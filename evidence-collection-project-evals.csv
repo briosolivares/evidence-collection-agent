@@ -1,0 +1,18 @@
+Task Query,Starting URL,Difficulty
+"Create a CSV of the top 5 stories on Hacker News: title, URL, points.",Blank Tab,Easy
+"Find and download the latest January 29, 2026 - 8-K report for Apple on the EDGAR site. Take a screenshot of the page that you downloaded ",Blank Tab,Easy
+What's the most recent PR on OpenClaw? What does it do?,Blank Tab,Easy
+"For Notion, Figma, and 8Sleep, take a screenshot of the website, as well as a screenshot of the most recent press/media/blog/content released by them to show the company is still alive",Blank Tab,Medium
+"From YC W24, pick 5 AI-focused companies. Create a csv with the founders name, LinkedIn URLs, and a personalized cold outreach email asking for a 15 min call.",https://www.ycombinator.com/companies,Medium
+"Go to the OpenClaw Repo, find the last 10 merged prs. Take a full page screenshot of each PR, and create a CSV of the PR #, who committed, who reviewed, and who merged the PR",https://github.com/openclaw/openclaw,Medium
+"Give me a CSV of all of Elon's tweets today, their number of likes, and time posted",https://x.com/home,Medium
+"Go to the OpenClaw Repo, find the 30 top contributors, and create a csv with their github, name, and linkedin URL",https://github.com/openclaw/openclaw,Medium
+Find the 275th reference in the ‘References’ section of this page. Clicking on it will cause the page to jump to the highlighted section for it in the ‘Sources’ section. Return the full text in the highlighted portion,https://en.wikipedia.org/wiki/World_War_II,Hard
+Look for airbnbs to Lake Tahoe for a one week stay next week. Look at the first 30 suggested places and tell me the places you looked at and a summary of it,airbnb.com,Hard
+"Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa
+
+For each of the above sororities at MIT above can you do the following
+1. identify the sorority website by googling 'sorority name MIT' and finding the sorority website 
+2. identifying the sisters page in the website
+3. identify the seniors (class of 2026) and juniors (class of 2027)
+4. adding their name + info to a google spreadsheet and filling out the relevant information (name, class, major, affiliation, interests, other)",https://www.google.com/,Hard
