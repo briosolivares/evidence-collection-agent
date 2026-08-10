@@ -1,0 +1,57 @@
+# Adjacent browser options
+
+This is a landscape for the design in `design-doc.md`, accessed 2026-08-10. “Fact” means documented by the project; “inference” is an architectural conclusion. Browserbase remains the managed-browser baseline; these options cover different layers and are not all substitutes.
+
+## Comparison
+
+### Raw Playwright — control library + local browser runtime
+
+**Fact.** Playwright is an Apache-2.0, cross-language automation library. It launches Chromium, Firefox, or WebKit and supports isolated contexts, `storageState` authentication reuse, screenshots, downloads, uploads, tracing, network interception, and parallel workers ([official docs](https://playwright.dev/docs/intro), [auth](https://playwright.dev/docs/auth), [downloads](https://playwright.dev/docs/downloads)). Browsers and OS dependencies run on our workers ([browser installation](https://playwright.dev/docs/browsers)).
+
+**Deployment/scale:** self-host in containers/VMs; horizontal scale is ours (queues, browser pools, patching, egress). **Auth:** excellent explicit context isolation and state files, but state files contain secrets and need encryption. **Artifacts/observability:** native screenshots/downloads, traces and HAR-like network evidence; retention/export are ours. **Anti-bot:** ordinary automation fingerprints; no managed CAPTCHA, residential proxy, or verified identity. **Pricing/license:** open source; infrastructure and proxy costs remain ours. **Best role:** reference implementation and fallback for client-controlled/VPC deployments. **Disqualifier:** operating thousands of browsers and anti-bot reliability becomes a substantial product. *Inference:* it is the best control benchmark, not the fastest route to broad portal coverage.
+
+### Vercel `agent-browser` — agent-oriented control CLI
+
+**Fact.** `agent-browser` is an Apache-2.0 Rust-native CLI for AI agents, using compact snapshots/refs and supporting sessions, state save/load, auth vault/encryption, screenshots, PDFs, downloads, uploads, and optional remote Browserless connections ([official repository](https://github.com/vercel-labs/agent-browser), [README](https://github.com/vercel-labs/agent-browser/blob/main/README.md)). It can launch local Chrome/Chrome-for-Testing or connect to a cloud session. **Deployment/scale:** local/container scale is our responsibility; Vercel’s optional Sandbox/remote integrations are separate. **Auth:** per-session storage plus encrypted state is unusually useful for an agent adapter. **Artifacts/observability:** CLI output, screenshots/PDFs and browser events; no vendor-grade audit recording by itself. **Anti-bot:** no first-party CAPTCHA/verified identity; remote Browserless may supply it. **Pricing/license:** Apache-2.0; pay for our runtime/cloud. **Best role:** token-efficient tool facade over Playwright/CDP in the existing loop. **Disqualifier:** fast-moving project and CLI abstraction may obscure low-level evidence/error handling; it is not a browser fleet. *Inference:* excellent POC control surface, with Playwright retained underneath for deterministic checks.
+
+### Stagehand — agent framework/control layer
+
+**Fact.** Stagehand is Browserbase’s open-source AI browser framework, exposing `act`, `observe`, and `extract` while retaining Playwright-level control; official TypeScript/Python/Ruby/Go repositories are public ([Stagehand repo](https://github.com/browserbase/stagehand), [docs](https://docs.stagehand.dev/)). It can run against Browserbase or local/other CDP browsers and supports model-provider configuration. **Deployment/scale:** browser runtime remains ours or Browserbase’s; Stagehand itself is a library. **Auth/artifacts:** inherits Playwright/browser-provider contexts, screenshots, downloads, and logs. **Anti-bot:** inherits runtime; Browserbase adds proxies/identity/CAPTCHA. **Observability:** Browserbase integration and Stagehand step outputs help debugging, but our evidence manifest remains necessary. **Pricing/license:** MIT code; model tokens and browser infrastructure cost extra. **Best role:** optional adaptive action/extraction tool for selector drift, behind strict schemas and deterministic assertions. **Disqualifier:** LLM-driven actions can reduce reproducibility and add token/latency cost. *Inference:* compare it as an agent-layer complement to Browserbase, not as an alternative browser backend.
+
+### Steel — managed or self-hosted browser API
+
+**Fact.** Steel is an open-source browser API providing cloud sessions controlled through Playwright/CDP, with a Docker self-host option ([site](https://steel.dev/), [session quickstart](https://docs.steel.dev/overview/sessions-api/quickstart), [GitHub](https://github.com/steel-dev/steel-browser)). Steel advertises built-in stealth, proxies, CAPTCHA solving, session persistence, and dedicated resources; verify each feature/plan in a POC. **Deployment/scale:** hosted sessions or customer-operated Docker; Enterprise advertises 1,000+ concurrent sessions and reserved pools. **Auth:** persistent sessions/cookies and reconnectable IDs. **Artifacts/observability:** browser-control artifacts and session tooling; validate download retrieval, recording export, and log retention against Browserbase’s richer documented APIs. **Anti-bot:** stronger posture than raw Playwright; claims are vendor statements, not universal success. **Pricing/license:** free usage tier; Scale $250/month plus usage; Enterprise custom, self-host code available. **Best role:** second managed-browser benchmark, especially when self-hosting/residency is decisive. **Disqualifier:** smaller ecosystem/less independently verifiable compliance and artifact semantics than Browserbase.
+
+### Browserless — managed/self-hosted browser infrastructure
+
+**Fact.** Browserless offers BaaS WebSocket connections for Puppeteer/Playwright, REST screenshot/PDF/download APIs, BrowserQL for stealth automation, CAPTCHA solving, proxies, MCP/agent integrations, and Docker/private-fleet deployment ([docs](https://docs.browserless.io/), [self-hosting](https://docs.browserless.io/enterprise/self-hosting), [sessions](https://docs.browserless.io/baas/session-management)). Long-lived sessions can persist state for days; TTL expiration permanently deletes them ([persistent state](https://docs.browserless.io/baas/session-management/persisting-state)). **Deployment/scale:** hosted cloud or private Docker fleet; queues/concurrency are configurable in enterprise. **Auth:** reconnectable/persistent sessions and ordinary Playwright storage state. **Artifacts/observability:** REST screenshots/PDFs/downloads, live debugging and logs; validate audit-grade recording and export. **Anti-bot:** BrowserQL includes fingerprint evasion, human simulation, stealth, and CAPTCHA; use only for authorized collection. **Pricing:** usage is units: browser time in 30-second increments, proxies by MB, CAPTCHA per attempt ([unit consumption](https://docs.browserless.io/overview/unit-consumption)); cloud pricing varies. **Best role:** direct Browserbase competitor and strongest self-host/private-fleet comparison. **Disqualifier:** unit economics can become opaque with residential proxy/CAPTCHA-heavy workflows.
+
+### Patchright — patched Playwright control library
+
+**Fact.** Patchright is a community-maintained Playwright fork/patch set intended to reduce automation detection; its canonical implementation and compatibility claims should be checked in its repository before adoption ([GitHub search/official project](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python), [Node project](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-nodejs)). It remains a local/self-hosted browser library rather than a managed service. **Deployment/scale:** our containers and fleet. **Auth/artifacts/observability:** largely Playwright-compatible—contexts, state, screenshots, downloads, traces—subject to fork compatibility. **Anti-bot:** patched fingerprints are the core posture; no managed proxy, CAPTCHA, compliance, or success guarantee. **Pricing/license:** open-source repository licensing must be reviewed/version-pinned. **Best role:** controlled experiment for portals that reject stock Playwright, compared against raw Playwright. **Disqualifier:** fork lag, unclear maintenance/security provenance, and detection arms-race risk are poor fits for audit infrastructure. *Inference:* do not make it the default; use only as an isolated benchmark.
+
+## Fit and shortlist
+
+For the evidence agent, the layers compose as follows: Browserbase/Browserless/Steel supply remote browser fleets; Playwright or agent-browser supplies deterministic controls; Stagehand supplies optional adaptive AI actions; Patchright is a specialized local runtime. None supplies the whole product loop, CSV/natural-language evidence schema, semantic accuracy oracle, or durable audit store.
+
+Recommended POC alongside Browserbase, Camoufox, browser-use, and Ego Lite:
+
+1. **Raw Playwright** as the control/residency baseline: same workflows, explicit artifacts, known costs.
+2. **Browserless** as managed/private-fleet comparator: test long-lived auth, self-hosting, BrowserQL stealth, and unit economics.
+3. **Vercel agent-browser + Playwright** as the agent-tooling comparator: test token use, snapshot robustness, encrypted state, and whether its CLI can preserve our evidence/provenance contract.
+
+Keep Stagehand as a within-Browserbase branch, Steel as a secondary managed-browser bakeoff if self-hosting is important, and Patchright as a narrowly scoped anti-bot experiment. Acceptance should use the same synthetic Workday/GitHub/Jira-like tasks, 100 repeated samples, MFA handoff, screenshot/PDF/CSV hashing, cross-session leakage tests, p95 latency, 25/100-session load, and documented PII retention/deletion answers.
+
+The comparison should score not only successful navigation but evidence quality: can an independent reviewer replay the exact action, identify the source page and timestamp, verify that the downloaded bytes match the cited record, and determine which credentials, cookies, proxy, model, and browser version were involved? Candidates that win on anti-bot rate but cannot export this provenance should remain experimental. Conversely, a slower private deployment may be preferable for regulated clients if it makes residency, deletion, and network allowlisting auditable.
+
+## Sources
+
+| Title | Publisher | Accessed | URL |
+|---|---|---:|---|
+| Playwright docs | Microsoft/Playwright | 2026-08-10 | [playwright.dev](https://playwright.dev/docs/intro) |
+| agent-browser repository | Vercel Labs | 2026-08-10 | [GitHub](https://github.com/vercel-labs/agent-browser) |
+| Stagehand repository/docs | Browserbase | 2026-08-10 | [GitHub](https://github.com/browserbase/stagehand), [docs](https://docs.stagehand.dev/) |
+| Steel site/docs/repository | Steel / Nen Labs | 2026-08-10 | [site](https://steel.dev/), [docs](https://docs.steel.dev/overview/sessions-api/quickstart), [GitHub](https://github.com/steel-dev/steel-browser) |
+| Browserless docs | Browserless | 2026-08-10 | [docs](https://docs.browserless.io/) |
+| Browserless unit consumption | Browserless | 2026-08-10 | [units](https://docs.browserless.io/overview/unit-consumption) |
+| Patchright Python/Node repositories | Community maintainers | 2026-08-10 | [Python](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-python), [Node](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright-nodejs) |
