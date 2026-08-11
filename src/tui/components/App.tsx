@@ -17,7 +17,7 @@ import {
   routeInput,
   unknownCommandNotice,
 } from '../store/reducer.js';
-import type { UiEvent } from '../store/state.js';
+import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
@@ -29,6 +29,10 @@ interface AppProps {
   config: SherlockConfig;
   /** False renders the missing-API-key warning banner. */
   apiKeyPresent: boolean;
+  /** Who/where the welcome card greets ({name, model, cwd}); computed in
+   * main.tsx. Optional — absent (bare test renders) the card falls back
+   * to its generic, deterministic form. */
+  identity?: BannerIdentity;
   /** Play the canned demo investigation on mount (`--demo`). */
   demo?: boolean;
   /** Starts a real agent run (wired to the runtime by main.tsx); absent
@@ -47,11 +51,18 @@ interface AppProps {
  * run is active, overlays for /runs and /evals, slash routing, and the
  * persistent composer.
  */
-export function App({ config, apiKeyPresent, demo = false, runner, onExit }: AppProps) {
+export function App({
+  config,
+  apiKeyPresent,
+  identity,
+  demo = false,
+  runner,
+  onExit,
+}: AppProps) {
   const { exit } = useApp();
   const [state, dispatch] = useReducer(
     reduce,
-    { apiKeyPresent, completionVerb: config.completionVerb },
+    { apiKeyPresent, completionVerb: config.completionVerb, identity },
     createInitialState,
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);

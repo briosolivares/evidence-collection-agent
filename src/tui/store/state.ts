@@ -12,6 +12,21 @@ export type SessionMode =
   | 'evalsMenu'
   | 'evalsRunning';
 
+/**
+ * Who and where the startup welcome card greets. Computed at the edge
+ * (main.tsx: git config / os / DEFAULT_MODEL) and injected — never inside
+ * the reducer, which stays pure. Absent → the card renders its generic
+ * fallback (no name, no footer), keeping bare test renders deterministic.
+ */
+export interface BannerIdentity {
+  /** First name for the `Welcome back {name}!` line. */
+  name: string;
+  /** Model id shown in the card footer. */
+  model: string;
+  /** Working directory (home shortened to `~`) shown in the footer. */
+  cwd: string;
+}
+
 /** One artifact row of the /runs detail view (from manifest.json). */
 export interface ManifestArtifactView {
   filename: string;
@@ -49,7 +64,7 @@ export interface AssertionView {
  * anything still changing lives in LiveRunState instead.
  */
 export type TranscriptItemBody =
-  | { kind: 'banner'; apiKeyPresent: boolean }
+  | { kind: 'banner'; apiKeyPresent: boolean; identity?: BannerIdentity }
   | { kind: 'user_task'; text: string }
   | { kind: 'agent_text'; text: string }
   | {

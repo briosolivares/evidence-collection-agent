@@ -1,13 +1,43 @@
 // Sherlock entry point: env load, preflight, persistent-browser launch,
 // render(<App/>), teardown.
 import { render } from 'ink';
+import { execFileSync } from 'node:child_process';
+import { homedir, userInfo } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { launchPersistentChrome } from '../browser/playwrightAdapter.js';
+// Read-only import of the core's default model id for the welcome card —
+// the sanctioned touch-point; the core itself stays untouched.
+import { DEFAULT_MODEL } from '../model/callModel.js';
 import { createTuiRuntime } from './bridge/runtime.js';
 import { App } from './components/App.js';
 import { createConfig } from './config.js';
+import type { BannerIdentity } from './store/state.js';
+
+/** First word of `git config user.name`, else the OS username
+ * capitalized — the name the welcome card greets. */
+function detectFirstName(): string {
+  try {
+    const configured = execFileSync('git', ['config', 'user.name'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    const first = configured.split(/\s+/)[0];
+    if (first !== undefined && first !== '') return first;
+  } catch {
+    // No git, or no configured name — fall back to the OS username.
+  }
+  const { username } = userInfo();
+  return username.charAt(0).toUpperCase() + username.slice(1);
+}
+
+/** The working directory with the home prefix shortened to `~`. */
+function shortenedCwd(): string {
+  const cwd = process.cwd();
+  const home = homedir();
+  return home !== '' && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd;
+}
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -36,6 +66,14 @@ if (!process.stdin.isTTY || !process.stdout.isTTY) {
   process.exit(1);
 }
 
+// Welcome-card identity, computed here at the edge (the reducer stays
+// pure — it only ever sees these as injected values).
+const identity: BannerIdentity = {
+  name: detectFirstName(),
+  model: DEFAULT_MODEL,
+  cwd: shortenedCwd(),
+};
+
 const demo = process.argv.includes('--demo');
 const config = createConfig({
   verbose: process.argv.includes('--verbose'),
@@ -61,6 +99,7 @@ try {
     <App
       config={config}
       apiKeyPresent={Boolean(process.env.ANTHROPIC_API_KEY)}
+      identity={identity}
       demo={demo}
       runner={
         runtime === undefined

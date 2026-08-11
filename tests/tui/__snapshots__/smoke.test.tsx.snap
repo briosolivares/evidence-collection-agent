@@ -1,7 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`smoke: full scripted-run rendering contract > locks the frame at narrow width (44 columns) 1`] = `
-"✻ Sherlock — evidence collection agent
+"╭─ Sherlock — evidence collection agent ─╮
+│             Welcome back!              │
+│                                        │
+│                 ╭───╮                  │
+│                ╭╯   ╰╮                 │
+│                │  ◆  │                 │
+│                ╰╮   ╭╯                 │
+│                 ╰───╯╲                 │
+│                       ╲                │
+╰────────────────────────────────────────╯
 
 
 ▸ Find Acme Corp's Series B investors and
@@ -46,7 +55,16 @@ ries-b_demo
 `;
 
 exports[`smoke: full scripted-run rendering contract > locks the frame at normal width (80 columns) 1`] = `
-"✻ Sherlock — evidence collection agent
+"╭─ Sherlock — evidence collection agent ───────────────────────╮
+│                        Welcome back!                         │
+│                                                              │
+│                            ╭───╮                             │
+│                           ╭╯   ╰╮                            │
+│                           │  ◆  │                            │
+│                           ╰╮   ╭╯                            │
+│                            ╰───╯╲                            │
+│                                  ╲                           │
+╰──────────────────────────────────────────────────────────────╯
 
 
 ▸ Find Acme Corp's Series B investors and save them to a CSV
@@ -80,7 +98,16 @@ saved in investors.csv.
 `;
 
 exports[`smoke: full scripted-run rendering contract > locks the waiting composer state 1`] = `
-"✻ Sherlock — evidence collection agent
+"╭─ Sherlock — evidence collection agent ───────────────────────╮
+│                        Welcome back!                         │
+│                                                              │
+│                            ╭───╮                             │
+│                           ╭╯   ╰╮                            │
+│                           │  ◆  │                            │
+│                           ╰╮   ╭╯                            │
+│                            ╰───╯╲                            │
+│                                  ╲                           │
+╰──────────────────────────────────────────────────────────────╯
 
 
 ▸ Find Acme Corp's Series B investors and save them to a CSV

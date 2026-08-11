@@ -3,6 +3,7 @@ import { Box, Text } from 'ink';
 import { formatDuration, formatTokens } from '../format.js';
 import type { TranscriptItem } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
+import { WelcomeCard } from './WelcomeCard.js';
 
 /**
  * Render one finalized transcript item. Items are immutable by the time
@@ -18,21 +19,7 @@ export function TranscriptItemView({
 }) {
   switch (item.kind) {
     case 'banner':
-      return (
-        <Box flexDirection="column" marginBottom={1}>
-          <Box>
-            <Text color={theme.primary} bold>
-              {`${glyphs.spinnerFrames[2]} Sherlock`}
-            </Text>
-            <Text color={theme.muted}> — evidence collection agent</Text>
-          </Box>
-          {!item.apiKeyPresent && (
-            <Text color={theme.error}>
-              {`${glyphs.retried} ANTHROPIC_API_KEY is not set — investigations will fail until it is configured.`}
-            </Text>
-          )}
-        </Box>
-      );
+      return <WelcomeCard apiKeyPresent={item.apiKeyPresent} identity={item.identity} />;
     case 'user_task':
       return (
         <Box marginTop={1}>

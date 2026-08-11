@@ -42,6 +42,19 @@ export function formatBytes(bytes: number): string {
 }
 
 /**
+ * Truncate text to maxLength characters by replacing the middle with a
+ * single `…`, keeping the start and the end (`~/Desk…nt-agent`). For
+ * paths, whose head and tail both matter.
+ */
+export function middleTruncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  if (maxLength <= 1) return '…';
+  const head = Math.ceil((maxLength - 1) / 2);
+  const tail = maxLength - 1 - head;
+  return `${text.slice(0, head)}…${text.slice(text.length - tail)}`;
+}
+
+/**
  * Format how long ago a moment was, compactly: `just now`, `5m ago`,
  * `3h ago`, `2d ago`.
  */

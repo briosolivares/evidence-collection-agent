@@ -14,6 +14,7 @@ import { findCommand, SLASH_COMMANDS, type CommandKind } from './commands.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
   AssertionView,
+  BannerIdentity,
   LiveRunState,
   SessionState,
   TranscriptItemBody,
@@ -98,14 +99,25 @@ export function unknownCommandNotice(command: string): string {
   return `Hmm, ${command} isn't a command I know — /help lists the available ones.`;
 }
 
-/** Fresh session state; the banner is the first transcript item. */
+/** Fresh session state; the banner (welcome card) is the first transcript
+ * item. `identity` arrives precomputed — the reducer never touches
+ * process/git itself. */
 export function createInitialState(
-  options: { apiKeyPresent?: boolean; completionVerb?: string } = {},
+  options: {
+    apiKeyPresent?: boolean;
+    completionVerb?: string;
+    identity?: BannerIdentity | undefined;
+  } = {},
 ): SessionState {
   return {
     mode: 'idle',
     transcript: [
-      { id: 0, kind: 'banner', apiKeyPresent: options.apiKeyPresent ?? true },
+      {
+        id: 0,
+        kind: 'banner',
+        apiKeyPresent: options.apiKeyPresent ?? true,
+        ...(options.identity === undefined ? {} : { identity: options.identity }),
+      },
     ],
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',

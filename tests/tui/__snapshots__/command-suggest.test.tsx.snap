@@ -15,7 +15,16 @@ exports[`CommandSuggestions rendering contract > renders with zero overflow at 4
 `;
 
 exports[`slash-command autosuggest panel (R1) > locks the open panel frame (all commands, /help selected) 1`] = `
-"✻ Sherlock — evidence collection agent
+"╭─ Sherlock — evidence collection agent ───────────────────────╮
+│                        Welcome back!                         │
+│                                                              │
+│                            ╭───╮                             │
+│                           ╭╯   ╰╮                            │
+│                           │  ◆  │                            │
+│                           ╰╮   ╭╯                            │
+│                            ╰───╯╲                            │
+│                                  ╲                           │
+╰──────────────────────────────────────────────────────────────╯
 
 
 › /help   Show this list
