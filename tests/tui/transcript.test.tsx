@@ -28,6 +28,46 @@ describe('Transcript', () => {
     unmount();
   });
 
+  it('hides raw input/result detail by default and shows it in verbose mode', async () => {
+    const activityItems = items({
+      kind: 'activity',
+      line: 'Searching files for "Q3"',
+      status: 'ok',
+      verbose: { input: '{"pattern":"Q3"}', result: 'notes.md:4: Q3 revenue' },
+    });
+
+    const plain = render(<Transcript items={activityItems} />);
+    await tick();
+    const plainOutput = plain.frames.join('\n');
+    expect(plainOutput).toContain('Searching files for "Q3"');
+    expect(plainOutput).not.toContain('{"pattern":"Q3"}');
+    plain.unmount();
+
+    const verbose = render(<Transcript items={activityItems} verbose={true} />);
+    await tick();
+    const verboseOutput = verbose.frames.join('\n');
+    expect(verboseOutput).toContain('input: {"pattern":"Q3"}');
+    expect(verboseOutput).toContain('result: notes.md:4: Q3 revenue');
+    verbose.unmount();
+  });
+
+  it('renders evidence items with their source line', async () => {
+    const { frames, unmount } = render(
+      <Transcript
+        items={items({
+          kind: 'evidence',
+          line: 'Evidence saved → top5.csv',
+          sourceUrl: 'https://news.ycombinator.com/',
+        })}
+      />,
+    );
+    await tick();
+    const output = frames.join('\n');
+    expect(output).toContain('◆ Evidence saved → top5.csv');
+    expect(output).toContain('source: https://news.ycombinator.com/');
+    unmount();
+  });
+
   it('keeps earlier items visible as later items append (persistence)', async () => {
     const first = items({ kind: 'user_task', text: 'first investigation' });
     const { frames, rerender, unmount } = render(<Transcript items={first} />);

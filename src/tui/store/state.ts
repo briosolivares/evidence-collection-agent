@@ -124,7 +124,15 @@ export type UiEvent =
   | { type: 'text_delta'; text: string }
   | { type: 'tool_pending'; name: string }
   | { type: 'tool_exec_start'; id: number; name: string; input: unknown }
-  | { type: 'tool_exec_end'; id: number; ok: boolean; result?: unknown; error?: string }
+  | {
+      type: 'tool_exec_end';
+      id: number;
+      ok: boolean;
+      result?: unknown;
+      error?: string;
+      /** Manifest-recorded source URL, for evidence artifacts. */
+      sourceUrl?: string;
+    }
   | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
   | {
       type: 'run_finished';

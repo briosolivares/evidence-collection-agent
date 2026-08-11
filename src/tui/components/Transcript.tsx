@@ -8,10 +8,17 @@ import { TranscriptItemView } from './TranscriptItem.js';
  * flow into terminal scrollback; only new items are ever painted (R2).
  * Every item must therefore be final before it is appended.
  */
-export function Transcript({ items }: { items: readonly TranscriptItem[] }) {
+export function Transcript({
+  items,
+  verbose = false,
+}: {
+  items: readonly TranscriptItem[];
+  /** Render dim input/result detail under activity/evidence lines. */
+  verbose?: boolean;
+}) {
   return (
     <Static items={items as TranscriptItem[]}>
-      {(item) => <TranscriptItemView key={item.id} item={item} />}
+      {(item) => <TranscriptItemView key={item.id} item={item} verbose={verbose} />}
     </Static>
   );
 }

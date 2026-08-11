@@ -28,6 +28,7 @@ import {
   type ModelStreamEvent,
 } from '../../model/streamAssembly.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
+import { createTuiTracing } from './tuiTracing.js';
 import { actionTools } from '../../tools/actionTools.js';
 import { evidenceTools } from '../../tools/evidenceTools.js';
 import { fileTools } from '../../tools/fileTools.js';
@@ -65,8 +66,9 @@ export interface RunSessionDeps {
   maxTurns?: number;
   maxTokens?: number;
   startUrl?: string;
-  /** Run-scoped tracing (step 6's tuiTracing); runTask defaults otherwise. */
-  tracing?: RunTracing;
+  /** Tracing the TUI's adapter delegates to; defaults to the core's
+   * createRunTracing() so Langfuse observability is preserved. */
+  tracingDelegate?: RunTracing;
   /** Test seam: replaces the core runTask. */
   runTaskFn?: (taskText: string, config: RunTaskConfig) => Promise<RunTaskResult>;
   /** Test seam: produces one model response's raw event stream. The
@@ -164,17 +166,24 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
 
   emit({ type: 'run_started', task, at: now() });
 
+  // The tracing seam gives the TUI tool inputs/results and the runDir
+  // mid-run, while delegating spans to the real tracing (Langfuse).
+  const tracing = createTuiTracing({
+    onEvent: emit,
+    ...(deps.tracingDelegate === undefined ? {} : { delegate: deps.tracingDelegate }),
+  });
+
   const done: Promise<RunOutcome> = (async () => {
     try {
       const result = await runTaskFn(task, {
         browser: deps.browser,
         callModel,
+        tracing,
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
         ...(deps.maxTokens === undefined ? {} : { maxTokens: deps.maxTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
-        ...(deps.tracing === undefined ? {} : { tracing: deps.tracing }),
       });
       if (result.status === 'completed') {
         emit({

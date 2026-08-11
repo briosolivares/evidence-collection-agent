@@ -31,7 +31,8 @@ describe('the --demo scripted event source', () => {
     const output = frames.join('\n');
     expect(output).toContain('✓ Brewed in 42s · 18.7k tokens');
     expect(output).toContain('▸ Find Acme Corp');
-    expect(output).toContain('navigate');
+    expect(output).toContain('● Opening techcrunch.com/');
+    expect(output).toContain('◆ Evidence saved → investors.csv');
     unmount();
   });
 

@@ -7,8 +7,15 @@ import { glyphs, theme } from '../theme.js';
 /**
  * Render one finalized transcript item. Items are immutable by the time
  * they reach <Static>, so this component renders each exactly once.
+ * Raw input/result detail renders only in verbose mode (R5).
  */
-export function TranscriptItemView({ item }: { item: TranscriptItem }) {
+export function TranscriptItemView({
+  item,
+  verbose = false,
+}: {
+  item: TranscriptItem;
+  verbose?: boolean;
+}) {
   switch (item.kind) {
     case 'banner':
       return (
@@ -47,7 +54,7 @@ export function TranscriptItemView({ item }: { item: TranscriptItem }) {
             <Text>{item.line}</Text>
             <Text color={statusColor(item.status)}>{`  ${statusGlyph(item.status)}`}</Text>
           </Box>
-          {item.verbose !== undefined && <VerboseDetail verbose={item.verbose} />}
+          {verbose && item.verbose !== undefined && <VerboseDetail verbose={item.verbose} />}
         </Box>
       );
     case 'evidence':
@@ -60,7 +67,7 @@ export function TranscriptItemView({ item }: { item: TranscriptItem }) {
           {item.sourceUrl !== undefined && (
             <Text color={theme.muted}>{`  ${glyphs.source} source: ${item.sourceUrl}`}</Text>
           )}
-          {item.verbose !== undefined && <VerboseDetail verbose={item.verbose} />}
+          {verbose && item.verbose !== undefined && <VerboseDetail verbose={item.verbose} />}
         </Box>
       );
     case 'completion':

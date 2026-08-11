@@ -10,12 +10,26 @@
 //   turn_start, or at run end.
 
 import { formatDuration, formatTokens } from '../format.js';
+import { deriveSemanticLine } from './semantic.js';
 import type {
   LiveRunState,
   SessionState,
   TranscriptItemBody,
   UiEvent,
 } from './state.js';
+
+const VERBOSE_MAX = 400;
+
+/** Compact any value into a one-line verbose detail string. */
+function compactDetail(value: unknown): string {
+  let text: string;
+  try {
+    text = typeof value === 'string' ? value : JSON.stringify(value) ?? 'undefined';
+  } catch {
+    text = String(value);
+  }
+  return text.length > VERBOSE_MAX ? `${text.slice(0, VERBOSE_MAX - 1)}…` : text;
+}
 
 /** UI-originated actions (composer submits, slash-command output, Esc). */
 export type UiAction =
@@ -206,6 +220,14 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       if (state.live === undefined) return state;
       const next = finalizeStreamingText(state);
       const live = next.live!;
+      const semantic = deriveSemanticLine(action.name, action.input);
+      const upgraded = {
+        name: action.name,
+        execId: action.id,
+        line: semantic.line,
+        isEvidence: semantic.isEvidence,
+        verbose: { input: compactDetail(action.input), result: '' },
+      };
       const waiting = live.pendingTools.find(
         (pending) => pending.execId === undefined && pending.name === action.name,
       );
@@ -217,23 +239,18 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
             nextPendingId: live.nextPendingId + 1,
             pendingTools: [
               ...live.pendingTools,
-              {
-                id: live.nextPendingId,
-                name: action.name,
-                execId: action.id,
-                line: action.name,
-                isEvidence: false,
-              },
+              { id: live.nextPendingId, ...upgraded },
             ],
           },
         };
       }
+      // The stream announced this tool by name; upgrade its line in place.
       return {
         ...next,
         live: {
           ...live,
           pendingTools: live.pendingTools.map((pending) =>
-            pending === waiting ? { ...pending, execId: action.id } : pending,
+            pending === waiting ? { ...pending, ...upgraded } : pending,
           ),
         },
       };
@@ -247,18 +264,27 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       );
       if (finished === undefined) return state;
       const remaining = live.pendingTools.filter((pending) => pending !== finished);
+      const verbose =
+        finished.verbose === undefined
+          ? undefined
+          : {
+              input: finished.verbose.input,
+              result: action.ok
+                ? compactDetail(action.result)
+                : compactDetail(action.error ?? 'error'),
+            };
       const withItem = finished.isEvidence && action.ok
         ? append(state, {
             kind: 'evidence',
             line: finished.line,
-            ...(finished.sourceUrl !== undefined ? { sourceUrl: finished.sourceUrl } : {}),
-            ...(finished.verbose !== undefined ? { verbose: finished.verbose } : {}),
+            ...(action.sourceUrl !== undefined ? { sourceUrl: action.sourceUrl } : {}),
+            ...(verbose !== undefined ? { verbose } : {}),
           })
         : append(state, {
             kind: 'activity',
             line: finished.line,
             status: action.ok ? 'ok' : 'error',
-            ...(finished.verbose !== undefined ? { verbose: finished.verbose } : {}),
+            ...(verbose !== undefined ? { verbose } : {}),
           });
       return { ...withItem, live: { ...live, pendingTools: remaining } };
     }

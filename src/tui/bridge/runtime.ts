@@ -18,7 +18,7 @@ export interface TuiRuntimeDeps {
   /** Test seam: replaces the run-session bridge. */
   startRunFn?: (task: string, deps: RunSessionDeps) => RunHandle;
   /** Extra per-run configuration forwarded to the bridge. */
-  runConfig?: Pick<RunSessionDeps, 'model' | 'maxTurns' | 'maxTokens' | 'tracing'>;
+  runConfig?: Pick<RunSessionDeps, 'model' | 'maxTurns' | 'maxTokens' | 'tracingDelegate'>;
 }
 
 /** The session runtime the App drives runs through. */

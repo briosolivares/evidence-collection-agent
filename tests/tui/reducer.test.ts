@@ -369,3 +369,87 @@ describe('reduce (cancellation)', () => {
     });
   });
 });
+
+// ————— Step 6: semantic upgrades and evidence —————
+
+describe('reduce (semantic activity + evidence)', () => {
+  it('upgrades a name-only pending line in place when exec starts', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      { type: 'tool_pending', name: 'navigate' },
+      {
+        type: 'tool_exec_start',
+        id: 1,
+        name: 'navigate',
+        input: { url: 'https://www.sec.gov/cgi-bin/browse-edgar' },
+      },
+    ]);
+    expect(state.live?.pendingTools).toHaveLength(1);
+    expect(state.live?.pendingTools[0]).toMatchObject({
+      execId: 1,
+      line: 'Opening sec.gov/cgi-bin/browse-edgar',
+      isEvidence: false,
+    });
+  });
+
+  it('finalizes evidence tools as evidence items carrying the source URL', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      { type: 'tool_pending', name: 'write_file' },
+      {
+        type: 'tool_exec_start',
+        id: 1,
+        name: 'write_file',
+        input: { file_path: 'top5.csv', content: 'a,b' },
+      },
+      {
+        type: 'tool_exec_end',
+        id: 1,
+        ok: true,
+        result: 'Created top5.csv',
+        sourceUrl: 'https://news.ycombinator.com/',
+      },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'evidence',
+      line: 'Evidence saved → top5.csv',
+      sourceUrl: 'https://news.ycombinator.com/',
+    });
+  });
+
+  it('a failed evidence tool finalizes as an error activity, not evidence', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      {
+        type: 'tool_exec_start',
+        id: 1,
+        name: 'screenshot',
+        input: { filename: 'page.png' },
+      },
+      { type: 'tool_exec_end', id: 1, ok: false, error: 'no browser' },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'activity',
+      status: 'error',
+      line: 'Captured page.png',
+    });
+  });
+
+  it('stores compact verbose input/result detail on finalized lines', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      { type: 'tool_exec_start', id: 1, name: 'grep', input: { pattern: 'Q3' } },
+      { type: 'tool_exec_end', id: 1, ok: true, result: 'notes.md:4: Q3 revenue' },
+    ]);
+    const item = state.transcript.at(-1);
+    expect(item).toMatchObject({ kind: 'activity', status: 'ok' });
+    expect((item as { verbose?: { input: string; result: string } }).verbose).toEqual({
+      input: '{"pattern":"Q3"}',
+      result: 'notes.md:4: Q3 revenue',
+    });
+  });
+});

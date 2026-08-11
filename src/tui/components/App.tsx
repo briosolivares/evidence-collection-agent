@@ -86,7 +86,7 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
 
   return (
     <Box flexDirection="column">
-      <Transcript items={state.transcript} />
+      <Transcript items={state.transcript} verbose={config.verbose} />
       {running && state.live !== undefined && (
         <LiveRegion
           config={config}

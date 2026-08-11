@@ -82,3 +82,17 @@ Verification evidence:
 - `S5-H1` (human-judged) — agent-performed real-run verification via PTY (/tmp/sherlock-cancel.out): started a real HN-scrape task, pressed Esc at ~12 s → status flipped to "✽ Wrapping up…" within a frame, transcript kept the task line and got `✗ Interrupted after 12s · 467 tokens`; immediately typed a second task in the same session → `✓ Brewed in 12s · 1.1k tokens` with title.txt = "Example Domain" on disk. Cancelled run dir `runs/2026-08-11T09-38-30-442Z-723820684f7b`: manifest.json finalized (finishedAt set), metrics.json absent — the design's "stopped, not crashed" contract.
 
 Statuses flipped: S5-F1…S5-F8 → pass.
+
+## 2026-08-11 02:52 PDT — Step 6 complete: semantic activity, evidence lines, verbose mode
+
+- New: `src/tui/store/semantic.ts` — pure ten-tool derivation table (navigate→Opening <short url>, inspect_page→Reading the page, click/type/scroll/grep/read_file, screenshot/download/write_file as evidence) with truncation, URL shortening, graceful degradation on missing/malformed input, and bare-name fallback for unknown tools.
+- New: `src/tui/bridge/tuiTracing.ts` — RunTracing whose wrapRegistry emits tool_exec_start (validated input) / tool_exec_end (ok+result or error, rethrown) with monotonic exec ids, captures ctx.runDir on first execution (one-shot run_dir event), attaches manifest-recorded sourceUrl for evidence tools (best-effort read, never breaks a run), and DELEGATES wrapCallModel/wrapRegistry/traceRun/flush/close to the composed delegate (default createRunTracing() → Langfuse preserved). Wrapper composes outside the delegate's wrapped registry.
+- runSession now always passes tuiTracing into runTask (config.tracing); `tracingDelegate` is the injection seam. Reducer: tool_exec_start upgrades name-only pending lines in place (semantic line + isEvidence + verbose input); tool_exec_end finalizes as ◆ evidence (with sourceUrl) or ●/✗ activity, storing compact verbose input/result. Transcript/TranscriptItemView gained a `verbose` flag (App passes config.verbose) — raw JSON hidden by default. Demo exec events now carry small results so --verbose reads sensibly.
+- run-session ordering test updated: exec events (run_dir → tool_exec_start/end) now appear between turn boundaries, run_dir matches the final runDir.
+
+Verification evidence:
+
+- `S6-V1`…`S6-V6` all exit 0 — semantic table (10 mappings + 3-evidence classification + truncation/URL/degradation cases), tui-tracing (validated input, error rethrow, runDir once, manifest sourceUrl, full delegation), reducer upgrades, transcript verbose on/off, typecheck. 13 files / 110 TUI tests green.
+- `S6-H1` (human-judged) — agent-judged from a real PTY run (/tmp/sherlock-semantic.out): task "save top 3 HN titles to top3.csv" rendered navigation → investigation → evidence → conclusion: `● navigate…` upgraded in place to `● Opening news.ycombinator.com…` then `✓`; `● Reading the page ✓`; `◆ Evidence saved → top3.csv` (bright); `● Re-reading top3.csv ✓`; `✓ Brewed in 15s · 56.9k tokens`. No ⚠ retried artifacts remain. top3.csv on disk has exactly `rank,title` + 3 rows. `--demo --verbose` PTY capture shows dim indented `input:`/`result:` detail under each line; default mode omits it.
+
+Statuses flipped: S6-F1…S6-F9 → pass.

@@ -110,10 +110,15 @@ describe('startRun (RunSession bridge)', () => {
       'turn_start:1',
       'tool_pending',
       'turn_end',
+      'run_dir',
+      'tool_exec_start',
+      'tool_exec_end',
       'turn_start:2',
       'turn_end',
       'run_finished',
     ]);
+    const runDirEvent = events.find((event) => event.type === 'run_dir');
+    expect(runDirEvent).toMatchObject({ runDir: outcome.runDir });
 
     // tool_pending arrives after turn 1's prose and before its turn_end.
     const pendingIndex = events.findIndex((event) => event.type === 'tool_pending');
