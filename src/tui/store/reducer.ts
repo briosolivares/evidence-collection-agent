@@ -10,6 +10,7 @@
 //   turn_start, or at run end.
 
 import { formatDuration, formatTokens } from '../format.js';
+import { findCommand, SLASH_COMMANDS, type CommandKind } from './commands.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
   AssertionView,
@@ -75,13 +76,11 @@ export type RoutedInput =
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
 
-/** The /help transcript block: commands and keys (R10). */
+/** The /help transcript block: commands and keys (R10), driven by the
+ * single SLASH_COMMANDS registry (R1). */
 export const HELP_TEXT = [
   'Commands',
-  '  /help   Show this list',
-  '  /runs   Browse past run directories',
-  '  /evals  Run eval tasks',
-  '  /exit   Quit Sherlock',
+  ...SLASH_COMMANDS.map((entry) => `  ${entry.name.padEnd(8)}${entry.description}`),
   'Keys',
   '  Esc     Cancel the current run',
   '  Ctrl+C  Quit',
@@ -89,24 +88,17 @@ export const HELP_TEXT = [
 
 /**
  * Route one submitted composer line: `/`-prefixed lines are commands
- * (known or unknown), everything else is a task.
+ * (known — per the SLASH_COMMANDS registry — or unknown), everything
+ * else is a task.
  */
 export function routeInput(text: string): RoutedInput {
   const trimmed = text.trim();
   if (!trimmed.startsWith('/')) return { kind: 'task', text: trimmed };
   const command = trimmed.split(/\s+/, 1)[0]!;
-  switch (command) {
-    case '/help':
-      return { kind: 'help' };
-    case '/runs':
-      return { kind: 'runs' };
-    case '/evals':
-      return { kind: 'evals' };
-    case '/exit':
-      return { kind: 'exit' };
-    default:
-      return { kind: 'unknown', command };
-  }
+  const known = findCommand(command);
+  if (known === undefined) return { kind: 'unknown', command };
+  // Registry names are `/${kind}` by construction, so the slice is safe.
+  return { kind: known.name.slice(1) as CommandKind };
 }
 
 /** The gentle notice an unknown command produces. */

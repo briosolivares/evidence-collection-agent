@@ -1,5 +1,3 @@
-import { EventEmitter } from 'node:events';
-import { render as inkRender } from 'ink';
 import { Box } from 'ink';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
@@ -8,44 +6,7 @@ import { Composer } from '../../src/tui/components/Composer.js';
 import { Transcript } from '../../src/tui/components/Transcript.js';
 import { createDemoScript } from '../../src/tui/demo.js';
 import { createInitialState, reduce } from '../../src/tui/store/reducer.js';
-import { tick } from './helpers.js';
-
-// A width-controllable render harness (ink-testing-library fixes the
-// terminal at 100 columns; the rendering contract must hold on narrow
-// terminals too). Ink's debug mode writes complete frames.
-function renderAt(width: number, tree: ReactElement) {
-  const frames: string[] = [];
-  const stdout = Object.assign(new EventEmitter(), {
-    columns: width,
-    rows: 40,
-    isTTY: true,
-    write: (data: string) => {
-      frames.push(data);
-      return true;
-    },
-  });
-  const stdin = Object.assign(new EventEmitter(), {
-    isTTY: true,
-    setRawMode: () => {},
-    setEncoding: () => {},
-    read: () => null,
-    unref: () => {},
-    ref: () => {},
-    resume: () => {},
-    pause: () => {},
-  });
-  const instance = inkRender(tree, {
-    stdout: stdout as unknown as NodeJS.WriteStream,
-    stdin: stdin as unknown as NodeJS.ReadStream,
-    debug: true,
-    exitOnCtrlC: false,
-    patchConsole: false,
-  });
-  return {
-    lastFrame: () => frames.at(-1) ?? '',
-    unmount: () => instance.unmount(),
-  };
-}
+import { renderAt, tick } from './helpers.js';
 
 // The full scripted run, folded through the real reducer — the exact
 // pipeline --demo drives.

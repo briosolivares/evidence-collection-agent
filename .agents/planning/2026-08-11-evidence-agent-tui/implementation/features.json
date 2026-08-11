@@ -670,7 +670,7 @@
       "verification": [
         "R1-V1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R1-F2",
@@ -679,7 +679,7 @@
       "verification": [
         "R1-V2"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R1-F3",
@@ -689,7 +689,7 @@
         "R1-V2",
         "R1-V3"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R1-H1",
@@ -698,7 +698,7 @@
       "verification": [
         "R1-H1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R2-F1",
