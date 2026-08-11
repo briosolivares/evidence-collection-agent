@@ -6,15 +6,17 @@
  * This file is the harness's composition root and only printing edge; all
  * logic lives in the modules it wires together.
  */
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
+import { formatProgressEvent } from '../src/cli/replFormat.js';
+import { runTask } from '../src/cli/runTask.js';
 import { parseEvalArgs } from './cliArgs.js';
-import { makeFakeRunTask } from './fakeAgent.js';
 import { loadEvalTask } from './loadTask.js';
 import { formatReport, writeResults } from './report.js';
 import { runEvals } from './runner.js';
-import type { EvalTask } from './types.js';
+import type { EvalTask, RunTaskFn } from './types.js';
 
 /** Directory holding the eval task definitions — the one this file lives in. */
 const EVALS_DIR = fileURLToPath(new URL('.', import.meta.url));
@@ -25,6 +27,9 @@ const RUNS_DIR = 'runs';
 /** Where results JSON files land (inside the gitignored runs/). */
 const RESULTS_DIR = join(RUNS_DIR, 'eval-results');
 
+/** Persistent Chrome profile shared with the REPL and demos. */
+const PROFILE_DIR = resolve('chrome-profile');
+
 async function main(): Promise<void> {
   const args = parseEvalArgs(process.argv.slice(2));
 
@@ -33,15 +38,34 @@ async function main(): Promise<void> {
     tasks.push(await loadEvalTask(EVALS_DIR, name));
   }
 
-  // The agent under evaluation. T17 ships with the fake agent only; when
-  // T14 lands, its real runTask drops in here (it satisfies RunTaskFn
-  // structurally) — this line is the single wiring point.
-  const runTask = makeFakeRunTask(RUNS_DIR);
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn(
+      'warning: ANTHROPIC_API_KEY is not set — the SDK will try its other ambient ' +
+        'credential sources; without any, the first model call will fail.',
+    );
+  }
 
-  const report = await runEvals(tasks, args.k, { runTask });
+  // The agent under evaluation: the real T14 runTask over one session-long
+  // headed browser; each trial gets its own fresh tab (runTask owns tab
+  // lifecycle). Tests and the fake agent keep injecting their own RunTaskFn
+  // through runEvals — this wiring is the CLI's alone.
+  const browser = await launchPersistentChrome({ profileDir: PROFILE_DIR });
+  try {
+    const realRunTask: RunTaskFn = (taskText, opts) =>
+      runTask(taskText, {
+        browser,
+        runsBaseDir: RUNS_DIR,
+        startUrl: opts.startUrl,
+        onProgress: (event) => process.stdout.write(formatProgressEvent(event)),
+      });
 
-  console.log(formatReport(report));
-  console.log(`\nresults JSON: ${writeResults(report, RESULTS_DIR)}`);
+    const report = await runEvals(tasks, args.k, { runTask: realRunTask });
+
+    console.log(formatReport(report));
+    console.log(`\nresults JSON: ${writeResults(report, RESULTS_DIR)}`);
+  } finally {
+    await browser.close();
+  }
 }
 
 main().catch((err: unknown) => {
