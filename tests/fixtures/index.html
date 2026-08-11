@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browser Adapter Fixture</title>
+  </head>
+  <body>
+    <main>
+      <h1>Browser adapter fixture</h1>
+      <p>This deterministic page exercises semantic browser observations.</p>
+
+      <a href="/second.html">Visit second page</a>
+
+      <button id="announce" type="button">Announce ready</button>
+      <p id="status" role="status">Waiting</p>
+
+      <label for="evidence-query">Evidence query</label>
+      <input id="evidence-query" name="evidence-query" type="text" />
+    </main>
+
+    <script>
+      document.querySelector('#announce').addEventListener('click', () => {
+        document.querySelector('#status').textContent = 'Ready';
+      });
+    </script>
+  </body>
+</html>

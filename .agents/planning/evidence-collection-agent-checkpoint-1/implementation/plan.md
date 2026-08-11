@@ -13,7 +13,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [ ] T7: Agent loop against a fake model
 - [ ] T8: Tool scheduling — parallel reads, serialized writes
 - [ ] T9: Real model client — streaming + prompt caching
-- [ ] T10: Browser adapter (Playwright, persistent Chrome)
+- [x] T10: Browser adapter (Playwright, persistent Chrome)
 - [ ] T11: Observation tools — `navigate`, `inspect_page`
 - [ ] T12: Action tools — `click`, `type`, `scroll`
 - [ ] T13: Evidence tools — `screenshot`, `download`
