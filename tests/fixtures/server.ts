@@ -118,6 +118,12 @@ async function serveFixture(
       return;
     }
 
+    if (pathname === '/redirect-to-second') {
+      response.writeHead(302, { Location: '/second.html' });
+      response.end();
+      return;
+    }
+
     fixturePath = resolveFixturePath(pathname);
   } catch {
     respondNotFound(response);

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { BrowserAdapter } from '../browser/adapter.js';
+
 /**
  * Context handed to every tool executor: the per-run resources a tool may
  * need. Later tasks grow this interface in place (e.g. a browser adapter
@@ -9,6 +11,9 @@ export interface ToolCtx {
   /** Absolute path to the current run's directory. All of a tool's file
    * I/O must stay inside it. */
   runDir: string;
+  /** Browser session for tools that observe or act on a page. File-only
+   * tool registries may omit it. */
+  browser?: BrowserAdapter;
 }
 
 /**
