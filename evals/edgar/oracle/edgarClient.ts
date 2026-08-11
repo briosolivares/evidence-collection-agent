@@ -24,8 +24,10 @@ export const TARGET_FORM = '8-K';
 /** The filing date (SEC's `filingDate` format, YYYY-MM-DD) the eval task targets. */
 export const TARGET_FILING_DATE = '2026-01-29';
 
-/** SEC requests a descriptive User-Agent identifying the requester on every call. */
-const SEC_USER_AGENT = 'evidence-collection-agent-eval (baseline oracle; contact: brioso@mit.edu)';
+/** SEC requests a declared requester identity on every call, in their plain
+ * `Name email` format — decorated strings (parentheses, colons) are rejected
+ * by their edge with an HTML 403, observed live 2026-08-10. */
+const SEC_USER_AGENT = 'Brios Olivares brioso@mit.edu';
 
 /** One filing record from a company's SEC submissions feed. */
 export interface EdgarFiling {
