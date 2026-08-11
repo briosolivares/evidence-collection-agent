@@ -1,4 +1,4 @@
-import type { BrowserAdapter } from '../browser/adapter.js';
+import type { BrowserController } from '../browser/controller.js';
 import {
   runAgentLoop,
   type LoopResult,
@@ -40,7 +40,7 @@ const DEFAULT_MAX_TOKENS = 250_000;
 export interface RunTaskConfig {
   /** A live session browser with no active task tab. The caller owns and
    * eventually closes the session; runTask owns only the fresh tab it opens. */
-  browser: BrowserAdapter;
+  browser: BrowserController;
   /** Directory that holds run directories; defaults to `runs`. */
   runsBaseDir?: string;
   /** Optional HTTP(S) page to load before the first model turn. */

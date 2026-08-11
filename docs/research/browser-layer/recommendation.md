@@ -11,7 +11,7 @@ The agent loop (see the design doc) needs a browser it can drive through a small
 - Two tasks need a logged-in session (reading the X feed; writing to a Google Sheet), so logins have to survive between runs.
 - The scored constraints are accuracy, generality, scale, consistency between runs, and speed — and token cost matters, especially for tasks we'll run repeatedly.
 
-One thing worth knowing before comparing: these options aren't all competing with each other. Some are browsers, some are libraries for driving browsers, some are complete AI agents, and some are companies that host browsers for you. Every research report reached the same structural conclusion: whichever we use should sit *behind* our tools as a swappable adapter, with the agent loop, evidence manifests, and guardrails remaining our own code.
+One thing worth knowing before comparing: these options aren't all competing with each other. Some are browsers, some are libraries for driving browsers, some are complete AI agents, and some are companies that host browsers for you. Every research report reached the same structural conclusion: tools should depend on a swappable `BrowserController`, session hosting should depend on `BrowserSessionProvider`, and the agent loop, evidence manifests, and guardrails should remain our own code.
 
 ## The options
 
@@ -74,13 +74,13 @@ The reasoning, briefly:
 - **Token efficiency stays in our hands.** Owning the loop lets us keep a stable prompt prefix for caching, return compact page outlines instead of raw HTML, batch several deterministic actions per tool call, and record successful runs for cheap replay. None of that is possible inside someone else's loop.
 - **Nothing is locked in.** Because the tools are written to the Playwright API, the browser behind them can become a stealth build or a cloud fleet later without touching the loop.
 
-If a site does block us, the sensible response is one step at a time — Patchright first (stays Chromium), Camoufox second (with a pinned fingerprint), paid stealth services last — each step taken only on an observed block, not preemptively. To make those calls with data rather than guesses, it's worth wiring a Browserbase connection into the adapter early (an API key and one connect call) and measuring block rates on X, Airbnb, and Google both locally and hosted.
+If a site does block us, the sensible response is one step at a time — Patchright first (stays Chromium), Camoufox second (with a pinned fingerprint), paid stealth services last — each step taken only on an observed block, not preemptively. To make those calls with data rather than guesses, it's worth adding a Browserbase session provider (an API key and one connect call) and measuring block rates on X, Airbnb, and Google both locally and hosted.
 
 Early proof points worth building toward: every artifact hashed and listed in a manifest, a login that survives a restart, identical outputs across repeated runs of the same task, and those block-rate measurements.
 
 ## Changes we're likely to make later
 
-- **Move browsers to Browserbase when we leave this machine.** The moment the agent runs on cloud servers — for always-on scheduled checks, more parallelism than one machine, or per-client isolation — the detection argument flips (vanilla Chromium on AWS looks bot-like; Browserbase's identity work is the fix) and its recordings become useful audit artifacts. The adapter makes this roughly a one-line change.
+- **Move browsers to Browserbase when we leave this machine.** The moment the agent runs on cloud servers — for always-on scheduled checks, more parallelism than one machine, or per-client isolation — the detection argument flips (vanilla Chromium on AWS looks bot-like; Browserbase's identity work is the fix) and its recordings become useful audit artifacts. The provider seam confines that change to session acquisition.
 - **Add action caching for repeated tasks.** Once the same checks run on a schedule, replaying recorded actions instead of re-asking the model is the big cost and consistency win. Whether we build that replay layer ourselves or adopt Stagehand's caching deserves a small head-to-head experiment; the likely production shape is Browserbase plus cached actions.
 - **Scale throughput with a queue, not just concurrency.** For bursts like "500 GitHub PR checks," a task queue feeding a modest worker pool beats raw parallelism — any single site's rate limits bind long before browser supply does.
 - **Swap in a stealth build per-site if blocks appear** — the escalation path above, driven by measurements.

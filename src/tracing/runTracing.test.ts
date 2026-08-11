@@ -11,12 +11,12 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
-  BrowserAdapter,
+  BrowserController,
   BrowserDownloadResult,
   BrowserDownloadTarget,
   BrowserFetchResult,
   BrowserScreenshotOptions,
-} from '../browser/adapter.js';
+} from '../browser/controller.js';
 import { runTask } from '../cli/runTask.js';
 import {
   METRICS_FILENAME,
@@ -45,7 +45,7 @@ const SECOND_USAGE: Usage = {
   cache_read_input_tokens: 4,
 };
 
-class FakeBrowser implements BrowserAdapter {
+class FakeBrowser implements BrowserController {
   activeTab = false;
   sessionClosed = false;
 

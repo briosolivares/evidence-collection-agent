@@ -6,7 +6,7 @@ External dependencies, what each is used for, and where it is imported.
 
 | Package | Version | Imported in | Used for |
 | --- | --- | --- | --- |
-| `playwright` | ^1.62 | `src/browser/playwrightAdapter.ts` **only** | `chromium.launchPersistentContext` (`channel: 'chrome'`, headed), `page.ariaSnapshot({ mode: 'ai' })` outlines, `aria-ref=` locators, `context.request.get` for session-shared fetches, screenshots |
+| `playwright` | ^1.62 | `src/browser/playwrightBrowserController.ts` **only** | local Chrome session provisioning, `page.ariaSnapshot({ mode: 'ai' })` outlines, `aria-ref=` locators, `context.request.get` for session-shared fetches, screenshots |
 | `@anthropic-ai/sdk` | ^0.116 | `src/model/callModel.ts` (runtime), `src/model/streamAssembly.ts` (types only) | `new Anthropic()` (ambient credentials), `client.messages.stream`, raw stream event types |
 | `zod` | ^4 | `src/tools/*.ts` | Tool input schemas; runtime `safeParse` validation; `z.toJSONSchema(schema, { io: 'input' })` for API tool definitions |
 | `@langfuse/tracing` | 5.10.0 | `src/tracing/runTracing.ts` | `startObservation` (agent/generation/tool spans), `setLangfuseTracerProvider` |
@@ -29,7 +29,7 @@ External dependencies, what each is used for, and where it is imported.
 
 ```mermaid
 graph LR
-    PW["playwright"] -->|only| A["src/browser/playwrightAdapter.ts"]
+    PW["playwright"] -->|only| A["src/browser/playwrightBrowserController.ts"]
     SDK["@anthropic-ai/sdk"] -->|only| M["src/model/"]
     LF["langfuse + otel packages"] -->|only| T["src/tracing/runTracing.ts"]
     Z["zod"] -->|only| TOOLS["src/tools/"]
@@ -46,7 +46,7 @@ graph LR
 | --- | --- | --- |
 | Anthropic API | REPL, eval CLI, demos 09/14 | `ANTHROPIC_API_KEY` (ambient; entry points warn if unset) |
 | Langfuse cloud | Tracing (optional) | `LANGFUSE_PUBLIC_KEY` + `LANGFUSE_SECRET_KEY` (+ optional `LANGFUSE_BASE_URL`) |
-| Local Chrome install | Adapter tests, demos 10–14, all real runs | none — `channel: 'chrome'` uses the system Chrome, not bundled Chromium |
+| Local Chrome install | Controller/provider tests, demos 10–14, all real runs | none — `channel: 'chrome'` uses the system Chrome, not bundled Chromium |
 | HN Firebase / SEC EDGAR / GitHub REST | Eval oracles at grading time only | none (SEC requires a plain `Name email` User-Agent; GitHub unauthenticated → 60 req/hr) |
 
 `npm test` is hermetic: no network beyond the loopback fixture server, no API keys — but it does require a local Chrome install for the Playwright-backed tests.

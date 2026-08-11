@@ -69,7 +69,7 @@ flowchart TB
         RT["runTask()"]
         LOOP["runAgentLoop"]
         TOOLS["tool registry (10 tools)"]
-        BROW["BrowserAdapter (Chrome)"]
+        BROW["BrowserController (Chrome)"]
         EVL["evals/ (loadEvalTask, grade, …)"]
     end
 
@@ -206,7 +206,7 @@ interface RunHandle {
   cancel(): void;                    // aborts the AbortController
   done: Promise<RunOutcome>;         // completed | budget_exceeded | cancelled | failed
 }
-startRun(task: string, deps: { browser: BrowserAdapter }): RunHandle
+startRun(task: string, deps: { browser: BrowserController }): RunHandle
 ```
 
 Internals: one `AbortController` per run; custom `callModel` closure (checks `signal.aborted` at entry, passes `{ signal }` to the SDK stream, re-emits progress via `assembleModelResponse`'s callback + its own turn events); `tuiTracing` (wraps registry for tool events + `runDir` capture, delegates spans to the real `createRunTracing()`). Event ordering is normalized here so the reducer sees one coherent stream.
@@ -307,7 +307,7 @@ Colors are foreground-only (terminal background is the user's); Ink/chalk downsa
 
 ## Error Handling
 
-- **Run failure** (`runTask` rejects for non-abort reasons — network, API, browser death): append an `error` item with the message, return to `idle`, keep the TUI alive. If the browser connection died, offer relaunch on next submit (detect via the adapter throwing on `newTab`).
+- **Run failure** (`runTask` rejects for non-abort reasons — network, API, browser death): append an `error` item with the message, return to `idle`, keep the TUI alive. If the browser connection died, offer relaunch on next submit (detect via the controller throwing on `newTab`).
 - **Cancellation semantics**: Esc → `cancelling` mode (status line shows `✻ Wrapping up…`); the core's `finally` still closes the tab and finalizes the manifest; on rejection append the `cancelled` line. A cancelled run has `manifest.finishedAt` but **no `metrics.json`** — the RunsList status logic treats that as "stopped", never "crashed".
 - **Tool errors mid-run**: rendered as `✗`-status activity lines (the loop feeds errors back to the model and continues — errors/retries are part of the story per R2, not fatal).
 - **Rejected tool calls** (`unknown_tool` / `invalid_input` — invisible to the tracing seam): pending lines settled as `⚠ retried` at the next turn boundary.

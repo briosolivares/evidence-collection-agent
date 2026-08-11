@@ -13,8 +13,9 @@ flowchart TD
     L -->|"tool calls"| S["Scheduler\n(src/loop/scheduler.ts)\nparallel reads / serialized writes"]
     S --> P["Tool pipeline\n(src/tools/pipeline.ts)\nvalidate → execute → normalize → cap"]
     P --> T["10 tools\n(src/tools — file, observation,\naction, evidence)"]
-    T --> B["BrowserAdapter\n(src/browser/adapter.ts)"]
-    B --> PW["PlaywrightBrowserAdapter\nlocal visible Chrome,\npersistent profile"]
+    T --> B["BrowserController\n(src/browser/controller.ts)"]
+    SP["BrowserSessionProvider\nlocal or hosted session acquisition"] --> PW["PlaywrightBrowserController\nlocal visible Chrome,\npersistent profile"]
+    B --> PW
     T --> R["Run directory\nruns/&lt;run-id&gt;/\nmanifest + transcript + metrics + artifacts"]
     L -.->|"OpenTelemetry spans"| O["Langfuse\n(src/tracing/runTracing.ts)"]
     R --> G["Eval graders\n(evals/&lt;task&gt;/grader)\nread ONLY the run directory"]
@@ -28,33 +29,34 @@ The agent is a minimal Claude Code–style loop: assemble context → call the m
 ```mermaid
 graph BT
     subgraph "Layer 0 — leaves (no internal imports)"
-        ADAPTER["browser/adapter (types)"]
+        CONTROLLER["browser/controller (types)"]
         MESSAGES["loop/messages (types)"]
         RUNDIR["run/runDir"]
         RUNID["run/runId"]
         TRANSCRIPT["run/transcript"]
         SYSPROMPT["cli/systemPrompt"]
     end
+    PROVIDER["browser/sessionProvider"] --> CONTROLLER
     ARTIFACTS["run/artifacts"] --> RUNDIR
     REGISTRY["tools/registry"]
     CAP["tools/capResult"] --> ARTIFACTS
     PIPELINE["tools/pipeline"] --> CAP & REGISTRY
-    TOOLS["tools/{file,observation,action,evidence}Tools"] --> REGISTRY & ARTIFACTS & RUNDIR & ADAPTER
+    TOOLS["tools/{file,observation,action,evidence}Tools"] --> REGISTRY & ARTIFACTS & RUNDIR & CONTROLLER
     SCHED["loop/scheduler"] --> PIPELINE
     STREAM["model/streamAssembly"] --> MESSAGES
     CALLMODEL["model/callModel"] --> STREAM & REGISTRY & MESSAGES
     LOOP["loop/agentLoop"] --> SCHED & TRANSCRIPT & MESSAGES
     TRACING["tracing/runTracing"] --> MESSAGES & REGISTRY
-    PWA["browser/playwrightAdapter"] --> ADAPTER
+    PBC["browser/playwrightBrowserController"] --> CONTROLLER & PROVIDER
     RUNTASK["cli/runTask"] --> LOOP & CALLMODEL & TOOLS & TRACING & ARTIFACTS & RUNID & SYSPROMPT
-    REPL["cli/repl"] --> RUNTASK & PWA
-    EVALS["evals/* (harness)"] --> RUNTASK & PWA
+    REPL["cli/repl"] --> RUNTASK & PBC
+    EVALS["evals/* (harness)"] --> RUNTASK & PBC
 ```
 
 Properties the codebase maintains deliberately:
 
-- **No import cycles.** `run/` is the bottom layer alongside `browser/adapter`; it never imports from `tools/`, `loop/`, or `browser/`.
-- **`playwright` appears in exactly one file** (`src/browser/playwrightAdapter.ts`). Everything else programs against the engine-neutral `BrowserAdapter` interface, so the browser is swappable (Patchright/Camoufox/Browserbase are the researched escalation path).
+- **No import cycles.** `run/` is the bottom layer alongside `browser/controller`; it never imports from `tools/`, `loop/`, or `browser/`.
+- **`playwright` appears in exactly one file** (`src/browser/playwrightBrowserController.ts`). Tools and runs program against the engine-neutral `BrowserController`; entry points acquire sessions through `BrowserSessionProvider`. That separates browser control from local/hosted session provisioning so Browserbase can be added without changing the loop or tools.
 - **`src/cli/runTask.ts` is the single composition root** — the only place registry + model client + run dir + tracing + loop are wired together. Both product (REPL) and eval harness drive the same `runTask`.
 - **The Anthropic SDK is imported only in `src/model/`.** `loop/messages.ts` mirrors the API shapes structurally (snake_case preserved) without importing the SDK, so a scripted fake model and the real streaming client satisfy the same `CallModel` contract.
 
@@ -82,7 +84,7 @@ Properties the codebase maintains deliberately:
 
 ## Browser posture
 
-Playwright drives real, local, **visible** Chrome (`channel: 'chrome'`, headed by default) with a persistent profile at `chrome-profile/`. This is deliberately the best available anti-bot posture (real fingerprint + real session history + residential IP); headless is the most detectable configuration. The browser session launches once per REPL/eval session so logins persist; each task run opens a fresh tab and closes it on completion. Credentials are never typed by the agent — a human logs into the profile manually once.
+`LocalChromeBrowserSessionProvider` uses Playwright to launch real, local, **visible** Chrome (`channel: 'chrome'`, headed by default) with a persistent profile at `chrome-profile/`, returning a `PlaywrightBrowserController`. This is deliberately the best available anti-bot posture (real fingerprint + real session history + residential IP); headless is the most detectable configuration. The browser session launches once per REPL/eval session so logins persist; each task run opens a fresh tab and closes it on completion. Credentials are never typed by the agent — a human logs into the profile manually once.
 
 The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot (`page.ariaSnapshot({ mode: 'ai' })`) — a compact accessibility-tree outline with stable element refs. `click`/`type` act by ref, not coordinates or selectors.
 

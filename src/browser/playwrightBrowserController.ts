@@ -11,49 +11,53 @@ import {
 
 import {
   BrowserRefNotFoundError,
-  type BrowserAdapter,
+  type BrowserController,
   type BrowserDownloadResult,
   type BrowserDownloadTarget,
   type BrowserFetchResult,
-  type BrowserLaunchOptions,
   type BrowserScreenshotOptions,
-} from './adapter.js';
+} from './controller.js';
+import type { BrowserSessionProvider } from './sessionProvider.js';
 
 const ARIA_REF_PATTERN = /^(?:f\d+)?e\d+$/;
 const DOWNLOAD_EVENT_TIMEOUT_MS = 5_000;
 const DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS = 1_000;
 const SCROLL_SETTLE_MS = 50;
 
-/**
- * Launch a persistent local Chrome session behind the browser adapter.
- *
- * @param options - absolute profile directory and optional headless setting;
- *   headed mode is the product default, while tests may opt into headless
- * @returns an engine-neutral adapter with a live persistent browser session
- *   and no active task tab
- */
-export async function launchPersistentChrome(
-  options: BrowserLaunchOptions,
-): Promise<BrowserAdapter> {
-  if (!isAbsolute(options.profileDir)) {
-    throw new TypeError('Browser profileDir must be an absolute path.');
-  }
+/** Configuration for browser sessions backed by persistent local Chrome. */
+export interface LocalChromeBrowserSessionOptions {
+  /** Absolute path to the persistent Chrome profile directory. */
+  profileDir: string;
+  /** Whether Chrome runs without a visible window; defaults to false. */
+  headless?: boolean;
+}
 
-  const context = await chromium.launchPersistentContext(options.profileDir, {
-    channel: 'chrome',
-    headless: options.headless ?? false,
-  });
+/** Creates persistent local Chrome sessions controlled through Playwright. */
+export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider {
+  constructor(private readonly options: LocalChromeBrowserSessionOptions) {}
 
-  try {
-    await prepareSessionPage(context);
-    return new PlaywrightBrowserAdapter(context);
-  } catch (error) {
-    await context.close();
-    throw error;
+  async createSession(): Promise<BrowserController> {
+    if (!isAbsolute(this.options.profileDir)) {
+      throw new TypeError('Browser profileDir must be an absolute path.');
+    }
+
+    const context = await chromium.launchPersistentContext(this.options.profileDir, {
+      channel: 'chrome',
+      headless: this.options.headless ?? false,
+    });
+
+    try {
+      await prepareSessionPage(context);
+      return new PlaywrightBrowserController(context);
+    } catch (error) {
+      await context.close();
+      throw error;
+    }
   }
 }
 
-class PlaywrightBrowserAdapter implements BrowserAdapter {
+/** Playwright implementation of the engine-neutral browser controller. */
+export class PlaywrightBrowserController implements BrowserController {
   private activePage: Page | undefined;
   private closePromise: Promise<void> | undefined;
   private closed = false;

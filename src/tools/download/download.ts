@@ -49,7 +49,7 @@ export type DownloadInput = z.infer<typeof downloadInputSchema>;
  * `download` — save exact bytes obtained through Chrome itself.
  *
  * Accepts either a link/control ref from the current page or a verified
- * direct HTTP(S) URL. The browser adapter captures a real Chrome navigation
+ * direct HTTP(S) URL. The browser controller captures a real Chrome navigation
  * response or download event, preserving the page's cookies, network
  * identity, and session. Direct URLs let the agent bypass viewer wrappers
  * without any site-specific logic. The exact captured bytes are written

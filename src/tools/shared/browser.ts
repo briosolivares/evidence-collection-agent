@@ -1,14 +1,14 @@
 import {
   BrowserRefNotFoundError,
-  type BrowserAdapter,
-} from '../../browser/adapter.js';
+  type BrowserController,
+} from '../../browser/controller.js';
 import type { ToolCtx } from '../registry.js';
 
-/** Get the context's browser adapter, or throw for a context without one —
+/** Get the context's browser controller, or throw for a context without one —
  * every browser-driving tool starts here. */
-export function requireBrowser(ctx: ToolCtx): BrowserAdapter {
+export function requireBrowser(ctx: ToolCtx): BrowserController {
   if (ctx.browser === undefined) {
-    throw new Error('Tool context has no browser adapter.');
+    throw new Error('Tool context has no browser controller.');
   }
   return ctx.browser;
 }
@@ -48,7 +48,7 @@ function descriptionForRef(outline: string, ref: string): string | undefined {
 /** Resolve a ref to its semantic role/name in the current outline, or throw
  * the same stale-ref guidance a failed action would. */
 export async function requireRefDescription(
-  browser: BrowserAdapter,
+  browser: BrowserController,
   ref: string,
 ): Promise<string> {
   const description = descriptionForRef(await browser.outline(), ref);

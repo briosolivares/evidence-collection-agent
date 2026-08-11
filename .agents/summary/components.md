@@ -23,8 +23,9 @@ Loop semantics worth knowing: completion is decided from response *content* (zer
 
 | File | Responsibility |
 | --- | --- |
-| `adapter.ts` | Pure types: the engine-neutral `BrowserAdapter` interface (tab lifecycle, `goto`, `outline`, `click`/`type` by ref, `scroll`, `screenshot`, `resolveHref`, `fetch`, `currentUrl`, `title`, `close`), `BrowserLaunchOptions`, `BrowserFetchResult`, and `BrowserRefNotFoundError` (a first-class part of the contract). A session owns at most one task tab at a time. |
-| `playwrightAdapter.ts` | `launchPersistentChrome(options)` — the only file importing `playwright`. Launches `chromium.launchPersistentContext(profileDir, { channel: 'chrome', headless: false })`. `outline()` is `page.ariaSnapshot({ mode: 'ai' })`; refs are validated against `/^(?:f\d+)?e\d+$/` and resolved via `aria-ref=` locators requiring exactly one match. `fetch()` uses `context.request.get` (shares cookies). Tab lifecycle operations are serialized on a promise queue; `close()` is idempotent. |
+| `controller.ts` | Pure types: the engine-neutral `BrowserController` interface (tab lifecycle, `goto`, `outline`, `click`/`type` by ref, `scroll`, `screenshot`, `resolveHref`, `fetch`, `currentUrl`, `title`, `close`), `BrowserFetchResult`, and `BrowserRefNotFoundError` (a first-class part of the contract). A controller owns at most one task tab at a time. |
+| `sessionProvider.ts` | `BrowserSessionProvider` — the hosting-neutral session-acquisition seam. `createSession()` returns a live `BrowserController` with no active task tab; callers own and close it. |
+| `playwrightBrowserController.ts` | The only file importing `playwright`. `LocalChromeBrowserSessionProvider` launches `chromium.launchPersistentContext(profileDir, { channel: 'chrome', headless: false })` and returns a `PlaywrightBrowserController`. The controller's `outline()` is `page.ariaSnapshot({ mode: 'ai' })`; refs are validated against `/^(?:f\d+)?e\d+$/` and resolved via `aria-ref=` locators requiring exactly one match. `fetch()` uses `context.request.get` (shares cookies). Tab lifecycle operations are serialized on a promise queue; `close()` is idempotent. |
 
 ## src/tools — registry, pipeline, and the ten tools
 
@@ -96,7 +97,7 @@ Oracle clients split parsing from fetching: parse logic is unit-tested against c
 
 ## demos/ — build-order walkthrough
 
-Fourteen standalone `tsx` scripts mirroring the implementation order (T1→T14): run ids → run dirs → manifest → registry → offloading → file tools → loop with a fake model (zero tokens) → scheduling → first real agent (needs `ANTHROPIC_API_KEY`) → adapter → observe → act (incl. the scroll→inspect lazy-load pattern) → evidence (screenshot + authenticated download) → full `runTask` against a live site. Demos 10–14 need local Chrome; 11–13 start their own loopback fixture server; 09 and 14 spend real tokens.
+Fourteen standalone `tsx` scripts mirroring the implementation order (T1→T14): run ids → run dirs → manifest → registry → offloading → file tools → loop with a fake model (zero tokens) → scheduling → first real agent (needs `ANTHROPIC_API_KEY`) → browser controller → observe → act (incl. the scroll→inspect lazy-load pattern) → evidence (screenshot + authenticated download) → full `runTask` against a live site. Demos 10–14 need local Chrome; 11–13 start their own loopback fixture server; 09 and 14 spend real tokens.
 
 ## tests/ — fixtures and shared helpers
 

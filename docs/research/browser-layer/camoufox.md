@@ -6,7 +6,7 @@ _Accessed 2026-08-10. Claims marked “documented” are from the linked project
 
 Camoufox is a plausible browser engine for this evidence-collection agent, but not an agent framework, workflow orchestrator, hosted browser service, or evidence store. It is an open-source Firefox fork plus a Python package that launches a customized Firefox through a Playwright-compatible API. Its differentiator is engine-level fingerprint and anti-detection work: the project says properties are intercepted in C++ rather than injected into page JavaScript, and that BrowserForge generates internally consistent device characteristics ([Fingerprint Injection](https://camoufox.com/fingerprint/), [Introduction](https://camoufox.com/)). That can help when a client system has bot controls, though it is not a guarantee of access and should not be treated as a CAPTCHA bypass.
 
-Recommendation: use Camoufox as an optional, replaceable browser adapter behind the existing `navigate`, inspect, click, type, scroll, screenshot, download and file tools. Start with a small POC using the stable package and pinned binary. Do not make it the sole production dependency until Firefox compatibility, authentication persistence, audit reproducibility, container startup, and target-system success rates are measured. The project’s own release notes warn that it is in active development and may not be suitable for production ([releases](https://github.com/daijro/camoufox/releases)).
+Recommendation: use Camoufox as an optional, replaceable `BrowserController`/`BrowserSessionProvider` implementation behind the existing `navigate`, inspect, click, type, scroll, screenshot, download and file tools. Start with a small POC using the stable package and pinned binary. Do not make it the sole production dependency until Firefox compatibility, authentication persistence, audit reproducibility, container startup, and target-system success rates are measured. The project’s own release notes warn that it is in active development and may not be suitable for production ([releases](https://github.com/daijro/camoufox/releases)).
 
 ## Boundary and architecture
 
@@ -38,7 +38,7 @@ The browser binary download is sizeable and startup includes Firefox launch plus
 
 ## Observability and debugging
 
-Playwright tracing, screenshots, video (if enabled), console/page errors, request/response logs and browser stderr can support audit debugging. Visible (non-headless) mode and the Camoufox inspector/test CLI are useful for reproducing a failed run ([Installation](https://camoufox.com/python/installation/), [Usage](https://camoufox.com/python/usage/)). Add structured events at the adapter boundary: browser version/channel, context ID, URL (redacted query values), tool name, duration, retries, response status, artifact hashes and failure category. Never log credentials, cookies, authorization headers or full page content by default.
+Playwright tracing, screenshots, video (if enabled), console/page errors, request/response logs and browser stderr can support audit debugging. Visible (non-headless) mode and the Camoufox inspector/test CLI are useful for reproducing a failed run ([Installation](https://camoufox.com/python/installation/), [Usage](https://camoufox.com/python/usage/)). Add structured events at the controller boundary: browser version/channel, context ID, URL (redacted query values), tool name, duration, retries, response status, artifact hashes and failure category. Never log credentials, cookies, authorization headers or full page content by default.
 
 ## Security, supply chain, license, cost, maturity
 
@@ -58,7 +58,7 @@ Software cost is zero under the open-source license; operational cost is worker 
 | Scalable | Possible with workers/containers; no built-in scheduler, tenancy or quotas. |
 | Consistent | Deterministic pinned fingerprints/profiles and fixed tool semantics are required; random defaults can reduce consistency. |
 | Fast | Likely reasonable, but benchmark cold/warm startup and Firefox page performance. |
-| Tracing | Playwright tracing plus adapter events; Camoufox does not provide an audit trace product. |
+| Tracing | Playwright tracing plus controller events; Camoufox does not provide an audit trace product. |
 
 ## Risks and unknowns
 
@@ -66,7 +66,7 @@ Key unknowns are target SaaS compatibility, SSO/MFA and WebAuthn, persistent pro
 
 ## POC and acceptance tests
 
-Build a Python adapter implementing the seven initial browser tools. Pin Python package, browser channel/version and image digest. Run against a local fixture plus authorized GitHub/Jira/Workday-like test tenants.
+Build a Python controller and session provider implementing the seven initial browser tools. Pin Python package, browser channel/version and image digest. Run against a local fixture plus authorized GitHub/Jira/Workday-like test tenants.
 
 1. Launch headless and visible; navigate, inspect, click, type, scroll, screenshot and download a known fixture.
 2. Save/restore storage state and a persistent profile; verify logout and cleanup; test two simultaneous profiles cannot read each other’s cookies/files.
@@ -76,7 +76,7 @@ Build a Python adapter implementing the seven initial browser tools. Pin Python 
 6. Load-test 1/10/50 workers and measure p50/p95 startup/navigation/tool latency, RSS, CPU, crashes and artifact throughput.
 7. Run browser fingerprint test pages only as a diagnostic, not as a success guarantee; compare Camoufox with stock Playwright Firefox and Chromium.
 
-Acceptance gates: ≥95% deterministic pass rate on a representative authorized workflow suite; zero cross-profile or secret leaks; 100% artifact hash/manifest coverage; p95 latency and RSS budgets agreed with operations; clean container rebuild from pinned inputs; and a tested fallback adapter. CAPTCHA cases must be classified as “needs human/provider,” never silently marked successful.
+Acceptance gates: ≥95% deterministic pass rate on a representative authorized workflow suite; zero cross-profile or secret leaks; 100% artifact hash/manifest coverage; p95 latency and RSS budgets agreed with operations; clean container rebuild from pinned inputs; and a tested fallback provider. CAPTCHA cases must be classified as “needs human/provider,” never silently marked successful.
 
 ## Alternatives worth comparing
 

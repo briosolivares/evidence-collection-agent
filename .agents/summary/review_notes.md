@@ -11,7 +11,7 @@ Cross-checked the six documentation files against each other, the code, `.agents
 3. **`metrics.json` filename constant is duplicated**: `METRICS_FILENAME` lives in `src/loop/agentLoop.ts`, and `src/tools/shared/evidence.ts` re-declares the literal in `RESERVED_RUN_METADATA_PATHS` to avoid creating a `tools → loop` import edge. Intentional, but a rename would have to touch both.
 4. **The known-failure docs and the code agree**: `maxTurns` is still 12, the `download` tool still lacks the in-page-fetch/download-event fallback, and thinking is still disabled — the four candidate mechanisms (F1–F4) from the baseline report are **not yet applied**, matching the handoff state ("do not apply without user direction"). Documentation describes current code, not the proposed fixes.
 5. **SEC oracle User-Agent is a hardcoded personal identity** (`Name email` format in `evals/datasets/edgar/oracle/edgarClient.ts`) rather than a config value. Load-bearing (SEC 403s decorated UAs) and deliberate, but worth knowing before anyone "cleans it up" or another person runs the evals.
-6. Minor: `demos/10-adapter.ts` is the only demo without a header comment stating its run command.
+6. Resolved: `demos/10-controller.ts` now includes its run command in the header comment.
 
 No contradictions were found between the generated files; terminology is consistent (run directory, manifest, outline, ref, oracle, grader, trial, task pass).
 

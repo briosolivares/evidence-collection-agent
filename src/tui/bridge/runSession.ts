@@ -14,7 +14,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 
-import type { BrowserAdapter } from '../../browser/adapter.js';
+import type { BrowserController } from '../../browser/controller.js';
 import type { CallModel } from '../../loop/messages.js';
 import { runTask, type RunTaskConfig, type RunTaskResult } from '../../cli/runTask.js';
 import { SYSTEM_PROMPT } from '../../cli/systemPrompt.js';
@@ -60,7 +60,7 @@ export interface RunHandle {
 /** Everything startRun needs; optional members are test/config seams. */
 export interface RunSessionDeps {
   /** The session browser handed to the run (caller owns lifecycle). */
-  browser: BrowserAdapter;
+  browser: BrowserController;
   /** Receives the run's ordered UiEvent stream. */
   onEvent: (event: UiEvent) => void;
   runsBaseDir?: string;

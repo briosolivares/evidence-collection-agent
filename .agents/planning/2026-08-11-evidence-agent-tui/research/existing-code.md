@@ -7,10 +7,10 @@ Researched 2026-08-11 against this worktree. All paths relative to repo root.
 The REPL is a thin shell over a real programmatic interface — the agent core never touches the terminal.
 
 - `runTask(taskText, config): Promise<RunTaskResult>` — `src/cli/runTask.ts:79`
-- `RunTaskConfig` (`src/cli/runTask.ts:38-62`): `browser` (live `BrowserAdapter`), `runsBaseDir?`, `startUrl?`, `model?`, `maxOutputTokens?`, `maxTurns?`, `maxTokens?`, `onProgress?`, `callModel?`, `tracing?`.
+- `RunTaskConfig` (`src/cli/runTask.ts:38-62`): `browser` (live `BrowserController`), `runsBaseDir?`, `startUrl?`, `model?`, `maxOutputTokens?`, `maxTurns?`, `maxTokens?`, `onProgress?`, `callModel?`, `tracing?`.
 - `RunTaskResult = { runDir } & LoopResult`; `LoopResult` = `{status:'completed', finalText}` | `{status:'budget_exceeded', reason}` (`src/loop/agentLoop.ts:83-85`).
 - Defaults (`runTask.ts:32-35`): `runs/` base dir, 8192 output tokens, 12 turns, 250k cumulative tokens.
-- Browser ownership is the caller's: `launchPersistentChrome` (`src/browser/playwrightAdapter.ts:29`), close in `finally` — exactly as `repl.ts:37,74` does.
+- Browser ownership is the caller's: acquire it with `BrowserSessionProvider.createSession()` and close the returned `BrowserController` in `finally` — exactly as `repl.ts` does.
 
 ## Progress events (the only live channel)
 

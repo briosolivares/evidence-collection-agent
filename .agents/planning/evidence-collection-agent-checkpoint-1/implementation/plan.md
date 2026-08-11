@@ -13,7 +13,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [x] T7: Agent loop against a fake model
 - [x] T8: Tool scheduling — parallel reads, serialized writes
 - [x] T9: Real model client — streaming + prompt caching
-- [x] T10: Browser adapter (Playwright, persistent Chrome)
+- [x] T10: Browser controller and session provider (Playwright, persistent Chrome)
 - [x] T11: Observation tools — `navigate`, `inspect_page`
 - [x] T12: Action tools — `click`, `type`, `scroll`
 - [x] T13: Evidence tools — `screenshot`, `download`
@@ -31,7 +31,7 @@ The checklist order T1 → T18 is a valid order for one person working alone (it
 flowchart TD
     T1["T1 Scaffold"] --> T2["T2 Run dir + transcript"]
     T1 --> T4["T4 Tool registry"]
-    T1 --> T10["T10 Browser adapter"]
+    T1 --> T10["T10 Browser controller + provider"]
     T2 --> T3["T3 Artifacts + manifest"]
     T3 --> T5["T5 Bounded results"]
     T4 --> T5
@@ -59,7 +59,7 @@ flowchart TD
 
 **Parallel opportunities:**
 
-- **After T1, three tracks open:** the run-dir track (T2 → T3), the registry (T4), and the browser adapter (T10). T10 is deliberately standalone — the whole browser track (T10 → T11 → T12/T13) proceeds independently of the loop/model track (T6 → T7 → T8/T9) until both join at T14. T11 is the browser track's only cross-dependency: it waits on T5 for the size cap.
+- **After T1, three tracks open:** the run-dir track (T2 → T3), the registry (T4), and the browser controller/provider (T10). T10 is deliberately standalone — the whole browser track (T10 → T11 → T12/T13) proceeds independently of the loop/model track (T6 → T7 → T8/T9) until both join at T14. T11 is the browser track's only cross-dependency: it waits on T5 for the size cap.
 - **After T7:** T8 (scheduling) ∥ T9 (real model) — neither needs the other.
 - **After T11:** T12 (actions) ∥ T13 (evidence) — both consume refs from outlines, neither consumes the other.
 - **After T14:** T15 (REPL) ∥ T16 (tracing).
@@ -107,7 +107,7 @@ src/
   tools/     # registry, pipeline, file tools, browser tools
   loop/      # agent loop, state, scheduling
   model/     # callModel, prompt assembly
-  browser/   # adapter interface, Playwright implementation
+  browser/   # controller/provider interfaces, Playwright implementation
   cli/       # runTask entry point, REPL
 demos/       # one runnable script per task: NN-name.ts, run with npx tsx
 evals/       # eval tasks, oracles, graders, runner (from T17)
@@ -180,7 +180,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 **Objective:** A tool registry where each tool is defined once (zod schema + executor + read-only flag), plus the execution pipeline stages 1–4 and 6: exists-check → zod validation → execute → normalize → return. Malformed anything comes back as a structured error result, never a crash.
 
 **Implementation guidance:** (`src/tools/`)
-- `ToolDef = { name, description, inputSchema (zod), readOnly: boolean, execute(input, ctx) }` where `ctx` carries `runDir` and later the browser adapter. The `readOnly` flag is declared here so T8's scheduler can consume it.
+- `ToolDef = { name, description, inputSchema (zod), readOnly: boolean, execute(input, ctx) }` where `ctx` carries `runDir` and later the browser controller. The `readOnly` flag is declared here so T8's scheduler can consume it.
 - `executeToolCall(registry, call, ctx)` → the pipeline. Three error shapes, all returned as normal tool results the model can read: unknown tool, invalid input (include zod's issue list — the model needs to know *what* was malformed), execution error.
 - `toApiToolDefs(registry)` → the Claude API `tools` array via `z.toJSONSchema`. **Determinism matters:** this array is part of the stable prompt prefix (T9); its serialization must be byte-identical across calls.
 
@@ -304,15 +304,15 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 
 ---
 
-## T10: Browser adapter (Playwright, persistent Chrome)
+## T10: Browser controller and session provider (Playwright, persistent Chrome)
 
-**Objective:** The engine-agnostic `BrowserAdapter` interface and its Playwright implementation: real local Chrome, visible window, persistent profile, session-long browser, fresh tab per run.
+**Objective:** The engine-agnostic `BrowserController`, the hosting-neutral `BrowserSessionProvider`, and their Playwright/local-Chrome implementations: real local Chrome, visible window, persistent profile, session-long browser, fresh tab per run.
 
 **Implementation guidance:** (`src/browser/`)
 - Interface shaped by what the ten tools need: `goto`, `outline` (ARIA snapshot with refs), `click(ref)`, `type(ref, text)`, `scroll`, `screenshot`, `resolveHref(ref)`/download support, `newTab`/`closeTab`, `currentUrl`. Tools call only this interface — swapping in Patchright/Camoufox/Browserbase later touches nothing else (the design's escalation path).
 - Playwright impl: `launchPersistentContext` with `channel: 'chrome'`, `headless: false`, profile dir from config (project-local, gitignored). Launch once per session; each run gets a fresh tab, closed on completion.
 - Headless-ness is config: the *product* runs headed (anti-bot posture); the *test suite* may run headless against local fixtures where detection is irrelevant.
-- For the ref mechanism, verify the installed Playwright's API: ARIA snapshots with ref annotations and the `aria-ref=` selector engine (as used by Playwright MCP; possibly via `_snapshotForAI`). Pin down what the installed version provides before writing the adapter spec.
+- For the ref mechanism, verify the installed Playwright's API: ARIA snapshots with ref annotations and the `aria-ref=` selector engine (as used by Playwright MCP; possibly via `_snapshotForAI`). Pin down what the installed version provides before writing the controller spec.
 
 **Test requirements (against local fixture pages via an in-process static server — this harness is a deliverable of the task):**
 - Launch → goto fixture → read title/URL → close: the lifecycle works.
@@ -321,7 +321,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 
 **Integration with previous work:** None wired yet — deliberately standalone so browser breakage never implicates the loop. `ctx.browser` lands in tools in T11.
 
-**Demo:** `npx tsx demos/10-adapter.ts` — visible Chrome opens with the persistent profile, navigates to example.com, prints the outline, leaves the window open briefly.
+**Demo:** `npx tsx demos/10-controller.ts` — visible Chrome opens with the persistent profile, navigates to example.com, prints the outline, leaves the window open briefly.
 
 ---
 
@@ -330,7 +330,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 **Objective:** The model's eyes: `navigate` (state-changing) and `inspect_page` (read-only) as registry tools returning the compact semantic outline.
 
 **Implementation guidance:**
-- Thin wrappers over the adapter, in the registry with zod schemas like every other tool. `inspect_page` result: page URL + title header, then the outline with refs.
+- Thin wrappers over the controller, in the registry with zod schemas like every other tool. `inspect_page` result: page URL + title header, then the outline with refs.
 - The outline flows through the T5 cap: a huge page offloads to disk with a preview — exactly the design's answer to context flooding. No special casing.
 - `navigate` returns landed URL + title (redirects happen; the model needs to know where it actually is).
 
@@ -351,7 +351,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 **Objective:** The model's hands: act by ref (never coordinates, never selectors), with the scroll → inspect pattern working on lazy-loading pages.
 
 **Implementation guidance:**
-- `click(ref)` and `type(ref, text)` resolve refs via the adapter; Playwright auto-scrolls elements into view, so no pre-scrolling logic.
+- `click(ref)` and `type(ref, text)` resolve refs via the controller; Playwright auto-scrolls elements into view, so no pre-scrolling logic.
 - Stale ref (page changed since the outline was taken) → structured error telling the model to re-run `inspect_page` — the model can recover only if the error says how.
 - `scroll`: about one viewport-height per call; state-changing (viewport position + network loads), so T8 always serializes it — assert the registry flags it correctly.
 - Results should be transcript-readable per the design ("clicked ref=42, the 'Download' button"): echo the element's role/name in the result.
@@ -365,7 +365,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 
 **Test requirements note:** action effects are asserted through outlines — the tests stay clients of the tool contract, not of Playwright.
 
-**Integration with previous work:** Refs come from T11 outlines; scheduling contract from T8; adapter from T10.
+**Integration with previous work:** Refs come from T11 outlines; scheduling contract from T8; controller from T10.
 
 **Demo:** `npx tsx demos/12-act.ts` — scripted sequence fills a small form on a fixture (inspect → type → click → inspect shows the result), then scrolls a lazy list until 20 items exist.
 
@@ -384,7 +384,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 - Full-page vs viewport on a tall fixture: full-page image is taller.
 - Download: saved bytes are identical to the served file (hash equality), manifest entry correct; ref without an href → structured error.
 
-**Integration with previous work:** `writeArtifact` (T3), adapter (T10), refs (T11). All ten tools now exist.
+**Integration with previous work:** `writeArtifact` (T3), controller (T10), refs (T11). All ten tools now exist.
 
 **Demo:** `npx tsx demos/13-evidence.ts` — screenshot a fixture, download the sample file, print the manifest showing both entries with hashes; verify one with `shasum -a 256`.
 

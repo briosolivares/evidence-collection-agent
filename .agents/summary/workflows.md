@@ -9,7 +9,7 @@ sequenceDiagram
     participant Caller as REPL / eval CLI
     participant RT as runTask
     participant TR as RunTracing
-    participant B as BrowserAdapter
+    participant B as BrowserController
     participant L as runAgentLoop
     Caller->>RT: runTask(taskText, { browser, ... })
     RT->>RT: createRunDir + initManifest
@@ -88,7 +88,7 @@ sequenceDiagram
     participant O as Oracle (live API)
     participant G as Grader
     CLI->>CLI: parse --tasks/--k; loadEvalTask each
-    CLI->>CLI: launchPersistentChrome (once for the session)
+    CLI->>CLI: BrowserSessionProvider.createSession (once for the session)
     CLI->>R: runEvals(tasks, k, { runTask })
     loop each task × k trials (sequential)
         R->>A: runTask(taskText, { startUrl })

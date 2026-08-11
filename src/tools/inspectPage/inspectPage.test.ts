@@ -22,7 +22,7 @@ describe('inspect_page tool', () => {
     return executeToolCall(
       registry,
       { id: `call-${name}`, name, input },
-      { runDir: suite.runDir(), browser: suite.adapter() },
+      { runDir: suite.runDir(), browser: suite.controller() },
     );
   }
 
@@ -37,7 +37,7 @@ describe('inspect_page tool', () => {
       expect(first.isError).toBe(false);
       expect(second.isError).toBe(false);
       expect(first.content).toContain(
-        `URL: ${suite.server().url('/')}\nTitle: Browser Adapter Fixture\n\n`,
+        `URL: ${suite.server().url('/')}\nTitle: Browser Controller Fixture\n\n`,
       );
       for (const roleAndName of [
         'link "Visit second page"',
@@ -67,7 +67,7 @@ describe('inspect_page tool', () => {
       const result = await executeToolCall(
         smallCapRegistry,
         { id: 'call-oversized', name: 'inspect_page', input: {} },
-        { runDir: suite.runDir(), browser: suite.adapter() },
+        { runDir: suite.runDir(), browser: suite.controller() },
       );
 
       expect(result.isError).toBe(false);

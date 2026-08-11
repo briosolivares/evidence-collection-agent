@@ -15,7 +15,7 @@
 import { resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 
-import { launchPersistentChrome } from '../browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 import { runTask } from './runTask.js';
 
@@ -34,7 +34,10 @@ console.log(`Chrome profile: ${PROFILE_DIR}`);
 console.log(`runs directory: ${RUNS_BASE_DIR}`);
 console.log('Type a task and press enter. Ctrl-C or Ctrl-D ends the session.');
 
-const browser = await launchPersistentChrome({ profileDir: PROFILE_DIR });
+const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+  profileDir: PROFILE_DIR,
+});
+const browser = await browserSessionProvider.createSession();
 const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: PROMPT });
 
 // Node's readline only pauses input on Ctrl-C by default (it neither exits

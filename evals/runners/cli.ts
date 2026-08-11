@@ -7,7 +7,7 @@
  * logic lives in the modules it wires together. Paths and defaults come
  * from evals/config.ts.
  */
-import { launchPersistentChrome } from '../../src/browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import { formatProgressEvent } from '../../src/cli/replFormat.js';
 import { runTask } from '../../src/cli/runTask.js';
 import { DATASETS_DIR, EXPERIMENTS_DIR, MODEL, PROFILE_DIR, RUNS_DIR } from '../config.js';
@@ -36,7 +36,10 @@ async function main(): Promise<void> {
   // headed browser; each trial gets its own fresh tab (runTask owns tab
   // lifecycle). Tests and the fake agent keep injecting their own RunTaskFn
   // through runEvals — this wiring is the CLI's alone.
-  const browser = await launchPersistentChrome({ profileDir: PROFILE_DIR });
+  const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+    profileDir: PROFILE_DIR,
+  });
+  const browser = await browserSessionProvider.createSession();
   try {
     const realRunTask: RunTaskFn = (taskText, opts) =>
       runTask(taskText, {

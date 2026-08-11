@@ -25,7 +25,7 @@ describe('screenshot tool', () => {
     return executeToolCall(
       registry,
       { id: `call-${name}`, name, input },
-      { runDir: suite.runDir(), browser: suite.adapter() },
+      { runDir: suite.runDir(), browser: suite.controller() },
     );
   }
 

@@ -5,7 +5,8 @@
 // is classified and the next submit relaunches a fresh browser instead of
 // failing every subsequent run.
 
-import type { BrowserAdapter } from '../../browser/adapter.js';
+import type { BrowserController } from '../../browser/controller.js';
+import type { BrowserSessionProvider } from '../../browser/sessionProvider.js';
 import type { UiEvent } from '../store/state.js';
 import {
   startRun,
@@ -16,8 +17,8 @@ import {
 
 /** What the runtime needs; launch is injectable for tests. */
 export interface TuiRuntimeDeps {
-  /** Launches the session browser (production: launchPersistentChrome). */
-  launchBrowser: () => Promise<BrowserAdapter>;
+  /** Creates session browsers (production: local persistent Chrome). */
+  browserSessionProvider: BrowserSessionProvider;
   runsBaseDir?: string;
   /** Test seam: replaces the run-session bridge. */
   startRunFn?: (task: string, deps: RunSessionDeps) => RunHandle;
@@ -42,7 +43,7 @@ export interface TuiRuntime {
 }
 
 /** Recognize failures that mean the session browser itself is gone (the
- * adapter's operations reject once the context closes), as opposed to an
+ * controller's operations reject once the context closes), as opposed to an
  * ordinary in-run error. */
 export function isBrowserDeathMessage(message: string): boolean {
   return /browser has been closed|context or browser has been closed|browser session is closed|browserContext\.|Target closed|browser process crashed/i.test(
@@ -54,11 +55,11 @@ export function isBrowserDeathMessage(message: string): boolean {
 export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
   const now = deps.now ?? Date.now;
-  let browser: BrowserAdapter | undefined;
+  let browser: BrowserController | undefined;
   let started = false;
   let browserDead = false;
 
-  const ensureBrowser = async (): Promise<BrowserAdapter> => {
+  const ensureBrowser = async (): Promise<BrowserController> => {
     if (!started) {
       throw new Error('runtime not started — no browser session');
     }
@@ -74,7 +75,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         // Already gone.
       }
     }
-    browser = await deps.launchBrowser();
+    browser = await deps.browserSessionProvider.createSession();
     browserDead = false;
     return browser;
   };
@@ -85,7 +86,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         throw new Error('runtime already started');
       }
       started = true;
-      browser = await deps.launchBrowser();
+      browser = await deps.browserSessionProvider.createSession();
     },
 
     startRun(task, onEvent, opts) {
@@ -96,7 +97,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
       let cancelled = false;
 
       const done: Promise<RunOutcome> = (async () => {
-        let session: BrowserAdapter;
+        let session: BrowserController;
         try {
           session = await ensureBrowser();
         } catch (error) {

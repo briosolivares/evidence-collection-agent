@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
 import { runTask } from '../src/cli/runTask.js';
 import { METRICS_FILENAME, type RunMetrics } from '../src/loop/agentLoop.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
@@ -33,7 +33,10 @@ console.log(`task:        ${task}`);
 console.log(`start URL:   ${START_URL}`);
 console.log(`Chrome data: ${PROFILE_DIR}`);
 
-const browser = await launchPersistentChrome({ profileDir: PROFILE_DIR });
+const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+  profileDir: PROFILE_DIR,
+});
+const browser = await browserSessionProvider.createSession();
 
 try {
   const result = await runTask(task, {

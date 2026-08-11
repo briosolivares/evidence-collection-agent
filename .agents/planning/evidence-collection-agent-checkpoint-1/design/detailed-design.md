@@ -119,7 +119,8 @@ flowchart TD
     U["Terminal REPL\n(user types a task)"] --> L["Agent loop"]
     L <-->|"messages + tools"| M["Claude API\n(claude-sonnet-5, streaming,\nprompt caching)"]
     L -->|"tool calls"| T["Tool registry\n10 tools, zod-validated,\nsize-capped results"]
-    T --> B["Browser adapter\n(Playwright API)"]
+    T --> B["BrowserController\n(engine-neutral actions)"]
+    SP["BrowserSessionProvider\n(local or hosted)"] --> B
     B --> C["Local Chrome\nvisible window,\npersistent profile"]
     T --> R["Run directory\nruns/run-id/\nartifacts + manifest.json\n+ transcript.jsonl"]
     L -.->|"OpenTelemetry"| O["Langfuse\n(traces + metrics)"]
@@ -240,7 +241,7 @@ Thinking and effort settings stay at API defaults. Spend policy: be sensible; no
 
 ## The Browser Layer
 
-**Decision: Playwright driving normal, local Chrome — visible window, persistent profile — behind an engine-agnostic adapter.**
+**Decision: Playwright driving normal, local Chrome — visible window, persistent profile — behind an engine-neutral `BrowserController`, with session acquisition behind `BrowserSessionProvider`.**
 
 ### Playwright
 
@@ -259,9 +260,9 @@ A **persistent profile** is a browser profile whose cookies and logins survive r
 
 
 
-### The adapter and the escalation path
+### The controller, session provider, and escalation path
 
-The **adapter** is a thin interface our tools call instead of calling Playwright directly. **Why:** it makes the browser swappable without touching the loop or tools.
+`BrowserController` is the thin interface our tools call instead of calling Playwright directly. `BrowserSessionProvider` creates those controllers without exposing whether the session is local or hosted. **Why:** browser actions remain stable while session hosting can move from local Chrome to Browserbase without touching the loop, tools, or `runTask`.
 
 If a site blocks us, escalation happens one step at a time — *only on an observed block, never preemptively*:
 
@@ -269,7 +270,7 @@ If a site blocks us, escalation happens one step at a time — *only on an obser
 2. **Camoufox** — a Firefox fork with engine-level fingerprint spoofing, with its randomized fingerprint pinned (randomization would hurt consistency, priority #4).
 3. **Paid stealth services** — last resort.
 
-To make those calls with data instead of guesses, a Browserbase connection (hosted browsers; an API key and one connect call) gets wired into the adapter early, so block rates can be measured locally vs. hosted.
+To make those calls with data instead of guesses, a `BrowserbaseBrowserSessionProvider` (hosted browsers; an API key and one connect call) can be added alongside `LocalChromeBrowserSessionProvider`, so block rates can be measured locally vs. hosted while both return the same controller contract.
 
 ### Browser state between runs
 
@@ -565,7 +566,6 @@ flowchart LR
     R --> G
     G --> S["accuracy, completion,\ntask pass over k = 3 trials"]
 ```
-
 
 
 

@@ -5,8 +5,8 @@ import { join } from 'node:path';
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import type { BrowserAdapter } from '../browser/adapter.js';
-import { launchPersistentChrome } from '../browser/playwrightAdapter.js';
+import type { BrowserController } from '../browser/controller.js';
+import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
 import {
   METRICS_FILENAME,
   type RunMetrics,
@@ -92,7 +92,7 @@ async function readTranscript(runDir: string): Promise<TranscriptEvent[]> {
 }
 
 describe('runTask', () => {
-  let browser: BrowserAdapter;
+  let browser: BrowserController;
   let fixtureServer: FixtureServer;
   let tempRoot: string;
   let runsBaseDir: string;
@@ -101,10 +101,11 @@ describe('runTask', () => {
     fixtureServer = await startFixtureServer();
     tempRoot = await mkdtemp(join(tmpdir(), 'run-task-test-'));
     runsBaseDir = join(tempRoot, 'runs');
-    browser = await launchPersistentChrome({
+    const browserSessionProvider = new LocalChromeBrowserSessionProvider({
       profileDir: join(tempRoot, 'chrome-profile'),
       headless: true,
     });
+    browser = await browserSessionProvider.createSession();
   }, TEST_TIMEOUT_MS);
 
   afterEach(async () => {
@@ -125,7 +126,7 @@ describe('runTask', () => {
       const taskText =
         'Inspect the local evidence fixture and write its title and URL to stories.csv.';
       const fixtureUrl = fixtureServer.url('/');
-      const csv = `title,url\nBrowser Adapter Fixture,${fixtureUrl}\n`;
+      const csv = `title,url\nBrowser Controller Fixture,${fixtureUrl}\n`;
       const fake = scriptModel([
         toolResponse('navigate-1', 'navigate', { url: fixtureUrl }, {
           input_tokens: 11,
@@ -169,9 +170,9 @@ describe('runTask', () => {
       expect(await readFile(join(result.runDir, 'stories.csv'), 'utf8')).toBe(csv);
 
       // The third request can only contain this page data if navigate and
-      // inspect_page ran through the real browser adapter in the prior turns.
+      // inspect_page ran through the real browser controller in the prior turns.
       expect(JSON.stringify(fake.requests[2])).toContain(fixtureUrl);
-      expect(JSON.stringify(fake.requests[2])).toContain('Browser Adapter Fixture');
+      expect(JSON.stringify(fake.requests[2])).toContain('Browser Controller Fixture');
       expect(fake.requests).toHaveLength(4);
 
       const events = await readTranscript(result.runDir);
