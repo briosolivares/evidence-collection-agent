@@ -156,3 +156,89 @@ Verification evidence:
 - `R1-H1` (agent-judged, honestly: I drove and judged this myself, no human eyes on it): Python pty+TIOCSWINSZ driver (/tmp/r1_pty.py, /tmp/r1_pty2.py) ran `npm run sherlock -- --demo`, waited 50 s for the demo to finish, then typed the script; ANSI stripped with perl. 80-col captures (/tmp/r1-pty80.out, /tmp/r1-pty80b.out): `/` renders all four rows (`› /help   Show this list` through `  /exit   Quit Sherlock`) above the composer; `r` re-filters live to only `› /runs   Browse past run directories`; raw bytes show the typed prefix bold — selected row is ESC[38;2;174;164;255m + `› ` + ESC[1m + `/r` + ESC[22m + `uns` with the description in muted ESC[38;2;125;121;147m, matching the Claude Code reference treatment; down-arrow moves `›` from /help to /runs; Tab completes the input to `/runs` without submitting; Enter then opens the real Past runs overlay (12 runs listed); Esc closes it; `/exit`+Enter (Enter submits the selected command) quits cleanly. Esc-dismissal also captured: panel gone while `› /r` stays in the composer, and the next edit re-shows it. 44-col capture (/tmp/r1-pty44.out): same panel intact, and the width scan (unicodedata.east_asian_width display columns, /tmp/r1_width.py) reports 0 of the stripped capture's lines over 44 (widest exactly 44 — the composer border).
 
 Statuses flipped: R1-F1, R1-F2, R1-F3, R1-H1 → pass. R2/R3 untouched.
+
+## 2026-08-11 11:13 PDT — Revision round 1 (R1–R3) complete: all 84 features pass
+
+R1 was implemented directly on this branch; R2 and R3 ran as parallel subagents in
+isolated worktrees and were combined here (R2 fast-forwarded, R3 cherry-picked as
+278a619 from df2b400 with two both-added conflicts resolved in format.ts/state.ts).
+Statuses were flipped only after re-verifying the MERGED tree. Sub-agent evidence
+below is reproduced from their reports (agent-judged, PTY-verified in their
+worktrees before the merge).
+
+### R1 — slash-command autosuggest (commit edbada0, verified on this branch)
+- R1-V1: commands.test.ts 12/12; reducer.test.ts 27/27 (routeInput/HELP_TEXT now
+  derive from the single SLASH_COMMANDS registry; HELP_TEXT byte-identical).
+- R1-V2: command-suggest.test.tsx 12/12 — '/' lists all four commands, '/e' filters
+  to /evals+/exit, down+Enter opens the Past runs overlay, Tab completes without
+  submitting, Esc dismisses (150 ms ESC wait) and typing re-shows, no-match submits
+  as typed.
+- R1-V3: npm test 57 files / 396 tests green; typecheck exit 0; git diff --check
+  clean; core dirs zero-diff.
+- R1-H1 (agent-judged PTY): Python pty+TIOCSWINSZ over `npm run sherlock -- --demo`;
+  80-col frames show the panel above the composer, live filtering to
+  '› /runs   Browse past run directories', raw bytes confirm prefix bolding
+  (ESC[1m/rESC[22muns); down moves the marker, Tab completes unsubmitted, Enter
+  opens the real overlay. 44-col capture: 0 lines over 44 display columns.
+
+### R2 — arrow-navigable /runs browser (commit 33e6a6a, agent-verified pre-merge)
+- R2-V1/V2: runs-list.test.tsx (12) + app.test.tsx — Enter and right-arrow open the
+  highlighted run's detail in-overlay (artifacts + sha256 prefixes + 'completed ·
+  5 turns · 31.2k tokens · 1m 24s' asserted); left/Esc return to the list with the
+  cursor preserved; up/down in detail switch runs, clamped at both ends;
+  load-failure path renders "Couldn't read this run: …" inside the overlay; detail
+  renders with zero overflow at 44 columns; app-level test drives the whole loop
+  through the real reducer and real loadRunSummary over fixture run dirs, and
+  asserts no transcript summary is appended.
+- R2-V3 (in the agent worktree): npm test 57 files / 401 tests green; typecheck 0;
+  git diff --check clean.
+- R2-H1 (agent-judged PTY, real runs/ with 12 runs): 80-col script(1) capture and
+  44-col Python pty capture. Frames: list ('Past runs', 8-row window, '1/12',
+  '↑↓ select · enter view · esc close') → Enter → 'Past runs · run 1/12' with
+  '◆ heading.txt  31 B · sha256 e510f63c425b' and '◆ andera_homepage.png  84.1 KB ·
+  sha256 89e711b881dc' → down → 'run 2/12' → left → list with '›' on row 2
+  (cursor preserved) → Esc closes. Width: 0/1698 lines over 44 cols; 0/1657 over 80.
+- Dead code removed: show_run_summary reducer action, run_summary transcript body +
+  renderer; formatBytes moved to format.ts as a public helper. S7-F5/S7-F6
+  descriptions revised in features.json to match the in-overlay behavior.
+
+### R3 — startup welcome card (df2b400, cherry-picked as 278a619; agent-verified pre-merge)
+- R3-V1: shell.test.tsx 7/7 — '╭─ Sherlock — evidence collection agent ─' in the
+  border chrome; 'Welcome back Brios!' with injected identity; art rows asserted;
+  footer 'claude-sonnet-5 · ~/Desktop/Code/evidence-collection-agent'; the
+  ANTHROPIC_API_KEY warning still asserted at apiKeyPresent=false; generic
+  no-identity fallback asserted.
+- R3-V2: renderAt(44) — card lines exactly 42 wide, zero overflow, footer path
+  middle-truncated; renderAt(36) — title truncates, zero overflow. Smoke +
+  command-suggest snapshots re-recorded; only the banner block changed.
+- R3-V3 (in the agent worktree): 400/400 total (394 in a load-constrained full run
+  + playwrightAdapter 6/6 standalone after an environmental beforeAll timeout under
+  parallel load); typecheck 0; git diff --check clean.
+- R3-H1 (agent-judged PTY): real startup captures at 80 and 44 cols (Python
+  pty.fork + TIOCSWINSZ). Card shows title-in-border, 'Welcome back Brios!' (real
+  git config), lens art, model·path footer; missing-key warning verified in a
+  separate capture with the var unset via env manipulation (no .env created or
+  read). 0 lines over width in both captures.
+- Identity {name, model, cwd} computed in main.tsx (git config user.name first word,
+  fallback os.userInfo; DEFAULT_MODEL imported read-only from src/model/callModel.ts);
+  reducer stays pure; App identity prop optional with a deterministic generic
+  fallback.
+
+### Merged-tree verification (this branch, after combining all three)
+- npm run typecheck → exit 0.
+- npm test → 57 files / 405 tests, all passed (26.4 s).
+- git diff --check → clean. Core check: `git diff --name-only edbada0..HEAD --
+  src/loop src/model src/tools src/run src/browser src/tracing` → empty.
+- Combined PTY session (agent-judged; /tmp/combined-pty80.out, 214 KB, 80×30,
+  Python pty driver): startup card ('╭─ Sherlock — evidence collection agent ─…╮',
+  'Welcome back Brios!', '│  ◆  │' lens row, 'claude-sonnet-5 ·
+  ~/Desktop/Code/eviden…s/evidence-agent-tui') → demo played to '✓ Brewed in 42s'
+  → '/' opened the suggestion panel ('/help' … 'Browse past run…') → 'r' filtered
+  → Enter opened 'Past runs' ('enter view · esc close') → Enter opened run 1/12
+  detail (sha256 prefixes visible) → down to 'run 2/12' ('◆ heading3.txt  14 B ·
+  sha256 162b81548a8d', '↑↓ prev/next run · ← back · esc back') → left returned to
+  the list with '›' preserved on row 2 → Esc closed → /exit quit cleanly.
+  Width: 0/1982 lines over 80 display columns.
+- Notable operational finding: both isolated agent worktrees were created on a
+  wrong base (70af47f, pre-TUI lineage); both agents detected this and repointed to
+  edbada0 before starting. Recorded in project memory.

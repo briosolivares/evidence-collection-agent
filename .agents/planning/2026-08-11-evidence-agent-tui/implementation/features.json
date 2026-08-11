@@ -474,7 +474,7 @@
     {
       "id": "S7-F5",
       "step": 7,
-      "description": "Run summaries show task, timing, tokens, artifact sizes, and SHA-256 prefixes.",
+      "description": "Run summaries (shown in the /runs detail view) show task, timing, tokens, artifact sizes, and SHA-256 prefixes.",
       "verification": [
         "S7-V3"
       ],
@@ -483,7 +483,7 @@
     {
       "id": "S7-F6",
       "step": 7,
-      "description": "/runs routes into the overlay and selection appends an inline transcript summary.",
+      "description": "/runs routes into the overlay and selection opens the run summary in the overlay detail view (revised by R2; was: appends an inline transcript summary).",
       "verification": [
         "S7-V4"
       ],
@@ -707,7 +707,7 @@
       "verification": [
         "R2-V1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R2-F2",
@@ -717,7 +717,7 @@
         "R2-V2",
         "R2-V3"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R2-F3",
@@ -726,7 +726,7 @@
       "verification": [
         "R2-V1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R2-H1",
@@ -735,7 +735,7 @@
       "verification": [
         "R2-H1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R3-F1",
@@ -744,7 +744,7 @@
       "verification": [
         "R3-V1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R3-F2",
@@ -753,7 +753,7 @@
       "verification": [
         "R3-V1"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R3-F3",
@@ -763,7 +763,7 @@
         "R3-V2",
         "R3-V3"
       ],
-      "status": "todo"
+      "status": "pass"
     },
     {
       "id": "R3-H1",
@@ -772,7 +772,7 @@
       "verification": [
         "R3-H1"
       ],
-      "status": "todo"
+      "status": "pass"
     }
   ]
 }
