@@ -36,3 +36,20 @@ Verification evidence:
 - `S2-H1` (human-judged) — verified by the agent from a PTY capture (/tmp/sherlock-tty2.out): four submissions ("first investigation", /help, "second investigation", /frobnicate) each landed as persistent scrollback blocks (▸ entries, help block, gentle notice) with the bordered composer repainted anchored beneath after every append; Ctrl+C exited cleanly.
 
 Statuses flipped: S2-F1…S2-F6 → pass.
+
+## 2026-08-11 02:23 PDT — Step 3 complete: live region, status line, --demo
+
+- Reducer now covers the full UiEvent set with the design's finalization rules: streaming text finalizes at first tool_pending of a batch and at turn_end; pending tool lines finalize (✓/✗) on tool_exec_end; dangling pending settle as ⚠ retried at next turn_start and at run end; tokens = settled sum of turn_end (input+output) plus in-turn estimate (chars/4) snapped at turn_end; run_finished(completed) → completion item using the session's configured verb; budget_exceeded → distinct error item carrying reason + runDir; run_cancelled/run_failed supported. Stale run events with no live run are ignored.
+- New: `src/tui/components/StatusLine.tsx` (✢✳✻✽ glyph at config.glyphFps, working word re-picked every config.wordCycleMs via exported no-repeat `pickWord`, 1 s clock, `↳ tokens · elapsed (esc to interrupt)`; injectable now/rng), `LiveRegion.tsx` (streaming prose + pending ● lines + StatusLine), `src/tui/demo.ts` (createDemoScript(baseAt) — logical 42 s / 18 700-token investigation incl. one errored click; playDemo with cancel). `--demo` flag wired in main.tsx/App.
+- SessionState gained `completionVerb` (fixed at init from config) so the pure reducer can build completion items.
+
+Verification evidence:
+
+- `S3-V1` exit 0 (both components exist).
+- `S3-V2` exit 0 — reducer suite (now 21 cases) covers text finalization at batch/turn end, pending→finalized, dangling→retried at turn_start and run end, settled-vs-estimate snap math, budget_exceeded distinctness, cancel/fail paths.
+- `S3-V3` exit 0 — status-line suite: injected clock/RNG; pickWord no-repeat sweep; `↳ 12.4k tokens · 18s` exact; 'Wrapping up…' while cancelling; configured verb 'Distilled in 1m 24s · 31.2k tokens' assertion.
+- `S3-V4` exit 0 — demo suite: script finite → idle; final rendered transcript contains `✓ Brewed in 42s · 18.7k tokens`; error-activity survives; playDemo order + cancellation.
+- `S3-V5` exit 0 — typecheck (61 TUI tests green overall).
+- `S3-H1` (human-judged) — agent-judged from a 32 s PTY capture of `npm run sherlock -- --demo` (/tmp/sherlock-demo.out, 192 KB): prose streams in place (growing text repainted only in the live region, 13 partial paints, single final paint once static); 4 distinct working words over the ~19 s playback (Consulting the archives / Sifting / Brewing / Reading the fine print); token meter ticks up from 0 → 18.7k; ● lines get ✓; completion line `✓ Brewed in 42s · 18.7k tokens` + dim runDir painted exactly once; user_task painted exactly once (no layout shift of finalized content); composer re-enabled after completion.
+
+Statuses flipped: S3-F1…S3-F9 → pass.

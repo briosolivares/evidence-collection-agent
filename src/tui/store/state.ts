@@ -79,9 +79,15 @@ export type TranscriptItem = TranscriptItemBody & { id: number };
 
 /** A tool line still awaiting its result — rendered in the live region. */
 export interface PendingTool {
+  /** Local key, unique within the run. */
   id: number;
+  /** Tool name, used to pair stream-announced lines with exec events. */
+  name: string;
+  /** Execution id from the tracing seam, once execution has started. */
+  execId?: number;
   line: string;
   isEvidence: boolean;
+  sourceUrl?: string;
   verbose?: { input: string; result: string };
 }
 
@@ -91,9 +97,13 @@ export interface LiveRunState {
   streamingText: string;
   /** Tool lines awaiting results. */
   pendingTools: PendingTool[];
+  /** Local id source for pending tool lines. */
+  nextPendingId: number;
   /** Epoch ms the run started (drives elapsed time). */
   startedAt: number;
-  /** Settled = summed turn_end usage; estimate = in-turn growth on top. */
+  /** Settled = summed turn_end usage (input + output); estimate = settled
+   * plus a light in-turn guess from streamed text (~chars/4), snapped back
+   * to settled at each turn_end. */
   tokens: { settled: number; estimate: number };
   /** Current turn number. */
   turn: number;
@@ -121,6 +131,8 @@ export type UiEvent =
       outcome: 'completed' | 'budget_exceeded';
       finalText?: string;
       runDir: string;
+      /** Which guard tripped, on budget_exceeded. */
+      reason?: string;
       at: number;
     }
   | { type: 'run_cancelled'; at: number }
@@ -132,6 +144,8 @@ export interface SessionState {
   transcript: readonly TranscriptItem[];
   /** Monotonic id source for transcript items. */
   nextItemId: number;
+  /** Completion-line verb, fixed at session start from config (R6). */
+  completionVerb: string;
   /** Present only while a run is active (running/cancelling). */
   live?: LiveRunState;
 }

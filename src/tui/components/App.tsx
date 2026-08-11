@@ -1,7 +1,8 @@
 import { Box, Text, useApp } from 'ink';
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import type { SherlockConfig } from '../config.js';
+import { createDemoScript, playDemo } from '../demo.js';
 import {
   createInitialState,
   HELP_TEXT,
@@ -11,28 +12,35 @@ import {
 } from '../store/reducer.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
+import { LiveRegion } from './LiveRegion.js';
 import { Transcript } from './Transcript.js';
 
 interface AppProps {
   config: SherlockConfig;
   /** False renders the missing-API-key warning banner. */
   apiKeyPresent: boolean;
+  /** Play the canned demo investigation on mount (`--demo`). */
+  demo?: boolean;
   /** Test seam for /exit; defaults to Ink's app exit. */
   onExit?: () => void;
 }
 
 /**
- * The Sherlock shell: transcript over <Static>, slash routing, and the
- * persistent composer. Tasks append to the transcript; the run bridge
- * (step 4) will pick them up from here.
+ * The Sherlock shell: transcript over <Static>, the live region while a
+ * run is active, slash routing, and the persistent composer.
  */
-export function App({ config, apiKeyPresent, onExit }: AppProps) {
+export function App({ config, apiKeyPresent, demo = false, onExit }: AppProps) {
   const { exit } = useApp();
   const [state, dispatch] = useReducer(
     reduce,
-    { apiKeyPresent },
+    { apiKeyPresent, completionVerb: config.completionVerb },
     createInitialState,
   );
+
+  useEffect(() => {
+    if (!demo) return;
+    return playDemo(createDemoScript(Date.now()), dispatch);
+  }, [demo]);
 
   const handleSubmit = (text: string) => {
     const routed = routeInput(text);
@@ -52,13 +60,20 @@ export function App({ config, apiKeyPresent, onExit }: AppProps) {
     }
   };
 
-  const composerActive = state.mode === 'idle';
+  const running = state.mode === 'running' || state.mode === 'cancelling';
 
   return (
     <Box flexDirection="column">
       <Transcript items={state.transcript} />
+      {running && state.live !== undefined && (
+        <LiveRegion
+          config={config}
+          live={state.live}
+          cancelling={state.mode === 'cancelling'}
+        />
+      )}
       <Box flexDirection="column" marginTop={1}>
-        <Composer disabled={!composerActive} onSubmit={handleSubmit} />
+        <Composer disabled={state.mode !== 'idle'} onSubmit={handleSubmit} />
         <Text color={theme.muted}>  /help for commands</Text>
       </Box>
     </Box>

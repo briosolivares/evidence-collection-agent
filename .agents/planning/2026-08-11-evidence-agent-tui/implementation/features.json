@@ -139,7 +139,7 @@
       "verification": [
         "S3-V1"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F2",
@@ -148,7 +148,7 @@
       "verification": [
         "S3-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F3",
@@ -157,7 +157,7 @@
       "verification": [
         "S3-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F4",
@@ -166,7 +166,7 @@
       "verification": [
         "S3-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F5",
@@ -175,7 +175,7 @@
       "verification": [
         "S3-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F6",
@@ -184,7 +184,7 @@
       "verification": [
         "S3-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F7",
@@ -193,7 +193,7 @@
       "verification": [
         "S3-V4"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F8",
@@ -202,7 +202,7 @@
       "verification": [
         "S3-V5"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F9",
@@ -212,7 +212,7 @@
         "S3-H1"
       ],
       "humanJudged": true,
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S4-F1",

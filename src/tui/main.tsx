@@ -40,6 +40,10 @@ const config = createConfig({
 });
 
 render(
-  <App config={config} apiKeyPresent={Boolean(process.env.ANTHROPIC_API_KEY)} />,
+  <App
+    config={config}
+    apiKeyPresent={Boolean(process.env.ANTHROPIC_API_KEY)}
+    demo={process.argv.includes('--demo')}
+  />,
   { exitOnCtrlC: true },
 );
