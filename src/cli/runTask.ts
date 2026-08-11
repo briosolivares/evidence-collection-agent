@@ -5,6 +5,7 @@ import {
 } from '../loop/agentLoop.js';
 import type { CallModel } from '../loop/messages.js';
 import {
+  DEFAULT_MODEL,
   makeCallModel,
   type ProgressEvent,
 } from '../model/callModel.js';
@@ -14,6 +15,10 @@ import {
 } from '../run/artifacts.js';
 import { generateRunId } from '../run/runId.js';
 import { createRunDir } from '../run/runDir.js';
+import {
+  createRunTracing,
+  type RunTracing,
+} from '../tracing/runTracing.js';
 import { actionTools } from '../tools/actionTools.js';
 import { evidenceTools } from '../tools/evidenceTools.js';
 import { fileTools } from '../tools/fileTools.js';
@@ -51,6 +56,9 @@ export interface RunTaskConfig {
   /** Optional model implementation for tests or alternate clients. When
    * omitted, runTask creates the production streaming Anthropic client. */
   callModel?: CallModel;
+  /** Optional run-scoped tracing implementation. When omitted, tracing is
+   * configured from LANGFUSE_* environment variables or becomes a no-op. */
+  tracing?: RunTracing;
 }
 
 /** The finished run directory together with the loop's terminal outcome. */
@@ -85,7 +93,7 @@ export async function runTask(
     ...actionTools,
     ...evidenceTools,
   ]);
-  const callModel = config.callModel ?? makeCallModel({
+  const baseCallModel = config.callModel ?? makeCallModel({
     model: config.model,
     system: SYSTEM_PROMPT,
     apiToolDefs: toApiToolDefs(registry),
@@ -99,23 +107,32 @@ export async function runTask(
   );
   initManifest(runDir, taskText);
 
+  const tracing = config.tracing ?? createRunTracing();
+  const callModel = tracing.wrapCallModel(
+    baseCallModel,
+    config.model ?? DEFAULT_MODEL,
+  );
+  const tracedRegistry = tracing.wrapRegistry(registry);
+
   let tabOpened = false;
   try {
-    await config.browser.newTab();
-    tabOpened = true;
+    const result = await tracing.traceRun(taskText, async () => {
+      await config.browser.newTab();
+      tabOpened = true;
 
-    if (config.startUrl !== undefined) {
-      await config.browser.goto(config.startUrl);
-    }
+      if (config.startUrl !== undefined) {
+        await config.browser.goto(config.startUrl);
+      }
 
-    const result = await runAgentLoop(
-      taskText,
-      { callModel, registry, runDir, browser: config.browser },
-      {
-        maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
-        maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
-      },
-    );
+      return runAgentLoop(
+        taskText,
+        { callModel, registry: tracedRegistry, runDir, browser: config.browser },
+        {
+          maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+          maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
+        },
+      );
+    });
     return { runDir, ...result };
   } finally {
     try {
@@ -123,7 +140,11 @@ export async function runTask(
         await config.browser.closeTab();
       }
     } finally {
-      finalizeManifest(runDir);
+      try {
+        finalizeManifest(runDir);
+      } finally {
+        await tracing.close();
+      }
     }
   }
 }
