@@ -1,0 +1,4 @@
+{
+  "task": "Find Apple's 8-K filing from January 29, 2026 on SEC EDGAR, download the filing document, and take a screenshot of the filing page.",
+  "startUrl": "about:blank"
+}
