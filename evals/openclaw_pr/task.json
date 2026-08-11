@@ -1,4 +1,4 @@
 {
   "task": "What is the most recent pull request on the OpenClaw GitHub repository? Write a brief answer explaining what it does.",
-  "startUrl": "about:blank"
+  "startUrl": "https://github.com/openclaw/openclaw"
 }

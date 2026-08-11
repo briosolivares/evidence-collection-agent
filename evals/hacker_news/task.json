@@ -1,4 +1,4 @@
 {
   "task": "Create a CSV of the top 5 stories on Hacker News right now, with columns for title, URL, and points.",
-  "startUrl": "about:blank"
+  "startUrl": "https://news.ycombinator.com/"
 }
