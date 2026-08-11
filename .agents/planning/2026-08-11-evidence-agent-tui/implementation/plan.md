@@ -14,6 +14,49 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 - [ ] Step 8: `/evals` — task multi-select, k prompt, live trial loop, report
 - [ ] Step 9: Hardening + polish pass against the vision checklist
 
+## Task graph — parallelization (T1–T9)
+
+Tasks are the plan's steps: **Tn = Step n**. Arrows are hard dependencies ("must be complete before"); tasks with no path between them can run in parallel.
+
+```mermaid
+flowchart LR
+    T1["T1 Scaffold"]
+    T2["T2 Store + transcript + slash"]
+    T3["T3 Live region + status line (--demo)"]
+    T4["T4 RunSession bridge (real runs)"]
+    T5["T5 Esc cancellation"]
+    T6["T6 Semantic/evidence lines + tracing"]
+    T7["T7 /runs browser"]
+    T8["T8 /evals"]
+    T9["T9 Hardening + polish"]
+
+    T1 --> T2 --> T3 --> T4
+    T1 -. "bridge internals only<br/>(runSession vs stubs)" .-> T4
+    T1 -. "semantic.ts (pure) only" .-> T6
+    T4 --> T5
+    T4 --> T6
+    T2 --> T7
+    T2 --> T8
+    T5 --> T8
+    T4 --> T8
+    T5 --> T9
+    T6 --> T9
+    T7 --> T9
+    T8 --> T9
+```
+
+**Sequential spine:** T1 → T2 → T3 → T4 → T9. Each of these genuinely consumes the previous one's output (scaffold → store → rendering pipeline → real-event integration → acceptance over everything).
+
+**Parallel opportunities:**
+
+- **T7 ∥ T3–T6** — the `/runs` browser only needs T2's transcript/overlay machinery; it reads run directories from disk and never touches the bridge. It can proceed the moment T2 lands.
+- **T5 ∥ T6** — after T4, cancellation (abort path) and semantic lines (tracing seam) touch disjoint code and can be built concurrently.
+- **Early starts (dashed edges)** — two pieces are pure and only need T1: the bridge internals of T4 (`runSession.ts` developed against a stubbed SDK stream; its TUI integration still waits for T3) and T6's `semantic.ts` derivation table (its tracing integration still waits for T4).
+- **T8** needs the menu machinery (T2), the run pipeline (T4), and Esc-skip semantics (T5); T6 improves its output but is not a prerequisite.
+- **T9** is the join point: it hardens error paths and runs acceptance across everything, so it goes last.
+
+Minimal-latency schedule for two workers: A does T1 → T2 → T3 → T4-integration → T5; B starts T4-internals + T6's `semantic.ts` after T1, picks up T7 after T2, then T6-integration after T4; either does T8 after T5; both converge on T9.
+
 ---
 
 ## Step 1: Scaffold `sherlock` — bin, deps, theme, formatting, static shell
@@ -28,6 +71,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 
 **Demo:** `npm run sherlock` (or linked `sherlock`) opens the purple-themed shell; typing text gets a styled notice; Ctrl+C exits cleanly.
 
+**Verify:**
+
+- `S1-V1` — `node -e "const fs=require('node:fs'); const p=require('./package.json'); const t=JSON.parse(fs.readFileSync('tsconfig.json','utf8')); const required=['ink','react','ink-text-input','ink-select-input']; const dev=['@types/react','ink-testing-library']; if(p.bin?.sherlock!=='bin/sherlock.mjs'||p.scripts?.sherlock!=='node bin/sherlock.mjs'||required.some(x=>!p.dependencies?.[x])||dev.some(x=>!p.devDependencies?.[x])||t.compilerOptions?.jsx!=='react-jsx') process.exit(1)"` exits 0.
+- `S1-V2` — `test -x bin/sherlock.mjs && test -f src/tui/main.tsx && test -f src/tui/theme.ts && test -f src/tui/format.ts && test -f src/tui/config.ts && test -f src/tui/components/App.tsx && test -f src/tui/components/Composer.tsx` exits 0.
+- `S1-V3` — `npx vitest run tests/tui/format.test.ts tests/tui/config.test.ts tests/tui/shell.test.tsx` exits 0; the shell suite asserts that the banner, composer, and submitted-text notice render.
+- `S1-V4` — `npm run typecheck` exits 0.
+- `S1-V5` — `npm run sherlock </dev/null > /tmp/sherlock-step1.out 2>&1` exits non-zero, and `grep -Ei 'tty|interactive terminal' /tmp/sherlock-step1.out` exits 0.
+- `S1-H1` — Human-judged visual remainder: in a TTY, the shell uses the Andera purple theme, accepts text, shows the styled notice, and Ctrl+C exits without leaving terminal artifacts.
+
 ## Step 2: Session store, transcript rendering, slash routing
 
 **Objective:** The append-only transcript works end-to-end with pure state management, and `/help` + `/exit` function.
@@ -39,6 +91,14 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 **Integration:** Replaces Step 1's echo notice with real store dispatch.
 
 **Demo:** Type a task → it appears as a transcript entry; `/help` shows the command list; `/exit` quits; earlier entries persist in scrollback as new ones append.
+
+**Verify:**
+
+- `S2-V1` — `test -f src/tui/store/state.ts && test -f src/tui/store/reducer.ts && test -f src/tui/components/Transcript.tsx && test -f src/tui/components/TranscriptItem.tsx` exits 0.
+- `S2-V2` — `npx vitest run tests/tui/reducer.test.ts` exits 0; the suite covers user-task and notice appends, unknown-command handling, and retention of `idle` mode.
+- `S2-V3` — `npx vitest run tests/tui/transcript.test.tsx tests/tui/app.test.tsx` exits 0; the suites assert transcript persistence, submitted-text rendering, `/help`, `/exit`, and the gentle unknown-command notice.
+- `S2-V4` — `npm run typecheck` exits 0.
+- `S2-H1` — Human-judged visual remainder: several submitted entries remain readable in terminal scrollback while the composer stays anchored at the bottom.
 
 ## Step 3: Live region + status line on a scripted demo run
 
@@ -52,6 +112,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 
 **Demo:** `sherlock --demo` plays a ~30 s fake investigation: prose streams, `●` lines appear and get ✓, words cycle (several across the run), tokens tick up, and it ends with `✓ Brewed in 42s · 18.7k tokens` persisting in the transcript.
 
+**Verify:**
+
+- `S3-V1` — `test -f src/tui/components/LiveRegion.tsx && test -f src/tui/components/StatusLine.tsx` exits 0.
+- `S3-V2` — `npx vitest run tests/tui/reducer.test.ts` exits 0; full event-sequence fixtures assert text finalization, pending-tool completion, dangling-tool `retried` settlement, and settled-versus-estimated token math.
+- `S3-V3` — `npx vitest run tests/tui/status-line.test.tsx` exits 0; the suite uses an injected clock/RNG, asserts no consecutive word repeat, matches `↳ 12.4k tokens · 18s`, and matches the configured completion verb.
+- `S3-V4` — `npx vitest run tests/tui/demo.test.ts` exits 0; the scripted event source terminates and its final rendered transcript contains `✓ Brewed in 42s · 18.7k tokens`.
+- `S3-V5` — `npm run typecheck` exits 0.
+- `S3-H1` — Human-judged visual remainder: `npm run sherlock -- --demo` shows in-place streaming and restrained animation, cycles several working words over the run, and finishes without flicker or layout shift.
+
 ## Step 4: RunSession bridge — real runs
 
 **Objective:** Typing a task runs the real agent with live streaming in the TUI.
@@ -63,6 +132,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 **Integration:** The store's submit handler dispatches to the bridge instead of the demo script; `--demo` remains for UI iteration.
 
 **Demo:** `sherlock` → type "Create a CSV of the top 5 Hacker News stories…" → Chrome opens, prose streams, tool names appear, completion line shows real time/tokens, and the run directory on disk contains the CSV + manifest.
+
+**Verify:**
+
+- `S4-V1` — `test -f src/tui/bridge/runSession.ts && test -f tests/tui/run-session.test.ts` exits 0.
+- `S4-V2` — `npx vitest run tests/tui/run-session.test.ts` exits 0; a stubbed SDK stream asserts ordered re-emission of `turn_start`, `text_delta`, `tool_use_start`, and `turn_end`, faithful usage totals, `run_finished` with `finalText`/`runDir`, and distinct `budget_exceeded` handling.
+- `S4-V3` — `npx vitest run tests/tui/app.test.tsx` exits 0; the suite asserts that task submission calls the run-session bridge, disables the composer during a run, preserves `--demo`, and renders the completed run directory.
+- `S4-V4` — `npx vitest run tests/tui/browser-lifecycle.test.ts` exits 0; the suite asserts one persistent browser is launched at startup, handed to runs, and closed during TUI teardown.
+- `S4-V5` — `npm run typecheck` exits 0.
+- `S4-H1` — Human-judged external-integration remainder (requires Chrome and an API key): a real task streams into the TUI and its displayed run directory contains the requested artifact plus `manifest.json`.
 
 ## Step 5: Esc cancellation
 
@@ -76,6 +154,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 
 **Demo:** Start a run, hit Esc mid-investigation: status flips to wrapping-up, an interrupted line lands in the transcript, and the next task can be typed immediately. The run dir has a finalized `manifest.json` and no `metrics.json`.
 
+**Verify:**
+
+- `S5-V1` — `npx vitest run tests/tui/run-session.test.ts` exits 0; the suite asserts that aborting mid-stream emits `run_cancelled`, and aborting during a stubbed tool batch waits for that batch before cancellation settles.
+- `S5-V2` — `npx vitest run tests/tui/reducer.test.ts` exits 0; the suite asserts `running → cancelling → idle`, a persistent `cancelled` item, token/elapsed preservation, and non-abort rejection mapping to an `error` item.
+- `S5-V3` — `npx vitest run tests/tui/app.test.tsx` exits 0; the suite asserts Esc is a no-op in `idle`, invokes `RunHandle.cancel()` once in `running`, shows the wrapping-up state, and re-enables the composer after cancellation.
+- `S5-V4` — `npx vitest run tests/tui/cancellation-artifacts.test.ts` exits 0; a fixture cancellation leaves a finalized `manifest.json` and no `metrics.json`.
+- `S5-V5` — `npm run typecheck` exits 0.
+- `S5-H1` — Human-judged interaction remainder: cancelling a real investigation feels responsive, preserves the transcript, and permits immediate submission of the next task without exiting Sherlock.
+
 ## Step 6: Semantic activity + evidence lines; verbose mode
 
 **Objective:** Tool activity reads semantically (`● Opening sec.gov/…`, `◆ Evidence saved → top5.csv`) instead of bare tool names.
@@ -87,6 +174,16 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 **Integration:** Bridge now passes `tracing` into `runTask`; the runDir is known mid-run (used by Step 7's freshness and the completion line).
 
 **Demo:** A real run now reads like the vision mockup: semantic `●` lines with ✓, `◆` evidence entries with sources, skimmable afterward; `sherlock --verbose` shows the raw detail beneath each action.
+
+**Verify:**
+
+- `S6-V1` — `test -f src/tui/store/semantic.ts && test -f src/tui/bridge/tuiTracing.ts` exits 0.
+- `S6-V2` — `npx vitest run tests/tui/semantic.test.ts` exits 0; table-driven cases cover all ten tool mappings, evidence classification, truncation, and URL-shortening edge cases.
+- `S6-V3` — `npx vitest run tests/tui/tui-tracing.test.ts` exits 0; a stub registry asserts validated inputs and success/error results are emitted, `runDir` is captured on first execution, and the `createRunTracing()` delegate is invoked.
+- `S6-V4` — `npx vitest run tests/tui/reducer.test.ts` exits 0; the suite asserts name-only pending lines upgrade in place on exec events and evidence events finalize as evidence items with source URLs when present.
+- `S6-V5` — `npx vitest run tests/tui/transcript.test.tsx` exits 0; default rendering omits raw input/result JSON while verbose rendering includes dim input/result details.
+- `S6-V6` — `npm run typecheck` exits 0.
+- `S6-H1` — Human-judged visual remainder: a real completed transcript is skimmable as navigation → investigation → evidence → conclusion, with evidence visually stronger than routine activity.
 
 ## Step 7: `/runs` — past-run browser
 
@@ -100,6 +197,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 
 **Demo:** After a few runs (including the Step 5 cancelled one), `/runs` lists them with correct statuses; selecting one prints its provenance summary inline; Esc returns to the composer.
 
+**Verify:**
+
+- `S7-V1` — `test -f src/tui/components/RunsList.tsx && test -f tests/tui/runs-list.test.tsx && test -f tests/tui/run-scanner.test.ts` exits 0.
+- `S7-V2` — `npx vitest run tests/tui/run-scanner.test.ts` exits 0; fixture directories assert newest-first ordering and classification as `✓` with metrics, `◐` without `finishedAt`, and `✗` when finalized without metrics, including a cancelled run never labeled `crashed`.
+- `S7-V3` — `npx vitest run tests/tui/runs-list.test.tsx` exits 0; the suite asserts windowed navigation, Enter selection, a summary containing task/duration/tokens plus artifact size and SHA-256 prefix, and Esc close.
+- `S7-V4` — `npx vitest run tests/tui/app.test.tsx` exits 0; the suite asserts `/runs` enters `runsList` mode and a selected summary is appended through the transcript pipeline before returning to the composer.
+- `S7-V5` — `npm run typecheck` exits 0.
+- `S7-H1` — Human-judged visual remainder: a long real run history remains navigable and summaries are legible without permanent panels or terminal layout breakage.
+
 ## Step 8: `/evals` — menu, trial loop, live progress
 
 **Objective:** Kick off eval batches from the TUI and watch trials stream live.
@@ -112,6 +218,15 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 
 **Demo:** `/evals` → select `stub` (+ another task), k=2 → trials stream with live status; assertions print pass/fail; the report block matches the CLI's format and lands in `evals/experiments/`.
 
+**Verify:**
+
+- `S8-V1` — `test -f src/tui/components/EvalsMenu.tsx && test -f src/tui/bridge/evalSession.ts` exits 0.
+- `S8-V2` — `npx vitest run tests/tui/eval-session.test.ts` exits 0; fixture-tree cases discover only `evals/*/task.json`, and stubbed run/oracle/grader cases assert sequential trial ordering, per-assertion verdicts, report assembly through `formatReport`, persistence through `writeResults`, and Esc skipping the remaining trials.
+- `S8-V3` — `npx vitest run tests/tui/evals-menu.test.tsx` exits 0; the suite asserts checkbox toggling, multi-select confirmation, default `k=3`, rejection of non-positive/non-integer k, and confirmation of a valid k.
+- `S8-V4` — `npx vitest run tests/tui/app.test.tsx` exits 0; the suite asserts `/evals` enters menu mode, accepted selection enters `evalsRunning`, and trial/report items use the same transcript/live-run pipeline as interactive tasks.
+- `S8-V5` — `npm run typecheck` exits 0.
+- `S8-H1` — Human-judged external-integration remainder (requires Chrome, an API key, and oracle access): a k=2 batch streams live trial progress, prints verdicts, and produces a report in `evals/experiments/` matching the CLI presentation.
+
 ## Step 9: Hardening + polish against the vision
 
 **Objective:** The failure paths and the feel are finished.
@@ -123,3 +238,14 @@ Each step ends with a working, demoable increment. Tests are written with (or be
 **Integration:** Touches all prior steps; ends with README usage note for `sherlock` (kept minimal).
 
 **Demo:** Kill Chrome mid-run → TUI reports the failure and recovers on the next task. Run in a narrow terminal — no layout breakage. The completed transcript of a real investigation reads: navigation → investigation → evidence → conclusion, at a glance.
+
+**Verify:**
+
+- `S9-V1` — `npx vitest run tests/tui/error-paths.test.ts tests/tui/browser-lifecycle.test.ts` exits 0; fixtures assert a mid-stream failure appends an error and returns to `idle`, browser-death errors are classified, and the next submit relaunches the browser.
+- `S9-V2` — `npx vitest run tests/tui/preflight.test.ts` exits 0; cases assert the missing-key banner, a one-line non-TTY failure with non-zero exit status, and Ctrl+C/double-Esc behavior while cancelling.
+- `S9-V3` — `npx vitest run tests/tui/smoke.test.tsx` exits 0; committed frame snapshots cover a full scripted run at normal and narrow terminal widths and contain user task, agent prose, finalized activity, emphasized evidence, completion, and composer states.
+- `S9-V4` — `node -e "const s=require('node:fs').readFileSync('README.md','utf8'); for(const x of ['sherlock','npm run sherlock','--demo','--verbose','/help','/runs','/evals','/exit','Esc']) if(!s.includes(x)) process.exit(1)"` exits 0.
+- `S9-V5` — `npm test` exits 0.
+- `S9-V6` — `npm run typecheck` exits 0.
+- `S9-V7` — `git diff --exit-code main...HEAD -- src/loop src/model src/tools src/run src/browser src/tracing` exits 0, proving committed implementation changes leave the agent core untouched; `git diff --exit-code -- src/loop src/model src/tools src/run src/browser src/tracing` also exits 0 for uncommitted changes.
+- `S9-H1` — Human-judged acceptance remainder: on real runs, motion is restrained, terminal resizing introduces no flicker/layout shift, Chrome-death recovery is understandable, and the R1–R12/glanceability pass has no open gaps.
