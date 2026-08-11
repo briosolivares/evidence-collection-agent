@@ -14,6 +14,23 @@ export interface BrowserFetchResult {
   bytes: Uint8Array;
 }
 
+/** A resource captured through an actual browser page or download event. */
+export interface BrowserDownloadResult {
+  /** Final resource URL after redirects, or a browser-generated blob URL. */
+  finalUrl: string;
+  /** HTTP status when the capture came from a navigation response. */
+  status?: number;
+  /** Response headers when available, keyed using lower-case names. */
+  headers: Readonly<Record<string, string>>;
+  /** Complete downloaded response bytes. */
+  bytes: Uint8Array;
+  /** Browser-provided filename for attachment/download-event captures. */
+  suggestedFilename?: string;
+}
+
+/** A browser-native download source: an observed page ref or verified URL. */
+export type BrowserDownloadTarget = { ref: string } | { url: string };
+
 /** Configuration for launching a persistent local Chrome session. */
 export interface BrowserLaunchOptions {
   /** Absolute path to the persistent Chrome profile directory. */
@@ -129,6 +146,19 @@ export interface BrowserAdapter {
    *   and session state are included, and non-success statuses still resolve
    */
   fetch(url: string): Promise<BrowserFetchResult>;
+
+  /**
+   * Capture a resource through Chrome's page network stack.
+   *
+   * HTTP(S) refs and URLs are opened in a temporary page so the active task
+   * page remains unchanged; the main navigation response or resulting browser
+   * download is captured exactly. Refs without an HTTP(S) href are clicked on
+   * the active page and must trigger a browser download event.
+   *
+   * @param target - an inspected page ref or an absolute HTTP(S) URL
+   * @returns exact bytes plus the final URL and available response metadata
+   */
+  download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult>;
 
   /**
    * Read the active task tab's current URL.

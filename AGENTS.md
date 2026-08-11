@@ -40,14 +40,14 @@ A browser agent for audit evidence collection: a minimal Claude Code–style loo
 - The browser launches headed (`channel: 'chrome'`) with the persistent profile `chrome-profile/` (gitignored) — headless is deliberately avoided for anti-bot posture. Profile paths must be absolute.
 - Tool results over 50 KB are offloaded to `runs/<id>/tool-output/` with a preview — that's the designed behavior, not a bug.
 - SEC-related code: their edge 403s any non-plain User-Agent and most non-browser HTTP clients; the oracle's `Name email` UA in `evals/datasets/edgar/oracle/edgarClient.ts` is load-bearing.
-- Defaults that matter when debugging runs: model `claude-sonnet-5`, `maxTurns` 12, token budget 250k (all in `src/cli/runTask.ts` / `src/model/callModel.ts`, overridable per run via `RunTaskConfig`).
+- Defaults that matter when debugging runs: model `claude-sonnet-5`, `maxTurns` 24, token budget 250k (all in `src/cli/runTask.ts` / `src/model/callModel.ts`, overridable per run via `RunTaskConfig`).
 - Planning docs are part of the workflow: failure analysis goes in `.agents/planning/.../implementation/baseline-failure-log.md`; commit scoped `git add` after each verified step, planning dir included.
 
 ## Current state (2026-08-11)
 
 <!-- metadata: status, work-queue -->
 
-Checkpoint 1 complete; k=3 baseline run: 0/3 easy tasks pass (details in `docs/reports/2026-08-11-baseline.md`). Four candidate mechanisms (F1 schema-exactness prompt line, F2 download fallback, F3 raise maxTurns, F4 start-page anchoring) are proposed but **not applied — the user decides; don't apply or re-baseline without their direction.** Eight of the eleven design-doc eval tasks have no eval package yet.
+Checkpoint 1 complete; k=3 baseline run: 0/3 easy tasks pass (details in `docs/reports/2026-08-11-baseline.md`). F1–F4 have been applied: exact-output prompt guidance, Chrome-native downloads with direct-URL support, a 24-turn default, and initial-page anchoring. The longer-term initializer/planner output-contract idea is deferred. **Do not re-baseline without the user's direction.** Eight of the eleven design-doc eval tasks have no eval package yet.
 
 ## Custom Instructions
 

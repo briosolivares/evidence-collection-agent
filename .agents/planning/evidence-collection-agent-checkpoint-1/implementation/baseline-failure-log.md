@@ -12,25 +12,25 @@ Per the plan's standing rule, every fix proposed here is a **general mechanism**
 
 - **Evidence:** trial 2 grader detail: `extra: rank (header: rank, title, url, points)`. Trials 1 and 3 produced exact columns. Both pre-baseline flagship demo runs also added `rank` — the agent likes volunteering it.
 - **Mechanism (proposed):** one general system-prompt line on schema exactness: when a task specifies an output's structure (columns, fields, format), produce exactly that structure — additions are deviations, not favors.
-- **Result:** —
+- **Result:** Applied by user decision: the production prompt now treats named columns, fields, formats, sections, counts, and other structural constraints as exact and forbids unrequested additions. The longer-term initializer/planner-generated output contract was explicitly deferred. Re-baseline pending.
 
 ### F2. `download` gets HTTP 403 through SEC's iXBRL viewer wrapper (edgar, 3/3 trials)
 
 - **Evidence:** filing-page links resolve (via `resolveHref`) to `https://www.sec.gov/ix?doc=/Archives/...` viewer-wrapper URLs; the download tool's `context.request` fetch of that URL returns 403. The *same* raw `/Archives/...` URL loads fine when the agent navigates the real page — Chrome's network stack is accepted where Playwright's request client is not. No trial ever landed the document; the hash assertion failed 3/3 while screenshot + manifest assertions passed 3/3.
-- **Mechanism (proposed):** make `download` resilient by design: fall back to an in-page fetch (the page's own network stack, session and headers) when the request-context fetch fails, and/or capture Playwright download events — both already noted in the tool's docstring as the alternative for wrapper/JS-triggered downloads. Wrapper-URL hrefs are a general web pattern (viewers, redirectors), not an EDGAR quirk.
-- **Result:** —
+- **Mechanism (proposed):** make browser-native capture the accurate default while retaining lightweight HTTP fetch as a separate secondary capability. Capture ordinary resources from a temporary Chrome page's navigation response, capture attachment and JavaScript-triggered downloads from browser download events, and accept a verified direct URL so an agent can bypass viewer wrappers without site-specific logic.
+- **Result:** Applied by user decision: `download` accepts exactly one inspected ref or direct HTTP(S) URL and saves exact bytes captured through Chrome with final-resource provenance. Regression fixtures prove that the request client receives 403 while the Chrome-native path succeeds, and cover inline responses, attachments, direct URLs, and JavaScript-triggered downloads. Re-baseline pending.
 
 ### F3. Budget guard cuts EDGAR runs mid-recovery (edgar, 3/3 trials; couples with F2)
 
 - **Evidence:** all three trials ended `budget_exceeded` at 11–12 turns while actively recovering from F2 (navigating to raw document URLs to retry). EDGAR's navigation depth (search → results → filing index → document) plus one recovery loop simply doesn't fit in `maxTurns: 12`.
 - **Mechanism (proposed):** revisit the default guards in the composition root — they are config values, and accuracy is priority #1. A browser task with error recovery needs headroom (e.g. maxTurns 24); the token ceiling (250k) does the real cost-guarding.
-- **Result:** —
+- **Result:** Applied by user decision: the production default is now 24 turns; the configurable 250k cumulative token ceiling is unchanged. A regression test verifies that a run can complete on turn 24 when `maxTurns` is omitted. Re-baseline pending.
 
 ### F4. "OpenClaw" name collision pulls the agent off its anchor (openclaw_pr, 2/3 trials)
 
 - **Evidence:** GitHub hosts both `openclaw/openclaw` (the intended repo, per oracle) and `pjasicek/OpenClaw` (the Captain Claw game engine). Trials start at the intended repo, but: trial 1 noticed the collision, went to "check both," and died `budget_exceeded` at 12 turns with **no answer.md at all**; trial 3 concluded the game repo was intended and answered with its PR #203 (oracle wanted #121863). Trial 2 stayed anchored and passed 3/3.
 - **Mechanism (proposed):** a general system-prompt line on anchoring: the run's starting page is task context — prefer interpretations consistent with it and do not wander to alternative interpretations unless the task itself demands disambiguation. (F3's turn headroom also matters here: trial 1 might have recovered given more turns.)
-- **Result:** —
+- **Result:** Applied by user decision: the production prompt requires inspecting the initial page before navigating elsewhere and treats a nonblank initial page as deliberate task context and strong evidence unless the task or concrete observed evidence contradicts it. Re-baseline pending.
 
 ## What held up (worth recording)
 

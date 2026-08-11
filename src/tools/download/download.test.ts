@@ -17,6 +17,10 @@ import type { EvidenceResult } from '../shared/evidence.js';
 import { downloadTool } from './download.js';
 
 const AUTHENTICATED_BYTES = Buffer.from('browser-session-authenticated\n');
+const BROWSER_NATIVE_BYTES = Buffer.from('browser-native-download\n');
+const BROWSER_DOCUMENT_BYTES = Buffer.from(
+  '<!doctype html><title>Browser-only filing</title><p>Exact filing bytes</p>\n',
+);
 
 describe('download tool', () => {
   const suite = setupBrowserToolSuite('download-tool');
@@ -58,7 +62,7 @@ describe('download tool', () => {
         expect.objectContaining({
           filename: 'authenticated.bin',
           sha256: sha256(AUTHENTICATED_BYTES),
-          sourceUrl: suite.server().url('/downloads.html'),
+          sourceUrl: suite.server().url('/authenticated.bin'),
         }),
       );
       expect(downloadTool.readOnly).toBe(false);
@@ -67,10 +71,100 @@ describe('download tool', () => {
   );
 
   it(
-    'returns a structured error for a ref whose element has no href',
+    'captures an inline document through Chrome when direct HTTP is blocked',
+    async () => {
+      const url = suite.server().url('/browser-only-document.htm');
+      await expect(suite.adapter().fetch(url)).resolves.toMatchObject({ status: 403 });
+
+      const outline = await successfulCall('inspect_page', {});
+      const ref = refFor(outline, 'link "View browser-only document"');
+      const result = JSON.parse(
+        await successfulCall('download', { ref }),
+      ) as EvidenceResult;
+
+      expect(result.path).toBe('browser-only-document.htm');
+      expect(readFileSync(join(suite.runDir(), result.path))).toEqual(
+        BROWSER_DOCUMENT_BYTES,
+      );
+      expect(readManifest(suite.runDir()).artifacts).toContainEqual(
+        expect.objectContaining({
+          filename: 'browser-only-document.htm',
+          sha256: sha256(BROWSER_DOCUMENT_BYTES),
+          sourceUrl: url,
+        }),
+      );
+      expect(suite.adapter().currentUrl()).toBe(suite.server().url('/downloads.html'));
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'accepts a verified direct URL for bypassing a viewer wrapper',
+    async () => {
+      const url = suite.server().url('/browser-only-document.htm');
+      const result = JSON.parse(
+        await successfulCall('download', {
+          url,
+          filename: 'raw-filing.htm',
+        }),
+      ) as EvidenceResult;
+
+      expect(result.path).toBe('raw-filing.htm');
+      expect(readFileSync(join(suite.runDir(), result.path))).toEqual(
+        BROWSER_DOCUMENT_BYTES,
+      );
+      expect(readManifest(suite.runDir()).artifacts).toContainEqual(
+        expect.objectContaining({ filename: 'raw-filing.htm', sourceUrl: url }),
+      );
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'uses the browser-suggested filename for an attachment response',
+    async () => {
+      const outline = await successfulCall('inspect_page', {});
+      const ref = refFor(outline, 'link "Download browser-only evidence"');
+      const result = JSON.parse(
+        await successfulCall('download', { ref }),
+      ) as EvidenceResult;
+
+      expect(result.path).toBe('browser-evidence.bin');
+      expect(readFileSync(join(suite.runDir(), result.path))).toEqual(
+        BROWSER_NATIVE_BYTES,
+      );
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'captures a JavaScript-triggered browser download from a ref without an href',
     async () => {
       const outline = await successfulCall('inspect_page', {});
       const ref = refFor(outline, 'button "Generate download with JavaScript"');
+      const result = JSON.parse(
+        await successfulCall('download', { ref }),
+      ) as EvidenceResult;
+
+      expect(result.path).toBe('javascript-evidence.bin');
+      expect(readFileSync(join(suite.runDir(), result.path))).toEqual(
+        BROWSER_NATIVE_BYTES,
+      );
+      expect(readManifest(suite.runDir()).artifacts).toContainEqual(
+        expect.objectContaining({
+          filename: 'javascript-evidence.bin',
+          sourceUrl: suite.server().url('/downloads.html'),
+        }),
+      );
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'returns a structured error for a ref that does not start a download',
+    async () => {
+      const outline = await successfulCall('inspect_page', {});
+      const ref = refFor(outline, 'button "Do nothing"');
       const result = await call('download', { ref, filename: 'should-not-exist.bin' });
 
       expect(result).toMatchObject({
@@ -78,8 +172,8 @@ describe('download tool', () => {
         isError: true,
         errorKind: 'execution_error',
       });
-      expect(result.content).toContain('has no href');
-      expect(result.content).toContain('re-run inspect_page');
+      expect(result.content).toContain('did not start a browser download');
+      expect(result.content).toContain('Re-run inspect_page');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

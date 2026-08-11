@@ -15,7 +15,21 @@
       <h1>Evidence downloads fixture</h1>
       <p>This page is intentionally taller than the browser viewport.</p>
       <a href="/authenticated.bin">Download authenticated evidence</a>
-      <button type="button">Generate download with JavaScript</button>
+      <a href="/browser-only.bin">Download browser-only evidence</a>
+      <a href="/browser-only-document.htm">View browser-only document</a>
+      <button id="javascript-download" type="button">Generate download with JavaScript</button>
+      <button type="button">Do nothing</button>
     </main>
+    <script>
+      document.querySelector('#javascript-download').addEventListener('click', async () => {
+        const response = await fetch('/browser-only.bin', { credentials: 'include' });
+        const blobUrl = URL.createObjectURL(await response.blob());
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'javascript-evidence.bin';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+      });
+    </script>
   </body>
 </html>

@@ -12,6 +12,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
   BrowserAdapter,
+  BrowserDownloadResult,
+  BrowserDownloadTarget,
   BrowserFetchResult,
   BrowserScreenshotOptions,
 } from '../browser/adapter.js';
@@ -90,6 +92,10 @@ class FakeBrowser implements BrowserAdapter {
 
   async fetch(_url: string): Promise<BrowserFetchResult> {
     throw new Error('Unexpected browser fetch.');
+  }
+
+  async download(_target: BrowserDownloadTarget): Promise<BrowserDownloadResult> {
+    throw new Error('Unexpected browser download.');
   }
 
   currentUrl(): string {

@@ -59,6 +59,20 @@ function productionConfig(): CallModelConfig {
 }
 
 describe('SYSTEM_PROMPT', () => {
+  it('requires exact output structure and anchors interpretation to an initial page', () => {
+    expect(SYSTEM_PROMPT).toContain('Treat output requirements as exact.');
+    expect(SYSTEM_PROMPT).toContain('Do not add unrequested fields');
+    expect(SYSTEM_PROMPT).toContain(
+      'At the start of a run, inspect the current page before navigating elsewhere.',
+    );
+    expect(SYSTEM_PROMPT).toContain(
+      'A nonblank initial page is deliberately provided task context',
+    );
+    expect(SYSTEM_PROMPT).toContain(
+      'unless the task or concrete observed evidence indicates otherwise',
+    );
+  });
+
   it('forms a byte-identical cached prefix with all ten production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);

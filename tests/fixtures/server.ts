@@ -15,6 +15,10 @@ const CONTENT_TYPES: Readonly<Record<string, string>> = {
 };
 
 const AUTHENTICATED_BODY = Buffer.from('browser-session-authenticated\n');
+const BROWSER_ONLY_BODY = Buffer.from('browser-native-download\n');
+const BROWSER_ONLY_DOCUMENT = Buffer.from(
+  '<!doctype html><title>Browser-only filing</title><p>Exact filing bytes</p>\n',
+);
 const SESSION_COOKIE = 'fixture-session=ready';
 
 export interface FixtureServer {
@@ -118,6 +122,29 @@ async function serveFixture(
       return;
     }
 
+    if (pathname === '/browser-only.bin') {
+      serveBrowserOnlyFixture(
+        request,
+        response,
+        method,
+        BROWSER_ONLY_BODY,
+        'application/octet-stream',
+        'attachment; filename="browser-evidence.bin"',
+      );
+      return;
+    }
+
+    if (pathname === '/browser-only-document.htm') {
+      serveBrowserOnlyFixture(
+        request,
+        response,
+        method,
+        BROWSER_ONLY_DOCUMENT,
+        'text/html; charset=utf-8',
+      );
+      return;
+    }
+
     if (pathname === '/redirect-to-second') {
       response.writeHead(302, { Location: '/second.html' });
       response.end();
@@ -167,6 +194,32 @@ function serveAuthenticatedFixture(
     'Content-Type': 'application/octet-stream',
   });
   response.end(method === 'HEAD' ? undefined : AUTHENTICATED_BODY);
+}
+
+function serveBrowserOnlyFixture(
+  request: IncomingMessage,
+  response: ServerResponse,
+  method: 'GET' | 'HEAD',
+  body: Buffer,
+  contentType: string,
+  contentDisposition?: string,
+): void {
+  const cookies = request.headers.cookie?.split(';').map((cookie) => cookie.trim()) ?? [];
+  const cameThroughBrowserPage = request.headers['sec-fetch-mode'] !== undefined;
+  if (!cookies.includes(SESSION_COOKIE) || !cameThroughBrowserPage) {
+    response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end(method === 'HEAD' ? undefined : 'Use the browser page network path');
+    return;
+  }
+
+  response.writeHead(200, {
+    'Content-Length': body.byteLength,
+    'Content-Type': contentType,
+    ...(contentDisposition !== undefined
+      ? { 'Content-Disposition': contentDisposition }
+      : {}),
+  });
+  response.end(method === 'HEAD' ? undefined : body);
 }
 
 function resolveFixturePath(pathname: string): string | undefined {

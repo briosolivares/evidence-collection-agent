@@ -8,9 +8,9 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 ## The baseline (the input to everything next)
 
-**0/3 tasks pass at k=3.** hacker_news 94.4% acc (2/3 complete), edgar 66.7% (0/3), openclaw_pr 66.7% (1/3). Human-readable analysis: `docs/reports/2026-08-11-baseline.md`. Failure→mechanism log: `baseline-failure-log.md` — four proposed general mechanisms (F1 schema-exactness prompt line; F2 download fallback via in-page fetch/download events; F3 raise maxTurns default; F4 start-page anchoring prompt line), none applied yet.
+**0/3 tasks pass at k=3.** hacker_news 94.4% acc (2/3 complete), edgar 66.7% (0/3), openclaw_pr 66.7% (1/3). Human-readable analysis: `docs/reports/2026-08-11-baseline.md`. Failure→mechanism log: `baseline-failure-log.md` — F1–F4 are now implemented: exact-output prompt guidance, Chrome-native downloads with direct-URL support, a 24-turn default, and initial-page anchoring. Re-baseline pending.
 
-**The user is analyzing the failure modes and choosing next steps themselves — do not apply F1–F4 or re-baseline without their direction.** The disabled-thinking science flag's revival trigger is formally met; also the user's call (report lays out both sides).
+**Do not re-baseline without the user's direction.** The longer-term initializer/planner-generated output contract was discussed and explicitly deferred. The disabled-thinking science flag's revival trigger is formally met; enabling it is also the user's call.
 
 ## Standing rulings (user-made, binding)
 
@@ -29,4 +29,4 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 ## Costs observed (for planning re-baselines)
 
-Only the prompt prefix caches; deep browser tasks reach ~20–35k uncached input tokens per late turn. EDGAR/OpenClaw trials ran ~35–50s and often hit the 250k cumulative or 12-turn ceiling. A nine-run baseline is minutes of wall-clock and noticeable spend — batch mechanism changes before re-running unless attribution demands stages.
+Only the prompt prefix caches; deep browser tasks reach ~20–35k uncached input tokens per late turn. EDGAR/OpenClaw baseline trials ran ~35–50s and often hit the 250k cumulative or former 12-turn ceiling. The production turn default is now 24, while the 250k cumulative token ceiling is unchanged. A nine-run baseline is minutes of wall-clock and noticeable spend — batch mechanism changes before re-running unless attribution demands stages.
