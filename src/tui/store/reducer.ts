@@ -12,6 +12,7 @@
 import { formatDuration, formatTokens } from '../format.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
+  AssertionView,
   LiveRunState,
   ManifestView,
   MetricsView,
@@ -46,7 +47,21 @@ export type UiAction =
       manifest: ManifestView;
       metrics?: MetricsView;
       runDir: string;
-    };
+    }
+  | { type: 'open_evals' }
+  | { type: 'evals_started'; tasks: string[]; k: number }
+  | { type: 'eval_trial_started'; task: string; trial: number; k: number }
+  | {
+      type: 'eval_trial_done';
+      task: string;
+      trial: number;
+      k: number;
+      assertions: AssertionView[];
+      elapsedMs: number;
+    }
+  | { type: 'eval_report_ready'; text: string }
+  | { type: 'eval_error'; message: string }
+  | { type: 'evals_finished' };
 
 /** Everything the reducer consumes. */
 export type StoreAction = UiAction | UiEvent;
@@ -56,6 +71,7 @@ export type RoutedInput =
   | { kind: 'task'; text: string }
   | { kind: 'help' }
   | { kind: 'runs' }
+  | { kind: 'evals' }
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
 
@@ -84,6 +100,8 @@ export function routeInput(text: string): RoutedInput {
       return { kind: 'help' };
     case '/runs':
       return { kind: 'runs' };
+    case '/evals':
+      return { kind: 'evals' };
     case '/exit':
       return { kind: 'exit' };
     default:
@@ -143,10 +161,11 @@ function displayTokens(live: LiveRunState): number {
   return Math.round(Math.max(live.tokens.settled, live.tokens.estimate));
 }
 
-/** End the run: clear the live region and return to idle. */
+/** End the run: clear the live region; an active eval batch returns to
+ * evalsRunning (between trials), everything else to idle. */
 function endRun(state: SessionState): SessionState {
   const { live: _live, ...rest } = state;
-  return { ...rest, mode: 'idle' };
+  return { ...rest, mode: state.evalsActive === true ? 'evalsRunning' : 'idle' };
 }
 
 /**
@@ -184,6 +203,47 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
         runDir: action.runDir,
       });
       return { ...appended, mode: 'idle' };
+    }
+
+    case 'open_evals':
+      if (state.mode !== 'idle') return state;
+      return { ...state, mode: 'evalsMenu' };
+
+    case 'evals_started':
+      return {
+        ...append(state, {
+          kind: 'notice',
+          text: `Running evals: ${action.tasks.join(', ')} · k=${action.k}`,
+        }),
+        mode: 'evalsRunning',
+        evalsActive: true,
+      };
+
+    case 'eval_trial_started':
+      return append(state, {
+        kind: 'notice',
+        text: `— ${action.task} · trial ${action.trial}/${action.k} —`,
+      });
+
+    case 'eval_trial_done':
+      return append(state, {
+        kind: 'eval_trial',
+        task: action.task,
+        trial: action.trial,
+        k: action.k,
+        assertions: action.assertions,
+        elapsedMs: action.elapsedMs,
+      });
+
+    case 'eval_report_ready':
+      return append(state, { kind: 'eval_report', text: action.text });
+
+    case 'eval_error':
+      return append(state, { kind: 'error', message: action.message });
+
+    case 'evals_finished': {
+      const { evalsActive: _evalsActive, ...rest } = state;
+      return { ...rest, mode: 'idle' };
     }
 
     case 'run_started':

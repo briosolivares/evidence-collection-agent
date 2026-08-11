@@ -156,4 +156,7 @@ export interface SessionState {
   completionVerb: string;
   /** Present only while a run is active (running/cancelling). */
   live?: LiveRunState;
+  /** True while an eval batch owns the session (its runs return to
+   * evalsRunning between trials instead of idle). */
+  evalsActive?: boolean;
 }

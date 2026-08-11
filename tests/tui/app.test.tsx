@@ -219,6 +219,100 @@ describe('App /runs browsing', () => {
   });
 });
 
+// ————— Step 8: /evals workflow —————
+
+describe('App /evals workflow', () => {
+  it('/evals opens the menu; a confirmed selection streams trials through the live pipeline', async () => {
+    const { mkdtempSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+
+    const resultsDir = mkdtempSync(join(tmpdir(), 'sherlock-app-eval-results-'));
+    try {
+      // The repo's real, hermetic `stub` eval task: static oracle, and a
+      // grader that returns failed assertions (never throws) for a run
+      // dir that does not exist.
+      const evalsConfig = createConfig({ evalsDir: 'evals', evalResultsDir: resultsDir });
+      const bridge = fakeRunner();
+      const runner = vi.fn(
+        (task: string, onEvent: (event: UiEvent) => void): RunHandle => {
+          onEvent({ type: 'run_started', task, at: 0 });
+          onEvent({ type: 'turn_start', turn: 1 });
+          onEvent({ type: 'text_delta', text: 'Investigating for the eval…' });
+          onEvent({ type: 'turn_end', usage: { input: 500, output: 100 } });
+          onEvent({
+            type: 'run_finished',
+            outcome: 'completed',
+            finalText: 'done',
+            runDir: '/runs/eval-trial',
+            at: 9_000,
+          });
+          return {
+            cancel: bridge.cancel,
+            done: Promise.resolve({
+              status: 'completed',
+              finalText: 'done',
+              runDir: '/runs/eval-trial',
+            }),
+          };
+        },
+      );
+
+      const { frames, lastFrame, stdin, unmount } = render(
+        <App config={evalsConfig} apiKeyPresent={true} runner={runner} />,
+      );
+      await tick();
+      await submitLine(stdin, '/evals');
+      expect(lastFrame()).toContain('Eval tasks');
+      expect(lastFrame()).toContain('[ ] stub');
+
+      // Navigate to `stub` (tasks list alphabetically) and select it.
+      while (!(lastFrame() ?? '').includes('\u203a [ ] stub')) {
+        stdin.write('\u001b[B');
+        await tick();
+      }
+      stdin.write(' '); // select stub
+      await tick();
+      expect(lastFrame()).toContain('[x] stub');
+      stdin.write('\r'); // to k stage
+      await tick();
+      expect(lastFrame()).toContain('k: 3');
+      stdin.write('\u007f'); // clear the default 3
+      await tick();
+      stdin.write('1');
+      await tick();
+      stdin.write('\r'); // start k=1
+      await tick(200);
+
+      const output = frames.join('\n');
+      // Trial framing + the run streamed through the same live pipeline.
+      expect(output).toContain('— stub · trial 1/1 —');
+      expect(output).toContain('Investigating for the eval…');
+      expect(output).toContain('Brewed in');
+      expect(output).toContain('/runs/eval-trial');
+      // Verdicts and the report block landed as transcript items.
+      expect(output).toContain('answer.md missing from run dir');
+      expect(output).toContain('Eval report — k=1');
+      expect(runner).toHaveBeenCalledTimes(1);
+      // Batch finished: composer is back.
+      expect(lastFrame()).not.toContain('evals running');
+      unmount();
+    } finally {
+      rmSync(resultsDir, { recursive: true, force: true });
+    }
+  });
+
+  it('/evals without a runner explains itself', async () => {
+    const { frames, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} />,
+    );
+    await tick();
+    await submitLine(stdin, '/evals');
+    expect(frames.join('\n')).toContain('not available in --demo');
+    unmount();
+  });
+});
+
 // ————— Step 5: Esc cancellation —————
 
 describe('App Esc cancellation', () => {

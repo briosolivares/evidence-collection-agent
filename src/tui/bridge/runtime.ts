@@ -26,7 +26,11 @@ export interface TuiRuntime {
   /** Launch the persistent browser; call exactly once, before runs. */
   start(): Promise<void>;
   /** Start one agent run against the session browser. */
-  startRun(task: string, onEvent: (event: UiEvent) => void): RunHandle;
+  startRun(
+    task: string,
+    onEvent: (event: UiEvent) => void,
+    opts?: { startUrl?: string },
+  ): RunHandle;
   /** Close the persistent browser; safe to call once at teardown. */
   shutdown(): Promise<void>;
 }
@@ -44,7 +48,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
       browser = await deps.launchBrowser();
     },
 
-    startRun(task, onEvent) {
+    startRun(task, onEvent, opts) {
       if (browser === undefined) {
         throw new Error('runtime not started — no browser session');
       }
@@ -52,6 +56,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         browser,
         onEvent,
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
+        ...(opts?.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
         ...deps.runConfig,
       });
     },

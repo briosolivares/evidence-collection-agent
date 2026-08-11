@@ -14,6 +14,10 @@ export interface SherlockConfig {
   verbose: boolean;
   /** Directory that holds run directories. */
   runsBaseDir: string;
+  /** Directory holding eval task definitions (<name>/task.json). */
+  evalsDir: string;
+  /** Where eval results JSON files land (the CLI's convention). */
+  evalResultsDir: string;
   /** How often the working word is re-picked, in milliseconds. */
   wordCycleMs: number;
   /** Spinner glyph frame rate, frames per second. */
@@ -52,6 +56,8 @@ export function createConfig(
     workingWords: DEFAULT_WORKING_WORDS,
     verbose: false,
     runsBaseDir: 'runs',
+    evalsDir: 'evals',
+    evalResultsDir: 'runs/eval-results',
     wordCycleMs: 6_000,
     glyphFps: 4,
     ...overrides,

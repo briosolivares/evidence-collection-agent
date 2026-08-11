@@ -1,6 +1,11 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useEffect, useReducer, useRef, useState } from 'react';
 
+import {
+  discoverEvalTasks,
+  startEvalBatch,
+  type EvalBatchHandle,
+} from '../bridge/evalSession.js';
 import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
@@ -15,6 +20,7 @@ import {
 import type { UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
+import { EvalsMenu } from './EvalsMenu.js';
 import { LiveRegion } from './LiveRegion.js';
 import { RunsList } from './RunsList.js';
 import { Transcript } from './Transcript.js';
@@ -27,14 +33,19 @@ interface AppProps {
   demo?: boolean;
   /** Starts a real agent run (wired to the runtime by main.tsx); absent
    * in demo mode, where tasks only append to the transcript. */
-  runner?: (task: string, onEvent: (event: UiEvent) => void) => RunHandle;
+  runner?: (
+    task: string,
+    onEvent: (event: UiEvent) => void,
+    opts?: { startUrl?: string },
+  ) => RunHandle;
   /** Test seam for /exit; defaults to Ink's app exit. */
   onExit?: () => void;
 }
 
 /**
  * The Sherlock shell: transcript over <Static>, the live region while a
- * run is active, slash routing, and the persistent composer.
+ * run is active, overlays for /runs and /evals, slash routing, and the
+ * persistent composer.
  */
 export function App({ config, apiKeyPresent, demo = false, runner, onExit }: AppProps) {
   const { exit } = useApp();
@@ -44,21 +55,29 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
     createInitialState,
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);
+  const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
+  const [evalTasks, setEvalTasks] = useState<readonly string[]>([]);
 
   useEffect(() => {
     if (!demo) return;
     return playDemo(createDemoScript(Date.now()), dispatch);
   }, [demo]);
 
-  // Esc cancels an in-flight run (R9): flip to cancelling (status line
-  // shows "Wrapping up…") and abort the bridge; the run's rejection then
-  // lands as run_cancelled. A no-op in every other mode.
+  // Esc cancels an in-flight run (R9). During an eval batch it cancels
+  // the current trial and skips the rest; the overlays handle their own
+  // Esc. A no-op while idle.
   useInput((_input, key) => {
     if (!key.escape) return;
-    if (state.mode !== 'running') return;
-    dispatch({ type: 'cancel_requested' });
-    runHandle.current?.cancel();
+    if (state.mode === 'running') {
+      dispatch({ type: 'cancel_requested' });
+      if (evalHandle.current !== undefined) evalHandle.current.cancel();
+      else runHandle.current?.cancel();
+      return;
+    }
+    if (state.mode === 'evalsRunning') {
+      evalHandle.current?.cancel();
+    }
   });
 
   const handleSubmit = (text: string) => {
@@ -80,6 +99,17 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
         setRunEntries(scanRuns(config.runsBaseDir));
         dispatch({ type: 'open_runs' });
         return;
+      case 'evals':
+        if (runner === undefined) {
+          dispatch({
+            type: 'notice',
+            text: 'Evals need a live browser session — not available in --demo.',
+          });
+          return;
+        }
+        setEvalTasks(discoverEvalTasks(config.evalsDir));
+        dispatch({ type: 'open_evals' });
+        return;
       case 'exit':
         (onExit ?? exit)();
         return;
@@ -89,7 +119,26 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
     }
   };
 
+  const startEvals = (tasks: string[], k: number) => {
+    if (runner === undefined) return;
+    evalHandle.current = startEvalBatch(tasks, k, {
+      onAction: dispatch,
+      evalsDir: config.evalsDir,
+      resultsDir: config.evalResultsDir,
+      runner,
+    });
+    void evalHandle.current.done.finally(() => {
+      evalHandle.current = undefined;
+    });
+  };
+
   const running = state.mode === 'running' || state.mode === 'cancelling';
+  const composerHint =
+    state.mode === 'runsList' || state.mode === 'evalsMenu'
+      ? '(menu open — esc to close)'
+      : state.mode === 'evalsRunning'
+        ? '(evals running — esc to stop)'
+        : '(waiting for agent…)';
 
   return (
     <Box flexDirection="column">
@@ -121,8 +170,19 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
           }}
         />
       )}
+      {state.mode === 'evalsMenu' && (
+        <EvalsMenu
+          tasks={evalTasks}
+          onClose={() => dispatch({ type: 'close_overlay' })}
+          onConfirm={startEvals}
+        />
+      )}
       <Box flexDirection="column" marginTop={1}>
-        <Composer disabled={state.mode !== 'idle'} onSubmit={handleSubmit} />
+        <Composer
+          disabled={state.mode !== 'idle'}
+          hint={composerHint}
+          onSubmit={handleSubmit}
+        />
         <Text color={theme.muted}>  /help for commands</Text>
       </Box>
     </Box>

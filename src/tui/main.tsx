@@ -40,6 +40,8 @@ const demo = process.argv.includes('--demo');
 const config = createConfig({
   verbose: process.argv.includes('--verbose'),
   runsBaseDir: resolve(REPO_ROOT, 'runs'),
+  evalsDir: resolve(REPO_ROOT, 'evals'),
+  evalResultsDir: resolve(REPO_ROOT, 'runs', 'eval-results'),
 });
 
 // One persistent, headed Chrome for the whole session (same profile-dir
@@ -63,7 +65,7 @@ try {
       runner={
         runtime === undefined
           ? undefined
-          : (task, onEvent) => runtime.startRun(task, onEvent)
+          : (task, onEvent, opts) => runtime.startRun(task, onEvent, opts)
       }
     />,
     { exitOnCtrlC: true },

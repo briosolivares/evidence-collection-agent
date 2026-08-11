@@ -5,8 +5,10 @@ import { useState } from 'react';
 import { theme } from '../theme.js';
 
 interface ComposerProps {
-  /** While true the input ignores keystrokes and shows a waiting hint. */
+  /** While true the input ignores keystrokes and shows the hint. */
   disabled?: boolean;
+  /** What the disabled composer shows (why input is unavailable). */
+  hint?: string;
   /** Called with the trimmed, non-empty submitted text. */
   onSubmit: (text: string) => void;
 }
@@ -15,7 +17,11 @@ interface ComposerProps {
  * The persistent input box anchored at the bottom of the transcript (R2).
  * Submitting clears the field; empty submissions are ignored.
  */
-export function Composer({ disabled = false, onSubmit }: ComposerProps) {
+export function Composer({
+  disabled = false,
+  hint = '(waiting for agent…)',
+  onSubmit,
+}: ComposerProps) {
   const [value, setValue] = useState('');
 
   const handleSubmit = (raw: string) => {
@@ -29,7 +35,7 @@ export function Composer({ disabled = false, onSubmit }: ComposerProps) {
     <Box borderStyle="round" borderColor={theme.muted} paddingX={1}>
       <Text color={theme.primary}>{'› '}</Text>
       {disabled ? (
-        <Text color={theme.muted}>(waiting for agent…)</Text>
+        <Text color={theme.muted}>{hint}</Text>
       ) : (
         <TextInput value={value} onChange={setValue} onSubmit={handleSubmit} />
       )}
