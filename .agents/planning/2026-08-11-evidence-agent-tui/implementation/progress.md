@@ -242,3 +242,22 @@ worktrees before the merge).
 - Notable operational finding: both isolated agent worktrees were created on a
   wrong base (70af47f, pre-TUI lineage); both agents detected this and repointed to
   edbada0 before starting. Recorded in project memory.
+
+## 2026-08-11 12:07 PDT — R4: transcript breathing room (prose padding + action spacing)
+
+- Change: `paddingLeft={2}` on agent prose (finalized agent_text items and the
+  LiveRegion streaming text, so wraps indent too); `marginTop={1}` on activity/
+  evidence items and on LiveRegion pending tool rows (spacing identical before
+  and after finalization into <Static>). Source/verbose sub-lines stay attached.
+- R4-V1: smoke snapshots re-recorded; git diff reviewed line by line — only the
+  two intended deltas (2-space prose indent incl. wrapped lines; exactly one
+  blank line between consecutive action rows, none doubled; the 3-space wrap
+  artifact in the 44-col frame pre-exists this change). npm test → 57 files /
+  405 tests passed (28.4 s). npm run typecheck → exit 0. git diff --check → clean.
+- R4-H1 (agent-judged PTY): /tmp/r4-pty80.out (80×30, Python pty driver,
+  --demo). Streaming prose padded from the first token ('  I'll'); finalized
+  '● Opening sec.gov/cgi-bin/browse-edgar?company=acme  ✓' followed by exactly
+  one blank line then the next pending action; pending '◆ Evidence saved →
+  investors.csv…' likewise carries one blank line above. Width: 0/1921 lines
+  over 80 display columns. 44-col rendering covered by the re-recorded narrow
+  smoke snapshot.

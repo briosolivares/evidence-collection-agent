@@ -16,35 +16,41 @@ exports[`smoke: full scripted-run rendering contract > locks the frame at narrow
 ▸ Find Acme Corp's Series B investors and
 save them to a CSV
 
-I'll start with recent funding coverage,
-then confirm the names against the primary
-filing.
+  I'll start with recent funding coverage,
+  then confirm the names against the primary
+   filing.
+
 ● Opening
 techcrunch.com/2026/05/14/acme-series-b  ✓
 
-The coverage is up. Reading the page for
-investor names.
+  The coverage is up. Reading the page for
+  investor names.
+
 ● Reading the page  ✓
 
-The article names three investors — Meridian
- Growth, Halcyon Partners, and Northgate
-Capital. The filing should confirm the
-amounts.
+  The article names three investors —
+  Meridian Growth, Halcyon Partners, and
+  Northgate Capital. The filing should
+  confirm the amounts.
+
 ● Opening
 sec.gov/cgi-bin/browse-edgar?company=acme  ✓
+
 ● Clicking e42  ✗
 
-The link moved after the page settled —
-re-inspecting, then saving the confirmed
-list as evidence.
+  The link moved after the page settled —
+  re-inspecting, then saving the confirmed
+  list as evidence.
+
 ● Reading the page  ✓
+
 ◆ Evidence saved → investors.csv
 
-Acme's Series B was led by Meridian Growth
-with participation from Halcyon Partners and
- Northgate Capital; the three names and
-their filing references are saved in
-investors.csv.
+  Acme's Series B was led by Meridian Growth
+   with participation from Halcyon Partners
+  and Northgate Capital; the three names and
+   their filing references are saved in
+  investors.csv.
 
 ✓ Brewed in 42s · 18.7k tokens
   runs/2026-08-11_10-15-02_find-acme-corp-se
@@ -69,26 +75,32 @@ exports[`smoke: full scripted-run rendering contract > locks the frame at normal
 
 ▸ Find Acme Corp's Series B investors and save them to a CSV
 
-I'll start with recent funding coverage, then confirm the names against the
-primary filing.
+  I'll start with recent funding coverage, then confirm the names against the
+  primary filing.
+
 ● Opening techcrunch.com/2026/05/14/acme-series-b  ✓
 
-The coverage is up. Reading the page for investor names.
+  The coverage is up. Reading the page for investor names.
+
 ● Reading the page  ✓
 
-The article names three investors — Meridian Growth, Halcyon Partners, and
-Northgate Capital. The filing should confirm the amounts.
+  The article names three investors — Meridian Growth, Halcyon Partners, and
+  Northgate Capital. The filing should confirm the amounts.
+
 ● Opening sec.gov/cgi-bin/browse-edgar?company=acme  ✓
+
 ● Clicking e42  ✗
 
-The link moved after the page settled — re-inspecting, then saving the confirmed
- list as evidence.
+  The link moved after the page settled — re-inspecting, then saving the
+  confirmed list as evidence.
+
 ● Reading the page  ✓
+
 ◆ Evidence saved → investors.csv
 
-Acme's Series B was led by Meridian Growth with participation from Halcyon
-Partners and Northgate Capital; the three names and their filing references are
-saved in investors.csv.
+  Acme's Series B was led by Meridian Growth with participation from Halcyon
+  Partners and Northgate Capital; the three names and their filing references
+  are saved in investors.csv.
 
 ✓ Brewed in 42s · 18.7k tokens
   runs/2026-08-11_10-15-02_find-acme-corp-series-b_demo
@@ -112,26 +124,32 @@ exports[`smoke: full scripted-run rendering contract > locks the waiting compose
 
 ▸ Find Acme Corp's Series B investors and save them to a CSV
 
-I'll start with recent funding coverage, then confirm the names against the
-primary filing.
+  I'll start with recent funding coverage, then confirm the names against the
+  primary filing.
+
 ● Opening techcrunch.com/2026/05/14/acme-series-b  ✓
 
-The coverage is up. Reading the page for investor names.
+  The coverage is up. Reading the page for investor names.
+
 ● Reading the page  ✓
 
-The article names three investors — Meridian Growth, Halcyon Partners, and
-Northgate Capital. The filing should confirm the amounts.
+  The article names three investors — Meridian Growth, Halcyon Partners, and
+  Northgate Capital. The filing should confirm the amounts.
+
 ● Opening sec.gov/cgi-bin/browse-edgar?company=acme  ✓
+
 ● Clicking e42  ✗
 
-The link moved after the page settled — re-inspecting, then saving the confirmed
- list as evidence.
+  The link moved after the page settled — re-inspecting, then saving the
+  confirmed list as evidence.
+
 ● Reading the page  ✓
+
 ◆ Evidence saved → investors.csv
 
-Acme's Series B was led by Meridian Growth with participation from Halcyon
-Partners and Northgate Capital; the three names and their filing references are
-saved in investors.csv.
+  Acme's Series B was led by Meridian Growth with participation from Halcyon
+  Partners and Northgate Capital; the three names and their filing references
+  are saved in investors.csv.
 
 ✓ Brewed in 42s · 18.7k tokens
   runs/2026-08-11_10-15-02_find-acme-corp-series-b_demo

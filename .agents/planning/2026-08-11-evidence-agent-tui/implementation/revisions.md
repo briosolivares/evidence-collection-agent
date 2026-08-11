@@ -133,3 +133,26 @@ Verify:
 - Interaction-heavy new test files set `vi.setConfig({ testTimeout: 30_000 })`.
 - Ink 7 defers a lone ESC byte — tests wait ~150 ms after writing ESC.
 - Commit per revision; `git diff --check` clean before each commit.
+
+## R4 — Transcript breathing room (2026-08-11, second note batch)
+
+User notes (as given): streaming/agent text is "too close to the left edge" —
+add padding; and add "a tiny bit more space between consecutive agent actions
+so it doesn't feel as cluttered (only a tiny bit not too much space)".
+
+Design:
+- Agent prose — both the live streaming text (LiveRegion) and finalized
+  `agent_text` items — gets `paddingLeft={2}`, aligning it with the label text
+  after the `● `/`◆ ` markers. Markers stay at column 0.
+- Activity and evidence items get `marginTop={1}` (one blank line — the
+  smallest increment a terminal has). Pending tool lines in the LiveRegion get
+  the same margin so spacing doesn't jump when a line finalizes into <Static>.
+  Evidence `└ source:` sub-lines and verbose detail stay attached to their item.
+
+Verify:
+- R4-V1: updated transcript/smoke tests green; smoke snapshots re-recorded and
+  reviewed line by line (only spacing/padding deltas); full battery — npm test,
+  npm run typecheck, git diff --check.
+- R4-H1 (agent-judged PTY): --demo capture at 80 cols shows padded prose and
+  single blank lines between consecutive action rows; 44-col zero-overflow
+  unchanged.

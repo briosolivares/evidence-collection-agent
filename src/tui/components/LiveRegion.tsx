@@ -22,12 +22,12 @@ export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionPro
   return (
     <Box flexDirection="column">
       {live.streamingText !== '' && (
-        <Box marginTop={1}>
+        <Box marginTop={1} paddingLeft={2}>
           <Text>{live.streamingText}</Text>
         </Box>
       )}
       {live.pendingTools.map((pending) => (
-        <Box key={pending.id}>
+        <Box key={pending.id} marginTop={1}>
           <Text>
             <Text color={pending.isEvidence ? theme.emphasis : theme.activity}>
               {`${pending.isEvidence ? glyphs.evidence : glyphs.activity} `}

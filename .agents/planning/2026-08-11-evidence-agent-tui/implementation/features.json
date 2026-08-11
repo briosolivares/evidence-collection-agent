@@ -773,6 +773,33 @@
         "R3-H1"
       ],
       "status": "pass"
+    },
+    {
+      "id": "R4-F1",
+      "step": 13,
+      "description": "Agent prose (live streaming text and finalized agent_text items) is left-padded two columns, aligning with the label text after the action markers.",
+      "verification": [
+        "R4-V1"
+      ],
+      "status": "pass"
+    },
+    {
+      "id": "R4-F2",
+      "step": 13,
+      "description": "Activity/evidence rows (pending and finalized) carry a single blank line above them; source/verbose sub-lines stay attached to their item.",
+      "verification": [
+        "R4-V1"
+      ],
+      "status": "pass"
+    },
+    {
+      "id": "R4-H1",
+      "step": 13,
+      "description": "Agent-judged PTY check: --demo capture shows padded prose and single-blank-line action spacing; 44-col zero-overflow unchanged.",
+      "verification": [
+        "R4-H1"
+      ],
+      "status": "pass"
     }
   ]
 }

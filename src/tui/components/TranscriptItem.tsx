@@ -31,13 +31,13 @@ export function TranscriptItemView({
       );
     case 'agent_text':
       return (
-        <Box marginTop={1}>
+        <Box marginTop={1} paddingLeft={2}>
           <Text>{item.text}</Text>
         </Box>
       );
     case 'activity':
       return (
-        <Box flexDirection="column">
+        <Box flexDirection="column" marginTop={1}>
           <Text>
             <Text color={theme.activity}>{`${glyphs.activity} `}</Text>
             <Text>{item.line}</Text>
@@ -48,7 +48,7 @@ export function TranscriptItemView({
       );
     case 'evidence':
       return (
-        <Box flexDirection="column">
+        <Box flexDirection="column" marginTop={1}>
           <Text>
             <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
             <Text color={theme.emphasis}>{item.line}</Text>
