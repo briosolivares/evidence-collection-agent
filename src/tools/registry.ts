@@ -29,6 +29,10 @@ export interface ToolDef<Input = unknown> {
   /** True iff the tool never changes state — the scheduler (T8) runs
    * read-only tools in parallel and serializes state-changing ones. */
   readOnly: boolean;
+  /** Maximum size in bytes of this tool's normalized result before the
+   * pipeline offloads it to a file and hands the model a preview + path
+   * (T5). Omitted means DEFAULT_MAX_RESULT_BYTES. */
+  maxBytes?: number;
   /**
    * Do the tool's work.
    *

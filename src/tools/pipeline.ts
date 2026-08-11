@@ -1,3 +1,4 @@
+import { capResult, DEFAULT_MAX_RESULT_BYTES } from './capResult.js';
 import type { ToolCtx, ToolRegistry } from './registry.js';
 
 /** One tool invocation as requested by the model (a `tool_use` block). */
@@ -26,17 +27,21 @@ export type ToolCallResult =
 
 /**
  * Execute one tool call through the standard pipeline:
- * exists-check → zod validation → execute → normalize → return.
+ * exists-check → zod validation → execute → normalize → cap → return.
  *
  * @param registry - the tools available to this run
  * @param call     - the model-requested invocation; its `input` is untrusted
  * @param ctx      - per-run context passed through to the executor
  * @returns a structured result the model can read — never throws. On
  *   success, `content` is the executor's output (strings unchanged, other
- *   values as JSON). On failure, `isError` is true and `content` names the
- *   problem: an unknown tool (lists the tools that do exist), invalid input
- *   (includes zod's issue list, so the model sees *what* was malformed), or
- *   an executor throw (includes the thrown message). `toolCallId` always
+ *   values as JSON) — unless it exceeds the tool's size cap (`maxBytes`,
+ *   default DEFAULT_MAX_RESULT_BYTES), in which case the full output is
+ *   offloaded to a file in the run directory and `content` is the
+ *   JSON-serialized replacement (preview + path; see capResult). On
+ *   failure, `isError` is true and `content` names the problem: an unknown
+ *   tool (lists the tools that do exist), invalid input (includes zod's
+ *   issue list, so the model sees *what* was malformed), or an executor or
+ *   offload failure (includes the thrown message). `toolCallId` always
  *   echoes `call.id`.
  */
 export async function executeToolCall(
@@ -72,12 +77,24 @@ export async function executeToolCall(
     };
   }
 
-  // Stages 3 + 4: execute, then normalize the output to model-readable
-  // text. Normalization sits inside the try so an unserializable output is
-  // reported as an execution error rather than crashing the pipeline.
+  // Stages 3–5: execute, normalize the output to model-readable text, then
+  // cap its size — oversize output is offloaded to a file in the run
+  // directory and `content` becomes a preview + path replacement, so no
+  // single result can flood the context window. All three sit inside the
+  // try so an unserializable output or a failed offload is reported as an
+  // execution error rather than crashing the pipeline.
   let content: string;
   try {
-    content = normalizeOutput(await tool.execute(parsed.data, ctx));
+    const normalized = normalizeOutput(await tool.execute(parsed.data, ctx));
+    const capped = capResult(
+      ctx.runDir,
+      tool.name,
+      normalized,
+      tool.maxBytes ?? DEFAULT_MAX_RESULT_BYTES,
+    );
+    // An offloaded replacement is structured output like any other: the
+    // model receives it JSON-serialized.
+    content = typeof capped === 'string' ? capped : JSON.stringify(capped);
   } catch (thrown) {
     const message = thrown instanceof Error ? thrown.message : String(thrown);
     return {
@@ -87,12 +104,6 @@ export async function executeToolCall(
       content: `Tool "${call.name}" failed: ${message}`,
     };
   }
-
-  // Stage 5 — SEAM (T5, not implemented here): result size-capping.
-  // `capResult` slots in at this exact point, rewriting `content` when it
-  // exceeds the tool's byte cap (full output offloaded to disk, `content`
-  // replaced by a preview + path). Nothing before this line should assume
-  // `content` is what the model ultimately receives.
 
   // Stage 6: return.
   return { toolCallId: call.id, isError: false, content };

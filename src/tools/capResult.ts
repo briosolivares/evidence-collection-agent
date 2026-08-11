@@ -1,0 +1,158 @@
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+
+import { writeArtifact } from '../run/artifacts.js';
+import { resolveRunPath } from '../run/runDir.js';
+
+/**
+ * Default maximum size in bytes of a tool result before it is offloaded to
+ * disk. Mirrors Claude Code's per-tool persistence threshold
+ * (DEFAULT_MAX_RESULT_SIZE_CHARS = 50,000): roughly 12k tokens — large
+ * enough that ordinary results are untouched, small enough that one result
+ * can never flood the context window.
+ */
+export const DEFAULT_MAX_RESULT_BYTES = 50_000;
+
+/**
+ * Maximum size in bytes of the preview an offloaded result leaves behind.
+ * Mirrors Claude Code's PREVIEW_SIZE_BYTES = 2,000: enough to show the
+ * model what kind of output it is, cheap enough to keep in context.
+ */
+export const PREVIEW_MAX_BYTES = 2_000;
+
+/** Run-dir subdirectory that holds offloaded tool output. */
+export const OFFLOAD_DIR = 'tool-output';
+
+/** File extension for offloaded tool output (always model-readable text). */
+const OFFLOAD_EXT = '.txt';
+
+/**
+ * The model-facing replacement for an oversize tool result: a short preview
+ * of the original output plus the run-dir-relative path holding all of it.
+ */
+export interface OffloadedResult {
+  /** The opening portion of the original output — at most
+   * min(PREVIEW_MAX_BYTES, the cap) bytes, always whole UTF-8 characters. */
+  preview: string;
+  /** Run-dir-relative path of the file holding the complete output, usable
+   * directly with read_file / grep. */
+  offloadedTo: string;
+  /** Human/model-readable explanation: the output's size, the cap it broke,
+   * and how to read the rest. */
+  note: string;
+}
+
+/**
+ * Bound a tool result's size (pipeline stage 5). Results at or under the cap
+ * pass through untouched; oversize results are written — complete — to a
+ * numbered file under tool-output/ in the run directory (via writeArtifact,
+ * so the manifest records its hash) and replaced by a preview + path the
+ * model can follow up on with read_file / grep.
+ *
+ * @param runDir - absolute path to a run directory whose manifest has been
+ *   initialized (offloading throws otherwise, writing nothing)
+ * @param toolName - name of the tool that produced the result; must be a
+ *   registry-style name safe as a filename segment (no path separators)
+ * @param result - the tool's normalized model-facing output text
+ * @param maxBytes - the cap: a positive integer number of UTF-8 bytes
+ *   (throws otherwise)
+ * @returns `result` itself, unchanged, when its UTF-8 byte length is at or
+ *   under `maxBytes`. Otherwise an OffloadedResult whose `offloadedTo` file
+ *   exists inside the run directory containing the complete original output
+ *   (hashed into the manifest), and whose preview is a prefix of the
+ *   original that never splits a multi-byte character and, when the output
+ *   is line-shaped, ends on a whole line. Each offload gets a fresh file:
+ *   tool-output/<toolName>-<n>.txt, where n counts up from one past the
+ *   highest number already on disk for that tool and the file is claimed
+ *   with an exclusive create — so concurrent offloads (parallel read-only
+ *   tools, T8) can never clobber each other
+ */
+export function capResult(
+  runDir: string,
+  toolName: string,
+  result: string,
+  maxBytes: number,
+): string | OffloadedResult {
+  if (!Number.isInteger(maxBytes) || maxBytes <= 0) {
+    throw new Error(`maxBytes must be a positive integer, got ${maxBytes}`);
+  }
+
+  const sizeBytes = Buffer.byteLength(result, 'utf8');
+  if (sizeBytes <= maxBytes) return result;
+
+  const { relPath, absPath } = reserveOffloadPath(runDir, toolName);
+  try {
+    writeArtifact(runDir, relPath, Buffer.from(result, 'utf8'));
+  } catch (thrown) {
+    // Don't leave the empty reservation behind as an untracked file.
+    rmSync(absPath, { force: true });
+    throw thrown;
+  }
+
+  return {
+    preview: buildPreview(result, Math.min(PREVIEW_MAX_BYTES, maxBytes)),
+    offloadedTo: relPath,
+    note:
+      `Output was ${sizeBytes} bytes, over this tool's ${maxBytes}-byte limit. ` +
+      `The complete output is saved at ${relPath} in the run directory — ` +
+      `use read_file or grep on that path to read the rest.`,
+  };
+}
+
+/**
+ * Claim a fresh offload filename for a tool: tool-output/<toolName>-<n>.txt.
+ * Scans the offload directory for the highest existing n, then creates the
+ * next file exclusively, advancing past any concurrent claimer. The
+ * returned path names a now-existing empty file no other call can receive.
+ */
+function reserveOffloadPath(
+  runDir: string,
+  toolName: string,
+): { relPath: string; absPath: string } {
+  const offloadDirAbs = resolveRunPath(runDir, OFFLOAD_DIR);
+  mkdirSync(offloadDirAbs, { recursive: true });
+
+  // First candidate: one past the highest index already on disk for this
+  // tool, so a deleted or raced file is never silently reused.
+  const prefix = `${toolName}-`;
+  let n = 1;
+  for (const entry of readdirSync(offloadDirAbs)) {
+    if (!entry.startsWith(prefix) || !entry.endsWith(OFFLOAD_EXT)) continue;
+    const index = Number(entry.slice(prefix.length, -OFFLOAD_EXT.length));
+    if (Number.isInteger(index) && index >= n) n = index + 1;
+  }
+
+  for (;;) {
+    const relPath = `${OFFLOAD_DIR}/${toolName}-${n}${OFFLOAD_EXT}`;
+    const absPath = resolveRunPath(runDir, relPath);
+    try {
+      // Exclusive create claims the index; EEXIST means a concurrent offload
+      // won the race for it, so move on to the next number.
+      writeFileSync(absPath, '', { flag: 'wx' });
+      return { relPath, absPath };
+    } catch (thrown) {
+      if ((thrown as NodeJS.ErrnoException).code !== 'EEXIST') throw thrown;
+      n += 1;
+    }
+  }
+}
+
+/**
+ * Take the opening portion of a text for use as a preview: at most maxBytes
+ * of UTF-8, never splitting a multi-byte character, and — following Claude
+ * Code's convention — cut back to the last line boundary when a newline
+ * falls in the second half of the window, so the preview doesn't end
+ * mid-line.
+ */
+function buildPreview(text: string, maxBytes: number): string {
+  const bytes = Buffer.from(text, 'utf8');
+  if (bytes.length <= maxBytes) return text;
+
+  // Walk the cut point back off any UTF-8 continuation bytes (0b10xxxxxx)
+  // so a character straddling the boundary is dropped whole, never sliced.
+  let end = maxBytes;
+  while (end > 0 && (bytes[end]! & 0b1100_0000) === 0b1000_0000) end -= 1;
+  const hardCut = bytes.subarray(0, end).toString('utf8');
+
+  const lastNewline = hardCut.lastIndexOf('\n');
+  return lastNewline > hardCut.length / 2 ? hardCut.slice(0, lastNewline) : hardCut;
+}

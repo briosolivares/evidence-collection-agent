@@ -8,7 +8,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [x] T2: Run directory, path confinement, transcript
 - [x] T3: Artifacts and manifest (`writeArtifact`, SHA-256)
 - [x] T4: Tool registry + validation pipeline
-- [ ] T5: Bounded results + artifact offloading
+- [x] T5: Bounded results + artifact offloading
 - [ ] T6: File tools — `read_file`, `write_file`, `grep`
 - [ ] T7: Agent loop against a fake model
 - [ ] T8: Tool scheduling — parallel reads, serialized writes

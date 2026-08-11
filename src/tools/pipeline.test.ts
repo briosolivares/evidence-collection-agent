@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
+import { initManifest } from '../run/artifacts.js';
+import { DEFAULT_MAX_RESULT_BYTES, type OffloadedResult } from './capResult.js';
 import { executeToolCall } from './pipeline.js';
 import { createRegistry, type ToolCtx, type ToolDef } from './registry.js';
 
@@ -107,5 +112,80 @@ describe('executeToolCall', () => {
     });
     expect(result.content).toContain('explode');
     expect(result.content).toContain('boiler pressure too high');
+  });
+});
+
+describe('executeToolCall result capping (stage 5)', () => {
+  // These tests offload to disk, so they need a real run directory with an
+  // initialized manifest.
+  let runDir: string;
+  let cappedCtx: ToolCtx;
+
+  beforeEach(() => {
+    runDir = mkdtempSync(join(tmpdir(), 'pipeline-cap-test-'));
+    initManifest(runDir, 'test task');
+    cappedCtx = { runDir };
+  });
+
+  afterEach(() => {
+    rmSync(runDir, { recursive: true, force: true });
+  });
+
+  /** A tool that emits `bytes` bytes of ASCII output, optionally declaring
+   * its own result cap. */
+  function makeFlood(maxBytes?: number): ToolDef<{ bytes: number }> {
+    return {
+      name: 'flood',
+      description: 'Emit the requested number of bytes.',
+      inputSchema: z.object({ bytes: z.number() }),
+      readOnly: true,
+      ...(maxBytes !== undefined ? { maxBytes } : {}),
+      execute: async (input) => 'x'.repeat(input.bytes),
+    };
+  }
+
+  it('offloads output over the default cap: the model gets a preview + path, the disk gets it all', async () => {
+    const floodRegistry = createRegistry([makeFlood()]);
+    const result = await executeToolCall(
+      floodRegistry,
+      { id: 'call-6', name: 'flood', input: { bytes: DEFAULT_MAX_RESULT_BYTES + 1 } },
+      cappedCtx,
+    );
+
+    expect(result.isError).toBe(false);
+    const replacement = JSON.parse(result.content) as OffloadedResult;
+    expect(replacement.offloadedTo).toBeDefined();
+    expect(replacement.note).toContain(replacement.offloadedTo);
+    const offloadPath = join(runDir, replacement.offloadedTo);
+    expect(existsSync(offloadPath)).toBe(true);
+    expect(readFileSync(offloadPath, 'utf8')).toBe('x'.repeat(DEFAULT_MAX_RESULT_BYTES + 1));
+  });
+
+  it("honors a tool's own declared maxBytes over the default", async () => {
+    const floodRegistry = createRegistry([makeFlood(64)]);
+    const result = await executeToolCall(
+      floodRegistry,
+      { id: 'call-7', name: 'flood', input: { bytes: 65 } },
+      cappedCtx,
+    );
+
+    expect(result.isError).toBe(false);
+    const replacement = JSON.parse(result.content) as OffloadedResult;
+    expect(readFileSync(join(runDir, replacement.offloadedTo), 'utf8')).toBe('x'.repeat(65));
+  });
+
+  it('passes at-cap output through byte-identical — capping is invisible under the limit', async () => {
+    const floodRegistry = createRegistry([makeFlood(64)]);
+    const result = await executeToolCall(
+      floodRegistry,
+      { id: 'call-8', name: 'flood', input: { bytes: 64 } },
+      cappedCtx,
+    );
+
+    expect(result).toEqual({
+      toolCallId: 'call-8',
+      isError: false,
+      content: 'x'.repeat(64),
+    });
   });
 });
