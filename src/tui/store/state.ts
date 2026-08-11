@@ -12,7 +12,7 @@ export type SessionMode =
   | 'evalsMenu'
   | 'evalsRunning';
 
-/** One artifact row of a run summary (from manifest.json). */
+/** One artifact row of the /runs detail view (from manifest.json). */
 export interface ManifestArtifactView {
   filename: string;
   sizeBytes: number | undefined;
@@ -20,7 +20,7 @@ export interface ManifestArtifactView {
   sourceUrl?: string;
 }
 
-/** What a run-summary block shows from a run's manifest. */
+/** What the /runs detail view shows from a run's manifest. */
 export interface ManifestView {
   task: string;
   startedAt: string;
@@ -28,7 +28,7 @@ export interface ManifestView {
   artifacts: ManifestArtifactView[];
 }
 
-/** What a run-summary block shows from a run's metrics, when present. */
+/** What the /runs detail view shows from a run's metrics, when present. */
 export interface MetricsView {
   status: string;
   turns: number;
@@ -63,7 +63,6 @@ export type TranscriptItemBody =
   | { kind: 'cancelled'; elapsedMs: number; tokens: number }
   | { kind: 'error'; message: string }
   | { kind: 'notice'; text: string }
-  | { kind: 'run_summary'; manifest: ManifestView; metrics?: MetricsView; runDir: string }
   | {
       kind: 'eval_trial';
       task: string;

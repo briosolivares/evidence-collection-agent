@@ -15,8 +15,6 @@ import { deriveSemanticLine } from './semantic.js';
 import type {
   AssertionView,
   LiveRunState,
-  ManifestView,
-  MetricsView,
   SessionState,
   TranscriptItemBody,
   UiEvent,
@@ -43,12 +41,6 @@ export type UiAction =
   | { type: 'cancel_requested' }
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
-  | {
-      type: 'show_run_summary';
-      manifest: ManifestView;
-      metrics?: MetricsView;
-      runDir: string;
-    }
   | { type: 'open_evals' }
   | { type: 'evals_started'; tasks: string[]; k: number }
   | { type: 'eval_trial_started'; task: string; trial: number; k: number }
@@ -186,16 +178,6 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'close_overlay':
       if (state.mode !== 'runsList' && state.mode !== 'evalsMenu') return state;
       return { ...state, mode: 'idle' };
-
-    case 'show_run_summary': {
-      const appended = append(state, {
-        kind: 'run_summary',
-        manifest: action.manifest,
-        ...(action.metrics === undefined ? {} : { metrics: action.metrics }),
-        runDir: action.runDir,
-      });
-      return { ...appended, mode: 'idle' };
-    }
 
     case 'open_evals':
       if (state.mode !== 'idle') return state;

@@ -9,7 +9,7 @@ import {
 import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
-import { loadRunSummary, scanRuns, type RunListEntry } from '../runScanner.js';
+import { scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
   HELP_TEXT,
@@ -154,20 +154,6 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
         <RunsList
           entries={runEntries}
           onClose={() => dispatch({ type: 'close_overlay' })}
-          onSelect={(entry) => {
-            try {
-              const summary = loadRunSummary(entry.runDir);
-              dispatch({ type: 'show_run_summary', ...summary, runDir: entry.runDir });
-            } catch (error) {
-              dispatch({ type: 'close_overlay' });
-              dispatch({
-                type: 'notice',
-                text: `Couldn't read that run: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              });
-            }
-          }}
         />
       )}
       {state.mode === 'evalsMenu' && (

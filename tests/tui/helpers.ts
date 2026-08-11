@@ -43,11 +43,18 @@ export function renderAt(width: number, tree: ReactElement) {
       return true;
     },
   });
+  // Mirrors ink-testing-library's Stdin: write buffers one chunk and
+  // signals both readable-stream styles so Ink's useInput picks it up.
+  let pending: string | null = null;
   const stdin = Object.assign(new EventEmitter(), {
     isTTY: true,
     setRawMode: () => {},
     setEncoding: () => {},
-    read: () => null,
+    read: () => {
+      const data = pending;
+      pending = null;
+      return data;
+    },
     unref: () => {},
     ref: () => {},
     resume: () => {},
@@ -62,6 +69,13 @@ export function renderAt(width: number, tree: ReactElement) {
   });
   return {
     lastFrame: () => frames.at(-1) ?? '',
+    stdin: {
+      write: (data: string) => {
+        pending = data;
+        stdin.emit('readable');
+        stdin.emit('data', data);
+      },
+    },
     unmount: () => instance.unmount(),
   };
 }

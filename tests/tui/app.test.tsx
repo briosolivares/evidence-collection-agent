@@ -164,22 +164,36 @@ describe('App run-session wiring', () => {
 // ————— Step 7: /runs overlay —————
 
 describe('App /runs browsing', () => {
-  it('/runs opens the overlay and a selection appends an inline summary', async () => {
+  it('/runs browses list ↔ detail with arrows through the real reducer', async () => {
     const { mkdtempSync, rmSync } = await import('node:fs');
     const { tmpdir } = await import('node:os');
     const { join } = await import('node:path');
     const { writeFixtureRun } = await import('./runFixtures.js');
 
+    const DOWN = '\u001b[B';
+    const UP = '\u001b[A';
+    const LEFT = '\u001b[D';
+
     const baseDir = mkdtempSync(join(tmpdir(), 'sherlock-app-runs-'));
     try {
+      // Newest first: ids sort lexically descending.
       writeFixtureRun(baseDir, {
-        id: '2026-08-11T10-00-00-000Z-xyz',
-        task: 'the summarized investigation',
-        startedAt: '2026-08-11T10:00:00.000Z',
-        finishedAt: '2026-08-11T10:01:24.000Z',
+        id: '2026-08-11T11-00-00-000Z-new',
+        task: 'the newest investigation',
+        startedAt: '2026-08-11T11:00:00.000Z',
+        finishedAt: '2026-08-11T11:01:24.000Z',
         metrics: { status: 'completed', turns: 4, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 0, wallClockMs: 84_000 },
         artifacts: [
           { filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' },
+        ],
+      });
+      writeFixtureRun(baseDir, {
+        id: '2026-08-11T10-00-00-000Z-old',
+        task: 'the older investigation',
+        startedAt: '2026-08-11T10:00:00.000Z',
+        finishedAt: '2026-08-11T10:00:30.000Z',
+        artifacts: [
+          { filename: 'page.png', content: 'png-bytes', sha256: 'cafebabe12340000' },
         ],
       });
 
@@ -190,15 +204,39 @@ describe('App /runs browsing', () => {
       await tick();
       await submitLine(stdin, '/runs');
       expect(lastFrame()).toContain('Past runs');
-      expect(lastFrame()).toContain('the summarized investigation');
+      expect(lastFrame()).toContain('the newest investigation');
+      expect(lastFrame()).toContain('the older investigation');
 
-      stdin.write('\r'); // select the only entry
+      // ↓ then Enter opens the older run's detail inside the overlay.
+      stdin.write(DOWN);
       await tick();
-      const output = frames.join('\n');
-      expect(output).toContain('sha256 feedfacedead');
-      expect(output).toContain('1m 24s');
-      // Back at the composer, overlay gone.
+      stdin.write('\r');
+      await tick();
+      expect(lastFrame()).toContain('sha256 cafebabe1234');
+      expect(lastFrame()).toContain('page.png');
+      expect(lastFrame()).toContain('↑↓ prev/next run · ← back · esc back');
+
+      // ↑ jumps straight to the newer run's detail (real loadRunSummary).
+      stdin.write(UP);
+      await tick();
+      expect(lastFrame()).toContain('sha256 feedfacedead');
+      expect(lastFrame()).toContain('1m 24s');
+      stdin.write(DOWN); // and back down to the older one
+      await tick();
+      expect(lastFrame()).toContain('sha256 cafebabe1234');
+
+      // ← returns to the list with the cursor still on the older run.
+      stdin.write(LEFT);
+      await tick();
+      expect(lastFrame()).toContain('↑↓ select · enter view · esc close');
+      expect(lastFrame()).toContain('› ✗ the older investigation');
+
+      // Esc from the list closes the overlay; nothing was appended to the
+      // transcript, and the composer is usable again.
+      stdin.write(ESC);
+      await tick(150);
       expect(lastFrame()).not.toContain('Past runs');
+      expect(lastFrame()).not.toContain('sha256');
       await submitLine(stdin, 'next question');
       expect(frames.join('\n')).toContain('▸ next question');
       unmount();

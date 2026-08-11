@@ -105,8 +105,6 @@ export function TranscriptItemView({
           <Text color={theme.muted}>{item.text}</Text>
         </Box>
       );
-    case 'run_summary':
-      return <RunSummary item={item} />;
     case 'eval_trial':
       return <EvalTrial item={item} />;
     case 'eval_report':
@@ -139,37 +137,6 @@ function VerboseDetail({ verbose }: { verbose: { input: string; result: string }
   );
 }
 
-function RunSummary({ item }: { item: Extract<TranscriptItem, { kind: 'run_summary' }> }) {
-  const { manifest, metrics } = item;
-  return (
-    <Box flexDirection="column" marginTop={1}>
-      <Box>
-        <Text color={theme.primary}>{`${glyphs.user} `}</Text>
-        <Text bold>{manifest.task}</Text>
-      </Box>
-      <Text color={theme.muted}>{`  started ${manifest.startedAt}`}</Text>
-      {metrics !== undefined && (
-        <Text color={theme.muted}>
-          {`  ${metrics.status} · ${metrics.turns} turns · ${formatTokens(metrics.totalTokens)} · ${formatDuration(metrics.wallClockMs)}`}
-        </Text>
-      )}
-      {manifest.artifacts.length === 0 ? (
-        <Text color={theme.muted}>  no artifacts</Text>
-      ) : (
-        manifest.artifacts.map((artifact) => (
-          <Text key={artifact.filename}>
-            <Text color={theme.emphasis}>{`  ${glyphs.evidence} ${artifact.filename}`}</Text>
-            <Text color={theme.muted}>
-              {`  ${artifact.sizeBytes === undefined ? '?' : formatBytes(artifact.sizeBytes)} · sha256 ${artifact.sha256Prefix}`}
-            </Text>
-          </Text>
-        ))
-      )}
-      <Text color={theme.muted}>{`  ${item.runDir}`}</Text>
-    </Box>
-  );
-}
-
 function EvalTrial({ item }: { item: Extract<TranscriptItem, { kind: 'eval_trial' }> }) {
   return (
     <Box flexDirection="column" marginTop={1}>
@@ -186,10 +153,4 @@ function EvalTrial({ item }: { item: Extract<TranscriptItem, { kind: 'eval_trial
       ))}
     </Box>
   );
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

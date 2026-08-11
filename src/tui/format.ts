@@ -33,6 +33,15 @@ export function truncate(text: string, maxLength: number): string {
 }
 
 /**
+ * Format a byte count compactly: `512 B`, `2.0 KB`, `1.3 MB`.
+ */
+export function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
  * Format how long ago a moment was, compactly: `just now`, `5m ago`,
  * `3h ago`, `2d ago`.
  */
