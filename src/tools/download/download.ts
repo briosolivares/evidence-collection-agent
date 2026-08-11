@@ -20,22 +20,27 @@ const httpUrlSchema = z.url().refine((url) => {
   return protocol === 'http:' || protocol === 'https:';
 }, 'URL must use HTTP or HTTPS');
 
-const downloadInputSchema = z.union([
-  z
-    .object({
-      ref: z.string().min(1).describe('Ref for a download link or control from inspect_page'),
-      filename: filenameSchema,
-    })
-    .strict(),
-  z
-    .object({
-      url: httpUrlSchema.describe(
+// A single object with an exactly-one-of check rather than a z.union of two
+// objects: the Anthropic API requires input_schema to have top-level
+// `type: "object"`, and a union converts to a bare `anyOf` without it.
+const downloadInputSchema = z
+  .object({
+    ref: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('Ref for a download link or control from inspect_page'),
+    url: httpUrlSchema
+      .optional()
+      .describe(
         'Verified direct resource URL when the visible page link is a viewer or redirect wrapper',
       ),
-      filename: filenameSchema,
-    })
-    .strict(),
-]);
+    filename: filenameSchema,
+  })
+  .strict()
+  .refine((input) => (input.ref === undefined) !== (input.url === undefined), {
+    message: 'Provide exactly one of ref or url',
+  });
 
 /** Input accepted by the download tool. */
 export type DownloadInput = z.infer<typeof downloadInputSchema>;
@@ -67,7 +72,7 @@ export const downloadTool: ToolDef<DownloadInput> = {
     }
     const initiatingPageUrl = browser.currentUrl();
     const response = await browser.download(
-      'ref' in input ? { ref: input.ref } : { url: input.url },
+      input.ref !== undefined ? { ref: input.ref } : { url: input.url! },
     );
     if (
       response.status !== undefined
