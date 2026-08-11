@@ -5,8 +5,8 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 ## Progress checklist
 
 - [x] T1: Project scaffold + spec conventions
-- [ ] T2: Run directory, path confinement, transcript
-- [ ] T3: Artifacts and manifest (`writeArtifact`, SHA-256)
+- [x] T2: Run directory, path confinement, transcript
+- [x] T3: Artifacts and manifest (`writeArtifact`, SHA-256)
 - [x] T4: Tool registry + validation pipeline
 - [ ] T5: Bounded results + artifact offloading
 - [ ] T6: File tools — `read_file`, `write_file`, `grep`
