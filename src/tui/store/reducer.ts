@@ -13,6 +13,8 @@ import { formatDuration, formatTokens } from '../format.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
   LiveRunState,
+  ManifestView,
+  MetricsView,
   SessionState,
   TranscriptItemBody,
   UiEvent,
@@ -31,11 +33,20 @@ function compactDetail(value: unknown): string {
   return text.length > VERBOSE_MAX ? `${text.slice(0, VERBOSE_MAX - 1)}…` : text;
 }
 
-/** UI-originated actions (composer submits, slash-command output, Esc). */
+/** UI-originated actions (composer submits, slash-command output, Esc,
+ * overlay control). */
 export type UiAction =
   | { type: 'submit_task'; text: string }
   | { type: 'notice'; text: string }
-  | { type: 'cancel_requested' };
+  | { type: 'cancel_requested' }
+  | { type: 'open_runs' }
+  | { type: 'close_overlay' }
+  | {
+      type: 'show_run_summary';
+      manifest: ManifestView;
+      metrics?: MetricsView;
+      runDir: string;
+    };
 
 /** Everything the reducer consumes. */
 export type StoreAction = UiAction | UiEvent;
@@ -44,6 +55,7 @@ export type StoreAction = UiAction | UiEvent;
 export type RoutedInput =
   | { kind: 'task'; text: string }
   | { kind: 'help' }
+  | { kind: 'runs' }
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
 
@@ -70,6 +82,8 @@ export function routeInput(text: string): RoutedInput {
   switch (command) {
     case '/help':
       return { kind: 'help' };
+    case '/runs':
+      return { kind: 'runs' };
     case '/exit':
       return { kind: 'exit' };
     default:
@@ -153,6 +167,24 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       // already cancelling (or any press while idle) is a no-op.
       if (state.mode !== 'running') return state;
       return { ...state, mode: 'cancelling' };
+
+    case 'open_runs':
+      if (state.mode !== 'idle') return state;
+      return { ...state, mode: 'runsList' };
+
+    case 'close_overlay':
+      if (state.mode !== 'runsList' && state.mode !== 'evalsMenu') return state;
+      return { ...state, mode: 'idle' };
+
+    case 'show_run_summary': {
+      const appended = append(state, {
+        kind: 'run_summary',
+        manifest: action.manifest,
+        ...(action.metrics === undefined ? {} : { metrics: action.metrics }),
+        runDir: action.runDir,
+      });
+      return { ...appended, mode: 'idle' };
+    }
 
     case 'run_started':
       return {

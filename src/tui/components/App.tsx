@@ -1,9 +1,10 @@
 import { Box, Text, useApp, useInput } from 'ink';
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 
 import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
+import { loadRunSummary, scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
   HELP_TEXT,
@@ -15,6 +16,7 @@ import type { UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
 import { LiveRegion } from './LiveRegion.js';
+import { RunsList } from './RunsList.js';
 import { Transcript } from './Transcript.js';
 
 interface AppProps {
@@ -42,6 +44,7 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
     createInitialState,
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);
+  const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
 
   useEffect(() => {
     if (!demo) return;
@@ -73,6 +76,10 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
       case 'help':
         dispatch({ type: 'notice', text: HELP_TEXT });
         return;
+      case 'runs':
+        setRunEntries(scanRuns(config.runsBaseDir));
+        dispatch({ type: 'open_runs' });
+        return;
       case 'exit':
         (onExit ?? exit)();
         return;
@@ -92,6 +99,26 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
           config={config}
           live={state.live}
           cancelling={state.mode === 'cancelling'}
+        />
+      )}
+      {state.mode === 'runsList' && (
+        <RunsList
+          entries={runEntries}
+          onClose={() => dispatch({ type: 'close_overlay' })}
+          onSelect={(entry) => {
+            try {
+              const summary = loadRunSummary(entry.runDir);
+              dispatch({ type: 'show_run_summary', ...summary, runDir: entry.runDir });
+            } catch (error) {
+              dispatch({ type: 'close_overlay' });
+              dispatch({
+                type: 'notice',
+                text: `Couldn't read that run: ${
+                  error instanceof Error ? error.message : String(error)
+                }`,
+              });
+            }
+          }}
         />
       )}
       <Box flexDirection="column" marginTop={1}>

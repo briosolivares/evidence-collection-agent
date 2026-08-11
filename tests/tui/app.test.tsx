@@ -157,6 +157,68 @@ describe('App run-session wiring', () => {
   });
 });
 
+// ————— Step 7: /runs overlay —————
+
+describe('App /runs browsing', () => {
+  it('/runs opens the overlay and a selection appends an inline summary', async () => {
+    const { mkdtempSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { writeFixtureRun } = await import('./runFixtures.js');
+
+    const baseDir = mkdtempSync(join(tmpdir(), 'sherlock-app-runs-'));
+    try {
+      writeFixtureRun(baseDir, {
+        id: '2026-08-11T10-00-00-000Z-xyz',
+        task: 'the summarized investigation',
+        startedAt: '2026-08-11T10:00:00.000Z',
+        finishedAt: '2026-08-11T10:01:24.000Z',
+        metrics: { status: 'completed', turns: 4, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 0, wallClockMs: 84_000 },
+        artifacts: [
+          { filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' },
+        ],
+      });
+
+      const runsConfig = createConfig({ runsBaseDir: baseDir });
+      const { frames, lastFrame, stdin, unmount } = render(
+        <App config={runsConfig} apiKeyPresent={true} />,
+      );
+      await tick();
+      await submitLine(stdin, '/runs');
+      expect(lastFrame()).toContain('Past runs');
+      expect(lastFrame()).toContain('the summarized investigation');
+
+      stdin.write('\r'); // select the only entry
+      await tick();
+      const output = frames.join('\n');
+      expect(output).toContain('sha256 feedfacedead');
+      expect(output).toContain('1m 24s');
+      // Back at the composer, overlay gone.
+      expect(lastFrame()).not.toContain('Past runs');
+      await submitLine(stdin, 'next question');
+      expect(frames.join('\n')).toContain('▸ next question');
+      unmount();
+    } finally {
+      rmSync(baseDir, { recursive: true, force: true });
+    }
+  });
+
+  it('Esc closes the overlay without a summary', async () => {
+    const runsConfig = createConfig({ runsBaseDir: '/nonexistent-runs-dir' });
+    const { lastFrame, stdin, unmount } = render(
+      <App config={runsConfig} apiKeyPresent={true} />,
+    );
+    await tick();
+    await submitLine(stdin, '/runs');
+    expect(lastFrame()).toContain('No runs yet');
+    stdin.write(ESC);
+    await tick(150);
+    expect(lastFrame()).not.toContain('Past runs');
+    expect(lastFrame()).toContain('›');
+    unmount();
+  });
+});
+
 // ————— Step 5: Esc cancellation —————
 
 describe('App Esc cancellation', () => {

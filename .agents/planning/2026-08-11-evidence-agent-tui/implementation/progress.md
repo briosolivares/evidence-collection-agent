@@ -96,3 +96,16 @@ Verification evidence:
 - `S6-H1` (human-judged) — agent-judged from a real PTY run (/tmp/sherlock-semantic.out): task "save top 3 HN titles to top3.csv" rendered navigation → investigation → evidence → conclusion: `● navigate…` upgraded in place to `● Opening news.ycombinator.com…` then `✓`; `● Reading the page ✓`; `◆ Evidence saved → top3.csv` (bright); `● Re-reading top3.csv ✓`; `✓ Brewed in 15s · 56.9k tokens`. No ⚠ retried artifacts remain. top3.csv on disk has exactly `rank,title` + 3 rows. `--demo --verbose` PTY capture shows dim indented `input:`/`result:` detail under each line; default mode omits it.
 
 Statuses flipped: S6-F1…S6-F9 → pass.
+
+## 2026-08-11 03:00 PDT — Step 7 complete: /runs past-run browser
+
+- New: `src/tui/runScanner.ts` — scanRuns (newest first by lexically time-ordered ids; skips junk/manifest-less dirs; classification per the core's write contract: metrics ⇒ complete ✓, no finishedAt ⇒ unfinished ◐, finished without metrics ⇒ stopped ✗ — never "crashed") and loadRunSummary (manifest view with on-disk artifact sizes + 12-char sha256 prefixes + sourceUrl, metrics view with input+output tokens). `formatRelativeTime` added to format.ts.
+- New: `src/tui/components/RunsList.tsx` — windowed scrollable overlay (↑↓/Enter/Esc via useInput, cursor-centered window, position indicator, friendly empty state). Store: mode `runsList` via open_runs/close_overlay actions; show_run_summary appends a run_summary item and returns to idle. Slash router gained `/runs`. App scans on open and loads summaries on select (read failures degrade to a notice).
+- Tests: run-scanner (ordering, all three statuses, cancelled-never-crashed, junk skipping, missing dir, summary views ±metrics), runs-list (glyph rows, relative dates, 12-entry window scroll with indicator, Enter selection, Esc close, empty state, full summary rendering incl. sizes/sha prefix), app (/runs → overlay → Enter → inline summary through the transcript pipeline → composer restored; Esc close on empty dir).
+
+Verification evidence:
+
+- `S7-V1`…`S7-V5` all exit 0; 15 files / 124 TUI tests green; typecheck clean.
+- `S7-H1` (human-judged) — agent-judged from a PTY session against the real run history (/tmp/sherlock-runs.out): `/runs` listed 3 real runs newest-first with correct glyphs (two ✓ completed, one ✗ for the step-5 Esc-cancelled run — displayed stopped, never "crashed") and relative dates (10m/19m ago); ↓+Enter appended the inline summary block (task, started timestamp, `completed · 4 turns · 1.1k tokens · 12s`, `◆ title.txt  14 B · sha256 162b81548a8d`, run dir) and returned to the composer; a second `/runs` then Esc closed cleanly. Noted for step 9 polish: composer placeholder reads "(waiting for agent…)" while an overlay is open.
+
+Statuses flipped: S7-F1…S7-F8 → pass.

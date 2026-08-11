@@ -442,7 +442,7 @@
       "verification": [
         "S7-V1"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F2",
@@ -451,7 +451,7 @@
       "verification": [
         "S7-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F3",
@@ -460,7 +460,7 @@
       "verification": [
         "S7-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F4",
@@ -469,7 +469,7 @@
       "verification": [
         "S7-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F5",
@@ -478,7 +478,7 @@
       "verification": [
         "S7-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F6",
@@ -487,7 +487,7 @@
       "verification": [
         "S7-V4"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F7",
@@ -496,7 +496,7 @@
       "verification": [
         "S7-V5"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S7-F8",
@@ -506,7 +506,7 @@
         "S7-H1"
       ],
       "humanJudged": true,
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S8-F1",

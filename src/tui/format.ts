@@ -33,6 +33,20 @@ export function truncate(text: string, maxLength: number): string {
 }
 
 /**
+ * Format how long ago a moment was, compactly: `just now`, `5m ago`,
+ * `3h ago`, `2d ago`.
+ */
+export function formatRelativeTime(thenMs: number, nowMs: number): string {
+  const seconds = Math.max(0, Math.floor((nowMs - thenMs) / 1000));
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+/**
  * Shorten a URL for a semantic activity line: protocol and a leading
  * `www.` are dropped, the host is kept, and the path/query is trimmed to
  * fit maxLength (`sec.gov/cgi-bin/browse-edgar…`). A string that does not
