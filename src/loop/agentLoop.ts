@@ -1,7 +1,13 @@
+import { Buffer } from 'node:buffer';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { appendTranscriptEvent } from '../run/transcript.js';
+import {
+  MAX_TOOL_RESULTS_PER_MESSAGE_BYTES,
+  offloadResult,
+  PREVIEW_MAX_BYTES,
+} from '../tools/capResult.js';
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
 import { scheduleToolCalls } from './scheduler.js';
@@ -52,8 +58,9 @@ export interface LoopDeps {
 }
 
 /**
- * The run's hard guards. Both are required: together they guarantee the
- * loop terminates no matter what the model does.
+ * The run's hard guards. Both are required: maxTurns is what guarantees
+ * the loop terminates no matter what the model does; maxContextTokens
+ * bounds how large any single request may grow.
  */
 export interface LoopConfig {
   /** Maximum number of model calls (turns); an integer >= 1. Boundary: the
@@ -62,17 +69,25 @@ export interface LoopConfig {
    * after tool execution, per the design's loop diagram) and the run then
    * ends budget_exceeded instead of calling the model again. */
   maxTurns: number;
-  /** Cumulative token budget across all responses, counting each
-   * response's input_tokens + output_tokens + cache_read_input_tokens;
-   * >= 0. Boundary: the budget is spendable in full — the run continues at
-   * exactly maxTokens and ends budget_exceeded only when the total
-   * strictly exceeds it. */
-  maxTokens: number;
+  /** Per-request context ceiling: the largest single request/response the
+   * run may make, measured from each response's usage as input_tokens +
+   * cache_creation_input_tokens + cache_read_input_tokens + output_tokens
+   * (the full prompt the model just saw plus what it wrote — Claude Code's
+   * canonical context measure; a cumulative sum would double-count history
+   * every turn). >= 0. Boundary: spendable in full — the run continues at
+   * exactly maxContextTokens and ends budget_exceeded only when one
+   * response's context strictly exceeds it. Known simplification: the
+   * guard measures the request the model just answered, not the one about
+   * to be sent, so the next request can exceed the last measured context
+   * by at most the just-appended tool results — bounded by the per-message
+   * batch cap (MAX_TOOL_RESULTS_PER_MESSAGE_BYTES), so no token estimation
+   * is needed. */
+  maxContextTokens: number;
 }
 
 /** Which guard ended a budget_exceeded run. If both trip after the same
  * turn, max_turns is reported. */
-export type BudgetReason = 'max_turns' | 'token_budget';
+export type BudgetReason = 'max_turns' | 'context_budget';
 
 /**
  * How a run ended. `completed`: the model responded without tool calls;
@@ -96,6 +111,12 @@ export interface RunMetrics {
   outputTokens: number;
   /** Sum of cache_read_input_tokens across all responses. */
   cacheReadInputTokens: number;
+  /** Sum of cache_creation_input_tokens across all responses. */
+  cacheCreationInputTokens: number;
+  /** Largest per-request context of the run: max over responses of
+   * input + cache_creation + cache_read + output tokens. The depth number
+   * for comparing runs across guard-semantics changes. */
+  peakContextTokens: number;
   /** Wall-clock duration of the run in milliseconds. */
   wallClockMs: number;
 }
@@ -116,8 +137,14 @@ export interface RunMetrics {
  * Guards are checked after tool execution, before the next model call —
  * boundary semantics on LoopConfig; completion is checked before the
  * guards, so a final response that arrives within maxTurns completes the
- * run even if its usage pushes the total past the token budget (the answer
- * is already in hand).
+ * run even if its usage exceeds the context budget (the answer is already
+ * in hand).
+ *
+ * One message's combined tool results are bounded by
+ * MAX_TOOL_RESULTS_PER_MESSAGE_BYTES on top of the pipeline's per-result
+ * cap: when a batch exceeds it, the largest results are offloaded to
+ * tool-output/ files (largest first, previews and manifest hashes
+ * preserved) until the batch fits — the run keeps going; nothing dies.
  *
  * Transcript: every model request, response, tool call, and tool result is
  * appended to <runDir>/transcript.jsonl as events `model_request` {turn,
@@ -125,14 +152,20 @@ export interface RunMetrics {
  * and `tool_result` {turn, result}. Within a turn, all tool_call events
  * are appended in request order before execution begins and all
  * tool_result events in request order after every call has settled
- * (parallel completion order is not observable in the transcript). On run
+ * (parallel completion order is not observable in the transcript); a
+ * tool_result is recorded as the model will see it, after both caps. A
+ * `cache_miss_warning` {turn} event is appended for any turn >= 2 whose
+ * response reports zero cache reads — from turn 2 the stable prefix alone
+ * guarantees a cache hit, so zero means the prefix silently broke (the
+ * two-line version of Claude Code's prompt-cache break detection). On run
  * end — both statuses — <runDir>/metrics.json is written (see RunMetrics).
  *
  * @param taskText - the user's task, sent as the conversation's first message
  * @param deps - the loop's only I/O surface (see LoopDeps); deps.runDir
  *   must be an existing run directory with an initialized manifest
  * @param config - termination guards (see LoopConfig); throws before any
- *   model call if maxTurns is not an integer >= 1 or maxTokens is negative
+ *   model call if maxTurns is not an integer >= 1 or maxContextTokens is
+ *   negative
  * @returns the run's outcome (see LoopResult); by return time the
  *   transcript holds the run's full event sequence and metrics.json its
  *   totals
@@ -147,8 +180,8 @@ export async function runAgentLoop(
   if (!Number.isInteger(config.maxTurns) || config.maxTurns < 1) {
     throw new Error(`maxTurns must be an integer >= 1, got ${config.maxTurns}`);
   }
-  if (config.maxTokens < 0) {
-    throw new Error(`maxTokens must be >= 0, got ${config.maxTokens}`);
+  if (config.maxContextTokens < 0) {
+    throw new Error(`maxContextTokens must be >= 0, got ${config.maxContextTokens}`);
   }
 
   const startedMs = Date.now();
@@ -156,7 +189,15 @@ export async function runAgentLoop(
     messages: [{ role: 'user', content: [{ type: 'text', text: taskText }] }],
     turnCount: 0,
   };
-  const totals = { inputTokens: 0, outputTokens: 0, cacheReadInputTokens: 0 };
+  // Cumulative sums are observability only (metrics, cost derivation) —
+  // the guard below is per-request, never cumulative.
+  const totals = {
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheReadInputTokens: 0,
+    cacheCreationInputTokens: 0,
+  };
+  let peakContextTokens = 0;
   const toolCtx: ToolCtx = { runDir: deps.runDir, browser: deps.browser };
 
   // Every exit path funnels through here, so no ending can skip metrics.
@@ -165,6 +206,7 @@ export async function runAgentLoop(
       status: result.status,
       turns: state.turnCount,
       ...totals,
+      peakContextTokens,
       wallClockMs: Date.now() - startedMs,
     };
     writeFileSync(
@@ -189,6 +231,23 @@ export async function runAgentLoop(
     totals.inputTokens += response.usage.input_tokens;
     totals.outputTokens += response.usage.output_tokens;
     totals.cacheReadInputTokens += response.usage.cache_read_input_tokens ?? 0;
+    totals.cacheCreationInputTokens += response.usage.cache_creation_input_tokens ?? 0;
+
+    // This response's full context: the entire prompt the model just saw
+    // (uncached input + cache writes + cache reads) plus what it wrote.
+    const contextTokens =
+      response.usage.input_tokens
+      + (response.usage.cache_creation_input_tokens ?? 0)
+      + (response.usage.cache_read_input_tokens ?? 0)
+      + response.usage.output_tokens;
+    peakContextTokens = Math.max(peakContextTokens, contextTokens);
+
+    // Cache-miss tripwire: from turn 2 the stable prompt prefix alone
+    // guarantees cache reads, so zero means the prefix silently broke —
+    // make it visible in the run dir rather than only in the bill.
+    if (turn >= 2 && (response.usage.cache_read_input_tokens ?? 0) === 0) {
+      appendTranscriptEvent(deps.runDir, { type: 'cache_miss_warning', turn });
+    }
 
     state.messages.push({ role: 'assistant', content: response.content });
 
@@ -215,7 +274,13 @@ export async function runAgentLoop(
     for (const call of calls) {
       appendTranscriptEvent(deps.runDir, { type: 'tool_call', turn, call });
     }
-    const results = await scheduleToolCalls(calls, deps.registry, toolCtx);
+    // The batch cap runs before the transcript's tool_result events so the
+    // transcript records exactly what the model will see next turn.
+    const results = capResultBatch(
+      deps.runDir,
+      calls,
+      await scheduleToolCalls(calls, deps.registry, toolCtx),
+    );
     const resultBlocks: ToolResultBlock[] = results.map((result) => {
       appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
       return toResultBlock(result);
@@ -227,10 +292,8 @@ export async function runAgentLoop(
     if (turn >= config.maxTurns) {
       return finish({ status: 'budget_exceeded', reason: 'max_turns' });
     }
-    const cumulativeTokens =
-      totals.inputTokens + totals.outputTokens + totals.cacheReadInputTokens;
-    if (cumulativeTokens > config.maxTokens) {
-      return finish({ status: 'budget_exceeded', reason: 'token_budget' });
+    if (contextTokens > config.maxContextTokens) {
+      return finish({ status: 'budget_exceeded', reason: 'context_budget' });
     }
   }
 }
@@ -241,6 +304,59 @@ function extractText(content: readonly AssistantContentBlock[]): string {
     .filter((block): block is TextBlock => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
+}
+
+/**
+ * Bound one message's combined tool-result bytes (the per-message batch
+ * cap). Each result already passed the pipeline's per-result cap, but a
+ * batch of individually-legal results can still flood one user message —
+ * 5 parallel reads × 50k bytes is ~250k. While the batch's combined
+ * content exceeds MAX_TOOL_RESULTS_PER_MESSAGE_BYTES, the largest
+ * not-yet-offloaded result is written to a tool-output/ file (manifest
+ * hash and preview preserved, same replacement shape as the per-result
+ * cap) — the remedy is offload, the run keeps going. Results at or under
+ * preview size are never offloaded (replacing them couldn't shrink the
+ * batch), so a pathological batch of many tiny results passes through
+ * over-cap rather than looping; the returned array always matches
+ * `results` positionally, untouched entries by identity.
+ */
+function capResultBatch(
+  runDir: string,
+  calls: readonly ToolCall[],
+  results: readonly ToolCallResult[],
+): ToolCallResult[] {
+  const bounded = [...results];
+  const sizes = bounded.map((result) => Buffer.byteLength(result.content, 'utf8'));
+  let total = sizes.reduce((sum, size) => sum + size, 0);
+  const offloaded = new Set<number>();
+
+  while (total > MAX_TOOL_RESULTS_PER_MESSAGE_BYTES) {
+    let largest = -1;
+    for (let index = 0; index < bounded.length; index += 1) {
+      if (offloaded.has(index)) continue;
+      if (largest === -1 || sizes[index]! > sizes[largest]!) largest = index;
+    }
+    if (largest === -1 || sizes[largest]! <= PREVIEW_MAX_BYTES) break;
+
+    // Offload file names come from the model-supplied tool name here (the
+    // pipeline's capResult gets registry names); sanitize so an unknown-tool
+    // result can never smuggle path separators into the offload dir.
+    const safeToolName = calls[largest]!.name.replace(/[^A-Za-z0-9_-]/g, '_');
+    const replacement = JSON.stringify(offloadResult(
+      runDir,
+      safeToolName,
+      bounded[largest]!.content,
+      `over the ${MAX_TOOL_RESULTS_PER_MESSAGE_BYTES}-byte combined limit ` +
+        "for one message's tool results",
+    ));
+    bounded[largest] = { ...bounded[largest]!, content: replacement };
+    total -= sizes[largest]!;
+    sizes[largest] = Buffer.byteLength(replacement, 'utf8');
+    total += sizes[largest]!;
+    offloaded.add(largest);
+  }
+
+  return bounded;
 }
 
 /** Convert one pipeline result into the API-shaped tool_result block the

@@ -21,10 +21,11 @@ function usage(
   inputTokens: number,
   outputTokens: number,
   cacheReadInputTokens: number | null,
+  cacheCreationInputTokens: number | null = 0,
 ): Anthropic.Messages.Usage {
   return {
     cache_creation: null,
-    cache_creation_input_tokens: 0,
+    cache_creation_input_tokens: cacheCreationInputTokens,
     cache_read_input_tokens: cacheReadInputTokens,
     inference_geo: null,
     input_tokens: inputTokens,
@@ -138,7 +139,12 @@ describe('assembleModelResponse', () => {
         { type: 'tool_use', id: 'toolu_01BBB', name: 'list_files', input: {} },
       ],
       stop_reason: 'tool_use',
-      usage: { input_tokens: 1200, output_tokens: 96, cache_read_input_tokens: 1150 },
+      usage: {
+        input_tokens: 1200,
+        output_tokens: 96,
+        cache_read_input_tokens: 1150,
+        cache_creation_input_tokens: 0,
+      },
     });
   });
 
@@ -181,6 +187,39 @@ describe('assembleModelResponse', () => {
       input_tokens: 87,
       output_tokens: 12,
       cache_read_input_tokens: null,
+      cache_creation_input_tokens: 0,
+    });
+  });
+
+  it('captures cache_creation_input_tokens from message_delta when reported', async () => {
+    // The moving conversation breakpoint writes a cache extension every
+    // turn; its size arrives in the delta usage and must survive assembly.
+    const events: ModelStreamEvent[] = [
+      messageStart(usage(50, 2, 3000, 0)),
+      {
+        type: 'content_block_start',
+        index: 0,
+        content_block: { type: 'text', text: '', citations: null },
+      },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Done.' } },
+      { type: 'content_block_stop', index: 0 },
+      messageDelta('end_turn', {
+        cache_creation_input_tokens: 2400,
+        cache_read_input_tokens: 3000,
+        input_tokens: 50,
+        output_tokens: 9,
+        output_tokens_details: null,
+        server_tool_use: null,
+      }),
+      { type: 'message_stop' },
+    ];
+
+    const response = await assembleModelResponse(replay(events));
+    expect(response.usage).toEqual({
+      input_tokens: 50,
+      output_tokens: 9,
+      cache_read_input_tokens: 3000,
+      cache_creation_input_tokens: 2400,
     });
   });
 

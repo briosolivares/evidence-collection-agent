@@ -29,10 +29,16 @@ export function formatProgressEvent(event: ProgressEvent): string {
     case 'tool_use_start':
       return `\n[turn ${event.turn}] tool call: ${event.toolName}\n`;
     case 'turn_end': {
-      const { input_tokens, output_tokens, cache_read_input_tokens } = event.usage;
+      const {
+        input_tokens,
+        output_tokens,
+        cache_read_input_tokens,
+        cache_creation_input_tokens,
+      } = event.usage;
       return (
         `\n[turn ${event.turn}] usage: in=${input_tokens} out=${output_tokens} ` +
-        `cache_read=${cache_read_input_tokens ?? 0}\n`
+        `cache_read=${cache_read_input_tokens ?? 0} ` +
+        `cache_write=${cache_creation_input_tokens ?? 0}\n`
       );
     }
   }

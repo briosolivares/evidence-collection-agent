@@ -99,7 +99,7 @@ console.log(`task:    ${TASK}\n`);
 
 const result = await runAgentLoop(TASK, { callModel, registry, runDir }, {
   maxTurns: 3,
-  maxTokens: 100_000,
+  maxContextTokens: 100_000,
 });
 finalizeManifest(runDir);
 

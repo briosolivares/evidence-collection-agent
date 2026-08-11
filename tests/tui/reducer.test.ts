@@ -265,7 +265,7 @@ describe('reduce (run lifecycle events)', () => {
       {
         type: 'run_finished',
         outcome: 'budget_exceeded',
-        reason: 'token_budget',
+        reason: 'context_budget',
         runDir: '/runs/over',
         at: 100_000,
       },
@@ -273,7 +273,7 @@ describe('reduce (run lifecycle events)', () => {
     expect(state.mode).toBe('idle');
     const last = state.transcript.at(-1);
     expect(last).toMatchObject({ kind: 'error' });
-    expect((last as { message: string }).message).toContain('token budget');
+    expect((last as { message: string }).message).toContain('context budget');
     expect((last as { message: string }).message).toContain('/runs/over');
   });
 

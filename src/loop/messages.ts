@@ -69,6 +69,11 @@ export interface Usage {
    * them (absent or null otherwise). Nonzero from turn 2 onward is the
    * design's explicit check that the stable prompt prefix is working. */
   cache_read_input_tokens?: number | null;
+  /** Input tokens written to the prompt cache by this response, when the
+   * client reports them (absent or null otherwise). With the moving
+   * conversation breakpoint every turn extends the cache, so nonzero here
+   * on every turn is the check that the extension is being written. */
+  cache_creation_input_tokens?: number | null;
 }
 
 /** One complete model response. */

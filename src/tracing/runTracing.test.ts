@@ -301,8 +301,8 @@ describe('createRunTracing with runTask', () => {
       )
       .sort((left, right) => left.input - right.input);
     expect(usageDetails).toEqual([
-      { input: 11, output: 3, cache_read_input_tokens: 2 },
-      { input: 13, output: 5, cache_read_input_tokens: 4 },
+      { input: 11, output: 3, cache_read_input_tokens: 2, cache_creation_input_tokens: 0 },
+      { input: 13, output: 5, cache_read_input_tokens: 4, cache_creation_input_tokens: 0 },
     ]);
     for (const generation of generationSpans) {
       expect(

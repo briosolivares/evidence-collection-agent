@@ -66,7 +66,7 @@ export interface RunSessionDeps {
   runsBaseDir?: string;
   model?: string;
   maxTurns?: number;
-  maxTokens?: number;
+  maxContextTokens?: number;
   startUrl?: string;
   /** Tracing the TUI's adapter delegates to; defaults to the core's
    * createRunTracing() so Langfuse observability is preserved. */
@@ -184,7 +184,9 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
-        ...(deps.maxTokens === undefined ? {} : { maxTokens: deps.maxTokens }),
+        ...(deps.maxContextTokens === undefined
+          ? {}
+          : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
       });
       if (result.status === 'completed') {

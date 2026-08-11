@@ -135,6 +135,8 @@ function createEnabledRunTracing(
             output: response.usage.output_tokens,
             cache_read_input_tokens:
               response.usage.cache_read_input_tokens ?? 0,
+            cache_creation_input_tokens:
+              response.usage.cache_creation_input_tokens ?? 0,
           },
         }));
         return response;

@@ -116,7 +116,7 @@ const callModel = makeCallModel({
 
 const result = await runAgentLoop(task, { callModel, registry, runDir }, {
   maxTurns: 12,
-  maxTokens: 250_000,
+  maxContextTokens: 200_000,
 });
 finalizeManifest(runDir);
 

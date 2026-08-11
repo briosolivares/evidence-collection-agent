@@ -159,7 +159,7 @@ describe('runTask', () => {
         runsBaseDir,
         callModel: fake.callModel,
         maxTurns: 8,
-        maxTokens: 10_000,
+        maxContextTokens: 10_000,
       });
 
       expect(result.status).toBe('completed');
@@ -265,7 +265,7 @@ describe('runTask', () => {
         browser,
         runsBaseDir,
         callModel: fake.callModel,
-        maxTokens: 10_000,
+        maxContextTokens: 10_000,
       });
 
       expect(result).toMatchObject({
@@ -293,7 +293,7 @@ describe('runTask', () => {
         runsBaseDir,
         callModel: budgetFake.callModel,
         maxTurns: 1,
-        maxTokens: 10_000,
+        maxContextTokens: 10_000,
       });
 
       expect(budgetResult).toMatchObject({
@@ -317,7 +317,7 @@ describe('runTask', () => {
         runsBaseDir,
         callModel: nextFake.callModel,
         maxTurns: 2,
-        maxTokens: 10_000,
+        maxContextTokens: 10_000,
       });
       expect(nextResult).toMatchObject({
         status: 'completed',

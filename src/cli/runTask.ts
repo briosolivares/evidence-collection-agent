@@ -34,7 +34,12 @@ import { SYSTEM_PROMPT } from './systemPrompt.js';
 const DEFAULT_RUNS_BASE_DIR = 'runs';
 const DEFAULT_MAX_OUTPUT_TOKENS = 8_192;
 const DEFAULT_MAX_TURNS = 60;
-const DEFAULT_MAX_TOKENS = 750_000;
+// Per-request context ceiling (see LoopConfig.maxContextTokens). 200k:
+// Step 0 measured medium-task context growing ~3k tokens/turn toward
+// ~150-220k at the ~50-70-turn completion depth, so 100k would bind before
+// completion; if runs die at 200k the remedy is cheaper repeat-page
+// representation, not a bigger cap.
+const DEFAULT_MAX_CONTEXT_TOKENS = 200_000;
 
 /** Configuration for one complete evidence-collection run. */
 export interface RunTaskConfig {
@@ -51,8 +56,9 @@ export interface RunTaskConfig {
   maxOutputTokens?: number;
   /** Maximum model turns in the loop; defaults to 60. */
   maxTurns?: number;
-  /** Cumulative loop token budget; defaults to 750000. */
-  maxTokens?: number;
+  /** Per-request context ceiling (see LoopConfig.maxContextTokens);
+   * defaults to 200000. */
+  maxContextTokens?: number;
   /** Optional callback for production model streaming progress. */
   onProgress?: (event: ProgressEvent) => void;
   /** Optional model implementation for tests or alternate clients. When
@@ -133,7 +139,7 @@ export async function runTask(
         { callModel, registry: tracedRegistry, runDir, browser: config.browser },
         {
           maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
-          maxTokens: config.maxTokens ?? DEFAULT_MAX_TOKENS,
+          maxContextTokens: config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS,
         },
       );
     });

@@ -6,14 +6,25 @@ import { assembleModelResponse } from './streamAssembly.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
 // CallModel contract the T7 fake satisfies, so it drops into the loop
-// unchanged. Two properties matter here and are tested directly:
+// unchanged. Three properties matter here and are tested directly:
 //
 // 1. Stable prompt prefix. The API renders requests as tools → system →
 //    messages, and prompt caching is a byte-exact prefix match — so system
 //    prompt + tool definitions must serialize identically on every call,
-//    with the cache_control breakpoint on the last (only) system block,
+//    with a cache_control breakpoint on the last (only) system block,
 //    which caches tools and system together. Only `messages` varies.
-// 2. Always streaming. Long tool-filled turns can run for minutes;
+// 2. Moving conversation breakpoint. A second cache_control marker rides
+//    the last content block of the last message on every request, so turn
+//    N+1 resumes from the cache entry turn N wrote: the whole conversation
+//    is read at cache rates instead of being re-paid as fresh input each
+//    turn. One message-level marker only, matching Claude Code — the
+//    server evicts cache pages past the marker, so a second one would pin
+//    pages nothing resumes from. Exactly 2 breakpoints per request (API
+//    max 4). Caveat (documented, not guarded): the server matches cached
+//    prefixes up to 20 content blocks back from a marker, so a single turn
+//    appending more than 20 blocks would silently miss; our turns append
+//    two messages with at most ~12 blocks (5-parallel tool cap).
+// 3. Always streaming. Long tool-filled turns can run for minutes;
 //    streaming avoids API timeouts and feeds live progress to the REPL.
 
 /** Model used when the config names none — the design's default (Sonnet
@@ -61,10 +72,16 @@ export interface CallModelConfig {
  *   serialization is byte-identical across calls regardless of `messages`
  *   (nothing dynamic — timestamps, ids — enters them), and the single
  *   system block carries the `cache_control` breakpoint that ends the
- *   prefix (the API renders tools before system, so it caches both).
- *   Thinking is explicitly disabled: on claude-sonnet-5 it defaults to on,
- *   but thinking blocks must be replayed verbatim in later turns and the
- *   loop's message types (text and tool_use only) cannot carry them.
+ *   prefix (the API renders tools before system, so it caches both). A
+ *   second, moving `cache_control` breakpoint rides the last content block
+ *   of the last message (the marked message is a clone; `messages` and its
+ *   blocks are never mutated), so each turn's request resumes from the
+ *   cache entry the previous turn wrote — see the file header. All earlier
+ *   messages pass through untouched. Thinking is explicitly disabled: on
+ *   claude-sonnet-5 it defaults to on, but thinking blocks must be
+ *   replayed verbatim in later turns and the loop's message types (text
+ *   and tool_use only) cannot carry them — which also means every block a
+ *   marker can land on (text, tool_use, tool_result) accepts one.
  */
 export function buildRequestParams(
   config: CallModelConfig,
@@ -88,10 +105,45 @@ export function buildRequestParams(
         cache_control: { type: 'ephemeral' },
       },
     ],
-    // The loop's message shapes mirror the API's on purpose (see
-    // messages.ts) — they are structurally valid MessageParams.
-    messages: messages.map((message) => message as Anthropic.Messages.MessageParam),
+    messages: withConversationBreakpoint(messages),
   };
+}
+
+/** A content block that may carry a cache_control marker. The loop's block
+ * types (text, tool_use, tool_result) all accept one; this local widening
+ * spares a per-variant switch. */
+type MarkableBlockParam = Anthropic.Messages.ContentBlockParam & {
+  cache_control?: Anthropic.Messages.CacheControlEphemeral | null;
+};
+
+/**
+ * The conversation as API message params, with the moving cache breakpoint
+ * on the last content block of the last message. The marked message and
+ * block are clones — the input array (owned by the loop, logged live to
+ * the transcript) is never mutated, and all earlier messages pass through
+ * as-is. An empty conversation or an empty final message (neither of which
+ * the loop produces) passes through unmarked: the marker is an
+ * optimization, never worth a throw.
+ */
+function withConversationBreakpoint(
+  messages: readonly Message[],
+): Anthropic.Messages.MessageParam[] {
+  // The loop's message shapes mirror the API's on purpose (see
+  // messages.ts) — they are structurally valid MessageParams.
+  const params = messages.map((message) => message as Anthropic.Messages.MessageParam);
+  const last = params[params.length - 1];
+  if (last === undefined || typeof last.content === 'string') return params;
+  const lastBlock = last.content[last.content.length - 1];
+  if (lastBlock === undefined) return params;
+
+  params[params.length - 1] = {
+    ...last,
+    content: [
+      ...last.content.slice(0, -1),
+      { ...lastBlock, cache_control: { type: 'ephemeral' } } as MarkableBlockParam,
+    ],
+  };
+  return params;
 }
 
 /**

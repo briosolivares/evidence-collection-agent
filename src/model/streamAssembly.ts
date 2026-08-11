@@ -157,6 +157,8 @@ export async function assembleModelResponse(
       output_tokens: deltaUsage?.output_tokens ?? startUsage.output_tokens,
       cache_read_input_tokens:
         deltaUsage?.cache_read_input_tokens ?? startUsage.cache_read_input_tokens,
+      cache_creation_input_tokens:
+        deltaUsage?.cache_creation_input_tokens ?? startUsage.cache_creation_input_tokens,
     },
   };
 }
