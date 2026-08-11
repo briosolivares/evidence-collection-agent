@@ -57,6 +57,22 @@ flowchart LR
 
 Minimal-latency schedule for two workers: A does T1 → T2 → T3 → T4-integration → T5; B starts T4-internals + T6's `semantic.ts` after T1, picks up T7 after T2, then T6-integration after T4; either does T8 after T5; both converge on T9.
 
+### Agent execution model
+
+One **main agent** — the most capable/intelligent model available — owns the build. It does the reasoning-heavy work itself and **delegates mechanical code-change work to cheap, fast subagents**, judging their output against the plan's narrow `Verify:` checks rather than re-reading everything.
+
+**Main agent keeps (reasoning-heavy, cross-cutting):**
+- Sequencing, integration, and every design-sensitive seam — especially the `callModel`-bypasses-`onProgress` re-emission (T4), abort/cancellation semantics (T5), the tracing delegation to Langfuse (T6), and the `<Static>` finalization rules in the reducer (T2/T3).
+- Reviewing every subagent diff before it lands; resolving anything a subagent got wrong rather than re-prompting in circles.
+- Judging `Verify:` results, flipping `features.json` statuses (`fail` → `pass` only when the mapped `S*-V*` checks actually pass), and appending `progress.md` entries (including what was delegated and the outcome).
+
+**Delegate to cheap/fast subagents (mechanical, narrowly specified, verifiable):**
+- Scaffolding files from the design's file layout; `theme.ts` tokens, `format.ts` helpers, `config.ts` defaults (T1).
+- Table-driven work with a spec already written: the `semantic.ts` derivation table and its tests (T6), fixture run-directories and fixture evals trees (T5/T7/T8), table-driven test suites where the cases are enumerated in the plan.
+- Running verify commands and reporting results; typecheck/test sweeps; README usage note (T9).
+
+**Delegation contract:** each subagent task must name its target files, the exact `Verify:` IDs that define done, and the constraint that the agent core (`src/loop`, `src/model`, `src/tools`, `src/run`, `src/browser`, `src/tracing`) is untouched. The verification surfaces exist precisely so delegated work is judged by surface evidence against a narrow condition — a subagent's word is never the evidence.
+
 ---
 
 ## Step 1: Scaffold `sherlock` — bin, deps, theme, formatting, static shell
