@@ -6,7 +6,7 @@ _Accessed 2026-08-10. Claims marked “documented” are from the linked project
 
 Camoufox is a plausible browser engine for this evidence-collection agent, but not an agent framework, workflow orchestrator, hosted browser service, or evidence store. It is an open-source Firefox fork plus a Python package that launches a customized Firefox through a Playwright-compatible API. Its differentiator is engine-level fingerprint and anti-detection work: the project says properties are intercepted in C++ rather than injected into page JavaScript, and that BrowserForge generates internally consistent device characteristics ([Fingerprint Injection](https://camoufox.com/fingerprint/), [Introduction](https://camoufox.com/)). That can help when a client system has bot controls, though it is not a guarantee of access and should not be treated as a CAPTCHA bypass.
 
-Recommendation: use Camoufox as an optional, replaceable browser adapter behind the existing `navigate`, inspect, click, type, screenshot, download and file tools. Start with a small POC using the stable package and pinned binary. Do not make it the sole production dependency until Firefox compatibility, authentication persistence, audit reproducibility, container startup, and target-system success rates are measured. The project’s own release notes warn that it is in active development and may not be suitable for production ([releases](https://github.com/daijro/camoufox/releases)).
+Recommendation: use Camoufox as an optional, replaceable browser adapter behind the existing `navigate`, inspect, click, type, scroll, screenshot, download and file tools. Start with a small POC using the stable package and pinned binary. Do not make it the sole production dependency until Firefox compatibility, authentication persistence, audit reproducibility, container startup, and target-system success rates are measured. The project’s own release notes warn that it is in active development and may not be suitable for production ([releases](https://github.com/daijro/camoufox/releases)).
 
 ## Boundary and architecture
 
@@ -66,9 +66,9 @@ Key unknowns are target SaaS compatibility, SSO/MFA and WebAuthn, persistent pro
 
 ## POC and acceptance tests
 
-Build a Python adapter implementing the six initial tools. Pin Python package, browser channel/version and image digest. Run against a local fixture plus authorized GitHub/Jira/Workday-like test tenants.
+Build a Python adapter implementing the seven initial browser tools. Pin Python package, browser channel/version and image digest. Run against a local fixture plus authorized GitHub/Jira/Workday-like test tenants.
 
-1. Launch headless and visible; navigate, inspect, click, type, screenshot and download a known fixture.
+1. Launch headless and visible; navigate, inspect, click, type, scroll, screenshot and download a known fixture.
 2. Save/restore storage state and a persistent profile; verify logout and cleanup; test two simultaneous profiles cannot read each other’s cookies/files.
 3. Exercise SSO redirect, iframe, file upload/download, PDF, CSV and a long page; hash and manifest every artifact.
 4. Enable a fixed fingerprint and proxy/GeoIP; check locale/timezone/WebRTC consistency and verify no credential/IP leakage in logs.

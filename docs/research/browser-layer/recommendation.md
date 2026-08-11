@@ -4,7 +4,7 @@ Synthesized 2026-08-10 from the five research reports in this directory: [browse
 
 ## What we need
 
-The agent loop (see the design doc) needs a browser it can drive through a small set of tools — navigate, inspect page, click, type, screenshot, download — plus file writing for CSVs. Whatever provides that browser has to hold up against what the eval tasks actually involve:
+The agent loop (see the design doc) needs a browser it can drive through a small set of tools — navigate, inspect page, click, type, scroll, screenshot, download — plus file writing for CSVs. Whatever provides that browser has to hold up against what the eval tasks actually involve:
 
 - All eleven tasks target public websites (HN, EDGAR, GitHub, Wikipedia, YC, Airbnb, X, Google) — no enterprise SSO.
 - Three of those targets actively resist bots (X, Airbnb, Google Search), so getting blocked is a real risk.

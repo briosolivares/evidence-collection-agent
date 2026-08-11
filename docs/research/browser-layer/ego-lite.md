@@ -19,7 +19,7 @@ It is **not** an autonomous agent framework or durable orchestrator. It does not
 
 ```text
 custom agent loop
-  -> validated navigate / inspect / click / type / screenshot / download tools
+  -> validated navigate / inspect / click / type / scroll / screenshot / download tools
   -> EgoLiteAdapter
   -> ego-browser local Node helper runtime
   -> local Ego Lite Chromium + selected Space
@@ -108,7 +108,7 @@ The project is young: GitHub records creation in April 2026, while activity and 
 
 Run this only with dedicated test accounts and a dedicated browser profile—not an employee's everyday client sessions.
 
-1. Build a narrow `EgoLiteAdapter` for `navigate`, `inspect`, `click`, `type`, `screenshot`, and `download`. Disable arbitrary server fetch, page JS, raw CDP, uploads, and cross-domain navigation by default.
+1. Build a narrow `EgoLiteAdapter` for `navigate`, `inspect`, `click`, `type`, `scroll`, `screenshot`, and `download`. Disable arbitrary server fetch, page JS, raw CDP, uploads, and cross-domain navigation by default.
 2. Define an evidence manifest containing task ID, system, account alias, source URL, capture time, browser/runtime version, action trace, screenshot/download path, SHA-256, and extraction output.
 3. Assemble at least 40 representative tasks across GitHub, Jira/Linear, Workday-like HR, NetSuite-like finance, tables/pagination, downloads, cross-origin iframes, shadow DOM, SSO, expired sessions, and an adversarial prompt-injection page. Include read-only and mutation-attempt negatives.
 4. Run each task five times from a controlled starting state, and compare with the same outer loop on the leading managed/headless backend. Record task success, field-level precision/recall, artifact correctness, forbidden-action rate, human interventions, model/browser latency, tool calls, tokens, and peak memory.

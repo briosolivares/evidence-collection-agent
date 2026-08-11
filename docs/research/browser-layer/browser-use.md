@@ -48,7 +48,7 @@ Key risks are model hallucination or premature completion, DOM changes, bot defe
 
 ## Concrete POC and acceptance tests
 
-Build an adapter with `start_session`, `navigate`, `inspect`, `click/type`, `screenshot`, `download`, `structured_extract`, `stop`; emit append-only event records and SHA-256 hashes. Run three representative systems (GitHub, Jira/Linear, and one SSO-heavy finance/HR sandbox) using synthetic read-only data. Compare Browser Use-only, Playwright-only and hybrid flows.
+Build an adapter with `start_session`, `navigate`, `inspect`, `click/type`, `scroll`, `screenshot`, `download`, `structured_extract`, `stop`; emit append-only event records and SHA-256 hashes. Run three representative systems (GitHub, Jira/Linear, and one SSO-heavy finance/HR sandbox) using synthetic read-only data. Compare Browser Use-only, Playwright-only and hybrid flows.
 
 Acceptance tests: (1) ≥95% successful completion on a 20-case deterministic gold set, with zero unauthorized writes; (2) every output has task/sample IDs, source URL, UTC timestamp, profile/tenant ID, artifact hash and trace pointer; (3) schema-valid CSV/JSON in 100% of successful cases; (4) screenshot and downloaded artifact hashes reproduce after retrieval; (5) max iterations, tool-result caps, domain allowlist and timeout are enforced; (6) expired/stale auth yields a typed `AUTH_REQUIRED` state without leaking secrets; (7) 100 parallel synthetic sessions meet agreed p95 latency and no cross-tenant artifacts; (8) replay/evaluator catches intentionally corrupted or wrong-page evidence; (9) deletion removes profiles, recordings and artifacts within the contractual/tested SLA; and (10) cost per sample is measured for OSS/self-hosted and Cloud, including LLM/proxy/storage.
 
