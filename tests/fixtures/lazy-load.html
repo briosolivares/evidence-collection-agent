@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lazy-load Fixture</title>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .first-viewport {
+        box-sizing: border-box;
+        min-height: 110vh;
+        padding: 24px;
+      }
+
+      .tail-spacer {
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="first-viewport">
+        <h1>Lazy evidence list</h1>
+        <p>Scroll to load the evidence records.</p>
+      </section>
+      <div id="sentinel" role="status">More evidence is available below</div>
+      <ol id="records" aria-label="Lazy evidence records"></ol>
+      <div class="tail-spacer" aria-hidden="true"></div>
+    </main>
+
+    <script>
+      const sentinel = document.querySelector('#sentinel');
+      const records = document.querySelector('#records');
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+
+        for (let index = 1; index <= 20; index += 1) {
+          const item = document.createElement('li');
+          item.textContent = `Lazy evidence item ${index}`;
+          records.append(item);
+        }
+        sentinel.textContent = 'All evidence loaded';
+        observer.disconnect();
+      });
+      observer.observe(sentinel);
+    </script>
+  </body>
+</html>
