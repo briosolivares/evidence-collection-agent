@@ -2,8 +2,9 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { appendTranscriptEvent } from '../run/transcript.js';
-import { executeToolCall, type ToolCall, type ToolCallResult } from '../tools/pipeline.js';
+import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
+import { scheduleToolCalls } from './scheduler.js';
 import type {
   AssistantContentBlock,
   CallModel,
@@ -107,19 +108,25 @@ export interface RunMetrics {
  * Whether the run continues is decided by inspecting each response's
  * *content* for tool_use blocks; its stop_reason label is deliberately
  * never consulted (content is ground truth — see ModelResponse). Requested
- * tools execute through the standard pipeline sequentially, in request
- * order, and their results return to the model as tool_result blocks
- * (failures flagged is_error) in one new user message. Guards are checked
- * after tool execution, before the next model call — boundary semantics on
- * LoopConfig; completion is checked before the guards, so a final response
- * that arrives within maxTurns completes the run even if its usage pushes
- * the total past the token budget (the answer is already in hand).
+ * tools execute through the standard pipeline under the scheduling
+ * contract of `scheduleToolCalls`: read-only tools in parallel (capped),
+ * state-changing tools one at a time, request order preserved at batch
+ * granularity. Their results return to the model as tool_result blocks
+ * (failures flagged is_error), in request order, in one new user message.
+ * Guards are checked after tool execution, before the next model call —
+ * boundary semantics on LoopConfig; completion is checked before the
+ * guards, so a final response that arrives within maxTurns completes the
+ * run even if its usage pushes the total past the token budget (the answer
+ * is already in hand).
  *
  * Transcript: every model request, response, tool call, and tool result is
  * appended to <runDir>/transcript.jsonl as events `model_request` {turn,
  * messages}, `model_response` {turn, response}, `tool_call` {turn, call},
- * and `tool_result` {turn, result}, in execution order. On run end — both
- * statuses — <runDir>/metrics.json is written (see RunMetrics).
+ * and `tool_result` {turn, result}. Within a turn, all tool_call events
+ * are appended in request order before execution begins and all
+ * tool_result events in request order after every call has settled
+ * (parallel completion order is not observable in the transcript). On run
+ * end — both statuses — <runDir>/metrics.json is written (see RunMetrics).
  *
  * @param taskText - the user's task, sent as the conversation's first message
  * @param deps - the loop's only I/O surface (see LoopDeps); deps.runDir
@@ -194,19 +201,25 @@ export async function runAgentLoop(
       return finish({ status: 'completed', finalText: extractText(response.content) });
     }
 
-    // T8 SCHEDULING SEAM: this sequential for-loop is deliberately the
-    // simplest correct execution — one tool at a time, in request order. T8
-    // replaces exactly this block with scheduleToolCalls (read-only tools in
-    // parallel capped at 5, state-changing tools serialized, results still
-    // in request order). Nothing outside this block changes.
-    const resultBlocks: ToolResultBlock[] = [];
-    for (const block of toolUses) {
-      const call: ToolCall = { id: block.id, name: block.name, input: block.input };
+    // T8: execution is delegated to the scheduler — read-only tools in
+    // parallel (capped), state-changing tools serialized, results back in
+    // request order. Transcript events bracket the batch deterministically:
+    // every tool_call is logged before execution starts, every tool_result
+    // after all calls settle, both in request order — so the transcript
+    // stays replayable even though completion order varies run to run.
+    const calls: ToolCall[] = toolUses.map((block) => ({
+      id: block.id,
+      name: block.name,
+      input: block.input,
+    }));
+    for (const call of calls) {
       appendTranscriptEvent(deps.runDir, { type: 'tool_call', turn, call });
-      const result = await executeToolCall(deps.registry, call, toolCtx);
-      appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
-      resultBlocks.push(toResultBlock(result));
     }
+    const results = await scheduleToolCalls(calls, deps.registry, toolCtx);
+    const resultBlocks: ToolResultBlock[] = results.map((result) => {
+      appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
+      return toResultBlock(result);
+    });
     state.messages.push({ role: 'user', content: resultBlocks });
 
     // Guards, in the design's loop order: after tool execution, before the
