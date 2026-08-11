@@ -20,7 +20,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [ ] T14: End-to-end wiring — `runTask` + system prompt
 - [ ] T15: Terminal REPL
 - [ ] T16: Langfuse tracing
-- [ ] T17: Eval harness core (runner, assertions, metrics)
+- [x] T17: Eval harness core (runner, assertions, metrics)
 - [ ] T18: Easy-task oracles + graders; baseline run
 
 ## Task graph: parallel vs. sequential

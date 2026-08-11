@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "evals": "tsx evals/cli.ts"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
