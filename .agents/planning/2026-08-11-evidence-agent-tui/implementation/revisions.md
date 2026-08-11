@@ -156,3 +156,12 @@ Verify:
 - R4-H1 (agent-judged PTY): --demo capture at 80 cols shows padded prose and
   single blank lines between consecutive action rows; 44-col zero-overflow
   unchanged.
+
+### R4 addendum (user follow-up): marker gutter
+
+Note (as given): "the dots on the side still feel too close to the edge — move
+them just a tiny bit." Design: one-column left padding on every marker row —
+activity ●, evidence ◆ (sub-lines shift with their box), user task ▸,
+completion ✓, cancelled/error ✗, and the LiveRegion pending rows to match.
+Prose keeps its 2-column padding. Verify (R4-V2): smoke snapshot diff reviewed
+line by line (only the 1-column shift), full battery green.

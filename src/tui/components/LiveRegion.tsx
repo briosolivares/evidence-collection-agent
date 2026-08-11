@@ -27,7 +27,7 @@ export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionPro
         </Box>
       )}
       {live.pendingTools.map((pending) => (
-        <Box key={pending.id} marginTop={1}>
+        <Box key={pending.id} marginTop={1} paddingLeft={1}>
           <Text>
             <Text color={pending.isEvidence ? theme.emphasis : theme.activity}>
               {`${pending.isEvidence ? glyphs.evidence : glyphs.activity} `}

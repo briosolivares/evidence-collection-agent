@@ -261,3 +261,16 @@ worktrees before the merge).
   investors.csv…' likewise carries one blank line above. Width: 0/1921 lines
   over 80 display columns. 44-col rendering covered by the re-recorded narrow
   smoke snapshot.
+
+## 2026-08-11 12:13 PDT — R4 addendum: one-column marker gutter (user follow-up)
+
+- Change: paddingLeft={1} on every marker row — user_task, activity, evidence,
+  completion (runDir sub-line shifts with it), cancelled, error, and LiveRegion
+  pending rows. Prose keeps paddingLeft={2}.
+- R4-V2: smoke snapshots re-recorded; diff reviewed line by line — every marker
+  row shifted exactly one column, prose lines byte-identical; the 44-col
+  sec.gov action line now wraps its trailing status glyph (expected at 42
+  effective columns), zero overflow. npm test → 57 files / 405 tests passed
+  (27.9 s). npm run typecheck → exit 0. git diff --check → clean. The rendered
+  smoke frames are the evidence surface for this one-column nudge; no separate
+  PTY pass (mechanism unchanged from R4-H1).

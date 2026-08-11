@@ -22,7 +22,7 @@ export function TranscriptItemView({
       return <WelcomeCard apiKeyPresent={item.apiKeyPresent} identity={item.identity} />;
     case 'user_task':
       return (
-        <Box marginTop={1}>
+        <Box marginTop={1} paddingLeft={1}>
           <Text>
             <Text color={theme.primary}>{`${glyphs.user} `}</Text>
             <Text bold>{item.text}</Text>
@@ -37,7 +37,7 @@ export function TranscriptItemView({
       );
     case 'activity':
       return (
-        <Box flexDirection="column" marginTop={1}>
+        <Box flexDirection="column" marginTop={1} paddingLeft={1}>
           <Text>
             <Text color={theme.activity}>{`${glyphs.activity} `}</Text>
             <Text>{item.line}</Text>
@@ -48,7 +48,7 @@ export function TranscriptItemView({
       );
     case 'evidence':
       return (
-        <Box flexDirection="column" marginTop={1}>
+        <Box flexDirection="column" marginTop={1} paddingLeft={1}>
           <Text>
             <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
             <Text color={theme.emphasis}>{item.line}</Text>
@@ -61,7 +61,7 @@ export function TranscriptItemView({
       );
     case 'completion':
       return (
-        <Box flexDirection="column" marginTop={1}>
+        <Box flexDirection="column" marginTop={1} paddingLeft={1}>
           <Box>
             <Text color={theme.success}>{`${glyphs.success} `}</Text>
             <Text>
@@ -73,7 +73,7 @@ export function TranscriptItemView({
       );
     case 'cancelled':
       return (
-        <Box marginTop={1}>
+        <Box marginTop={1} paddingLeft={1}>
           <Text color={theme.error}>{`${glyphs.error} `}</Text>
           <Text>
             {`Interrupted after ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`}
@@ -82,7 +82,7 @@ export function TranscriptItemView({
       );
     case 'error':
       return (
-        <Box marginTop={1}>
+        <Box marginTop={1} paddingLeft={1}>
           <Text color={theme.error}>{`${glyphs.error} ${item.message}`}</Text>
         </Box>
       );
