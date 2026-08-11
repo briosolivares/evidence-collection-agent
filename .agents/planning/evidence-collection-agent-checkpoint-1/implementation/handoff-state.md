@@ -8,9 +8,9 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 ## The baseline (the input to everything next)
 
-**0/3 tasks pass at k=3.** hacker_news 94.4% acc (2/3 complete), edgar 66.7% (0/3), openclaw_pr 66.7% (1/3). Human-readable analysis: `docs/reports/2026-08-11-baseline.md`. Failure→mechanism log: `baseline-failure-log.md` — F1–F4 are now implemented: exact-output prompt guidance, Chrome-native downloads with direct-URL support, a 24-turn default, and initial-page anchoring. Re-baseline pending.
+**Re-baseline complete (2026-08-11, user-directed): 3/3 tasks pass at k=3, 9/9 trials, 100% accuracy per task** — up from 0/3. All four mechanisms verified in transcripts. Report: `docs/reports/2026-08-11-rebaseline.md` (the original `2026-08-11-baseline.md` now carries a superseded banner); failure log closed out with per-mechanism results. One blocker was found and fixed first: F2's `z.union` input schema produced no top-level `type: "object"` and the API 400'd every run on turn 1 — fixed as a single object with an exactly-one-of refinement (commit `7233203`, tests+typecheck+live runs verified).
 
-**Do not re-baseline without the user's direction.** The longer-term initializer/planner-generated output contract was discussed and explicitly deferred. The disabled-thinking science flag's revival trigger is formally met; enabling it is also the user's call.
+The longer-term initializer/planner-generated output contract remains explicitly deferred. **The disabled-thinking science flag's revival trigger is no longer met** (easy suite at 100%); it stays shelved until a harder task set produces an accuracy signal. The easy suite is saturated — further mechanism attribution needs harder tasks.
 
 ## Standing rulings (user-made, binding)
 
