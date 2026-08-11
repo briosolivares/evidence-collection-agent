@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 
-**Status:** proposed; not implemented
+**Status:** tool and selectable profiles implemented; experiment harness and A/B pending
 
 **Scope:** one composite browser tool, an explicit atomic-versus-batch tool profile, and an easy-suite A/B experiment
 

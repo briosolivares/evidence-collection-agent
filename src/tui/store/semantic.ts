@@ -21,6 +21,20 @@ function field(input: unknown, key: string): string | undefined {
   return typeof value === 'string' && value !== '' ? value : undefined;
 }
 
+function browserBatchActions(input: unknown): unknown[] | undefined {
+  if (typeof input !== 'object' || input === null) return undefined;
+  const actions = (input as Record<string, unknown>).actions;
+  return Array.isArray(actions) ? actions : undefined;
+}
+
+function browserBatchProducesEvidence(actions: readonly unknown[]): boolean {
+  return actions.some((action) => {
+    if (typeof action !== 'object' || action === null) return false;
+    const tool = (action as Record<string, unknown>).tool;
+    return tool === 'screenshot' || tool === 'download';
+  });
+}
+
 /**
  * Derive the semantic transcript line for one tool call.
  *
@@ -56,6 +70,17 @@ export function deriveSemanticLine(name: string, input?: unknown): SemanticLine 
     }
     case 'scroll':
       return { line: 'Scrolling', isEvidence: false };
+    case 'browser_batch': {
+      const actions = browserBatchActions(input);
+      return {
+        line:
+          actions === undefined
+            ? 'Running browser steps'
+            : `Running ${actions.length} browser steps`,
+        isEvidence:
+          actions === undefined ? false : browserBatchProducesEvidence(actions),
+      };
+    }
     case 'grep': {
       const pattern = field(input, 'pattern');
       return {

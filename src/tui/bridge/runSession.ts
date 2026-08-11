@@ -30,12 +30,11 @@ import {
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import {
-  actionTools,
-  evidenceTools,
-  fileTools,
-  observationTools,
+  createProductionRegistry,
+  DEFAULT_TOOL_PROFILE,
+  type ToolProfile,
 } from '../../tools/index.js';
-import { createRegistry, toApiToolDefs } from '../../tools/registry.js';
+import { toApiToolDefs } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 
 // Mirrors the core's (module-private) per-call output-token default.
@@ -65,6 +64,7 @@ export interface RunSessionDeps {
   onEvent: (event: UiEvent) => void;
   runsBaseDir?: string;
   model?: string;
+  toolProfile?: ToolProfile;
   maxTurns?: number;
   maxContextTokens?: number;
   startUrl?: string;
@@ -85,15 +85,8 @@ export interface RunSessionDeps {
 
 /** The production tool surface, rebuilt exactly as runTask registers it —
  * needed here only to serialize the same stable API tool definitions. */
-function buildApiToolDefs() {
-  return toApiToolDefs(
-    createRegistry([
-      ...fileTools,
-      ...observationTools,
-      ...actionTools,
-      ...evidenceTools,
-    ]),
-  );
+function buildApiToolDefs(profile: ToolProfile) {
+  return toApiToolDefs(createProductionRegistry(profile));
 }
 
 /**
@@ -112,6 +105,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const runTaskFn = deps.runTaskFn ?? runTask;
   const controller = new AbortController();
   const { signal } = controller;
+  const toolProfile = deps.toolProfile ?? DEFAULT_TOOL_PROFILE;
 
   // Lazy: constructing the SDK client can throw (missing API key); doing
   // it inside the first model call routes that failure through the normal
@@ -130,7 +124,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const modelConfig: CallModelConfig = {
     model: deps.model ?? DEFAULT_MODEL,
     system: SYSTEM_PROMPT,
-    apiToolDefs: buildApiToolDefs(),
+    apiToolDefs: buildApiToolDefs(toolProfile),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
   };
 
@@ -181,6 +175,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         browser: deps.browser,
         callModel,
         tracing,
+        toolProfile,
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
