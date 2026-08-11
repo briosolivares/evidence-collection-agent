@@ -7,39 +7,38 @@ import { ENTER, tick, typeText } from './helpers.js';
 
 const config = createConfig();
 
-describe('sherlock shell (step 1 scaffold)', () => {
+describe('sherlock shell', () => {
   it('renders the banner and the composer', async () => {
-    const { lastFrame, unmount } = render(
+    const { frames, lastFrame, unmount } = render(
       <App config={config} apiKeyPresent={true} />,
     );
     await tick();
     const frame = lastFrame() ?? '';
-    expect(frame).toContain('Sherlock');
     expect(frame).toContain('›');
     expect(frame).toContain('/help for commands');
+    expect(frames.join('\n')).toContain('Sherlock');
     unmount();
   });
 
-  it('shows a styled notice when text is submitted', async () => {
-    const { lastFrame, stdin, unmount } = render(
+  it('renders submitted text into the transcript', async () => {
+    const { frames, stdin, unmount } = render(
       <App config={config} apiKeyPresent={true} />,
     );
     await tick();
     await typeText(stdin, 'find the filings');
     stdin.write(ENTER);
     await tick();
-    const frame = lastFrame() ?? '';
-    expect(frame).toContain('find the filings');
-    expect(frame).toContain("isn't wired up yet");
+    const output = frames.join('\n');
+    expect(output).toContain('▸ find the filings');
     unmount();
   });
 
   it('warns in the banner when the API key is missing', async () => {
-    const { lastFrame, unmount } = render(
+    const { frames, unmount } = render(
       <App config={config} apiKeyPresent={false} />,
     );
     await tick();
-    expect(lastFrame()).toContain('ANTHROPIC_API_KEY is not set');
+    expect(frames.join('\n')).toContain('ANTHROPIC_API_KEY is not set');
     unmount();
   });
 });

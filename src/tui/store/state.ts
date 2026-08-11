@@ -1,0 +1,137 @@
+// The session store's data model (design "Data Models"): finalized
+// transcript items (append-only — they drive Ink's <Static>, which never
+// re-renders an item), the live run state that stays mutable until
+// finalized, and the single UiEvent stream the reducer consumes.
+
+/** Interaction modes; overlays are modes so exactly one surface owns input. */
+export type SessionMode =
+  | 'idle'
+  | 'running'
+  | 'cancelling'
+  | 'runsList'
+  | 'evalsMenu'
+  | 'evalsRunning';
+
+/** One artifact row of a run summary (from manifest.json). */
+export interface ManifestArtifactView {
+  filename: string;
+  sizeBytes: number | undefined;
+  sha256Prefix: string;
+  sourceUrl?: string;
+}
+
+/** What a run-summary block shows from a run's manifest. */
+export interface ManifestView {
+  task: string;
+  startedAt: string;
+  finishedAt?: string;
+  artifacts: ManifestArtifactView[];
+}
+
+/** What a run-summary block shows from a run's metrics, when present. */
+export interface MetricsView {
+  status: string;
+  turns: number;
+  totalTokens: number;
+  wallClockMs: number;
+}
+
+/** One per-trial assertion verdict in an eval transcript block. */
+export interface AssertionView {
+  name: string;
+  passed: boolean;
+  detail?: string;
+}
+
+/**
+ * A finalized transcript entry, before its id is assigned. Items are
+ * append-only and immutable once appended (the <Static> contract);
+ * anything still changing lives in LiveRunState instead.
+ */
+export type TranscriptItemBody =
+  | { kind: 'banner'; apiKeyPresent: boolean }
+  | { kind: 'user_task'; text: string }
+  | { kind: 'agent_text'; text: string }
+  | {
+      kind: 'activity';
+      line: string;
+      status: 'ok' | 'error' | 'retried';
+      verbose?: { input: string; result: string };
+    }
+  | { kind: 'evidence'; line: string; sourceUrl?: string; verbose?: { input: string; result: string } }
+  | { kind: 'completion'; verb: string; elapsedMs: number; tokens: number; runDir: string }
+  | { kind: 'cancelled'; elapsedMs: number; tokens: number }
+  | { kind: 'error'; message: string }
+  | { kind: 'notice'; text: string }
+  | { kind: 'run_summary'; manifest: ManifestView; metrics?: MetricsView; runDir: string }
+  | {
+      kind: 'eval_trial';
+      task: string;
+      trial: number;
+      k: number;
+      assertions: AssertionView[];
+      elapsedMs: number;
+    }
+  | { kind: 'eval_report'; text: string };
+
+/** A finalized transcript entry; `id` is the stable render key. */
+export type TranscriptItem = TranscriptItemBody & { id: number };
+
+/** A tool line still awaiting its result — rendered in the live region. */
+export interface PendingTool {
+  id: number;
+  line: string;
+  isEvidence: boolean;
+  verbose?: { input: string; result: string };
+}
+
+/** The dynamic region's state — mutable until finalized into items. */
+export interface LiveRunState {
+  /** Model prose still streaming (finalizes at tool batches / turn end). */
+  streamingText: string;
+  /** Tool lines awaiting results. */
+  pendingTools: PendingTool[];
+  /** Epoch ms the run started (drives elapsed time). */
+  startedAt: number;
+  /** Settled = summed turn_end usage; estimate = in-turn growth on top. */
+  tokens: { settled: number; estimate: number };
+  /** Current turn number. */
+  turn: number;
+  /** Known once tracing captures it (step 6); shown on completion. */
+  runDir?: string;
+}
+
+/**
+ * The bridge's event stream, plus UI-originated actions — the single
+ * union the reducer consumes. Events that end or start a timed run carry
+ * an `at` epoch-ms stamp (added by the dispatcher) so the reducer stays
+ * pure while computing elapsed durations.
+ */
+export type UiEvent =
+  | { type: 'run_started'; task: string; at: number }
+  | { type: 'run_dir'; runDir: string }
+  | { type: 'turn_start'; turn: number }
+  | { type: 'text_delta'; text: string }
+  | { type: 'tool_pending'; name: string }
+  | { type: 'tool_exec_start'; id: number; name: string; input: unknown }
+  | { type: 'tool_exec_end'; id: number; ok: boolean; result?: unknown; error?: string }
+  | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
+  | {
+      type: 'run_finished';
+      outcome: 'completed' | 'budget_exceeded';
+      finalText?: string;
+      runDir: string;
+      at: number;
+    }
+  | { type: 'run_cancelled'; at: number }
+  | { type: 'run_failed'; message: string; at: number };
+
+/** The whole session: mode machine + transcript + live region. */
+export interface SessionState {
+  mode: SessionMode;
+  transcript: readonly TranscriptItem[];
+  /** Monotonic id source for transcript items. */
+  nextItemId: number;
+  /** Present only while a run is active (running/cancelling). */
+  live?: LiveRunState;
+}

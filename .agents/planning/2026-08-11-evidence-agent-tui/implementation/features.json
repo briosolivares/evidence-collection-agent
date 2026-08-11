@@ -82,7 +82,7 @@
         "S2-V1",
         "S2-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S2-F2",
@@ -92,7 +92,7 @@
         "S2-V1",
         "S2-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S2-F3",
@@ -102,7 +102,7 @@
         "S2-V2",
         "S2-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S2-F4",
@@ -111,7 +111,7 @@
       "verification": [
         "S2-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S2-F5",
@@ -120,7 +120,7 @@
       "verification": [
         "S2-V4"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S2-F6",
@@ -130,7 +130,7 @@
         "S2-H1"
       ],
       "humanJudged": true,
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S3-F1",

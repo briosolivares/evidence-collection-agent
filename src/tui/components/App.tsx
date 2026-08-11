@@ -1,53 +1,66 @@
-import { Box, Text } from 'ink';
-import { useState } from 'react';
+import { Box, Text, useApp } from 'ink';
+import { useReducer } from 'react';
 
 import type { SherlockConfig } from '../config.js';
-import { glyphs, theme } from '../theme.js';
+import {
+  createInitialState,
+  HELP_TEXT,
+  reduce,
+  routeInput,
+  unknownCommandNotice,
+} from '../store/reducer.js';
+import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
+import { Transcript } from './Transcript.js';
 
 interface AppProps {
   config: SherlockConfig;
   /** False renders the missing-API-key warning banner. */
   apiKeyPresent: boolean;
+  /** Test seam for /exit; defaults to Ink's app exit. */
+  onExit?: () => void;
 }
 
 /**
- * The Sherlock shell: banner, transcript area, and the persistent composer
- * anchored at the bottom. Step 1 scaffold — submitting text only echoes a
- * "not wired yet" notice; the session store replaces this in step 2.
+ * The Sherlock shell: transcript over <Static>, slash routing, and the
+ * persistent composer. Tasks append to the transcript; the run bridge
+ * (step 4) will pick them up from here.
  */
-export function App({ config, apiKeyPresent }: AppProps) {
-  const [notices, setNotices] = useState<readonly string[]>([]);
+export function App({ config, apiKeyPresent, onExit }: AppProps) {
+  const { exit } = useApp();
+  const [state, dispatch] = useReducer(
+    reduce,
+    { apiKeyPresent },
+    createInitialState,
+  );
 
   const handleSubmit = (text: string) => {
-    setNotices((prior) => [
-      ...prior,
-      `“${text}” — the agent isn't wired up yet; this shell only takes notes.`,
-    ]);
+    const routed = routeInput(text);
+    switch (routed.kind) {
+      case 'task':
+        dispatch({ type: 'submit_task', text: routed.text });
+        return;
+      case 'help':
+        dispatch({ type: 'notice', text: HELP_TEXT });
+        return;
+      case 'exit':
+        (onExit ?? exit)();
+        return;
+      case 'unknown':
+        dispatch({ type: 'notice', text: unknownCommandNotice(routed.command) });
+        return;
+    }
   };
+
+  const composerActive = state.mode === 'idle';
 
   return (
     <Box flexDirection="column">
-      <Box marginBottom={1}>
-        <Text color={theme.primary} bold>
-          {`${glyphs.spinnerFrames[2]} Sherlock`}
-        </Text>
-        <Text color={theme.muted}> — evidence collection agent</Text>
+      <Transcript items={state.transcript} />
+      <Box flexDirection="column" marginTop={1}>
+        <Composer disabled={!composerActive} onSubmit={handleSubmit} />
+        <Text color={theme.muted}>  /help for commands</Text>
       </Box>
-      {!apiKeyPresent && (
-        <Box marginBottom={1}>
-          <Text color={theme.error}>
-            {`${glyphs.retried} ANTHROPIC_API_KEY is not set — investigations will fail until it is configured.`}
-          </Text>
-        </Box>
-      )}
-      {notices.map((notice, index) => (
-        <Box key={index} marginBottom={1}>
-          <Text color={theme.muted}>{notice}</Text>
-        </Box>
-      ))}
-      <Composer onSubmit={handleSubmit} />
-      <Text color={theme.muted}>  /help for commands</Text>
     </Box>
   );
 }
