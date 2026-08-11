@@ -92,7 +92,7 @@ function bar(span: Span, totalMs: number, width: number): string {
 }
 
 const registry = createRegistry([probeTool('probe_read', 'read'), probeTool('probe_write', 'write')]);
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo scheduling'));
 initManifest(runDir, TASK);
 console.log(`run dir: ${runDir}`);
 console.log(`task:    ${TASK}\n`);

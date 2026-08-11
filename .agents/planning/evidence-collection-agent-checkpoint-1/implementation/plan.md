@@ -377,7 +377,7 @@ tests/fixtures/  # local HTML fixture pages for browser tests
 
 **Implementation guidance:**
 - `screenshot(filename, fullPage?)` → PNG into the run dir via `writeArtifact` with `sourceUrl` = current page URL. Viewport shot by default; `fullPage: true` for the full-page evidence several tasks require. Result: path + size (not image content — images go to the model only if it chooses to read them; they're token-expensive).
-- `download(ref, filename?)` → resolve the element's href via the adapter, fetch through the **browser context's request** (shares cookies/session — a plain `fetch` would lose auth), save via `writeArtifact`. Covers the EDGAR case (document links) without fragile download-event capture; note the event-capture alternative in the docstring for pages that only offer JS-triggered downloads.
+- `download(ref | url, filename?)` → capture exact bytes through an actual Chrome page: ordinary resources from a temporary page's navigation response and attachments/JavaScript controls from browser download events, then save via `writeArtifact` with final-resource provenance. A verified direct HTTP(S) URL bypasses viewer wrappers without site-specific logic. The lightweight browser-context request client remains a separate capability, not the accuracy-first download path.
 
 **Test requirements (fixtures; the static server serves a small binary file):**
 - Screenshot: file exists, starts with PNG magic bytes, manifest entry has correct hash + the page URL as source (the provenance chain is the product — it must not break).

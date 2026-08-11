@@ -250,6 +250,36 @@ describe('runTask', () => {
   );
 
   it(
+    'allows completion on turn 24 when maxTurns is omitted',
+    async () => {
+      const responses = Array.from({ length: 23 }, (_, index) =>
+        toolResponse(`inspect-default-${index + 1}`, 'inspect_page', {}),
+      );
+      const fake = scriptModel([
+        ...responses,
+        textResponse('Completed on the default final turn.'),
+      ]);
+
+      const result = await runTask('Use the complete default turn budget.', {
+        browser,
+        runsBaseDir,
+        callModel: fake.callModel,
+        maxTokens: 10_000,
+      });
+
+      expect(result).toMatchObject({
+        status: 'completed',
+        finalText: 'Completed on the default final turn.',
+      });
+      expect(fake.requests).toHaveLength(24);
+      await expect(
+        readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
+      ).resolves.toMatchObject({ status: 'completed', turns: 24 });
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
     'closes a budget-exceeded tab and leaves the browser ready for the next run',
     async () => {
       const budgetFake = scriptModel([

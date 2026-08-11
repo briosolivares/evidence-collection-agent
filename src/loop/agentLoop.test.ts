@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
-import { fileTools } from '../tools/fileTools.js';
+import { fileTools } from '../tools/index.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
 import {
   METRICS_FILENAME,

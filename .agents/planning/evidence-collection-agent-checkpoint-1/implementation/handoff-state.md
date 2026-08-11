@@ -8,9 +8,11 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 ## The baseline (the input to everything next)
 
-**0/3 tasks pass at k=3.** hacker_news 94.4% acc (2/3 complete), edgar 66.7% (0/3), openclaw_pr 66.7% (1/3). Human-readable analysis: `docs/reports/2026-08-11-baseline.md`. Failure→mechanism log: `baseline-failure-log.md` — four proposed general mechanisms (F1 schema-exactness prompt line; F2 download fallback via in-page fetch/download events; F3 raise maxTurns default; F4 start-page anchoring prompt line), none applied yet.
+**Re-baseline complete (2026-08-11, user-directed): 3/3 tasks pass at k=3, 9/9 trials, 100% accuracy per task** — up from 0/3. All four mechanisms verified in transcripts. Report: `docs/reports/2026-08-11-rebaseline.md` (the original `2026-08-11-baseline.md` now carries a superseded banner); failure log closed out with per-mechanism results. One blocker was found and fixed first: F2's `z.union` input schema produced no top-level `type: "object"` and the API 400'd every run on turn 1 — fixed as a single object with an exactly-one-of refinement (commit `7233203`, tests+typecheck+live runs verified).
 
-**The user is analyzing the failure modes and choosing next steps themselves — do not apply F1–F4 or re-baseline without their direction.** The disabled-thinking science flag's revival trigger is formally met; also the user's call (report lays out both sides).
+The longer-term initializer/planner-generated output contract remains explicitly deferred. **The disabled-thinking science flag's revival trigger is no longer met** (easy suite at 100%); it stays shelved until a harder task set produces an accuracy signal. The easy suite is saturated — further mechanism attribution needs harder tasks.
+
+**Medium tasks (started 2026-08-11, user-directed):** packages for design rows 6 (`openclaw_merged_prs`) and 8 (`openclaw_contributors`) are built and tested — see `medium-tasks.md` for the decisions (GitHub token added and verified, 250k cap kept). **Their baseline: 0/2, all six trials `budget_exceeded` on the token ceiling before producing a CSV** — one failure mode, working agents out of budget, not judgment. Report: `docs/reports/2026-08-11-medium-baseline.md`; candidate mechanisms (conversation caching / budget redefinition / raised ceiling) await the user's pick.
 
 ## Standing rulings (user-made, binding)
 
@@ -29,4 +31,4 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 ## Costs observed (for planning re-baselines)
 
-Only the prompt prefix caches; deep browser tasks reach ~20–35k uncached input tokens per late turn. EDGAR/OpenClaw trials ran ~35–50s and often hit the 250k cumulative or 12-turn ceiling. A nine-run baseline is minutes of wall-clock and noticeable spend — batch mechanism changes before re-running unless attribution demands stages.
+Only the prompt prefix caches; deep browser tasks reach ~20–35k uncached input tokens per late turn. EDGAR/OpenClaw baseline trials ran ~35–50s and often hit the 250k cumulative or former 12-turn ceiling. The production turn default is now 24, while the 250k cumulative token ceiling is unchanged. A nine-run baseline is minutes of wall-clock and noticeable spend — batch mechanism changes before re-running unless attribution demands stages.

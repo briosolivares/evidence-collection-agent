@@ -29,7 +29,7 @@ const dumpLog: ToolDef<{ lines: number }> = {
 };
 
 const registry = createRegistry([dumpLog]);
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo offload'));
 initManifest(runDir, 'demo: offload an oversize tool result');
 console.log(`created run dir: ${runDir}`);
 

@@ -56,7 +56,7 @@ export function createConfig(
     workingWords: DEFAULT_WORKING_WORDS,
     verbose: false,
     runsBaseDir: 'runs',
-    evalsDir: 'evals',
+    evalsDir: 'evals/datasets',
     evalResultsDir: 'runs/eval-results',
     wordCycleMs: 6_000,
     glyphFps: 4,

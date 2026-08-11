@@ -14,13 +14,12 @@ import {
 } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { evidenceTools } from '../src/tools/evidenceTools.js';
-import { observationTools } from '../src/tools/observationTools.js';
+import { evidenceTools, observationTools } from '../src/tools/index.js';
 import { executeToolCall } from '../src/tools/pipeline.js';
 import { createRegistry } from '../src/tools/registry.js';
 import { startFixtureServer } from '../tests/fixtures/server.js';
 
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo evidence'));
 initManifest(runDir, 'demo: capture browser evidence from a local fixture');
 
 const fixtureServer = await startFixtureServer();

@@ -10,10 +10,11 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { loadEvalTask } from '../../../evals/loadTask.js';
-import { summarizeTask, type TaskReport, type TrialGrade } from '../../../evals/metrics.js';
-import { formatReport, writeResults } from '../../../evals/report.js';
-import type { EvalReport } from '../../../evals/runner.js';
+import { loadEvalTask } from '../../../evals/runners/loadTask.js';
+import { DEFAULT_MODEL } from '../../model/callModel.js';
+import { summarizeTask, type TaskReport, type TrialGrade } from '../../../evals/metrics/metrics.js';
+import { formatReport, writeResults } from '../../../evals/runners/report.js';
+import type { EvalReport } from '../../../evals/runners/runner.js';
 import type { EvalTask } from '../../../evals/types.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
@@ -169,6 +170,7 @@ export function startEvalBatch(
         startedAt,
         finishedAt: new Date(now()).toISOString(),
         k,
+        model: DEFAULT_MODEL,
         tasks: taskReports,
       };
       const resultsPath = writeResultsFn(report, deps.resultsDir);

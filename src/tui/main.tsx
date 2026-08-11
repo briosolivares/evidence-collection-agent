@@ -78,7 +78,7 @@ const demo = process.argv.includes('--demo');
 const config = createConfig({
   verbose: process.argv.includes('--verbose'),
   runsBaseDir: resolve(REPO_ROOT, 'runs'),
-  evalsDir: resolve(REPO_ROOT, 'evals'),
+  evalsDir: resolve(REPO_ROOT, 'evals/datasets'),
   evalResultsDir: resolve(REPO_ROOT, 'runs', 'eval-results'),
 });
 

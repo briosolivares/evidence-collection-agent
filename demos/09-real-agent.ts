@@ -26,7 +26,7 @@ import { makeCallModel, type ProgressEvent } from '../src/model/callModel.js';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { fileTools } from '../src/tools/fileTools.js';
+import { fileTools } from '../src/tools/index.js';
 import { createRegistry, toApiToolDefs } from '../src/tools/registry.js';
 
 const DEFAULT_TASK = 'Write a limerick about auditors to limerick.txt';
@@ -102,7 +102,7 @@ if (!process.env.ANTHROPIC_API_KEY) {
 }
 
 const registry = createRegistry(fileTools);
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo real-agent'));
 initManifest(runDir, task);
 console.log(`run dir: ${runDir}`);
 console.log(`task:    ${task}`);

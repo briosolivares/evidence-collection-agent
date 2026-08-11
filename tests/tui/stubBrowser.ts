@@ -16,6 +16,12 @@ export function stubBrowser(): BrowserAdapter {
     type: vi.fn(async () => {}),
     scroll: vi.fn(async () => {}),
     screenshot: vi.fn(async () => new Uint8Array([137, 80])),
+    download: vi.fn(async () => ({
+      finalUrl: 'https://stub.example/file',
+      status: 200,
+      headers: {},
+      bytes: new Uint8Array(),
+    })),
     resolveHref: vi.fn(async () => null),
     fetch: vi.fn(async () => ({
       status: 200,

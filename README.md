@@ -15,3 +15,88 @@ npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
 Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial count), `/exit` quits. Esc cancels the in-flight run (or eval trial) without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and `ANTHROPIC_API_KEY` (loaded from `.env`).
+
+## How it works
+
+Give it a task ("Create a CSV of the top 5 stories on Hacker News, with columns for title, URL, and points") and it:
+
+1. Opens a fresh tab in a real, visible Chrome window (persistent profile, so logins survive between runs).
+2. Loops: the model observes pages through a compact accessibility-tree outline, acts by element ref (`click`, `type`, `scroll`, `navigate`), and writes evidence (`write_file`, `screenshot`, `download`) — until it responds with no tool calls.
+3. Leaves behind a self-contained run directory:
+
+```
+runs/2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b/   # date_time_task-slug_suffix (local time)
+  <deliverables>      # the CSVs, screenshots, downloads, answer.md the task asked for
+  manifest.json       # provenance: SHA-256 hash, source URL, capture time per artifact
+  transcript.jsonl    # append-only record of every model call and tool call
+  metrics.json        # tokens, turns, wall-clock time
+```
+
+The manifest makes evidence tamper-evident — re-hash any artifact to prove it hasn't changed since collection.
+
+## Requirements
+
+- Node 18+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
+- An Anthropic API key. Optionally Langfuse keys for tracing.
+
+## Setup
+
+```bash
+npm install
+```
+
+Create a `.env` at the repo root (gitignored; there is no dotenv loader — pass it explicitly with `--env-file`):
+
+```
+ANTHROPIC_API_KEY=...
+LANGFUSE_PUBLIC_KEY=...    # optional — tracing is a no-op without these
+LANGFUSE_SECRET_KEY=...
+LANGFUSE_BASE_URL=...      # optional
+```
+
+## Usage
+
+**Interactive agent** (a REPL: type a task, watch it stream, get the run directory path):
+
+```bash
+npx tsx --env-file=.env src/cli/repl.ts
+```
+
+**Evals** — each task runs k independent trials, then a grader checks the run directory against live ground truth (the grader never sees the agent's conversation):
+
+```bash
+npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news,edgar,openclaw_pr --k 3
+```
+
+Results print to stdout and persist to `evals/experiments/`. Available tasks: `hacker_news`, `edgar`, `openclaw_pr`, `stub`.
+
+**Tests and typecheck** (no API keys or network needed; Chrome required):
+
+```bash
+npm test
+npm run typecheck
+```
+
+**Demos** — fourteen numbered scripts under `demos/` walk each subsystem in build order (`npx tsx demos/07-loop-fake-model.ts` runs the full loop with a scripted model and zero tokens; 09 and 14 call the real API). They are manual walkthroughs, not tests — see [demos/README.md](demos/README.md).
+
+## Project layout
+
+| Path | Contents |
+| --- | --- |
+| `src/` | The agent: loop, model client, tools (one directory per tool under `src/tools/`), browser adapter, run/provenance layer, CLI |
+| `evals/` | Eval harness: `runners/` (run-triggering scripts), `metrics/` (metric definitions), `datasets/` (per-task `task.json` + oracle + grader), `experiments/` (past-run results JSON), `config.ts` |
+| `demos/` | Build-order walkthrough scripts (manual, not tests — see its README) |
+| `tests/` | Fixture pages + loopback server (`fixtures/`) and shared test helpers (`helpers/`) |
+| `docs/` | Baseline reports and browser-layer research |
+| `.agents/summary/` | Generated codebase knowledge base (start at `index.md`) |
+| `.agents/planning/` | Design doc, implementation plan, baseline failure log |
+
+## Design highlights
+
+- **Provenance first**: every file-producing tool routes through one `writeArtifact` chokepoint that hashes bytes into the manifest at capture time.
+- **Bounded context**: tool results over 50 KB are offloaded to disk; the model gets a preview plus the path and reads selectively.
+- **Prompt caching by construction**: a byte-stable system-prompt + tool-definition prefix, verified by tests and by `cache_read_input_tokens` in traces.
+- **No shell access**: the agent has no `bash` tool, so a prompt-injecting web page cannot execute code on the host.
+- **General mechanisms only**: eval failures are never fixed with task-specific logic — the eval suite is treated as a test set for general capability.
+
+Full documentation: [.agents/summary/index.md](.agents/summary/index.md). Design rationale: `.agents/planning/evidence-collection-agent-checkpoint-1/design/detailed-design.md`.

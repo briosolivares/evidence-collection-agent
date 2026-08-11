@@ -29,10 +29,12 @@ import {
 } from '../../model/streamAssembly.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
-import { actionTools } from '../../tools/actionTools.js';
-import { evidenceTools } from '../../tools/evidenceTools.js';
-import { fileTools } from '../../tools/fileTools.js';
-import { observationTools } from '../../tools/observationTools.js';
+import {
+  actionTools,
+  evidenceTools,
+  fileTools,
+  observationTools,
+} from '../../tools/index.js';
 import { createRegistry, toApiToolDefs } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 

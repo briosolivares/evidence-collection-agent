@@ -10,7 +10,7 @@ import { finalizeManifest, initManifest, MANIFEST_FILENAME, writeArtifact } from
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
 
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo manifest'));
 console.log(`created run dir: ${runDir}`);
 
 initManifest(runDir, 'demo: exercise the manifest');

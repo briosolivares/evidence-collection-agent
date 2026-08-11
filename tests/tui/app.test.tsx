@@ -274,7 +274,7 @@ describe('App /evals workflow', () => {
       // The repo's real, hermetic `stub` eval task: static oracle, and a
       // grader that returns failed assertions (never throws) for a run
       // dir that does not exist.
-      const evalsConfig = createConfig({ evalsDir: 'evals', evalResultsDir: resultsDir });
+      const evalsConfig = createConfig({ evalsDir: 'evals/datasets', evalResultsDir: resultsDir });
       const bridge = fakeRunner();
       const runner = vi.fn(
         (task: string, onEvent: (event: UiEvent) => void): RunHandle => {

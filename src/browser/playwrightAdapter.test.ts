@@ -153,4 +153,30 @@ describe('Playwright browser adapter', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+
+  it(
+    'captures exact bytes through Chrome when the lightweight request client is blocked',
+    async () => {
+      await adapter.newTab();
+      await adapter.goto(fixtureServer.url('/'));
+
+      const url = fixtureServer.url('/browser-only-document.htm');
+      await expect(adapter.fetch(url)).resolves.toMatchObject({ status: 403 });
+
+      const result = await adapter.download({ url });
+
+      expect(result).toMatchObject({
+        finalUrl: url,
+        status: 200,
+        headers: expect.objectContaining({
+          'content-type': 'text/html; charset=utf-8',
+        }),
+      });
+      expect(new TextDecoder().decode(result.bytes)).toBe(
+        '<!doctype html><title>Browser-only filing</title><p>Exact filing bytes</p>\n',
+      );
+      expect(adapter.currentUrl()).toBe(fixtureServer.url('/'));
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
 });

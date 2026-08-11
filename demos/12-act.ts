@@ -8,13 +8,12 @@ import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
 import { finalizeManifest, initManifest } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { actionTools } from '../src/tools/actionTools.js';
-import { observationTools } from '../src/tools/observationTools.js';
+import { actionTools, observationTools } from '../src/tools/index.js';
 import { executeToolCall } from '../src/tools/pipeline.js';
 import { createRegistry } from '../src/tools/registry.js';
 import { startFixtureServer } from '../tests/fixtures/server.js';
 
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo act'));
 initManifest(runDir, 'demo: act on a fixture form and lazy list');
 
 const fixtureServer = await startFixtureServer();

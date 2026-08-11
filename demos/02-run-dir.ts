@@ -9,7 +9,7 @@ import { generateRunId } from '../src/run/runId.js';
 import { createRunDir, resolveRunPath } from '../src/run/runDir.js';
 import { appendTranscriptEvent, TRANSCRIPT_FILENAME } from '../src/run/transcript.js';
 
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo run-dir'));
 console.log(`created run dir: ${runDir}`);
 
 appendTranscriptEvent(runDir, { type: 'run_started', task: 'demo: exercise the transcript' });

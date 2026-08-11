@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { EvalReport } from '../../evals/runner.js';
+import type { EvalReport } from '../../evals/runners/runner.js';
 import type { EvalTask } from '../../evals/types.js';
 import {
   discoverEvalTasks,

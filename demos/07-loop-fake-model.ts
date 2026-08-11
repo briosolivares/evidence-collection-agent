@@ -14,7 +14,7 @@ import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/ar
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { TRANSCRIPT_FILENAME } from '../src/run/transcript.js';
-import { fileTools } from '../src/tools/fileTools.js';
+import { fileTools } from '../src/tools/index.js';
 import { createRegistry } from '../src/tools/registry.js';
 
 const TASK = 'Write a haiku about evidence collection to haiku.txt, then finish.';
@@ -97,7 +97,7 @@ function summarize(event: Record<string, any>): string {
 }
 
 const registry = createRegistry(fileTools);
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo loop-fake-model'));
 initManifest(runDir, TASK);
 console.log(`run dir: ${runDir}`);
 console.log(`task:    ${TASK}`);

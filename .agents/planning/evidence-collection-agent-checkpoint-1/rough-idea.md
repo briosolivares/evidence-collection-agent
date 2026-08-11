@@ -211,4 +211,4 @@ evals/
 
 ### Evals
 
-See `@evidence-collection-project-evals.csv`.
+See `@evals/evidence-collection-project-evals.csv`.

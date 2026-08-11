@@ -274,3 +274,26 @@ worktrees before the merge).
   (27.9 s). npm run typecheck → exit 0. git diff --check → clean. The rendered
   smoke frames are the evidence surface for this one-column nudge; no separate
   PTY pass (mechanism unchanged from R4-H1).
+
+## 2026-08-11 13:50 PDT — Merged main into the TUI branch (pre-merge-to-main integration)
+
+- main had diverged by 8 commits (repo restructure into per-tool dirs +
+  evals-by-concern, Chrome-native download tool with exactly-one-of ref/url
+  schema, F1-F4 baseline mechanisms, eval baselines). Textual conflicts: only
+  README.md (kept both — Sherlock section + main's restructured body) and
+  package.json (kept sherlock bin/script + main's evals/runners/cli.ts path).
+- Semantic fixes after the merge:
+  - runSession: tool groupings now import from src/tools/index.js (per-tool
+    dir restructure).
+  - evalSession: loadTask/report/runner moved to evals/runners/, metrics to
+    evals/metrics/; EvalReport gained a required `model` field — recorded as
+    DEFAULT_MODEL (the model the TUI's injected callModel runs).
+  - evalsDir default: evals -> evals/datasets (tasks moved in the restructure);
+    updated in config.ts, main.tsx, and the app-level /evals test.
+  - stubBrowser: BrowserAdapter gained download() — stub returns an empty
+    BrowserDownloadResult.
+- Verification on the integrated tree: npm run typecheck exit 0; npm test twice
+  consecutively -> 70 files / 463 tests passed both times (main's new suites +
+  all 20 TUI suites); git diff --check clean.
+- Note: real-API end-to-end run not re-executed for this merge (core behavior
+  covered by main's own suites + the TUI's real-runTask scripted-stream tests).
