@@ -6,8 +6,7 @@
  * file touches the network, and the automated suite never calls it.
  */
 
-/** Base URL of the GitHub REST API. */
-const GITHUB_API_BASE = 'https://api.github.com';
+import { githubGetJson } from '../../../oracles/githubApi.js';
 
 /** Owner of the target repository. */
 export const REPO_OWNER = 'openclaw';
@@ -122,11 +121,8 @@ export function acceptablePrsInWindow(
  *   `parsePullRequestsResponse` cannot parse
  */
 export async function fetchOpenClawPullRequests(): Promise<GithubPullRequest[]> {
-  const url =
-    `${GITHUB_API_BASE}/repos/${REPO_OWNER}/${REPO_NAME}/pulls` +
+  const path =
+    `/repos/${REPO_OWNER}/${REPO_NAME}/pulls` +
     `?state=all&sort=created&direction=desc&per_page=${PR_HISTORY_LIMIT}`;
-  const response = await fetch(url, {
-    headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'evidence-collection-agent-eval' },
-  });
-  return parsePullRequestsResponse(await response.json());
+  return parsePullRequestsResponse(await githubGetJson(path));
 }

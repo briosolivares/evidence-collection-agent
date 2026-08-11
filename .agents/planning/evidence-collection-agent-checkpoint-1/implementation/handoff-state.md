@@ -12,6 +12,8 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 The longer-term initializer/planner-generated output contract remains explicitly deferred. **The disabled-thinking science flag's revival trigger is no longer met** (easy suite at 100%); it stays shelved until a harder task set produces an accuracy signal. The easy suite is saturated — further mechanism attribution needs harder tasks.
 
+**Medium tasks (started 2026-08-11, user-directed):** packages for design rows 6 (`openclaw_merged_prs`) and 8 (`openclaw_contributors`) are built and tested — see `medium-tasks.md` for the decisions (GitHub token support added, 250k cap kept). Their baseline is blocked on the user adding `GITHUB_TOKEN` to `.env`.
+
 ## Standing rulings (user-made, binding)
 
 - **Exact output schema:** a task naming CSV columns means exactly those columns, nothing else — graders enforce; extra columns fail.

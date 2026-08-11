@@ -1,0 +1,4 @@
+{
+  "task": "Collect evidence about the last 10 merged pull requests on the OpenClaw GitHub repository. Take a full-page screenshot of each pull request's page, and create a CSV describing the 10 pull requests with columns pr_number, committer, reviewer, merger.",
+  "startUrl": "https://github.com/openclaw/openclaw"
+}

@@ -1,0 +1,4 @@
+{
+  "task": "Create a CSV of the top 30 contributors to the OpenClaw GitHub repository, with columns github_handle, name, linkedin_url.",
+  "startUrl": "https://github.com/openclaw/openclaw"
+}
