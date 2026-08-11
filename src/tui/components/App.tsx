@@ -1,6 +1,7 @@
 import { Box, Text, useApp } from 'ink';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 
+import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
 import {
@@ -10,6 +11,7 @@ import {
   routeInput,
   unknownCommandNotice,
 } from '../store/reducer.js';
+import type { UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
 import { LiveRegion } from './LiveRegion.js';
@@ -21,6 +23,9 @@ interface AppProps {
   apiKeyPresent: boolean;
   /** Play the canned demo investigation on mount (`--demo`). */
   demo?: boolean;
+  /** Starts a real agent run (wired to the runtime by main.tsx); absent
+   * in demo mode, where tasks only append to the transcript. */
+  runner?: (task: string, onEvent: (event: UiEvent) => void) => RunHandle;
   /** Test seam for /exit; defaults to Ink's app exit. */
   onExit?: () => void;
 }
@@ -29,13 +34,14 @@ interface AppProps {
  * The Sherlock shell: transcript over <Static>, the live region while a
  * run is active, slash routing, and the persistent composer.
  */
-export function App({ config, apiKeyPresent, demo = false, onExit }: AppProps) {
+export function App({ config, apiKeyPresent, demo = false, runner, onExit }: AppProps) {
   const { exit } = useApp();
   const [state, dispatch] = useReducer(
     reduce,
     { apiKeyPresent, completionVerb: config.completionVerb },
     createInitialState,
   );
+  const runHandle = useRef<RunHandle | undefined>(undefined);
 
   useEffect(() => {
     if (!demo) return;
@@ -47,6 +53,12 @@ export function App({ config, apiKeyPresent, demo = false, onExit }: AppProps) {
     switch (routed.kind) {
       case 'task':
         dispatch({ type: 'submit_task', text: routed.text });
+        if (runner !== undefined) {
+          runHandle.current = runner(routed.text, dispatch);
+          void runHandle.current.done.finally(() => {
+            runHandle.current = undefined;
+          });
+        }
         return;
       case 'help':
         dispatch({ type: 'notice', text: HELP_TEXT });

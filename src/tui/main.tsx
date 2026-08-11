@@ -1,9 +1,11 @@
-// Sherlock entry point: env load, preflight, render(<App/>). Browser
-// launch arrives with the run-session bridge (step 4).
+// Sherlock entry point: env load, preflight, persistent-browser launch,
+// render(<App/>), teardown.
 import { render } from 'ink';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { launchPersistentChrome } from '../browser/playwrightAdapter.js';
+import { createTuiRuntime } from './bridge/runtime.js';
 import { App } from './components/App.js';
 import { createConfig } from './config.js';
 
@@ -34,16 +36,39 @@ if (!process.stdin.isTTY || !process.stdout.isTTY) {
   process.exit(1);
 }
 
+const demo = process.argv.includes('--demo');
 const config = createConfig({
   verbose: process.argv.includes('--verbose'),
   runsBaseDir: resolve(REPO_ROOT, 'runs'),
 });
 
-render(
-  <App
-    config={config}
-    apiKeyPresent={Boolean(process.env.ANTHROPIC_API_KEY)}
-    demo={process.argv.includes('--demo')}
-  />,
-  { exitOnCtrlC: true },
-);
+// One persistent, headed Chrome for the whole session (same profile-dir
+// semantics as the REPL); each run gets a fresh tab. The demo needs no
+// browser — it never leaves the UI pipeline.
+const runtime = demo
+  ? undefined
+  : createTuiRuntime({
+      launchBrowser: () =>
+        launchPersistentChrome({ profileDir: resolve(REPO_ROOT, 'chrome-profile') }),
+      runsBaseDir: config.runsBaseDir,
+    });
+await runtime?.start();
+
+try {
+  const instance = render(
+    <App
+      config={config}
+      apiKeyPresent={Boolean(process.env.ANTHROPIC_API_KEY)}
+      demo={demo}
+      runner={
+        runtime === undefined
+          ? undefined
+          : (task, onEvent) => runtime.startRun(task, onEvent)
+      }
+    />,
+    { exitOnCtrlC: true },
+  );
+  await instance.waitUntilExit();
+} finally {
+  await runtime?.shutdown();
+}
