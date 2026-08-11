@@ -287,7 +287,7 @@
       "verification": [
         "S5-V1"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F2",
@@ -296,7 +296,7 @@
       "verification": [
         "S5-V1"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F3",
@@ -305,7 +305,7 @@
       "verification": [
         "S5-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F4",
@@ -314,7 +314,7 @@
       "verification": [
         "S5-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F5",
@@ -323,7 +323,7 @@
       "verification": [
         "S5-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F6",
@@ -332,7 +332,7 @@
       "verification": [
         "S5-V4"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F7",
@@ -341,7 +341,7 @@
       "verification": [
         "S5-V5"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S5-F8",
@@ -351,7 +351,7 @@
         "S5-H1"
       ],
       "humanJudged": true,
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S6-F1",

@@ -324,3 +324,48 @@ describe('reduce (run lifecycle events)', () => {
     expect(fold([{ type: 'turn_end', usage: { input: 1, output: 1 } }], initial)).toEqual(initial);
   });
 });
+
+// ————— Step 5: cancellation transitions —————
+
+describe('reduce (cancellation)', () => {
+  it('cancel_requested flips running to cancelling', () => {
+    const state = fold([...started, { type: 'cancel_requested' }]);
+    expect(state.mode).toBe('cancelling');
+    expect(state.live).toBeDefined();
+  });
+
+  it('cancel_requested is a no-op outside running', () => {
+    const idle = createInitialState();
+    expect(reduce(idle, { type: 'cancel_requested' })).toEqual(idle);
+    const cancelling = fold([...started, { type: 'cancel_requested' }]);
+    expect(reduce(cancelling, { type: 'cancel_requested' })).toEqual(cancelling);
+  });
+
+  it('runs running → cancelling → idle with a persistent cancelled item', () => {
+    let state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      { type: 'turn_end', usage: { input: 9_000, output: 300 } },
+    ]);
+    state = reduce(state, { type: 'cancel_requested' });
+    expect(state.mode).toBe('cancelling');
+    state = reduce(state, { type: 'run_cancelled', at: 19_000 });
+    expect(state.mode).toBe('idle');
+    expect(state.live).toBeUndefined();
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'cancelled',
+      elapsedMs: 18_000,
+      tokens: 9_300,
+    });
+  });
+
+  it('a non-abort rejection while cancelling still maps to an error item', () => {
+    let state = fold([...started, { type: 'cancel_requested' }]);
+    state = reduce(state, { type: 'run_failed', message: 'socket hang up', at: 3_000 });
+    expect(state.mode).toBe('idle');
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'error',
+      message: 'socket hang up',
+    });
+  });
+});

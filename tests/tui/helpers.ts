@@ -10,7 +10,7 @@ export function tick(ms = 0): Promise<void> {
 export const ENTER = '\r';
 
 /** The Escape key. */
-export const ESC = '';
+export const ESC = '\u001b';
 
 /** Type text into a rendered component's stdin one write at a time. */
 export async function typeText(

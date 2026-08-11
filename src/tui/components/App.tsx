@@ -1,4 +1,4 @@
-import { Box, Text, useApp } from 'ink';
+import { Box, Text, useApp, useInput } from 'ink';
 import { useEffect, useReducer, useRef } from 'react';
 
 import type { RunHandle } from '../bridge/runSession.js';
@@ -47,6 +47,16 @@ export function App({ config, apiKeyPresent, demo = false, runner, onExit }: App
     if (!demo) return;
     return playDemo(createDemoScript(Date.now()), dispatch);
   }, [demo]);
+
+  // Esc cancels an in-flight run (R9): flip to cancelling (status line
+  // shows "Wrapping up…") and abort the bridge; the run's rejection then
+  // lands as run_cancelled. A no-op in every other mode.
+  useInput((_input, key) => {
+    if (!key.escape) return;
+    if (state.mode !== 'running') return;
+    dispatch({ type: 'cancel_requested' });
+    runHandle.current?.cancel();
+  });
 
   const handleSubmit = (text: string) => {
     const routed = routeInput(text);

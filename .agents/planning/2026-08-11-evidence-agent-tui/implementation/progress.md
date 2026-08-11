@@ -68,3 +68,17 @@ Verification evidence:
 - Note: worktree `.env` is a gitignored symlink to the main checkout's .env (needed for real-run verification; never read or printed).
 
 Statuses flipped: S4-F1…S4-F7 → pass.
+
+## 2026-08-11 02:43 PDT — Step 5 complete: Esc cancellation
+
+- Reducer gained `cancel_requested` (running → cancelling; no-op in any other mode, so double-Esc and idle-Esc are safe). `App` uses `useInput`: Esc in running dispatches cancel_requested and calls `RunHandle.cancel()` (held in the ref from step 4); the bridge's post-abort rejection lands as run_cancelled → cancelled item (`✗ Interrupted after …`), idle mode, composer re-enabled. StatusLine already renders "Wrapping up…" for cancelling (built in step 3).
+- Bridge abort semantics tested against the REAL runTask: (a) mid-stream — a hanging scripted stream that rejects on signal abort → run rejects → `run_cancelled`, outcome `{status:'cancelled'}`; (b) mid-tool-batch — a blocked `browser.goto` with cancel() issued while the batch executes: the batch settles first (goto completes), the next callModel entry sees the aborted signal and throws, and no second model stream is ever requested (asserted via stream-factory call count).
+- New `tests/tui/cancellation-artifacts.test.ts`: a cancelled fixture run leaves manifest.json with `finishedAt` and NO metrics.json.
+- Test learning: Ink 7 defers a lone ESC (~escape-sequence disambiguation), so component tests wait ~150 ms after `stdin.write(ESC)`.
+
+Verification evidence:
+
+- `S5-V1`…`S5-V5` all exit 0 (run-session 8 cases, reducer 30 cases, app 14 cases, cancellation-artifacts, typecheck; 86 TUI tests green).
+- `S5-H1` (human-judged) — agent-performed real-run verification via PTY (/tmp/sherlock-cancel.out): started a real HN-scrape task, pressed Esc at ~12 s → status flipped to "✽ Wrapping up…" within a frame, transcript kept the task line and got `✗ Interrupted after 12s · 467 tokens`; immediately typed a second task in the same session → `✓ Brewed in 12s · 1.1k tokens` with title.txt = "Example Domain" on disk. Cancelled run dir `runs/2026-08-11T09-38-30-442Z-723820684f7b`: manifest.json finalized (finishedAt set), metrics.json absent — the design's "stopped, not crashed" contract.
+
+Statuses flipped: S5-F1…S5-F8 → pass.

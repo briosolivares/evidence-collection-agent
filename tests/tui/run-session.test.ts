@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
@@ -184,6 +185,104 @@ describe('startRun (RunSession bridge)', () => {
     const outcome = await handle.done;
     expect(outcome).toEqual({ status: 'failed', message: 'api unreachable' });
     expect(events.at(-1)).toMatchObject({ type: 'run_failed', message: 'api unreachable' });
+  });
+
+  it('aborting mid-stream rejects the run and emits run_cancelled', async () => {
+    const { events, onEvent } = collect();
+    let sawDelta: () => void = () => {};
+    const firstDelta = new Promise<void>((resolve) => {
+      sawDelta = resolve;
+    });
+
+    // A stream that yields some prose, then hangs until the signal aborts.
+    async function* hangingStream(signal: AbortSignal): AsyncGenerator<ModelStreamEvent> {
+      const opening = scriptedResponse([{ type: 'text', text: 'Working on ' }], {
+        input: 1,
+        output: 1,
+      }).slice(0, 3); // message_start, block_start, one delta
+      yield* opening;
+      sawDelta();
+      await new Promise((_resolve, reject) => {
+        const abort = () =>
+          reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+        if (signal.aborted) abort();
+        else signal.addEventListener('abort', abort, { once: true });
+      });
+    }
+
+    const handle = startRun('long investigation', {
+      browser: stubBrowser(),
+      onEvent,
+      runsBaseDir,
+      createStream: (_params, signal) => hangingStream(signal),
+    });
+
+    await firstDelta;
+    handle.cancel();
+    const outcome = await handle.done;
+
+    expect(outcome).toEqual({ status: 'cancelled' });
+    expect(events.at(-1)?.type).toBe('run_cancelled');
+    expect(events.some((event) => event.type === 'run_failed')).toBe(false);
+  });
+
+  it('aborting during a tool batch lets the batch settle before cancelling', async () => {
+    const { events, onEvent } = collect();
+    let releaseGoto: () => void = () => {};
+    const gotoBlocked = new Promise<void>((resolve) => {
+      releaseGoto = resolve;
+    });
+    let gotoStarted: () => void = () => {};
+    const gotoStartedPromise = new Promise<void>((resolve) => {
+      gotoStarted = resolve;
+    });
+    let gotoFinished = false;
+
+    const browser = stubBrowser();
+    browser.goto = async () => {
+      gotoStarted();
+      await gotoBlocked;
+      gotoFinished = true;
+    };
+
+    const factory = scriptedStreamFactory([
+      scriptedResponse(
+        [
+          {
+            type: 'tool_use',
+            id: 'tu_1',
+            name: 'navigate',
+            input: { url: 'https://example.com/slow' },
+          },
+        ],
+        { input: 100, output: 20 },
+        'tool_use',
+      ),
+      // A second scripted response exists but must never be requested: the
+      // bridge's callModel checks the aborted signal at entry.
+      scriptedResponse([{ type: 'text', text: 'should never stream' }], {
+        input: 1,
+        output: 1,
+      }),
+    ]);
+
+    const handle = startRun('navigate somewhere slow', {
+      browser,
+      onEvent,
+      runsBaseDir,
+      createStream: factory.createStream,
+    });
+
+    await gotoStartedPromise;
+    handle.cancel(); // mid-batch: the model call already returned
+    expect(gotoFinished).toBe(false);
+    releaseGoto();
+    const outcome = await handle.done;
+
+    expect(gotoFinished).toBe(true); // the batch settled first
+    expect(outcome).toEqual({ status: 'cancelled' });
+    expect(events.at(-1)?.type).toBe('run_cancelled');
+    expect(factory.calls).toHaveLength(1); // no second model call
   });
 
   it('passes the abort signal to every stream request', async () => {

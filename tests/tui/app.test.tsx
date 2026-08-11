@@ -5,7 +5,7 @@ import type { RunHandle, RunOutcome } from '../../src/tui/bridge/runSession.js';
 import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
-import { ENTER, tick, typeText } from './helpers.js';
+import { ENTER, ESC, tick, typeText } from './helpers.js';
 
 const config = createConfig();
 
@@ -153,6 +153,62 @@ describe('App run-session wiring', () => {
     await submitLine(stdin, 'no bridge here');
     expect(frames.join('\n')).toContain('▸ no bridge here');
     expect(lastFrame()).not.toContain('(waiting for agent…)');
+    unmount();
+  });
+});
+
+// ————— Step 5: Esc cancellation —————
+
+describe('App Esc cancellation', () => {
+  it('Esc is a no-op while idle', async () => {
+    const bridge = fakeRunner();
+    const { stdin, lastFrame, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    stdin.write(ESC);
+    await tick();
+    expect(bridge.cancel).not.toHaveBeenCalled();
+    expect(lastFrame()).toContain('›');
+    unmount();
+  });
+
+  it('Esc during a run cancels once and shows the wrapping-up state', async () => {
+    const bridge = fakeRunner();
+    const { stdin, lastFrame, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'a long investigation');
+    stdin.write(ESC);
+    await tick(150);
+    stdin.write(ESC); // double-Esc while already cancelling
+    await tick(150);
+    expect(bridge.cancel).toHaveBeenCalledTimes(1);
+    expect(lastFrame()).toContain('Wrapping up…');
+    unmount();
+  });
+
+  it('after cancellation the transcript keeps the interrupted line and the composer returns', async () => {
+    const bridge = fakeRunner();
+    const { frames, lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'to be interrupted');
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    bridge.emit({ type: 'turn_end', usage: { input: 9_000, output: 300 } });
+    stdin.write(ESC);
+    await tick();
+    bridge.emit({ type: 'run_cancelled', at: 18_000 });
+    bridge.finish();
+    await tick();
+    const output = frames.join('\n');
+    expect(output).toContain('Interrupted after 18s · 9.3k tokens');
+    expect(lastFrame()).not.toContain('(waiting for agent…)');
+    // The next task can be typed immediately.
+    await submitLine(stdin, 'next task');
+    expect(frames.join('\n')).toContain('▸ next task');
     unmount();
   });
 });

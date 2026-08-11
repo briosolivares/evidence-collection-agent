@@ -17,10 +17,11 @@ import type {
   UiEvent,
 } from './state.js';
 
-/** UI-originated actions (composer submits, slash-command output). */
+/** UI-originated actions (composer submits, slash-command output, Esc). */
 export type UiAction =
   | { type: 'submit_task'; text: string }
-  | { type: 'notice'; text: string };
+  | { type: 'notice'; text: string }
+  | { type: 'cancel_requested' };
 
 /** Everything the reducer consumes. */
 export type StoreAction = UiAction | UiEvent;
@@ -132,6 +133,12 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
 
     case 'notice':
       return append(state, { kind: 'notice', text: action.text });
+
+    case 'cancel_requested':
+      // Esc is meaningful only while a run streams; a second press while
+      // already cancelling (or any press while idle) is a no-op.
+      if (state.mode !== 'running') return state;
+      return { ...state, mode: 'cancelling' };
 
     case 'run_started':
       return {
