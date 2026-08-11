@@ -662,6 +662,117 @@
       ],
       "humanJudged": true,
       "status": "pass"
+    },
+    {
+      "id": "R1-F1",
+      "step": 10,
+      "description": "A single exported slash-command registry (name + description) drives routeInput, HELP_TEXT, and the suggestion panel.",
+      "verification": [
+        "R1-V1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R1-F2",
+      "step": 10,
+      "description": "Typing '/' in the idle composer shows a suggestion panel above the input: command name left, muted description right, typed prefix bolded, selected row marked; filtering is live as you type.",
+      "verification": [
+        "R1-V2"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R1-F3",
+      "step": 10,
+      "description": "Suggestion keys: up/down move selection, Tab completes without submitting, Enter submits the selected command, Esc dismisses; panel hides when nothing matches or input has a space.",
+      "verification": [
+        "R1-V2",
+        "R1-V3"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R1-H1",
+      "step": 10,
+      "description": "Agent-judged PTY check: panel matches the Claude Code reference at 80 cols and renders with zero overflow at 44 cols.",
+      "verification": [
+        "R1-H1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R2-F1",
+      "step": 11,
+      "description": "Enter (or right arrow) on a run in /runs opens that run's summary inside the overlay (no transcript append); load failures render in-overlay.",
+      "verification": [
+        "R2-V1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R2-F2",
+      "step": 11,
+      "description": "Left arrow or Esc in the detail view returns to the list with the cursor preserved; up/down in detail jump to the previous/next run; Esc from the list closes the overlay.",
+      "verification": [
+        "R2-V2",
+        "R2-V3"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R2-F3",
+      "step": 11,
+      "description": "Footer hints reflect each level's keys (list vs detail).",
+      "verification": [
+        "R2-V1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R2-H1",
+      "step": 11,
+      "description": "Agent-judged PTY check: full arrow-key loop over the real runs/ directory (list -> detail -> prev/next -> back -> close).",
+      "verification": [
+        "R2-H1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R3-F1",
+      "step": 12,
+      "description": "Startup banner is a bordered welcome card with 'Sherlock - evidence collection agent' embedded in the colored top border chrome.",
+      "verification": [
+        "R3-V1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R3-F2",
+      "step": 12,
+      "description": "Card shows bold 'Welcome back {name}!', a magnifying-glass glyph art, and a muted '{model} . {path}' line (name/model/cwd injected from main.tsx; model read-only from core DEFAULT_MODEL; cwd home-shortened).",
+      "verification": [
+        "R3-V1"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R3-F3",
+      "step": 12,
+      "description": "Card renders with zero overflow at 44 columns and the missing-API-key warning behavior survives.",
+      "verification": [
+        "R3-V2",
+        "R3-V3"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "R3-H1",
+      "step": 12,
+      "description": "Agent-judged PTY check: real startup capture at 80 and 44 cols compared against the reference welcome box.",
+      "verification": [
+        "R3-H1"
+      ],
+      "status": "todo"
     }
   ]
 }
