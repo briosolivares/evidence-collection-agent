@@ -35,6 +35,7 @@ CSV columns (exact): `github_handle, name, linkedin_url`. Grader-design choices:
 
 ## State / next steps
 
-- Both packages: typecheck clean, full suite green (500 tests / 83 files), parsers smoke-tested against live GitHub (2-call probe; full oracle fetch not exercised unauthenticated — it would burn most of the 60/hr budget).
-- **Blocked on the user adding `GITHUB_TOKEN` to `.env`**, then: `npx tsx --env-file=.env evals/runners/cli.ts --tasks openclaw_merged_prs,openclaw_contributors --k 3`.
-- Watch for: task 6 hitting the 250k ceiling (expected, kept deliberately); `sort=updated` proxy quality on a high-velocity repo; whether 24 turns suffices for 10 screenshot-navigate loops.
+- Both packages: typecheck clean, full suite green (500 tests / 83 files), parsers smoke-tested against live GitHub.
+- Token added by the user (verified via `/rate_limit`: 5,000/hr); oracles fetched cleanly for all six gradings.
+- **Baseline run 2026-08-11T08:47Z: 0/2 — all six trials `budget_exceeded` on the 250k token ceiling before writing the CSV** (turns never bound; max 18 of 24). Report: `docs/reports/2026-08-11-medium-baseline.md`. Row 6 needs ~3× the ceiling at current caching; row 8 burned the budget scrolling GitHub's lazy-loading contributors graph.
+- **Open decision (user's):** candidate mechanisms — conversation-depth caching, budget redefinition to uncached-only, and/or a raised ceiling; recommended first step is a raised-ceiling re-run to measure true task depth. Grader content assertions are still unexercised by a real run (all failed downstream of no-CSV).
