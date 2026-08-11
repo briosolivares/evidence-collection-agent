@@ -21,7 +21,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [x] T15: Terminal REPL
 - [x] T16: Langfuse tracing
 - [x] T17: Eval harness core (runner, assertions, metrics)
-- [ ] T18: Easy-task oracles + graders; baseline run
+- [x] T18: Easy-task oracles + graders; baseline run (baseline 2026-08-11: 0/3 tasks pass — see baseline-failure-log.md)
 
 ## Task graph: parallel vs. sequential
 
