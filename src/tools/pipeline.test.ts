@@ -1,0 +1,111 @@
+import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
+
+import { executeToolCall } from './pipeline.js';
+import { createRegistry, type ToolCtx, type ToolDef } from './registry.js';
+
+// Tool executions in these tests never touch the filesystem, so any
+// syntactically valid absolute path serves as the run directory.
+const ctx: ToolCtx = { runDir: '/tmp/fake-run-dir' };
+
+const echo: ToolDef<{ message: string }> = {
+  name: 'echo',
+  description: 'Echo the message back.',
+  inputSchema: z.object({ message: z.string() }),
+  readOnly: true,
+  execute: async (input) => `echo: ${input.message}`,
+};
+
+const inventory: ToolDef<{ item: string }> = {
+  name: 'inventory',
+  description: 'Look up an item, returning structured data.',
+  inputSchema: z.object({ item: z.string() }),
+  readOnly: true,
+  execute: async (input) => ({ item: input.item, count: 3 }),
+};
+
+const explode: ToolDef<Record<string, never>> = {
+  name: 'explode',
+  description: 'Always throws.',
+  inputSchema: z.object({}),
+  readOnly: true,
+  execute: async () => {
+    throw new Error('boiler pressure too high');
+  },
+};
+
+const registry = createRegistry([echo, inventory, explode]);
+
+describe('executeToolCall', () => {
+  it('round-trips a valid call: input reaches the executor, output comes back normalized', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'call-1', name: 'echo', input: { message: 'hello' } },
+      ctx,
+    );
+    expect(result).toEqual({
+      toolCallId: 'call-1',
+      isError: false,
+      content: 'echo: hello',
+    });
+  });
+
+  it('serializes non-string executor output as JSON the model can read', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'call-2', name: 'inventory', input: { item: 'rivets' } },
+      ctx,
+    );
+    expect(result.isError).toBe(false);
+    expect(JSON.parse(result.content)).toEqual({ item: 'rivets', count: 3 });
+  });
+
+  it('returns a structured unknown-tool error naming the missing tool', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'call-3', name: 'teleport', input: {} },
+      ctx,
+    );
+    expect(result).toMatchObject({
+      toolCallId: 'call-3',
+      isError: true,
+      errorKind: 'unknown_tool',
+    });
+    // The message must name the problem tool (and it helps to list real ones).
+    expect(result.content).toContain('teleport');
+    expect(result.content).toContain('echo');
+  });
+
+  it('returns a structured invalid-input error that says what was malformed', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'call-4', name: 'echo', input: { message: 42 } },
+      ctx,
+    );
+    expect(result).toMatchObject({
+      toolCallId: 'call-4',
+      isError: true,
+      errorKind: 'invalid_input',
+    });
+    // zod's issue list must reach the model: the offending field and what
+    // was expected of it.
+    expect(result.content).toContain('echo');
+    expect(result.content).toContain('message');
+    expect(result.content).toMatch(/string/i);
+  });
+
+  it('returns a structured execution error when the executor throws', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'call-5', name: 'explode', input: {} },
+      ctx,
+    );
+    expect(result).toMatchObject({
+      toolCallId: 'call-5',
+      isError: true,
+      errorKind: 'execution_error',
+    });
+    expect(result.content).toContain('explode');
+    expect(result.content).toContain('boiler pressure too high');
+  });
+});
