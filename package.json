@@ -6,7 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "evals": "tsx evals/cli.ts",
+    "evals": "tsx evals/runners/cli.ts",
     "agent": "tsx src/cli/repl.ts"
   },
   "devDependencies": {

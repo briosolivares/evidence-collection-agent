@@ -10,12 +10,12 @@ import { join } from 'node:path';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { fileTools } from '../src/tools/fileTools.js';
+import { fileTools } from '../src/tools/index.js';
 import { executeToolCall, type ToolCall } from '../src/tools/pipeline.js';
 import { createRegistry } from '../src/tools/registry.js';
 
 const registry = createRegistry(fileTools);
-const runDir = createRunDir('runs', generateRunId());
+const runDir = createRunDir('runs', generateRunId('demo file-tools'));
 initManifest(runDir, 'demo: file tools through the pipeline');
 console.log(`created run dir: ${runDir}`);
 

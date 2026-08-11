@@ -1,0 +1,70 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
+
+import type { BrowserAdapter } from '../../src/browser/adapter.js';
+import { launchPersistentChrome } from '../../src/browser/playwrightAdapter.js';
+import { initManifest } from '../../src/run/artifacts.js';
+import { startFixtureServer, type FixtureServer } from '../fixtures/server.js';
+
+/** Timeout for individual tests that drive the real browser. */
+export const BROWSER_TEST_TIMEOUT_MS = 15_000;
+
+/** Accessors into the suite's live browser state; each is valid once the
+ * corresponding lifecycle hook has run (i.e. inside tests). */
+export interface BrowserToolSuite {
+  /** The suite's live browser adapter (one headless Chrome per suite). */
+  adapter: () => BrowserAdapter;
+  /** The suite's loopback fixture server. */
+  server: () => FixtureServer;
+  /** The current test's run directory — fresh per test, manifest initialized. */
+  runDir: () => string;
+}
+
+/**
+ * Register the shared lifecycle every browser tool suite needs: one
+ * headless Chrome (temp profile) and one fixture server per suite, plus a
+ * fresh run directory (manifest initialized) and browser tab per test.
+ * Call once inside a `describe` block; `name` prefixes the temp dirs so a
+ * leftover is attributable to its suite.
+ */
+export function setupBrowserToolSuite(name: string): BrowserToolSuite {
+  let adapter: BrowserAdapter;
+  let fixtureServer: FixtureServer;
+  let profileDir: string;
+  let runDir: string;
+
+  beforeAll(async () => {
+    fixtureServer = await startFixtureServer();
+    profileDir = await mkdtemp(join(tmpdir(), `${name}-chrome-`));
+    adapter = await launchPersistentChrome({ profileDir, headless: true });
+  }, 30_000);
+
+  beforeEach(async () => {
+    runDir = mkdtempSync(join(tmpdir(), `${name}-run-`));
+    initManifest(runDir, `test ${name}`);
+    await adapter.newTab();
+  });
+
+  afterEach(async () => {
+    await adapter.closeTab();
+    rmSync(runDir, { recursive: true, force: true });
+  });
+
+  afterAll(async () => {
+    await adapter?.close();
+    await fixtureServer?.close();
+    if (profileDir !== undefined) {
+      rmSync(profileDir, { recursive: true, force: true });
+    }
+  });
+
+  return {
+    adapter: () => adapter,
+    server: () => fixtureServer,
+    runDir: () => runDir,
+  };
+}

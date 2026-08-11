@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
-import { actionTools } from '../tools/actionTools.js';
-import { evidenceTools } from '../tools/evidenceTools.js';
-import { fileTools } from '../tools/fileTools.js';
-import { observationTools } from '../tools/observationTools.js';
+import {
+  actionTools,
+  evidenceTools,
+  fileTools,
+  observationTools,
+} from '../tools/index.js';
 import { createRegistry, toApiToolDefs } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 

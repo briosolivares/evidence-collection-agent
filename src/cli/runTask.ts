@@ -19,10 +19,12 @@ import {
   createRunTracing,
   type RunTracing,
 } from '../tracing/runTracing.js';
-import { actionTools } from '../tools/actionTools.js';
-import { evidenceTools } from '../tools/evidenceTools.js';
-import { fileTools } from '../tools/fileTools.js';
-import { observationTools } from '../tools/observationTools.js';
+import {
+  actionTools,
+  evidenceTools,
+  fileTools,
+  observationTools,
+} from '../tools/index.js';
 import {
   createRegistry,
   toApiToolDefs,
@@ -103,7 +105,9 @@ export async function runTask(
 
   const runDir = createRunDir(
     config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
-    generateRunId(),
+    // The task text names the run dir (slugified), so listings read like a
+    // history of what was asked rather than a wall of timestamps.
+    generateRunId(taskText),
   );
   initManifest(runDir, taskText);
 

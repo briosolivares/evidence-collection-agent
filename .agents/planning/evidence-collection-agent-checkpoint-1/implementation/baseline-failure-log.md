@@ -1,6 +1,6 @@
 # Baseline failure log — k=3, 2026-08-11
 
-First real milestone run: `npm run evals -- --tasks hacker_news,edgar,openclaw_pr --k 3` (nine live trials, per-trial live oracles). Results JSON: `runs/eval-results/2026-08-11T04-48-32-504Z-1adfa719ef9b.json`.
+First real milestone run: `npm run evals -- --tasks hacker_news,edgar,openclaw_pr --k 3` (nine live trials, per-trial live oracles). Results JSON: `evals/experiments/2026-08-11T04-48-32-504Z-1adfa719ef9b.json` (moved from `runs/eval-results/` in the 2026-08-10 restructure).
 
 **Headline: 0/3 tasks passed.** hacker_news accuracy 94.4% (completion 2/3), edgar 66.7% (0/3), openclaw_pr 66.7% (1/3).
 
