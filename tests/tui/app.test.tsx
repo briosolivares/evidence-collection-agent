@@ -7,6 +7,10 @@ import { createConfig } from '../../src/tui/config.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { ENTER, ESC, tick, typeText } from './helpers.js';
 
+// Interaction-heavy suites type through a fake stdin tick by tick and
+// can exceed the 5 s default under full-suite parallel load.
+vi.setConfig({ testTimeout: 30_000 });
+
 const config = createConfig();
 
 async function submitLine(

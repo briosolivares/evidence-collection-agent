@@ -23,8 +23,8 @@ describe('TUI browser lifecycle', () => {
     await runtime.start();
     expect(launchBrowser).toHaveBeenCalledTimes(1);
 
-    runtime.startRun('first', () => {});
-    runtime.startRun('second', () => {});
+    await runtime.startRun('first', () => {}).done;
+    await runtime.startRun('second', () => {}).done;
     expect(launchBrowser).toHaveBeenCalledTimes(1);
     expect(seenDeps).toHaveLength(2);
     expect(seenDeps[0]?.browser).toBe(adapter);

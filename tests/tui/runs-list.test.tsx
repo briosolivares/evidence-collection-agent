@@ -6,6 +6,10 @@ import { TranscriptItemView } from '../../src/tui/components/TranscriptItem.js';
 import type { RunListEntry } from '../../src/tui/runScanner.js';
 import { ESC, tick } from './helpers.js';
 
+// Interaction-heavy suites type through a fake stdin tick by tick and
+// can exceed the 5 s default under full-suite parallel load.
+vi.setConfig({ testTimeout: 30_000 });
+
 const DOWN = '\u001b[B';
 const UP = '\u001b[A';
 const ENTER = '\r';

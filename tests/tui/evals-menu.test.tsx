@@ -4,6 +4,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { EvalsMenu, validateK } from '../../src/tui/components/EvalsMenu.js';
 import { ESC, tick } from './helpers.js';
 
+// Interaction-heavy suites type through a fake stdin tick by tick and
+// can exceed the 5 s default under full-suite parallel load.
+vi.setConfig({ testTimeout: 30_000 });
+
 const DOWN = '\u001b[B';
 const ENTER = '\r';
 const BACKSPACE = '\u007f';

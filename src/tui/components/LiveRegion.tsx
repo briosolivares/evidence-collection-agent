@@ -28,11 +28,13 @@ export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionPro
       )}
       {live.pendingTools.map((pending) => (
         <Box key={pending.id}>
-          <Text color={pending.isEvidence ? theme.emphasis : theme.activity}>
-            {`${pending.isEvidence ? glyphs.evidence : glyphs.activity} `}
+          <Text>
+            <Text color={pending.isEvidence ? theme.emphasis : theme.activity}>
+              {`${pending.isEvidence ? glyphs.evidence : glyphs.activity} `}
+            </Text>
+            <Text>{pending.line}</Text>
+            <Text color={theme.muted}>{'…'}</Text>
           </Text>
-          <Text>{pending.line}</Text>
-          <Text color={theme.muted}>{'…'}</Text>
         </Box>
       ))}
       <StatusLine

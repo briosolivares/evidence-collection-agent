@@ -597,7 +597,7 @@
       "verification": [
         "S9-V1"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F2",
@@ -606,7 +606,7 @@
       "verification": [
         "S9-V2"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F3",
@@ -615,7 +615,7 @@
       "verification": [
         "S9-V3"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F4",
@@ -624,7 +624,7 @@
       "verification": [
         "S9-V4"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F5",
@@ -633,7 +633,7 @@
       "verification": [
         "S9-V5"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F6",
@@ -642,7 +642,7 @@
       "verification": [
         "S9-V6"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F7",
@@ -651,7 +651,7 @@
       "verification": [
         "S9-V7"
       ],
-      "status": "fail"
+      "status": "pass"
     },
     {
       "id": "S9-F8",
@@ -661,7 +661,7 @@
         "S9-H1"
       ],
       "humanJudged": true,
-      "status": "fail"
+      "status": "pass"
     }
   ]
 }

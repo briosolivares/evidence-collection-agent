@@ -36,8 +36,10 @@ export function TranscriptItemView({
     case 'user_task':
       return (
         <Box marginTop={1}>
-          <Text color={theme.primary}>{`${glyphs.user} `}</Text>
-          <Text bold>{item.text}</Text>
+          <Text>
+            <Text color={theme.primary}>{`${glyphs.user} `}</Text>
+            <Text bold>{item.text}</Text>
+          </Text>
         </Box>
       );
     case 'agent_text':
@@ -49,21 +51,21 @@ export function TranscriptItemView({
     case 'activity':
       return (
         <Box flexDirection="column">
-          <Box>
+          <Text>
             <Text color={theme.activity}>{`${glyphs.activity} `}</Text>
             <Text>{item.line}</Text>
             <Text color={statusColor(item.status)}>{`  ${statusGlyph(item.status)}`}</Text>
-          </Box>
+          </Text>
           {verbose && item.verbose !== undefined && <VerboseDetail verbose={item.verbose} />}
         </Box>
       );
     case 'evidence':
       return (
         <Box flexDirection="column">
-          <Box>
+          <Text>
             <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
             <Text color={theme.emphasis}>{item.line}</Text>
-          </Box>
+          </Text>
           {item.sourceUrl !== undefined && (
             <Text color={theme.muted}>{`  ${glyphs.source} source: ${item.sourceUrl}`}</Text>
           )}

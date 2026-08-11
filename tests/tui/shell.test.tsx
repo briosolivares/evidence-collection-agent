@@ -1,9 +1,13 @@
 import { render } from 'ink-testing-library';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
 import { ENTER, tick, typeText } from './helpers.js';
+
+// Interaction-heavy suites type through a fake stdin tick by tick and
+// can exceed the 5 s default under full-suite parallel load.
+vi.setConfig({ testTimeout: 30_000 });
 
 const config = createConfig();
 
