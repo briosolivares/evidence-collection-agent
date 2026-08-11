@@ -18,7 +18,7 @@ Source design: `../design/detailed-design.md`. Every task below (T1–T18) is te
 - [x] T12: Action tools — `click`, `type`, `scroll`
 - [x] T13: Evidence tools — `screenshot`, `download`
 - [x] T14: End-to-end wiring — `runTask` + system prompt
-- [ ] T15: Terminal REPL
+- [x] T15: Terminal REPL
 - [x] T16: Langfuse tracing
 - [x] T17: Eval harness core (runner, assertions, metrics)
 - [ ] T18: Easy-task oracles + graders; baseline run
