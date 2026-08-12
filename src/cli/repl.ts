@@ -17,7 +17,11 @@ import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
-import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
+import {
+  chromeExecutablePath,
+  findDevRoot,
+  resolveSherlockPaths,
+} from '../config/paths.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 import { runTask } from './runTask.js';
 
@@ -43,6 +47,7 @@ console.log('Type a task and press enter. Ctrl-C or Ctrl-D ends the session.');
 
 const browserSessionProvider = new LocalChromeBrowserSessionProvider({
   profileDir: PROFILE_DIR,
+  executablePath: chromeExecutablePath(),
 });
 const browser = await browserSessionProvider.createSession();
 const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: PROMPT });

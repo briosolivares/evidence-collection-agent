@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
 import {
+  chromeExecutablePath,
   findDevRoot,
   loadFirstEnvFile,
   resolveSherlockPaths,
@@ -124,6 +125,7 @@ const runtime = demo
   : createTuiRuntime({
       browserSessionProvider: new LocalChromeBrowserSessionProvider({
         profileDir: paths.profileDir,
+        executablePath: chromeExecutablePath(),
       }),
       runsBaseDir: config.runsBaseDir,
     });

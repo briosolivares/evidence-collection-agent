@@ -89,6 +89,19 @@ export function resolveSherlockPaths(
 }
 
 /**
+ * Optional Chrome/Chromium binary override (SHERLOCK_CHROME_PATH). When
+ * unset, Playwright discovers system Google Chrome via its `chrome`
+ * channel — which has no answer for Chromium-only Linux boxes or
+ * non-standard install locations; this is the escape hatch.
+ */
+export function chromeExecutablePath(
+  env: Record<string, string | undefined> = process.env,
+): string | undefined {
+  const value = env.SHERLOCK_CHROME_PATH;
+  return value !== undefined && value !== '' ? value : undefined;
+}
+
+/**
  * The dev-checkout marker: the package root is a git checkout (a `.git`
  * directory, or a `.git` file in a linked worktree). Installed packages
  * — `npm install -g`, git installs included — never carry `.git`.
