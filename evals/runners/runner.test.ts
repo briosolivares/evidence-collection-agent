@@ -122,7 +122,7 @@ describe('runEvals', () => {
       expect(existsSync(join(runDirArg as string, TRANSCRIPT_FILENAME))).toBe(true);
 
       // Second argument is the oracle data, verbatim.
-      expect(oracleArg).toEqual({ expectedFile: 'answer.md' });
+      expect(oracleArg).toEqual({ expectedFile: 'artifacts/answer.md' });
     });
   });
 

@@ -75,13 +75,16 @@ afterEach(() => {
 });
 
 function writeCsv(rows: string[][], header: string[] = HEADER): void {
-  writeArtifact(runDir, 'prs.csv', Buffer.from(csvText(header, rows)));
+  writeArtifact(runDir, 'artifacts/prs.csv', Buffer.from(csvText(header, rows)), {
+    roles: ['requested_output'],
+  });
 }
 
 function writeScreenshots(numbers: number[]): void {
   for (const n of numbers) {
-    writeArtifact(runDir, `pr_${n}.png`, PNG_BYTES, {
+    writeArtifact(runDir, `artifacts/pr_${n}.png`, PNG_BYTES, {
       sourceUrl: `https://github.com/openclaw/openclaw/pull/${n}`,
+      roles: ['requested_output', 'evidence'],
     });
   }
 }
@@ -212,9 +215,11 @@ describe('openclaw_merged_prs grader', () => {
   it('fails a screenshot whose provenance is a different PR page', async () => {
     writeCsv(passingRows());
     writeScreenshots(passingNumbers().slice(1));
-    // A PNG exists, but its sourceUrl is #9001's page, not #900's.
-    writeArtifact(runDir, 'pr_900.png', PNG_BYTES, {
+    // A PNG exists as a requested output, but its sourceUrl is #9001's
+    // page, not #900's — the provenance check, not the role filter, fails.
+    writeArtifact(runDir, 'artifacts/pr_900.png', PNG_BYTES, {
       sourceUrl: 'https://github.com/openclaw/openclaw/pull/9001',
+      roles: ['requested_output', 'evidence'],
     });
 
     const results = await grade(runDir, ORACLE);

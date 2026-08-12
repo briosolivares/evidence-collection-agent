@@ -29,25 +29,25 @@ function byName(results: AssertionResult[], name: string): AssertionResult {
 
 describe('wikipedia_reference grader', () => {
   it('passes the full source with harmless Markdown formatting', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(`# Source\n\n**Beevor, Antony (2012).** *The Second World War.* London: Weidenfeld & Nicolson. ISBN 978-0-297-84497-6.\n`));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(`# Source\n\n**Beevor, Antony (2012).** *The Second World War.* London: Weidenfeld & Nicolson. ISBN 978-0-297-84497-6.\n`), { roles: ['requested_output'] });
     expect((await grade(runDir, ORACLE)).every((result) => result.passed)).toBe(true);
   });
 
   it('rejects the short reference text in place of the linked Sources entry', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from('Beevor 2012, pp. 555–560.'));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('Beevor 2012, pp. 555–560.'), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'answer contains the complete source text reached from reference 275').passed).toBe(false);
   });
 
   it('rejects explicit truncation even if the source text is present', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(`${ORACLE.sourceText} ...`));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(`${ORACLE.sourceText} ...`), { roles: ['requested_output'] });
     expect(byName(await grade(runDir, ORACLE), 'answer has no truncation marker and is long enough for the full source').passed).toBe(false);
   });
 
   it('requires manifested answer.md, catches tampering, and rejects malformed oracle data', async () => {
     expect(byName(await grade(runDir, ORACLE), 'answer.md exists with a manifest entry').passed).toBe(false);
-    writeArtifact(runDir, 'answer.md', Buffer.from(ORACLE.sourceText));
-    writeFileSync(join(runDir, 'answer.md'), `${ORACLE.sourceText} changed`);
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(ORACLE.sourceText), { roles: ['requested_output'] });
+    writeFileSync(join(runDir, 'artifacts/answer.md'), `${ORACLE.sourceText} changed`);
     expect(byName(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
     await expect(async () => grade(runDir, { sourceText: 'wrong' })).rejects.toThrow(/oracle/);
   });

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest, ManifestEntry } from '../../../../src/run/artifacts.js';
-import { readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import { readManifest, requestedOutputs, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { CompanyFreshnessOracle, CompanyFreshnessTarget } from '../oracle/companyContentClient.js';
 
@@ -63,7 +63,7 @@ export const grade: Grader = (runDirPath, oracleData) => {
 };
 
 function validScreenshots(runDirPath: string, manifest: Manifest): Screenshot[] {
-  return manifest.artifacts.flatMap((entry): Screenshot[] => {
+  return requestedOutputs(manifest).flatMap((entry): Screenshot[] => {
     if (!entry.filename.toLowerCase().endsWith('.png') || !entry.sourceUrl) return [];
     const path = join(runDirPath, entry.filename);
     if (!existsSync(path) || !readFileSync(path).subarray(0, PNG_MAGIC.length).equals(PNG_MAGIC)) return [];

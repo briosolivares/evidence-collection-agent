@@ -29,8 +29,8 @@ function passingCsv(): string {
   return `name,class,major,affiliation,interests,other\n${rows.join('\n')}\n`;
 }
 function writePassingArtifacts(): void {
-  writeArtifact(runDir, 'sorority_members.csv', Buffer.from(passingCsv()));
-  writeArtifact(runDir, 'answer.md', Buffer.from('Sheet: https://docs.google.com/spreadsheets/d/abc_123/edit#gid=0\n'));
+  writeArtifact(runDir, 'artifacts/sorority_members.csv', Buffer.from(passingCsv()), { roles: ['requested_output'] });
+  writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('Sheet: https://docs.google.com/spreadsheets/d/abc_123/edit#gid=0\n'), { roles: ['requested_output'] });
 }
 function byName(results: AssertionResult[], name: string): AssertionResult {
   const found = results.find((result) => result.name === name);
@@ -47,8 +47,8 @@ describe('mit_sororities grader', () => {
   it('rejects an extra CSV column and a missing cohort', async () => {
     const bad = passingCsv().replace('name,class,major,affiliation,interests,other', 'name,class,major,affiliation,interests,other,source')
       .split('\n').filter((line) => !line.includes('Alpha Chi Omega') || !line.includes(',2027,')).join('\n');
-    writeArtifact(runDir, 'sorority_members.csv', Buffer.from(bad));
-    writeArtifact(runDir, 'answer.md', Buffer.from('https://docs.google.com/spreadsheets/d/sheet-id/edit'));
+    writeArtifact(runDir, 'artifacts/sorority_members.csv', Buffer.from(bad), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('https://docs.google.com/spreadsheets/d/sheet-id/edit'), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'CSV has exactly the columns name, class, major, affiliation, interests, other (no more, no fewer)').passed).toBe(false);
     expect(byName(results, 'CSV has plausible rows and every sorority/class cohort is represented').passed).toBe(false);
@@ -64,8 +64,8 @@ describe('mit_sororities grader', () => {
       cells[5] = '';
       return cells.join(',');
     }).join('\n');
-    writeArtifact(runDir, 'sorority_members.csv', Buffer.from(`${sparse}\n${lines[1]}\n`));
-    writeArtifact(runDir, 'answer.md', Buffer.from('https://docs.google.com/document/d/not-a-sheet'));
+    writeArtifact(runDir, 'artifacts/sorority_members.csv', Buffer.from(`${sparse}\n${lines[1]}\n`), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('https://docs.google.com/document/d/not-a-sheet'), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'member names are plausible and unique within each affiliation').passed).toBe(false);
     expect(byName(results, 'major and interests/other fields meet minimum information coverage').passed).toBe(false);
@@ -75,7 +75,7 @@ describe('mit_sororities grader', () => {
   it('requires the named artifacts, catches tampering, and rejects malformed oracle data', async () => {
     expect(byName(await grade(runDir, ORACLE), 'sorority_members.csv exists with a manifest entry').passed).toBe(false);
     writePassingArtifacts();
-    writeFileSync(join(runDir, 'sorority_members.csv'), `${passingCsv()}tampered`);
+    writeFileSync(join(runDir, 'artifacts/sorority_members.csv'), `${passingCsv()}tampered`);
     expect(byName(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
     await expect(async () => grade(runDir, { nope: true })).rejects.toThrow(/oracle/);
   });

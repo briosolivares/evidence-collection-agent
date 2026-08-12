@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { parseCsv } from '../../../grading/csv.js';
 import { exactColumnsAssertion, exactColumnsAssertionName } from '../../../grading/csvAssertions.js';
-import { readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { MitSororitiesOracle } from '../oracle/oracle.js';
 
@@ -29,12 +29,14 @@ interface MemberRow {
 export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOracle(oracleData);
   const manifest = readManifest(runDirPath);
-  const csvEntry = manifest.artifacts.find((entry) => entry.filename === CSV_FILENAME);
-  const csvExists = csvEntry !== undefined && existsSync(join(runDirPath, CSV_FILENAME));
+  const csvEntry = findRequestedOutputByName(manifest, CSV_FILENAME);
+  const csvExists = csvEntry !== undefined && existsSync(join(runDirPath, csvEntry.filename));
   const assertions: AssertionResult[] = [{
     name: `${CSV_FILENAME} exists with a manifest entry`,
     passed: csvExists,
-    detail: csvExists ? `${CSV_FILENAME} found and manifested` : `${CSV_FILENAME} missing or unmanifested`,
+    detail: csvExists
+      ? `${csvEntry!.filename} found and manifested`
+      : `${CSV_FILENAME} missing or not published as a requested output`,
   }];
   assertions.push(sheetAssertion(runDirPath, manifest));
 
@@ -45,7 +47,7 @@ export const grade: Grader = (runDirPath, oracleData) => {
   let header: string[];
   let rawRows: string[][];
   try {
-    ({ header, rows: rawRows } = parseCsv(readFileSync(join(runDirPath, CSV_FILENAME), 'utf8')));
+    ({ header, rows: rawRows } = parseCsv(readFileSync(join(runDirPath, csvEntry!.filename), 'utf8')));
   } catch (error) {
     const detail = `${CSV_FILENAME} could not be parsed: ${error instanceof Error ? error.message : String(error)}`;
     return [...assertions, ...failedCsvContent(detail), verifyManifestHashes(runDirPath, manifest)];
@@ -60,11 +62,15 @@ export const grade: Grader = (runDirPath, oracleData) => {
 };
 
 function sheetAssertion(runDirPath: string, manifest: ReturnType<typeof readManifest>): AssertionResult {
-  const entry = manifest.artifacts.find((artifact) => artifact.filename === ANSWER_FILENAME);
-  if (!entry || !existsSync(join(runDirPath, ANSWER_FILENAME))) {
-    return { name: SHEET_ASSERTION_NAME, passed: false, detail: `${ANSWER_FILENAME} missing or unmanifested` };
+  const entry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
+  if (!entry || !existsSync(join(runDirPath, entry.filename))) {
+    return {
+      name: SHEET_ASSERTION_NAME,
+      passed: false,
+      detail: `${ANSWER_FILENAME} missing or not published as a requested output`,
+    };
   }
-  const text = readFileSync(join(runDirPath, ANSWER_FILENAME), 'utf8');
+  const text = readFileSync(join(runDirPath, entry.filename), 'utf8');
   const urls = text.match(/https?:\/\/docs\.google\.com\/spreadsheets\/d\/[A-Za-z0-9_-]+[^\s)>\]}]*/gi) ?? [];
   return {
     name: SHEET_ASSERTION_NAME,

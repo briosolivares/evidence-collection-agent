@@ -57,9 +57,11 @@ function manifestHashAssertion(runDirPath: string, filename: string): AssertionR
     return { name, passed: false, detail: `${MANIFEST_FILENAME} missing or unreadable` };
   }
 
-  const entry = manifest.artifacts.find((a) => a.filename === filename);
+  const entry = manifest.artifacts.find(
+    (a) => a.filename === filename && (a.roles?.includes('requested_output') ?? false),
+  );
   if (entry === undefined) {
-    return { name, passed: false, detail: `no manifest entry for ${filename}` };
+    return { name, passed: false, detail: `no requested-output manifest entry for ${filename}` };
   }
 
   let bytes: Buffer;

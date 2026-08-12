@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { Manifest } from '../../../../src/run/artifacts.js';
-import { readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import type { Manifest, ManifestEntry } from '../../../../src/run/artifacts.js';
+import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import {
   acceptablePrsInWindow,
@@ -34,18 +34,19 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOpenClawPrOracle(oracleData);
   const manifest = readManifest(runDirPath);
 
-  const answerExists = existsSync(join(runDirPath, ANSWER_FILENAME));
+  const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
+  const answerExists = answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
   const existsAssertion: AssertionResult = {
     name: `${ANSWER_FILENAME} exists`,
     passed: answerExists,
     detail: answerExists
-      ? `${ANSWER_FILENAME} found in run dir`
-      : `${ANSWER_FILENAME} missing from run dir`,
+      ? `${answerEntry!.filename} found in run dir`
+      : `${ANSWER_FILENAME} missing or not published as a requested output`,
   };
 
   return [
     existsAssertion,
-    mentionsPrAssertion(runDirPath, answerExists, manifest, oracle),
+    mentionsPrAssertion(runDirPath, answerExists ? answerEntry : undefined, manifest, oracle),
     verifyManifestHashes(runDirPath, manifest),
   ];
 };
@@ -54,13 +55,13 @@ export const grade: Grader = (runDirPath, oracleData) => {
  * "most recent" at some point during the run's window? */
 function mentionsPrAssertion(
   runDirPath: string,
-  answerExists: boolean,
+  answerEntry: ManifestEntry | undefined,
   manifest: Manifest,
   oracle: OpenClawPrOracle,
 ): AssertionResult {
   const name = `${ANSWER_FILENAME} mentions the number and title of a most-recent-in-window PR`;
 
-  if (!answerExists) {
+  if (answerEntry === undefined) {
     return { name, passed: false, detail: `${ANSWER_FILENAME} missing from run dir` };
   }
   if (manifest.finishedAt === undefined) {
@@ -76,7 +77,7 @@ function mentionsPrAssertion(
     };
   }
 
-  const answerText = readFileSync(join(runDirPath, ANSWER_FILENAME), 'utf8');
+  const answerText = readFileSync(join(runDirPath, answerEntry.filename), 'utf8');
   const matched = acceptable.find((pr) => mentionsPr(answerText, pr));
   return {
     name,

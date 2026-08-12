@@ -43,14 +43,14 @@ describe('airbnb_lake_tahoe grader', () => {
   });
 
   it('passes a complete, internally consistent report', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(passingAnswer()));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(passingAnswer()), { roles: ['requested_output'] });
     expect((await grade(runDir, ORACLE)).every((result) => result.passed)).toBe(true);
   });
 
   it('rejects a missing item and a duplicated room URL', async () => {
     const bad = passingAnswer().replace(/^30\. [\s\S]*?(?=\n\n## Overall Summary)/m, '')
       .replace('/rooms/1001', '/rooms/1000');
-    writeArtifact(runDir, 'answer.md', Buffer.from(bad));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(bad), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'answer has a numbered list containing exactly items 1 through 30').passed).toBe(false);
     expect(byName(results, 'all 30 items contain distinct Airbnb room URLs').passed).toBe(false);
@@ -61,7 +61,7 @@ describe('airbnb_lake_tahoe grader', () => {
       .replace(/Check-in: \d{4}-\d{2}-\d{2}/, 'Check-in: 2001-01-01')
       .replace(/Check-out: \d{4}-\d{2}-\d{2}/, 'Check-out: 2001-01-08')
       .replace(/## Overall Summary[\s\S]*$/, '## Overall Summary\nToo short.');
-    writeArtifact(runDir, 'answer.md', Buffer.from(bad));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(bad), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'answer states a seven-night date range beginning next week').passed).toBe(false);
     expect(byName(results, 'answer contains a substantive overall summary and identifies Lake Tahoe').passed).toBe(false);
@@ -69,8 +69,8 @@ describe('airbnb_lake_tahoe grader', () => {
 
   it('requires manifested answer.md, verifies hashes, and validates the oracle', async () => {
     expect(byName(await grade(runDir, ORACLE), 'answer.md exists with a manifest entry').passed).toBe(false);
-    writeArtifact(runDir, 'answer.md', Buffer.from(passingAnswer()));
-    writeFileSync(join(runDir, 'answer.md'), `${passingAnswer()}\ntampered`);
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(passingAnswer()), { roles: ['requested_output'] });
+    writeFileSync(join(runDir, 'artifacts/answer.md'), `${passingAnswer()}\ntampered`);
     expect(byName(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
     await expect(async () => grade(runDir, { wrong: true })).rejects.toThrow(/oracle/);
   });

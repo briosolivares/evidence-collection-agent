@@ -21,7 +21,7 @@ beforeEach(() => {
 afterEach(() => rmSync(runDir, { recursive: true, force: true }));
 
 function writeCsv(body = 'text,likes,time_posted\nFirst tweet,"1,234",9:15 AM\nSecond tweet,2.5K,2h ago\n'): void {
-  writeArtifact(runDir, 'tweets.csv', Buffer.from(body));
+  writeArtifact(runDir, 'artifacts/tweets.csv', Buffer.from(body), { roles: ['requested_output'] });
 }
 function assertion(results: AssertionResult[], name: string): AssertionResult {
   const found = results.find((result) => result.name === name);
@@ -53,7 +53,7 @@ describe('elon_tweets grader', () => {
     const missing = await grade(runDir, ORACLE);
     expect(assertion(missing, 'CSV artifact exists').passed).toBe(false);
     writeCsv();
-    writeFileSync(join(runDir, 'tweets.csv'), 'text,likes,time_posted\nChanged,1,now\n');
+    writeFileSync(join(runDir, 'artifacts', 'tweets.csv'), 'text,likes,time_posted\nChanged,1,now\n');
     expect(assertion(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
   });
 

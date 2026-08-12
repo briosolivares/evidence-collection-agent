@@ -68,7 +68,7 @@ function mentionText(pr: GithubPullRequest): string {
 
 describe('openclaw_pr grader', () => {
   it('passes every assertion when answer.md names the PR created during the run', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), { roles: ['requested_output'] });
 
     const results = await grade(runDir, ORACLE);
 
@@ -77,7 +77,7 @@ describe('openclaw_pr grader', () => {
   });
 
   it('churn tolerance: accepts the PR that was most recent at run start too', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(mentionText(PR_MOST_RECENT_AT_START)));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_MOST_RECENT_AT_START)), { roles: ['requested_output'] });
 
     const results = await grade(runDir, ORACLE);
 
@@ -87,7 +87,7 @@ describe('openclaw_pr grader', () => {
   });
 
   it('churn tolerance: rejects a PR that only became most recent after the run finished', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(mentionText(PR_CREATED_AFTER_RUN)));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_AFTER_RUN)), { roles: ['requested_output'] });
 
     const results = await grade(runDir, ORACLE);
 
@@ -98,7 +98,7 @@ describe('openclaw_pr grader', () => {
   });
 
   it('fails when answer.md names a PR that was never most-recent', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(mentionText(PR_LONG_STALE)));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_LONG_STALE)), { roles: ['requested_output'] });
 
     const results = await grade(runDir, ORACLE);
 
@@ -121,11 +121,11 @@ describe('openclaw_pr grader', () => {
   });
 
   it('fails only the manifest-hash assertion when answer.md is tampered with after capture', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), { roles: ['requested_output'] });
     // Tamper behind the manifest's back: append text after capture. The
     // original correct mention is still present, so the content assertion
     // still passes; only the standing re-hash-from-disk assertion catches it.
-    const tamperedPath = join(runDir, 'answer.md');
+    const tamperedPath = join(runDir, 'artifacts/answer.md');
     writeFileSync(tamperedPath, mentionText(PR_CREATED_MID_RUN) + '\n[appended after capture]\n');
 
     const results = await grade(runDir, ORACLE);

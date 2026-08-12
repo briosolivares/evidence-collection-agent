@@ -18,7 +18,7 @@ describe('loadEvalTask', () => {
     expect(task.taskText).toContain('answer.md');
     expect(task.startUrl).toBe('about:blank');
     expect(typeof task.grade).toBe('function');
-    await expect(task.fetchOracle()).resolves.toEqual({ expectedFile: 'answer.md' });
+    await expect(task.fetchOracle()).resolves.toEqual({ expectedFile: 'artifacts/answer.md' });
   });
 
   it('rejects task names that could traverse outside the evals dir', async () => {
