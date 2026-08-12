@@ -71,6 +71,72 @@ The session-acquisition seam: `createSession()` returns a live `BrowserControlle
 
 One zod schema per tool does double duty: runtime validation and (via `z.toJSONSchema`) the API tool definition. `readOnly` drives the scheduler; `maxBytes` overrides the 50 KB result cap. `ToolCtx { runDir, browser? }` is the capability bundle handed to every `execute`. `toApiToolDefs(registry)` must stay deterministic — its output is part of the cached prompt prefix.
 
+The production registry is deterministic and has fourteen core tools in this
+order: `read_file`, `write_file`, `grep`, `navigate`, `inspect_page`, `click`,
+`type`, `scroll`, `screenshot`, `download`, `TaskCreate`, `TaskList`,
+`TaskGet`, and `TaskUpdate`. The optional `batch-enabled` profile appends
+`browser_batch` as the fifteenth tool. The scheduler treats
+`read_file`, `grep`, `inspect_page`, `TaskList`, and `TaskGet` as read-only;
+all other tools are state-changing barriers. Read-only calls may be batched
+(up to the scheduler's parallelism limit), while state-changing calls remain
+serialized. Registry order and every description/schema are stable because
+they contribute to the model prompt cache prefix.
+
+### Run-scoped checklist (`src/run/checklist.ts`)
+
+Checklist state is identified solely by the current run directory and is
+durable under `<runDir>/checklist/`. The store API is:
+
+```ts
+createChecklistTask(runDir, input): ChecklistTask
+listChecklistTasks(runDir): ChecklistTask[]
+getChecklistTask(runDir, taskId): ChecklistTask | undefined
+updateChecklistTask(runDir, taskId, patch): ChecklistTask
+deleteChecklistTask(runDir, taskId): boolean
+onChecklistUpdated(listener: (runDir: string) => void): () => void
+```
+
+Task IDs are positive decimal strings allocated by the run-local
+`.highwatermark`; deleting a task never reuses its ID. Task JSON is strict and
+validated on every read, with `pending`, `in_progress`, and `completed`
+statuses. `TaskUpdate` also accepts `status: "deleted"`; deletion removes the
+task file and its matching manifest record. Metadata patches merge by key and
+`null` removes a key. A transition to `completed` verifies each
+`metadata.expectedArtifacts` path is present in the manifest as a published
+`requested_output`.
+
+The model-facing tools map directly to this store: `TaskCreate` and
+`TaskUpdate` are state-changing, while `TaskList` and `TaskGet` are read-only.
+Their schemas are strict and static. Results provide concise progress nudges;
+completion specifically asks the model to call `TaskList`, but checklist state
+never controls whether the ordinary agent loop takes another turn.
+
+### Managed checklist provenance (`src/run/artifacts.ts`)
+
+`initManifest` creates `artifacts/`, `scratch/`, and `checklist/`. All checklist
+JSON and `.highwatermark` writes still pass through `writeArtifact`, so their
+SHA-256 hashes remain in `manifest.json`, but checklist entries carry neither
+artifact roles nor `sourceUrl` and are never deliverables. The internal
+`managedState: 'checklist'` discriminator is required for normalized
+`checklist/...` paths and rejected for `artifacts/` and `scratch/`; ordinary
+model `write_file` remains limited to those existing two workspaces.
+
+`deleteTrackedRunFile(runDir, relPath, { managedState: 'checklist' })` is the
+confined deletion chokepoint. It validates the normalized checklist path,
+loads the manifest before mutation, removes one tracked file and its matching
+entry, and cannot escape the run directory. A missing file is an idempotent
+no-op; an existing untracked file is rejected.
+
+### TUI checklist snapshot (`src/tui/hooks/useRunChecklist.ts`)
+
+`useRunChecklist(runDir)` returns `{ tasks, visible }` from a single App-owned
+subscription. The hook immediately reads the run's checklist, subscribes to
+the store's invalidation signal and filesystem changes, debounces rereads, and
+polls unresolved lists as a fallback. Disk is always the source of truth; a
+transient malformed read retains the last good snapshot. Empty lists hide
+immediately, while an all-completed list remains visible briefly before
+hiding without deleting task files.
+
 ### `runTask` (`src/cli/runTask.ts`) — the programmatic entry point
 
 ```ts

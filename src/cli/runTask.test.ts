@@ -299,6 +299,14 @@ describe('runTask', () => {
       expect(JSON.stringify(fake.requests[5])).toContain(
         '#1 [completed] Publish the report',
       );
+      expect(fake.requests[5]?.at(-1)).toEqual({
+        role: 'user',
+        content: [{
+          type: 'tool_result',
+          tool_use_id: 'task-list-1',
+          content: '#1 [completed] Publish the report',
+        }],
+      });
 
       const task = await readJson<ChecklistTask>(
         join(result.runDir, 'checklist', '1.json'),

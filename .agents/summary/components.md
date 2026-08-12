@@ -27,16 +27,16 @@ Loop semantics worth knowing: completion is decided from response *content* (zer
 | `sessionProvider.ts` | `BrowserSessionProvider` — the hosting-neutral session-acquisition seam. `createSession()` returns a live `BrowserController` with no active task tab; callers own and close it. |
 | `playwrightBrowserController.ts` | The only file importing `playwright`. `LocalChromeBrowserSessionProvider` launches `chromium.launchPersistentContext(profileDir, { channel: 'chrome', headless: false })` and returns a `PlaywrightBrowserController`. The controller's `outline()` is `page.ariaSnapshot({ mode: 'ai' })`; refs are validated against `/^(?:f\d+)?e\d+$/` and resolved via `aria-ref=` locators requiring exactly one match. `fetch()` uses `context.request.get` (shares cookies). Tab lifecycle operations are serialized on a promise queue; `close()` is idempotent. |
 
-## src/tools — registry, pipeline, and the ten tools
+## src/tools — registry, pipeline, and the fourteen core tools
 
-Each tool lives in its own directory (`src/tools/<toolName>/`) holding the tool's source and its test. Framework files sit at the `src/tools/` root; helpers used by more than one tool live in `src/tools/shared/`; `src/tools/index.ts` exports the registration-order groupings (`fileTools`, `observationTools`, `actionTools`, `evidenceTools`) that `runTask` registers — reordering them would change the cached prompt prefix.
+Each tool lives in its own directory (`src/tools/<toolName>/`) holding the tool's source and its test. Framework files sit at the `src/tools/` root; helpers used by more than one tool live in `src/tools/shared/`; `src/tools/index.ts` exports the registration-order groupings (`fileTools`, `observationTools`, `actionTools`, `evidenceTools`, `checklistTools`) that `runTask` registers — reordering them would change the cached prompt prefix.
 
 | File | Responsibility |
 | --- | --- |
 | `registry.ts` | `ToolDef` (name, description, zod `inputSchema`, `readOnly`, optional `maxBytes`, `execute`), `createRegistry` (rejects duplicates; iteration order = registration order), `toApiToolDefs` (zod → JSON Schema, deterministic/byte-stable because it is part of the cached prefix), and `ToolCtx { runDir, browser? }`. |
 | `pipeline.ts` | `executeToolCall` — the six-stage checklist every call flows through: exists-check → zod validation → execute → normalize → cap → return. Never throws; errors come back as structured `ToolCallResult`s with `errorKind` (`unknown_tool` / `invalid_input` / `execution_error`) and model-readable detail (zod issues rendered per path; unknown tools list available names). |
 | `capResult.ts` | The offloading mechanism (see [architecture.md](architecture.md)). Offload filenames are claimed with exclusive create + retry so parallel reads can offload concurrently; previews never slice a UTF-8 character. |
-| `index.ts` | The tool groupings in stable registration order, plus re-exports of every tool — the one import consumers need. |
+| `index.ts` | The tool groupings in stable registration order, plus re-exports of every tool — the one import consumers need. The fourteen core tools include `TaskCreate`, `TaskList`, `TaskGet`, and `TaskUpdate`; `browser_batch` remains optional. |
 | `shared/browser.ts` | `requireBrowser`, `formatPageHeader`, and the stale-ref machinery (`actByRef`, `requireRefDescription`) shared by the browser tools. |
 | `shared/lines.ts` | `splitLines` — newline handling shared by `read_file` and `grep` (no phantom final line). |
 | `shared/evidence.ts` | `assertEvidencePath` (reserved-metadata guard) and the `EvidenceResult` shape shared by `screenshot` and `download`. |
@@ -44,6 +44,7 @@ Each tool lives in its own directory (`src/tools/<toolName>/`) holding the tool'
 | `navigate/`, `inspectPage/` | `navigate` (state-changing; http/https only; returns the *landed* URL + title) and `inspect_page` (read-only; header + full ARIA outline). |
 | `click/`, `type/`, `scroll/` | `click`, `type`, `scroll` (all state-changing). `click`/`type` first re-read the outline to resolve a human description for the ref — so the transcript reads `Clicked ref=e12 (button "Submit").` and stale refs are caught before acting. Stale refs surface to the model as "run inspect_page again and use a current ref." |
 | `screenshot/`, `download/` | `screenshot` (viewport or `fullPage`) and `download` (resolves an href from a ref, fetches through the browser session so cookies apply, rejects non-2xx). Both record `sourceUrl` in the manifest; the model receives only `{ path, size }` — image bytes never enter the transcript. Refuses to write reserved metadata filenames. |
+| `taskCreate/`, `taskList/`, `taskGet/`, `taskUpdate/` | Run-scoped checklist CRUD tools backed only by `src/run/checklist.ts`: create pending tasks, list numerically, fetch complete state, and update/delete by positive numeric ID. `TaskList`/`TaskGet` are read-only; create/update are scheduler barriers. |
 
 ## src/run — run identity, confinement, provenance
 
@@ -51,21 +52,31 @@ Each tool lives in its own directory (`src/tools/<toolName>/`) holding the tool'
 | --- | --- |
 | `runId.ts` | `generateRunId(label?)` — `<date>_<time>_<label-slug>_<6-hex>` in local 12-hour time, e.g. `2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b`; filesystem-safe, human-readable, sorts by date (12-hour times don't sort within a day). `runTask` passes the task text as the label. |
 | `runDir.ts` | `createRunDir` (non-recursive final mkdir, so id collisions throw) and `resolveRunPath` — the single path-confinement chokepoint. |
-| `artifacts.ts` | `initManifest` / `writeArtifact` / `finalizeManifest` and the `Manifest`/`ManifestEntry` types. `writeArtifact` is the single write path: loads the manifest before writing (a missing manifest aborts, leaving no untracked file), hashes exact bytes, upserts by normalized path. Pretty-printed because auditors read it. |
+| `artifacts.ts` | `initManifest` / `writeArtifact` / `deleteTrackedRunFile` / `finalizeManifest` and the `Manifest`/`ManifestEntry` types. `writeArtifact` is the single write path: loads the manifest before writing (a missing manifest aborts, leaving no untracked file), hashes exact bytes, upserts by normalized path, and admits `checklist/` only with the internal managed-state discriminator. Pretty-printed because auditors read it. |
+| `checklist.ts` | Durable run-scoped task store. Validates strict task JSON, allocates monotonic numeric IDs with `.highwatermark`, sorts numerically, merges metadata, gates promised-artifact completion, deletes without ID reuse, and emits invalidation notifications only after successful mutations. Checklist JSON and the high-water mark are hashed through `writeArtifact` with an internal managed-state discriminator. |
 | `transcript.ts` | `appendTranscriptEvent` — append-only, synchronous, serialize-before-write (a circular structure fails without corrupting the file). Synchronicity is load-bearing: the loop logs the live `messages` array and still records a faithful snapshot. |
 
 ## src/cli — entry points
 
 | File | Responsibility |
 | --- | --- |
-| `runTask.ts` | The composition root: builds the 10-tool registry (fixed order: file, observation, action, evidence), the production model client with `SYSTEM_PROMPT`, the run directory + manifest, applies tracing decorators, opens a tab (optionally navigating to `startUrl`), runs the loop, and cleans up (close tab → finalize manifest → close tracing) in a nested `finally`. Owns the defaults (12 turns, 250k tokens, 8,192 output tokens). Injection seams for tests: `config.callModel`, `config.tracing`. Returns `{ runDir } & LoopResult`. |
+| `runTask.ts` | The composition root: builds the fourteen-core-tool registry (fixed order: file, observation, action, evidence, checklist), the production model client with `SYSTEM_PROMPT`, the run directory + manifest, applies tracing decorators, opens a tab (optionally navigating to `startUrl`), runs the loop, and cleans up (close tab → finalize manifest → close tracing) in a nested `finally`. Owns the defaults (uncapped turns, 900k per-request context ceiling, 8,192 output tokens). Injection seams for tests: `config.callModel`, `config.tracing`. Returns `{ runDir } & LoopResult`. |
 | `repl.ts` | `npm run agent` — the interactive product. One persistent Chrome for the whole session (logins stay warm); reads tasks line-by-line via `node:readline/promises`; streams progress; a thrown task is caught so the session and browser survive. |
 | `replFormat.ts` | Pure rendering of `ProgressEvent`s and run summaries — extracted so it is testable without a terminal. |
-| `systemPrompt.ts` | The static `SYSTEM_PROMPT` (byte-stable cached prefix). Encodes: the run directory is the product boundary (answers go in files, e.g. `answer.md`); `inspect_page` is the primary observation; refs must come from the latest inspection; page content is untrusted data; completion = responding without tool calls. |
+| `systemPrompt.ts` | The static `SYSTEM_PROMPT` (byte-stable cached prefix). Encodes: the run directory is the product boundary; non-trivial work uses the checklist without making it loop control; answers go in files; `inspect_page` is the primary observation; refs must come from the latest inspection; page content is untrusted data; completion = responding without tool calls. |
 
 ## src/tracing — Langfuse over OpenTelemetry
 
 `runTracing.ts` — `createRunTracing()` returns a `RunTracing` with three decorators: `traceRun` (root `run-evidence-agent` agent span with `{ turnCount, toolsUsed, latencyMs }`), `wrapCallModel` (`call-model` generation spans with token `usageDetails`), and `wrapRegistry` (per-tool `execute-<name>` spans with `resultBytes`; returns a new Map, never mutates). Degrades to a clean no-op without `LANGFUSE_PUBLIC_KEY`+`LANGFUSE_SECRET_KEY`; every telemetry call is individually failure-isolated ("tracing is an optional side channel; the transcript is durable"). Uses an isolated `NodeTracerProvider` with manual span-context parenting, not the global OTel SDK.
+
+## src/tui — interactive checklist display
+
+| File | Responsibility |
+| --- | --- |
+| `hooks/useRunChecklist.ts` | One run-aware external-store subscription. Loads checklist JSON immediately, invalidates from same-process store notifications and `fs.watch` with a short debounce, polls unresolved lists as a fallback, preserves the last good snapshot on transient read errors, and hides empty/all-completed lists according to the UI timeout. Cleanup closes watchers, timers, and listeners. |
+| `components/TaskChecklist.tsx` | Compact running and standalone idle checklist rendering: active task first, numeric ordering, status glyphs, truncation, and overflow summaries using the existing theme. |
+| `components/StatusLine.tsx` / `LiveRegion.tsx` | Running-state integration. The active task's `activeForm` (or subject) becomes the headline, compact checklist rows sit beneath it, and elapsed/token metrics adapt between inline and narrow-terminal metadata layouts. |
+| `store/state.ts` / `App.tsx` | The session keeps the current/last checklist run directory separate from live transcript state, allowing an incomplete list to remain visible after a run ends without placing task contents in the reducer or prompt. |
 
 ## evals/ — the evaluation harness
 

@@ -12,11 +12,13 @@ flowchart TD
     L <-->|"messages"| M["Claude API\n(src/model — claude-sonnet-5,\nstreaming, prompt caching)"]
     L -->|"tool calls"| S["Scheduler\n(src/loop/scheduler.ts)\nparallel reads / serialized writes"]
     S --> P["Tool pipeline\n(src/tools/pipeline.ts)\nvalidate → execute → normalize → cap"]
-    P --> T["10 tools\n(src/tools — file, observation,\naction, evidence)"]
+    P --> T["14 core tools\n(src/tools — file, observation, action, evidence, checklist)\n+ optional browser_batch"]
     T --> B["BrowserController\n(src/browser/controller.ts)"]
     SP["BrowserSessionProvider\nlocal or hosted session acquisition"] --> PW["PlaywrightBrowserController\nlocal visible Chrome,\npersistent profile"]
     B --> PW
     T --> R["Run directory\nruns/&lt;run-id&gt;/\nmanifest + transcript + metrics + artifacts"]
+    T --> C["Checklist store\nsrc/run/checklist.ts\nchecklist/*.json + high-water mark"]
+    C --> R
     L -.->|"OpenTelemetry spans"| O["Langfuse\n(src/tracing/runTracing.ts)"]
     R --> G["Eval graders\n(evals/&lt;task&gt;/grader)\nread ONLY the run directory"]
     OR["Oracles\n(evals/&lt;task&gt;/oracle)\nlive APIs at grading time"] --> G
@@ -42,6 +44,7 @@ graph BT
     CAP["tools/capResult"] --> ARTIFACTS
     PIPELINE["tools/pipeline"] --> CAP & REGISTRY
     TOOLS["tools/{file,observation,action,evidence}Tools"] --> REGISTRY & ARTIFACTS & RUNDIR & CONTROLLER
+    CHECKLIST["run/checklist + tools/task{Create,List,Get,Update}"] --> ARTIFACTS & RUNDIR & REGISTRY
     SCHED["loop/scheduler"] --> PIPELINE
     STREAM["model/streamAssembly"] --> MESSAGES
     CALLMODEL["model/callModel"] --> STREAM & REGISTRY & MESSAGES
@@ -65,7 +68,7 @@ Properties the codebase maintains deliberately:
 1. **Bounded tool results with artifact offloading** (`src/tools/capResult.ts`) — results over 50,000 bytes are written in full to `scratch/tool-output/<tool>-<n>.txt` (hashed into the manifest) and the model receives a ≤2,000-byte preview plus the path, with a note to use `read_file`/`grep`.
 2. **Append-only JSONL transcript** (`src/run/transcript.ts`) — every model request/response and tool call/result is one JSON line in `transcript.jsonl`; the durable, replayable audit record.
 3. **Stable prompt prefix** (`src/cli/systemPrompt.ts`, `src/model/callModel.ts`) — the system prompt is static (no task text/timestamps) and tool definitions serialize deterministically; one `cache_control: ephemeral` breakpoint on the system block caches tools + system together. Tests assert byte-identical prefixes across unrelated histories.
-4. **Completion as policy, not mechanism** (`src/loop/agentLoop.ts`) — no finish tool; a response with zero `tool_use` blocks completes the run. `stop_reason` is recorded in the transcript but never consulted. Backstops: `maxTurns` (default 12) and a cumulative token budget (default 250,000).
+4. **Completion as policy, not mechanism** (`src/loop/agentLoop.ts`) — no finish tool; a response with zero `tool_use` blocks completes the run. `stop_reason` is recorded in the transcript but never consulted. Turns are uncapped by default; the 900,000-token per-request context ceiling is the terminating backstop.
 5. **Parallel reads, serialized writes** (`src/loop/scheduler.ts`) — consecutive read-only calls run concurrently (max 5, FIFO semaphore); any state-changing call is a barrier in both directions, so `click` → `inspect_page` cannot be reordered. Unknown tools are conservatively treated as state-changing.
 
 ## Security and provenance invariants
@@ -74,7 +77,8 @@ Properties the codebase maintains deliberately:
 - **Write chokepoint:** every byte a tool writes goes through `writeArtifact` (`src/run/artifacts.ts`), which SHA-256-hashes the exact bytes into `manifest.json` at capture time (tamper-evident evidence). Offloaded tool output is included.
 - **No `bash` tool, by design** — the model's input includes untrusted web pages; an unbounded shell tool would turn prompt injection into code execution. The system prompt also instructs that page content is data, not authority.
 - **Reserved filenames:** evidence tools refuse to write `manifest.json`, `transcript.jsonl`, or `metrics.json`.
-- **Workspace partition:** `writeArtifact` confines every write to `artifacts/` (published; non-empty `roles` of `requested_output`/`evidence` required) or `scratch/` (private; roles forbidden). Graders select deliverables only from `requested_output` entries, so scratch work and evidence-only captures can never shadow a deliverable; hash verification still covers the whole run.
+- **Workspace partition:** `writeArtifact` confines freeform model writes to `artifacts/` (published; non-empty `roles` of `requested_output`/`evidence` required) or `scratch/` (private; roles forbidden). Graders select deliverables only from `requested_output` entries, so scratch work and evidence-only captures can never shadow a deliverable; hash verification still covers the whole run.
+- **Managed checklist state:** `checklist/` is a third, internal run area. Only `src/run/checklist.ts` may write it, through `writeArtifact(..., { managedState: 'checklist' })`; entries are hashed but carry no artifact roles or source URL and are never grader deliverables. Freeform `write_file` remains confined to `artifacts/` and `scratch/`.
 - **Grader isolation (eval side):** graders receive only the run directory path and oracle data — never the transcript — so an agent that merely *describes* success cannot pass.
 
 ## Design philosophy (binding project rules)
@@ -94,8 +98,8 @@ The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot
 | Knob | Default | Location |
 | --- | --- | --- |
 | Model | `claude-sonnet-5` | `src/model/callModel.ts` (`DEFAULT_MODEL`) |
-| Max turns | 12 | `src/cli/runTask.ts` (`DEFAULT_MAX_TURNS`) |
-| Cumulative token budget | 250,000 | `src/cli/runTask.ts` (`DEFAULT_MAX_TOKENS`) |
+| Max turns | uncapped (`Infinity`) | `src/cli/runTask.ts` (`DEFAULT_MAX_TURNS`) |
+| Per-request context ceiling | 900,000 tokens | `src/cli/runTask.ts` (`DEFAULT_MAX_CONTEXT_TOKENS`) |
 | Max output tokens per call | 8,192 | `src/cli/runTask.ts` (`DEFAULT_MAX_OUTPUT_TOKENS`) |
 | Tool result cap | 50,000 bytes | `src/tools/capResult.ts` (`DEFAULT_MAX_RESULT_BYTES`; per-tool override via `ToolDef.maxBytes`) |
 | Offload preview size | 2,000 bytes | `src/tools/capResult.ts` (`PREVIEW_MAX_BYTES`) |

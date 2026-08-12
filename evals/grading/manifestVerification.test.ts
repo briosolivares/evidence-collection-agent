@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { initManifest, writeArtifact } from '../../src/run/artifacts.js';
+import { createChecklistTask } from '../../src/run/checklist.js';
 import { sha256Hex } from './hash.js';
 import {
   findArtifactByExtension,
@@ -101,6 +102,27 @@ describe('requestedOutputs', () => {
 
     const outputs = requestedOutputs(readManifest(runDir)).map((entry) => entry.filename);
     expect(outputs).toEqual(['artifacts/answer.csv', 'artifacts/both.png']);
+  });
+
+  it('never selects manifest-tracked checklist state as a deliverable', () => {
+    createChecklistTask(runDir, {
+      subject: 'Prepare the answer',
+      description: 'Write and verify the requested output.',
+    });
+    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('answer\n'), {
+      roles: ['requested_output'],
+    });
+
+    const manifest = readManifest(runDir);
+    expect(manifest.artifacts.map((entry) => entry.filename)).toEqual([
+      'checklist/.highwatermark',
+      'checklist/1.json',
+      'artifacts/answer.csv',
+    ]);
+    expect(requestedOutputs(manifest).map((entry) => entry.filename)).toEqual([
+      'artifacts/answer.csv',
+    ]);
+    expect(verifyManifestHashes(runDir, manifest).passed).toBe(true);
   });
 });
 

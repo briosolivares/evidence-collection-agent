@@ -28,12 +28,15 @@ Give it a task ("Create a CSV of the top 5 stories on Hacker News, with columns 
 runs/2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b/   # date_time_task-slug_suffix (local time)
   artifacts/          # published outputs — the CSVs, screenshots, downloads, answer.md the task asked for
   scratch/            # the agent's private working files (never graded, still hashed)
-  manifest.json       # provenance: SHA-256 hash, source URL, roles, capture time per artifact
+  checklist/          # durable structured task state managed only by checklist tools (never a deliverable)
+  manifest.json       # provenance: SHA-256 hash and metadata for every tracked run file
   transcript.jsonl    # append-only record of every model call and tool call
   metrics.json        # tokens, turns, wall-clock time
 ```
 
 The manifest makes evidence tamper-evident — re-hash any artifact to prove it hasn't changed since collection.
+
+The checklist is run-scoped durable state for non-trivial work. `TaskCreate`, `TaskList`, `TaskGet`, and `TaskUpdate` are the only model-facing interfaces that may mutate `checklist/`; freeform model writes remain limited to `scratch/` and `artifacts/`. Checklist files are hashed into the manifest for provenance but carry no artifact roles. Graders select deliverables only from published `artifacts/` entries marked `requested_output`.
 
 ## Requirements
 

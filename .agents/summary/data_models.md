@@ -11,12 +11,15 @@ runs/<run-id>/
   manifest.json                 # provenance index (initManifest → writeArtifact upserts → finalizeManifest)
   transcript.jsonl              # append-only event log, one JSON object per line
   metrics.json                  # written once, on every exit path
+  checklist/                    # tool-managed task state; never a deliverable
+    .highwatermark              # monotonic numeric task-ID counter
+    1.json                      # one strict task object per live task
   artifacts/                    # everything the agent publishes — answer.md, *.csv, *.png, downloads
   scratch/                      # private agent working state; never graded or shown, still hashed
     tool-output/<tool>-<n>.txt  # offloaded oversize tool results
 ```
 
-**Workspace partition** (enforced by `writeArtifact`, both dirs created by `initManifest`): every write lands under `artifacts/` or `scratch/`. Published (`artifacts/`) entries must carry non-empty `roles` — `requested_output` (the task asked for this file) and/or `evidence` (supporting/audit capture); one artifact may hold both (an explicitly requested screenshot that is also audit evidence). Scratch entries carry no roles — the field's presence is itself the published/private marker. Graders select deliverables exclusively through `requestedOutputs()` and the finders in `evals/grading/manifestVerification.ts`, so scratch files and evidence-only captures can never shadow a deliverable; `verifyManifestHashes` still covers the whole run (tamper evidence is total). External users need not know the directory names — the roles field is the product-facing model.
+**Workspace partition** (enforced by `writeArtifact`, all three dirs created by `initManifest`): ordinary writes land under `artifacts/` or `scratch/`. Published (`artifacts/`) entries must carry non-empty `roles` — `requested_output` (the task asked for this file) and/or `evidence` (supporting/audit capture); one artifact may hold both (an explicitly requested screenshot that is also audit evidence). Scratch entries carry no roles — the field's presence is itself the published/private marker. The internal `checklist/` area is writable only with `managedState: 'checklist'`; its entries are hashed but carry neither roles nor source URLs and are never deliverables. Graders select deliverables exclusively through `requestedOutputs()` and the finders in `evals/grading/manifestVerification.ts`, so scratch, checklist, and evidence-only captures can never shadow a deliverable; `verifyManifestHashes` still covers the whole run (tamper evidence is total). External users need not know the directory names — the roles field is the product-facing model.
 
 **Run ID** (`src/run/runId.ts`): `<date>_<time>_<label-slug>_<6-hex>` in **local 12-hour time** — e.g. `2026-08-10_09-48-32pm_top-5-hacker-news_1adfa7` (slug omitted when no label is given; `runTask` passes the task text; the manifest's `startedAt` keeps the exact UTC instant). Ids sort lexically by date; within a day the 12-hour clock means alphabetical order is not strictly clock order. Collisions throw at `mkdir` rather than reusing a directory.
 
@@ -51,6 +54,23 @@ classDiagram
     }
     Manifest "1" *-- "many" ManifestEntry
 ```
+
+## Checklist task types (`src/run/checklist.ts`)
+
+```ts
+interface ChecklistTask {
+  id: string; // positive decimal ID; never reused after deletion
+  subject: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  activeForm?: string;
+  metadata?: { expectedArtifacts?: string[]; [key: string]: unknown };
+}
+```
+
+The strict schema is used for both writes and reads. `createChecklistTask` allocates IDs from the durable high-water mark (or the highest task on first resume); `listChecklistTasks` sorts numerically. `TaskUpdate` merges metadata keys and treats `null` as deletion; `status: 'deleted'` removes the JSON and matching manifest entry without lowering the high-water mark. Transitioning to `completed` rejects when any `metadata.expectedArtifacts` path is missing or lacks a published `requested_output` manifest entry, leaving the task unchanged. `onChecklistUpdated` is an invalidation signal emitted only after successful mutations; consumers reread disk rather than trusting tool-result text.
+
+The TUI subscription exposes a readonly snapshot `{ tasks, visible }`. It loads from the run directory, watches and polls checklist files, retains the last valid snapshot during malformed writes, hides empty lists, and temporarily shows all-completed lists before hiding them without deleting task files.
 
 - `ManifestEntry.sha256` is computed from the exact bytes at capture time — the tamper-evidence mechanism. `filename` is normalized run-dir-relative (so `artifacts/data.csv` and `./artifacts/data.csv` collapse); rewriting a path **upserts** the entry. `roles` (`ArtifactRole = 'requested_output' | 'evidence'`) is present exactly on published (`artifacts/`) entries.
 - `TranscriptEvent` (`src/run/transcript.ts`) is open-ended (`{ type: string, ...}`); the loop writes exactly four shapes: `model_request {turn, messages}`, `model_response {turn, response}`, `tool_call {turn, call}`, `tool_result {turn, result}`. Tool events are bracketed — all `tool_call`s appended in request order before execution, all `tool_result`s after every call settles — so parallel completion order is never observable in the transcript.
