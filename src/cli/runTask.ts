@@ -33,12 +33,19 @@ const DEFAULT_MAX_OUTPUT_TOKENS = 8_192;
 // completion, and the context ceiling below still guarantees termination
 // (per-request context grows every turn). Pass a finite maxTurns to cap.
 const DEFAULT_MAX_TURNS = Infinity;
-// Per-request context ceiling (see LoopConfig.maxContextTokens). 200k:
-// Step 0 measured medium-task context growing ~3k tokens/turn toward
-// ~150-220k at the ~50-70-turn completion depth, so 100k would bind before
-// completion; if runs die at 200k the remedy is cheaper repeat-page
-// representation, not a bigger cap.
-const DEFAULT_MAX_CONTEXT_TOKENS = 200_000;
+// Per-request context ceiling (see LoopConfig.maxContextTokens). 900k:
+// claude-sonnet-5's real context window is 1M tokens (verified against
+// current model docs 2026-08-11 — the prior 200k default assumed a 200k
+// window), so 900k opens ~5x headroom over the deepest observed run while
+// keeping termination graceful: the run ends budget_exceeded with metrics
+// and gradable artifacts instead of crashing into the API's 1M wall as a
+// 400. The 100k margin absorbs the guard's post-hoc overshoot (a single
+// turn added ~15k at most) plus output. Note this ceiling is also the
+// de-facto cost guard — deep-run spend is dominated by cache reads (0.1x
+// input price) and scales roughly linearly with it. If runs die here,
+// cheaper repeat-page representation remains the remedy of record, not a
+// bigger cap.
+const DEFAULT_MAX_CONTEXT_TOKENS = 900_000;
 
 /** Configuration for one complete evidence-collection run. */
 export interface RunTaskConfig {
@@ -59,7 +66,8 @@ export interface RunTaskConfig {
    * the context ceiling is then the run's terminating guard. */
   maxTurns?: number;
   /** Per-request context ceiling (see LoopConfig.maxContextTokens);
-   * defaults to 200000. */
+   * defaults to 900000 (just under the model's 1M window, so runs end
+   * budget_exceeded instead of crashing on the API's context limit). */
   maxContextTokens?: number;
   /** Optional callback for production model streaming progress. */
   onProgress?: (event: ProgressEvent) => void;

@@ -126,6 +126,29 @@ describe('runEvals', () => {
     });
   });
 
+  it('awaits onTrialGraded after every trial with that trial\'s grade, in order', async () => {
+    const seen: Array<{ taskName: string; trialIndex: number; runDir: string }> = [];
+    const report = await runEvals([stubTask()], 3, {
+      runTask: makeFakeRunTask(baseDir),
+      model: 'fake-model',
+      toolProfile: 'atomic',
+      onTrialGraded: async (taskName, trialIndex, grade) => {
+        // Async on purpose: the runner must await the hook (persistence
+        // must complete before the next trial can crash the process).
+        await Promise.resolve();
+        expect(grade.assertions.length).toBeGreaterThan(0);
+        seen.push({ taskName, trialIndex, runDir: grade.runDir });
+      },
+    });
+
+    expect(seen).toHaveLength(3);
+    expect(seen.map((s) => s.trialIndex)).toEqual([0, 1, 2]);
+    for (const [i, s] of seen.entries()) {
+      expect(s.taskName).toBe('stub');
+      expect(s.runDir).toBe(report.tasks[0]!.trials[i]!.runDir);
+    }
+  });
+
   it('rejects k < 1, an empty task list, and a grader returning no assertions', async () => {
     const deps = {
       runTask: makeFakeRunTask(baseDir),

@@ -11,6 +11,13 @@ export interface EvalRunnerDeps {
   model: string;
   /** Deterministic tool surface every trial ran with. */
   toolProfile: ToolProfile;
+  /** Optional hook awaited after each trial is graded, with the grade just
+   * recorded. Exists so callers can persist grades incrementally — without
+   * it, grades live only in this process's memory until the report returns,
+   * and a crash on a later trial discards every finished trial's grading
+   * (the failure regrade.ts recovers from). Callers own their error
+   * handling; a rejection here propagates and aborts the eval. */
+  onTrialGraded?: (taskName: string, trialIndex: number, grade: TrialGrade) => void | Promise<void>;
 }
 
 /** The full result of one eval invocation, over all tasks and trials. */
@@ -78,7 +85,9 @@ export async function runEvals(
       if (assertions.length === 0) {
         throw new Error(`grader for task "${task.name}" returned no assertions`);
       }
-      trials.push({ runDir, assertions, latencyMs });
+      const grade: TrialGrade = { runDir, assertions, latencyMs };
+      trials.push(grade);
+      await deps.onTrialGraded?.(task.name, i, grade);
     }
     taskReports.push(summarizeTask(task.name, trials));
   }
