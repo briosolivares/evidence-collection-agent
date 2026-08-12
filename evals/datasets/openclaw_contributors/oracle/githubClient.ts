@@ -22,14 +22,21 @@ export const REPO_NAME = 'openclaw';
 /** How many rows the task's CSV must have. */
 export const REQUIRED_ROW_COUNT = 30;
 
-/** How many top contributors the oracle keeps. Larger than the task's 30 so
- *  ranking-edge disagreements (e.g. an agent excluding a bot account, or
- *  commit-count ties ordered differently on the website) don't fail rows
- *  that are honestly top-30-ish. */
-export const CONTRIBUTOR_WINDOW_SIZE = 40;
+/** How many top contributors the oracle keeps. Larger than the task's 30
+ *  because the website's contributors graph — ruled a valid, correct source
+ *  for this task (user/Tina decision, 2026-08-11) — ranks differently from
+ *  this REST endpoint: the graph credits `Co-authored-by:` trailers and
+ *  orders ties differently, so handles the site shows at ranks ~23–30 sit
+ *  at API ranks 41–70. 100 (the per_page maximum, one request) absorbs
+ *  that spread while a wrong repo, an invented handle, or a wrong page
+ *  still lands far outside it. */
+export const CONTRIBUTOR_WINDOW_SIZE = 100;
 
-/** How many of the CSV's 30 handles must fall inside the oracle window —
- *  tolerance for the ranking-edge disagreements above. */
+/** How many of the CSV's 30 handles must fall inside the oracle window.
+ *  The remaining tolerance is spent on contributors the REST API cannot
+ *  see at any window size: co-author-credited accounts (e.g. agent
+ *  identities credited only via trailers) that the site's graph ranks in
+ *  its top 30 — accepted as correct rows per the same ruling. */
 export const MIN_MATCHING_HANDLES = 25;
 
 /** One contributor, as the oracle reports it. */
