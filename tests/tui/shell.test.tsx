@@ -47,10 +47,10 @@ describe('sherlock shell', () => {
     expect(output).toContain('╭─ Sherlock — evidence collection agent ─');
     // Bold centered welcome line with the injected first name.
     expect(output).toContain('Welcome back Brios!');
-    // The magnifying-glass glyph art (lens rows + gem + handle).
-    expect(output).toContain('╭╯   ╰╮');
-    expect(output).toContain('│  ◆  │');
-    expect(output).toContain('╰───╯╲');
+    // The owl illustration (eye row, collar line, shaded chest).
+    expect(output).toContain('(( ◉ ))(( ◉ ))');
+    expect(output).toContain(",__  \\  '~~\\/~~'  /  __,");
+    expect(output).toContain('|▒▒▓▓▒▒|');
     // Muted `model · cwd` footer.
     expect(output).toContain('claude-sonnet-5 · ~/Desktop/Code/evidence-collection-agent');
     unmount();
@@ -64,7 +64,7 @@ describe('sherlock shell', () => {
     const output = frames.join('\n');
     expect(output).toContain('╭─ Sherlock — evidence collection agent ─');
     expect(output).toContain('Welcome back!');
-    expect(output).toContain('│  ◆  │');
+    expect(output).toContain('(( ◉ ))(( ◉ ))');
     // No identity → no model · cwd footer.
     expect(output).not.toContain(' · ');
     unmount();

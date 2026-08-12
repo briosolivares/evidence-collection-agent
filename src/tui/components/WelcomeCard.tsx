@@ -1,6 +1,7 @@
 import { Box, Text, useStdout } from 'ink';
 
 import { middleTruncate, truncate } from '../format.js';
+import { OWL_LINES, OWL_WIDTH, owlLineSegments, type OwlRole } from '../owl.js';
 import type { BannerIdentity } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 
@@ -14,23 +15,15 @@ const MAX_WIDTH = 64;
 const CHROME = 4;
 
 /**
- * The deterministic magnifying-glass art: an octagonal lens with the
- * evidence ◆ at its focus and a diagonal handle. Every character is a
- * one-column box-drawing/geometric glyph, so each row's string length is
- * its display width.
+ * Theme color per owl role: the ◉ pupils are the only saturated element,
+ * the ░▒▓ chest shading sits one step darker, and every structural stroke
+ * stays muted so the illustration reads as line art.
  */
-const ART = {
-  top: ' ╭───╮',
-  upper: '╭╯   ╰╮',
-  midLeft: '│  ',
-  gem: glyphs.evidence,
-  midRight: '  │',
-  lower: '╰╮   ╭╯',
-  bottom: ' ╰───╯╲',
-  handle: '       ╲',
-  /** Widest row — the column box the art left-aligns inside. */
-  width: 8,
-} as const;
+const OWL_COLORS: Record<OwlRole, string> = {
+  feather: theme.muted,
+  pupil: theme.emphasis,
+  shade: theme.activity,
+};
 
 /**
  * The custom top border: Ink has no native border title, so the top line
@@ -56,10 +49,11 @@ function footerLine(identity: BannerIdentity, contentWidth: number): string {
 /**
  * The startup welcome card (the banner transcript item): round border in
  * the primary color with the title in the top border chrome, a bold
- * centered welcome line, the magnifying-glass art, and a muted
- * `model · cwd` footer. Without an injected identity it falls back to a
- * generic card (no name, no footer). Lives in <Static>, so the terminal
- * width is read once at first render — acceptable for a startup card.
+ * centered welcome line, the detective-owl illustration, and a muted
+ * `model · cwd` footer. Terminals too narrow for the owl omit it rather
+ * than wrap it. Without an injected identity it falls back to a generic
+ * card (no name, no footer). Lives in <Static>, so the terminal width is
+ * read once at first render — acceptable for a startup card.
  */
 export function WelcomeCard({
   apiKeyPresent,
@@ -88,22 +82,25 @@ export function WelcomeCard({
         <Box justifyContent="center">
           <Text bold>{truncate(welcome, contentWidth)}</Text>
         </Box>
-        <Box justifyContent="center" marginTop={1}>
-          <Box flexDirection="column" width={ART.width}>
-            <Text color={theme.activity}>{ART.top}</Text>
-            <Text color={theme.activity}>{ART.upper}</Text>
-            <Text>
-              <Text color={theme.activity}>{ART.midLeft}</Text>
-              <Text color={theme.emphasis} bold>
-                {ART.gem}
-              </Text>
-              <Text color={theme.activity}>{ART.midRight}</Text>
-            </Text>
-            <Text color={theme.activity}>{ART.lower}</Text>
-            <Text color={theme.activity}>{ART.bottom}</Text>
-            <Text color={theme.activity}>{ART.handle}</Text>
+        {contentWidth >= OWL_WIDTH && (
+          <Box justifyContent="center" marginTop={1}>
+            <Box flexDirection="column" width={OWL_WIDTH}>
+              {OWL_LINES.map((line, row) => (
+                <Text key={row}>
+                  {owlLineSegments(line).map((segment, i) => (
+                    <Text
+                      key={i}
+                      bold={segment.role === 'pupil'}
+                      color={OWL_COLORS[segment.role]}
+                    >
+                      {segment.text}
+                    </Text>
+                  ))}
+                </Text>
+              ))}
+            </Box>
           </Box>
-        </Box>
+        )}
         {identity !== undefined && (
           <Box justifyContent="center" marginTop={1}>
             <Text color={theme.muted}>{footerLine(identity, contentWidth)}</Text>
