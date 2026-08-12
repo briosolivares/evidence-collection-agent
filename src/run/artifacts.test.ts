@@ -30,28 +30,30 @@ describe('writeArtifact', () => {
   });
 
   it('records the SHA-256 known-answer vector for "abc"', () => {
-    const entry = writeArtifact(runDir, 'abc.txt', Buffer.from('abc'));
+    const entry = writeArtifact(runDir, 'artifacts/abc.txt', Buffer.from('abc'), {
+      roles: ['requested_output'],
+    });
 
     expect(entry.sha256).toBe(SHA256_OF_ABC);
     const manifest = readManifestFile();
     expect(manifest.artifacts).toHaveLength(1);
-    expect(manifest.artifacts[0]).toMatchObject({ filename: 'abc.txt', sha256: SHA256_OF_ABC });
+    expect(manifest.artifacts[0]).toMatchObject({ filename: 'artifacts/abc.txt', sha256: SHA256_OF_ABC });
   });
 
   it('writes the exact bytes given, and re-hashing the file on disk matches the recorded hash', () => {
     // Binary content (all 256 byte values) so text-mode mangling would be caught.
     const bytes = Buffer.from(Array.from({ length: 256 }, (_, i) => i));
-    const entry = writeArtifact(runDir, 'blob.bin', bytes);
+    const entry = writeArtifact(runDir, 'scratch/blob.bin', bytes);
 
-    const onDisk = readFileSync(join(runDir, 'blob.bin'));
+    const onDisk = readFileSync(join(runDir, 'scratch/blob.bin'));
     expect(onDisk.equals(bytes)).toBe(true);
     expect(createHash('sha256').update(onDisk).digest('hex')).toBe(entry.sha256);
   });
 
   it('upserts: writing the same path twice yields one entry carrying the new hash', () => {
-    writeArtifact(runDir, 'data.csv', Buffer.from('old contents'));
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('old contents'), { roles: ['requested_output'] });
     const second = Buffer.from('new contents');
-    writeArtifact(runDir, 'data.csv', second);
+    writeArtifact(runDir, 'artifacts/data.csv', second, { roles: ['requested_output'] });
 
     const manifest = readManifestFile();
     expect(manifest.artifacts).toHaveLength(1);
@@ -59,31 +61,36 @@ describe('writeArtifact', () => {
   });
 
   it('upserts equivalent spellings of the same path into one entry', () => {
-    writeArtifact(runDir, 'data.csv', Buffer.from('one'));
-    writeArtifact(runDir, './data.csv', Buffer.from('two'));
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('one'), { roles: ['requested_output'] });
+    writeArtifact(runDir, './artifacts/data.csv', Buffer.from('two'), { roles: ['requested_output'] });
 
     const manifest = readManifestFile();
     expect(manifest.artifacts).toHaveLength(1);
-    expect(manifest.artifacts[0]!.filename).toBe('data.csv');
+    expect(manifest.artifacts[0]!.filename).toBe('artifacts/data.csv');
   });
 
   it('keeps distinct paths as distinct entries', () => {
-    writeArtifact(runDir, 'a.txt', Buffer.from('a'));
-    writeArtifact(runDir, 'b.txt', Buffer.from('b'));
+    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
 
     expect(readManifestFile().artifacts).toHaveLength(2);
   });
 
   it('creates parent directories for nested artifact paths', () => {
-    const entry = writeArtifact(runDir, 'sub/dir/file.bin', Buffer.from('nested'));
+    const entry = writeArtifact(runDir, 'artifacts/sub/dir/file.bin', Buffer.from('nested'), {
+      roles: ['evidence'],
+    });
 
-    expect(entry.filename).toBe('sub/dir/file.bin');
-    expect(existsSync(join(runDir, 'sub', 'dir', 'file.bin'))).toBe(true);
+    expect(entry.filename).toBe('artifacts/sub/dir/file.bin');
+    expect(existsSync(join(runDir, 'artifacts', 'sub', 'dir', 'file.bin'))).toBe(true);
   });
 
   it('records sourceUrl when provided and omits the key otherwise', () => {
-    writeArtifact(runDir, 'page.png', Buffer.from('img'), { sourceUrl: 'https://example.com/page' });
-    writeArtifact(runDir, 'notes.md', Buffer.from('text'));
+    writeArtifact(runDir, 'artifacts/page.png', Buffer.from('img'), {
+      sourceUrl: 'https://example.com/page',
+      roles: ['evidence'],
+    });
+    writeArtifact(runDir, 'scratch/notes.md', Buffer.from('text'));
 
     const [withUrl, withoutUrl] = readManifestFile().artifacts;
     expect(withUrl!.sourceUrl).toBe('https://example.com/page');
@@ -110,6 +117,47 @@ describe('writeArtifact', () => {
     expect(existsSync(join(dirname(runDir), 'evil.txt'))).toBe(false);
     expect(readManifestFile().artifacts).toHaveLength(0);
   });
+
+  it('rejects paths outside artifacts/ and scratch/ and writes nothing', () => {
+    for (const path of ['loose.csv', 'sub/loose.csv', 'artifacts', 'scratch']) {
+      expect(() => writeArtifact(runDir, path, Buffer.from('x'))).toThrow(/artifacts\/.*scratch\//);
+    }
+
+    expect(existsSync(join(runDir, 'loose.csv'))).toBe(false);
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+
+  it('normalizes traversal between the workspaces before applying the partition rules', () => {
+    // Resolves to scratch/x.csv, so roles must be absent — the spelling
+    // cannot smuggle a role onto a scratch file.
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/../scratch/x.csv', Buffer.from('x'), {
+        roles: ['requested_output'],
+      }),
+    ).toThrow(/scratch/);
+
+    const entry = writeArtifact(runDir, 'artifacts/../scratch/x.csv', Buffer.from('x'));
+    expect(entry.filename).toBe('scratch/x.csv');
+  });
+
+  it('rejects published writes without a non-empty roles list, writing nothing', () => {
+    expect(() => writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('x'))).toThrow(/role/);
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('x'), { roles: [] }),
+    ).toThrow(/role/);
+
+    expect(existsSync(join(runDir, 'artifacts/answer.csv'))).toBe(false);
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+
+  it('rejects scratch writes that carry roles, writing nothing', () => {
+    expect(() =>
+      writeArtifact(runDir, 'scratch/private.csv', Buffer.from('x'), { roles: ['evidence'] }),
+    ).toThrow(/scratch/);
+
+    expect(existsSync(join(runDir, 'scratch/private.csv'))).toBe(false);
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
 });
 
 describe('manifest lifecycle', () => {
@@ -121,8 +169,11 @@ describe('manifest lifecycle', () => {
     expect(Number.isNaN(Date.parse(manifest.startedAt))).toBe(false);
     expect(manifest.artifacts).toEqual([]);
 
-    writeArtifact(runDir, 'a.txt', Buffer.from('a'), { sourceUrl: 'https://example.com/a' });
-    writeArtifact(runDir, 'b.txt', Buffer.from('b'));
+    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), {
+      sourceUrl: 'https://example.com/a',
+      roles: ['evidence'],
+    });
+    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
     finalizeManifest(runDir);
 
     manifest = readManifestFile();
@@ -150,8 +201,10 @@ describe('manifest lifecycle', () => {
   });
 
   it('writeArtifact before initManifest throws and writes no file', () => {
-    expect(() => writeArtifact(runDir, 'orphan.txt', Buffer.from('x'))).toThrow();
-    expect(existsSync(join(runDir, 'orphan.txt'))).toBe(false);
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/orphan.txt', Buffer.from('x'), { roles: ['requested_output'] }),
+    ).toThrow(/manifest/);
+    expect(existsSync(join(runDir, 'artifacts/orphan.txt'))).toBe(false);
   });
 
   it('finalizeManifest without a manifest throws', () => {
