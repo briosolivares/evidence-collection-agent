@@ -1,7 +1,11 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
 
-import { EvalsMenu, validateK } from '../../src/tui/components/EvalsMenu.js';
+import {
+  EvalsMenu,
+  validateConcurrency,
+  validateK,
+} from '../../src/tui/components/EvalsMenu.js';
 import { ESC, tick } from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
@@ -28,8 +32,20 @@ describe('validateK', () => {
   });
 });
 
+describe('validateConcurrency', () => {
+  it('accepts only positive integers', () => {
+    expect(validateConcurrency('3')).toBe(3);
+    expect(validateConcurrency('0')).toBeUndefined();
+    expect(validateConcurrency('1.5')).toBeUndefined();
+  });
+});
+
 describe('EvalsMenu', () => {
-  const tasks = ['edgar', 'hacker_news', 'stub'];
+  const tasks = [
+    { name: 'edgar', requiresAuth: false },
+    { name: 'hacker_news', requiresAuth: false },
+    { name: 'stub', requiresAuth: true },
+  ];
 
   it('toggles checkboxes with space and requires a selection', async () => {
     const { lastFrame, stdin, unmount } = render(
@@ -49,7 +65,7 @@ describe('EvalsMenu', () => {
     unmount();
   });
 
-  it('confirms a multi-select with the default k=3', async () => {
+  it('confirms a multi-select with default k=3 and concurrency=3', async () => {
     const onConfirm = vi.fn();
     const { lastFrame, stdin, unmount } = render(
       <EvalsMenu tasks={tasks} onConfirm={onConfirm} onClose={() => {}} />,
@@ -64,9 +80,12 @@ describe('EvalsMenu', () => {
     stdin.write(ENTER); // to k stage
     await tick();
     expect(lastFrame()).toContain('k: 3');
-    stdin.write(ENTER); // confirm default
+    stdin.write(ENTER); // to concurrency stage
     await tick();
-    expect(onConfirm).toHaveBeenCalledWith(['edgar', 'hacker_news'], 3);
+    expect(lastFrame()).toContain('concurrency: 3');
+    stdin.write(ENTER); // confirm defaults
+    await tick();
+    expect(onConfirm).toHaveBeenCalledWith(['edgar', 'hacker_news'], 3, 3);
     unmount();
   });
 
@@ -92,9 +111,11 @@ describe('EvalsMenu', () => {
     await tick();
     stdin.write('2');
     await tick();
-    stdin.write(ENTER);
+    stdin.write(ENTER); // to concurrency stage
     await tick();
-    expect(onConfirm).toHaveBeenCalledWith(['edgar'], 2);
+    stdin.write(ENTER); // confirm default concurrency
+    await tick();
+    expect(onConfirm).toHaveBeenCalledWith(['edgar'], 2, 3);
     unmount();
   });
 
@@ -132,6 +153,15 @@ describe('EvalsMenu', () => {
     stdin.write(ESC);
     await tick(150);
     expect(onClose).toHaveBeenCalledTimes(1);
+    unmount();
+  });
+
+  it('marks authenticated tasks in the selection list', async () => {
+    const { lastFrame, unmount } = render(
+      <EvalsMenu tasks={tasks} onConfirm={() => {}} onClose={() => {}} />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('stub [auth]');
     unmount();
   });
 });

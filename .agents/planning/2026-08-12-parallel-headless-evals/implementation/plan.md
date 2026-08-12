@@ -12,7 +12,7 @@
 - [x] Step 2 — Eval-owned browser lifecycle helpers
 - [x] Step 3 — Concurrent deterministic shared runner
 - [x] Step 4 — Standalone CLI wiring
-- [ ] Step 5 — Sherlock `/evals` wiring
+- [x] Step 5 — Sherlock `/evals` wiring
 - [ ] Step 6 — Documentation and full verification
 
 ## Decisions

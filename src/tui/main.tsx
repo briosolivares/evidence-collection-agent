@@ -1,4 +1,4 @@
-// Sherlock entry point: env load, preflight, persistent-browser launch,
+// Sherlock entry point: env load, preflight, lazy browser runtimes,
 // render(<App/>), teardown.
 import { render } from 'ink';
 import { execFileSync } from 'node:child_process';
@@ -10,6 +10,7 @@ import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserC
 // Read-only import of the core's default model id for the welcome card —
 // the sanctioned touch-point; the core itself stays untouched.
 import { DEFAULT_MODEL } from '../model/callModel.js';
+import { createTuiEvalRuntime } from './bridge/evalRuntime.js';
 import { createTuiRuntime } from './bridge/runtime.js';
 import { App } from './components/App.js';
 import { createConfig } from './config.js';
@@ -82,18 +83,27 @@ const config = createConfig({
   evalResultsDir: resolve(REPO_ROOT, 'runs', 'eval-results'),
 });
 
-// One persistent, headed Chrome for the whole session (same profile-dir
-// semantics as the REPL); each run gets a fresh tab. The demo needs no
-// browser — it never leaves the UI pipeline.
+const authenticatedProfileDir = resolve(REPO_ROOT, 'chrome-profile');
+
+// The headed persistent browser launches lazily on the first interactive
+// or authenticated run. Normal evals use the separate headless runtime.
 const runtime = demo
   ? undefined
   : createTuiRuntime({
       browserSessionProvider: new LocalChromeBrowserSessionProvider({
-        profileDir: resolve(REPO_ROOT, 'chrome-profile'),
+        profileDir: authenticatedProfileDir,
       }),
       runsBaseDir: config.runsBaseDir,
     });
 await runtime?.start();
+const evalRuntime =
+  runtime === undefined
+    ? undefined
+    : createTuiEvalRuntime({
+        authenticatedRunner: (task, onEvent, opts) => runtime.startRun(task, onEvent, opts),
+        authenticatedProfileDir,
+        runsBaseDir: config.runsBaseDir,
+      });
 
 try {
   const instance = render(
@@ -107,10 +117,12 @@ try {
           ? undefined
           : (task, onEvent, opts) => runtime.startRun(task, onEvent, opts)
       }
+      evalRunner={evalRuntime?.startRun}
     />,
     { exitOnCtrlC: true },
   );
   await instance.waitUntilExit();
 } finally {
+  await evalRuntime?.close();
   await runtime?.shutdown();
 }
