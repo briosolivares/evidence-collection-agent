@@ -90,6 +90,19 @@ describe('writeArtifact', () => {
     expect(withoutUrl).not.toHaveProperty('sourceUrl');
   });
 
+  it('records roles when provided — including both roles on one artifact — and omits the key otherwise', () => {
+    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/proof.png', Buffer.from('b'), {
+      roles: ['requested_output', 'evidence'],
+    });
+    writeArtifact(runDir, 'scratch/working.csv', Buffer.from('c'));
+
+    const [single, both, none] = readManifestFile().artifacts;
+    expect(single!.roles).toEqual(['requested_output']);
+    expect(both!.roles).toEqual(['requested_output', 'evidence']);
+    expect(none).not.toHaveProperty('roles');
+  });
+
   it('rejects artifact paths that escape the run directory and writes nothing', () => {
     expect(() => writeArtifact(runDir, '../evil.txt', Buffer.from('x'))).toThrow();
     expect(() => writeArtifact(runDir, '/tmp/evil.txt', Buffer.from('x'))).toThrow();
@@ -127,6 +140,13 @@ describe('manifest lifecycle', () => {
   it('initManifest refuses to overwrite an existing manifest', () => {
     initManifest(runDir, 'first');
     expect(() => initManifest(runDir, 'second')).toThrow();
+  });
+
+  it('initManifest creates the artifacts/ and scratch/ workspace directories', () => {
+    initManifest(runDir, 'task');
+
+    expect(existsSync(join(runDir, 'artifacts'))).toBe(true);
+    expect(existsSync(join(runDir, 'scratch'))).toBe(true);
   });
 
   it('writeArtifact before initManifest throws and writes no file', () => {

@@ -7,6 +7,22 @@ import { resolveRunPath } from './runDir.js';
 /** Name of the manifest file inside every run directory. */
 export const MANIFEST_FILENAME = 'manifest.json';
 
+/** Run-dir subdirectory holding everything the agent publishes. */
+export const ARTIFACTS_DIR = 'artifacts';
+
+/** Run-dir subdirectory holding private agent working state — never graded
+ * or shown, though still hashed into the manifest (tamper evidence is
+ * total). */
+export const SCRATCH_DIR = 'scratch';
+
+/**
+ * Semantic role of a published artifact: the task explicitly asked for the
+ * file (`requested_output`), or it is a supporting/audit capture backing the
+ * outputs (`evidence`). One artifact may hold both roles — e.g. an
+ * explicitly requested screenshot that also serves as audit evidence.
+ */
+export type ArtifactRole = 'requested_output' | 'evidence';
+
 /** Provenance record for one artifact in the run directory. */
 export interface ManifestEntry {
   /** Run-dir-relative path of the artifact file. */
@@ -15,6 +31,10 @@ export interface ManifestEntry {
   sha256: string;
   /** URL the artifact was captured from, when one applies. */
   sourceUrl?: string;
+  /** Semantic roles of a published artifact. Present exactly when the file
+   * lives under artifacts/ — scratch entries carry no roles, so the field's
+   * presence is itself the published/private marker. */
+  roles?: ArtifactRole[];
   /** ISO 8601 timestamp of when the artifact was written. */
   capturedAt: string;
 }
@@ -35,6 +55,9 @@ export interface Manifest {
 export interface ArtifactMeta {
   /** URL the artifact was captured from, recorded in its manifest entry. */
   sourceUrl?: string;
+  /** Semantic roles for a published (artifacts/) write, recorded in its
+   * manifest entry. Scratch writes carry none. */
+  roles?: ArtifactRole[];
 }
 
 /**
@@ -45,7 +68,9 @@ export interface ArtifactMeta {
  *   bug, and overwriting would erase recorded provenance)
  * @param taskText - the task the run was started with, recorded verbatim
  * @returns nothing; <runDir>/manifest.json now holds valid JSON with the
- *   task text, a start timestamp, and an empty artifact list
+ *   task text, a start timestamp, and an empty artifact list, and the
+ *   artifacts/ and scratch/ subdirectories exist — the workspace layout is
+ *   in place before the loop's first turn, like the manifest itself
  */
 export function initManifest(runDir: string, taskText: string): void {
   const manifest: Manifest = {
@@ -55,6 +80,8 @@ export function initManifest(runDir: string, taskText: string): void {
   };
   // 'wx' fails if the file exists — the guard against double-init.
   writeFileSync(manifestPath(runDir), serializeManifest(manifest), { flag: 'wx' });
+  mkdirSync(join(runDir, ARTIFACTS_DIR), { recursive: true });
+  mkdirSync(join(runDir, SCRATCH_DIR), { recursive: true });
 }
 
 /**
@@ -68,8 +95,8 @@ export function initManifest(runDir: string, taskText: string): void {
  *   directory (see resolveRunPath); throws (writing nothing) if it escapes.
  *   Missing parent directories are created
  * @param bytes - the artifact's content, written to disk exactly as given
- * @param meta - optional provenance; a given sourceUrl is recorded in the
- *   artifact's manifest entry
+ * @param meta - optional provenance; a given sourceUrl and given roles are
+ *   recorded in the artifact's manifest entry
  * @returns the manifest entry now on record for this artifact: its
  *   normalized run-dir-relative filename, the SHA-256 of the exact bytes
  *   written, the sourceUrl if given, and the capture timestamp. The
@@ -96,6 +123,7 @@ export function writeArtifact(
     filename: relative(resolve(runDir), absPath),
     sha256: createHash('sha256').update(bytes).digest('hex'),
     ...(meta.sourceUrl !== undefined ? { sourceUrl: meta.sourceUrl } : {}),
+    ...(meta.roles !== undefined ? { roles: meta.roles } : {}),
     capturedAt: new Date().toISOString(),
   };
 
