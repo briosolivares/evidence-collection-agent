@@ -5,7 +5,7 @@
 - [x] Step 1: Implement and verify the isolated `browser_batch` tool
 - [x] Step 2: Add deterministic tool profiles and wire every composition point
 - [x] Step 3: Add eval condition metadata and the experiment analyzer
-- [ ] Step 4: Verify the complete feature and run a local live smoke test
+- [x] Step 4: Verify the complete feature and run a local live smoke test
 - [ ] Step 5: Run the easy-suite A/B experiment and publish the report
 - [ ] Step 6: Make and record the rollout decision
 
