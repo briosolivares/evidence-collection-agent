@@ -46,9 +46,26 @@ export type Grader = (
  * @returns the absolute path of the trial's finished run directory,
  *   containing at least a finalized manifest.json
  */
+export interface EvalRunOptions {
+  /** Starting page declared by the dataset, when present. */
+  startUrl?: string;
+  /** Stable dataset name, never inferred from task text. */
+  taskName: string;
+  /** Zero-based trial index used for deterministic result placement. */
+  trialIndex: number;
+  /** One-based trial number used for human-facing progress. */
+  trialNumber: number;
+  /** Total trials requested for this task. */
+  k: number;
+  /** Browser policy declared by the dataset. */
+  requiresAuth: boolean;
+  /** Aborted when the batch is cancelled or another trial fails fatally. */
+  signal: AbortSignal;
+}
+
 export type RunTaskFn = (
   taskText: string,
-  opts: { startUrl?: string },
+  opts: EvalRunOptions,
 ) => Promise<{ runDir: string }>;
 
 /** One eval task, loaded from evals/<name>/, ready for the runner. */

@@ -1,23 +1,41 @@
-import { summarizeTask, type TaskReport, type TrialGrade } from '../metrics/metrics.js';
 import type { ToolProfile } from '../../src/tools/index.js';
-import type { EvalTask, RunTaskFn } from '../types.js';
+import { summarizeTask, type TaskReport, type TrialGrade } from '../metrics/metrics.js';
+import type { EvalRunOptions, EvalTask, RunTaskFn } from '../types.js';
+
+export interface EvalTrialJob extends EvalRunOptions {
+  /** Input-order position of the task, used only for deterministic result placement. */
+  taskIndex: number;
+}
+
+/** Cancellation is a batch outcome, not a failed trial or grader assertion. */
+export class EvalRunCancelledError extends Error {
+  constructor() {
+    super('eval batch cancelled');
+    this.name = 'EvalRunCancelledError';
+  }
+}
 
 /** What the runner needs injected: the agent under evaluation. */
 export interface EvalRunnerDeps {
-  /** Runs one full trial; the real T14 runTask or a fake. */
+  /** Runs one full trial; the real runTask composition or a fake. */
   runTask: RunTaskFn;
-  /** Name of the model the injected agent runs with, recorded verbatim in
-   * the report so past experiments stay comparable across model changes. */
+  /** Maximum simultaneous normal/headless trials. */
+  concurrency: number;
+  /** Name of the model every trial uses, recorded verbatim. */
   model: string;
-  /** Deterministic tool surface every trial ran with. */
+  /** Deterministic tool surface every trial uses. */
   toolProfile: ToolProfile;
-  /** Optional hook awaited after each trial is graded, with the grade just
-   * recorded. Exists so callers can persist grades incrementally — without
-   * it, grades live only in this process's memory until the report returns,
-   * and a crash on a later trial discards every finished trial's grading
-   * (the failure regrade.ts recovers from). Callers own their error
-   * handling; a rejection here propagates and aborts the eval. */
-  onTrialGraded?: (taskName: string, trialIndex: number, grade: TrialGrade) => void | Promise<void>;
+  /** Optional batch cancellation signal. */
+  signal?: AbortSignal;
+  /** Lifecycle hooks carry full job identity so concurrent output stays attributable. */
+  onTrialStarted?: (job: EvalTrialJob) => void | Promise<void>;
+  onTrialRunFinished?: (
+    job: EvalTrialJob,
+    runDir: string,
+    latencyMs: number,
+  ) => void | Promise<void>;
+  /** Awaited inside the serialized grading queue for crash-safe persistence. */
+  onTrialGraded?: (job: EvalTrialJob, grade: TrialGrade) => void | Promise<void>;
 }
 
 /** The full result of one eval invocation, over all tasks and trials. */
@@ -28,6 +46,8 @@ export interface EvalReport {
   finishedAt: string;
   /** Trials per task this report was run with. */
   k: number;
+  /** Maximum simultaneous normal/headless trials. */
+  concurrency: number;
   /** Name of the model every trial ran with. */
   model: string;
   /** Tool condition every trial used. */
@@ -37,21 +57,10 @@ export interface EvalReport {
 }
 
 /**
- * Run every given task for k trials each and grade every trial — the one
- * parameterized runner behind every eval mode (k=1 debugging, k=3
- * consistency, subsets, full suite).
- *
- * Trials run sequentially (checkpoint-1 baseline). Each trial is one
- * deps.runTask call; its oracle is fetched at grading time, and its grader
- * is handed exactly the trial's run directory path and that oracle data —
- * nothing else (the design's standing rule).
- *
- * @param tasks - the tasks to evaluate, in order; throws if empty
- * @param k - trials per task; throws unless a positive integer
- * @param deps - the injected agent; each trial awaits one runTask call
- * @returns a report with per-trial grades and latencies and per-task
- *   aggregate metrics (accuracy, completion, task pass); throws if a grader
- *   returns zero assertions
+ * Run normal trials through a bounded pool and authenticated trials through
+ * a separate serial lane. Browser/model work is concurrent; fresh oracle
+ * fetches and grading are serialized independently. Results always return
+ * in requested task/trial order.
  */
 export async function runEvals(
   tasks: EvalTask[],
@@ -61,43 +70,133 @@ export async function runEvals(
   if (!Number.isInteger(k) || k < 1) {
     throw new Error(`k must be a positive integer, got ${k}`);
   }
+  if (!Number.isInteger(deps.concurrency) || deps.concurrency < 1) {
+    throw new Error(`concurrency must be a positive integer, got ${deps.concurrency}`);
+  }
   if (tasks.length === 0) {
     throw new Error('no tasks to run');
   }
 
   const startedAt = new Date().toISOString();
-  const taskReports: TaskReport[] = [];
-  for (const task of tasks) {
-    const trials: TrialGrade[] = [];
-    for (let i = 0; i < k; i++) {
-      const runStart = performance.now();
-      const { runDir } = await deps.runTask(task.taskText, { startUrl: task.startUrl });
-      const latencyMs = performance.now() - runStart;
+  const controller = new AbortController();
+  const callerAbort = () => controller.abort(new EvalRunCancelledError());
+  if (deps.signal?.aborted === true) callerAbort();
+  else deps.signal?.addEventListener('abort', callerAbort, { once: true });
 
-      // Ground truth is fetched at grading time, per trial — Tier A oracles
-      // must reflect the live source as it stands when the grade is taken.
-      const oracleData = await task.fetchOracle();
+  const grades: Array<Array<TrialGrade | undefined>> = tasks.map(() =>
+    Array.from<TrialGrade | undefined>({ length: k }).fill(undefined),
+  );
+  const jobs = createJobs(tasks, k, controller.signal);
+  const normalJobs = jobs.filter((job) => !job.requiresAuth);
+  const authenticatedJobs = jobs.filter((job) => job.requiresAuth);
+  let firstError: unknown;
+  let gradingTail: Promise<void> = Promise.resolve();
 
-      // The harness's only grading call site. The grader gets the run dir
-      // path and oracle data — never a transcript or conversation — so the
-      // standing rule holds for every grader by construction.
-      const assertions = await task.grade(runDir, oracleData);
-      if (assertions.length === 0) {
-        throw new Error(`grader for task "${task.name}" returned no assertions`);
-      }
-      const grade: TrialGrade = { runDir, assertions, latencyMs };
-      trials.push(grade);
-      await deps.onTrialGraded?.(task.name, i, grade);
-    }
-    taskReports.push(summarizeTask(task.name, trials));
-  }
-
-  return {
-    startedAt,
-    finishedAt: new Date().toISOString(),
-    k,
-    model: deps.model,
-    toolProfile: deps.toolProfile,
-    tasks: taskReports,
+  const fail = (error: unknown) => {
+    if (firstError !== undefined) return;
+    firstError = error;
+    controller.abort(error);
   };
+
+  const scheduleGrade = (
+    task: EvalTask,
+    job: EvalTrialJob,
+    runDir: string,
+    latencyMs: number,
+  ) => {
+    gradingTail = gradingTail.then(async () => {
+      if (firstError !== undefined) return;
+      try {
+        // The grader receives exactly the run directory and freshly fetched
+        // oracle data. Concurrent execution does not widen this boundary.
+        const oracleData = await task.fetchOracle();
+        const assertions = await task.grade(runDir, oracleData);
+        if (assertions.length === 0) {
+          throw new Error(`grader for task "${task.name}" returned no assertions`);
+        }
+        const grade: TrialGrade = { runDir, assertions, latencyMs };
+        grades[job.taskIndex]![job.trialIndex] = grade;
+        await deps.onTrialGraded?.(job, grade);
+      } catch (error) {
+        fail(error);
+      }
+    });
+  };
+
+  const runPool = async (queue: EvalTrialJob[], size: number): Promise<void> => {
+    let nextIndex = 0;
+    const worker = async () => {
+      while (!controller.signal.aborted) {
+        const job = queue[nextIndex++];
+        if (job === undefined) return;
+        const task = tasks[job.taskIndex]!;
+        try {
+          await deps.onTrialStarted?.(job);
+          const runStart = performance.now();
+          const { runDir } = await deps.runTask(task.taskText, job);
+          const latencyMs = performance.now() - runStart;
+          if (controller.signal.aborted) return;
+          await deps.onTrialRunFinished?.(job, runDir, latencyMs);
+          scheduleGrade(task, job, runDir, latencyMs);
+        } catch (error) {
+          fail(error);
+          return;
+        }
+      }
+    };
+
+    await Promise.all(
+      Array.from({ length: Math.min(size, queue.length) }, () => worker()),
+    );
+  };
+
+  try {
+    await Promise.all([
+      runPool(normalJobs, deps.concurrency),
+      runPool(authenticatedJobs, 1),
+    ]);
+    await gradingTail;
+
+    if (firstError !== undefined) throw firstError;
+    if (deps.signal?.aborted === true) throw new EvalRunCancelledError();
+
+    const taskReports = tasks.map((task, taskIndex) => {
+      const taskGrades = grades[taskIndex]!.map((grade, trialIndex) => {
+        if (grade === undefined) {
+          throw new Error(
+            `missing grade for task "${task.name}" trial ${trialIndex + 1} — internal scheduling bug`,
+          );
+        }
+        return grade;
+      });
+      return summarizeTask(task.name, taskGrades);
+    });
+
+    return {
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      k,
+      concurrency: deps.concurrency,
+      model: deps.model,
+      toolProfile: deps.toolProfile,
+      tasks: taskReports,
+    };
+  } finally {
+    deps.signal?.removeEventListener('abort', callerAbort);
+  }
+}
+
+function createJobs(tasks: EvalTask[], k: number, signal: AbortSignal): EvalTrialJob[] {
+  return tasks.flatMap((task, taskIndex) =>
+    Array.from({ length: k }, (_, trialIndex) => ({
+      taskIndex,
+      taskName: task.name,
+      trialIndex,
+      trialNumber: trialIndex + 1,
+      k,
+      startUrl: task.startUrl,
+      requiresAuth: task.requiresAuth,
+      signal,
+    })),
+  );
 }

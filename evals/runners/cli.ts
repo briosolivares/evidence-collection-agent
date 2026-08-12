@@ -65,11 +65,12 @@ async function main(): Promise<void> {
     const partialPath = join(resolve(EXPERIMENTS_DIR), `${generateRunId('eval partial')}.jsonl`);
     const report = await runEvals(tasks, args.k, {
       runTask: realRunTask,
+      concurrency: args.concurrency,
       model: MODEL,
       toolProfile: args.toolProfile,
-      onTrialGraded: (taskName, trialIndex, grade) => {
+      onTrialGraded: (job, grade) => {
         try {
-          appendFileSync(partialPath, `${JSON.stringify({ task: taskName, trial: trialIndex, ...grade })}\n`);
+          appendFileSync(partialPath, `${JSON.stringify({ task: job.taskName, trial: job.trialIndex, ...grade })}\n`);
         } catch (err: unknown) {
           console.warn(`warning: could not persist partial grade: ${err instanceof Error ? err.message : err}`);
         }

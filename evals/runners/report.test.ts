@@ -13,6 +13,7 @@ function sampleReport(): EvalReport {
     startedAt: '2026-08-10T00:00:00.000Z',
     finishedAt: '2026-08-10T00:00:05.000Z',
     k: 2,
+    concurrency: 3,
     model: 'claude-sonnet-5',
     toolProfile: 'batch-enabled',
     tasks: [
@@ -43,6 +44,7 @@ describe('formatReport', () => {
     const text = formatReport(sampleReport());
 
     expect(text).toContain('k=2');
+    expect(text).toContain('concurrency 3');
     expect(text).toContain('model claude-sonnet-5');
     expect(text).toContain('tool profile batch-enabled');
     expect(text).toContain('stub: accuracy 75.0%  completion 1/2  task FAIL  mean latency 50ms');

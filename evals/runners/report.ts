@@ -16,7 +16,7 @@ import type { EvalReport } from './runner.js';
  */
 export function formatReport(report: EvalReport): string {
   const lines: string[] = [
-    `Eval report — k=${report.k}, model ${report.model}, ` +
+    `Eval report — k=${report.k}, concurrency ${report.concurrency}, model ${report.model}, ` +
       `tool profile ${report.toolProfile}, started ${report.startedAt}`,
   ];
 

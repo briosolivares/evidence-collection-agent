@@ -173,6 +173,7 @@ export function startEvalBatch(
         startedAt,
         finishedAt: new Date(now()).toISOString(),
         k,
+        concurrency: 1,
         model: DEFAULT_MODEL,
         toolProfile: deps.toolProfile ?? DEFAULT_TOOL_PROFILE,
         tasks: taskReports,
