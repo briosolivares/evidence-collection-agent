@@ -1,0 +1,4 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startUrl": "https://www.ycombinator.com/companies"
+}
