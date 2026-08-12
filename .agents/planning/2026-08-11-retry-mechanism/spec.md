@@ -1,6 +1,6 @@
 # Spec: Retry on transients (oracle fetch + model call) & metrics on crash
 
-**Date:** 2026-08-11 · **Status:** implemented 2026-08-11 (all three parts; full suite + typecheck green)
+**Date:** 2026-08-11 · **Status:** implemented 2026-08-11 (all three parts; full suite + typecheck green); live-verified 2026-08-11 evening — see Verification below
 **Motivated by:** `docs/reports/2026-08-11-medium-rebaseline.md` — three consecutive eval attempts crashed on transient failures, none in harness code: `fetch failed` from the grading oracle's bare `fetch()` (attempts 1 and 3), and an Anthropic `overloaded_error` surfaced mid-stream, which the SDK never retries (attempt 2). One crashed model call also leaves no `metrics.json` (run `…_3181ed`): `runAgentLoop` throws before `finish()`.
 **Mechanism provenance:** Claude Code disables SDK auto-retry (`maxRetries: 0` — `claude-code/src/services/api/claude.ts:1781`, "Disabled auto-retry in favor of manual implementation") and owns retries in `src/services/api/withRetry.ts`: `DEFAULT_MAX_RETRIES = 10`, `MAX_529_RETRIES = 3`, exponential backoff honoring retry-after, ECONNRESET/EPIPE keep-alive healing, 529 retries only for foreground query sources. We borrow the shape at harness scale, not the numbers.
 **Why retries are cheap now:** a retried request is byte-identical, so it re-reads the prompt cache the failed attempt already wrote (0.1×). Part 1 of the cache spec made this mechanism nearly free.
@@ -57,6 +57,8 @@ Considered and rejected for now: returning `{ status: 'failed' }` instead of ret
 - Kill the network mid-eval-grading once (or point `githubGet` at a flaky mock): grading survives.
 - Full test suite + typecheck.
 - Next multi-trial eval lands without a regrade.
+
+**Result (2026-08-11 evening, easy + medium suites, 15 trials):** the "lands without a regrade" criterion is met — both suites ran end-to-end and graded in-process on the first attempt (vs. three consecutive crashed attempts pre-mechanism). The retry loops themselves went **unexercised**: zero retry events across ~470 turns and eight oracle fetch groups (no transients occurred), so Parts A/B/C remain live-untested and covered by the unit suite only. The same run verified the companion `maxTurns`-off change: five of six medium trials ran to 76–94 turns with the 200k context ceiling terminating two of them. Report: `docs/reports/2026-08-11-retry-maxturns-off.md`.
 
 ## Decisions log
 
