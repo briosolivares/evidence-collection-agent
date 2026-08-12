@@ -1,0 +1,4 @@
+{
+  "task": "Find the 275th reference in the References section of the Wikipedia World War II page. Follow that reference's link to the highlighted entry in the Sources section and return the full text of that highlighted source in answer.md.",
+  "startUrl": "https://en.wikipedia.org/wiki/World_War_II"
+}
