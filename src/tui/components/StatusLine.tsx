@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { SherlockConfig } from '../config.js';
 import { formatDuration, formatTokens } from '../format.js';
+import type { RunChecklistSnapshot } from '../hooks/useRunChecklist.js';
 import type { LiveRunState } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 
@@ -25,6 +26,8 @@ export function pickWord(
 interface StatusLineProps {
   config: SherlockConfig;
   live: LiveRunState;
+  /** App-owned disk snapshot; rendered by the checklist-aware status in Step 4. */
+  checklist?: RunChecklistSnapshot;
   /** True while Esc has been pressed and the run is wrapping up. */
   cancelling?: boolean;
   /** Injectable clock (epoch ms) for tests. */

@@ -1,6 +1,7 @@
 import { Box, Text } from 'ink';
 
 import type { SherlockConfig } from '../config.js';
+import type { RunChecklistSnapshot } from '../hooks/useRunChecklist.js';
 import type { LiveRunState } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 import { StatusLine } from './StatusLine.js';
@@ -8,6 +9,7 @@ import { StatusLine } from './StatusLine.js';
 interface LiveRegionProps {
   config: SherlockConfig;
   live: LiveRunState;
+  checklist: RunChecklistSnapshot;
   cancelling?: boolean;
   now?: () => number;
   rng?: () => number;
@@ -18,7 +20,7 @@ interface LiveRegionProps {
  * lines, and the animated status line. Everything here is mutable —
  * content moves into <Static> only once finalized by the reducer.
  */
-export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionProps) {
+export function LiveRegion({ config, live, checklist, cancelling, now, rng }: LiveRegionProps) {
   return (
     <Box flexDirection="column">
       {live.streamingText !== '' && (
@@ -40,6 +42,7 @@ export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionPro
       <StatusLine
         config={config}
         live={live}
+        checklist={checklist}
         cancelling={cancelling}
         now={now}
         rng={rng}

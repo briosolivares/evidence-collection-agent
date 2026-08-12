@@ -236,6 +236,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return {
         ...state,
         mode: 'running',
+        checklistRunDir: undefined,
         live: {
           streamingText: '',
           pendingTools: [],
@@ -248,7 +249,11 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
 
     case 'run_dir':
       if (state.live === undefined) return state;
-      return { ...state, live: { ...state.live, runDir: action.runDir } };
+      return {
+        ...state,
+        checklistRunDir: action.runDir,
+        live: { ...state.live, runDir: action.runDir },
+      };
 
     case 'turn_start': {
       if (state.live === undefined) return state;

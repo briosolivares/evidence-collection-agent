@@ -114,6 +114,36 @@ describe('reduce (run lifecycle events)', () => {
     });
   });
 
+  it('preserves run A checklist directory after completion, then clears it for run B until its directory arrives', () => {
+    let state = fold([
+      ...started,
+      { type: 'run_dir', runDir: '/runs/a' },
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/a', at: 2_000 },
+    ]);
+    expect(state.live).toBeUndefined();
+    expect(state.checklistRunDir).toBe('/runs/a');
+
+    state = reduce(state, { type: 'run_started', task: 'second', at: 3_000 });
+    expect(state.checklistRunDir).toBeUndefined();
+    state = reduce(state, { type: 'run_dir', runDir: '/runs/b' });
+    expect(state.checklistRunDir).toBe('/runs/b');
+    expect(state.live?.runDir).toBe('/runs/b');
+  });
+
+  it('preserves the checklist directory through cancellation and failure', () => {
+    let state = fold([
+      ...started,
+      { type: 'run_dir', runDir: '/runs/cancelled' },
+      { type: 'run_cancelled', at: 2_000 },
+    ]);
+    expect(state.checklistRunDir).toBe('/runs/cancelled');
+
+    state = reduce(state, { type: 'run_started', task: 'failed', at: 3_000 });
+    state = reduce(state, { type: 'run_dir', runDir: '/runs/failed' });
+    state = reduce(state, { type: 'run_failed', message: 'failed', at: 4_000 });
+    expect(state.checklistRunDir).toBe('/runs/failed');
+  });
+
   it('accumulates streaming text and grows the token estimate in-turn', () => {
     const state = fold([
       ...started,

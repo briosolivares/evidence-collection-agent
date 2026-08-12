@@ -9,6 +9,7 @@ import {
 import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
+import { useRunChecklist } from '../hooks/useRunChecklist.js';
 import { scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
@@ -69,6 +70,7 @@ export function App({
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
   const [evalTasks, setEvalTasks] = useState<readonly string[]>([]);
+  const checklist = useRunChecklist(state.checklistRunDir);
 
   useEffect(() => {
     if (!demo) return;
@@ -159,6 +161,7 @@ export function App({
           config={config}
           live={state.live}
           cancelling={state.mode === 'cancelling'}
+          checklist={checklist}
         />
       )}
       {state.mode === 'runsList' && (
