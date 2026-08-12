@@ -10,7 +10,8 @@
 
 - Apply the behavior to both the standalone eval CLI and Sherlock's `/evals` flow.
 - Add optional `requiresAuth: true` metadata to `task.json`; missing means `false`.
-- Initially mark `elon_tweets` and `mit_sororities` as authenticated.
+- Initially mark only `elon_tweets` as authenticated. Keep `mit_sororities` and
+  `airbnb_lake_tahoe` in the normal headless lane.
 - Default normal-eval concurrency to 3 and expose it as `--concurrency` in the CLI.
 - Normal trials run in separate headless Chrome processes with separate temporary profiles.
 - Authenticated trials run sequentially through one headed Chrome session using the existing
@@ -73,7 +74,6 @@ retaining the rule that each trial fetches fresh ground truth at grading time.
 - `evals/runners/loadTask.ts`
 - `evals/runners/loadTask.test.ts`
 - `evals/datasets/elon_tweets/task.json`
-- `evals/datasets/mit_sororities/task.json`
 - `evals/config.ts`
 - `evals/runners/cliArgs.ts`
 - `evals/runners/cliArgs.test.ts`
@@ -83,8 +83,9 @@ retaining the rule that each trial fetches fresh ground truth at grading time.
 - Add a required, normalized `requiresAuth: boolean` property to the loaded `EvalTask` type.
 - Accept only a boolean `requiresAuth` field in `task.json`; default it to `false` when absent.
   Reject strings and other truthy values rather than coercing them.
-- Set `requiresAuth: true` on the two agreed authenticated datasets. Do not branch on task names
-  anywhere in runtime code.
+- Set `requiresAuth: true` only on `elon_tweets`. Leave `mit_sororities` and
+  `airbnb_lake_tahoe` unmarked so they default to `false`. Do not branch on task names anywhere in
+  runtime code.
 - Add `DEFAULT_EVAL_CONCURRENCY = 3` to eval config.
 - Parse `--concurrency <positive integer>` in both `--flag value` and `--flag=value` forms.
 - Include concurrency in `EvalCliArgs`, usage errors, and tests.
