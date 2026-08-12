@@ -83,7 +83,7 @@ describe('browser_batch execution', () => {
           },
           { tool: 'click', input: { ref: buttonRef } },
           { tool: 'inspect_page', input: {} },
-          { tool: 'screenshot', input: { filename: 'batch-evidence.png' } },
+          { tool: 'screenshot', input: { filename: 'artifacts/batch-evidence.png' } },
         ],
       });
       const batch = JSON.parse(content) as BrowserBatchResult;

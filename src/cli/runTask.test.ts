@@ -140,7 +140,7 @@ describe('runTask', () => {
         toolResponse(
           'write-1',
           'write_file',
-          { file_path: 'stories.csv', content: csv },
+          { file_path: 'artifacts/stories.csv', content: csv },
           {
             input_tokens: 17,
             output_tokens: 5,
@@ -167,7 +167,7 @@ describe('runTask', () => {
         throw new Error(`Expected a completed run, got ${result.status}.`);
       }
       expect(result.finalText).toBe('The CSV deliverable is complete.');
-      expect(await readFile(join(result.runDir, 'stories.csv'), 'utf8')).toBe(csv);
+      expect(await readFile(join(result.runDir, 'artifacts/stories.csv'), 'utf8')).toBe(csv);
 
       // The third request can only contain this page data if navigate and
       // inspect_page ran through the real browser controller in the prior turns.
@@ -216,7 +216,7 @@ describe('runTask', () => {
         Date.parse(manifest.startedAt),
       );
       expect(manifest.artifacts).toHaveLength(1);
-      expect(manifest.artifacts[0]?.filename).toBe('stories.csv');
+      expect(manifest.artifacts[0]?.filename).toBe('artifacts/stories.csv');
       const recordedArtifact = manifest.artifacts[0];
       if (recordedArtifact === undefined) {
         throw new Error('Expected stories.csv in the finalized manifest.');

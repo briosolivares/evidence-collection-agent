@@ -73,7 +73,7 @@ describe('inspect_page tool', () => {
       expect(result.isError).toBe(false);
       const replacement = JSON.parse(result.content) as OffloadedResult;
       expect(replacement.preview).toContain('Oversized Outline Fixture');
-      expect(replacement.offloadedTo).toMatch(/^tool-output\/inspect_page-/);
+      expect(replacement.offloadedTo).toMatch(/^scratch\/tool-output\/inspect_page-/);
       const fullOutline = readFileSync(join(suite.runDir(), replacement.offloadedTo), 'utf8');
       expect(fullOutline).toBe(uncapped.content);
       expect(fullOutline).toContain('link "Evidence record 120"');

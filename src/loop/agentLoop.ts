@@ -157,7 +157,7 @@ export interface RunMetrics {
  * One message's combined tool results are bounded by
  * MAX_TOOL_RESULTS_PER_MESSAGE_BYTES on top of the pipeline's per-result
  * cap: when a batch exceeds it, the largest results are offloaded to
- * tool-output/ files (largest first, previews and manifest hashes
+ * scratch/tool-output/ files (largest first, previews and manifest hashes
  * preserved) until the batch fits — the run keeps going; nothing dies.
  *
  * Transcript: every model request, response, tool call, and tool result is
@@ -361,7 +361,7 @@ function extractText(content: readonly AssistantContentBlock[]): string {
  * batch of individually-legal results can still flood one user message —
  * 5 parallel reads × 50k bytes is ~250k. While the batch's combined
  * content exceeds MAX_TOOL_RESULTS_PER_MESSAGE_BYTES, the largest
- * not-yet-offloaded result is written to a tool-output/ file (manifest
+ * not-yet-offloaded result is written to a scratch/tool-output/ file (manifest
  * hash and preview preserved, same replacement shape as the per-result
  * cap) — the remedy is offload, the run keeps going. Results at or under
  * preview size are never offloaded (replacing them couldn't shrink the

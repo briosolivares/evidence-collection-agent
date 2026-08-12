@@ -77,7 +77,7 @@ describe('startRun (RunSession bridge)', () => {
             type: 'tool_use',
             id: 'tu_1',
             name: 'write_file',
-            input: { file_path: 'notes.md', content: 'hello evidence' },
+            input: { file_path: 'artifacts/notes.md', content: 'hello evidence' },
           },
         ],
         { input: 1000, output: 200 },
@@ -132,11 +132,11 @@ describe('startRun (RunSession bridge)', () => {
     expect(usages[1]).toMatchObject({ usage: { input: 2400, output: 60, cacheRead: 900 } });
 
     // The real pipeline ran: the artifact and manifest exist on disk.
-    expect(readFileSync(join(outcome.runDir, 'notes.md'), 'utf8')).toBe('hello evidence');
+    expect(readFileSync(join(outcome.runDir, 'artifacts/notes.md'), 'utf8')).toBe('hello evidence');
     const manifest = JSON.parse(
       readFileSync(join(outcome.runDir, 'manifest.json'), 'utf8'),
     ) as { artifacts: { filename: string }[]; finishedAt?: string };
-    expect(manifest.artifacts.map((artifact) => artifact.filename)).toContain('notes.md');
+    expect(manifest.artifacts.map((artifact) => artifact.filename)).toContain('artifacts/notes.md');
     expect(manifest.finishedAt).toBeDefined();
     expect(existsSync(join(outcome.runDir, 'metrics.json'))).toBe(true);
   });
@@ -197,7 +197,7 @@ describe('startRun (RunSession bridge)', () => {
             type: 'tool_use',
             id: 'tu_1',
             name: 'write_file',
-            input: { file_path: 'a.txt', content: 'x' },
+            input: { file_path: 'artifacts/a.txt', content: 'x' },
           },
         ],
         { input: 500, output: 50 },
