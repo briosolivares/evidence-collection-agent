@@ -12,6 +12,7 @@ import { join, resolve } from 'node:path';
 
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import { formatProgressEvent } from '../../src/cli/replFormat.js';
+import { chromeExecutablePath } from '../../src/config/paths.js';
 import { runTask } from '../../src/cli/runTask.js';
 import { generateRunId } from '../../src/run/runId.js';
 import { DATASETS_DIR, EXPERIMENTS_DIR, MODEL, PROFILE_DIR, RUNS_DIR } from '../config.js';
@@ -42,6 +43,7 @@ async function main(): Promise<void> {
   // through runEvals — this wiring is the CLI's alone.
   const browserSessionProvider = new LocalChromeBrowserSessionProvider({
     profileDir: PROFILE_DIR,
+    executablePath: chromeExecutablePath(),
   });
   const browser = await browserSessionProvider.createSession();
   try {

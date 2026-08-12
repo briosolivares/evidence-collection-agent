@@ -12,15 +12,26 @@
 // the interactive product entry point, not a test — it is never invoked by
 // the automated suite.
 
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
+import { fileURLToPath } from 'node:url';
 
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
+import {
+  chromeExecutablePath,
+  findDevRoot,
+  resolveSherlockPaths,
+} from '../config/paths.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 import { runTask } from './runTask.js';
 
-const PROFILE_DIR = resolve('chrome-profile');
-const RUNS_BASE_DIR = 'runs';
+// Repo-anchored in a checkout, ~/.sherlock installed — never cwd-bound:
+// a cwd-relative profile dir silently trades every saved login for a
+// fresh empty profile when the REPL is started from anywhere else.
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const paths = resolveSherlockPaths({ devRoot: findDevRoot(PACKAGE_ROOT) });
+const PROFILE_DIR = paths.profileDir;
+const RUNS_BASE_DIR = paths.runsBaseDir;
 const PROMPT = '\ntask> ';
 
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -36,6 +47,7 @@ console.log('Type a task and press enter. Ctrl-C or Ctrl-D ends the session.');
 
 const browserSessionProvider = new LocalChromeBrowserSessionProvider({
   profileDir: PROFILE_DIR,
+  executablePath: chromeExecutablePath(),
 });
 const browser = await browserSessionProvider.createSession();
 const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: PROMPT });

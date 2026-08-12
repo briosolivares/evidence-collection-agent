@@ -1,6 +1,6 @@
 # One-command install plan
 
-**Status: PROPOSED — not yet implemented.** Written 2026-08-12 from a full portability audit of the codebase (see [multi-user-findings.md](multi-user-findings.md) for the raw findings with file:line anchors).
+**Status: IMPLEMENTED 2026-08-12 on `feat/one-command-install`** (phases 1–4; nine commits, each one plan item). Deviations: demos stay cwd-bound (their README documents running from the repo root, and they are excluded from the package); the first-run key prompt is plain stdin before Ink renders rather than an Ink component; npm publish (phase 4 item 12) remains future work. Written 2026-08-12 from a full portability audit of the codebase (see [multi-user-findings.md](multi-user-findings.md) for the raw findings with file:line anchors).
 
 ## Goal
 
