@@ -21,6 +21,7 @@ import {
   MANIFEST_FILENAME,
   type Manifest,
 } from '../run/artifacts.js';
+import type { ChecklistTask } from '../run/checklist.js';
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import {
   startFixtureServer,
@@ -246,6 +247,82 @@ describe('runTask', () => {
       await browser.goto(fixtureServer.url('/second.html'));
       expect(await browser.title()).toBe('Second Fixture Page');
       await browser.closeTab();
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'runs checklist tools as ordinary turns and completes only on the zero-tool response',
+    async () => {
+      const fake = scriptModel([
+        toolResponse('task-create-1', 'TaskCreate', {
+          subject: 'Publish the report',
+          description: 'Write and verify the requested report artifact.',
+          activeForm: 'Publishing the report',
+          metadata: { expectedArtifacts: ['artifacts/report.md'] },
+        }),
+        toolResponse('task-start-1', 'TaskUpdate', {
+          taskId: '1',
+          status: 'in_progress',
+        }),
+        toolResponse('write-report-1', 'write_file', {
+          file_path: 'artifacts/report.md',
+          content: '# Verified report\n',
+        }),
+        toolResponse('task-complete-1', 'TaskUpdate', {
+          taskId: '1',
+          status: 'completed',
+        }),
+        toolResponse('task-list-1', 'TaskList', {}),
+        textResponse('The checklist and requested report are complete.'),
+      ]);
+
+      const result = await runTask('Complete a checklist-backed report.', {
+        browser,
+        runsBaseDir,
+        callModel: fake.callModel,
+        maxTurns: 8,
+        maxContextTokens: 10_000,
+      });
+
+      expect(result).toMatchObject({
+        status: 'completed',
+        finalText: 'The checklist and requested report are complete.',
+      });
+      expect(fake.requests).toHaveLength(6);
+      expect(JSON.stringify(fake.requests[1])).toContain(
+        'Mark it in_progress before starting it.',
+      );
+      expect(JSON.stringify(fake.requests[4])).toContain(
+        'Call TaskList now; do not batch task completions.',
+      );
+      expect(JSON.stringify(fake.requests[5])).toContain(
+        '#1 [completed] Publish the report',
+      );
+
+      const task = await readJson<ChecklistTask>(
+        join(result.runDir, 'checklist', '1.json'),
+      );
+      expect(task).toMatchObject({
+        id: '1',
+        subject: 'Publish the report',
+        status: 'completed',
+        metadata: { expectedArtifacts: ['artifacts/report.md'] },
+      });
+      await expect(readFile(join(result.runDir, 'artifacts/report.md'), 'utf8'))
+        .resolves.toBe('# Verified report\n');
+
+      const events = await readTranscript(result.runDir);
+      expect(
+        events
+          .filter((event) => event.type === 'tool_call')
+          .map((event) => (event.call as { name: string }).name),
+      ).toEqual(['TaskCreate', 'TaskUpdate', 'write_file', 'TaskUpdate', 'TaskList']);
+      expect(
+        events.filter((event) => event.type === 'tool_result'),
+      ).toHaveLength(5);
+      await expect(readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)))
+        .resolves.toMatchObject({ status: 'completed', turns: 6 });
     },
     TEST_TIMEOUT_MS,
   );

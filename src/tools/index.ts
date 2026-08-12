@@ -15,6 +15,10 @@ import { navigateTool } from './navigate/navigate.js';
 import { readFileTool } from './readFile/readFile.js';
 import { screenshotTool } from './screenshot/screenshot.js';
 import { scrollTool } from './scroll/scroll.js';
+import { taskCreateTool } from './taskCreate/taskCreate.js';
+import { taskGetTool } from './taskGet/taskGet.js';
+import { taskListTool } from './taskList/taskList.js';
+import { taskUpdateTool } from './taskUpdate/taskUpdate.js';
 import { typeTool } from './type/type.js';
 import { writeFileTool } from './writeFile/writeFile.js';
 
@@ -33,6 +37,10 @@ export { navigateTool, type NavigateInput } from './navigate/navigate.js';
 export { readFileTool } from './readFile/readFile.js';
 export { screenshotTool, type ScreenshotInput } from './screenshot/screenshot.js';
 export { scrollTool } from './scroll/scroll.js';
+export { taskCreateTool } from './taskCreate/taskCreate.js';
+export { taskGetTool } from './taskGet/taskGet.js';
+export { taskListTool } from './taskList/taskList.js';
+export { taskUpdateTool } from './taskUpdate/taskUpdate.js';
 export { typeTool } from './type/type.js';
 export { writeFileTool } from './writeFile/writeFile.js';
 export { type EvidenceResult } from './shared/evidence.js';
@@ -70,6 +78,14 @@ export const actionTools: readonly ToolDef[] = [clickTool, typeTool, scrollTool]
 /** Browser evidence tools in stable registration order. */
 export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
 
+/** Run-scoped checklist tools in stable registration order. */
+export const checklistTools: readonly ToolDef[] = [
+  taskCreateTool as ToolDef,
+  taskListTool as ToolDef,
+  taskGetTool as ToolDef,
+  taskUpdateTool as ToolDef,
+];
+
 /** Deterministic model/runtime tool surfaces used by production entry points. */
 export type ToolProfile = 'atomic' | 'batch-enabled';
 
@@ -77,9 +93,9 @@ export type ToolProfile = 'atomic' | 'batch-enabled';
 export const DEFAULT_TOOL_PROFILE: ToolProfile = 'atomic';
 
 /**
- * Build one complete production registry. The atomic profile retains the
- * existing ten tools and their exact order; the treatment appends the
- * composite browser tool without replacing any atomic capability.
+ * Build one complete production registry. Both profiles expose the fourteen
+ * core tools in exact order; the treatment appends the composite browser tool
+ * without replacing any atomic capability.
  */
 export function createProductionRegistry(
   profile: ToolProfile = DEFAULT_TOOL_PROFILE,
@@ -89,6 +105,7 @@ export function createProductionRegistry(
     ...observationTools,
     ...actionTools,
     ...evidenceTools,
+    ...checklistTools,
     ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
   ]);
 }

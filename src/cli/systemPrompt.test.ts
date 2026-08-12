@@ -3,12 +3,9 @@ import { describe, expect, it } from 'vitest';
 import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
 import {
-  actionTools,
-  evidenceTools,
-  fileTools,
-  observationTools,
+  createProductionRegistry,
 } from '../tools/index.js';
-import { createRegistry, toApiToolDefs } from '../tools/registry.js';
+import { toApiToolDefs } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 const firstTask = 'Collect the first fixture record and write it as CSV.';
@@ -45,12 +42,7 @@ const secondTaskHistory: readonly Message[] = [
 
 /** Build a fresh production prompt prefix instead of sharing registry or API-tool objects. */
 function productionConfig(): CallModelConfig {
-  const registry = createRegistry([
-    ...fileTools,
-    ...observationTools,
-    ...actionTools,
-    ...evidenceTools,
-  ]);
+  const registry = createProductionRegistry();
   return {
     system: SYSTEM_PROMPT,
     apiToolDefs: toApiToolDefs(registry),
@@ -85,7 +77,22 @@ describe('SYSTEM_PROMPT', () => {
     );
   });
 
-  it('forms a byte-identical cached prefix with all ten production tools across unrelated task histories', () => {
+  it('guides non-trivial checklist use without making it loop control', () => {
+    expect(SYSTEM_PROMPT).toContain(
+      'For non-trivial work with three or more meaningful steps, use TaskCreate',
+    );
+    expect(SYSTEM_PROMPT).toContain('skip it for straightforward tasks');
+    expect(SYSTEM_PROMPT).toContain('Prefer only one in_progress item at a time');
+    expect(SYSTEM_PROMPT).toContain('Mark an item completed immediately');
+    expect(SYSTEM_PROMPT).toContain('promised artifacts are fully done');
+    expect(SYSTEM_PROMPT).toContain('After each completion, call TaskList');
+    expect(SYSTEM_PROMPT).toContain('never controls the agent loop');
+    expect(SYSTEM_PROMPT).toContain(
+      'does not replace writing and verifying required artifacts',
+    );
+  });
+
+  it('forms a byte-identical cached prefix with all fourteen core tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
 
@@ -99,7 +106,7 @@ describe('SYSTEM_PROMPT', () => {
     });
 
     expect(secondPrefix).toBe(firstPrefix);
-    expect(firstParams.tools).toHaveLength(10);
+    expect(firstParams.tools).toHaveLength(14);
     expect(firstParams.tools?.map((tool) => tool.name)).toEqual([
       'read_file',
       'write_file',
@@ -111,6 +118,10 @@ describe('SYSTEM_PROMPT', () => {
       'scroll',
       'screenshot',
       'download',
+      'TaskCreate',
+      'TaskList',
+      'TaskGet',
+      'TaskUpdate',
     ]);
 
     expect(firstParams.system).toEqual([

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { deriveSemanticLine } from '../../src/tui/store/semantic.js';
 
-describe('deriveSemanticLine — the ten-tool table', () => {
+describe('deriveSemanticLine — the fourteen-tool table', () => {
   const table: Array<{
     name: string;
     input: unknown;
@@ -53,6 +53,25 @@ describe('deriveSemanticLine — the ten-tool table', () => {
       input: { file_path: 'top5.csv', content: '…' },
       line: 'Evidence saved → top5.csv',
       isEvidence: true,
+    },
+    {
+      name: 'TaskCreate',
+      input: { subject: 'Collect filing evidence', description: 'Find the filing' },
+      line: 'Adding a checklist item',
+      isEvidence: false,
+    },
+    { name: 'TaskList', input: {}, line: 'Reviewing the checklist', isEvidence: false },
+    {
+      name: 'TaskGet',
+      input: { taskId: '2' },
+      line: 'Reviewing task #2',
+      isEvidence: false,
+    },
+    {
+      name: 'TaskUpdate',
+      input: { taskId: '2', status: 'in_progress' },
+      line: 'Updating task #2',
+      isEvidence: false,
     },
   ];
 
@@ -116,6 +135,22 @@ describe('deriveSemanticLine — truncation and URL edge cases', () => {
     });
     expect(deriveSemanticLine('type', { ref: 'e1' }).line).toBe('Typing');
     expect(deriveSemanticLine('grep', 42).line).toBe('Searching files');
+    expect(deriveSemanticLine('TaskCreate', null)).toEqual({
+      line: 'Adding a checklist item',
+      isEvidence: false,
+    });
+    expect(deriveSemanticLine('TaskList', null)).toEqual({
+      line: 'Reviewing the checklist',
+      isEvidence: false,
+    });
+    expect(deriveSemanticLine('TaskGet', null)).toEqual({
+      line: 'Reviewing a task',
+      isEvidence: false,
+    });
+    expect(deriveSemanticLine('TaskUpdate', null)).toEqual({
+      line: 'Updating a task',
+      isEvidence: false,
+    });
   });
 
   it('falls back to the bare name for unknown tools', () => {

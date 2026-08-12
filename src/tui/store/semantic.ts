@@ -21,6 +21,10 @@ function field(input: unknown, key: string): string | undefined {
   return typeof value === 'string' && value !== '' ? value : undefined;
 }
 
+function taskId(input: unknown): string | undefined {
+  return field(input, 'taskId');
+}
+
 function browserBatchActions(input: unknown): unknown[] | undefined {
   if (typeof input !== 'object' || input === null) return undefined;
   const actions = (input as Record<string, unknown>).actions;
@@ -126,6 +130,24 @@ export function deriveSemanticLine(name: string, input?: unknown): SemanticLine 
             ? 'Saving evidence'
             : `Evidence saved → ${truncate(path, TEXT_MAX)}`,
         isEvidence: true,
+      };
+    }
+    case 'TaskCreate':
+      return { line: 'Adding a checklist item', isEvidence: false };
+    case 'TaskList':
+      return { line: 'Reviewing the checklist', isEvidence: false };
+    case 'TaskGet': {
+      const id = taskId(input);
+      return {
+        line: id === undefined ? 'Reviewing a task' : `Reviewing task #${truncate(id, TEXT_MAX)}`,
+        isEvidence: false,
+      };
+    }
+    case 'TaskUpdate': {
+      const id = taskId(input);
+      return {
+        line: id === undefined ? 'Updating a task' : `Updating task #${truncate(id, TEXT_MAX)}`,
+        isEvidence: false,
       };
     }
     default:
