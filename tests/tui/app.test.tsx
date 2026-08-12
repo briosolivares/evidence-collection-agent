@@ -327,7 +327,10 @@ describe('App /evals workflow', () => {
       await tick();
       expect(lastFrame()).toContain('concurrency: 3');
       stdin.write('\r'); // start k=1, concurrency=3
-      await tick(200);
+      await vi.waitFor(
+        () => expect(frames.join('\n')).toContain('Eval report — k=1'),
+        { timeout: 10_000, interval: 25 },
+      );
 
       const output = frames.join('\n');
       // Parallel evals use keyed compact progress; raw prose is kept in
