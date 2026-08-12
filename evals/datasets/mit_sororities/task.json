@@ -1,0 +1,4 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startUrl": "https://www.google.com/"
+}

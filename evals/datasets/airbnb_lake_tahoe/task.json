@@ -1,0 +1,4 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startUrl": "https://www.airbnb.com/"
+}
