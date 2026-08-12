@@ -11,9 +11,12 @@ runs/<run-id>/
   manifest.json                 # provenance index (initManifest → writeArtifact upserts → finalizeManifest)
   transcript.jsonl              # append-only event log, one JSON object per line
   metrics.json                  # written once, on every exit path
-  <deliverables>                # answer.md, *.csv, *.png, downloads — whatever the task asked for
-  tool-output/<tool>-<n>.txt    # offloaded oversize tool results (hashed like any artifact)
+  artifacts/                    # everything the agent publishes — answer.md, *.csv, *.png, downloads
+  scratch/                      # private agent working state; never graded or shown, still hashed
+    tool-output/<tool>-<n>.txt  # offloaded oversize tool results
 ```
+
+**Workspace partition** (enforced by `writeArtifact`, both dirs created by `initManifest`): every write lands under `artifacts/` or `scratch/`. Published (`artifacts/`) entries must carry non-empty `roles` — `requested_output` (the task asked for this file) and/or `evidence` (supporting/audit capture); one artifact may hold both (an explicitly requested screenshot that is also audit evidence). Scratch entries carry no roles — the field's presence is itself the published/private marker. Graders select deliverables exclusively through `requestedOutputs()` and the finders in `evals/grading/manifestVerification.ts`, so scratch files and evidence-only captures can never shadow a deliverable; `verifyManifestHashes` still covers the whole run (tamper evidence is total). External users need not know the directory names — the roles field is the product-facing model.
 
 **Run ID** (`src/run/runId.ts`): `<date>_<time>_<label-slug>_<6-hex>` in **local 12-hour time** — e.g. `2026-08-10_09-48-32pm_top-5-hacker-news_1adfa7` (slug omitted when no label is given; `runTask` passes the task text; the manifest's `startedAt` keeps the exact UTC instant). Ids sort lexically by date; within a day the 12-hour clock means alphabetical order is not strictly clock order. Collisions throw at `mkdir` rather than reusing a directory.
 
@@ -31,6 +34,7 @@ classDiagram
         +filename: string
         +sha256: string
         +sourceUrl?: string
+        +roles?: ArtifactRole[]
         +capturedAt: string
     }
     class TranscriptEvent {
@@ -48,7 +52,7 @@ classDiagram
     Manifest "1" *-- "many" ManifestEntry
 ```
 
-- `ManifestEntry.sha256` is computed from the exact bytes at capture time — the tamper-evidence mechanism. `filename` is normalized run-dir-relative (so `data.csv` and `./data.csv` collapse); rewriting a path **upserts** the entry.
+- `ManifestEntry.sha256` is computed from the exact bytes at capture time — the tamper-evidence mechanism. `filename` is normalized run-dir-relative (so `artifacts/data.csv` and `./artifacts/data.csv` collapse); rewriting a path **upserts** the entry. `roles` (`ArtifactRole = 'requested_output' | 'evidence'`) is present exactly on published (`artifacts/`) entries.
 - `TranscriptEvent` (`src/run/transcript.ts`) is open-ended (`{ type: string, ...}`); the loop writes exactly four shapes: `model_request {turn, messages}`, `model_response {turn, response}`, `tool_call {turn, call}`, `tool_result {turn, result}`. Tool events are bracketed — all `tool_call`s appended in request order before execution, all `tool_result`s after every call settles — so parallel completion order is never observable in the transcript.
 - `RunMetrics` (`src/loop/agentLoop.ts`) — `status` is `completed` or `budget_exceeded`.
 
@@ -132,10 +136,10 @@ flowchart LR
     TU["ToolUseBlock\n(model response)"] -->|"agentLoop"| TC["ToolCall"]
     TC -->|"scheduler + pipeline"| TR["ToolCallResult"]
     TR -->|"agentLoop"| TRB["ToolResultBlock\n(next user message)"]
-    TR -->|"oversize"| OFF["OffloadedResult\n+ tool-output/ file"]
-    TOOL["write_file / screenshot / download / offload"] -->|"writeArtifact"| ME["ManifestEntry\n(sha256 + sourceUrl)"]
+    TR -->|"oversize"| OFF["OffloadedResult\n+ scratch/tool-output/ file"]
+    TOOL["write_file / screenshot / download / offload"] -->|"writeArtifact"| ME["ManifestEntry\n(sha256 + sourceUrl + roles)"]
     ME --> MAN["manifest.json"]
-    MAN -->|"readManifest"| GR["Graders"]
+    MAN -->|"readManifest +\nrequestedOutputs"| GR["Graders"]
     OR["Oracle data (unknown)"] --> GR
     GR --> AR["AssertionResult[]"]
     AR -->|"metrics.ts"| REP["TaskReport / EvalReport"]

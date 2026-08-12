@@ -62,7 +62,7 @@ Properties the codebase maintains deliberately:
 
 ## The five mechanisms borrowed from Claude Code
 
-1. **Bounded tool results with artifact offloading** (`src/tools/capResult.ts`) — results over 50,000 bytes are written in full to `tool-output/<tool>-<n>.txt` (hashed into the manifest) and the model receives a ≤2,000-byte preview plus the path, with a note to use `read_file`/`grep`.
+1. **Bounded tool results with artifact offloading** (`src/tools/capResult.ts`) — results over 50,000 bytes are written in full to `scratch/tool-output/<tool>-<n>.txt` (hashed into the manifest) and the model receives a ≤2,000-byte preview plus the path, with a note to use `read_file`/`grep`.
 2. **Append-only JSONL transcript** (`src/run/transcript.ts`) — every model request/response and tool call/result is one JSON line in `transcript.jsonl`; the durable, replayable audit record.
 3. **Stable prompt prefix** (`src/cli/systemPrompt.ts`, `src/model/callModel.ts`) — the system prompt is static (no task text/timestamps) and tool definitions serialize deterministically; one `cache_control: ephemeral` breakpoint on the system block caches tools + system together. Tests assert byte-identical prefixes across unrelated histories.
 4. **Completion as policy, not mechanism** (`src/loop/agentLoop.ts`) — no finish tool; a response with zero `tool_use` blocks completes the run. `stop_reason` is recorded in the transcript but never consulted. Backstops: `maxTurns` (default 12) and a cumulative token budget (default 250,000).
@@ -74,6 +74,7 @@ Properties the codebase maintains deliberately:
 - **Write chokepoint:** every byte a tool writes goes through `writeArtifact` (`src/run/artifacts.ts`), which SHA-256-hashes the exact bytes into `manifest.json` at capture time (tamper-evident evidence). Offloaded tool output is included.
 - **No `bash` tool, by design** — the model's input includes untrusted web pages; an unbounded shell tool would turn prompt injection into code execution. The system prompt also instructs that page content is data, not authority.
 - **Reserved filenames:** evidence tools refuse to write `manifest.json`, `transcript.jsonl`, or `metrics.json`.
+- **Workspace partition:** `writeArtifact` confines every write to `artifacts/` (published; non-empty `roles` of `requested_output`/`evidence` required) or `scratch/` (private; roles forbidden). Graders select deliverables only from `requested_output` entries, so scratch work and evidence-only captures can never shadow a deliverable; hash verification still covers the whole run.
 - **Grader isolation (eval side):** graders receive only the run directory path and oracle data — never the transcript — so an agent that merely *describes* success cannot pass.
 
 ## Design philosophy (binding project rules)

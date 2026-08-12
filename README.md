@@ -26,8 +26,9 @@ Give it a task ("Create a CSV of the top 5 stories on Hacker News, with columns 
 
 ```
 runs/2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b/   # date_time_task-slug_suffix (local time)
-  <deliverables>      # the CSVs, screenshots, downloads, answer.md the task asked for
-  manifest.json       # provenance: SHA-256 hash, source URL, capture time per artifact
+  artifacts/          # published outputs — the CSVs, screenshots, downloads, answer.md the task asked for
+  scratch/            # the agent's private working files (never graded, still hashed)
+  manifest.json       # provenance: SHA-256 hash, source URL, roles, capture time per artifact
   transcript.jsonl    # append-only record of every model call and tool call
   metrics.json        # tokens, turns, wall-clock time
 ```

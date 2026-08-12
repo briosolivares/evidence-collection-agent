@@ -57,7 +57,7 @@ flowchart LR
     A["1. exists?\n(unknown → error listing\navailable tools)"] --> B["2. zod validate\n(issues rendered per path)"]
     B --> C["3. execute(input, ctx)"]
     C --> D["4. normalize\n(string pass-through,\nundefined → '', else JSON)"]
-    D --> E["5. cap\n(> 50 KB → offload to\ntool-output/, preview + path)"]
+    D --> E["5. cap\n(> 50 KB → offload to\nscratch/tool-output/, preview + path)"]
     E --> F["6. ToolCallResult"]
     C -.->|"throw"| X["execution_error\n(structured, model-readable)"]
 ```
