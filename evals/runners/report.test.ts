@@ -14,6 +14,7 @@ function sampleReport(): EvalReport {
     finishedAt: '2026-08-10T00:00:05.000Z',
     k: 2,
     model: 'claude-sonnet-5',
+    toolProfile: 'batch-enabled',
     tasks: [
       summarizeTask('stub', [
         {
@@ -43,6 +44,7 @@ describe('formatReport', () => {
 
     expect(text).toContain('k=2');
     expect(text).toContain('model claude-sonnet-5');
+    expect(text).toContain('tool profile batch-enabled');
     expect(text).toContain('stub: accuracy 75.0%  completion 1/2  task FAIL  mean latency 50ms');
     expect(text).toContain('trial 1: 2/2 assertions');
     expect(text).toContain('trial 2: 1/2 assertions');

@@ -1,4 +1,5 @@
 import { summarizeTask, type TaskReport, type TrialGrade } from '../metrics/metrics.js';
+import type { ToolProfile } from '../../src/tools/index.js';
 import type { EvalTask, RunTaskFn } from '../types.js';
 
 /** What the runner needs injected: the agent under evaluation. */
@@ -8,6 +9,8 @@ export interface EvalRunnerDeps {
   /** Name of the model the injected agent runs with, recorded verbatim in
    * the report so past experiments stay comparable across model changes. */
   model: string;
+  /** Deterministic tool surface every trial ran with. */
+  toolProfile: ToolProfile;
 }
 
 /** The full result of one eval invocation, over all tasks and trials. */
@@ -20,6 +23,8 @@ export interface EvalReport {
   k: number;
   /** Name of the model every trial ran with. */
   model: string;
+  /** Tool condition every trial used. */
+  toolProfile: ToolProfile;
   /** One aggregated report per task, in the order the tasks were given. */
   tasks: TaskReport[];
 }
@@ -83,6 +88,7 @@ export async function runEvals(
     finishedAt: new Date().toISOString(),
     k,
     model: deps.model,
+    toolProfile: deps.toolProfile,
     tasks: taskReports,
   };
 }

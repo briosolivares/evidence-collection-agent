@@ -10,6 +10,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "evals": "tsx evals/runners/cli.ts",
+    "analyze:browser-batch": "tsx evals/analysis/browserBatchCli.ts",
     "agent": "tsx src/cli/repl.ts",
     "sherlock": "node bin/sherlock.mjs"
   },

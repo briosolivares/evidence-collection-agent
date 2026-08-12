@@ -22,6 +22,7 @@
 import { resolve } from 'node:path';
 
 import { DATASETS_DIR, EXPERIMENTS_DIR, MODEL } from '../config.js';
+import { DEFAULT_TOOL_PROFILE } from '../../src/tools/index.js';
 import type { EvalTask, RunTaskFn } from '../types.js';
 import { loadEvalTask } from './loadTask.js';
 import { formatReport, writeResults } from './report.js';
@@ -69,7 +70,11 @@ async function main(): Promise<void> {
     return { runDir };
   };
 
-  const report = await runEvals(tasks, k, { runTask: replayRunTask, model: MODEL });
+  const report = await runEvals(tasks, k, {
+    runTask: replayRunTask,
+    model: MODEL,
+    toolProfile: DEFAULT_TOOL_PROFILE,
+  });
 
   console.log(formatReport(report));
   console.log(`\nresults JSON: ${writeResults(report, EXPERIMENTS_DIR)}`);

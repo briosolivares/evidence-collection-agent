@@ -45,12 +45,17 @@ async function main(): Promise<void> {
       runTask(taskText, {
         browser,
         model: MODEL,
+        toolProfile: args.toolProfile,
         runsBaseDir: RUNS_DIR,
         startUrl: opts.startUrl,
         onProgress: (event) => process.stdout.write(formatProgressEvent(event)),
       });
 
-    const report = await runEvals(tasks, args.k, { runTask: realRunTask, model: MODEL });
+    const report = await runEvals(tasks, args.k, {
+      runTask: realRunTask,
+      model: MODEL,
+      toolProfile: args.toolProfile,
+    });
 
     console.log(formatReport(report));
     console.log(`\nresults JSON: ${writeResults(report, EXPERIMENTS_DIR)}`);
