@@ -62,6 +62,7 @@ describe('createEvalBrowserRuntime', () => {
     const events: string[] = [];
     const providerOptions: LocalChromeBrowserSessionOptions[] = [];
     const firstCanFinish = deferred();
+    const firstStarted = deferred();
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
       createProvider: (options) => {
@@ -78,14 +79,14 @@ describe('createEvalBrowserRuntime', () => {
 
     const first = runtime.withBrowser(true, async () => {
       events.push('first:start');
+      firstStarted.resolve();
       await firstCanFinish.promise;
       events.push('first:end');
     });
     const second = runtime.withBrowser(true, async () => {
       events.push('second:start');
     });
-    await Promise.resolve();
-    await Promise.resolve();
+    await firstStarted.promise;
     expect(events).toEqual(['first:start']);
 
     firstCanFinish.resolve();
@@ -147,5 +148,21 @@ describe('createEvalBrowserRuntime', () => {
 
     expect(options).toEqual([{ profileDir: '/tmp/normal-only', headless: true }]);
     expect(() => runtime.withBrowser(false, async () => undefined)).toThrow(/closed/);
+  });
+
+  it('explains the persistent-profile singleton lock', async () => {
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      createProvider: () => ({
+        createSession: async () => {
+          throw new Error('Failed to create a ProcessSingleton for your profile directory');
+        },
+      }),
+    });
+
+    await expect(runtime.withBrowser(true, async () => undefined)).rejects.toThrow(
+      /authenticated Chrome profile is already in use.*close the other Sherlock/i,
+    );
+    await runtime.close();
   });
 });

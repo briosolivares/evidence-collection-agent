@@ -11,7 +11,7 @@
 - [x] Step 1 — Authentication metadata and concurrency configuration
 - [x] Step 2 — Eval-owned browser lifecycle helpers
 - [x] Step 3 — Concurrent deterministic shared runner
-- [ ] Step 4 — Standalone CLI wiring
+- [x] Step 4 — Standalone CLI wiring
 - [ ] Step 5 — Sherlock `/evals` wiring
 - [ ] Step 6 — Documentation and full verification
 

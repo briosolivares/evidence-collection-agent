@@ -67,7 +67,18 @@ export function createEvalBrowserRuntime(options: EvalBrowserRuntimeOptions): Ev
     authenticatedBrowserPromise ??= createProvider({
       profileDir: options.authenticatedProfileDir,
       headless: false,
-    }).createSession();
+    })
+      .createSession()
+      .catch((error: unknown) => {
+        const message = errorMessage(error);
+        if (/ProcessSingleton|user data directory is already in use|profile.*in use/i.test(message)) {
+          throw new Error(
+            `authenticated Chrome profile is already in use (${options.authenticatedProfileDir}); ` +
+              'close the other Sherlock or authenticated eval session and retry',
+          );
+        }
+        throw error;
+      });
     return authenticatedBrowserPromise;
   };
 

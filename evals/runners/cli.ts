@@ -10,16 +10,16 @@
 import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
-import { formatProgressEvent } from '../../src/cli/replFormat.js';
-import { runTask } from '../../src/cli/runTask.js';
 import { generateRunId } from '../../src/run/runId.js';
 import { DATASETS_DIR, EXPERIMENTS_DIR, MODEL, PROFILE_DIR, RUNS_DIR } from '../config.js';
 import { parseEvalArgs } from './cliArgs.js';
+import { createEvalBrowserRuntime } from './browserRuntime.js';
+import { createBrowserBackedRunTask } from './cliRuntime.js';
 import { loadEvalTask } from './loadTask.js';
 import { formatReport, writeResults } from './report.js';
 import { runEvals } from './runner.js';
-import type { EvalTask, RunTaskFn } from '../types.js';
+import { formatEvalProgress, trialLabel } from './progress.js';
+import type { EvalTask } from '../types.js';
 
 async function main(): Promise<void> {
   const args = parseEvalArgs(process.argv.slice(2));
@@ -36,24 +36,24 @@ async function main(): Promise<void> {
     );
   }
 
-  // The agent under evaluation: the real T14 runTask over one session-long
-  // headed browser; each trial gets its own fresh tab (runTask owns tab
-  // lifecycle). Tests and the fake agent keep injecting their own RunTaskFn
-  // through runEvals — this wiring is the CLI's alone.
-  const browserSessionProvider = new LocalChromeBrowserSessionProvider({
-    profileDir: PROFILE_DIR,
+  console.log(
+    `eval browsers: normal=headless isolated (concurrency ${args.concurrency}); ` +
+      'authenticated=headed persistent (serial)',
+  );
+  const browserRuntime = createEvalBrowserRuntime({
+    authenticatedProfileDir: PROFILE_DIR,
   });
-  const browser = await browserSessionProvider.createSession();
   try {
-    const realRunTask: RunTaskFn = (taskText, opts) =>
-      runTask(taskText, {
-        browser,
-        model: MODEL,
-        toolProfile: args.toolProfile,
-        runsBaseDir: RUNS_DIR,
-        startUrl: opts.startUrl,
-        onProgress: (event) => process.stdout.write(formatProgressEvent(event)),
-      });
+    const realRunTask = createBrowserBackedRunTask({
+      browserRuntime,
+      model: MODEL,
+      toolProfile: args.toolProfile,
+      runsBaseDir: RUNS_DIR,
+      onProgress: (taskName, trialNumber, k, event) => {
+        const text = formatEvalProgress(taskName, trialNumber, k, event);
+        if (text !== undefined) process.stdout.write(text);
+      },
+    });
 
     // Crash insurance: every graded trial is appended to a partial JSONL
     // the moment its grade exists, so a transient failure on a later trial
@@ -68,12 +68,32 @@ async function main(): Promise<void> {
       concurrency: args.concurrency,
       model: MODEL,
       toolProfile: args.toolProfile,
+      onTrialStarted: (job) => {
+        const policy = job.requiresAuth ? 'headed authenticated' : 'headless isolated';
+        console.log(`${trialLabel(job.taskName, job.trialNumber, job.k)} started — ${policy}`);
+      },
+      onTrialRunFinished: (job, runDir) => {
+        console.log(`${trialLabel(job.taskName, job.trialNumber, job.k)} run finished — ${runDir}`);
+      },
       onTrialGraded: (job, grade) => {
         try {
-          appendFileSync(partialPath, `${JSON.stringify({ task: job.taskName, trial: job.trialIndex, ...grade })}\n`);
+          appendFileSync(
+            partialPath,
+            `${JSON.stringify({
+              task: job.taskName,
+              trial: job.trialNumber,
+              trialIndex: job.trialIndex,
+              ...grade,
+            })}\n`,
+          );
         } catch (err: unknown) {
           console.warn(`warning: could not persist partial grade: ${err instanceof Error ? err.message : err}`);
         }
+        const passed = grade.assertions.filter((assertion) => assertion.passed).length;
+        console.log(
+          `${trialLabel(job.taskName, job.trialNumber, job.k)} graded — ` +
+            `${passed}/${grade.assertions.length} assertions`,
+        );
       },
     });
 
@@ -81,7 +101,7 @@ async function main(): Promise<void> {
     console.log(`\nresults JSON: ${writeResults(report, EXPERIMENTS_DIR)}`);
     rmSync(partialPath, { force: true });
   } finally {
-    await browser.close();
+    await browserRuntime.close();
   }
 }
 
