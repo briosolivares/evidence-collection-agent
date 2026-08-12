@@ -25,7 +25,7 @@ describe('TUI browser lifecycle', () => {
       runsBaseDir: '/tmp/runs',
     });
     await runtime.start();
-    expect(createSession).toHaveBeenCalledTimes(1);
+    expect(createSession).toHaveBeenCalledTimes(0);
 
     await runtime.startRun('first', () => {}).done;
     await runtime.startRun('second', () => {}).done;
@@ -43,9 +43,21 @@ describe('TUI browser lifecycle', () => {
       startRunFn: () => makeHandle(),
     });
     await runtime.start();
+    await runtime.startRun('launch it', () => {}).done;
     await runtime.shutdown();
     await runtime.shutdown();
     expect(controller.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not launch headed Chrome when started and shut down without an interactive run', async () => {
+    const createSession = vi.fn(async () => stubBrowser());
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn: () => makeHandle(),
+    });
+    await runtime.start();
+    await runtime.shutdown();
+    expect(createSession).not.toHaveBeenCalled();
   });
 
   it('refuses to run before the browser session exists', async () => {

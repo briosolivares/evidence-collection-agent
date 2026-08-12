@@ -111,11 +111,11 @@ describe('browser relaunch on next submit', () => {
       startRunFn,
     });
     await runtime.start();
-    expect(createSession).toHaveBeenCalledTimes(1);
+    expect(createSession).toHaveBeenCalledTimes(0);
 
     const first = await runtime.startRun('dies', () => {}).done;
     expect(first.status).toBe('failed');
-    expect(createSession).toHaveBeenCalledTimes(1); // not yet — relaunch is lazy
+    expect(createSession).toHaveBeenCalledTimes(1); // first run launched lazily
 
     const second = await runtime.startRun('recovers', () => {}).done;
     expect(second.status).toBe('completed');

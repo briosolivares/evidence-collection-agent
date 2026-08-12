@@ -32,7 +32,7 @@ npm run sherlock -- --demo    # scripted demo investigation, no API cost
 npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
-Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial count), `/exit` quits. Esc cancels the in-flight run (or eval trial) without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
+Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
 
 ## How it works
 
@@ -85,10 +85,13 @@ npx tsx --env-file=.env src/cli/repl.ts
 **Evals** — each task runs k independent trials, then a grader checks the run directory against live ground truth (the grader never sees the agent's conversation):
 
 ```bash
-npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news,edgar,openclaw_pr --k 3
+npx tsx --env-file=.env evals/runners/cli.ts \
+  --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
 ```
 
-Results print to stdout and persist to `evals/experiments/`. Available tasks: `hacker_news`, `edgar`, `openclaw_pr`, `stub`.
+Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"requiresAuth": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/`; currently only `elon_tweets` uses that policy. The authenticated lane may overlap the normal pool.
+
+Results print to stdout and persist to `evals/experiments/`. Task packages are the directories under `evals/datasets/`.
 
 **Tests and typecheck** (no API keys or network needed; Chrome required):
 

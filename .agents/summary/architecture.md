@@ -85,7 +85,7 @@ Properties the codebase maintains deliberately:
 
 ## Browser posture
 
-`LocalChromeBrowserSessionProvider` uses Playwright to launch real, local, **visible** Chrome (`channel: 'chrome'`, headed by default) with a persistent profile at `chrome-profile/`, returning a `PlaywrightBrowserController`. This is deliberately the best available anti-bot posture (real fingerprint + real session history + residential IP); headless is the most detectable configuration. The browser session launches once per REPL/eval session so logins persist; each task run opens a fresh tab and closes it on completion. Credentials are never typed by the agent — a human logs into the profile manually once.
+`LocalChromeBrowserSessionProvider` launches real local Chrome (`channel: 'chrome'`) in either mode selected by its caller. Interactive and `requiresAuth` work uses a lazy visible session backed by persistent `chrome-profile/`, preserving logins and human takeover. Every normal eval trial gets its own headless Chrome process and temporary profile, removed after the trial; the normal pool defaults to three concurrent trials. Authenticated trials serialize through the single persistent-profile session and may overlap the normal pool. Credentials are never typed by the agent — a human logs into the persistent profile manually once.
 
 The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot (`page.ariaSnapshot({ mode: 'ai' })`) — a compact accessibility-tree outline with stable element refs. `click`/`type` act by ref, not coordinates or selectors.
 
@@ -101,7 +101,8 @@ The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot
 | Offload preview size | 2,000 bytes | `src/tools/capResult.ts` (`PREVIEW_MAX_BYTES`) |
 | Concurrent read-only tools | 5 | `src/loop/scheduler.ts` (`MAX_CONCURRENT_READS`) |
 | Runs base dir | `runs` | `src/cli/runTask.ts` |
-| Chrome profile | `./chrome-profile` (absolute path required) | `src/cli/repl.ts`, `evals/runners/cli.ts` |
+| Eval concurrency | 3 normal/headless trials | `evals/config.ts`, CLI `--concurrency`, TUI `/evals` menu |
+| Auth Chrome profile | `./chrome-profile` (absolute path; single owner) | interactive and `requiresAuth` runs |
 | Thinking | disabled (`thinking: { type: 'disabled' }`) | `src/model/callModel.ts` — messages types don't carry thinking blocks yet |
 
 All per-run values are overridable through `RunTaskConfig` (see [interfaces.md](interfaces.md)).

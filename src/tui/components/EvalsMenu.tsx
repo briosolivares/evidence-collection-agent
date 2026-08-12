@@ -1,59 +1,52 @@
 import { Box, Text, useInput } from 'ink';
 import { useState } from 'react';
 
+import { DEFAULT_EVAL_CONCURRENCY } from '../../../evals/config.js';
+import type { EvalTaskChoice } from '../bridge/evalSession.js';
 import { theme } from '../theme.js';
 
-/** Parse a trial-count entry: a positive integer, or undefined. */
 export function validateK(text: string): number | undefined {
-  if (!/^\d+$/.test(text)) return undefined;
-  const value = Number(text);
-  return Number.isInteger(value) && value > 0 ? value : undefined;
+  return validatePositiveInteger(text);
+}
+
+export function validateConcurrency(text: string): number | undefined {
+  return validatePositiveInteger(text);
 }
 
 interface EvalsMenuProps {
-  /** Discovered task names. */
-  tasks: readonly string[];
-  /** Called with the selected task names and validated k. */
-  onConfirm: (tasks: string[], k: number) => void;
-  /** Called on Esc from the task stage. */
+  tasks: readonly EvalTaskChoice[];
+  onConfirm: (tasks: string[], k: number, concurrency: number) => void;
   onClose: () => void;
 }
 
-/**
- * The /evals overlay: checkbox multi-select of tasks (space toggles,
- * enter confirms), then a numeric prompt for trials-per-task k (default
- * 3, positive integer). Menu-only by design — no CLI-style args (R10).
- */
+/** Task selection followed by k and normal/headless concurrency prompts. */
 export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
-  const [stage, setStage] = useState<'tasks' | 'k'>('tasks');
+  const [stage, setStage] = useState<'tasks' | 'k' | 'concurrency'>('tasks');
   const [cursor, setCursor] = useState(0);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [kText, setKText] = useState('3');
+  const [concurrencyText, setConcurrencyText] = useState(String(DEFAULT_EVAL_CONCURRENCY));
   const [error, setError] = useState<string | undefined>(undefined);
 
   useInput((input, key) => {
     if (key.escape) {
-      if (stage === 'k') {
-        setStage('tasks');
-        setError(undefined);
-      } else {
-        onClose();
-      }
+      if (stage === 'concurrency') setStage('k');
+      else if (stage === 'k') setStage('tasks');
+      else onClose();
+      setError(undefined);
       return;
     }
 
     if (stage === 'tasks') {
-      if (key.upArrow) {
-        setCursor((current) => Math.max(0, current - 1));
-      } else if (key.downArrow) {
-        setCursor((current) => Math.min(tasks.length - 1, current + 1));
-      } else if (input === ' ') {
+      if (key.upArrow) setCursor((current) => Math.max(0, current - 1));
+      else if (key.downArrow) setCursor((current) => Math.min(tasks.length - 1, current + 1));
+      else if (input === ' ') {
         const task = tasks[cursor];
         if (task === undefined) return;
         setSelected((current) => {
           const next = new Set(current);
-          if (next.has(task)) next.delete(task);
-          else next.add(task);
+          if (next.has(task.name)) next.delete(task.name);
+          else next.add(task.name);
           return next;
         });
         setError(undefined);
@@ -68,43 +61,52 @@ export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
       return;
     }
 
-    // Stage 'k': digits only, backspace edits, enter validates.
     if (key.return) {
-      const k = validateK(kText);
-      if (k === undefined) {
-        setError('k must be a positive integer.');
+      const value = stage === 'k' ? validateK(kText) : validateConcurrency(concurrencyText);
+      if (value === undefined) {
+        setError(`${stage === 'k' ? 'k' : 'concurrency'} must be a positive integer.`);
         return;
       }
-      onConfirm(tasks.filter((task) => selected.has(task)), k);
-      return;
-    }
-    if (key.backspace || key.delete) {
-      setKText((current) => current.slice(0, -1));
+      if (stage === 'k') {
+        setStage('concurrency');
+      } else {
+        onConfirm(
+          tasks.filter((task) => selected.has(task.name)).map((task) => task.name),
+          validateK(kText)!,
+          value,
+        );
+      }
       setError(undefined);
       return;
     }
-    if (/^\d$/.test(input)) {
-      setKText((current) => (current + input).slice(0, 4));
+
+    const currentText = stage === 'k' ? kText : concurrencyText;
+    const setText = stage === 'k' ? setKText : setConcurrencyText;
+    if (key.backspace || key.delete) {
+      setText(currentText.slice(0, -1));
+      setError(undefined);
+    } else if (/^\d$/.test(input)) {
+      setText((currentText + input).slice(0, 4));
       setError(undefined);
     }
   });
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text color={theme.primary} bold>
-        Eval tasks
-      </Text>
+      <Text color={theme.primary} bold>Eval tasks</Text>
       {tasks.length === 0 ? (
         <Text color={theme.muted}>  No eval tasks found.</Text>
       ) : stage === 'tasks' ? (
         <>
           {tasks.map((task, index) => (
-            <Box key={task}>
+            <Box key={task.name}>
               <Text color={index === cursor ? theme.emphasis : undefined}>
                 {index === cursor ? '› ' : '  '}
               </Text>
-              <Text color={selected.has(task) ? theme.emphasis : undefined}>
-                {`[${selected.has(task) ? 'x' : ' '}] ${task}`}
+              <Text color={selected.has(task.name) ? theme.emphasis : undefined}>
+                {`[${selected.has(task.name) ? 'x' : ' '}] ${task.name}${
+                  task.requiresAuth ? ' [auth]' : ''
+                }`}
               </Text>
             </Box>
           ))}
@@ -113,15 +115,25 @@ export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
       ) : (
         <>
           <Text>
-            {`  Trials per task — k: `}
-            <Text color={theme.emphasis}>{kText === '' ? '∙' : kText}</Text>
+            {stage === 'k' ? '  Trials per task — k: ' : '  Parallel headless trials — concurrency: '}
+            <Text color={theme.emphasis}>
+              {(stage === 'k' ? kText : concurrencyText) || '∙'}
+            </Text>
           </Text>
           <Text color={theme.muted}>
-            {`  running ${[...selected].join(', ')} · enter start · esc back`}
+            {`  running ${[...selected].join(', ')} · enter ${
+              stage === 'k' ? 'continue' : 'start'
+            } · esc back`}
           </Text>
         </>
       )}
       {error !== undefined && <Text color={theme.error}>{`  ${error}`}</Text>}
     </Box>
   );
+}
+
+function validatePositiveInteger(text: string): number | undefined {
+  if (!/^\d+$/.test(text)) return undefined;
+  const value = Number(text);
+  return Number.isInteger(value) && value > 0 ? value : undefined;
 }

@@ -43,8 +43,15 @@ export type UiAction =
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
   | { type: 'open_evals' }
-  | { type: 'evals_started'; tasks: string[]; k: number }
-  | { type: 'eval_trial_started'; task: string; trial: number; k: number }
+  | { type: 'evals_started'; tasks: string[]; k: number; concurrency: number }
+  | {
+      type: 'eval_trial_started';
+      task: string;
+      trial: number;
+      k: number;
+      requiresAuth: boolean;
+    }
+  | { type: 'eval_trial_progress'; task: string; trial: number; status: string }
   | {
       type: 'eval_trial_done';
       task: string;
@@ -199,20 +206,49 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return {
         ...append(state, {
           kind: 'notice',
-          text: `Running evals: ${action.tasks.join(', ')} · k=${action.k}`,
+          text:
+            `Running evals: ${action.tasks.join(', ')} · k=${action.k} · ` +
+            `concurrency=${action.concurrency}`,
         }),
         mode: 'evalsRunning',
         evalsActive: true,
+        evalsLive: {},
       };
 
-    case 'eval_trial_started':
-      return append(state, {
-        kind: 'notice',
-        text: `— ${action.task} · trial ${action.trial}/${action.k} —`,
-      });
+    case 'eval_trial_started': {
+      const key = evalTrialKey(action.task, action.trial);
+      return {
+        ...state,
+        evalsLive: {
+          ...state.evalsLive,
+          [key]: {
+            task: action.task,
+            trial: action.trial,
+            k: action.k,
+            requiresAuth: action.requiresAuth,
+            status: 'starting',
+          },
+        },
+      };
+    }
 
-    case 'eval_trial_done':
-      return append(state, {
+    case 'eval_trial_progress': {
+      const key = evalTrialKey(action.task, action.trial);
+      const current = state.evalsLive?.[key];
+      if (current === undefined) return state;
+      return {
+        ...state,
+        evalsLive: {
+          ...state.evalsLive,
+          [key]: { ...current, status: action.status },
+        },
+      };
+    }
+
+    case 'eval_trial_done': {
+      const key = evalTrialKey(action.task, action.trial);
+      const { [key]: _finished, ...remaining } = state.evalsLive ?? {};
+      const next = append(state, {
         kind: 'eval_trial',
         task: action.task,
         trial: action.trial,
@@ -220,6 +256,8 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
         assertions: action.assertions,
         elapsedMs: action.elapsedMs,
       });
+      return { ...next, evalsLive: remaining };
+    }
 
     case 'eval_report_ready':
       return append(state, { kind: 'eval_report', text: action.text });
@@ -228,7 +266,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return append(state, { kind: 'error', message: action.message });
 
     case 'evals_finished': {
-      const { evalsActive: _evalsActive, ...rest } = state;
+      const { evalsActive: _evalsActive, evalsLive: _evalsLive, ...rest } = state;
       return { ...rest, mode: 'idle' };
     }
 
@@ -429,4 +467,8 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return endRun(next);
     }
   }
+}
+
+function evalTrialKey(task: string, trial: number): string {
+  return `${task}\u0000${trial}`;
 }

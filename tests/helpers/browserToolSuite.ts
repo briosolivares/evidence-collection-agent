@@ -64,7 +64,7 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
     if (profileDir !== undefined) {
       rmSync(profileDir, { recursive: true, force: true });
     }
-  });
+  }, 30_000);
 
   return {
     controller: () => controller,

@@ -5,6 +5,8 @@ import {
   discoverEvalTasks,
   startEvalBatch,
   type EvalBatchHandle,
+  type EvalRunner,
+  type EvalTaskChoice,
 } from '../bridge/evalSession.js';
 import type { RunHandle } from '../bridge/runSession.js';
 import type { SherlockConfig } from '../config.js';
@@ -21,6 +23,7 @@ import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
+import { EvalsLiveRegion } from './EvalsLiveRegion.js';
 import { LiveRegion } from './LiveRegion.js';
 import { RunsList } from './RunsList.js';
 import { Transcript } from './Transcript.js';
@@ -42,6 +45,8 @@ interface AppProps {
     onEvent: (event: UiEvent) => void,
     opts?: { startUrl?: string },
   ) => RunHandle;
+  /** Eval-specific runner: isolated headless normally, persistent headed for auth. */
+  evalRunner?: EvalRunner;
   /** Test seam for /exit; defaults to Ink's app exit. */
   onExit?: () => void;
 }
@@ -57,6 +62,7 @@ export function App({
   identity,
   demo = false,
   runner,
+  evalRunner,
   onExit,
 }: AppProps) {
   const { exit } = useApp();
@@ -68,7 +74,8 @@ export function App({
   const runHandle = useRef<RunHandle | undefined>(undefined);
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
-  const [evalTasks, setEvalTasks] = useState<readonly string[]>([]);
+  const [evalTasks, setEvalTasks] = useState<readonly EvalTaskChoice[]>([]);
+  const batchRunner = evalRunner ?? runner;
 
   useEffect(() => {
     if (!demo) return;
@@ -111,7 +118,7 @@ export function App({
         dispatch({ type: 'open_runs' });
         return;
       case 'evals':
-        if (runner === undefined) {
+        if (batchRunner === undefined) {
           dispatch({
             type: 'notice',
             text: 'Evals need a live browser session — not available in --demo.',
@@ -130,13 +137,13 @@ export function App({
     }
   };
 
-  const startEvals = (tasks: string[], k: number) => {
-    if (runner === undefined) return;
-    evalHandle.current = startEvalBatch(tasks, k, {
+  const startEvals = (tasks: string[], k: number, concurrency: number) => {
+    if (batchRunner === undefined) return;
+    evalHandle.current = startEvalBatch(tasks, k, concurrency, {
       onAction: dispatch,
       evalsDir: config.evalsDir,
       resultsDir: config.evalResultsDir,
-      runner,
+      runner: batchRunner,
     });
     void evalHandle.current.done.finally(() => {
       evalHandle.current = undefined;
@@ -160,6 +167,9 @@ export function App({
           live={state.live}
           cancelling={state.mode === 'cancelling'}
         />
+      )}
+      {state.mode === 'evalsRunning' && state.evalsLive !== undefined && (
+        <EvalsLiveRegion trials={state.evalsLive} />
       )}
       {state.mode === 'runsList' && (
         <RunsList
