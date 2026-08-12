@@ -4,6 +4,24 @@ A general browser agent for audit evidence collection: it takes a natural-langua
 
 The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of validated browser and file tools. An engine-agnostic `BrowserController` drives each session, while a `BrowserSessionProvider` decides whether that session comes from local Chrome or a hosted service.
 
+## Install
+
+```bash
+npm install -g github:briosolivares/evidence-collection-agent
+sherlock
+```
+
+Requires Node ≥ 22 and Google Chrome. On first launch Sherlock prompts for an Anthropic API key and offers to save it. An installed Sherlock keeps all of its state under `~/.sherlock/`:
+
+```
+~/.sherlock/
+  chrome-profile/   # persistent Chrome profile — logins survive across runs
+  runs/             # one directory per investigation (evidence + provenance)
+  .env              # ANTHROPIC_API_KEY and friends (written by the first-run prompt)
+```
+
+Overrides: `--runs-dir <path>` (or `SHERLOCK_RUNS_DIR`) moves just the runs directory, `SHERLOCK_HOME` moves the whole data home, `--env-file <path>` loads a specific env file (the default order is `./.env`, then `~/.sherlock/.env`), and `SHERLOCK_CHROME_PATH` points at a non-standard Chrome/Chromium binary. In a git checkout none of this applies — state stays repo-anchored (`runs/`, `chrome-profile/`, `.env` at the repo root; see Setup).
+
 ## Sherlock (TUI)
 
 `sherlock` is the interactive terminal UI: type a task, watch the investigation stream in (semantic activity lines, evidence highlights, a live status line), and get a persistent completion line plus the run directory.
@@ -14,7 +32,7 @@ npm run sherlock -- --demo    # scripted demo investigation, no API cost
 npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
-Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial count), `/exit` quits. Esc cancels the in-flight run (or eval trial) without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and `ANTHROPIC_API_KEY` (loaded from `.env`).
+Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial count), `/exit` quits. Esc cancels the in-flight run (or eval trial) without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
 
 ## How it works
 
@@ -46,13 +64,14 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 npm install
 ```
 
-Create a `.env` at the repo root (gitignored; there is no dotenv loader — pass it explicitly with `--env-file`):
+Copy `.env.example` to `.env` at the repo root and fill in your keys (gitignored; `sherlock` loads it automatically, every other entry point takes it explicitly with `--env-file`):
 
 ```
 ANTHROPIC_API_KEY=...
 LANGFUSE_PUBLIC_KEY=...    # optional — tracing is a no-op without these
 LANGFUSE_SECRET_KEY=...
 LANGFUSE_BASE_URL=...      # optional
+GITHUB_TOKEN=...           # optional — authenticated GitHub eval oracles
 ```
 
 ## Usage
