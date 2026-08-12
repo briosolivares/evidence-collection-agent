@@ -50,13 +50,8 @@ try {
   // No .env — ambient environment only.
 }
 
-const nodeMajor = Number(process.versions.node.split('.')[0]);
-if (Number.isNaN(nodeMajor) || nodeMajor < 22) {
-  console.error(
-    `sherlock requires Node 22 or newer (Ink 7); this is Node ${process.versions.node}.`,
-  );
-  process.exit(1);
-}
+// The Node ≥22 floor is enforced in bin/sherlock.mjs, before any of
+// this module's imports (Ink 7 among them) get a chance to load.
 
 if (!process.stdin.isTTY || !process.stdout.isTTY) {
   console.error(

@@ -37,7 +37,7 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 
 ## Requirements
 
-- Node 18+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
+- Node 22+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
 - An Anthropic API key. Optionally Langfuse keys for tracing.
 
 ## Setup
