@@ -54,4 +54,36 @@ describe('createBrowserBackedRunTask', () => {
       ['auth-task', 1, 2, { type: 'turn_start', turn: 1 }],
     ]);
   });
+
+  it('drops non-HTTP(S) start URLs instead of passing them to runTask', async () => {
+    const browser = { close: vi.fn() } as unknown as BrowserController;
+    const configs: RunTaskConfig[] = [];
+    const browserRuntime: EvalBrowserRuntime = {
+      withBrowser: async (_requiresAuth, operation) => operation(browser),
+      close: vi.fn(),
+    };
+    const runTaskFn = vi.fn(async (_taskText: string, config: RunTaskConfig) => {
+      configs.push(config);
+      return { runDir: '/runs/one' };
+    });
+    const run = createBrowserBackedRunTask({
+      browserRuntime,
+      model: 'test-model',
+      toolProfile: 'atomic',
+      runsBaseDir: '/runs',
+      runTaskFn,
+    });
+
+    await run('write the answer', {
+      taskName: 'blank-tab-task',
+      trialIndex: 0,
+      trialNumber: 1,
+      k: 1,
+      startUrl: 'about:blank',
+      requiresAuth: false,
+      signal: new AbortController().signal,
+    });
+
+    expect(configs[0]).not.toHaveProperty('startUrl');
+  });
 });

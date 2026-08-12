@@ -12,6 +12,7 @@ import {
   type EvalReport,
 } from '../../../evals/runners/runner.js';
 import type { EvalRunOptions, EvalTask } from '../../../evals/types.js';
+import { usableStartUrl } from '../../cli/runTask.js';
 import { DEFAULT_MODEL } from '../../model/callModel.js';
 import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../tools/index.js';
 import type { StoreAction } from '../store/reducer.js';
@@ -46,16 +47,7 @@ export interface EvalBatchHandle {
   done: Promise<'completed' | 'cancelled' | 'failed'>;
 }
 
-/** Keep only HTTP(S) URLs accepted by runTask. */
-export function usableStartUrl(startUrl: string | undefined): string | undefined {
-  if (startUrl === undefined) return undefined;
-  try {
-    const protocol = new URL(startUrl).protocol;
-    return protocol === 'http:' || protocol === 'https:' ? startUrl : undefined;
-  } catch {
-    return undefined;
-  }
-}
+export { usableStartUrl };
 
 /** Discover task packages and their auth marker, alphabetically. */
 export function discoverEvalTasks(evalsDir: string): EvalTaskChoice[] {

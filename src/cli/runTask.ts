@@ -57,6 +57,21 @@ const DEFAULT_MAX_TURNS = Infinity;
 // bigger cap.
 const DEFAULT_MAX_CONTEXT_TOKENS = 900_000;
 
+/**
+ * Keep only start URLs runTask can actually open: `goto` accepts HTTP(S)
+ * pages only, so schemes like `about:blank` (a task's way of saying
+ * "blank tab") map to "no start URL" rather than a run-killing throw.
+ */
+export function usableStartUrl(startUrl: string | undefined): string | undefined {
+  if (startUrl === undefined) return undefined;
+  try {
+    const protocol = new URL(startUrl).protocol;
+    return protocol === 'http:' || protocol === 'https:' ? startUrl : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Configuration for one complete evidence-collection run. */
 export interface RunTaskConfig {
   /** A live session browser with no active task tab. The caller owns and

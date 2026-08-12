@@ -1,5 +1,5 @@
 import type { BrowserController } from '../../src/browser/controller.js';
-import { runTask, type RunTaskConfig } from '../../src/cli/runTask.js';
+import { runTask, usableStartUrl, type RunTaskConfig } from '../../src/cli/runTask.js';
 import type { ProgressEvent } from '../../src/model/callModel.js';
 import type { ToolProfile } from '../../src/tools/index.js';
 import type { RunTaskFn } from '../types.js';
@@ -18,14 +18,15 @@ export interface BrowserBackedRunTaskOptions {
 /** Build the CLI agent function while keeping browser policy outside runTask. */
 export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions): RunTaskFn {
   const runTaskFn = options.runTaskFn ?? runTask;
-  return (taskText, evalOptions) =>
-    options.browserRuntime.withBrowser(evalOptions.requiresAuth, (browser: BrowserController) =>
+  return (taskText, evalOptions) => {
+    const startUrl = usableStartUrl(evalOptions.startUrl);
+    return options.browserRuntime.withBrowser(evalOptions.requiresAuth, (browser: BrowserController) =>
       runTaskFn(taskText, {
         browser,
         model: options.model,
         toolProfile: options.toolProfile,
         runsBaseDir: options.runsBaseDir,
-        ...(evalOptions.startUrl === undefined ? {} : { startUrl: evalOptions.startUrl }),
+        ...(startUrl === undefined ? {} : { startUrl }),
         ...(options.onProgress === undefined
           ? {}
           : {
@@ -39,4 +40,5 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
             }),
       }),
     );
+  };
 }
