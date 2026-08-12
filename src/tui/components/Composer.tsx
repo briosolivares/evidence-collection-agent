@@ -23,7 +23,8 @@ interface ComposerProps {
  * whitespace), an autosuggest panel renders directly above the input
  * (R1). Suggestion selection is purely local component state — the
  * reducer never sees it. Keys while the panel is up: ↑/↓ move the
- * selection (clamped), Tab completes the selected name without
+ * selection (clamped), Tab completes the selected name plus a trailing
+ * space with the cursor after it (the space also hides the panel) without
  * submitting, Enter submits the selected command, Esc dismisses the
  * panel until the input next changes.
  *
@@ -39,6 +40,11 @@ export function Composer({
   const [value, setValue] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  // Bumped on every Tab completion. TextInput only derives its internal
+  // cursor offset on mount (afterwards it merely clamps to a shrinking
+  // value), so an externally grown value would leave the cursor mid-word;
+  // keying the input on this count remounts it with the cursor at the end.
+  const [completionCount, setCompletionCount] = useState(0);
 
   const suggestions = disabled || dismissed ? [] : filterCommands(value);
   const panelVisible = suggestions.length > 0;
@@ -82,8 +88,11 @@ export function Composer({
       } else if (key.downArrow) {
         setSelectedIndex(Math.min(suggestions.length - 1, cursor + 1));
       } else if (key.tab && selected !== undefined) {
-        setValue(selected.name);
+        // Complete to "<name> " — the trailing space readies the line for
+        // arguments and, containing whitespace, hides the panel.
+        setValue(`${selected.name} `);
         setSelectedIndex(0);
+        setCompletionCount((count) => count + 1);
       }
     },
     { isActive: panelVisible },
@@ -105,7 +114,12 @@ export function Composer({
         ) : (
           <>
             <Text color={isCommand ? theme.emphasis : undefined}>
-              <TextInput value={value} onChange={handleChange} onSubmit={handleSubmit} />
+              <TextInput
+                key={completionCount}
+                value={value}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+              />
             </Text>
             {ghost !== '' && (
               <Text color={theme.muted} dimColor>

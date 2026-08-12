@@ -108,7 +108,7 @@ describe('slash-command autosuggest panel (R1)', () => {
     unmount();
   });
 
-  it('Tab completes the selected name without submitting', async () => {
+  it('Tab completes the name plus a space, cursor at the end', async () => {
     const { frames, lastFrame, stdin, unmount } = render(
       <App config={config} apiKeyPresent={true} />,
     );
@@ -117,14 +117,32 @@ describe('slash-command autosuggest panel (R1)', () => {
     stdin.write('\t');
     await tick();
     const frame = lastFrame() ?? '';
-    // The input now holds the full name and the panel shows its one match…
+    // The input now holds the full name; the trailing space hides the panel…
     expect(frame).toContain('› /evals');
-    expect(frame).toContain(DESCRIPTIONS.evals);
-    // …but nothing was submitted: no overlay, no notice, no transcript echo.
+    expect(frame).not.toContain(DESCRIPTIONS.evals);
+    // …and the cursor sits after that space: typing appends at the end.
+    await typeText(stdin, 'x');
+    expect(lastFrame()).toContain('› /evals x');
+    // Nothing was submitted: no overlay, no notice, no transcript echo.
     const output = frames.join('\n');
     expect(output).not.toContain('Eval tasks');
     expect(output).not.toContain('not available in --demo');
     expect(output).not.toContain('▸');
+    unmount();
+  });
+
+  it('Enter after Tab submits the completed command', async () => {
+    const onExit = vi.fn();
+    const { stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} onExit={onExit} />,
+    );
+    await tick();
+    await typeText(stdin, '/ex');
+    stdin.write('\t');
+    await tick();
+    stdin.write(ENTER); // "/exit " trims to /exit and routes
+    await tick();
+    expect(onExit).toHaveBeenCalledTimes(1);
     unmount();
   });
 
@@ -231,7 +249,7 @@ describe('composer ghost completion (R5)', () => {
     unmount();
   });
 
-  it('Tab fills the value; the ghost disappears once complete', async () => {
+  it('Tab fills the value; ghost and panel disappear once complete', async () => {
     const { lastFrame, stdin, unmount } = render(
       <App config={config} apiKeyPresent={true} />,
     );
@@ -240,10 +258,10 @@ describe('composer ghost completion (R5)', () => {
     expect(composerLine(lastFrame())).toContain('/r uns');
     stdin.write('\t');
     await tick();
-    // Value is now the full command with only the cursor cell after it —
-    // no ghost letters, and the panel is still up (not submitted).
+    // Value is now "/runs " with only the cursor cell after it — no ghost
+    // letters, and the trailing space hides the panel (not submitted).
     expect(composerLine(lastFrame())).toMatch(/› \/runs\s+│/);
-    expect(lastFrame()).toContain(DESCRIPTIONS.runs);
+    expect(lastFrame()).not.toContain(DESCRIPTIONS.runs);
     unmount();
   });
 });
