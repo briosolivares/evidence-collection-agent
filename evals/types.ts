@@ -59,6 +59,8 @@ export interface EvalTask {
   taskText: string;
   /** Starting page for the agent, from task.json, when the task has one. */
   startUrl?: string;
+  /** Whether the task must use the shared, logged-in browser identity. */
+  requiresAuth: boolean;
   /** Fetches this task's ground truth; called at grading time (Tier A oracles must be fresh). */
   fetchOracle: () => Promise<unknown>;
   /** The task's grader; see Grader for the standing rule it lives under. */

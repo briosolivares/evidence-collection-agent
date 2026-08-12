@@ -30,6 +30,7 @@ function stubTask(): EvalTask {
     name: 'stub',
     taskText: 'write the answer',
     startUrl: 'about:blank',
+    requiresAuth: false,
     fetchOracle,
     grade,
   };

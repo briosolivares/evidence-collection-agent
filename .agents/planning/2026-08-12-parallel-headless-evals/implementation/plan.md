@@ -6,6 +6,15 @@
 
 **Date:** 2026-08-12
 
+## Progress
+
+- [x] Step 1 — Authentication metadata and concurrency configuration
+- [ ] Step 2 — Eval-owned browser lifecycle helpers
+- [ ] Step 3 — Concurrent deterministic shared runner
+- [ ] Step 4 — Standalone CLI wiring
+- [ ] Step 5 — Sherlock `/evals` wiring
+- [ ] Step 6 — Documentation and full verification
+
 ## Decisions
 
 - Apply the behavior to both the standalone eval CLI and Sherlock's `/evals` flow.

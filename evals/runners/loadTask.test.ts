@@ -17,8 +17,31 @@ describe('loadEvalTask', () => {
     expect(task.name).toBe('stub');
     expect(task.taskText).toContain('answer.md');
     expect(task.startUrl).toBe('about:blank');
+    expect(task.requiresAuth).toBe(false);
     expect(typeof task.grade).toBe('function');
     await expect(task.fetchOracle()).resolves.toEqual({ expectedFile: 'answer.md' });
+  });
+
+  it('loads explicit authentication metadata without inferring from task text', async () => {
+    await expect(loadEvalTask(evalsDir, 'elon_tweets')).resolves.toMatchObject({
+      name: 'elon_tweets',
+      requiresAuth: true,
+    });
+  });
+
+  it('rejects non-boolean authentication metadata', async () => {
+    const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-auth-test-'));
+    try {
+      mkdirSync(join(tmpEvals, 'bad'));
+      writeFileSync(
+        join(tmpEvals, 'bad', 'task.json'),
+        '{"task":"bad auth metadata","requiresAuth":"yes"}',
+      );
+
+      await expect(loadEvalTask(tmpEvals, 'bad')).rejects.toThrow(/requiresAuth.*boolean/);
+    } finally {
+      rmSync(tmpEvals, { recursive: true, force: true });
+    }
   });
 
   it('rejects task names that could traverse outside the evals dir', async () => {

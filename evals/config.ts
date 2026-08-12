@@ -35,6 +35,9 @@ export const PROFILE_DIR = resolve('chrome-profile');
 /** Trials per task when --k is not given (the k=1 debugging inner loop). */
 export const DEFAULT_K = 1;
 
+/** Maximum simultaneous normal/headless eval trials. */
+export const DEFAULT_EVAL_CONCURRENCY = 3;
+
 /**
  * Model id every eval trial runs with. Defaults to the production model so
  * evals measure what users get; point it at another id here to run an

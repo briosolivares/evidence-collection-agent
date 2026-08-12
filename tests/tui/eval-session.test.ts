@@ -92,6 +92,7 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
     name,
     taskText: `run the ${name} investigation`,
     startUrl: `https://start.example/${name}`,
+    requiresAuth: false,
     fetchOracle: async () => ({ oracleFor: name }),
     grade: (runDir, oracle) => {
       fixture.gradeCalls.push([runDir, oracle]);
