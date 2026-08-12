@@ -2,8 +2,10 @@
 // render(<App/>), teardown.
 import { render } from 'ink';
 import { execFileSync } from 'node:child_process';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { homedir, userInfo } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
@@ -43,6 +45,40 @@ function shortenedCwd(): string {
   const cwd = process.cwd();
   const home = homedir();
   return home !== '' && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd;
+}
+
+/** One-time key setup: ask on stdin, optionally persist. Runs before
+ * Ink renders and before Chrome launches, so a missing key is fixed
+ * here instead of surfacing as a 401 halfway through the first run.
+ * Skipping is allowed — the welcome card then shows its warning. */
+async function promptForApiKey(
+  checked: string[],
+  saveTarget: string,
+): Promise<void> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log(`No Anthropic API key found (checked ${checked.join(', ')}).`);
+    const key = (
+      await rl.question('Paste an API key to use (Enter to skip): ')
+    ).trim();
+    if (key === '') return;
+    process.env.ANTHROPIC_API_KEY = key;
+    const save = (
+      await rl.question(`Save it to ${saveTarget} for future sessions? [Y/n] `)
+    )
+      .trim()
+      .toLowerCase();
+    if (save === '' || save === 'y' || save === 'yes') {
+      mkdirSync(dirname(saveTarget), { recursive: true });
+      appendFileSync(saveTarget, `ANTHROPIC_API_KEY=${key}\n`, { mode: 0o600 });
+      console.log('Saved — future sessions load it automatically.');
+    }
+  } catch {
+    // Ctrl+D (EOF) or a closed stream at either question means skip —
+    // the welcome card's warning banner takes it from here.
+  } finally {
+    rl.close();
+  }
 }
 
 /** Value of `--flag <value>` or `--flag=<value>`, else undefined. */
@@ -117,6 +153,23 @@ if (verbose) {
   );
 }
 
+// Key preflight: catch the missing-credential case while the terminal
+// is still plain stdin, not after Chrome is already on screen. The SDK
+// also honors ANTHROPIC_AUTH_TOKEN, so only a fully bare environment
+// prompts. Saving targets the last .env candidate — the repo .env in a
+// checkout, ~/.sherlock/.env installed.
+if (
+  !demo &&
+  process.env.ANTHROPIC_API_KEY === undefined &&
+  process.env.ANTHROPIC_AUTH_TOKEN === undefined
+) {
+  const candidates = paths.envFileCandidates;
+  await promptForApiKey(
+    ['the environment', ...candidates],
+    candidates[candidates.length - 1]!,
+  );
+}
+
 // One persistent, headed Chrome for the whole session (same profile-dir
 // semantics as the REPL); each run gets a fresh tab. The demo needs no
 // browser — it never leaves the UI pipeline.
@@ -129,7 +182,21 @@ const runtime = demo
       }),
       runsBaseDir: config.runsBaseDir,
     });
-await runtime?.start();
+try {
+  await runtime?.start();
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error('sherlock could not launch Chrome.');
+  if (/not found|install|doesn'?t exist|does not exist/i.test(message)) {
+    console.error(
+      'Google Chrome does not appear to be installed. Install it from ' +
+        'https://www.google.com/chrome/ (or run `npx playwright install chrome`), ' +
+        'or point SHERLOCK_CHROME_PATH at a Chrome/Chromium binary.',
+    );
+  }
+  console.error(`\n${message}`);
+  process.exit(1);
+}
 
 try {
   const instance = render(
