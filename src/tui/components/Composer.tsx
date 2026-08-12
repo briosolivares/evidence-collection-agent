@@ -26,6 +26,10 @@ interface ComposerProps {
  * selection (clamped), Tab completes the selected name without
  * submitting, Enter submits the selected command, Esc dismisses the
  * panel until the input next changes.
+ *
+ * The highlighted command's untyped remainder renders inline after the
+ * cursor as muted ghost text (R5), and input starting with `/` renders
+ * in the emphasis color rather than plain text.
  */
 export function Composer({
   disabled = false,
@@ -41,6 +45,14 @@ export function Composer({
   // Clamp so a shrinking match list can never strand the selection.
   const cursor = Math.min(selectedIndex, suggestions.length - 1);
   const selected = panelVisible ? suggestions[cursor] : undefined;
+
+  // The untyped remainder of the highlighted command, shown inline after
+  // the cursor as ghost text — what Tab will fill in.
+  const ghost =
+    selected !== undefined && selected.name.length > value.length
+      ? selected.name.slice(value.length)
+      : '';
+  const isCommand = value.startsWith('/');
 
   const handleChange = (next: string) => {
     setValue(next);
@@ -91,7 +103,16 @@ export function Composer({
         {disabled ? (
           <Text color={theme.muted}>{hint}</Text>
         ) : (
-          <TextInput value={value} onChange={handleChange} onSubmit={handleSubmit} />
+          <>
+            <Text color={isCommand ? theme.emphasis : undefined}>
+              <TextInput value={value} onChange={handleChange} onSubmit={handleSubmit} />
+            </Text>
+            {ghost !== '' && (
+              <Text color={theme.muted} dimColor>
+                {ghost}
+              </Text>
+            )}
+          </>
         )}
       </Box>
     </Box>

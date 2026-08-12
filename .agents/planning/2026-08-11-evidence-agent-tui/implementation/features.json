@@ -809,6 +809,33 @@
         "R4-V2"
       ],
       "status": "pass"
+    },
+    {
+      "id": "R5-F1",
+      "step": 14,
+      "description": "The highlighted command's untyped remainder renders inline after the composer cursor as muted ghost text; it follows the up/down selection and disappears once complete; Tab fills it (pre-existing R1 behavior, now visible).",
+      "verification": [
+        "R5-V1"
+      ],
+      "status": "pass"
+    },
+    {
+      "id": "R5-F2",
+      "step": 14,
+      "description": "Composer input starting with '/' renders in the emphasis purple instead of default text color.",
+      "verification": [
+        "R5-H1"
+      ],
+      "status": "pass"
+    },
+    {
+      "id": "R5-H1",
+      "step": 14,
+      "description": "Agent-judged PTY check: raw bytes show emphasis (38;2;174;164;255) on the typed command and muted+dim ghost after the cursor block; Tab completes and Enter submits.",
+      "verification": [
+        "R5-H1"
+      ],
+      "status": "pass"
     }
   ]
 }

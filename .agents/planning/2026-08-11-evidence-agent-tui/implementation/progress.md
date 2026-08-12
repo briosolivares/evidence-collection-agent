@@ -297,3 +297,25 @@ worktrees before the merge).
   all 20 TUI suites); git diff --check clean.
 - Note: real-API end-to-end run not re-executed for this merge (core behavior
   covered by main's own suites + the TUI's real-runTask scripted-stream tests).
+
+## 2026-08-11 18:40 PDT — R5: composer ghost completion + purple command text
+
+- Change: Composer renders the highlighted suggestion's untyped remainder as
+  muted+dim ghost text inline after the TextInput cursor (what Tab fills);
+  input starting with '/' renders in theme.emphasis via a Text wrapper around
+  TextInput (nested-Text style cascade). Tab completion itself is unchanged
+  from R1.
+- R5-V1: command-suggest.test.tsx 14/14 — '/e' shows '/e vals' in the composer
+  row, down-arrow switches the ghost to '/e xit', Tab fills '/runs' with no
+  ghost letters left and the panel still up (not submitted). Panel snapshot
+  re-recorded; diff reviewed — only the ghost in the composer line.
+- Full battery: npx vitest run --maxWorkers=2 → 70 files / 465 tests passed.
+  Two flaky failures in earlier unconstrained runs (inspectPage afterAll
+  Chrome-teardown timeout; the /evals app trial) both pass standalone and in
+  the constrained run — contention with a LIVE user sherlock session (pid
+  14156) whose Chrome shares this machine; that session was left untouched.
+  npm run typecheck exit 0; git diff --check clean.
+- R5-H1 (agent-judged PTY, /tmp/r5-pty80.out): composer row raw bytes show
+  border(muted) '› '(primary) then ESC[38;2;174;164;255m'/e' (emphasis purple),
+  the inverse-space cursor, then ESC[38;2;125;121;147m ESC[2m 'vals' (muted dim
+  ghost); down-arrow, Tab -> '/exit' completed, Enter quit the session.

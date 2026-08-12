@@ -209,3 +209,41 @@ describe('CommandSuggestions rendering contract', () => {
     unmount();
   });
 });
+
+describe('composer ghost completion (R5)', () => {
+  /** The composer's input row (bordered, holds the › marker). */
+  const composerLine = (frame: string | undefined): string =>
+    (frame ?? '')
+      .split('\n')
+      .find((line) => line.includes('│') && line.includes('› ')) ?? '';
+
+  it('shows the untyped remainder inline and follows the selection', async () => {
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} />,
+    );
+    await tick();
+    await typeText(stdin, '/e');
+    // TextInput's cursor renders as one cell between value and ghost.
+    expect(composerLine(lastFrame())).toContain('/e vals');
+    stdin.write(DOWN); // /evals → /exit
+    await tick();
+    expect(composerLine(lastFrame())).toContain('/e xit');
+    unmount();
+  });
+
+  it('Tab fills the value; the ghost disappears once complete', async () => {
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} />,
+    );
+    await tick();
+    await typeText(stdin, '/r');
+    expect(composerLine(lastFrame())).toContain('/r uns');
+    stdin.write('\t');
+    await tick();
+    // Value is now the full command with only the cursor cell after it —
+    // no ghost letters, and the panel is still up (not submitted).
+    expect(composerLine(lastFrame())).toMatch(/› \/runs\s+│/);
+    expect(lastFrame()).toContain(DESCRIPTIONS.runs);
+    unmount();
+  });
+});

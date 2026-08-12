@@ -32,7 +32,7 @@ exports[`slash-command autosuggest panel (R1) > locks the open panel frame (all 
   /evals  Run eval tasks
   /exit   Quit Sherlock
 ╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ › /                                                                                              │
+│ › / help                                                                                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
   /help for commands"
 `;

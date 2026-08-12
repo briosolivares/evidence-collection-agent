@@ -165,3 +165,27 @@ activity ●, evidence ◆ (sub-lines shift with their box), user task ▸,
 completion ✓, cancelled/error ✗, and the LiveRegion pending rows to match.
 Prose keeps its 2-column padding. Verify (R4-V2): smoke snapshot diff reviewed
 line by line (only the 1-column shift), full battery green.
+
+## R5 — Composer inline completion + command color (2026-08-11, third note batch)
+
+User note (as given): "when you're typing a command, and it autofills in the
+composer, you should be able to click tab and it autocomplete the rest of the
+command name. the command should then also appear a different color (like a
+shade of purple) not just white text."
+
+Design:
+- Tab-completing the selected suggestion already exists (R1). New: the
+  remainder of the selected command renders inline in the composer after the
+  cursor as muted ghost text (`› /ru▊ns`), so what Tab will fill is visible;
+  the ghost follows the ↑/↓ selection and disappears once typed/completed.
+- Input text starting with `/` renders in theme.emphasis (#AEA4FF) instead of
+  default white, via a Text wrapper around the TextInput.
+
+Verify:
+- R5-V1: composer tests — ghost completes the visible line (`/e` shows
+  `/evals`, ↓ switches the ghost to `/exit`), Tab fills the value (Enter then
+  submits it), ghost absent when the input exactly equals the command or the
+  panel is hidden. Full battery: npm test, npm run typecheck, git diff --check.
+- R5-H1 (agent-judged PTY): raw capture shows the emphasis color escape
+  (38;2;174;164;255) on the typed command and the muted ghost remainder
+  (colors are chalk-disabled in unit-test frames, so color proof is PTY-only).
