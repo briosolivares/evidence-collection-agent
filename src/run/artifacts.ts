@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { resolveRunPath } from './runDir.js';
@@ -14,6 +14,9 @@ export const ARTIFACTS_DIR = 'artifacts';
  * or shown, though still hashed into the manifest (tamper evidence is
  * total). */
 export const SCRATCH_DIR = 'scratch';
+
+/** Run-dir subdirectory holding tool-managed checklist state. */
+export const CHECKLIST_DIR = 'checklist';
 
 /**
  * Semantic role of a published artifact: the task explicitly asked for the
@@ -32,8 +35,7 @@ export interface ManifestEntry {
   /** URL the artifact was captured from, when one applies. */
   sourceUrl?: string;
   /** Semantic roles of a published artifact. Present exactly when the file
-   * lives under artifacts/ — scratch entries carry no roles, so the field's
-   * presence is itself the published/private marker. */
+   * lives under artifacts/ — scratch and checklist entries carry no roles. */
   roles?: ArtifactRole[];
   /** ISO 8601 timestamp of when the artifact was written. */
   capturedAt: string;
@@ -58,6 +60,10 @@ export interface ArtifactMeta {
   /** Semantic roles for a published (artifacts/) write, recorded in its
    * manifest entry. Scratch writes carry none. */
   roles?: ArtifactRole[];
+  /** Internal discriminator for the run-scoped checklist store. Checklist
+   * entries are hashed for provenance but are neither published artifacts nor
+   * private scratch files, and therefore carry no roles or source URL. */
+  managedState?: 'checklist';
 }
 
 /**
@@ -69,8 +75,8 @@ export interface ArtifactMeta {
  * @param taskText - the task the run was started with, recorded verbatim
  * @returns nothing; <runDir>/manifest.json now holds valid JSON with the
  *   task text, a start timestamp, and an empty artifact list, and the
- *   artifacts/ and scratch/ subdirectories exist — the workspace layout is
- *   in place before the loop's first turn, like the manifest itself
+ *   artifacts/, scratch/, and checklist/ subdirectories exist — the run
+ *   layout is in place before the loop's first turn, like the manifest itself
  */
 export function initManifest(runDir: string, taskText: string): void {
   const manifest: Manifest = {
@@ -82,6 +88,7 @@ export function initManifest(runDir: string, taskText: string): void {
   writeFileSync(manifestPath(runDir), serializeManifest(manifest), { flag: 'wx' });
   mkdirSync(join(runDir, ARTIFACTS_DIR), { recursive: true });
   mkdirSync(join(runDir, SCRATCH_DIR), { recursive: true });
+  mkdirSync(join(runDir, CHECKLIST_DIR), { recursive: true });
 }
 
 /**
@@ -93,8 +100,9 @@ export function initManifest(runDir: string, taskText: string): void {
  *   initialized; throws (writing nothing) if the manifest is missing
  * @param relPath - relative path for the artifact, confined to the run
  *   directory (see resolveRunPath) and required to land under artifacts/
- *   (published — non-empty roles required) or scratch/ (private — roles
- *   forbidden); throws (writing nothing) if it escapes or breaks the
+ *   (published — non-empty roles required), scratch/ (private — roles
+ *   forbidden), or checklist/ when the internal managed-state discriminator
+ *   is present; throws (writing nothing) if it escapes or breaks the
  *   partition. Missing parent directories are created
  * @param bytes - the artifact's content, written to disk exactly as given
  * @param meta - optional provenance; a given sourceUrl and given roles are
@@ -143,6 +151,43 @@ export function writeArtifact(
 }
 
 /**
+ * Delete one internally managed checklist file and its matching provenance
+ * entry. The path is confined and partition-checked before any mutation, and
+ * the manifest is loaded first so a missing manifest can never leave an
+ * untracked deletion behind.
+ *
+ * Missing files are a no-op and return false. This preserves the manifest when
+ * a caller races with an already-completed deletion. An existing file without
+ * a matching manifest entry is rejected, preserving the meaning of "tracked"
+ * and leaving the file untouched.
+ */
+export function deleteTrackedRunFile(
+  runDir: string,
+  relPath: string,
+  meta: { managedState: 'checklist' },
+): boolean {
+  const absPath = resolveRunPath(runDir, relPath);
+  const filename = relative(resolve(runDir), absPath);
+  assertWorkspacePartition(filename, relPath, meta);
+
+  // Require the manifest before checking or mutating the tracked file.
+  const manifest = loadManifest(runDir);
+  if (!existsSync(absPath)) {
+    return false;
+  }
+
+  const existing = manifest.artifacts.findIndex((a) => a.filename === filename);
+  if (existing < 0) {
+    throw new Error(`no manifest entry for tracked checklist file: ${JSON.stringify(relPath)}`);
+  }
+
+  unlinkSync(absPath);
+  manifest.artifacts.splice(existing, 1);
+  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  return true;
+}
+
+/**
  * Stamp the run's end time into the manifest.
  *
  * @param runDir - absolute path to a run directory whose manifest has been
@@ -157,10 +202,9 @@ export function finalizeManifest(runDir: string): void {
 }
 
 /**
- * Enforce the workspace partition at the single write path: every artifact
- * lives under artifacts/ (published — must carry at least one role) or
- * scratch/ (private — must carry none). The roles field's presence is the
- * published/private marker, so it can never contradict the file's location.
+ * Enforce the run partition at the single write path: published artifacts
+ * carry roles, private scratch files do not, and internal checklist state is
+ * accepted only through its explicit discriminator.
  */
 function assertWorkspacePartition(
   filename: string,
@@ -169,10 +213,30 @@ function assertWorkspacePartition(
 ): void {
   const published = filename.startsWith(`${ARTIFACTS_DIR}${sep}`);
   const scratch = filename.startsWith(`${SCRATCH_DIR}${sep}`);
-  if (!published && !scratch) {
+  const checklist = filename.startsWith(`${CHECKLIST_DIR}${sep}`);
+  if (!published && !scratch && !checklist) {
     throw new Error(
       `artifact path must be under ${ARTIFACTS_DIR}/ (published) or ` +
         `${SCRATCH_DIR}/ (private working files): ${JSON.stringify(relPath)}`,
+    );
+  }
+  if (checklist) {
+    if (meta.managedState !== 'checklist') {
+      throw new Error(
+        `checklist files require the internal managedState discriminator ` +
+          `"checklist": ${JSON.stringify(relPath)}`,
+      );
+    }
+    if (meta.roles !== undefined || meta.sourceUrl !== undefined) {
+      throw new Error(
+        `checklist files cannot carry roles or sourceUrl: ${JSON.stringify(relPath)}`,
+      );
+    }
+    return;
+  }
+  if (meta.managedState !== undefined) {
+    throw new Error(
+      `managedState is only allowed for checklist files: ${JSON.stringify(relPath)}`,
     );
   }
   if (published && (meta.roles === undefined || meta.roles.length === 0)) {

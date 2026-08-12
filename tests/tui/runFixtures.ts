@@ -3,7 +3,7 @@
 // normally-completed runs).
 
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 /** Options describing one fixture run. */
 export interface FixtureRun {
@@ -16,7 +16,13 @@ export interface FixtureRun {
   /** Present ⇒ metrics.json exists (normal loop completion). */
   metrics?: { status: string; turns: number; inputTokens: number; outputTokens: number; cacheReadInputTokens: number; wallClockMs: number };
   /** Artifact files to create, with manifest entries. */
-  artifacts?: { filename: string; content: string; sha256: string; sourceUrl?: string }[];
+  artifacts?: {
+    filename: string;
+    content: string;
+    sha256: string;
+    sourceUrl?: string;
+    roles?: ('requested_output' | 'evidence')[];
+  }[];
 }
 
 /** Create one fixture run directory under baseDir. */
@@ -26,7 +32,9 @@ export function writeFixtureRun(baseDir: string, run: FixtureRun): string {
 
   const artifacts = run.artifacts ?? [];
   for (const artifact of artifacts) {
-    writeFileSync(join(runDir, artifact.filename), artifact.content);
+    const path = join(runDir, artifact.filename);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, artifact.content);
   }
 
   writeFileSync(
@@ -40,6 +48,7 @@ export function writeFixtureRun(baseDir: string, run: FixtureRun): string {
           filename: artifact.filename,
           sha256: artifact.sha256,
           ...(artifact.sourceUrl === undefined ? {} : { sourceUrl: artifact.sourceUrl }),
+          ...(artifact.roles === undefined ? {} : { roles: artifact.roles }),
           capturedAt: run.startedAt,
         })),
       },

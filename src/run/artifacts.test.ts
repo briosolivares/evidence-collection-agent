@@ -1,10 +1,18 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { finalizeManifest, initManifest, MANIFEST_FILENAME, writeArtifact, type Manifest } from './artifacts.js';
+import {
+  CHECKLIST_DIR,
+  deleteTrackedRunFile,
+  finalizeManifest,
+  initManifest,
+  MANIFEST_FILENAME,
+  writeArtifact,
+  type Manifest,
+} from './artifacts.js';
 
 /** SHA-256 of the ASCII bytes "abc" — the classic FIPS 180 known-answer vector. */
 const SHA256_OF_ABC = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
@@ -158,6 +166,45 @@ describe('writeArtifact', () => {
     expect(existsSync(join(runDir, 'scratch/private.csv'))).toBe(false);
     expect(readManifestFile().artifacts).toHaveLength(0);
   });
+
+  it('allows checklist writes only with the internal managed-state discriminator', () => {
+    expect(() => writeArtifact(runDir, 'checklist/1.json', Buffer.from('{}'))).toThrow(
+      /managedState/,
+    );
+
+    const entry = writeArtifact(runDir, 'checklist/1.json', Buffer.from('{}'), {
+      managedState: 'checklist',
+    });
+    expect(entry.filename).toBe('checklist/1.json');
+    expect(entry).not.toHaveProperty('roles');
+    expect(entry).not.toHaveProperty('sourceUrl');
+  });
+
+  it('rejects checklist provenance roles and source URLs, and rejects the discriminator elsewhere', () => {
+    expect(() =>
+      writeArtifact(runDir, 'checklist/1.json', Buffer.from('{}'), {
+        managedState: 'checklist',
+        roles: ['evidence'],
+      }),
+    ).toThrow(/roles or sourceUrl/);
+    expect(() =>
+      writeArtifact(runDir, 'checklist/1.json', Buffer.from('{}'), {
+        managedState: 'checklist',
+        sourceUrl: 'https://example.com',
+      }),
+    ).toThrow(/roles or sourceUrl/);
+    expect(() =>
+      writeArtifact(runDir, 'scratch/notes.txt', Buffer.from('x'), {
+        managedState: 'checklist',
+      }),
+    ).toThrow(/only allowed for checklist/);
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/report.txt', Buffer.from('x'), {
+        managedState: 'checklist',
+        roles: ['requested_output'],
+      }),
+    ).toThrow(/only allowed for checklist/);
+  });
 });
 
 describe('manifest lifecycle', () => {
@@ -193,11 +240,12 @@ describe('manifest lifecycle', () => {
     expect(() => initManifest(runDir, 'second')).toThrow();
   });
 
-  it('initManifest creates the artifacts/ and scratch/ workspace directories', () => {
+  it('initManifest creates the artifacts/, scratch/, and checklist/ workspace directories', () => {
     initManifest(runDir, 'task');
 
     expect(existsSync(join(runDir, 'artifacts'))).toBe(true);
     expect(existsSync(join(runDir, 'scratch'))).toBe(true);
+    expect(existsSync(join(runDir, CHECKLIST_DIR))).toBe(true);
   });
 
   it('writeArtifact before initManifest throws and writes no file', () => {
@@ -209,5 +257,65 @@ describe('manifest lifecycle', () => {
 
   it('finalizeManifest without a manifest throws', () => {
     expect(() => finalizeManifest(runDir)).toThrow();
+  });
+
+  it('deletes one tracked checklist file and exactly its manifest entry', () => {
+    initManifest(runDir, 'task');
+    writeArtifact(runDir, 'checklist/1.json', Buffer.from('{"id":"1"}\n'), {
+      managedState: 'checklist',
+    });
+    writeArtifact(runDir, 'checklist/2.json', Buffer.from('{"id":"2"}\n'), {
+      managedState: 'checklist',
+    });
+    writeArtifact(runDir, 'scratch/working.txt', Buffer.from('keep'));
+    writeArtifact(runDir, 'artifacts/result.txt', Buffer.from('keep'), {
+      roles: ['requested_output'],
+    });
+
+    expect(
+      deleteTrackedRunFile(runDir, 'checklist/1.json', { managedState: 'checklist' }),
+    ).toBe(true);
+    expect(existsSync(join(runDir, 'checklist/1.json'))).toBe(false);
+    expect(existsSync(join(runDir, 'checklist/2.json'))).toBe(true);
+    expect(readManifestFile().artifacts.map((entry) => entry.filename)).toEqual([
+      'checklist/2.json',
+      'scratch/working.txt',
+      'artifacts/result.txt',
+    ]);
+  });
+
+  it('treats a missing tracked file as a no-op after requiring the manifest', () => {
+    initManifest(runDir, 'task');
+
+    expect(
+      deleteTrackedRunFile(runDir, 'checklist/missing.json', { managedState: 'checklist' }),
+    ).toBe(false);
+    expect(readManifestFile().artifacts).toEqual([]);
+  });
+
+  it('confines tracked deletion to checklist paths and loads the manifest before mutation', () => {
+    initManifest(runDir, 'task');
+    writeArtifact(runDir, 'checklist/1.json', Buffer.from('{}'), { managedState: 'checklist' });
+
+    expect(() =>
+      deleteTrackedRunFile(runDir, '../outside.json', { managedState: 'checklist' }),
+    ).toThrow();
+    expect(() =>
+      deleteTrackedRunFile(runDir, 'scratch/working.txt', { managedState: 'checklist' }),
+    ).toThrow(/only allowed for checklist/);
+    expect(existsSync(join(runDir, 'checklist/1.json'))).toBe(true);
+
+    const withoutManifest = mkdtempSync(join(tmpdir(), 'artifacts-no-manifest-'));
+    try {
+      const checklistFile = join(withoutManifest, CHECKLIST_DIR, '1.json');
+      mkdirSync(join(withoutManifest, CHECKLIST_DIR), { recursive: true });
+      writeFileSync(checklistFile, '{}');
+      expect(() =>
+        deleteTrackedRunFile(withoutManifest, 'checklist/1.json', { managedState: 'checklist' }),
+      ).toThrow(/manifest/);
+      expect(existsSync(checklistFile)).toBe(true);
+    } finally {
+      rmSync(withoutManifest, { recursive: true, force: true });
+    }
   });
 });

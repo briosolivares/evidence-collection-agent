@@ -68,6 +68,16 @@ describe('write_file', () => {
     expect(readManifestFile().artifacts).toHaveLength(0);
   });
 
+  it('rejects checklist paths and writes nothing', async () => {
+    const result = await call('write_file', { file_path: 'checklist/1.json', content: '{"done":true}' });
+
+    expect(result).toMatchObject({ isError: true, errorKind: 'execution_error' });
+    expect(result.content).toContain('artifacts/');
+    expect(result.content).toContain('scratch/');
+    expect(existsSync(join(runDir, 'checklist/1.json'))).toBe(false);
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+
   it('published files default to the requested_output role', async () => {
     await call('write_file', { file_path: 'artifacts/report.csv', content: 'a,b\n' });
 

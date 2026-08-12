@@ -82,6 +82,53 @@ describe('scanRuns', () => {
 });
 
 describe('loadRunSummary', () => {
+  it('includes published artifacts and excludes scratch and checklist entries', () => {
+    const runDir = writeFixtureRun(baseDir, {
+      id: '2026-08-11T10-00-00-000Z-partitioned',
+      task: 'partitioned run',
+      startedAt: '2026-08-11T10:00:00.000Z',
+    });
+    mkdirSync(join(runDir, 'artifacts'));
+    mkdirSync(join(runDir, 'scratch'));
+    mkdirSync(join(runDir, 'checklist'));
+    writeFileSync(join(runDir, 'artifacts', 'answer.csv'), 'answer');
+    writeFileSync(join(runDir, 'scratch', 'notes.txt'), 'private notes');
+    writeFileSync(join(runDir, 'checklist', '1.json'), '{"id":"1"}');
+    writeFileSync(
+      join(runDir, 'manifest.json'),
+      JSON.stringify({
+        task: 'partitioned run',
+        startedAt: '2026-08-11T10:00:00.000Z',
+        artifacts: [
+          {
+            filename: 'artifacts/answer.csv',
+            sha256: 'published-sha',
+            roles: ['requested_output'],
+            capturedAt: '2026-08-11T10:00:00.000Z',
+          },
+          {
+            filename: 'scratch/notes.txt',
+            sha256: 'scratch-sha',
+            capturedAt: '2026-08-11T10:00:00.000Z',
+          },
+          {
+            filename: 'checklist/1.json',
+            sha256: 'checklist-sha',
+            capturedAt: '2026-08-11T10:00:00.000Z',
+          },
+        ],
+      }),
+    );
+
+    expect(loadRunSummary(runDir).manifest.artifacts).toEqual([
+      {
+        filename: 'artifacts/answer.csv',
+        sizeBytes: 6,
+        sha256Prefix: 'published-sh',
+      },
+    ]);
+  });
+
   it('builds the manifest view with sizes and sha256 prefixes, plus metrics', () => {
     const runDir = writeFixtureRun(baseDir, {
       id: '2026-08-11T10-00-00-000Z-full',
@@ -91,10 +138,11 @@ describe('loadRunSummary', () => {
       metrics: { status: 'completed', turns: 5, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 9_000, wallClockMs: 84_000 },
       artifacts: [
         {
-          filename: 'top5.csv',
+          filename: 'artifacts/top5.csv',
           content: 'a,b,c\n1,2,3\n',
           sha256: 'deadbeefcafe0123456789abcdef',
           sourceUrl: 'https://news.ycombinator.com/',
+          roles: ['requested_output'],
         },
       ],
     });
@@ -103,7 +151,7 @@ describe('loadRunSummary', () => {
     expect(summary.manifest.task).toBe('summarize me');
     expect(summary.manifest.artifacts).toEqual([
       {
-        filename: 'top5.csv',
+        filename: 'artifacts/top5.csv',
         sizeBytes: 12,
         sha256Prefix: 'deadbeefcafe',
         sourceUrl: 'https://news.ycombinator.com/',

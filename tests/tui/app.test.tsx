@@ -184,7 +184,12 @@ describe('App /runs browsing', () => {
         finishedAt: '2026-08-11T11:01:24.000Z',
         metrics: { status: 'completed', turns: 4, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 0, wallClockMs: 84_000 },
         artifacts: [
-          { filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' },
+          {
+            filename: 'artifacts/out.csv',
+            content: 'a,b\n',
+            sha256: 'feedfacedead0000',
+            roles: ['requested_output'],
+          },
         ],
       });
       writeFixtureRun(baseDir, {
@@ -193,7 +198,12 @@ describe('App /runs browsing', () => {
         startedAt: '2026-08-11T10:00:00.000Z',
         finishedAt: '2026-08-11T10:00:30.000Z',
         artifacts: [
-          { filename: 'page.png', content: 'png-bytes', sha256: 'cafebabe12340000' },
+          {
+            filename: 'artifacts/page.png',
+            content: 'png-bytes',
+            sha256: 'cafebabe12340000',
+            roles: ['evidence'],
+          },
         ],
       });
 

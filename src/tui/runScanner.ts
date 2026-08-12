@@ -85,20 +85,30 @@ export function loadRunSummary(
     throw new Error(`no readable manifest in ${runDir}`);
   }
 
-  const artifacts = manifest.artifacts.map((artifact) => {
-    let sizeBytes: number | undefined;
-    try {
-      sizeBytes = statSync(join(runDir, artifact.filename)).size;
-    } catch {
-      sizeBytes = undefined;
-    }
-    return {
-      filename: artifact.filename,
-      sizeBytes,
-      sha256Prefix: artifact.sha256.slice(0, 12),
-      ...(artifact.sourceUrl === undefined ? {} : { sourceUrl: artifact.sourceUrl }),
-    };
-  });
+  // The manifest also indexes private scratch files and managed checklist
+  // state for provenance. Only entries that are both under the published
+  // artifacts/ tree and carry semantic roles belong in the /runs summary.
+  const artifacts = manifest.artifacts
+    .filter(
+      (artifact) =>
+        artifact.filename.startsWith('artifacts/') &&
+        artifact.roles !== undefined &&
+        artifact.roles.length > 0,
+    )
+    .map((artifact) => {
+      let sizeBytes: number | undefined;
+      try {
+        sizeBytes = statSync(join(runDir, artifact.filename)).size;
+      } catch {
+        sizeBytes = undefined;
+      }
+      return {
+        filename: artifact.filename,
+        sizeBytes,
+        sha256Prefix: artifact.sha256.slice(0, 12),
+        ...(artifact.sourceUrl === undefined ? {} : { sourceUrl: artifact.sourceUrl }),
+      };
+    });
 
   const manifestView: ManifestView = {
     task: manifest.task,
