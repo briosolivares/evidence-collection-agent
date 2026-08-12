@@ -7,6 +7,11 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
+import {
+  findDevRoot,
+  loadFirstEnvFile,
+  resolveSherlockPaths,
+} from '../config/paths.js';
 // Read-only import of the core's default model id for the welcome card —
 // the sanctioned touch-point; the core itself stays untouched.
 import { DEFAULT_MODEL } from '../model/callModel.js';
@@ -39,15 +44,34 @@ function shortenedCwd(): string {
   return home !== '' && cwd.startsWith(home) ? `~${cwd.slice(home.length)}` : cwd;
 }
 
-const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+/** Value of `--flag <value>` or `--flag=<value>`, else undefined. */
+function argValue(flag: string): string | undefined {
+  const withEquals = process.argv.find((arg) => arg.startsWith(`${flag}=`));
+  if (withEquals !== undefined) return withEquals.slice(flag.length + 1);
+  const index = process.argv.indexOf(flag);
+  return index !== -1 ? process.argv[index + 1] : undefined;
+}
 
-// The repo deliberately has no dotenv; Sherlock loads the gitignored .env
-// itself so a bare `sherlock` works without `--env-file`. An absent file
-// is fine — the SDK falls back to ambient credentials.
-try {
-  process.loadEnvFile(resolve(REPO_ROOT, '.env'));
-} catch {
-  // No .env — ambient environment only.
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+// Per-user state locations: repo-anchored in a dev checkout, under
+// ~/.sherlock when installed — see src/config/paths.ts for the rules.
+const paths = resolveSherlockPaths({ devRoot: findDevRoot(PACKAGE_ROOT) });
+
+// The repo deliberately has no dotenv; Sherlock loads the first .env it
+// finds so a bare `sherlock` works without flags. All candidates being
+// absent is fine — the SDK falls back to ambient credentials — but an
+// explicitly requested --env-file must load.
+const envFileFlag = argValue('--env-file');
+let loadedEnvFile: string | undefined;
+if (envFileFlag !== undefined) {
+  loadedEnvFile = loadFirstEnvFile([resolve(envFileFlag)]);
+  if (loadedEnvFile === undefined) {
+    console.error(`could not read --env-file ${envFileFlag}`);
+    process.exit(1);
+  }
+} else {
+  loadedEnvFile = loadFirstEnvFile(paths.envFileCandidates);
 }
 
 // The Node ≥22 floor is enforced in bin/sherlock.mjs, before any of
@@ -70,12 +94,27 @@ const identity: BannerIdentity = {
 };
 
 const demo = process.argv.includes('--demo');
+const verbose = process.argv.includes('--verbose');
+const runsDirFlag = argValue('--runs-dir');
+const runsBaseDir =
+  runsDirFlag !== undefined ? resolve(runsDirFlag) : paths.runsBaseDir;
 const config = createConfig({
-  verbose: process.argv.includes('--verbose'),
-  runsBaseDir: resolve(REPO_ROOT, 'runs'),
-  evalsDir: resolve(REPO_ROOT, 'evals/datasets'),
-  evalResultsDir: resolve(REPO_ROOT, 'runs', 'eval-results'),
+  verbose,
+  runsBaseDir,
+  evalsDir: paths.evalsDir,
+  evalResultsDir:
+    runsDirFlag !== undefined
+      ? resolve(runsBaseDir, 'eval-results')
+      : paths.evalResultsDir,
 });
+
+if (verbose) {
+  console.error(
+    loadedEnvFile !== undefined
+      ? `env: loaded ${loadedEnvFile}`
+      : 'env: no .env file found; using the ambient environment only',
+  );
+}
 
 // One persistent, headed Chrome for the whole session (same profile-dir
 // semantics as the REPL); each run gets a fresh tab. The demo needs no
@@ -84,7 +123,7 @@ const runtime = demo
   ? undefined
   : createTuiRuntime({
       browserSessionProvider: new LocalChromeBrowserSessionProvider({
-        profileDir: resolve(REPO_ROOT, 'chrome-profile'),
+        profileDir: paths.profileDir,
       }),
       runsBaseDir: config.runsBaseDir,
     });
