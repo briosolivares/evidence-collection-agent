@@ -24,6 +24,7 @@ import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
 import { LiveRegion } from './LiveRegion.js';
 import { RunsList } from './RunsList.js';
+import { TaskChecklist } from './TaskChecklist.js';
 import { Transcript } from './Transcript.js';
 
 interface AppProps {
@@ -178,6 +179,9 @@ export function App({
         />
       )}
       <Box flexDirection="column" marginTop={1}>
+        {state.mode === 'idle' && checklist.visible && (
+          <TaskChecklist tasks={checklist.tasks} variant="standalone" />
+        )}
         <Composer
           disabled={state.mode !== 'idle'}
           hint={composerHint}

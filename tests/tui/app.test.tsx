@@ -1,6 +1,11 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createChecklistTask, updateChecklistTask } from '../../src/run/checklist.js';
+import { initManifest } from '../../src/run/artifacts.js';
 import type { RunHandle, RunOutcome } from '../../src/tui/bridge/runSession.js';
 import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
@@ -99,6 +104,38 @@ function fakeRunner(outcome: RunOutcome = { status: 'cancelled' }) {
   };
 }
 
+/** A fake run that creates a real checklist task after publishing its runDir. */
+function checklistRunner(runDirs: readonly string[]) {
+  let nextRun = 0;
+  const resolveDone: Array<(value: RunOutcome) => void> = [];
+  const emitters: Array<(event: UiEvent) => void> = [];
+  const runner = vi.fn((task: string, onEvent: (event: UiEvent) => void): RunHandle => {
+    const runDir = runDirs[nextRun++];
+    if (runDir === undefined) throw new Error('checklist test ran out of run directories');
+    emitters.push(onEvent);
+    onEvent({ type: 'run_started', task, at: 0 });
+    onEvent({ type: 'run_dir', runDir });
+    createChecklistTask(runDir, {
+      subject: `${task} checklist item`,
+      description: `Checklist coverage for ${task}`,
+      activeForm: `Working on ${task}`,
+    });
+    return {
+      cancel: vi.fn(),
+      done: new Promise<RunOutcome>((resolve) => resolveDone.push(resolve)),
+    };
+  });
+  return {
+    runner,
+    emit(index: number, event: UiEvent) {
+      emitters[index]?.(event);
+    },
+    finish(index: number, outcome: RunOutcome = { status: 'cancelled' }) {
+      resolveDone[index]?.(outcome);
+    },
+  };
+}
+
 describe('App run-session wiring', () => {
   it('submitting a task invokes the bridge and disables the composer', async () => {
     const bridge = fakeRunner();
@@ -158,6 +195,136 @@ describe('App run-session wiring', () => {
     expect(frames.join('\n')).toContain('▸ no bridge here');
     expect(lastFrame()).not.toContain('(waiting for agent…)');
     unmount();
+  });
+
+  it('observes a real checklist create/update while the run is active', async () => {
+    const runDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-live-'));
+    try {
+      initManifest(runDir, 'checklist live task');
+      const bridge = checklistRunner([runDir]);
+      const { frames, stdin, unmount } = render(
+        <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+      );
+      await tick();
+      await submitLine(stdin, 'collect filing evidence');
+      updateChecklistTask(runDir, '1', { status: 'in_progress' });
+      await tick(180);
+
+      const output = frames.join('\n');
+      expect(output).toContain('Working on collect filing evidence');
+      expect(output).toContain('collect filing evidence checklist item');
+      bridge.finish(0);
+      unmount();
+    } finally {
+      rmSync(runDir, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps an incomplete checklist above the composer after cancellation', async () => {
+    const runDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-cancel-'));
+    try {
+      initManifest(runDir, 'checklist cancellation task');
+      const bridge = checklistRunner([runDir]);
+      const { lastFrame, stdin, unmount } = render(
+        <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+      );
+      await tick();
+      await submitLine(stdin, 'cancelled checklist');
+      bridge.emit(0, { type: 'run_cancelled', at: 18_000 });
+      bridge.finish(0);
+      await tick(120);
+
+      expect(lastFrame()).toContain('cancelled checklist checklist item');
+      expect(lastFrame()).toContain('Checklist');
+      unmount();
+    } finally {
+      rmSync(runDir, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps an incomplete checklist above the composer after budget termination', async () => {
+    const runDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-budget-'));
+    try {
+      initManifest(runDir, 'checklist budget task');
+      const bridge = checklistRunner([runDir]);
+      const { lastFrame, stdin, unmount } = render(
+        <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+      );
+      await tick();
+      await submitLine(stdin, 'budget checklist');
+      bridge.emit(0, {
+        type: 'run_finished',
+        outcome: 'budget_exceeded',
+        reason: 'max_turns',
+        runDir,
+        at: 18_000,
+      });
+      bridge.finish(0, { status: 'budget_exceeded', reason: 'max_turns', runDir });
+      await tick(120);
+
+      expect(lastFrame()).toContain('budget checklist checklist item');
+      expect(lastFrame()).toContain('Checklist');
+      unmount();
+    } finally {
+      rmSync(runDir, { recursive: true, force: true });
+    }
+  });
+
+  it('hides the idle checklist behind the /runs overlay', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-overlay-'));
+    const runDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-overlay-run-'));
+    try {
+      initManifest(runDir, 'checklist overlay task');
+      const overlayConfig = createConfig({ runsBaseDir: join(root, 'runs') });
+      const bridge = checklistRunner([runDir]);
+      const { lastFrame, stdin, unmount } = render(
+        <App config={overlayConfig} apiKeyPresent={true} runner={bridge.runner} />,
+      );
+      await tick();
+      await submitLine(stdin, 'overlay checklist');
+      bridge.emit(0, { type: 'run_cancelled', at: 18_000 });
+      bridge.finish(0);
+      await tick(120);
+      expect(lastFrame()).toContain('overlay checklist checklist item');
+
+      await submitLine(stdin, '/runs');
+      expect(lastFrame()).toContain('No runs yet');
+      expect(lastFrame()).not.toContain('overlay checklist checklist item');
+      unmount();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(runDir, { recursive: true, force: true });
+    }
+  });
+
+  it('clears the previous checklist when a new run starts', async () => {
+    const firstRunDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-first-'));
+    const secondRunDir = mkdtempSync(join(tmpdir(), 'sherlock-app-checklist-second-'));
+    try {
+      initManifest(firstRunDir, 'first checklist task');
+      initManifest(secondRunDir, 'second checklist task');
+      const bridge = checklistRunner([firstRunDir, secondRunDir]);
+      const { frames, lastFrame, stdin, unmount } = render(
+        <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+      );
+      await tick();
+      await submitLine(stdin, 'first run');
+      bridge.emit(0, { type: 'run_cancelled', at: 18_000 });
+      bridge.finish(0);
+      await tick(120);
+      expect(lastFrame()).toContain('first run checklist item');
+
+      await submitLine(stdin, 'second run');
+      await tick(120);
+      expect(lastFrame()).toContain('second run checklist item');
+      expect(lastFrame()).not.toContain('first run checklist item');
+      expect(frames.join('\n')).toContain('first run checklist item');
+      bridge.finish(1);
+      unmount();
+    } finally {
+      rmSync(firstRunDir, { recursive: true, force: true });
+      rmSync(secondRunDir, { recursive: true, force: true });
+    }
   });
 });
 

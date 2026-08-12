@@ -4,8 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { pickWord, StatusLine } from '../../src/tui/components/StatusLine.js';
 import { TranscriptItemView } from '../../src/tui/components/TranscriptItem.js';
 import { createConfig } from '../../src/tui/config.js';
+import type { RunChecklistSnapshot } from '../../src/tui/hooks/useRunChecklist.js';
 import type { LiveRunState } from '../../src/tui/store/state.js';
-import { tick } from './helpers.js';
+import { renderAt, tick } from './helpers.js';
 
 function liveState(overrides: Partial<LiveRunState> = {}): LiveRunState {
   return {
@@ -38,9 +39,26 @@ describe('pickWord', () => {
 });
 
 describe('StatusLine', () => {
-  it('renders the metrics line `↳ 12.4k tokens · 18s`', async () => {
+  it('renders inline metrics at normal width', async () => {
     const config = createConfig();
-    const { lastFrame, unmount } = render(
+    const { lastFrame, unmount } = renderAt(
+      80,
+      <StatusLine
+        config={config}
+        live={liveState({ startedAt: 0, tokens: { settled: 12_400, estimate: 12_400 } })}
+        now={() => 18_000}
+        rng={() => 0}
+      />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('(18s · ↓ 12.4k tokens)');
+    unmount();
+  });
+
+  it('keeps metrics on the muted metadata line at narrow width', async () => {
+    const config = createConfig();
+    const { lastFrame, unmount } = renderAt(
+      44,
       <StatusLine
         config={config}
         live={liveState({ startedAt: 0, tokens: { settled: 12_400, estimate: 12_400 } })}
@@ -50,6 +68,74 @@ describe('StatusLine', () => {
     );
     await tick();
     expect(lastFrame()).toContain('↳ 12.4k tokens · 18s');
+    expect(lastFrame()).not.toContain('(18s · ↓ 12.4k tokens)');
+    unmount();
+  });
+
+  it('wraps metrics when a long active headline leaves too little inline space', async () => {
+    const { lastFrame, unmount } = renderAt(
+      64,
+      <StatusLine
+        config={createConfig()}
+        live={liveState({ tokens: { settled: 209, estimate: 209 } })}
+        checklist={{
+          visible: true,
+          tasks: [{
+            id: '1',
+            subject: 'Validation',
+            description: 'Validate',
+            status: 'in_progress',
+            activeForm: 'Running validation and writing the final report',
+          }],
+        }}
+        now={() => 9_000}
+      />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('↳ 209 tokens · 9s');
+    expect(lastFrame()).not.toContain('(9s · ↓ 209 tokens)');
+    unmount();
+  });
+
+  it('uses the active task activeForm, then subject, for the running headline', async () => {
+    const config = createConfig();
+    const checklist: RunChecklistSnapshot = {
+      visible: true,
+      tasks: [{ id: '1', subject: 'Collect filing', description: 'Collect it', status: 'in_progress', activeForm: 'Collecting filing' }],
+    };
+    const active = render(
+      <StatusLine config={config} live={liveState()} checklist={checklist} rng={() => 0} />,
+    );
+    await tick();
+    expect(active.lastFrame()).toContain('Collecting filing…');
+    active.unmount();
+
+    const subjectFallback = render(
+      <StatusLine config={config} live={liveState()} checklist={{
+        visible: true,
+        tasks: [{ id: '1', subject: 'Collect filing', description: 'Collect it', status: 'in_progress' }],
+      }} rng={() => 0} />,
+    );
+    await tick();
+    expect(subjectFallback.lastFrame()).toContain('Collect filing…');
+    subjectFallback.unmount();
+  });
+
+  it('renders the compact checklist only when the snapshot is visible', async () => {
+    const config = createConfig();
+    const checklist: RunChecklistSnapshot = {
+      visible: true,
+      tasks: [
+        { id: '1', subject: 'Collect filing', description: 'Collect it', status: 'in_progress' },
+        { id: '2', subject: 'Write report', description: 'Write it', status: 'pending' },
+      ],
+    };
+    const { lastFrame, unmount } = render(
+      <StatusLine config={config} live={liveState()} checklist={checklist} rng={() => 0} />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('Collect filing');
+    expect(lastFrame()).toContain('Write report');
     unmount();
   });
 

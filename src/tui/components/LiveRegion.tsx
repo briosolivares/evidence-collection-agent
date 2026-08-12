@@ -9,7 +9,7 @@ import { StatusLine } from './StatusLine.js';
 interface LiveRegionProps {
   config: SherlockConfig;
   live: LiveRunState;
-  checklist: RunChecklistSnapshot;
+  checklist?: RunChecklistSnapshot;
   cancelling?: boolean;
   now?: () => number;
   rng?: () => number;

@@ -13,7 +13,7 @@
 - [x] Step 1: Add the run-scoped checklist schema, durable store, bootstrap, and provenance behavior.
 - [x] Step 2: Add `TaskCreate`, `TaskList`, `TaskGet`, and `TaskUpdate`; register them and teach the model to use them.
 - [x] Step 3: Add a disk-backed checklist subscription for the current run.
-- [ ] Step 4: Render the checklist in Sherlock while running and above the composer while idle.
+- [x] Step 4: Render the checklist in Sherlock while running and above the composer while idle.
 - [ ] Step 5: Lock the contract in documentation and complete end-to-end validation.
 
 ## Codebase-specific starting point

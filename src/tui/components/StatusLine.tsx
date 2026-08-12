@@ -1,4 +1,4 @@
-import { Box, Text } from 'ink';
+import { Box, Text, useStdout } from 'ink';
 import { useEffect, useState } from 'react';
 
 import type { SherlockConfig } from '../config.js';
@@ -6,6 +6,7 @@ import { formatDuration, formatTokens } from '../format.js';
 import type { RunChecklistSnapshot } from '../hooks/useRunChecklist.js';
 import type { LiveRunState } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
+import { chooseCurrentTask, TaskChecklist } from './TaskChecklist.js';
 
 /**
  * Pick a working word, never repeating the current one (R4's "no
@@ -37,13 +38,14 @@ interface StatusLineProps {
 }
 
 /**
- * The animated working state (R3/R4): spinner glyph + whimsical word,
- * with `↳ tokens · elapsed` metadata beneath. Ephemeral — never enters
- * the transcript.
+ * The animated working state (R3/R4): spinner glyph + active checklist
+ * form (or whimsical fallback), with metrics inline when they fit and on a
+ * muted line when they do not. Ephemeral — never enters the transcript.
  */
 export function StatusLine({
   config,
   live,
+  checklist,
   cancelling = false,
   now = Date.now,
   rng = Math.random,
@@ -76,19 +78,37 @@ export function StatusLine({
   }, []);
 
   const glyph = glyphs.spinnerFrames[frame % glyphs.spinnerFrames.length];
-  const label = cancelling ? 'Wrapping up' : word;
   const tokens = formatTokens(Math.round(live.tokens.estimate));
   const elapsed = formatDuration(now() - live.startedAt);
+  const { stdout } = useStdout();
+  const terminalWidth = stdout?.columns ?? 80;
+  const activeTask = chooseCurrentTask(checklist?.tasks ?? []);
+  const headline = cancelling ? 'Wrapping up' : activeTask?.activeForm ?? activeTask?.subject ?? word;
+  const metricSummary = `(${elapsed} · ↓ ${tokens})`;
+  const inlineMetrics =
+    terminalWidth >= 60 && headline.length + metricSummary.length + 5 <= terminalWidth;
 
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text>
         <Text color={theme.primary}>{glyph}</Text>
-        {` ${label}…`}
+        {` ${headline}…`}
+        {inlineMetrics && (
+          <Text color={theme.muted}>{`  ${metricSummary}`}</Text>
+        )}
       </Text>
-      <Text color={theme.muted}>
-        {`${glyphs.metadata} ${tokens} · ${elapsed} (esc to interrupt)`}
-      </Text>
+      {!inlineMetrics && (
+        <Text color={theme.muted}>
+          {`${glyphs.metadata} ${tokens} · ${elapsed} (esc to interrupt)`}
+        </Text>
+      )}
+      {checklist?.visible && (
+        <TaskChecklist
+          tasks={checklist.tasks}
+          variant="compact"
+          width={terminalWidth}
+        />
+      )}
     </Box>
   );
 }
