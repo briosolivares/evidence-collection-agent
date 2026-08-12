@@ -21,8 +21,10 @@ import { SYSTEM_PROMPT } from '../../cli/systemPrompt.js';
 import {
   buildRequestParams,
   DEFAULT_MODEL,
+  makeAnthropicClient,
   type CallModelConfig,
 } from '../../model/callModel.js';
+import { callWithRetry } from '../../model/callWithRetry.js';
 import {
   assembleModelResponse,
   type ModelStreamEvent,
@@ -117,7 +119,8 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
       params: Anthropic.Messages.MessageStreamParams,
       streamSignal: AbortSignal,
     ) => {
-      client ??= new Anthropic();
+      // maxRetries: 0 — callWithRetry below is the single retry authority.
+      client ??= makeAnthropicClient();
       return client.messages.stream(params, { signal: streamSignal });
     });
 
@@ -137,13 +140,33 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
     const thisTurn = turn;
     emit({ type: 'turn_start', turn: thisTurn });
 
-    const stream = createStream(buildRequestParams(modelConfig, messages), signal);
-    const response = await assembleModelResponse(stream, (event) => {
-      if (event.type === 'text_delta') {
-        emit({ type: 'text_delta', text: event.text });
-      } else {
-        emit({ type: 'tool_pending', name: event.toolName });
+    // Retry span covers stream creation AND consumption (mid-stream
+    // failures only retry by re-creating the stream); an abort rejects
+    // immediately, including out of a backoff sleep. A retried attempt may
+    // re-emit text_deltas the failed attempt already streamed — accepted
+    // cosmetic wart (see ProgressEvent in callModel.ts).
+    const response = await callWithRetry(
+      async () => {
+        const stream = createStream(buildRequestParams(modelConfig, messages), signal);
+        return await assembleModelResponse(stream, (event) => {
+          if (event.type === 'text_delta') {
+            emit({ type: 'text_delta', text: event.text });
+          } else {
+            emit({ type: 'tool_pending', name: event.toolName });
+          }
+        });
+      },
+      { signal },
+    ).catch((error: unknown) => {
+      // Any failure observed after abort IS the cancellation. Normalize
+      // its name — the SDK's abort error keeps the default 'Error', and a
+      // killed stream can surface as truncation — so the loop's abort
+      // carve-out (cancelled runs get no failed-metrics bookkeeping)
+      // fires regardless of shape.
+      if (signal.aborted && !(error instanceof Error && error.name === 'AbortError')) {
+        throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
       }
+      throw error;
     });
 
     emit({

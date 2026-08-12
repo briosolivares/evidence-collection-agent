@@ -58,13 +58,17 @@ export interface LoopDeps {
 }
 
 /**
- * The run's hard guards. Both are required: maxTurns is what guarantees
- * the loop terminates no matter what the model does; maxContextTokens
- * bounds how large any single request may grow.
+ * The run's hard guards. Both are required. A finite maxTurns bounds the
+ * turn count outright; maxContextTokens bounds how large any single
+ * request may grow — and because the conversation (and with it each
+ * request's context) grows every turn, the context ceiling still
+ * guarantees termination when maxTurns is Infinity.
  */
 export interface LoopConfig {
-  /** Maximum number of model calls (turns); an integer >= 1. Boundary: the
-   * run may *complete* on the final allowed turn; if that turn's response
+  /** Maximum number of model calls (turns); an integer >= 1, or Infinity
+   * to let a run follow its trajectory uncapped (the context ceiling below
+   * still ends it eventually). Boundary: with a finite cap the run may
+   * *complete* on the final allowed turn; if that turn's response
    * still requests tools, the tools are executed and recorded (guards run
    * after tool execution, per the design's loop diagram) and the run then
    * ends budget_exceeded instead of calling the model again. */
@@ -99,10 +103,20 @@ export type LoopResult =
   | { status: 'completed'; finalText: string }
   | { status: 'budget_exceeded'; reason: BudgetReason };
 
-/** The run's summary numbers, written to <runDir>/metrics.json at run end. */
+/**
+ * The run's summary numbers, written to <runDir>/metrics.json at run end.
+ *
+ * Accounting caveat: token sums count only successful model calls. A
+ * failed attempt that callWithRetry retried billed real tokens upstream
+ * but reported no usage here, so retried turns undercount true cost
+ * slightly.
+ */
 export interface RunMetrics {
-  /** How the run ended. */
-  status: LoopResult['status'];
+  /** How the run ended. Beyond LoopResult's statuses, metrics alone can
+   * say 'failed': the loop crashed, wrote what it knew, and rethrew — a
+   * crash is never returned as a result, so 'failed' exists only in
+   * metrics.json. */
+  status: LoopResult['status'] | 'failed';
   /** Model calls made. */
   turns: number;
   /** Sum of input_tokens across all responses. */
@@ -158,14 +172,21 @@ export interface RunMetrics {
  * response reports zero cache reads — from turn 2 the stable prefix alone
  * guarantees a cache hit, so zero means the prefix silently broke (the
  * two-line version of Claude Code's prompt-cache break detection). On run
- * end — both statuses — <runDir>/metrics.json is written (see RunMetrics).
+ * end — every ending — <runDir>/metrics.json is written (see RunMetrics):
+ * completed, budget_exceeded, and, when the loop throws, status 'failed' —
+ * in which case a final `run_error` {turn, message} event is appended to
+ * the transcript and the error is rethrown unchanged (crash bookkeeping
+ * only; callers see exactly the rejection they always saw). Exception: an
+ * error named 'AbortError' is rethrown with no bookkeeping at all —
+ * cancellation is "stopped", not "crashed", and a cancelled run's
+ * directory stays free of metrics.json by design.
  *
  * @param taskText - the user's task, sent as the conversation's first message
  * @param deps - the loop's only I/O surface (see LoopDeps); deps.runDir
  *   must be an existing run directory with an initialized manifest
  * @param config - termination guards (see LoopConfig); throws before any
- *   model call if maxTurns is not an integer >= 1 or maxContextTokens is
- *   negative
+ *   model call if maxTurns is neither an integer >= 1 nor Infinity, or
+ *   maxContextTokens is negative
  * @returns the run's outcome (see LoopResult); by return time the
  *   transcript holds the run's full event sequence and metrics.json its
  *   totals
@@ -177,8 +198,11 @@ export async function runAgentLoop(
 ): Promise<LoopResult> {
   // Fail fast on a nonsensical config: a guard that can never be evaluated
   // sanely must not get the chance to loop forever or end a run spuriously.
-  if (!Number.isInteger(config.maxTurns) || config.maxTurns < 1) {
-    throw new Error(`maxTurns must be an integer >= 1, got ${config.maxTurns}`);
+  if (
+    config.maxTurns !== Infinity &&
+    (!Number.isInteger(config.maxTurns) || config.maxTurns < 1)
+  ) {
+    throw new Error(`maxTurns must be an integer >= 1 or Infinity, got ${config.maxTurns}`);
   }
   if (config.maxContextTokens < 0) {
     throw new Error(`maxContextTokens must be >= 0, got ${config.maxContextTokens}`);
@@ -200,10 +224,11 @@ export async function runAgentLoop(
   let peakContextTokens = 0;
   const toolCtx: ToolCtx = { runDir: deps.runDir, browser: deps.browser };
 
-  // Every exit path funnels through here, so no ending can skip metrics.
-  const finish = (result: LoopResult): LoopResult => {
+  // Every ending funnels through here — returns via finish, crashes via
+  // the catch below — so no exit can skip metrics.
+  const writeMetrics = (status: RunMetrics['status']): void => {
     const metrics: RunMetrics = {
-      status: result.status,
+      status,
       turns: state.turnCount,
       ...totals,
       peakContextTokens,
@@ -214,87 +239,111 @@ export async function runAgentLoop(
       `${JSON.stringify(metrics, null, 2)}\n`,
       'utf8',
     );
+  };
+  const finish = (result: LoopResult): LoopResult => {
+    writeMetrics(result.status);
     return result;
   };
 
-  while (true) {
-    state.turnCount += 1;
-    const turn = state.turnCount;
+  try {
+    while (true) {
+      state.turnCount += 1;
+      const turn = state.turnCount;
 
-    // appendTranscriptEvent serializes synchronously, so logging the live
-    // messages array records a faithful snapshot of this turn's request
-    // even though the loop mutates the array afterwards.
-    appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: state.messages });
-    const response = await deps.callModel(state.messages);
-    appendTranscriptEvent(deps.runDir, { type: 'model_response', turn, response });
+      // appendTranscriptEvent serializes synchronously, so logging the live
+      // messages array records a faithful snapshot of this turn's request
+      // even though the loop mutates the array afterwards.
+      appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: state.messages });
+      const response = await deps.callModel(state.messages);
+      appendTranscriptEvent(deps.runDir, { type: 'model_response', turn, response });
 
-    totals.inputTokens += response.usage.input_tokens;
-    totals.outputTokens += response.usage.output_tokens;
-    totals.cacheReadInputTokens += response.usage.cache_read_input_tokens ?? 0;
-    totals.cacheCreationInputTokens += response.usage.cache_creation_input_tokens ?? 0;
+      totals.inputTokens += response.usage.input_tokens;
+      totals.outputTokens += response.usage.output_tokens;
+      totals.cacheReadInputTokens += response.usage.cache_read_input_tokens ?? 0;
+      totals.cacheCreationInputTokens += response.usage.cache_creation_input_tokens ?? 0;
 
-    // This response's full context: the entire prompt the model just saw
-    // (uncached input + cache writes + cache reads) plus what it wrote.
-    const contextTokens =
-      response.usage.input_tokens
-      + (response.usage.cache_creation_input_tokens ?? 0)
-      + (response.usage.cache_read_input_tokens ?? 0)
-      + response.usage.output_tokens;
-    peakContextTokens = Math.max(peakContextTokens, contextTokens);
+      // This response's full context: the entire prompt the model just saw
+      // (uncached input + cache writes + cache reads) plus what it wrote.
+      const contextTokens =
+        response.usage.input_tokens
+        + (response.usage.cache_creation_input_tokens ?? 0)
+        + (response.usage.cache_read_input_tokens ?? 0)
+        + response.usage.output_tokens;
+      peakContextTokens = Math.max(peakContextTokens, contextTokens);
 
-    // Cache-miss tripwire: from turn 2 the stable prompt prefix alone
-    // guarantees cache reads, so zero means the prefix silently broke —
-    // make it visible in the run dir rather than only in the bill.
-    if (turn >= 2 && (response.usage.cache_read_input_tokens ?? 0) === 0) {
-      appendTranscriptEvent(deps.runDir, { type: 'cache_miss_warning', turn });
+      // Cache-miss tripwire: from turn 2 the stable prompt prefix alone
+      // guarantees cache reads, so zero means the prefix silently broke —
+      // make it visible in the run dir rather than only in the bill.
+      if (turn >= 2 && (response.usage.cache_read_input_tokens ?? 0) === 0) {
+        appendTranscriptEvent(deps.runDir, { type: 'cache_miss_warning', turn });
+      }
+
+      state.messages.push({ role: 'assistant', content: response.content });
+
+      // Completion as policy: the model is done iff its response contains no
+      // tool_use blocks. Checked on content, never on stop_reason.
+      const toolUses = response.content.filter(
+        (block): block is ToolUseBlock => block.type === 'tool_use',
+      );
+      if (toolUses.length === 0) {
+        return finish({ status: 'completed', finalText: extractText(response.content) });
+      }
+
+      // T8: execution is delegated to the scheduler — read-only tools in
+      // parallel (capped), state-changing tools serialized, results back in
+      // request order. Transcript events bracket the batch deterministically:
+      // every tool_call is logged before execution starts, every tool_result
+      // after all calls settle, both in request order — so the transcript
+      // stays replayable even though completion order varies run to run.
+      const calls: ToolCall[] = toolUses.map((block) => ({
+        id: block.id,
+        name: block.name,
+        input: block.input,
+      }));
+      for (const call of calls) {
+        appendTranscriptEvent(deps.runDir, { type: 'tool_call', turn, call });
+      }
+      // The batch cap runs before the transcript's tool_result events so the
+      // transcript records exactly what the model will see next turn.
+      const results = capResultBatch(
+        deps.runDir,
+        calls,
+        await scheduleToolCalls(calls, deps.registry, toolCtx),
+      );
+      const resultBlocks: ToolResultBlock[] = results.map((result) => {
+        appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
+        return toResultBlock(result);
+      });
+      state.messages.push({ role: 'user', content: resultBlocks });
+
+      // Guards, in the design's loop order: after tool execution, before the
+      // next model call. maxTurns takes precedence when both trip at once.
+      if (turn >= config.maxTurns) {
+        return finish({ status: 'budget_exceeded', reason: 'max_turns' });
+      }
+      if (contextTokens > config.maxContextTokens) {
+        return finish({ status: 'budget_exceeded', reason: 'context_budget' });
+      }
     }
+  } catch (error) {
+    // Cancellation is "stopped", not "crashed": the design's cancellation
+    // artifact contract (tests/tui/cancellation-artifacts.test.ts) keeps a
+    // cancelled run's directory free of metrics.json so the /runs browser
+    // can tell the two apart. The TUI bridge normalizes every post-abort
+    // failure to this name.
+    if (error instanceof Error && error.name === 'AbortError') throw error;
 
-    state.messages.push({ role: 'assistant', content: response.content });
-
-    // Completion as policy: the model is done iff its response contains no
-    // tool_use blocks. Checked on content, never on stop_reason.
-    const toolUses = response.content.filter(
-      (block): block is ToolUseBlock => block.type === 'tool_use',
-    );
-    if (toolUses.length === 0) {
-      return finish({ status: 'completed', finalText: extractText(response.content) });
-    }
-
-    // T8: execution is delegated to the scheduler — read-only tools in
-    // parallel (capped), state-changing tools serialized, results back in
-    // request order. Transcript events bracket the batch deterministically:
-    // every tool_call is logged before execution starts, every tool_result
-    // after all calls settle, both in request order — so the transcript
-    // stays replayable even though completion order varies run to run.
-    const calls: ToolCall[] = toolUses.map((block) => ({
-      id: block.id,
-      name: block.name,
-      input: block.input,
-    }));
-    for (const call of calls) {
-      appendTranscriptEvent(deps.runDir, { type: 'tool_call', turn, call });
-    }
-    // The batch cap runs before the transcript's tool_result events so the
-    // transcript records exactly what the model will see next turn.
-    const results = capResultBatch(
-      deps.runDir,
-      calls,
-      await scheduleToolCalls(calls, deps.registry, toolCtx),
-    );
-    const resultBlocks: ToolResultBlock[] = results.map((result) => {
-      appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
-      return toResultBlock(result);
+    // Crash bookkeeping, not a retry loop and not recovery: record what
+    // happened where the run's artifacts live, then rethrow unchanged so
+    // every caller sees exactly the rejection it sees today. The turns
+    // already completed keep their metrics instead of vanishing.
+    appendTranscriptEvent(deps.runDir, {
+      type: 'run_error',
+      turn: state.turnCount,
+      message: error instanceof Error ? error.message : String(error),
     });
-    state.messages.push({ role: 'user', content: resultBlocks });
-
-    // Guards, in the design's loop order: after tool execution, before the
-    // next model call. maxTurns takes precedence when both trip at once.
-    if (turn >= config.maxTurns) {
-      return finish({ status: 'budget_exceeded', reason: 'max_turns' });
-    }
-    if (contextTokens > config.maxContextTokens) {
-      return finish({ status: 'budget_exceeded', reason: 'context_budget' });
-    }
+    writeMetrics('failed');
+    throw error;
   }
 }
 

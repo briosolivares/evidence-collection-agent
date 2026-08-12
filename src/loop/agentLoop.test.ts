@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -344,6 +344,28 @@ describe('runAgentLoop guards', () => {
     expect(result).toEqual({ status: 'completed', finalText: 'Done.' });
   });
 
+  it('maxTurns: Infinity never trips — the run follows its trajectory to completion', async () => {
+    // Twelve tool turns then a completion: a finite-only guard would have
+    // rejected the config or cut the run; uncapped, the context ceiling is
+    // what guarantees termination (context grows every turn).
+    const executed: string[] = [];
+    const { callModel, requests } = scriptModel([
+      ...Array.from({ length: 12 }, (_, i) =>
+        toolResponse([{ id: `t${i + 1}`, name: 'echo', input: { message: `m${i + 1}` } }]),
+      ),
+      textResponse('Trajectory complete.'),
+    ]);
+    const result = await runAgentLoop(
+      TASK,
+      { callModel, registry: echoRegistry(executed), runDir },
+      { maxTurns: Infinity, maxContextTokens: 1_000_000 },
+    );
+
+    expect(result).toEqual({ status: 'completed', finalText: 'Trajectory complete.' });
+    expect(requests).toHaveLength(13);
+    expect(executed).toHaveLength(12);
+  });
+
   it('rejects a nonsensical config outright instead of running with it', async () => {
     const { callModel } = scriptModel([]);
     const deps = { callModel, registry: echoRegistry([]), runDir };
@@ -439,6 +461,67 @@ describe('runAgentLoop transcript and metrics', () => {
       .map((line) => JSON.parse(line) as Record<string, unknown>)
       .filter((event) => event.type === 'cache_miss_warning');
     expect(warnings).toEqual([{ type: 'cache_miss_warning', turn: 3 }]);
+  });
+
+  it('a mid-run crash writes failed metrics, logs run_error, and rethrows unchanged', async () => {
+    // Crash bookkeeping, not a retry loop: the run that spent turn 1's
+    // budget must not vanish from metrics because turn 2's model call blew
+    // up — and every caller still sees exactly the original rejection.
+    const scripted = scriptModel([
+      toolResponse([{ id: 't1', name: 'echo', input: { message: 'hi' } }]),
+    ]);
+    const boom = new Error('overloaded_error: upstream fell over mid-stream');
+    let modelCalls = 0;
+    const callModel = async (messages: readonly Message[]): Promise<ModelResponse> => {
+      modelCalls += 1;
+      if (modelCalls === 2) throw boom;
+      return scripted.callModel(messages);
+    };
+
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toBe(boom);
+
+    // Metrics carry the crash status and everything the run earned before it.
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics).toMatchObject({
+      status: 'failed',
+      turns: 2, // the crash happened on turn 2
+      inputTokens: 10, // turn 1's usage only — turn 2 never reported any
+      outputTokens: 5,
+      cacheReadInputTokens: 0,
+      cacheCreationInputTokens: 0,
+      peakContextTokens: 15,
+    });
+    expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
+
+    // The transcript ends with the run_error event.
+    const events = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+    expect(events.at(-1)).toEqual({
+      type: 'run_error',
+      turn: 2,
+      message: 'overloaded_error: upstream fell over mid-stream',
+    });
+  });
+
+  it('an abort gets no crash bookkeeping — cancelled is "stopped", not "crashed"', async () => {
+    // The design's cancellation artifact contract: a cancelled run keeps
+    // its finalized manifest but no metrics.json, so the /runs browser can
+    // tell a stop from a crash. The bridge normalizes post-abort failures
+    // to this error name.
+    const cancelled = Object.assign(new Error('run cancelled'), { name: 'AbortError' });
+    const callModel = (): Promise<ModelResponse> => Promise.reject(cancelled);
+
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toBe(cancelled);
+
+    expect(existsSync(join(runDir, METRICS_FILENAME))).toBe(false);
+    const transcript = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
+    expect(transcript).not.toContain('run_error');
   });
 });
 

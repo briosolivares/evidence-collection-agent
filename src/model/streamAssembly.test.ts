@@ -255,11 +255,34 @@ describe('assembleModelResponse', () => {
     ];
 
     await expect(assembleModelResponse(replay(events))).rejects.toThrow(/unterminated|truncated/);
+    // Named for retry classification: truncation is transient (retryable).
+    await expect(assembleModelResponse(replay(events))).rejects.toMatchObject({
+      name: 'TruncatedStreamError',
+    });
   });
 
   it('rejects a stream with no message_start', async () => {
     await expect(assembleModelResponse(replay([{ type: 'message_stop' }]))).rejects.toThrow(
       /message_start/,
     );
+    await expect(assembleModelResponse(replay([{ type: 'message_stop' }]))).rejects.toMatchObject({
+      name: 'TruncatedStreamError',
+    });
+  });
+
+  it('keeps deterministic failures as plain Errors — never TruncatedStreamError', async () => {
+    // Retrying an unsupported block or bad tool JSON reproduces it; the
+    // retry loop must be able to tell these apart from truncation by name.
+    const unsupported: ModelStreamEvent[] = [
+      messageStart(usage(10, 1, null)),
+      {
+        type: 'content_block_start',
+        index: 0,
+        content_block: { type: 'thinking', thinking: '', signature: '' },
+      },
+    ];
+    await expect(assembleModelResponse(replay(unsupported))).rejects.toMatchObject({
+      name: 'Error',
+    });
   });
 });

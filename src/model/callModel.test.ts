@@ -1,9 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import type { Message } from '../loop/messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
-import { buildRequestParams, DEFAULT_MODEL, type CallModelConfig } from './callModel.js';
+import {
+  buildRequestParams,
+  DEFAULT_MODEL,
+  makeAnthropicClient,
+  type CallModelConfig,
+} from './callModel.js';
 
 // A small but realistic registry: two tools with described, typed schemas,
 // exactly the shape the file tools use.
@@ -151,5 +156,26 @@ describe('buildRequestParams', () => {
     });
     // And the input history itself is untouched (no marker leaked back).
     expect(JSON.stringify(turnThreeHistory)).not.toContain('cache_control');
+  });
+});
+
+describe('makeAnthropicClient', () => {
+  let savedKey: string | undefined;
+
+  beforeEach(() => {
+    savedKey = process.env.ANTHROPIC_API_KEY;
+    // The constructor requires a key; the client never makes a call here.
+    process.env.ANTHROPIC_API_KEY = 'test-key-never-used';
+  });
+
+  afterEach(() => {
+    if (savedKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = savedKey;
+  });
+
+  it('disables SDK auto-retry — callWithRetry is the single retry authority', () => {
+    // maxRetries: 0, or SDK retries nest inside the manual loop (up to 12
+    // requests for one turn) and mid-stream failures still go unretried.
+    expect(makeAnthropicClient().maxRetries).toBe(0);
   });
 });

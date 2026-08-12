@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import type { CallModel, Message, Usage } from '../loop/messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
+import { callWithRetry } from './callWithRetry.js';
 import { assembleModelResponse } from './streamAssembly.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
@@ -39,11 +40,19 @@ export const DEFAULT_MODEL = 'claude-sonnet-5';
  * tool_use_start per tool call, when its name is known but its input is
  * still streaming); then one `turn_end` carrying the turn's usage. `turn`
  * counts this CallModel's invocations from 1.
+ *
+ * A `retry` event may appear anywhere between `turn_start` and `turn_end`:
+ * a transient failure killed the attempt and callWithRetry is about to run
+ * attempt `attempt` after `delayMs`. Known cosmetic wart, documented not
+ * fixed: the failed attempt may already have streamed partial text_deltas,
+ * so a display can show a duplicated sentence fragment before the retry
+ * line — the successful attempt re-streams the turn from the top.
  */
 export type ProgressEvent =
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; turn: number; text: string }
   | { type: 'tool_use_start'; turn: number; toolName: string }
+  | { type: 'retry'; turn: number; attempt: number; delayMs: number; reason: string }
   | { type: 'turn_end'; turn: number; usage: Usage };
 
 /** Everything makeCallModel closes over. The system prompt and tool
@@ -156,13 +165,15 @@ function withConversationBreakpoint(
  *   or the SDK's other ambient sources) — calls fail without them
  * @returns a CallModel that streams every request, assembles the complete
  *   ModelResponse from the stream (content blocks including tool_use
- *   inputs, stop_reason, usage including cache_read_input_tokens), and
+ *   inputs, stop_reason, usage including cache_read_input_tokens), retries
+ *   transient failures across the whole create-and-consume span (see
+ *   callWithRetry; retry attempts surface as `retry` progress events), and
  *   reports progress through config.onProgress (see ProgressEvent),
  *   numbering turns from 1 across its own invocations. The messages
  *   argument is never mutated
  */
 export function makeCallModel(config: CallModelConfig): CallModel {
-  const client = new Anthropic();
+  const client = makeAnthropicClient();
   let turnCount = 0;
 
   return async (messages) => {
@@ -170,16 +181,37 @@ export function makeCallModel(config: CallModelConfig): CallModel {
     const turn = turnCount;
     config.onProgress?.({ type: 'turn_start', turn });
 
-    const stream = client.messages.stream(buildRequestParams(config, messages));
-    const response = await assembleModelResponse(stream, (event) => {
-      if (event.type === 'text_delta') {
-        config.onProgress?.({ type: 'text_delta', turn, text: event.text });
-      } else {
-        config.onProgress?.({ type: 'tool_use_start', turn, toolName: event.toolName });
-      }
-    });
+    // The retry span covers stream creation AND consumption: mid-stream
+    // failures (SSE error events, dropped connections) throw out of the
+    // assembly iteration, and only re-creating the stream retries them.
+    const response = await callWithRetry(
+      async () => {
+        const stream = client.messages.stream(buildRequestParams(config, messages));
+        return await assembleModelResponse(stream, (event) => {
+          if (event.type === 'text_delta') {
+            config.onProgress?.({ type: 'text_delta', turn, text: event.text });
+          } else {
+            config.onProgress?.({ type: 'tool_use_start', turn, toolName: event.toolName });
+          }
+        });
+      },
+      { onRetry: (info) => config.onProgress?.({ type: 'retry', turn, ...info }) },
+    );
 
     config.onProgress?.({ type: 'turn_end', turn, usage: response.usage });
     return response;
   };
+}
+
+/**
+ * The Anthropic client every production call site constructs: SDK
+ * auto-retry disabled so callWithRetry is the single retry authority
+ * (matching Claude Code). Nested SDK retries would multiply ours — up to
+ * 12 requests for one turn — and the SDK's retry covers only the initial
+ * POST anyway, not stream consumption. Credentials come from the
+ * environment (ANTHROPIC_API_KEY, or the SDK's other ambient sources);
+ * construction throws without them.
+ */
+export function makeAnthropicClient(): Anthropic {
+  return new Anthropic({ maxRetries: 0 });
 }

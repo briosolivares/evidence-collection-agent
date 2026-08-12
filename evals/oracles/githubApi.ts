@@ -7,6 +7,8 @@
  * (the eval CLI runs under `--env-file=.env`) and is never logged.
  */
 
+import { fetchWithRetry } from './fetchWithRetry.js';
+
 /** Base URL of the GitHub REST API. */
 export const GITHUB_API_BASE = 'https://api.github.com';
 
@@ -36,15 +38,19 @@ export function githubHeaders(): Record<string, string> {
  *
  * @param path - API path starting with `/` (e.g. `/repos/o/r/pulls?...`)
  * @returns the response body, JSON-parsed
- * @throws on any non-2xx response, naming the path and status; when the
- *   failure is rate-limit exhaustion, the message says how to raise the
- *   limit (set GITHUB_TOKEN)
+ * @throws on any non-2xx response that survives fetchWithRetry's transient
+ *   retries (network errors and 408/429/5xx get up to 4 attempts), naming
+ *   the path and status; when the failure is rate-limit exhaustion, the
+ *   message says how to raise the limit (set GITHUB_TOKEN)
  */
 export async function githubGetJson(path: string): Promise<unknown> {
-  const response = await fetch(`${GITHUB_API_BASE}${path}`, { headers: githubHeaders() });
+  const response = await fetchWithRetry(`${GITHUB_API_BASE}${path}`, {
+    headers: githubHeaders(),
+  });
   if (!response.ok) {
     const rateLimited =
-      response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0';
+      (response.status === 403 || response.status === 429) &&
+      response.headers.get('x-ratelimit-remaining') === '0';
     throw new Error(
       `GitHub API GET ${path} failed with HTTP ${response.status}` +
         (rateLimited
