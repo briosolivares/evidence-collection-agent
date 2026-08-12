@@ -12,6 +12,8 @@ State snapshot for the next coordinator session. Read alongside `plan.md` (check
 
 The longer-term initializer/planner-generated output contract remains explicitly deferred. **The disabled-thinking science flag's revival trigger is no longer met** (easy suite at 100%); it stays shelved until a harder task set produces an accuracy signal. The easy suite is saturated — further mechanism attribution needs harder tasks.
 
+**Browser batch feature experiment complete (2026-08-11):** fresh control and treatment both passed 3/3 tasks and 9/9 trials, but treatment used `browser_batch` in 0/9 trials. The added schema cost 1,244 first-request prompt tokens with no call compression, so `atomic` remains the product default and `batch-enabled` remains explicit/experimental. Report: `docs/reports/2026-08-11-browser-batch-experiment.md`; implementation and analyzer checklist: `.agents/planning/2026-08-11-browser-batch/implementation/plan.md`. A prompt-guided treatment, if wanted, must be specified as a separate intervention.
+
 **Medium tasks (started 2026-08-11, user-directed):** packages for design rows 6 (`openclaw_merged_prs`) and 8 (`openclaw_contributors`) are built and tested — see `medium-tasks.md` for the decisions (GitHub token added and verified, 250k cap kept). **Their baseline: 0/2, all six trials `budget_exceeded` on the token ceiling before producing a CSV** — one failure mode, working agents out of budget, not judgment. Report: `docs/reports/2026-08-11-medium-baseline.md`; candidate mechanisms (conversation caching / budget redefinition / raised ceiling) await the user's pick.
 
 ## Standing rulings (user-made, binding)

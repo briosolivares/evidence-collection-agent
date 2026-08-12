@@ -6,8 +6,8 @@
 - [x] Step 2: Add deterministic tool profiles and wire every composition point
 - [x] Step 3: Add eval condition metadata and the experiment analyzer
 - [x] Step 4: Verify the complete feature and run a local live smoke test
-- [ ] Step 5: Run the easy-suite A/B experiment and publish the report
-- [ ] Step 6: Make and record the rollout decision
+- [x] Step 5: Run the easy-suite A/B experiment and publish the report
+- [x] Step 6: Make and record the rollout decision
 
 Each verified step ends with a scoped commit. Update this checklist and include the planning directory in that commit, per repository workflow.
 
