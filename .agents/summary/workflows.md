@@ -25,7 +25,7 @@ sequenceDiagram
     RT-->>Caller: { runDir } & LoopResult
 ```
 
-The browser **session** is never closed by `runTask` — only the tab. The caller (REPL or eval CLI) launches one persistent Chrome and owns its lifetime, which is how logins stay warm across tasks.
+The browser **session** is never closed by `runTask` — only the tab. Its caller owns the session: interactive/authenticated callers reuse persistent Chrome, while normal eval callers close their isolated headless session and remove its temporary profile after the trial.
 
 ## 2. One turn of the agent loop (`src/loop/agentLoop.ts`)
 
@@ -87,11 +87,14 @@ sequenceDiagram
     participant A as runTask (real agent)
     participant O as Oracle (live API)
     participant G as Grader
-    CLI->>CLI: parse --tasks/--k; loadEvalTask each
-    CLI->>CLI: BrowserSessionProvider.createSession (once for the session)
-    CLI->>R: runEvals(tasks, k, { runTask })
-    loop each task × k trials (sequential)
-        R->>A: runTask(taskText, { startUrl })
+    CLI->>CLI: parse --tasks/--k/--concurrency; load tasks
+    CLI->>R: runEvals(tasks, k, { concurrency, runTask })
+    par normal jobs (bounded pool, default 3)
+        R->>A: isolated headless Chrome + temp profile + runTask
+    and authenticated jobs (serial lane)
+        R->>A: shared headed chrome-profile + runTask
+    end
+    loop completed trials (one-slot grading queue)
         A-->>R: { runDir } (+ latency timed)
         R->>O: fetchOracle() — at grading time
         O-->>R: oracleData
@@ -100,10 +103,10 @@ sequenceDiagram
     end
     R-->>CLI: EvalReport
     CLI->>CLI: print formatReport; writeResults → evals/experiments/<id>.json
-    CLI->>CLI: browser.close()
+    CLI->>CLI: close sessions; remove temporary profiles
 ```
 
-Modes by parameters: `--tasks hacker_news --k 1` (debugging inner loop), `--k 3` (consistency bar), `--tasks hacker_news,edgar,openclaw_pr --k 3` (the checkpoint-1 baseline command). The development done-bar is every task passing all 3 trials.
+Modes by parameters: `--tasks hacker_news --k 1` (debugging inner loop), `--k 3 --concurrency 3` (parallel consistency run), or lower concurrency for resource-constrained machines. `requiresAuth` metadata, never task-specific runtime logic, selects the headed serial lane. The development done-bar remains every task passing all 3 trials.
 
 **Fixing a failing eval:** the binding rule is general mechanisms only — improve the outline, tool results, or prompt; never task-specific branches. Log failures and candidate mechanisms in `.agents/planning/.../implementation/baseline-failure-log.md` (see `docs/reports/2026-08-11-baseline.md` for the worked example).
 

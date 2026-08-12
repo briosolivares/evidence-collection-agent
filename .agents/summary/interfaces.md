@@ -95,8 +95,8 @@ Identity no-op without Langfuse credentials, so callers wire it unconditionally.
 
 ```ts
 type Grader = (runDirPath: string, oracleData: unknown) => AssertionResult[] | Promise<AssertionResult[]>
-type RunTaskFn = (taskText: string, opts: { startUrl?: string }) => Promise<{ runDir: string }>
-interface EvalTask { name; taskText; startUrl?; fetchOracle; grade }
+type RunTaskFn = (taskText: string, opts: EvalRunOptions) => Promise<{ runDir: string }>
+interface EvalTask { name; taskText; startUrl?; requiresAuth; fetchOracle; grade }
 ```
 
 Standing rule, enforced structurally at the runner's single grading call site: a grader receives **only** the run directory path and oracle data — never a transcript. A bad run yields failed assertions, never a throw; a *malformed oracle payload* throws (harness bug, not a failed trial).
@@ -109,10 +109,11 @@ Standing rule, enforced structurally at the runner's single grading call site: a
 | --- | --- | --- | --- |
 | `task` | non-empty string | yes | Task text handed verbatim to the agent |
 | `startUrl` | string | no | Page loaded before the first model turn |
+| `requiresAuth` | boolean | no | Use the serial headed persistent-profile lane; defaults to `false` |
 
 ### Eval CLI
 
-`npm run evals -- --tasks <a,b,c> [--k <n>]` — both `--flag value` and `--flag=value` forms; `--tasks` required, `--k` a positive integer (default 1). Results: report text to stdout, JSON to `evals/experiments/<run-id>.json`.
+`npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n>]` — both flag forms; `--tasks` required, `--k` defaults to 1, and normal/headless concurrency defaults to 3. Results: labeled progress/report text to stdout and JSON to `evals/experiments/<run-id>.json`.
 
 ## External integration points
 

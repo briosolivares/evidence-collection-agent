@@ -6,13 +6,13 @@ Navigation and ground rules for AI agents working in this repository. Deep docum
 
 <!-- metadata: overview, subsystems, navigation -->
 
-A browser agent for audit evidence collection: a minimal Claude Code–style loop (`src/loop/agentLoop.ts`) over ten zod-validated tools (one directory per tool under `src/tools/`, grouped for registration by `src/tools/index.ts`), driving browser sessions through an engine-neutral `BrowserController` and acquiring them through `BrowserSessionProvider` (`src/browser/`). The current provider launches local visible Chrome via Playwright. Every run writes a self-contained directory under `runs/`, named `<date>_<time>_<task-slug>_<suffix>` in local time — deliverables plus `manifest.json` (SHA-256 provenance, exact UTC `startedAt`), `transcript.jsonl`, `metrics.json` — which is the product's output boundary and the only thing eval graders may read.
+A browser agent for audit evidence collection: a minimal Claude Code–style loop (`src/loop/agentLoop.ts`) over ten zod-validated tools (one directory per tool under `src/tools/`, grouped for registration by `src/tools/index.ts`), driving browser sessions through an engine-neutral `BrowserController` and acquiring them through `BrowserSessionProvider` (`src/browser/`). The local Playwright provider can launch either headed persistent Chrome or headless isolated Chrome, as selected by the caller. Every run writes a self-contained directory under `runs/`, named `<date>_<time>_<task-slug>_<suffix>` in local time — deliverables plus `manifest.json` (SHA-256 provenance, exact UTC `startedAt`), `transcript.jsonl`, `metrics.json` — which is the product's output boundary and the only thing eval graders may read.
 
 | Subsystem | Entry point | Notes |
 | --- | --- | --- |
 | Composition root | `src/cli/runTask.ts` | The only place loop + model + tools + tracing are wired; both REPL and evals drive it |
 | Interactive agent | `src/cli/repl.ts` (`npm run agent`) | One persistent Chrome per session; fresh tab per task |
-| Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b,c> [--k <n>]`) | Datasets in `evals/datasets/<name>/{task.json, oracle/, grader/}`; paths + defaults in `evals/config.ts`; results JSON in `evals/experiments/` |
+| Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n>]`) | Normal trials: parallel isolated headless Chrome (default 3); `requiresAuth` trials: serial headed `chrome-profile/`; results JSON in `evals/experiments/` |
 | Model client | `src/model/` | Streaming always; thinking disabled; prompt caching via one `cache_control` breakpoint |
 | Provenance | `src/run/` | `writeArtifact` and `resolveRunPath` are the only write/path chokepoints |
 | Demos | `demos/01…14` | Build-order walkthrough; 09/14 spend real tokens; 10–14 need Chrome |
@@ -37,7 +37,7 @@ A browser agent for audit evidence collection: a minimal Claude Code–style loo
 - **No dotenv loader.** `.env` (gitignored) holds `ANTHROPIC_API_KEY` and `LANGFUSE_*`; run key-needing scripts as `npx tsx --env-file=.env <script>`. Never read or print the values.
 - **No build step** — `tsx` runs TypeScript directly; `tsconfig` is `noEmit`. Typecheck covers `src`, `demos`, `evals`, `tests`.
 - `npm test` is hermetic (loopback fixture server in `tests/fixtures/server.ts`) but **requires a local Chrome install**; oracle network functions are never called in tests. Browser tool suites register their Chrome/fixture/run-dir lifecycle through `tests/helpers/browserToolSuite.ts`.
-- The browser launches headed (`channel: 'chrome'`) with the persistent profile `chrome-profile/` (gitignored) — headless is deliberately avoided for anti-bot posture. Profile paths must be absolute.
+- Interactive and authenticated runs launch headed (`channel: 'chrome'`) with the persistent `chrome-profile/` (gitignored). Normal eval trials each launch headless with their own temporary profile. Profile paths must be absolute; only one process may own the persistent profile.
 - Tool results over 50 KB are offloaded to `runs/<id>/tool-output/` with a preview — that's the designed behavior, not a bug.
 - SEC-related code: their edge 403s any non-plain User-Agent and most non-browser HTTP clients; the oracle's `Name email` UA in `evals/datasets/edgar/oracle/edgarClient.ts` is load-bearing.
 - Defaults that matter when debugging runs: model `claude-sonnet-5`, `maxTurns` 24, token budget 250k (all in `src/cli/runTask.ts` / `src/model/callModel.ts`, overridable per run via `RunTaskConfig`).
@@ -48,6 +48,8 @@ A browser agent for audit evidence collection: a minimal Claude Code–style loo
 <!-- metadata: status, work-queue -->
 
 Checkpoint 1 complete; the post-F1–F4 easy re-baseline passes 3/3 tasks at k=3 (details in `docs/reports/2026-08-11-rebaseline.md`). All eleven design-doc eval tasks now have loadable dataset packages; the six added on 2026-08-12 have not been baseline-run. The longer-term initializer/planner output-contract idea is deferred. **Do not re-baseline without the user's direction.**
+
+Eval execution supports parallel normal trials with isolated headless Chrome profiles and a separate serial authenticated lane. `task.json` controls the policy through optional boolean `requiresAuth`; never infer it from task names or task text.
 
 ## Custom Instructions
 

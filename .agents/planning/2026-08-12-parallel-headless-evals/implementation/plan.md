@@ -1,6 +1,6 @@
 # Parallel Headless Evals — Implementation Plan
 
-**Status:** Planned
+**Status:** Implemented; final verification pending
 
 **Branch:** `feat/parallel-headless-evals`
 
@@ -13,7 +13,7 @@
 - [x] Step 3 — Concurrent deterministic shared runner
 - [x] Step 4 — Standalone CLI wiring
 - [x] Step 5 — Sherlock `/evals` wiring
-- [ ] Step 6 — Documentation and full verification
+- [x] Step 6 — Documentation updates
 
 ## Decisions
 
