@@ -1,8 +1,12 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import type { BrowserController } from '../browser/controller.js';
 import {
   runAgentLoop,
   type LoopResult,
 } from '../loop/agentLoop.js';
+import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
 import {
   DEFAULT_MODEL,
@@ -27,7 +31,13 @@ import {
 import { toApiToolDefs } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
-const DEFAULT_RUNS_BASE_DIR = 'runs';
+// Default runs base when the caller passes none: the checkout's runs/
+// in a dev tree, ~/.sherlock/runs installed — never the cwd, which
+// would scatter run directories across wherever callers launch from.
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
+  devRoot: findDevRoot(PACKAGE_ROOT),
+}).runsBaseDir;
 const DEFAULT_MAX_OUTPUT_TOKENS = 8_192;
 // Uncapped by default: a well-reasoning agent follows its trajectory to
 // completion, and the context ceiling below still guarantees termination
@@ -52,7 +62,8 @@ export interface RunTaskConfig {
   /** A live session browser with no active task tab. The caller owns and
    * eventually closes the session; runTask owns only the fresh tab it opens. */
   browser: BrowserController;
-  /** Directory that holds run directories; defaults to `runs`. */
+  /** Directory that holds run directories; defaults to the checkout's
+   * `runs/` in a dev tree, `~/.sherlock/runs` installed. */
   runsBaseDir?: string;
   /** Optional HTTP(S) page to load before the first model turn. */
   startUrl?: string;

@@ -4,7 +4,6 @@
  * runner-facing path constant belongs here — runners import these rather
  * than building their own paths.
  */
-import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { DEFAULT_MODEL } from '../src/model/callModel.js';
@@ -20,8 +19,10 @@ export const DATASETS_DIR = fileURLToPath(new URL('./datasets/', import.meta.url
 /**
  * Where trial run directories are created — the same gitignored home as
  * real (non-eval) runs, so graders and humans inspect both the same way.
+ * Anchored to the checkout (not the cwd) so running the harness from any
+ * directory lands trials in the same place.
  */
-export const RUNS_DIR = 'runs';
+export const RUNS_DIR = fileURLToPath(new URL('../runs', import.meta.url));
 
 /**
  * Where each eval invocation writes its results JSON (one file per
@@ -29,8 +30,10 @@ export const RUNS_DIR = 'runs';
  */
 export const EXPERIMENTS_DIR = fileURLToPath(new URL('./experiments/', import.meta.url));
 
-/** Persistent Chrome profile shared with the REPL and demos. */
-export const PROFILE_DIR = resolve('chrome-profile');
+/** Persistent Chrome profile shared with the REPL and demos — anchored
+ * to the checkout: a cwd-relative profile silently starts Chrome with a
+ * fresh empty profile (every login lost) when run from elsewhere. */
+export const PROFILE_DIR = fileURLToPath(new URL('../chrome-profile', import.meta.url));
 
 /** Trials per task when --k is not given (the k=1 debugging inner loop). */
 export const DEFAULT_K = 1;
