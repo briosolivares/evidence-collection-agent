@@ -6,6 +6,17 @@
   "engines": {
     "node": ">=22"
   },
+  "files": [
+    "bin",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "evals/runners/loadTask.ts",
+    "evals/runners/report.ts",
+    "evals/metrics/metrics.ts",
+    "evals/types.ts",
+    "tsconfig.json"
+  ],
   "bin": {
     "sherlock": "bin/sherlock.mjs"
   },
