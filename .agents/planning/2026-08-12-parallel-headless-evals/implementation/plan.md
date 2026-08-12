@@ -1,6 +1,6 @@
 # Parallel Headless Evals — Implementation Plan
 
-**Status:** Implemented; final verification pending
+**Status:** Implemented; automated verification complete
 
 **Branch:** `feat/parallel-headless-evals`
 
@@ -14,6 +14,18 @@
 - [x] Step 4 — Standalone CLI wiring
 - [x] Step 5 — Sherlock `/evals` wiring
 - [x] Step 6 — Documentation updates
+- [x] Final automated verification
+
+## Verification results
+
+- `npm run typecheck` passed on 2026-08-12.
+- `npm test` passed on 2026-08-12: 87 test files and 571 tests.
+- Focused loader, CLI parser, scheduler, browser-runtime, TUI bridge, reducer, lifecycle, component,
+  and timer tests passed during their corresponding implementation steps.
+- No real dataset re-baseline was run, in accordance with repository policy.
+- The manual normal-eval desktop observation and authenticated human-takeover smoke test remain
+  intentionally deferred because they launch real evals; the authenticated check also requires the
+  user to be ready to interact with the headed persistent profile.
 
 ## Decisions
 
