@@ -93,3 +93,12 @@ There were no grader failures, run failures, budget exits, batch errors, or inva
 The sample is directional (`k=3` per task), not statistically powered, and the easy suite is saturated on quality. More importantly, zero adoption means this A/B tested discoverability from the tool description, not batching's theoretical execution value. The observed efficiency differences are not a batching effect.
 
 **Rollout decision:** keep `DEFAULT_TOOL_PROFILE = 'atomic'`. `browser_batch` remains available only through the explicit `batch-enabled` profile. If batching is pursued further, specify a separate prompt-guided treatment; do not reinterpret or overwrite this description-only result.
+
+## Possible follow-ups
+
+Treat each as a separately specified intervention so its effect is distinguishable from this description-only A/B:
+
+- Revise the system prompt to make ordered multi-action browser sequences discoverable and state when they are preferred.
+- Revise the composite tool definition and schema to clarify its affordance while reducing unnecessary prefix overhead.
+- Rename `browser_batch` to `browser_sequence`, which may better communicate ordered, sequential execution than “batch.”
+- Explore richer programmable browser primitives beyond a fixed action list, while preserving validation, provenance, confinement, and the no-shell security boundary.
