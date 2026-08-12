@@ -1,6 +1,6 @@
 import { render } from 'ink-testing-library';
 import { createElement } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Transcript } from '../../src/tui/components/Transcript.js';
 import { createDemoScript, playDemo } from '../../src/tui/demo.js';
@@ -50,20 +50,25 @@ describe('the --demo scripted event source', () => {
   });
 
   it('playDemo dispatches every step in order and honors cancellation', async () => {
-    const script = createDemoScript(0).slice(0, 5).map((step) => ({
-      ...step,
-      delayMs: 1,
-    }));
-    const seen: StoreAction[] = [];
-    const cancel = playDemo(script, (action) => seen.push(action));
-    await new Promise((resolve) => setTimeout(resolve, 60));
-    expect(seen).toEqual(script.map((step) => step.action));
+    vi.useFakeTimers();
+    try {
+      const script = createDemoScript(0).slice(0, 5).map((step) => ({
+        ...step,
+        delayMs: 1,
+      }));
+      const seen: StoreAction[] = [];
+      const cancel = playDemo(script, (action) => seen.push(action));
+      await vi.runAllTimersAsync();
+      expect(seen).toEqual(script.map((step) => step.action));
 
-    const seenAfterCancel: StoreAction[] = [];
-    const cancelEarly = playDemo(script, (action) => seenAfterCancel.push(action));
-    cancelEarly();
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(seenAfterCancel).toEqual([]);
-    cancel();
+      const seenAfterCancel: StoreAction[] = [];
+      const cancelEarly = playDemo(script, (action) => seenAfterCancel.push(action));
+      cancelEarly();
+      await vi.runAllTimersAsync();
+      expect(seenAfterCancel).toEqual([]);
+      cancel();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
