@@ -6,7 +6,7 @@ Basic facts about the evidence-collection-agent repository. See [index.md](index
 
 A general browser agent for audit evidence collection. It takes a natural-language task (e.g. "Create a CSV of the top 5 stories on Hacker News"), drives a real local Chrome browser via Playwright to carry it out, and produces evidence artifacts — CSVs, screenshots, downloaded files, and/or a written answer — with tamper-evident provenance (SHA-256 hashes in a per-run manifest).
 
-The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of zod-validated browser and file tools, behind an engine-agnostic browser adapter.
+The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of zod-validated browser and file tools. Browser operations use an engine-agnostic controller, and session creation is isolated behind a provider.
 
 ## Technology stack
 
@@ -30,7 +30,7 @@ graph TB
         SRC --> LOOP["src/loop — agent loop, scheduler, message types"]
         SRC --> MODEL["src/model — Claude API calls, stream assembly"]
         SRC --> TOOLS["src/tools — registry + pipeline, one directory per tool"]
-        SRC --> BROWSER["src/browser — adapter interface + Playwright implementation"]
+        SRC --> BROWSER["src/browser — controller + session-provider interfaces and Playwright implementation"]
         SRC --> RUN["src/run — run IDs, run directories, artifacts, transcript"]
         SRC --> CLI["src/cli — REPL, runTask composition root, system prompt"]
         SRC --> TRACE["src/tracing — Langfuse/OTel wiring"]

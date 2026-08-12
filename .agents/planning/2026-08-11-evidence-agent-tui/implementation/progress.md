@@ -58,7 +58,7 @@ Statuses flipped: S3-F1…S3-F9 → pass.
 
 - New: `src/tui/bridge/runSession.ts` — per-run AbortController; injected callModel composed from the core's exported `buildRequestParams` + an abortable stream factory (default: Anthropic SDK `client.messages.stream(params, {signal})`, constructed lazily so a missing key fails inside the run) + `assembleModelResponse`; **re-emits all four progress events** (turn_start / text_delta / tool_use_start→tool_pending / turn_end) since injecting callModel bypasses onProgress; maps LoopResult to run_finished (completed vs budget_exceeded+reason), post-cancel rejections to run_cancelled, others to run_failed. `done` never rejects. Tool defs rebuilt from the same exported tool arrays runTask registers, so the prompt prefix stays byte-identical.
 - New: `src/tui/bridge/runtime.ts` — one persistent browser launched at startup, same instance handed to every run, closed once at teardown; injectable launcher/bridge for tests. `main.tsx` launches Chrome (worktree-root `chrome-profile`, absolute) before render and shuts down after `waitUntilExit()`; `--demo` skips the browser entirely (demo never leaves the UI pipeline — documented deviation from "launch at startup" for demo mode only). `App` gained a `runner` prop; submit dispatches `submit_task` then starts the bridge run, holding the RunHandle in a ref (Esc uses it in step 5).
-- Tests: `tests/tui/{streamFixtures,stubBrowser}.ts` (scripted RawMessageStreamEvent builder; spy adapter); `run-session.test.ts` drives the REAL runTask + registry + scheduler against scripted streams in a tmp runs dir — ordered re-emission, per-turn usage incl. cacheRead, artifact + finalized manifest + metrics on disk, budget_exceeded distinctness, run_failed mapping, abort signal presence; `browser-lifecycle.test.ts` (launch-once, same instance to all runs, close-exactly-once, not-started guard); `app.test.tsx` gained bridge wiring cases (submission calls bridge + disables composer, completion renders runDir + re-enables, --demo preserved, runner-less fallback).
+- Tests: `tests/tui/{streamFixtures,stubBrowser}.ts` (scripted RawMessageStreamEvent builder; spy controller); `run-session.test.ts` drives the REAL runTask + registry + scheduler against scripted streams in a tmp runs dir — ordered re-emission, per-turn usage incl. cacheRead, artifact + finalized manifest + metrics on disk, budget_exceeded distinctness, run_failed mapping, abort signal presence; `browser-lifecycle.test.ts` (launch-once, same instance to all runs, close-exactly-once, not-started guard); `app.test.tsx` gained bridge wiring cases (submission calls bridge + disables composer, completion renders runDir + re-enables, --demo preserved, runner-less fallback).
 - Fixed during verification: a `*/` inside runSession's doc comment terminated the block comment (TS1434) — reworded.
 
 Verification evidence:
@@ -125,7 +125,7 @@ Statuses flipped: S8-F1…S8-F9 → pass.
 
 ## 2026-08-11 03:40 PDT — Step 9 complete: hardening + polish; all 72 features pass
 
-- Runtime hardening: `isBrowserDeathMessage` classifies Playwright/adapter shutdown failures; a browser-death outcome marks the session browser dead and the NEXT submit relaunches a fresh Chrome (corpse closed best-effort; relaunch failure itself degrades to a run_failed event, never a crash). startRun defers behind ensureBrowser.
+- Runtime hardening: `isBrowserDeathMessage` classifies Playwright/controller shutdown failures; a browser-death outcome marks the session browser dead and the NEXT submit relaunches a fresh Chrome (corpse closed best-effort; relaunch failure itself degrades to a run_failed event, never a crash). startRun defers behind ensureBrowser.
 - Narrow-terminal fix found during verification: rows composed of sibling `<Text>`s (marker + content) overflowed their container by ~2 columns at 44 cols; user_task/activity/evidence/pending rows now nest their Texts so each row wraps as one paragraph — re-verified 0 lines exceeding 44 display columns in a 44-col PTY demo run.
 - New tests: `error-paths.test.ts` (mid-stream non-abort failure → error item + idle via real bridge + reducer fold; death-message classification; relaunch-on-next-submit; ordinary failures don't relaunch; failed relaunch → run_failed), `preflight.test.ts` (missing-key banner; real `node bin/sherlock.mjs` spawn under pipes exits non-zero with exactly one stderr line; double-Esc cancels once and stays cancelling; Ctrl+C uncaptured by App), `smoke.test.tsx` (width-controllable Ink debug harness; committed snapshots of the full scripted run at 80 and 44 columns + waiting-composer state, asserting user task/prose/finalized activity/emphasized evidence/completion/composer). README gained the Sherlock usage note.
 - Deflake: interaction-heavy TUI suites (fake-stdin typing, subprocess spawn) got `vi.setConfig({testTimeout: 30_000})` after two 5 s timeouts under full-suite parallel load; two consecutive full-suite runs green after.
@@ -212,7 +212,7 @@ worktrees before the merge).
   middle-truncated; renderAt(36) — title truncates, zero overflow. Smoke +
   command-suggest snapshots re-recorded; only the banner block changed.
 - R3-V3 (in the agent worktree): 400/400 total (394 in a load-constrained full run
-  + playwrightAdapter 6/6 standalone after an environmental beforeAll timeout under
+  + playwrightBrowserController 6/6 standalone after an environmental beforeAll timeout under
   parallel load); typecheck 0; git diff --check clean.
 - R3-H1 (agent-judged PTY): real startup captures at 80 and 44 cols (Python
   pty.fork + TIOCSWINSZ). Card shows title-in-border, 'Welcome back Brios!' (real
@@ -290,7 +290,7 @@ worktrees before the merge).
     DEFAULT_MODEL (the model the TUI's injected callModel runs).
   - evalsDir default: evals -> evals/datasets (tasks moved in the restructure);
     updated in config.ts, main.tsx, and the app-level /evals test.
-  - stubBrowser: BrowserAdapter gained download() — stub returns an empty
+  - stubBrowser: BrowserController gained download() — stub returns an empty
     BrowserDownloadResult.
 - Verification on the integrated tree: npm run typecheck exit 0; npm test twice
   consecutively -> 70 files / 463 tests passed both times (main's new suites +

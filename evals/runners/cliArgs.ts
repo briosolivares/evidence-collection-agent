@@ -1,4 +1,5 @@
 import { DEFAULT_K } from '../config.js';
+import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../src/tools/index.js';
 
 /** The eval CLI's parsed parameters: which tasks, how many trials. */
 export interface EvalCliArgs {
@@ -6,6 +7,8 @@ export interface EvalCliArgs {
   tasks: string[];
   /** Trials per task, a positive integer. */
   k: number;
+  /** Deterministic tool surface used by every trial. */
+  toolProfile: ToolProfile;
 }
 
 /**
@@ -21,6 +24,7 @@ export interface EvalCliArgs {
 export function parseEvalArgs(argv: string[]): EvalCliArgs {
   let tasksRaw: string | undefined;
   let kRaw: string | undefined;
+  let toolProfileRaw: string | undefined;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
@@ -37,7 +41,11 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
 
     if (flag === '--tasks') tasksRaw = takeValue();
     else if (flag === '--k') kRaw = takeValue();
-    else throw new Error(`unknown argument ${JSON.stringify(arg)} (usage: --tasks <a,b,c> [--k <n>])`);
+    else if (flag === '--tool-profile') toolProfileRaw = takeValue();
+    else throw new Error(
+      `unknown argument ${JSON.stringify(arg)} ` +
+        '(usage: --tasks <a,b,c> [--k <n>] [--tool-profile atomic|batch-enabled])',
+    );
   }
 
   if (tasksRaw === undefined) {
@@ -58,5 +66,11 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
       throw new Error(`--k must be a positive integer, got ${JSON.stringify(kRaw)}`);
     }
   }
-  return { tasks, k };
+  const toolProfile = toolProfileRaw ?? DEFAULT_TOOL_PROFILE;
+  if (toolProfile !== 'atomic' && toolProfile !== 'batch-enabled') {
+    throw new Error(
+      `--tool-profile must be "atomic" or "batch-enabled", got ${JSON.stringify(toolProfileRaw)}`,
+    );
+  }
+  return { tasks, k, toolProfile };
 }

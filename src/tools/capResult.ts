@@ -19,6 +19,20 @@ export const DEFAULT_MAX_RESULT_BYTES = 50_000;
  */
 export const PREVIEW_MAX_BYTES = 2_000;
 
+/**
+ * Maximum combined size in bytes of one message's tool results — the batch
+ * cap the loop enforces on top of the per-result cap. 4× the per-result
+ * default, mirroring Claude Code's MAX_TOOL_RESULTS_PER_MESSAGE_CHARS
+ * ratio; without it, 5 parallel reads × 50k bytes can land ~250k bytes
+ * (~60k tokens) in a single user message with every result individually
+ * legal. Deliberately bytes, not chars, like DEFAULT_MAX_RESULT_BYTES
+ * above: bytes are the stricter token proxy (Claude Code itself estimates
+ * at 4 bytes/token) and match the offload file mechanics — do not "fix"
+ * this to chars. Messages are evaluated independently: 150k this turn and
+ * 150k next turn are both untouched.
+ */
+export const MAX_TOOL_RESULTS_PER_MESSAGE_BYTES = 200_000;
+
 /** Run-dir subdirectory that holds offloaded tool output. */
 export const OFFLOAD_DIR = 'tool-output';
 
@@ -79,6 +93,44 @@ export function capResult(
   const sizeBytes = Buffer.byteLength(result, 'utf8');
   if (sizeBytes <= maxBytes) return result;
 
+  return offloadResult(
+    runDir,
+    toolName,
+    result,
+    `over this tool's ${maxBytes}-byte limit`,
+    Math.min(PREVIEW_MAX_BYTES, maxBytes),
+  );
+}
+
+/**
+ * Offload a result unconditionally: write it — complete — to a fresh
+ * numbered file under tool-output/ (via writeArtifact, so the manifest
+ * records its hash) and return the preview + path replacement. This is
+ * capResult's offload path exposed for callers that decide *themselves*
+ * that a result must go to disk — the loop's per-message batch cap
+ * (MAX_TOOL_RESULTS_PER_MESSAGE_BYTES), where each result passed its own
+ * per-tool cap but the batch's combined size did not.
+ *
+ * @param runDir - absolute path to a run directory whose manifest has been
+ *   initialized (throws otherwise, writing nothing)
+ * @param toolName - name of the tool that produced the result; must be a
+ *   registry-style name safe as a filename segment (no path separators)
+ * @param result - the tool's normalized model-facing output text
+ * @param limitDescription - why the result is being offloaded, completing
+ *   the sentence "Output was N bytes, …" in the replacement's note
+ * @param previewMaxBytes - preview size cap; defaults to PREVIEW_MAX_BYTES
+ * @returns an OffloadedResult exactly as capResult would produce for an
+ *   oversize result (see capResult's contract for the file-naming and
+ *   preview guarantees)
+ */
+export function offloadResult(
+  runDir: string,
+  toolName: string,
+  result: string,
+  limitDescription: string,
+  previewMaxBytes: number = PREVIEW_MAX_BYTES,
+): OffloadedResult {
+  const sizeBytes = Buffer.byteLength(result, 'utf8');
   const { relPath, absPath } = reserveOffloadPath(runDir, toolName);
   try {
     writeArtifact(runDir, relPath, Buffer.from(result, 'utf8'));
@@ -89,10 +141,10 @@ export function capResult(
   }
 
   return {
-    preview: buildPreview(result, Math.min(PREVIEW_MAX_BYTES, maxBytes)),
+    preview: buildPreview(result, previewMaxBytes),
     offloadedTo: relPath,
     note:
-      `Output was ${sizeBytes} bytes, over this tool's ${maxBytes}-byte limit. ` +
+      `Output was ${sizeBytes} bytes, ${limitDescription}. ` +
       `The complete output is saved at ${relPath} in the run directory — ` +
       `use read_file or grep on that path to read the rest.`,
   };

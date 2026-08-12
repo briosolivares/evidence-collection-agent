@@ -5,8 +5,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import type { BrowserAdapter } from '../src/browser/adapter.js';
-import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
+import type { BrowserController } from '../src/browser/controller.js';
+import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
 import {
   finalizeManifest,
   initManifest,
@@ -24,12 +24,13 @@ initManifest(runDir, 'demo: capture browser evidence from a local fixture');
 
 const fixtureServer = await startFixtureServer();
 const registry = createRegistry([...observationTools, ...evidenceTools]);
-let browser: BrowserAdapter | undefined;
+let browser: BrowserController | undefined;
 
 try {
-  browser = await launchPersistentChrome({
+  const browserSessionProvider = new LocalChromeBrowserSessionProvider({
     profileDir: resolve('chrome-profile'),
   });
+  browser = await browserSessionProvider.createSession();
   await browser.newTab();
   const ctx = { runDir, browser };
 

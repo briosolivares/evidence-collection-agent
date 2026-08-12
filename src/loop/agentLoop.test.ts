@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -23,7 +23,7 @@ import type { Message, ModelResponse, Usage } from './messages.js';
 const TASK = 'Do the scripted thing.';
 
 /** Ample guards for tests that are not probing them. */
-const ROOMY: LoopConfig = { maxTurns: 10, maxTokens: 1_000_000 };
+const ROOMY: LoopConfig = { maxTurns: 10, maxContextTokens: 1_000_000 };
 
 /** Default per-response usage: 15 tokens per turn (10 in + 5 out). */
 const DEFAULT_USAGE: Usage = { input_tokens: 10, output_tokens: 5 };
@@ -218,7 +218,7 @@ describe('runAgentLoop guards', () => {
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry(executed), runDir },
-      { maxTurns: 3, maxTokens: 1_000_000 },
+      { maxTurns: 3, maxContextTokens: 1_000_000 },
     );
 
     expect(result).toEqual({ status: 'budget_exceeded', reason: 'max_turns' });
@@ -240,87 +240,140 @@ describe('runAgentLoop guards', () => {
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry([]), runDir },
-      { maxTurns: 3, maxTokens: 1_000_000 },
+      { maxTurns: 3, maxContextTokens: 1_000_000 },
     );
 
     expect(result).toEqual({ status: 'completed', finalText: 'Finished on the last allowed turn.' });
     expect(requests).toHaveLength(3);
   });
 
-  it('one token over the budget ends the run budget_exceeded', async () => {
-    // 15 tokens per turn: cumulative 30 after turn 2, one over a 29 budget.
+  it('one response whose context strictly exceeds the cap ends the run context_budget', async () => {
+    // Per-request context = input + cache_creation + cache_read + output.
+    // Turn 1 sits at 15 and passes; turn 2 reaches 30 against a 29 cap.
     const { callModel, requests } = scriptModel([
       toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }]),
-      toolResponse([{ id: 't2', name: 'echo', input: { message: 'b' } }]),
+      toolResponse([{ id: 't2', name: 'echo', input: { message: 'b' } }], {
+        usage: { input_tokens: 20, output_tokens: 10 },
+      }),
       textResponse('Never reached.'),
     ]);
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry([]), runDir },
-      { maxTurns: 10, maxTokens: 29 },
+      { maxTurns: 10, maxContextTokens: 29 },
     );
 
-    expect(result).toEqual({ status: 'budget_exceeded', reason: 'token_budget' });
+    expect(result).toEqual({ status: 'budget_exceeded', reason: 'context_budget' });
     expect(requests).toHaveLength(2);
   });
 
-  it('sitting exactly at the token budget continues — the budget is spendable in full', async () => {
-    // Same 15-per-turn script, budget exactly 30: turn 3 must still happen.
+  it('a response sitting exactly at the context cap continues — the cap is spendable in full', async () => {
+    // Turn 1's context is exactly 30 against a 30 cap: turn 2 must happen.
     const { callModel, requests } = scriptModel([
-      toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }]),
-      toolResponse([{ id: 't2', name: 'echo', input: { message: 'b' } }]),
+      toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }], {
+        usage: { input_tokens: 20, output_tokens: 10 },
+      }),
       textResponse('Made it.'),
     ]);
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry([]), runDir },
-      { maxTurns: 10, maxTokens: 30 },
+      { maxTurns: 10, maxContextTokens: 30 },
     );
 
     expect(result).toEqual({ status: 'completed', finalText: 'Made it.' });
-    expect(requests).toHaveLength(3);
+    expect(requests).toHaveLength(2);
   });
 
-  it('cache_read_input_tokens count toward the budget', async () => {
-    // 10 + 5 + 20 cache reads = 35 > 34; without cache reads it would be 15
-    // and the loop would (wrongly) ask for an unscripted second response.
+  it("cache reads and cache writes count toward a response's context", async () => {
+    // 10 in + 5 out + 20 cache reads + 10 cache writes = 45 > 44; without
+    // the cache fields it would be 15 and the loop would (wrongly) ask for
+    // an unscripted second response.
     const { callModel, requests } = scriptModel([
       toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }], {
-        usage: { input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 20 },
+        usage: {
+          input_tokens: 10,
+          output_tokens: 5,
+          cache_read_input_tokens: 20,
+          cache_creation_input_tokens: 10,
+        },
       }),
     ]);
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry([]), runDir },
-      { maxTurns: 10, maxTokens: 34 },
+      { maxTurns: 10, maxContextTokens: 44 },
     );
 
-    expect(result).toEqual({ status: 'budget_exceeded', reason: 'token_budget' });
+    expect(result).toEqual({ status: 'budget_exceeded', reason: 'context_budget' });
     expect(requests).toHaveLength(1);
   });
 
-  it('a final response with no tool calls completes even when it blows the budget', async () => {
+  it('a run whose cumulative tokens far exceed the cap completes when every request stays under', async () => {
+    // Five turns at 15 context each: cumulative 75 against a 20 cap. The
+    // old cumulative guard would have died on turn 2; the per-request
+    // guard never trips because no single request exceeds the cap.
+    const { callModel, requests } = scriptModel([
+      toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }]),
+      toolResponse([{ id: 't2', name: 'echo', input: { message: 'b' } }]),
+      toolResponse([{ id: 't3', name: 'echo', input: { message: 'c' } }]),
+      toolResponse([{ id: 't4', name: 'echo', input: { message: 'd' } }]),
+      textResponse('Deep run finished.'),
+    ]);
+    const result = await runAgentLoop(
+      TASK,
+      { callModel, registry: echoRegistry([]), runDir },
+      { maxTurns: 10, maxContextTokens: 20 },
+    );
+
+    expect(result).toEqual({ status: 'completed', finalText: 'Deep run finished.' });
+    expect(requests).toHaveLength(5);
+  });
+
+  it('a final response with no tool calls completes even when it blows the context cap', async () => {
     const { callModel } = scriptModel([
       textResponse('Done.', { usage: { input_tokens: 999, output_tokens: 999 } }),
     ]);
     const result = await runAgentLoop(
       TASK,
       { callModel, registry: echoRegistry([]), runDir },
-      { maxTurns: 10, maxTokens: 10 },
+      { maxTurns: 10, maxContextTokens: 10 },
     );
 
     // The answer is in hand — completion is checked before the guards.
     expect(result).toEqual({ status: 'completed', finalText: 'Done.' });
   });
 
+  it('maxTurns: Infinity never trips — the run follows its trajectory to completion', async () => {
+    // Twelve tool turns then a completion: a finite-only guard would have
+    // rejected the config or cut the run; uncapped, the context ceiling is
+    // what guarantees termination (context grows every turn).
+    const executed: string[] = [];
+    const { callModel, requests } = scriptModel([
+      ...Array.from({ length: 12 }, (_, i) =>
+        toolResponse([{ id: `t${i + 1}`, name: 'echo', input: { message: `m${i + 1}` } }]),
+      ),
+      textResponse('Trajectory complete.'),
+    ]);
+    const result = await runAgentLoop(
+      TASK,
+      { callModel, registry: echoRegistry(executed), runDir },
+      { maxTurns: Infinity, maxContextTokens: 1_000_000 },
+    );
+
+    expect(result).toEqual({ status: 'completed', finalText: 'Trajectory complete.' });
+    expect(requests).toHaveLength(13);
+    expect(executed).toHaveLength(12);
+  });
+
   it('rejects a nonsensical config outright instead of running with it', async () => {
     const { callModel } = scriptModel([]);
     const deps = { callModel, registry: echoRegistry([]), runDir };
-    await expect(runAgentLoop(TASK, deps, { maxTurns: 0, maxTokens: 100 })).rejects.toThrow(
+    await expect(runAgentLoop(TASK, deps, { maxTurns: 0, maxContextTokens: 100 })).rejects.toThrow(
       /maxTurns/,
     );
-    await expect(runAgentLoop(TASK, deps, { maxTurns: 5, maxTokens: -1 })).rejects.toThrow(
-      /maxTokens/,
+    await expect(runAgentLoop(TASK, deps, { maxTurns: 5, maxContextTokens: -1 })).rejects.toThrow(
+      /maxContextTokens/,
     );
   });
 });
@@ -329,7 +382,12 @@ describe('runAgentLoop transcript and metrics', () => {
   it('the transcript replays the full event sequence with turn stamps', async () => {
     const { callModel } = scriptModel([
       toolResponse([{ id: 't1', name: 'echo', input: { message: 'hi' } }]),
-      textResponse('Done.'),
+      // Turn 2 reports cache reads (as a healthy prefix would) so the
+      // sequence stays free of cache_miss_warning events — those have
+      // their own test below.
+      textResponse('Done.', {
+        usage: { input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 40 },
+      }),
     ]);
     await runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY);
 
@@ -358,7 +416,12 @@ describe('runAgentLoop transcript and metrics', () => {
   it('metrics.json totals match the usage the fake model reported', async () => {
     const { callModel } = scriptModel([
       toolResponse([{ id: 't1', name: 'echo', input: { message: 'hi' } }], {
-        usage: { input_tokens: 11, output_tokens: 7, cache_read_input_tokens: 3 },
+        usage: {
+          input_tokens: 11,
+          output_tokens: 7,
+          cache_read_input_tokens: 3,
+          cache_creation_input_tokens: 9,
+        },
       }),
       textResponse('Done.', { usage: { input_tokens: 13, output_tokens: 2 } }),
     ]);
@@ -372,8 +435,173 @@ describe('runAgentLoop transcript and metrics', () => {
       inputTokens: 24,
       outputTokens: 9,
       cacheReadInputTokens: 3,
+      cacheCreationInputTokens: 9,
+      // Turn 1's context (11 + 9 + 3 + 7 = 30) beats turn 2's (13 + 2 = 15).
+      peakContextTokens: 30,
     });
     expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it('appends cache_miss_warning for turns >= 2 with zero cache reads — and only those', async () => {
+    // Turn 1 never warns (nothing is cached yet); turn 2 reads cache and
+    // stays quiet; turn 3 reports zero reads — the prefix broke — and the
+    // warning lands in the transcript even though the run completes there.
+    const { callModel } = scriptModel([
+      toolResponse([{ id: 't1', name: 'echo', input: { message: 'a' } }]),
+      toolResponse([{ id: 't2', name: 'echo', input: { message: 'b' } }], {
+        usage: { input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 40 },
+      }),
+      textResponse('Done.'),
+    ]);
+    await runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY);
+
+    const warnings = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>)
+      .filter((event) => event.type === 'cache_miss_warning');
+    expect(warnings).toEqual([{ type: 'cache_miss_warning', turn: 3 }]);
+  });
+
+  it('a mid-run crash writes failed metrics, logs run_error, and rethrows unchanged', async () => {
+    // Crash bookkeeping, not a retry loop: the run that spent turn 1's
+    // budget must not vanish from metrics because turn 2's model call blew
+    // up — and every caller still sees exactly the original rejection.
+    const scripted = scriptModel([
+      toolResponse([{ id: 't1', name: 'echo', input: { message: 'hi' } }]),
+    ]);
+    const boom = new Error('overloaded_error: upstream fell over mid-stream');
+    let modelCalls = 0;
+    const callModel = async (messages: readonly Message[]): Promise<ModelResponse> => {
+      modelCalls += 1;
+      if (modelCalls === 2) throw boom;
+      return scripted.callModel(messages);
+    };
+
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toBe(boom);
+
+    // Metrics carry the crash status and everything the run earned before it.
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics).toMatchObject({
+      status: 'failed',
+      turns: 2, // the crash happened on turn 2
+      inputTokens: 10, // turn 1's usage only — turn 2 never reported any
+      outputTokens: 5,
+      cacheReadInputTokens: 0,
+      cacheCreationInputTokens: 0,
+      peakContextTokens: 15,
+    });
+    expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
+
+    // The transcript ends with the run_error event.
+    const events = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+    expect(events.at(-1)).toEqual({
+      type: 'run_error',
+      turn: 2,
+      message: 'overloaded_error: upstream fell over mid-stream',
+    });
+  });
+
+  it('an abort gets no crash bookkeeping — cancelled is "stopped", not "crashed"', async () => {
+    // The design's cancellation artifact contract: a cancelled run keeps
+    // its finalized manifest but no metrics.json, so the /runs browser can
+    // tell a stop from a crash. The bridge normalizes post-abort failures
+    // to this error name.
+    const cancelled = Object.assign(new Error('run cancelled'), { name: 'AbortError' });
+    const callModel = (): Promise<ModelResponse> => Promise.reject(cancelled);
+
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toBe(cancelled);
+
+    expect(existsSync(join(runDir, METRICS_FILENAME))).toBe(false);
+    const transcript = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
+    expect(transcript).not.toContain('run_error');
+  });
+});
+
+describe('runAgentLoop per-message batch cap', () => {
+  /** A registry with one read-only `blob` tool returning `size` bytes of x —
+   * each result legal under the 50k per-result cap, so only the batch cap
+   * can touch them. */
+  function blobRegistry(): ToolRegistry {
+    const blob: ToolDef<{ size: number }> = {
+      name: 'blob',
+      description: 'Return size bytes of filler.',
+      inputSchema: z.object({ size: z.number().int().positive() }),
+      readOnly: true,
+      execute: async (input) => 'x'.repeat(input.size),
+    };
+    return createRegistry([blob as ToolDef]);
+  }
+
+  function blobCalls(sizes: number[]): Array<{ id: string; name: string; input: unknown }> {
+    return sizes.map((size, index) => ({ id: `t${index + 1}`, name: 'blob', input: { size } }));
+  }
+
+  it('a batch at or under 200k bytes passes through untouched', async () => {
+    const { callModel, requests } = scriptModel([
+      toolResponse(blobCalls([45_000, 45_000, 45_000, 45_000])), // 180k combined
+      textResponse('Done.'),
+    ]);
+    await runAgentLoop(TASK, { callModel, registry: blobRegistry(), runDir }, ROOMY);
+
+    const feedback = requests[1][2];
+    expect(feedback.content).toHaveLength(4);
+    for (const block of feedback.content) {
+      expect((block as { content: string }).content).toBe('x'.repeat(45_000));
+    }
+  });
+
+  it('offloads the largest results first until the batch fits, previews and hashes preserved', async () => {
+    // 45k + 44k + 4×40k = 249k > 200k. One offload leaves ~206k (still
+    // over), so the two largest go to disk — largest first — and the four
+    // 40k results stay inline.
+    const { callModel, requests } = scriptModel([
+      toolResponse(blobCalls([45_000, 44_000, 40_000, 40_000, 40_000, 40_000])),
+      textResponse('Done.'),
+    ]);
+    await runAgentLoop(TASK, { callModel, registry: blobRegistry(), runDir }, ROOMY);
+
+    const feedback = requests[1][2];
+    const contents = feedback.content.map((block) => (block as { content: string }).content);
+
+    // The two largest were replaced by capResult-shaped offload previews,
+    // largest first (the 45k result claimed the first offload file)...
+    const first = JSON.parse(contents[0]) as { preview: string; offloadedTo: string; note: string };
+    const second = JSON.parse(contents[1]) as { preview: string; offloadedTo: string; note: string };
+    expect(first.offloadedTo).toBe('tool-output/blob-1.txt');
+    expect(second.offloadedTo).toBe('tool-output/blob-2.txt');
+    expect(first.note).toContain('combined limit');
+    expect(first.preview.length).toBeGreaterThan(0);
+    // ...each offloaded file holds the complete original output...
+    expect(readFileSync(join(runDir, first.offloadedTo), 'utf8')).toBe('x'.repeat(45_000));
+    expect(readFileSync(join(runDir, second.offloadedTo), 'utf8')).toBe('x'.repeat(44_000));
+    // ...the smaller results passed through untouched...
+    for (const content of contents.slice(2)) {
+      expect(content).toBe('x'.repeat(40_000));
+    }
+    // ...the batch the model sees now fits...
+    const combined = contents.reduce((sum, content) => sum + content.length, 0);
+    expect(combined).toBeLessThanOrEqual(200_000);
+    // ...the manifest hashed both offloaded files...
+    const manifest = JSON.parse(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')) as Manifest;
+    for (const relPath of [first.offloadedTo, second.offloadedTo]) {
+      expect(manifest.artifacts.some((artifact) => artifact.filename === relPath)).toBe(true);
+    }
+    // ...and the transcript recorded results as the model sees them.
+    const toolResults = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, any>)
+      .filter((event) => event.type === 'tool_result');
+    expect(toolResults[0].result.content).toBe(contents[0]);
+    expect(toolResults[2].result.content).toBe(contents[2]);
   });
 });
 

@@ -1,12 +1,18 @@
+// Demo for T10: create a local Chrome session and drive it through the
+// engine-neutral browser controller. Run with: npx tsx demos/10-controller.ts
+
 import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
 
 const DEMO_WINDOW_MS = 5_000;
 const PROFILE_DIR = resolve('chrome-profile');
 
-const browser = await launchPersistentChrome({ profileDir: PROFILE_DIR });
+const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+  profileDir: PROFILE_DIR,
+});
+const browser = await browserSessionProvider.createSession();
 
 try {
   await browser.newTab();

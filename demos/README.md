@@ -20,7 +20,7 @@ npx tsx --env-file=.env demos/14-run-task.ts "your task here"   # the real thing
 | `07-loop-fake-model` | Full agent loop with a scripted model | — |
 | `08-scheduling` | Parallel-read tool scheduling | — |
 | `09-real-agent` | Loop against the live model (file tools only) | API key, **spends tokens** |
-| `10-adapter` | Browser adapter over local Chrome | Chrome |
+| `10-controller` | Browser controller over local Chrome | Chrome |
 | `11-observe` | navigate + inspect_page | Chrome |
 | `12-act` | click / type / scroll | Chrome |
 | `13-evidence` | screenshot + download | Chrome |

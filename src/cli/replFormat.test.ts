@@ -60,6 +60,21 @@ describe('formatProgressEvent', () => {
     };
     expect(formatProgressEvent(event)).toContain('cache_read=0');
   });
+
+  it('renders a retry event with the turn, attempt count, delay, and reason', () => {
+    const event: ProgressEvent = {
+      type: 'retry',
+      turn: 3,
+      attempt: 2,
+      delayMs: 2_100,
+      reason: 'overloaded_error',
+    };
+    const line = formatProgressEvent(event);
+    expect(line).toContain('turn 3');
+    expect(line).toContain('2/4');
+    expect(line).toContain('2.1s');
+    expect(line).toContain('overloaded_error');
+  });
 });
 
 describe('formatRunSummary', () => {

@@ -5,8 +5,8 @@ import { join } from 'node:path';
 
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
-import type { BrowserAdapter } from '../../src/browser/adapter.js';
-import { launchPersistentChrome } from '../../src/browser/playwrightAdapter.js';
+import type { BrowserController } from '../../src/browser/controller.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import { initManifest } from '../../src/run/artifacts.js';
 import { startFixtureServer, type FixtureServer } from '../fixtures/server.js';
 
@@ -16,8 +16,8 @@ export const BROWSER_TEST_TIMEOUT_MS = 15_000;
 /** Accessors into the suite's live browser state; each is valid once the
  * corresponding lifecycle hook has run (i.e. inside tests). */
 export interface BrowserToolSuite {
-  /** The suite's live browser adapter (one headless Chrome per suite). */
-  adapter: () => BrowserAdapter;
+  /** The suite's live browser controller (one headless Chrome per suite). */
+  controller: () => BrowserController;
   /** The suite's loopback fixture server. */
   server: () => FixtureServer;
   /** The current test's run directory — fresh per test, manifest initialized. */
@@ -32,7 +32,7 @@ export interface BrowserToolSuite {
  * leftover is attributable to its suite.
  */
 export function setupBrowserToolSuite(name: string): BrowserToolSuite {
-  let adapter: BrowserAdapter;
+  let controller: BrowserController;
   let fixtureServer: FixtureServer;
   let profileDir: string;
   let runDir: string;
@@ -40,22 +40,26 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
   beforeAll(async () => {
     fixtureServer = await startFixtureServer();
     profileDir = await mkdtemp(join(tmpdir(), `${name}-chrome-`));
-    adapter = await launchPersistentChrome({ profileDir, headless: true });
+    const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+      profileDir,
+      headless: true,
+    });
+    controller = await browserSessionProvider.createSession();
   }, 30_000);
 
   beforeEach(async () => {
     runDir = mkdtempSync(join(tmpdir(), `${name}-run-`));
     initManifest(runDir, `test ${name}`);
-    await adapter.newTab();
+    await controller.newTab();
   });
 
   afterEach(async () => {
-    await adapter.closeTab();
+    await controller.closeTab();
     rmSync(runDir, { recursive: true, force: true });
   });
 
   afterAll(async () => {
-    await adapter?.close();
+    await controller?.close();
     await fixtureServer?.close();
     if (profileDir !== undefined) {
       rmSync(profileDir, { recursive: true, force: true });
@@ -63,7 +67,7 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
   });
 
   return {
-    adapter: () => adapter,
+    controller: () => controller,
     server: () => fixtureServer,
     runDir: () => runDir,
   };

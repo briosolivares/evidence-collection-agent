@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { BrowserAdapter } from '../../src/browser/adapter.js';
+import type { BrowserController } from '../../src/browser/controller.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import {
   createTuiRuntime,
@@ -64,7 +64,7 @@ describe('mid-stream failure', () => {
 });
 
 describe('browser-death classification', () => {
-  it('recognizes the adapter and Playwright shutdown messages', () => {
+  it('recognizes the controller and Playwright shutdown messages', () => {
     expect(
       isBrowserDeathMessage('Target page, context or browser has been closed'),
     ).toBe(true);
@@ -84,11 +84,11 @@ describe('browser-death classification', () => {
 
 describe('browser relaunch on next submit', () => {
   it('relaunches a fresh browser after a browser-death failure', async () => {
-    const adapters: BrowserAdapter[] = [];
-    const launchBrowser = vi.fn(async () => {
-      const adapter = stubBrowser();
-      adapters.push(adapter);
-      return adapter;
+    const controllers: BrowserController[] = [];
+    const createSession = vi.fn(async () => {
+      const controller = stubBrowser();
+      controllers.push(controller);
+      return controller;
     });
 
     let call = 0;
@@ -106,39 +106,45 @@ describe('browser relaunch on next submit', () => {
       return { cancel: vi.fn(), done: Promise.resolve(outcome) };
     });
 
-    const runtime = createTuiRuntime({ launchBrowser, startRunFn });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn,
+    });
     await runtime.start();
-    expect(launchBrowser).toHaveBeenCalledTimes(1);
+    expect(createSession).toHaveBeenCalledTimes(1);
 
     const first = await runtime.startRun('dies', () => {}).done;
     expect(first.status).toBe('failed');
-    expect(launchBrowser).toHaveBeenCalledTimes(1); // not yet — relaunch is lazy
+    expect(createSession).toHaveBeenCalledTimes(1); // not yet — relaunch is lazy
 
     const second = await runtime.startRun('recovers', () => {}).done;
     expect(second.status).toBe('completed');
-    expect(launchBrowser).toHaveBeenCalledTimes(2); // relaunched on next submit
-    expect(seen[1]?.browser).toBe(adapters[1]); // the fresh session
-    expect(adapters[0]?.close).toHaveBeenCalled(); // corpse cleaned up
+    expect(createSession).toHaveBeenCalledTimes(2); // relaunched on next submit
+    expect(seen[1]?.browser).toBe(controllers[1]); // the fresh session
+    expect(controllers[0]?.close).toHaveBeenCalled(); // corpse cleaned up
   });
 
   it('an ordinary failure does not trigger a relaunch', async () => {
-    const launchBrowser = vi.fn(async () => stubBrowser());
+    const createSession = vi.fn(async () => stubBrowser());
     const startRunFn = vi.fn(
       (): RunHandle => ({
         cancel: vi.fn(),
         done: Promise.resolve({ status: 'failed', message: 'HTTP 500' } as const),
       }),
     );
-    const runtime = createTuiRuntime({ launchBrowser, startRunFn });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn,
+    });
     await runtime.start();
     await runtime.startRun('a', () => {}).done;
     await runtime.startRun('b', () => {}).done;
-    expect(launchBrowser).toHaveBeenCalledTimes(1);
+    expect(createSession).toHaveBeenCalledTimes(1);
   });
 
   it('a failed relaunch reports run_failed instead of crashing', async () => {
     let launches = 0;
-    const launchBrowser = vi.fn(async () => {
+    const createSession = vi.fn(async () => {
       launches += 1;
       if (launches > 1) throw new Error('no chrome anymore');
       return stubBrowser();
@@ -152,7 +158,11 @@ describe('browser relaunch on next submit', () => {
         } as const),
       }),
     );
-    const runtime = createTuiRuntime({ launchBrowser, startRunFn, now: () => 7 });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn,
+      now: () => 7,
+    });
     await runtime.start();
     await runtime.startRun('dies', () => {}).done;
 

@@ -141,6 +141,53 @@ describe('startRun (RunSession bridge)', () => {
     expect(existsSync(join(outcome.runDir, 'metrics.json'))).toBe(true);
   });
 
+  it('uses the same batch-enabled profile for model definitions and execution', async () => {
+    const { events, onEvent } = collect();
+    const factory = scriptedStreamFactory([
+      scriptedResponse(
+        [
+          {
+            type: 'tool_use',
+            id: 'tu_batch',
+            name: 'browser_batch',
+            input: {
+              actions: [
+                { tool: 'navigate', input: { url: 'https://example.test/' } },
+                { tool: 'inspect_page', input: {} },
+              ],
+            },
+          },
+        ],
+        { input: 1000, output: 200 },
+        'tool_use',
+      ),
+      scriptedResponse([{ type: 'text', text: 'Done.' }], {
+        input: 1500,
+        output: 40,
+      }),
+    ]);
+
+    const handle = startRun('use a browser batch', {
+      browser: stubBrowser(),
+      onEvent,
+      runsBaseDir,
+      toolProfile: 'batch-enabled',
+      createStream: factory.createStream,
+    });
+    await expect(handle.done).resolves.toMatchObject({ status: 'completed' });
+
+    const firstParams = factory.calls[0]?.params as {
+      tools?: Array<{ name: string }>;
+    };
+    expect(firstParams.tools?.map((tool) => tool.name).at(-1)).toBe('browser_batch');
+    expect(events.filter((event) => event.type === 'tool_exec_start')).toEqual([
+      expect.objectContaining({ name: 'browser_batch' }),
+    ]);
+    expect(events.filter((event) => event.type === 'tool_exec_end')).toEqual([
+      expect.objectContaining({ ok: true }),
+    ]);
+  });
+
   it('maps budget exhaustion to a distinct outcome and event', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([

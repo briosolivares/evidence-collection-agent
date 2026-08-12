@@ -1,9 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import type { Message } from '../loop/messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
-import { buildRequestParams, DEFAULT_MODEL, type CallModelConfig } from './callModel.js';
+import {
+  buildRequestParams,
+  DEFAULT_MODEL,
+  makeAnthropicClient,
+  type CallModelConfig,
+} from './callModel.js';
 
 // A small but realistic registry: two tools with described, typed schemas,
 // exactly the shape the file tools use.
@@ -87,7 +92,7 @@ describe('buildRequestParams', () => {
     expect(JSON.stringify(paramsA.messages)).not.toBe(JSON.stringify(paramsB.messages));
   });
 
-  it('places the cache_control breakpoint on the last block of the stable prefix', () => {
+  it('places a cache_control breakpoint on the last block of the stable prefix', () => {
     const params = buildRequestParams(makeConfig(), turnOneHistory);
 
     // The API renders tools → system → messages, so the breakpoint on the
@@ -95,8 +100,29 @@ describe('buildRequestParams', () => {
     const system = params.system as Array<{ text: string; cache_control?: unknown }>;
     expect(system.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
     expect(system.at(-1)?.text).toBe(SYSTEM_PROMPT);
-    // No breakpoints inside the volatile suffix.
-    expect(JSON.stringify(params.messages)).not.toContain('cache_control');
+    // No breakpoints inside the tools array — the system block's marker
+    // already caches them (the API renders tools first).
+    expect(JSON.stringify(params.tools)).not.toContain('cache_control');
+  });
+
+  it('places the moving breakpoint on the last block of the last message — and nowhere else', () => {
+    for (const history of [turnOneHistory, turnThreeHistory]) {
+      const params = buildRequestParams(makeConfig(), history);
+      const contents = params.messages.map(
+        (message) => message.content as Array<{ cache_control?: unknown }>,
+      );
+
+      // The marker rides the final block (task text on turn 1, the last
+      // tool_result later), so each request resumes the previous turn's
+      // cache entry.
+      expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
+      // Exactly one message-level marker: 2 breakpoints per request total
+      // (system + moving), within the API's max of 4.
+      const markers = contents
+        .flat()
+        .filter((block) => block.cache_control !== undefined);
+      expect(markers).toHaveLength(1);
+    }
   });
 
   it('carries the config into the request: model default and override, max_tokens, thinking off', () => {
@@ -111,9 +137,45 @@ describe('buildRequestParams', () => {
     expect(overridden.model).toBe('claude-opus-5');
   });
 
-  it('passes the conversation through verbatim without mutating it', () => {
+  it('passes the conversation through without mutating it — the marked message is a clone', () => {
     // turnThreeHistory is deeply frozen — any mutation would have thrown.
     const params = buildRequestParams(makeConfig(), turnThreeHistory);
-    expect(params.messages).toEqual(turnThreeHistory);
+
+    // Every message except the last passes through by identity; the last is
+    // a clone equal to the original plus the moving marker on its final block.
+    expect(params.messages.slice(0, -1)).toEqual(turnThreeHistory.slice(0, -1));
+    const lastOriginal = turnThreeHistory.at(-1)!;
+    expect(params.messages.at(-1)).toEqual({
+      ...lastOriginal,
+      content: [
+        {
+          ...lastOriginal.content.at(-1)!,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+    });
+    // And the input history itself is untouched (no marker leaked back).
+    expect(JSON.stringify(turnThreeHistory)).not.toContain('cache_control');
+  });
+});
+
+describe('makeAnthropicClient', () => {
+  let savedKey: string | undefined;
+
+  beforeEach(() => {
+    savedKey = process.env.ANTHROPIC_API_KEY;
+    // The constructor requires a key; the client never makes a call here.
+    process.env.ANTHROPIC_API_KEY = 'test-key-never-used';
+  });
+
+  afterEach(() => {
+    if (savedKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = savedKey;
+  });
+
+  it('disables SDK auto-retry — callWithRetry is the single retry authority', () => {
+    // maxRetries: 0, or SDK retries nest inside the manual loop (up to 12
+    // requests for one turn) and mid-stream failures still go unretried.
+    expect(makeAnthropicClient().maxRetries).toBe(0);
   });
 });

@@ -397,7 +397,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
         const reason =
           action.reason === 'max_turns'
             ? 'turn limit reached'
-            : 'token budget exhausted';
+            : 'context budget exhausted';
         next = append(next, {
           kind: 'error',
           message:

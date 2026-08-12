@@ -4,7 +4,7 @@
 
 import { resolve } from 'node:path';
 
-import { launchPersistentChrome } from '../src/browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
 import { finalizeManifest, initManifest } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
@@ -17,9 +17,10 @@ const runDir = createRunDir('runs', generateRunId('demo observe'));
 initManifest(runDir, 'demo: observe a local fixture page');
 
 const fixtureServer = await startFixtureServer();
-const browser = await launchPersistentChrome({
+const browserSessionProvider = new LocalChromeBrowserSessionProvider({
   profileDir: resolve('chrome-profile'),
 });
+const browser = await browserSessionProvider.createSession();
 const registry = createRegistry(observationTools);
 
 try {

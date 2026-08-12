@@ -7,9 +7,12 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { startFixtureServer, type FixtureServer } from '../../tests/fixtures/server.js';
 import {
   BrowserRefNotFoundError,
-  type BrowserAdapter,
-} from './adapter.js';
-import { launchPersistentChrome } from './playwrightAdapter.js';
+  type BrowserController,
+} from './controller.js';
+import {
+  LocalChromeBrowserSessionProvider,
+  PlaywrightBrowserController,
+} from './playwrightBrowserController.js';
 
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 const BROWSER_TEST_TIMEOUT_MS = 15_000;
@@ -27,23 +30,28 @@ function refFor(outline: string, roleAndName: string): string {
   return match[1];
 }
 
-describe('Playwright browser adapter', () => {
-  let adapter: BrowserAdapter;
+describe('Playwright browser controller', () => {
+  let controller: BrowserController;
   let fixtureServer: FixtureServer;
   let profileDir: string;
 
   beforeAll(async () => {
     fixtureServer = await startFixtureServer();
     profileDir = await mkdtemp(join(tmpdir(), 'evidence-agent-chrome-'));
-    adapter = await launchPersistentChrome({ profileDir, headless: true });
+    const provider = new LocalChromeBrowserSessionProvider({
+      profileDir,
+      headless: true,
+    });
+    controller = await provider.createSession();
+    expect(controller).toBeInstanceOf(PlaywrightBrowserController);
   }, 30_000);
 
   afterEach(async () => {
-    await adapter.closeTab();
+    await controller.closeTab();
   });
 
   afterAll(async () => {
-    await adapter?.close();
+    await controller?.close();
     await fixtureServer?.close();
     if (profileDir !== undefined) {
       await rm(profileDir, { recursive: true, force: true });
@@ -53,19 +61,19 @@ describe('Playwright browser adapter', () => {
   it(
     'round-trips an outline ref to the intended interactive element',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/'));
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
 
-      const firstOutline = await adapter.outline();
+      const firstOutline = await controller.outline();
       const buttonRef = refFor(firstOutline, 'button "Announce ready"');
-      const secondOutline = await adapter.outline();
+      const secondOutline = await controller.outline();
 
       expect(refFor(secondOutline, 'button "Announce ready"')).toBe(buttonRef);
-      await adapter.click(buttonRef);
-      expect(await adapter.outline()).toContain('Ready');
+      await controller.click(buttonRef);
+      expect(await controller.outline()).toContain('Ready');
 
-      await adapter.goto(fixtureServer.url('/second.html'));
-      await expect(adapter.click(buttonRef)).rejects.toBeInstanceOf(
+      await controller.goto(fixtureServer.url('/second.html'));
+      await expect(controller.click(buttonRef)).rejects.toBeInstanceOf(
         BrowserRefNotFoundError,
       );
     },
@@ -75,11 +83,11 @@ describe('Playwright browser adapter', () => {
   it(
     'launches, navigates, reports page metadata, and closes cleanly',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/'));
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
 
-      expect(adapter.currentUrl()).toBe(fixtureServer.url('/'));
-      expect(await adapter.title()).toBe('Browser Adapter Fixture');
+      expect(controller.currentUrl()).toBe(fixtureServer.url('/'));
+      expect(await controller.title()).toBe('Browser Controller Fixture');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -87,14 +95,14 @@ describe('Playwright browser adapter', () => {
   it(
     'opens a fresh blank tab for each sequential run',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/second.html'));
-      expect(await adapter.title()).toBe('Second Fixture Page');
-      await adapter.closeTab();
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/second.html'));
+      expect(await controller.title()).toBe('Second Fixture Page');
+      await controller.closeTab();
 
-      await adapter.newTab();
-      expect(adapter.currentUrl()).toBe('about:blank');
-      expect(await adapter.title()).toBe('');
+      await controller.newTab();
+      expect(controller.currentUrl()).toBe('about:blank');
+      expect(await controller.title()).toBe('');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -103,13 +111,13 @@ describe('Playwright browser adapter', () => {
     'allows only one active tab when two opens race',
     async () => {
       const results = await Promise.allSettled([
-        adapter.newTab(),
-        adapter.newTab(),
+        controller.newTab(),
+        controller.newTab(),
       ]);
 
       expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
       expect(results.filter((result) => result.status === 'rejected')).toHaveLength(1);
-      expect(adapter.currentUrl()).toBe('about:blank');
+      expect(controller.currentUrl()).toBe('about:blank');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -117,19 +125,19 @@ describe('Playwright browser adapter', () => {
   it(
     'supports ref-based typing, href resolution, and PNG capture',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/'));
-      const outline = await adapter.outline();
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
+      const outline = await controller.outline();
       const inputRef = refFor(outline, 'textbox "Evidence query"');
       const linkRef = refFor(outline, 'link "Visit second page"');
 
-      await adapter.type(inputRef, 'quarterly controls');
-      expect(await adapter.outline()).toContain('quarterly controls');
-      expect(await adapter.resolveHref(linkRef)).toBe(
+      await controller.type(inputRef, 'quarterly controls');
+      expect(await controller.outline()).toContain('quarterly controls');
+      expect(await controller.resolveHref(linkRef)).toBe(
         fixtureServer.url('/second.html'),
       );
 
-      const png = await adapter.screenshot();
+      const png = await controller.screenshot();
       expect(Array.from(png.subarray(0, PNG_MAGIC.length))).toEqual(PNG_MAGIC);
     },
     BROWSER_TEST_TIMEOUT_MS,
@@ -138,10 +146,10 @@ describe('Playwright browser adapter', () => {
   it(
     'fetches with cookies from the persistent browser context',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/'));
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
 
-      const response = await adapter.fetch(
+      const response = await controller.fetch(
         fixtureServer.url('/authenticated.bin'),
       );
 
@@ -157,13 +165,13 @@ describe('Playwright browser adapter', () => {
   it(
     'captures exact bytes through Chrome when the lightweight request client is blocked',
     async () => {
-      await adapter.newTab();
-      await adapter.goto(fixtureServer.url('/'));
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
 
       const url = fixtureServer.url('/browser-only-document.htm');
-      await expect(adapter.fetch(url)).resolves.toMatchObject({ status: 403 });
+      await expect(controller.fetch(url)).resolves.toMatchObject({ status: 403 });
 
-      const result = await adapter.download({ url });
+      const result = await controller.download({ url });
 
       expect(result).toMatchObject({
         finalUrl: url,
@@ -175,7 +183,7 @@ describe('Playwright browser adapter', () => {
       expect(new TextDecoder().decode(result.bytes)).toBe(
         '<!doctype html><title>Browser-only filing</title><p>Exact filing bytes</p>\n',
       );
-      expect(adapter.currentUrl()).toBe(fixtureServer.url('/'));
+      expect(controller.currentUrl()).toBe(fixtureServer.url('/'));
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

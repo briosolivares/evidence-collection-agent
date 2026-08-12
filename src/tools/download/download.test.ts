@@ -30,7 +30,7 @@ describe('download tool', () => {
     return executeToolCall(
       registry,
       { id: `call-${name}`, name, input },
-      { runDir: suite.runDir(), browser: suite.adapter() },
+      { runDir: suite.runDir(), browser: suite.controller() },
     );
   }
 
@@ -74,7 +74,7 @@ describe('download tool', () => {
     'captures an inline document through Chrome when direct HTTP is blocked',
     async () => {
       const url = suite.server().url('/browser-only-document.htm');
-      await expect(suite.adapter().fetch(url)).resolves.toMatchObject({ status: 403 });
+      await expect(suite.controller().fetch(url)).resolves.toMatchObject({ status: 403 });
 
       const outline = await successfulCall('inspect_page', {});
       const ref = refFor(outline, 'link "View browser-only document"');
@@ -93,7 +93,7 @@ describe('download tool', () => {
           sourceUrl: url,
         }),
       );
-      expect(suite.adapter().currentUrl()).toBe(suite.server().url('/downloads.html'));
+      expect(suite.controller().currentUrl()).toBe(suite.server().url('/downloads.html'));
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

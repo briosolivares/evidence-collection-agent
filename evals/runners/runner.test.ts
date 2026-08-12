@@ -40,10 +40,12 @@ describe('runEvals', () => {
     const report = await runEvals([stubTask()], 3, {
       runTask: makeFakeRunTask(baseDir),
       model: 'fake-model',
+      toolProfile: 'batch-enabled',
     });
 
     expect(report.k).toBe(3);
     expect(report.model).toBe('fake-model');
+    expect(report.toolProfile).toBe('batch-enabled');
     expect(report.tasks).toHaveLength(1);
     const task = report.tasks[0]!;
     expect(task.task).toBe('stub');
@@ -78,7 +80,11 @@ describe('runEvals', () => {
       return { runDir };
     };
 
-    const report = await runEvals([stubTask()], 2, { runTask: flaky, model: 'fake-model' });
+    const report = await runEvals([stubTask()], 2, {
+      runTask: flaky,
+      model: 'fake-model',
+      toolProfile: 'atomic',
+    });
 
     const task = report.tasks[0]!;
     expect(task.trials.map((t) => t.completed)).toEqual([true, false]);
@@ -97,6 +103,7 @@ describe('runEvals', () => {
     const report = await runEvals([{ ...stubTask(), grade: spyGrader }], 2, {
       runTask: makeFakeRunTask(baseDir),
       model: 'fake-model',
+      toolProfile: 'atomic',
     });
 
     expect(calls).toHaveLength(2);
@@ -120,7 +127,11 @@ describe('runEvals', () => {
   });
 
   it('rejects k < 1, an empty task list, and a grader returning no assertions', async () => {
-    const deps = { runTask: makeFakeRunTask(baseDir), model: 'fake-model' };
+    const deps = {
+      runTask: makeFakeRunTask(baseDir),
+      model: 'fake-model',
+      toolProfile: 'atomic' as const,
+    };
 
     await expect(runEvals([stubTask()], 0, deps)).rejects.toThrow(/positive integer/);
     await expect(runEvals([], 1, deps)).rejects.toThrow(/no tasks/);

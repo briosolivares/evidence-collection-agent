@@ -31,14 +31,6 @@ export interface BrowserDownloadResult {
 /** A browser-native download source: an observed page ref or verified URL. */
 export type BrowserDownloadTarget = { ref: string } | { url: string };
 
-/** Configuration for launching a persistent local Chrome session. */
-export interface BrowserLaunchOptions {
-  /** Absolute path to the persistent Chrome profile directory. */
-  profileDir: string;
-  /** Whether Chrome runs without a visible window; defaults to false. */
-  headless?: boolean;
-}
-
 /** Error raised when a ref from an outline no longer identifies an element. */
 export class BrowserRefNotFoundError extends Error {
   /** Ref that could not be resolved. */
@@ -52,13 +44,13 @@ export class BrowserRefNotFoundError extends Error {
 }
 
 /**
- * Engine-neutral control surface for one persistent browser session.
+ * Engine-neutral control surface for one browser session.
  *
  * A session owns at most one task tab at a time. Calling {@link newTab}
  * starts a run with a fresh page; calling {@link closeTab} ends that run
- * without closing the underlying browser or its shared profile.
+ * without closing the underlying browser session or its shared state.
  */
-export interface BrowserAdapter {
+export interface BrowserController {
   /**
    * Open a fresh blank tab for a task run.
    *
@@ -90,7 +82,7 @@ export interface BrowserAdapter {
    * @returns a YAML accessibility snapshot covering the full loaded page,
    *   with interactive elements annotated by refs. Consecutive calls on an
    *   unchanged page preserve refs, and returned refs can be passed to the
-   *   ref-based methods on this adapter.
+   *   ref-based methods on this controller.
    */
   outline(): Promise<string>;
 
@@ -139,7 +131,7 @@ export interface BrowserAdapter {
   resolveHref(ref: string): Promise<string | null>;
 
   /**
-   * Fetch a URL through the persistent browser context's request layer.
+   * Fetch a URL through the browser session's request layer.
    *
    * @param url - absolute HTTP or HTTPS URL to request
    * @returns response status, headers, and complete bytes; browser cookies
@@ -176,7 +168,7 @@ export interface BrowserAdapter {
   title(): Promise<string>;
 
   /**
-   * Close the persistent browser session and every page it owns.
+   * Close the browser session and every page it owns.
    *
    * @returns nothing; all browser resources are released. Repeated calls are
    *   safe and no later browser operation may succeed.

@@ -15,17 +15,17 @@ Its most interesting design idea is not merely “use the user's browser.” Ego
 
 Ego Lite is a custom Chromium desktop browser plus an `ego-browser` connection layer. The browser owns tabs, task spaces, CDP transport, snapshots, and events; the open Node helper package wraps those primitives in Playwright-style facades and is invoked by an agent through `ego-browser nodejs` ([helper runtime README](https://github.com/citrolabs/ego-lite/blob/main/package/ego-browser/README.md)).
 
-It is **not** an autonomous agent framework or durable orchestrator. It does not replace the design doc's model loop, mutable state, token budget, tool-result cap, tracing, evaluator, queue, or artifact store. It is also not a Browserbase-like public managed browser API. The clean integration boundary would be an adapter behind the proposed browser tools:
+It is **not** an autonomous agent framework or durable orchestrator. It does not replace the design doc's model loop, mutable state, token budget, tool-result cap, tracing, evaluator, queue, or artifact store. It is also not a Browserbase-like public managed browser API. The clean integration boundary would be a controller behind the browser tools:
 
 ```text
 custom agent loop
   -> validated navigate / inspect / click / type / scroll / screenshot / download tools
-  -> EgoLiteAdapter
+  -> EgoLiteBrowserController
   -> ego-browser local Node helper runtime
   -> local Ego Lite Chromium + selected Space
 ```
 
-The official skill instead encourages the model to generate multi-step JavaScript and execute it through a shell heredoc ([agent-facing skill contract](https://github.com/citrolabs/ego-lite/blob/main/skills/ego-browser/SKILL.md)). That is convenient for a Claude Code-style prototype, but a production implementation should not expose unrestricted shell or arbitrary raw CDP by default. It should translate validated tool inputs into a narrow allowlisted adapter and log each consequential browser action.
+The official skill instead encourages the model to generate multi-step JavaScript and execute it through a shell heredoc ([agent-facing skill contract](https://github.com/citrolabs/ego-lite/blob/main/skills/ego-browser/SKILL.md)). That is convenient for a Claude Code-style prototype, but a production implementation should not expose unrestricted shell or arbitrary raw CDP by default. It should translate validated tool inputs into a narrow allowlisted controller and log each consequential browser action.
 
 ## Architecture and capabilities
 
@@ -55,7 +55,7 @@ What is missing from public documentation is more important for audit evidence: 
 
 Ego Lite can run tasks in parallel Spaces without taking over the user's tabs. The free plan says parallelism is “limited only by your machine,” while the business plan offers custom volume and deployment terms but publishes no architecture, API, concurrency quota, SLA, or reference deployment ([enterprise/pricing page](https://www.egolite.app/enterprise)).
 
-The website reports a 3.45x result—81.8 seconds versus 282.9 seconds—for one X scraping task against Vercel agent-browser, and illustrates fewer tool calls by batching operations ([vendor comparison](https://www.egolite.app/compare/ego-lite-vs-agent-browser)). Treat this as directional only: it is vendor-run, one showcased task, and not a reproducible cross-site benchmark with confidence intervals. More fundamentally, eliminating model round trips can improve speed but also removes opportunities to inspect unexpected intermediate state. The adapter should batch deterministic operations and retain observation checkpoints before irreversible actions.
+The website reports a 3.45x result—81.8 seconds versus 282.9 seconds—for one X scraping task against Vercel agent-browser, and illustrates fewer tool calls by batching operations ([vendor comparison](https://www.egolite.app/compare/ego-lite-vs-agent-browser)). Treat this as directional only: it is vendor-run, one showcased task, and not a reproducible cross-site benchmark with confidence intervals. More fundamentally, eliminating model round trips can improve speed but also removes opportunities to inspect unexpected intermediate state. The controller should batch deterministic operations and retain observation checkpoints before irreversible actions.
 
 For this project, the production blocker is explicit: Ego Lite says it **cannot run headless in CI today** and positions itself as an interactive inner-loop browser on a Mac ([testing boundary](https://www.egolite.app/solutions/browser-testing#where-ego-lite-fits-and-where-it-doesnt)). A single user's Mac and shared profile cannot meet “thousands of samples” with controlled isolation and repeatable provisioning. Open issues requesting resource budgets for concurrent Spaces and reporting background rendering pauses are useful warning signals, though they are user reports rather than confirmed product limitations ([issue #174](https://github.com/citrolabs/ego-lite/issues/174), [issue #168](https://github.com/citrolabs/ego-lite/issues/168)).
 
@@ -108,7 +108,7 @@ The project is young: GitHub records creation in April 2026, while activity and 
 
 Run this only with dedicated test accounts and a dedicated browser profile—not an employee's everyday client sessions.
 
-1. Build a narrow `EgoLiteAdapter` for `navigate`, `inspect`, `click`, `type`, `scroll`, `screenshot`, and `download`. Disable arbitrary server fetch, page JS, raw CDP, uploads, and cross-domain navigation by default.
+1. Build a narrow `EgoLiteBrowserController` for `navigate`, `inspect`, `click`, `type`, `scroll`, `screenshot`, and `download`. Disable arbitrary server fetch, page JS, raw CDP, uploads, and cross-domain navigation by default.
 2. Define an evidence manifest containing task ID, system, account alias, source URL, capture time, browser/runtime version, action trace, screenshot/download path, SHA-256, and extraction output.
 3. Assemble at least 40 representative tasks across GitHub, Jira/Linear, Workday-like HR, NetSuite-like finance, tables/pagination, downloads, cross-origin iframes, shadow DOM, SSO, expired sessions, and an adversarial prompt-injection page. Include read-only and mutation-attempt negatives.
 4. Run each task five times from a controlled starting state, and compare with the same outer loop on the leading managed/headless backend. Record task success, field-level precision/recall, artifact correctness, forbidden-action rate, human interventions, model/browser latency, tool calls, tokens, and peak memory.

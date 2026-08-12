@@ -6,7 +6,7 @@ The contracts that hold the system together, and every external surface it touch
 
 ```mermaid
 classDiagram
-    class BrowserAdapter {
+    class BrowserController {
         <<interface>>
         +newTab() Promise~void~
         +closeTab() Promise~void~
@@ -21,6 +21,10 @@ classDiagram
         +currentUrl() string
         +title() Promise~string~
         +close() Promise~void~
+    }
+    class BrowserSessionProvider {
+        <<interface>>
+        +createSession() Promise~BrowserController~
     }
     class ToolDef {
         <<interface>>
@@ -43,15 +47,21 @@ classDiagram
         <<function type>>
         (messages) Promise~ModelResponse~
     }
-    PlaywrightBrowserAdapter ..|> BrowserAdapter
-    ToolDef --> BrowserAdapter : via ToolCtx.browser
+    LocalChromeBrowserSessionProvider ..|> BrowserSessionProvider
+    LocalChromeBrowserSessionProvider --> PlaywrightBrowserController : creates
+    PlaywrightBrowserController ..|> BrowserController
+    ToolDef --> BrowserController : via ToolCtx.browser
     RunTracing --> CallModel : decorates
     RunTracing --> ToolDef : decorates registry
 ```
 
-### `BrowserAdapter` (`src/browser/adapter.ts`)
+### `BrowserController` (`src/browser/controller.ts`)
 
-The engine seam. A session owns at most one task tab; `newTab()` starts a run, `closeTab()` ends it without closing the browser/profile. Contract details: `click`/`type` take refs from the latest `outline()` and throw `BrowserRefNotFoundError` for stale/malformed refs; `fetch()` goes through the browser session (cookies shared); `goto` reports the *landed* URL via `currentUrl()`. Implemented by `launchPersistentChrome` in `src/browser/playwrightAdapter.ts`.
+The engine-neutral control seam for a live browser session. A controller owns at most one task tab; `newTab()` starts a run, `closeTab()` ends it without closing the session or its shared state. Contract details: `click`/`type` take refs from the latest `outline()` and throw `BrowserRefNotFoundError` for stale/malformed refs; `fetch()` goes through the browser session (cookies shared); `goto` reports the *landed* URL via `currentUrl()`. The current implementation is `PlaywrightBrowserController` in `src/browser/playwrightBrowserController.ts`.
+
+### `BrowserSessionProvider` (`src/browser/sessionProvider.ts`)
+
+The session-acquisition seam: `createSession()` returns a live `BrowserController` with no active task tab, and the caller owns and closes it. `LocalChromeBrowserSessionProvider` is the production implementation today. A future `BrowserbaseBrowserSessionProvider` can create a hosted session and return a controller without changing the loop, tools, or `runTask`.
 
 ### `CallModel` (`src/loop/messages.ts`)
 
@@ -65,7 +75,7 @@ One zod schema per tool does double duty: runtime validation and (via `z.toJSONS
 
 ```ts
 runTask(taskText: string, config: RunTaskConfig): Promise<RunTaskResult>
-// RunTaskConfig: { browser (required); runsBaseDir?; startUrl?; model?;
+// RunTaskConfig: { browser: BrowserController (required); runsBaseDir?; startUrl?; model?;
 //                  maxOutputTokens?; maxTurns?; maxTokens?; onProgress?;
 //                  callModel? (test seam); tracing? (test seam) }
 // RunTaskResult: { runDir: string } & LoopResult

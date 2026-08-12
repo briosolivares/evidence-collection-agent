@@ -23,6 +23,21 @@ export type StreamProgressEvent =
   /** The model started a tool call (its input is still streaming). */
   | { type: 'tool_use_start'; toolName: string };
 
+/**
+ * Thrown when the event stream ends before describing a complete response —
+ * the connection died mid-stream. Distinguished by `name` so retry logic
+ * (callWithRetry) can classify truncation as transient without regexing
+ * messages; the assembly's deterministic failures (unsupported block type,
+ * unparseable tool-input JSON) stay plain Errors, because retrying those
+ * would only reproduce them.
+ */
+export class TruncatedStreamError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TruncatedStreamError';
+  }
+}
+
 /** An in-progress content block, tracked from its start event to its stop
  * event. tool_use inputs accumulate as raw JSON text until the block stops. */
 type OpenBlock =
@@ -35,10 +50,11 @@ type OpenBlock =
  * @param events - the events of exactly one streamed Messages API response,
  *   in wire order (a live SDK stream or a fixture). Must contain a
  *   message_start, and every content block must be closed by a
- *   content_block_stop before the stream ends; throws on a truncated or
- *   malformed stream, and on any content block the loop cannot carry
- *   (anything other than text and tool_use — e.g. thinking blocks, which
- *   the request avoids by disabling thinking)
+ *   content_block_stop before the stream ends; throws TruncatedStreamError
+ *   on a stream that ends early, and a plain Error on a malformed stream or
+ *   any content block the loop cannot carry (anything other than text and
+ *   tool_use — e.g. thinking blocks, which the request avoids by disabling
+ *   thinking)
  * @param onProgress - optional; invoked synchronously for each text
  *   fragment and each tool-call start, in stream order (see
  *   StreamProgressEvent)
@@ -141,10 +157,12 @@ export async function assembleModelResponse(
   }
 
   if (startUsage === undefined) {
-    throw new Error('model stream ended without a message_start event');
+    throw new TruncatedStreamError('model stream ended without a message_start event');
   }
   if (openBlocks.size > 0) {
-    throw new Error('model stream ended with unterminated content blocks — response is truncated');
+    throw new TruncatedStreamError(
+      'model stream ended with unterminated content blocks — response is truncated',
+    );
   }
 
   return {
@@ -157,6 +175,8 @@ export async function assembleModelResponse(
       output_tokens: deltaUsage?.output_tokens ?? startUsage.output_tokens,
       cache_read_input_tokens:
         deltaUsage?.cache_read_input_tokens ?? startUsage.cache_read_input_tokens,
+      cache_creation_input_tokens:
+        deltaUsage?.cache_creation_input_tokens ?? startUsage.cache_creation_input_tokens,
     },
   };
 }

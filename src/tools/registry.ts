@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import type { BrowserAdapter } from '../browser/adapter.js';
+import type { BrowserController } from '../browser/controller.js';
 
 /**
  * Context handed to every tool executor: the per-run resources a tool may
- * need. Later tasks grow this interface in place (e.g. a browser adapter
+ * need. Later tasks grow this interface in place (e.g. a browser controller
  * field), so tools gain capabilities without any signature churn.
  */
 export interface ToolCtx {
@@ -13,7 +13,7 @@ export interface ToolCtx {
   runDir: string;
   /** Browser session for tools that observe or act on a page. File-only
    * tool registries may omit it. */
-  browser?: BrowserAdapter;
+  browser?: BrowserController;
 }
 
 /**

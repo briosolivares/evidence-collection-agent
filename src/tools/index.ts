@@ -4,8 +4,9 @@
  * arrays being deterministic — reordering them changes the prompt prefix
  * and breaks prompt caching.
  */
-import type { ToolDef } from './registry.js';
+import { createRegistry, type ToolDef, type ToolRegistry } from './registry.js';
 
+import { browserBatchTool } from './browserBatch/browserBatch.js';
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
 import { grepTool } from './grep/grep.js';
@@ -18,6 +19,13 @@ import { typeTool } from './type/type.js';
 import { writeFileTool } from './writeFile/writeFile.js';
 
 export { clickTool } from './click/click.js';
+export {
+  browserBatchTool,
+  type BrowserBatchAction,
+  type BrowserBatchActionResult,
+  type BrowserBatchInput,
+  type BrowserBatchResult,
+} from './browserBatch/browserBatch.js';
 export { downloadTool, type DownloadInput } from './download/download.js';
 export { grepTool } from './grep/grep.js';
 export { inspectPageTool, type InspectPageInput } from './inspectPage/inspectPage.js';
@@ -61,3 +69,26 @@ export const actionTools: readonly ToolDef[] = [clickTool, typeTool, scrollTool]
 
 /** Browser evidence tools in stable registration order. */
 export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
+
+/** Deterministic model/runtime tool surfaces used by production entry points. */
+export type ToolProfile = 'atomic' | 'batch-enabled';
+
+/** The regression-safe production default during the browser-batch experiment. */
+export const DEFAULT_TOOL_PROFILE: ToolProfile = 'atomic';
+
+/**
+ * Build one complete production registry. The atomic profile retains the
+ * existing ten tools and their exact order; the treatment appends the
+ * composite browser tool without replacing any atomic capability.
+ */
+export function createProductionRegistry(
+  profile: ToolProfile = DEFAULT_TOOL_PROFILE,
+): ToolRegistry {
+  return createRegistry([
+    ...fileTools,
+    ...observationTools,
+    ...actionTools,
+    ...evidenceTools,
+    ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
+  ]);
+}

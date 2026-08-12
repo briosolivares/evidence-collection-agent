@@ -1,12 +1,12 @@
-// A no-op BrowserAdapter for bridge tests: the real runTask opens/closes
+// A no-op BrowserController for bridge tests: the real runTask opens/closes
 // its tab against this stub while scripted model streams drive the loop.
 
 import { vi } from 'vitest';
 
-import type { BrowserAdapter } from '../../src/browser/adapter.js';
+import type { BrowserController } from '../../src/browser/controller.js';
 
-/** A fully-stubbed adapter whose methods are all vi.fn spies. */
-export function stubBrowser(): BrowserAdapter {
+/** A fully stubbed controller whose methods are all vi.fn spies. */
+export function stubBrowser(): BrowserController {
   return {
     newTab: vi.fn(async () => {}),
     closeTab: vi.fn(async () => {}),

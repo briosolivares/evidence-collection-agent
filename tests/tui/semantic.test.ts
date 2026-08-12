@@ -72,6 +72,21 @@ describe('deriveSemanticLine — the ten-tool table', () => {
 });
 
 describe('deriveSemanticLine — truncation and URL edge cases', () => {
+  it('summarizes browser batches and highlights nested evidence work', () => {
+    expect(
+      deriveSemanticLine('browser_batch', {
+        actions: [
+          { tool: 'click', input: { ref: 'e1' } },
+          { tool: 'screenshot', input: { filename: 'proof.png' } },
+        ],
+      }),
+    ).toEqual({ line: 'Running 2 browser steps', isEvidence: true });
+    expect(deriveSemanticLine('browser_batch')).toEqual({
+      line: 'Running browser steps',
+      isEvidence: false,
+    });
+  });
+
   it('truncates long typed text', () => {
     const { line } = deriveSemanticLine('type', { ref: 'e1', text: 'x'.repeat(100) });
     expect(line).toBe(`Typing "${'x'.repeat(39)}…"`);

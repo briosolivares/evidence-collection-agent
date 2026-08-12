@@ -6,7 +6,7 @@ import { homedir, userInfo } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { launchPersistentChrome } from '../browser/playwrightAdapter.js';
+import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
 // Read-only import of the core's default model id for the welcome card —
 // the sanctioned touch-point; the core itself stays untouched.
 import { DEFAULT_MODEL } from '../model/callModel.js';
@@ -88,8 +88,9 @@ const config = createConfig({
 const runtime = demo
   ? undefined
   : createTuiRuntime({
-      launchBrowser: () =>
-        launchPersistentChrome({ profileDir: resolve(REPO_ROOT, 'chrome-profile') }),
+      browserSessionProvider: new LocalChromeBrowserSessionProvider({
+        profileDir: resolve(REPO_ROOT, 'chrome-profile'),
+      }),
       runsBaseDir: config.runsBaseDir,
     });
 await runtime?.start();

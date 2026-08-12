@@ -4,7 +4,7 @@ Grilling session started 2026-08-10, on `rough-idea.md`. Questions asked in roun
 
 ## Taken as settled (from repo docs, unless objected)
 
-- **Browser layer:** Playwright driving local Chrome — visible window, persistent profile — behind an engine-agnostic adapter. Escalation on observed blocks only: Patchright → Camoufox (pinned fingerprint) → paid stealth. Browserbase wired into the adapter early to measure block rates. (Source: `docs/research/browser-layer/recommendation.md`.)
+- **Browser layer:** Playwright driving local Chrome — visible window, persistent profile — behind an engine-neutral `BrowserController`; `BrowserSessionProvider` separates local from hosted session acquisition. Escalation on observed blocks only: Patchright → Camoufox (pinned fingerprint) → paid stealth. A Browserbase provider can be added to measure block rates. (Source: `docs/research/browser-layer/recommendation.md`.)
 - **Loop ownership:** we build the agent loop ourselves, Claude Code–style — the brief evaluates the agent design itself, so outsourcing it (Browser Use, Stagehand-as-orchestrator) is off the table. (Source: recommendation.md + work-trial brief.)
 - **Tracing:** Braintrust. (Source: design doc; note no Braintrust key in `.env` yet — only `ANTHROPIC_API_KEY` is configured.)
 - **Priority order from the brief:** Accuracy > Generability > Scalability (thousands) > Consistency > Speed.
@@ -141,4 +141,4 @@ Tinah's "why not use Claude Code's tools," made precise via the harness research
 
 **Tools & browser (R3):** Ten tools (`scroll` added in the post-session amendment to Q15), no bash (revival trigger: task the tools can't express; then allowlist-gated). Fresh page per run in one long-lived persistent-profile Chrome.
 
-**Immediate next steps** (per worklog): scaffold loop + Playwright adapter → baseline on 3 easy evals (HN, EDGAR, OpenClaw PR) with Tier-A oracles.
+**Immediate next steps** (per worklog): scaffold loop + Playwright browser controller → baseline on 3 easy evals (HN, EDGAR, OpenClaw PR) with Tier-A oracles.

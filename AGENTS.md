@@ -6,7 +6,7 @@ Navigation and ground rules for AI agents working in this repository. Deep docum
 
 <!-- metadata: overview, subsystems, navigation -->
 
-A browser agent for audit evidence collection: a minimal Claude Code–style loop (`src/loop/agentLoop.ts`) over ten zod-validated tools (one directory per tool under `src/tools/`, grouped for registration by `src/tools/index.ts`), driving local visible Chrome via Playwright behind an engine-neutral adapter (`src/browser/`). Every run writes a self-contained directory under `runs/`, named `<date>_<time>_<task-slug>_<suffix>` in local time — deliverables plus `manifest.json` (SHA-256 provenance, exact UTC `startedAt`), `transcript.jsonl`, `metrics.json` — which is the product's output boundary and the only thing eval graders may read.
+A browser agent for audit evidence collection: a minimal Claude Code–style loop (`src/loop/agentLoop.ts`) over ten zod-validated tools (one directory per tool under `src/tools/`, grouped for registration by `src/tools/index.ts`), driving browser sessions through an engine-neutral `BrowserController` and acquiring them through `BrowserSessionProvider` (`src/browser/`). The current provider launches local visible Chrome via Playwright. Every run writes a self-contained directory under `runs/`, named `<date>_<time>_<task-slug>_<suffix>` in local time — deliverables plus `manifest.json` (SHA-256 provenance, exact UTC `startedAt`), `transcript.jsonl`, `metrics.json` — which is the product's output boundary and the only thing eval graders may read.
 
 | Subsystem | Entry point | Notes |
 | --- | --- | --- |

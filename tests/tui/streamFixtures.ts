@@ -88,12 +88,12 @@ export async function* streamOf(
  * order, and records the params/signal of each call.
  */
 export function scriptedStreamFactory(responses: ModelStreamEvent[][]) {
-  const calls: { signal: AbortSignal }[] = [];
+  const calls: { params: unknown; signal: AbortSignal }[] = [];
   let next = 0;
   return {
     calls,
-    createStream: (_params: unknown, signal: AbortSignal) => {
-      calls.push({ signal });
+    createStream: (params: unknown, signal: AbortSignal) => {
+      calls.push({ params, signal });
       const events = responses[next];
       if (events === undefined) {
         throw new Error(`scripted stream exhausted after ${next} calls`);

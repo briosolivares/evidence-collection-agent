@@ -2,7 +2,7 @@
 
 A general browser agent for audit evidence collection: it takes a natural-language task, drives a browser to gather the evidence, and produces CSVs, screenshots, and/or written summaries suitable for audit documentation.
 
-The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of validated browser and file tools, driving local Chrome through Playwright behind an engine-agnostic adapter.
+The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of validated browser and file tools. An engine-agnostic `BrowserController` drives each session, while a `BrowserSessionProvider` decides whether that session comes from local Chrome or a hosted service.
 
 ## Sherlock (TUI)
 
@@ -83,7 +83,7 @@ npm run typecheck
 
 | Path | Contents |
 | --- | --- |
-| `src/` | The agent: loop, model client, tools (one directory per tool under `src/tools/`), browser adapter, run/provenance layer, CLI |
+| `src/` | The agent: loop, model client, tools (one directory per tool under `src/tools/`), browser controller/session providers, run/provenance layer, CLI |
 | `evals/` | Eval harness: `runners/` (run-triggering scripts), `metrics/` (metric definitions), `datasets/` (per-task `task.json` + oracle + grader), `experiments/` (past-run results JSON), `config.ts` |
 | `demos/` | Build-order walkthrough scripts (manual, not tests — see its README) |
 | `tests/` | Fixture pages + loopback server (`fixtures/`) and shared test helpers (`helpers/`) |

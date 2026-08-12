@@ -16,6 +16,7 @@ import { summarizeTask, type TaskReport, type TrialGrade } from '../../../evals/
 import { formatReport, writeResults } from '../../../evals/runners/report.js';
 import type { EvalReport } from '../../../evals/runners/runner.js';
 import type { EvalTask } from '../../../evals/types.js';
+import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../tools/index.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
 import type { RunHandle } from './runSession.js';
@@ -37,6 +38,8 @@ export interface EvalSessionDeps {
   resultsDir: string;
   /** Runs one trial through the live-run pipeline. */
   runner: EvalRunner;
+  /** Tool condition used by the trial runner; defaults to the product default. */
+  toolProfile?: ToolProfile;
   loadTask?: (evalsDir: string, name: string) => Promise<EvalTask>;
   formatReportFn?: (report: EvalReport) => string;
   writeResultsFn?: (report: EvalReport, resultsDir: string) => string;
@@ -171,6 +174,7 @@ export function startEvalBatch(
         finishedAt: new Date(now()).toISOString(),
         k,
         model: DEFAULT_MODEL,
+        toolProfile: deps.toolProfile ?? DEFAULT_TOOL_PROFILE,
         tasks: taskReports,
       };
       const resultsPath = writeResultsFn(report, deps.resultsDir);

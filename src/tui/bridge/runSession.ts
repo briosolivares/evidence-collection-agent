@@ -14,15 +14,17 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 
-import type { BrowserAdapter } from '../../browser/adapter.js';
+import type { BrowserController } from '../../browser/controller.js';
 import type { CallModel } from '../../loop/messages.js';
 import { runTask, type RunTaskConfig, type RunTaskResult } from '../../cli/runTask.js';
 import { SYSTEM_PROMPT } from '../../cli/systemPrompt.js';
 import {
   buildRequestParams,
   DEFAULT_MODEL,
+  makeAnthropicClient,
   type CallModelConfig,
 } from '../../model/callModel.js';
+import { callWithRetry } from '../../model/callWithRetry.js';
 import {
   assembleModelResponse,
   type ModelStreamEvent,
@@ -30,12 +32,11 @@ import {
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import {
-  actionTools,
-  evidenceTools,
-  fileTools,
-  observationTools,
+  createProductionRegistry,
+  DEFAULT_TOOL_PROFILE,
+  type ToolProfile,
 } from '../../tools/index.js';
-import { createRegistry, toApiToolDefs } from '../../tools/registry.js';
+import { toApiToolDefs } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 
 // Mirrors the core's (module-private) per-call output-token default.
@@ -60,13 +61,14 @@ export interface RunHandle {
 /** Everything startRun needs; optional members are test/config seams. */
 export interface RunSessionDeps {
   /** The session browser handed to the run (caller owns lifecycle). */
-  browser: BrowserAdapter;
+  browser: BrowserController;
   /** Receives the run's ordered UiEvent stream. */
   onEvent: (event: UiEvent) => void;
   runsBaseDir?: string;
   model?: string;
+  toolProfile?: ToolProfile;
   maxTurns?: number;
-  maxTokens?: number;
+  maxContextTokens?: number;
   startUrl?: string;
   /** Tracing the TUI's adapter delegates to; defaults to the core's
    * createRunTracing() so Langfuse observability is preserved. */
@@ -85,15 +87,8 @@ export interface RunSessionDeps {
 
 /** The production tool surface, rebuilt exactly as runTask registers it —
  * needed here only to serialize the same stable API tool definitions. */
-function buildApiToolDefs() {
-  return toApiToolDefs(
-    createRegistry([
-      ...fileTools,
-      ...observationTools,
-      ...actionTools,
-      ...evidenceTools,
-    ]),
-  );
+function buildApiToolDefs(profile: ToolProfile) {
+  return toApiToolDefs(createProductionRegistry(profile));
 }
 
 /**
@@ -112,6 +107,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const runTaskFn = deps.runTaskFn ?? runTask;
   const controller = new AbortController();
   const { signal } = controller;
+  const toolProfile = deps.toolProfile ?? DEFAULT_TOOL_PROFILE;
 
   // Lazy: constructing the SDK client can throw (missing API key); doing
   // it inside the first model call routes that failure through the normal
@@ -123,14 +119,15 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
       params: Anthropic.Messages.MessageStreamParams,
       streamSignal: AbortSignal,
     ) => {
-      client ??= new Anthropic();
+      // maxRetries: 0 — callWithRetry below is the single retry authority.
+      client ??= makeAnthropicClient();
       return client.messages.stream(params, { signal: streamSignal });
     });
 
   const modelConfig: CallModelConfig = {
     model: deps.model ?? DEFAULT_MODEL,
     system: SYSTEM_PROMPT,
-    apiToolDefs: buildApiToolDefs(),
+    apiToolDefs: buildApiToolDefs(toolProfile),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
   };
 
@@ -143,13 +140,33 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
     const thisTurn = turn;
     emit({ type: 'turn_start', turn: thisTurn });
 
-    const stream = createStream(buildRequestParams(modelConfig, messages), signal);
-    const response = await assembleModelResponse(stream, (event) => {
-      if (event.type === 'text_delta') {
-        emit({ type: 'text_delta', text: event.text });
-      } else {
-        emit({ type: 'tool_pending', name: event.toolName });
+    // Retry span covers stream creation AND consumption (mid-stream
+    // failures only retry by re-creating the stream); an abort rejects
+    // immediately, including out of a backoff sleep. A retried attempt may
+    // re-emit text_deltas the failed attempt already streamed — accepted
+    // cosmetic wart (see ProgressEvent in callModel.ts).
+    const response = await callWithRetry(
+      async () => {
+        const stream = createStream(buildRequestParams(modelConfig, messages), signal);
+        return await assembleModelResponse(stream, (event) => {
+          if (event.type === 'text_delta') {
+            emit({ type: 'text_delta', text: event.text });
+          } else {
+            emit({ type: 'tool_pending', name: event.toolName });
+          }
+        });
+      },
+      { signal },
+    ).catch((error: unknown) => {
+      // Any failure observed after abort IS the cancellation. Normalize
+      // its name — the SDK's abort error keeps the default 'Error', and a
+      // killed stream can surface as truncation — so the loop's abort
+      // carve-out (cancelled runs get no failed-metrics bookkeeping)
+      // fires regardless of shape.
+      if (signal.aborted && !(error instanceof Error && error.name === 'AbortError')) {
+        throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
       }
+      throw error;
     });
 
     emit({
@@ -181,10 +198,13 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         browser: deps.browser,
         callModel,
         tracing,
+        toolProfile,
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
-        ...(deps.maxTokens === undefined ? {} : { maxTokens: deps.maxTokens }),
+        ...(deps.maxContextTokens === undefined
+          ? {}
+          : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
       });
       if (result.status === 'completed') {
