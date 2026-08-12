@@ -43,11 +43,11 @@ A browser agent for audit evidence collection: a minimal Claude Code–style loo
 - Defaults that matter when debugging runs: model `claude-sonnet-5`, `maxTurns` 24, token budget 250k (all in `src/cli/runTask.ts` / `src/model/callModel.ts`, overridable per run via `RunTaskConfig`).
 - Planning docs are part of the workflow: failure analysis goes in `.agents/planning/.../implementation/baseline-failure-log.md`; commit scoped `git add` after each verified step, planning dir included.
 
-## Current state (2026-08-11)
+## Current state (2026-08-12)
 
 <!-- metadata: status, work-queue -->
 
-Checkpoint 1 complete; k=3 baseline run: 0/3 easy tasks pass (details in `docs/reports/2026-08-11-baseline.md`). F1–F4 have been applied: exact-output prompt guidance, Chrome-native downloads with direct-URL support, a 24-turn default, and initial-page anchoring. The longer-term initializer/planner output-contract idea is deferred. **Do not re-baseline without the user's direction.** Eight of the eleven design-doc eval tasks have no eval package yet.
+Checkpoint 1 complete; the post-F1–F4 easy re-baseline passes 3/3 tasks at k=3 (details in `docs/reports/2026-08-11-rebaseline.md`). All eleven design-doc eval tasks now have loadable dataset packages; the six added on 2026-08-12 have not been baseline-run. The longer-term initializer/planner output-contract idea is deferred. **Do not re-baseline without the user's direction.**
 
 ## Custom Instructions
 

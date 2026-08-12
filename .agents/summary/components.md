@@ -92,8 +92,16 @@ Five subdirectories separate the harness's concerns — `runners/` (the scripts 
 | `datasets/hacker_news/` | HN Firebase API, top 5 (Tier A) | CSV exists (by extension); columns exactly `title,url,points`; 5 rows; ≥4/5 oracle titles present (churn tolerance); URLs well-formed; manifest hashes verify |
 | `datasets/edgar/` | SEC submissions API + archive document bytes (Tier A) | An artifact hash-matches the oracle document's SHA-256; a `.png` with real PNG magic bytes exists; manifest hashes verify (screenshot *content* is Tier C / human) |
 | `datasets/openclaw_pr/` | GitHub REST, last 10 PRs, churn window as a step function of run start/end (Tier A) | `answer.md` exists; mentions number **and** title of a most-recent-in-window PR; manifest hashes verify |
+| `datasets/company_freshness/` | Official Notion pages, Figma JSON Feed, and Eight Sleep blog (Tier A + C) | At least six real PNGs; official homepage provenance for each company; content provenance matches each live three-item freshness window; distinct pairs; hashes verify. Pixel contents remain human-reviewed |
+| `datasets/yc_w24_outreach/` | Official YC public Startup + Founder directory Algolia indexes (Tier A/B) | Exact CSV columns; distinct complete founder rows; all founders belong to W24 AI companies; exactly five companies with every public founder included; personal LinkedIn URL shape/name agreement; founder/company/detail-specific 15-minute asks; hashes verify |
+| `datasets/openclaw_merged_prs/` | GitHub REST recently-merged window + PR/review details (Tier A) | Exact CSV columns and 10 distinct PRs; recent-window membership; author/merger/reviewer agreement where independently checkable; one provenance-matched real PNG per PR; hashes verify |
+| `datasets/elon_tweets/` | Run-time structural contract (Tier B) | Exact CSV columns; plausible non-empty distinct rows; parseable non-negative like counts; same-day/relative time values; hashes verify. Authorship and completeness remain human-reviewed |
+| `datasets/openclaw_contributors/` | GitHub REST top-100 contributor window + profiles (Tier A/B) | Exact CSV columns and 30 distinct handles; ≥25 oracle-window matches; public-name agreement where comparable; LinkedIn URL shape; hashes verify |
+| `datasets/wikipedia_reference/` | Official MediaWiki parse API, displayed-reference traversal (Tier A) | `answer.md` exists; contains the full Sources entry reached from displayed reference 275; no truncation; hashes verify |
+| `datasets/airbnb_lake_tahoe/` | Run-time structural/date contract (Tier B) | `answer.md`; exactly numbered 1–30; 30 distinct Airbnb room URLs; substantive per-listing summaries; seven-night next-week date pair; Lake Tahoe overall summary; hashes verify. Ranking/availability remain human-reviewed |
+| `datasets/mit_sororities/` | Static affiliation/cohort contract (Tier B) | Local CSV + Google Sheet URL receipt; exact columns; plausible row bounds; all 12 affiliation/class cohorts; plausible unique names; minimum detail coverage; hashes verify. Private Sheet/site fidelity remains human-reviewed |
 
-Oracle clients split parsing from fetching: parse logic is unit-tested against canned JSON; no test ever calls the network.
+Oracle clients split parsing from fetching: parse logic is unit-tested against canned payloads; no test ever calls the network. Live smoke checks are separate, explicit developer actions.
 
 ## demos/ — build-order walkthrough
 
