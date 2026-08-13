@@ -56,16 +56,47 @@ export function createDemoScript(baseAt: number): DemoStep[] {
     },
     { delayMs: 1400, action: { type: 'tool_exec_end', id: 1, ok: true, result: 'Loaded techcrunch.com — Acme Corp raises $85M Series B' } },
 
-    // Turn 2 — read the article.
+    // Turn 2 — read the article, capture the coverage as evidence.
     { delayMs: 300, action: { type: 'turn_start', turn: 2 } },
-    ...deltas(400, 'The coverage is up. Reading the page for investor names.'),
+    ...deltas(
+      400,
+      'The coverage is up. Reading the page for investor names and capturing the article as evidence.',
+    ),
     { delayMs: 350, action: { type: 'tool_pending', name: 'inspect_page' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 3400, output: 240 } } },
     {
       delayMs: 200,
       action: { type: 'tool_exec_start', id: 2, name: 'inspect_page', input: {} },
     },
     { delayMs: 1200, action: { type: 'tool_exec_end', id: 2, ok: true, result: 'outline: article — "Acme Corp raises $85M Series B led by Meridian Growth"' } },
+    {
+      delayMs: 150,
+      action: {
+        type: 'tool_exec_start',
+        id: 3,
+        name: 'screenshot',
+        input: { filename: 'series-b-coverage.png' },
+      },
+    },
+    // Publishes precede their execution's tool_exec_end (the tracing-seam
+    // contract), carrying the manifest entry verbatim — sourceUrl included.
+    {
+      delayMs: 700,
+      action: {
+        type: 'artifact_published',
+        entry: {
+          filename: 'artifacts/series-b-coverage.png',
+          sha256: '4c8a1d2e9f30b6a75d4e3c2b1a09f8e7d6c5b4a3928170f6e5d4c3b2a1908f7e',
+          sourceUrl: 'https://techcrunch.com/2026/05/14/acme-series-b',
+          roles: ['evidence'],
+          capturedAt: '2026-08-11T10:15:12.000Z',
+        },
+        sizeBytes: 84_512,
+        toolExecId: 3,
+      },
+    },
+    { delayMs: 150, action: { type: 'tool_exec_end', id: 3, ok: true, result: 'Captured series-b-coverage.png (viewport)' } },
 
     // Turn 3 — follow to the filing; one flaky click for texture.
     { delayMs: 300, action: { type: 'turn_start', turn: 3 } },
@@ -80,45 +111,71 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       delayMs: 200,
       action: {
         type: 'tool_exec_start',
-        id: 3,
+        id: 4,
         name: 'navigate',
         input: { url: 'https://www.sec.gov/cgi-bin/browse-edgar?company=acme' },
       },
     },
-    { delayMs: 1300, action: { type: 'tool_exec_end', id: 3, ok: true, result: 'Loaded sec.gov EDGAR company search' } },
+    { delayMs: 1300, action: { type: 'tool_exec_end', id: 4, ok: true, result: 'Loaded sec.gov EDGAR company search' } },
     {
       delayMs: 150,
-      action: { type: 'tool_exec_start', id: 4, name: 'click', input: { ref: 'e42' } },
+      action: { type: 'tool_exec_start', id: 5, name: 'click', input: { ref: 'e42' } },
     },
     {
       delayMs: 900,
       action: {
         type: 'tool_exec_end',
-        id: 4,
+        id: 5,
         ok: false,
         error: 'ref e42 not found after navigation',
       },
     },
 
-    // Turn 4 — recover, capture evidence.
+    // Turn 4 — recover, capture the filing, save the deliverable.
     { delayMs: 300, action: { type: 'turn_start', turn: 4 } },
     ...deltas(
       400,
-      'The link moved after the page settled — re-inspecting, then saving the confirmed list as evidence.',
+      'The link moved after the page settled — re-inspecting, then capturing the filing and saving the confirmed list as evidence.',
     ),
     { delayMs: 350, action: { type: 'tool_pending', name: 'inspect_page' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
     { delayMs: 100, action: { type: 'tool_pending', name: 'write_file' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 4300, output: 420 } } },
     {
       delayMs: 200,
-      action: { type: 'tool_exec_start', id: 5, name: 'inspect_page', input: {} },
+      action: { type: 'tool_exec_start', id: 6, name: 'inspect_page', input: {} },
     },
-    { delayMs: 1000, action: { type: 'tool_exec_end', id: 5, ok: true, result: 'outline: Form D — Acme Corp, total offering $85,000,000' } },
+    { delayMs: 1000, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'outline: Form D — Acme Corp, total offering $85,000,000' } },
     {
       delayMs: 150,
       action: {
         type: 'tool_exec_start',
-        id: 6,
+        id: 7,
+        name: 'screenshot',
+        input: { filename: 'form-d-filing.png' },
+      },
+    },
+    {
+      delayMs: 650,
+      action: {
+        type: 'artifact_published',
+        entry: {
+          filename: 'artifacts/form-d-filing.png',
+          sha256: '7e5d4c3b2a1908f7e6d5c4b3a291807f6e5d4c3b2a19f8e7d6c5b4a392817065',
+          sourceUrl: 'https://www.sec.gov/Archives/edgar/data/1874523/primary_doc.xml',
+          roles: ['evidence'],
+          capturedAt: '2026-08-11T10:15:36.000Z',
+        },
+        sizeBytes: 61_240,
+        toolExecId: 7,
+      },
+    },
+    { delayMs: 150, action: { type: 'tool_exec_end', id: 7, ok: true, result: 'Captured form-d-filing.png (full page)' } },
+    {
+      delayMs: 150,
+      action: {
+        type: 'tool_exec_start',
+        id: 8,
         name: 'write_file',
         input: { file_path: 'investors.csv' },
       },
@@ -136,10 +193,10 @@ export function createDemoScript(baseAt: number): DemoStep[] {
           capturedAt: '2026-08-11T10:15:40.000Z',
         },
         sizeBytes: 182,
-        toolExecId: 6,
+        toolExecId: 8,
       },
     },
-    { delayMs: 150, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'Created investors.csv (3 rows)' } },
+    { delayMs: 150, action: { type: 'tool_exec_end', id: 8, ok: true, result: 'Created investors.csv (3 rows)' } },
 
     // Turn 5 — conclude.
     { delayMs: 300, action: { type: 'turn_start', turn: 5 } },
@@ -153,7 +210,10 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       action: {
         type: 'run_finished',
         outcome: 'completed',
-        finalText: 'Saved to investors.csv',
+        // The completion panel's answer block — a real one-line answer
+        // (the full prose is already in the transcript above).
+        finalText:
+          'Series B: $85M led by Meridian Growth, with Halcyon Partners and Northgate Capital — confirmed against the Form D and saved to investors.csv.',
         runDir: DEMO_RUN_DIR,
         at: baseAt + 42_000,
       },

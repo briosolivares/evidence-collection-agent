@@ -32,8 +32,52 @@ describe('the --demo scripted event source', () => {
     expect(output).toContain('✓ Brewed in 42s · 18.7k tokens');
     expect(output).toContain('▸ Find Acme Corp');
     expect(output).toContain('● Opening techcrunch.com/');
+    expect(output).toContain('◆ Captured series-b-coverage.png');
     expect(output).toContain('◆ Evidence saved → investors.csv');
     unmount();
+  });
+
+  it('publishes a believable artifact set: two sourced screenshots + the CSV', () => {
+    const final = createDemoScript(0).reduce(
+      (state, step) => reduce(state, step.action),
+      createInitialState(),
+    );
+    // Publish order (the live rail's order); the CSV is the sole
+    // requested output, so the summary surfaces reorder it first.
+    expect(final.artifacts.map((artifact) => artifact.entry.filename)).toEqual([
+      'artifacts/series-b-coverage.png',
+      'artifacts/form-d-filing.png',
+      'artifacts/investors.csv',
+    ]);
+    const roles = final.artifacts.map((artifact) => artifact.entry.roles);
+    expect(roles).toEqual([['evidence'], ['evidence'], ['requested_output']]);
+    // The browsing turns' captures carry their source URLs into the rail.
+    expect(final.artifacts[0]!.entry.sourceUrl).toContain('techcrunch.com');
+    expect(final.artifacts[1]!.entry.sourceUrl).toContain('sec.gov');
+    // Every publish lands as a finalized ◆ evidence transcript item.
+    const evidence = final.transcript.filter((item) => item.kind === 'evidence');
+    expect(evidence).toHaveLength(3);
+  });
+
+  it('records a completion summary with a real answer for the panel', () => {
+    const final = createDemoScript(0).reduce(
+      (state, step) => reduce(state, step.action),
+      createInitialState(),
+    );
+    expect(final.completedRun).toBeDefined();
+    expect(final.completedRun!.finalText).toContain('Meridian Growth');
+    expect(final.completedRun!.finalText).toContain('investors.csv');
+    // The transcript's inert digest mirrors it, requested outputs first.
+    const completion = final.transcript.find((item) => item.kind === 'completion');
+    expect(
+      completion?.kind === 'completion'
+        ? completion.artifacts.map((artifact) => artifact.filename)
+        : [],
+    ).toEqual([
+      'artifacts/investors.csv',
+      'artifacts/series-b-coverage.png',
+      'artifacts/form-d-filing.png',
+    ]);
   });
 
   it('streams prose, runs tool batches, and survives an errored call', () => {
