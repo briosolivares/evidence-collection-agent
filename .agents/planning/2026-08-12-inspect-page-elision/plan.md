@@ -65,7 +65,10 @@ Remaining mit failures are a different story:
 - **Google Sheets URL (0/3, likely structural):** the task requires
   publishing a Google Sheet; headless isolated browsers have no Google
   account. Candidate: per-task headed-lane opt-in (same as edgar /
-  failure mode 2).
+  failure mode 2). **USER DECISION 2026-08-12: mit_sororities, edgar, and
+  elon_tweets run the headed lane BY DEFAULT in evals — harness
+  intricacies (bot-blocks, missing auth) have been masking the agent's
+  true limits. Not yet implemented.**
 - **Cohort coverage/format (capability):** trial 2 collected all 182
   members but wrote affiliations as "Alpha Chi Omega (MIT)" — unrequested
   decoration the grader rightly rejects (exact-structure rule). Trials 1
