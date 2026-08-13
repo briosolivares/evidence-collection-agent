@@ -10,6 +10,7 @@ import {
 } from '../tools/capResult.js';
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
+import { elideStaleInspectResults } from './contextView.js';
 import { scheduleToolCalls } from './scheduler.js';
 import type {
   AssistantContentBlock,
@@ -160,10 +161,18 @@ export interface RunMetrics {
  * scratch/tool-output/ files (largest first, previews and manifest hashes
  * preserved) until the batch fits — the run keeps going; nothing dies.
  *
+ * What the model sees each turn is the API message view, not the raw
+ * conversation: all but the most recent successful inspect_page results
+ * are replaced by URL/title stubs (elideStaleInspectResults — see
+ * contextView.ts for the full contract). The loop's own state keeps every
+ * result intact; the view is derived fresh per turn.
+ *
  * Transcript: every model request, response, tool call, and tool result is
  * appended to <runDir>/transcript.jsonl as events `model_request` {turn,
  * messages}, `model_response` {turn, response}, `tool_call` {turn, call},
- * and `tool_result` {turn, result}. Within a turn, all tool_call events
+ * and `tool_result` {turn, result}. A model_request's messages are the API
+ * message view — exactly the request the model saw; every result's full
+ * content is durably recorded once, in its tool_result event. Within a turn, all tool_call events
  * are appended in request order before execution begins and all
  * tool_result events in request order after every call has settled
  * (parallel completion order is not observable in the transcript); a
@@ -250,11 +259,18 @@ export async function runAgentLoop(
       state.turnCount += 1;
       const turn = state.turnCount;
 
-      // appendTranscriptEvent serializes synchronously, so logging the live
-      // messages array records a faithful snapshot of this turn's request
-      // even though the loop mutates the array afterwards.
-      appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: state.messages });
-      const response = await deps.callModel(state.messages);
+      // The request is the API message view, not the raw conversation:
+      // stale inspect_page results collapse to URL/title stubs (see
+      // contextView.ts) so deep runs stay out of the decode-stall regime.
+      // state.messages keeps every result in full — the view is rebuilt
+      // from it each turn — and the transcript's model_request records the
+      // view because that is what the model actually saw; the full results
+      // live in the tool_result events. appendTranscriptEvent serializes
+      // synchronously, so the snapshot stays faithful even though the loop
+      // extends the conversation afterwards.
+      const requestMessages = elideStaleInspectResults(state.messages);
+      appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: requestMessages });
+      const response = await deps.callModel(requestMessages);
       appendTranscriptEvent(deps.runDir, { type: 'model_response', turn, response });
 
       totals.inputTokens += response.usage.input_tokens;

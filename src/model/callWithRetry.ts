@@ -14,7 +14,20 @@ import { APIConnectionError, APIError, APIUserAbortError } from '@anthropic-ai/s
 /** Total attempts per model call: the first try plus up to three retries. */
 export const MAX_CALL_ATTEMPTS = 4;
 
-/** Base backoff before retry n (1-indexed); jittered ±50%. */
+/**
+ * Higher ceiling for TruncatedStreamError only. The deep-context decode
+ * stall (docs/reports/2026-08-12-full-suite-first-run.md, failure mode 1)
+ * makes truncation genuinely probabilistic per attempt — measured on the
+ * 2026-08-12 mit_sororities validation batch: four stall episodes, one
+ * survived on its 5th attempt, three died with the ceiling exhausted
+ * (~6% per-attempt success). Each extra attempt costs ~60s (the server
+ * watchdog) and ~$0.10 of cached input, and buys real survival
+ * probability; nothing else in the run can rescue a stalled turn.
+ */
+export const MAX_TRUNCATED_STREAM_ATTEMPTS = 8;
+
+/** Base backoff before retry n (1-indexed); jittered ±50%. Attempts past
+ * the table reuse its last entry. */
 const BACKOFF_BASE_MS = [1_000, 2_000, 4_000] as const;
 
 /** Longest server-requested retry-after honored, in milliseconds. */
@@ -22,8 +35,12 @@ const MAX_RETRY_AFTER_MS = 60_000;
 
 /** What onRetry learns about each scheduled retry. */
 export interface RetryInfo {
-  /** The attempt about to run, 2..MAX_CALL_ATTEMPTS. */
+  /** The attempt about to run, 2..maxAttempts. */
   attempt: number;
+  /** The ceiling this failure class allows (MAX_TRUNCATED_STREAM_ATTEMPTS
+   * for truncation, MAX_CALL_ATTEMPTS otherwise) — displays render
+   * "retry attempt/maxAttempts" from it. */
+  maxAttempts: number;
   /** How long the loop will sleep before that attempt. */
   delayMs: number;
   /** Short classification of the failure being retried, e.g.
@@ -57,12 +74,21 @@ export interface CallWithRetryOptions {
  * request, auth, not-found); and deterministic assembly errors — retrying
  * those would only reproduce them.
  *
- * Backoff between attempts is 1s / 2s / 4s with ±50% jitter; an error
- * carrying a numeric retry-after header replaces the backoff, capped at
- * 60s.
+ * Backoff between attempts is 1s / 2s / 4s (then 4s) with ±50% jitter; an
+ * error carrying a numeric retry-after header replaces the backoff, capped
+ * at 60s.
+ *
+ * The attempt ceiling is per error class, judged on the failure just
+ * observed: TruncatedStreamError may retry up to
+ * MAX_TRUNCATED_STREAM_ATTEMPTS total attempts (the decode stall is
+ * probabilistic per attempt — see the constant); every other transient
+ * stops at MAX_CALL_ATTEMPTS. In a mixed sequence a late non-truncation
+ * failure therefore ends the call even though truncation would have
+ * retried: the patience is for the stall, not for a struggling upstream.
  *
  * @param attempt - performs one complete attempt (create the stream AND
- *   consume it to a ModelResponse); called up to MAX_CALL_ATTEMPTS times
+ *   consume it to a ModelResponse); called up to
+ *   MAX_TRUNCATED_STREAM_ATTEMPTS times
  * @param opts - see CallWithRetryOptions
  * @returns the first successful attempt's result
  * @throws the first non-retryable error, or the last error once attempts
@@ -84,9 +110,12 @@ export async function callWithRetry<T>(
       // is the abort wearing a costume.
       if (opts.signal?.aborted || isAbortError(error)) throw error;
       const reason = transientReason(error);
-      if (reason === undefined || attemptNumber >= MAX_CALL_ATTEMPTS) throw error;
+      const maxAttempts = isTruncatedStreamError(error)
+        ? MAX_TRUNCATED_STREAM_ATTEMPTS
+        : MAX_CALL_ATTEMPTS;
+      if (reason === undefined || attemptNumber >= maxAttempts) throw error;
       const delayMs = retryDelayMs(error, attemptNumber, random);
-      opts.onRetry?.({ attempt: attemptNumber + 1, delayMs, reason });
+      opts.onRetry?.({ attempt: attemptNumber + 1, maxAttempts, delayMs, reason });
       await sleep(delayMs, opts.signal);
     }
   }
@@ -95,11 +124,11 @@ export async function callWithRetry<T>(
 /** Whether this failure is transient, and if so how to describe it;
  * undefined means don't retry (see callWithRetry). */
 function transientReason(error: unknown): string | undefined {
-  // Stream truncation is classified by error name, not message regex —
-  // streamAssembly gives its two truncation throws this name and leaves
-  // its deterministic throws as plain Errors.
-  if (error instanceof Error && error.name === 'TruncatedStreamError') {
-    return 'truncated stream';
+  // The where-it-died summary rides along so retried-and-recovered
+  // truncations still leave a trace in the progress log.
+  if (isTruncatedStreamError(error)) {
+    const summary = (error as { diagnosticsSummary?: string }).diagnosticsSummary;
+    return summary === undefined ? 'truncated stream' : `truncated stream (${summary})`;
   }
   if (error instanceof APIConnectionError) return 'connection error';
   if (error instanceof APIError) {
@@ -118,6 +147,13 @@ function transientReason(error: unknown): string | undefined {
       : undefined;
   }
   return undefined;
+}
+
+/** Stream truncation, classified by error name, not message regex —
+ * streamAssembly gives its two truncation throws this name and leaves its
+ * deterministic throws as plain Errors. */
+function isTruncatedStreamError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'TruncatedStreamError';
 }
 
 /** Cancellation in any of its shapes: the SDK's abort error class, or the

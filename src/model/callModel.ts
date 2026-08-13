@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+import { isElisionStub } from '../loop/contextView.js';
 import type { CallModel, Message, Usage } from '../loop/messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
 import { callWithRetry } from './callWithRetry.js';
@@ -14,17 +15,25 @@ import { assembleModelResponse } from './streamAssembly.js';
 //    prompt + tool definitions must serialize identically on every call,
 //    with a cache_control breakpoint on the last (only) system block,
 //    which caches tools and system together. Only `messages` varies.
-// 2. Moving conversation breakpoint. A second cache_control marker rides
-//    the last content block of the last message on every request, so turn
-//    N+1 resumes from the cache entry turn N wrote: the whole conversation
-//    is read at cache rates instead of being re-paid as fresh input each
-//    turn. One message-level marker only, matching Claude Code — the
-//    server evicts cache pages past the marker, so a second one would pin
-//    pages nothing resumes from. Exactly 2 breakpoints per request (API
-//    max 4). Caveat (documented, not guarded): the server matches cached
-//    prefixes up to 20 content blocks back from a marker, so a single turn
-//    appending more than 20 blocks would silently miss; our turns append
-//    two messages with at most ~12 blocks (5-parallel tool cap).
+// 2. Moving conversation breakpoints. A cache_control marker rides the
+//    last content block of the last message on every request, so turn N+1
+//    resumes from the cache entry turn N wrote: the whole conversation is
+//    read at cache rates instead of being re-paid as fresh input each
+//    turn. A second marker rides the elision frontier — the newest
+//    inspect_page stub in the API message view (see loop/contextView.ts).
+//    It exists because the server matches cached prefixes only up to ~20
+//    content blocks back from a marker: when a new inspection stubs the
+//    third-most-recent one, the request diverges at that stub — usually
+//    far more than 20 blocks before the tip — and without a marker there
+//    the whole conversation misses and is re-paid at cache-write rates
+//    (measured live: every displacement turn re-wrote ~full context,
+//    1.07M cache-write tokens on a 62k-context run). Consecutive
+//    frontiers sit a couple of messages apart, so each displacement turn
+//    resumes from the previous frontier's entry instead. At most 3
+//    breakpoints per request (API max 4). Caveat (documented, not
+//    guarded): a single turn appending more than 20 blocks would still
+//    silently miss at the tip; our turns append two messages with at most
+//    ~12 blocks (5-parallel tool cap).
 // 3. Always streaming. Long tool-filled turns can run for minutes;
 //    streaming avoids API timeouts and feeds live progress to the REPL.
 
@@ -52,7 +61,7 @@ export type ProgressEvent =
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; turn: number; text: string }
   | { type: 'tool_use_start'; turn: number; toolName: string }
-  | { type: 'retry'; turn: number; attempt: number; delayMs: number; reason: string }
+  | { type: 'retry'; turn: number; attempt: number; maxAttempts: number; delayMs: number; reason: string }
   | { type: 'turn_end'; turn: number; usage: Usage };
 
 /** Everything makeCallModel closes over. The system prompt and tool
@@ -83,10 +92,12 @@ export interface CallModelConfig {
  *   system block carries the `cache_control` breakpoint that ends the
  *   prefix (the API renders tools before system, so it caches both). A
  *   second, moving `cache_control` breakpoint rides the last content block
- *   of the last message (the marked message is a clone; `messages` and its
- *   blocks are never mutated), so each turn's request resumes from the
- *   cache entry the previous turn wrote — see the file header. All earlier
- *   messages pass through untouched. Thinking is explicitly disabled: on
+ *   of the last message, and a third rides the elision frontier — the
+ *   newest inspect_page stub — when the view contains one (marked
+ *   messages are clones; `messages` and its blocks are never mutated), so
+ *   each turn's request resumes from a previous turn's cache entry even
+ *   when elision edited a message mid-conversation — see the file header.
+ *   All other messages pass through untouched. Thinking is explicitly disabled: on
  *   claude-sonnet-5 it defaults to on, but thinking blocks must be
  *   replayed verbatim in later turns and the loop's message types (text
  *   and tool_use only) cannot carry them — which also means every block a
@@ -114,7 +125,7 @@ export function buildRequestParams(
         cache_control: { type: 'ephemeral' },
       },
     ],
-    messages: withConversationBreakpoint(messages),
+    messages: withConversationBreakpoints(messages),
   };
 }
 
@@ -125,34 +136,70 @@ type MarkableBlockParam = Anthropic.Messages.ContentBlockParam & {
   cache_control?: Anthropic.Messages.CacheControlEphemeral | null;
 };
 
+/** A block's place in the conversation, for cache marker placement. */
+interface BlockPosition {
+  messageIndex: number;
+  blockIndex: number;
+}
+
 /**
- * The conversation as API message params, with the moving cache breakpoint
- * on the last content block of the last message. The marked message and
- * block are clones — the input array (owned by the loop, logged live to
- * the transcript) is never mutated, and all earlier messages pass through
+ * The conversation as API message params, with the moving cache
+ * breakpoints in place: one on the last content block of the last message
+ * (the tip), and one on the elision frontier when the view contains
+ * inspect_page stubs (see the file header for why). Marked messages and
+ * blocks are clones — the input array (owned by the loop, logged live to
+ * the transcript) is never mutated, and all other messages pass through
  * as-is. An empty conversation or an empty final message (neither of which
- * the loop produces) passes through unmarked: the marker is an
+ * the loop produces) passes through unmarked: the markers are an
  * optimization, never worth a throw.
  */
-function withConversationBreakpoint(
+function withConversationBreakpoints(
   messages: readonly Message[],
 ): Anthropic.Messages.MessageParam[] {
   // The loop's message shapes mirror the API's on purpose (see
   // messages.ts) — they are structurally valid MessageParams.
   const params = messages.map((message) => message as Anthropic.Messages.MessageParam);
-  const last = params[params.length - 1];
-  if (last === undefined || typeof last.content === 'string') return params;
-  const lastBlock = last.content[last.content.length - 1];
-  if (lastBlock === undefined) return params;
-
-  params[params.length - 1] = {
-    ...last,
-    content: [
-      ...last.content.slice(0, -1),
-      { ...lastBlock, cache_control: { type: 'ephemeral' } } as MarkableBlockParam,
-    ],
-  };
+  const tip = tipPosition(messages);
+  const frontier = frontierPosition(messages);
+  // A frontier that IS the tip block gets one marker, not two.
+  const frontierIsTip =
+    frontier !== undefined &&
+    tip !== undefined &&
+    frontier.messageIndex === tip.messageIndex &&
+    frontier.blockIndex === tip.blockIndex;
+  for (const position of frontierIsTip ? [tip] : [frontier, tip]) {
+    if (position === undefined) continue;
+    const message = params[position.messageIndex]!;
+    if (typeof message.content === 'string') continue;
+    const content = [...message.content];
+    content[position.blockIndex] = {
+      ...content[position.blockIndex]!,
+      cache_control: { type: 'ephemeral' },
+    } as MarkableBlockParam;
+    params[position.messageIndex] = { ...message, content };
+  }
   return params;
+}
+
+/** The tip: the last content block of the last message. */
+function tipPosition(messages: readonly Message[]): BlockPosition | undefined {
+  const messageIndex = messages.length - 1;
+  const blockIndex = (messages[messageIndex]?.content.length ?? 0) - 1;
+  return blockIndex < 0 ? undefined : { messageIndex, blockIndex };
+}
+
+/** The elision frontier: the newest inspect_page stub in the view — the
+ * block where a displacement turn's request diverges from the previous
+ * turn's, and therefore where its cache entry must end. */
+function frontierPosition(messages: readonly Message[]): BlockPosition | undefined {
+  for (let messageIndex = messages.length - 1; messageIndex >= 0; messageIndex -= 1) {
+    const message = messages[messageIndex]!;
+    if (message.role !== 'user') continue;
+    for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
+      if (isElisionStub(message.content[blockIndex]!)) return { messageIndex, blockIndex };
+    }
+  }
+  return undefined;
 }
 
 /**

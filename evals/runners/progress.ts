@@ -1,5 +1,4 @@
 import type { ProgressEvent } from '../../src/model/callModel.js';
-import { MAX_CALL_ATTEMPTS } from '../../src/model/callWithRetry.js';
 
 /** Format attributable, line-oriented progress for concurrent CLI trials. */
 export function formatEvalProgress(
@@ -20,7 +19,7 @@ export function formatEvalProgress(
       return `${prefix} turn ${event.turn} tool: ${event.toolName}\n`;
     case 'retry':
       return (
-        `${prefix} turn ${event.turn} retry ${event.attempt}/${MAX_CALL_ATTEMPTS} ` +
+        `${prefix} turn ${event.turn} retry ${event.attempt}/${event.maxAttempts} ` +
         `in ${(event.delayMs / 1000).toFixed(1)}s — ${event.reason}\n`
       );
     case 'turn_end':

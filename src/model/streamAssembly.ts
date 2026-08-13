@@ -23,18 +23,70 @@ export type StreamProgressEvent =
   /** The model started a tool call (its input is still streaming). */
   | { type: 'tool_use_start'; toolName: string };
 
+/** Where and when a stream died, measured from assembly start (which is
+ * effectively request dispatch — the first await on the SDK stream). */
+export interface TruncatedStreamDiagnostics {
+  /** Total time from assembly start to the stream ending, in ms. */
+  streamAgeMs: number;
+  /** When the first event arrived (~time to first byte); absent if none did. */
+  firstEventAtMs?: number;
+  /** When the final event arrived, relative to assembly start. */
+  lastEventAtMs?: number;
+  /** Type of the final event received before the stream ended. */
+  lastEventType?: string;
+  /** Total events received. */
+  eventCount: number;
+  /** Characters of generated content received (text + tool-input JSON) —
+   * a proxy for output tokens, which the API only reports at message end. */
+  outputChars: number;
+  /** Human-readable descriptions of blocks still open at stream end. */
+  openBlocks: string[];
+  /** stop_reason reported by a message_delta before the stream ended, if
+   * any — a non-null value on a truncated stream means the server ended
+   * the message deliberately (e.g. "refusal"), not a dropped connection. */
+  stopReason?: string;
+}
+
+/** Render diagnostics as the compact parenthetical used in error messages
+ * and retry log lines. */
+export function formatTruncationDiagnostics(d: TruncatedStreamDiagnostics): string {
+  const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
+  const parts = [`stream age ${sec(d.streamAgeMs)}`];
+  parts.push(
+    d.firstEventAtMs === undefined ? 'no events received' : `first event +${sec(d.firstEventAtMs)}`,
+  );
+  if (d.lastEventAtMs !== undefined) {
+    parts.push(`last event ${d.lastEventType ?? '?'} +${sec(d.lastEventAtMs)}`);
+  }
+  parts.push(`${d.eventCount} events`, `~${d.outputChars} output chars`);
+  if (d.openBlocks.length > 0) parts.push(`open: ${d.openBlocks.join(', ')}`);
+  if (d.stopReason !== undefined) parts.push(`stop_reason ${d.stopReason}`);
+  return parts.join(', ');
+}
+
 /**
  * Thrown when the event stream ends before describing a complete response —
  * the connection died mid-stream. Distinguished by `name` so retry logic
  * (callWithRetry) can classify truncation as transient without regexing
  * messages; the assembly's deterministic failures (unsupported block type,
  * unparseable tool-input JSON) stay plain Errors, because retrying those
- * would only reproduce them.
+ * would only reproduce them. Carries where-it-died diagnostics so each
+ * occurrence (including ones a retry recovers from) is attributable to a
+ * regime: died mid-generation vs died before/just after the stream opened.
  */
 export class TruncatedStreamError extends Error {
-  constructor(message: string) {
-    super(message);
+  readonly diagnostics?: TruncatedStreamDiagnostics;
+  /** The compact rendering of `diagnostics`, for retry log lines. */
+  readonly diagnosticsSummary?: string;
+
+  constructor(message: string, diagnostics?: TruncatedStreamDiagnostics) {
+    const summary = diagnostics === undefined ? undefined : formatTruncationDiagnostics(diagnostics);
+    super(summary === undefined ? message : `${message} (${summary})`);
     this.name = 'TruncatedStreamError';
+    if (diagnostics !== undefined) {
+      this.diagnostics = diagnostics;
+      this.diagnosticsSummary = summary;
+    }
   }
 }
 
@@ -74,7 +126,33 @@ export async function assembleModelResponse(
   let deltaUsage: Anthropic.Messages.MessageDeltaUsage | undefined;
   let stopReason: string | null = null;
 
+  const assemblyStart = performance.now();
+  let firstEventAtMs: number | undefined;
+  let lastEventAtMs: number | undefined;
+  let lastEventType: string | undefined;
+  let eventCount = 0;
+  let outputChars = 0;
+  const diagnostics = (): TruncatedStreamDiagnostics => ({
+    streamAgeMs: performance.now() - assemblyStart,
+    ...(firstEventAtMs === undefined ? {} : { firstEventAtMs }),
+    ...(lastEventAtMs === undefined ? {} : { lastEventAtMs }),
+    ...(lastEventType === undefined ? {} : { lastEventType }),
+    eventCount,
+    outputChars,
+    openBlocks: [...openBlocks.values()].map((open) =>
+      open.kind === 'tool_use'
+        ? `${open.block.name}[${open.partialJson.length} chars json]`
+        : `text[${open.block.text.length} chars]`,
+    ),
+    ...(stopReason === null ? {} : { stopReason }),
+  });
+
   for await (const event of events) {
+    lastEventAtMs = performance.now() - assemblyStart;
+    firstEventAtMs ??= lastEventAtMs;
+    lastEventType = event.type;
+    eventCount += 1;
+
     switch (event.type) {
       case 'message_start':
         startUsage = event.message.usage;
@@ -114,9 +192,11 @@ export async function assembleModelResponse(
         }
         if (event.delta.type === 'text_delta' && open.kind === 'text') {
           open.block.text += event.delta.text;
+          outputChars += event.delta.text.length;
           onProgress?.({ type: 'text_delta', text: event.delta.text });
         } else if (event.delta.type === 'input_json_delta' && open.kind === 'tool_use') {
           open.partialJson += event.delta.partial_json;
+          outputChars += event.delta.partial_json.length;
         } else {
           throw new Error(
             `unsupported delta type "${event.delta.type}" for a ${open.kind} block at index ${event.index}`,
@@ -157,11 +237,15 @@ export async function assembleModelResponse(
   }
 
   if (startUsage === undefined) {
-    throw new TruncatedStreamError('model stream ended without a message_start event');
+    throw new TruncatedStreamError(
+      'model stream ended without a message_start event',
+      diagnostics(),
+    );
   }
   if (openBlocks.size > 0) {
     throw new TruncatedStreamError(
       'model stream ended with unterminated content blocks — response is truncated',
+      diagnostics(),
     );
   }
 

@@ -1,5 +1,4 @@
 import type { ProgressEvent } from '../model/callModel.js';
-import { MAX_CALL_ATTEMPTS } from '../model/callWithRetry.js';
 import type { RunTaskResult } from './runTask.js';
 
 // Pure ProgressEvent/RunTaskResult -> display-text formatting for the T15
@@ -33,7 +32,7 @@ export function formatProgressEvent(event: ProgressEvent): string {
       return `\n[turn ${event.turn}] tool call: ${event.toolName}\n`;
     case 'retry':
       return (
-        `\n[turn ${event.turn}] retrying ${event.attempt}/${MAX_CALL_ATTEMPTS} ` +
+        `\n[turn ${event.turn}] retrying ${event.attempt}/${event.maxAttempts} ` +
         `in ${(event.delayMs / 1000).toFixed(1)}s — ${event.reason}\n`
       );
     case 'turn_end': {

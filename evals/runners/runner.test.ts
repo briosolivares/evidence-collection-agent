@@ -8,7 +8,7 @@ import { createRunDir } from '../../src/run/runDir.js';
 import { generateRunId } from '../../src/run/runId.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
 import { makeFakeRunTask } from './fakeAgent.js';
-import { runEvals } from './runner.js';
+import { EvalRunCancelledError, runEvals } from './runner.js';
 import { grade } from '../datasets/stub/grader/grader.js';
 import { fetchOracle } from '../datasets/stub/oracle/oracle.js';
 import type { AssertionResult, EvalTask, Grader, RunTaskFn } from '../types.js';
@@ -351,6 +351,37 @@ describe('runEvals', () => {
     expect(report.tasks[0]!.accuracy).toBeCloseTo(2 / 3);
     // The errored trial is persisted through the same serialized hook as grades.
     expect(graded.find((g) => g.trialNumber === 1)).toEqual({ trialNumber: 1, error: 'first trial failed' });
+  });
+
+  it('a cancelled trial stops the batch as cancelled, never as a recorded failure', async () => {
+    // Cancellation is an interrupt, not a verdict: an EvalRunCancelledError
+    // echoing up from a trial must abort the batch, not land in the report
+    // as an errored FAIL the way an ordinary throwing trial does.
+    const fakeRunTask = makeFakeRunTask(baseDir);
+    const graded: number[] = [];
+    let calls = 0;
+    const runTask: RunTaskFn = async (taskText, opts) => {
+      calls += 1;
+      if (opts.trialIndex === 1) throw new EvalRunCancelledError();
+      return fakeRunTask(taskText, opts);
+    };
+
+    await expect(
+      runEvals([passingTask('interrupt')], 3, {
+        runTask,
+        concurrency: 1,
+        model: 'fake-model',
+        toolProfile: 'atomic',
+        onTrialGraded: (job) => {
+          graded.push(job.trialNumber);
+        },
+      }),
+    ).rejects.toBeInstanceOf(EvalRunCancelledError);
+    // The third trial never started, and the cancelled second trial was
+    // never recorded as a grade.
+    expect(calls).toBe(2);
+    expect(graded).not.toContain(2);
+    expect(graded).not.toContain(3);
   });
 
   it('propagates caller cancellation to every active trial and starts no more', async () => {

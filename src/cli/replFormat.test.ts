@@ -62,18 +62,21 @@ describe('formatProgressEvent', () => {
   });
 
   it('renders a retry event with the turn, attempt count, delay, and reason', () => {
+    // The denominator comes from the event (the failure class's own
+    // ceiling), not a constant — truncation retries run to 8, not 4.
     const event: ProgressEvent = {
       type: 'retry',
       turn: 3,
-      attempt: 2,
+      attempt: 5,
+      maxAttempts: 8,
       delayMs: 2_100,
-      reason: 'overloaded_error',
+      reason: 'truncated stream',
     };
     const line = formatProgressEvent(event);
     expect(line).toContain('turn 3');
-    expect(line).toContain('2/4');
+    expect(line).toContain('5/8');
     expect(line).toContain('2.1s');
-    expect(line).toContain('overloaded_error');
+    expect(line).toContain('truncated stream');
   });
 });
 

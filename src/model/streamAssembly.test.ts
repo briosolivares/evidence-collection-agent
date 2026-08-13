@@ -5,6 +5,7 @@ import {
   assembleModelResponse,
   type ModelStreamEvent,
   type StreamProgressEvent,
+  type TruncatedStreamError,
 } from './streamAssembly.js';
 
 // Fixtures are typed as the SDK's own RawMessageStreamEvent so the compiler
@@ -259,6 +260,57 @@ describe('assembleModelResponse', () => {
     await expect(assembleModelResponse(replay(events))).rejects.toMatchObject({
       name: 'TruncatedStreamError',
     });
+    // Carries where-it-died diagnostics: which block was open, how much of
+    // its input had arrived, and the compact summary used in retry lines.
+    const error = await assembleModelResponse(replay(events)).catch((e: unknown) => e);
+    const truncation = error as TruncatedStreamError;
+    expect(truncation.diagnostics).toMatchObject({
+      eventCount: 3,
+      outputChars: '{"file_'.length,
+      openBlocks: ['write_file[7 chars json]'],
+    });
+    expect(truncation.diagnostics!.firstEventAtMs).toBeGreaterThanOrEqual(0);
+    expect(truncation.diagnosticsSummary).toContain('open: write_file[7 chars json]');
+    expect(truncation.message).toContain('3 events');
+  });
+
+  it('truncation diagnostics carry a reported stop_reason — a deliberate server stop', async () => {
+    const events: ModelStreamEvent[] = [
+      messageStart(usage(10, 1, null)),
+      {
+        type: 'content_block_start',
+        index: 0,
+        content_block: {
+          type: 'tool_use',
+          id: 'toolu_01DDD',
+          name: 'write_file',
+          input: {},
+          caller: { type: 'direct' },
+        },
+      },
+      { type: 'content_block_delta', index: 0, delta: { type: 'input_json_delta', partial_json: '{"filename"' } },
+      // The server ends the message deliberately without closing the block.
+      {
+        type: 'message_delta',
+        delta: {
+          stop_reason: 'refusal',
+          stop_sequence: null,
+          container: null,
+          stop_details: null,
+        } as Anthropic.Messages.RawMessageDeltaEvent['delta'],
+        usage: { output_tokens: 12 } as Anthropic.Messages.MessageDeltaUsage,
+      },
+      { type: 'message_stop' },
+    ];
+
+    const error = await assembleModelResponse(replay(events)).catch((e: unknown) => e);
+    const truncation = error as TruncatedStreamError;
+    expect(truncation.name).toBe('TruncatedStreamError');
+    expect(truncation.diagnostics).toMatchObject({
+      stopReason: 'refusal',
+      lastEventType: 'message_stop',
+    });
+    expect(truncation.diagnosticsSummary).toContain('stop_reason refusal');
   });
 
   it('rejects a stream with no message_start', async () => {
