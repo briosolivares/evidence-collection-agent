@@ -605,6 +605,62 @@ describe('runAgentLoop per-message batch cap', () => {
   });
 });
 
+describe('runAgentLoop API message view', () => {
+  /** A registry whose fake inspect_page returns a numbered header + outline,
+   * so elision (keyed on the tool name) engages exactly as in production. */
+  function inspectRegistry(): ToolRegistry {
+    let calls = 0;
+    const inspect: ToolDef<Record<string, never>> = {
+      name: 'inspect_page',
+      description: 'Fake page inspection.',
+      inputSchema: z.object({}).strict(),
+      readOnly: true,
+      execute: async () => {
+        calls += 1;
+        return `URL: https://site.test/page-${calls}\nTitle: Page ${calls}\n\n- outline ${calls} [ref=r1]`;
+      },
+    };
+    return createRegistry([inspect as ToolDef]);
+  }
+
+  it('the model sees stale inspections stubbed; the transcript keeps every result in full', async () => {
+    const { callModel, requests } = scriptModel([
+      toolResponse([{ id: 'i1', name: 'inspect_page', input: {} }]),
+      toolResponse([{ id: 'i2', name: 'inspect_page', input: {} }]),
+      toolResponse([{ id: 'i3', name: 'inspect_page', input: {} }]),
+      textResponse('Done.'),
+    ]);
+    await runAgentLoop(TASK, { callModel, registry: inspectRegistry(), runDir }, ROOMY);
+
+    // Turn 4's request: the first inspection is a stub, the last two are full.
+    const fourth = requests[3];
+    const contentOf = (index: number): string =>
+      (fourth[index].content[0] as { content: string }).content;
+    expect(contentOf(2)).toContain('elided');
+    expect(contentOf(2)).toContain('URL: https://site.test/page-1');
+    expect(contentOf(2)).not.toContain('outline 1');
+    expect(contentOf(4)).toContain('outline 2');
+    expect(contentOf(6)).toContain('outline 3');
+
+    const events = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, any>);
+    // Every tool_result event still carries the complete original output...
+    const toolResults = events.filter((event) => event.type === 'tool_result');
+    expect(toolResults.map((event) => event.result.content)).toEqual([
+      'URL: https://site.test/page-1\nTitle: Page 1\n\n- outline 1 [ref=r1]',
+      'URL: https://site.test/page-2\nTitle: Page 2\n\n- outline 2 [ref=r1]',
+      'URL: https://site.test/page-3\nTitle: Page 3\n\n- outline 3 [ref=r1]',
+    ]);
+    // ...and the turn-4 model_request records the view — exactly the
+    // request the model saw, stub included.
+    const lastRequest = events.filter((event) => event.type === 'model_request').at(-1)!;
+    expect(lastRequest.turn).toBe(4);
+    expect(lastRequest.messages).toEqual(fourth);
+  });
+});
+
 describe('runAgentLoop with the real file tools', () => {
   const HAIKU = 'evidence gathered\nhashes pin each byte in place\nthe manifest knows\n';
 

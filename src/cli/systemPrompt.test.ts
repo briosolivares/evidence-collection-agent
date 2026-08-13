@@ -85,6 +85,16 @@ describe('SYSTEM_PROMPT', () => {
     );
   });
 
+  it('teaches the inspection window: stale inspections collapse, facts go to files, refs stay fresh', () => {
+    // Must match the loop's actual behavior (contextView.ts): only the two
+    // most recent inspect_page results survive in the conversation.
+    expect(SYSTEM_PROMPT).toContain(
+      'Only your two most recent page inspections stay in the conversation',
+    );
+    expect(SYSTEM_PROMPT).toContain('record lasting facts in scratch/ or artifacts/ files');
+    expect(SYSTEM_PROMPT).toContain('re-inspect a page if you need it again');
+  });
+
   it('forms a byte-identical cached prefix with all ten production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
