@@ -7,55 +7,61 @@
 **Scope:** Accuracy, generality, consistency, and speed for public-information
 evidence collection
 
-**Primary decision:** Replace the long prompt-driven ReAct loop with a
-contract-driven execution engine.
+**Primary decision:** Stop making one long model conversation manage the whole
+task. Let the model choose what to do, while ordinary TypeScript tracks the
+work, operates the browser, validates data, and decides whether the task is
+actually complete.
 
 ## Executive summary
 
-The existing system has a strong harness: deterministic Zod-validated tools,
-clean browser provisioning, prompt caching, artifact provenance, a clear
-run-directory boundary, and graders that inspect deliverables rather than
-trusting model prose.
+The foundation is strong. Tools have strict input validation, browser sessions
+are created cleanly, prompts are cached, files are traceable to their sources,
+and every run has a clear output directory. Graders inspect the actual files
+instead of trusting the model's written answer.
 
-The limiting architecture is the agent loop itself. Browser state, research
-planning, memory, output construction, and completion are all expressed through
-one growing natural-language conversation. The model is consequently being
-asked to simulate a workflow engine, database, CSV library, and verifier.
+The main constraint is the agent loop. Today, one ever-growing conversation has
+to carry five different responsibilities: remember browser state, plan the
+research, retain facts, build output files, and decide when the task is done.
+This forces the model to behave like a workflow engine, database, CSV writer,
+and quality-control system at the same time. Models are useful at judgment;
+they are much less reliable at bookkeeping.
 
-The proposed replacement is:
+The proposed design moves that bookkeeping into normal TypeScript components:
 
 ~~~text
 Task
-  → lightweight typed contract
-  → goal and coverage ledger
-  → browser transactions returning state deltas
-  → typed facts and records linked to evidence
-  → deterministic output renderers
-  → completion gate
-  → optional semantic judge
+  → extract the concrete requirements
+  → track what is done and what is missing
+  → perform browser actions and return what changed
+  → store facts in validated records linked to evidence
+  → generate output files with regular code
+  → check every objective requirement
+  → use a model judge only for subjective questions
 ~~~
 
-The model continues to own the parts that require judgment: interpreting the
-goal, choosing research strategies, resolving ambiguity, and synthesizing
-natural language. The runtime owns state, browser mechanics, output syntax,
-coverage, scheduling, and completion invariants.
+The split is simple: the model handles work that requires judgment—understanding
+the goal, choosing a research strategy, resolving ambiguity, and writing clear
+prose. The application handles work that regular code does better—tracking
+state, operating the browser safely, formatting files, measuring coverage,
+scheduling independent work, and enforcing the rules for completion.
 
 This proposal intentionally prioritizes capability and performance. Heavy
 security hardening, signed evidence journals, strict origin policy, and
 adversarial prompt-injection work are deferred. The existing no-shell boundary
-should remain, along with inexpensive safeguards such as exact-origin
-credential use and download-size limits.
+should remain, along with inexpensive safeguards such as sending saved
+credentials only to the exact site they belong to and limiting download sizes.
 
 ## Goals
 
 1. Complete a substantially broader class of browser tasks.
 2. Reduce model turns and end-to-end latency.
-3. Make exact output formats deterministic.
+3. Generate exact output formats reliably with regular code.
 4. Make omissions and incomplete work observable.
 5. Support visual pages, PDFs, spreadsheets, popups, frames, and rich
    interactions.
 6. Parallelize independent research where it produces real speedups.
-7. Retain the current run-directory, provenance, and eval foundations.
+7. Retain the current run-directory, source-tracking, and evaluation
+   foundations.
 
 ## Non-goals for the first iteration
 
@@ -67,25 +73,26 @@ credential use and download-size limits.
 - A new browser engine.
 - Task-specific selectors or hidden-eval tuning.
 
-## Keep, remove, and replace
+## The proposal at a glance
 
 ### Keep
 
-- BrowserSessionProvider and Playwright.
-- Zod-validated tool contracts.
-- The state-changing tool barrier.
+- `BrowserSessionProvider` and Playwright.
+- Zod-validated tool inputs.
+- The rule that browser-changing tools run in sequence.
 - Prompt caching and streaming.
-- The artifacts versus scratch workspace split.
+- The split between published files (`artifacts/`) and private working files
+  (`scratch/`).
 - Manifest hashes and source URLs.
 - The run-directory product boundary.
-- Dataset packages, oracles, and graders.
+- The existing evaluation datasets, reference-data providers, and graders.
 
 ### Remove or defer
 
-- browser_batch.
-- Fresh worker-session cycles as the default judge-retry mechanism.
-- Free-form INTENT.md and CONTRACT.md generation.
-- Unconditional initializer and judge calls.
+- `browser_batch`.
+- Starting a fresh model session every time a judge asks for a correction.
+- Free-form `INTENT.md` and `CONTRACT.md` planning files.
+- Calling an initializer and judge for every task, even when they add no value.
 - Raw model-authored CSV.
 - Full conversation replay as long-term memory.
 - Prompt instructions encoding implementation workarounds such as the
@@ -95,21 +102,24 @@ credential use and download-size limits.
 
 | Current mechanism | Replacement |
 | --- | --- |
-| inspect → model → click → model → inspect | Browser actions return a post-action observation |
-| Bare Playwright ARIA refs | Revisioned hybrid element identities |
-| Scratch-file roster | Runtime goal and coverage ledger |
-| Raw CSV strings | Typed record store plus deterministic renderer |
-| No-tool-call completion | Explicit completion proposal plus validation |
-| Full conversation as memory | Recent interaction window plus durable structured state |
-| One sequential research path | Bounded parallel entity and resource jobs |
-| Full-page accessibility tree every time | Adaptive targeted observation |
+| inspect → model → click → model → inspect | Each browser action also reports what changed |
+| Short-lived Playwright element references | Element references tied to a page, frame, and page version |
+| Checklist stored in a scratch file | A structured in-memory record of completed and missing work |
+| Raw CSV strings | Validated records rendered by a normal CSV library |
+| Treating “no tool call” as completion | An explicit finish request checked by code |
+| Replaying the full conversation as memory | A short recent history plus compact structured state |
+| One sequential research path | Limited parallel work for truly independent items |
+| Full-page accessibility tree every time | Inspect only the type and area of content currently needed |
 
 ## Architecture
 
-### 1. Lightweight task contract
+### 1. Turn the request into concrete requirements
 
-Use a schema-constrained contract for nontrivial tasks. Simple navigation or
-single-output tasks should skip the planner call.
+For a complex task, translate the user's request into a small, validated data
+structure before doing the work. This is not a second source of truth; it is a
+machine-checkable summary of requirements such as filenames, CSV columns, and
+the number of entities to collect. A simple task should skip this extra model
+call.
 
 ~~~ts
 type Deliverable =
@@ -151,11 +161,12 @@ interface TaskContract {
 }
 ~~~
 
-The original task remains authoritative. The contract may clarify explicit
-requirements, but it must not invent hard requirements. Material ambiguities
-remain in unresolvedQuestions.
+The original request remains authoritative. This structure may clarify what the
+user explicitly asked for, but it must not invent new requirements. Important
+ambiguities stay in `unresolvedQuestions` until they can be resolved.
 
-A deterministic fast path should recognize obvious requirements:
+Regular parsing code should handle obvious requirements without calling a
+model:
 
 - explicitly named CSV columns;
 - requested filenames;
@@ -163,11 +174,15 @@ A deterministic fast path should recognize obvious requirements:
 - exact entity counts;
 - explicitly required formats.
 
-Use an LLM compiler only when the task has genuinely semantic structure.
+Use a model only when understanding the requirements actually requires
+language judgment. For example, “summarize the key control failures” requires
+interpretation; “write a CSV with columns Name and URL” does not.
 
-### 2. Goal and coverage ledger
+### 2. Track completed and missing work explicitly
 
-Replace scratch-file checklists with state maintained by the runtime.
+Replace model-written scratch checklists with structured state maintained by
+the application. The document calls this the **ledger**: it is simply the live
+list of goals, entities, evidence, failures, and unfinished work.
 
 ~~~ts
 interface Goal {
@@ -194,20 +209,23 @@ interface RunLedger {
 }
 ~~~
 
-For a task such as “collect the top 30 contributors”:
+For a task such as “collect the top 30 contributors,” the application would:
 
-1. Enumerate the authoritative roster once.
+1. Find the complete list from an authoritative source once.
 2. Add 30 work items.
 3. Collect and validate each item.
 4. Require each item to become complete or explicitly failed with evidence.
 
-This makes omissions observable without relying on the model to reread and
-correctly interpret a scratch file.
+The application can now tell exactly which contributors are missing. It no
+longer depends on the model remembering a list or correctly rereading its own
+notes.
 
-### 3. Revisioned browser state
+### 3. Give the application an accurate view of the browser
 
-The browser controller should own tabs, frames, revisions, and element
-identity.
+The browser controller—not the model—should track tabs, embedded frames, page
+changes, and element identity. Every meaningful page change increments a
+`revision`, which is just a version number. An element reference is valid only
+for the page version where it was observed.
 
 ~~~ts
 interface ElementRef {
@@ -233,17 +251,21 @@ interface PageState {
 }
 ~~~
 
-Element resolution order:
+When the agent tries to use an element reference, resolve it in this order:
 
-1. Exact backend node within the expected page, frame, and revision.
-2. Stable locator captured during observation.
-3. Role, name, and ordinal fallback only when unambiguous.
-4. Otherwise return a stale-state result and reobserve.
+1. Use the browser's exact internal node ID if the page and frame have not
+   changed.
+2. Otherwise try the stable locator saved when the element was observed.
+3. Otherwise match its role, visible name, and position—but only if there is
+   exactly one safe match.
+4. If none of those works, report that the reference is stale and inspect the
+   page again.
 
-This preserves semantic element selection while eliminating the assumption
-that one short-lived ARIA ref remains globally meaningful.
+This keeps the useful human description (“the Submit button”) without assuming
+that a short-lived accessibility reference will remain valid after the page
+changes.
 
-### 4. Actions return observations
+### 4. Make every browser action report what happened
 
 This is the highest-leverage speed improvement.
 
@@ -267,26 +289,34 @@ interface ActionResult {
 }
 ~~~
 
-A click should return:
+A click should return enough information to make the next decision:
 
 - landed URL and title;
-- changed semantic nodes;
+- the relevant content and controls that appeared, disappeared, or changed;
 - newly opened pages;
 - dialog state;
 - detected downloads;
-- whether navigation or a meaningful rerender occurred.
+- whether the page navigated or substantially updated.
 
-The model should not need another turn merely to request inspect_page.
+Today, the model often spends one call clicking and another call asking what the
+click did. Returning the updated state with the click removes that second call.
+The `delta` in the code above means “the useful difference between the page
+before and after the action.”
 
 ~~~text
 Current: observe → click → observe → fill → click → observe
 V2:      observe → transaction → updated state
 ~~~
 
-### 5. Typed browser transactions
+### 5. Group related actions, but verify as you go
 
-Borrow the coherent observe–act–verify principle from programmable browser
-harnesses, but use a typed DSL rather than arbitrary code.
+Allow the model to request a short sequence of related browser actions in one
+turn—for example, fill two fields, submit a form, and confirm the results page
+appeared. Call this sequence a **browser transaction**. It uses a small set of
+validated operations rather than model-generated JavaScript.
+
+Each transaction states both the actions and the conditions that prove they
+worked. A `BrowserPredicate` below is simply one such check.
 
 ~~~ts
 interface BrowserTransaction {
@@ -307,19 +337,23 @@ type BrowserPredicate =
   | { type: 'popup_opened' };
 ~~~
 
-The runtime stops a transaction when:
+The application stops the sequence immediately when:
 
-- state invalidates a future target;
+- a page change makes a later element reference stale;
 - a popup or dialog appears unexpectedly;
-- a postcondition fails;
+- an expected result does not appear;
 - navigation leaves the expected workflow.
 
-This provides batching speed without optimistic stale execution. Once this
-exists, browser_batch should be removed.
+This gains most of the speed of batching without blindly continuing after the
+page has changed. Once transactions exist, the separate `browser_batch` tool
+adds no value and should be removed.
 
-### 6. Adaptive observation
+### 6. Inspect the right kind of content for the job
 
-Neither accessibility trees nor screenshots should be universal.
+No single page representation works everywhere. Accessibility data is good for
+buttons and forms, raw page text is good for quotations, table parsing is good
+for rows and columns, and screenshots are necessary when layout or visual
+meaning matters. The agent should ask for the smallest useful view.
 
 ~~~ts
 interface ObserveRequest {
@@ -330,25 +364,29 @@ interface ObserveRequest {
 }
 ~~~
 
-Observation modes:
+Available inspection modes should include:
 
 1. Compact accessibility snapshot for ordinary interaction.
-2. Targeted semantic subtree for one section.
+2. Accessibility data for one relevant section instead of the whole page.
 3. Structured HTML table extraction.
-4. DOM text with source anchors for exact quotations.
+4. Exact page text linked back to its source element for quotations.
 5. Cropped screenshot for visual ambiguity.
 6. Full screenshot for evidence.
 7. PDF text and layout extraction.
 8. Spreadsheet parsing.
 9. OCR for image-only documents.
 
-The model should receive image content when it needs to reason visually.
-Evidence capture remains a separate durable artifact operation.
+When the task depends on layout, charts, images, or other visual information,
+the model should actually receive the image. Saving a screenshot as evidence is
+a separate operation: one helps the model reason, while the other creates a
+durable output for the auditor.
 
-### 7. Public-resource extraction lane
+### 7. Read public data directly when the webpage exposes it
 
-Many browser tasks are research tasks hidden behind a webpage. Expose a
-resource reader backed by the browser session.
+Many “browser” tasks involve data that a webpage already loads from a JSON
+endpoint, CSV export, PDF, or HTML table. Once the browser has discovered such
+a public URL, the agent should be able to read it through the same browser
+session instead of clicking through hundreds of rows.
 
 ~~~ts
 interface ReadResourceRequest {
@@ -362,7 +400,8 @@ interface ReadResourceRequest {
 }
 ~~~
 
-Use it when the agent has observed or derived a relevant public resource URL:
+Use this only after the agent has found or reasonably derived the relevant
+public resource URL, such as:
 
 - GitHub JSON endpoints;
 - page-embedded JSON;
@@ -371,13 +410,14 @@ Use it when the agent has observed or derived a relevant public resource URL:
 - PDFs;
 - HTML tables.
 
-This avoids UI pagination when the same information can be obtained in one
-request. Preserve source URLs and response bytes when they are useful as
-evidence.
+This can replace many slow pagination steps with one read. Keep the source URL
+and, when useful for audit evidence, the original response bytes.
 
-### 8. Typed record store
+### 8. Store rows as data, then generate the output file
 
-The model should not hand-author structured output strings.
+The model should provide facts as validated records, not hand-write CSV text.
+The application stores those records and generates the final file with a normal
+CSV library.
 
 ~~~ts
 interface DatasetSpec {
@@ -403,7 +443,7 @@ class DatasetStore {
 }
 ~~~
 
-The add operation rejects:
+When records are added, the application rejects:
 
 - missing columns;
 - extra columns;
@@ -411,17 +451,19 @@ The add operation rejects:
 - duplicates when disallowed;
 - malformed dates;
 - rows without required evidence;
-- spreadsheet formula injection.
+- values that spreadsheet programs could accidentally execute as formulas.
 
-The finalize operation renders standards-compliant CSV once. The same
-abstraction can produce JSON, Markdown tables, and other structured formats.
+When collection is complete, `finalize` generates a standards-compliant CSV in
+one pass. The same stored records can also produce JSON, Markdown tables, or
+other formats without asking the model to rewrite the data.
 
-This removes malformed-row failures, eliminates quadratic append behavior, and
-shrinks model output.
+This prevents malformed rows, avoids repeatedly reading and rewriting a growing
+file, and uses far fewer model output tokens.
 
-### 9. Claim-to-evidence linkage
+### 9. Link every important fact to its evidence
 
-Outputs should point to the evidence that supports them.
+Each output row or factual statement should record which screenshot, webpage
+text, download, or network response supports it.
 
 ~~~ts
 interface Evidence {
@@ -441,16 +483,23 @@ interface Claim {
 }
 ~~~
 
-Each output row or factual claim can reference one or more evidence IDs. This
-improves semantic verification, debugging, human audit review, and targeted
-recollection when a single fact is weak.
+These links make review and debugging much easier. An auditor can move from a
+claim to its source, and the agent can recollect one weak fact without repeating
+the entire task.
 
 The current manifest hashing is sufficient for the initial capability-focused
 version. Stronger signing can be added later.
 
-### 10. Completion gate
+### 10. Require the agent to prove it is finished
 
-Introduce an explicit completion proposal.
+The current loop treats any response with no tool call as completion. That can
+also happen when the model reaches a token limit, refuses, or simply forgets to
+continue. Instead, the model must explicitly ask to finish and identify the
+deliverables and claims it believes are complete.
+
+The application then runs a **completion gate**: ordinary validation code that
+checks the finish request against the original requirements and the work
+ledger.
 
 ~~~ts
 interface CompletionProposal {
@@ -481,37 +530,40 @@ async function evaluateCompletion(
 }
 ~~~
 
-Deterministic checks run first:
+Checks with objective answers run first:
 
 - required artifacts exist;
 - exact columns;
-- parseability;
+- whether files can be parsed;
 - row counts;
-- roster coverage;
+- whether every required entity was handled;
 - duplicates;
 - screenshot counts;
-- unresolved placeholders;
+- unfinished placeholders such as `TODO` or missing values;
 - evidence linkage.
 
-Invoke a semantic judge only when the remaining question is genuinely
-semantic, such as whether a summary accurately represents cited sources.
+Call a model judge only when the remaining question requires judgment, such as
+whether a summary fairly represents its cited sources. Do not spend a model
+call checking columns, counts, filenames, duplicates, or parseability.
 
-Judge feedback returns to the same worker session. Do not restart the worker
-unless measured context pressure requires compaction.
+Return judge feedback to the same working session so it keeps the task context.
+Start a fresh session only when the measured context size requires it.
 
-### 11. Compact working context
+### 11. Keep the audit log, but give the model a compact memory
 
-The transcript remains the durable record, but it should not be the agent’s
-working memory.
+The full transcript should remain available as the audit record. It should not
+be resent to the model on every turn. Instead, each turn should contain a
+compact view of the current task and the information needed for the next
+decision.
 
-Model context should contain:
+That compact view should contain:
 
 - the original task;
 - the typed contract;
-- ledger summary;
+- a summary of completed and missing work;
 - current page states;
 - recent actions and failures;
-- relevant retrieved notes;
+- only the notes relevant to the current decision;
 - outstanding work.
 
 ~~~ts
@@ -525,15 +577,17 @@ interface WorkingContext {
 }
 ~~~
 
-Record each event once. Do not serialize the complete prior request into the
-transcript on every turn. Compact or restart only when context pressure is
-measured.
+Record each event once. Do not copy the entire previous model request into the
+transcript again on every turn. Summarize or restart a session only when context
+size is actually becoming a problem.
 
-### 12. Parallelism where it helps
+### 12. Run only clearly independent work in parallel
 
-Avoid generic worker swarms. Parallelize only after work is structured.
+Do not create a general swarm of browser agents. First divide the task into
+well-defined items with clear inputs and outputs; then run items concurrently
+only when they cannot interfere with one another.
 
-Good candidates:
+Good candidates include:
 
 - independent entity profiles;
 - independent pull request pages;
@@ -554,18 +608,23 @@ interface WorkNode {
 }
 ~~~
 
-Rules:
+Scheduling rules:
 
-- UI mutations remain serial within one page.
+- Actions that change one page remain sequential.
 - Independent pages may run concurrently.
-- HTTP extraction can use higher concurrency.
+- Public data reads can use more concurrency than browser pages.
 - Output writes go through the central record store.
-- Failure blocks dependent work, not unrelated branches.
+- A failure pauses work that depends on it, but not unrelated items.
 
 ## Revised core loop
 
+The code below shows the control flow, not a required class structure. One
+worker model chooses the next useful work. The application executes that work,
+updates its records, and accepts completion only after validation succeeds.
+
 ~~~ts
 async function runTask(task: string): Promise<VerifiedRun> {
+  // Avoid a planning call when straightforward parsing is enough.
   const contract = await compileContractWhenNeeded(task);
   const ledger = createLedger(contract);
   const session = await browser.createSession();
@@ -578,6 +637,7 @@ async function runTask(task: string): Promise<VerifiedRun> {
       browser: session.state(),
     });
 
+    // The model proposes decisions; it does not directly change application state.
     const proposal = await worker.next(context);
 
     for (const transaction of proposal.browserTransactions) {
@@ -586,9 +646,11 @@ async function runTask(task: string): Promise<VerifiedRun> {
       evidenceStore.record(result.evidence);
     }
 
+    // Facts enter a validated store rather than a hand-written output file.
     datasetStore.apply(proposal.records);
 
     if (proposal.completion !== undefined) {
+      // Objective requirements must pass before the run can finish.
       const verdict = await completionGate.evaluate(proposal.completion);
 
       if (verdict.status === 'verified') {
@@ -603,85 +665,128 @@ async function runTask(task: string): Promise<VerifiedRun> {
 }
 ~~~
 
+The important difference from the current loop is not “more agents.” It is a
+clear ownership boundary. The model proposes; the application executes,
+records, and verifies. This makes the model's mistakes visible and recoverable
+instead of allowing them to silently become output.
+
+## Concrete example
+
+Suppose the request is: “Find the top 30 contributors to this repository. Save
+`contributors.csv` with exactly the columns `Name`, `Profile URL`, and
+`Commits`, and capture a screenshot of the leaderboard.”
+
+V2 would handle it as follows:
+
+1. Regular parsing code records the filename, exact columns, row count, and
+   screenshot requirement.
+2. The model opens the repository and finds the contributor list. If the page
+   exposes the same list as public JSON, it can read that data directly.
+3. The application creates 30 ledger items and marks them complete as validated
+   records arrive.
+4. Each record stores the evidence that supports its values. A CSV library—not
+   the model—writes the final file.
+5. The screenshot tool saves the leaderboard as both requested output and
+   evidence.
+6. The completion gate checks for exactly 30 unique rows, exactly three
+   columns, valid profile URLs, the required screenshot, and evidence links.
+
+If only 29 contributors were collected, the application would return one clear
+failure—“contributor 30 is missing”—instead of asking the model to reread the
+entire conversation and discover the omission itself.
+
 ## Implementation sequence
+
+The phases below are ordered by expected value. Each phase is useful by itself;
+the team does not need to build the entire architecture before measuring an
+improvement.
 
 ### Phase 1 — reduce browser turns
 
-- Add PageState, page IDs, revisions, frames, and popup tracking.
-- Make navigate, click, fill, and scroll return semantic deltas.
-- Remove browser_batch.
+- Add `PageState`, page IDs, version numbers, frame tracking, and popup tracking.
+- Make navigate, click, fill, and scroll report the relevant page changes.
+- Remove `browser_batch`.
 - Cache observed element descriptions instead of regenerating outlines.
 - Add keyboard, select, and page-switch operations.
 
-Primary metric: model calls per successful browser action.
+Primary metric: model calls per successful browser action. A lower number means
+less latency and cost without relying on a faster model.
 
 ### Phase 2 — eliminate output failures
 
 - Add dataset creation, batch record insertion, and finalization.
 - Add strict CSV rendering.
-- Derive artifact paths and roles from the task contract.
-- Add deterministic completion validation.
+- Derive output paths and whether files are deliverables or supporting evidence
+  from the task requirements.
+- Add code-based completion validation.
 
 Primary metric: malformed structured-output rate, targeting zero.
 
 ### Phase 3 — broaden observation
 
-- Add targeted DOM and text extraction.
+- Add targeted page-structure and text extraction.
 - Add table extraction.
 - Let the model inspect screenshots.
 - Add PDF and spreadsheet parsing.
-- Add element screenshots and OCR fallback.
+- Add element screenshots and optical character recognition (OCR) for
+  image-only content.
 
-Primary metric: capability-suite completion by modality.
+Primary metric: task completion rate for each content type—ordinary webpages,
+visual pages, PDFs, spreadsheets, and image-only documents.
 
-### Phase 4 — structured memory and parallel collection
+### Phase 4 — compact memory and parallel collection
 
 - Add the goal and entity ledger.
-- Replace repeated request snapshots with delta events.
-- Add bounded multi-page and public-resource concurrency.
-- Add context retrieval and compaction.
+- Record each new event once instead of storing repeated copies of prior model
+  requests.
+- Run a limited number of independent page and public-data jobs concurrently.
+- Retrieve only relevant past information and summarize history when needed.
 
-Primary metrics: p50/p95 turns, latency, observed bytes, and redundant
-inspections.
+Primary metrics: median and slow-case model turns, latency, page data sent to
+the model, and repeated inspections that revealed nothing new.
 
-### Phase 5 — semantic verification and recipes
+### Phase 5 — verify meaning and add reusable site knowledge
 
-- Add a scoped multimodal semantic judge.
-- Add declarative origin-specific interaction recipes with expiration and
-  postconditions.
+- Add a narrowly scoped judge that can review both text and images when code
+  cannot answer the quality question.
+- Add data-only, site-specific interaction recipes. Each recipe should name the
+  site it applies to, define how success is checked, and expire so stale site
+  behavior is not trusted forever.
 - Expand long-horizon and adversarial evals.
 
-Primary metric: semantic error rate on structurally valid outputs.
+Primary metric: factual or interpretive error rate among outputs that already
+pass all structural checks.
 
 ## Success metrics
 
 The architecture should be evaluated against:
 
-- task pass rate and k-trial consistency;
-- p50 and p95 end-to-end latency;
-- model calls per browser mutation;
+- task pass rate and consistency across repeated attempts;
+- median and 95th-percentile end-to-end latency;
+- model calls per browser action that changes the page;
 - total browser observations;
 - redundant observation rate;
-- peak model context;
+- largest model input during a run;
 - total output and cached-input tokens;
 - output validation failures;
-- entity coverage;
+- required entities found versus required entities missing;
 - unsupported-interaction failures;
 - evidence coverage per claim or row.
 
-The primary performance target should be fewer model decisions, not merely
-cheaper cached tokens.
+The primary performance target should be fewer model decisions. Prompt caching
+can make repeated context cheaper, but it does not remove the latency or failure
+opportunity of an unnecessary decision.
 
 ## Expected outcome
 
 This architecture improves:
 
-- **Accuracy:** deterministic coverage and output validation.
-- **Generality:** multimodal observation and a more complete interaction
-  surface.
+- **Accuracy:** code tracks coverage and validates output requirements.
+- **Generality:** the agent can inspect text, structure, images, PDFs, and
+  spreadsheets, and can perform a wider range of browser actions.
 - **Consistency:** explicit browser state and completion criteria.
-- **Speed:** fewer model turns, targeted observations, direct extraction, and
-  bounded parallel work.
+- **Speed:** fewer model turns, smaller inspections, direct data reads, and
+  limited parallel work.
 
-The key shift is to let the model perform the work that requires judgment while
-making everything else executable.
+The key shift is straightforward: let the model handle judgment, and turn
+everything else into explicit, testable application behavior.
