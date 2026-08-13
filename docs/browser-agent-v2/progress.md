@@ -6,14 +6,18 @@
 
 **Design:** [Browser Agent V2 — Revised Architecture Proposal](../revised-browser-agent-proposal.md)
 
-**Implementation baseline:** `feat/judge-harness` at `19d458f`
+**Implementation baseline:** current `feat/judge-harness` head; `19d458f` is the
+minimum reviewed harness baseline
+
+**Session limit:** 150 minutes; stop starting new work with 15 minutes remaining
 
 ## How agents should update these files
 
 1. Treat `tasks.json` as the machine-readable source of truth for task and
    feature status.
 2. When starting work, set the task and active features to `in_progress`, add
-   the owner and `startedAt`, then add an entry to the log below.
+   the owner and `startedAt`, record the exact start epoch from the
+   implementation plan's clock command, then add an entry to the log below.
 3. Use `blocked` only with a concrete entry in `blockedBy` and the Blockers
    section below.
 4. Mark a feature `complete` only after its focused tests pass.
@@ -25,6 +29,9 @@
    direction and a separate report.
 8. Keep entries factual and short. Link to code, tests, runs, or reports instead
    of pasting large logs.
+9. Run and print the implementation plan's `TIME_CHECK` after every numbered
+   implementation item. Copy the final check for each T-task into its progress
+   entry.
 
 Use ISO 8601 timestamps with the local offset, for example
 `2026-08-13T14:30:00-07:00`.
@@ -64,6 +71,8 @@ When work begins, replace the sentence above with one section per active task:
 - Owner: `<agent or person>`
 - Branch/worktree: `<branch and path>`
 - Started: `<ISO 8601 timestamp>`
+- Start epoch: `<exact BROWSER_V2_START_EPOCH output>`
+- Latest time check: `<exact TIME_CHECK output>`
 - Current feature: `<Tn.m and short description>`
 - Next action: `<single concrete next action>`
 - Expected handoff: `<what another agent can safely start afterward>`
@@ -83,6 +92,7 @@ factual error.
 - Changed: <short description with links to important files>
 - Verified:
   - `<command>` — pass/fail and concise result
+- Time check: `<exact final TIME_CHECK output for this task>`
 - Remaining: <next concrete work>
 - Notes: <decision, risk, or none>
 -->

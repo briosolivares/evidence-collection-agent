@@ -10,11 +10,99 @@
 
 **Progress log:** [Browser Agent V2 progress](./browser-agent-v2/progress.md)
 
-**Implementation baseline:** `feat/judge-harness` at `19d458f`, plus the two
-V2 design documents from `docs/browser-agent-v2-proposal`
+**Implementation baseline:** the current head of `feat/judge-harness`;
+`19d458f` is the minimum reviewed harness baseline. Also bring in the V2 design
+documents from `docs/browser-agent-v2-proposal`.
+
+## 150-minute execution protocol
+
+Treat 2.5 hours as a hard limit for the assigned implementation session. This
+roadmap is larger than one guaranteed session, so “complete” always means the
+explicitly assigned T-task(s), not unverified coverage of all T1–T16. If the
+assigned scope is not narrower, work in dependency order and maximize fully
+tested, reviewable tasks rather than touching many tasks partially.
+
+The shell commands below are for the coding agent's terminal. They do **not**
+authorize adding a `bash` tool to the browser agent itself.
+
+### Start the clock before inspecting or editing
+
+Run this once at the very beginning:
+
+```bash
+date -u '+BROWSER_V2_START_EPOCH=%s BROWSER_V2_START_UTC=%Y-%m-%dT%H:%M:%SZ'
+```
+
+Read the complete output string. Preserve its numeric `BROWSER_V2_START_EPOCH`
+in the active-work entry in `docs/browser-agent-v2/progress.md`; do not estimate
+or reconstruct it later.
+
+### Check time after every implementation step
+
+After every numbered implementation item inside a T-task—and again after the
+task's focused tests—run the following with `<START_EPOCH>` replaced by the
+exact number printed by the start command:
+
+```bash
+BROWSER_V2_START_EPOCH=<START_EPOCH>
+BROWSER_V2_NOW_EPOCH="$(date +%s)"
+BROWSER_V2_TOTAL_SECONDS=9000
+BROWSER_V2_ELAPSED_SECONDS=$((BROWSER_V2_NOW_EPOCH - BROWSER_V2_START_EPOCH))
+BROWSER_V2_REMAINING_SECONDS=$((BROWSER_V2_TOTAL_SECONDS - BROWSER_V2_ELAPSED_SECONDS))
+if [ "$BROWSER_V2_REMAINING_SECONDS" -lt 0 ]; then
+  BROWSER_V2_REMAINING_SECONDS=0
+fi
+printf 'TIME_CHECK start=%s now=%s elapsed=%02dh:%02dm:%02ds remaining=%02dh:%02dm:%02ds\n' \
+  "$BROWSER_V2_START_EPOCH" \
+  "$BROWSER_V2_NOW_EPOCH" \
+  $((BROWSER_V2_ELAPSED_SECONDS / 3600)) \
+  $(((BROWSER_V2_ELAPSED_SECONDS % 3600) / 60)) \
+  $((BROWSER_V2_ELAPSED_SECONDS % 60)) \
+  $((BROWSER_V2_REMAINING_SECONDS / 3600)) \
+  $(((BROWSER_V2_REMAINING_SECONDS % 3600) / 60)) \
+  $((BROWSER_V2_REMAINING_SECONDS % 60))
+```
+
+Read the printed `TIME_CHECK` string and explicitly compare `elapsed` with the
+150-minute limit before choosing the next action. Print the line in the agent's
+progress update; do not run the command silently. At each completed T-task,
+also copy its final time check into the task's entry in `progress.md`.
+
+### Estimate at machine speed
+
+Estimate editing and analysis in seconds or minutes, not human developer days.
+A targeted TypeScript edit, search, or fixture addition often takes seconds;
+an edit/test/debug loop should normally be budgeted in minutes. Use measured
+command duration for typecheck, Chrome tests, package installation, and external
+services rather than pretending those processes are instantaneous.
+
+- Prefer direct edits and focused tests over long speculative planning.
+- Reuse existing helpers and fixtures before creating frameworks.
+- Run independent read-only inspections together when possible.
+- Do not use the deadline to skip required validation or mark partial work
+  complete. Reduce scope instead.
+- Do not wait idly. If one safe check is running, prepare the next independent
+  review or progress update.
+
+### Reserve the last 15 minutes
+
+When `remaining` is 15 minutes or less, start no new T-task and no new feature.
+Immediately consolidate:
+
+1. Finish only the smallest safe unit already in progress; do not widen scope.
+2. Run the focused tests most relevant to the changed behavior and typecheck if
+   it fits. Run the full suite only if it can finish inside the window.
+3. Run `git diff --check` and review the scoped diff and worktree status.
+4. Update `tasks.json` and `progress.md` truthfully. Do not mark a task complete
+   when a required check did not run or failed.
+5. Commit a coherent verified slice when possible. Preserve unfinished work and
+   name its exact state, tests, blocker, and next command otherwise.
+6. Print one final `TIME_CHECK` and provide a concise handoff before the
+   150-minute limit.
 
 ## Table of contents
 
+- [150-minute execution protocol](#150-minute-execution-protocol)
 - [What this plan optimizes for](#what-this-plan-optimizes-for)
 - [Starting point and working rules](#starting-point-and-working-rules)
 - [Task index](#task-index)
@@ -64,10 +152,11 @@ measured before treating T9–T16 as a fixed commitment.
 
 ### Code baseline
 
-Start implementation from `feat/judge-harness` at `19d458f`. That branch already
-contains the initializer, worker-cycle, screenshot-aware judge, and correction
-experiment. T2–T4 refine those components; they do not reimplement the
-experiment on the proposal branch.
+Start implementation from the current head of `feat/judge-harness`. Commit
+`19d458f` is the minimum reviewed baseline containing the initializer,
+worker-cycle, screenshot-aware judge, and correction experiment; later branch
+work must be preserved. T2–T4 refine those components rather than reimplementing
+the experiment on the proposal branch.
 
 Bring this proposal and plan onto the implementation branch as documentation
 only. Do not merge unrelated worktree changes. In particular,

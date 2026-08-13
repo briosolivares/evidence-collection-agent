@@ -4,7 +4,15 @@
   "updatedAt": "2026-08-13",
   "implementationBaseline": {
     "branch": "feat/judge-harness",
-    "commit": "19d458f"
+    "minimumReviewedCommit": "19d458f",
+    "instruction": "Start from the current branch head, not a detached historical commit."
+  },
+  "executionPolicy": {
+    "sessionBudgetMinutes": 150,
+    "consolidationThresholdMinutes": 15,
+    "timeCheckAfterEveryImplementationStep": true,
+    "recordFinalTaskTimeCheckInProgressLog": true,
+    "completionRequiresRequiredTests": true
   },
   "documents": {
     "design": "../revised-browser-agent-proposal.md",
