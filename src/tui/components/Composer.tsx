@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { filterCommands } from '../store/commands.js';
 import { theme } from '../theme.js';
@@ -13,6 +13,10 @@ interface ComposerProps {
   hint?: string;
   /** Called with the trimmed, non-empty submitted text. */
   onSubmit: (text: string) => void;
+  /** Reports the suggestion panel's visibility whenever it changes, so
+   * App-level key handlers (the idle Tab → artifacts focus) can yield to
+   * the panel's own Tab completion. */
+  onSuggestionsVisibleChange?: (visible: boolean) => void;
 }
 
 /**
@@ -36,6 +40,7 @@ export function Composer({
   disabled = false,
   hint = '(waiting for agent…)',
   onSubmit,
+  onSuggestionsVisibleChange,
 }: ComposerProps) {
   const [value, setValue] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -48,6 +53,12 @@ export function Composer({
 
   const suggestions = disabled || dismissed ? [] : filterCommands(value);
   const panelVisible = suggestions.length > 0;
+
+  // Effect, not render: the report is a parent-side mutation (App keeps
+  // it in a ref for its key handler; visibility itself stays local).
+  useEffect(() => {
+    onSuggestionsVisibleChange?.(panelVisible);
+  }, [panelVisible, onSuggestionsVisibleChange]);
   // Clamp so a shrinking match list can never strand the selection.
   const cursor = Math.min(selectedIndex, suggestions.length - 1);
   const selected = panelVisible ? suggestions[cursor] : undefined;

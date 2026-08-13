@@ -22,6 +22,7 @@ import {
 import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { ArtifactRail } from './ArtifactRail.js';
+import { ArtifactsPanel } from './ArtifactsPanel.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
 import { EvalsLiveRegion } from './EvalsLiveRegion.js';
@@ -74,6 +75,10 @@ export function App({
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
+  // Mirrors the composer's slash-suggestion panel visibility (reported
+  // via effect, read on the next keypress): while the panel is up, Tab
+  // belongs to suggestion completion, not the artifacts panel.
+  const suggestionsVisible = useRef(false);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
   const [evalTasks, setEvalTasks] = useState<readonly EvalTaskChoice[]>([]);
   const batchRunner = evalRunner ?? runner;
@@ -89,8 +94,36 @@ export function App({
   // the rail itself never listens for Esc). During an eval batch it
   // cancels the current trial and skips the rest; the overlays handle
   // their own Esc. A no-op while idle.
+  //
+  // Tab toggles focus on the completion artifacts panel (design decision
+  // 4): into 'artifacts' mode while the panel renders passively — unless
+  // the composer's slash-suggestion panel is up, whose own Tab completes
+  // the highlighted command — and back out to idle. Both keys live here
+  // so exactly one handler arbitrates them against mode.
   useInput((_input, key) => {
+    if (key.tab) {
+      if (state.mode === 'artifacts') {
+        dispatch({ type: 'artifacts_blur' });
+      } else if (
+        state.mode === 'idle' &&
+        state.completedRun !== undefined &&
+        !suggestionsVisible.current
+      ) {
+        dispatch({ type: 'artifacts_focus' });
+      }
+      return;
+    }
     if (!key.escape) return;
+    if (state.mode === 'artifacts') {
+      // Same precedence as during the run: close an open detail card
+      // first; from the rows view, return the keys to the composer.
+      if (state.artifactUi.view === 'detail') {
+        dispatch({ type: 'artifact_close_detail' });
+      } else {
+        dispatch({ type: 'artifacts_blur' });
+      }
+      return;
+    }
     if (state.mode === 'running') {
       if (state.artifactUi.view === 'detail') {
         dispatch({ type: 'artifact_close_detail' });
@@ -164,7 +197,9 @@ export function App({
       ? '(menu open — esc to close)'
       : state.mode === 'evalsRunning'
         ? '(evals running — esc to stop)'
-        : '(waiting for agent…)';
+        : state.mode === 'artifacts'
+          ? '(browsing artifacts — esc to return)'
+          : '(waiting for agent…)';
 
   return (
     <Box flexDirection="column">
@@ -203,11 +238,28 @@ export function App({
           onConfirm={startEvals}
         />
       )}
+      {/* The completion summary: passive above the composer while idle,
+          focused (input-owning) in artifacts mode. Between eval trials
+          the mode is evalsRunning, never idle, so no panel mid-batch. */}
+      {state.completedRun !== undefined &&
+        (state.mode === 'idle' || state.mode === 'artifacts') && (
+          <ArtifactsPanel
+            summary={state.completedRun}
+            artifacts={state.artifacts}
+            ui={state.artifactUi}
+            focused={state.mode === 'artifacts'}
+            runDir={state.completedRun.runDir}
+            dispatch={dispatch}
+          />
+        )}
       <Box flexDirection="column" marginTop={1}>
         <Composer
           disabled={state.mode !== 'idle'}
           hint={composerHint}
           onSubmit={handleSubmit}
+          onSuggestionsVisibleChange={(visible) => {
+            suggestionsVisible.current = visible;
+          }}
         />
         <Text color={theme.muted}>  /help for commands</Text>
       </Box>

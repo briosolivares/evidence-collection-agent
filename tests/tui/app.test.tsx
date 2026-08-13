@@ -411,6 +411,173 @@ describe('App artifact rail Esc precedence', () => {
   });
 });
 
+// ————— Plan item 6: completion summary panel + Tab focus —————
+
+describe('App completion summary panel', () => {
+  const TAB = '\t';
+  const PASSIVE_HINT = 'tab to browse artifacts';
+
+  /** Drive a full run to completion with one published artifact. */
+  async function completeRun(
+    bridge: ReturnType<typeof fakeRunner>,
+    stdin: { write: (data: string) => void },
+  ) {
+    await submitLine(stdin, 'collect the filings');
+    bridge.emit({ type: 'run_dir', runDir: '/runs/done' });
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    bridge.emit({
+      type: 'artifact_published',
+      entry: {
+        filename: 'artifacts/page.png',
+        sha256: 'a'.repeat(64),
+        sourceUrl: 'https://sec.gov/filings',
+        roles: ['evidence'],
+        capturedAt: '2026-08-12T10:00:00.000Z',
+      },
+      sizeBytes: 2_048,
+      toolExecId: 1,
+    });
+    bridge.emit({ type: 'turn_end', usage: { input: 900, output: 100 } });
+    bridge.emit({
+      type: 'run_finished',
+      outcome: 'completed',
+      finalText: 'The filings are captured.',
+      runDir: '/runs/done',
+      at: 42_000,
+    });
+    bridge.finish();
+    await tick();
+  }
+
+  it('renders passively after a completed run; the composer keeps focus', async () => {
+    const bridge = fakeRunner();
+    const { frames, lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await completeRun(bridge, stdin);
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('✓ Brewed in 42s');
+    expect(frame).toContain('The filings are captured.');
+    expect(frame).toContain('◆ artifacts/page.png');
+    expect(frame).toContain(PASSIVE_HINT);
+    // No selection cursor while passive; the composer types immediately —
+    // submitting the next task supersedes the panel.
+    expect(frame).not.toContain('› ◆');
+    await submitLine(stdin, 'next question');
+    expect(frames.join('\n')).toContain('▸ next question');
+    expect(lastFrame()).not.toContain(PASSIVE_HINT);
+    unmount();
+  });
+
+  it('Tab focuses the panel; keys browse; Esc unwinds detail then focus', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await completeRun(bridge, stdin);
+
+    stdin.write(TAB);
+    await tick();
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+    expect(lastFrame()).toContain('(browsing artifacts — esc to return)');
+
+    stdin.write('\r'); // Enter opens the provenance card
+    await tick();
+    expect(lastFrame()).toContain(`sha256: ${'a'.repeat(64)}`);
+
+    stdin.write(ESC); // first Esc closes the card, keeps focus
+    await tick(150);
+    expect(lastFrame()).not.toContain('sha256:');
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+
+    stdin.write(ESC); // second Esc returns to idle, panel still visible
+    await tick(150);
+    expect(lastFrame()).toContain(PASSIVE_HINT);
+    expect(lastFrame()).not.toContain('› ◆');
+    expect(lastFrame()).not.toContain('(browsing artifacts');
+    unmount();
+  });
+
+  it('Tab toggles focus in and out, panel visible throughout', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await completeRun(bridge, stdin);
+    stdin.write(TAB);
+    await tick();
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+    stdin.write(TAB);
+    await tick();
+    expect(lastFrame()).toContain(PASSIVE_HINT);
+    expect(lastFrame()).not.toContain('› ◆');
+    // Still typable after the round trip.
+    await typeText(stdin, 'follow-up');
+    expect(lastFrame()).toContain('follow-up');
+    unmount();
+  });
+
+  it('Tab with the slash-suggestion panel up still completes the command', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await completeRun(bridge, stdin);
+    await typeText(stdin, '/ev');
+    stdin.write(TAB);
+    await tick();
+    // The command completed in place; artifacts mode was not entered.
+    expect(lastFrame()).toContain('/evals');
+    expect(lastFrame()).not.toContain('(browsing artifacts');
+    expect(lastFrame()).not.toContain('› ◆');
+    unmount();
+  });
+
+  it('renders no panel after a cancelled run', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'to be interrupted');
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    stdin.write(ESC);
+    await tick(150);
+    bridge.emit({ type: 'run_cancelled', at: 9_000 });
+    bridge.finish();
+    await tick();
+    expect(lastFrame()).toContain('Interrupted after');
+    expect(lastFrame()).not.toContain(PASSIVE_HINT);
+    unmount();
+  });
+
+  it('renders no panel after a budget-exceeded run', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'a run that overruns');
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    bridge.emit({
+      type: 'run_finished',
+      outcome: 'budget_exceeded',
+      reason: 'max_turns',
+      runDir: '/runs/over',
+      at: 9_000,
+    });
+    bridge.finish();
+    await tick();
+    expect(lastFrame()).toContain('turn limit reached');
+    expect(lastFrame()).not.toContain(PASSIVE_HINT);
+    unmount();
+  });
+});
+
 describe('App Esc cancellation', () => {
   it('Esc is a no-op while idle', async () => {
     const bridge = fakeRunner();

@@ -10,6 +10,7 @@ export type SessionMode =
   | 'idle'
   | 'running'
   | 'cancelling'
+  | 'artifacts'
   | 'runsList'
   | 'evalsMenu'
   | 'evalsRunning';
@@ -134,6 +135,28 @@ export interface PublishedArtifact {
 }
 
 /**
+ * What the completion summary panel shows for the run that just finished:
+ * the completion header's data plus the final answer prose. Recorded only
+ * for interactive runs that end with outcome 'completed' (eval trials and
+ * early stops never set it) and cleared by the next run_started, so its
+ * presence is the panel's render condition while idle.
+ */
+export interface CompletedRunSummary {
+  /** Final model prose; the panel falls back to "Task completed" when
+   * this is absent or empty. Full prose stays in the transcript. */
+  finalText?: string;
+  /** Completion-line verb, fixed from config at session start. */
+  verb: string;
+  /** Wall-clock duration of the run. */
+  elapsedMs: number;
+  /** Tokens the run visibly consumed (settled or estimate, whichever is
+   * larger — the same figure the completion line shows). */
+  tokens: number;
+  /** Absolute run directory; artifact rows open files against it. */
+  runDir: string;
+}
+
+/**
  * Selection state of the artifact surfaces (the live rail now; the
  * completion panel later). Owned by the reducer — a deliberate deviation
  * from RunsList's component-local view state: while running, Esc belongs
@@ -225,6 +248,9 @@ export interface SessionState {
   artifacts: readonly PublishedArtifact[];
   /** Cursor + view of the artifact rail/panel; reset on run_started. */
   artifactUi: ArtifactUiState;
+  /** Summary of the last completed interactive run — the completion
+   * panel's data and its render condition; cleared on run_started. */
+  completedRun?: CompletedRunSummary;
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;

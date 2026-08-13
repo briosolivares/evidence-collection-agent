@@ -19,6 +19,7 @@ import type {
   AssertionView,
   BannerIdentity,
   LiveRunState,
+  PublishedArtifact,
   SessionState,
   TranscriptItemBody,
   UiEvent,
@@ -49,6 +50,8 @@ export type UiAction =
   | { type: 'artifact_nav'; delta: -1 | 1 }
   | { type: 'artifact_open_detail' }
   | { type: 'artifact_close_detail' }
+  | { type: 'artifacts_focus' }
+  | { type: 'artifacts_blur' }
   | { type: 'evals_started'; tasks: string[]; k: number; concurrency: number }
   | {
       type: 'eval_trial_started';
@@ -149,6 +152,23 @@ function clampCursor(cursor: number, length: number): number {
   return Math.max(0, Math.min(cursor, length - 1));
 }
 
+/**
+ * Summary display order: requested outputs first, then evidence-only
+ * artifacts, each group keeping its publish order. The live rail keeps
+ * raw publish order (chronological log); the completion panel and the
+ * transcript digest use this instead.
+ */
+export function orderArtifactsForSummary(
+  artifacts: readonly PublishedArtifact[],
+): readonly PublishedArtifact[] {
+  const isRequested = (artifact: PublishedArtifact) =>
+    (artifact.entry.roles ?? []).includes('requested_output');
+  return [
+    ...artifacts.filter(isRequested),
+    ...artifacts.filter((artifact) => !isRequested(artifact)),
+  ];
+}
+
 /** Append one finalized item, assigning its stable id. */
 function append(state: SessionState, item: TranscriptItemBody): SessionState {
   return {
@@ -240,6 +260,19 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       if (state.artifactUi.view === 'rows') return state;
       return { ...state, artifactUi: { ...state.artifactUi, view: 'rows' } };
 
+    case 'artifacts_focus':
+      // Tab on the idle completion panel (or /artifacts) hands the keys
+      // to the artifact rows; meaningless without rows to browse. A fresh
+      // focus always starts at the top with no stale detail card.
+      if (state.mode !== 'idle' || state.artifacts.length === 0) return state;
+      return { ...state, mode: 'artifacts', artifactUi: initialArtifactUi() };
+
+    case 'artifacts_blur':
+      // Tab again (or Esc from the rows view) returns the keys to the
+      // composer; the panel stays visible, passive.
+      if (state.mode !== 'artifacts') return state;
+      return { ...state, mode: 'idle' };
+
     case 'evals_started':
       return {
         ...append(state, {
@@ -308,9 +341,11 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return { ...rest, mode: 'idle' };
     }
 
-    case 'run_started':
+    case 'run_started': {
+      // The previous run's completion summary is superseded, not kept.
+      const { completedRun: _completedRun, ...rest } = state;
       return {
-        ...state,
+        ...rest,
         mode: 'running',
         artifacts: [],
         artifactUi: initialArtifactUi(),
@@ -323,6 +358,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           turn: 0,
         },
       };
+    }
 
     case 'run_dir':
       if (state.live === undefined) return state;
@@ -504,6 +540,20 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           tokens,
           runDir: action.runDir,
         });
+        // Record the completion panel's summary — interactive runs only
+        // (eval trials complete between trials, where no panel belongs).
+        if (state.evalsActive !== true) {
+          next = {
+            ...next,
+            completedRun: {
+              verb: state.completionVerb,
+              elapsedMs,
+              tokens,
+              runDir: action.runDir,
+              ...(action.finalText === undefined ? {} : { finalText: action.finalText }),
+            },
+          };
+        }
       } else {
         const reason =
           action.reason === 'max_turns'

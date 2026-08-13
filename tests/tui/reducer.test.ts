@@ -743,3 +743,156 @@ describe('reduce (artifact UI substate)', () => {
     expect(state.artifactUi).toEqual({ cursor: 0, view: 'rows' });
   });
 });
+
+// ————— Plan item 6: completion summary + artifacts focus mode —————
+
+describe('reduce (completion summary)', () => {
+  const oneArtifact: StoreAction[] = [
+    ...started,
+    { type: 'turn_start', turn: 1 },
+    { type: 'turn_end', usage: { input: 15_000, output: 3_700 } },
+    published(1, publishedEntry({ filename: 'artifacts/page.png' })),
+  ];
+
+  it('run_finished (completed) records the summary the panel renders', () => {
+    const state = fold([
+      ...oneArtifact,
+      {
+        type: 'run_finished',
+        outcome: 'completed',
+        finalText: 'Here is the answer.',
+        runDir: '/runs/abc',
+        at: 43_000,
+      },
+    ]);
+    expect(state.completedRun).toEqual({
+      finalText: 'Here is the answer.',
+      verb: 'Brewed',
+      elapsedMs: 42_000,
+      tokens: 18_700,
+      runDir: '/runs/abc',
+    });
+  });
+
+  it('a completion without finalText records a summary without it', () => {
+    const state = fold([
+      ...started,
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    expect(state.completedRun).toBeDefined();
+    expect(state.completedRun?.finalText).toBeUndefined();
+  });
+
+  it('the next run_started clears the previous summary', () => {
+    let state = fold([
+      ...started,
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    state = reduce(state, { type: 'run_started', task: 'again', at: 3_000 });
+    expect(state.completedRun).toBeUndefined();
+  });
+
+  it('budget_exceeded records no summary', () => {
+    const state = fold([
+      ...started,
+      {
+        type: 'run_finished',
+        outcome: 'budget_exceeded',
+        reason: 'max_turns',
+        runDir: '/runs/over',
+        at: 2_000,
+      },
+    ]);
+    expect(state.completedRun).toBeUndefined();
+  });
+
+  it('a cancelled run records no summary but keeps its artifacts for /artifacts', () => {
+    const state = fold([...oneArtifact, { type: 'run_cancelled', at: 2_000 }]);
+    expect(state.completedRun).toBeUndefined();
+    expect(state.artifacts).toHaveLength(1);
+  });
+
+  it('a completed eval trial records no summary — no panel between trials', () => {
+    const state = fold([
+      { type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 },
+      { type: 'run_started', task: 'stub', at: 0 },
+      {
+        type: 'run_finished',
+        outcome: 'completed',
+        finalText: 'done',
+        runDir: '/runs/eval-trial',
+        at: 9_000,
+      },
+    ]);
+    expect(state.mode).toBe('evalsRunning');
+    expect(state.completedRun).toBeUndefined();
+  });
+});
+
+describe('reduce (artifacts focus mode)', () => {
+  /** A completed run with two artifacts, requested output published last. */
+  const completedWithArtifacts: StoreAction[] = [
+    ...started,
+    { type: 'turn_start', turn: 1 },
+    published(1, publishedEntry({ filename: 'artifacts/a.png' })),
+    published(2, publishedEntry({ filename: 'artifacts/b.csv', roles: ['requested_output'] })),
+    {
+      type: 'run_finished',
+      outcome: 'completed',
+      finalText: 'Saved.',
+      runDir: '/runs/abc',
+      at: 2_000,
+    },
+  ];
+
+  it('artifacts_focus enters the mode from idle with a fresh selection', () => {
+    let state = fold(completedWithArtifacts);
+    // Leave stale selection behind to prove focus resets it.
+    state = { ...state, artifactUi: { cursor: 1, view: 'detail' } };
+    state = reduce(state, { type: 'artifacts_focus' });
+    expect(state.mode).toBe('artifacts');
+    expect(state.artifactUi).toEqual({ cursor: 0, view: 'rows' });
+  });
+
+  it('artifacts_focus is a no-op while a run is live or evals own the session', () => {
+    const running = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      published(1, publishedEntry({ filename: 'artifacts/a.png' })),
+    ]);
+    expect(reduce(running, { type: 'artifacts_focus' })).toEqual(running);
+    const evals = fold([
+      { type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 },
+    ]);
+    expect(reduce(evals, { type: 'artifacts_focus' })).toEqual(evals);
+  });
+
+  it('artifacts_focus is a no-op with nothing to browse', () => {
+    const state = fold([
+      ...started,
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    expect(reduce(state, { type: 'artifacts_focus' })).toEqual(state);
+  });
+
+  it('artifacts_blur returns to idle, keeping the summary and artifacts', () => {
+    let state = fold(completedWithArtifacts);
+    state = reduce(state, { type: 'artifacts_focus' });
+    state = reduce(state, { type: 'artifacts_blur' });
+    expect(state.mode).toBe('idle');
+    expect(state.completedRun).toBeDefined();
+    expect(state.artifacts).toHaveLength(2);
+    // Blur anywhere else changes nothing.
+    expect(reduce(state, { type: 'artifacts_blur' })).toEqual(state);
+  });
+
+  it('closing an open detail card stays in artifacts mode (Esc precedence)', () => {
+    let state = fold(completedWithArtifacts);
+    state = reduce(state, { type: 'artifacts_focus' });
+    state = reduce(state, { type: 'artifact_open_detail' });
+    expect(state.artifactUi.view).toBe('detail');
+    state = reduce(state, { type: 'artifact_close_detail' });
+    expect(state.mode).toBe('artifacts');
+    expect(state.artifactUi.view).toBe('rows');
+  });
+});
