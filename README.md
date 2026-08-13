@@ -32,7 +32,9 @@ npm run sherlock -- --demo    # scripted demo investigation, no API cost
 npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
-Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
+Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/artifacts` browses the last run's artifacts, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
+
+During a run, published artifacts appear as selectable rows the moment they land: ↑↓ select · Enter details (source URL, capture time, sha256, size) · Space preview · o open · r reveal — and with a detail card open, Esc closes it before it ever means cancel. On completion a summary panel (the concise answer plus the artifacts, requested outputs first) appears above the composer without taking focus, so the next task types immediately; Tab focuses the rows (Tab or Esc hands focus back), and `/artifacts` brings the panel back later. Space is macOS Quick Look — the same preview as Finder's spacebar; on Linux it falls back to `xdg-open`, and reveal is macOS-only.
 
 ## How it works
 
