@@ -96,8 +96,9 @@ describe('SYSTEM_PROMPT', () => {
     );
     expect(SYSTEM_PROMPT).toContain('write the output contract');
     expect(SYSTEM_PROMPT).toContain('enum-like values copied verbatim with nothing added');
-    expect(SYSTEM_PROMPT).toContain('reconcile the output against the roster');
+    expect(SYSTEM_PROMPT).toContain('reconcile in both directions');
     expect(SYSTEM_PROMPT).toContain('its absence justified by observed evidence');
+    expect(SYSTEM_PROMPT).toContain('every line of the output is a valid row under the contract');
   });
 
   it('teaches chunked writes: large files are built with append, in small pieces', () => {
