@@ -645,6 +645,22 @@ describe('reduce (published artifacts)', () => {
     expect(state.artifacts).toHaveLength(2);
   });
 
+  it('a publish clamps a stale cursor back into the list bounds', () => {
+    // Artifacts can only shrink via run_started today; pin the
+    // clamp-on-change contract against a synthetic stale cursor anyway.
+    const stale: SessionState = {
+      ...fold(captured),
+      artifacts: [],
+      artifactUi: { cursor: 5, view: 'rows' },
+    };
+    const next = reduce(
+      stale,
+      published(9, publishedEntry({ filename: 'artifacts/late.png' })),
+    );
+    expect(next.artifacts).toHaveLength(1);
+    expect(next.artifactUi.cursor).toBe(0);
+  });
+
   it('a failed exec renders error activity even when it published first', () => {
     const state = fold([
       ...started,
@@ -663,5 +679,67 @@ describe('reduce (published artifacts)', () => {
     expect(state.artifacts.map((artifact) => artifact.entry.filename)).toEqual([
       'artifacts/partial.png',
     ]);
+  });
+});
+
+// ————— Plan item 4: artifact UI substate (rail selection + detail) —————
+
+describe('reduce (artifact UI substate)', () => {
+  const twoArtifacts: StoreAction[] = [
+    ...started,
+    { type: 'turn_start', turn: 1 },
+    published(1, publishedEntry({ filename: 'artifacts/a.png' })),
+    published(2, publishedEntry({ filename: 'artifacts/b.csv', roles: ['requested_output'] })),
+  ];
+
+  it('starts at cursor 0 in the rows view', () => {
+    expect(createInitialState().artifactUi).toEqual({ cursor: 0, view: 'rows' });
+  });
+
+  it('artifact_nav moves the cursor, clamped at both ends', () => {
+    let state = fold(twoArtifacts);
+    state = reduce(state, { type: 'artifact_nav', delta: -1 });
+    expect(state.artifactUi.cursor).toBe(0); // clamped at the top
+    state = reduce(state, { type: 'artifact_nav', delta: 1 });
+    expect(state.artifactUi.cursor).toBe(1);
+    state = reduce(state, { type: 'artifact_nav', delta: 1 });
+    expect(state.artifactUi.cursor).toBe(1); // clamped at the bottom
+  });
+
+  it('artifact_nav and artifact_open_detail are no-ops with no artifacts', () => {
+    const state = fold(started);
+    expect(reduce(state, { type: 'artifact_nav', delta: 1 })).toEqual(state);
+    expect(reduce(state, { type: 'artifact_open_detail' })).toEqual(state);
+  });
+
+  it('open/close flip the detail view; a redundant close is a no-op', () => {
+    let state = fold(twoArtifacts);
+    state = reduce(state, { type: 'artifact_open_detail' });
+    expect(state.artifactUi.view).toBe('detail');
+    const closed = reduce(state, { type: 'artifact_close_detail' });
+    expect(closed.artifactUi.view).toBe('rows');
+    expect(reduce(closed, { type: 'artifact_close_detail' })).toEqual(closed);
+  });
+
+  it('closing the detail never touches the run — mode stays running', () => {
+    let state = fold(twoArtifacts);
+    state = reduce(state, { type: 'artifact_open_detail' });
+    state = reduce(state, { type: 'artifact_close_detail' });
+    expect(state.mode).toBe('running');
+    expect(state.live).toBeDefined();
+  });
+
+  it('run_started resets the substate for the next run', () => {
+    let state = fold(twoArtifacts);
+    state = reduce(state, { type: 'artifact_nav', delta: 1 });
+    state = reduce(state, { type: 'artifact_open_detail' });
+    state = reduce(state, {
+      type: 'run_finished',
+      outcome: 'completed',
+      runDir: '/runs/abc',
+      at: 2_000,
+    });
+    state = reduce(state, { type: 'run_started', task: 'again', at: 3_000 });
+    expect(state.artifactUi).toEqual({ cursor: 0, view: 'rows' });
   });
 });

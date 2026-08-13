@@ -133,6 +133,24 @@ export interface PublishedArtifact {
   sizeBytes: number | undefined;
 }
 
+/**
+ * Selection state of the artifact surfaces (the live rail now; the
+ * completion panel later). Owned by the reducer — a deliberate deviation
+ * from RunsList's component-local view state: while running, Esc belongs
+ * to App's global handler (cancel), and closing an open detail card must
+ * win over cancelling the run, so the handler needs this state to consult
+ * before treating Esc as cancel (design decision 3). Bonus: the whole
+ * interaction is reducer-testable without Ink.
+ */
+export interface ArtifactUiState {
+  /** Index of the highlighted row in `artifacts`, clamped as the list
+   * changes (upserts arrive mid-run). */
+  cursor: number;
+  /** 'rows' lists the artifacts; 'detail' shows the highlighted one's
+   * provenance card. */
+  view: 'rows' | 'detail';
+}
+
 /** The dynamic region's state — mutable until finalized into items. */
 export interface LiveRunState {
   /** Model prose still streaming (finalizes at tool batches / turn end). */
@@ -205,6 +223,8 @@ export interface SessionState {
    * `entry.filename` in publish order; cleared on run_started, retained
    * after the run ends (/artifacts and the completion summary read it). */
   artifacts: readonly PublishedArtifact[];
+  /** Cursor + view of the artifact rail/panel; reset on run_started. */
+  artifactUi: ArtifactUiState;
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;

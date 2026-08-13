@@ -363,6 +363,54 @@ describe('App /evals workflow', () => {
 
 // ————— Step 5: Esc cancellation —————
 
+// ————— Plan item 4: artifact rail + Esc precedence —————
+
+describe('App artifact rail Esc precedence', () => {
+  it('Esc with a detail card open closes it without cancelling; a second Esc cancels', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'capture the filings page');
+    bridge.emit({ type: 'run_dir', runDir: '/runs/live' });
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    bridge.emit({
+      type: 'artifact_published',
+      entry: {
+        filename: 'artifacts/page.png',
+        sha256: 'a'.repeat(64),
+        sourceUrl: 'https://sec.gov/filings',
+        roles: ['evidence'],
+        capturedAt: '2026-08-12T10:00:00.000Z',
+      },
+      sizeBytes: 2_048,
+      toolExecId: 1,
+    });
+    await tick();
+    // The rail mounted the moment the artifact landed, mid-run.
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+
+    stdin.write('\r'); // Enter opens the provenance card
+    await tick();
+    expect(lastFrame()).toContain(`sha256: ${'a'.repeat(64)}`);
+
+    stdin.write(ESC);
+    await tick(150);
+    // The card closed and the run kept running — no cancel dispatched.
+    expect(bridge.cancel).not.toHaveBeenCalled();
+    expect(lastFrame()).not.toContain('sha256:');
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+    expect(lastFrame()).not.toContain('Wrapping up…');
+
+    stdin.write(ESC); // rows view: Esc cancels as today
+    await tick(150);
+    expect(bridge.cancel).toHaveBeenCalledTimes(1);
+    expect(lastFrame()).toContain('Wrapping up…');
+    unmount();
+  });
+});
+
 describe('App Esc cancellation', () => {
   it('Esc is a no-op while idle', async () => {
     const bridge = fakeRunner();

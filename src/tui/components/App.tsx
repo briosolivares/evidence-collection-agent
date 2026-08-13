@@ -21,6 +21,7 @@ import {
 } from '../store/reducer.js';
 import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
+import { ArtifactRail } from './ArtifactRail.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
 import { EvalsLiveRegion } from './EvalsLiveRegion.js';
@@ -82,12 +83,19 @@ export function App({
     return playDemo(createDemoScript(Date.now()), dispatch);
   }, [demo]);
 
-  // Esc cancels an in-flight run (R9). During an eval batch it cancels
-  // the current trial and skips the rest; the overlays handle their own
-  // Esc. A no-op while idle.
+  // Esc cancels an in-flight run (R9) — unless an artifact detail card
+  // is open, which Esc closes instead (the reducer-owned artifact
+  // substate exists precisely so this handler can check that precedence;
+  // the rail itself never listens for Esc). During an eval batch it
+  // cancels the current trial and skips the rest; the overlays handle
+  // their own Esc. A no-op while idle.
   useInput((_input, key) => {
     if (!key.escape) return;
     if (state.mode === 'running') {
+      if (state.artifactUi.view === 'detail') {
+        dispatch({ type: 'artifact_close_detail' });
+        return;
+      }
       dispatch({ type: 'cancel_requested' });
       if (evalHandle.current !== undefined) evalHandle.current.cancel();
       else runHandle.current?.cancel();
@@ -166,6 +174,17 @@ export function App({
           config={config}
           live={state.live}
           cancelling={state.mode === 'cancelling'}
+        />
+      )}
+      {/* Mounted for the whole run (it renders nothing until the first
+          publish) so its key subscription is registered by the submit
+          keystroke, not by a mid-run publish event — see ArtifactRail. */}
+      {state.mode === 'running' && (
+        <ArtifactRail
+          artifacts={state.artifacts}
+          ui={state.artifactUi}
+          runDir={state.live?.runDir}
+          dispatch={dispatch}
         />
       )}
       {state.mode === 'evalsRunning' && state.evalsLive !== undefined && (

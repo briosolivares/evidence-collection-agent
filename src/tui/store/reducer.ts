@@ -15,6 +15,7 @@ import { formatDuration, formatTokens } from '../format.js';
 import { findCommand, SLASH_COMMANDS, type CommandKind } from './commands.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
+  ArtifactUiState,
   AssertionView,
   BannerIdentity,
   LiveRunState,
@@ -45,6 +46,9 @@ export type UiAction =
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
   | { type: 'open_evals' }
+  | { type: 'artifact_nav'; delta: -1 | 1 }
+  | { type: 'artifact_open_detail' }
+  | { type: 'artifact_close_detail' }
   | { type: 'evals_started'; tasks: string[]; k: number; concurrency: number }
   | {
       type: 'eval_trial_started';
@@ -131,7 +135,18 @@ export function createInitialState(
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',
     artifacts: [],
+    artifactUi: initialArtifactUi(),
   };
+}
+
+/** The artifact rail/panel's rest state: first row, no detail open. */
+function initialArtifactUi(): ArtifactUiState {
+  return { cursor: 0, view: 'rows' };
+}
+
+/** Clamp an artifact cursor into the list's current bounds. */
+function clampCursor(cursor: number, length: number): number {
+  return Math.max(0, Math.min(cursor, length - 1));
 }
 
 /** Append one finalized item, assigning its stable id. */
@@ -204,6 +219,26 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'open_evals':
       if (state.mode !== 'idle') return state;
       return { ...state, mode: 'evalsMenu' };
+
+    case 'artifact_nav': {
+      // Clamped at both ends; meaningless without rows to move over.
+      if (state.artifacts.length === 0) return state;
+      const cursor = clampCursor(
+        state.artifactUi.cursor + action.delta,
+        state.artifacts.length,
+      );
+      return { ...state, artifactUi: { ...state.artifactUi, cursor } };
+    }
+
+    case 'artifact_open_detail':
+      if (state.artifacts.length === 0) return state;
+      return { ...state, artifactUi: { ...state.artifactUi, view: 'detail' } };
+
+    case 'artifact_close_detail':
+      // Esc with a detail card open lands here (App checks the view
+      // before treating Esc as cancel); it never touches the run mode.
+      if (state.artifactUi.view === 'rows') return state;
+      return { ...state, artifactUi: { ...state.artifactUi, view: 'rows' } };
 
     case 'evals_started':
       return {
@@ -278,6 +313,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
         ...state,
         mode: 'running',
         artifacts: [],
+        artifactUi: initialArtifactUi(),
         live: {
           streamingText: '',
           pendingTools: [],
@@ -434,7 +470,12 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           ? { ...pending, published: [...(pending.published ?? []), action.entry] }
           : pending,
       );
-      return { ...state, artifacts, live: { ...live, pendingTools } };
+      // Keep the rail cursor in bounds as the list changes underneath it.
+      const artifactUi = {
+        ...state.artifactUi,
+        cursor: clampCursor(state.artifactUi.cursor, artifacts.length),
+      };
+      return { ...state, artifacts, artifactUi, live: { ...live, pendingTools } };
     }
 
     case 'turn_end': {
