@@ -61,7 +61,7 @@ export type ProgressEvent =
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; turn: number; text: string }
   | { type: 'tool_use_start'; turn: number; toolName: string }
-  | { type: 'retry'; turn: number; attempt: number; delayMs: number; reason: string }
+  | { type: 'retry'; turn: number; attempt: number; maxAttempts: number; delayMs: number; reason: string }
   | { type: 'turn_end'; turn: number; usage: Usage };
 
 /** Everything makeCallModel closes over. The system prompt and tool

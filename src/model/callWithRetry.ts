@@ -35,8 +35,12 @@ const MAX_RETRY_AFTER_MS = 60_000;
 
 /** What onRetry learns about each scheduled retry. */
 export interface RetryInfo {
-  /** The attempt about to run, 2..MAX_CALL_ATTEMPTS. */
+  /** The attempt about to run, 2..maxAttempts. */
   attempt: number;
+  /** The ceiling this failure class allows (MAX_TRUNCATED_STREAM_ATTEMPTS
+   * for truncation, MAX_CALL_ATTEMPTS otherwise) — displays render
+   * "retry attempt/maxAttempts" from it. */
+  maxAttempts: number;
   /** How long the loop will sleep before that attempt. */
   delayMs: number;
   /** Short classification of the failure being retried, e.g.
@@ -111,7 +115,7 @@ export async function callWithRetry<T>(
         : MAX_CALL_ATTEMPTS;
       if (reason === undefined || attemptNumber >= maxAttempts) throw error;
       const delayMs = retryDelayMs(error, attemptNumber, random);
-      opts.onRetry?.({ attempt: attemptNumber + 1, delayMs, reason });
+      opts.onRetry?.({ attempt: attemptNumber + 1, maxAttempts, delayMs, reason });
       await sleep(delayMs, opts.signal);
     }
   }

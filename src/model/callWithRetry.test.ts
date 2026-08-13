@@ -75,7 +75,9 @@ describe('callWithRetry', () => {
     await expect(callWithRetry(attempt, opts)).resolves.toBe('ok');
     expect(calls()).toBe(2);
     expect(sleeps).toEqual([1_000]);
-    expect(retries).toEqual([{ attempt: 2, delayMs: 1_000, reason: 'connection error' }]);
+    expect(retries).toEqual([
+      { attempt: 2, maxAttempts: MAX_CALL_ATTEMPTS, delayMs: 1_000, reason: 'connection error' },
+    ]);
   });
 
   it('retries a 529 APIError with exponential backoff until success', async () => {
@@ -92,7 +94,9 @@ describe('callWithRetry', () => {
     const { opts, retries } = recordingOpts();
     const { attempt } = flakyAttempt([sseError('overloaded_error')], 'ok');
     await expect(callWithRetry(attempt, opts)).resolves.toBe('ok');
-    expect(retries).toEqual([{ attempt: 2, delayMs: 1_000, reason: 'overloaded_error' }]);
+    expect(retries).toEqual([
+      { attempt: 2, maxAttempts: MAX_CALL_ATTEMPTS, delayMs: 1_000, reason: 'overloaded_error' },
+    ]);
   });
 
   it('retries a TruncatedStreamError from stream assembly', async () => {
