@@ -1,3 +1,9 @@
+import type {
+  BrowserObservation,
+  BrowserObserveRequest,
+  BrowserPage,
+} from './browserState.js';
+
 /** Options controlling a browser screenshot. */
 export interface BrowserScreenshotOptions {
   /** Capture the entire scrollable page instead of only the viewport. */
@@ -166,6 +172,38 @@ export interface BrowserController {
    * @returns the current document title. Rejects when no task tab is active.
    */
   title(): Promise<string>;
+
+  /**
+   * List every tracked page (task tab and popups) with stable identity.
+   *
+   * @returns one {@link BrowserPage} per live tracked page, in tracking
+   *   order. Internal throwaway pages (e.g. download capture pages) never
+   *   appear. Listing never advances any page's observation id.
+   */
+  pages(): Promise<BrowserPage[]>;
+
+  /**
+   * Take a fresh snapshot of a page in the requested representations.
+   *
+   * @param request - page selection, requested needs, and an optional diff
+   *   baseline; omitted entirely means an interactive snapshot of the
+   *   selected page
+   * @returns the new observation: the page (with its incremented
+   *   observation id), one bounded view per need, the observed elements,
+   *   and changes vs the requested baseline. An evicted or unknown
+   *   baseline degrades to `basis: 'full_snapshot'` — never an error.
+   */
+  observe(request?: BrowserObserveRequest): Promise<BrowserObservation>;
+
+  /**
+   * Select a tracked page as the target of the single-page methods
+   * (goto/outline/click/type/...) — how legacy tools reach a popup.
+   *
+   * @param pageId - a page id from {@link pages} or an observation
+   * @returns the selected page's current state with `active: true`.
+   *   Rejects when the id names no live tracked page.
+   */
+  switchPage(pageId: string): Promise<BrowserPage>;
 
   /**
    * Close the browser session and every page it owns.

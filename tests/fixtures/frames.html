@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Frames Fixture</title>
+  </head>
+  <body>
+    <main>
+      <h1>Frames fixture</h1>
+      <button id="swap" type="button">Swap frame source</button>
+      <iframe src="/second.html" title="Embedded fixture" width="400" height="200"></iframe>
+    </main>
+
+    <script>
+      // Navigating the iframe replaces its document without replacing the
+      // frame: frameId must stay stable while its documentId rotates.
+      document.querySelector('#swap').addEventListener('click', () => {
+        document.querySelector('iframe').src = '/index.html';
+      });
+    </script>
+  </body>
+</html>

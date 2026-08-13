@@ -11,6 +11,10 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
+  BrowserObservation,
+  BrowserPage,
+} from '../browser/browserState.js';
+import type {
   BrowserController,
   BrowserDownloadResult,
   BrowserDownloadTarget,
@@ -110,6 +114,18 @@ class FakeBrowser implements BrowserController {
       throw new Error('No browser task tab.');
     }
     return '';
+  }
+
+  async pages(): Promise<BrowserPage[]> {
+    throw new Error('Unexpected page listing.');
+  }
+
+  async observe(): Promise<BrowserObservation> {
+    throw new Error('Unexpected page observation.');
+  }
+
+  async switchPage(_pageId: string): Promise<BrowserPage> {
+    throw new Error('Unexpected page switch.');
   }
 
   async close(): Promise<void> {

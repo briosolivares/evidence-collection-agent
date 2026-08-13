@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Duplicate Rows Fixture</title>
+  </head>
+  <body>
+    <main>
+      <h1>Duplicate rows fixture</h1>
+      <p id="status" role="status">No deletions</p>
+
+      <button id="reverse" type="button">Reverse rows</button>
+      <button id="mutate" type="button">Add unrelated note</button>
+      <button id="strip" type="button">Strip observation markers</button>
+
+      <ul id="rows">
+        <li data-label="alpha">Row alpha <button type="button" class="delete">Delete row</button></li>
+        <li data-label="beta">Row beta <button type="button" class="delete">Delete row</button></li>
+      </ul>
+    </main>
+
+    <script>
+      const rows = document.querySelector('#rows');
+      const status = document.querySelector('#status');
+
+      // Reversal MOVES the existing nodes (append re-parents), preserving
+      // node identity — the scenario where an ordinal-based ref would
+      // silently target the wrong row.
+      document.querySelector('#reverse').addEventListener('click', () => {
+        for (const item of [...rows.children].reverse()) {
+          rows.append(item);
+        }
+      });
+
+      // An unrelated mutation that adds a NEW interactive element.
+      document.querySelector('#mutate').addEventListener('click', () => {
+        const note = document.createElement('button');
+        note.type = 'button';
+        note.textContent = 'Added later';
+        document.querySelector('main').append(note);
+      });
+
+      // Simulates a page that destroys observation markers, forcing the
+      // unique role/name fallback (and stale errors for duplicates).
+      document.querySelector('#strip').addEventListener('click', () => {
+        for (const element of document.querySelectorAll('[data-sherlock-el]')) {
+          element.removeAttribute('data-sherlock-el');
+        }
+      });
+
+      rows.addEventListener('click', (event) => {
+        const button = event.target.closest('button.delete');
+        if (button) {
+          status.textContent = 'Deleted ' + button.closest('li').dataset.label;
+        }
+      });
+    </script>
+  </body>
+</html>
