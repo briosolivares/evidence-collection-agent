@@ -47,7 +47,7 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T1 | complete | claude (impl session) | see log | Trustworthy shared model driver |
 | T2 | complete | claude (impl session) | 199467a | Persistent worker and truthful outcomes |
 | T3 | complete | claude (impl session) | 77f63d3 | Typed verifier result |
-| T4 | not_started | — | — | Typed output contract |
+| T4 | complete | claude (impl session) | 9703b57 | Typed output contract |
 | T5 | not_started | — | — | Explicit submission and code checks |
 | T6 | not_started | — | — | Bounded page JavaScript |
 | T7 | not_started | — | — | Evidence-linked output tables |
@@ -85,6 +85,49 @@ When work begins, replace the sentence above with one section per active task:
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 14:35 — T4 complete
+
+- Owner: claude (browser-agent-v2 impl session)
+- Commits: `e0a3825` (schemas), `8a9c784` (store), `4aa23c2` (tool + ToolCtx),
+  `4f14f67` (contract-first gate), `9703b57` (initializer mode), plus the
+  verifier contract/history wiring
+- Features: T4.1–T4.4 complete.
+- What landed:
+  - `src/contracts/outputContract.ts` — the OutputSpec union, column types,
+    table rules, revision-basis union, and `validateContractRevision()`,
+    which reports EVERY cross-field problem at once so one rejected call is
+    enough to fix the whole contract. `serializeContractRevision()` emits
+    canonical JSON so the same input stores byte-identically whichever role
+    authored it.
+  - `src/contracts/outputContractStore.ts` — append-only history persisted
+    through `writeArtifact()`; a rejected revision writes nothing and
+    consumes no revision number.
+  - `src/tools/setOutputContract/` — the tool, plus `outputContracts` on
+    `ToolCtx`; a registry offering the tool without a store fails closed.
+  - `src/contracts/contractFirstGate.ts` + worker wiring — until a valid
+    contract exists, a response may only call `set_output_contract`.
+    A refused response executes NOTHING while every attempted call still
+    receives exactly one result. A leading contract call runs alone first;
+    the rest of the response proceeds only if it was accepted.
+  - Initializer mode (`runContractInitializer`,
+    `makeContractInitializerModelDriver`) — offered only
+    `set_output_contract` with `tool_choice` forced to it, one bounded
+    repair, and a test proving initializer- and worker-authored contracts
+    store byte-identically.
+  - The verifier now receives the current contract AND its full revision
+    history, so it can tell evidence-driven strengthening from drift.
+- Delegation note: the schema module was drafted by a subagent that was
+  stopped mid-task. The primary agent reviewed it, found and fixed two raw
+  NUL bytes it had written into a regex class and a join separator (which
+  made `file(1)` report the source as binary and made `grep -r` skip it
+  silently — the same defect class found in the T9 draft), then wrote every
+  test. No subagent output was committed unreviewed.
+- Verified:
+  - `npm run typecheck` — 0 errors
+  - `npm test` — 110 files, 1000 tests, exit 0
+- Remaining: T5, T6, T7, T8, T10–T16. `contractAuthor` defaults to
+  `initializer` pending a user-authorized comparison; no live eval was run.
 
 ### 2026-08-13 14:12 — session close: T1, T2, T3, T9 complete
 
@@ -250,10 +293,10 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: T1, T2, T3, T9 — all fully gated (typecheck 0 errors,
-  full suite 106 files / 932 tests)
-- Safe next task: T4 (unblocked by T3; sequential core). T10 is also unblocked
-  now that T9 has landed, and T6 needs only T4's run policy
+- Last completed task: T1, T2, T3, T4, T9 — all fully gated (typecheck 0
+  errors, full suite 110 files / 1000 tests)
+- Safe next task: T5 (unblocked by T4) and T6 (unblocked by T1 + T4). T10 is
+  unblocked by T9
 - Parallel work currently unlocked: T4 and T10 can proceed in parallel (T4
   owns src/contracts + the contract tool; T10 owns src/browser/browserActions
   + the action tools). Assign ONE owner to src/tools/index.ts,

@@ -160,35 +160,35 @@
     {
       "id": "T4",
       "title": "Introduce one typed output contract",
-      "status": "not_started",
+      "status": "complete",
       "dependsOn": [
         "T3"
       ],
-      "owner": null,
-      "startedAt": null,
-      "completedAt": null,
+      "owner": "claude (primary; schema drafted by a stopped subagent, then reviewed and repaired)",
+      "startedAt": "2026-08-13T13:45:00-07:00",
+      "completedAt": "2026-08-13T14:35:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t4--introduce-one-typed-output-contract",
       "features": [
         {
           "id": "T4.1",
           "description": "Implement and cross-validate the OutputContract and OutputSpec schemas.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T4.2",
           "description": "Persist numbered contract revisions and their evidence, assumption, or user basis through writeArtifact.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T4.3",
           "description": "Require set_output_contract first and block all later calls when the first contract is missing or invalid.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T4.4",
           "description": "Support worker and initializer ContractAuthor policies with the same schema and verifier path.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
