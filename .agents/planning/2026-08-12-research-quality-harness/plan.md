@@ -247,3 +247,28 @@ specific task's oracle is out.
 4. Sequencing: 1–3 are prompt-only and could ship as one commit + one
    validation batch (yc, wikipedia, mit, hacker_news as the cost canary);
    4 is a separate tool build.
+
+## Open problem: agent authentication (acknowledged 2026-08-13, user ruling)
+
+Everything built so far is **authentication by inheritance**: a human logs
+in, the agent borrows whatever sessions live in the profile it launches.
+The pre-seeded persistent profile is the static borrow, the TUI headed-lane
+question dialog (b657059) is the runtime human handoff when the borrow
+turns out empty, and the `login` helper makes the borrow verifiable. None
+of it gives the agent an authentication *capability*. Missing, stated as
+requirements: durable sessions the agent can rely on across runs, a way to
+query its auth state instead of discovering it by hitting a wall, scoping
+(the profile grants everything the account can do, not what the task
+needs), and unattended recovery when a session expires mid-run.
+`fill_credentials` (feat/browser-runtime-auth, unmerged) is the only
+agent-driven piece; it is unvalidated live and structurally blocked for
+Google, whose bot detection treats automated login as an attack.
+
+Part of this is terrain, not backlog: sites actively fight automated
+authentication, so human-performs-the-grant / agent-inherits-the-session
+is likely the correct architecture, not a stopgap. The genuinely solvable,
+unsolved part is **session lifecycle as a first-class concern** — one
+canonical profile, preflight verification, expiry detection, proactive
+re-auth prompts, per-service auth state the agent can query. Nothing on
+any branch is that yet. Recorded so a passing mit is never mistaken for
+authentication being solved.
