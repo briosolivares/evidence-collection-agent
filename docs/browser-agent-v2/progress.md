@@ -51,9 +51,9 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T5 | complete | claude (impl session) | 15fb0d1 | Explicit submission and code checks |
 | T6 | complete | delegated subagent, primary-verified | 60483ff | Bounded page JavaScript |
 | T7 | complete | claude (impl session) | fef9588 | Evidence-linked output tables |
-| T8 | in_progress | delegated subagent | — | Evidence-linked documents |
+| T8 | complete | delegated subagent, primary-verified | a63b952 | Evidence-linked documents |
 | T9 | complete | delegated subagent, primary-verified | 70884d6 | Stable browser identity and observation |
-| T10 | in_progress | delegated subagent | — | Receipted browser actions |
+| T10 | complete | delegated subagent, primary-verified | see log | Receipted browser actions (no drag) |
 | T11 | in_progress | delegated subagent | — | Targeted observation and public resources |
 | T12 | complete | claude (impl session) | see log | PDF, spreadsheet, and OCR adapters |
 | T13 | not_started | — | — | Input-aware scheduler |
