@@ -15,33 +15,37 @@ contract held everywhere.
 
 ## Two harness fixes were needed to get the run done
 
-1. **`about:blank` start URLs crashed CLI trials** (`c9c7e69`). The two "Blank Tab"
-   tasks (`company_freshness`, `stub`) navigate nowhere; the TUI path filtered this,
+1. `about:blank` **start URLs crashed CLI trials** (`c9c7e69`). The two "Blank Tab"
+  tasks (`company_freshness`, `stub`) navigate nowhere; the TUI path filtered this,
    the CLI path did not. `usableStartUrl` now lives in `runTask` and the CLI runner
    uses it. Without this fix company_freshness would have been 0/3 on startup crashes;
    with it, 3/3.
 2. **A throwing trial killed the whole batch** (`5d1217e`). Batch 1 died 6 trials in
-   when one mit_sororities trial exhausted its stream retries; 27 pending trials were
+  when one mit_sororities trial exhausted its stream retries; 27 pending trials were
    discarded (the 6 finished grades survived via the partial JSONL). The runner now
    records a trial error as a failed trial (`error` on the grade, zero accuracy, task
    FAIL) and continues; only explicit cancellation aborts a batch. Batch 2 validated
    this live: four trials errored, twenty-three others were unaffected.
 
+
+
 ## Results by task
 
-| Task | Difficulty | Completion | Accuracy | Mean latency | Mean cost/trial | Verdict |
-|---|---|---|---|---|---|---|
-| hacker_news | Easy | 3/3 **PASS** | 100% | 24s | $0.07 | saturated |
-| edgar | Easy | 0/3 FAIL | 22.2% | 218s | $0.77 | infra: SEC bot-block |
-| openclaw_pr | Easy | 3/3 **PASS** | 100% | 63s | $0.15 | saturated |
-| company_freshness | Medium | 3/3 **PASS** | 100% | 120s | $0.94 | first CLI pass |
-| yc_w24_outreach | Medium | 0/3 FAIL | 75.0% | 102s | $0.71 | capability: research quality |
-| openclaw_merged_prs | Medium | 1/3 FAIL | 91.7% | 183s | $2.02 | ambiguity: bot committer |
-| elon_tweets | Medium | 2/3 FAIL | 95.2% | 69s | $0.34 | suspected grader bug |
-| openclaw_contributors | Medium | 3/3 **PASS** | 100% | 254s | $3.54 | second consecutive pass |
-| wikipedia_reference | Hard | 2/3 FAIL | 91.7% | 115s | $0.49 | capability: extraction depth |
-| airbnb_lake_tahoe | Hard | 3/3 **PASS** | 100% | 235s | $2.62 | first-ever run: pass |
-| mit_sororities | Hard | 0/3 FAIL | 0% | 649s | $4.04 (sunk) | infra: stream truncation |
+
+| Task                  | Difficulty | Completion   | Accuracy | Mean latency | Mean cost/trial | Verdict                      |
+| --------------------- | ---------- | ------------ | -------- | ------------ | --------------- | ---------------------------- |
+| hacker_news           | Easy       | 3/3 **PASS** | 100%     | 24s          | $0.07           | saturated                    |
+| edgar                 | Easy       | 0/3 FAIL     | 22.2%    | 218s         | $0.77           | infra: SEC bot-block         |
+| openclaw_pr           | Easy       | 3/3 **PASS** | 100%     | 63s          | $0.15           | saturated                    |
+| company_freshness     | Medium     | 3/3 **PASS** | 100%     | 120s         | $0.94           | first CLI pass               |
+| yc_w24_outreach       | Medium     | 0/3 FAIL     | 75.0%    | 102s         | $0.71           | capability: research quality |
+| openclaw_merged_prs   | Medium     | 1/3 FAIL     | 91.7%    | 183s         | $2.02           | ambiguity: bot committer     |
+| elon_tweets           | Medium     | 2/3 FAIL     | 95.2%    | 69s          | $0.34           | suspected grader bug         |
+| openclaw_contributors | Medium     | 3/3 **PASS** | 100%     | 254s         | $3.54           | second consecutive pass      |
+| wikipedia_reference   | Hard       | 2/3 FAIL     | 91.7%    | 115s         | $0.49           | capability: extraction depth |
+| airbnb_lake_tahoe     | Hard       | 3/3 **PASS** | 100%     | 235s         | $2.62           | first-ever run: pass         |
+| mit_sororities        | Hard       | 0/3 FAIL     | 0%       | 649s         | $4.04 (sunk)    | infra: stream truncation     |
+
 
 Spend: **$60.26 total** ($24.94 batch 1 + $35.32 batch 2), of which **$28.20 was
 consumed by the six mit_sororities trials that errored** (three unrecorded in batch 1's
@@ -50,6 +54,8 @@ Wall clock: batch 2 ran 27 trials in 30 minutes; the suite minus mit_sororities 
 fast (hard-task trials 2–7 min each, easies under 1 min).
 
 ## Failure modes, ranked by priority
+
+
 
 ### 1. Stream truncation at deep context kills long trials (infrastructure, P0)
 
@@ -65,16 +71,25 @@ This is the single biggest blocker: the suite's longest task cannot currently
 produce a grade at all, and each attempt costs ~$4.70 before dying.
 
 Candidate remedies, in the order I'd try them:
-- **Raise the retry ceiling and lengthen backoff** for the truncated-stream class
-  specifically (retries did occasionally succeed — batch 1 trial 2 survived a 4/4
-  retry — so each attempt has meaningful success probability; 8 attempts with
-  30–60s ceilings would likely get through).
-- **Shrink the exposure window**: large `write_file` payloads stream thousands of
-  output tokens on top of a 200k-token request; teaching the agent (or the tool) to
-  append in chunks would shorten each stream.
-- **Investigate the client**: 6/6 correlation with (deep context × long output) is
-  strong enough that a client-side stream timeout is worth ruling out before
-  blaming the API.
+
+- **Diagnose before building**: have `TruncatedStreamError` carry stream age, last
+event type, and output tokens received at death, then run one instrumented
+mit_sororities trial. "Dies mid-generation" and "dies right after message_start"
+point at different fixes; today we can't tell them apart.
+- **Shrink the exposure window (the structural fix)**: the failure needs huge
+context × long output stream in one request, and the current toolset forces the
+agent to stream an entire deliverable in a single `write_file` response — there is
+no append, and read-then-rewrite assembly re-streams everything anyway. An append
+mode on `write_file` (manifest hash on final content) caps how much any one model
+response streams, regardless of what the API is doing.
+- **Retry/backoff tuning is insurance, not a fix**: the current policy spreads 4
+attempts across ~8 seconds, so a 30–120s degradation episode eats all four
+(batch 1 showed the three trials retrying inside the same minute). Longer backoff
+decorrelates attempts from short episodes — worth having — but if this request
+profile is being deterministically shed, no retry count helps; that's what the
+diagnostics decide.
+
+
 
 ### 2. Bot-detection blocks headless isolated browsers (infrastructure, P0 for affected sites)
 
@@ -91,12 +106,15 @@ honest answer.md declaring the task incomplete, and a screenshot of the block pa
 published as evidence.
 
 Candidate remedies:
+
 - **Per-task browser policy metadata**: the eval infrastructure already has two
-  lanes; let task.json opt into the headed persistent lane for bot-sensitive sites
-  (edgar today; airbnb and x.com are plausible future members). Cost: those trials
-  serialize.
+lanes; let task.json opt into the headed persistent lane for bot-sensitive sites
+(edgar today; airbnb and x.com are plausible future members). Cost: those trials
+serialize.
 - Alternatively, humanize the headless fingerprint (UA, `AutomationControlled`
-  blink feature) and stagger same-site trials. Less certain against SEC.
+blink feature) and stagger same-site trials. Less certain against SEC.
+
+
 
 ### 3. Entity-research quality on yc_w24_outreach (capability, P1)
 
@@ -104,13 +122,13 @@ Candidate remedies:
 misses are research depth:
 
 - **Guessed LinkedIn URLs**: `linkedin.com/in/sacellarius`, `/in/binw` — pattern-shaped
-  slugs the agent never verified (trials 2, 3).
+slugs the agent never verified (trials 2, 3).
 - **Incomplete founder enumeration**: trial 3 selected Artisan but omitted co-founder
-  Rupert Dodkins, which the task text explicitly requires ("one row for every founder").
+Rupert Dodkins, which the task text explicitly requires ("one row for every founder").
 - **Company-selection window** (partly ambiguity): trial 1 chose Reprompt, whose
-  founders aren't in the oracle's YC-AI-tagged set. "AI-focused" per the agent's
-  judgment vs YC's official tag — defensible, but it costs two founder-match
-  assertions. Worth a task-text clarification ("companies YC tags as AI").
+founders aren't in the oracle's YC-AI-tagged set. "AI-focused" per the agent's
+judgment vs YC's official tag — defensible, but it costs two founder-match
+assertions. Worth a task-text clarification ("companies YC tags as AI").
 - One email flagged as insufficiently company-specific (trial 1, row 7).
 
 The actionable agent-side iteration: verify a LinkedIn URL resolves to the named
@@ -149,28 +167,16 @@ first outing was flawless: logged-in x.com, 10–24 turns, $0.18–0.55/trial).
 ## What worked
 
 - **The scratch/artifacts contract, suite-wide.** Zero steering errors, zero
-  shadowing incidents, correct roles everywhere sampled (evidence screenshots
-  role-tagged, deliverables as requested_output, blocked-page evidence on edgar).
+shadowing incidents, correct roles everywhere sampled (evidence screenshots
+role-tagged, deliverables as requested_output, blocked-page evidence on edgar).
 - **The two-lane browser runtime.** Headless pool + serial headed lane ran
-  4-concurrent without profile conflicts; authenticated x.com trials worked
-  end to end on the first try.
+4-concurrent without profile conflicts; authenticated x.com trials worked
+end to end on the first try.
 - **Failure honesty.** The blocked edgar trials produced explicit "task not
-  completed" answers with evidence, not fabricated filings.
+completed" answers with evidence, not fabricated filings.
 - **airbnb_lake_tahoe passed 3/3 on its first-ever run** — 30 listings enumerated,
-  dates correct, per-listing summaries — the hardest browsing task in the suite.
+dates correct, per-listing summaries — the hardest browsing task in the suite.
 - **Crash insurance + resilience.** The partial JSONL saved batch 1's grades; the
-  runner fix turned batch 2's four errors into recorded data instead of a third
-  relaunch.
+runner fix turned batch 2's four errors into recorded data instead of a third
+relaunch.
 
-## Recommended iteration order
-
-1. Truncated-stream retry policy (unblocks mit_sororities, protects every future
-   long task).
-2. Headed-lane opt-in for bot-sensitive sites (unblocks edgar; re-run to confirm).
-3. elon_tweets grader time parsing (cheap; likely flips a task to PASS).
-4. merged_prs bot-committer oracle rule (cheap; likely flips a task to PASS).
-5. Agent-side: LinkedIn verification + founder-list cross-check behavior for
-   yc_w24_outreach (prompt or tool-description nudge; the only pure capability gap
-   with a clear fix).
-6. Re-run the three infra-failed tasks (mit_sororities, edgar) plus yc_w24 after
-   1–5; the suite's true capability ceiling is plausibly 9–10/11.
