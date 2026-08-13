@@ -111,9 +111,26 @@ export interface PendingTool {
   /** Execution id from the tracing seam, once execution has started. */
   execId?: number;
   line: string;
+  /** Likely-evidence hint styling the in-flight line; the finalized item's
+   * activity/evidence classification is decided by publishes instead. */
   isEvidence: boolean;
-  sourceUrl?: string;
+  /** Manifest entries this execution has published so far (each
+   * artifact_published event precedes its execution's tool_exec_end). */
+  published?: readonly ManifestEntry[];
   verbose?: { input: string; result: string };
+}
+
+/**
+ * One published artifact of the current (or most recent) run. The manifest
+ * entry is kept verbatim — filename, roles, sourceUrl, full sha256,
+ * capturedAt — so later surfaces (artifact rail, /artifacts, completion
+ * summary) can render full provenance and order requested outputs first
+ * without re-reading manifest.json.
+ */
+export interface PublishedArtifact {
+  entry: ManifestEntry;
+  /** Size on disk at publish time; undefined if the stat failed. */
+  sizeBytes: number | undefined;
 }
 
 /** The dynamic region's state — mutable until finalized into items. */
@@ -149,15 +166,7 @@ export type UiEvent =
   | { type: 'text_delta'; text: string }
   | { type: 'tool_pending'; name: string }
   | { type: 'tool_exec_start'; id: number; name: string; input: unknown }
-  | {
-      type: 'tool_exec_end';
-      id: number;
-      ok: boolean;
-      result?: unknown;
-      error?: string;
-      /** Manifest-recorded source URL, for evidence artifacts. */
-      sourceUrl?: string;
-    }
+  | { type: 'tool_exec_end'; id: number; ok: boolean; result?: unknown; error?: string }
   | {
       type: 'artifact_published';
       /** The manifest's provenance record, verbatim (published entries
@@ -192,6 +201,10 @@ export interface SessionState {
   completionVerb: string;
   /** Present only while a run is active (running/cancelling). */
   live?: LiveRunState;
+  /** Published artifacts of the current or most recent run, upserted by
+   * `entry.filename` in publish order; cleared on run_started, retained
+   * after the run ends (/artifacts and the completion summary read it). */
+  artifacts: readonly PublishedArtifact[];
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;

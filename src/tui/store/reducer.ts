@@ -4,7 +4,9 @@
 //
 // Finalization rules (the <Static> contract — items never re-render):
 // - streaming agent text finalizes at the next tool batch or turn end;
-// - a pending tool line finalizes when its execution result arrives;
+// - a pending tool line finalizes when its execution result arrives — as
+//   evidence iff that execution published artifacts (artifact_published
+//   events precede its tool_exec_end), as plain activity otherwise;
 // - pending lines that never receive exec events (registry-rejected calls
 //   are invisible to the tracing seam) settle as ⚠ retried at the next
 //   turn_start, or at run end.
@@ -128,6 +130,7 @@ export function createInitialState(
     ],
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',
+    artifacts: [],
   };
 }
 
@@ -274,6 +277,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return {
         ...state,
         mode: 'running',
+        artifacts: [],
         live: {
           streamingText: '',
           pendingTools: [],
@@ -389,11 +393,17 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
                 ? compactDetail(action.result)
                 : compactDetail(action.error ?? 'error'),
             };
-      const withItem = finished.isEvidence && action.ok
+      // Publish-driven classification: an execution reads as evidence iff
+      // it actually published (a scratch write publishes nothing however
+      // evidence-flavored its name; a browser_batch capture publishes
+      // whatever its name suggests). Failures stay error activity.
+      const published = finished.published ?? [];
+      const sourceUrl = published.find((entry) => entry.sourceUrl !== undefined)?.sourceUrl;
+      const withItem = action.ok && published.length > 0
         ? append(state, {
             kind: 'evidence',
             line: finished.line,
-            ...(action.sourceUrl !== undefined ? { sourceUrl: action.sourceUrl } : {}),
+            ...(sourceUrl !== undefined ? { sourceUrl } : {}),
             ...(verbose !== undefined ? { verbose } : {}),
           })
         : append(state, {
@@ -405,9 +415,27 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return { ...withItem, live: { ...live, pendingTools: remaining } };
     }
 
-    case 'artifact_published':
-      // Placeholder until the artifact substate lands (plan item 2).
-      return state;
+    case 'artifact_published': {
+      const live = state.live;
+      if (live === undefined) return state;
+      const record = { entry: action.entry, sizeBytes: action.sizeBytes };
+      const known = state.artifacts.some(
+        (artifact) => artifact.entry.filename === action.entry.filename,
+      );
+      const artifacts = known
+        ? state.artifacts.map((artifact) =>
+            artifact.entry.filename === action.entry.filename ? record : artifact,
+          )
+        : [...state.artifacts, record];
+      // Tag the publishing execution so its tool_exec_end finalizes as an
+      // evidence line carrying the entry's sourceUrl.
+      const pendingTools = live.pendingTools.map((pending) =>
+        pending.execId === action.toolExecId
+          ? { ...pending, published: [...(pending.published ?? []), action.entry] }
+          : pending,
+      );
+      return { ...state, artifacts, live: { ...live, pendingTools } };
+    }
 
     case 'turn_end': {
       const next = finalizeStreamingText(state);

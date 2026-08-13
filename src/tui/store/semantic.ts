@@ -1,7 +1,9 @@
 // Pure derivation of semantic transcript lines from tool calls (design
 // "Semantic line derivation" table): tool activity reads as what the
-// agent is doing (`Opening sec.gov/…`), never raw JSON; evidence-
-// producing tools are classified for the stronger ◆ treatment (R5).
+// agent is doing (`Opening sec.gov/…`), never raw JSON. Tools likely to
+// publish get the stronger ◆ treatment while in flight (R5) — the
+// finalized item's activity/evidence classification is decided by actual
+// artifact publishes in the reducer, not here.
 
 import { shortenUrl, truncate } from '../format.js';
 
@@ -9,7 +11,8 @@ import { shortenUrl, truncate } from '../format.js';
 const TEXT_MAX = 40;
 const LINE_URL_MAX = 44;
 
-/** One derived line: its text and whether it is evidence. */
+/** One derived line: its text and whether it likely publishes evidence
+ * (a styling hint for the pending line, not a classification). */
 export interface SemanticLine {
   line: string;
   isEvidence: boolean;
@@ -120,6 +123,11 @@ export function deriveSemanticLine(name: string, input?: unknown): SemanticLine 
     }
     case 'write_file': {
       const path = field(input, 'file_path');
+      // A scratch/ write is private working state — style it as plain
+      // activity even in flight, never as evidence-to-be.
+      if (path !== undefined && path.startsWith('scratch/')) {
+        return { line: `Writing ${truncate(path, TEXT_MAX)}`, isEvidence: false };
+      }
       return {
         line:
           path === undefined

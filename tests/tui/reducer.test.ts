@@ -8,6 +8,7 @@ import {
   unknownCommandNotice,
   type StoreAction,
 } from '../../src/tui/store/reducer.js';
+import type { ManifestEntry } from '../../src/run/artifacts.js';
 import type { SessionState } from '../../src/tui/store/state.js';
 
 describe('createInitialState', () => {
@@ -149,6 +150,27 @@ const started: StoreAction[] = [
   { type: 'submit_task', text: 'investigate' },
   { type: 'run_started', task: 'investigate', at: 1_000 },
 ];
+
+/** A published manifest entry, verbatim shape (roles present ⟺ published). */
+function publishedEntry(
+  overrides: Partial<ManifestEntry> & { filename: string },
+): ManifestEntry {
+  return {
+    sha256: 'a'.repeat(64),
+    roles: ['evidence'],
+    capturedAt: '2026-08-12T10:00:00.000Z',
+    ...overrides,
+  };
+}
+
+/** The tracing seam's publish announcement for one manifest entry. */
+function published(
+  toolExecId: number,
+  entry: ManifestEntry,
+  sizeBytes: number | undefined = 128,
+): StoreAction {
+  return { type: 'artifact_published', entry, sizeBytes, toolExecId };
+}
 
 describe('reduce (run lifecycle events)', () => {
   it('run_started enters running mode with fresh live state', () => {
@@ -371,6 +393,9 @@ describe('reduce (run lifecycle events)', () => {
     const initial = createInitialState();
     expect(fold([{ type: 'text_delta', text: 'stray' }], initial)).toEqual(initial);
     expect(fold([{ type: 'turn_end', usage: { input: 1, output: 1 } }], initial)).toEqual(initial);
+    expect(
+      fold([published(1, publishedEntry({ filename: 'artifacts/stray.png' }))], initial),
+    ).toEqual(initial);
   });
 });
 
@@ -442,7 +467,7 @@ describe('reduce (semantic activity + evidence)', () => {
     });
   });
 
-  it('finalizes evidence tools as evidence items carrying the source URL', () => {
+  it('finalizes a publishing write_file as an evidence item', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
@@ -451,21 +476,18 @@ describe('reduce (semantic activity + evidence)', () => {
         type: 'tool_exec_start',
         id: 1,
         name: 'write_file',
-        input: { file_path: 'top5.csv', content: 'a,b' },
+        input: { file_path: 'artifacts/top5.csv', content: 'a,b' },
       },
-      {
-        type: 'tool_exec_end',
-        id: 1,
-        ok: true,
-        result: 'Created top5.csv',
-        sourceUrl: 'https://news.ycombinator.com/',
-      },
+      published(1, publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }), 3),
+      { type: 'tool_exec_end', id: 1, ok: true, result: 'Created top5.csv' },
     ]);
-    expect(state.transcript.at(-1)).toMatchObject({
+    const item = state.transcript.at(-1);
+    expect(item).toMatchObject({
       kind: 'evidence',
-      line: 'Evidence saved → top5.csv',
-      sourceUrl: 'https://news.ycombinator.com/',
+      line: 'Evidence saved → artifacts/top5.csv',
     });
+    // write_file records no sourceUrl, so the evidence line omits it.
+    expect((item as { sourceUrl?: string }).sourceUrl).toBeUndefined();
   });
 
   it('a failed evidence tool finalizes as an error activity, not evidence', () => {
@@ -500,5 +522,146 @@ describe('reduce (semantic activity + evidence)', () => {
       input: '{"pattern":"Q3"}',
       result: 'notes.md:4: Q3 revenue',
     });
+  });
+});
+
+// ————— Plan item 2: publish-driven artifacts and evidence —————
+
+describe('reduce (published artifacts)', () => {
+  // A screenshot exec whose publish arrives before its end, per the
+  // tracing seam's emission contract.
+  const captured: StoreAction[] = [
+    ...started,
+    { type: 'turn_start', turn: 1 },
+    {
+      type: 'tool_exec_start',
+      id: 1,
+      name: 'screenshot',
+      input: { filename: 'artifacts/page.png' },
+    },
+    published(
+      1,
+      publishedEntry({ filename: 'artifacts/page.png', sourceUrl: 'https://sec.gov/filings' }),
+      10,
+    ),
+    { type: 'tool_exec_end', id: 1, ok: true, result: { path: 'artifacts/page.png', size: 10 } },
+  ];
+
+  it('upserts published artifacts by filename — a re-publish replaces in place', () => {
+    const state = fold([
+      ...captured,
+      {
+        type: 'tool_exec_start',
+        id: 2,
+        name: 'write_file',
+        input: { file_path: 'artifacts/top5.csv', content: 'v1' },
+      },
+      published(2, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '1'.repeat(64), roles: ['requested_output'] }), 2),
+      { type: 'tool_exec_end', id: 2, ok: true },
+      {
+        type: 'tool_exec_start',
+        id: 3,
+        name: 'write_file',
+        input: { file_path: 'artifacts/top5.csv', content: 'v2!' },
+      },
+      published(3, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '2'.repeat(64), roles: ['requested_output'] }), 3),
+      { type: 'tool_exec_end', id: 3, ok: true },
+    ]);
+    expect(state.artifacts.map((artifact) => artifact.entry.filename)).toEqual([
+      'artifacts/page.png',
+      'artifacts/top5.csv',
+    ]);
+    expect(state.artifacts[1]).toMatchObject({
+      entry: { sha256: '2'.repeat(64), roles: ['requested_output'] },
+      sizeBytes: 3,
+    });
+  });
+
+  it('retains artifacts with full provenance after the run ends, clears them on the next run_started', () => {
+    const finished = fold([
+      ...captured,
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    expect(finished.mode).toBe('idle');
+    expect(finished.live).toBeUndefined();
+    expect(finished.artifacts).toEqual([
+      {
+        entry: publishedEntry({ filename: 'artifacts/page.png', sourceUrl: 'https://sec.gov/filings' }),
+        sizeBytes: 10,
+      },
+    ]);
+    const next = reduce(finished, { type: 'run_started', task: 'again', at: 3_000 });
+    expect(next.artifacts).toEqual([]);
+  });
+
+  it('an exec that published finalizes as evidence, sourceUrl lifted from the entry', () => {
+    const state = fold(captured);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'evidence',
+      line: 'Captured artifacts/page.png',
+      sourceUrl: 'https://sec.gov/filings',
+    });
+  });
+
+  it('an exec that published nothing renders plain activity — the scratch-write fix', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      {
+        type: 'tool_exec_start',
+        id: 1,
+        name: 'write_file',
+        input: { file_path: 'scratch/notes.md', content: 'wip' },
+      },
+      { type: 'tool_exec_end', id: 1, ok: true, result: 'File created successfully at: scratch/notes.md' },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'activity',
+      status: 'ok',
+      line: 'Writing scratch/notes.md',
+    });
+    expect(state.artifacts).toEqual([]);
+  });
+
+  it('a publishing browser_batch finalizes as evidence, first entry with a sourceUrl winning', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      {
+        type: 'tool_exec_start',
+        id: 4,
+        name: 'browser_batch',
+        input: { actions: [{ tool: 'click', input: { ref: 'e1' } }] },
+      },
+      published(4, publishedEntry({ filename: 'artifacts/notes.csv', roles: ['requested_output'] })),
+      published(4, publishedEntry({ filename: 'artifacts/shot.png', sourceUrl: 'https://x.test/b' })),
+      { type: 'tool_exec_end', id: 4, ok: true },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'evidence',
+      line: 'Running 1 browser steps',
+      sourceUrl: 'https://x.test/b',
+    });
+    expect(state.artifacts).toHaveLength(2);
+  });
+
+  it('a failed exec renders error activity even when it published first', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      {
+        type: 'tool_exec_start',
+        id: 5,
+        name: 'browser_batch',
+        input: { actions: [{ tool: 'screenshot', input: {} }, { tool: 'click', input: {} }] },
+      },
+      published(5, publishedEntry({ filename: 'artifacts/partial.png', sourceUrl: 'https://x.test/a' })),
+      { type: 'tool_exec_end', id: 5, ok: false, error: 'step 2 failed' },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({ kind: 'activity', status: 'error' });
+    // The capture itself is real and stays listed.
+    expect(state.artifacts.map((artifact) => artifact.entry.filename)).toEqual([
+      'artifacts/partial.png',
+    ]);
   });
 });

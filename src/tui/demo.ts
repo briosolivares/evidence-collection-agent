@@ -123,7 +123,23 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         input: { file_path: 'investors.csv' },
       },
     },
-    { delayMs: 700, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'Created investors.csv (3 rows)' } },
+    // The publish is what makes the write render as evidence (the reducer
+    // classifies by artifact_published, not by tool name).
+    {
+      delayMs: 550,
+      action: {
+        type: 'artifact_published',
+        entry: {
+          filename: 'artifacts/investors.csv',
+          sha256: '9b2f6cd3a4e18f70b5c243d9a0e6f1785c3b2a4d6e8f9012a3b4c5d6e7f80915',
+          roles: ['requested_output'],
+          capturedAt: '2026-08-11T10:15:40.000Z',
+        },
+        sizeBytes: 182,
+        toolExecId: 6,
+      },
+    },
+    { delayMs: 150, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'Created investors.csv (3 rows)' } },
 
     // Turn 5 — conclude.
     { delayMs: 300, action: { type: 'turn_start', turn: 5 } },
