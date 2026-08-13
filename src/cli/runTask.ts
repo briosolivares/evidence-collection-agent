@@ -16,6 +16,7 @@ import {
   makeInitializerCallModel,
   runInitializer,
   writeInitializerFiles,
+  type ContractAuthor,
 } from '../harness/initializer.js';
 import {
   makeVerifierModelDriver,
@@ -133,6 +134,12 @@ export interface HarnessConfig {
   /** Test seam for the verifier's read-only mini-loop, mirroring
    * `RunTaskConfig.callModel`. Production default: makeVerifierModelDriver. */
   verifierCallModel?: CallModel;
+  /** Which role states the run's output contract (T4). Defaults to
+   * 'initializer', preserved as the migration default until a
+   * user-authorized measured comparison chooses otherwise — the
+   * architecture does not depend on which is picked, since both feed the
+   * same store, code checks, and verifier. */
+  contractAuthor?: ContractAuthor;
 }
 
 /** Configuration for one complete evidence-collection run. */

@@ -201,12 +201,17 @@ export async function runVerifier(args: {
   taskText: string;
   runDir: string;
   callModel: CallModel;
+  /** The run's typed contract and its full revision history, when the run
+   * has one (T4). Omitted on the compatibility path, where the prose
+   * INTENT.md/CONTRACT.md pair is read from the run dir instead. */
+  contracts?: { current: unknown; history: readonly unknown[] };
 }): Promise<VerifierOutcome> {
   const { taskText, runDir, callModel } = args;
 
-  // A run dir missing its contract documents throws here — a harness bug
-  // that must fail loudly rather than invent an outcome from nothing.
-  const opening = buildVerificationInput(runDir, taskText);
+  // A run dir with neither a typed contract nor its prose documents throws
+  // here — a harness bug that must fail loudly rather than invent an
+  // outcome from nothing.
+  const opening = buildVerificationInput(runDir, taskText, args.contracts);
 
   const registry = createVerifierRegistry();
   const messages: Message[] = [

@@ -43,32 +43,64 @@ export function createVerifierRegistry(): ToolRegistry {
 }
 
 /**
- * Assemble the verifier's opening user message: the original task, both
- * contract-compatibility documents (INTENT.md/CONTRACT.md — T4 replaces
- * these with the typed OutputContract), the manifest's raw content, and the
- * artifacts/ listing — everything the evidence diet promises up front, so
- * tool calls can go straight to specific files instead of discovering what
- * exists.
+ * Assemble the verifier's opening user message: the original task, the
+ * contract, the manifest's raw content, and the artifacts/ listing —
+ * everything the evidence diet promises up front, so tool calls can go
+ * straight to specific files instead of discovering what exists.
  *
- * @throws if INTENT.md or CONTRACT.md is missing — a run reaching the
- *   verifier without both documents is a harness bug and must fail loudly
+ * The contract arrives in one of two forms. When the run has a typed
+ * `OutputContract` (T4), the latest revision AND the full revision history
+ * are supplied: the verifier needs the history to tell evidence-driven
+ * strengthening from drift that quietly weakened an original requirement,
+ * which is a judgment only it can make. Otherwise the compatibility path
+ * reads the prose INTENT.md/CONTRACT.md pair.
+ *
+ * The original task is always included, whichever form the contract takes —
+ * checking task ↔ contract is what stops a mis-stated contract from
+ * validating its own mistake.
+ *
+ * @param contracts - the run's contract history, when the run has one
+ * @throws if no typed contract is supplied and INTENT.md or CONTRACT.md is
+ *   missing — a run reaching the verifier with neither is a harness bug and
+ *   must fail loudly
  */
-export function buildVerificationInput(runDir: string, taskText: string): string {
-  const intent = readRequiredRunDirFile(runDir, INTENT_FILENAME);
-  const contract = readRequiredRunDirFile(runDir, CONTRACT_FILENAME);
+export function buildVerificationInput(
+  runDir: string,
+  taskText: string,
+  contracts?: { current: unknown; history: readonly unknown[] },
+): string {
   const manifestRaw = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
   const artifactListing = listArtifactFiles(runDir);
   const artifactsSection =
     artifactListing.length > 0 ? artifactListing.join('\n') : '(no files published)';
+
+  const contractSections =
+    contracts === undefined
+      ? [
+          `# Intent (${INTENT_FILENAME})`,
+          readRequiredRunDirFile(runDir, INTENT_FILENAME),
+          '',
+          `# Contract (${CONTRACT_FILENAME})`,
+          readRequiredRunDirFile(runDir, CONTRACT_FILENAME),
+        ]
+      : [
+          '# Output contract (current revision)',
+          JSON.stringify(contracts.current, null, 2),
+          '',
+          '# Contract revision history',
+          // Every revision in order, each with the basis its author gave.
+          // A later revision that weakened an original explicit requirement
+          // is visible here and nowhere else.
+          contracts.history.length <= 1
+            ? '(single revision — the contract was never changed)'
+            : JSON.stringify(contracts.history, null, 2),
+        ];
+
   return [
     '# Task',
     taskText,
     '',
-    `# Intent (${INTENT_FILENAME})`,
-    intent,
-    '',
-    `# Contract (${CONTRACT_FILENAME})`,
-    contract,
+    ...contractSections,
     '',
     `# Manifest (${MANIFEST_FILENAME})`,
     manifestRaw,

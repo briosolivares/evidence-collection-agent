@@ -317,6 +317,69 @@ describe('runVerifier fails closed', () => {
   });
 });
 
+describe('runVerifier typed-contract input', () => {
+  const CONTRACT = {
+    outputs: [{ id: 'roster', kind: 'table', filename: 'roster.csv', format: 'csv' }],
+  };
+
+  it('shows the current contract and flags a single-revision history', async () => {
+    const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
+    await runVerifier({
+      taskText: TASK,
+      runDir,
+      callModel: script.callModel,
+      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+    });
+
+    const opening = JSON.stringify(script.requests[0]);
+    expect(opening).toContain('# Output contract (current revision)');
+    expect(opening).toContain('roster.csv');
+    expect(opening).toContain('never changed');
+    // The original task is always present: task vs. contract is the check
+    // that stops a mis-stated contract validating its own mistake.
+    expect(opening).toContain(TASK);
+  });
+
+  it('shows the full revision history with its basis when the contract changed', async () => {
+    const history = [
+      { revision: 1, contract: CONTRACT },
+      {
+        revision: 2,
+        basis: { kind: 'evidence_discovery', summary: 'Exact roster size found.', evidenceIds: ['E1'] },
+        contract: CONTRACT,
+      },
+    ];
+    const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
+    await runVerifier({
+      taskText: TASK,
+      runDir,
+      callModel: script.callModel,
+      contracts: { current: CONTRACT, history },
+    });
+
+    const opening = JSON.stringify(script.requests[0]);
+    expect(opening).toContain('# Contract revision history');
+    // The basis is what lets the verifier tell strengthening from drift.
+    expect(opening).toContain('evidence_discovery');
+    expect(opening).toContain('Exact roster size found.');
+  });
+
+  it('needs no prose contract documents when a typed contract is supplied', async () => {
+    rmSync(join(runDir, CONTRACT_FILENAME));
+    rmSync(join(runDir, INTENT_FILENAME));
+    const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
+
+    await expect(
+      runVerifier({
+        taskText: TASK,
+        runDir,
+        callModel: script.callModel,
+        contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+      }),
+    ).resolves.toEqual({ status: 'verified', findings: [] });
+  });
+});
+
 describe('runVerifier evidence scope and screenshots', () => {
   it('refuses reads outside published evidence without executing them', async () => {
     writeFileSync(join(runDir, 'scratch', 'notes.md'), 'private worker notes');
