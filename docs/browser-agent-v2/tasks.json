@@ -641,7 +641,7 @@
     {
       "id": "T15",
       "title": "Add cache-safe compact memory",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T4",
         "T7",
@@ -649,7 +649,7 @@
       ],
       "owner": "claude (browser-agent-v2 impl session)",
       "startedAt": "2026-08-13T15:40:00-07:00",
-      "completedAt": null,
+      "completedAt": "2026-08-13T16:50:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t15--add-cache-safe-compact-memory",
       "features": [
@@ -682,14 +682,14 @@
       "completionCriteria": [
         "Unchanged state produces byte-identical history and cache markers.",
         "Old repeated failures remain visible after raw history compaction.",
-        "Compact memory graduates only if pass rate holds and wall time or cost improves."
+        "Compact memory graduates only if pass rate holds and wall time or cost improves \u2014 DEFERRED by user decision 2026-08-13; shipping non-compact, machinery built and dormant."
       ],
       "focusedTestCommand": "npx vitest run src/loop/agentContext.test.ts src/loop/contextView.test.ts src/loop/workerSession.test.ts src/model/callModel.test.ts"
     },
     {
       "id": "T16",
       "title": "Cut over to V2 and retire superseded paths",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T3",
         "T8",
@@ -697,8 +697,8 @@
         "T14",
         "T15"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T16:40:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t16--cut-over-to-v2-and-retire-superseded-paths",
@@ -706,7 +706,7 @@
         {
           "id": "T16.1",
           "description": "Freeze one deterministic V2 production tool order and static prompt snapshot.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T16.2",
@@ -716,12 +716,12 @@
         {
           "id": "T16.3",
           "description": "Propagate truthful RunOutcome through CLI, TUI, eval output, and reports while retaining legacy run readability.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T16.4",
           "description": "Prepare the four-way contract-author/verifier comparison and run it only with user approval.",
-          "status": "not_started"
+          "status": "deferred_by_user"
         },
         {
           "id": "T16.5",

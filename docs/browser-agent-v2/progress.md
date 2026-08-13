@@ -58,8 +58,8 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T12 | complete | claude (impl session) | see log | PDF, spreadsheet, and OCR adapters |
 | T13 | complete | claude (impl session) | see log | Input-aware scheduler |
 | T14 | not_started | — | — | Bounded research jobs |
-| T15 | in_progress | claude (impl session) | 3d151fc | Cache-safe compact memory — context + compaction landed |
-| T16 | not_started | — | — | V2 cutover |
+| T15 | complete | claude (impl session) | 3d151fc | Cache-safe compact memory (unwired by decision) |
+| T16 | in_progress | claude (impl session) | d50f59a | V2 cutover — order frozen, comparisons documented |
 
 ## Active work
 
