@@ -12,6 +12,37 @@ be the workflow engine, database, file formatter, and quality-control system.
 Ordinary TypeScript should track state, validate outputs, schedule safe work,
 and enforce the rules for completion.
 
+## Table of contents
+
+- [Executive summary](#executive-summary)
+- [Goals](#goals)
+- [Non-goals for the first iteration](#non-goals-for-the-first-iteration)
+- [The proposal at a glance](#the-proposal-at-a-glance)
+- [Terms used below](#terms-used-below)
+- [Architecture](#architecture)
+  1. [Define a small, validated output contract](#1-define-a-small-validated-output-contract)
+  2. [Derive output status instead of maintaining task state](#2-derive-output-status-instead-of-maintaining-task-state)
+  3. [Give the application an accurate view of the browser](#3-give-the-application-an-accurate-view-of-the-browser)
+  4. [Use `browser_action` for normal browser interaction](#4-use-browser_action-for-normal-browser-interaction)
+  5. [Make `execute_javascript` a normal page capability](#5-make-execute_javascript-a-normal-page-capability)
+  6. [Inspect the right kind of content for the job](#6-inspect-the-right-kind-of-content-for-the-job)
+  7. [Read public data directly when the webpage exposes it](#7-read-public-data-directly-when-the-webpage-exposes-it)
+  8. [Store rows as data, then generate the output file](#8-store-rows-as-data-then-generate-the-output-file)
+  9. [Link every important fact to its evidence](#9-link-every-important-fact-to-its-evidence)
+  10. [Require the agent to prove it is finished](#10-require-the-agent-to-prove-it-is-finished)
+  11. [Give the model a compact memory](#11-keep-the-audit-log-but-give-the-model-a-compact-memory)
+  12. [Run only clearly independent work in parallel](#12-run-only-clearly-independent-work-in-parallel)
+  13. [Bound every resource explicitly](#13-bound-every-resource-explicitly)
+  14. [Use one shared model driver everywhere](#14-use-one-shared-model-driver-everywhere)
+  15. [Give each model role a small, explicit tool set](#15-give-each-model-role-a-small-explicit-tool-set)
+- [Revised core loop](#revised-core-loop)
+- [Concrete example](#concrete-example)
+- [Useful implementation patterns from Claude Code](#useful-implementation-patterns-from-claude-code)
+- [Highest-leverage work to do first](#highest-leverage-work-to-do-first)
+- [Implementation sequence](#implementation-sequence)
+- [Success metrics](#success-metrics)
+- [Expected outcome](#expected-outcome)
+
 ## Executive summary
 
 The foundation is strong. Tools have strict input validation, browser sessions
@@ -160,6 +191,12 @@ Do not build a natural-language requirements parser. Do not ask a model to
 format `INTENT.md` and `CONTRACT.md` and then parse headings from that prose.
 The contract should arrive as a `set_output_contract` tool call, validated by
 the same Zod schema the rest of the application uses.
+
+> **Claude Code influence — schema-backed handoffs:** Claude Code's
+> `SyntheticOutputTool` turns a caller-provided JSON schema into a required
+> `StructuredOutput` tool, while `QueryEngine` caps retries for invalid output.
+> `set_output_contract` and `report_verification` adapt that pattern for
+> internal agent handoffs rather than final CLI output.
 
 The default path lets the worker define the contract in its first response. It
 may start browsing in that same response:
@@ -939,6 +976,11 @@ continue. Replace this with the explicit `submit_for_verification` tool. The
 name is deliberate: the worker requests verification; it does not decide that
 the run is complete.
 
+> **Claude Code influence — same-conversation correction:** Claude Code's
+> `handleStopHooks` can block a proposed stop and append the reason to the
+> current conversation. `submit_for_verification` uses the same control-loop
+> shape, but adds browser-evidence checks and a separate verifier model.
+
 Completion has two gates:
 
 1. `CompletionCheck` uses ordinary code for facts with objective answers.
@@ -1163,6 +1205,12 @@ tool conversation normally. Add a compact state snapshot only when its source
 data changes. When older conversation must be summarized, do it at an explicit
 boundary that can become a new cached prefix.
 
+> **Claude Code influence — cache-safe request construction:** Claude Code's
+> `createCacheSafeParams` preserves the original prompt inputs, and
+> `buildForkedMessages` uses byte-identical placeholder results across child
+> requests. This proposal borrows that byte-stability discipline without
+> copying the full parent conversation into every research job.
+
 A contract revision affects requests from that revision forward. It does not
 rewrite unrelated earlier turns.
 
@@ -1245,6 +1293,12 @@ An access key names shared state, such as `page:research-2`,
 writes something the other reads or writes. Invalid inputs and tools without an
 access declaration run alone.
 
+> **Claude Code influence — input-aware concurrency:** Claude Code's tool
+> interface exposes `isConcurrencySafe(input)`. Its `runTools` implementation
+> validates input before choosing parallel work and applies queued state changes
+> in request order. `getAccess` extends that boolean decision into explicit
+> page, file, manifest, and table reads and writes.
+
 This is more accurate than one static `readOnly` flag. For example,
 `execute_javascript` always writes its selected page because generated code may
 change the DOM. It can still run beside work on another page.
@@ -1280,6 +1334,12 @@ open-ended research conversations.
 Repeated entity research is the one place where bounded worker jobs are worth
 testing. Each job has its own browser session, cancellation signal, limits,
 transcript, and result file:
+
+> **Claude Code influence — isolated child work:** Claude Code's
+> `registerAsyncAgent` gives child agents linked cancellation and their own
+> transcript, while `runForkedAgent` creates an isolated tool context. A
+> `ResearchJob` adds browser-specific limits and a typed rows-and-evidence
+> result, and it forbids recursive workers and shared-output writes.
 
 ~~~ts
 interface ResearchJobResult {
@@ -1382,6 +1442,13 @@ type ModelAttempt =
       reason: 'refusal' | 'context_window_exhausted' | 'malformed_response';
     };
 ~~~
+
+> **Claude Code influence — retry cleanup:** Claude Code's query loop removes
+> partial assistant messages and pending tool results before a fallback, and it
+> can retry the same request with a larger output-token limit. This design
+> borrows that cleanup and retry discipline. It deliberately does **not** borrow
+> Claude Code's optional `StreamingToolExecutor`, because a browser action may
+> change an external page and cannot be rolled back safely.
 
 The TUI observes typed lifecycle events and cancels through `AbortSignal`; it
 does not copy the production model client. The driver returns `accepted` only
@@ -1656,23 +1723,24 @@ for 30.
 
 ## Useful implementation patterns from Claude Code
 
-The local Claude Code archive contains several mature control-loop patterns
-that fit this design:
+The inline notes above mark where this proposal borrows from the local Claude
+Code archive. These are the specific reference points:
 
-- **Correct in the same conversation.** A failed stop check becomes feedback
-  in the current conversation instead of restarting the worker.
-- **Use schemas for model handoffs.** Tool schemas validate structured
-  output without parsing headings or relying on exact prose.
-- **Accept a complete response before acting.** Failed stream attempts discard
-  their partial messages and tool calls.
-- **Decide concurrency from validated input.** A tool can determine whether one
-  specific call is safe to overlap, and state updates still commit in request
-  order.
-- **Keep child work outside the parent context.** Background workers have
-  separate cancellation, transcripts, usage, and output files. The parent
-  receives a small final result.
-- **Keep shared prompts exactly the same.** Worker jobs reuse the same rendered
-  prompt and tool bytes, then add only their narrow assignment at the end.
+- **Same-conversation correction:** `handleStopHooks` in
+  `src/query/stopHooks.ts`.
+- **Schema-backed handoffs:** `SyntheticOutputTool` in
+  `src/tools/SyntheticOutputTool/SyntheticOutputTool.ts` and retry enforcement
+  in `src/QueryEngine.ts`.
+- **Retry cleanup:** the fallback and maximum-output-token recovery paths in
+  `src/query.ts`.
+- **Input-aware concurrency:** `Tool.isConcurrencySafe(input)` in `src/Tool.ts`
+  and `runTools` in `src/services/tools/toolOrchestration.ts`.
+- **Isolated child lifecycle:** `registerAsyncAgent` in
+  `src/tasks/LocalAgentTask/LocalAgentTask.tsx` and `runForkedAgent` in
+  `src/utils/forkedAgent.ts`.
+- **Cache-safe child requests:** `createCacheSafeParams` in
+  `src/utils/forkedAgent.ts` and `buildForkedMessages` in
+  `src/tools/AgentTool/forkSubagent.ts`.
 
 We should borrow those patterns, not the surrounding product complexity. In
 particular, do not copy streaming tool execution, a general task dependency
