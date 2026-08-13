@@ -26,6 +26,11 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
         model: options.model,
         toolProfile: options.toolProfile,
         runsBaseDir: options.runsBaseDir,
+        // Eval batches always run the initializer→worker→judge harness
+        // (judge-design.md step 5): defaults apply (2 worker cycles,
+        // production initializer/judge models). Interactive surfaces
+        // (REPL/TUI) stay judge-less until validated.
+        harness: {},
         ...(startUrl === undefined ? {} : { startUrl }),
         ...(options.onProgress === undefined
           ? {}

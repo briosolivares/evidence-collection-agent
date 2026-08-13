@@ -49,6 +49,8 @@ describe('createBrowserBackedRunTask', () => {
       toolProfile: 'batch-enabled',
       runsBaseDir: '/runs',
       startUrl: 'https://example.com/',
+      // Eval batches always enable the judge harness with defaults.
+      harness: {},
     });
     expect(progress).toEqual([
       ['headed-task', 1, 2, { type: 'turn_start', turn: 1 }],
