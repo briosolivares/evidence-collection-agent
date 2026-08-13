@@ -650,9 +650,7 @@
       "owner": "claude (browser-agent-v2 impl session)",
       "startedAt": "2026-08-13T15:40:00-07:00",
       "completedAt": null,
-      "blockedBy": [
-        "T15.5 requires a user-authorized live A/B comparison; hermetic tests cannot establish it"
-      ],
+      "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t15--add-cache-safe-compact-memory",
       "features": [
         {
@@ -677,8 +675,8 @@
         },
         {
           "id": "T15.5",
-          "description": "Measure pass rate, cache use, cost, latency, context peak, and repeated-action rate against non-compact mode.",
-          "status": "blocked"
+          "description": "Measure pass rate, cache use, cost, latency, context peak, and repeated-action rate against non-compact mode. \u2014 DEFERRED by user decision 2026-08-13: ship non-compact as the default; run the comparison later on request.",
+          "status": "deferred_by_user"
         }
       ],
       "completionCriteria": [

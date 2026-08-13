@@ -343,22 +343,16 @@ factual error.
 
 ## Blockers
 
-- T15 / T15.5 — "Measure pass rate, cache use, cost, latency, context peak, and
-  repeated-action rate against non-compact mode" cannot be satisfied by
-  hermetic tests: it is a measured A/B comparison over live runs, and the plan
-  forbids live evaluation without explicit user direction.
-  - First observed: 2026-08-13T15:45:00-07:00
-  - Evidence: the plan's "Rules that apply to every task" — "Do not run a live
-    re-baseline ... without the user's direction" — and the test-cadence
-    section listing live evals as decision-point-only.
-  - Needed to unblock: the user authorizes a compact-vs-non-compact eval
-    batch. T15.1–T15.4 (the machinery it would measure) are implemented and
-    tested; graduating compact memory as a default is the decision that waits.
-  - Owner: user decision, then this session or its successor.
-- T16 / T16.4 and T16.6 — the four-way contract-author x verifier comparison,
-  and choosing the production contract-author default from its evidence, are
-  likewise live-eval work the plan reserves for explicit user approval. The
-  matrix can be prepared without approval; running it cannot.
+No blockers. The two live-eval items are DEFERRED BY USER DECISION
+(2026-08-13, see the decisions table), not blocked:
+
+- T15.5 — the compact-vs-non-compact comparison. Resolved by shipping
+  non-compact as the default. T15.1–T15.4 are implemented and tested; the
+  compaction machinery stays unwired until the user asks for the experiment.
+- T16.4 / T16.6 — the four-way contract-author x verifier matrix and the
+  production contract-author default. The matrix is prepared as a documented
+  procedure; `contractAuthor` stays `initializer` and `harness.outputContract`
+  stays opt-in until measured evidence says otherwise.
 
 For a blocker, record:
 
@@ -377,7 +371,7 @@ code-level choices belong in code review, not here.
 
 | Date | Task | Decision | Reason | Follow-up |
 | --- | --- | --- | --- | --- |
-| — | — | No implementation decisions yet | — | — |
+| 2026-08-13 | T15 / T16 | User deferred both live A/B comparisons. Ship with NON-COMPACT memory as the default and the prose-contract path intact; finish the plan so the stack can be tested end to end first. | Getting a testable whole is worth more right now than choosing between two configurations. Both experiments need live runs and tokens, and neither blocks the architecture — the machinery is built and dormant either way. | Run the compact-vs-non-compact batch, and the four-way contract-author x verifier matrix, when the user asks. Until then `contractAuthor` stays `initializer` and compaction stays unwired. |
 
 ## Verification history
 
