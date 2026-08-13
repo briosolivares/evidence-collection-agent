@@ -7,6 +7,8 @@
 **Scope:** Accuracy, generality, consistency, and speed for public-information
 evidence collection
 
+**Implementation plan:** [Browser Agent V2 — Step-by-Step Implementation Plan](./revised-browser-agent-implementation-plan.md)
+
 **Primary decision:** Let the model make judgment calls, but stop asking it to
 be the workflow engine, database, file formatter, and quality-control system.
 Ordinary TypeScript should track state, validate outputs, schedule safe work,
