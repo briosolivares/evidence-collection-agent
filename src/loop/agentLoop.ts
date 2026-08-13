@@ -58,6 +58,9 @@ export interface LoopDeps {
   /** Stored login credentials for fill_credentials; runs without any omit
    * it. Passed through to tool executors untouched. */
   credentials?: ToolCtx['credentials'];
+  /** Resolver for interactive tool calls; omitted in headless runs, where
+   * such tools fail closed. Passed through to the pipeline untouched. */
+  requestPermission?: ToolCtx['requestPermission'];
 }
 
 /**
@@ -229,6 +232,7 @@ export async function runAgentLoop(
     runDir: deps.runDir,
     browser: deps.browser,
     credentials: deps.credentials,
+    requestPermission: deps.requestPermission,
   };
 
   // Every ending funnels through here — returns via finish, crashes via

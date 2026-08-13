@@ -39,7 +39,12 @@ export interface TuiRuntime {
   startRun(
     task: string,
     onEvent: (event: UiEvent) => void,
-    opts?: { startUrl?: string },
+    opts?: {
+      startUrl?: string;
+      /** The App's question-dialog resolver; omitted (eval runs, demo)
+       * interactive tools fail closed. */
+      requestPermission?: RunSessionDeps['requestPermission'];
+    },
   ): RunHandle;
   /** Close the persistent browser; safe to call once at teardown. */
   shutdown(): Promise<void>;
@@ -115,6 +120,9 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
           onEvent,
           ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
           ...(opts?.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
+          ...(opts?.requestPermission === undefined
+            ? {}
+            : { requestPermission: opts.requestPermission }),
           ...deps.runConfig,
         });
         if (cancelled) inner.cancel();

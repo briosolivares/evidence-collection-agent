@@ -156,6 +156,14 @@ export type UiEvent =
       /** Manifest-recorded source URL, for evidence artifacts. */
       sourceUrl?: string;
     }
+  | {
+      /** An interactive tool is paused awaiting the user (announcement
+       * only — the resolution travels through the requestPermission
+       * promise, not the event stream). */
+      type: 'permission_request';
+      toolName: string;
+      input: unknown;
+    }
   | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
   | {
       type: 'run_finished';

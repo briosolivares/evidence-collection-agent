@@ -36,7 +36,11 @@ import {
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
 } from '../../tools/index.js';
-import { toApiToolDefs } from '../../tools/registry.js';
+import {
+  toApiToolDefs,
+  type PermissionDecision,
+  type PermissionRequest,
+} from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 
 // Mirrors the core's (module-private) per-call output-token default.
@@ -73,6 +77,9 @@ export interface RunSessionDeps {
   /** Tracing the TUI's adapter delegates to; defaults to the core's
    * createRunTracing() so Langfuse observability is preserved. */
   tracingDelegate?: RunTracing;
+  /** Resolves interactive tool calls (the App's question dialog). Omitted —
+   * evals, headless — interactive tools fail closed in the pipeline. */
+  requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
   /** Test seam: replaces the core runTask. */
   runTaskFn?: (taskText: string, config: RunTaskConfig) => Promise<RunTaskResult>;
   /** Test seam: produces one model response's raw event stream. The
@@ -183,6 +190,49 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
     return response;
   };
 
+  // The pause/ask/answer channel: announce the question on the event
+  // stream, then race the App's dialog against the run's abort signal —
+  // cancelling during a pause resolves deny, the tool errors, and the loop
+  // observes the abort at its next model call (run_cancelled as usual).
+  // The dialog promise never rejects into the pipeline: a dialog failure
+  // becomes a deny with the error as feedback.
+  const askUser = deps.requestPermission;
+  const requestPermission =
+    askUser === undefined
+      ? undefined
+      : (request: PermissionRequest): Promise<PermissionDecision> => {
+          emit({
+            type: 'permission_request',
+            toolName: request.toolName,
+            input: request.input,
+          });
+          return new Promise<PermissionDecision>((resolve) => {
+            const decide = (decision: PermissionDecision): void => {
+              signal.removeEventListener('abort', onAbort);
+              resolve(decision);
+            };
+            const onAbort = (): void =>
+              decide({
+                behavior: 'deny',
+                feedback: 'The run was cancelled while waiting for the user.',
+              });
+            if (signal.aborted) {
+              onAbort();
+              return;
+            }
+            signal.addEventListener('abort', onAbort);
+            askUser(request).then(decide, (error: unknown) =>
+              decide({
+                behavior: 'deny',
+                feedback:
+                  `The question dialog failed: ${
+                    error instanceof Error ? error.message : String(error)
+                  }. Continue without this information.`,
+              }),
+            );
+          });
+        };
+
   emit({ type: 'run_started', task, at: now() });
 
   // The tracing seam gives the TUI tool inputs/results and the runDir
@@ -206,6 +256,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           ? {}
           : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
+        ...(requestPermission === undefined ? {} : { requestPermission }),
       });
       if (result.status === 'completed') {
         emit({

@@ -32,7 +32,7 @@ import {
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
 } from '../tools/index.js';
-import { toApiToolDefs } from '../tools/registry.js';
+import { toApiToolDefs, type ToolCtx } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 // Default runs base when the caller passes none: the checkout's runs/
@@ -111,6 +111,10 @@ export interface RunTaskConfig {
    * reads the gitignored `.credentials.json` at the repo root, or the file
    * named by the CREDENTIALS_FILE environment variable. */
   credentials?: CredentialStore;
+  /** Optional resolver for interactive tool calls (the TUI wires its
+   * question dialog here). When omitted — evals, headless CLI — tools that
+   * require user interaction fail closed in the pipeline. */
+  requestPermission?: ToolCtx['requestPermission'];
 }
 
 /** The finished run directory together with the loop's terminal outcome. */
@@ -189,6 +193,7 @@ export async function runTask(
           runDir,
           browser: config.browser,
           credentials,
+          requestPermission: config.requestPermission,
         },
         {
           maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,

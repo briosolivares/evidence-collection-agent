@@ -405,6 +405,13 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return { ...withItem, live: { ...live, pendingTools: remaining } };
     }
 
+    case 'permission_request':
+      // The question dialog is App-local state (it holds a resolve
+      // function, which this pure store must not). The event settles any
+      // streaming prose so the transcript is stable while the run pauses.
+      if (state.live === undefined) return state;
+      return finalizeStreamingText(state);
+
     case 'turn_end': {
       const next = finalizeStreamingText(state);
       const live = next.live;

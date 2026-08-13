@@ -11,5 +11,5 @@
     "jsx": "react-jsx",
     "types": ["node"]
   },
-  "include": ["src", "demos", "evals", "tests"]
+  "include": ["src", "demos", "evals", "scripts", "tests"]
 }
