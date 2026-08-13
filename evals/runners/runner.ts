@@ -25,6 +25,8 @@ export interface EvalRunnerDeps {
   model: string;
   /** Deterministic tool surface every trial uses. */
   toolProfile: ToolProfile;
+  /** Completion protocol every trial ran; omitted means the prose path. */
+  protocol?: EvalProtocol;
   /** Optional batch cancellation signal. */
   signal?: AbortSignal;
   /** Lifecycle hooks carry full job identity so concurrent output stays attributable. */
@@ -36,6 +38,22 @@ export interface EvalRunnerDeps {
   ) => void | Promise<void>;
   /** Awaited inside the serialized grading queue for crash-safe persistence. */
   onTrialGraded?: (job: EvalTrialJob, grade: TrialGrade) => void | Promise<void>;
+}
+
+/**
+ * Which completion protocol a batch ran.
+ *
+ * Recorded on the report because the two are not comparable: `prose` scores
+ * an INTENT.md/CONTRACT.md run, `output-contract` scores a typed-contract run
+ * with code checks and `submit_for_verification`. A results file that does not
+ * name its protocol cannot be distinguished from one that ran the other, which
+ * is exactly the confusion the contract-author experiment cannot afford.
+ */
+export interface EvalProtocol {
+  /** 'prose' | 'output-contract' — the completion path under test. */
+  completion: 'prose' | 'output-contract';
+  /** Who authored the contract. Absent under 'prose', which has no author choice. */
+  contractAuthor?: 'initializer' | 'worker';
 }
 
 /** The full result of one eval invocation, over all tasks and trials. */
@@ -52,6 +70,9 @@ export interface EvalReport {
   model: string;
   /** Tool condition every trial used. */
   toolProfile: ToolProfile;
+  /** Completion protocol every trial ran. Absent on reports written before
+   * the protocol switch existed, which were all prose runs. */
+  protocol?: EvalProtocol;
   /** Number of interactive dialogs a human answered during the batch (TUI
    * headed-lane assists — see the TUI's evalSession). Present only when
    * nonzero: an assisted batch's scores are not comparable to unassisted
@@ -216,6 +237,7 @@ export async function runEvals(
       concurrency: deps.concurrency,
       model: deps.model,
       toolProfile: deps.toolProfile,
+      ...(deps.protocol === undefined ? {} : { protocol: deps.protocol }),
       tasks: taskReports,
     };
   } finally {

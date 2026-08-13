@@ -1,4 +1,5 @@
 import { DEFAULT_EVAL_CONCURRENCY, DEFAULT_K } from '../config.js';
+import type { ContractAuthor } from '../../src/harness/initializer.js';
 import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../src/tools/index.js';
 
 /** The eval CLI's parsed parameters: which tasks, how many trials. */
@@ -11,6 +12,18 @@ export interface EvalCliArgs {
   concurrency: number;
   /** Deterministic tool surface used by every trial. */
   toolProfile: ToolProfile;
+  /**
+   * True to run the typed-output-contract protocol (contract-first gate, typed
+   * rows, code checks, `submit_for_verification`); false for the prose
+   * INTENT.md/CONTRACT.md path that is still production's default.
+   *
+   * A flag rather than a config constant because the contract-author
+   * experiment compares both paths on the same task set, and a comparison you
+   * have to edit a source file to run is a comparison nobody runs twice.
+   */
+  outputContract: boolean;
+  /** Who states the contract. Only meaningful with outputContract. */
+  contractAuthor: ContractAuthor;
 }
 
 /**
@@ -28,6 +41,8 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
   let kRaw: string | undefined;
   let concurrencyRaw: string | undefined;
   let toolProfileRaw: string | undefined;
+  let outputContractRaw: string | undefined;
+  let contractAuthorRaw: string | undefined;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
@@ -46,10 +61,17 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     else if (flag === '--k') kRaw = takeValue();
     else if (flag === '--concurrency') concurrencyRaw = takeValue();
     else if (flag === '--tool-profile') toolProfileRaw = takeValue();
+    // A bare boolean: `--output-contract` on its own means true, and only the
+    // `=` form takes a value. Deliberately NOT `--output-contract true`, which
+    // would be indistinguishable from a stray positional and could silently
+    // swallow the next flag's value.
+    else if (flag === '--output-contract') outputContractRaw = inlineValue ?? 'true';
+    else if (flag === '--contract-author') contractAuthorRaw = takeValue();
     else throw new Error(
       `unknown argument ${JSON.stringify(arg)} ` +
         '(usage: --tasks <a,b,c> [--k <n>] [--concurrency <n>] ' +
-          '[--tool-profile atomic|batch-enabled])',
+          '[--tool-profile atomic|batch-enabled] [--output-contract] ' +
+          '[--contract-author initializer|worker])',
     );
   }
 
@@ -86,5 +108,29 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
       `--tool-profile must be "atomic" or "batch-enabled", got ${JSON.stringify(toolProfileRaw)}`,
     );
   }
-  return { tasks, k, concurrency, toolProfile };
+
+  let outputContract = false;
+  if (outputContractRaw !== undefined) {
+    if (outputContractRaw !== 'true' && outputContractRaw !== 'false') {
+      throw new Error(
+        `--output-contract must be "true" or "false", got ${JSON.stringify(outputContractRaw)}`,
+      );
+    }
+    outputContract = outputContractRaw === 'true';
+  }
+
+  const contractAuthor = contractAuthorRaw ?? 'initializer';
+  if (contractAuthor !== 'initializer' && contractAuthor !== 'worker') {
+    throw new Error(
+      `--contract-author must be "initializer" or "worker", got ` +
+        `${JSON.stringify(contractAuthorRaw)}`,
+    );
+  }
+  // Rejecting rather than ignoring: an author named for a protocol that is off
+  // is a batch that would silently measure the wrong cell of the experiment.
+  if (contractAuthorRaw !== undefined && !outputContract) {
+    throw new Error('--contract-author requires --output-contract (it is unread without it)');
+  }
+
+  return { tasks, k, concurrency, toolProfile, outputContract, contractAuthor };
 }

@@ -18,7 +18,7 @@ import { createEvalBrowserRuntime } from './browserRuntime.js';
 import { createBrowserBackedRunTask } from './cliRuntime.js';
 import { loadEvalTask } from './loadTask.js';
 import { formatReport, writeResults } from './report.js';
-import { runEvals } from './runner.js';
+import { runEvals, type EvalProtocol } from './runner.js';
 import { formatEvalProgress, trialLabel } from './progress.js';
 import type { EvalTask } from '../types.js';
 
@@ -41,6 +41,17 @@ async function main(): Promise<void> {
     `eval browsers: default=headless isolated (concurrency ${args.concurrency}); ` +
       'headed tasks=headed persistent logged-in (serial)',
   );
+  // Announced before the first trial, not just recorded in the results file:
+  // the protocol decides what the batch even measures, and a run whose path
+  // you have to reconstruct afterwards is a run you will misread.
+  console.log(
+    args.outputContract
+      ? `eval protocol: typed output contract, authored by the ${args.contractAuthor}`
+      : 'eval protocol: prose INTENT.md/CONTRACT.md (production default)',
+  );
+  const protocol: EvalProtocol = args.outputContract
+    ? { completion: 'output-contract', contractAuthor: args.contractAuthor }
+    : { completion: 'prose' };
   const browserRuntime = createEvalBrowserRuntime({
     authenticatedProfileDir: PROFILE_DIR,
     executablePath: chromeExecutablePath(),
@@ -51,6 +62,9 @@ async function main(): Promise<void> {
       model: MODEL,
       toolProfile: args.toolProfile,
       runsBaseDir: RUNS_DIR,
+      harness: args.outputContract
+        ? { outputContract: true, contractAuthor: args.contractAuthor }
+        : {},
       onProgress: (taskName, trialNumber, k, event) => {
         const text = formatEvalProgress(taskName, trialNumber, k, event);
         if (text !== undefined) process.stdout.write(text);
@@ -70,6 +84,7 @@ async function main(): Promise<void> {
       concurrency: args.concurrency,
       model: MODEL,
       toolProfile: args.toolProfile,
+      protocol,
       onTrialStarted: (job) => {
         const policy = job.headed ? 'headed persistent' : 'headless isolated';
         console.log(`${trialLabel(job.taskName, job.trialNumber, job.k)} started — ${policy}`);
