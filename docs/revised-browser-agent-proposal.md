@@ -30,13 +30,13 @@ The proposed design moves that bookkeeping into normal TypeScript components:
 
 ~~~text
 Task
-  → extract the concrete requirements
-  → derive what is done and what is missing
+  → worker defines a narrow output contract and starts work in the same turn
+  → derive output status from that contract and the files produced so far
   → use browser actions or page-scoped JavaScript
   → store tabular results in validated output tables linked to evidence
   → generate output files with regular code
-  → check every objective requirement
-  → use a model judge only for subjective questions
+  → run mechanical completion checks
+  → fresh-context verifier checks task, contract, outputs, and evidence
 ~~~
 
 The split is simple: the model handles work that requires judgment—understanding
@@ -91,9 +91,9 @@ credentials only to the exact site they belong to and limiting download sizes.
 ### Remove or defer
 
 - `browser_batch`.
-- Starting a fresh model session every time a judge asks for a correction.
+- Restarting the worker every time the verifier asks for a correction.
 - Free-form `INTENT.md` and `CONTRACT.md` planning files.
-- Calling an initializer and judge for every task, even when they add no value.
+- A separate initializer or contract-writer model call before the worker starts.
 - Raw model-authored CSV.
 - Full conversation replay as long-term memory.
 - Prompt instructions encoding implementation workarounds such as the
@@ -105,7 +105,7 @@ credentials only to the exact site they belong to and limiting download sizes.
 | --- | --- |
 | inspect → model → click → model → inspect | Each browser action also reports what changed |
 | Short-lived Playwright element references | Element references tied to a page, frame, and page version |
-| Checklist stored in a scratch file | Progress derived from requirements and validated outputs |
+| Checklist stored in a scratch file | Output status derived from the contract and current files |
 | Raw CSV strings | An `OutputTable` rendered by a normal CSV library |
 | Treating “no tool call” as completion | An explicit finish request checked by code |
 | Replaying the full conversation as memory | A short recent history plus compact structured state |
@@ -115,101 +115,113 @@ credentials only to the exact site they belong to and limiting download sizes.
 
 ## Architecture
 
-### 1. Turn the request into concrete requirements
+### 1. Define the output contract in the first worker response
 
-For a complex task, translate the user's request into a small, validated data
-structure before doing the work. This is not a second source of truth; it is a
-machine-checkable summary of requirements such as filenames, CSV columns, and
-the number of entities to collect. A simple task should skip this extra model
-call.
+Do not build a natural-language requirements parser and do not add a separate
+contract-writer model call. The worker already has to interpret the task. In its
+first response, it calls `set_output_contract` and may also issue its first
+browser calls:
+
+~~~text
+tool_use: set_output_contract(...)
+tool_use: browser_action(...)
+~~~
+
+The contract describes only what must exist at the end:
 
 ~~~ts
-type RequestedOutput =
+type OutputSpec =
   | {
       id: string;
-      kind: 'csv';
+      kind: 'table';
       filename: string;
-      columns: string[];
-      expectedRows?: { exact: number } | { minimum: number };
+      format: 'csv' | 'json' | 'markdown';
+      columns: OutputColumn[];
+      rules: TableRule[];
     }
   | {
       id: string;
-      kind: 'markdown';
+      kind: 'document';
       filename: string;
+      format: 'markdown' | 'text' | 'pdf';
       requiredSections?: string[];
     }
   | {
       id: string;
       kind: 'screenshots';
-      count?: number;
-      namingPattern?: string;
+      count: { exact: number } | { minimum: number };
+      filenamePattern?: string;
+      mustShow?: string[];
     }
   | {
       id: string;
       kind: 'download';
       filename?: string;
-      mediaTypes?: string[];
+      allowedMediaTypes?: string[];
     };
 
-interface TaskRequirements {
-  objective: string;
-  outputs: RequestedOutput[];
-  freshness?: string;
-  unresolvedQuestions: string[];
+interface OutputContract {
+  outputs: OutputSpec[];
+  contentExpectations?: string[];
+  assumptions?: string[];
 }
 ~~~
 
-The original request remains authoritative. This structure may clarify what the
-user explicitly asked for, but it must not invent new requirements. Important
-ambiguities stay in `unresolvedQuestions` until they can be resolved.
+`contentExpectations` holds semantic expectations such as “explain the most
+material control gaps and support them with evidence.” `assumptions` contains
+only choices that materially affect the result. Both are optional. The contract
+contains no research plan, browser steps, source list, goal hierarchy, or
+per-entity state.
 
-Regular parsing code should handle obvious requirements without calling a
-model:
+On the first turn, `set_output_contract` must be the first tool call. The runtime
+validates and stores it before executing later calls from the same response. If
+the contract is invalid, later calls do not run. This adds no extra model round
+trip.
 
-- explicitly named CSV columns;
-- requested filenames;
-- requested screenshot counts;
-- exact entity counts;
-- explicitly required formats.
+Structural validation rejects duplicate output IDs or paths, unsafe filenames,
+duplicate table columns, non-positive counts, and conflicting table rules. The
+accepted contract is written through `writeArtifact` under
+`scratch/output-contract/`. If the worker explicitly changes the contract, save
+a new numbered revision instead of silently overwriting the previous one. The
+final verifier sees the latest contract and the revision history, so the worker
+cannot hide a mistake by moving the goalposts.
 
-Use a model only when understanding the requirements actually requires
-language judgment. For example, “summarize the key control failures” requires
-interpretation; “write a CSV with columns Name and URL” does not.
+The original task remains authoritative. The contract is an execution target,
+not a replacement for the request, and the final verifier checks that the two
+agree.
 
-### 2. Derive progress instead of maintaining another state machine
+Do not add a dedicated contract-writer call unless evals show that first-turn
+contract defects are common enough to justify the added latency.
 
-The application still needs to tell the model what is complete and what remains,
-but it does not need `Goal`, `CollectionItem`, or `CoverageSet` objects to do so.
-Those objects duplicate information already present in the requirements,
-outputs, evidence, and validation results.
+### 2. Derive output status instead of maintaining task state
 
-Create `TaskProgress` as a computed view:
+The application needs a compact way to tell the worker what remains, but it
+does not need `TaskRequirements`, `TaskProgress`, `Goal`, `CollectionItem`, or
+`CoverageSet` objects.
+
+Build an output summary from the contract, current tables, published files, and
+validation failures:
 
 ~~~ts
-interface CheckFailure {
-  requirementId: string;
-  message: string;
-  relatedOutputIds?: string[];
+interface OutputSummary {
+  outputId: string;
+  state: 'missing' | 'in_progress' | 'valid' | 'invalid';
+  paths: string[];
+  failures: string[];
 }
 
-interface TaskProgress {
-  completedRequirementIds: string[];
-  remainingRequirementIds: string[];
-  failures: CheckFailure[];
-}
-
-function getTaskProgress(
-  requirements: TaskRequirements,
+function summarizeOutputs(
+  contract: OutputContract,
   outputs: PublishedOutput[],
   tables: OutputTable[],
   evidence: Evidence[],
-): TaskProgress;
+): OutputSummary[];
 ~~~
 
-For “collect the top 30 contributors,” completeness comes from the output
-table's rules: exactly 30 rows, unique profile URLs, required values, and—when a
-complete source list was discovered—an exact match against that list. There is
-no second per-contributor status record to keep synchronized.
+This summary is computed for model context; it is not another persisted state
+machine. For “collect the top 30 contributors,” the table's row-count,
+uniqueness, required-value, and optional exact-value rules determine what is
+missing.
 
 ### 3. Give the application an accurate view of the browser
 
@@ -539,9 +551,9 @@ also happen when the model reaches a token limit, refuses, or simply forgets to
 continue. Instead, the model must explicitly ask to finish and identify the
 deliverables and claims it believes are complete.
 
-The application then runs `CompletionCheck`: ordinary validation code that
-checks the finish request against the original requirements, published outputs,
-table rules, and evidence.
+The application first runs `CompletionCheck`: ordinary validation code that
+checks the finish request against the output contract, published outputs, table
+rules, and evidence.
 
 ~~~ts
 interface FinishRequest {
@@ -551,14 +563,14 @@ interface FinishRequest {
 }
 
 async function runCompletionCheck(
-  requirements: TaskRequirements,
+  contract: OutputContract,
   request: FinishRequest,
   outputs: PublishedOutput[],
   tables: OutputTable[],
   evidence: Evidence[],
 ): Promise<CompletionCheckResult> {
   const failures = [
-    ...validateRequestedOutputs(requirements, outputs, tables),
+    ...validateExpectedOutputs(contract, outputs, tables),
     ...validateTableRules(tables),
     ...validateEvidenceLinks(request, tables, evidence),
   ];
@@ -587,12 +599,45 @@ Checks with objective answers run first:
 A transport EOF without the provider's normal message-stop event is an error,
 not a successful finish.
 
-Call a model judge only when the remaining question requires judgment, such as
-whether a summary fairly represents its cited sources. Do not spend a model
-call checking columns, counts, filenames, duplicates, or parseability.
+After mechanical checks pass, run one verifier call with fresh context:
 
-Return judge feedback to the same working session so it keeps the task context.
-Start a fresh session only when the measured context size requires it.
+~~~ts
+interface VerificationResult {
+  status: 'accepted' | 'needs_correction';
+  contractProblems: string[];
+  outputProblems: string[];
+  evidenceProblems: string[];
+}
+
+interface VerificationInput {
+  originalTask: string;
+  contract: OutputContract;
+  contractHistory: OutputContract[];
+  outputs: PublishedOutput[];
+  tables: OutputTable[];
+  evidence: Evidence[];
+}
+~~~
+
+The verifier checks four relationships:
+
+~~~text
+Original task ↔ Output contract
+Output contract ↔ Produced outputs
+Original task ↔ Produced outputs
+Claims and rows ↔ Evidence
+~~~
+
+Checking the original task prevents an incorrect contract from validating its
+own mistake. The verifier receives the run outputs and evidence, not the
+worker's full conversation, so it forms an independent view. Code handles
+columns, counts, filenames, duplicates, and parseability before this call.
+
+If verification fails, return the specific contract, output, and evidence
+problems to the same worker. The worker corrects the run and requests
+verification again; it is not restarted from scratch. Verification-repair
+cycles must have their own small limit. If they remain unresolved, publish an
+incomplete run rather than accepting it.
 
 ### 11. Keep the audit log, but give the model a compact memory
 
@@ -604,8 +649,8 @@ decision.
 That compact view should contain:
 
 - the original task;
-- the structured requirements;
-- a summary of completed and missing work;
+- the output contract;
+- the derived output summary;
 - current page states;
 - recent actions and failures;
 - only the notes relevant to the current decision;
@@ -613,8 +658,8 @@ That compact view should contain:
 
 ~~~ts
 interface AgentContext {
-  requirements: TaskRequirements;
-  progress: TaskProgress;
+  contract?: OutputContract;
+  outputs: OutputSummary[];
   pages: BrowserPage[];
   recentEvents: RunEvent[];
   relevantNotes: string[];
@@ -663,35 +708,44 @@ updates its records, and accepts completion only after validation succeeds.
 
 ~~~ts
 async function runTask(task: string): Promise<VerifiedRun> {
-  // Avoid a planning call when straightforward parsing is enough.
-  const requirements = await extractRequirementsWhenNeeded(task);
   const session = await browser.createSession();
+  let contract: OutputContract | undefined;
 
   while (!budget.expired()) {
-    const progress = getTaskProgress(
-      requirements,
-      publishedOutputs.all(),
-      outputTables.all(),
-      evidenceStore.all(),
-    );
+    const outputs = contract
+      ? summarizeOutputs(
+          contract,
+          publishedOutputs.all(),
+          outputTables.all(),
+          evidenceStore.all(),
+        )
+      : [];
 
     const context = buildAgentContext({
       task,
-      requirements,
-      progress,
+      contract,
+      outputs,
       browser: session.state(),
     });
 
     // The model proposes tool calls; tools own all application-state changes.
     const nextStep = await worker.next(context);
 
-    const results = await scheduler.execute(nextStep.toolCalls);
+    const results = await scheduler.execute(nextStep.toolCalls, {
+      requireOutputContract: contract === undefined,
+    });
     runEvents.record(results);
+    contract = outputContracts.current();
 
     if (nextStep.finishRequest !== undefined) {
-      // Objective requirements must pass before the run can finish.
+      if (contract === undefined) {
+        worker.addFeedback(['Set a valid output contract before finishing.']);
+        continue;
+      }
+
+      // Mechanical contract checks must pass before semantic verification.
       const verdict = await runCompletionCheck(
-        requirements,
+        contract,
         nextStep.finishRequest,
         publishedOutputs.all(),
         outputTables.all(),
@@ -699,7 +753,25 @@ async function runTask(task: string): Promise<VerifiedRun> {
       );
 
       if (verdict.status === 'verified') {
-        return publishRun({ tables: outputTables.all() });
+        const verification = await verifier.verify({
+          originalTask: task,
+          contract,
+          contractHistory: outputContracts.all(),
+          outputs: publishedOutputs.all(),
+          tables: outputTables.all(),
+          evidence: evidenceStore.all(),
+        });
+
+        if (verification.status === 'accepted') {
+          return publishRun({ tables: outputTables.all() });
+        }
+
+        worker.addFeedback([
+          ...verification.contractProblems,
+          ...verification.outputProblems,
+          ...verification.evidenceProblems,
+        ]);
+        continue;
       }
 
       worker.addFeedback(verdict.failures);
@@ -723,20 +795,22 @@ Suppose the request is: “Find the top 30 contributors to this repository. Save
 
 V2 would handle it as follows:
 
-1. Regular parsing code records the filename, exact columns, row count, and
-   screenshot requirement.
+1. In its first response, the worker calls `set_output_contract` with one table
+   output and one screenshot output. It may navigate in the same response.
 2. The model opens the repository and finds the contributor list. It can use
    `execute_javascript` to extract the visible list or `read_resource` if the
    page exposes the same data as public JSON.
-3. The application creates an `OutputTable` with a 30-row rule, exact columns,
+3. The contract creates an `OutputTable` with a 30-row rule, exact columns,
    unique profile URLs, and an exact-value rule if a complete contributor list
-   is available.
+   becomes available.
 4. Each table row stores the evidence that supports its values. A CSV
    library—not the model—writes the final file.
 5. The screenshot tool saves the leaderboard as both requested output and
    evidence.
 6. `CompletionCheck` verifies exactly 30 unique rows, exactly three
    columns, valid profile URLs, the required screenshot, and evidence links.
+7. The verifier independently compares the original task, output contract,
+   finished CSV, screenshot, and evidence before accepting the run.
 
 If only 29 contributors were collected, the application would return one clear
 failure—“expected 30 rows; found 29.” If an authoritative list is available, it
@@ -765,11 +839,13 @@ less latency and cost without relying on a faster model.
 
 ### Phase 2 — eliminate output failures
 
+- Add the validated `set_output_contract` tool and store numbered contract
+  revisions under `scratch/output-contract/` through `writeArtifact`.
 - Add `OutputTable`, batch row insertion, and `TableRule` validation.
 - Add strict CSV rendering.
 - Derive output paths and whether files are deliverables or supporting evidence
-  from the task requirements.
-- Add code-based completion validation.
+  from the output contract.
+- Add derived `OutputSummary` and code-based `CompletionCheck`.
 
 Primary metric: malformed structured-output rate, targeting zero.
 
@@ -787,8 +863,8 @@ visual pages, PDFs, spreadsheets, and image-only documents.
 
 ### Phase 4 — compact memory and parallel work
 
-- Add derived `TaskProgress` to `AgentContext`; do not introduce a separate
-  goal, collection-item, or coverage state machine.
+- Add the current contract and derived `OutputSummary` to `AgentContext`; do not
+  introduce a separate goal, collection-item, or coverage state machine.
 - Record each new event once instead of storing repeated copies of prior model
   requests.
 - Run a limited number of independent page and public-data jobs concurrently.
@@ -799,10 +875,11 @@ visual pages, PDFs, spreadsheets, and image-only documents.
 Primary metrics: median and slow-case model turns, latency, page data sent to
 the model, and repeated inspections that revealed nothing new.
 
-### Phase 5 — verify meaning and add reusable site knowledge
+### Phase 5 — add independent verification and reusable site knowledge
 
-- Add a narrowly scoped judge that can review both text and images when code
-  cannot answer the quality question.
+- Add the fresh-context verifier. It checks task-to-contract,
+  contract-to-output, task-to-output, and claim-to-evidence alignment after
+  mechanical checks pass.
 - Add data-only, site-specific interaction recipes. Each recipe should name the
   site it applies to, define how success is checked, and expire so stale site
   behavior is not trusted forever.
@@ -823,6 +900,8 @@ The architecture should be evaluated against:
 - largest model input during a run;
 - total output and cached-input tokens;
 - output validation failures;
+- contract defects found by the verifier;
+- verifier correction rate and added latency;
 - required table values found versus missing;
 - unsupported-interaction failures;
 - evidence coverage per claim or row.
