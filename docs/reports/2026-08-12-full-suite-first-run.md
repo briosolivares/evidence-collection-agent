@@ -70,24 +70,40 @@ worse: batch 1 shows all three retrying truncated streams within the same minute
 This is the single biggest blocker: the suite's longest task cannot currently
 produce a grade at all, and each attempt costs ~$4.70 before dying.
 
-Candidate remedies, in the order I'd try them:
+**Diagnosed 2026-08-12 evening** (instrumented `TruncatedStreamError`, commits
+`72f99f4`/`4b73864`; one instrumented trial + a minimal-context replay probe):
 
-- **Diagnose before building**: have `TruncatedStreamError` carry stream age, last
-event type, and output tokens received at death, then run one instrumented
-mit_sororities trial. "Dies mid-generation" and "dies right after message_start"
-point at different fixes; today we can't tell them apart.
-- **Shrink the exposure window (the structural fix)**: the failure needs huge
-context × long output stream in one request, and the current toolset forces the
-agent to stream an entire deliverable in a single `write_file` response — there is
-no append, and read-then-rewrite assembly re-streams everything anyway. An append
-mode on `write_file` (manifest hash on final content) caps how much any one model
-response streams, regardless of what the API is doing.
-- **Retry/backoff tuning is insurance, not a fix**: the current policy spreads 4
-attempts across ~8 seconds, so a 30–120s degradation episode eats all four
-(batch 1 showed the three trials retrying inside the same minute). Longer backoff
-decorrelates attempts from short episodes — worth having — but if this request
-profile is being deterministically shed, no retry count helps; that's what the
-diagnostics decide.
+- Every truncation ends with a **real `message_stop` event** at a stream age of
+**55–60 seconds** — the server ends the message deliberately; this is not a
+dropped connection.
+- The stream is essentially **stalled, not slow**: ~17–21 events and only
+~150–800 chars arrive over that minute, always halting at the same position —
+the first ~46 chars of the `write_file` input JSON, i.e. the instant the file
+*content* value begins generating.
+- **Content is exonerated**: replaying the identical 13.6k-char payload in a
+~4k-token request completed 3/3 at normal token rates (`stop_reason tool_use`).
+- **Context depth is the variable**: the stall only ever occurs at 170k–230k
+tokens. The deepest surviving task (contributors, ~130k) never hit it.
+
+Diagnosis: at deep context, generation of a long tool-input value stalls at its
+start, and a ~60s server-side watchdog then ends the message cleanly with the
+block unterminated. Retries are probabilistic — one instrumented turn recovered
+on attempt 4, the next turn exhausted all 4 and killed the trial.
+
+Remedies, reordered by what the diagnosis supports:
+
+- **Context reduction for long tasks** (the real fix): the correlate is context
+depth, and mit_sororities is the only task operating in the stall regime.
+Cheaper repeat-page representation was already the remedy of record for context
+growth; this gives it a hard motivation.
+- **Patient retries are now rational insurance**: each attempt costs ~60s and
+~$0.10 (cached input), success is genuinely probabilistic per attempt, so
+raising the attempt ceiling for this error class buys real survival probability.
+- **Report upstream**: the signature (deep-context request, tool-input stream
+stalls at value start, clean `message_stop` at ~60s) is reproducible and looks
+like a service-side defect worth filing with Anthropic.
+- **Append-mode `write_file` is demoted**: the stall happens at the *start* of
+the content value, so chunking the write does not clearly dodge it.
 
 
 
