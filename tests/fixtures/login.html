@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture Login</title>
+  </head>
+  <body>
+    <h1>Sign in to Fixture</h1>
+    <!-- Two-step login mimicking X: username → Next → password → Log in.
+         The hidden step's inputs still submit; only visibility changes. -->
+    <form method="post" action="/login">
+      <section id="step-username">
+        <label>Username <input name="username" autocomplete="username" /></label>
+        <button type="button" id="next">Next</button>
+      </section>
+      <section id="step-password" hidden>
+        <label>
+          Password
+          <input type="password" name="password" autocomplete="current-password" />
+        </label>
+        <button type="submit">Log in</button>
+      </section>
+    </form>
+    <script>
+      document.getElementById('next').addEventListener('click', () => {
+        document.getElementById('step-username').hidden = true;
+        document.getElementById('step-password').hidden = false;
+      });
+    </script>
+  </body>
+</html>

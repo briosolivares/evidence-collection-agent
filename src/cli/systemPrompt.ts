@@ -18,4 +18,6 @@ Collect enough evidence to support the deliverables and preserve useful source i
 
 Recover from errors instead of silently guessing. Read tool errors, correct invalid inputs, re-inspect when refs are stale, and try another supported route when appropriate. Do not claim success when required evidence or deliverables are missing.
 
+Authentication. If a login wall blocks the task, try logging in: inspect the page, then use fill_credentials to fill the form — it knows which sites have stored credentials and will tell you if none exist. Never type usernames or passwords with the type tool. If login fails, or requires something you cannot do (a code, a CAPTCHA, "sign in with…"), or if something important is ambiguous, ask the user — ask_user_question pauses the task so they can act in the browser window and tell you when they are done; afterwards, reinspect the page before continuing.
+
 Finish only after all requested artifacts have been written and verified. There is no finish tool: signal completion by responding without any tool call. In that final response, briefly name the files you produced.`;

@@ -9,6 +9,11 @@ import {
   type EvalTaskChoice,
 } from '../bridge/evalSession.js';
 import type { RunHandle } from '../bridge/runSession.js';
+import type {
+  PermissionDecision,
+  PermissionRequest,
+} from '../../tools/registry.js';
+import type { AskUserAnswers } from '../../tools/index.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
 import { scanRuns, type RunListEntry } from '../runScanner.js';
@@ -23,6 +28,7 @@ import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
+import { QuestionDialog } from './QuestionDialog.js';
 import { EvalsLiveRegion } from './EvalsLiveRegion.js';
 import { LiveRegion } from './LiveRegion.js';
 import { RunsList } from './RunsList.js';
@@ -43,7 +49,12 @@ interface AppProps {
   runner?: (
     task: string,
     onEvent: (event: UiEvent) => void,
-    opts?: { startUrl?: string },
+    opts?: {
+      startUrl?: string;
+      requestPermission?: (
+        request: PermissionRequest,
+      ) => Promise<PermissionDecision>;
+    },
   ) => RunHandle;
   /** Eval-specific runner: isolated headless normally, persistent headed for auth. */
   evalRunner?: EvalRunner;
@@ -75,7 +86,50 @@ export function App({
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
   const [evalTasks, setEvalTasks] = useState<readonly EvalTaskChoice[]>([]);
+  // A paused interactive tool call: the question plus its resolver (the
+  // ToolUseConfirm shape). Deliberately App-local, not reducer state — a
+  // resolve function has no place in the pure store.
+  const [question, setQuestion] = useState<
+    | {
+        request: PermissionRequest;
+        resolve: (decision: PermissionDecision) => void;
+      }
+    | undefined
+  >(undefined);
   const batchRunner = evalRunner ?? runner;
+
+  const settleQuestion = (decision: PermissionDecision) => {
+    setQuestion((current) => {
+      // Resolving twice is harmless (first resolution wins), so racing a
+      // dialog submit against run teardown needs no coordination.
+      current?.resolve(decision);
+      return undefined;
+    });
+  };
+
+  const requestPermission = (
+    request: PermissionRequest,
+  ): Promise<PermissionDecision> =>
+    new Promise((resolve) => {
+      setQuestion({ request, resolve });
+    });
+
+  // The dialog answers through the same event dispatcher the run streams
+  // through; terminal events also close a dialog the bridge has already
+  // denied via its abort race (or that a failed run abandoned).
+  const onRunEvent = (event: UiEvent) => {
+    if (
+      event.type === 'run_finished' ||
+      event.type === 'run_cancelled' ||
+      event.type === 'run_failed'
+    ) {
+      settleQuestion({
+        behavior: 'deny',
+        feedback: 'The run ended before the user answered.',
+      });
+    }
+    dispatch(event);
+  };
 
   useEffect(() => {
     if (!demo) return;
@@ -84,9 +138,12 @@ export function App({
 
   // Esc cancels an in-flight run (R9). During an eval batch it cancels
   // the current trial and skips the rest; the overlays handle their own
-  // Esc. A no-op while idle.
+  // Esc. A no-op while idle. While a question dialog is open the dialog
+  // owns Esc (dismiss = deny; the run continues) — cancelling still works
+  // because the next Esc, dialog closed, lands here.
   useInput((_input, key) => {
     if (!key.escape) return;
+    if (question !== undefined) return;
     if (state.mode === 'running') {
       dispatch({ type: 'cancel_requested' });
       if (evalHandle.current !== undefined) evalHandle.current.cancel();
@@ -104,7 +161,9 @@ export function App({
       case 'task':
         dispatch({ type: 'submit_task', text: routed.text });
         if (runner !== undefined) {
-          runHandle.current = runner(routed.text, dispatch);
+          runHandle.current = runner(routed.text, onRunEvent, {
+            requestPermission,
+          });
           void runHandle.current.done.finally(() => {
             runHandle.current = undefined;
           });
@@ -152,11 +211,13 @@ export function App({
 
   const running = state.mode === 'running' || state.mode === 'cancelling';
   const composerHint =
-    state.mode === 'runsList' || state.mode === 'evalsMenu'
-      ? '(menu open — esc to close)'
-      : state.mode === 'evalsRunning'
-        ? '(evals running — esc to stop)'
-        : '(waiting for agent…)';
+    question !== undefined
+      ? '(answer the question above)'
+      : state.mode === 'runsList' || state.mode === 'evalsMenu'
+        ? '(menu open — esc to close)'
+        : state.mode === 'evalsRunning'
+          ? '(evals running — esc to stop)'
+          : '(waiting for agent…)';
 
   return (
     <Box flexDirection="column">
@@ -182,6 +243,29 @@ export function App({
           tasks={evalTasks}
           onClose={() => dispatch({ type: 'close_overlay' })}
           onConfirm={startEvals}
+        />
+      )}
+      {question !== undefined && (
+        <QuestionDialog
+          toolName={question.request.toolName}
+          input={question.request.input}
+          onSubmit={(answers: AskUserAnswers) =>
+            settleQuestion({
+              behavior: 'allow',
+              updatedInput: {
+                ...(question.request.input as object),
+                answers,
+              },
+            })
+          }
+          onDismiss={() =>
+            settleQuestion({
+              behavior: 'deny',
+              feedback:
+                'The user dismissed the question. Continue without this ' +
+                'information or finish the task.',
+            })
+          }
         />
       )}
       <Box flexDirection="column" marginTop={1}>

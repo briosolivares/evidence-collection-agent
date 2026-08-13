@@ -1,6 +1,24 @@
 import { z } from 'zod';
 
+import type { CredentialStore } from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
+
+/** A tool call awaiting the user's decision. */
+export interface PermissionRequest {
+  toolName: string;
+  /** The validated tool input (safe: validated before the gate). */
+  input: unknown;
+}
+
+/**
+ * The user's answer to a permission request. `updatedInput` is trusted and
+ * NOT re-validated: it comes from our own UI code, never the model, and the
+ * allow path deliberately merges answer fields the model-facing schema must
+ * not declare (the Claude Code pattern this seam follows).
+ */
+export type PermissionDecision =
+  | { behavior: 'allow'; updatedInput: unknown }
+  | { behavior: 'deny'; feedback: string };
 
 /**
  * Context handed to every tool executor: the per-run resources a tool may
@@ -14,6 +32,14 @@ export interface ToolCtx {
   /** Browser session for tools that observe or act on a page. File-only
    * tool registries may omit it. */
   browser?: BrowserController;
+  /** Stored login credentials for fill_credentials. Environments without
+   * any omit it; fills then degrade to the no-credentials error and the
+   * model falls back to human handoff. */
+  credentials?: CredentialStore;
+  /** Interactive environments resolve tool permission requests here (the
+   * TUI dialog). Headless environments omit it; tools that require user
+   * interaction then fail closed. */
+  requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
 }
 
 /**
@@ -38,6 +64,11 @@ export interface ToolDef<Input = unknown> {
    * pipeline offloads it to a file and hands the model a preview + path
    * (T5). Omitted means DEFAULT_MAX_RESULT_BYTES. */
   maxBytes?: number;
+  /** True iff this tool must not run without an interactive user decision.
+   * The pipeline gates such calls through `ToolCtx.requestPermission`; when
+   * the environment provides none, calls fail closed with a
+   * permission_denied error. */
+  requiresUserInteraction?: boolean;
   /**
    * Do the tool's work.
    *

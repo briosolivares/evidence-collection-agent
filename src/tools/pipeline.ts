@@ -13,8 +13,14 @@ export interface ToolCall {
   input: unknown;
 }
 
-/** Which pipeline stage rejected a call. */
-export type ToolErrorKind = 'unknown_tool' | 'invalid_input' | 'execution_error';
+/** Which pipeline stage rejected a call. `permission_denied` separates
+ * "the human said no / nobody was there to ask" from execution failures in
+ * transcripts and metrics. */
+export type ToolErrorKind =
+  | 'unknown_tool'
+  | 'invalid_input'
+  | 'permission_denied'
+  | 'execution_error';
 
 /**
  * The outcome of one tool call, always model-readable: `content` is the
@@ -27,7 +33,8 @@ export type ToolCallResult =
 
 /**
  * Execute one tool call through the standard pipeline:
- * exists-check → zod validation → execute → normalize → cap → return.
+ * exists-check → zod validation → permission gate → execute → normalize →
+ * cap → return.
  *
  * @param registry - the tools available to this run
  * @param call     - the model-requested invocation; its `input` is untrusted
@@ -77,7 +84,40 @@ export async function executeToolCall(
     };
   }
 
-  // Stages 3–5: execute, normalize the output to model-readable text, then
+  // Stage 3: the permission gate. A tool that requires user interaction
+  // runs only after an interactive user allows it; the decision's
+  // updatedInput (trusted, from our own UI — see PermissionDecision) then
+  // replaces the validated input, which is how dialog answers reach the
+  // executor. No interactive environment means fail closed: the model gets
+  // a structured error and routes around it, so headless runs never hang.
+  let input = parsed.data;
+  if (tool.requiresUserInteraction === true) {
+    if (ctx.requestPermission === undefined) {
+      return {
+        toolCallId: call.id,
+        isError: true,
+        errorKind: 'permission_denied',
+        content:
+          `Tool "${call.name}" requires user interaction, which this ` +
+          `environment does not support. Proceed without it.`,
+      };
+    }
+    const decision = await ctx.requestPermission({
+      toolName: call.name,
+      input,
+    });
+    if (decision.behavior === 'deny') {
+      return {
+        toolCallId: call.id,
+        isError: true,
+        errorKind: 'permission_denied',
+        content: decision.feedback,
+      };
+    }
+    input = decision.updatedInput;
+  }
+
+  // Stages 4–6: execute, normalize the output to model-readable text, then
   // cap its size — oversize output is offloaded to a file in the run
   // directory and `content` becomes a preview + path replacement, so no
   // single result can flood the context window. All three sit inside the
@@ -85,7 +125,7 @@ export async function executeToolCall(
   // execution error rather than crashing the pipeline.
   let content: string;
   try {
-    const normalized = normalizeOutput(await tool.execute(parsed.data, ctx));
+    const normalized = normalizeOutput(await tool.execute(input, ctx));
     const capped = capResult(
       ctx.runDir,
       tool.name,
@@ -105,7 +145,7 @@ export async function executeToolCall(
     };
   }
 
-  // Stage 6: return.
+  // Stage 7: return.
   return { toolCallId: call.id, isError: false, content };
 }
 

@@ -354,3 +354,112 @@ describe('startRun (RunSession bridge)', () => {
     expect(factory.calls[0]?.signal.aborted).toBe(false);
   });
 });
+
+describe('startRun permission channel', () => {
+  const askInput = {
+    question: 'Did you finish logging in?',
+    options: [{ label: 'Yes' }],
+  };
+
+  function askResponse() {
+    return scriptedResponse(
+      [{ type: 'tool_use', id: 'tu_ask', name: 'ask_user_question', input: askInput }],
+      { input: 900, output: 40 },
+      'tool_use',
+    );
+  }
+
+  it('announces the pause, then resumes the run with the dialog answers', async () => {
+    const { events, onEvent } = collect();
+    const factory = scriptedStreamFactory([
+      askResponse(),
+      scriptedResponse([{ type: 'text', text: 'Resuming.' }], { input: 1000, output: 20 }),
+    ]);
+    const seen: unknown[] = [];
+
+    const handle = startRun('needs a human', {
+      browser: stubBrowser(),
+      onEvent,
+      runsBaseDir,
+      createStream: factory.createStream,
+      requestPermission: async (request) => {
+        seen.push(request);
+        return {
+          behavior: 'allow',
+          updatedInput: {
+            ...(request.input as object),
+            answers: { chosen: [], freeText: 'yes, all done' },
+          },
+        };
+      },
+    });
+    const outcome = await handle.done;
+
+    expect(outcome.status).toBe('completed');
+    expect(seen).toEqual([{ toolName: 'ask_user_question', input: askInput }]);
+    expect(
+      events.find((event) => event.type === 'permission_request'),
+    ).toMatchObject({ toolName: 'ask_user_question', input: askInput });
+    // The tool executed with the merged answers and echoed them as prose —
+    // the round-trip reached the model as an ordinary tool result.
+    expect(events.find((event) => event.type === 'tool_exec_end')).toMatchObject({
+      ok: true,
+      result: 'User answered: "yes, all done"',
+    });
+  });
+
+  it('cancel during a pause denies the question and ends run_cancelled', async () => {
+    const { events, onEvent } = collect();
+    const factory = scriptedStreamFactory([askResponse()]);
+    let reachPause!: () => void;
+    const paused = new Promise<void>((resolve) => {
+      reachPause = resolve;
+    });
+
+    const handle = startRun('pause then cancel', {
+      browser: stubBrowser(),
+      onEvent,
+      runsBaseDir,
+      createStream: factory.createStream,
+      // The dialog never answers — only the abort race can settle it.
+      requestPermission: () => {
+        reachPause();
+        return new Promise(() => {});
+      },
+    });
+    await paused;
+    handle.cancel();
+    const outcome = await handle.done;
+
+    expect(outcome).toEqual({ status: 'cancelled' });
+    expect(events.at(-1)?.type).toBe('run_cancelled');
+  });
+
+  it('fails closed without a dialog: no pause, and the model routes around it', async () => {
+    const { events, onEvent } = collect();
+    const factory = scriptedStreamFactory([
+      askResponse(),
+      scriptedResponse([{ type: 'text', text: 'Proceeding without the user.' }], {
+        input: 1000,
+        output: 20,
+      }),
+    ]);
+
+    const handle = startRun('headless ask', {
+      browser: stubBrowser(),
+      onEvent,
+      runsBaseDir,
+      createStream: factory.createStream,
+    });
+    const outcome = await handle.done;
+
+    expect(outcome.status).toBe('completed');
+    expect(events.some((event) => event.type === 'permission_request')).toBe(false);
+    // Execute never ran (no exec events); the model saw the structured
+    // fail-closed error in its next request instead.
+    expect(events.some((event) => event.type === 'tool_exec_start')).toBe(false);
+    expect(JSON.stringify(factory.calls[1]?.params)).toContain(
+      'does not support',
+    );
+  });
+});

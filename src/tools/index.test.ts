@@ -33,6 +33,8 @@ describe('production tool schemas', () => {
       'scroll',
       'screenshot',
       'download',
+      'fill_credentials',
+      'ask_user_question',
     ]);
 
     const batchEnabled = createProductionRegistry('batch-enabled');

@@ -189,3 +189,138 @@ describe('executeToolCall result capping (stage 5)', () => {
     });
   });
 });
+
+describe('executeToolCall permission gate', () => {
+  function makeInteractiveTool(executed: unknown[]): ToolDef<{ question: string }> {
+    return {
+      name: 'interactive',
+      description: 'Requires a user decision before running.',
+      inputSchema: z.object({ question: z.string() }),
+      readOnly: false,
+      requiresUserInteraction: true,
+      execute: async (input) => {
+        executed.push(input);
+        return `ran with: ${JSON.stringify(input)}`;
+      },
+    };
+  }
+
+  it('fails closed when the environment provides no requestPermission', async () => {
+    const executed: unknown[] = [];
+    const gateRegistry = createRegistry([makeInteractiveTool(executed)]);
+
+    const result = await executeToolCall(
+      gateRegistry,
+      { id: 'gate-1', name: 'interactive', input: { question: 'proceed?' } },
+      ctx,
+    );
+
+    expect(result).toMatchObject({
+      toolCallId: 'gate-1',
+      isError: true,
+      errorKind: 'permission_denied',
+    });
+    expect(result.content).toContain('does not support');
+    expect(result.content).toContain('Proceed without it');
+    expect(executed).toEqual([]);
+  });
+
+  it('returns deny feedback as the error content without executing', async () => {
+    const executed: unknown[] = [];
+    const gateRegistry = createRegistry([makeInteractiveTool(executed)]);
+
+    const result = await executeToolCall(
+      gateRegistry,
+      { id: 'gate-2', name: 'interactive', input: { question: 'proceed?' } },
+      {
+        ...ctx,
+        requestPermission: async () => ({
+          behavior: 'deny',
+          feedback: 'The user dismissed the question.',
+        }),
+      },
+    );
+
+    expect(result).toMatchObject({
+      toolCallId: 'gate-2',
+      isError: true,
+      errorKind: 'permission_denied',
+      content: 'The user dismissed the question.',
+    });
+    expect(executed).toEqual([]);
+  });
+
+  it('hands the executor the decision updatedInput, not the original', async () => {
+    const executed: unknown[] = [];
+    const gateRegistry = createRegistry([makeInteractiveTool(executed)]);
+    const requests: unknown[] = [];
+
+    const result = await executeToolCall(
+      gateRegistry,
+      { id: 'gate-3', name: 'interactive', input: { question: 'proceed?' } },
+      {
+        ...ctx,
+        requestPermission: async (request) => {
+          requests.push(request);
+          return {
+            behavior: 'allow',
+            updatedInput: { question: 'proceed?', answers: { chosen: ['Yes'] } },
+          };
+        },
+      },
+    );
+
+    // The gate saw the validated input…
+    expect(requests).toEqual([
+      { toolName: 'interactive', input: { question: 'proceed?' } },
+    ]);
+    // …and the executor received the trusted updated input unchanged.
+    expect(executed).toEqual([
+      { question: 'proceed?', answers: { chosen: ['Yes'] } },
+    ]);
+    expect(result.isError).toBe(false);
+  });
+
+  it('validates before gating: invalid input never reaches the user', async () => {
+    const gateRegistry = createRegistry([makeInteractiveTool([])]);
+    let asked = false;
+
+    const result = await executeToolCall(
+      gateRegistry,
+      { id: 'gate-4', name: 'interactive', input: { question: 42 } },
+      {
+        ...ctx,
+        requestPermission: async () => {
+          asked = true;
+          return { behavior: 'allow', updatedInput: {} };
+        },
+      },
+    );
+
+    expect(result).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+    expect(asked).toBe(false);
+  });
+
+  it('bypasses the gate entirely for non-interactive tools', async () => {
+    let asked = false;
+
+    const result = await executeToolCall(
+      registry,
+      { id: 'gate-5', name: 'echo', input: { message: 'hi' } },
+      {
+        ...ctx,
+        requestPermission: async () => {
+          asked = true;
+          return { behavior: 'deny', feedback: 'never consulted' };
+        },
+      },
+    );
+
+    expect(result).toEqual({
+      toolCallId: 'gate-5',
+      isError: false,
+      content: 'echo: hi',
+    });
+    expect(asked).toBe(false);
+  });
+});
