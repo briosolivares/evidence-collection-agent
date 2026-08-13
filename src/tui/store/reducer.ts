@@ -405,6 +405,10 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return { ...withItem, live: { ...live, pendingTools: remaining } };
     }
 
+    case 'artifact_published':
+      // Placeholder until the artifact substate lands (plan item 2).
+      return state;
+
     case 'turn_end': {
       const next = finalizeStreamingText(state);
       const live = next.live;

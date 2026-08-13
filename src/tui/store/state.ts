@@ -3,6 +3,8 @@
 // re-renders an item), the live run state that stays mutable until
 // finalized, and the single UiEvent stream the reducer consumes.
 
+import type { ManifestEntry } from '../../run/artifacts.js';
+
 /** Interaction modes; overlays are modes so exactly one surface owns input. */
 export type SessionMode =
   | 'idle'
@@ -155,6 +157,17 @@ export type UiEvent =
       error?: string;
       /** Manifest-recorded source URL, for evidence artifacts. */
       sourceUrl?: string;
+    }
+  | {
+      type: 'artifact_published';
+      /** The manifest's provenance record, verbatim (published entries
+       * only — scratch entries are never emitted). */
+      entry: ManifestEntry;
+      /** Size on disk at publish time; undefined if the stat failed. */
+      sizeBytes: number | undefined;
+      /** The execution that published it, emitted before that execution's
+       * tool_exec_end so the reducer holds provenance when it renders. */
+      toolExecId: number;
     }
   | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
   | {
