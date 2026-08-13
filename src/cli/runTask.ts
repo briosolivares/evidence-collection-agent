@@ -438,18 +438,19 @@ async function runVerificationHarness(
         break;
       }
 
-      let verification: VerifierOutcome;
-      try {
-        verification = await runVerifier({ taskText, runDir, callModel: verifierCallModel });
-      } catch (thrown) {
-        // A cancellation is the caller's, not the verifier's — honor it.
-        if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
-        // Only a harness bug throws out of runVerifier (a run dir missing
-        // its contract documents); every model-side failure already
-        // arrives as the verifier_unavailable outcome below.
-        recordWorkerSessionCrash(session, thrown);
-        throw thrown;
-      }
+      // Only a harness bug throws out of runVerifier (a run dir missing its
+      // contract documents) or a caller cancellation (an AbortError); every
+      // model-side failure — refusal, token limit, truncated stream,
+      // transport error, an invalid report after its bounded repair —
+      // already arrives as the verifier_unavailable outcome below. Both
+      // throwing cases are handled by this function's single outer catch,
+      // so no inner bookkeeping here: a second recordWorkerSessionCrash
+      // would duplicate the run_error event and the failed-metrics write.
+      const verification: VerifierOutcome = await runVerifier({
+        taskText,
+        runDir,
+        callModel: verifierCallModel,
+      });
 
       // Fail closed: an unavailable verifier is never success. The
       // worker's artifacts are preserved, but nobody trustworthy reviewed
