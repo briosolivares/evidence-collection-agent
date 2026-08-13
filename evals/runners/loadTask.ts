@@ -24,7 +24,7 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     );
   }
   const taskDir = join(resolve(evalsDir), name);
-  const { task, startUrl, requiresAuth } = readTaskJson(taskDir, name);
+  const { task, startUrl, headed } = readTaskJson(taskDir, name);
 
   const fetchOracle = await importTaskFunction(taskDir, name, 'oracle/oracle.ts', 'fetchOracle');
   const grade = await importTaskFunction(taskDir, name, 'grader/grader.ts', 'grade');
@@ -33,17 +33,22 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     name,
     taskText: task,
     startUrl,
-    requiresAuth,
+    headed,
     fetchOracle: fetchOracle as EvalTask['fetchOracle'],
     grade: grade as Grader,
   };
 }
 
-/** Read and validate <taskDir>/task.json: { task, startUrl?, requiresAuth? }. */
+/**
+ * Read and validate <taskDir>/task.json: { task, startUrl?, headed? }.
+ * `headed` puts the task on the serial headed persistent-profile browser
+ * lane — for tasks that need a real login or that bot-block headless
+ * browsers. Defaults to false (headless isolated pool).
+ */
 function readTaskJson(
   taskDir: string,
   name: string,
-): { task: string; startUrl?: string; requiresAuth: boolean } {
+): { task: string; startUrl?: string; headed: boolean } {
   const jsonPath = join(taskDir, 'task.json');
 
   let raw: string;
@@ -60,20 +65,26 @@ function readTaskJson(
     throw new Error(`task "${name}": task.json is not valid JSON`);
   }
 
-  const obj = parsed as { task?: unknown; startUrl?: unknown; requiresAuth?: unknown };
+  const obj = parsed as { task?: unknown; startUrl?: unknown; headed?: unknown; requiresAuth?: unknown };
   if (typeof parsed !== 'object' || parsed === null || typeof obj.task !== 'string' || obj.task === '') {
     throw new Error(`task "${name}": task.json must have a non-empty string "task" field`);
   }
   if (obj.startUrl !== undefined && typeof obj.startUrl !== 'string') {
     throw new Error(`task "${name}": task.json "startUrl" must be a string when present`);
   }
-  if (obj.requiresAuth !== undefined && typeof obj.requiresAuth !== 'boolean') {
-    throw new Error(`task "${name}": task.json "requiresAuth" must be a boolean when present`);
+  if (obj.requiresAuth !== undefined) {
+    throw new Error(
+      `task "${name}": task.json "requiresAuth" was renamed to "headed" — ` +
+        'silently ignoring it would drop the task to the headless lane',
+    );
+  }
+  if (obj.headed !== undefined && typeof obj.headed !== 'boolean') {
+    throw new Error(`task "${name}": task.json "headed" must be a boolean when present`);
   }
   return {
     task: obj.task,
     ...(obj.startUrl !== undefined ? { startUrl: obj.startUrl } : {}),
-    requiresAuth: obj.requiresAuth ?? false,
+    headed: obj.headed ?? false,
   };
 }
 

@@ -95,6 +95,7 @@ describe('loadRunSummary', () => {
           content: 'a,b,c\n1,2,3\n',
           sha256: 'deadbeefcafe0123456789abcdef',
           sourceUrl: 'https://news.ycombinator.com/',
+          roles: ['requested_output'],
         },
       ],
     });

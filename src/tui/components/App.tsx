@@ -19,6 +19,7 @@ import { createDemoScript, playDemo } from '../demo.js';
 import { scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
+  deriveSuggestions,
   HELP_TEXT,
   reduce,
   routeInput,
@@ -26,6 +27,8 @@ import {
 } from '../store/reducer.js';
 import type { BannerIdentity, UiEvent } from '../store/state.js';
 import { theme } from '../theme.js';
+import { ArtifactRail } from './ArtifactRail.js';
+import { ArtifactsPanel } from './ArtifactsPanel.js';
 import { Composer } from './Composer.js';
 import { EvalsMenu } from './EvalsMenu.js';
 import { QuestionDialog } from './QuestionDialog.js';
@@ -136,15 +139,45 @@ export function App({
     return playDemo(createDemoScript(Date.now()), dispatch);
   }, [demo]);
 
-  // Esc cancels an in-flight run (R9). During an eval batch it cancels
-  // the current trial and skips the rest; the overlays handle their own
-  // Esc. A no-op while idle. While a question dialog is open the dialog
-  // owns Esc (dismiss = deny; the run continues) — cancelling still works
-  // because the next Esc, dialog closed, lands here.
+  // Esc cancels an in-flight run (R9) — unless an artifact detail card
+  // is open, which Esc closes instead (the reducer-owned artifact
+  // substate exists precisely so this handler can check that precedence;
+  // the rail itself never listens for Esc). During an eval batch it
+  // cancels the current trial and skips the rest; the overlays handle
+  // their own Esc. A no-op while idle.
+  //
+  // Tab is routed here whole, as one tab_pressed action: the reducer
+  // arbitrates its meaning — suggestion completion while the derived
+  // panel is up, otherwise artifacts focus/blur (design decision 4) —
+  // against the same state it mutates, so exactly one handler owns the
+  // key and no stale mirror of composer state is consulted.
+  //
+  // While a question dialog is open the dialog owns the keys (dismiss =
+  // deny; the run continues) — Tab and Esc both yield to it here, and
+  // cancelling still works because the next Esc, dialog closed, lands
+  // in the branches below.
   useInput((_input, key) => {
-    if (!key.escape) return;
     if (question !== undefined) return;
+    if (key.tab) {
+      dispatch({ type: 'tab_pressed' });
+      return;
+    }
+    if (!key.escape) return;
+    if (state.mode === 'artifacts') {
+      // Same precedence as during the run: close an open detail card
+      // first; from the rows view, return the keys to the composer.
+      if (state.artifactUi.view === 'detail') {
+        dispatch({ type: 'artifact_close_detail' });
+      } else {
+        dispatch({ type: 'artifacts_blur' });
+      }
+      return;
+    }
     if (state.mode === 'running') {
+      if (state.artifactUi.view === 'detail') {
+        dispatch({ type: 'artifact_close_detail' });
+        return;
+      }
       dispatch({ type: 'cancel_requested' });
       if (evalHandle.current !== undefined) evalHandle.current.cancel();
       else runHandle.current?.cancel();
@@ -156,6 +189,9 @@ export function App({
   });
 
   const handleSubmit = (text: string) => {
+    // The field reset lives with the rest of the composer substate in
+    // the reducer; routing continues on the already-captured text.
+    dispatch({ type: 'composer_submitted' });
     const routed = routeInput(text);
     switch (routed.kind) {
       case 'task':
@@ -175,6 +211,19 @@ export function App({
       case 'runs':
         setRunEntries(scanRuns(config.runsBaseDir));
         dispatch({ type: 'open_runs' });
+        return;
+      case 'artifacts':
+        // Re-render the panel for the most recent run and focus it —
+        // with or without a completion summary (cancelled and
+        // budget-exceeded runs keep their artifacts in state).
+        if (state.artifacts.length === 0) {
+          dispatch({
+            type: 'notice',
+            text: 'No artifacts to browse yet — run a task that publishes some first.',
+          });
+          return;
+        }
+        dispatch({ type: 'artifacts_focus' });
         return;
       case 'evals':
         if (batchRunner === undefined) {
@@ -217,7 +266,9 @@ export function App({
         ? '(menu open — esc to close)'
         : state.mode === 'evalsRunning'
           ? '(evals running — esc to stop)'
-          : '(waiting for agent…)';
+          : state.mode === 'artifacts'
+            ? '(browsing artifacts — esc to return)'
+            : '(waiting for agent…)';
 
   return (
     <Box flexDirection="column">
@@ -227,6 +278,18 @@ export function App({
           config={config}
           live={state.live}
           cancelling={state.mode === 'cancelling'}
+        />
+      )}
+      {/* Mounted for the whole run (it renders nothing until the first
+          publish) so its key subscription is registered by the submit
+          keystroke, not by a mid-run publish event — see ArtifactRail. */}
+      {state.mode === 'running' && (
+        <ArtifactRail
+          artifacts={state.artifacts}
+          ui={state.artifactUi}
+          runDir={state.live?.runDir}
+          dispatch={dispatch}
+          active={question === undefined}
         />
       )}
       {state.mode === 'evalsRunning' && state.evalsLive !== undefined && (
@@ -268,10 +331,30 @@ export function App({
           }
         />
       )}
+      {/* The completion summary: passive above the composer while idle,
+          focused (input-owning) in artifacts mode. Between eval trials
+          the mode is evalsRunning, never idle, so no panel mid-batch.
+          /artifacts enters artifacts mode with no summary recorded (a
+          cancelled/budget-exceeded run's retained artifacts): the panel
+          then renders artifacts-only, and only while focused. */}
+      {(state.mode === 'artifacts' ||
+        (state.mode === 'idle' && state.completedRun !== undefined)) && (
+        <ArtifactsPanel
+          summary={state.completedRun}
+          artifacts={state.artifacts}
+          ui={state.artifactUi}
+          focused={state.mode === 'artifacts'}
+          runDir={state.completedRun?.runDir ?? state.lastRunDir}
+          dispatch={dispatch}
+        />
+      )}
       <Box flexDirection="column" marginTop={1}>
         <Composer
           disabled={state.mode !== 'idle'}
           hint={composerHint}
+          composer={state.composer}
+          suggestions={deriveSuggestions(state)}
+          dispatch={dispatch}
           onSubmit={handleSubmit}
         />
         <Text color={theme.muted}>  /help for commands</Text>

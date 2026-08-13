@@ -3,11 +3,14 @@
 // re-renders an item), the live run state that stays mutable until
 // finalized, and the single UiEvent stream the reducer consumes.
 
+import type { ArtifactRole, ManifestEntry } from '../../run/artifacts.js';
+
 /** Interaction modes; overlays are modes so exactly one surface owns input. */
 export type SessionMode =
   | 'idle'
   | 'running'
   | 'cancelling'
+  | 'artifacts'
   | 'runsList'
   | 'evalsMenu'
   | 'evalsRunning';
@@ -68,6 +71,20 @@ export interface EvalTrialLive {
 }
 
 /**
+ * One artifact digest line of a completion item — filename · size ·
+ * role(s), the transcript's permanent, inert copy of the completion
+ * summary after the panel is superseded.
+ */
+export interface CompletionArtifact {
+  /** Run-dir-relative path, as the manifest records it. */
+  filename: string;
+  /** Size on disk at publish time; undefined if the stat failed. */
+  sizeBytes: number | undefined;
+  /** The published entry's roles (requested_output and/or evidence). */
+  roles: readonly ArtifactRole[];
+}
+
+/**
  * A finalized transcript entry, before its id is assigned. Items are
  * append-only and immutable once appended (the <Static> contract);
  * anything still changing lives in LiveRunState instead.
@@ -83,7 +100,16 @@ export type TranscriptItemBody =
       verbose?: { input: string; result: string };
     }
   | { kind: 'evidence'; line: string; sourceUrl?: string; verbose?: { input: string; result: string } }
-  | { kind: 'completion'; verb: string; elapsedMs: number; tokens: number; runDir: string }
+  | {
+      kind: 'completion';
+      verb: string;
+      elapsedMs: number;
+      tokens: number;
+      runDir: string;
+      /** Published-artifact digest, requested outputs first (the same
+       * order the summary panel shows). */
+      artifacts: readonly CompletionArtifact[];
+    }
   | { kind: 'cancelled'; elapsedMs: number; tokens: number }
   | { kind: 'error'; message: string }
   | { kind: 'notice'; text: string }
@@ -109,9 +135,93 @@ export interface PendingTool {
   /** Execution id from the tracing seam, once execution has started. */
   execId?: number;
   line: string;
+  /** Likely-evidence hint styling the in-flight line; the finalized item's
+   * activity/evidence classification is decided by publishes instead. */
   isEvidence: boolean;
-  sourceUrl?: string;
+  /** Manifest entries this execution has published so far (each
+   * artifact_published event precedes its execution's tool_exec_end). */
+  published?: readonly ManifestEntry[];
   verbose?: { input: string; result: string };
+}
+
+/**
+ * One published artifact of the current (or most recent) run. The manifest
+ * entry is kept verbatim — filename, roles, sourceUrl, full sha256,
+ * capturedAt — so later surfaces (artifact rail, /artifacts, completion
+ * summary) can render full provenance and order requested outputs first
+ * without re-reading manifest.json.
+ */
+export interface PublishedArtifact {
+  entry: ManifestEntry;
+  /** Size on disk at publish time; undefined if the stat failed. */
+  sizeBytes: number | undefined;
+}
+
+/**
+ * What the completion summary panel shows for the run that just finished:
+ * the completion header's data plus the final answer prose. Recorded only
+ * for interactive runs that end with outcome 'completed' (eval trials and
+ * early stops never set it) and cleared by the next run_started, so its
+ * presence is the panel's render condition while idle.
+ */
+export interface CompletedRunSummary {
+  /** Final model prose; the panel falls back to "Task completed" when
+   * this is absent or empty. Full prose stays in the transcript. */
+  finalText?: string;
+  /** Completion-line verb, fixed from config at session start. */
+  verb: string;
+  /** Wall-clock duration of the run. */
+  elapsedMs: number;
+  /** Tokens the run visibly consumed (settled or estimate, whichever is
+   * larger — the same figure the completion line shows). */
+  tokens: number;
+  /** Absolute run directory; artifact rows open files against it. */
+  runDir: string;
+}
+
+/**
+ * Selection state of the artifact surfaces (the live rail now; the
+ * completion panel later). Owned by the reducer — a deliberate deviation
+ * from RunsList's component-local view state: while running, Esc belongs
+ * to App's global handler (cancel), and closing an open detail card must
+ * win over cancelling the run, so the handler needs this state to consult
+ * before treating Esc as cancel (design decision 3). Bonus: the whole
+ * interaction is reducer-testable without Ink.
+ */
+export interface ArtifactUiState {
+  /** Index of the highlighted row in `artifacts`, clamped as the list
+   * changes (upserts arrive mid-run). */
+  cursor: number;
+  /** 'rows' lists the artifacts; 'detail' shows the highlighted one's
+   * provenance card. */
+  view: 'rows' | 'detail';
+}
+
+/**
+ * The composer's input substate. Reducer-owned, not component-local, by
+ * the same rule that promoted ArtifactUiState (design decision 3):
+ * a globally-routed key's meaning depends on it — Tab completes the
+ * highlighted suggestion while the panel is up and only otherwise
+ * focuses/blurs the artifacts panel — so App's single 'tab_pressed'
+ * route must decide against the same state it mutates, never a
+ * one-frame-stale mirror. Suggestions and panel visibility are pure
+ * derivations of this substate plus the mode (deriveSuggestions in the
+ * reducer module); they are never stored.
+ */
+export interface ComposerState {
+  /** The input line as typed. */
+  value: string;
+  /** True after Esc dismissed the panel, until the input next changes. */
+  dismissed: boolean;
+  /** Selected suggestion row; clamped against the derived match list
+   * wherever it is read, so a shrinking list never strands it. */
+  selectedIndex: number;
+  /** Bumped on every Tab completion. TextInput only derives its internal
+   * cursor offset on mount (afterwards it merely clamps to a shrinking
+   * value), so an externally grown value would leave the cursor
+   * mid-word; keying the input on this count remounts it with the
+   * cursor at the end. */
+  completions: number;
 }
 
 /** The dynamic region's state — mutable until finalized into items. */
@@ -147,14 +257,17 @@ export type UiEvent =
   | { type: 'text_delta'; text: string }
   | { type: 'tool_pending'; name: string }
   | { type: 'tool_exec_start'; id: number; name: string; input: unknown }
+  | { type: 'tool_exec_end'; id: number; ok: boolean; result?: unknown; error?: string }
   | {
-      type: 'tool_exec_end';
-      id: number;
-      ok: boolean;
-      result?: unknown;
-      error?: string;
-      /** Manifest-recorded source URL, for evidence artifacts. */
-      sourceUrl?: string;
+      type: 'artifact_published';
+      /** The manifest's provenance record, verbatim (published entries
+       * only — scratch entries are never emitted). */
+      entry: ManifestEntry;
+      /** Size on disk at publish time; undefined if the stat failed. */
+      sizeBytes: number | undefined;
+      /** The execution that published it, emitted before that execution's
+       * tool_exec_end so the reducer holds provenance when it renders. */
+      toolExecId: number;
     }
   | {
       /** An interactive tool is paused awaiting the user (announcement
@@ -185,8 +298,24 @@ export interface SessionState {
   nextItemId: number;
   /** Completion-line verb, fixed at session start from config (R6). */
   completionVerb: string;
+  /** The composer's input line + suggestion selection; the suggestion
+   * panel derives from it (deriveSuggestions), never stored. */
+  composer: ComposerState;
   /** Present only while a run is active (running/cancelling). */
   live?: LiveRunState;
+  /** Published artifacts of the current or most recent run, upserted by
+   * `entry.filename` in publish order; cleared on run_started, retained
+   * after the run ends (/artifacts and the completion summary read it). */
+  artifacts: readonly PublishedArtifact[];
+  /** Cursor + view of the artifact rail/panel; reset on run_started. */
+  artifactUi: ArtifactUiState;
+  /** Summary of the last completed interactive run — the completion
+   * panel's data and its render condition; cleared on run_started. */
+  completedRun?: CompletedRunSummary;
+  /** Run dir of the most recent run whatever its outcome, retained as
+   * the run ends — /artifacts opens retained artifacts against it when
+   * no completion summary exists (cancelled / budget-exceeded runs). */
+  lastRunDir?: string;
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;

@@ -57,7 +57,7 @@ export interface EvalReport {
 }
 
 /**
- * Run normal trials through a bounded pool and authenticated trials through
+ * Run headless trials through a bounded pool and headed trials through
  * a separate serial lane. Browser/model work is concurrent; fresh oracle
  * fetches and grading are serialized independently. Results always return
  * in requested task/trial order.
@@ -91,8 +91,8 @@ export async function runEvals(
     Array.from<TrialGrade | undefined>({ length: k }).fill(undefined),
   );
   const jobs = createJobs(tasks, k, controller.signal);
-  const normalJobs = jobs.filter((job) => !job.requiresAuth);
-  const authenticatedJobs = jobs.filter((job) => job.requiresAuth);
+  const headlessJobs = jobs.filter((job) => !job.headed);
+  const headedJobs = jobs.filter((job) => job.headed);
   let gradingTail: Promise<void> = Promise.resolve();
 
   // A throwing trial becomes a recorded, failed trial — never a dead batch.
@@ -181,8 +181,8 @@ export async function runEvals(
 
   try {
     await Promise.all([
-      runPool(normalJobs, deps.concurrency),
-      runPool(authenticatedJobs, 1),
+      runPool(headlessJobs, deps.concurrency),
+      runPool(headedJobs, 1),
     ]);
     await gradingTail;
 
@@ -226,7 +226,7 @@ function createJobs(tasks: EvalTask[], k: number, signal: AbortSignal): EvalTria
       trialNumber: trialIndex + 1,
       k,
       startUrl: task.startUrl,
-      requiresAuth: task.requiresAuth,
+      headed: task.headed,
       signal,
     })),
   );

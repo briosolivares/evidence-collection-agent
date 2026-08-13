@@ -4,7 +4,7 @@ import type { SlashCommand } from '../store/commands.js';
 import { theme } from '../theme.js';
 
 /** Name column width: the longest command name plus two spaces. */
-const NAME_COLUMN = 8;
+const NAME_COLUMN = 12;
 
 interface CommandSuggestionsProps {
   /** What has been typed so far (starts with `/`); bolded inside names. */

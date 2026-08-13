@@ -57,8 +57,8 @@ export interface EvalRunOptions {
   trialNumber: number;
   /** Total trials requested for this task. */
   k: number;
-  /** Browser policy declared by the dataset. */
-  requiresAuth: boolean;
+  /** Whether this trial runs on the serial headed persistent-profile lane. */
+  headed: boolean;
   /** Aborted when the batch is cancelled or another trial fails fatally. */
   signal: AbortSignal;
 }
@@ -76,8 +76,13 @@ export interface EvalTask {
   taskText: string;
   /** Starting page for the agent, from task.json, when the task has one. */
   startUrl?: string;
-  /** Whether the task must use the shared, logged-in browser identity. */
-  requiresAuth: boolean;
+  /**
+   * Whether the task runs on the headed persistent (logged-in) browser lane
+   * instead of a headless isolated one — set for tasks that need a real
+   * login (X, Google Sheets) or that headless browsers get bot-blocked on
+   * (SEC EDGAR, Google Search).
+   */
+  headed: boolean;
   /** Fetches this task's ground truth; called at grading time (Tier A oracles must be fresh). */
   fetchOracle: () => Promise<unknown>;
   /** The task's grader; see Grader for the standing rule it lives under. */

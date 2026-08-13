@@ -112,6 +112,7 @@ describe('startRun (RunSession bridge)', () => {
       'turn_end',
       'run_dir',
       'tool_exec_start',
+      'artifact_published',
       'tool_exec_end',
       'turn_start:2',
       'turn_end',

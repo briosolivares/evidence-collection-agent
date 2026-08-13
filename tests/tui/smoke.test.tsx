@@ -2,10 +2,11 @@ import { Box } from 'ink';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { ArtifactsPanel } from '../../src/tui/components/ArtifactsPanel.js';
 import { Composer } from '../../src/tui/components/Composer.js';
 import { Transcript } from '../../src/tui/components/Transcript.js';
 import { createDemoScript } from '../../src/tui/demo.js';
-import { createInitialState, reduce } from '../../src/tui/store/reducer.js';
+import { createInitialState, deriveSuggestions, reduce } from '../../src/tui/store/reducer.js';
 import { renderAt, tick } from './helpers.js';
 
 // The full scripted run, folded through the real reducer — the exact
@@ -15,11 +16,30 @@ const finalState = createDemoScript(0).reduce(
   createInitialState(),
 );
 
+// An enabled composer stands in for App's idle state, where the passive
+// completion panel renders (idle + a completed-run summary); a disabled
+// one stands in for mid-run, where no panel belongs.
 function fullShell(composerDisabled: boolean): ReactElement {
   return (
     <Box flexDirection="column">
       <Transcript items={finalState.transcript} />
-      <Composer disabled={composerDisabled} onSubmit={() => {}} />
+      {!composerDisabled && finalState.completedRun !== undefined && (
+        <ArtifactsPanel
+          summary={finalState.completedRun}
+          artifacts={finalState.artifacts}
+          ui={finalState.artifactUi}
+          focused={false}
+          runDir={finalState.completedRun.runDir}
+          dispatch={() => {}}
+        />
+      )}
+      <Composer
+        disabled={composerDisabled}
+        composer={finalState.composer}
+        suggestions={deriveSuggestions(finalState)}
+        dispatch={() => {}}
+        onSubmit={() => {}}
+      />
     </Box>
   );
 }
@@ -35,6 +55,8 @@ describe('smoke: full scripted-run rendering contract', () => {
     expect(frame).toContain('● Opening techcrunch.com/2026/05/14/acme-series-b');
     expect(frame).toContain('◆ Evidence saved → investors.csv');
     expect(frame).toContain('✓ Brewed in 42s · 18.7k tokens');
+    // …and the passive completion panel sits above the composer.
+    expect(frame).toContain('tab to browse artifacts');
     expect(frame).toContain('›');
     // …and the exact rendering is locked.
     expect(frame).toMatchSnapshot();
@@ -47,6 +69,7 @@ describe('smoke: full scripted-run rendering contract', () => {
     const frame = lastFrame();
     expect(frame).toContain('✓ Brewed in 42s · 18.7k tokens');
     expect(frame).toContain('◆ Evidence saved → investors.csv');
+    expect(frame).toContain('tab to browse artifacts');
     expect(frame).toMatchSnapshot();
     unmount();
   });

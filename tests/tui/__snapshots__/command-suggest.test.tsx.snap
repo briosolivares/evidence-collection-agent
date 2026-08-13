@@ -1,17 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`CommandSuggestions rendering contract > locks the panel at normal width (80 columns) 1`] = `
-"  /help   Show this list
-› /runs   Browse past run directories
-  /evals  Run eval tasks
-  /exit   Quit Sherlock"
+"  /help       Show this list
+› /runs       Browse past run directories
+  /artifacts  Browse the last run's artifacts
+  /evals      Run eval tasks
+  /exit       Quit Sherlock"
 `;
 
 exports[`CommandSuggestions rendering contract > renders with zero overflow at 44 columns 1`] = `
-"› /help   Show this list
-  /runs   Browse past run directories
-  /evals  Run eval tasks
-  /exit   Quit Sherlock"
+"› /help       Show this list
+  /runs       Browse past run directories
+  /artifacts  Browse the last run's artifac…
+  /evals      Run eval tasks
+  /exit       Quit Sherlock"
 `;
 
 exports[`slash-command autosuggest panel (R1) > locks the open panel frame (all commands, /help selected) 1`] = `
@@ -35,10 +37,11 @@ exports[`slash-command autosuggest panel (R1) > locks the open panel frame (all 
 ╰──────────────────────────────────────────────────────────────╯
 
 
-› /help   Show this list
-  /runs   Browse past run directories
-  /evals  Run eval tasks
-  /exit   Quit Sherlock
+› /help       Show this list
+  /runs       Browse past run directories
+  /artifacts  Browse the last run's artifacts
+  /evals      Run eval tasks
+  /exit       Quit Sherlock
 ╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ › / help                                                                                         │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯

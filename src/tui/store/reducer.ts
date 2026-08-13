@@ -4,18 +4,30 @@
 //
 // Finalization rules (the <Static> contract — items never re-render):
 // - streaming agent text finalizes at the next tool batch or turn end;
-// - a pending tool line finalizes when its execution result arrives;
+// - a pending tool line finalizes when its execution result arrives — as
+//   evidence iff that execution published artifacts (artifact_published
+//   events precede its tool_exec_end), as plain activity otherwise;
 // - pending lines that never receive exec events (registry-rejected calls
 //   are invisible to the tracing seam) settle as ⚠ retried at the next
 //   turn_start, or at run end.
 
 import { formatDuration, formatTokens } from '../format.js';
-import { findCommand, SLASH_COMMANDS, type CommandKind } from './commands.js';
+import {
+  filterCommands,
+  findCommand,
+  SLASH_COMMANDS,
+  type CommandKind,
+  type SlashCommand,
+} from './commands.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
+  ArtifactUiState,
   AssertionView,
   BannerIdentity,
+  ComposerState,
+  CompletionArtifact,
   LiveRunState,
+  PublishedArtifact,
   SessionState,
   TranscriptItemBody,
   UiEvent,
@@ -39,10 +51,20 @@ function compactDetail(value: unknown): string {
 export type UiAction =
   | { type: 'submit_task'; text: string }
   | { type: 'notice'; text: string }
+  | { type: 'composer_changed'; value: string }
+  | { type: 'composer_submitted' }
+  | { type: 'suggest_nav'; delta: -1 | 1 }
+  | { type: 'suggest_dismiss' }
+  | { type: 'tab_pressed' }
   | { type: 'cancel_requested' }
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
   | { type: 'open_evals' }
+  | { type: 'artifact_nav'; delta: -1 | 1 }
+  | { type: 'artifact_open_detail' }
+  | { type: 'artifact_close_detail' }
+  | { type: 'artifacts_focus' }
+  | { type: 'artifacts_blur' }
   | { type: 'evals_started'; tasks: string[]; k: number; concurrency: number }
   | {
       type: 'eval_trial_started';
@@ -72,18 +94,25 @@ export type RoutedInput =
   | { kind: 'task'; text: string }
   | { kind: 'help' }
   | { kind: 'runs' }
+  | { kind: 'artifacts' }
   | { kind: 'evals' }
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
+
+/** /help's name column: the longest command name plus two spaces. */
+const HELP_NAME_PAD =
+  Math.max(...SLASH_COMMANDS.map((entry) => entry.name.length)) + 2;
 
 /** The /help transcript block: commands and keys (R10), driven by the
  * single SLASH_COMMANDS registry (R1). */
 export const HELP_TEXT = [
   'Commands',
-  ...SLASH_COMMANDS.map((entry) => `  ${entry.name.padEnd(8)}${entry.description}`),
+  ...SLASH_COMMANDS.map(
+    (entry) => `  ${entry.name.padEnd(HELP_NAME_PAD)}${entry.description}`,
+  ),
   'Keys',
-  '  Esc     Cancel the current run',
-  '  Ctrl+C  Quit',
+  `  ${'Esc'.padEnd(HELP_NAME_PAD)}Cancel the current run`,
+  `  ${'Ctrl+C'.padEnd(HELP_NAME_PAD)}Quit`,
 ].join('\n');
 
 /**
@@ -128,7 +157,88 @@ export function createInitialState(
     ],
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',
+    composer: initialComposer(),
+    artifacts: [],
+    artifactUi: initialArtifactUi(),
   };
+}
+
+/** The artifact rail/panel's rest state: first row, no detail open. */
+function initialArtifactUi(): ArtifactUiState {
+  return { cursor: 0, view: 'rows' };
+}
+
+/** The composer's rest state: empty line, first row, panel undismissed. */
+function initialComposer(): ComposerState {
+  return { value: '', dismissed: false, selectedIndex: 0, completions: 0 };
+}
+
+/** The composer's derived suggestion view — recomputed from state, never
+ * stored (state.composer holds only what the user did). */
+export interface SuggestionView {
+  /** Commands the autosuggest panel offers (empty ⇒ panel hidden). */
+  suggestions: readonly SlashCommand[];
+  /** True while the panel renders — and while Tab means completion. */
+  panelVisible: boolean;
+  /** selectedIndex clamped into the match list, so a shrinking list can
+   * never strand the selection (-1 with no matches, never rendered). */
+  cursor: number;
+  /** The highlighted command, when the panel is up. */
+  selected: SlashCommand | undefined;
+}
+
+/**
+ * Derive the suggestion panel from the composer substate. The composer
+ * accepts input only while idle (App mounts it disabled in every other
+ * mode), so suggestions exist only there; Esc-dismissal holds until the
+ * input next changes.
+ */
+export function deriveSuggestions(state: SessionState): SuggestionView {
+  const suggestions =
+    state.mode === 'idle' && !state.composer.dismissed
+      ? filterCommands(state.composer.value)
+      : [];
+  const panelVisible = suggestions.length > 0;
+  const cursor = Math.min(state.composer.selectedIndex, suggestions.length - 1);
+  return {
+    suggestions,
+    panelVisible,
+    cursor,
+    selected: panelVisible ? suggestions[cursor] : undefined,
+  };
+}
+
+/** Clamp an artifact cursor into the list's current bounds. */
+function clampCursor(cursor: number, length: number): number {
+  return Math.max(0, Math.min(cursor, length - 1));
+}
+
+/**
+ * Summary display order: requested outputs first, then evidence-only
+ * artifacts, each group keeping its publish order. The live rail keeps
+ * raw publish order (chronological log); the completion panel and the
+ * transcript digest use this instead.
+ */
+export function orderArtifactsForSummary(
+  artifacts: readonly PublishedArtifact[],
+): readonly PublishedArtifact[] {
+  const isRequested = (artifact: PublishedArtifact) =>
+    (artifact.entry.roles ?? []).includes('requested_output');
+  return [
+    ...artifacts.filter(isRequested),
+    ...artifacts.filter((artifact) => !isRequested(artifact)),
+  ];
+}
+
+/** The completion item's inert artifact digest, in summary order. */
+function completionDigest(
+  artifacts: readonly PublishedArtifact[],
+): readonly CompletionArtifact[] {
+  return orderArtifactsForSummary(artifacts).map((artifact) => ({
+    filename: artifact.entry.filename,
+    sizeBytes: artifact.sizeBytes,
+    roles: artifact.entry.roles ?? [],
+  }));
 }
 
 /** Append one finalized item, assigning its stable id. */
@@ -164,11 +274,17 @@ function displayTokens(live: LiveRunState): number {
   return Math.round(Math.max(live.tokens.settled, live.tokens.estimate));
 }
 
-/** End the run: clear the live region; an active eval batch returns to
- * evalsRunning (between trials), everything else to idle. */
+/** End the run: clear the live region — retaining its run dir so
+ * /artifacts can open files after runs that record no completion summary
+ * (cancelled/failed carry no runDir of their own) — and return to idle,
+ * or to evalsRunning while an eval batch owns the session. */
 function endRun(state: SessionState): SessionState {
-  const { live: _live, ...rest } = state;
-  return { ...rest, mode: state.evalsActive === true ? 'evalsRunning' : 'idle' };
+  const { live, ...rest } = state;
+  return {
+    ...rest,
+    ...(live?.runDir === undefined ? {} : { lastRunDir: live.runDir }),
+    mode: state.evalsActive === true ? 'evalsRunning' : 'idle',
+  };
 }
 
 /**
@@ -183,6 +299,76 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
 
     case 'notice':
       return append(state, { kind: 'notice', text: action.text });
+
+    case 'composer_changed':
+      // Every edit re-arms the panel (dismissal ends at the next change)
+      // and returns the selection to the top of the fresh match list.
+      return {
+        ...state,
+        composer: {
+          ...state.composer,
+          value: action.value,
+          selectedIndex: 0,
+          dismissed: false,
+        },
+      };
+
+    case 'composer_submitted':
+      // App dispatches this alongside routing the submitted text: the
+      // field clears for the next line. Idempotent — completions stays,
+      // since the controlled TextInput clamps its cursor on shrink.
+      return {
+        ...state,
+        composer: { ...state.composer, value: '', selectedIndex: 0, dismissed: false },
+      };
+
+    case 'suggest_nav': {
+      // ↑/↓ while the panel is up; clamped at both ends, from the
+      // derived (already-clamped) cursor.
+      const { panelVisible, cursor, suggestions } = deriveSuggestions(state);
+      if (!panelVisible) return state;
+      const selectedIndex = Math.max(
+        0,
+        Math.min(suggestions.length - 1, cursor + action.delta),
+      );
+      return { ...state, composer: { ...state.composer, selectedIndex } };
+    }
+
+    case 'suggest_dismiss':
+      // Esc while the panel is up hides it until the input next changes.
+      if (!deriveSuggestions(state).panelVisible) return state;
+      return { ...state, composer: { ...state.composer, dismissed: true } };
+
+    case 'tab_pressed': {
+      // App's single Tab route; the reducer arbitrates what Tab means
+      // against the same state it mutates. Precedence: suggestion
+      // completion beats the artifacts panel (a visible panel implies
+      // idle mode, so the branches below cannot also apply).
+      const { panelVisible, cursor, suggestions } = deriveSuggestions(state);
+      if (panelVisible) {
+        // Complete to "<name> " — the trailing space readies the line
+        // for arguments and, containing whitespace, hides the panel.
+        // Not a submission; completions keys the TextInput remount that
+        // puts the cursor after the grown value.
+        const selected = suggestions[cursor]!;
+        return {
+          ...state,
+          composer: {
+            ...state.composer,
+            value: `${selected.name} `,
+            selectedIndex: 0,
+            completions: state.composer.completions + 1,
+          },
+        };
+      }
+      // Toggle focus on the completion artifacts panel (design decision
+      // 4), reusing the guarded focus/blur cases verbatim.
+      if (state.mode === 'artifacts') return reduce(state, { type: 'artifacts_blur' });
+      if (state.mode === 'idle' && state.completedRun !== undefined) {
+        return reduce(state, { type: 'artifacts_focus' });
+      }
+      return state;
+    }
 
     case 'cancel_requested':
       // Esc is meaningful only while a run streams; a second press while
@@ -201,6 +387,39 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'open_evals':
       if (state.mode !== 'idle') return state;
       return { ...state, mode: 'evalsMenu' };
+
+    case 'artifact_nav': {
+      // Clamped at both ends; meaningless without rows to move over.
+      if (state.artifacts.length === 0) return state;
+      const cursor = clampCursor(
+        state.artifactUi.cursor + action.delta,
+        state.artifacts.length,
+      );
+      return { ...state, artifactUi: { ...state.artifactUi, cursor } };
+    }
+
+    case 'artifact_open_detail':
+      if (state.artifacts.length === 0) return state;
+      return { ...state, artifactUi: { ...state.artifactUi, view: 'detail' } };
+
+    case 'artifact_close_detail':
+      // Esc with a detail card open lands here (App checks the view
+      // before treating Esc as cancel); it never touches the run mode.
+      if (state.artifactUi.view === 'rows') return state;
+      return { ...state, artifactUi: { ...state.artifactUi, view: 'rows' } };
+
+    case 'artifacts_focus':
+      // Tab on the idle completion panel (or /artifacts) hands the keys
+      // to the artifact rows; meaningless without rows to browse. A fresh
+      // focus always starts at the top with no stale detail card.
+      if (state.mode !== 'idle' || state.artifacts.length === 0) return state;
+      return { ...state, mode: 'artifacts', artifactUi: initialArtifactUi() };
+
+    case 'artifacts_blur':
+      // Tab again (or Esc from the rows view) returns the keys to the
+      // composer; the panel stays visible, passive.
+      if (state.mode !== 'artifacts') return state;
+      return { ...state, mode: 'idle' };
 
     case 'evals_started':
       return {
@@ -270,10 +489,14 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return { ...rest, mode: 'idle' };
     }
 
-    case 'run_started':
+    case 'run_started': {
+      // The previous run's completion summary is superseded, not kept.
+      const { completedRun: _completedRun, ...rest } = state;
       return {
-        ...state,
+        ...rest,
         mode: 'running',
+        artifacts: [],
+        artifactUi: initialArtifactUi(),
         live: {
           streamingText: '',
           pendingTools: [],
@@ -283,6 +506,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           turn: 0,
         },
       };
+    }
 
     case 'run_dir':
       if (state.live === undefined) return state;
@@ -389,11 +613,17 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
                 ? compactDetail(action.result)
                 : compactDetail(action.error ?? 'error'),
             };
-      const withItem = finished.isEvidence && action.ok
+      // Publish-driven classification: an execution reads as evidence iff
+      // it actually published (a scratch write publishes nothing however
+      // evidence-flavored its name; a browser_batch capture publishes
+      // whatever its name suggests). Failures stay error activity.
+      const published = finished.published ?? [];
+      const sourceUrl = published.find((entry) => entry.sourceUrl !== undefined)?.sourceUrl;
+      const withItem = action.ok && published.length > 0
         ? append(state, {
             kind: 'evidence',
             line: finished.line,
-            ...(action.sourceUrl !== undefined ? { sourceUrl: action.sourceUrl } : {}),
+            ...(sourceUrl !== undefined ? { sourceUrl } : {}),
             ...(verbose !== undefined ? { verbose } : {}),
           })
         : append(state, {
@@ -411,6 +641,33 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       // streaming prose so the transcript is stable while the run pauses.
       if (state.live === undefined) return state;
       return finalizeStreamingText(state);
+
+    case 'artifact_published': {
+      const live = state.live;
+      if (live === undefined) return state;
+      const record = { entry: action.entry, sizeBytes: action.sizeBytes };
+      const known = state.artifacts.some(
+        (artifact) => artifact.entry.filename === action.entry.filename,
+      );
+      const artifacts = known
+        ? state.artifacts.map((artifact) =>
+            artifact.entry.filename === action.entry.filename ? record : artifact,
+          )
+        : [...state.artifacts, record];
+      // Tag the publishing execution so its tool_exec_end finalizes as an
+      // evidence line carrying the entry's sourceUrl.
+      const pendingTools = live.pendingTools.map((pending) =>
+        pending.execId === action.toolExecId
+          ? { ...pending, published: [...(pending.published ?? []), action.entry] }
+          : pending,
+      );
+      // Keep the rail cursor in bounds as the list changes underneath it.
+      const artifactUi = {
+        ...state.artifactUi,
+        cursor: clampCursor(state.artifactUi.cursor, artifacts.length),
+      };
+      return { ...state, artifacts, artifactUi, live: { ...live, pendingTools } };
+    }
 
     case 'turn_end': {
       const next = finalizeStreamingText(state);
@@ -437,7 +694,22 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           elapsedMs,
           tokens,
           runDir: action.runDir,
+          artifacts: completionDigest(state.artifacts),
         });
+        // Record the completion panel's summary — interactive runs only
+        // (eval trials complete between trials, where no panel belongs).
+        if (state.evalsActive !== true) {
+          next = {
+            ...next,
+            completedRun: {
+              verb: state.completionVerb,
+              elapsedMs,
+              tokens,
+              runDir: action.runDir,
+              ...(action.finalText === undefined ? {} : { finalText: action.finalText }),
+            },
+          };
+        }
       } else {
         const reason =
           action.reason === 'max_turns'

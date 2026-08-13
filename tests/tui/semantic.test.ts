@@ -65,9 +65,16 @@ describe('deriveSemanticLine — the ten-tool table', () => {
     });
   }
 
-  it('classifies exactly the three evidence producers as evidence', () => {
+  it('hints exactly the three publishing tools as likely evidence', () => {
     const evidence = table.filter((row) => row.isEvidence).map((row) => row.name);
     expect(evidence.sort()).toEqual(['download', 'screenshot', 'write_file']);
+  });
+
+  it('styles a scratch write as plain activity, never as evidence-to-be', () => {
+    expect(deriveSemanticLine('write_file', { file_path: 'scratch/plan.md' })).toEqual({
+      line: 'Writing scratch/plan.md',
+      isEvidence: false,
+    });
   });
 });
 
