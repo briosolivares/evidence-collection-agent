@@ -87,9 +87,9 @@ describe('on darwin', () => {
     expect(children[0]!.unrefCalls).toBe(1);
   });
 
-  it('quickLookPath launches `qlmanage -p <path>`', async () => {
+  it('quickLookPath launches `qlmanage -p <path>` when the helper is disabled', async () => {
     const { calls, children, spawn } = makeSpawnRecorder();
-    const result = quickLookPath(PATH, { spawn, platform: 'darwin' });
+    const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: null });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
     expect(calls).toEqual([
@@ -205,7 +205,7 @@ function enoent(command: string): Error {
 describe('launch failures', () => {
   it('a missing qlmanage names Quick Look, not the raw spawn error', async () => {
     const { children, spawn } = makeSpawnRecorder();
-    const result = quickLookPath(PATH, { spawn, platform: 'darwin' });
+    const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: null });
     children[0]!.emit('error', enoent('qlmanage'));
     await expect(result).resolves.toEqual({
       ok: false,
@@ -253,7 +253,7 @@ describe('launch failures', () => {
 
   it("a non-ENOENT 'error' event keeps the command and the raw detail", async () => {
     const { children, spawn } = makeSpawnRecorder();
-    const result = quickLookPath(PATH, { spawn, platform: 'darwin' });
+    const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: null });
     children[0]!.emit(
       'error',
       Object.assign(new Error('spawn qlmanage EACCES'), { code: 'EACCES' }),
@@ -278,9 +278,54 @@ describe('launch failures', () => {
     const spawn: SpawnFn = () => {
       throw enoent('qlmanage');
     };
-    await expect(quickLookPath(PATH, { spawn, platform: 'darwin' })).resolves.toEqual({
+    await expect(
+      quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: null }),
+    ).resolves.toEqual({
       ok: false,
       message: "Quick Look isn't available here (qlmanage not found)",
     });
+  });
+});
+
+describe('the sherlock-ql helper chain (darwin Space)', () => {
+  it('prefers the compiled helper when it exists on disk', async () => {
+    const { calls, children, spawn } = makeSpawnRecorder();
+    const helper = join(baseDir, 'sherlock-ql');
+    writeFileSync(helper, 'not-really-a-binary');
+    const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: helper });
+    children[0]!.emit('spawn');
+    await expect(result).resolves.toEqual({ ok: true });
+    expect(calls).toEqual([
+      { command: helper, args: [PATH], options: TTY_SAFE_OPTIONS },
+    ]);
+    expect(children[0]!.unrefCalls).toBe(1);
+  });
+
+  it('falls back to qlmanage when the helper was never built', async () => {
+    const { calls, children, spawn } = makeSpawnRecorder();
+    const result = quickLookPath(PATH, {
+      spawn,
+      platform: 'darwin',
+      quickLookHelper: join(baseDir, 'never-built'),
+    });
+    children[0]!.emit('spawn');
+    await expect(result).resolves.toEqual({ ok: true });
+    expect(calls).toEqual([
+      { command: 'qlmanage', args: ['-p', PATH], options: TTY_SAFE_OPTIONS },
+    ]);
+  });
+
+  it('the missing-file gate still beats the helper chain', async () => {
+    const { calls, spawn } = makeSpawnRecorder();
+    const helper = join(baseDir, 'sherlock-ql');
+    writeFileSync(helper, 'x');
+    const gone = join(baseDir, 'gone.png');
+    await expect(
+      quickLookPath(gone, { spawn, platform: 'darwin', quickLookHelper: helper }),
+    ).resolves.toEqual({
+      ok: false,
+      message: `Nothing to preview — ${gone} is missing on disk`,
+    });
+    expect(calls).toEqual([]);
   });
 });

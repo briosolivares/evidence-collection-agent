@@ -29,6 +29,7 @@
 
 import { spawn as nodeSpawn } from 'node:child_process';
 import { statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 /** What the caller renders: success, or a one-line notice. */
 export type OpenExternalResult = { ok: true } | { ok: false; message: string };
@@ -55,7 +56,19 @@ export interface OpenExternalDeps {
   platform?: string;
   /** File-existence probe; defaults to the real filesystem. */
   exists?: (absPath: string) => boolean;
+  /** Path to the compiled sherlock-ql Quick Look helper; undefined uses
+   * the repo default (bin/sherlock-ql), null disables the helper so
+   * Space always uses qlmanage. */
+  quickLookHelper?: string | null;
 }
+
+/** Where `npm run build:quicklook` puts the helper, resolved from this
+ * module (src/tui/ → repo root). The binary is gitignored: present on
+ * machines that ran the build, absent otherwise — hence the runtime
+ * existence probe before choosing it. */
+const DEFAULT_QUICK_LOOK_HELPER = fileURLToPath(
+  new URL('../../bin/sherlock-ql', import.meta.url),
+);
 
 const defaultSpawn: SpawnFn = (command, args, options) =>
   nodeSpawn(command, args, options);
@@ -129,9 +142,10 @@ export function revealPath(
 }
 
 /**
- * Preview the file: macOS Quick Look (`qlmanage -p`, the system preview,
- * identical to Finder's spacebar); Linux has no Quick Look, so Space
- * falls back to the default opener.
+ * Preview the file: macOS Quick Look — the bundled sherlock-ql helper
+ * (the real Finder panel, chrome-free) when it has been built, else
+ * `qlmanage -p` (same preview pipeline, debug-titled panel); Linux has
+ * no Quick Look, so Space falls back to the default opener.
  */
 export function quickLookPath(
   absPath: string,
@@ -140,11 +154,19 @@ export function quickLookPath(
   const missing = missingFile('preview', absPath, deps);
   if (missing !== undefined) return missing;
   const platform = deps.platform ?? process.platform;
-  if (platform === 'darwin')
+  if (platform === 'darwin') {
+    const helper =
+      deps.quickLookHelper === undefined
+        ? DEFAULT_QUICK_LOOK_HELPER
+        : deps.quickLookHelper;
+    const exists = deps.exists ?? defaultExists;
+    if (helper !== null && exists(helper))
+      return launch({ command: helper, args: [absPath], capability: 'Quick Look' }, deps);
     return launch(
       { command: 'qlmanage', args: ['-p', absPath], capability: 'Quick Look' },
       deps,
     );
+  }
   if (platform === 'linux')
     return launch(
       {

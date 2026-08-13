@@ -26,7 +26,8 @@
     "evals": "tsx evals/runners/cli.ts",
     "analyze:browser-batch": "tsx evals/analysis/browserBatchCli.ts",
     "agent": "tsx src/cli/repl.ts",
-    "sherlock": "node bin/sherlock.mjs"
+    "sherlock": "node bin/sherlock.mjs",
+    "build:quicklook": "swiftc -O -o bin/sherlock-ql native/quicklook/main.swift"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",

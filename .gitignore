@@ -8,3 +8,6 @@ runs/
 chrome-profile/
 evals/experiments/*
 !evals/experiments/.gitkeep
+
+# Compiled Quick Look helper (npm run build:quicklook)
+bin/sherlock-ql
