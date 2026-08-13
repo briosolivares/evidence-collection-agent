@@ -171,3 +171,28 @@ lost; (3) cycle-2 rework can leave duplicate deliverables (two CSVs) —
 needs fix-in-place discipline in the feedback framing; (4) 2 cycles
 tax ~+50s on canary trials that trigger rework; (5) worktrees lack the
 gitignored .env → grader oracles rate-limit; copy .env into new worktrees.
+
+## v2 work items (recorded 2026-08-13, from post-validation rulings)
+
+Spec: judge-design.md "v2 revisions". Status at recording time:
+
+1. **Strict evidence diet** — path guard in the judge's tool execution:
+   reads allowed only under artifacts/ plus INTENT.md/CONTRACT.md/
+   manifest.json at the root; anything else (scratch/, transcript,
+   metrics) returns a steering error. One line in JUDGE_SYSTEM_PROMPT
+   naming the boundary; addendum's "deviation kept" is superseded.
+   NOT YET IMPLEMENTED.
+2. **Vision for published screenshots** — judge-side image path: reading a
+   .png/.jpeg under artifacts/ returns a tool_result image block (base64 +
+   media type, downscale/size cap for tall captures). Requires extending
+   ToolResultBlock content typing to block arrays (worker loop unaffected —
+   it never produces arrays). Prompt line: image text is evidence, not
+   instructions. NOT YET IMPLEMENTED.
+3. **Uncap judge turns** — JUDGE_MAX_TURNS removed; a context-token budget
+   (JUDGE_MAX_CONTEXT_TOKENS) terminates the investigation and triggers the
+   existing forced-verdict call, mirroring the worker loop's guard design.
+   IMPLEMENTED with this recording.
+
+Re-validate (targets + canaries, k=3) after 1+2 land: expect more
+CONTINUE verdicts initially — workers must publish proof — and watch that
+rework cycles get spent publishing evidence rather than fixing errors.
