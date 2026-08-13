@@ -61,6 +61,7 @@ CONTINUE + reason, unparseable verdict, artifact reading.
 ### 3. Outer loop in runTask
 Wire the triangle into `runTask` behind a config option (suggested
 `harness?: { maxWorkerCycles: number }`, default enabled with cap 2 on this
+(raised to 3 on 2026-08-13 — see judge-design.md v2 revisions item 4)
 branch; `0`/absent semantics chosen so existing tests and the REPL can run
 judge-less):
 

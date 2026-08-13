@@ -138,3 +138,10 @@ v1 text above:
    turn, so termination stays guaranteed), and hitting it triggers the
    existing forced-verdict call. A complete verdict is returned even when
    its own turn overruns the budget — the answer is already in hand.
+4. **Worker-cycle cap raised to 3** (user ruling 2026-08-13, post-v2
+   validation). The v2 batch's only graded wikipedia failure was a run
+   whose judge had exactly diagnosed the grader's failing assertion at
+   cycle 2 — the cap, not the diagnosis, bound. The extra cycle fires only
+   on a cycle-2 CONTINUE (3 of 12 runs in that batch); known cost: a
+   judge-unresolvable criterion now burns two extra cycles instead of one
+   before the cap ends the run.

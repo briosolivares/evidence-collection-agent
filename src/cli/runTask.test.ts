@@ -560,6 +560,49 @@ describe('runTask', () => {
     );
 
     it(
+      'the default cycle cap permits a third worker cycle (maxWorkerCycles omitted)',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([
+          textResponse('First attempt.'),
+          textResponse('Second attempt.'),
+          textResponse('Third attempt.'),
+        ]);
+        const judge = scriptModel([
+          judgeContinue('First reason.'),
+          judgeContinue('Second reason.'),
+          judgeDone(),
+        ]);
+
+        const result = await runTask('Collect widgets and publish a report.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: judge.callModel,
+          },
+        });
+
+        // Under the old default of 2, cycle 2's CONTINUE would have ended
+        // the run; the default of 3 lets the third cycle run to DONE.
+        expect(result).toMatchObject({ status: 'completed', finalText: 'Third attempt.' });
+        expect(worker.requests).toHaveLength(3);
+        expect(judge.requests).toHaveLength(3);
+
+        const events = await readTranscript(result.runDir);
+        expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([
+          1, 2, 3,
+        ]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
       'ends at a worker budget_exceeded without ever calling the judge',
       async () => {
         const initializer = scriptModel([

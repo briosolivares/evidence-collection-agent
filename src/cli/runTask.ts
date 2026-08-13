@@ -103,10 +103,15 @@ export function usableStartUrl(startUrl: string | undefined): string | undefined
  */
 export interface HarnessConfig {
   /** Maximum number of worker cycles this run may spend; an integer >= 1.
-   * Defaults to 2 (the design's v1 cap). A judge 'continue' verdict on the
-   * final cycle still ends the run with that cycle's completed result —
-   * this caps spend, not correctness (post-hoc graders stay the arbiter of
-   * whether the run actually succeeded). */
+   * Defaults to 3 (raised from the design's v1 cap of 2 after the
+   * 2026-08-13 v2 validation: on the one wikipedia trial that failed
+   * grading, the judge's cycle-2 CONTINUE had named exactly the assertion
+   * the grader failed — the cap, not the diagnosis, was the binding
+   * constraint. The extra cycle costs nothing unless the judge is still
+   * dissatisfied at cycle 2, a minority of runs). A judge 'continue'
+   * verdict on the final cycle still ends the run with that cycle's
+   * completed result — this caps spend, not correctness (post-hoc graders
+   * stay the arbiter of whether the run actually succeeded). */
   maxWorkerCycles?: number;
   /** Test seam for the initializer's single model call, mirroring
    * `RunTaskConfig.callModel`. Production default: makeInitializerCallModel. */
@@ -213,7 +218,7 @@ export async function runTask(
 
   // Harness-mode-only guard: absent config.harness, maxWorkerCycles is never
   // read, so a caller that never opts in can never trip this.
-  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 2;
+  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 3;
   if (
     config.harness !== undefined
     && (!Number.isInteger(maxWorkerCycles) || maxWorkerCycles < 1)
