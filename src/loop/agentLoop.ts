@@ -55,6 +55,9 @@ export interface LoopDeps {
   /** Browser session for runs whose registry includes browser tools;
    * file-only runs omit it. Passed through to tool executors untouched. */
   browser?: ToolCtx['browser'];
+  /** Stored login credentials for fill_credentials; runs without any omit
+   * it. Passed through to tool executors untouched. */
+  credentials?: ToolCtx['credentials'];
 }
 
 /**
@@ -222,7 +225,11 @@ export async function runAgentLoop(
     cacheCreationInputTokens: 0,
   };
   let peakContextTokens = 0;
-  const toolCtx: ToolCtx = { runDir: deps.runDir, browser: deps.browser };
+  const toolCtx: ToolCtx = {
+    runDir: deps.runDir,
+    browser: deps.browser,
+    credentials: deps.credentials,
+  };
 
   // Every ending funnels through here — returns via finish, crashes via
   // the catch below — so no exit can skip metrics.

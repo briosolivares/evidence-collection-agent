@@ -9,6 +9,7 @@ import { createRegistry, type ToolDef, type ToolRegistry } from './registry.js';
 import { browserBatchTool } from './browserBatch/browserBatch.js';
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
+import { fillCredentialsTool } from './fillCredentials/fillCredentials.js';
 import { grepTool } from './grep/grep.js';
 import { inspectPageTool } from './inspectPage/inspectPage.js';
 import { navigateTool } from './navigate/navigate.js';
@@ -27,6 +28,10 @@ export {
   type BrowserBatchResult,
 } from './browserBatch/browserBatch.js';
 export { downloadTool, type DownloadInput } from './download/download.js';
+export {
+  fillCredentialsTool,
+  type FillCredentialsInput,
+} from './fillCredentials/fillCredentials.js';
 export { grepTool } from './grep/grep.js';
 export { inspectPageTool, type InspectPageInput } from './inspectPage/inspectPage.js';
 export { navigateTool, type NavigateInput } from './navigate/navigate.js';
@@ -70,6 +75,11 @@ export const actionTools: readonly ToolDef[] = [clickTool, typeTool, scrollTool]
 /** Browser evidence tools in stable registration order. */
 export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
 
+/** Authentication tools in stable registration order. Appended after the
+ * original ten so their order — and the cached prompt prefix bytes they
+ * contribute — never shifts. */
+export const authTools: readonly ToolDef[] = [fillCredentialsTool as ToolDef];
+
 /** Deterministic model/runtime tool surfaces used by production entry points. */
 export type ToolProfile = 'atomic' | 'batch-enabled';
 
@@ -78,8 +88,9 @@ export const DEFAULT_TOOL_PROFILE: ToolProfile = 'atomic';
 
 /**
  * Build one complete production registry. The atomic profile retains the
- * existing ten tools and their exact order; the treatment appends the
- * composite browser tool without replacing any atomic capability.
+ * existing ten tools and their exact order (plus the appended auth tools);
+ * the treatment appends the composite browser tool without replacing any
+ * atomic capability.
  */
 export function createProductionRegistry(
   profile: ToolProfile = DEFAULT_TOOL_PROFILE,
@@ -89,6 +100,7 @@ export function createProductionRegistry(
     ...observationTools,
     ...actionTools,
     ...evidenceTools,
+    ...authTools,
     ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
   ]);
 }

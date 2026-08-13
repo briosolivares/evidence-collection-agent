@@ -1,6 +1,10 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+  FileCredentialStore,
+  type CredentialStore,
+} from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
 import {
   runAgentLoop,
@@ -103,6 +107,10 @@ export interface RunTaskConfig {
   /** Optional run-scoped tracing implementation. When omitted, tracing is
    * configured from LANGFUSE_* environment variables or becomes a no-op. */
   tracing?: RunTracing;
+  /** Optional credential store consulted by fill_credentials. When omitted,
+   * reads the gitignored `.credentials.json` at the repo root, or the file
+   * named by the CREDENTIALS_FILE environment variable. */
+  credentials?: CredentialStore;
 }
 
 /** The finished run directory together with the loop's terminal outcome. */
@@ -150,6 +158,12 @@ export async function runTask(
   );
   initManifest(runDir, taskText);
 
+  const credentials =
+    config.credentials ??
+    new FileCredentialStore(
+      process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
+    );
+
   const tracing = config.tracing ?? createRunTracing();
   const callModel = tracing.wrapCallModel(
     baseCallModel,
@@ -169,7 +183,13 @@ export async function runTask(
 
       return runAgentLoop(
         taskText,
-        { callModel, registry: tracedRegistry, runDir, browser: config.browser },
+        {
+          callModel,
+          registry: tracedRegistry,
+          runDir,
+          browser: config.browser,
+          credentials,
+        },
         {
           maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
           maxContextTokens: config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS,

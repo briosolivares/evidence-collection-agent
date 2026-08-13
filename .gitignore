@@ -6,5 +6,6 @@ docs/research/claude-code-harness.md
 node_modules/
 runs/
 chrome-profile/
+.credentials.json
 evals/experiments/*
 !evals/experiments/.gitkeep

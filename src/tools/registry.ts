@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import type { CredentialStore } from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
 
 /**
@@ -14,6 +15,10 @@ export interface ToolCtx {
   /** Browser session for tools that observe or act on a page. File-only
    * tool registries may omit it. */
   browser?: BrowserController;
+  /** Stored login credentials for fill_credentials. Environments without
+   * any omit it; fills then degrade to the no-credentials error and the
+   * model falls back to human handoff. */
+  credentials?: CredentialStore;
 }
 
 /**
