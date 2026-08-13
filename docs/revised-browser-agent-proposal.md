@@ -69,6 +69,8 @@ credentials only to the exact site they belong to and limiting download sizes.
   There is no general-purpose host code runner; page-scoped JavaScript is
   intentionally supported.
 - A swarm of unconstrained browser workers.
+- A mandatory model-maintained task checklist or separate `TaskProgress`
+  object; evaluate planning tools independently before adding them.
 - Cryptographically signed evidence bundles.
 - A complete enterprise security-policy engine.
 - A new browser engine.
@@ -104,10 +106,10 @@ credentials only to the exact site they belong to and limiting download sizes.
 | Current mechanism | Replacement |
 | --- | --- |
 | inspect → model → click → model → inspect | Each browser action also reports what changed |
-| Short-lived Playwright element references | Element references tied to a page, frame, and page version |
+| Short-lived Playwright element references | Element references tied to a page, frame, and document |
 | Checklist stored in a scratch file | Output status derived from the contract and current files |
 | Raw CSV strings | An `OutputTable` rendered by a normal CSV library |
-| Treating “no tool call” as completion | An explicit finish request checked by code |
+| Treating “no tool call” as completion | Explicit `submit_for_verification` protocol |
 | Replaying the full conversation as memory | A short recent history plus compact structured state |
 | One sequential research path | Limited parallel work for truly independent items |
 | Full-page accessibility tree every time | Inspect only the type and area of content currently needed |
@@ -165,6 +167,17 @@ interface OutputContract {
   contentExpectations?: string[];
   assumptions?: string[];
 }
+
+interface SetOutputContractInput {
+  contract: OutputContract;
+  revisionReason?: string;
+}
+
+interface OutputContractRevision {
+  revision: number;
+  reason?: string;
+  contract: OutputContract;
+}
 ~~~
 
 `contentExpectations` holds semantic expectations such as “explain the most
@@ -182,9 +195,10 @@ Structural validation rejects duplicate output IDs or paths, unsafe filenames,
 duplicate table columns, non-positive counts, and conflicting table rules. The
 accepted contract is written through `writeArtifact` under
 `scratch/output-contract/`. If the worker explicitly changes the contract, save
-a new numbered revision instead of silently overwriting the previous one. The
-final verifier sees the latest contract and the revision history, so the worker
-cannot hide a mistake by moving the goalposts.
+a new numbered revision with a required `revisionReason` instead of silently
+overwriting the previous one. The final verifier sees the latest contract and
+the revision history, so the worker cannot hide a mistake by moving the
+goalposts.
 
 The original task remains authoritative. The contract is an execution target,
 not a replacement for the request, and the final verifier checks that the two
@@ -225,17 +239,17 @@ missing.
 
 ### 3. Give the application an accurate view of the browser
 
-The browser controller—not the model—should track tabs, embedded frames, page
-changes, and element identity. Navigation, frame changes, and DOM mutations that
-can invalidate an observed element increment `pageVersion`. An element
-reference is valid only for the page version where it was observed.
+The browser controller—not the model—should track tabs, embedded frames,
+documents, observations, and element identity. A `documentId` changes only when
+navigation, reload, or frame replacement creates a new document. An
+`observationId` identifies the page snapshot used to calculate what changed.
 
 ~~~ts
 interface ElementRef {
   id: string;
   pageId: string;
   frameId: string;
-  pageVersion: number;
+  documentId: string;
 
   backendNodeId?: number;
   role: string;
@@ -245,27 +259,29 @@ interface ElementRef {
 
 interface BrowserPage {
   pageId: string;
-  pageVersion: number;
+  documentId: string;
+  observationId: number;
   url: string;
   title: string;
   active: boolean;
-  frames: Array<{ frameId: string; url: string }>;
+  frames: Array<{ frameId: string; documentId: string; url: string }>;
 }
 ~~~
 
-When the agent tries to use an element reference, resolve it in this order:
+Before every action, revalidate its element reference in this order:
 
-1. Use the browser's exact internal node ID if the page and frame have not
-   changed.
-2. Otherwise try the stable locator saved when the element was observed.
+1. Use the browser's exact internal node ID if it is still connected to the
+   expected document.
+2. Otherwise try the stable locator saved when the element was observed, within
+   that same document.
 3. Otherwise match its role, visible name, and position—but only if there is
    exactly one safe match.
 4. If none of those works, report that the reference is stale and inspect the
    page again.
 
-This keeps the useful human description (“the Submit button”) without assuming
-that a short-lived accessibility reference will remain valid after the page
-changes.
+Unrelated DOM mutations do not invalidate every element on the page. This keeps
+the useful human description (“the Submit button”) while avoiding both stale
+actions and constant reinspection on live pages.
 
 ### 4. Use `browser_action` for normal browser interaction
 
@@ -280,8 +296,7 @@ type BrowserAction =
   | { op: 'fill'; target: ElementRef; text: string }
   | { op: 'press'; target?: ElementRef; key: string }
   | { op: 'select'; target: ElementRef; values: string[] }
-  | { op: 'scroll'; direction: 'up' | 'down'; amount?: number }
-  | { op: 'activate_page'; pageId: string };
+  | { op: 'scroll'; direction: 'up' | 'down'; amount?: number };
 
 type SuccessCheck =
   | { type: 'url_matches'; pattern: string }
@@ -300,14 +315,15 @@ interface PageChanges {
 
 interface BrowserActionInput {
   pageId: string;
-  pageVersion: number;
+  documentId: string;
+  basedOnObservationId: number;
   actions: [BrowserAction, ...BrowserAction[]];
   successChecks?: SuccessCheck[];
 }
 
 interface BrowserActionOutput {
   status: 'completed' | 'stale' | 'blocked' | 'failed';
-  previousPageVersion: number;
+  previousObservationId: number;
   currentPage: BrowserPage;
   changes: PageChanges;
   openedPages: BrowserPage[];
@@ -321,10 +337,16 @@ controls that changed, new pages, dialogs, downloads, and whether navigation
 occurred. `PageChanges` means the useful difference between the page before and
 after the action.
 
-If an action changes the page and makes a later target stale, or if an
-unexpected popup or dialog appears, the application stops the sequence. This
-gains the speed of batching without blindly continuing. It replaces the
-separate `browser_batch` tool.
+The Zod schema allows one to eight actions, all against one page and document.
+The runtime revalidates every target immediately before use. Navigation,
+document replacement, an unexpected popup, or a dialog stops the sequence.
+Page switching uses a separate `switch_page` tool and cannot be mixed with
+element actions. This gains the speed of batching without blindly continuing
+and replaces the separate `browser_batch` tool.
+
+`PageChanges` contains only the affected or previously observed regions and is
+size-capped. Larger changes use the existing scratch offload mechanism rather
+than serializing the entire page into every action result.
 
 ~~~text
 Current: observe → click → observe → fill → click → observe
@@ -341,7 +363,8 @@ unusual controls.
 ~~~ts
 interface ExecuteJavaScriptInput {
   pageId: string;
-  pageVersion: number;
+  documentId: string;
+  basedOnObservationId: number;
   code: string;
   timeoutMs?: number;
   successChecks?: SuccessCheck[];
@@ -349,7 +372,7 @@ interface ExecuteJavaScriptInput {
 
 interface ExecuteJavaScriptOutput {
   status: 'completed' | 'stale' | 'blocked' | 'failed';
-  previousPageVersion: number;
+  previousObservationId: number;
   result?: JsonValue;
   pageChanged: boolean;
   currentPage: BrowserPage;
@@ -372,7 +395,8 @@ JavaScript runs inside the selected webpage, never in Node.js or the host
 filesystem. Each execution has a timeout and output-size limit, returns only
 JSON-compatible values, and records its code and result in the transcript. The
 application also captures page changes, navigation, popups, dialogs, downloads,
-logs, and errors.
+logs, and errors. A caller-supplied timeout is capped by the provider's finite
+maximum.
 
 The tool definition remains static and deterministic. Page-specific data belongs
 in the tool input, so adding this capability does not make the cached prompt
@@ -381,6 +405,12 @@ prefix vary between runs.
 Because model-generated JavaScript can change the page even when it claims to
 be read-only, every call acquires that page's state-changing lock. Calls on
 independent pages may still run concurrently.
+
+A timer alone cannot stop synchronous JavaScript that monopolizes the renderer.
+The browser provider must be able to terminate execution. If it cannot restore
+the page to a known state, it closes that page, invalidates its element
+references, and creates a replacement page. The result reports this recovery as
+a failed execution rather than leaving the run hung.
 
 ### 6. Inspect the right kind of content for the job
 
@@ -455,9 +485,8 @@ JavaScript can read it.
 ### 8. Store rows as data, then generate the output file
 
 For structured output, the model should add rows to an `OutputTable`, not
-hand-write CSV text. The table is the answer before file formatting; its
-`TableRule` values describe what must be true before that answer can be
-published.
+hand-write CSV text. The corresponding table `OutputSpec` in the contract is
+the only source of truth for its filename, format, columns, and rules.
 
 ~~~ts
 interface OutputColumn {
@@ -479,37 +508,45 @@ type TableRule =
       type: 'matches_expected_values';
       column: string;
       expected: string[];
-      sourceEvidenceIds: string[];
+      source:
+        | { kind: 'original_task' }
+        | { kind: 'evidence'; evidenceIds: string[] };
     };
 
 interface OutputTable {
-  id: string;
-  filename: string;
-  format: 'csv' | 'json' | 'markdown';
-  columns: OutputColumn[];
+  outputId: string;
+  version: number;
   rows: OutputRow[];
-  rules: TableRule[];
 }
 ~~~
 
-When rows are added, the application rejects:
+When rows are added, the application looks up the contract's `OutputSpec` by
+`outputId` and rejects:
 
-- missing columns;
-- extra columns;
+- missing required values;
+- unexpected columns;
 - invalid URLs or integers;
 - duplicates when disallowed;
 - malformed dates;
 - rows without required evidence;
 - values that spreadsheet programs could accidentally execute as formulas.
 
-Before publishing, regular code evaluates every `TableRule` and generates a
-standards-compliant CSV in one pass. The same rows can also produce JSON,
-Markdown tables, or other formats without asking the model to rewrite the data.
+The model does not need a separate “finalize table” tool. When it calls
+`submit_for_verification`, application code validates the current rows against
+the latest contract revision, renders the requested format, and writes the
+actual requested-output artifact through `writeArtifact`. The verifier then
+reads that exact file. Every row mutation advances `version`, which supports
+safe serialized updates and output-summary caching; it is not another piece of
+progress state for the model to maintain.
 
 `matches_expected_values` handles the cases that actually require proof of
 completeness. For example, after discovering the complete contributor list, it
-can require the table's `Profile URL` column to match that list exactly. This is
-a validation rule, not a separate collection-item or coverage state machine.
+can require the table's `Profile URL` column to match that list exactly. Because
+those values were unknown when the first contract was created, adding this rule
+requires an explicit numbered contract revision whose `source` names the
+supporting evidence IDs. Values stated directly by the user can instead name
+the original task as their source. A rule is never silently attached to the
+table.
 
 This prevents malformed rows, avoids repeatedly reading and rewriting a growing
 file, and uses far fewer model output tokens.
@@ -537,9 +574,15 @@ interface Claim {
 }
 ~~~
 
-These links make review and debugging much easier. An auditor can move from a
-claim to its source, and the agent can recollect one weak fact without repeating
-the entire task.
+`OutputRow.evidenceIds` and `Claim.evidenceIds` are the links; do not maintain a
+second evidence-link index that can drift out of sync. They make review and
+debugging much easier: an auditor can move from a fact to its source, and the
+agent can recollect one weak fact without repeating the entire task.
+
+An `Evidence` object is an index, not the evidence itself. Screenshots,
+downloads, and saved network responses must point to a manifest-hashed artifact.
+Web-text evidence must contain either a captured artifact or an exact quote and
+locator. This keeps every reference reviewable from the run directory.
 
 The current manifest hashing is sufficient for the initial capability-focused
 version. Stronger signing can be added later.
@@ -548,46 +591,64 @@ version. Stronger signing can be added later.
 
 The current loop treats any response with no tool call as completion. That can
 also happen when the model reaches a token limit, refuses, or simply forgets to
-continue. Instead, the model must explicitly ask to finish and identify the
-deliverables and claims it believes are complete.
+continue. Replace this with the explicit `submit_for_verification` tool. The
+name is deliberate: the worker requests verification; it does not decide that
+the run is complete.
 
 The application first runs `CompletionCheck`: ordinary validation code that
-checks the finish request against the output contract, published outputs, table
-rules, and evidence.
+checks table state and evidence, renders valid table outputs, and then checks
+the actual published artifacts.
 
 ~~~ts
-interface FinishRequest {
-  outputIds: string[];
-  claimIds: string[];
-  unresolvedLimitations: string[];
+interface SubmitForVerificationInput {
+  unresolvedLimitations?: string[];
 }
 
 async function runCompletionCheck(
-  contract: OutputContract,
-  request: FinishRequest,
-  outputs: PublishedOutput[],
+  revision: OutputContractRevision,
   tables: OutputTable[],
+  claims: Claim[],
   evidence: Evidence[],
 ): Promise<CompletionCheckResult> {
-  const failures = [
-    ...validateExpectedOutputs(contract, outputs, tables),
-    ...validateTableRules(tables),
-    ...validateEvidenceLinks(request, tables, evidence),
+  const stateFailures = [
+    ...validateTableRules(revision.contract, tables),
+    ...validateEvidenceReferences(revision.contract, tables, claims, evidence),
   ];
 
-  if (failures.length > 0) {
-    return { status: 'continue', failures };
+  if (stateFailures.length > 0) {
+    return { status: 'continue', failures: stateFailures };
   }
 
-  return { status: 'verified' };
+  await materializeTableOutputs(revision, tables); // uses writeArtifact
+  const outputs = publishedOutputs.all();
+  const artifactFailures = validateExpectedOutputs(
+    revision.contract,
+    outputs,
+    tables,
+  );
+
+  return artifactFailures.length > 0
+    ? { status: 'continue', failures: artifactFailures }
+    : { status: 'verified', outputs };
 }
 ~~~
 
+The submission handler is state-changing and runs as a scheduler barrier.
+Rendering or write failures become ordinary `CompletionCheck` failures; they
+never count as completion.
+
+`submit_for_verification` must be the only tool call in its assistant response.
+The provider message must end with a complete `message_stop` and the expected
+tool-use stop reason. A no-tool response, `max_tokens`, refusal, malformed tool
+block, or transport EOF never indicates completion. Mechanical or verifier
+failures return as the tool result for the same submission call, allowing the
+worker to correct them on its next turn.
+
 Checks with objective answers run first:
 
-- the model response ended normally rather than at a token limit, refusal, or
-  truncated stream;
-- required artifacts exist;
+- every contract output has an actual published artifact;
+- every table artifact was rendered from the current rows and contract
+  revision;
 - exact columns;
 - whether files can be parsed;
 - row counts;
@@ -595,9 +656,6 @@ Checks with objective answers run first:
 - screenshot counts;
 - unfinished placeholders such as `TODO` or missing values;
 - evidence linkage.
-
-A transport EOF without the provider's normal message-stop event is an error,
-not a successful finish.
 
 After mechanical checks pass, run one verifier call with fresh context:
 
@@ -612,10 +670,13 @@ interface VerificationResult {
 interface VerificationInput {
   originalTask: string;
   contract: OutputContract;
-  contractHistory: OutputContract[];
+  contractHistory: OutputContractRevision[];
   outputs: PublishedOutput[];
   tables: OutputTable[];
+  claims: Claim[];
   evidence: Evidence[];
+  mechanicalChecks: CompletionCheckResult;
+  reportedLimitations: string[];
 }
 ~~~
 
@@ -629,15 +690,17 @@ Claims and rows ↔ Evidence
 ~~~
 
 Checking the original task prevents an incorrect contract from validating its
-own mistake. The verifier receives the run outputs and evidence, not the
-worker's full conversation, so it forms an independent view. Code handles
-columns, counts, filenames, duplicates, and parseability before this call.
+own mistake. The verifier gets read-only access to the published artifacts,
+evidence files, screenshots, contract history, and mechanical results. It does
+not receive the worker transcript, a mutable browser, or write tools. Code
+handles columns, counts, filenames, duplicates, and parseability before this
+call.
 
 If verification fails, return the specific contract, output, and evidence
 problems to the same worker. The worker corrects the run and requests
-verification again; it is not restarted from scratch. Verification-repair
-cycles must have their own small limit. If they remain unresolved, publish an
-incomplete run rather than accepting it.
+verification again; it is not restarted from scratch. Default to at most two
+verification-repair cycles. If they remain unresolved, finalize an incomplete
+run rather than accepting it.
 
 ### 11. Keep the audit log, but give the model a compact memory
 
@@ -658,6 +721,7 @@ That compact view should contain:
 
 ~~~ts
 interface AgentContext {
+  originalTask: string;
   contract?: OutputContract;
   outputs: OutputSummary[];
   pages: BrowserPage[];
@@ -697,8 +761,67 @@ Scheduling rules:
 - Public data reads can use more concurrency than browser pages.
 - Output-table updates are serialized, and published files still go through
   `writeArtifact`.
+- Reject a response that exceeds `maxToolCallsPerTurn` before executing any of
+  its calls. Every attempted call also counts toward the total run limit,
+  regardless of how small its result is.
+- Apply both per-result and combined-result size limits; offloading one large
+  result must not let many small results overflow the next model request.
 - A failed call is returned immediately, while successful independent results
   remain usable.
+
+### 13. Bound every resource explicitly
+
+Concurrency limits are not total-work limits. Every run needs independently
+validated, finite budgets:
+
+~~~ts
+interface RunBudget {
+  maxModelTurns: number;
+  maxWallTimeMs: number;
+  maxPromptTokensPerTurn: number;
+  maxOutputTokensPerTurn: number;
+  maxTotalModelTokens: number;
+  maxConcurrentToolCalls: number;
+  maxToolCallsPerTurn: number;
+  maxToolCalls: number;
+  maxDownloadedBytes: number;
+  maxPublishedBytes: number;
+  maxVerificationRepairs: number;
+}
+~~~
+
+Require positive finite safe integers for time, token, turn, and call limits.
+Byte and verifier-repair limits may be zero to disable that capability;
+otherwise they have the same validation. `maxTotalModelTokens` counts prompt
+and output tokens across the run. Enforce each limit while work runs—not only
+after a model call or download has already exceeded it. For example, check a
+tool-call batch before scheduling it and stop a streamed download at its byte
+limit.
+
+### 14. Use one model and streaming driver everywhere
+
+The CLI, eval runner, and TUI should not each implement their own version of the
+model loop. Put provider streaming, cancellation, prompt caching, response
+assembly, usage accounting, and terminal-state validation behind one driver:
+
+~~~ts
+interface ModelDriver {
+  complete(
+    request: ModelRequest,
+    options: {
+      signal: AbortSignal;
+      onEvent?: (event: ModelLifecycleEvent) => void;
+    },
+  ): Promise<CompleteModelResponse>;
+}
+~~~
+
+The TUI observes typed lifecycle events and cancels through `AbortSignal`; it
+does not copy the production model client. The driver returns a complete
+response only after the provider's required terminal event and stop reason. A
+network stream that ends early (transport EOF), incomplete content blocks,
+refusal, and token-limit termination are typed non-success outcomes. This
+prevents UI-specific behavior from silently diverging from eval behavior.
 
 ## Revised core loop
 
@@ -710,6 +833,7 @@ updates its records, and accepts completion only after validation succeeds.
 async function runTask(task: string): Promise<VerifiedRun> {
   const session = await browser.createSession();
   let contract: OutputContract | undefined;
+  let verificationRepairsUsed = 0;
 
   while (!budget.expired()) {
     const outputs = contract
@@ -722,65 +846,103 @@ async function runTask(task: string): Promise<VerifiedRun> {
       : [];
 
     const context = buildAgentContext({
-      task,
+      originalTask: task,
       contract,
       outputs,
       browser: session.state(),
     });
 
     // The model proposes tool calls; tools own all application-state changes.
-    const nextStep = await worker.next(context);
+    const response = await worker.next(context);
 
-    const results = await scheduler.execute(nextStep.toolCalls, {
-      requireOutputContract: contract === undefined,
-    });
-    runEvents.record(results);
-    contract = outputContracts.current();
+    if (!isUsableModelResponse(response)) {
+      runEvents.recordFailure('Truncated, refused, or malformed model response');
+      worker.addFeedback([
+        'The previous response was unusable and did not complete the run.',
+      ]);
+      continue;
+    }
 
-    if (nextStep.finishRequest !== undefined) {
+    const { submission, protocolError } = parseExclusiveSubmission(response);
+
+    if (protocolError !== undefined) {
+      worker.addFeedback([protocolError]);
+      continue;
+    }
+
+    if (submission !== undefined) {
       if (contract === undefined) {
-        worker.addFeedback(['Set a valid output contract before finishing.']);
-        continue;
-      }
-
-      // Mechanical contract checks must pass before semantic verification.
-      const verdict = await runCompletionCheck(
-        contract,
-        nextStep.finishRequest,
-        publishedOutputs.all(),
-        outputTables.all(),
-        evidenceStore.all(),
-      );
-
-      if (verdict.status === 'verified') {
-        const verification = await verifier.verify({
-          originalTask: task,
-          contract,
-          contractHistory: outputContracts.all(),
-          outputs: publishedOutputs.all(),
-          tables: outputTables.all(),
-          evidence: evidenceStore.all(),
-        });
-
-        if (verification.status === 'accepted') {
-          return publishRun({ tables: outputTables.all() });
-        }
-
-        worker.addFeedback([
-          ...verification.contractProblems,
-          ...verification.outputProblems,
-          ...verification.evidenceProblems,
+        worker.addToolResult(submission.toolUseId, [
+          'Set a valid output contract before submitting.',
         ]);
         continue;
       }
 
-      worker.addFeedback(verdict.failures);
+      const contractRevision = outputContracts.currentRevision();
+      const mechanicalChecks = await runCompletionCheck(
+        contractRevision,
+        outputTables.all(),
+        claimStore.all(),
+        evidenceStore.all(),
+      );
+
+      if (mechanicalChecks.status !== 'verified') {
+        worker.addToolResult(submission.toolUseId, mechanicalChecks.failures);
+        continue;
+      }
+
+      const verification = await verifier.verify({
+        originalTask: task,
+        contract,
+        contractHistory: outputContracts.all(),
+        outputs: mechanicalChecks.outputs,
+        tables: outputTables.all(),
+        claims: claimStore.all(),
+        evidence: evidenceStore.all(),
+        mechanicalChecks,
+        reportedLimitations: submission.input.unresolvedLimitations ?? [],
+      });
+
+      if (verification.status === 'accepted') {
+        runEvents.recordToolResult(submission.toolUseId, verification);
+        return finalizeRun();
+      }
+
+      if (verificationRepairsUsed >= budget.maxVerificationRepairs) {
+        runEvents.recordToolResult(submission.toolUseId, verification);
+        return finalizeIncompleteRun(verification);
+      }
+
+      verificationRepairsUsed += 1;
+      worker.addToolResult(submission.toolUseId, [
+        ...verification.contractProblems,
+        ...verification.outputProblems,
+        ...verification.evidenceProblems,
+      ]);
+      continue;
     }
+
+    if (response.toolCalls.length === 0) {
+      worker.addFeedback([
+        'Continue working or call submit_for_verification explicitly.',
+      ]);
+      continue;
+    }
+
+    const results = await scheduler.execute(response.toolCalls, {
+      requireOutputContract: contract === undefined,
+    });
+    runEvents.record(results);
+    contract = outputContracts.current();
   }
 
-  return publishIncompleteRun();
+  return finalizeIncompleteRun();
 }
 ~~~
+
+`finalizeRun()` only closes the manifest, transcript, and metrics. Table files
+have already been rendered by `CompletionCheck`; every other requested output
+must already have been written through its normal artifact tool.
 
 The important difference from the current loop is not “more agents.” It is a
 clear ownership boundary. The model proposes; the application executes,
@@ -800,15 +962,16 @@ V2 would handle it as follows:
 2. The model opens the repository and finds the contributor list. It can use
    `execute_javascript` to extract the visible list or `read_resource` if the
    page exposes the same data as public JSON.
-3. The contract creates an `OutputTable` with a 30-row rule, exact columns,
-   unique profile URLs, and an exact-value rule if a complete contributor list
-   becomes available.
-4. Each table row stores the evidence that supports its values. A CSV
-   library—not the model—writes the final file.
+3. The contract defines a 30-row rule, exact columns, and unique profile URLs.
+   If a complete contributor list becomes available, the worker can add an
+   evidence-backed exact-value rule through an explicit contract revision.
+4. Each `OutputTable` row stores the evidence supporting its values.
 5. The screenshot tool saves the leaderboard as both requested output and
    evidence.
-6. `CompletionCheck` verifies exactly 30 unique rows, exactly three
-   columns, valid profile URLs, the required screenshot, and evidence links.
+6. The worker calls `submit_for_verification` as its only tool call.
+   `CompletionCheck` verifies exactly 30 unique rows, renders the CSV, then
+   checks the actual file's three columns, profile URLs, required screenshot,
+   and evidence links.
 7. The verifier independently compares the original task, output contract,
    finished CSV, screenshot, and evidence before accepting the run.
 
@@ -823,16 +986,31 @@ The phases below are ordered by expected value. Each phase is useful by itself;
 the team does not need to build the entire architecture before measuring an
 improvement.
 
+### Phase 0 — make the control loop trustworthy
+
+- Replace the TUI's separate model loop with the shared, cancellable
+  `ModelDriver`.
+- Make stream assembly reject missing terminal events, incomplete blocks,
+  token-limit stops, and refusals as completion.
+- Add finite per-turn and whole-run token, tool-call, byte, time, and repair
+  budgets. Enforce them before or during the operation that consumes them.
+- Until `submit_for_verification` lands in Phase 2, require a clean provider
+  stop before accepting the existing no-tool completion signal.
+
+Primary metric: zero false-successful completions under forced truncation,
+cancellation, refusal, and budget-exhaustion tests.
+
 ### Phase 1 — reduce browser turns
 
-- Add `BrowserPage`, page IDs, version numbers, frame tracking, and popup
+- Add `BrowserPage`, document IDs, observation IDs, frame tracking, and popup
   tracking.
-- Add `browser_action` and make every action report the relevant page changes.
+- Add per-element revalidation and `browser_action` sequences capped at eight
+  same-document actions.
 - Add page-scoped `execute_javascript` with page locking, timeouts, bounded
-  output, and before/after page state.
+  output, execution termination, and page recovery.
 - Remove `browser_batch`.
 - Cache observed element descriptions instead of regenerating outlines.
-- Add keyboard, select, and page-switch operations.
+- Add keyboard and select operations plus a separate `switch_page` operation.
 
 Primary metric: model calls per successful page operation. A lower number means
 less latency and cost without relying on a faster model.
@@ -841,8 +1019,12 @@ less latency and cost without relying on a faster model.
 
 - Add the validated `set_output_contract` tool and store numbered contract
   revisions under `scratch/output-contract/` through `writeArtifact`.
-- Add `OutputTable`, batch row insertion, and `TableRule` validation.
-- Add strict CSV rendering.
+- Add schema-free, versioned `OutputTable` row state keyed to the contract
+  output ID.
+- Add batch row insertion and `TableRule` validation.
+- Add the exclusive `submit_for_verification` protocol and reject no-tool,
+  truncated, refused, or malformed completion attempts. Its handler renders
+  current table artifacts through `writeArtifact` before verification.
 - Derive output paths and whether files are deliverables or supporting evidence
   from the output contract.
 - Add derived `OutputSummary` and code-based `CompletionCheck`.
@@ -880,6 +1062,8 @@ the model, and repeated inspections that revealed nothing new.
 - Add the fresh-context verifier. It checks task-to-contract,
   contract-to-output, task-to-output, and claim-to-evidence alignment after
   mechanical checks pass.
+- Give it only read access to actual artifacts and evidence, and cap repair
+  cycles at two by default.
 - Add data-only, site-specific interaction recipes. Each recipe should name the
   site it applies to, define how success is checked, and expire so stale site
   behavior is not trusted forever.
@@ -897,9 +1081,12 @@ The architecture should be evaluated against:
 - model calls per successful page operation;
 - total browser observations;
 - redundant observation rate;
+- stale-element retries and false-stale rate;
+- JavaScript termination and page-recovery rate;
 - largest model input during a run;
 - total output and cached-input tokens;
 - output validation failures;
+- table materialization or artifact-validation failures at submission;
 - contract defects found by the verifier;
 - verifier correction rate and added latency;
 - required table values found versus missing;
