@@ -13,6 +13,7 @@ function sampleReport(): EvalReport {
     startedAt: '2026-08-10T00:00:00.000Z',
     finishedAt: '2026-08-10T00:00:05.000Z',
     k: 2,
+    concurrency: 3,
     model: 'claude-sonnet-5',
     toolProfile: 'batch-enabled',
     tasks: [
@@ -43,6 +44,7 @@ describe('formatReport', () => {
     const text = formatReport(sampleReport());
 
     expect(text).toContain('k=2');
+    expect(text).toContain('concurrency 3');
     expect(text).toContain('model claude-sonnet-5');
     expect(text).toContain('tool profile batch-enabled');
     expect(text).toContain('stub: accuracy 75.0%  completion 1/2  task FAIL  mean latency 50ms');
@@ -53,6 +55,27 @@ describe('formatReport', () => {
     expect(text).toContain('FAIL  hash verifies — sha256 mismatch on disk');
     expect(text).toContain('pass  answer.md exists');
     expect(text).toContain('0/1 tasks passed');
+  });
+
+  it('renders an errored trial with its error and no assertion lines', () => {
+    const report: EvalReport = {
+      ...sampleReport(),
+      tasks: [
+        summarizeTask('stub', [
+          {
+            runDir: '/runs/r1',
+            assertions: [{ name: 'answer.md exists', passed: true, detail: 'found' }],
+            latencyMs: 40,
+          },
+          { assertions: [], latencyMs: 120_000, error: 'model stream ended unexpectedly' },
+        ]),
+      ],
+    };
+
+    const text = formatReport(report);
+    expect(text).toContain('stub: accuracy 50.0%  completion 1/2  task FAIL');
+    expect(text).toContain('trial 2: ERRORED  120000ms  (no run directory)');
+    expect(text).toContain('ERROR  model stream ended unexpectedly');
   });
 });
 

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { AirbnbLakeTahoeOracle } from '../oracle/oracle.js';
 
@@ -24,19 +24,21 @@ interface NumberedSection {
 export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOracle(oracleData);
   const manifest = readManifest(runDirPath);
-  const answerPath = join(runDirPath, ANSWER_FILENAME);
-  const answerExists = existsSync(answerPath) && manifest.artifacts.some((entry) => entry.filename === ANSWER_FILENAME);
+  const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
+  const answerExists = answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
   const assertions: AssertionResult[] = [{
     name: `${ANSWER_FILENAME} exists with a manifest entry`,
     passed: answerExists,
-    detail: answerExists ? `${ANSWER_FILENAME} found and manifested` : `${ANSWER_FILENAME} missing or unmanifested`,
+    detail: answerExists
+      ? `${answerEntry!.filename} found and manifested`
+      : `${ANSWER_FILENAME} missing or not published as a requested output`,
   }];
 
   if (!answerExists) {
     return [...assertions, ...failedContent(`${ANSWER_FILENAME} is unavailable`), verifyManifestHashes(runDirPath, manifest)];
   }
 
-  const answer = readFileSync(answerPath, 'utf8');
+  const answer = readFileSync(join(runDirPath, answerEntry!.filename), 'utf8');
   const sections = parseNumberedSections(answer);
   assertions.push(listAssertion(sections, oracle));
   assertions.push(urlAssertion(sections, oracle));

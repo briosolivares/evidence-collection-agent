@@ -2,17 +2,18 @@ import { basename } from 'node:path';
 
 import { z } from 'zod';
 
-import { writeArtifact } from '../../run/artifacts.js';
+import { ARTIFACTS_DIR, writeArtifact } from '../../run/artifacts.js';
 import type { ToolDef } from '../registry.js';
 import { requireBrowser } from '../shared/browser.js';
-import { assertEvidencePath, type EvidenceResult } from '../shared/evidence.js';
+import { artifactRolesInput, assertEvidencePath, type EvidenceResult } from '../shared/evidence.js';
 
 const filenameSchema = z
   .string()
   .min(1)
   .optional()
   .describe(
-    'Run-directory-relative output path. Defaults to the browser-suggested filename or a safe URL basename',
+    'Run-directory-relative output path under artifacts/. ' +
+      'Defaults to artifacts/<browser-suggested filename or safe URL basename>',
   );
 
 const httpUrlSchema = z.url().refine((url) => {
@@ -36,6 +37,10 @@ const downloadInputSchema = z
         'Verified direct resource URL when the visible page link is a viewer or redirect wrapper',
       ),
     filename: filenameSchema,
+    roles: artifactRolesInput.describe(
+      'Roles recorded for the download. Defaults to ["evidence"]; ' +
+        'pass ["requested_output","evidence"] when the task explicitly asked for this file.',
+    ),
   })
   .strict()
   .refine((input) => (input.ref === undefined) !== (input.url === undefined), {
@@ -53,8 +58,10 @@ export type DownloadInput = z.infer<typeof downloadInputSchema>;
  * response or download event, preserving the page's cookies, network
  * identity, and session. Direct URLs let the agent bypass viewer wrappers
  * without any site-specific logic. The exact captured bytes are written
- * through `writeArtifact`; the final resource URL is recorded as provenance
- * (or the initiating page for browser-generated blob downloads).
+ * through `writeArtifact` — always published under artifacts/, with the
+ * given roles (default `evidence`) recorded — and the final resource URL is
+ * recorded as provenance (or the initiating page for browser-generated blob
+ * downloads).
  */
 export const downloadTool: ToolDef<DownloadInput> = {
   name: 'download',
@@ -62,7 +69,8 @@ export const downloadTool: ToolDef<DownloadInput> = {
     'Download exact bytes through Chrome using either an inspect_page ref or a verified ' +
     'direct HTTP(S) URL (provide exactly one). Supports ordinary document responses, ' +
     'attachment links, and JavaScript-triggered browser downloads. Use a direct URL when ' +
-    'an observed link is only a viewer or redirect wrapper. Saves the artifact with final-URL provenance.',
+    'an observed link is only a viewer or redirect wrapper. ' +
+    'Saves the artifact under artifacts/ with final-URL provenance.',
   inputSchema: downloadInputSchema,
   readOnly: false,
   async execute(input, ctx): Promise<EvidenceResult> {
@@ -84,13 +92,17 @@ export const downloadTool: ToolDef<DownloadInput> = {
     }
 
     const filename = input.filename
-      ?? safeSuggestedFilename(response.suggestedFilename)
-      ?? safeUrlBasename(response.finalUrl);
+      ?? `${ARTIFACTS_DIR}/${
+        safeSuggestedFilename(response.suggestedFilename) ?? safeUrlBasename(response.finalUrl)
+      }`;
     assertEvidencePath(ctx.runDir, filename);
     const sourceUrl = isHttpUrl(response.finalUrl)
       ? response.finalUrl
       : initiatingPageUrl;
-    const entry = writeArtifact(ctx.runDir, filename, response.bytes, { sourceUrl });
+    const entry = writeArtifact(ctx.runDir, filename, response.bytes, {
+      sourceUrl,
+      roles: input.roles ?? ['evidence'],
+    });
     return { path: entry.filename, size: response.bytes.byteLength };
   },
 };

@@ -42,8 +42,13 @@ function byName(results: { name: string; passed: boolean }[], name: string) {
 
 describe('edgar grader', () => {
   it('passes every assertion when the download matches and a real screenshot exists', async () => {
-    writeArtifact(runDir, 'aapl-8k-0129.htm', DOCUMENT_BYTES, { sourceUrl: ORACLE.documentUrl });
-    writeArtifact(runDir, 'filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]));
+    writeArtifact(runDir, 'artifacts/aapl-8k-0129.htm', DOCUMENT_BYTES, {
+      sourceUrl: ORACLE.documentUrl,
+      roles: ['requested_output', 'evidence'],
+    });
+    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
+      roles: ['requested_output', 'evidence'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
@@ -52,8 +57,14 @@ describe('edgar grader', () => {
   });
 
   it('fails only the document-hash assertion when no downloaded artifact matches', async () => {
-    writeArtifact(runDir, 'wrong-doc.htm', Buffer.from('not the filing'));
-    writeArtifact(runDir, 'filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]));
+    // Published as a requested output, so the hash check — not the role
+    // filter — is what rejects it.
+    writeArtifact(runDir, 'artifacts/wrong-doc.htm', Buffer.from('not the filing'), {
+      roles: ['requested_output', 'evidence'],
+    });
+    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
+      roles: ['requested_output', 'evidence'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
@@ -64,7 +75,10 @@ describe('edgar grader', () => {
   });
 
   it('fails only the screenshot assertion when no screenshot artifact exists', async () => {
-    writeArtifact(runDir, 'aapl-8k-0129.htm', DOCUMENT_BYTES, { sourceUrl: ORACLE.documentUrl });
+    writeArtifact(runDir, 'artifacts/aapl-8k-0129.htm', DOCUMENT_BYTES, {
+      sourceUrl: ORACLE.documentUrl,
+      roles: ['requested_output', 'evidence'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
@@ -75,8 +89,15 @@ describe('edgar grader', () => {
   });
 
   it('fails the screenshot assertion for a .png file that is not actually a PNG', async () => {
-    writeArtifact(runDir, 'aapl-8k-0129.htm', DOCUMENT_BYTES, { sourceUrl: ORACLE.documentUrl });
-    writeArtifact(runDir, 'filing-page.png', Buffer.from('not really a png'));
+    writeArtifact(runDir, 'artifacts/aapl-8k-0129.htm', DOCUMENT_BYTES, {
+      sourceUrl: ORACLE.documentUrl,
+      roles: ['requested_output', 'evidence'],
+    });
+    // Published as a requested output, so the PNG-bytes check — not the
+    // role filter — is what rejects it.
+    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.from('not really a png'), {
+      roles: ['requested_output', 'evidence'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
@@ -84,13 +105,18 @@ describe('edgar grader', () => {
   });
 
   it('fails only the manifest-hash assertion when the download is tampered with after capture', async () => {
-    writeArtifact(runDir, 'aapl-8k-0129.htm', DOCUMENT_BYTES, { sourceUrl: ORACLE.documentUrl });
-    writeArtifact(runDir, 'filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]));
+    writeArtifact(runDir, 'artifacts/aapl-8k-0129.htm', DOCUMENT_BYTES, {
+      sourceUrl: ORACLE.documentUrl,
+      roles: ['requested_output', 'evidence'],
+    });
+    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
+      roles: ['requested_output', 'evidence'],
+    });
     // Tamper behind the manifest's back: the manifest still records the
     // correct (matching) hash, so the document-match assertion — which
     // trusts the manifest's recorded hash — still passes; only the standing
     // re-hash-from-disk assertion catches the tamper.
-    writeFileSync(join(runDir, 'aapl-8k-0129.htm'), 'doctored filing content');
+    writeFileSync(join(runDir, 'artifacts/aapl-8k-0129.htm'), 'doctored filing content');
 
     const results = await grade(runDir, ORACLE);
 

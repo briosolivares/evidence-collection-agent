@@ -19,6 +19,55 @@ describe('createInitialState', () => {
   });
 });
 
+describe('concurrent eval state', () => {
+  it('tracks interleaved trials independently and removes only the completed row', () => {
+    let state = createInitialState();
+    state = reduce(state, {
+      type: 'evals_started',
+      tasks: ['alpha', 'beta'],
+      k: 2,
+      concurrency: 3,
+    });
+    state = reduce(state, {
+      type: 'eval_trial_started',
+      task: 'alpha',
+      trial: 1,
+      k: 2,
+      requiresAuth: false,
+    });
+    state = reduce(state, {
+      type: 'eval_trial_started',
+      task: 'beta',
+      trial: 1,
+      k: 2,
+      requiresAuth: true,
+    });
+    state = reduce(state, {
+      type: 'eval_trial_progress',
+      task: 'alpha',
+      trial: 1,
+      status: 'running navigate',
+    });
+
+    expect(Object.values(state.evalsLive ?? {})).toEqual([
+      expect.objectContaining({ task: 'alpha', status: 'running navigate' }),
+      expect.objectContaining({ task: 'beta', status: 'starting', requiresAuth: true }),
+    ]);
+
+    state = reduce(state, {
+      type: 'eval_trial_done',
+      task: 'alpha',
+      trial: 1,
+      k: 2,
+      assertions: [{ name: 'ok', passed: true }],
+      elapsedMs: 10,
+    });
+    expect(Object.values(state.evalsLive ?? {})).toEqual([
+      expect.objectContaining({ task: 'beta' }),
+    ]);
+  });
+});
+
 describe('routeInput', () => {
   it('routes plain text as a task, trimmed', () => {
     expect(routeInput('  find the filings  ')).toEqual({

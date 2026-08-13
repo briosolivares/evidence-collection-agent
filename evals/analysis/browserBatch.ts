@@ -182,8 +182,14 @@ function analyzeTrial(
   trialNumber: number,
   grade: TrialReport,
 ): BrowserBatchTrialAnalysis {
-  const metrics = readJson<StoredMetrics>(resolveRunPath(grade.runDir, 'metrics.json'));
-  const events = readTranscript(resolveRunPath(grade.runDir, 'transcript.jsonl'));
+  const runDir = grade.runDir;
+  if (runDir === undefined) {
+    throw new Error(
+      `trial ${trialNumber} of task "${task}" errored without a run directory — nothing to analyze`,
+    );
+  }
+  const metrics = readJson<StoredMetrics>(resolveRunPath(runDir, 'metrics.json'));
+  const events = readTranscript(resolveRunPath(runDir, 'transcript.jsonl'));
   const calls: ToolCallRecord[] = [];
   const results = new Map<string, ToolResultRecord>();
   let firstRequestPromptTokens: number | null = null;
@@ -218,7 +224,7 @@ function analyzeTrial(
     if (result !== undefined) {
       // A successful aggregate may itself be offloaded. Resolve the path
       // through the run confinement chokepoint before reading it.
-      loadCompleteResultContent(grade.runDir, result.content);
+      loadCompleteResultContent(runDir, result.content);
     }
   }
 
@@ -234,7 +240,7 @@ function analyzeTrial(
     reportPath,
     task,
     trial: trialNumber,
-    runDir: grade.runDir,
+    runDir,
     completed: grade.completed,
     assertionAccuracy: assertionAccuracy(grade),
     graderLatencyMs: grade.latencyMs,

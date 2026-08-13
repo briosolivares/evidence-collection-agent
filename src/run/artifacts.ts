@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { resolveRunPath } from './runDir.js';
 
@@ -92,8 +92,10 @@ export function initManifest(runDir: string, taskText: string): void {
  * @param runDir - absolute path to a run directory whose manifest has been
  *   initialized; throws (writing nothing) if the manifest is missing
  * @param relPath - relative path for the artifact, confined to the run
- *   directory (see resolveRunPath); throws (writing nothing) if it escapes.
- *   Missing parent directories are created
+ *   directory (see resolveRunPath) and required to land under artifacts/
+ *   (published — non-empty roles required) or scratch/ (private — roles
+ *   forbidden); throws (writing nothing) if it escapes or breaks the
+ *   partition. Missing parent directories are created
  * @param bytes - the artifact's content, written to disk exactly as given
  * @param meta - optional provenance; a given sourceUrl and given roles are
  *   recorded in the artifact's manifest entry
@@ -110,6 +112,11 @@ export function writeArtifact(
   meta: ArtifactMeta = {},
 ): ManifestEntry {
   const absPath = resolveRunPath(runDir, relPath);
+  // Normalizing through the resolved path makes equivalent spellings
+  // ("artifacts/data.csv", "./artifacts/data.csv") collide onto one
+  // manifest entry.
+  const filename = relative(resolve(runDir), absPath);
+  assertWorkspacePartition(filename, relPath, meta);
   // Load (and thereby require) the manifest before writing the file, so a
   // missing manifest aborts the write instead of leaving untracked files.
   const manifest = loadManifest(runDir);
@@ -118,9 +125,7 @@ export function writeArtifact(
   writeFileSync(absPath, bytes);
 
   const entry: ManifestEntry = {
-    // Normalizing through the resolved path makes equivalent spellings
-    // ("data.csv", "./data.csv") collide onto one manifest entry.
-    filename: relative(resolve(runDir), absPath),
+    filename,
     sha256: createHash('sha256').update(bytes).digest('hex'),
     ...(meta.sourceUrl !== undefined ? { sourceUrl: meta.sourceUrl } : {}),
     ...(meta.roles !== undefined ? { roles: meta.roles } : {}),
@@ -149,6 +154,38 @@ export function finalizeManifest(runDir: string): void {
   const manifest = loadManifest(runDir);
   manifest.finishedAt = new Date().toISOString();
   writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+}
+
+/**
+ * Enforce the workspace partition at the single write path: every artifact
+ * lives under artifacts/ (published — must carry at least one role) or
+ * scratch/ (private — must carry none). The roles field's presence is the
+ * published/private marker, so it can never contradict the file's location.
+ */
+function assertWorkspacePartition(
+  filename: string,
+  relPath: string,
+  meta: ArtifactMeta,
+): void {
+  const published = filename.startsWith(`${ARTIFACTS_DIR}${sep}`);
+  const scratch = filename.startsWith(`${SCRATCH_DIR}${sep}`);
+  if (!published && !scratch) {
+    throw new Error(
+      `artifact path must be under ${ARTIFACTS_DIR}/ (published) or ` +
+        `${SCRATCH_DIR}/ (private working files): ${JSON.stringify(relPath)}`,
+    );
+  }
+  if (published && (meta.roles === undefined || meta.roles.length === 0)) {
+    throw new Error(
+      `published artifacts must carry at least one role ` +
+        `(requested_output and/or evidence): ${JSON.stringify(relPath)}`,
+    );
+  }
+  if (scratch && meta.roles !== undefined) {
+    throw new Error(
+      `scratch files are private and carry no roles: ${JSON.stringify(relPath)}`,
+    );
+  }
 }
 
 function manifestPath(runDir: string): string {

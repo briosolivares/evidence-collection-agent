@@ -12,5 +12,5 @@ export interface StubOracle {
  * @returns the expected deliverable's run-dir-relative path
  */
 export async function fetchOracle(): Promise<StubOracle> {
-  return { expectedFile: 'answer.md' };
+  return { expectedFile: 'artifacts/answer.md' };
 }

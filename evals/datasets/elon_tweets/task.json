@@ -1,4 +1,5 @@
 {
   "task": "Give me a CSV of all of Elon Musk's tweets posted today, with exactly these columns: text, likes, time_posted.",
-  "startUrl": "https://x.com/home"
+  "startUrl": "https://x.com/home",
+  "requiresAuth": true
 }

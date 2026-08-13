@@ -58,6 +58,15 @@ export interface AssertionView {
   detail?: string;
 }
 
+/** One keyed row in the concurrent eval live region. */
+export interface EvalTrialLive {
+  task: string;
+  trial: number;
+  k: number;
+  requiresAuth: boolean;
+  status: string;
+}
+
 /**
  * A finalized transcript entry, before its id is assigned. Items are
  * append-only and immutable once appended (the <Static> contract);
@@ -173,4 +182,6 @@ export interface SessionState {
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;
+  /** Concurrent eval trials keyed by task name + trial number. */
+  evalsLive?: Readonly<Record<string, EvalTrialLive>>;
 }

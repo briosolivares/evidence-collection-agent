@@ -24,7 +24,7 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     );
   }
   const taskDir = join(resolve(evalsDir), name);
-  const { task, startUrl } = readTaskJson(taskDir, name);
+  const { task, startUrl, requiresAuth } = readTaskJson(taskDir, name);
 
   const fetchOracle = await importTaskFunction(taskDir, name, 'oracle/oracle.ts', 'fetchOracle');
   const grade = await importTaskFunction(taskDir, name, 'grader/grader.ts', 'grade');
@@ -33,13 +33,17 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     name,
     taskText: task,
     startUrl,
+    requiresAuth,
     fetchOracle: fetchOracle as EvalTask['fetchOracle'],
     grade: grade as Grader,
   };
 }
 
-/** Read and validate <taskDir>/task.json: { task, startUrl? }. */
-function readTaskJson(taskDir: string, name: string): { task: string; startUrl?: string } {
+/** Read and validate <taskDir>/task.json: { task, startUrl?, requiresAuth? }. */
+function readTaskJson(
+  taskDir: string,
+  name: string,
+): { task: string; startUrl?: string; requiresAuth: boolean } {
   const jsonPath = join(taskDir, 'task.json');
 
   let raw: string;
@@ -56,14 +60,21 @@ function readTaskJson(taskDir: string, name: string): { task: string; startUrl?:
     throw new Error(`task "${name}": task.json is not valid JSON`);
   }
 
-  const obj = parsed as { task?: unknown; startUrl?: unknown };
+  const obj = parsed as { task?: unknown; startUrl?: unknown; requiresAuth?: unknown };
   if (typeof parsed !== 'object' || parsed === null || typeof obj.task !== 'string' || obj.task === '') {
     throw new Error(`task "${name}": task.json must have a non-empty string "task" field`);
   }
   if (obj.startUrl !== undefined && typeof obj.startUrl !== 'string') {
     throw new Error(`task "${name}": task.json "startUrl" must be a string when present`);
   }
-  return { task: obj.task, ...(obj.startUrl !== undefined ? { startUrl: obj.startUrl } : {}) };
+  if (obj.requiresAuth !== undefined && typeof obj.requiresAuth !== 'boolean') {
+    throw new Error(`task "${name}": task.json "requiresAuth" must be a boolean when present`);
+  }
+  return {
+    task: obj.task,
+    ...(obj.startUrl !== undefined ? { startUrl: obj.startUrl } : {}),
+    requiresAuth: obj.requiresAuth ?? false,
+  };
 }
 
 /** Import <taskDir>/<relModulePath> and return its named function export. */

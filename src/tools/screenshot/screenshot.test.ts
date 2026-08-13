@@ -44,11 +44,11 @@ describe('screenshot tool', () => {
     'writes viewport and full-page PNGs with hashes and source provenance',
     async () => {
       const viewportResult = JSON.parse(
-        await successfulCall('screenshot', { filename: 'evidence/viewport.png' }),
+        await successfulCall('screenshot', { filename: 'artifacts/viewport.png' }),
       ) as EvidenceResult;
       const fullPageResult = JSON.parse(
         await successfulCall('screenshot', {
-          filename: 'evidence/full-page.png',
+          filename: 'artifacts/full-page.png',
           fullPage: true,
         }),
       ) as EvidenceResult;
@@ -58,11 +58,11 @@ describe('screenshot tool', () => {
       expect(viewportBytes.subarray(0, PNG_MAGIC.byteLength)).toEqual(PNG_MAGIC);
       expect(fullPageBytes.subarray(0, PNG_MAGIC.byteLength)).toEqual(PNG_MAGIC);
       expect(viewportResult).toEqual({
-        path: 'evidence/viewport.png',
+        path: 'artifacts/viewport.png',
         size: viewportBytes.byteLength,
       });
       expect(fullPageResult).toEqual({
-        path: 'evidence/full-page.png',
+        path: 'artifacts/full-page.png',
         size: fullPageBytes.byteLength,
       });
       expect(pngHeight(fullPageBytes)).toBeGreaterThan(pngHeight(viewportBytes));
@@ -77,10 +77,48 @@ describe('screenshot tool', () => {
             filename: path,
             sha256: sha256(bytes),
             sourceUrl: suite.server().url('/downloads.html'),
+            roles: ['evidence'],
           }),
         );
       }
       expect(screenshotTool.readOnly).toBe(false);
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'records requested_output alongside evidence when the capture was explicitly asked for',
+    async () => {
+      const result = JSON.parse(
+        await successfulCall('screenshot', {
+          filename: 'artifacts/requested.png',
+          roles: ['requested_output', 'evidence'],
+        }),
+      ) as EvidenceResult;
+
+      expect(readManifest(suite.runDir()).artifacts).toContainEqual(
+        expect.objectContaining({
+          filename: result.path,
+          roles: ['requested_output', 'evidence'],
+        }),
+      );
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'rejects scratch/ paths — captures always publish — without corrupting the manifest',
+    async () => {
+      const result = await call('screenshot', {
+        filename: 'scratch/hidden.png',
+      });
+
+      expect(result).toMatchObject({
+        isError: true,
+        errorKind: 'execution_error',
+      });
+      expect(result.content).toContain('artifacts/');
+      expect(readManifest(suite.runDir()).artifacts).toEqual([]);
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

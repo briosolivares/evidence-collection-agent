@@ -103,7 +103,7 @@ describe('size cap integration (T5)', () => {
 
     expect(result.isError).toBe(false);
     const replacement = JSON.parse(result.content) as OffloadedResult;
-    expect(replacement.offloadedTo).toMatch(/^tool-output\//);
+    expect(replacement.offloadedTo).toMatch(/^scratch\/tool-output\//);
     expect(replacement.note).toContain(replacement.offloadedTo);
 
     // The complete numbered output — down to the last line — is on disk.

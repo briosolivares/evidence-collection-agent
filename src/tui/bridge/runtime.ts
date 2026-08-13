@@ -1,6 +1,6 @@
-// Session-long wiring: one persistent browser launched at startup, handed
-// to every run, closed at TUI teardown — the same ownership model as the
-// REPL (the caller owns the browser; runTask owns only its tab). If the
+// Session-long wiring: one persistent browser launched lazily on the first
+// interactive/authenticated run, handed to later persistent-profile runs,
+// and closed at TUI teardown. If the
 // browser dies mid-session (window closed, process killed), the failure
 // is classified and the next submit relaunches a fresh browser instead of
 // failing every subsequent run.
@@ -33,7 +33,7 @@ export interface TuiRuntimeDeps {
 
 /** The session runtime the App drives runs through. */
 export interface TuiRuntime {
-  /** Launch the persistent browser; call exactly once, before runs. */
+  /** Mark the runtime ready; the persistent browser launches lazily. */
   start(): Promise<void>;
   /** Start one agent run against the session browser. */
   startRun(
@@ -89,7 +89,6 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         throw new Error('runtime already started');
       }
       started = true;
-      browser = await deps.browserSessionProvider.createSession();
     },
 
     startRun(task, onEvent, opts) {

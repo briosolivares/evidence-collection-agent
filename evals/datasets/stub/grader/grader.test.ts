@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import { grade } from './grader.js';
 
-const ORACLE = { expectedFile: 'answer.md' };
+const ORACLE = { expectedFile: 'artifacts/answer.md' };
 
 // A temp dir stands in for the run directory; the suite stays hermetic.
 let runDir: string;
@@ -22,12 +22,26 @@ afterEach(() => {
 
 describe('stub grader', () => {
   it('passes both assertions on a run whose manifest and deliverable agree', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from('# Answer\n'));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('# Answer\n'), {
+      roles: ['requested_output'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
     expect(results).toHaveLength(2);
     expect(results.every((r) => r.passed)).toBe(true);
+  });
+
+  it('fails the manifest assertion when the file exists but was never published as a requested output', async () => {
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('# Answer\n'), {
+      roles: ['evidence'],
+    });
+
+    const results = await grade(runDir, ORACLE);
+
+    expect(results[0]!.passed).toBe(true); // the file does exist on disk
+    expect(results[1]!.passed).toBe(false);
+    expect(results[1]!.detail).toMatch(/requested-output/);
   });
 
   it('fails both assertions with detail when the deliverable is missing', async () => {
@@ -40,9 +54,11 @@ describe('stub grader', () => {
   });
 
   it('fails the hash assertion when the artifact was tampered with after capture', async () => {
-    writeArtifact(runDir, 'answer.md', Buffer.from('original evidence'));
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('original evidence'), {
+      roles: ['requested_output'],
+    });
     // Tamper behind the manifest's back — bytes change, recorded hash does not.
-    writeFileSync(join(runDir, 'answer.md'), 'doctored evidence');
+    writeFileSync(join(runDir, 'artifacts/answer.md'), 'doctored evidence');
 
     const results = await grade(runDir, ORACLE);
 

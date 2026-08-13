@@ -73,12 +73,13 @@ Five subdirectories separate the harness's concerns — `runners/` (the scripts 
 
 | File(s) | Responsibility |
 | --- | --- |
-| `config.ts` | Central config: `DATASETS_DIR`, `RUNS_DIR`, `EXPERIMENTS_DIR`, `PROFILE_DIR`, `DEFAULT_K`, and `MODEL` (defaults to the production `DEFAULT_MODEL`; override here to eval a different model). |
-| `runners/cli.ts` + `runners/cliArgs.ts` | `npm run evals -- --tasks <a,b,c> [--k <n>]` (default k=1). Launches one persistent Chrome for the whole eval session, injects the real `runTask`, prints the report, persists results. |
-| `runners/runner.ts` | `runEvals(tasks, k, deps)` — sequential trials (k per task); fetches each task's oracle *at grading time* per trial; the harness's only grading call site passes graders exactly the run dir path + oracle data. No pass@k — `k` means k independent trials. |
+| `config.ts` | Central config: dataset/run/result/profile paths, `DEFAULT_K`, `DEFAULT_EVAL_CONCURRENCY` (3), and `MODEL`. |
+| `runners/cli.ts` + `runners/cliArgs.ts` | `npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n>]`. Normal trials use isolated headless Chrome/temp profiles; authenticated trials use the serial headed persistent lane. |
+| `runners/browserRuntime.ts` | Owns eval browser lifecycle: one fresh headless Chrome/temp profile per normal trial, plus one lazy shared headed `chrome-profile/` session for authenticated trials. |
+| `runners/runner.ts` | `runEvals(tasks, k, deps)` — bounded normal pool plus serial auth lane, deterministic report slots, cancellation, and a separate one-slot fresh-oracle/grading queue. The grader still receives exactly run dir + oracle data. |
 | `metrics/metrics.ts` | Accuracy = mean fraction of assertions passed across trials; completion = all assertions pass in a trial; task pass = **all** k trials complete. Zero assertions or zero trials throw (harness bug, not a score). |
 | `runners/report.ts` | Human-readable report text + `writeResults` to `evals/experiments/<fresh-run-id>.json` (never overwrites). |
-| `runners/loadTask.ts` | Loads `evals/datasets/<name>/task.json` + dynamically imports `oracle/oracle.ts#fetchOracle` and `grader/grader.ts#grade`. Task names are validated (`/^[A-Za-z0-9_-]+$/`) before any path join. |
+| `runners/loadTask.ts` | Loads `task.json` (including normalized boolean `requiresAuth`) plus oracle/grader modules. Task names are validated (`/^[A-Za-z0-9_-]+$/`) before any path join. |
 | `grading/manifestVerification.ts` | Shared grader helpers: `readManifest`, `verifyManifestHashes` (the standing provenance assertion every grader runs), `findArtifactByExtension` (deterministic tie-break), `findArtifactBySha256`. |
 | `grading/csv.ts`, `grading/hash.ts` | Dependency-free RFC 4180-shaped CSV parser; `sha256Hex` matching `writeArtifact`'s encoding. |
 | `runners/fakeAgent.ts` | `makeFakeRunTask` — builds a realistic run dir in milliseconds with no browser/model. Its transcript deliberately *claims success* so the suite can prove graders never read transcripts. Test-only. |

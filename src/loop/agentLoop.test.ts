@@ -575,8 +575,8 @@ describe('runAgentLoop per-message batch cap', () => {
     // largest first (the 45k result claimed the first offload file)...
     const first = JSON.parse(contents[0]) as { preview: string; offloadedTo: string; note: string };
     const second = JSON.parse(contents[1]) as { preview: string; offloadedTo: string; note: string };
-    expect(first.offloadedTo).toBe('tool-output/blob-1.txt');
-    expect(second.offloadedTo).toBe('tool-output/blob-2.txt');
+    expect(first.offloadedTo).toBe('scratch/tool-output/blob-1.txt');
+    expect(second.offloadedTo).toBe('scratch/tool-output/blob-2.txt');
     expect(first.note).toContain('combined limit');
     expect(first.preview.length).toBeGreaterThan(0);
     // ...each offloaded file holds the complete original output...
@@ -611,7 +611,7 @@ describe('runAgentLoop with the real file tools', () => {
   it('write_file lands on disk and in the manifest through the real pipeline', async () => {
     const { callModel, requests } = scriptModel([
       toolResponse([
-        { id: 'w1', name: 'write_file', input: { file_path: 'haiku.txt', content: HAIKU } },
+        { id: 'w1', name: 'write_file', input: { file_path: 'artifacts/haiku.txt', content: HAIKU } },
       ]),
       textResponse('Haiku written.'),
     ]);
@@ -623,10 +623,10 @@ describe('runAgentLoop with the real file tools', () => {
     expect(result).toEqual({ status: 'completed', finalText: 'Haiku written.' });
 
     // The deliverable exists with the exact content...
-    expect(readFileSync(join(runDir, 'haiku.txt'), 'utf8')).toBe(HAIKU);
+    expect(readFileSync(join(runDir, 'artifacts/haiku.txt'), 'utf8')).toBe(HAIKU);
     // ...its manifest entry records the correct hash...
     const manifest = JSON.parse(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')) as Manifest;
-    const entry = manifest.artifacts.find((artifact) => artifact.filename === 'haiku.txt');
+    const entry = manifest.artifacts.find((artifact) => artifact.filename === 'artifacts/haiku.txt');
     expect(entry?.sha256).toBe(createHash('sha256').update(HAIKU).digest('hex'));
     // ...and the model heard back through the pipeline's success result.
     const feedback = requests[1][2];

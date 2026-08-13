@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { findArtifactBySha256, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import { findArtifactBySha256, readManifest, requestedOutputs, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { EdgarOracle } from '../oracle/edgarClient.js';
 
@@ -37,7 +37,7 @@ export const grade: Grader = (runDirPath, oracleData) => {
         : `no artifact matches sha256 ${oracle.documentSha256} for accession ${oracle.filing.accessionNumber} (${oracle.filing.primaryDocument})`,
   };
 
-  const screenshotEntry = manifest.artifacts.find(
+  const screenshotEntry = requestedOutputs(manifest).find(
     (a) => a.filename.toLowerCase().endsWith('.png') && isPngOnDisk(runDirPath, a.filename),
   );
   const screenshotAssertion: AssertionResult = {

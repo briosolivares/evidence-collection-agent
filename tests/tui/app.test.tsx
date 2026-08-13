@@ -323,14 +323,20 @@ describe('App /evals workflow', () => {
       await tick();
       stdin.write('1');
       await tick();
-      stdin.write('\r'); // start k=1
-      await tick(200);
+      stdin.write('\r'); // to concurrency stage
+      await tick();
+      expect(lastFrame()).toContain('concurrency: 3');
+      stdin.write('\r'); // start k=1, concurrency=3
+      await vi.waitFor(
+        () => expect(frames.join('\n')).toContain('Eval report — k=1'),
+        { timeout: 10_000, interval: 25 },
+      );
 
       const output = frames.join('\n');
-      // Trial framing + the run streamed through the same live pipeline.
-      expect(output).toContain('— stub · trial 1/1 —');
-      expect(output).toContain('Investigating for the eval…');
-      expect(output).toContain('Brewed in');
+      // Parallel evals use keyed compact progress; raw prose is kept in
+      // each run transcript instead of interleaving in the TUI.
+      expect(output).toContain('Running evals: stub · k=1 · concurrency=3');
+      expect(output).not.toContain('Investigating for the eval…');
       expect(output).toContain('/runs/eval-trial');
       // Verdicts and the report block landed as transcript items.
       expect(output).toContain('answer.md missing from run dir');

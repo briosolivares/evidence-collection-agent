@@ -1,6 +1,6 @@
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 
-import { writeArtifact } from '../run/artifacts.js';
+import { SCRATCH_DIR, writeArtifact } from '../run/artifacts.js';
 import { resolveRunPath } from '../run/runDir.js';
 
 /**
@@ -33,8 +33,9 @@ export const PREVIEW_MAX_BYTES = 2_000;
  */
 export const MAX_TOOL_RESULTS_PER_MESSAGE_BYTES = 200_000;
 
-/** Run-dir subdirectory that holds offloaded tool output. */
-export const OFFLOAD_DIR = 'tool-output';
+/** Run-dir subdirectory that holds offloaded tool output — private agent
+ * working state, so it lives under scratch/. */
+export const OFFLOAD_DIR = `${SCRATCH_DIR}/tool-output`;
 
 /** File extension for offloaded tool output (always model-readable text). */
 const OFFLOAD_EXT = '.txt';
@@ -58,9 +59,9 @@ export interface OffloadedResult {
 /**
  * Bound a tool result's size (pipeline stage 5). Results at or under the cap
  * pass through untouched; oversize results are written — complete — to a
- * numbered file under tool-output/ in the run directory (via writeArtifact,
- * so the manifest records its hash) and replaced by a preview + path the
- * model can follow up on with read_file / grep.
+ * numbered file under scratch/tool-output/ in the run directory (via
+ * writeArtifact, so the manifest records its hash) and replaced by a
+ * preview + path the model can follow up on with read_file / grep.
  *
  * @param runDir - absolute path to a run directory whose manifest has been
  *   initialized (offloading throws otherwise, writing nothing)
@@ -75,7 +76,7 @@ export interface OffloadedResult {
  *   (hashed into the manifest), and whose preview is a prefix of the
  *   original that never splits a multi-byte character and, when the output
  *   is line-shaped, ends on a whole line. Each offload gets a fresh file:
- *   tool-output/<toolName>-<n>.txt, where n counts up from one past the
+ *   scratch/tool-output/<toolName>-<n>.txt, where n counts up from one past the
  *   highest number already on disk for that tool and the file is claimed
  *   with an exclusive create — so concurrent offloads (parallel read-only
  *   tools, T8) can never clobber each other
@@ -104,8 +105,8 @@ export function capResult(
 
 /**
  * Offload a result unconditionally: write it — complete — to a fresh
- * numbered file under tool-output/ (via writeArtifact, so the manifest
- * records its hash) and return the preview + path replacement. This is
+ * numbered file under scratch/tool-output/ (via writeArtifact, so the
+ * manifest records its hash) and return the preview + path replacement. This is
  * capResult's offload path exposed for callers that decide *themselves*
  * that a result must go to disk — the loop's per-message batch cap
  * (MAX_TOOL_RESULTS_PER_MESSAGE_BYTES), where each result passed its own
@@ -151,7 +152,8 @@ export function offloadResult(
 }
 
 /**
- * Claim a fresh offload filename for a tool: tool-output/<toolName>-<n>.txt.
+ * Claim a fresh offload filename for a tool:
+ * scratch/tool-output/<toolName>-<n>.txt.
  * Scans the offload directory for the highest existing n, then creates the
  * next file exclusively, advancing past any concurrent claimer. The
  * returned path names a now-existing empty file no other call can receive.

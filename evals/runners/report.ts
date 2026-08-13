@@ -16,7 +16,7 @@ import type { EvalReport } from './runner.js';
  */
 export function formatReport(report: EvalReport): string {
   const lines: string[] = [
-    `Eval report — k=${report.k}, model ${report.model}, ` +
+    `Eval report — k=${report.k}, concurrency ${report.concurrency}, model ${report.model}, ` +
       `tool profile ${report.toolProfile}, started ${report.startedAt}`,
   ];
 
@@ -30,10 +30,18 @@ export function formatReport(report: EvalReport): string {
         `mean latency ${Math.round(task.meanLatencyMs)}ms`,
     );
     task.trials.forEach((trial, i) => {
+      const runDir = trial.runDir ?? '(no run directory)';
+      if (trial.error !== undefined) {
+        lines.push(
+          `  trial ${i + 1}: ERRORED  ${Math.round(trial.latencyMs)}ms  ${runDir}`,
+          `    ERROR  ${trial.error}`,
+        );
+        return;
+      }
       const passed = trial.assertions.filter((a) => a.passed).length;
       lines.push(
         `  trial ${i + 1}: ${passed}/${trial.assertions.length} assertions  ` +
-          `${Math.round(trial.latencyMs)}ms  ${trial.runDir}`,
+          `${Math.round(trial.latencyMs)}ms  ${runDir}`,
       );
       for (const a of trial.assertions) {
         lines.push(a.passed ? `    pass  ${a.name}` : `    FAIL  ${a.name} — ${a.detail}`);

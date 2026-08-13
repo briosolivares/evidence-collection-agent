@@ -56,7 +56,9 @@ afterEach(() => {
 });
 
 function writeCsv(rows: string[][], header: string[] = HEADER): void {
-  writeArtifact(runDir, 'contributors.csv', Buffer.from(csvText(header, rows)));
+  writeArtifact(runDir, 'artifacts/contributors.csv', Buffer.from(csvText(header, rows)), {
+    roles: ['requested_output'],
+  });
 }
 
 function byName(results: AssertionResult[], name: string): AssertionResult {
@@ -180,5 +182,46 @@ describe('openclaw_contributors grader', () => {
   it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
     writeCsv(passingRows());
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
+  });
+
+  // Regression: 2026-08-12 medium-eval trial 2 (run …_47abf9). The agent's
+  // deliverable was correct, but a leftover scrape CSV sorted alphabetically
+  // first and findArtifactByExtension graded it instead. Under the
+  // scratch/artifacts contract the scrape lives in scratch/ and must be
+  // invisible to grading.
+  describe('artifact shadowing (trial-2 regression)', () => {
+    /** Trial 2's raw scrape: rank,github_handle,commits — 32 rows. */
+    function rawScrapeCsv(): string {
+      const rows = Array.from({ length: 32 }, (_, i) => `${i + 1},dev-${i + 1},${4000 - i * 37}`);
+      return `rank,github_handle,commits\n${rows.join('\n')}\n`;
+    }
+
+    it('a scratch/ scrape CSV alongside the published deliverable is invisible: every content assertion passes', async () => {
+      // 'scratch/contributors_raw.csv' would sort before the deliverable if
+      // grading ever saw it — exactly trial 2's layout.
+      writeArtifact(runDir, 'scratch/contributors_raw.csv', Buffer.from(rawScrapeCsv()));
+      writeArtifact(
+        runDir,
+        'artifacts/top_30_contributors.csv',
+        Buffer.from(csvText(HEADER, passingRows())),
+        { roles: ['requested_output'] },
+      );
+
+      const results = await grade(runDir, ORACLE);
+
+      expect(byName(results, 'CSV artifact exists').detail).toContain('top_30_contributors.csv');
+      expect(results.every((r) => r.passed)).toBe(true);
+    });
+
+    it('the raw scrape published alone as the requested output still fails the schema assertion', async () => {
+      writeArtifact(runDir, 'artifacts/contributors_raw.csv', Buffer.from(rawScrapeCsv()), {
+        roles: ['requested_output'],
+      });
+
+      const results = await grade(runDir, ORACLE);
+
+      expect(byName(results, COLUMNS).passed).toBe(false);
+      expect(byName(results, ROWS).passed).toBe(false);
+    });
   });
 });

@@ -30,20 +30,42 @@ function stubTask(): EvalTask {
     name: 'stub',
     taskText: 'write the answer',
     startUrl: 'about:blank',
+    requiresAuth: false,
     fetchOracle,
     grade,
   };
+}
+
+function passingTask(name: string, requiresAuth = false): EvalTask {
+  return {
+    ...stubTask(),
+    name,
+    taskText: `run ${name}`,
+    requiresAuth,
+    fetchOracle: async () => ({ task: name }),
+    grade: async () => [{ name: 'complete', passed: true, detail: 'ok' }],
+  };
+}
+
+function deferred(): { promise: Promise<void>; resolve: () => void } {
+  let resolve!: () => void;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
 }
 
 describe('runEvals', () => {
   it('k trials produce k distinct run dirs, per-trial grades, and correct aggregation', async () => {
     const report = await runEvals([stubTask()], 3, {
       runTask: makeFakeRunTask(baseDir),
+      concurrency: 2,
       model: 'fake-model',
       toolProfile: 'batch-enabled',
     });
 
     expect(report.k).toBe(3);
+    expect(report.concurrency).toBe(2);
     expect(report.model).toBe('fake-model');
     expect(report.toolProfile).toBe('batch-enabled');
     expect(report.tasks).toHaveLength(1);
@@ -54,7 +76,8 @@ describe('runEvals', () => {
     const runDirs = task.trials.map((t) => t.runDir);
     expect(new Set(runDirs).size).toBe(3);
     for (const dir of runDirs) {
-      expect(statSync(dir).isDirectory()).toBe(true);
+      expect(dir).toBeDefined();
+      expect(statSync(dir!).isDirectory()).toBe(true);
     }
 
     for (const trial of task.trials) {
@@ -82,6 +105,7 @@ describe('runEvals', () => {
 
     const report = await runEvals([stubTask()], 2, {
       runTask: flaky,
+      concurrency: 1,
       model: 'fake-model',
       toolProfile: 'atomic',
     });
@@ -102,6 +126,7 @@ describe('runEvals', () => {
 
     const report = await runEvals([{ ...stubTask(), grade: spyGrader }], 2, {
       runTask: makeFakeRunTask(baseDir),
+      concurrency: 1,
       model: 'fake-model',
       toolProfile: 'atomic',
     });
@@ -122,7 +147,7 @@ describe('runEvals', () => {
       expect(existsSync(join(runDirArg as string, TRANSCRIPT_FILENAME))).toBe(true);
 
       // Second argument is the oracle data, verbatim.
-      expect(oracleArg).toEqual({ expectedFile: 'answer.md' });
+      expect(oracleArg).toEqual({ expectedFile: 'artifacts/answer.md' });
     });
   });
 
@@ -130,14 +155,15 @@ describe('runEvals', () => {
     const seen: Array<{ taskName: string; trialIndex: number; runDir: string }> = [];
     const report = await runEvals([stubTask()], 3, {
       runTask: makeFakeRunTask(baseDir),
+      concurrency: 1,
       model: 'fake-model',
       toolProfile: 'atomic',
-      onTrialGraded: async (taskName, trialIndex, grade) => {
+      onTrialGraded: async (job, grade) => {
         // Async on purpose: the runner must await the hook (persistence
         // must complete before the next trial can crash the process).
         await Promise.resolve();
         expect(grade.assertions.length).toBeGreaterThan(0);
-        seen.push({ taskName, trialIndex, runDir: grade.runDir });
+        seen.push({ taskName: job.taskName, trialIndex: job.trialIndex, runDir: grade.runDir! });
       },
     });
 
@@ -149,19 +175,213 @@ describe('runEvals', () => {
     }
   });
 
-  it('rejects k < 1, an empty task list, and a grader returning no assertions', async () => {
+  it('rejects k < 1 and an empty task list; a grader asserting nothing errors its trial', async () => {
     const deps = {
       runTask: makeFakeRunTask(baseDir),
+      concurrency: 1,
       model: 'fake-model',
       toolProfile: 'atomic' as const,
     };
 
     await expect(runEvals([stubTask()], 0, deps)).rejects.toThrow(/positive integer/);
     await expect(runEvals([], 1, deps)).rejects.toThrow(/no tasks/);
+    await expect(runEvals([stubTask()], 1, { ...deps, concurrency: 0 })).rejects.toThrow(
+      /concurrency.*positive integer/,
+    );
 
     const silent: Grader = () => [];
-    await expect(runEvals([{ ...stubTask(), grade: silent }], 1, deps)).rejects.toThrow(
-      /no assertions/,
+    const report = await runEvals([{ ...stubTask(), grade: silent }], 1, deps);
+    const trial = report.tasks[0]!.trials[0]!;
+    expect(trial.error).toMatch(/no assertions/);
+    expect(trial.completed).toBe(false);
+    expect(report.tasks[0]!.taskPassed).toBe(false);
+    expect(report.tasks[0]!.accuracy).toBe(0);
+  });
+
+  it('caps normal work at 3, auth work at 1, and allows all four to overlap', async () => {
+    const fourStarted = deferred();
+    const release = deferred();
+    let started = 0;
+    let normalActive = 0;
+    let authActive = 0;
+    let totalActive = 0;
+    let maxNormal = 0;
+    let maxAuth = 0;
+    let maxTotal = 0;
+
+    const reportPromise = runEvals(
+      [passingTask('normal'), passingTask('auth', true)],
+      3,
+      {
+        concurrency: 3,
+        model: 'fake-model',
+        toolProfile: 'atomic',
+        runTask: async (_taskText, opts) => {
+          started += 1;
+          if (opts.requiresAuth) authActive += 1;
+          else normalActive += 1;
+          totalActive += 1;
+          maxNormal = Math.max(maxNormal, normalActive);
+          maxAuth = Math.max(maxAuth, authActive);
+          maxTotal = Math.max(maxTotal, totalActive);
+          if (started === 4) fourStarted.resolve();
+          await release.promise;
+          if (opts.requiresAuth) authActive -= 1;
+          else normalActive -= 1;
+          totalActive -= 1;
+          return { runDir: `/runs/${opts.taskName}-${opts.trialIndex}` };
+        },
+      },
     );
+
+    await fourStarted.promise;
+    expect({ normalActive, authActive, totalActive }).toEqual({
+      normalActive: 3,
+      authActive: 1,
+      totalActive: 4,
+    });
+    release.resolve();
+    const report = await reportPromise;
+
+    expect({ maxNormal, maxAuth, maxTotal }).toEqual({
+      maxNormal: 3,
+      maxAuth: 1,
+      maxTotal: 4,
+    });
+    expect(report.tasks.map((task) => task.task)).toEqual(['normal', 'auth']);
+  });
+
+  it('keeps report slots ordered when concurrent trials finish in reverse order', async () => {
+    const allStarted = deferred();
+    const gates = new Map<string, ReturnType<typeof deferred>>();
+    const reportPromise = runEvals(
+      [passingTask('alpha'), passingTask('beta')],
+      2,
+      {
+        concurrency: 4,
+        model: 'fake-model',
+        toolProfile: 'atomic',
+        runTask: async (_taskText, opts) => {
+          const key = `${opts.taskName}-${opts.trialIndex}`;
+          const gate = deferred();
+          gates.set(key, gate);
+          if (gates.size === 4) allStarted.resolve();
+          await gate.promise;
+          return { runDir: `/runs/${key}` };
+        },
+      },
+    );
+
+    await allStarted.promise;
+    for (const key of ['beta-1', 'beta-0', 'alpha-1', 'alpha-0']) {
+      gates.get(key)!.resolve();
+      await Promise.resolve();
+    }
+    const report = await reportPromise;
+
+    expect(report.tasks.map((task) => task.trials.map((trial) => trial.runDir))).toEqual([
+      ['/runs/alpha-0', '/runs/alpha-1'],
+      ['/runs/beta-0', '/runs/beta-1'],
+    ]);
+  });
+
+  it('serializes grading without holding a browser worker slot', async () => {
+    const gradingStarted = deferred();
+    const thirdRunStarted = deferred();
+    const releaseRuns = deferred();
+    const releaseGrading = deferred();
+    let gradingActive = 0;
+    let maxGrading = 0;
+    const task = passingTask('pipeline');
+    task.grade = async () => {
+      gradingActive += 1;
+      maxGrading = Math.max(maxGrading, gradingActive);
+      gradingStarted.resolve();
+      await releaseGrading.promise;
+      gradingActive -= 1;
+      return [{ name: 'complete', passed: true, detail: 'ok' }];
+    };
+
+    const reportPromise = runEvals([task], 3, {
+      concurrency: 2,
+      model: 'fake-model',
+      toolProfile: 'atomic',
+      runTask: async (_taskText, opts) => {
+        if (opts.trialIndex === 0) return { runDir: '/runs/pipeline-0' };
+        if (opts.trialIndex === 2) thirdRunStarted.resolve();
+        await releaseRuns.promise;
+        return { runDir: `/runs/pipeline-${opts.trialIndex}` };
+      },
+    });
+
+    await Promise.all([gradingStarted.promise, thirdRunStarted.promise]);
+    releaseRuns.resolve();
+    releaseGrading.resolve();
+    await reportPromise;
+    expect(maxGrading).toBe(1);
+  });
+
+  it('records a throwing trial as errored and finishes the rest of the batch', async () => {
+    const fakeRunTask = makeFakeRunTask(baseDir);
+    const graded: Array<{ trialNumber: number; error?: string }> = [];
+    const runTask: RunTaskFn = async (taskText, opts) => {
+      if (opts.trialIndex === 0) throw new Error('first trial failed');
+      return fakeRunTask(taskText, opts);
+    };
+
+    const report = await runEvals([passingTask('resilience')], 3, {
+      runTask,
+      concurrency: 2,
+      model: 'fake-model',
+      toolProfile: 'atomic',
+      onTrialGraded: (job, grade) => {
+        graded.push({ trialNumber: job.trialNumber, ...(grade.error === undefined ? {} : { error: grade.error }) });
+      },
+    });
+
+    const trials = report.tasks[0]!.trials;
+    expect(trials).toHaveLength(3);
+    expect(trials[0]).toMatchObject({ error: 'first trial failed', completed: false, assertions: [] });
+    expect(trials[0]!.runDir).toBeUndefined();
+    for (const trial of trials.slice(1)) {
+      expect(trial.error).toBeUndefined();
+      expect(trial.completed).toBe(true);
+    }
+    expect(report.tasks[0]!.taskPassed).toBe(false);
+    expect(report.tasks[0]!.accuracy).toBeCloseTo(2 / 3);
+    // The errored trial is persisted through the same serialized hook as grades.
+    expect(graded.find((g) => g.trialNumber === 1)).toEqual({ trialNumber: 1, error: 'first trial failed' });
+  });
+
+  it('propagates caller cancellation to every active trial and starts no more', async () => {
+    const controller = new AbortController();
+    const twoStarted = deferred();
+    let started = 0;
+    let aborted = 0;
+    const reportPromise = runEvals([passingTask('cancel')], 5, {
+      concurrency: 2,
+      model: 'fake-model',
+      toolProfile: 'atomic',
+      signal: controller.signal,
+      runTask: async (_taskText, opts) => {
+        started += 1;
+        if (started === 2) twoStarted.resolve();
+        return await new Promise((_resolve, reject) => {
+          opts.signal.addEventListener(
+            'abort',
+            () => {
+              aborted += 1;
+              reject(opts.signal.reason);
+            },
+            { once: true },
+          );
+        });
+      },
+    });
+
+    await twoStarted.promise;
+    controller.abort();
+    await expect(reportPromise).rejects.toThrow(/cancelled/);
+    expect({ started, aborted }).toEqual({ started: 2, aborted: 2 });
   });
 });

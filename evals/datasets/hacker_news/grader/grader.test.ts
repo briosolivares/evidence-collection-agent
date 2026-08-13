@@ -43,6 +43,12 @@ function passingCsvRows(): string[][] {
   return ORACLE.stories.map((s, i) => [s.title, s.url, String(50 - i)]);
 }
 
+/** Publish the CSV deliverable where the grader looks: under artifacts/,
+ *  with the requested_output role graders select deliverables by. */
+function writeCsvArtifact(csv: string): void {
+  writeArtifact(runDir, 'artifacts/hn.csv', Buffer.from(csv), { roles: ['requested_output'] });
+}
+
 function byName(results: AssertionResult[], name: string): AssertionResult {
   const found = results.find((r) => r.name === name);
   if (found === undefined) throw new Error(`no assertion named "${name}" in ${JSON.stringify(results)}`);
@@ -51,7 +57,7 @@ function byName(results: AssertionResult[], name: string): AssertionResult {
 
 describe('hacker_news grader', () => {
   it('passes every assertion on a well-formed run matching the oracle exactly', async () => {
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], passingCsvRows())));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], passingCsvRows()));
 
     const results = await grade(runDir, ORACLE);
 
@@ -62,7 +68,7 @@ describe('hacker_news grader', () => {
   it('fails only the column-shape assertion when a required column is misnamed', async () => {
     // "points" renamed to "score" — title/url stay correct.
     const csv = csvText(['title', 'url', 'score'], passingCsvRows());
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csv));
+    writeCsvArtifact(csv);
 
     const results = await grade(runDir, ORACLE);
 
@@ -78,7 +84,7 @@ describe('hacker_news grader', () => {
     // correct, and every other assertion only looks up columns by name.
     const rows = ORACLE.stories.map((s, i) => [String(i + 1), s.title, s.url, String(50 - i)]);
     const csv = csvText(['rank', 'title', 'url', 'points'], rows);
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csv));
+    writeCsvArtifact(csv);
 
     const results = await grade(runDir, ORACLE);
 
@@ -91,7 +97,7 @@ describe('hacker_news grader', () => {
 
   it('fails only the row-count assertion when one row is missing', async () => {
     const rows = passingCsvRows().slice(0, 4); // 4 of 5, all still oracle titles
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], rows)));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], rows));
 
     const results = await grade(runDir, ORACLE);
 
@@ -103,7 +109,7 @@ describe('hacker_news grader', () => {
   it('passes the churn-tolerance boundary at exactly 4 of 5 titles matching', async () => {
     const rows = passingCsvRows();
     rows[4] = ['A Totally Different Story', 'https://example.com/other', '10']; // replaces Story Five
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], rows)));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], rows));
 
     const results = await grade(runDir, ORACLE);
 
@@ -115,7 +121,7 @@ describe('hacker_news grader', () => {
     const rows = passingCsvRows();
     rows[3] = ['A Different Story A', 'https://example.com/other-a', '10'];
     rows[4] = ['A Different Story B', 'https://example.com/other-b', '5'];
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], rows)));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], rows));
 
     const results = await grade(runDir, ORACLE);
 
@@ -125,7 +131,7 @@ describe('hacker_news grader', () => {
   it('fails the well-formed-URL assertion when a url cell is not a URL', async () => {
     const rows = passingCsvRows();
     rows[0]![1] = 'not-a-url';
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], rows)));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], rows));
 
     const results = await grade(runDir, ORACLE);
 
@@ -146,12 +152,12 @@ describe('hacker_news grader', () => {
 
   it('fails only the manifest-hash assertion when the CSV is tampered with after capture', async () => {
     const csv = csvText(['title', 'url', 'points'], passingCsvRows());
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csv));
+    writeCsvArtifact(csv);
     // Tamper behind the manifest's back: change only the points values, which
     // no other assertion inspects, so every other assertion still passes.
     const tampered = csv.replace(/,50\n/, ',999\n');
     expect(tampered).not.toBe(csv);
-    writeFileSync(join(runDir, 'hn.csv'), tampered);
+    writeFileSync(join(runDir, 'artifacts', 'hn.csv'), tampered);
 
     const results = await grade(runDir, ORACLE);
 
@@ -162,7 +168,7 @@ describe('hacker_news grader', () => {
   });
 
   it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
-    writeArtifact(runDir, 'hn.csv', Buffer.from(csvText(['title', 'url', 'points'], passingCsvRows())));
+    writeCsvArtifact(csvText(['title', 'url', 'points'], passingCsvRows()));
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });
 });

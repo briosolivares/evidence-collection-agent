@@ -61,17 +61,20 @@ async function main(): Promise<void> {
     tasks.push(await loadEvalTask(DATASETS_DIR, pair.name));
   }
 
-  // The replay agent: runEvals asks for trial i of task t in order, so a
-  // flat queue in the same order hands each grading step its existing run.
-  const queue = pairs.flatMap((pair) => pair.runDirs);
-  const replayRunTask: RunTaskFn = async () => {
-    const runDir = queue.shift();
-    if (runDir === undefined) throw new Error('ran out of run dirs — internal ordering bug');
+  const runDirsByTask = new Map(pairs.map((pair) => [pair.name, pair.runDirs]));
+  const replayRunTask: RunTaskFn = async (_taskText, opts) => {
+    const runDir = runDirsByTask.get(opts.taskName)?.[opts.trialIndex];
+    if (runDir === undefined) {
+      throw new Error(
+        `missing run dir for task "${opts.taskName}" trial ${opts.trialNumber}`,
+      );
+    }
     return { runDir };
   };
 
   const report = await runEvals(tasks, k, {
     runTask: replayRunTask,
+    concurrency: 1,
     model: MODEL,
     toolProfile: DEFAULT_TOOL_PROFILE,
   });

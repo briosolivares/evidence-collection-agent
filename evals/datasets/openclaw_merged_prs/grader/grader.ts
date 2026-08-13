@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { Manifest } from '../../../../src/run/artifacts.js';
 import { parseCsv } from '../../../grading/csv.js';
 import { exactColumnsAssertion, exactColumnsAssertionName } from '../../../grading/csvAssertions.js';
-import { findArtifactByExtension, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import { findArtifactByExtension, readManifest, requestedOutputs, verifyManifestHashes } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import {
   REPO_NAME,
@@ -211,9 +211,11 @@ function screenshotAssertion(runDirPath: string, manifest: Manifest, validNumber
   if (validNumbers.length === 0) {
     return { name: SCREENSHOT_ASSERTION_NAME, passed: false, detail: 'no valid PR numbers to check' };
   }
+  // Screenshots the task asks for are requested outputs (typically published
+  // with both roles); evidence-only captures do not satisfy the request.
   const missing = validNumbers.filter(
     (n) =>
-      !manifest.artifacts.some(
+      !requestedOutputs(manifest).some(
         (a) =>
           a.filename.toLowerCase().endsWith('.png') &&
           a.sourceUrl !== undefined &&

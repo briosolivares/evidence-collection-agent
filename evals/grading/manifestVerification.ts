@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 import { MANIFEST_FILENAME, type Manifest, type ManifestEntry } from '../../src/run/artifacts.js';
 import type { AssertionResult } from '../types.js';
@@ -65,38 +65,80 @@ export function verifyManifestHashes(runDirPath: string, manifest: Manifest): As
 }
 
 /**
- * Find the manifest entry whose filename has the given extension.
+ * The manifest entries the agent published as requested outputs — its
+ * designation of which files are the task's answer. Graders select
+ * deliverables exclusively from this set, so a scratch working file or an
+ * evidence-only capture can never shadow the real deliverable. (Designating
+ * *which* files answer the task is the agent's to say; whether they are
+ * *correct* remains entirely the grader's.)
  *
  * @param manifest - the run's manifest
+ * @returns the entries whose roles include `requested_output`, in manifest
+ *   order
+ */
+export function requestedOutputs(manifest: Manifest): ManifestEntry[] {
+  return manifest.artifacts.filter((a) => a.roles?.includes('requested_output') ?? false);
+}
+
+/**
+ * Find the requested-output entry whose filename has the given extension.
+ *
+ * @param manifest - the run's manifest; only entries published with the
+ *   `requested_output` role are considered
  * @param extension - a filename extension including the leading dot (e.g.
  *   `.csv`), matched case-insensitively
  * @returns the matching entry with the lexicographically smallest filename,
- *   when one or more match (a deterministic, documented tie-break rather
- *   than an ambiguous pick); `undefined` when none match
+ *   when one or more match (two same-type requested outputs is a real agent
+ *   error, resolved by a deterministic, documented tie-break rather than an
+ *   ambiguous pick); `undefined` when none match
  */
 export function findArtifactByExtension(
   manifest: Manifest,
   extension: string,
 ): ManifestEntry | undefined {
   const lowerExt = extension.toLowerCase();
-  const matches = manifest.artifacts
+  const matches = requestedOutputs(manifest)
     .filter((a) => a.filename.toLowerCase().endsWith(lowerExt))
     .sort((a, b) => a.filename.localeCompare(b.filename));
   return matches[0];
 }
 
 /**
- * Find the manifest entry recording a given SHA-256 hash.
+ * Find the requested-output entry recording a given SHA-256 hash.
  *
- * @param manifest - the run's manifest
+ * @param manifest - the run's manifest; only entries published with the
+ *   `requested_output` role are considered
  * @param sha256Hash - lowercase hex SHA-256 to look for among recorded
  *   artifact hashes
  * @returns the first matching entry in manifest order, or `undefined` when
- *   no artifact's recorded hash equals `sha256Hash`
+ *   no requested output's recorded hash equals `sha256Hash`
  */
 export function findArtifactBySha256(
   manifest: Manifest,
   sha256Hash: string,
 ): ManifestEntry | undefined {
-  return manifest.artifacts.find((a) => a.sha256 === sha256Hash);
+  return requestedOutputs(manifest).find((a) => a.sha256 === sha256Hash);
+}
+
+/**
+ * Find the requested-output entry with the given base filename, wherever it
+ * sits under artifacts/ — graders name deliverables ("answer.md") without
+ * hardcoding workspace paths.
+ *
+ * @param manifest - the run's manifest; only entries published with the
+ *   `requested_output` role are considered
+ * @param name - the deliverable's base filename (no directories), matched
+ *   case-insensitively
+ * @returns the matching entry with the lexicographically smallest filename
+ *   (same tie-break as findArtifactByExtension); `undefined` when none match
+ */
+export function findRequestedOutputByName(
+  manifest: Manifest,
+  name: string,
+): ManifestEntry | undefined {
+  const lowerName = name.toLowerCase();
+  const matches = requestedOutputs(manifest)
+    .filter((a) => basename(a.filename).toLowerCase() === lowerName)
+    .sort((a, b) => a.filename.localeCompare(b.filename));
+  return matches[0];
 }

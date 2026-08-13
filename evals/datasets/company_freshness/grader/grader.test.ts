@@ -26,11 +26,13 @@ afterEach(() => rmSync(runDir, { recursive: true, force: true }));
 
 function writeScreenshots(): void {
   const pairs = [
-    ['notion-home.png', 'https://www.notion.com/'], ['notion-content.png', 'https://www.notion.com/en-us/blog/new-notion'],
-    ['figma-home.png', 'https://www.figma.com/'], ['figma-content.png', 'https://www.figma.com/blog/new-figma/'],
-    ['eight-home.png', 'https://www.eightsleep.com/us/'], ['eight-content.png', 'https://www.eightsleep.com/blog/new-eight'],
+    ['artifacts/notion-home.png', 'https://www.notion.com/'], ['artifacts/notion-content.png', 'https://www.notion.com/en-us/blog/new-notion'],
+    ['artifacts/figma-home.png', 'https://www.figma.com/'], ['artifacts/figma-content.png', 'https://www.figma.com/blog/new-figma/'],
+    ['artifacts/eight-home.png', 'https://www.eightsleep.com/us/'], ['artifacts/eight-content.png', 'https://www.eightsleep.com/blog/new-eight'],
   ];
-  for (const [filename, sourceUrl] of pairs) writeArtifact(runDir, filename!, PNG, { sourceUrl });
+  for (const [filename, sourceUrl] of pairs) {
+    writeArtifact(runDir, filename!, PNG, { sourceUrl, roles: ['requested_output', 'evidence'] });
+  }
 }
 function byName(results: AssertionResult[], name: string): AssertionResult {
   const found = results.find((result) => result.name === name);
@@ -46,13 +48,13 @@ describe('company_freshness grader', () => {
 
   it('rejects an old official content page outside the live window', async () => {
     writeScreenshots();
-    writeArtifact(runDir, 'notion-content.png', PNG, { sourceUrl: 'https://www.notion.com/blog/old-post' });
+    writeArtifact(runDir, 'artifacts/notion-content.png', PNG, { sourceUrl: 'https://www.notion.com/blog/old-post', roles: ['requested_output', 'evidence'] });
     expect(byName(await grade(runDir, ORACLE), 'each company has a valid screenshot from its live latest-content window').passed).toBe(false);
   });
 
   it('rejects invalid PNG bytes and lookalike domains', async () => {
     writeScreenshots();
-    writeArtifact(runDir, 'figma-home.png', Buffer.from('not png'), { sourceUrl: 'https://figma.com.evil.example/' });
+    writeArtifact(runDir, 'artifacts/figma-home.png', Buffer.from('not png'), { sourceUrl: 'https://figma.com.evil.example/', roles: ['requested_output', 'evidence'] });
     const results = await grade(runDir, ORACLE);
     expect(byName(results, 'at least six valid manifested PNG screenshots exist').passed).toBe(false);
     expect(byName(results, 'each company has a valid screenshot of its official homepage').passed).toBe(false);
@@ -60,7 +62,7 @@ describe('company_freshness grader', () => {
 
   it('verifies hashes and rejects malformed oracle data', async () => {
     writeScreenshots();
-    writeFileSync(join(runDir, 'figma-content.png'), Buffer.concat([PNG, Buffer.from('tampered')]));
+    writeFileSync(join(runDir, 'artifacts/figma-content.png'), Buffer.concat([PNG, Buffer.from('tampered')]));
     expect(byName(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
     await expect(async () => grade(runDir, { companies: [] })).rejects.toThrow(/oracle/);
   });

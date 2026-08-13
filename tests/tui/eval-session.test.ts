@@ -29,11 +29,14 @@ describe('discoverEvalTasks', () => {
     mkdirSync(join(fixtureDir, 'edgar'));
     writeFileSync(join(fixtureDir, 'edgar', 'task.json'), '{"task":"x"}');
     mkdirSync(join(fixtureDir, 'stub'));
-    writeFileSync(join(fixtureDir, 'stub', 'task.json'), '{"task":"y"}');
+    writeFileSync(join(fixtureDir, 'stub', 'task.json'), '{"task":"y","requiresAuth":true}');
     mkdirSync(join(fixtureDir, 'not-a-task'));
     writeFileSync(join(fixtureDir, 'loose-file.ts'), 'export {}');
 
-    expect(discoverEvalTasks(fixtureDir)).toEqual(['edgar', 'stub']);
+    expect(discoverEvalTasks(fixtureDir)).toEqual([
+      { name: 'edgar', requiresAuth: false },
+      { name: 'stub', requiresAuth: true },
+    ]);
   });
 
   it('returns empty for a missing directory', () => {
@@ -92,6 +95,7 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
     name,
     taskText: `run the ${name} investigation`,
     startUrl: `https://start.example/${name}`,
+    requiresAuth: false,
     fetchOracle: async () => ({ oracleFor: name }),
     grade: (runDir, oracle) => {
       fixture.gradeCalls.push([runDir, oracle]);
@@ -111,20 +115,19 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
 }
 
 describe('startEvalBatch', () => {
-  it('runs trials sequentially with ordered framing, verdicts, report, and persistence', async () => {
+  it('runs trials with keyed framing, verdicts, report, and persistence', async () => {
     const fixture = makeFixture([
       { status: 'completed', finalText: '', runDir: '/runs/t1' },
       { status: 'completed', finalText: '', runDir: '/runs/t2' },
     ]);
 
-    const handle = startEvalBatch(['stub'], 2, {
+    const handle = startEvalBatch(['stub'], 2, 1, {
       onAction: (action) => fixture.actions.push(action),
       evalsDir: fixtureDir,
       resultsDir: '/tmp/results-dir',
       runner: fixture.runner,
       loadTask: fixture.loadTask,
       writeResultsFn: fixture.writeResultsFn,
-      now: () => 5_000,
     });
     const result = await handle.done;
     expect(result).toBe('completed');
@@ -133,12 +136,10 @@ describe('startEvalBatch', () => {
     expect(types).toEqual([
       'evals_started',
       'eval_trial_started',
-      'run_started',
-      'run_finished',
-      'eval_trial_done',
+      'eval_trial_progress',
       'eval_trial_started',
-      'run_started',
-      'run_finished',
+      'eval_trial_done',
+      'eval_trial_progress',
       'eval_trial_done',
       'eval_report_ready',
       'evals_finished',
@@ -172,6 +173,7 @@ describe('startEvalBatch', () => {
     expect(fixture.written).toHaveLength(1);
     expect(fixture.written[0]?.dir).toBe('/tmp/results-dir');
     expect(fixture.written[0]?.report.k).toBe(2);
+    expect(fixture.written[0]?.report.concurrency).toBe(1);
     expect(fixture.written[0]?.report.tasks[0]?.trials).toHaveLength(2);
     const reportAction = fixture.actions.find((action) => action.type === 'eval_report_ready');
     expect((reportAction as { text: string }).text).toContain('Eval report — k=2');
@@ -185,14 +187,13 @@ describe('startEvalBatch', () => {
       { status: 'cancelled' },
     ]);
 
-    const handle = startEvalBatch(['stub', 'edgar'], 2, {
+    const handle = startEvalBatch(['stub', 'edgar'], 2, 1, {
       onAction: (action) => fixture.actions.push(action),
       evalsDir: fixtureDir,
       resultsDir: '/tmp/results-dir',
       runner: fixture.runner,
       loadTask: fixture.loadTask,
       writeResultsFn: fixture.writeResultsFn,
-      now: () => 5_000,
     });
     const result = await handle.done;
 
@@ -213,7 +214,7 @@ describe('startEvalBatch', () => {
 
   it('a failed trial run stops the batch with an error', async () => {
     const fixture = makeFixture([{ status: 'failed', message: 'browser died' }]);
-    const handle = startEvalBatch(['stub'], 1, {
+    const handle = startEvalBatch(['stub'], 1, 1, {
       onAction: (action) => fixture.actions.push(action),
       evalsDir: fixtureDir,
       resultsDir: '/tmp/results-dir',
@@ -225,5 +226,49 @@ describe('startEvalBatch', () => {
     const types = fixture.actions.map((action) => action.type);
     expect(types).toContain('eval_error');
     expect(types.at(-1)).toBe('evals_finished');
+  });
+
+  it('Esc-style cancellation cancels every active trial and starts no queued work', async () => {
+    const actions: StoreAction[] = [];
+    const cancels: Array<ReturnType<typeof vi.fn>> = [];
+    let started = 0;
+    let resolveAllStarted!: () => void;
+    const allStarted = new Promise<void>((resolve) => {
+      resolveAllStarted = resolve;
+    });
+    const runner: EvalRunner = () => {
+      started += 1;
+      if (started === 3) resolveAllStarted();
+      let finish!: (outcome: RunOutcome) => void;
+      const done = new Promise<RunOutcome>((resolve) => {
+        finish = resolve;
+      });
+      const cancel = vi.fn(() => finish({ status: 'cancelled' }));
+      cancels.push(cancel);
+      return { cancel, done };
+    };
+    const loadTask = async (_dir: string, name: string): Promise<EvalTask> => ({
+      name,
+      taskText: name,
+      requiresAuth: false,
+      fetchOracle: async () => ({}),
+      grade: async () => [{ name: 'ok', passed: true, detail: 'ok' }],
+    });
+
+    const handle = startEvalBatch(['normal'], 5, 3, {
+      onAction: (action) => actions.push(action),
+      evalsDir: fixtureDir,
+      resultsDir: fixtureDir,
+      runner,
+      loadTask,
+    });
+    await allStarted;
+    handle.cancel();
+
+    expect(await handle.done).toBe('cancelled');
+    expect(started).toBe(3);
+    expect(cancels).toHaveLength(3);
+    expect(cancels.every((cancel) => cancel.mock.calls.length === 1)).toBe(true);
+    expect(actions.some((action) => action.type === 'eval_report_ready')).toBe(false);
   });
 });

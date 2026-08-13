@@ -30,6 +30,9 @@ export interface LocalChromeBrowserSessionOptions {
   profileDir: string;
   /** Whether Chrome runs without a visible window; defaults to false. */
   headless?: boolean;
+  /** Chrome/Chromium binary to launch. When omitted, Playwright
+   * discovers system Google Chrome via its `chrome` channel. */
+  executablePath?: string;
 }
 
 /** Creates persistent local Chrome sessions controlled through Playwright. */
@@ -42,7 +45,9 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
     }
 
     const context = await chromium.launchPersistentContext(this.options.profileDir, {
-      channel: 'chrome',
+      ...(this.options.executablePath !== undefined
+        ? { executablePath: this.options.executablePath }
+        : { channel: 'chrome' }),
       headless: this.options.headless ?? false,
     });
 

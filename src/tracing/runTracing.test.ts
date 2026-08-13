@@ -137,7 +137,7 @@ function toolResponse(usage: Usage): ModelResponse {
         type: 'tool_use',
         id: 'write-1',
         name: 'write_file',
-        input: { file_path: 'trace.txt', content: 'traced output\n' },
+        input: { file_path: 'artifacts/trace.txt', content: 'traced output\n' },
       },
     ],
     stop_reason: 'tool_use',
@@ -248,7 +248,7 @@ describe('createRunTracing with runTask', () => {
     });
 
     expect(result.status).toBe('completed');
-    expect(await readFile(join(result.runDir, 'trace.txt'), 'utf8')).toBe(
+    expect(await readFile(join(result.runDir, 'artifacts/trace.txt'), 'utf8')).toBe(
       'traced output\n',
     );
 
@@ -319,7 +319,7 @@ describe('createRunTracing with runTask', () => {
     }
     const toolOutput =
       toolSpan.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT];
-    expect(toolOutput).toBe('File created successfully at: trace.txt');
+    expect(toolOutput).toBe('File created successfully at: artifacts/trace.txt');
     expect(
       toolSpan.attributes[
         `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.resultBytes`

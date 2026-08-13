@@ -4,6 +4,24 @@ A general browser agent for audit evidence collection: it takes a natural-langua
 
 The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of validated browser and file tools. An engine-agnostic `BrowserController` drives each session, while a `BrowserSessionProvider` decides whether that session comes from local Chrome or a hosted service.
 
+## Install
+
+```bash
+npm install -g github:briosolivares/evidence-collection-agent
+sherlock
+```
+
+Requires Node ≥ 22 and Google Chrome. On first launch Sherlock prompts for an Anthropic API key and offers to save it. An installed Sherlock keeps all of its state under `~/.sherlock/`:
+
+```
+~/.sherlock/
+  chrome-profile/   # persistent Chrome profile — logins survive across runs
+  runs/             # one directory per investigation (evidence + provenance)
+  .env              # ANTHROPIC_API_KEY and friends (written by the first-run prompt)
+```
+
+Overrides: `--runs-dir <path>` (or `SHERLOCK_RUNS_DIR`) moves just the runs directory, `SHERLOCK_HOME` moves the whole data home, `--env-file <path>` loads a specific env file (the default order is `./.env`, then `~/.sherlock/.env`), and `SHERLOCK_CHROME_PATH` points at a non-standard Chrome/Chromium binary. In a git checkout none of this applies — state stays repo-anchored (`runs/`, `chrome-profile/`, `.env` at the repo root; see Setup).
+
 ## Sherlock (TUI)
 
 `sherlock` is the interactive terminal UI: type a task, watch the investigation stream in (semantic activity lines, evidence highlights, a live status line), and get a persistent completion line plus the run directory.
@@ -14,7 +32,7 @@ npm run sherlock -- --demo    # scripted demo investigation, no API cost
 npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
-Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial count), `/exit` quits. Esc cancels the in-flight run (or eval trial) without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and `ANTHROPIC_API_KEY` (loaded from `.env`).
+Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
 
 ## How it works
 
@@ -26,8 +44,9 @@ Give it a task ("Create a CSV of the top 5 stories on Hacker News, with columns 
 
 ```
 runs/2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b/   # date_time_task-slug_suffix (local time)
-  <deliverables>      # the CSVs, screenshots, downloads, answer.md the task asked for
-  manifest.json       # provenance: SHA-256 hash, source URL, capture time per artifact
+  artifacts/          # published outputs — the CSVs, screenshots, downloads, answer.md the task asked for
+  scratch/            # the agent's private working files (never graded, still hashed)
+  manifest.json       # provenance: SHA-256 hash, source URL, roles, capture time per artifact
   transcript.jsonl    # append-only record of every model call and tool call
   metrics.json        # tokens, turns, wall-clock time
 ```
@@ -36,7 +55,7 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 
 ## Requirements
 
-- Node 18+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
+- Node 22+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
 - An Anthropic API key. Optionally Langfuse keys for tracing.
 
 ## Setup
@@ -45,13 +64,14 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 npm install
 ```
 
-Create a `.env` at the repo root (gitignored; there is no dotenv loader — pass it explicitly with `--env-file`):
+Copy `.env.example` to `.env` at the repo root and fill in your keys (gitignored; `sherlock` loads it automatically, every other entry point takes it explicitly with `--env-file`):
 
 ```
 ANTHROPIC_API_KEY=...
 LANGFUSE_PUBLIC_KEY=...    # optional — tracing is a no-op without these
 LANGFUSE_SECRET_KEY=...
 LANGFUSE_BASE_URL=...      # optional
+GITHUB_TOKEN=...           # optional — authenticated GitHub eval oracles
 ```
 
 ## Usage
@@ -65,10 +85,13 @@ npx tsx --env-file=.env src/cli/repl.ts
 **Evals** — each task runs k independent trials, then a grader checks the run directory against live ground truth (the grader never sees the agent's conversation):
 
 ```bash
-npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news,edgar,openclaw_pr --k 3
+npx tsx --env-file=.env evals/runners/cli.ts \
+  --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
 ```
 
-Results print to stdout and persist to `evals/experiments/`. Available tasks: `hacker_news`, `edgar`, `openclaw_pr`, `stub`.
+Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"requiresAuth": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/`; currently only `elon_tweets` uses that policy. The authenticated lane may overlap the normal pool.
+
+Results print to stdout and persist to `evals/experiments/`. Task packages are the directories under `evals/datasets/`.
 
 **Tests and typecheck** (no API keys or network needed; Chrome required):
 

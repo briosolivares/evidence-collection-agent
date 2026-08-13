@@ -62,7 +62,7 @@ Properties the codebase maintains deliberately:
 
 ## The five mechanisms borrowed from Claude Code
 
-1. **Bounded tool results with artifact offloading** (`src/tools/capResult.ts`) — results over 50,000 bytes are written in full to `tool-output/<tool>-<n>.txt` (hashed into the manifest) and the model receives a ≤2,000-byte preview plus the path, with a note to use `read_file`/`grep`.
+1. **Bounded tool results with artifact offloading** (`src/tools/capResult.ts`) — results over 50,000 bytes are written in full to `scratch/tool-output/<tool>-<n>.txt` (hashed into the manifest) and the model receives a ≤2,000-byte preview plus the path, with a note to use `read_file`/`grep`.
 2. **Append-only JSONL transcript** (`src/run/transcript.ts`) — every model request/response and tool call/result is one JSON line in `transcript.jsonl`; the durable, replayable audit record.
 3. **Stable prompt prefix** (`src/cli/systemPrompt.ts`, `src/model/callModel.ts`) — the system prompt is static (no task text/timestamps) and tool definitions serialize deterministically; one `cache_control: ephemeral` breakpoint on the system block caches tools + system together. Tests assert byte-identical prefixes across unrelated histories.
 4. **Completion as policy, not mechanism** (`src/loop/agentLoop.ts`) — no finish tool; a response with zero `tool_use` blocks completes the run. `stop_reason` is recorded in the transcript but never consulted. Backstops: `maxTurns` (default 12) and a cumulative token budget (default 250,000).
@@ -74,6 +74,7 @@ Properties the codebase maintains deliberately:
 - **Write chokepoint:** every byte a tool writes goes through `writeArtifact` (`src/run/artifacts.ts`), which SHA-256-hashes the exact bytes into `manifest.json` at capture time (tamper-evident evidence). Offloaded tool output is included.
 - **No `bash` tool, by design** — the model's input includes untrusted web pages; an unbounded shell tool would turn prompt injection into code execution. The system prompt also instructs that page content is data, not authority.
 - **Reserved filenames:** evidence tools refuse to write `manifest.json`, `transcript.jsonl`, or `metrics.json`.
+- **Workspace partition:** `writeArtifact` confines every write to `artifacts/` (published; non-empty `roles` of `requested_output`/`evidence` required) or `scratch/` (private; roles forbidden). Graders select deliverables only from `requested_output` entries, so scratch work and evidence-only captures can never shadow a deliverable; hash verification still covers the whole run.
 - **Grader isolation (eval side):** graders receive only the run directory path and oracle data — never the transcript — so an agent that merely *describes* success cannot pass.
 
 ## Design philosophy (binding project rules)
@@ -84,7 +85,7 @@ Properties the codebase maintains deliberately:
 
 ## Browser posture
 
-`LocalChromeBrowserSessionProvider` uses Playwright to launch real, local, **visible** Chrome (`channel: 'chrome'`, headed by default) with a persistent profile at `chrome-profile/`, returning a `PlaywrightBrowserController`. This is deliberately the best available anti-bot posture (real fingerprint + real session history + residential IP); headless is the most detectable configuration. The browser session launches once per REPL/eval session so logins persist; each task run opens a fresh tab and closes it on completion. Credentials are never typed by the agent — a human logs into the profile manually once.
+`LocalChromeBrowserSessionProvider` launches real local Chrome (`channel: 'chrome'`) in either mode selected by its caller. Interactive and `requiresAuth` work uses a lazy visible session backed by persistent `chrome-profile/`, preserving logins and human takeover. Every normal eval trial gets its own headless Chrome process and temporary profile, removed after the trial; the normal pool defaults to three concurrent trials. Authenticated trials serialize through the single persistent-profile session and may overlap the normal pool. Credentials are never typed by the agent — a human logs into the persistent profile manually once.
 
 The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot (`page.ariaSnapshot({ mode: 'ai' })`) — a compact accessibility-tree outline with stable element refs. `click`/`type` act by ref, not coordinates or selectors.
 
@@ -100,7 +101,8 @@ The model never sees raw HTML: `inspect_page` returns Playwright's ARIA snapshot
 | Offload preview size | 2,000 bytes | `src/tools/capResult.ts` (`PREVIEW_MAX_BYTES`) |
 | Concurrent read-only tools | 5 | `src/loop/scheduler.ts` (`MAX_CONCURRENT_READS`) |
 | Runs base dir | `runs` | `src/cli/runTask.ts` |
-| Chrome profile | `./chrome-profile` (absolute path required) | `src/cli/repl.ts`, `evals/runners/cli.ts` |
+| Eval concurrency | 3 normal/headless trials | `evals/config.ts`, CLI `--concurrency`, TUI `/evals` menu |
+| Auth Chrome profile | `./chrome-profile` (absolute path; single owner) | interactive and `requiresAuth` runs |
 | Thinking | disabled (`thinking: { type: 'disabled' }`) | `src/model/callModel.ts` — messages types don't carry thinking blocks yet |
 
 All per-run values are overridable through `RunTaskConfig` (see [interfaces.md](interfaces.md)).

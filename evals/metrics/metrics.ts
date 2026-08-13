@@ -1,13 +1,19 @@
 import type { AssertionResult } from '../types.js';
 
-/** The graded outcome of one trial: its run dir, assertion results, and latency. */
+/** The outcome of one trial: its run dir, assertion results, and latency —
+ * or, for a trial whose run/grading pipeline threw, the error that ended it. */
 export interface TrialGrade {
-  /** Absolute path of the trial's run directory. */
-  runDir: string;
-  /** The grader's assertion results for this trial; never empty. */
+  /** Absolute path of the trial's run directory; absent only when the
+   * trial errored before its run directory was known. */
+  runDir?: string;
+  /** The grader's assertion results for this trial; empty exactly when
+   * `error` is set (an errored trial was never graded). */
   assertions: AssertionResult[];
   /** Wall-clock duration of the agent run (excluding grading), in ms. */
   latencyMs: number;
+  /** Why this trial has no grade: its run or grading threw. An errored
+   * trial scores zero accuracy and never counts as completed. */
+  error?: string;
 }
 
 /** A trial's grade plus its derived completion flag. */
@@ -68,7 +74,8 @@ export function isComplete(assertions: AssertionResult[]): boolean {
  *
  * @param taskName - the task's name, copied into the report
  * @param trials - one grade per trial, in trial order; throws if empty or
- *   if any trial has zero assertions
+ *   if any non-errored trial has zero assertions. An errored trial scores
+ *   zero accuracy and is never completed.
  * @returns the task's report, with k = trials.length and each trial carrying
  *   its derived completion flag
  */
@@ -78,12 +85,12 @@ export function summarizeTask(taskName: string, trials: TrialGrade[]): TaskRepor
   }
   const trialReports: TrialReport[] = trials.map((t) => ({
     ...t,
-    completed: isComplete(t.assertions),
+    completed: t.error === undefined && isComplete(t.assertions),
   }));
   return {
     task: taskName,
     k: trials.length,
-    accuracy: mean(trials.map((t) => fractionPassed(t.assertions))),
+    accuracy: mean(trials.map((t) => (t.error === undefined ? fractionPassed(t.assertions) : 0))),
     taskPassed: trialReports.every((t) => t.completed),
     meanLatencyMs: mean(trials.map((t) => t.latencyMs)),
     trials: trialReports,

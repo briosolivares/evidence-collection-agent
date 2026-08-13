@@ -4,8 +4,9 @@ import { generateRunId } from '../../src/run/runId.js';
 import { appendTranscriptEvent } from '../../src/run/transcript.js';
 import type { RunTaskFn } from '../types.js';
 
-/** Run-dir-relative path of the deliverable the fake agent writes. */
-export const FAKE_DELIVERABLE = 'answer.md';
+/** Run-dir-relative path of the deliverable the fake agent writes —
+ * published under artifacts/ like a real deliverable. */
+export const FAKE_DELIVERABLE = 'artifacts/answer.md';
 
 /**
  * Make a fake agent satisfying RunTaskFn: each call produces, in
@@ -34,7 +35,10 @@ export function makeFakeRunTask(runsBaseDir: string): RunTaskFn {
       runDir,
       FAKE_DELIVERABLE,
       Buffer.from(`# Answer\n\nTask: ${taskText}\n`),
-      opts.startUrl !== undefined ? { sourceUrl: opts.startUrl } : {},
+      {
+        roles: ['requested_output'],
+        ...(opts.startUrl !== undefined ? { sourceUrl: opts.startUrl } : {}),
+      },
     );
     finalizeManifest(runDir);
     return { runDir };

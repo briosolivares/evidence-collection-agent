@@ -59,6 +59,18 @@ function productionConfig(): CallModelConfig {
 }
 
 describe('SYSTEM_PROMPT', () => {
+  it('teaches the workspace contract: publish to artifacts/, work in scratch/, assign roles', () => {
+    expect(SYSTEM_PROMPT).toContain('Publish every final requested output into artifacts/');
+    expect(SYSTEM_PROMPT).toContain('Use scratch/ for intermediate working files');
+    expect(SYSTEM_PROMPT).toContain(
+      'Preserve supporting audit evidence (screenshots, downloads) as published artifacts',
+    );
+    expect(SYSTEM_PROMPT).toContain('Assign each published file its correct roles');
+    expect(SYSTEM_PROMPT).toContain(
+      'both when a requested file also serves as audit evidence',
+    );
+  });
+
   it('requires exact output structure and anchors interpretation to an initial page', () => {
     expect(SYSTEM_PROMPT).toContain('Treat output requirements as exact.');
     expect(SYSTEM_PROMPT).toContain('Do not add unrequested fields');
