@@ -12,7 +12,9 @@
 // first of 'spawn' (launched) or 'error' (failed) — testable by driving
 // an injected fake child. The child's later lifetime is its own
 // business. Unsupported platform/action combinations resolve
-// { ok: false } with a notice and spawn nothing. A missing binary
+// { ok: false } with a notice and spawn nothing, and a path that does
+// not exist on disk is refused up front the same way (Quick Look would
+// otherwise "succeed" into a generic icon card). A missing binary
 // (ENOENT) renders as a capability-named notice ("Quick Look isn't
 // available here…"); every other launch failure keeps its raw detail.
 //
@@ -26,6 +28,7 @@
 // /dev/null, not our frame.
 
 import { spawn as nodeSpawn } from 'node:child_process';
+import { statSync } from 'node:fs';
 
 /** What the caller renders: success, or a one-line notice. */
 export type OpenExternalResult = { ok: true } | { ok: false; message: string };
@@ -50,16 +53,49 @@ export interface OpenExternalDeps {
   spawn?: SpawnFn;
   /** Defaults to process.platform. */
   platform?: string;
+  /** File-existence probe; defaults to the real filesystem. */
+  exists?: (absPath: string) => boolean;
 }
 
 const defaultSpawn: SpawnFn = (command, args, options) =>
   nodeSpawn(command, args, options);
+
+const defaultExists = (absPath: string): boolean => {
+  try {
+    statSync(absPath);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * The stat-before-launch gate: Quick Look renders a useless generic icon
+ * card for a nonexistent path, and `open` fails after the fact — both
+ * would read as {ok:true} under the launch-outcome contract. A missing
+ * file (deleted mid-session, or the demo's fictional artifacts) becomes
+ * a notice before anything spawns.
+ */
+function missingFile(
+  verb: string,
+  absPath: string,
+  deps: OpenExternalDeps,
+): Promise<OpenExternalResult> | undefined {
+  const exists = deps.exists ?? defaultExists;
+  if (exists(absPath)) return undefined;
+  return Promise.resolve({
+    ok: false,
+    message: `Nothing to ${verb} — ${absPath} is missing on disk`,
+  });
+}
 
 /** Open the file in its default application (macOS `open`, Linux `xdg-open`). */
 export function openPath(
   absPath: string,
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
+  const missing = missingFile('open', absPath, deps);
+  if (missing !== undefined) return missing;
   const platform = deps.platform ?? process.platform;
   if (platform === 'darwin')
     return launch({ command: 'open', args: [absPath], capability: 'Opening files' }, deps);
@@ -81,6 +117,8 @@ export function revealPath(
   absPath: string,
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
+  const missing = missingFile('reveal', absPath, deps);
+  if (missing !== undefined) return missing;
   const platform = deps.platform ?? process.platform;
   if (platform === 'darwin')
     return launch(
@@ -99,6 +137,8 @@ export function quickLookPath(
   absPath: string,
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
+  const missing = missingFile('preview', absPath, deps);
+  if (missing !== undefined) return missing;
   const platform = deps.platform ?? process.platform;
   if (platform === 'darwin')
     return launch(

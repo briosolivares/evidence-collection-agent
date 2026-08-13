@@ -9,7 +9,10 @@
 // at compile time, and these assertions keep that pin honest at runtime.
 
 import { EventEmitter } from 'node:events';
-import { describe, expect, it } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   openPath,
@@ -18,7 +21,20 @@ import {
   type SpawnFn,
 } from '../../src/tui/openExternal.js';
 
-const PATH = '/runs/2026-08-12_demo/artifacts/page.png';
+// A real file on disk: the helpers stat the path before launching
+// anything (default `exists` seam), so the fixture must exist.
+let baseDir: string;
+let PATH: string;
+
+beforeEach(() => {
+  baseDir = mkdtempSync(join(tmpdir(), 'sherlock-open-'));
+  PATH = join(baseDir, 'page.png');
+  writeFileSync(PATH, 'png-bytes');
+});
+
+afterEach(() => {
+  rmSync(baseDir, { recursive: true, force: true });
+});
 
 class FakeChild extends EventEmitter {
   unrefCalls = 0;
@@ -130,6 +146,49 @@ describe('on an unknown platform', () => {
     await expect(quickLookPath(PATH, deps)).resolves.toEqual({
       ok: false,
       message: expect.stringContaining('not supported on win32'),
+    });
+    expect(calls).toEqual([]);
+  });
+});
+
+describe('missing files (stat-before-launch)', () => {
+  it('each action refuses a nonexistent path with a notice, spawning nothing', async () => {
+    const { calls, spawn } = makeSpawnRecorder();
+    const gone = join(baseDir, 'gone.png');
+    const deps = { spawn, platform: 'darwin' };
+    await expect(quickLookPath(gone, deps)).resolves.toEqual({
+      ok: false,
+      message: `Nothing to preview — ${gone} is missing on disk`,
+    });
+    await expect(openPath(gone, deps)).resolves.toEqual({
+      ok: false,
+      message: `Nothing to open — ${gone} is missing on disk`,
+    });
+    await expect(revealPath(gone, deps)).resolves.toEqual({
+      ok: false,
+      message: `Nothing to reveal — ${gone} is missing on disk`,
+    });
+    expect(calls).toEqual([]);
+  });
+
+  it('the injected exists seam overrides the real filesystem', async () => {
+    const { calls, children, spawn } = makeSpawnRecorder();
+    const result = quickLookPath('/not/real/anywhere.png', {
+      spawn,
+      platform: 'darwin',
+      exists: () => true,
+    });
+    children[0]!.emit('spawn');
+    await expect(result).resolves.toEqual({ ok: true });
+    expect(calls).toHaveLength(1);
+  });
+
+  it('the missing-file gate beats the platform gate', async () => {
+    const { calls, spawn } = makeSpawnRecorder();
+    const gone = join(baseDir, 'gone.png');
+    await expect(openPath(gone, { spawn, platform: 'win32' })).resolves.toEqual({
+      ok: false,
+      message: `Nothing to open — ${gone} is missing on disk`,
     });
     expect(calls).toEqual([]);
   });
