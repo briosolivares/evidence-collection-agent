@@ -6,9 +6,12 @@ import type { OutputContract, OutputSpec } from '../contracts/outputContract.js'
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
+  writeArtifact,
   type Manifest,
   type ManifestEntry,
 } from '../run/artifacts.js';
+import { renderOutputTable } from '../outputs/renderTable.js';
+import type { OutputTableStore } from '../outputs/outputTable.js';
 import { resolveRunPath } from '../run/runDir.js';
 
 // The code-based completion check: everything about a proposed completion
@@ -600,4 +603,124 @@ function parseCsv(
       return row;
     }),
   };
+}
+
+// --- T7: table rendering and completeness -----------------------------------
+
+/**
+ * Render every table output the contract declares, writing each through
+ * `writeArtifact` so the manifest records its hash.
+ *
+ * Called at submission (and, best-effort, at incomplete finalization) — never
+ * during ordinary work. Rendering only at the boundary is what keeps a
+ * half-built table from being published and then graded.
+ *
+ * @param completionStatus - `complete` at submission; `partial` when
+ *   preserving an unverified run, which keeps the requested-output role while
+ *   marking the file as not fully satisfying its requirement
+ * @returns one failure per table that could not be rendered; an empty array
+ *   when every table was written
+ */
+export function renderTableOutputs(
+  runDir: string,
+  contract: OutputContract,
+  tables: OutputTableStore,
+  completionStatus: 'complete' | 'partial' = 'complete',
+): CompletionFailure[] {
+  const failures: CompletionFailure[] = [];
+  for (const output of contract.outputs) {
+    if (output.kind !== 'table') continue;
+    try {
+      const rendered = renderOutputTable(output, tables.table(output.id));
+      writeArtifact(runDir, `${ARTIFACTS_DIR}/${output.filename}`, Buffer.from(rendered, 'utf8'), {
+        roles: ['requested_output'],
+        completionStatus,
+      });
+    } catch (error) {
+      failures.push({
+        outputId: output.id,
+        code: 'table_render_failed',
+        message: `${output.filename} could not be rendered: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      });
+    }
+  }
+  return failures;
+}
+
+/**
+ * Every count-ruled table must carry evidence-backed completeness proof.
+ *
+ * A row-count rule is a claim about a POPULATION, not about how many rows
+ * happen to be stored — so the store's own row count can never satisfy it.
+ * Without this check a run could declare "exactly 12", collect 12 rows it
+ * happened to find, and pass mechanically while proving nothing.
+ */
+export function validateTableCompleteness(
+  contract: OutputContract,
+  tables: OutputTableStore,
+): CompletionFailure[] {
+  const failures: CompletionFailure[] = [];
+  for (const output of contract.outputs) {
+    if (output.kind !== 'table') continue;
+    const countRuled = output.rules.some(
+      (rule) => rule.type === 'exact_row_count' || rule.type === 'minimum_row_count',
+    );
+    if (!countRuled) continue;
+
+    const completeness = tables.table(output.id).completeness;
+    if (completeness === undefined) {
+      failures.push({
+        outputId: output.id,
+        code: 'missing_completeness_evidence',
+        message:
+          `${output.filename} declares a row-count rule, which is a claim about the whole ` +
+          'population. Record how you established it with set_table_completeness — the ' +
+          'number of rows found cannot prove the number that exist.',
+      });
+    }
+  }
+  return failures;
+}
+
+/**
+ * Every row's cited evidence must still resolve.
+ *
+ * Evidence can stop resolving between the upsert and the submission (a
+ * rewritten record, a store rebuilt mid-run), and a row whose proof has
+ * evaporated is exactly as unproven as one that never had any.
+ */
+export function validateEvidenceReferences(
+  contract: OutputContract,
+  tables: OutputTableStore,
+  evidenceExists: (evidenceId: string) => boolean,
+): CompletionFailure[] {
+  const failures: CompletionFailure[] = [];
+  for (const output of contract.outputs) {
+    if (output.kind !== 'table') continue;
+    const table = tables.table(output.id);
+    for (const row of table.rows) {
+      const dangling = row.evidenceIds.filter((id) => !evidenceExists(id));
+      if (dangling.length > 0) {
+        failures.push({
+          outputId: output.id,
+          code: 'dangling_evidence',
+          message:
+            `${output.filename} row "${row.rowId}" cites evidence that no longer resolves: ` +
+            `${dangling.join(', ')}.`,
+        });
+      }
+    }
+    for (const id of table.completeness?.evidenceIds ?? []) {
+      if (!evidenceExists(id)) {
+        failures.push({
+          outputId: output.id,
+          code: 'dangling_completeness_evidence',
+          message: `${output.filename} completeness evidence cites unresolvable id "${id}".`,
+        });
+      }
+    }
+  }
+  return failures;
 }

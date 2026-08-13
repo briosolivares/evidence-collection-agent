@@ -1,11 +1,18 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { OutputContract, OutputSpec } from '../contracts/outputContract.js';
+import { createOutputTableStore } from '../outputs/outputTable.js';
 import { initManifest, writeArtifact } from '../run/artifacts.js';
-import { runCompletionCheck, validateManifestIntegrity } from './completionCheck.js';
+import {
+  renderTableOutputs,
+  runCompletionCheck,
+  validateEvidenceReferences,
+  validateManifestIntegrity,
+  validateTableCompleteness,
+} from './completionCheck.js';
 
 const TASK = 'Publish the widget roster.';
 
@@ -337,5 +344,154 @@ describe('runCompletionCheck — reporting', () => {
     expect(codes(result)).toEqual(['column_mismatch', 'missing_file']);
     // Every failure names the output it belongs to.
     expect(result.failures.map((f) => f.outputId)).toEqual(['roster', 'report']);
+  });
+});
+
+// --- T7: table rendering, completeness, and evidence -------------------------
+
+describe('renderTableOutputs', () => {
+  const spec = (overrides: Record<string, unknown> = {}): OutputSpec =>
+    ({
+      id: 'roster',
+      kind: 'table',
+      filename: 'roster.csv',
+      format: 'csv',
+      columns: [{ name: 'name', required: true, type: 'string' }],
+      rules: [],
+      ...overrides,
+    }) as OutputSpec;
+
+  function tableStore(outputs: OutputSpec[]) {
+    return createOutputTableStore({
+      tableSpec: (id) => outputs.find((o) => o.kind === 'table' && o.id === id) as never,
+      evidenceExists: () => true,
+    });
+  }
+
+  it('writes each table through writeArtifact with the requested_output role', () => {
+    const outputs = [spec()];
+    const tables = tableStore(outputs);
+    tables.upsertOutputRows('roster', [
+      { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
+    ]);
+
+    const failures = renderTableOutputs(runDir, contract(outputs), tables);
+    expect(failures).toEqual([]);
+    expect(readFileSync(join(runDir, 'artifacts/roster.csv'), 'utf8')).toBe('name\nAlpha\n');
+
+    const manifest = JSON.parse(
+      readFileSync(join(runDir, 'manifest.json'), 'utf8'),
+    ) as { artifacts: Array<{ filename: string; roles?: string[]; completionStatus?: string }> };
+    const entry = manifest.artifacts.find((a) => a.filename === 'artifacts/roster.csv');
+    expect(entry?.roles).toEqual(['requested_output']);
+    expect(entry?.completionStatus).toBe('complete');
+  });
+
+  it('marks a partial render partial while keeping the requested-output role', () => {
+    const outputs = [spec()];
+    const tables = tableStore(outputs);
+    tables.upsertOutputRows('roster', [
+      { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
+    ]);
+
+    renderTableOutputs(runDir, contract(outputs), tables, 'partial');
+    const manifest = JSON.parse(
+      readFileSync(join(runDir, 'manifest.json'), 'utf8'),
+    ) as { artifacts: Array<{ filename: string; roles?: string[]; completionStatus?: string }> };
+    const entry = manifest.artifacts.find((a) => a.filename === 'artifacts/roster.csv');
+    // Still a requested output — a partial deliverable is still the
+    // deliverable, just honestly labelled.
+    expect(entry?.roles).toEqual(['requested_output']);
+    expect(entry?.completionStatus).toBe('partial');
+  });
+
+  it('renders an empty table as a header-only file rather than failing', () => {
+    const outputs = [spec()];
+    renderTableOutputs(runDir, contract(outputs), tableStore(outputs));
+    expect(readFileSync(join(runDir, 'artifacts/roster.csv'), 'utf8')).toBe('name\n');
+  });
+});
+
+describe('validateTableCompleteness', () => {
+  const ruled = {
+    id: 'roster',
+    kind: 'table',
+    filename: 'roster.csv',
+    format: 'csv',
+    columns: [{ name: 'name', required: true, type: 'string' }],
+    rules: [{ type: 'exact_row_count', value: 1 }],
+  } as OutputSpec;
+
+  function tableStore(outputs: OutputSpec[]) {
+    return createOutputTableStore({
+      tableSpec: (id) => outputs.find((o) => o.kind === 'table' && o.id === id) as never,
+      evidenceExists: () => true,
+    });
+  }
+
+  it('requires completeness evidence for a count-ruled table', () => {
+    const tables = tableStore([ruled]);
+    const failures = validateTableCompleteness(contract([ruled]), tables);
+    expect(failures.map((f) => f.code)).toEqual(['missing_completeness_evidence']);
+    // The message must explain WHY row count cannot prove population.
+    expect(failures[0]?.message).toMatch(/cannot prove the number that exist/);
+  });
+
+  it('accepts a count-ruled table once completeness is recorded', () => {
+    const tables = tableStore([ruled]);
+    tables.setTableCompleteness('roster', { method: 'header states 1', evidenceIds: ['E1'] });
+    expect(validateTableCompleteness(contract([ruled]), tables)).toEqual([]);
+  });
+
+  it('does not require completeness for an unruled table', () => {
+    const unruled = { ...(ruled as Record<string, unknown>), rules: [] } as OutputSpec;
+    expect(validateTableCompleteness(contract([unruled]), tableStore([unruled]))).toEqual([]);
+  });
+});
+
+describe('validateEvidenceReferences', () => {
+  const spec = {
+    id: 'roster',
+    kind: 'table',
+    filename: 'roster.csv',
+    format: 'csv',
+    columns: [{ name: 'name', required: true, type: 'string' }],
+    rules: [],
+  } as OutputSpec;
+
+  it('reports rows whose evidence stopped resolving', () => {
+    const tables = createOutputTableStore({
+      tableSpec: () => spec as never,
+      evidenceExists: () => true,
+    });
+    tables.upsertOutputRows('roster', [
+      { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
+    ]);
+
+    // Evidence disappears between the upsert and the submission.
+    const failures = validateEvidenceReferences(contract([spec]), tables, () => false);
+    expect(failures.map((f) => f.code)).toEqual(['dangling_evidence']);
+    expect(failures[0]?.message).toMatch(/row "r1"/);
+  });
+
+  it('passes when every cited id still resolves', () => {
+    const tables = createOutputTableStore({
+      tableSpec: () => spec as never,
+      evidenceExists: () => true,
+    });
+    tables.upsertOutputRows('roster', [
+      { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
+    ]);
+    expect(validateEvidenceReferences(contract([spec]), tables, () => true)).toEqual([]);
+  });
+
+  it('checks completeness evidence too', () => {
+    const tables = createOutputTableStore({
+      tableSpec: () => spec as never,
+      evidenceExists: () => true,
+    });
+    tables.setTableCompleteness('roster', { method: 'counted', evidenceIds: ['E9'] });
+    const failures = validateEvidenceReferences(contract([spec]), tables, () => false);
+    expect(failures.map((f) => f.code)).toEqual(['dangling_completeness_evidence']);
   });
 });
