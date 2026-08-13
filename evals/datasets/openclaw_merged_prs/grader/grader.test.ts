@@ -176,6 +176,30 @@ describe('openclaw_merged_prs grader', () => {
     expect(byName(results, PEOPLE).passed).toBe(true);
   });
 
+  it('accepts a commit identity (bot committer) in the committer cell', async () => {
+    const oracle = makeOracle();
+    oracle.mergedWindow[0]!.commitIdentities = ['ampagent', `author-900`];
+    const rows = passingRows();
+    rows[0]![1] = 'ampagent';
+    writeCsv(rows);
+    writeScreenshots(passingNumbers());
+
+    expect(byName(await grade(runDir, oracle), PEOPLE).passed).toBe(true);
+  });
+
+  it('still fails a committer who is neither the author nor on any commit', async () => {
+    const oracle = makeOracle();
+    oracle.mergedWindow[0]!.commitIdentities = ['ampagent'];
+    const rows = passingRows();
+    rows[0]![1] = 'random-stranger';
+    writeCsv(rows);
+    writeScreenshots(passingNumbers());
+
+    const results = await grade(runDir, oracle);
+    expect(byName(results, PEOPLE).passed).toBe(false);
+    expect(byName(results, PEOPLE).detail).toMatch(/neither author author-900 nor a commit identity/);
+  });
+
   it('fails the reviewer assertion when a reviewed PR names no actual reviewer', async () => {
     const rows = passingRows();
     rows[0]![2] = 'somebody-random';

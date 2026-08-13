@@ -138,9 +138,12 @@ function linkedinAssertion(rows: OutreachRow[]): AssertionResult {
       const host = url.hostname.toLowerCase();
       const slug = /^\/in\/([^/?#]+)/i.exec(url.pathname)?.[1]?.toLowerCase().replace(/[^a-z0-9]/g, '');
       const nameTokens = normalize(row.founderName).split(' ').filter((token) => token.length >= 3);
+      // Real handles are often truncated or initials-style ("binw" for
+      // Bing Wu), so a ≥3-char prefix of a name token counts as a match;
+      // profile ownership stays human-reviewed.
       if ((url.protocol !== 'http:' && url.protocol !== 'https:') ||
           (host !== 'linkedin.com' && !host.endsWith('.linkedin.com')) || !slug ||
-          !nameTokens.some((token) => slug.includes(token))) {
+          !nameTokens.some((token) => slug.includes(token.slice(0, 3)))) {
         bad.push(`row ${row.rowNumber}: ${row.linkedinUrl}`);
       } else {
         urls.push(url.href.toLowerCase().replace(/\/$/, ''));

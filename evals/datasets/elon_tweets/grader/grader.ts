@@ -138,12 +138,32 @@ function isPlausibleTodayTime(value: string, acceptedDates: Set<string>): boolea
   const text = value.trim();
   if (/^(?:just now|now|\d+\s*(?:s|sec(?:ond)?s?|m|min(?:ute)?s?|h|hr|hour)s?\s*(?:ago)?)$/i.test(text)) return true;
   if (/^(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?:\s*(?:am|pm))?$|^(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)$/i.test(text)) return true;
+  // X's own rendered timestamp ("8:41 AM · Aug 12, 2026", year omitted for the
+  // current year) — the `·` separator defeats Date.parse, and an agent that
+  // transcribes the page verbatim must not fail on rendering fidelity.
+  const xNative = /^(?:[01]?\d|2[0-3]):[0-5]\d\s*(?:am|pm)?\s*·\s*([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:,\s*(\d{4}))?$/i.exec(text);
+  if (xNative) {
+    const month = monthNumber(xNative[1]!);
+    const day = Number(xNative[2]);
+    const year = xNative[3];
+    return month !== undefined && [...acceptedDates].some((key) => {
+      const [keyYear, keyMonth, keyDay] = key.split('-');
+      return Number(keyMonth) === month && Number(keyDay) === day &&
+        (year === undefined || year === keyYear);
+    });
+  }
   const datePrefix = /^(\d{4}-\d{2}-\d{2})/.exec(text)?.[1];
   if (datePrefix) return acceptedDates.has(datePrefix) && !Number.isNaN(Date.parse(text));
   const parsed = Date.parse(text);
   if (Number.isNaN(parsed)) return false;
   const date = new Date(parsed);
   return [...acceptedDates].some((key) => key === dateKey(date, 'UTC') || key === dateKey(date, 'America/Los_Angeles'));
+}
+
+function monthNumber(name: string): number | undefined {
+  const index = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+    .indexOf(name.slice(0, 3).toLowerCase());
+  return index === -1 ? undefined : index + 1;
 }
 
 function dateKey(date: Date, timeZone: string): string {

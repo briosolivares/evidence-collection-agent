@@ -35,6 +35,28 @@ describe('elon_tweets grader', () => {
     expect((await grade(runDir, ORACLE)).every((result) => result.passed)).toBe(true);
   });
 
+  it("accepts X's native rendered timestamp for the run's day, with or without year", async () => {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric',
+    }).formatToParts(new Date());
+    const part = (type: Intl.DateTimeFormatPartTypes): string =>
+      parts.find((p) => p.type === type)?.value ?? '';
+    const monthDay = `${part('month')} ${part('day')}`;
+    writeCsv(
+      'text,likes,time_posted\n' +
+        `A,1,"8:41 AM · ${monthDay}, ${part('year')}"\n` +
+        `B,2,"9:37 PM · ${monthDay}"\n`,
+    );
+    const results = await grade(runDir, ORACLE);
+    expect(assertion(results, "every time_posted cell is a plausible time from the run's day").passed).toBe(true);
+  });
+
+  it("rejects X's native rendered timestamp for a different day", async () => {
+    writeCsv('text,likes,time_posted\nA,1,"3:33 PM · Jan 1, 2001"\n');
+    const results = await grade(runDir, ORACLE);
+    expect(assertion(results, "every time_posted cell is a plausible time from the run's day").passed).toBe(false);
+  });
+
   it('rejects duplicate text, a negative like count, and an old date independently', async () => {
     writeCsv('text,likes,time_posted\nSame,-2,2001-01-01T10:00:00Z\nSame,4,10:30 AM\n');
     const results = await grade(runDir, ORACLE);

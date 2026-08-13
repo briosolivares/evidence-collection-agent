@@ -171,8 +171,15 @@ function peopleAssertion(rows: CsvPrRow[], oracle: OpenClawMergedPrsOracle): Ass
   }
   const problems: string[] = [];
   for (const { row, pr } of checked) {
-    if (!mentionsLogin(row.committer, pr.author)) {
-      problems.push(`#${pr.number}: committer "${row.committer}" does not name author ${pr.author}`);
+    // "Committer" is ambiguous on a PR page: the opening author or the
+    // commits' git identities (bot-assisted PRs differ — e.g. ampagent
+    // commits on a PR steipete opened). Either is a faithful reading.
+    const committerNames = [pr.author, ...(pr.commitIdentities ?? [])];
+    if (!committerNames.some((name) => mentionsLogin(row.committer, name))) {
+      problems.push(
+        `#${pr.number}: committer "${row.committer}" names neither author ` +
+          `${pr.author} nor a commit identity`,
+      );
     }
     if (pr.mergedBy !== undefined && !mentionsLogin(row.merger, pr.mergedBy)) {
       problems.push(`#${pr.number}: merger "${row.merger}" does not name ${pr.mergedBy}`);

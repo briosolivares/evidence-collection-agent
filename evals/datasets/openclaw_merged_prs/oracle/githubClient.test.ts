@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   MERGED_WINDOW_SIZE,
+  parseCommitIdentities,
   parseMergedBy,
   parseMergedPullsResponse,
   parseReviewers,
@@ -70,5 +71,27 @@ describe('parseReviewers', () => {
 
   it('throws on a non-array response', () => {
     expect(() => parseReviewers({}, 'x')).toThrow(/array/);
+  });
+});
+
+describe('parseCommitIdentities', () => {
+  it('returns distinct logins and git names across all commits, in order', () => {
+    const commits = [
+      {
+        author: { login: 'steipete' },
+        committer: { login: 'ampagent' },
+        commit: { author: { name: 'Peter S' }, committer: { name: 'ampagent' } },
+      },
+      {
+        author: null,
+        committer: { login: 'ampagent' },
+        commit: { author: { name: 'Peter S' }, committer: { name: '' } },
+      },
+    ];
+    expect(parseCommitIdentities(commits)).toEqual(['steipete', 'ampagent', 'Peter S']);
+  });
+
+  it('throws on a non-array response', () => {
+    expect(() => parseCommitIdentities({})).toThrow(/array/);
   });
 });

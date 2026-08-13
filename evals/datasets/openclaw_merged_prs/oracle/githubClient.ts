@@ -47,6 +47,12 @@ export interface MergedPr {
   /** Distinct logins that submitted a review, the author excluded; present
    *  only for the detailed subset. */
   reviewers?: string[];
+  /** Distinct author/committer identities (logins and git names) on the
+   *  PR's commits; present only for the detailed subset. Bot-assisted PRs
+   *  (e.g. commits committed by "ampagent" on a PR steipete opened) show
+   *  these identities on the page, so a committer cell naming one is a
+   *  faithful reading, not an error. */
+  commitIdentities?: string[];
 }
 
 /** Ground truth for the merged-PRs task. */
@@ -146,12 +152,46 @@ export function parseReviewers(json: unknown, authorLogin: string): string[] {
 }
 
 /**
+ * Extract distinct commit identities from a `GET .../pulls/{n}/commits`
+ * response: the mapped GitHub logins and raw git author/committer names of
+ * every commit, in first-appearance order.
+ *
+ * @param json - the parsed JSON body of the commits-list response
+ * @returns distinct identity strings; entries without any identity are
+ *   skipped
+ * @throws if `json` is not an array
+ */
+export function parseCommitIdentities(json: unknown): string[] {
+  if (!Array.isArray(json)) {
+    throw new Error('commits response must be an array');
+  }
+  const identities: string[] = [];
+  const add = (value: unknown): void => {
+    if (typeof value === 'string' && value !== '' && !identities.includes(value)) {
+      identities.push(value);
+    }
+  };
+  for (const item of json) {
+    const obj = item as {
+      author?: { login?: unknown } | null;
+      committer?: { login?: unknown } | null;
+      commit?: { author?: { name?: unknown } | null; committer?: { name?: unknown } | null } | null;
+    } | null;
+    add(obj?.author?.login);
+    add(obj?.committer?.login);
+    add(obj?.commit?.author?.name);
+    add(obj?.commit?.committer?.name);
+  }
+  return identities;
+}
+
+/**
  * Fetch the merged-PRs oracle from the live GitHub REST API: one closed-PRs
  * listing (sorted by update recency — the closest proxy the REST API offers
  * to "recently merged"; a merge updates the PR, so a 100-entry page reliably
- * contains the newest merges), then detail + reviews calls for the newest
- * DETAILED_COUNT merged PRs (2 × DETAILED_COUNT + 1 requests total). Not
- * called anywhere in the automated test suite.
+ * contains the newest merges), then detail + reviews + commits calls for the
+ * newest DETAILED_COUNT merged PRs (3 × DETAILED_COUNT + 1 requests total).
+ * Not called anywhere in the automated test suite.
  *
  * @returns the oracle window, newest merge first
  * @throws if the API is unreachable, rate-limits, or returns a shape the
@@ -165,14 +205,16 @@ export async function fetchOpenClawMergedPrs(): Promise<OpenClawMergedPrsOracle>
 
   const detailed = await Promise.all(
     window.slice(0, DETAILED_COUNT).map(async (pr): Promise<MergedPr> => {
-      const [detail, reviews] = await Promise.all([
+      const [detail, reviews, commits] = await Promise.all([
         githubGetJson(`/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${pr.number}`),
         githubGetJson(`/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${pr.number}/reviews?per_page=100`),
+        githubGetJson(`/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${pr.number}/commits?per_page=100`),
       ]);
       return {
         ...pr,
         mergedBy: parseMergedBy(detail),
         reviewers: parseReviewers(reviews, pr.author),
+        commitIdentities: parseCommitIdentities(commits),
       };
     }),
   );
