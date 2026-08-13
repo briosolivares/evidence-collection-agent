@@ -3,6 +3,11 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
+  blockedByInvalidContractResults,
+  decideContractGate,
+  SET_OUTPUT_CONTRACT,
+} from '../contracts/contractFirstGate.js';
+import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
 } from '../model/modelDriver.js';
@@ -69,6 +74,10 @@ export interface WorkerSessionDeps {
   credentials?: ToolCtx['credentials'];
   /** Resolver for interactive tool calls; omitted in headless runs. */
   requestPermission?: ToolCtx['requestPermission'];
+  /** The run's output-contract store. Present enables the contract-first
+   * gate: until a valid contract exists, only `set_output_contract` may
+   * run. Absent (the judge-less path, fixture tests) leaves the gate off. */
+  outputContracts?: ToolCtx['outputContracts'];
 }
 
 /** The session's guards: the shared whole-run budget plus the per-request
@@ -333,13 +342,42 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
     browser: deps.browser,
     credentials: deps.credentials,
     requestPermission: deps.requestPermission,
+    outputContracts: deps.outputContracts,
   };
+
+  // Contract-first gate (T4.3): until a valid contract exists, the only
+  // call a response may make is set_output_contract. A refused response
+  // executes NOTHING — no navigation, no write, no capture — while every
+  // attempted call still receives exactly one result.
+  const contracts = deps.outputContracts;
+  const gate =
+    contracts === undefined
+      ? { kind: 'execute' as const }
+      : decideContractGate(calls, contracts.hasContract());
+  if (gate.kind === 'refuse') {
+    const refusedBlocks: ToolResultBlock[] = gate.results.map((result) => {
+      appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
+      return {
+        type: 'tool_result',
+        tool_use_id: result.toolCallId,
+        content: result.content,
+        is_error: true,
+      };
+    });
+    state.messages.push({ role: 'user', content: refusedBlocks });
+    const refusedLimit = budget.exceededLimit();
+    if (refusedLimit !== undefined) {
+      return { kind: 'budget_exceeded', reason: budgetReasonForLimit(refusedLimit) };
+    }
+    return { kind: 'working' };
+  }
+
   // The batch cap runs before the transcript's tool_result events so the
   // transcript records exactly what the model will see next turn.
   const results = capResultBatch(
     deps.runDir,
     calls,
-    await scheduleToolCalls(calls, deps.registry, toolCtx),
+    await runGatedCalls(calls, deps, toolCtx, contracts !== undefined && !contracts.hasContract()),
   );
   const resultBlocks: ToolResultBlock[] = results.map((result) => {
     appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
@@ -429,6 +467,50 @@ export function recordWorkerSessionCrash(session: WorkerSession, error: unknown)
     message: error instanceof Error ? error.message : String(error),
   });
   writeWorkerSessionMetrics(session, 'failed');
+}
+
+/**
+ * Execute one response's calls, honoring the contract-first rule when the
+ * run has no accepted contract yet.
+ *
+ * With a contract already in place (or no contract store at all) this is
+ * just `scheduleToolCalls`. On the contract-establishing response — the one
+ * whose first call is `set_output_contract` — the contract call runs ALONE
+ * first, and the rest of the response runs only if it was accepted:
+ * otherwise every later call is answered `blocked_by_invalid_contract`
+ * without running, because it was written against requirements the run
+ * never accepted.
+ */
+async function runGatedCalls(
+  calls: readonly ToolCall[],
+  deps: WorkerSessionDeps,
+  toolCtx: ToolCtx,
+  establishingContract: boolean,
+): Promise<ToolCallResult[]> {
+  if (!establishingContract || calls[0]?.name !== SET_OUTPUT_CONTRACT) {
+    return scheduleToolCalls(calls, deps.registry, toolCtx);
+  }
+
+  const [contractCall, ...rest] = calls;
+  const contractResult = (
+    await scheduleToolCalls([contractCall!], deps.registry, toolCtx)
+  )[0]!;
+  if (rest.length === 0) return [contractResult];
+
+  // Accepted: the remaining calls are now running under a validated
+  // contract, so they proceed normally.
+  if (deps.outputContracts?.hasContract() === true) {
+    return [contractResult, ...(await scheduleToolCalls(rest, deps.registry, toolCtx))];
+  }
+
+  return [
+    contractResult,
+    ...blockedByInvalidContractResults(rest).map((blocked) => ({
+      toolCallId: blocked.toolCallId,
+      content: blocked.content,
+      isError: true,
+    })),
+  ] as ToolCallResult[];
 }
 
 /** A response's prose: its text blocks joined with newlines ("" if none). */

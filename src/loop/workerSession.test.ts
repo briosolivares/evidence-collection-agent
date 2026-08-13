@@ -4,8 +4,13 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
+import {
+  createOutputContractStore,
+  type OutputContractStore,
+} from '../contracts/outputContractStore.js';
 import { initManifest } from '../run/artifacts.js';
 import { createRunBudgetTracker, type RunBudgetConfig } from '../run/runBudget.js';
+import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
 import type { Message, ModelResponse, Usage } from './messages.js';
 import {
@@ -192,6 +197,177 @@ describe('WorkerSession metrics', () => {
       outputTokens: 3,
       wallClockMs: 120,
     });
+  });
+});
+
+describe('WorkerSession contract-first gate', () => {
+  /** A registry pairing the real contract tool with a recording `touch`
+   * tool, so "did anything run?" is directly observable. */
+  function gatedRegistry(touched: string[]): ToolRegistry {
+    const touch: ToolDef<{ what: string }> = {
+      name: 'touch',
+      description: 'Record a side effect.',
+      inputSchema: z.object({ what: z.string() }),
+      readOnly: false,
+      execute: async (input) => {
+        touched.push(input.what);
+        return `touched ${input.what}`;
+      },
+    };
+    return createRegistry([setOutputContractTool as ToolDef, touch as ToolDef]);
+  }
+
+  const VALID_CONTRACT = {
+    contract: {
+      outputs: [
+        {
+          id: 'roster',
+          kind: 'table',
+          filename: 'roster.csv',
+          format: 'csv',
+          columns: [{ name: 'name', required: true, type: 'string' }],
+          rules: [],
+        },
+      ],
+    },
+  };
+
+  function contractSession(responses: ModelResponse[]): {
+    session: WorkerSession;
+    touched: string[];
+    store: OutputContractStore;
+  } {
+    const touched: string[] = [];
+    const store = createOutputContractStore(runDir);
+    const { callModel } = scriptModel(responses);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: gatedRegistry(touched), runDir, outputContracts: store },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+    return { session, touched, store };
+  }
+
+  function callsResponse(
+    calls: Array<{ id: string; name: string; input: unknown }>,
+  ): ModelResponse {
+    return {
+      content: calls.map((c) => ({ type: 'tool_use' as const, ...c })),
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+  }
+
+  it('executes nothing when the first response skips the contract', async () => {
+    const { session, touched, store } = contractSession([
+      callsResponse([
+        { id: 't1', name: 'touch', input: { what: 'page' } },
+        { id: 't2', name: 'touch', input: { what: 'file' } },
+      ]),
+    ]);
+
+    const outcome = await runWorkerTurn(session);
+
+    expect(outcome).toEqual({ kind: 'working' });
+    // The whole point: no side effect reached the tools.
+    expect(touched).toEqual([]);
+    expect(store.hasContract()).toBe(false);
+    // Every attempted call still got exactly one result.
+    const feedback = session.state.messages.at(-1)!;
+    expect(feedback.role).toBe('user');
+    expect(feedback.content).toHaveLength(2);
+    for (const block of feedback.content) {
+      expect(JSON.stringify(block)).toContain('output_contract_required');
+    }
+  });
+
+  it('accepts a leading contract call and then runs the rest of the response', async () => {
+    const { session, touched, store } = contractSession([
+      callsResponse([
+        { id: 'c1', name: 'set_output_contract', input: VALID_CONTRACT },
+        { id: 't1', name: 'touch', input: { what: 'page' } },
+      ]),
+    ]);
+
+    await runWorkerTurn(session);
+
+    expect(store.hasContract()).toBe(true);
+    expect(touched).toEqual(['page']);
+  });
+
+  it('blocks the rest of the response when the contract fails schema validation', async () => {
+    // Empty outputs is caught by the pipeline's zod layer, before execute —
+    // so the contract call never reaches the store at all.
+    const { session, touched, store } = contractSession([
+      callsResponse([
+        { id: 'c1', name: 'set_output_contract', input: { contract: { outputs: [] } } },
+        { id: 't1', name: 'touch', input: { what: 'page' } },
+      ]),
+    ]);
+
+    await runWorkerTurn(session);
+
+    expect(store.hasContract()).toBe(false);
+    expect(touched).toEqual([]);
+    const blocks = session.state.messages.at(-1)!.content;
+    expect(JSON.stringify(blocks[0])).toMatch(/Invalid input for tool/);
+    expect(JSON.stringify(blocks[1])).toContain('blocked_by_invalid_contract');
+  });
+
+  it('blocks the rest of the response when the contract fails a cross-field rule', async () => {
+    // Two outputs sharing one id passes the schema but fails
+    // validateContractRevision, so this exercises the store's own rejection
+    // path and its "NOT stored" wording.
+    const duplicateIds = {
+      contract: {
+        outputs: [
+          VALID_CONTRACT.contract.outputs[0],
+          { ...VALID_CONTRACT.contract.outputs[0], filename: 'other.csv' },
+        ],
+      },
+    };
+    const { session, touched, store } = contractSession([
+      callsResponse([
+        { id: 'c1', name: 'set_output_contract', input: duplicateIds },
+        { id: 't1', name: 'touch', input: { what: 'page' } },
+      ]),
+    ]);
+
+    await runWorkerTurn(session);
+
+    expect(store.hasContract()).toBe(false);
+    expect(touched).toEqual([]);
+    const blocks = session.state.messages.at(-1)!.content;
+    expect(JSON.stringify(blocks[0])).toMatch(/NOT stored/);
+    expect(JSON.stringify(blocks[0])).toMatch(/duplicate output id/);
+    expect(JSON.stringify(blocks[1])).toContain('blocked_by_invalid_contract');
+  });
+
+  it('stops gating once a contract exists', async () => {
+    const { session, touched } = contractSession([
+      callsResponse([{ id: 'c1', name: 'set_output_contract', input: VALID_CONTRACT }]),
+      callsResponse([{ id: 't1', name: 'touch', input: { what: 'later' } }]),
+    ]);
+
+    await runWorkerTurn(session);
+    await runWorkerTurn(session);
+
+    expect(touched).toEqual(['later']);
+  });
+
+  it('leaves the gate off entirely for runs without a contract store', async () => {
+    const touched: string[] = [];
+    const { callModel } = scriptModel([
+      callsResponse([{ id: 't1', name: 'touch', input: { what: 'ungated' } }]),
+    ]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: gatedRegistry(touched), runDir },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session);
+    expect(touched).toEqual(['ungated']);
   });
 });
 
