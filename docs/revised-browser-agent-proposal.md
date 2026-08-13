@@ -103,7 +103,9 @@ than claiming the credential-store boundary solves it.
   parity in tests and evals.
 - Restarting the worker every time the verifier asks for a correction.
 - Free-form `INTENT.md` and `CONTRACT.md` planning files.
-- A separate initializer or contract-writer model call before the worker starts.
+- Making a separate initializer or contract-writer call mandatory. Keep the
+  existing initializer experiment available until the ablation described below
+  shows whether it adds value beyond the contract and verifier themselves.
 - Raw model-authored CSV.
 - Full conversation replay as long-term memory.
 - Prompt instructions encoding implementation workarounds such as the
@@ -244,13 +246,20 @@ The original task remains authoritative. The contract is an execution target,
 not a replacement for the request, and the final verifier checks that the two
 agree.
 
-Do not add a dedicated contract-writer call unless evals show that first-turn
-contract defects are common enough to justify the added latency.
+The `feat/judge-harness` experiment changes how confidently we can reject a
+dedicated initializer. Its combined initializer, contract, verifier, screenshot
+review, and correction loop materially improved the measured tasks, but that
+experiment did not isolate which component caused the gain. Keep initializer
+authorship behind a configuration switch and compare it with worker authorship
+using the same structured contract schema. Do not make the extra call mandatory
+until that ablation shows that it improves pass rate enough to justify its
+latency.
 
-This decision explicitly supersedes the separate initializer portion of the
-earlier `Initializer → Worker → Judge` plan. It retains the valuable part—a
-fresh independent verifier—without paying for a second model to interpret the
-task before work can begin.
+The target path remains one in which the worker can define the contract and
+start browsing in the same turn. The experimental initializer is an alternate
+`ContractAuthor`, not a second contract format or a permanent architectural
+layer. In both modes the original task remains authoritative and the fresh
+verifier remains independent.
 
 ### 2. Derive output status instead of maintaining task state
 
@@ -1350,11 +1359,153 @@ can name the missing profile URL. If the source genuinely exposes only 29, the
 worker reports that limitation rather than weakening an explicit user request
 for 30.
 
+## Highest-leverage work to do first
+
+The full V2 design should not be implemented from top to bottom. The
+`feat/judge-harness` experiment has already shown that an independent review
+and correction loop can improve results, while also exposing several control-
+flow gaps that are more urgent than richer browser abstractions. Tackle the
+following tranche first, in this order.
+
+### 1. Make completion trustworthy
+
+This is the smallest high-severity fix. Stream assembly must require the
+provider's terminal events, and the loop must reject token-limit stops,
+refusals, malformed blocks, and transport EOFs. Until
+`submit_for_verification` exists, a no-tool response may complete only after a
+clean provider `message_stop` with the expected stop reason.
+
+Then add `submit_for_verification` as the only valid completion proposal. A
+model response without that tool is either another working turn or an invalid
+response; it is never proof that the task is finished.
+
+### 2. Make the existing judge harness tell the truth
+
+Do not scrap `feat/judge-harness`. Its measured gains justify retaining it as
+an experimental spine, but its terminal states must be corrected before it can
+become the production completion protocol:
+
+- Judge `DONE` becomes `verified` only after a clean judge response.
+- Judge `CONTINUE` at the correction limit becomes `incomplete`, not
+  `completed`.
+- A verifier crash preserves the worker's artifacts but marks the run
+  `incomplete: verifier_unavailable`.
+- One whole-run budget covers the initializer, every worker correction, and
+  every verifier call. Starting a new worker cycle must not silently reset the
+  turn or context budget.
+- Metrics include initializer and verifier tokens and latency, not only worker
+  time.
+
+Keep the harness's useful evidence boundary and screenshot review. Explicitly
+make the verifier check all four relationships from Section 10, especially
+original task ↔ contract; otherwise an initializer omission can validate its
+own mistake.
+
+### 3. Use one typed contract in both initializer modes
+
+Replace free-form `INTENT.md` and `CONTRACT.md` as the executable protocol with
+the structured `OutputContract` from Section 1. The original task already
+contains the user's intent, so a model-authored intent paraphrase is not another
+source of truth.
+
+Support two interchangeable policies:
+
+~~~ts
+type ContractAuthor = 'worker' | 'initializer';
+~~~
+
+Both policies must produce the same validated schema and feed the same worker,
+mechanical checks, and verifier. Run a controlled ablation with at least these
+conditions:
+
+1. Worker without a verifier.
+2. Worker-authored contract plus verifier.
+3. Initializer-authored contract plus verifier.
+4. Initializer-authored contract without a verifier.
+
+Compare pass rate, first-cycle acceptance, correction rate, wall time, and
+total model cost. This separates the value of deliberate contract authorship
+from the value of independent review and extra worker attempts.
+
+### 4. Put code in front of the verifier
+
+Once the contract is typed, implement the smallest useful `CompletionCheck`:
+
+- required requested outputs exist and are non-empty;
+- manifest roles and hashes are valid;
+- CSV and JSON outputs parse;
+- table columns are exact and in order;
+- row counts, required values, and uniqueness rules pass;
+- requested screenshots and downloads exist;
+- obvious placeholders such as `TODO` are absent.
+
+Only semantic questions and evidence quality should reach the verifier. This
+should improve consistency while reducing judge turns and variance.
+
+When verification requests a correction, continue the same worker conversation
+and return the findings as the result of `submit_for_verification`. The current
+fresh-worker approach remains a useful A/B condition, but it pays a
+reorientation cost, loses in-context page knowledge, and can create duplicate
+deliverables. Measure same-session correction against it rather than assuming
+either policy wins universally.
+
+### 5. Add page-scoped JavaScript before a larger browser rewrite
+
+Add the bounded `execute_javascript` capability from Section 5 before rebuilding
+the entire browser state model. Bulk DOM extraction and embedded application
+data can remove many model decisions immediately, particularly on repeated
+roster, profile, and table pages.
+
+The first useful version needs explicit page targeting, JSON-only results,
+finite execution and output limits, transcript logging, and optional persisted
+extraction evidence. Add renderer termination and page replacement in the same
+slice if the provider cannot otherwise recover from synchronous code that
+hangs the page. Do not prioritize another large batching schema until this
+capability is measured; the existing `browser_batch` experiment had no model
+adoption.
+
+### 6. Store rows as data before adding research subagents
+
+Implement the narrow `OutputTable` path next: upsert and delete rows, validate
+them against the contract, attach evidence IDs, and render the final CSV with
+ordinary code. This fixes a current output weakness and creates the merge
+boundary needed for safe parallel research.
+
+Only after that boundary exists should the runtime fan out repeated research.
+The MIT sororities task is a strong first evaluation because its six public-site
+investigations are independent while its CSV and Google Sheet are shared.
+Use bounded map/reduce-style execution:
+
+~~~text
+coordinator defines one output contract
+  → 2–3 concurrent research workers, one sorority per job
+  → each returns validated row candidates plus namespaced evidence
+  → application merges and checks all affiliations and class cohorts
+  → one coordinator writes the CSV and Google Sheet
+  → verifier reviews the merged outputs and evidence
+~~~
+
+Research workers must not edit the shared table, Google Sheet, contract, or
+final requested outputs. They return data and evidence only. Start with two or
+three concurrent public browser sessions rather than six, and keep the
+authenticated Sheet-writing session single-writer. The job envelope is an
+internal scheduling type, not a new model-maintained `Dataset`,
+`CollectionItem`, or task-progress state machine.
+
+### Defer for now
+
+Do not put compact-memory redesign, a general dependency graph, a large
+autonomous-agent swarm, or the complete multi-page browser identity model ahead
+of this tranche. They may be valuable, but the steps above are smaller, have
+clearer failure signals, and directly address problems already observed in the
+current loop and judge experiment.
+
 ## Implementation sequence
 
-The phases below are ordered by expected value. Each phase is useful by itself;
-the team does not need to build the entire architecture before measuring an
-improvement.
+The phases below describe the remaining V2 destination and dependencies. For
+the immediate implementation order, the high-leverage tranche above takes
+precedence. Each phase remains useful by itself; the team does not need to build
+the entire architecture before measuring an improvement.
 
 ### Phase 0 — make the control loop trustworthy
 
