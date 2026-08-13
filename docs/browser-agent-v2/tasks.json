@@ -506,12 +506,12 @@
     {
       "id": "T12",
       "title": "Add PDF, spreadsheet, and OCR content adapters",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T11"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T15:50:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t12--add-pdf-spreadsheet-and-ocr-content-adapters",
@@ -519,22 +519,22 @@
         {
           "id": "T12.1",
           "description": "Detect trusted content type from bytes and media type and route through a ContentReader registry.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T12.2",
           "description": "Extract bounded PDF page ranges with text/layout locators and optional page images.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T12.3",
           "description": "Read bounded spreadsheet sheet/cell ranges with exact addresses and values.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T12.4",
           "description": "Run cancellable OCR with engine/version/confidence metadata and retained source images.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
