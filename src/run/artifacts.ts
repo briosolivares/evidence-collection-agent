@@ -37,6 +37,14 @@ export interface ManifestEntry {
   roles?: ArtifactRole[];
   /** ISO 8601 timestamp of when the artifact was written. */
   capturedAt: string;
+  /** Whether this artifact fully satisfies what the contract asked of it.
+   * Absent means "not tracked" — the historical shape, and what every
+   * pre-V2 run directory carries, so existing readers keep working.
+   * `partial` is written only by incomplete-run finalization, and only for
+   * outputs whose contract requirement is unmet: an already-satisfied
+   * screenshot or download stays `complete`. Graders and humans can then
+   * see at a glance which deliverables to trust. */
+  completionStatus?: 'complete' | 'partial';
 }
 
 /** The run's provenance index, stored as <runDir>/manifest.json. */
@@ -58,6 +66,10 @@ export interface ArtifactMeta {
   /** Semantic roles for a published (artifacts/) write, recorded in its
    * manifest entry. Scratch writes carry none. */
   roles?: ArtifactRole[];
+  /** Whether the write fully satisfies its contract requirement (see
+   * ManifestEntry.completionStatus). Omit unless the caller genuinely
+   * knows; absent is the honest default. */
+  completionStatus?: 'complete' | 'partial';
 }
 
 /**
@@ -130,6 +142,9 @@ export function writeArtifact(
     ...(meta.sourceUrl !== undefined ? { sourceUrl: meta.sourceUrl } : {}),
     ...(meta.roles !== undefined ? { roles: meta.roles } : {}),
     capturedAt: new Date().toISOString(),
+    ...(meta.completionStatus !== undefined
+      ? { completionStatus: meta.completionStatus }
+      : {}),
   };
 
   const existing = manifest.artifacts.findIndex((a) => a.filename === entry.filename);
@@ -206,4 +221,40 @@ function serializeManifest(manifest: Manifest): string {
   // Pretty-printed: the manifest is read by humans (auditors) as well as
   // graders.
   return `${JSON.stringify(manifest, null, 2)}\n`;
+}
+
+/**
+ * Mark one already-written artifact `complete` or `partial` without
+ * rewriting its bytes (see ManifestEntry.completionStatus).
+ *
+ * Used by incomplete-run finalization: the run is ending unverified, and the
+ * outputs whose contract requirement is unmet must say so, while the ones
+ * already satisfied keep standing. Rewriting the file to record this would
+ * change its hash and destroy the provenance the manifest exists to keep, so
+ * only the entry is touched.
+ *
+ * @param runDir - absolute path to a run directory with an initialized manifest
+ * @param relPath - run-dir-relative path of an artifact already on record
+ * @param status - the status to record
+ * @returns the updated entry
+ * @throws if the manifest has no entry for that path — marking a file the
+ *   run never wrote would be a bookkeeping lie, not a recoverable slip
+ */
+export function setArtifactCompletionStatus(
+  runDir: string,
+  relPath: string,
+  status: 'complete' | 'partial',
+): ManifestEntry {
+  const filename = relative(resolve(runDir), resolveRunPath(runDir, relPath));
+  const manifest = loadManifest(runDir);
+  const index = manifest.artifacts.findIndex((a) => a.filename === filename);
+  if (index < 0) {
+    throw new Error(
+      `cannot set completion status: ${filename} has no manifest entry in ${runDir}`,
+    );
+  }
+  const updated: ManifestEntry = { ...manifest.artifacts[index]!, completionStatus: status };
+  manifest.artifacts[index] = updated;
+  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  return updated;
 }
