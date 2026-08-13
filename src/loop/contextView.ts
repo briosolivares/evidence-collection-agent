@@ -39,6 +39,22 @@ const REINSPECT_LINE =
   'Its content and refs are gone from this view. Run inspect_page again if this page is needed; durable facts belong in scratch/ or artifacts/ files.';
 
 /**
+ * Whether a tool_result block is one of this view's stubs. Content-based
+ * (the stub's fixed opening line), so callers outside the loop — the cache
+ * breakpoint placement in callModel — can recognize stubs without any
+ * plumbing. A tool result that merely *contains* the marker mid-content
+ * (say, a read_file of a saved transcript) is not mistaken for one; a
+ * false positive would misplace a cache marker, never corrupt a request.
+ */
+export function isElisionStub(block: { type: string; content?: unknown }): boolean {
+  return (
+    block.type === 'tool_result' &&
+    typeof block.content === 'string' &&
+    block.content.startsWith(ELISION_MARKER)
+  );
+}
+
+/**
  * Build the API message view: replace every successful inspect_page
  * tool_result except the last KEPT_INSPECT_RESULTS with a short stub
  * (URL/title when recoverable, plus re-inspect guidance).
