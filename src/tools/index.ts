@@ -6,6 +6,7 @@
  */
 import { createRegistry, type ToolDef, type ToolRegistry } from './registry.js';
 
+import { askUserQuestionTool } from './askUserQuestion/askUserQuestion.js';
 import { browserBatchTool } from './browserBatch/browserBatch.js';
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
@@ -19,6 +20,11 @@ import { scrollTool } from './scroll/scroll.js';
 import { typeTool } from './type/type.js';
 import { writeFileTool } from './writeFile/writeFile.js';
 
+export {
+  askUserQuestionTool,
+  type AskUserAnswers,
+  type AskUserQuestionInput,
+} from './askUserQuestion/askUserQuestion.js';
 export { clickTool } from './click/click.js';
 export {
   browserBatchTool,
@@ -80,6 +86,13 @@ export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
  * contribute — never shifts. */
 export const authTools: readonly ToolDef[] = [fillCredentialsTool as ToolDef];
 
+/** User-interaction tools in stable registration order. Only these pass
+ * through the pipeline's permission gate; headless environments fail them
+ * closed. */
+export const interactionTools: readonly ToolDef[] = [
+  askUserQuestionTool as ToolDef,
+];
+
 /** Deterministic model/runtime tool surfaces used by production entry points. */
 export type ToolProfile = 'atomic' | 'batch-enabled';
 
@@ -101,6 +114,7 @@ export function createProductionRegistry(
     ...actionTools,
     ...evidenceTools,
     ...authTools,
+    ...interactionTools,
     ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
   ]);
 }
