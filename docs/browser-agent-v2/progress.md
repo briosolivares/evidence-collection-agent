@@ -106,17 +106,21 @@ factual error.
     constant changed. Both fixed before the primary agent committed. This is
     exactly why a subagent's "done" is evidence to review, not proof.
   - T4 and T6 were delegated but stopped at the consolidation threshold
-    before producing reviewable, tested work. T4 produced nothing. T6 left
-    ONE unreviewed, untested module on disk, deliberately NOT committed:
-    `src/evidence/evidenceStore.ts` (untracked, 239 lines, compiles but has
-    no test and is 1 of 4 T6 deliverables). Treat it as a draft to review or
-    discard when T6 is picked up properly — it is not part of any commit.
+    before producing reviewable, tested work. Between them they left 1396
+    lines of draft code on disk with ZERO tests, deliberately NOT committed:
+    `src/contracts/outputContract.ts` (836 lines), `src/browser/browserJavaScript.ts`
+    (321), `src/evidence/evidenceStore.ts` (239). All three are untracked and
+    unreviewed. They compile (the tree typechecks with them present) but no
+    test exercises any of them, and each is only a fraction of its task's
+    deliverables. Treat them as drafts to review or discard when T4/T6 are
+    picked up properly — they are not part of any commit and no task status
+    counts them.
 - Verified:
   - `npm run typecheck` — pass, 0 errors
   - `npm test` — pass, 106 files / 932 tests, exit 0
   - `npx vitest run src/harness/verifier.test.ts src/harness/harness.test.ts src/cli/runTask.test.ts` — pass (37)
   - `git diff --check` — clean
-- Time check: `TIME_CHECK start=1786649718 now=1786655560 elapsed=01h:37m:22s remaining=00h:22m:38s`
+- Time check (measured, not reconstructed): `TIME_CHECK start=1786649718 now=1786655105 elapsed=01h:29m:47s remaining=00h:30m:13s`
 - Remaining: T4, T5, T6, T7, T8, T10–T16 are untouched. No live eval was run
   (still unauthorized).
 - Notes: no live re-baseline; no contract-author default chosen; both remain
