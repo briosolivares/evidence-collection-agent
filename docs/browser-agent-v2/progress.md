@@ -58,7 +58,7 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T12 | not_started | — | — | PDF, spreadsheet, and OCR adapters |
 | T13 | not_started | — | — | Input-aware scheduler |
 | T14 | not_started | — | — | Bounded research jobs |
-| T15 | not_started | — | — | Cache-safe compact memory |
+| T15 | in_progress | claude (impl session) | 3d151fc | Cache-safe compact memory — context + compaction landed |
 | T16 | not_started | — | — | V2 cutover |
 
 ## Active work

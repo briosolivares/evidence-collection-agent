@@ -639,14 +639,14 @@
     {
       "id": "T15",
       "title": "Add cache-safe compact memory",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T4",
         "T7",
         "T9"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T15:40:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t15--add-cache-safe-compact-memory",
@@ -654,22 +654,22 @@
         {
           "id": "T15.1",
           "description": "Derive AgentContext from contract, output summaries, browser pages, recent events, and repeated failures.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T15.2",
           "description": "Keep the cached prefix stable and append state snapshots only when their source hash changes.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T15.3",
           "description": "Compact only at explicit cache boundaries without removing current contract, output, evidence, or unresolved failure state.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T15.4",
           "description": "Freeze tool-result inline/offload decisions and preview bytes across history replay.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T15.5",
