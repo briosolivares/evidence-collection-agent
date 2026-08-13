@@ -8,6 +8,7 @@
   },
   "files": [
     "bin",
+    "native",
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
@@ -27,7 +28,7 @@
     "analyze:browser-batch": "tsx evals/analysis/browserBatchCli.ts",
     "agent": "tsx src/cli/repl.ts",
     "sherlock": "node bin/sherlock.mjs",
-    "build:quicklook": "swiftc -O -o bin/sherlock-ql native/quicklook/main.swift"
+    "build:quicklook": "native/quicklook/build.sh"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
