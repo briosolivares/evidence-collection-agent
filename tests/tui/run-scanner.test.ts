@@ -128,3 +128,137 @@ describe('loadRunSummary', () => {
     expect(loadRunSummary(runDir).metrics).toBeUndefined();
   });
 });
+
+// --- T16: legacy and V2 run directories must both stay readable ---------------
+
+describe('run-directory compatibility across the V2 cutover', () => {
+  it('reads a pre-V2 run directory unchanged', () => {
+    // The historical shape: no roles beyond requested_output, no
+    // completionStatus, no per-role metrics, status 'completed'.
+    const runDir = writeFixtureRun(baseDir, {
+      id: '2026-08-01T10-00-00-000Z-legacy',
+      task: 'a pre-V2 run',
+      startedAt: '2026-08-01T10:00:00.000Z',
+      finishedAt: '2026-08-01T10:02:00.000Z',
+      metrics: {
+        status: 'completed',
+        turns: 4,
+        inputTokens: 1_000,
+        outputTokens: 100,
+        cacheReadInputTokens: 0,
+        wallClockMs: 120_000,
+      },
+      artifacts: [
+        {
+          filename: 'out.csv',
+          content: 'a\n1\n',
+          sha256: 'aaaa1111',
+          roles: ['requested_output'],
+        },
+      ],
+    });
+
+    const summary = loadRunSummary(runDir);
+    expect(summary.metrics?.status).toBe('completed');
+    expect(summary.manifest.artifacts).toHaveLength(1);
+  });
+
+  it('reads a V2 verified run, including per-role metrics it does not model', () => {
+    const runDir = writeFixtureRun(baseDir, {
+      id: '2026-08-13T10-00-00-000Z-verified',
+      task: 'a V2 run',
+      startedAt: '2026-08-13T10:00:00.000Z',
+      finishedAt: '2026-08-13T10:03:00.000Z',
+      metrics: {
+        status: 'verified',
+        turns: 6,
+        inputTokens: 2_000,
+        outputTokens: 300,
+        cacheReadInputTokens: 5_000,
+        wallClockMs: 180_000,
+        // The reader must tolerate fields it knows nothing about.
+        roles: {
+          worker: { turns: 4, inputTokens: 1_500, outputTokens: 250, wallClockMs: 150_000 },
+          verifier: { turns: 2, inputTokens: 500, outputTokens: 50, wallClockMs: 30_000 },
+        },
+      } as never,
+      artifacts: [
+        {
+          filename: 'roster.csv',
+          content: 'name\nAlpha\n',
+          sha256: 'bbbb2222',
+          roles: ['requested_output'],
+        },
+      ],
+    });
+
+    const summary = loadRunSummary(runDir);
+    expect(summary.metrics?.status).toBe('verified');
+    expect(summary.metrics?.turns).toBe(6);
+  });
+
+  it('reads a V2 incomplete run and keeps its partial output visible', () => {
+    // The truthfulness guarantee at the reader boundary: an unverified run is
+    // still listed, with its artifacts, and its status says so.
+    const runDir = writeFixtureRun(baseDir, {
+      id: '2026-08-13T11-00-00-000Z-incomplete',
+      task: 'a V2 run that did not verify',
+      startedAt: '2026-08-13T11:00:00.000Z',
+      finishedAt: '2026-08-13T11:04:00.000Z',
+      metrics: {
+        status: 'incomplete',
+        turns: 9,
+        inputTokens: 3_000,
+        outputTokens: 400,
+        cacheReadInputTokens: 7_000,
+        wallClockMs: 240_000,
+      },
+      artifacts: [
+        {
+          filename: 'roster.csv',
+          content: 'name\nAlpha\n',
+          sha256: 'cccc3333',
+          roles: ['requested_output'],
+          completionStatus: 'partial',
+        } as never,
+      ],
+    });
+
+    const summary = loadRunSummary(runDir);
+    expect(summary.metrics?.status).toBe('incomplete');
+    // The partial deliverable is still surfaced rather than hidden.
+    expect(summary.manifest.artifacts[0]?.filename).toBe('roster.csv');
+  });
+
+  it('lists legacy and V2 runs side by side', () => {
+    // A runs/ directory accumulated across the cutover holds both shapes; the
+    // browser must list them together rather than choking on either.
+    const metrics = (status: string) => ({
+      status,
+      turns: 3,
+      inputTokens: 100,
+      outputTokens: 10,
+      cacheReadInputTokens: 0,
+      wallClockMs: 1_000,
+    });
+    for (const [id, status] of [
+      ['2026-08-01T10-00-00-000Z-legacy', 'completed'],
+      ['2026-08-13T10-00-00-000Z-verified', 'verified'],
+      ['2026-08-13T11-00-00-000Z-incomplete', 'incomplete'],
+    ] as const) {
+      writeFixtureRun(baseDir, {
+        id,
+        task: id,
+        startedAt: '2026-08-13T10:00:00.000Z',
+        finishedAt: '2026-08-13T10:01:00.000Z',
+        metrics: metrics(status) as never,
+        artifacts: [],
+      });
+    }
+
+    const ids = scanRuns(baseDir).map((entry) => entry.id);
+    expect(ids).toContain('2026-08-01T10-00-00-000Z-legacy');
+    expect(ids).toContain('2026-08-13T10-00-00-000Z-verified');
+    expect(ids).toContain('2026-08-13T11-00-00-000Z-incomplete');
+  });
+});
