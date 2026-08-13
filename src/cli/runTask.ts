@@ -70,8 +70,19 @@ import {
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
 } from '../tools/index.js';
-import { createRegistry, toApiToolDefs, type ToolCtx, type ToolDef } from '../tools/registry.js';
-import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
+import { toApiToolDefs, type ToolCtx, type ToolDef } from '../tools/registry.js';
+import { createV2Registry } from '../tools/index.js';
+import { createOutputRowTools } from '../tools/outputRows/outputRows.js';
+import { createInspectDocumentTool } from '../tools/inspectDocument/inspectDocument.js';
+import { createOutputTableStore } from '../outputs/outputTable.js';
+import { createEvidenceStore } from '../evidence/evidenceStore.js';
+import {
+  createContentReaderRegistry,
+} from '../content/contentReader.js';
+import { createPdfContentReader } from '../content/pdfContentReader.js';
+import { createSpreadsheetContentReader } from '../content/spreadsheetContentReader.js';
+import { createOcrContentReader } from '../content/ocrContentReader.js';
+import type { OutputSpec } from '../contracts/outputContract.js';
 import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
 import { createOutputContractStore } from '../contracts/outputContractStore.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
@@ -277,15 +288,69 @@ export async function runTask(
   }
 
   const v2Protocol = config.harness?.outputContract === true;
-  const baseRegistry = createProductionRegistry(
-    config.toolProfile ?? DEFAULT_TOOL_PROFILE,
+
+  const runDirForRun = createRunDir(
+    config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
+    // The task text names the run dir (slugified), so listings read like a
+    // history of what was asked rather than a wall of timestamps.
+    generateRunId(taskText),
   );
-  // The V2 protocol adds exactly two tools, appended after the frozen
-  // atomic order so existing prompt-prefix expectations are untouched (T16
-  // freezes the final V2 order).
+  const runDir = runDirForRun;
+  initManifest(runDir, taskText);
+
+  // Run-scoped V2 state. Built here, before the registry, because several
+  // tools close over it — a tool cannot be constructed without the store it
+  // mutates.
+  const outputContracts = v2Protocol ? createOutputContractStore(runDir) : undefined;
+  const evidenceStore = v2Protocol ? createEvidenceStore(runDir) : undefined;
+  const contentReaders = v2Protocol
+    ? createContentReaderRegistry([
+        createPdfContentReader(),
+        createSpreadsheetContentReader(),
+        createOcrContentReader(),
+      ])
+    : undefined;
+  const outputTables = v2Protocol
+    ? createOutputTableStore({
+        tableSpec: (outputId) => {
+          const current = outputContracts!.currentContract();
+          const found = current?.outputs.find(
+            (output) => output.kind === 'table' && output.id === outputId,
+          );
+          return found as Extract<OutputSpec, { kind: 'table' }> | undefined;
+        },
+        evidenceExists: (evidenceId) => evidenceStore!.get(evidenceId) !== undefined,
+      })
+    : undefined;
+
+  // The V2 registry, assembled at its frozen order (see V2_TOOL_ORDER).
+  // Tools whose dependencies this run cannot satisfy are simply absent rather
+  // than present-and-broken.
   const registry = v2Protocol
-    ? createRegistry([...baseRegistry.values(), setOutputContractTool as ToolDef])
-    : baseRegistry;
+    ? createV2Registry(
+        new Map<string, ToolDef>([
+          ...createOutputRowTools({
+            tables: outputTables!,
+            summaryDeps: () => ({
+              contract: outputContracts!.currentContract() ?? { outputs: [] },
+              tables: outputTables!,
+              evidenceExists: (id) => evidenceStore!.get(id) !== undefined,
+              publishedExists: () => false,
+              captureCount: () => 0,
+            }),
+          }).map((tool) => [tool.name, tool] as [string, ToolDef]),
+          [
+            'inspect_document',
+            createInspectDocumentTool({ registry: contentReaders! }) as ToolDef,
+          ],
+        ]),
+      )
+    : createProductionRegistry(config.toolProfile ?? DEFAULT_TOOL_PROFILE);
+
+  // The model's tool surface follows the registry exactly, plus the submission
+  // CONTROL tool — offered to the model but never executed through the
+  // pipeline (the session intercepts it), which is why it is appended here and
+  // not registered above.
   const apiToolDefs = v2Protocol
     ? [...toApiToolDefs(registry), submitForVerificationTool]
     : toApiToolDefs(registry);
@@ -296,15 +361,6 @@ export async function runTask(
     maxOutputTokens,
     onProgress: config.onProgress,
   });
-
-  const runDir = createRunDir(
-    config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
-    // The task text names the run dir (slugified), so listings read like a
-    // history of what was asked rather than a wall of timestamps.
-    generateRunId(taskText),
-  );
-  initManifest(runDir, taskText);
-  const outputContracts = v2Protocol ? createOutputContractStore(runDir) : undefined;
 
   const credentials =
     config.credentials ??

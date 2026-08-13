@@ -97,8 +97,14 @@ describe('V2 tool order', () => {
 
   it('builds a registry in frozen order, skipping tools a run cannot supply', () => {
     const registry = createV2Registry();
-    // Only the static tools are present, but in V2 order.
+    // Every statically-constructible tool, in V2 order — and nothing that
+    // needs run-scoped state, which a caller must supply explicitly.
     expect([...registry.keys()]).toEqual([
+      'set_output_contract',
+      'observe',
+      'browser_action',
+      'switch_page',
+      'handle_dialog',
       'screenshot',
       'download',
       'read_file',
@@ -107,6 +113,26 @@ describe('V2 tool order', () => {
       'fill_credentials',
       'ask_user_question',
     ]);
+  });
+
+  it('omits the run-scoped tools until a caller supplies them', () => {
+    // These need a table store, an evidence store, a content registry, or a
+    // browser reader, so they cannot be constructed statically. Their absence
+    // must be an omission, never a silently broken tool.
+    const names = new Set(createV2Registry().keys());
+    for (const runScoped of [
+      'upsert_output_rows',
+      'delete_output_rows',
+      'set_table_completeness',
+      'write_document',
+      'execute_javascript',
+      'read_resource',
+      'capture_text',
+      'inspect_document',
+      'run_research_jobs',
+    ]) {
+      expect(names.has(runScoped)).toBe(false);
+    }
   });
 
   it('places a run-scoped tool at its frozen position, not where it was passed', () => {

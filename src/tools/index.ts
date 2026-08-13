@@ -8,6 +8,11 @@ import { createRegistry, type ToolDef, type ToolRegistry } from './registry.js';
 
 import { askUserQuestionTool } from './askUserQuestion/askUserQuestion.js';
 import { browserBatchTool } from './browserBatch/browserBatch.js';
+import { observeTool } from './observe/observe.js';
+import { browserActionTool } from './browserAction/browserAction.js';
+import { switchPageTool } from './switchPage/switchPage.js';
+import { handleDialogTool } from './handleDialog/handleDialog.js';
+import { setOutputContractTool } from './setOutputContract/setOutputContract.js';
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
 import { fillCredentialsTool } from './fillCredentials/fillCredentials.js';
@@ -179,6 +184,13 @@ export const V2_TOOL_ORDER: readonly string[] = [
  * it builds, ordered by V2_TOOL_ORDER.
  */
 export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, ToolDef>([
+  // Browser tools that take their session from ToolCtx and so need no
+  // run-scoped construction.
+  ['observe', observeTool as ToolDef],
+  ['browser_action', browserActionTool as ToolDef],
+  ['switch_page', switchPageTool as ToolDef],
+  ['handle_dialog', handleDialogTool as ToolDef],
+  ['set_output_contract', setOutputContractTool as ToolDef],
   ['screenshot', screenshotTool],
   ['download', downloadTool],
   ['read_file', readFileTool as ToolDef],
