@@ -139,6 +139,12 @@ Lesson for Proposal 1's next iteration (worktree agent): reconcile both
 directions — every roster entry in the output, AND every output line a
 valid contract row. A judge subagent (Proposal 2) catches this trivially.
 
+**Addendum 3 (2026-08-13):** Proposal 2's strong form is now a finalized
+design — user's Initializer → Worker → Judge triangle with an outer harness
+loop, durable-workspace rehydration, and a /goal-style judge gate — in
+`judge-design.md` alongside this file. That doc supersedes the sketch above
+and is the build spec.
+
 ## Proposal 5 — cheaper repeat-visit page representation (delta inspect)
 
 Origin: the cache-context-guard spec
