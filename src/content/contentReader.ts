@@ -106,10 +106,13 @@ export function assertContentRange(range: ContentRange): void {
 /**
  * Detect a format from bytes first, media type second, filename last.
  *
- * Magic numbers checked: `%PDF-` (PDF), the ZIP local-file header `PK`
- * with an `xl/` entry (XLSX — a bare ZIP is not assumed to be a spreadsheet),
- * `ÐÏà` (legacy XLS/OLE2), PNG/JPEG/GIF/BMP/WEBP signatures
- * (image). Text-shaped content then falls through to JSON/HTML/CSV/text by
+ * Magic numbers checked, written as hex rather than embedded literally (a raw
+ * control byte in source makes `file(1)` report it as binary and makes
+ * `grep -r` skip the whole file): `%PDF-` for PDF; the ZIP local-file header
+ * 50 4B 03 04 combined with an `xl/` entry for XLSX — a bare ZIP is NOT
+ * assumed to be a spreadsheet, since .docx and .odt are ZIPs too; D0 CF 11 E0
+ * for legacy XLS/OLE2; and the PNG, JPEG, GIF, BMP, and WEBP signatures for
+ * images. Text-shaped content then falls through to JSON/HTML/CSV/text by
  * cheap structural inspection.
  */
 export function detectContentFormat(

@@ -388,7 +388,7 @@ export function validateTableRules(
       case 'unique': {
         const seen = new Map<string, number>();
         for (const [index, row] of rows.entries()) {
-          const key = rule.columns.map((name) => row[name] ?? '').join(' ');
+          const key = rule.columns.map((name) => row[name] ?? '').join('\u0000');
           const first = seen.get(key);
           if (first !== undefined) {
             failures.push({

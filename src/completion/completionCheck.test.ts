@@ -444,7 +444,7 @@ describe('validateTableCompleteness', () => {
   });
 
   it('does not require completeness for an unruled table', () => {
-    const unruled = { ...(ruled as Record<string, unknown>), rules: [] } as OutputSpec;
+    const unruled = { ...ruled, rules: [] } as OutputSpec;
     expect(validateTableCompleteness(contract([unruled]), tableStore([unruled]))).toEqual([]);
   });
 });

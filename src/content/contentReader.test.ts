@@ -46,11 +46,11 @@ describe('detectContentFormat — bytes beat extensions', () => {
 
   it('treats a ZIP as a spreadsheet only when it carries a spreadsheet part', () => {
     // XLSX: ZIP header plus an xl/ entry.
-    expect(detectContentFormat({ bytes: bytes('PKxl/workbook.xml') })).toBe(
+    expect(detectContentFormat({ bytes: bytes('PK\u0003\u0004xl/workbook.xml') })).toBe(
       'spreadsheet',
     );
     // A .docx is also a ZIP and must NOT be read as a spreadsheet.
-    expect(detectContentFormat({ bytes: bytes('PKword/document.xml') })).toBe('text');
+    expect(detectContentFormat({ bytes: bytes('PK\u0003\u0004word/document.xml') })).toBe('text');
   });
 
   it('detects a legacy OLE2 spreadsheet', () => {
