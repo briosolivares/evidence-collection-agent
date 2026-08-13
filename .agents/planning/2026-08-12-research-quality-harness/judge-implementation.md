@@ -202,3 +202,47 @@ Spec: judge-design.md "v2 revisions". Status at recording time:
 Re-validate (targets + canaries, k=3) after 1+2 land: expect more
 CONTINUE verdicts initially — workers must publish proof — and watch that
 rework cycles get spent publishing evidence rather than fixing errors.
+
+## v2 validation (2026-08-13, k=3, all four targets)
+
+Scores vs the v1-judge baseline (vs pre-judge in parens):
+
+| task | v2 | v1 judge | pre-judge |
+|---|---|---|---|
+| wikipedia_reference | **91.7%** (two 4/4 trials — first ever) | 66.7% | 58% |
+| yc_w24_outreach | **91.7%** | 87.5% | 79.2% |
+| hacker_news | **100% PASS** | 94.4% | 94.4% |
+| openclaw_merged_prs | **100% PASS** (rerun) | 100% | — |
+
+Two live-measured v2 fixes were needed mid-validation (first merged_prs
+attempt: all three trials 400-errored and were destroyed):
+
+1. **Image dimension guard (b4f91e2)** — the API rejects any image
+   dimension over 8000px, and full-page screenshots (e.g. 1280x8894) are
+   far taller while compressing well under the 3.75MB byte cap. Dimensions
+   now parsed from the file header (PNG IHDR / JPEG SOF walk, no image
+   dependency); over-dimension and unparseable images steer to
+   treat-as-unverified.
+2. **Judge crash containment (49be094)** — a judge throw (infra failure,
+   AbortError excepted) no longer propagates out of runTask and destroys
+   the finished worker run; it is recorded as the cycle's `judgeError` in
+   harness.json and the run ends with the worker's completed result. No
+   rework cycle: there is no verdict to act on.
+
+Observed judge behavior worth keeping:
+
+- wikipedia trial 06f9f8 (3/4): judge's cycle-2 CONTINUE said the evidence
+  did not prove the answered source was reference 275 — exactly the
+  assertion the grader failed. Cycle cap (2) was the binding constraint.
+- merged_prs trial 288093: dimension-guard steering error → actionable
+  CONTINUE → worker recovered → DONE, 8/8.
+- merged_prs trial 6b825d: judge visually read reviewer avatars in PR
+  screenshots contradicting the CSV's "No reviews" column — vision doing
+  verification text cannot; worker fixed it, grader's reviewer assertion
+  passed.
+- merged_prs trial 029231: judge flagged 12 published PNGs vs a 10-row
+  contract (the duplicate-deliverable watch item), worker cleaned up.
+- yc all-DONE at cycle 1: missing-founder residuals (Laleye, Dodkins ×1
+  each) are invisible to the judge — roster completeness against the
+  world is not verifiable from published evidence. Worker research-quality
+  item, not a judge item.
