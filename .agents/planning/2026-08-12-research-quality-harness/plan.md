@@ -23,6 +23,20 @@ quality — and these four target it. Ranked by expected payoff.
   decoration in an enum-like field; the exact-structure grader rejected the
   lot. A field-level contract violation, not a research failure.
 
+**Addendum (2026-08-12 headed-lane batch):** wikipedia went 0/3 — all three
+trials returned the SAME wrong reference. Elision was suspected and
+investigated (transcript check): cleared — runs were ~16 turns with the
+answer written from live context. Actual cause: every agent jumped to the
+HTML anchor `cite_note-275` and assumed anchor number = displayed reference
+number; the oracle counts the displayed 275th entry, and on Wikipedia
+anchor IDs follow wikitext creation order, not rendered position. An
+unverified counting assumption — the same failure family as yc's identity
+slips, and a second concrete case for Proposal 2's judge (a verifier asking
+"did you confirm the displayed number?" catches it; prose confidence does
+not). Same batch: mit trial 1 repeated the decorated-affiliation rejection
+(~30 rows) and had no Sheets URL (CAPTCHA + logged-out profile), and elon's
+two 6/7s were grader time-format parsing, not agent error.
+
 ## Proposal 1 — enumerate-then-fill protocol (yc-class completeness)
 
 For multi-entity collection tasks, the agent assembles rows from whatever its
@@ -110,6 +124,32 @@ verbatim fidelity + provenance, so keep the scope to exactly that.
 **Validation:** wikipedia_reference k=3 (the containment assertion passes by
 construction if the agent uses the tool); spot-check that other tasks don't
 misuse it as a general scraper.
+
+## Proposal 5 — cheaper repeat-visit page representation (delta inspect)
+
+Origin: the cache-context-guard spec
+(`.agents/planning/2026-08-11-cache-context-guard/spec.md`, decision 2):
+"if context_budget deaths appear, the remedy is cheaper repeat-page
+representation, not a bigger cap." Resurfaced by the user 2026-08-12 while
+weighing elision's costs.
+
+**Mechanism:** when inspect_page targets a URL already inspected this run,
+return a terser view — a delta against the previous outline ("unchanged
+except…") or a compressed outline — instead of the full dump. The prior
+full inspect is already on disk (scratch/tool-output offload), so the diff
+base exists.
+
+**Relationship to elision:** complementary, not competing. Elision
+compresses *history* (old inspects stub out); this compresses *repeat
+visits* — which elision made more frequent, since the prompt now tells the
+agent to re-inspect pages it lost. Together they bound both directions of
+inspect cost.
+
+**Risks:** a terse repeat view degrades exactly the verbatim-fidelity cases
+(same tension as Proposal 4 — pair them: mechanical quotes make terseness
+safe); dynamic pages need change detection that doesn't lie; "unchanged"
+must be provably true (hash the outline) or the model gets a stale view it
+trusts. Defer until inspect volume is a measured cost driver post-elision.
 
 ## Mapping to long-running-agent engineering (Bustamante) — the subagent angle
 
