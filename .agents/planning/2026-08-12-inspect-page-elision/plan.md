@@ -68,7 +68,8 @@ Remaining mit failures are a different story:
   failure mode 2). **USER DECISION 2026-08-12: mit_sororities, edgar, and
   elon_tweets run the headed lane BY DEFAULT in evals — harness
   intricacies (bot-blocks, missing auth) have been masking the agent's
-  true limits. Not yet implemented.**
+  true limits. Implemented in `7aeceea`: task.json `requiresAuth` renamed
+  to `headed`, all three tasks marked, loader rejects the retired name.**
 - **Cohort coverage/format (capability):** trial 2 collected all 182
   members but wrote affiliations as "Alpha Chi Omega (MIT)" — unrequested
   decoration the grader rightly rejects (exact-structure rule). Trials 1
