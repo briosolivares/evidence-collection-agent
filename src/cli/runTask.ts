@@ -17,7 +17,12 @@ import {
   runInitializer,
   writeInitializerFiles,
 } from '../harness/initializer.js';
-import { makeJudgeCallModel, runJudge, type JudgeVerdict } from '../harness/judge.js';
+import {
+  makeVerifierModelDriver,
+  runVerifier,
+  type VerificationFinding,
+  type VerifierOutcome,
+} from '../harness/verifier.js';
 import {
   runAgentLoop,
   type LoopConfig,
@@ -125,9 +130,9 @@ export interface HarnessConfig {
   /** Test seam for the initializer's single model call, mirroring
    * `RunTaskConfig.callModel`. Production default: makeInitializerCallModel. */
   initializerCallModel?: CallModel;
-  /** Test seam for the judge's read-only mini-loop, mirroring
-   * `RunTaskConfig.callModel`. Production default: makeJudgeCallModel. */
-  judgeCallModel?: CallModel;
+  /** Test seam for the verifier's read-only mini-loop, mirroring
+   * `RunTaskConfig.callModel`. Production default: makeVerifierModelDriver. */
+  verifierCallModel?: CallModel;
 }
 
 /** Configuration for one complete evidence-collection run. */
@@ -404,8 +409,8 @@ async function runVerificationHarness(
   loopDeps: LoopDeps,
   sessionConfig: { budget: RunBudgetTracker; maxContextTokens: number },
 ): Promise<RunOutcome> {
-  const judgeCallModel = withBudgetAccounting(
-    harnessConfig.judgeCallModel ?? makeJudgeCallModel(),
+  const verifierCallModel = withBudgetAccounting(
+    harnessConfig.verifierCallModel ?? makeVerifierModelDriver(),
     sessionConfig.budget,
     'verifier',
   );
@@ -422,7 +427,7 @@ async function runVerificationHarness(
       const result = await runWorkerCycle(session);
 
       if (result.kind === 'budget_exceeded') {
-        // Budgets end runs: no judge call, and no verdict/reason to record.
+        // Budgets end runs: no verifier call, no verdict/reason to record.
         cycleRecords.push({ cycle, workerStatus: 'budget_exceeded' });
         outcome = {
           status: 'incomplete',
@@ -433,41 +438,47 @@ async function runVerificationHarness(
         break;
       }
 
-      let verdict: JudgeVerdict;
+      let verification: VerifierOutcome;
       try {
-        verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
+        verification = await runVerifier({ taskText, runDir, callModel: verifierCallModel });
       } catch (thrown) {
-        // A cancellation is the caller's, not the judge's — honor it.
+        // A cancellation is the caller's, not the verifier's — honor it.
         if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
-        // Judge infrastructure failing is not a verdict, and it is not
-        // success either: the worker's finished artifacts are preserved,
-        // but nobody trustworthy reviewed them — the run is incomplete
-        // with the failure on record.
+        // Only a harness bug throws out of runVerifier (a run dir missing
+        // its contract documents); every model-side failure already
+        // arrives as the verifier_unavailable outcome below.
+        recordWorkerSessionCrash(session, thrown);
+        throw thrown;
+      }
+
+      // Fail closed: an unavailable verifier is never success. The
+      // worker's artifacts are preserved, but nobody trustworthy reviewed
+      // them, so the run is incomplete with the failure on record.
+      if (verification.status === 'verifier_unavailable') {
         cycleRecords.push({
           cycle,
           workerStatus: 'completed',
-          judgeError: thrown instanceof Error ? thrown.message : String(thrown),
+          verifierError: verification.reason,
         });
         outcome = {
           status: 'incomplete',
           reason: 'verifier_unavailable',
-          detail: `judge failed in cycle ${cycle}: ${
-            thrown instanceof Error ? thrown.message : String(thrown)
-          }`,
+          detail: `verifier unavailable in cycle ${cycle}: ${verification.reason}`,
           finalText: result.finalText,
         };
         break;
       }
+
+      const findingsText = formatFindings(verification.findings);
       cycleRecords.push({
         cycle,
         workerStatus: 'completed',
-        verdict: verdict.verdict,
-        // JudgeVerdict.reason is always '' on 'done' (see judge.ts) —
-        // nothing worth recording there.
-        ...(verdict.reason.length > 0 ? { reason: verdict.reason } : {}),
+        verdict: verification.status,
+        // `verified` carries no findings — nothing worth recording there.
+        ...(findingsText.length > 0 ? { reason: findingsText } : {}),
       });
 
-      if (verdict.verdict === 'done') {
+      if (verification.status === 'verified') {
         outcome = { status: 'verified', finalText: result.finalText };
         break;
       }
@@ -489,7 +500,7 @@ async function runVerificationHarness(
       // Same session, same conversation: the correction arrives as
       // feedback appended to everything the worker already knows.
       sessionConfig.budget.recordCorrection();
-      appendWorkerFeedback(session, `Judge feedback:\n${verdict.reason}`);
+      appendWorkerFeedback(session, `Verification findings:\n${findingsText}`);
     }
   } catch (error) {
     recordWorkerSessionCrash(session, error);
@@ -515,4 +526,24 @@ async function runVerificationHarness(
   writeWorkerSessionMetrics(session, outcome.status);
 
   return outcome;
+}
+
+/**
+ * Render typed verification findings as the plain-text feedback the worker
+ * receives (and the diagnostics record). One line per finding, each naming
+ * its area, stable code, message, and the output/evidence it points at —
+ * concrete enough to act on without the verifier's conversation. An empty
+ * findings array (a `verified` result) renders as "".
+ */
+function formatFindings(findings: readonly VerificationFinding[]): string {
+  return findings
+    .map((finding) => {
+      const target = finding.outputId === undefined ? '' : ` [${finding.outputId}]`;
+      const evidence =
+        finding.evidenceIds === undefined || finding.evidenceIds.length === 0
+          ? ''
+          : ` (evidence: ${finding.evidenceIds.join(', ')})`;
+      return `- ${finding.area}/${finding.code}${target}: ${finding.message}${evidence}`;
+    })
+    .join('\n');
 }

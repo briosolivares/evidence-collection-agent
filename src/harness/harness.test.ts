@@ -31,7 +31,7 @@ describe('writeHarnessDiagnostics', () => {
   it('writes harness.json with the given diagnostics, pretty-printed', () => {
     const diagnostics: HarnessDiagnostics = {
       initializer: { model: 'claude-sonnet-5' },
-      cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'done' }],
+      cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'verified' }],
       outcome: { status: 'verified' },
     };
 
@@ -55,8 +55,8 @@ describe('writeHarnessDiagnostics', () => {
     const second: HarnessDiagnostics = {
       initializer: { model: 'claude-sonnet-5' },
       cycles: [
-        { cycle: 1, workerStatus: 'completed', verdict: 'continue', reason: 'missing a column' },
-        { cycle: 2, workerStatus: 'completed', verdict: 'done' },
+        { cycle: 1, workerStatus: 'completed', verdict: 'needs_correction', reason: 'missing a column' },
+        { cycle: 2, workerStatus: 'completed', verdict: 'verified' },
       ],
       outcome: { status: 'verified' },
     };
@@ -70,7 +70,7 @@ describe('writeHarnessDiagnostics', () => {
     const diagnostics: HarnessDiagnostics = {
       initializer: { model: 'claude-sonnet-5' },
       cycles: [
-        { cycle: 1, workerStatus: 'completed', judgeError: 'API 500 from the judge request' },
+        { cycle: 1, workerStatus: 'completed', verifierError: 'API 500 from the judge request' },
       ],
       outcome: {
         status: 'incomplete',
@@ -85,6 +85,6 @@ describe('writeHarnessDiagnostics', () => {
       readFileSync(join(runDir, HARNESS_FILENAME), 'utf8'),
     ) as HarnessDiagnostics;
     expect(stored.outcome).toEqual(diagnostics.outcome);
-    expect(stored.cycles[0]?.judgeError).toBe('API 500 from the judge request');
+    expect(stored.cycles[0]?.verifierError).toBe('API 500 from the judge request');
   });
 });

@@ -25,25 +25,25 @@ export type RunRoleMetrics = RunRoleUsage;
 
 /**
  * One worker cycle's outcome, as recorded for harness.json diagnostics.
- * `verdict` and `reason` are both absent when the judge never ran for this
- * cycle (a `budget_exceeded` worker result skips the judge outright —
- * budgets end runs). `reason` is also absent on a `done` verdict, whose
- * JudgeVerdict.reason is always the empty string — nothing worth recording.
+ * `verdict` and `reason` are both absent when the verifier never ran for
+ * this cycle (a `budget_exceeded` worker result skips verification
+ * outright — budgets end runs). `reason` is absent on `verified` — there
+ * are no findings to record.
  */
 export interface HarnessCycleRecord {
   /** 1-based cycle index. */
   cycle: number;
   /** This cycle's worker outcome ('completed' or 'budget_exceeded'). */
   workerStatus: string;
-  /** The judge's verdict, when the judge ran this cycle. */
-  verdict?: 'done' | 'continue';
-  /** The judge's reason, when non-empty. */
+  /** The verifier's typed status, when the verifier reported this cycle. */
+  verdict?: 'verified' | 'needs_correction';
+  /** The formatted findings, when any (needs_correction only). */
   reason?: string;
-  /** The error message when the judge itself crashed this cycle (an
-   * infrastructure failure, never a verdict). The run ends incomplete with
-   * reason `verifier_unavailable`; this field is the diagnostic trail.
-   * Mutually exclusive with `verdict`/`reason`. */
-  judgeError?: string;
+  /** Why no trustworthy verification happened this cycle — the verifier
+   * crashed, refused, or returned nothing valid after its bounded repair.
+   * The run ends incomplete with reason `verifier_unavailable`; this field
+   * is the diagnostic trail. Mutually exclusive with `verdict`/`reason`. */
+  verifierError?: string;
 }
 
 /** The harness's own record of how the run ended — mirrors the returned

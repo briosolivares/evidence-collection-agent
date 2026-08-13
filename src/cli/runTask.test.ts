@@ -86,25 +86,32 @@ function scriptModel(responses: readonly ModelResponse[]): {
   return { callModel, requests };
 }
 
-// --- Harness-mode fakes: a well-formed initializer response, and judge
-// DONE/CONTINUE responses, all built on top of textResponse above (the
-// initializer's and judge's callModels are never offered tools, so every
-// scripted response here is text-only, matching initializer.test.ts and
-// judge.test.ts's own fakes).
+// --- Harness-mode fakes: a well-formed initializer response (text-only —
+// the initializer is never offered tools), plus verifier responses that
+// conclude the only way the verifier now can: one schema-valid
+// report_verification tool call. Prose verdicts are deliberately NOT used
+// here; DONE/CONTINUE text no longer carries any control-flow meaning.
 
 /** A well-formed initializer response: both sections, non-empty bodies. */
 function initializerResponse(intent: string, contract: string): ModelResponse {
   return textResponse(`# INTENT\n${intent}\n\n# CONTRACT\n${contract}`);
 }
 
-/** A judge response proposing DONE. */
-function judgeDone(): ModelResponse {
-  return textResponse('DONE');
+/** A verifier response reporting `verified` (no findings). */
+function verifierVerified(): ModelResponse {
+  return toolResponse('report-verified', 'report_verification', {
+    status: 'verified',
+    findings: [],
+  });
 }
 
-/** A judge response proposing CONTINUE with the given reason. */
-function judgeContinue(reason: string): ModelResponse {
-  return textResponse(`CONTINUE: ${reason}`);
+/** A verifier response reporting `needs_correction`, its single finding
+ * carrying the given message. */
+function verifierNeedsCorrection(message: string): ModelResponse {
+  return toolResponse('report-correction', 'report_verification', {
+    status: 'needs_correction',
+    findings: [{ area: 'output', code: 'unsatisfied_criterion', message }],
+  });
 }
 
 async function readJson<T>(path: string): Promise<T> {
@@ -395,7 +402,7 @@ describe('runTask', () => {
           ),
         ]);
         const worker = scriptModel([textResponse('Report published.')]);
-        const judge = scriptModel([judgeDone()]);
+        const verifier = scriptModel([verifierVerified()]);
 
         const result = await runTask('Collect widgets and publish a report.', {
           browser,
@@ -405,7 +412,7 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
-            judgeCallModel: judge.callModel,
+            verifierCallModel: verifier.callModel,
           },
         });
 
@@ -424,7 +431,7 @@ describe('runTask', () => {
         );
         expect(diagnostics).toEqual({
           initializer: { model: INITIALIZER_MODEL },
-          cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'done' }],
+          cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'verified' }],
           outcome: { status: 'verified' },
         });
 
@@ -454,9 +461,9 @@ describe('runTask', () => {
           textResponse('First attempt at the report.'),
           textResponse('Second attempt, column fixed.'),
         ]);
-        const judge = scriptModel([
-          judgeContinue('artifacts/report.md is missing the required id column.'),
-          judgeDone(),
+        const verifier = scriptModel([
+          verifierNeedsCorrection('artifacts/report.md is missing the required id column.'),
+          verifierVerified(),
         ]);
 
         const result = await runTask('Collect widgets and publish a report.', {
@@ -467,7 +474,7 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
-            judgeCallModel: judge.callModel,
+            verifierCallModel: verifier.callModel,
           },
         });
 
@@ -493,7 +500,7 @@ describe('runTask', () => {
         );
         const feedbackText = (secondRequest?.[2]?.content[0] as { text: string }).text;
         expect(secondRequest?.[2]?.role).toBe('user');
-        expect(feedbackText).toContain('Judge feedback:');
+        expect(feedbackText).toContain('Verification findings:');
         expect(feedbackText).toContain(
           'artifacts/report.md is missing the required id column.',
         );
@@ -507,10 +514,10 @@ describe('runTask', () => {
             {
               cycle: 1,
               workerStatus: 'completed',
-              verdict: 'continue',
-              reason: 'artifacts/report.md is missing the required id column.',
+              verdict: 'needs_correction',
+              reason: '- output/unsatisfied_criterion: artifacts/report.md is missing the required id column.',
             },
-            { cycle: 2, workerStatus: 'completed', verdict: 'done' },
+            { cycle: 2, workerStatus: 'completed', verdict: 'verified' },
           ],
           outcome: { status: 'verified' },
         });
@@ -531,9 +538,9 @@ describe('runTask', () => {
           textResponse('First attempt.'),
           textResponse('Second attempt.'),
         ]);
-        const judge = scriptModel([
-          judgeContinue('First reason.'),
-          judgeContinue('Second reason.'),
+        const verifier = scriptModel([
+          verifierNeedsCorrection('First reason.'),
+          verifierNeedsCorrection('Second reason.'),
         ]);
 
         const result = await runTask('Collect widgets and publish a report.', {
@@ -545,7 +552,7 @@ describe('runTask', () => {
           harness: {
             maxWorkerCycles: 2,
             initializerCallModel: initializer.callModel,
-            judgeCallModel: judge.callModel,
+            verifierCallModel: verifier.callModel,
           },
         });
 
@@ -559,7 +566,7 @@ describe('runTask', () => {
         // Exactly two worker cycles ran — a third would have thrown against
         // this fake's exhausted response script.
         expect(worker.requests).toHaveLength(2);
-        expect(judge.requests).toHaveLength(2);
+        expect(verifier.requests).toHaveLength(2);
 
         const diagnostics = await readJson<HarnessDiagnostics>(
           join(result.runDir, HARNESS_FILENAME),
@@ -568,8 +575,8 @@ describe('runTask', () => {
         expect(diagnostics.cycles[1]).toEqual({
           cycle: 2,
           workerStatus: 'completed',
-          verdict: 'continue',
-          reason: 'Second reason.',
+          verdict: 'needs_correction',
+          reason: '- output/unsatisfied_criterion: Second reason.',
         });
         expect(diagnostics.outcome).toMatchObject({
           status: 'incomplete',
@@ -596,10 +603,10 @@ describe('runTask', () => {
           textResponse('Second attempt.'),
           textResponse('Third attempt.'),
         ]);
-        const judge = scriptModel([
-          judgeContinue('First reason.'),
-          judgeContinue('Second reason.'),
-          judgeDone(),
+        const verifier = scriptModel([
+          verifierNeedsCorrection('First reason.'),
+          verifierNeedsCorrection('Second reason.'),
+          verifierVerified(),
         ]);
 
         const result = await runTask('Collect widgets and publish a report.', {
@@ -610,7 +617,7 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
-            judgeCallModel: judge.callModel,
+            verifierCallModel: verifier.callModel,
           },
         });
 
@@ -618,7 +625,7 @@ describe('runTask', () => {
         // the run; the default of 3 lets the third cycle run to DONE.
         expect(result).toMatchObject({ status: 'verified', finalText: 'Third attempt.' });
         expect(worker.requests).toHaveLength(3);
-        expect(judge.requests).toHaveLength(3);
+        expect(verifier.requests).toHaveLength(3);
         // The persistent session accretes: attempt 1, feedback, attempt 2,
         // feedback, then the third request sees the full history.
         expect(worker.requests[2]).toHaveLength(5);
@@ -644,7 +651,7 @@ describe('runTask', () => {
         ]);
         // No responses scripted: a judge call here throws immediately,
         // failing the test loudly instead of silently passing.
-        const judge = scriptModel([]);
+        const verifier = scriptModel([]);
 
         const result = await runTask('Keep browsing until stopped.', {
           browser,
@@ -654,14 +661,14 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
-            judgeCallModel: judge.callModel,
+            verifierCallModel: verifier.callModel,
           },
         });
 
         // Budget exhaustion inside the harness is an incomplete outcome —
         // budgets end runs, and an unverified end is not success.
         expect(result).toMatchObject({ status: 'incomplete', reason: 'budget_exceeded' });
-        expect(judge.requests).toHaveLength(0);
+        expect(verifier.requests).toHaveLength(0);
 
         const diagnostics = await readJson<HarnessDiagnostics>(
           join(result.runDir, HARNESS_FILENAME),
@@ -689,7 +696,7 @@ describe('runTask', () => {
           initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
         ]);
         const worker = scriptModel([textResponse('Report published.')]);
-        const crashingJudge: CallModel = async () => {
+        const crashingVerifier: CallModel = async () => {
           throw new Error('400 image dimensions exceed max allowed size');
         };
 
@@ -701,7 +708,7 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
-            judgeCallModel: crashingJudge,
+            verifierCallModel: crashingVerifier,
           },
         });
 
@@ -719,7 +726,7 @@ describe('runTask', () => {
           {
             cycle: 1,
             workerStatus: 'completed',
-            judgeError: '400 image dimensions exceed max allowed size',
+            verifierError: expect.stringContaining('400 image dimensions'),
           },
         ]);
         expect(diagnostics.outcome).toMatchObject({
@@ -739,7 +746,7 @@ describe('runTask', () => {
           initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
         ]);
         const worker = scriptModel([textResponse('Report published.')]);
-        const abortingJudge: CallModel = async () => {
+        const abortingVerifier: CallModel = async () => {
           const error = new Error('aborted');
           error.name = 'AbortError';
           throw error;
@@ -754,7 +761,7 @@ describe('runTask', () => {
             maxContextTokens: 10_000,
             harness: {
               initializerCallModel: initializer.callModel,
-              judgeCallModel: abortingJudge,
+              verifierCallModel: abortingVerifier,
             },
           }),
         ).rejects.toThrow('aborted');
@@ -772,7 +779,7 @@ describe('runTask', () => {
         const malformedTwice = textResponse('# INTENT\nGoal stated.\n\nNo contract header this time.');
         const initializer = scriptModel([malformedOnce, malformedTwice]);
         const worker = scriptModel([]);
-        const judge = scriptModel([]);
+        const verifier = scriptModel([]);
 
         const before = new Set(await readdir(runsBaseDir));
 
@@ -785,7 +792,7 @@ describe('runTask', () => {
             maxContextTokens: 10_000,
             harness: {
               initializerCallModel: initializer.callModel,
-              judgeCallModel: judge.callModel,
+              verifierCallModel: verifier.callModel,
             },
           }),
         ).rejects.toThrow(/CONTRACT/);
