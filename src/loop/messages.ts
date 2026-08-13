@@ -24,15 +24,32 @@ export interface ToolUseBlock {
   input: unknown;
 }
 
+/** An image carried inside a tool_result block, mirroring the API's base64
+ * image source shape. Produced only by the judge's screenshot reads (see
+ * harness/judge.ts) — every worker-loop tool returns strings. */
+export interface ImageBlock {
+  type: 'image';
+  source: {
+    type: 'base64';
+    /** The image's MIME type; the judge derives it from the file
+     * extension. */
+    media_type: 'image/png' | 'image/jpeg';
+    /** The image bytes, base64-encoded. */
+    data: string;
+  };
+}
+
 /** The harness's answer to one tool_use block, carried in the next user
  * message. */
 export interface ToolResultBlock {
   type: 'tool_result';
   /** The `id` of the tool_use block this result answers. */
   tool_use_id: string;
-  /** The model-readable result text (already bounded by the pipeline's
-   * size cap). */
-  content: string;
+  /** The model-readable result: plain text (already bounded by the
+   * pipeline's size cap) for every worker tool, or a block array when the
+   * result carries an image (the judge's screenshot reads — see
+   * harness/judge.ts). The API accepts both shapes verbatim. */
+  content: string | Array<TextBlock | ImageBlock>;
   /** Present and true iff the call failed; the model reads `content` to
    * learn what went wrong. Omitted on success. */
   is_error?: boolean;

@@ -138,7 +138,10 @@ export function elideStaleInspectResults(messages: readonly Message[]): readonly
 /** The stub that replaces a stale result: marker line, the page's URL/title
  * header when it can be recovered, and the re-inspect guidance. */
 function stubResultBlock(block: ToolResultBlock): ToolResultBlock {
-  const header = extractPageHeader(block.content);
+  // inspect_page results are always plain text; the string check is for the
+  // type system (ToolResultBlock.content also admits image-carrying arrays,
+  // which only the judge produces and which are never elidable).
+  const header = typeof block.content === 'string' ? extractPageHeader(block.content) : undefined;
   const content = [ELISION_MARKER, ...(header === undefined ? [] : [header]), REINSPECT_LINE].join(
     '\n',
   );

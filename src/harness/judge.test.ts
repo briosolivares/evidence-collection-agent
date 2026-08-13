@@ -3,8 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { CallModel, Message, ModelResponse, Usage } from '../loop/messages.js';
-import { JUDGE_MAX_CONTEXT_TOKENS, JUDGE_MODEL, runJudge } from './judge.js';
+import type { CallModel, ImageBlock, Message, ModelResponse, TextBlock, Usage } from '../loop/messages.js';
+import { JUDGE_MAX_CONTEXT_TOKENS, JUDGE_MAX_IMAGE_BYTES, JUDGE_MODEL, runJudge } from './judge.js';
 
 // Every test drives the judge with a scripted fake callModel — zero real API
 // calls anywhere in this file (hermetic-suite convention, matching
@@ -441,5 +441,78 @@ describe('evidence scope (v2 diet)', () => {
     });
     expect(block.is_error).toBeUndefined();
     expect(block.content).toContain('CONTRACT.md');
+  });
+});
+
+describe('screenshot vision (v2)', () => {
+  /** Fake image bytes — content is never validated, only carried. */
+  const PNG_BYTES = Buffer.from('89504e470d0a1a0afakepixels', 'hex');
+
+  /** Run one scripted read_file through the judge and return its
+   * tool_result block from the follow-up request. */
+  async function resultOfRead(filePath: string): Promise<{
+    tool_use_id: string;
+    content: string | Array<TextBlock | ImageBlock>;
+    is_error?: boolean;
+  }> {
+    const { callModel, requests } = scriptModel([
+      toolResponse([{ id: 't1', name: 'read_file', input: { file_path: filePath } }]),
+      textResponse('DONE'),
+    ]);
+    await runJudge({ taskText: TASK, runDir, callModel });
+    const followUp = requests[1]!;
+    const toolResultMessage = followUp[followUp.length - 1]!;
+    return toolResultMessage.content[0] as {
+      tool_use_id: string;
+      content: string | Array<TextBlock | ImageBlock>;
+      is_error?: boolean;
+    };
+  }
+
+  it('a read_file on a published .png returns the image as a base64 block, not UTF-8 text', async () => {
+    writeFileSync(join(runDir, 'artifacts', 'shot.png'), PNG_BYTES);
+
+    const block = await resultOfRead('artifacts/shot.png');
+    expect(block.is_error).toBeUndefined();
+    expect(Array.isArray(block.content)).toBe(true);
+    const [label, image] = block.content as [TextBlock, ImageBlock];
+    expect(label.type).toBe('text');
+    expect(label.text).toContain('artifacts/shot.png');
+    expect(image.type).toBe('image');
+    expect(image.source.media_type).toBe('image/png');
+    expect(Buffer.from(image.source.data, 'base64')).toEqual(PNG_BYTES);
+  });
+
+  it('.jpg and .jpeg map to image/jpeg', async () => {
+    for (const name of ['shot.jpg', 'shot.jpeg']) {
+      writeFileSync(join(runDir, 'artifacts', name), PNG_BYTES);
+      const block = await resultOfRead(`artifacts/${name}`);
+      const image = (block.content as Array<TextBlock | ImageBlock>)[1] as ImageBlock;
+      expect(image.source.media_type, `for ${name}`).toBe('image/jpeg');
+    }
+  });
+
+  it('an over-cap image returns a steering error instead of blowing the request', async () => {
+    writeFileSync(join(runDir, 'artifacts', 'huge.png'), Buffer.alloc(JUDGE_MAX_IMAGE_BYTES + 1));
+
+    const block = await resultOfRead('artifacts/huge.png');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('too large');
+    expect(block.content).toContain('unverified');
+  });
+
+  it('an image outside artifacts/ is still off-diet — the scope guard wins', async () => {
+    mkdirSync(join(runDir, 'scratch'), { recursive: true });
+    writeFileSync(join(runDir, 'scratch', 'shot.png'), PNG_BYTES);
+
+    const block = await resultOfRead('scratch/shot.png');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('evidence scope');
+  });
+
+  it('a missing image reads as the standard missing-file error', async () => {
+    const block = await resultOfRead('artifacts/nope.png');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('File does not exist: artifacts/nope.png');
   });
 });

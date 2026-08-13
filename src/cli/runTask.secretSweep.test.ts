@@ -28,7 +28,9 @@ function lastToolResultText(messages: readonly Message[]): string {
     const message = messages[i];
     if (message?.role !== 'user') continue;
     for (const block of message.content) {
-      if (block.type === 'tool_result') return block.content;
+      // Worker tool results are always plain text; the string check narrows
+      // ToolResultBlock.content's judge-only image-array variant away.
+      if (block.type === 'tool_result' && typeof block.content === 'string') return block.content;
     }
     break;
   }
