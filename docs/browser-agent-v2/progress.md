@@ -48,7 +48,7 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T2 | complete | claude (impl session) | 199467a | Persistent worker and truthful outcomes |
 | T3 | complete | claude (impl session) | 77f63d3 | Typed verifier result |
 | T4 | complete | claude (impl session) | 9703b57 | Typed output contract |
-| T5 | not_started | — | — | Explicit submission and code checks |
+| T5 | complete | claude (impl session) | 15fb0d1 | Explicit submission and code checks |
 | T6 | not_started | — | — | Bounded page JavaScript |
 | T7 | not_started | — | — | Evidence-linked output tables |
 | T8 | not_started | — | — | Evidence-linked documents |
@@ -85,6 +85,43 @@ When work begins, replace the sentence above with one section per active task:
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 15:05 — T5 complete
+
+- Owner: claude (browser-agent-v2 impl session)
+- Commits: `e7be62d` (protocol + code checks), `15fb0d1` (submission wiring,
+  incomplete finalization, vertical test)
+- Features: T5.1–T5.4 complete.
+- What landed:
+  - `submit_for_verification` as a CONTROL tool — offered to the model but
+    never run through `executeToolCall`. The session intercepts it before the
+    scheduler sees the response, which is what makes exclusivity enforceable:
+    there is no code path where a submission executes beside a write.
+  - A no-tool response is no longer completion under the V2 protocol. It gets
+    concise protocol feedback in the same conversation; the legacy judge-less
+    path keeps its historical implicit completion untouched.
+  - `runCompletionCheck` runs BEFORE the verifier and its failures return as
+    the submission call's own result. Separate budgets —
+    `maxCompletionCheckFailures` (5) vs `maxWorkerCycles` (3) — because a
+    malformed file is objective and cheap to fix while a semantic correction
+    is neither.
+  - `finalizeIncompleteRun` marks only unmet outputs `partial`; outputs whose
+    requirement is satisfied stay `complete`. `setArtifactCompletionStatus`
+    updates the manifest entry without rewriting the file, which would change
+    its hash and destroy the provenance the manifest exists to keep.
+  - `harness.outputContract` (default false) gates the whole V2 path, so
+    every existing prose-contract test still passes. Flipping the default is
+    T16's cutover, not a silent change here.
+- Verified:
+  - `src/cli/runTask.verification.test.ts` — 7 vertical cases with scripted
+    models and no API: contract → write → submit → check → verified; a failing
+    check costing zero verifier attempts; a prose completion claim refused;
+    a correction arriving in the same conversation with history intact; the
+    contract-first gate stopping a pre-contract navigation; exhausted
+    corrections ending incomplete with the passing output still `complete`;
+    initializer-authored contracts.
+  - `npm run typecheck` — 0 errors; `npm test` — 113 files, 1040 tests, exit 0
+- Remaining: T6, T7, T8, T10–T16. T6 and T10 are delegated and in flight.
 
 ### 2026-08-13 14:35 — T4 complete
 
@@ -293,10 +330,9 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: T1, T2, T3, T4, T9 — all fully gated (typecheck 0
-  errors, full suite 110 files / 1000 tests)
-- Safe next task: T5 (unblocked by T4) and T6 (unblocked by T1 + T4). T10 is
-  unblocked by T9
+- Last completed task: T1, T2, T3, T4, T5, T9 — all fully gated (typecheck 0
+  errors, full suite 113 files / 1040 tests)
+- Safe next task: T7 (unblocked once T6 lands; needs T5 + T6). T8 follows T7
 - Parallel work currently unlocked: T4 and T10 can proceed in parallel (T4
   owns src/contracts + the contract tool; T10 owns src/browser/browserActions
   + the action tools). Assign ONE owner to src/tools/index.ts,

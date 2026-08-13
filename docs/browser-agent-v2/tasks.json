@@ -201,35 +201,35 @@
     {
       "id": "T5",
       "title": "Add explicit submission and code-based completion checks",
-      "status": "not_started",
+      "status": "complete",
       "dependsOn": [
         "T4"
       ],
-      "owner": null,
-      "startedAt": null,
-      "completedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T14:40:00-07:00",
+      "completedAt": "2026-08-13T15:05:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t5--add-explicit-submission-and-code-based-completion-checks",
       "features": [
         {
           "id": "T5.1",
           "description": "Make submit_for_verification an exclusive control tool and remove implicit no-tool completion.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T5.2",
           "description": "Run objective manifest, file, schema, column, count, uniqueness, capture, marker, and placeholder checks before the verifier.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T5.3",
           "description": "Return code and verifier findings to the same worker with separate failure counters.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T5.4",
           "description": "Finalize incomplete runs truthfully and mark only unresolved usable artifacts partial.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
