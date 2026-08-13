@@ -94,11 +94,30 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain(
       'write a roster of every entity to cover into a scratch/ file',
     );
-    expect(SYSTEM_PROMPT).toContain('write the output contract');
+    // The worker no longer authors the contract itself — it defers to
+    // CONTRACT.md when the harness provided one, falling back to the
+    // task's own stated structure otherwise.
+    expect(SYSTEM_PROMPT).toContain('The output contract is CONTRACT.md when present');
+    expect(SYSTEM_PROMPT).toContain(
+      "otherwise the task's own stated columns, fields, and field-level rules",
+    );
     expect(SYSTEM_PROMPT).toContain('enum-like values copied verbatim with nothing added');
     expect(SYSTEM_PROMPT).toContain('reconcile in both directions');
     expect(SYSTEM_PROMPT).toContain('its absence justified by observed evidence');
     expect(SYSTEM_PROMPT).toContain('every line of the output is a valid row under the contract');
+  });
+
+  it('teaches the conditional INTENT.md/CONTRACT.md protocol for harness-managed runs', () => {
+    // These files exist only when the initializer→worker→judge harness
+    // wrote them; REPL/interactive runs and many existing tests are
+    // judge-less, so the language must be conditional on presence.
+    expect(SYSTEM_PROMPT).toContain('may also contain INTENT.md and CONTRACT.md at its root');
+    expect(SYSTEM_PROMPT).toContain('When present, read both before starting work');
+    expect(SYSTEM_PROMPT).toContain('consult the contract every time you write output');
+    expect(SYSTEM_PROMPT).toContain(
+      'do not consider the task done until every contract criterion is satisfied and proven',
+    );
+    expect(SYSTEM_PROMPT).toContain('These files cannot be modified.');
   });
 
   it('teaches chunked writes: large files are built with append, in small pieces', () => {
@@ -131,6 +150,22 @@ describe('SYSTEM_PROMPT', () => {
       'ask_user_question pauses the task so they can act in the browser window',
     );
     expect(SYSTEM_PROMPT).toContain('reinspect the page before continuing');
+  });
+
+  it('frames finishing as a proposal for verification, not a claim of success', () => {
+    // The judge harness reviews the worker's no-tool-call response as a
+    // completion proposal rather than trusting it as a success claim.
+    expect(SYSTEM_PROMPT).toContain(
+      'Finishing is a handoff for verification, not a claim of success.',
+    );
+    expect(SYSTEM_PROMPT).toContain(
+      'Only propose completion after all requested artifacts have been written and verified.',
+    );
+    expect(SYSTEM_PROMPT).toContain('There is no finish tool: propose completion');
+    expect(SYSTEM_PROMPT).toContain(
+      'your response submits the run for verification rather than declaring success',
+    );
+    expect(SYSTEM_PROMPT).toContain('briefly name the files you produced');
   });
 
   it('forms a byte-identical cached prefix with all twelve production tools across unrelated task histories', () => {
