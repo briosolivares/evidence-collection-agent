@@ -375,6 +375,16 @@ const IMAGE_MEDIA_TYPES: Record<string, ImageBlock['source']['media_type'] | und
  * revisions: "base64, size-guarded"). */
 export const JUDGE_MAX_IMAGE_BYTES = 3_750_000;
 
+/** Per-dimension pixel ceiling for a judge-viewed image — the API rejects
+ * any image with a dimension over 8000px, and a byte cap alone does not
+ * catch this: full-page screenshots are far taller than 8000px yet
+ * compress well under the byte cap (measured live 2026-08-13: every
+ * merged_prs validation trial 400-failed on the judge's first
+ * screenshot-carrying request, killing runs whose worker had already
+ * finished). Dimensions are read from the file header (PNG IHDR / JPEG
+ * SOF) — see imageDimensions; no image-processing dependency. */
+export const JUDGE_MAX_IMAGE_DIMENSION_PX = 8000;
+
 /**
  * Answer a judge read_file targeting a published image: the tool_result
  * carries a short text label plus the image as a base64 block, which the
@@ -424,6 +434,34 @@ function readImageToolResult(
       is_error: true,
     };
   }
+  const dimensions = imageDimensions(bytes, mediaType);
+  if (dimensions === undefined) {
+    // Unparseable header: the bytes are not a valid image of the type the
+    // extension claims. Refusing here keeps known-bad data out of the API
+    // request — one invalid image block 400-fails the judge's entire turn.
+    return {
+      type: 'tool_result',
+      tool_use_id: toolUseId,
+      content:
+        `Not a readable ${mediaType} image: ${relPath}. Treat whatever it would ` +
+        'have proven as unverified unless another published artifact proves it.',
+      is_error: true,
+    };
+  }
+  if (
+    dimensions.width > JUDGE_MAX_IMAGE_DIMENSION_PX ||
+    dimensions.height > JUDGE_MAX_IMAGE_DIMENSION_PX
+  ) {
+    return {
+      type: 'tool_result',
+      tool_use_id: toolUseId,
+      content:
+        `Image too large to view: ${relPath} is ${dimensions.width}x${dimensions.height} ` +
+        `pixels (limit ${JUDGE_MAX_IMAGE_DIMENSION_PX} per dimension). Treat whatever it ` +
+        'would have proven as unverified unless another published artifact proves it.',
+      is_error: true,
+    };
+  }
   return {
     type: 'tool_result',
     tool_use_id: toolUseId,
@@ -432,6 +470,56 @@ function readImageToolResult(
       { type: 'image', source: { type: 'base64', media_type: mediaType, data: bytes.toString('base64') } },
     ],
   };
+}
+
+/** The 8-byte signature every PNG file opens with. */
+const PNG_SIGNATURE = Buffer.from('89504e470d0a1a0a', 'hex');
+
+/**
+ * Read an image's pixel dimensions from its file header — a tiny fixed
+ * parser instead of an image-processing dependency, since the judge only
+ * needs the two numbers the API's dimension limit is checked against.
+ *
+ * @returns the dimensions, or undefined when the bytes do not parse as the
+ *   claimed type (wrong signature, no SOF marker, truncated header)
+ */
+function imageDimensions(
+  bytes: Buffer,
+  mediaType: ImageBlock['source']['media_type'],
+): { width: number; height: number } | undefined {
+  return mediaType === 'image/png' ? pngDimensions(bytes) : jpegDimensions(bytes);
+}
+
+/** PNG dimensions: the IHDR chunk is required to be first, so width and
+ * height sit at fixed offsets 16 and 20 (big-endian) after the 8-byte
+ * signature and the chunk's own length/type fields. */
+function pngDimensions(bytes: Buffer): { width: number; height: number } | undefined {
+  if (bytes.length < 24 || !bytes.subarray(0, 8).equals(PNG_SIGNATURE)) return undefined;
+  if (bytes.toString('latin1', 12, 16) !== 'IHDR') return undefined;
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+}
+
+/** JPEG dimensions: walk the marker segments from SOI until a
+ * start-of-frame marker (0xC0–0xCF, excluding the non-frame 0xC4/0xC8/0xCC),
+ * whose payload carries height then width, both big-endian, after the
+ * 2-byte segment length and 1-byte precision. */
+function jpegDimensions(bytes: Buffer): { width: number; height: number } | undefined {
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) return undefined;
+  let offset = 2;
+  while (offset + 9 <= bytes.length) {
+    if (bytes[offset] !== 0xff) return undefined;
+    const marker = bytes[offset + 1]!;
+    // Standalone markers (RST0–RST7, another SOI) carry no length field.
+    if (marker >= 0xd0 && marker <= 0xd8) {
+      offset += 2;
+      continue;
+    }
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+      return { height: bytes.readUInt16BE(offset + 5), width: bytes.readUInt16BE(offset + 7) };
+    }
+    offset += 2 + bytes.readUInt16BE(offset + 2);
+  }
+  return undefined;
 }
 
 /**

@@ -4,7 +4,13 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { CallModel, ImageBlock, Message, ModelResponse, TextBlock, Usage } from '../loop/messages.js';
-import { JUDGE_MAX_CONTEXT_TOKENS, JUDGE_MAX_IMAGE_BYTES, JUDGE_MODEL, runJudge } from './judge.js';
+import {
+  JUDGE_MAX_CONTEXT_TOKENS,
+  JUDGE_MAX_IMAGE_BYTES,
+  JUDGE_MAX_IMAGE_DIMENSION_PX,
+  JUDGE_MODEL,
+  runJudge,
+} from './judge.js';
 
 // Every test drives the judge with a scripted fake callModel — zero real API
 // calls anywhere in this file (hermetic-suite convention, matching
@@ -445,8 +451,31 @@ describe('evidence scope (v2 diet)', () => {
 });
 
 describe('screenshot vision (v2)', () => {
-  /** Fake image bytes — content is never validated, only carried. */
-  const PNG_BYTES = Buffer.from('89504e470d0a1a0afakepixels', 'hex');
+  /** Minimal PNG: real signature + IHDR header carrying the given
+   * dimensions (only the header is parsed — pixel data is never decoded). */
+  function pngBytes(width: number, height: number): Buffer {
+    const header = Buffer.alloc(24);
+    Buffer.from('89504e470d0a1a0a', 'hex').copy(header, 0);
+    header.writeUInt32BE(13, 8); // IHDR data length
+    header.write('IHDR', 12, 'latin1');
+    header.writeUInt32BE(width, 16);
+    header.writeUInt32BE(height, 20);
+    return Buffer.concat([header, Buffer.from('fakepixels')]);
+  }
+
+  /** Minimal JPEG: SOI + one SOF0 segment carrying the given dimensions. */
+  function jpegBytes(width: number, height: number): Buffer {
+    const bytes = Buffer.alloc(20);
+    bytes.writeUInt16BE(0xffd8, 0); // SOI
+    bytes.writeUInt16BE(0xffc0, 2); // SOF0
+    bytes.writeUInt16BE(11, 4); // segment length
+    bytes[6] = 8; // precision
+    bytes.writeUInt16BE(height, 7);
+    bytes.writeUInt16BE(width, 9);
+    return bytes;
+  }
+
+  const PNG_BYTES = pngBytes(1280, 720);
 
   /** Run one scripted read_file through the judge and return its
    * tool_result block from the follow-up request. */
@@ -485,7 +514,7 @@ describe('screenshot vision (v2)', () => {
 
   it('.jpg and .jpeg map to image/jpeg', async () => {
     for (const name of ['shot.jpg', 'shot.jpeg']) {
-      writeFileSync(join(runDir, 'artifacts', name), PNG_BYTES);
+      writeFileSync(join(runDir, 'artifacts', name), jpegBytes(1280, 720));
       const block = await resultOfRead(`artifacts/${name}`);
       const image = (block.content as Array<TextBlock | ImageBlock>)[1] as ImageBlock;
       expect(image.source.media_type, `for ${name}`).toBe('image/jpeg');
@@ -499,6 +528,44 @@ describe('screenshot vision (v2)', () => {
     expect(block.is_error).toBe(true);
     expect(block.content).toContain('too large');
     expect(block.content).toContain('unverified');
+  });
+
+  it('an over-dimension image (a full-page capture) steers instead of 400-failing the request', async () => {
+    // Well under the byte cap but taller than the API's 8000px limit — the
+    // shape that killed every merged_prs validation trial.
+    writeFileSync(join(runDir, 'artifacts', 'fullpage.png'), pngBytes(1280, JUDGE_MAX_IMAGE_DIMENSION_PX + 4000));
+
+    const block = await resultOfRead('artifacts/fullpage.png');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('12000');
+    expect(block.content).toContain('unverified');
+  });
+
+  it('an over-wide JPEG is caught the same way', async () => {
+    writeFileSync(join(runDir, 'artifacts', 'wide.jpg'), jpegBytes(JUDGE_MAX_IMAGE_DIMENSION_PX + 1, 400));
+
+    const block = await resultOfRead('artifacts/wide.jpg');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('too large');
+  });
+
+  it('an image at exactly the dimension limit is still viewed', async () => {
+    writeFileSync(
+      join(runDir, 'artifacts', 'edge.png'),
+      pngBytes(1280, JUDGE_MAX_IMAGE_DIMENSION_PX),
+    );
+
+    const block = await resultOfRead('artifacts/edge.png');
+    expect(block.is_error).toBeUndefined();
+    expect(Array.isArray(block.content)).toBe(true);
+  });
+
+  it('bytes that do not parse as the claimed image type are refused, not sent to the API', async () => {
+    writeFileSync(join(runDir, 'artifacts', 'fake.png'), Buffer.from('not actually a png'));
+
+    const block = await resultOfRead('artifacts/fake.png');
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('Not a readable');
   });
 
   it('an image outside artifacts/ is still off-diet — the scope guard wins', async () => {
