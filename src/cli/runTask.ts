@@ -14,6 +14,7 @@ import {
 import {
   INITIALIZER_MODEL,
   makeInitializerCallModel,
+  runContractInitializer,
   runInitializer,
   writeInitializerFiles,
   type ContractAuthor,
@@ -31,12 +32,15 @@ import {
   type LoopResult,
 } from '../loop/agentLoop.js';
 import {
+  appendSubmissionResult,
   appendWorkerFeedback,
   createWorkerSession,
   recordWorkerSessionCrash,
   runWorkerCycle,
   writeWorkerSessionMetrics,
 } from '../loop/workerSession.js';
+import { runCompletionCheck, type CompletionFailure } from '../completion/completionCheck.js';
+import { finalizeIncompleteRun } from '../completion/finalizeIncompleteRun.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
 import {
@@ -66,7 +70,10 @@ import {
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
 } from '../tools/index.js';
-import { toApiToolDefs, type ToolCtx } from '../tools/registry.js';
+import { createRegistry, toApiToolDefs, type ToolCtx, type ToolDef } from '../tools/registry.js';
+import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
+import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
+import { createOutputContractStore } from '../contracts/outputContractStore.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 // Default runs base when the caller passes none: the checkout's runs/
@@ -94,6 +101,11 @@ const DEFAULT_MAX_TURNS = Infinity;
 // cheaper repeat-page representation remains the remedy of record, not a
 // bigger cap.
 const DEFAULT_MAX_CONTEXT_TOKENS = 900_000;
+/** How many times the code checks may reject a submission before the run
+ * ends incomplete. Separate from (and larger than) the verifier's budget:
+ * a code-check failure is cheap, objective, and usually a one-line fix, so
+ * spending a scarce verifier attempt on one would be waste. */
+const DEFAULT_MAX_COMPLETION_CHECK_FAILURES = 5;
 
 /**
  * Keep only start URLs runTask can actually open: `goto` accepts HTTP(S)
@@ -134,6 +146,17 @@ export interface HarnessConfig {
   /** Test seam for the verifier's read-only mini-loop, mirroring
    * `RunTaskConfig.callModel`. Production default: makeVerifierModelDriver. */
   verifierCallModel?: CallModel;
+  /** How many times the automated completion checks may reject a
+   * submission before the run ends incomplete; defaults to 5. Deliberately
+   * separate from maxWorkerCycles: a code-check failure is objective and
+   * cheap to fix, so it must not consume a scarce verifier attempt. */
+  maxCompletionCheckFailures?: number;
+  /** Enables the V2 completion protocol: a run-scoped output-contract store,
+   * the `set_output_contract` and `submit_for_verification` tools, the
+   * contract-first gate, and code checks before the verifier. Defaults to
+   * false during the migration so the prose INTENT.md/CONTRACT.md path keeps
+   * working unchanged; T16 flips the default as part of the cutover. */
+  outputContract?: boolean;
   /** Which role states the run's output contract (T4). Defaults to
    * 'initializer', preserved as the migration default until a
    * user-authorized measured comparison chooses otherwise — the
@@ -253,13 +276,23 @@ export async function runTask(
     );
   }
 
-  const registry = createProductionRegistry(
+  const v2Protocol = config.harness?.outputContract === true;
+  const baseRegistry = createProductionRegistry(
     config.toolProfile ?? DEFAULT_TOOL_PROFILE,
   );
+  // The V2 protocol adds exactly two tools, appended after the frozen
+  // atomic order so existing prompt-prefix expectations are untouched (T16
+  // freezes the final V2 order).
+  const registry = v2Protocol
+    ? createRegistry([...baseRegistry.values(), setOutputContractTool as ToolDef])
+    : baseRegistry;
+  const apiToolDefs = v2Protocol
+    ? [...toApiToolDefs(registry), submitForVerificationTool]
+    : toApiToolDefs(registry);
   const baseCallModel = config.callModel ?? makeCallModel({
     model: config.model,
     system: SYSTEM_PROMPT,
-    apiToolDefs: toApiToolDefs(registry),
+    apiToolDefs,
     maxOutputTokens,
     onProgress: config.onProgress,
   });
@@ -271,6 +304,7 @@ export async function runTask(
     generateRunId(taskText),
   );
   initManifest(runDir, taskText);
+  const outputContracts = v2Protocol ? createOutputContractStore(runDir) : undefined;
 
   const credentials =
     config.credentials ??
@@ -320,8 +354,24 @@ export async function runTask(
         budget!,
         'initializer',
       );
-      const initializerResult = await runInitializer(taskText, initializerCallModel);
-      writeInitializerFiles(runDir, initializerResult);
+      const author = config.harness.contractAuthor ?? 'initializer';
+      if (v2Protocol && author === 'initializer') {
+        const authored = await runContractInitializer(
+          taskText,
+          initializerCallModel,
+          outputContracts!,
+        );
+        if (!authored.ok) {
+          // A run whose requirements were never validated must not proceed
+          // as if they had been.
+          throw new Error(`Contract initializer failed: ${authored.reason}`);
+        }
+      } else if (!v2Protocol) {
+        const initializerResult = await runInitializer(taskText, initializerCallModel);
+        writeInitializerFiles(runDir, initializerResult);
+      }
+      // v2Protocol with contractAuthor 'worker': the worker states the
+      // contract itself on its first response (the contract-first gate).
     }
 
     const result = await tracing.traceRun(taskText, async () => {
@@ -339,6 +389,8 @@ export async function runTask(
         browser: config.browser,
         credentials,
         requestPermission: config.requestPermission,
+        ...(outputContracts === undefined ? {} : { outputContracts }),
+        ...(v2Protocol ? { submissionProtocol: true } : {}),
       };
 
       if (config.harness === undefined) {
@@ -423,6 +475,10 @@ async function runVerificationHarness(
   );
 
   const session = createWorkerSession(taskText, loopDeps, sessionConfig);
+  const contractStore = loopDeps.outputContracts;
+  const maxCompletionCheckFailures =
+    harnessConfig.maxCompletionCheckFailures ?? DEFAULT_MAX_COMPLETION_CHECK_FAILURES;
+  let completionCheckFailures = 0;
   const cycleRecords: HarnessCycleRecord[] = [];
   let outcome: RunOutcome | undefined;
 
@@ -445,6 +501,51 @@ async function runVerificationHarness(
         break;
       }
 
+      // Code checks before the verifier (T5): a malformed file must never
+      // spend a verifier attempt. Failures return as the submission call's
+      // own result, so the worker keeps working in the same conversation
+      // and only a submission that survives them reaches the verifier.
+      const contract = contractStore?.currentContract();
+      if (result.kind === 'submitted' && contract !== undefined) {
+        const checks = runCompletionCheck(runDir, contract);
+        if (!checks.ok) {
+          completionCheckFailures += 1;
+          appendTranscriptEvent(runDir, {
+            type: 'completion_check_failed',
+            cycle,
+            failures: checks.failures,
+          });
+          if (completionCheckFailures >= maxCompletionCheckFailures) {
+            cycleRecords.push({
+              cycle,
+              workerStatus: 'completed',
+              verifierError:
+                `automated checks rejected ${completionCheckFailures} submissions; ` +
+                'the verifier was never reached',
+            });
+            outcome = {
+              status: 'incomplete',
+              reason: 'verification_attempts',
+              detail:
+                `automated completion checks failed ${completionCheckFailures} times; ` +
+                `last failures: ${formatCheckFailures(checks.failures)}`,
+              finalText: result.finalText,
+            };
+            break;
+          }
+          // Same conversation, same submission call: the worker reads the
+          // objective defects and fixes them without a fresh cycle.
+          appendSubmissionResult(
+            session,
+            result.call,
+            `Automated checks rejected this submission. Nothing was verified. Fix all of ` +
+              `these and submit again:\n${formatCheckFailures(checks.failures)}`,
+          );
+          cycle -= 1; // a rejected submission is not a verification cycle
+          continue;
+        }
+      }
+
       // Only a harness bug throws out of runVerifier (a run dir missing its
       // contract documents) or a caller cancellation (an AbortError); every
       // model-side failure — refusal, token limit, truncated stream,
@@ -457,6 +558,9 @@ async function runVerificationHarness(
         taskText,
         runDir,
         callModel: verifierCallModel,
+        ...(contract === undefined
+          ? {}
+          : { contracts: { current: contract, history: contractStore!.contractHistory() } }),
       });
 
       // Fail closed: an unavailable verifier is never success. The
@@ -487,6 +591,9 @@ async function runVerificationHarness(
       });
 
       if (verification.status === 'verified') {
+        if (result.kind === 'submitted') {
+          appendSubmissionResult(session, result.call, JSON.stringify({ status: 'verified' }), false);
+        }
         outcome = { status: 'verified', finalText: result.finalText };
         break;
       }
@@ -506,9 +613,18 @@ async function runVerificationHarness(
       }
 
       // Same session, same conversation: the correction arrives as
-      // feedback appended to everything the worker already knows.
+      // feedback appended to everything the worker already knows. When the
+      // cycle ended in a submission, the findings answer that exact call.
       sessionConfig.budget.recordCorrection();
-      appendWorkerFeedback(session, `Verification findings:\n${findingsText}`);
+      if (result.kind === 'submitted') {
+        appendSubmissionResult(
+          session,
+          result.call,
+          `Verification found problems. Fix these and submit again:\n${findingsText}`,
+        );
+      } else {
+        appendWorkerFeedback(session, `Verification findings:\n${findingsText}`);
+      }
     }
   } catch (error) {
     recordWorkerSessionCrash(session, error);
@@ -520,6 +636,21 @@ async function runVerificationHarness(
     // and every iteration either breaks with an outcome or is the loop's
     // last (cycle === maxWorkerCycles), which also breaks with one.
     throw new Error('verification harness ended without an outcome');
+  }
+
+  // An unverified ending preserves the run, but the manifest must stop
+  // implying every deliverable is trustworthy: only the outputs whose
+  // requirement is unmet are marked partial (see finalizeIncompleteRun).
+  if (outcome.status === 'incomplete') {
+    const contract = contractStore?.currentContract();
+    const finalization = finalizeIncompleteRun(runDir, contract);
+    if (finalization.markedPartial.length > 0) {
+      appendTranscriptEvent(runDir, {
+        type: 'incomplete_finalization',
+        markedPartial: finalization.markedPartial,
+        unsatisfiedOutputIds: finalization.unsatisfiedOutputIds,
+      });
+    }
   }
 
   const outcomeRecord: HarnessOutcomeRecord =
@@ -552,6 +683,16 @@ function formatFindings(findings: readonly VerificationFinding[]): string {
           ? ''
           : ` (evidence: ${finding.evidenceIds.join(', ')})`;
       return `- ${finding.area}/${finding.code}${target}: ${finding.message}${evidence}`;
+    })
+    .join('\n');
+}
+
+/** Render code-check failures as the worker-facing list. */
+function formatCheckFailures(failures: readonly CompletionFailure[]): string {
+  return failures
+    .map((failure) => {
+      const target = failure.outputId === undefined ? '' : ` [${failure.outputId}]`;
+      return `- ${failure.code}${target}: ${failure.message}`;
     })
     .join('\n');
 }

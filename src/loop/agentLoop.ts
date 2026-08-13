@@ -114,6 +114,14 @@ export async function runAgentLoop(
       writeWorkerSessionMetrics(session, 'completed');
       return { status: 'completed', finalText: outcome.finalText };
     }
+    if (outcome.kind === 'submitted') {
+      // Unreachable on this path: the submission protocol is off unless the
+      // caller sets deps.submissionProtocol, which only the verification
+      // harness does — and that harness does not go through this wrapper.
+      throw new Error(
+        'runAgentLoop received a submission; use runVerificationHarness for submission runs',
+      );
+    }
     writeWorkerSessionMetrics(session, 'budget_exceeded');
     return { status: 'budget_exceeded', reason: outcome.reason };
   } catch (error) {

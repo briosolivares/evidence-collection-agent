@@ -3,6 +3,10 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
+  SUBMIT_FOR_VERIFICATION,
+  validateWorkerResponse,
+} from '../completion/workerResponseProtocol.js';
+import {
   blockedByInvalidContractResults,
   decideContractGate,
   SET_OUTPUT_CONTRACT,
@@ -78,6 +82,11 @@ export interface WorkerSessionDeps {
    * gate: until a valid contract exists, only `set_output_contract` may
    * run. Absent (the judge-less path, fixture tests) leaves the gate off. */
   outputContracts?: ToolCtx['outputContracts'];
+  /** True when the run offers `submit_for_verification`, which makes
+   * explicit submission the ONLY way to finish (see runWorkerTurn). The
+   * legacy judge-less path leaves it unset and keeps implicit
+   * no-tool completion. */
+  submissionProtocol?: boolean;
 }
 
 /** The session's guards: the shared whole-run budget plus the per-request
@@ -120,6 +129,10 @@ export type WorkerBudgetReason =
 export type WorkerTurnOutcome =
   | { kind: 'working' }
   | { kind: 'completed'; finalText: string }
+  /** The worker called `submit_for_verification` alone. The harness now runs
+   * the code checks and, if they pass, the verifier — then answers this
+   * exact call with the result, so feedback lands in the same conversation. */
+  | { kind: 'submitted'; call: ToolCall; input: unknown; finalText: string }
   | { kind: 'budget_exceeded'; reason: WorkerBudgetReason };
 
 /** One live worker session. Treat every field as owned by this module;
@@ -316,13 +329,65 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
 
   state.messages.push({ role: 'assistant', content: response.content });
 
-  // Completion as policy: the model is done iff its response contains no
-  // tool_use blocks. Checked on content, never on stop_reason.
   const toolUses = response.content.filter(
     (block): block is ToolUseBlock => block.type === 'tool_use',
   );
-  if (toolUses.length === 0) {
-    return { kind: 'completed', finalText: extractText(response.content) };
+  const finalText = extractText(response.content);
+
+  // Two completion protocols coexist during the migration. When the run
+  // offers `submit_for_verification` (the V2 harness path), finishing
+  // requires calling it: a no-tool response is an invalid working response,
+  // never success. Otherwise — the legacy judge-less path — the historical
+  // rule stands: no tool_use blocks means the model is done. Either way the
+  // decision reads the response's CONTENT, never its stop_reason.
+  if (deps.submissionProtocol === true) {
+    const calls: ToolCall[] = toolUses.map((block) => ({
+      id: block.id,
+      name: block.name,
+      input: block.input,
+    }));
+    const disposition = validateWorkerResponse(calls, finalText);
+    if (disposition.kind === 'submit') {
+      budget.recordToolCalls(1);
+      appendTranscriptEvent(deps.runDir, {
+        type: 'submission',
+        turn,
+        input: disposition.call.input,
+      });
+      return {
+        kind: 'submitted',
+        call: disposition.call,
+        input: disposition.call.input,
+        finalText,
+      };
+    }
+    if (disposition.kind === 'invalid') {
+      // Nothing executed. Answer any attempted calls, then hand back the
+      // protocol correction in the same conversation.
+      const invalidBlocks: ToolResultBlock[] = disposition.results.map((result) => {
+        appendTranscriptEvent(deps.runDir, { type: 'tool_result', turn, result });
+        return {
+          type: 'tool_result',
+          tool_use_id: result.toolCallId,
+          content: result.content,
+          is_error: true,
+        };
+      });
+      state.messages.push({
+        role: 'user',
+        content: [
+          ...invalidBlocks,
+          { type: 'text', text: disposition.feedback },
+        ],
+      });
+      const invalidLimit = budget.exceededLimit();
+      if (invalidLimit !== undefined) {
+        return { kind: 'budget_exceeded', reason: budgetReasonForLimit(invalidLimit) };
+      }
+      return { kind: 'working' };
+    }
+  } else if (toolUses.length === 0) {
+    return { kind: 'completed', finalText };
   }
 
   // Execution is delegated to the scheduler — read-only tools in parallel
@@ -596,4 +661,36 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
     content: result.content,
     ...(result.isError ? { is_error: true } : {}),
   };
+}
+
+/**
+ * Answer a submission call in the same conversation, so the worker reads the
+ * code-check failures or verifier findings as that call's own result.
+ *
+ * The API requires every tool_use answered; returning the outcome here is
+ * what makes a correction a continuation of the same session rather than a
+ * fresh conversation with amnesia.
+ */
+export function appendSubmissionResult(
+  session: WorkerSession,
+  call: ToolCall,
+  content: string,
+  isError = true,
+): void {
+  appendTranscriptEvent(session.deps.runDir, {
+    type: 'tool_result',
+    turn: session.state.turnCount,
+    result: { toolCallId: call.id, content, isError },
+  });
+  session.state.messages.push({
+    role: 'user',
+    content: [
+      {
+        type: 'tool_result',
+        tool_use_id: call.id,
+        content,
+        ...(isError ? { is_error: true } : {}),
+      },
+    ],
+  });
 }
