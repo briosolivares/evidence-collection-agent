@@ -461,41 +461,41 @@
     {
       "id": "T11",
       "title": "Add targeted observation and anonymous public-resource reads",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T6",
         "T9"
       ],
-      "owner": "delegated subagent (primary agent integrates and verifies)",
+      "owner": "delegated subagent, reviewed and verified by primary",
       "startedAt": "2026-08-13T15:25:00-07:00",
-      "completedAt": null,
+      "completedAt": "2026-08-13T16:25:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t11--add-targeted-observation-and-anonymous-public-resource-reads",
       "features": [
         {
           "id": "T11.1",
           "description": "Index deliberately visited or observed URLs and allow only those public resource targets.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T11.2",
           "description": "Read JSON, CSV, or HTML through an anonymous context and persist original response evidence.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T11.3",
           "description": "Reject credentials, private/loopback/reserved addresses, and unsafe redirects.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T11.4",
           "description": "Add targeted text, table, and visual observations plus exact capture_text evidence.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T11.5",
           "description": "Require visible-UI spot reconciliation before endpoint data becomes final output data.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
@@ -549,37 +549,37 @@
     {
       "id": "T13",
       "title": "Make tool scheduling input-aware",
-      "status": "not_started",
+      "status": "complete",
       "dependsOn": [
         "T7",
         "T10",
         "T12"
       ],
-      "owner": null,
-      "startedAt": null,
-      "completedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T16:30:00-07:00",
+      "completedAt": "2026-08-13T16:45:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t13--make-tool-scheduling-input-aware",
       "features": [
         {
           "id": "T13.1",
           "description": "Validate inputs before scheduling and derive page, observation, table, file, origin, and manifest access keys.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T13.2",
           "description": "Overlap only calls with no write/read or write/write conflict and run undeclared tools serially.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T13.3",
           "description": "Buffer model-visible results and derived state, then commit in original call order while serializing manifest writes.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T13.4",
           "description": "Retain bounded concurrency and existing per-turn, whole-run, per-result, and combined-result caps.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
