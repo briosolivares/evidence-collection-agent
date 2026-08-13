@@ -17,8 +17,11 @@ const ANSWER_MAX_LINES = 3;
 const ANSWER_MAX_CHARS = 280;
 
 interface ArtifactsPanelProps {
-  /** The completed run the panel summarizes (header + answer data). */
-  summary: CompletedRunSummary;
+  /** The completed run the panel summarizes (header + answer data).
+   * Absent when /artifacts reopens artifacts retained from a run that
+   * recorded no summary (cancelled / budget-exceeded): the panel then
+   * renders an artifacts-only header and no answer block. */
+  summary?: CompletedRunSummary;
   /** Published artifacts in publish order (state.artifacts verbatim);
    * the panel reorders them requested-outputs-first itself. */
   artifacts: readonly PublishedArtifact[];
@@ -48,7 +51,8 @@ interface ArtifactsPanelProps {
  * Esc after a run; the composer keeps focus and the next task types
  * immediately); Tab hands it the keys, where selection, the detail
  * card, and Space/o/r behave exactly as in the live rail. Esc and Tab
- * are App's keys, as everywhere.
+ * are App's keys, as everywhere. /artifacts re-renders it focused for
+ * the most recent run — with or without a completion summary.
  */
 export function ArtifactsPanel({
   summary,
@@ -79,24 +83,44 @@ export function ArtifactsPanel({
 
   return (
     <Box flexDirection="column" marginTop={1} paddingLeft={1}>
-      <Box>
-        <Text color={theme.success}>{`${glyphs.success} `}</Text>
-        <Text>
-          {`${summary.verb} in ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`}
-        </Text>
-      </Box>
-      <Text color={theme.muted}>{`  ${summary.runDir}`}</Text>
-      <Box paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
-        <Text>{clampAnswer(summary.finalText)}</Text>
-      </Box>
-      {detailOpen && current !== undefined ? (
+      {summary !== undefined ? (
         <>
+          <Box>
+            <Text color={theme.success}>{`${glyphs.success} `}</Text>
+            <Text>
+              {`${summary.verb} in ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`}
+            </Text>
+          </Box>
+          <Text color={theme.muted}>{`  ${summary.runDir}`}</Text>
+          <Box paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
+            <Text>{clampAnswer(summary.finalText)}</Text>
+          </Box>
+        </>
+      ) : (
+        <>
+          {/* Artifacts-only header: what survived a run that recorded
+              no completion summary. */}
           <Text>
             <Text color={theme.primary} bold>
               Artifacts
             </Text>
-            <Text color={theme.muted}>{` · ${ui.cursor + 1}/${ordered.length}`}</Text>
+            {detailOpen && (
+              <Text color={theme.muted}>{` · ${ui.cursor + 1}/${ordered.length}`}</Text>
+            )}
           </Text>
+          {runDir !== undefined && <Text color={theme.muted}>{`  ${runDir}`}</Text>}
+        </>
+      )}
+      {detailOpen && current !== undefined ? (
+        <>
+          {summary !== undefined && (
+            <Text>
+              <Text color={theme.primary} bold>
+                Artifacts
+              </Text>
+              <Text color={theme.muted}>{` · ${ui.cursor + 1}/${ordered.length}`}</Text>
+            </Text>
+          )}
           <ArtifactDetail artifact={current} />
         </>
       ) : (

@@ -812,6 +812,18 @@ describe('reduce (completion summary)', () => {
     expect(state.artifacts).toHaveLength(1);
   });
 
+  it('run end retains the live run dir — /artifacts opens files against it', () => {
+    const state = fold([
+      ...started,
+      { type: 'run_dir', runDir: '/runs/abc' },
+      { type: 'turn_start', turn: 1 },
+      published(1, publishedEntry({ filename: 'artifacts/page.png' })),
+      { type: 'run_cancelled', at: 2_000 },
+    ]);
+    expect(state.lastRunDir).toBe('/runs/abc');
+    expect(state.completedRun).toBeUndefined();
+  });
+
   it('the completion item digests the published artifacts, requested outputs first', () => {
     const state = fold([
       ...started,

@@ -3,7 +3,7 @@
 // imports — pure data plus a prefix filter.
 
 /** The routing kind a known command maps to (name minus the slash). */
-export type CommandKind = 'help' | 'runs' | 'evals' | 'exit';
+export type CommandKind = 'help' | 'runs' | 'artifacts' | 'evals' | 'exit';
 
 /** One slash command: its full name and a one-line description. */
 export interface SlashCommand {
@@ -15,6 +15,7 @@ export interface SlashCommand {
 export const SLASH_COMMANDS: readonly SlashCommand[] = [
   { name: '/help', description: 'Show this list' },
   { name: '/runs', description: 'Browse past run directories' },
+  { name: '/artifacts', description: "Browse the last run's artifacts" },
   { name: '/evals', description: 'Run eval tasks' },
   { name: '/exit', description: 'Quit Sherlock' },
 ];

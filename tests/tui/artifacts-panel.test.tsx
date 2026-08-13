@@ -126,14 +126,16 @@ function Harness({
     log?.push(action);
     rawDispatch(action);
   };
-  if (state.completedRun === undefined) return null;
+  // App's mount condition: passive with a summary, or focused (which
+  // /artifacts reaches even without one).
+  if (state.completedRun === undefined && state.mode !== 'artifacts') return null;
   return (
     <ArtifactsPanel
       summary={state.completedRun}
       artifacts={state.artifacts}
       ui={state.artifactUi}
       focused={state.mode === 'artifacts'}
-      runDir={state.completedRun.runDir}
+      runDir={state.completedRun?.runDir ?? state.lastRunDir}
       dispatch={dispatch}
       open={open}
       reveal={reveal}
@@ -318,6 +320,77 @@ describe('ArtifactsPanel (focused)', () => {
       type: 'notice',
       text: 'qlmanage failed to launch: spawn qlmanage ENOENT',
     });
+    unmount();
+  });
+});
+
+// ————— Plan item 8: /artifacts without a completion summary —————
+
+describe('ArtifactsPanel (artifacts-only, no summary)', () => {
+  /** A cancelled run's retained artifacts, focused via /artifacts. */
+  function cancelledFocusedState(): SessionState {
+    const actions: StoreAction[] = [
+      { type: 'run_started', task: 'investigate', at: 0 },
+      { type: 'run_dir', runDir: RUN_DIR },
+      { type: 'turn_start', turn: 1 },
+      ...publishes(),
+      { type: 'run_cancelled', at: 9_000 },
+      { type: 'artifacts_focus' },
+    ];
+    return actions.reduce(reduce, createInitialState());
+  }
+
+  it('renders the artifacts-only header over the rows — no answer block', async () => {
+    const { lastFrame, unmount } = render(
+      <Harness initial={cancelledFocusedState()} />,
+    );
+    await tick();
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('Artifacts');
+    expect(frame).toContain(RUN_DIR);
+    expect(frame).toContain('› ◆ artifacts/top5.csv');
+    expect(frame).not.toContain('✓');
+    expect(frame).not.toContain('Task completed');
+    unmount();
+  });
+
+  it('the detail card folds its position into the single header line', async () => {
+    const { lastFrame, stdin, unmount } = render(
+      <Harness initial={cancelledFocusedState()} />,
+    );
+    await tick();
+    stdin.write(ENTER);
+    await tick();
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('Artifacts · 1/3');
+    expect(frame).toContain(`sha256: ${SHA}`);
+    expect(frame.match(/Artifacts/g)).toHaveLength(1);
+    unmount();
+  });
+
+  it('Space opens against the retained run dir', async () => {
+    const preview = recorder();
+    const { stdin, unmount } = render(
+      <Harness initial={cancelledFocusedState()} preview={preview.action} />,
+    );
+    await tick();
+    stdin.write(' ');
+    await tick();
+    expect(preview.paths).toEqual([`${RUN_DIR}/artifacts/top5.csv`]);
+    unmount();
+  });
+
+  it('renders with zero overflow at 44 columns', async () => {
+    const { lastFrame, unmount } = renderAt(
+      44,
+      <Harness initial={cancelledFocusedState()} />,
+    );
+    await tick();
+    const frame = lastFrame();
+    expect(frame).toContain('› ◆ artifacts/top5.csv');
+    for (const line of frame.split('\n')) {
+      expect(line.length).toBeLessThanOrEqual(44);
+    }
     unmount();
   });
 });

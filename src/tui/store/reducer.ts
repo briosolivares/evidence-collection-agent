@@ -82,18 +82,25 @@ export type RoutedInput =
   | { kind: 'task'; text: string }
   | { kind: 'help' }
   | { kind: 'runs' }
+  | { kind: 'artifacts' }
   | { kind: 'evals' }
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
+
+/** /help's name column: the longest command name plus two spaces. */
+const HELP_NAME_PAD =
+  Math.max(...SLASH_COMMANDS.map((entry) => entry.name.length)) + 2;
 
 /** The /help transcript block: commands and keys (R10), driven by the
  * single SLASH_COMMANDS registry (R1). */
 export const HELP_TEXT = [
   'Commands',
-  ...SLASH_COMMANDS.map((entry) => `  ${entry.name.padEnd(8)}${entry.description}`),
+  ...SLASH_COMMANDS.map(
+    (entry) => `  ${entry.name.padEnd(HELP_NAME_PAD)}${entry.description}`,
+  ),
   'Keys',
-  '  Esc     Cancel the current run',
-  '  Ctrl+C  Quit',
+  `  ${'Esc'.padEnd(HELP_NAME_PAD)}Cancel the current run`,
+  `  ${'Ctrl+C'.padEnd(HELP_NAME_PAD)}Quit`,
 ].join('\n');
 
 /**
@@ -214,11 +221,17 @@ function displayTokens(live: LiveRunState): number {
   return Math.round(Math.max(live.tokens.settled, live.tokens.estimate));
 }
 
-/** End the run: clear the live region; an active eval batch returns to
- * evalsRunning (between trials), everything else to idle. */
+/** End the run: clear the live region — retaining its run dir so
+ * /artifacts can open files after runs that record no completion summary
+ * (cancelled/failed carry no runDir of their own) — and return to idle,
+ * or to evalsRunning while an eval batch owns the session. */
 function endRun(state: SessionState): SessionState {
-  const { live: _live, ...rest } = state;
-  return { ...rest, mode: state.evalsActive === true ? 'evalsRunning' : 'idle' };
+  const { live, ...rest } = state;
+  return {
+    ...rest,
+    ...(live?.runDir === undefined ? {} : { lastRunDir: live.runDir }),
+    mode: state.evalsActive === true ? 'evalsRunning' : 'idle',
+  };
 }
 
 /**

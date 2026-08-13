@@ -44,6 +44,7 @@ describe('App slash routing and transcript', () => {
     await submitLine(stdin, '/help');
     const output = frames.join('\n');
     expect(output).toContain('/runs');
+    expect(output).toContain("/artifacts  Browse the last run's artifacts");
     expect(output).toContain('/evals');
     expect(output).toContain('/exit');
     expect(output).toContain('Esc');
@@ -534,6 +535,78 @@ describe('App completion summary panel', () => {
     expect(lastFrame()).toContain('/evals');
     expect(lastFrame()).not.toContain('(browsing artifacts');
     expect(lastFrame()).not.toContain('› ◆');
+    unmount();
+  });
+
+  it('/artifacts refocuses the panel after it went passive', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await completeRun(bridge, stdin);
+    expect(lastFrame()).toContain(PASSIVE_HINT);
+    await submitLine(stdin, '/artifacts');
+    expect(lastFrame()).toContain('› ◆ artifacts/page.png');
+    expect(lastFrame()).toContain('(browsing artifacts — esc to return)');
+    unmount();
+  });
+
+  it('/artifacts after a cancelled run shows the artifacts-only panel', async () => {
+    const bridge = fakeRunner();
+    const { lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'to be interrupted');
+    bridge.emit({ type: 'run_dir', runDir: '/runs/live' });
+    bridge.emit({ type: 'turn_start', turn: 1 });
+    bridge.emit({
+      type: 'artifact_published',
+      entry: {
+        filename: 'artifacts/page.png',
+        sha256: 'a'.repeat(64),
+        sourceUrl: 'https://sec.gov/filings',
+        roles: ['evidence'],
+        capturedAt: '2026-08-12T10:00:00.000Z',
+      },
+      sizeBytes: 2_048,
+      toolExecId: 1,
+    });
+    bridge.emit({ type: 'run_cancelled', at: 9_000 });
+    bridge.finish();
+    await tick();
+    expect(lastFrame()).not.toContain(PASSIVE_HINT);
+
+    await submitLine(stdin, '/artifacts');
+    const frame = lastFrame() ?? '';
+    // Artifacts-only: header + retained run dir, no answer block.
+    expect(frame).toContain('Artifacts');
+    expect(frame).toContain('/runs/live');
+    expect(frame).toContain('› ◆ artifacts/page.png');
+    expect(frame).not.toContain('✓ Brewed');
+    expect(frame).not.toContain('Task completed');
+
+    // Esc returns to the composer; with no summary the panel unmounts.
+    stdin.write(ESC);
+    await tick(150);
+    expect(lastFrame()).not.toContain('› ◆');
+    await submitLine(stdin, 'next question');
+    expect(lastFrame()).toContain('(waiting for agent…)');
+    unmount();
+  });
+
+  it('/artifacts with nothing recorded produces a gentle notice', async () => {
+    const { frames, lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} />,
+    );
+    await tick();
+    await submitLine(stdin, '/artifacts');
+    expect(frames.join('\n')).toContain(
+      'No artifacts to browse yet — run a task that publishes some first.',
+    );
+    // Still idle: no focused panel, composer usable.
+    expect(lastFrame()).not.toContain('(browsing artifacts');
     unmount();
   });
 

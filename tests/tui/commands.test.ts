@@ -8,10 +8,11 @@ import {
 import { HELP_TEXT, routeInput } from '../../src/tui/store/reducer.js';
 
 describe('SLASH_COMMANDS registry', () => {
-  it('lists exactly the four commands, each with a description', () => {
+  it('lists exactly the five commands, each with a description', () => {
     expect(SLASH_COMMANDS.map((entry) => entry.name)).toEqual([
       '/help',
       '/runs',
+      '/artifacts',
       '/evals',
       '/exit',
     ]);
@@ -86,17 +87,18 @@ describe('registry drives routeInput and HELP_TEXT', () => {
     }
   });
 
-  it('HELP_TEXT is byte-identical to the pre-registry literal', () => {
+  it('HELP_TEXT is locked byte-for-byte (one aligned name column)', () => {
     expect(HELP_TEXT).toBe(
       [
         'Commands',
-        '  /help   Show this list',
-        '  /runs   Browse past run directories',
-        '  /evals  Run eval tasks',
-        '  /exit   Quit Sherlock',
+        '  /help       Show this list',
+        '  /runs       Browse past run directories',
+        "  /artifacts  Browse the last run's artifacts",
+        '  /evals      Run eval tasks',
+        '  /exit       Quit Sherlock',
         'Keys',
-        '  Esc     Cancel the current run',
-        '  Ctrl+C  Quit',
+        '  Esc         Cancel the current run',
+        '  Ctrl+C      Quit',
       ].join('\n'),
     );
   });

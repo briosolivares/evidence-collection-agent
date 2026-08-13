@@ -158,6 +158,19 @@ export function App({
         setRunEntries(scanRuns(config.runsBaseDir));
         dispatch({ type: 'open_runs' });
         return;
+      case 'artifacts':
+        // Re-render the panel for the most recent run and focus it —
+        // with or without a completion summary (cancelled and
+        // budget-exceeded runs keep their artifacts in state).
+        if (state.artifacts.length === 0) {
+          dispatch({
+            type: 'notice',
+            text: 'No artifacts to browse yet — run a task that publishes some first.',
+          });
+          return;
+        }
+        dispatch({ type: 'artifacts_focus' });
+        return;
       case 'evals':
         if (batchRunner === undefined) {
           dispatch({
@@ -240,18 +253,21 @@ export function App({
       )}
       {/* The completion summary: passive above the composer while idle,
           focused (input-owning) in artifacts mode. Between eval trials
-          the mode is evalsRunning, never idle, so no panel mid-batch. */}
-      {state.completedRun !== undefined &&
-        (state.mode === 'idle' || state.mode === 'artifacts') && (
-          <ArtifactsPanel
-            summary={state.completedRun}
-            artifacts={state.artifacts}
-            ui={state.artifactUi}
-            focused={state.mode === 'artifacts'}
-            runDir={state.completedRun.runDir}
-            dispatch={dispatch}
-          />
-        )}
+          the mode is evalsRunning, never idle, so no panel mid-batch.
+          /artifacts enters artifacts mode with no summary recorded (a
+          cancelled/budget-exceeded run's retained artifacts): the panel
+          then renders artifacts-only, and only while focused. */}
+      {(state.mode === 'artifacts' ||
+        (state.mode === 'idle' && state.completedRun !== undefined)) && (
+        <ArtifactsPanel
+          summary={state.completedRun}
+          artifacts={state.artifacts}
+          ui={state.artifactUi}
+          focused={state.mode === 'artifacts'}
+          runDir={state.completedRun?.runDir ?? state.lastRunDir}
+          dispatch={dispatch}
+        />
+      )}
       <Box flexDirection="column" marginTop={1}>
         <Composer
           disabled={state.mode !== 'idle'}

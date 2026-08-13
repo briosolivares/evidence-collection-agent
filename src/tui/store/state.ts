@@ -274,6 +274,10 @@ export interface SessionState {
   /** Summary of the last completed interactive run — the completion
    * panel's data and its render condition; cleared on run_started. */
   completedRun?: CompletedRunSummary;
+  /** Run dir of the most recent run whatever its outcome, retained as
+   * the run ends — /artifacts opens retained artifacts against it when
+   * no completion summary exists (cancelled / budget-exceeded runs). */
+  lastRunDir?: string;
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
   evalsActive?: boolean;
