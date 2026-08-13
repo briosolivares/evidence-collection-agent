@@ -89,6 +89,17 @@ describe('SYSTEM_PROMPT', () => {
     );
   });
 
+  it('teaches the multi-entity protocol: roster and contract before collecting, reconcile before finishing', () => {
+    expect(SYSTEM_PROMPT).toContain('plan before collecting');
+    expect(SYSTEM_PROMPT).toContain(
+      'write a roster of every entity to cover into a scratch/ file',
+    );
+    expect(SYSTEM_PROMPT).toContain('write the output contract');
+    expect(SYSTEM_PROMPT).toContain('enum-like values copied verbatim with nothing added');
+    expect(SYSTEM_PROMPT).toContain('reconcile the output against the roster');
+    expect(SYSTEM_PROMPT).toContain('its absence justified by observed evidence');
+  });
+
   it('teaches chunked writes: large files are built with append, in small pieces', () => {
     // The decode-stall workaround: single large write_file values stall at
     // deep context; pieces of a few thousand characters never have.
