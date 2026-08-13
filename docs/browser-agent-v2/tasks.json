@@ -242,13 +242,13 @@
     {
       "id": "T6",
       "title": "Add bounded page-scoped JavaScript",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T1",
         "T4"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "delegated subagent (primary agent integrates and verifies)",
+      "startedAt": "2026-08-13T14:40:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t6--add-bounded-page-scoped-javascript",
@@ -413,12 +413,12 @@
     {
       "id": "T10",
       "title": "Replace blind browser batches with receipted actions",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T9"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "delegated subagent (primary agent integrates and verifies)",
+      "startedAt": "2026-08-13T14:40:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t10--replace-blind-browser-batches-with-receipted-actions",
