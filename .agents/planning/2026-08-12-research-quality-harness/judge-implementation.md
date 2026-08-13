@@ -247,3 +247,18 @@ Observed judge behavior worth keeping:
   each) are invisible to the judge — roster completeness against the
   world is not verifiable from published evidence. Worker research-quality
   item, not a judge item.
+
+### Cycle-cap-raise rerun (wikipedia k=3, cap 3, 2026-08-13)
+
+91.7% again; no trial used cycle 3 (max used: 2), so the raise is
+untested-but-costless so far. The residual moved: trial 6f6058 was
+another judge-driven conversion (cycle-1 CONTINUE demanding ordinal
+proof → correct full Beevor entry → 4/4), but trial d74425 fell into the
+anchor-vs-ordinal trap (answered Holland 2008 off cite_note-275; the
+oracle's 275th displayed reference is a different note) and ITS judge
+said DONE at cycle 1 — the same criterion another trial's judge
+enforced. **Watch item: cycle-1 judge variance on positional/ordinal
+proof is now the wikipedia bottleneck, not the cycle cap.** Candidate
+mitigations if ever needed (user ruled current state fine, 2026-08-13):
+a generic ordinal-skepticism prompt line, or a 2-vote panel on DONE
+verdicts only.
