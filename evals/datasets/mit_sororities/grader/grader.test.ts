@@ -9,7 +9,9 @@ import { MIT_SORORITIES, type MitSororitiesOracle } from '../oracle/oracle.js';
 import { grade } from './grader.js';
 
 const ORACLE: MitSororitiesOracle = {
-  affiliations: MIT_SORORITIES, classes: [2026, 2027], minRows: 12, maxRows: 400,
+  affiliations: MIT_SORORITIES, classes: [2026, 2027],
+  optionalCohorts: [{ affiliation: 'Pi Beta Phi', classYear: 2026 }],
+  minRows: 11, maxRows: 400,
   minMajorCoverage: 0.5, minEnrichmentCoverage: 0.25,
 };
 let runDir: string;
@@ -42,6 +44,18 @@ describe('mit_sororities grader', () => {
   it('passes a local evidence copy covering all twelve cohorts plus a Sheet URL', async () => {
     writePassingArtifacts();
     expect((await grade(runDir, ORACLE)).every((result) => result.passed)).toBe(true);
+  });
+
+  it('waives an absent optional cohort (Pi Beta Phi 2026 is unsourced on the live web) but names it', async () => {
+    const withoutPiPhiSeniors = passingCsv().split('\n')
+      .filter((line) => !line.includes('Pi Beta Phi') || !line.includes(',2026,')).join('\n');
+    writeArtifact(runDir, 'artifacts/sorority_members.csv', Buffer.from(withoutPiPhiSeniors), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('https://docs.google.com/spreadsheets/d/sheet-id/edit'), { roles: ['requested_output'] });
+    const cohorts = byName(await grade(runDir, ORACLE), 'CSV has plausible rows and every sorority/class cohort is represented');
+    expect(cohorts.passed).toBe(true);
+    expect(cohorts.detail).toContain('11 required cohorts');
+    expect(cohorts.detail).toContain('absent but optional');
+    expect(cohorts.detail).toContain('Pi Beta Phi 2026');
   });
 
   it('rejects an extra CSV column and a missing cohort', async () => {

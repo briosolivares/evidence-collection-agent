@@ -101,14 +101,20 @@ function cohortAssertion(rows: MemberRow[], oracle: MitSororitiesOracle): Assert
   const invalidAffiliation = rows.filter((row) => row.affiliation === undefined).map((row) => row.rowNumber);
   if (invalidClass.length) problems.push(`invalid class in row(s) ${invalidClass.join(', ')}`);
   if (invalidAffiliation.length) problems.push(`invalid affiliation in row(s) ${invalidAffiliation.join(', ')}`);
-  const missing = oracle.affiliations.flatMap((affiliation) => oracle.classes
+  const isOptional = (affiliation: string, classYear: number): boolean =>
+    oracle.optionalCohorts.some((cohort) => cohort.affiliation === affiliation && cohort.classYear === classYear);
+  const absent = oracle.affiliations.flatMap((affiliation) => oracle.classes
     .filter((classYear) => !rows.some((row) => row.affiliation === affiliation && row.classYear === classYear))
-    .map((classYear) => `${affiliation} ${classYear}`));
+    .map((classYear) => ({ label: `${affiliation} ${classYear}`, optional: isOptional(affiliation, classYear) })));
+  const missing = absent.filter((cohort) => !cohort.optional).map((cohort) => cohort.label);
+  const waived = absent.filter((cohort) => cohort.optional).map((cohort) => cohort.label);
   if (missing.length) problems.push(`missing cohort(s): ${missing.join(', ')}`);
+  const waivedNote = waived.length ? `; absent but optional (unsourced on the live web): ${waived.join(', ')}` : '';
+  const requiredCount = oracle.affiliations.length * oracle.classes.length - oracle.optionalCohorts.length;
   return {
     name: COHORT_ASSERTION_NAME,
     passed: problems.length === 0,
-    detail: problems.length ? problems.join('; ') : `${rows.length} rows cover all ${oracle.affiliations.length * oracle.classes.length} cohorts`,
+    detail: (problems.length ? problems.join('; ') : `${rows.length} rows cover all ${requiredCount} required cohorts`) + waivedNote,
   };
 }
 
@@ -175,7 +181,9 @@ function asOracle(data: unknown): MitSororitiesOracle {
   const value = data as Partial<MitSororitiesOracle> | null;
   if (!value || !Array.isArray(value.affiliations) || value.affiliations.length !== 6 ||
       !value.affiliations.every((item) => typeof item === 'string') || !Array.isArray(value.classes) ||
-      value.classes.length !== 2 || typeof value.minRows !== 'number' || typeof value.maxRows !== 'number' ||
+      value.classes.length !== 2 || !Array.isArray(value.optionalCohorts) ||
+      !value.optionalCohorts.every((item) => typeof item?.affiliation === 'string' && typeof item?.classYear === 'number') ||
+      typeof value.minRows !== 'number' || typeof value.maxRows !== 'number' ||
       typeof value.minMajorCoverage !== 'number' || typeof value.minEnrichmentCoverage !== 'number') {
     throw new Error('mit_sororities grader was handed malformed oracle data');
   }
