@@ -39,33 +39,33 @@
     {
       "id": "T1",
       "title": "Make model responses trustworthy",
-      "status": "not_started",
+      "status": "complete",
       "dependsOn": [],
-      "owner": null,
-      "startedAt": null,
-      "completedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T12:35:18-07:00",
+      "completedAt": "2026-08-13T12:55:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t1--make-model-responses-trustworthy",
       "features": [
         {
           "id": "T1.1",
           "description": "Require terminal message_delta, non-error stop reason, message_stop, and closed supported content blocks.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T1.2",
           "description": "Buffer attempts before history or execution; retry one max_tokens response without committing the rejected attempt.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T1.3",
           "description": "Use one cancellable ModelDriver for production and TUI request/stream handling.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T1.4",
           "description": "Enforce finite call/output limits, maxToolCallsPerTurn, and the combined tool-result byte cap before side effects or the next request.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [

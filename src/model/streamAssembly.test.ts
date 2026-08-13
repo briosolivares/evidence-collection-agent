@@ -322,6 +322,55 @@ describe('assembleModelResponse', () => {
     });
   });
 
+  it('rejects EOF after closed blocks but before the terminal message_delta', async () => {
+    // Every block closed, then the connection dies before the server ever
+    // reports a stop reason: still a truncated stream, never a completed
+    // response with stop_reason null.
+    const events: ModelStreamEvent[] = [
+      messageStart(usage(10, 1, null)),
+      {
+        type: 'content_block_start',
+        index: 0,
+        content_block: { type: 'text', text: '', citations: null },
+      },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Looks done.' } },
+      { type: 'content_block_stop', index: 0 },
+      // connection drops here — no message_delta, no message_stop
+    ];
+
+    await expect(assembleModelResponse(replay(events))).rejects.toMatchObject({
+      name: 'TruncatedStreamError',
+    });
+    await expect(assembleModelResponse(replay(events))).rejects.toThrow(/stop reason/);
+  });
+
+  it('rejects EOF after message_delta but before message_stop', async () => {
+    const events: ModelStreamEvent[] = [
+      messageStart(usage(10, 1, null)),
+      {
+        type: 'content_block_start',
+        index: 0,
+        content_block: { type: 'text', text: '', citations: null },
+      },
+      { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Almost.' } },
+      { type: 'content_block_stop', index: 0 },
+      messageDelta('end_turn', {
+        cache_creation_input_tokens: 0,
+        cache_read_input_tokens: 0,
+        input_tokens: 10,
+        output_tokens: 4,
+        output_tokens_details: null,
+        server_tool_use: null,
+      }),
+      // connection drops here — no message_stop
+    ];
+
+    await expect(assembleModelResponse(replay(events))).rejects.toMatchObject({
+      name: 'TruncatedStreamError',
+    });
+    await expect(assembleModelResponse(replay(events))).rejects.toThrow(/message_stop/);
+  });
+
   it('keeps deterministic failures as plain Errors — never TruncatedStreamError', async () => {
     // Retrying an unsupported block or bad tool JSON reproduces it; the
     // retry loop must be able to tell these apart from truncation by name.

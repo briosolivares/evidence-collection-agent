@@ -44,7 +44,7 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 
 | Task | Status | Owner | Last commit | Summary |
 | --- | --- | --- | --- | --- |
-| T1 | not_started | — | — | Trustworthy shared model driver |
+| T1 | complete | claude (impl session) | see log | Trustworthy shared model driver |
 | T2 | not_started | — | — | Persistent worker and truthful outcomes |
 | T3 | not_started | — | — | Typed verifier result |
 | T4 | not_started | — | — | Typed output contract |
@@ -85,6 +85,32 @@ When work begins, replace the sentence above with one section per active task:
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 12:55 — T1 complete
+
+- Owner: claude (browser-agent-v2 impl session)
+- Branch/worktree: `feat/browser-agent-v2` at `evidence-collection-agent-v2-impl`
+- Commit: recorded with this entry
+- Features: T1.1–T1.4 complete
+- Changed: added `src/model/modelDriver.ts` (strict cancellable ModelDriver,
+  `validateModelResponseForExecution`, typed `ModelResponseRejectedError`,
+  single enlarged max_tokens re-ask); `assembleModelResponse` now requires the
+  terminal message_delta stop reason and message_stop (EOF after closed blocks
+  is truncation); `makeCallModel` is an adapter over the driver;
+  `runSession.ts` dropped its duplicated stream assembly and uses the driver;
+  `runAgentLoop` handles rejections (protocol corrections capped at 3, context
+  exhaustion → budget_exceeded, refusal → failed) and `capResultBatch` offloads
+  small results note-only instead of returning an over-limit message.
+- Delegated: two read-only Explore agents (harness map, browser map); no code
+  delegation.
+- Verified:
+  - `npx vitest run src/model/streamAssembly.test.ts src/model/modelDriver.test.ts src/model/callModel.test.ts src/model/callWithRetry.test.ts src/loop/agentLoop.test.ts tests/tui/run-session.test.ts` — pass (109 tests)
+  - `npm run typecheck` — pass
+  - `npm test` — pass (103 files, 910 tests)
+- Time check: `TIME_CHECK start=1786649718 now=1786650857 elapsed=00h:18m:59s remaining=01h:41m:01s`
+- Remaining: none for T1
+- Notes: `maxToolCallsPerTurn` defaults to 16 in the driver; per-turn rejection
+  (not scheduler queueing) is the new enforcement point.
 
 <!--
 ### YYYY-MM-DD HH:MM — T<id> <status change>
@@ -139,9 +165,9 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: none
-- Safe next task: T1
-- Parallel work currently unlocked: none; T9 becomes available after T1
+- Last completed task: T1
+- Safe next task: T2 (sequential core); T9 is now unlocked for parallel work
+- Parallel work currently unlocked: T9 (browser identity) in a separate area
 - Known local state: `docs/adversarial-review-revised-browser-agent-proposal.md`
   is an untracked review input and must remain untouched unless explicitly
   requested

@@ -31,7 +31,9 @@ describe('cancellation artifacts', () => {
       sawDelta = resolve;
     });
 
-    async function* hangingStream(signal: AbortSignal): AsyncGenerator<ModelStreamEvent> {
+    async function* hangingStream(
+      signal: AbortSignal | undefined,
+    ): AsyncGenerator<ModelStreamEvent> {
       yield* scriptedResponse([{ type: 'text', text: 'Investigating ' }], {
         input: 1,
         output: 1,
@@ -40,6 +42,7 @@ describe('cancellation artifacts', () => {
       await new Promise((_resolve, reject) => {
         const abort = () =>
           reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+        if (signal === undefined) return;
         if (signal.aborted) abort();
         else signal.addEventListener('abort', abort, { once: true });
       });

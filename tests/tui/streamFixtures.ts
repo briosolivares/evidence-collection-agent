@@ -88,11 +88,11 @@ export async function* streamOf(
  * order, and records the params/signal of each call.
  */
 export function scriptedStreamFactory(responses: ModelStreamEvent[][]) {
-  const calls: { params: unknown; signal: AbortSignal }[] = [];
+  const calls: { params: unknown; signal: AbortSignal | undefined }[] = [];
   let next = 0;
   return {
     calls,
-    createStream: (params: unknown, signal: AbortSignal) => {
+    createStream: (params: unknown, signal: AbortSignal | undefined) => {
       calls.push({ params, signal });
       const events = responses[next];
       if (events === undefined) {

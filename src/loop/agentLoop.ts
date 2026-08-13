@@ -2,6 +2,10 @@ import { Buffer } from 'node:buffer';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import {
+  isModelResponseRejectedError,
+  isProtocolCorrectableRejection,
+} from '../model/modelDriver.js';
 import { appendTranscriptEvent } from '../run/transcript.js';
 import {
   MAX_TOOL_RESULTS_PER_MESSAGE_BYTES,
@@ -16,6 +20,7 @@ import type {
   AssistantContentBlock,
   CallModel,
   Message,
+  ModelResponse,
   TextBlock,
   ToolResultBlock,
   ToolUseBlock,
@@ -23,6 +28,16 @@ import type {
 
 /** Name of the metrics file the loop writes into the run directory. */
 export const METRICS_FILENAME = 'metrics.json';
+
+/**
+ * How many rejected-response protocol corrections one run may spend. A
+ * rejected attempt (too many tool calls, malformed call, output-limit
+ * overflow — see modelDriver's protocol-correctable reasons) costs a turn
+ * and appends only a short correction; the rejected content itself never
+ * enters history. The cap keeps a model stuck in a rejection loop from
+ * burning the whole budget on corrections.
+ */
+export const MAX_PROTOCOL_CORRECTIONS_PER_RUN = 3;
 
 /**
  * The loop's entire memory of a run: the conversation so far and how many
@@ -237,6 +252,7 @@ export async function runAgentLoop(
     cacheCreationInputTokens: 0,
   };
   let peakContextTokens = 0;
+  let protocolCorrections = 0;
   const toolCtx: ToolCtx = {
     runDir: deps.runDir,
     browser: deps.browser,
@@ -281,7 +297,48 @@ export async function runAgentLoop(
       // extends the conversation afterwards.
       const requestMessages = elideStaleInspectResults(state.messages);
       appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: requestMessages });
-      const response = await deps.callModel(requestMessages);
+      let response: ModelResponse;
+      try {
+        response = await deps.callModel(requestMessages);
+      } catch (error) {
+        // A strict-driver rejection: the whole response was discarded
+        // before history or execution (T1). Record it, charge its usage,
+        // and either end truthfully or hand the same conversation a short
+        // protocol correction — never the rejected content.
+        if (!isModelResponseRejectedError(error)) throw error;
+        appendTranscriptEvent(deps.runDir, {
+          type: 'model_response_rejected',
+          turn,
+          reason: error.reason,
+          message: error.message,
+        });
+        if (error.usage !== undefined) {
+          totals.inputTokens += error.usage.input_tokens;
+          totals.outputTokens += error.usage.output_tokens;
+          totals.cacheReadInputTokens += error.usage.cache_read_input_tokens ?? 0;
+          totals.cacheCreationInputTokens += error.usage.cache_creation_input_tokens ?? 0;
+        }
+        if (error.reason === 'context_exhausted') {
+          return finish({ status: 'budget_exceeded', reason: 'context_budget' });
+        }
+        if (
+          isProtocolCorrectableRejection(error.reason) &&
+          protocolCorrections < MAX_PROTOCOL_CORRECTIONS_PER_RUN
+        ) {
+          protocolCorrections += 1;
+          state.messages.push({
+            role: 'user',
+            content: [{ type: 'text', text: error.protocolFeedback }],
+          });
+          // The rejected call still consumed a turn; honor the guard
+          // before asking again.
+          if (turn >= config.maxTurns) {
+            return finish({ status: 'budget_exceeded', reason: 'max_turns' });
+          }
+          continue;
+        }
+        throw error;
+      }
       appendTranscriptEvent(deps.runDir, { type: 'model_response', turn, response });
 
       totals.inputTokens += response.usage.input_tokens;
@@ -382,19 +439,27 @@ function extractText(content: readonly AssistantContentBlock[]): string {
     .join('\n');
 }
 
+/** Below this size a note-only offload replacement (~250 bytes of JSON)
+ * cannot shrink a result, so offloading it would grow the message. Only
+ * reachable with hundreds of tiny results in one batch. */
+const OFFLOAD_REPLACEMENT_FLOOR_BYTES = 320;
+
 /**
  * Bound one message's combined tool-result bytes (the per-message batch
  * cap). Each result already passed the pipeline's per-result cap, but a
  * batch of individually-legal results can still flood one user message —
  * 5 parallel reads × 50k bytes is ~250k. While the batch's combined
  * content exceeds MAX_TOOL_RESULTS_PER_MESSAGE_BYTES, the largest
- * not-yet-offloaded result is written to a scratch/tool-output/ file (manifest
- * hash and preview preserved, same replacement shape as the per-result
- * cap) — the remedy is offload, the run keeps going. Results at or under
- * preview size are never offloaded (replacing them couldn't shrink the
- * batch), so a pathological batch of many tiny results passes through
- * over-cap rather than looping; the returned array always matches
- * `results` positionally, untouched entries by identity.
+ * not-yet-offloaded result is written to a scratch/tool-output/ file
+ * (manifest hash preserved, same replacement shape as the per-result cap)
+ * — the remedy is offload, the run keeps going. Results above preview size
+ * keep a preview; once previews alone cannot shrink the message under the
+ * cap, remaining results are offloaded with a compact path/note-only
+ * replacement (no preview) so many individually small results still cannot
+ * produce a deliberately over-limit message. The loop stops only when
+ * every result too small for offloading to help has been considered; the
+ * returned array always matches `results` positionally, untouched entries
+ * by identity.
  */
 function capResultBatch(
   runDir: string,
@@ -412,18 +477,25 @@ function capResultBatch(
       if (offloaded.has(index)) continue;
       if (largest === -1 || sizes[index]! > sizes[largest]!) largest = index;
     }
-    if (largest === -1 || sizes[largest]! <= PREVIEW_MAX_BYTES) break;
+    // Stop only when no remaining result is large enough for a replacement
+    // to shrink it — physically unreachable short of hundreds of tiny
+    // results, and never a deliberate over-limit return.
+    if (largest === -1 || sizes[largest]! <= OFFLOAD_REPLACEMENT_FLOOR_BYTES) break;
 
     // Offload file names come from the model-supplied tool name here (the
     // pipeline's capResult gets registry names); sanitize so an unknown-tool
     // result can never smuggle path separators into the offload dir.
     const safeToolName = calls[largest]!.name.replace(/[^A-Za-z0-9_-]/g, '_');
+    // Once a result no longer exceeds preview size, a preview would repeat
+    // most of the content — the replacement keeps only the path + note.
+    const previewBytes = sizes[largest]! > PREVIEW_MAX_BYTES ? PREVIEW_MAX_BYTES : 0;
     const replacement = JSON.stringify(offloadResult(
       runDir,
       safeToolName,
       bounded[largest]!.content,
       `over the ${MAX_TOOL_RESULTS_PER_MESSAGE_BYTES}-byte combined limit ` +
         "for one message's tool results",
+      previewBytes,
     ));
     bounded[largest] = { ...bounded[largest]!, content: replacement };
     total -= sizes[largest]!;

@@ -5,30 +5,26 @@
 // The load-bearing seam: passing `config.callModel` to runTask silently
 // bypasses `config.onProgress` (the core only wires onProgress into its
 // *default* client). This module's injected callModel therefore re-emits
-// all four progress events itself — turn_start, text_delta,
-// tool_use_start (as tool_pending), turn_end — via the core's exported
-// buildRequestParams + assembleModelResponse around an abortable SDK
-// stream. Aborting rejects the in-flight model call; the error propagates
-// out of the loop (no interior catch) through runTask's `finally` (tab
-// closed, manifest finalized) and rejects the runTask promise.
+// the progress events itself — turn_start, text_delta, tool_use_start (as
+// tool_pending), turn_end — around the same strict ModelDriver runTask's
+// default client uses (createAnthropicModelDriver): TUI and non-TUI
+// callers differ only in callbacks and cancellation, never in request or
+// acceptance semantics. Aborting rejects the in-flight model call; the
+// error propagates out of the loop (no interior catch) through runTask's
+// `finally` (tab closed, manifest finalized) and rejects the runTask
+// promise. Deltas from an attempt the driver later rejects are ephemeral
+// live output only — rejected attempts never reach the transcript or the
+// conversation.
 
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
 
 import type { BrowserController } from '../../browser/controller.js';
 import type { CallModel } from '../../loop/messages.js';
 import { runTask, type RunTaskConfig, type RunTaskResult } from '../../cli/runTask.js';
 import { SYSTEM_PROMPT } from '../../cli/systemPrompt.js';
-import {
-  buildRequestParams,
-  DEFAULT_MODEL,
-  makeAnthropicClient,
-  type CallModelConfig,
-} from '../../model/callModel.js';
-import { callWithRetry } from '../../model/callWithRetry.js';
-import {
-  assembleModelResponse,
-  type ModelStreamEvent,
-} from '../../model/streamAssembly.js';
+import { DEFAULT_MODEL } from '../../model/callModel.js';
+import { createAnthropicModelDriver } from '../../model/modelDriver.js';
+import type { ModelStreamEvent } from '../../model/streamAssembly.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import {
@@ -86,7 +82,7 @@ export interface RunSessionDeps {
    * default creates an Anthropic SDK stream carrying the abort signal. */
   createStream?: (
     params: Anthropic.Messages.MessageStreamParams,
-    signal: AbortSignal,
+    signal: AbortSignal | undefined,
   ) => AsyncIterable<ModelStreamEvent>;
   /** Test seam: clock for event stamps. */
   now?: () => number;
@@ -116,27 +112,17 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const { signal } = controller;
   const toolProfile = deps.toolProfile ?? DEFAULT_TOOL_PROFILE;
 
-  // Lazy: constructing the SDK client can throw (missing API key); doing
-  // it inside the first model call routes that failure through the normal
-  // run_failed path instead of crashing submit.
-  let client: Anthropic | undefined;
-  const createStream =
-    deps.createStream ??
-    ((
-      params: Anthropic.Messages.MessageStreamParams,
-      streamSignal: AbortSignal,
-    ) => {
-      // maxRetries: 0 — callWithRetry below is the single retry authority.
-      client ??= makeAnthropicClient();
-      return client.messages.stream(params, { signal: streamSignal });
-    });
-
-  const modelConfig: CallModelConfig = {
+  // The shared strict driver — the exact acceptance, retry, and request
+  // semantics runTask's default client uses. Client construction stays
+  // lazy inside the driver (a missing API key fails the first model call
+  // and routes through the normal run_failed path, not submit).
+  const driver = createAnthropicModelDriver({
     model: deps.model ?? DEFAULT_MODEL,
     system: SYSTEM_PROMPT,
     apiToolDefs: buildApiToolDefs(toolProfile),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
-  };
+    ...(deps.createStream === undefined ? {} : { createStream: deps.createStream }),
+  });
 
   let turn = 0;
   const callModel: CallModel = async (messages) => {
@@ -147,35 +133,37 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
     const thisTurn = turn;
     emit({ type: 'turn_start', turn: thisTurn });
 
-    // Retry span covers stream creation AND consumption (mid-stream
-    // failures only retry by re-creating the stream); an abort rejects
+    // The driver retries transport failures across stream creation AND
+    // consumption and re-asks one max_tokens overflow; an abort rejects
     // immediately, including out of a backoff sleep. A retried attempt may
     // re-emit text_deltas the failed attempt already streamed — accepted
-    // cosmetic wart (see ProgressEvent in callModel.ts).
-    const response = await callWithRetry(
-      async () => {
-        const stream = createStream(buildRequestParams(modelConfig, messages), signal);
-        return await assembleModelResponse(stream, (event) => {
+    // cosmetic wart (see ProgressEvent in callModel.ts); a rejected
+    // attempt's deltas are never committed anywhere downstream.
+    const accepted = await driver
+      .generate({
+        messages,
+        signal,
+        onEvent: (event) => {
           if (event.type === 'text_delta') {
             emit({ type: 'text_delta', text: event.text });
-          } else {
+          } else if (event.type === 'tool_use_start') {
             emit({ type: 'tool_pending', name: event.toolName });
           }
-        });
-      },
-      { signal },
-    ).catch((error: unknown) => {
-      // Any failure observed after abort IS the cancellation. Normalize
-      // its name — the SDK's abort error keeps the default 'Error', and a
-      // killed stream can surface as truncation — so the loop's abort
-      // carve-out (cancelled runs get no failed-metrics bookkeeping)
-      // fires regardless of shape.
-      if (signal.aborted && !(error instanceof Error && error.name === 'AbortError')) {
-        throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
-      }
-      throw error;
-    });
+        },
+      })
+      .catch((error: unknown) => {
+        // Any failure observed after abort IS the cancellation. Normalize
+        // its name — the SDK's abort error keeps the default 'Error', and a
+        // killed stream can surface as truncation — so the loop's abort
+        // carve-out (cancelled runs get no failed-metrics bookkeeping)
+        // fires regardless of shape.
+        if (signal.aborted && !(error instanceof Error && error.name === 'AbortError')) {
+          throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
+        }
+        throw error;
+      });
 
+    const response = accepted.response;
     emit({
       type: 'turn_end',
       usage: {

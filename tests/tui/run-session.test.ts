@@ -248,7 +248,9 @@ describe('startRun (RunSession bridge)', () => {
     });
 
     // A stream that yields some prose, then hangs until the signal aborts.
-    async function* hangingStream(signal: AbortSignal): AsyncGenerator<ModelStreamEvent> {
+    async function* hangingStream(
+      signal: AbortSignal | undefined,
+    ): AsyncGenerator<ModelStreamEvent> {
       const opening = scriptedResponse([{ type: 'text', text: 'Working on ' }], {
         input: 1,
         output: 1,
@@ -258,6 +260,7 @@ describe('startRun (RunSession bridge)', () => {
       await new Promise((_resolve, reject) => {
         const abort = () =>
           reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+        if (signal === undefined) return;
         if (signal.aborted) abort();
         else signal.addEventListener('abort', abort, { once: true });
       });
@@ -352,7 +355,7 @@ describe('startRun (RunSession bridge)', () => {
     await handle.done;
     expect(factory.calls).toHaveLength(1);
     expect(factory.calls[0]?.signal).toBeInstanceOf(AbortSignal);
-    expect(factory.calls[0]?.signal.aborted).toBe(false);
+    expect(factory.calls[0]?.signal?.aborted).toBe(false);
   });
 });
 

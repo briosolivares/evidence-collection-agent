@@ -3,8 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { isElisionStub } from '../loop/contextView.js';
 import type { CallModel, Message, Usage } from '../loop/messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import { callWithRetry } from './callWithRetry.js';
-import { assembleModelResponse } from './streamAssembly.js';
+import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
 // CallModel contract the T7 fake satisfies, so it drops into the loop
@@ -78,6 +77,14 @@ export interface CallModelConfig {
   maxOutputTokens: number;
   /** Optional live-progress callback (see ProgressEvent). */
   onProgress?: (event: ProgressEvent) => void;
+  /** Cancellation carried into streaming and retry backoff. */
+  signal?: AbortSignal;
+  /** Per-response tool-call cap; the driver's default when omitted. */
+  maxToolCallsPerTurn?: number;
+  /** Larger allowance for the driver's single max_tokens re-ask. */
+  maxTokensRetryOutputTokens?: number;
+  /** Test seam passed through to the driver (see ModelDriverConfig). */
+  createStream?: ModelDriverConfig['createStream'];
 }
 
 /**
@@ -203,24 +210,40 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
 }
 
 /**
- * Create the production CallModel: a closure over an Anthropic client and
- * the fixed prompt configuration.
+ * Create the production CallModel: a temporary adapter over the strict
+ * ModelDriver (createAnthropicModelDriver), kept so existing call sites
+ * keep their CallModel seam while callers migrate to the driver directly.
  *
  * @param config - see CallModelConfig; the returned function sends
  *   config.system + config.apiToolDefs as the stable cached prefix on
  *   every call. Credentials come from the environment (ANTHROPIC_API_KEY,
  *   or the SDK's other ambient sources) — calls fail without them
- * @returns a CallModel that streams every request, assembles the complete
- *   ModelResponse from the stream (content blocks including tool_use
- *   inputs, stop_reason, usage including cache_read_input_tokens), retries
- *   transient failures across the whole create-and-consume span (see
- *   callWithRetry; retry attempts surface as `retry` progress events), and
- *   reports progress through config.onProgress (see ProgressEvent),
- *   numbering turns from 1 across its own invocations. The messages
+ * @returns a CallModel that streams every request through the shared
+ *   driver: the complete ModelResponse is assembled (strictly — the
+ *   terminal message_delta/message_stop are required), transient failures
+ *   retry across the whole create-and-consume span (surfacing as `retry`
+ *   progress events), one structurally complete max_tokens response is
+ *   re-asked once with a larger allowance, and every returned response has
+ *   passed validateModelResponseForExecution — a truncated, refused, or
+ *   malformed response rejects (ModelResponseRejectedError) instead of
+ *   returning. Progress arrives through config.onProgress (see
+ *   ProgressEvent), turns numbered from 1 across invocations. The messages
  *   argument is never mutated
  */
 export function makeCallModel(config: CallModelConfig): CallModel {
-  const client = makeAnthropicClient();
+  const driver = createAnthropicModelDriver({
+    ...(config.model === undefined ? {} : { model: config.model }),
+    system: config.system,
+    apiToolDefs: config.apiToolDefs,
+    maxOutputTokens: config.maxOutputTokens,
+    ...(config.maxToolCallsPerTurn === undefined
+      ? {}
+      : { maxToolCallsPerTurn: config.maxToolCallsPerTurn }),
+    ...(config.maxTokensRetryOutputTokens === undefined
+      ? {}
+      : { maxTokensRetryOutputTokens: config.maxTokensRetryOutputTokens }),
+    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
+  });
   let turnCount = 0;
 
   return async (messages) => {
@@ -228,25 +251,33 @@ export function makeCallModel(config: CallModelConfig): CallModel {
     const turn = turnCount;
     config.onProgress?.({ type: 'turn_start', turn });
 
-    // The retry span covers stream creation AND consumption: mid-stream
-    // failures (SSE error events, dropped connections) throw out of the
-    // assembly iteration, and only re-creating the stream retries them.
-    const response = await callWithRetry(
-      async () => {
-        const stream = client.messages.stream(buildRequestParams(config, messages));
-        return await assembleModelResponse(stream, (event) => {
-          if (event.type === 'text_delta') {
-            config.onProgress?.({ type: 'text_delta', turn, text: event.text });
-          } else {
-            config.onProgress?.({ type: 'tool_use_start', turn, toolName: event.toolName });
-          }
-        });
+    const accepted = await driver.generate({
+      messages,
+      ...(config.signal === undefined ? {} : { signal: config.signal }),
+      onEvent: (event) => {
+        // Attempt-scoped driver events map onto the legacy turn-scoped
+        // ProgressEvents; a rejected attempt's deltas may already have
+        // streamed (the documented cosmetic wart) but its content is never
+        // returned, so nothing rejected can be committed downstream.
+        if (event.type === 'text_delta') {
+          config.onProgress?.({ type: 'text_delta', turn, text: event.text });
+        } else if (event.type === 'tool_use_start') {
+          config.onProgress?.({ type: 'tool_use_start', turn, toolName: event.toolName });
+        } else if (event.type === 'retry') {
+          config.onProgress?.({
+            type: 'retry',
+            turn,
+            attempt: event.attempt,
+            maxAttempts: event.maxAttempts,
+            delayMs: event.delayMs,
+            reason: event.reason,
+          });
+        }
       },
-      { onRetry: (info) => config.onProgress?.({ type: 'retry', turn, ...info }) },
-    );
+    });
 
-    config.onProgress?.({ type: 'turn_end', turn, usage: response.usage });
-    return response;
+    config.onProgress?.({ type: 'turn_end', turn, usage: accepted.response.usage });
+    return accepted.response;
   };
 }
 

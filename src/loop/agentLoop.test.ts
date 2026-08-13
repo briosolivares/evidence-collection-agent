@@ -5,11 +5,13 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
+import { ModelResponseRejectedError } from '../model/modelDriver.js';
 import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import { fileTools } from '../tools/index.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
 import {
+  MAX_PROTOCOL_CORRECTIONS_PER_RUN,
   METRICS_FILENAME,
   runAgentLoop,
   type LoopConfig,
@@ -602,6 +604,126 @@ describe('runAgentLoop per-message batch cap', () => {
       .filter((event) => event.type === 'tool_result');
     expect(toolResults[0].result.content).toBe(contents[0]);
     expect(toolResults[2].result.content).toBe(contents[2]);
+  });
+
+  it('offloads many individually small results with note-only replacements rather than returning an over-limit message', async () => {
+    // 130 × 1.9k = 247k, every result under the 2k preview size — the old
+    // behavior passed the batch through over-cap; now the excess offloads
+    // with compact path/note replacements (no preview).
+    const sizes = Array.from({ length: 130 }, () => 1_900);
+    const { callModel, requests } = scriptModel([
+      toolResponse(blobCalls(sizes)),
+      textResponse('Done.'),
+    ]);
+    await runAgentLoop(TASK, { callModel, registry: blobRegistry(), runDir }, ROOMY);
+
+    const feedback = requests[1][2];
+    const contents = feedback.content.map((block) => (block as { content: string }).content);
+    const combined = contents.reduce(
+      (sum, content) => sum + Buffer.byteLength(content, 'utf8'),
+      0,
+    );
+    expect(combined).toBeLessThanOrEqual(200_000);
+
+    const offloadedContents = contents.filter((content) => content.startsWith('{'));
+    expect(offloadedContents.length).toBeGreaterThan(0);
+    const first = JSON.parse(offloadedContents[0]) as {
+      preview: string;
+      offloadedTo: string;
+      note: string;
+    };
+    expect(first.preview).toBe('');
+    expect(first.note).toContain('combined limit');
+    expect(readFileSync(join(runDir, first.offloadedTo), 'utf8')).toBe('x'.repeat(1_900));
+    // Untouched results pass through by identity.
+    const untouched = contents.filter((content) => !content.startsWith('{'));
+    for (const content of untouched) expect(content).toBe('x'.repeat(1_900));
+  });
+});
+
+describe('runAgentLoop rejected model responses', () => {
+  function rejection(
+    reason: ConstructorParameters<typeof ModelResponseRejectedError>[0],
+    feedback = 'Your previous response was discarded. Adjust and continue.',
+  ): ModelResponseRejectedError {
+    return new ModelResponseRejectedError(reason, `scripted ${reason} rejection`, feedback, {
+      input_tokens: 7,
+      output_tokens: 3,
+    });
+  }
+
+  /** A callModel serving a script of responses OR throwable rejections. */
+  function scriptWithRejections(script: Array<ModelResponse | ModelResponseRejectedError>): {
+    callModel: (messages: readonly Message[]) => Promise<ModelResponse>;
+    requests: Message[][];
+  } {
+    const requests: Message[][] = [];
+    const callModel = async (messages: readonly Message[]): Promise<ModelResponse> => {
+      requests.push(structuredClone(messages) as Message[]);
+      const next = script[requests.length - 1];
+      if (next === undefined) throw new Error('script exhausted');
+      if (next instanceof ModelResponseRejectedError) throw next;
+      return next;
+    };
+    return { callModel, requests };
+  }
+
+  it('a protocol-correctable rejection appends only the correction — never the rejected content', async () => {
+    const feedback = 'Too many tool calls; use fewer per turn.';
+    const { callModel, requests } = scriptWithRejections([
+      rejection('too_many_tool_calls', feedback),
+      textResponse('Recovered.'),
+    ]);
+    const result = await runAgentLoop(
+      TASK,
+      { callModel, registry: echoRegistry([]), runDir },
+      ROOMY,
+    );
+
+    expect(result).toEqual({ status: 'completed', finalText: 'Recovered.' });
+    // The retry request holds the task and the correction — no assistant
+    // message exists for the rejected attempt.
+    expect(requests[1]).toEqual([
+      { role: 'user', content: [{ type: 'text', text: TASK }] },
+      { role: 'user', content: [{ type: 'text', text: feedback }] },
+    ]);
+    const transcript = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
+    expect(transcript).toContain('model_response_rejected');
+    // The rejected attempt's usage still counts toward the run totals.
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics.inputTokens).toBe(7 + DEFAULT_USAGE.input_tokens);
+    expect(metrics.outputTokens).toBe(3 + DEFAULT_USAGE.output_tokens);
+  });
+
+  it('context exhaustion ends the run as budget_exceeded, not completed', async () => {
+    const { callModel } = scriptWithRejections([rejection('context_exhausted')]);
+    const result = await runAgentLoop(
+      TASK,
+      { callModel, registry: echoRegistry([]), runDir },
+      ROOMY,
+    );
+    expect(result).toEqual({ status: 'budget_exceeded', reason: 'context_budget' });
+  });
+
+  it('a refusal cannot complete the run — the loop fails with failed metrics', async () => {
+    const { callModel } = scriptWithRejections([rejection('refusal')]);
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toMatchObject({ name: 'ModelResponseRejectedError', reason: 'refusal' });
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics.status).toBe('failed');
+  });
+
+  it('corrections are bounded: the rejection after the cap propagates', async () => {
+    const script = Array.from(
+      { length: MAX_PROTOCOL_CORRECTIONS_PER_RUN + 1 },
+      () => rejection('malformed_tool_call'),
+    );
+    const { callModel, requests } = scriptWithRejections(script);
+    await expect(
+      runAgentLoop(TASK, { callModel, registry: echoRegistry([]), runDir }, ROOMY),
+    ).rejects.toMatchObject({ reason: 'malformed_tool_call' });
+    expect(requests).toHaveLength(MAX_PROTOCOL_CORRECTIONS_PER_RUN + 1);
   });
 });
 

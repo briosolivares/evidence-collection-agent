@@ -101,20 +101,26 @@ type OpenBlock =
  *
  * @param events - the events of exactly one streamed Messages API response,
  *   in wire order (a live SDK stream or a fixture). Must contain a
- *   message_start, and every content block must be closed by a
- *   content_block_stop before the stream ends; throws TruncatedStreamError
- *   on a stream that ends early, and a plain Error on a malformed stream or
- *   any content block the loop cannot carry (anything other than text and
- *   tool_use — e.g. thinking blocks, which the request avoids by disabling
- *   thinking)
+ *   message_start, every content block must be closed by a
+ *   content_block_stop, a message_delta must have reported a non-null
+ *   stop_reason, and a message_stop must arrive before the stream ends —
+ *   the full wire shape of a complete response. EOF after closed blocks but
+ *   before the terminal message_delta/message_stop is still a truncated
+ *   stream: the server never said the response was finished, so treating it
+ *   as complete would let a dropped connection masquerade as a short
+ *   answer. Throws TruncatedStreamError on any stream that ends early, and
+ *   a plain Error on a malformed stream or any content block the loop
+ *   cannot carry (anything other than text and tool_use — e.g. thinking
+ *   blocks, which the request avoids by disabling thinking)
  * @param onProgress - optional; invoked synchronously for each text
  *   fragment and each tool-call start, in stream order (see
  *   StreamProgressEvent)
  * @returns the response the events describe: content blocks in stream
  *   order with each tool_use input parsed from its accumulated JSON deltas
- *   (an input with no deltas is `{}`), stop_reason as reported (null if the
- *   stream never reported one), and usage taken from the final
- *   message_delta where reported, falling back to message_start values
+ *   (an input with no deltas is `{}`), stop_reason as reported (always
+ *   non-null — a stream that never reported one is truncated), and usage
+ *   taken from the final message_delta where reported, falling back to
+ *   message_start values
  */
 export async function assembleModelResponse(
   events: AsyncIterable<ModelStreamEvent>,
@@ -125,6 +131,7 @@ export async function assembleModelResponse(
   let startUsage: Anthropic.Messages.Usage | undefined;
   let deltaUsage: Anthropic.Messages.MessageDeltaUsage | undefined;
   let stopReason: string | null = null;
+  let sawMessageStop = false;
 
   const assemblyStart = performance.now();
   let firstEventAtMs: number | undefined;
@@ -232,6 +239,7 @@ export async function assembleModelResponse(
         break;
 
       case 'message_stop':
+        sawMessageStop = true;
         break;
     }
   }
@@ -245,6 +253,22 @@ export async function assembleModelResponse(
   if (openBlocks.size > 0) {
     throw new TruncatedStreamError(
       'model stream ended with unterminated content blocks — response is truncated',
+      diagnostics(),
+    );
+  }
+  // Closed blocks alone do not make a complete response: the wire shape
+  // ends message_delta (carrying the stop reason) → message_stop, and a
+  // stream that dies between block close and those terminal events dropped
+  // the connection just like one that dies mid-block.
+  if (stopReason === null) {
+    throw new TruncatedStreamError(
+      'model stream ended without a message_delta reporting a stop reason — response is truncated',
+      diagnostics(),
+    );
+  }
+  if (!sawMessageStop) {
+    throw new TruncatedStreamError(
+      'model stream ended without a message_stop event — response is truncated',
       diagnostics(),
     );
   }
