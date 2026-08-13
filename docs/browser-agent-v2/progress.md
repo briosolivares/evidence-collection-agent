@@ -343,7 +343,22 @@ factual error.
 
 ## Blockers
 
-None.
+- T15 / T15.5 — "Measure pass rate, cache use, cost, latency, context peak, and
+  repeated-action rate against non-compact mode" cannot be satisfied by
+  hermetic tests: it is a measured A/B comparison over live runs, and the plan
+  forbids live evaluation without explicit user direction.
+  - First observed: 2026-08-13T15:45:00-07:00
+  - Evidence: the plan's "Rules that apply to every task" — "Do not run a live
+    re-baseline ... without the user's direction" — and the test-cadence
+    section listing live evals as decision-point-only.
+  - Needed to unblock: the user authorizes a compact-vs-non-compact eval
+    batch. T15.1–T15.4 (the machinery it would measure) are implemented and
+    tested; graduating compact memory as a default is the decision that waits.
+  - Owner: user decision, then this session or its successor.
+- T16 / T16.4 and T16.6 — the four-way contract-author x verifier comparison,
+  and choosing the production contract-author default from its evidence, are
+  likewise live-eval work the plan reserves for explicit user approval. The
+  matrix can be prepared without approval; running it cannot.
 
 For a blocker, record:
 
