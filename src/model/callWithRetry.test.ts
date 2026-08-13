@@ -1,7 +1,12 @@
 import { APIConnectionError, APIError } from '@anthropic-ai/sdk';
 import { describe, expect, it } from 'vitest';
 
-import { callWithRetry, MAX_CALL_ATTEMPTS, type RetryInfo } from './callWithRetry.js';
+import {
+  callWithRetry,
+  MAX_CALL_ATTEMPTS,
+  MAX_TRUNCATED_STREAM_ATTEMPTS,
+  type RetryInfo,
+} from './callWithRetry.js';
 import { TruncatedStreamError } from './streamAssembly.js';
 
 // Hermetic throughout: sleep is injected everywhere except the abort test
@@ -126,6 +131,38 @@ describe('callWithRetry', () => {
     await expect(callWithRetry(attempt, opts)).rejects.toBe(dead);
     expect(calls()).toBe(MAX_CALL_ATTEMPTS);
     expect(sleeps).toEqual([1_000, 2_000, 4_000]);
+  });
+
+  it('gives truncated streams the higher ceiling: survives 7 stalls and succeeds on attempt 8', async () => {
+    // The decode stall is probabilistic per attempt (~6% measured), so
+    // truncation gets patience nothing else does. Backoff past the table
+    // reuses its last entry (4s).
+    const stall = new TruncatedStreamError('response is truncated');
+    const { opts, sleeps } = recordingOpts();
+    const { attempt, calls } = flakyAttempt(Array(7).fill(stall), 'ok');
+    await expect(callWithRetry(attempt, opts)).resolves.toBe('ok');
+    expect(calls()).toBe(MAX_TRUNCATED_STREAM_ATTEMPTS);
+    expect(sleeps).toEqual([1_000, 2_000, 4_000, 4_000, 4_000, 4_000, 4_000]);
+  });
+
+  it('gives up on truncation after 8 attempts, rethrowing the last error unchanged', async () => {
+    const stall = new TruncatedStreamError('response is truncated');
+    const { opts } = recordingOpts();
+    const { attempt, calls } = flakyAttempt(Array(9).fill(stall), 'never');
+    await expect(callWithRetry(attempt, opts)).rejects.toBe(stall);
+    expect(calls()).toBe(MAX_TRUNCATED_STREAM_ATTEMPTS);
+  });
+
+  it('the higher ceiling is for the stall only: a late non-truncation failure ends the call', async () => {
+    // Four truncations then a connection error on attempt 5: the failure
+    // just observed is judged by its own class's ceiling (4), so the call
+    // ends even though truncation would have kept retrying.
+    const stall = new TruncatedStreamError('response is truncated');
+    const dead = new APIConnectionError({ message: 'Connection error.' });
+    const { opts } = recordingOpts();
+    const { attempt, calls } = flakyAttempt([stall, stall, stall, stall, dead], 'never');
+    await expect(callWithRetry(attempt, opts)).rejects.toBe(dead);
+    expect(calls()).toBe(5);
   });
 
   it('honors a numeric retry-after header, capped at 60s', async () => {
