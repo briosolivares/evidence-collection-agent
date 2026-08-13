@@ -43,7 +43,7 @@
       "dependsOn": [],
       "owner": "claude (browser-agent-v2 impl session)",
       "startedAt": "2026-08-13T12:35:18-07:00",
-      "completedAt": "2026-08-13T12:55:00-07:00",
+      "completedAt": "2026-08-13T14:10:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t1--make-model-responses-trustworthy",
       "features": [
@@ -78,13 +78,13 @@
     {
       "id": "T2",
       "title": "Preserve one worker session and report truthful outcomes",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T1"
       ],
       "owner": "claude (browser-agent-v2 impl session)",
       "startedAt": "2026-08-13T12:55:00-07:00",
-      "completedAt": null,
+      "completedAt": "2026-08-13T14:10:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t2--preserve-one-worker-session-and-report-truthful-outcomes",
       "features": [
@@ -119,13 +119,13 @@
     {
       "id": "T3",
       "title": "Replace prose judge verdicts with a typed verifier result",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T2"
       ],
       "owner": "claude (browser-agent-v2 impl session)",
       "startedAt": "2026-08-13T12:55:00-07:00",
-      "completedAt": null,
+      "completedAt": "2026-08-13T14:10:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t3--replace-prose-judge-verdicts-with-a-typed-verifier-result",
       "features": [
@@ -160,11 +160,11 @@
     {
       "id": "T4",
       "title": "Introduce one typed output contract",
-      "status": "in_progress",
+      "status": "not_started",
       "dependsOn": [
         "T3"
       ],
-      "owner": "delegated subagent (primary integrates)",
+      "owner": null,
       "startedAt": null,
       "completedAt": null,
       "blockedBy": [],
@@ -242,12 +242,12 @@
     {
       "id": "T6",
       "title": "Add bounded page-scoped JavaScript",
-      "status": "in_progress",
+      "status": "not_started",
       "dependsOn": [
         "T1",
         "T4"
       ],
-      "owner": "delegated subagent (primary integrates)",
+      "owner": null,
       "startedAt": null,
       "completedAt": null,
       "blockedBy": [],
@@ -372,35 +372,35 @@
     {
       "id": "T9",
       "title": "Give the browser stable page and observation identity",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T1"
       ],
-      "owner": "delegated subagent (primary integrates)",
+      "owner": "delegated subagent, reviewed and verified by primary",
       "startedAt": null,
-      "completedAt": null,
+      "completedAt": "2026-08-13T14:10:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t9--give-the-browser-stable-page-and-observation-identity",
       "features": [
         {
           "id": "T9.1",
           "description": "Track stable page/frame IDs, document replacement, observation snapshots, popups, and frame changes.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T9.2",
           "description": "Bind ElementRef to page, frame, and document and re-resolve targets conservatively without ordinal retargeting.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T9.3",
           "description": "Use basedOnObservationId as a diff baseline and return a full bounded snapshot after cache eviction.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T9.4",
           "description": "Add observe while keeping legacy atomic browser tools working through adapters.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [

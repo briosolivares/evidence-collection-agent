@@ -45,14 +45,14 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | Task | Status | Owner | Last commit | Summary |
 | --- | --- | --- | --- | --- |
 | T1 | complete | claude (impl session) | see log | Trustworthy shared model driver |
-| T2 | in_progress | claude (impl session) | 199467a | Persistent worker and truthful outcomes — focused tests pass; whole-tree gate pending |
-| T3 | in_progress | claude (impl session) | 1cc2b57 | Typed verifier result — focused tests pass; whole-tree gate pending |
-| T4 | in_progress | delegated subagent | — | Typed output contract — subagent in flight |
+| T2 | complete | claude (impl session) | 199467a | Persistent worker and truthful outcomes |
+| T3 | complete | claude (impl session) | 77f63d3 | Typed verifier result |
+| T4 | not_started | — | — | Typed output contract |
 | T5 | not_started | — | — | Explicit submission and code checks |
-| T6 | in_progress | delegated subagent | — | Bounded page JavaScript — subagent in flight |
+| T6 | not_started | — | — | Bounded page JavaScript |
 | T7 | not_started | — | — | Evidence-linked output tables |
 | T8 | not_started | — | — | Evidence-linked documents |
-| T9 | in_progress | delegated subagent | — | Stable browser identity — first subagent died at session limit, second finishing |
+| T9 | complete | delegated subagent, primary-verified | 70884d6 | Stable browser identity and observation |
 | T10 | not_started | — | — | Receipted browser actions |
 | T11 | not_started | — | — | Targeted observation and public resources |
 | T12 | not_started | — | — | PDF, spreadsheet, and OCR adapters |
@@ -85,6 +85,42 @@ When work begins, replace the sentence above with one section per active task:
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 14:12 — session close: T1, T2, T3, T9 complete
+
+- Owner: claude (browser-agent-v2 impl session)
+- Branch/worktree: `feat/browser-agent-v2` at `evidence-collection-agent-v2-impl`
+  (created from `feat/judge-harness` head `cb2e22d`)
+- Commits: `c271d55` (T1), `199467a` (T2), `1cc2b57` + `77f63d3` (T3),
+  `70884d6` (T9), `3b5cfd9` (tracking)
+- Completed and gated: T1, T2, T3, T9 — all features and completion criteria,
+  plus `npm run typecheck` (0 errors) and `npm test` (106 files, 932 tests,
+  exit 0) on the whole tree.
+- Delegation outcome:
+  - T9 was implemented by subagents. The first died at an API session limit
+    ~80% through; the second finished it and found two real defects in the
+    first one's work — a raw NUL byte written into a template literal (which
+    made `file(1)` classify the source as binary and made `grep -r` skip it)
+    and a marker-attribute name hardcoded at stamping time while resolution
+    read the constant, which would have made every ref instantly stale if the
+    constant changed. Both fixed before the primary agent committed. This is
+    exactly why a subagent's "done" is evidence to review, not proof.
+  - T4 and T6 were delegated but stopped at the consolidation threshold
+    before producing reviewable, tested work. T4 produced nothing. T6 left
+    ONE unreviewed, untested module on disk, deliberately NOT committed:
+    `src/evidence/evidenceStore.ts` (untracked, 239 lines, compiles but has
+    no test and is 1 of 4 T6 deliverables). Treat it as a draft to review or
+    discard when T6 is picked up properly — it is not part of any commit.
+- Verified:
+  - `npm run typecheck` — pass, 0 errors
+  - `npm test` — pass, 106 files / 932 tests, exit 0
+  - `npx vitest run src/harness/verifier.test.ts src/harness/harness.test.ts src/cli/runTask.test.ts` — pass (37)
+  - `git diff --check` — clean
+- Time check: `TIME_CHECK start=1786649718 now=1786655560 elapsed=01h:37m:22s remaining=00h:22m:38s`
+- Remaining: T4, T5, T6, T7, T8, T10–T16 are untouched. No live eval was run
+  (still unauthorized).
+- Notes: no live re-baseline; no contract-author default chosen; both remain
+  the user's calls per the plan.
 
 ### 2026-08-13 13:40 — T2 and T3 implemented; T4/T6/T9 delegated
 
@@ -210,11 +246,19 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: T1 (fully gated). T2 and T3 are implemented with
-  passing focused tests, awaiting the whole-tree typecheck/full-suite gate
-- Safe next task: T5 (needs T4 landed first), then T7
-- Parallel work currently unlocked: T4, T6, T9 are in flight with subagents;
-  T10 unlocks once T9 lands
+- Last completed task: T1, T2, T3, T9 — all fully gated (typecheck 0 errors,
+  full suite 106 files / 932 tests)
+- Safe next task: T4 (unblocked by T3; sequential core). T10 is also unblocked
+  now that T9 has landed, and T6 needs only T4's run policy
+- Parallel work currently unlocked: T4 and T10 can proceed in parallel (T4
+  owns src/contracts + the contract tool; T10 owns src/browser/browserActions
+  + the action tools). Assign ONE owner to src/tools/index.ts,
+  src/tools/registry.ts, and src/cli/runTask.ts — they are the recurring
+  integration points
+- In-flight/unreviewed: `src/evidence/evidenceStore.ts` is untracked draft
+  output from a stopped T6 subagent; review or discard it when starting T6
+- Next command for T4:
+  `npx vitest run src/contracts/outputContract.test.ts src/contracts/outputContractStore.test.ts src/tools/setOutputContract/setOutputContract.test.ts src/harness/initializer.test.ts src/harness/verifier.test.ts src/tools/index.test.ts src/model/callModel.test.ts`
 - Known local state: `docs/adversarial-review-revised-browser-agent-proposal.md`
   is an untracked review input and must remain untouched unless explicitly
   requested
