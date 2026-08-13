@@ -1,0 +1,836 @@
+import { z } from 'zod';
+
+import { MANIFEST_FILENAME } from '../run/artifacts.js';
+import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
+
+// The output contract: the one typed statement of what a run must produce
+// (docs/revised-browser-agent-proposal.md, "Define a small, validated output
+// contract"). It replaces the prose INTENT.md/CONTRACT.md pair — nothing here
+// is parsed out of model prose, and nothing downstream re-derives
+// requirements from headings. The worker, the initializer, the code-based
+// completion checks, and the verifier all read the same validated object.
+//
+// Two boundaries shape this module:
+//
+//  1. The contract describes only the END STATE — which files or captures
+//     must exist and their exact structure. It carries no research plan, no
+//     browser steps, no preferred sites, and no per-entity progress. Those
+//     belong to the loop, not to the requirements.
+//  2. Validation is total and mechanical. Anything a schema plus cross-field
+//     code can settle is settled here, before a single browser action runs,
+//     so an impossible or self-contradicting contract fails on turn one
+//     instead of after minutes of collection. Judgment-shaped requirements go
+//     in `contentExpectations`, which code deliberately does not check.
+//
+// Cross-field checks live in `validateContractRevision()` rather than in the
+// Zod schema on purpose: Zod refinements are dropped by `z.toJSONSchema()`
+// (so the model would never see them anyway), and hand-written messages name
+// the offending id, column, or filename — which is what makes one rejected
+// call enough for the model to correct course.
+
+/** A document's evidence requirement when the contract omits it. Most
+ * requested prose makes source-backed factual claims, so the safe default is
+ * "at least one piece of evidence", not "none". */
+export const DEFAULT_EVIDENCE_REQUIREMENT = 'at_least_one';
+
+/** A document's evidence presentation when the contract omits it. Citations
+ * are structural metadata by default; visible footnotes are opt-in, because
+ * an unrequested footnote apparatus changes the deliverable's shape. */
+export const DEFAULT_EVIDENCE_PRESENTATION = 'hidden';
+
+/**
+ * Run-dir filenames a contract may never claim: the run's own records. A
+ * contract output that collided with one of these would make the agent
+ * overwrite the provenance used to grade it. Mirrors the reserved set
+ * enforced for tool-supplied paths in `src/tools/shared/evidence.ts`;
+ * compared case-insensitively because run directories live on
+ * case-insensitive filesystems (macOS, Windows).
+ */
+export const RESERVED_OUTPUT_FILENAMES: readonly string[] = [
+  MANIFEST_FILENAME,
+  TRANSCRIPT_FILENAME,
+  'metrics.json',
+];
+
+/** A string that carries information: present, non-empty, and not just
+ * whitespace. `min(1)` alone would accept `"   "`, which reads as a filled-in
+ * field while saying nothing. */
+const nonBlankString = z
+  .string()
+  .min(1)
+  .refine((value) => value.trim().length > 0, 'must not be blank');
+
+/** A count or limit: a finite positive integer. Rejects `NaN`, `Infinity`,
+ * negatives, zero, and fractions — an output required "0 times" or "1.5
+ * times" is a contract bug, never a requirement. */
+const positiveInt = z.number().int().positive();
+
+/**
+ * An output id: a short machine-usable token. Later tools reference outputs
+ * by id (row upserts, completeness evidence, verifier findings), so ids must
+ * survive being embedded in messages and filenames without quoting.
+ */
+const outputIdSchema = z
+  .string()
+  .min(1)
+  .max(64)
+  .regex(
+    /^[A-Za-z0-9][A-Za-z0-9._-]*$/,
+    'must start with a letter or digit and contain only letters, digits, ".", "_", or "-"',
+  );
+
+/** How a date or datetime column is rendered in the finished output. Dates
+ * are stored internally in ISO form; a display format is recorded exactly
+ * (UTS #35 pattern plus locale) so rendering never depends on an ambient
+ * locale. */
+export const dateOutputFormatSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('iso_date') }),
+  z.strictObject({ kind: z.literal('iso_datetime') }),
+  z.strictObject({
+    kind: z.literal('unicode_pattern'),
+    /** Unicode Technical Standard #35 tokens, e.g. "MMM d, yyyy". */
+    pattern: nonBlankString.describe(
+      'Unicode Technical Standard #35 date pattern, e.g. "MMM d, yyyy"',
+    ),
+    locale: nonBlankString.describe('BCP 47 locale tag the pattern is rendered in, e.g. "en-US"'),
+  }),
+]);
+
+/** One column of a table output: its exact header, whether every row must
+ * fill it, and the value contract cells are validated against. */
+export const outputColumnSchema = z.discriminatedUnion('type', [
+  z.strictObject({
+    name: nonBlankString.describe('Exact column header, copied verbatim from the request'),
+    required: z.boolean().describe('True when every row must carry a value for this column'),
+    type: z.enum(['string', 'integer', 'number', 'boolean', 'url']),
+  }),
+  z.strictObject({
+    name: nonBlankString.describe('Exact column header, copied verbatim from the request'),
+    required: z.boolean().describe('True when every row must carry a value for this column'),
+    type: z.literal('enum'),
+    values: z
+      .array(nonBlankString)
+      .min(1)
+      .describe('The complete set of accepted values, copied verbatim from the source'),
+  }),
+  z.strictObject({
+    name: nonBlankString.describe('Exact column header, copied verbatim from the request'),
+    required: z.boolean().describe('True when every row must carry a value for this column'),
+    type: z.enum(['date', 'datetime']),
+    format: dateOutputFormatSchema,
+    timezone: nonBlankString
+      .optional()
+      .describe('IANA timezone name the values are interpreted in, e.g. "America/New_York"'),
+  }),
+]);
+
+/** A checkable, table-wide rule. Row counts, uniqueness, and known expected
+ * values are exactly the properties code can settle without a model, which is
+ * why they live in the contract instead of in prose. */
+export const tableRuleSchema = z.discriminatedUnion('type', [
+  z.strictObject({
+    type: z.literal('exact_row_count'),
+    value: positiveInt.describe('The table must contain exactly this many rows'),
+  }),
+  z.strictObject({
+    type: z.literal('minimum_row_count'),
+    value: positiveInt.describe('The table must contain at least this many rows'),
+  }),
+  z.strictObject({
+    type: z.literal('unique'),
+    columns: z
+      .array(nonBlankString)
+      .min(1)
+      .describe('Declared column names whose combined values must be distinct across rows'),
+  }),
+  z.strictObject({
+    type: z.literal('matches_expected_values'),
+    column: nonBlankString.describe('Declared column the expected values apply to'),
+    expected: z.array(nonBlankString).min(1).describe('Values that must appear in that column'),
+    source: z
+      .discriminatedUnion('kind', [
+        // Where the expectation came from. The verifier needs this to tell an
+        // explicit user requirement from something the run learned by
+        // browsing — only the first is authoritative on its own.
+        z.strictObject({ kind: z.literal('original_task') }),
+        z.strictObject({
+          kind: z.literal('evidence'),
+          evidenceIds: z.array(nonBlankString).min(1),
+        }),
+      ])
+      .describe('Whether the expectation comes from the original task or from collected evidence'),
+  }),
+]);
+
+/** How many captures or files an output requires. Exactly-N and at-least-N
+ * are different promises, so they are different shapes rather than one
+ * nullable pair. */
+export const outputCountSchema = z.union([
+  z.strictObject({ exact: positiveInt }),
+  z.strictObject({ minimum: positiveInt }),
+]);
+
+/** One required deliverable. `table` and `document` name a file; `screenshots`
+ * and `download` describe a set of captures constrained by count, filename
+ * pattern, media type, or source URL. */
+export const outputSpecSchema = z.discriminatedUnion('kind', [
+  z.strictObject({
+    id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
+    kind: z.literal('table'),
+    filename: nonBlankString.describe(
+      'Bare filename (no directories) the runtime publishes under artifacts/',
+    ),
+    format: z.enum(['csv', 'json', 'markdown']),
+    columns: z
+      .array(outputColumnSchema)
+      .min(1)
+      .describe('Columns in their exact required output order'),
+    rules: z.array(tableRuleSchema).describe('Table-wide rules code checks before verification'),
+  }),
+  z.strictObject({
+    id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
+    kind: z.literal('document'),
+    filename: nonBlankString.describe(
+      'Bare filename (no directories) the runtime publishes under artifacts/',
+    ),
+    format: z.enum(['markdown', 'text', 'pdf']),
+    requiredSections: z
+      .array(nonBlankString)
+      .min(1)
+      .optional()
+      .describe('Section headings the document must contain, in no particular order'),
+    evidenceRequirement: z
+      .enum(['none', 'at_least_one', 'per_required_section'])
+      .default(DEFAULT_EVIDENCE_REQUIREMENT)
+      .describe(
+        'How much evidence the document must be backed by. Defaults to at_least_one; ' +
+          'use per_required_section for evidence-heavy reports; "none" only when the ' +
+          'document makes no source-backed factual claims',
+      ),
+    evidencePresentation: z
+      .enum(['hidden', 'footnotes'])
+      .default(DEFAULT_EVIDENCE_PRESENTATION)
+      .describe(
+        'Whether citations are visible in the document. Defaults to hidden; use ' +
+          'footnotes when the request asks for visible citations',
+      ),
+  }),
+  z.strictObject({
+    id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
+    kind: z.literal('screenshots'),
+    count: outputCountSchema.describe('How many screenshots the run must publish'),
+    filenamePattern: nonBlankString
+      .optional()
+      .describe('Bare filename pattern the captures must match, e.g. "profile-*.png"'),
+    mustShow: z
+      .array(nonBlankString)
+      .min(1)
+      .optional()
+      .describe(
+        'What must be visible in the images. Deliberately semantic: checked by an ' +
+          'image-capable verifier, never by code',
+      ),
+  }),
+  z.strictObject({
+    id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
+    kind: z.literal('download'),
+    count: outputCountSchema.describe('How many downloaded files the run must publish'),
+    filenamePattern: nonBlankString
+      .optional()
+      .describe('Bare filename pattern the downloads must match, e.g. "*.pdf"'),
+    allowedMediaTypes: z
+      .array(nonBlankString)
+      .min(1)
+      .optional()
+      .describe('Accepted media types, e.g. ["application/pdf"]'),
+    sourceUrlPattern: nonBlankString
+      .optional()
+      .describe('Pattern the download source URL must match'),
+  }),
+]);
+
+/** The contract itself: required outputs, plus the judgment-shaped
+ * expectations and material assumptions that surround them. */
+export const outputContractSchema = z.strictObject({
+  outputs: z
+    .array(outputSpecSchema)
+    .min(1)
+    .describe('Every file or capture the finished run must contain'),
+  contentExpectations: z
+    .array(nonBlankString)
+    .optional()
+    .describe(
+      'Requirements that need judgment rather than code, e.g. "explain the most ' +
+        'material control gaps and support them with evidence"',
+    ),
+  assumptions: z
+    .array(nonBlankString)
+    .optional()
+    .describe('Only the choices that materially affect the result'),
+});
+
+/** Why a contract changed. Browsing legitimately reveals an exact
+ * population, a field rule, or a mistaken assumption; a revision without one
+ * of these three reasons is drift, and the verifier is given the basis so it
+ * can tell the two apart. */
+export const contractRevisionBasisSchema = z.discriminatedUnion('kind', [
+  z.strictObject({
+    kind: z.literal('evidence_discovery'),
+    summary: nonBlankString.describe('What the evidence showed that the previous revision missed'),
+    evidenceIds: z.array(nonBlankString).min(1).describe('Evidence records supporting the change'),
+  }),
+  z.strictObject({
+    kind: z.literal('assumption_correction'),
+    summary: nonBlankString.describe('Which earlier assumption was wrong, and what replaces it'),
+  }),
+  z.strictObject({
+    kind: z.literal('user_clarification'),
+    summary: nonBlankString.describe('What the user clarified or relaxed'),
+  }),
+]);
+
+/** Input accepted by the `set_output_contract` tool, in either authoring
+ * mode (worker-authored or initializer-authored). One schema, one validator,
+ * one stored form — the architecture must not depend on which author ran. */
+export const setOutputContractInputSchema = z.strictObject({
+  contract: outputContractSchema,
+  revisionBasis: contractRevisionBasisSchema
+    .optional()
+    .describe('Required on every revision after the first; omitted on the first'),
+});
+
+/** A date/datetime column's rendering contract. */
+export type DateOutputFormat = z.infer<typeof dateOutputFormatSchema>;
+/** One column of a table output. */
+export type OutputColumn = z.infer<typeof outputColumnSchema>;
+/** One table-wide checkable rule. */
+export type TableRule = z.infer<typeof tableRuleSchema>;
+/** How many captures or files an output requires. */
+export type OutputCount = z.infer<typeof outputCountSchema>;
+/** One required deliverable. */
+export type OutputSpec = z.infer<typeof outputSpecSchema>;
+/** The validated contract. Note that `outputs` and table `columns` are plain
+ * arrays in the type but carry a runtime minimum of one element. */
+export type OutputContract = z.infer<typeof outputContractSchema>;
+/** Why a contract changed. */
+export type ContractRevisionBasis = z.infer<typeof contractRevisionBasisSchema>;
+/** Validated `set_output_contract` input. */
+export type SetOutputContractInput = z.infer<typeof setOutputContractInputSchema>;
+
+/**
+ * One accepted, numbered contract state. History is append-only: a revision
+ * is never edited or replaced, so the verifier can always see how the
+ * requirements moved between revision 1 and now.
+ */
+export interface OutputContractRevision {
+  /** 1-based position in the run's contract history. */
+  revision: number;
+  /** Why this revision exists. Absent exactly on revision 1. */
+  basis?: ContractRevisionBasis;
+  /** The full contract as of this revision — never a diff. */
+  contract: OutputContract;
+}
+
+/** The outcome of validating one proposed revision: either the revision the
+ * store may persist, or every reason it was rejected. Errors are plural on
+ * purpose — one rejected tool call should be enough to fix everything. */
+export type ContractRevisionValidation =
+  | { ok: true; revision: OutputContractRevision }
+  | { ok: false; errors: [string, ...string[]] };
+
+/**
+ * Validate a proposed contract revision: shape, then every cross-field rule,
+ * then the revision-basis requirement.
+ *
+ * @param input - raw `set_output_contract` input, exactly as the model sent
+ *   it; never trusted
+ * @param revisionNumber - the 1-based number this revision would take (the
+ *   store passes `history.length + 1`). Must itself be a positive integer;
+ *   a non-integer is a caller bug and throws
+ * @returns `ok: true` with the revision to persist — Zod defaults applied
+ *   (a document's evidence requirement and presentation are always explicit
+ *   in the stored form) — or `ok: false` with one message per problem found.
+ *   Every message names the offending output id, column, filename, or rule
+ *   so the model can correct the whole contract in one follow-up call
+ *
+ * Rejects, beyond the schema: duplicate output ids; two outputs claiming the
+ * same file; unsafe filenames and filename patterns (path separators,
+ * absolute paths, `.`/`..`, control characters, the run's own reserved
+ * names); duplicate table columns; enum columns with repeated values;
+ * invalid IANA timezones or BCP 47 locales; conflicting table rules
+ * (repeated count rules, a minimum above an exact count, uniqueness or
+ * expected values naming an undeclared column, more expected values than
+ * rows); a download constrained by nothing; a document requiring
+ * per-section evidence with no sections, or visible footnotes with no
+ * evidence at all; a basis on revision 1; and a missing basis after it.
+ */
+export function validateContractRevision(
+  input: unknown,
+  revisionNumber: number,
+): ContractRevisionValidation {
+  if (!Number.isInteger(revisionNumber) || revisionNumber < 1) {
+    throw new Error(
+      `revisionNumber must be a positive integer, got ${JSON.stringify(revisionNumber)}`,
+    );
+  }
+
+  const parsed = setOutputContractInputSchema.safeParse(input);
+  if (!parsed.success) {
+    // Shape errors short-circuit: cross-field checks assume a well-formed
+    // contract, and a model reading both lists at once cannot tell which
+    // complaint to fix first.
+    return failure(
+      parsed.error.issues.map((issue) => {
+        const path = issue.path.length > 0 ? issue.path.map(String).join('.') : '(input)';
+        return `at ${path}: ${issue.message}`;
+      }),
+    );
+  }
+
+  const errors = [
+    ...checkOutputs(parsed.data.contract.outputs),
+    ...checkBasis(parsed.data.revisionBasis, revisionNumber),
+  ];
+  if (errors.length > 0) return failure(errors);
+
+  return {
+    ok: true,
+    revision: {
+      revision: revisionNumber,
+      ...(parsed.data.revisionBasis !== undefined ? { basis: parsed.data.revisionBasis } : {}),
+      contract: parsed.data.contract,
+    },
+  };
+}
+
+/**
+ * Serialize a revision to the exact bytes stored on disk.
+ *
+ * @param revision - an accepted revision (as returned by
+ *   `validateContractRevision`)
+ * @returns canonical JSON — object keys sorted recursively, array order
+ *   preserved (column order is semantic), two-space indent, trailing
+ *   newline. Canonical rather than "whatever `JSON.stringify` does" so that
+ *   the same tool input always produces byte-identical storage no matter
+ *   which authoring mode built it or what key order the model happened to
+ *   emit; the plan requires the two modes to be byte-for-byte comparable
+ * @throws if the revision contains a non-finite number or a value JSON
+ *   cannot represent — impossible after validation, and a silent `null` in
+ *   a stored requirement would be worse than a crash
+ */
+export function serializeContractRevision(revision: OutputContractRevision): string {
+  return `${JSON.stringify(canonicalizeJson(revision, 'revision'), null, 2)}\n`;
+}
+
+/** Every cross-field check over the contract's outputs. */
+function checkOutputs(outputs: readonly OutputSpec[]): string[] {
+  const errors: string[] = [];
+  const seenIds = new Set<string>();
+  const claimedFiles = new Map<string, string>();
+
+  for (const output of outputs) {
+    if (seenIds.has(output.id)) {
+      errors.push(
+        `duplicate output id ${JSON.stringify(output.id)}: every output needs its own id`,
+      );
+    }
+    seenIds.add(output.id);
+
+    switch (output.kind) {
+      case 'table': {
+        errors.push(...checkFilename(output, output.filename, claimedFiles));
+        errors.push(...checkColumns(output.id, output.columns));
+        errors.push(...checkRules(output.id, output.columns, output.rules));
+        break;
+      }
+      case 'document': {
+        errors.push(...checkFilename(output, output.filename, claimedFiles));
+        errors.push(...checkDocument(output));
+        break;
+      }
+      case 'screenshots': {
+        if (output.filenamePattern !== undefined) {
+          errors.push(...checkFilenamePattern(output.id, output.filenamePattern));
+        }
+        break;
+      }
+      case 'download': {
+        if (output.filenamePattern !== undefined) {
+          errors.push(...checkFilenamePattern(output.id, output.filenamePattern));
+        }
+        errors.push(...checkDownload(output));
+        break;
+      }
+    }
+  }
+  return errors;
+}
+
+/** Confine a contract filename to one safe name inside the published
+ * artifacts area, and reject two outputs claiming the same file. The
+ * contract names files the runtime later resolves through `resolveRunPath`;
+ * catching the unsafe name here means the failure arrives while the model
+ * can still fix it cheaply, not at publish time. */
+function checkFilename(
+  output: OutputSpec,
+  filename: string,
+  claimedFiles: Map<string, string>,
+): string[] {
+  const errors: string[] = [];
+  const problem = unsafeFilenameReason(filename);
+  if (problem !== undefined) {
+    errors.push(`output ${JSON.stringify(output.id)} filename ${JSON.stringify(filename)}: ${problem}`);
+    // A rejected name is not recorded as claimed: reporting it a second time
+    // as a duplicate would obscure the real problem.
+    return errors;
+  }
+  const key = filename.toLowerCase();
+  const owner = claimedFiles.get(key);
+  if (owner !== undefined) {
+    errors.push(
+      `outputs ${JSON.stringify(owner)} and ${JSON.stringify(output.id)} both write ` +
+        `${JSON.stringify(filename)}: each output needs its own file`,
+    );
+  } else {
+    claimedFiles.set(key, output.id);
+  }
+  return errors;
+}
+
+/** Why a filename cannot be used, or undefined when it is safe. */
+function unsafeFilenameReason(filename: string): string | undefined {
+  if (filename.trim() !== filename) {
+    return 'must not begin or end with whitespace';
+  }
+  if (/[/\\]/.test(filename)) {
+    return 'must be a bare filename with no directory separators (the runtime publishes it under artifacts/)';
+  }
+  if (/^[A-Za-z]:/.test(filename)) {
+    return 'must be a relative bare filename, not an absolute path';
+  }
+  if (filename === '.' || filename === '..') {
+    return 'is a directory reference, not a filename';
+  }
+  // eslint-disable-next-line no-control-regex -- control characters in a
+  // filename are a smuggling attempt or a copy/paste accident, never intent.
+  if (/[\u0000-\u001f\u007f]/.test(filename)) {
+    return 'must not contain control characters';
+  }
+  if (RESERVED_OUTPUT_FILENAMES.some((reserved) => reserved.toLowerCase() === filename.toLowerCase())) {
+    return `is reserved for the run's own records (${RESERVED_OUTPUT_FILENAMES.join(', ')})`;
+  }
+  return undefined;
+}
+
+/** A filename pattern constrains names the same way a filename does, so it
+ * inherits the same safety rules (wildcards excepted). */
+function checkFilenamePattern(outputId: string, pattern: string): string[] {
+  const problem = unsafeFilenameReason(pattern);
+  return problem === undefined
+    ? []
+    : [
+        `output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`,
+      ];
+}
+
+/** Column-level checks: distinct headers, well-formed enum value sets, and
+ * real timezones/locales for date rendering. */
+function checkColumns(outputId: string, columns: readonly OutputColumn[]): string[] {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  for (const column of columns) {
+    if (column.name.trim() !== column.name) {
+      errors.push(
+        `output ${JSON.stringify(outputId)} column ${JSON.stringify(column.name)}: ` +
+          `column names must not begin or end with whitespace`,
+      );
+    }
+    if (seen.has(column.name)) {
+      errors.push(
+        `output ${JSON.stringify(outputId)} declares column ${JSON.stringify(column.name)} twice`,
+      );
+    }
+    seen.add(column.name);
+
+    if (column.type === 'enum') {
+      const duplicates = duplicatesOf(column.values);
+      if (duplicates.length > 0) {
+        errors.push(
+          `output ${JSON.stringify(outputId)} column ${JSON.stringify(column.name)} repeats ` +
+            `enum value(s) ${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
+        );
+      }
+    }
+
+    if (column.type === 'date' || column.type === 'datetime') {
+      if (column.timezone !== undefined && !isValidTimezone(column.timezone)) {
+        errors.push(
+          `output ${JSON.stringify(outputId)} column ${JSON.stringify(column.name)}: ` +
+            `${JSON.stringify(column.timezone)} is not a valid IANA timezone name`,
+        );
+      }
+      if (column.format.kind === 'unicode_pattern' && !isValidLocale(column.format.locale)) {
+        errors.push(
+          `output ${JSON.stringify(outputId)} column ${JSON.stringify(column.name)}: ` +
+            `${JSON.stringify(column.format.locale)} is not a valid BCP 47 locale tag`,
+        );
+      }
+    }
+  }
+  return errors;
+}
+
+/** Rule-level checks: rules must be mutually satisfiable and may only name
+ * declared columns. A contract that no table can satisfy would otherwise
+ * burn the whole run before failing. */
+function checkRules(
+  outputId: string,
+  columns: readonly OutputColumn[],
+  rules: readonly TableRule[],
+): string[] {
+  const errors: string[] = [];
+  const declared = new Set(columns.map((column) => column.name));
+  const label = `output ${JSON.stringify(outputId)}`;
+
+  const exactRules = rules.filter((rule) => rule.type === 'exact_row_count');
+  const minimumRules = rules.filter((rule) => rule.type === 'minimum_row_count');
+  if (exactRules.length > 1) {
+    errors.push(`${label} declares ${exactRules.length} exact_row_count rules; at most one is allowed`);
+  }
+  if (minimumRules.length > 1) {
+    errors.push(
+      `${label} declares ${minimumRules.length} minimum_row_count rules; at most one is allowed`,
+    );
+  }
+  const exact = exactRules[0];
+  const minimum = minimumRules[0];
+  if (exact !== undefined && minimum !== undefined && minimum.value > exact.value) {
+    errors.push(
+      `${label} requires at least ${minimum.value} rows but exactly ${exact.value}: ` +
+        `no table can satisfy both`,
+    );
+  }
+
+  const seenUniqueSets = new Set<string>();
+  const seenExpectedColumns = new Set<string>();
+  for (const rule of rules) {
+    if (rule.type === 'unique') {
+      const duplicates = duplicatesOf(rule.columns);
+      if (duplicates.length > 0) {
+        errors.push(
+          `${label} unique rule repeats column(s) ` +
+            `${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
+        );
+      }
+      for (const column of rule.columns) {
+        if (!declared.has(column)) {
+          errors.push(
+            `${label} unique rule names undeclared column ${JSON.stringify(column)}`,
+          );
+        }
+      }
+      // Order-insensitive: unique over [a, b] and [b, a] are one rule.
+      const key = [...rule.columns].sort().join('\u0000');
+      if (seenUniqueSets.has(key)) {
+        errors.push(
+          `${label} declares the same unique rule twice over ` +
+            `${rule.columns.map((column) => JSON.stringify(column)).join(', ')}`,
+        );
+      }
+      seenUniqueSets.add(key);
+    }
+
+    if (rule.type === 'matches_expected_values') {
+      if (!declared.has(rule.column)) {
+        errors.push(
+          `${label} matches_expected_values rule names undeclared column ` +
+            `${JSON.stringify(rule.column)}`,
+        );
+      }
+      if (seenExpectedColumns.has(rule.column)) {
+        errors.push(
+          `${label} declares two matches_expected_values rules for column ` +
+            `${JSON.stringify(rule.column)}`,
+        );
+      }
+      seenExpectedColumns.add(rule.column);
+
+      const duplicates = duplicatesOf(rule.expected);
+      if (duplicates.length > 0) {
+        errors.push(
+          `${label} matches_expected_values rule for column ${JSON.stringify(rule.column)} ` +
+            `repeats value(s) ${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
+        );
+      }
+      if (exact !== undefined && rule.expected.length > exact.value) {
+        errors.push(
+          `${label} expects ${rule.expected.length} values in column ` +
+            `${JSON.stringify(rule.column)} but allows only ${exact.value} rows`,
+        );
+      }
+    }
+  }
+  return errors;
+}
+
+/** Document-level checks: the evidence policy must be satisfiable and
+ * self-consistent. */
+function checkDocument(output: Extract<OutputSpec, { kind: 'document' }>): string[] {
+  const errors: string[] = [];
+  const label = `output ${JSON.stringify(output.id)}`;
+
+  if (output.requiredSections !== undefined) {
+    const duplicates = duplicatesOf(output.requiredSections);
+    if (duplicates.length > 0) {
+      errors.push(
+        `${label} repeats required section(s) ` +
+          `${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
+      );
+    }
+  }
+  if (
+    output.evidenceRequirement === 'per_required_section' &&
+    (output.requiredSections === undefined || output.requiredSections.length === 0)
+  ) {
+    errors.push(
+      `${label} requires evidence per required section but declares no requiredSections`,
+    );
+  }
+  if (output.evidenceRequirement === 'none' && output.evidencePresentation === 'footnotes') {
+    errors.push(
+      `${label} asks for footnoted citations but requires no evidence: ` +
+        `raise evidenceRequirement or drop the footnotes`,
+    );
+  }
+  return errors;
+}
+
+/** A download must constrain something. "Any file the browser happened to
+ * save" is not a requirement, and code could never check it. */
+function checkDownload(output: Extract<OutputSpec, { kind: 'download' }>): string[] {
+  const errors: string[] = [];
+  const label = `output ${JSON.stringify(output.id)}`;
+
+  const constrained =
+    output.filenamePattern !== undefined ||
+    output.allowedMediaTypes !== undefined ||
+    output.sourceUrlPattern !== undefined;
+  if (!constrained) {
+    errors.push(
+      `${label} constrains nothing: a download output needs at least one of ` +
+        `filenamePattern, allowedMediaTypes, or sourceUrlPattern, or any saved file would satisfy it`,
+    );
+  }
+  for (const mediaType of output.allowedMediaTypes ?? []) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*\/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$/.test(mediaType)) {
+      errors.push(
+        `${label} media type ${JSON.stringify(mediaType)} is not a type/subtype pair, ` +
+          `e.g. "application/pdf"`,
+      );
+    }
+  }
+  const duplicates = duplicatesOf(output.allowedMediaTypes ?? []);
+  if (duplicates.length > 0) {
+    errors.push(
+      `${label} repeats media type(s) ${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
+    );
+  }
+  return errors;
+}
+
+/** The revision-basis rule. Revision 1 has nothing to explain; every later
+ * revision must say what evidence, corrected assumption, or user
+ * clarification moved the requirements — an unexplained change is exactly
+ * the drift the verifier needs to see. */
+function checkBasis(
+  basis: ContractRevisionBasis | undefined,
+  revisionNumber: number,
+): string[] {
+  if (revisionNumber === 1) {
+    return basis === undefined
+      ? []
+      : [
+          `the first contract revision has no revisionBasis: there is no earlier ` +
+            `contract for it to explain`,
+        ];
+  }
+  return basis === undefined
+    ? [
+        `revision ${revisionNumber} needs a revisionBasis explaining the change ` +
+          `(evidence_discovery, assumption_correction, or user_clarification)`,
+      ]
+    : [];
+}
+
+/** Values appearing more than once, each reported once, in first-seen
+ * order. */
+function duplicatesOf(values: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const value of values) {
+    if (seen.has(value)) duplicates.add(value);
+    seen.add(value);
+  }
+  return [...duplicates];
+}
+
+/** True iff the runtime's ICU data recognizes the timezone. `Intl` is the
+ * same authority the date formatter will use, so accepting anything it
+ * rejects would only defer the failure to render time. */
+function isValidTimezone(timezone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** True iff the tag is a structurally valid BCP 47 locale. */
+function isValidLocale(locale: string): boolean {
+  try {
+    return Intl.getCanonicalLocales(locale).length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/** Build the failure branch, preserving the non-empty guarantee in the type
+ * without a cast. */
+function failure(errors: string[]): { ok: false; errors: [string, ...string[]] } {
+  const [first, ...rest] = errors;
+  return { ok: false, errors: [first, ...rest] };
+}
+
+/**
+ * Recursively sort object keys so serialization depends only on the data.
+ * Arrays keep their order — a table's column order is part of the
+ * requirement, not an incidental detail.
+ */
+function canonicalizeJson(value: unknown, path: string): unknown {
+  if (value === null || typeof value === 'boolean' || typeof value === 'string') return value;
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw new Error(`cannot serialize non-finite number at ${path}: ${String(value)}`);
+    }
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item, index) => canonicalizeJson(item, `${path}[${index}]`));
+  }
+  if (typeof value === 'object') {
+    const source = value as Record<string, unknown>;
+    const canonical: Record<string, unknown> = {};
+    // Default sort order is by UTF-16 code unit: locale-independent, so two
+    // machines produce the same bytes.
+    for (const key of Object.keys(source).sort()) {
+      const child = source[key];
+      // JSON.stringify drops undefined-valued keys; dropping them here keeps
+      // the canonical form and the emitted JSON in agreement.
+      if (child === undefined) continue;
+      canonical[key] = canonicalizeJson(child, `${path}.${key}`);
+    }
+    return canonical;
+  }
+  throw new Error(`cannot serialize ${typeof value} at ${path}`);
+}
