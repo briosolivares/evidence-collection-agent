@@ -78,12 +78,12 @@
     {
       "id": "T2",
       "title": "Preserve one worker session and report truthful outcomes",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T1"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T12:55:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t2--preserve-one-worker-session-and-report-truthful-outcomes",
@@ -91,22 +91,22 @@
         {
           "id": "T2.1",
           "description": "Keep one WorkerSession and append verifier corrections without restarting the conversation.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T2.2",
           "description": "Enforce one finite whole-run budget across initializer, worker, verifier, tools, time, and corrections.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T2.3",
           "description": "Return verified, incomplete, failed, or cancelled outcomes without mapping judge failure or exhausted corrections to success.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T2.4",
           "description": "Include every model role in run metrics while preserving current aggregate readers.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
@@ -119,12 +119,12 @@
     {
       "id": "T3",
       "title": "Replace prose judge verdicts with a typed verifier result",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T2"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T12:55:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t3--replace-prose-judge-verdicts-with-a-typed-verifier-result",
@@ -132,22 +132,22 @@
         {
           "id": "T3.1",
           "description": "Return verified or needs_correction through the schema-validated report_verification tool.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T3.2",
           "description": "Give the verifier only scoped read/image tools and evidence-relevant run data.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T3.3",
           "description": "Allow one bounded schema repair and fail closed as verifier_unavailable afterward.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T3.4",
           "description": "Remove DONE and CONTINUE text parsing while preserving screenshot-aware review.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
@@ -160,11 +160,11 @@
     {
       "id": "T4",
       "title": "Introduce one typed output contract",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T3"
       ],
-      "owner": null,
+      "owner": "delegated subagent (primary integrates)",
       "startedAt": null,
       "completedAt": null,
       "blockedBy": [],
@@ -242,12 +242,12 @@
     {
       "id": "T6",
       "title": "Add bounded page-scoped JavaScript",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T1",
         "T4"
       ],
-      "owner": null,
+      "owner": "delegated subagent (primary integrates)",
       "startedAt": null,
       "completedAt": null,
       "blockedBy": [],
@@ -372,11 +372,11 @@
     {
       "id": "T9",
       "title": "Give the browser stable page and observation identity",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T1"
       ],
-      "owner": null,
+      "owner": "delegated subagent (primary integrates)",
       "startedAt": null,
       "completedAt": null,
       "blockedBy": [],

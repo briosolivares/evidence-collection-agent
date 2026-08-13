@@ -45,14 +45,14 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | Task | Status | Owner | Last commit | Summary |
 | --- | --- | --- | --- | --- |
 | T1 | complete | claude (impl session) | see log | Trustworthy shared model driver |
-| T2 | not_started | — | — | Persistent worker and truthful outcomes |
-| T3 | not_started | — | — | Typed verifier result |
-| T4 | not_started | — | — | Typed output contract |
+| T2 | in_progress | claude (impl session) | 199467a | Persistent worker and truthful outcomes — focused tests pass; whole-tree gate pending |
+| T3 | in_progress | claude (impl session) | 1cc2b57 | Typed verifier result — focused tests pass; whole-tree gate pending |
+| T4 | in_progress | delegated subagent | — | Typed output contract — subagent in flight |
 | T5 | not_started | — | — | Explicit submission and code checks |
-| T6 | not_started | — | — | Bounded page JavaScript |
+| T6 | in_progress | delegated subagent | — | Bounded page JavaScript — subagent in flight |
 | T7 | not_started | — | — | Evidence-linked output tables |
 | T8 | not_started | — | — | Evidence-linked documents |
-| T9 | not_started | — | — | Stable browser identity and observation |
+| T9 | in_progress | delegated subagent | — | Stable browser identity — first subagent died at session limit, second finishing |
 | T10 | not_started | — | — | Receipted browser actions |
 | T11 | not_started | — | — | Targeted observation and public resources |
 | T12 | not_started | — | — | PDF, spreadsheet, and OCR adapters |
@@ -85,6 +85,51 @@ When work begins, replace the sentence above with one section per active task:
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 13:40 — T2 and T3 implemented; T4/T6/T9 delegated
+
+- Owner: claude (browser-agent-v2 impl session)
+- Branch/worktree: `feat/browser-agent-v2` at `evidence-collection-agent-v2-impl`
+- Commits: `199467a` (T2), `1cc2b57` (T3)
+- Features: T2.1–T2.4 and T3.1–T3.4 implemented with passing focused tests.
+  Task status deliberately left `in_progress`: the plan requires
+  `npm run typecheck` + `npm test` on the tree before `complete`, and three
+  delegated subagents were mid-edit in the same worktree.
+- Changed (T2): `src/loop/workerSession.ts` (one persistent conversation;
+  corrections append feedback and replay full history), `src/run/runBudget.ts`
+  (one unresettable whole-run budget across initializer/worker/verifier;
+  finite-limit validation up front; `withBudgetAccounting`),
+  `src/run/runOutcome.ts` (`verified` is the only success; judge crash,
+  correction exhaustion, and budget exhaustion are explicit incomplete
+  reasons with artifacts preserved), `runAgentLoop` reduced to a
+  compatibility wrapper, `runVerificationHarness` replaces
+  `runHarnessCycles`, single `metrics.json` with per-role usage replaces
+  `metrics-cycle-N.json` archival/rollup, TUI renders incomplete distinctly
+  from failure.
+- Changed (T3): `src/harness/verifier.ts` + `verifierTools.ts` —
+  `report_verification` is the only decision channel; one bounded repair,
+  then `verifier_unavailable`; evidence scope and the screenshot byte/8000px
+  safeguards preserved. Deleted `src/harness/judge.ts` and `judge.test.ts`.
+- Delegated (primary owns integration and tracking):
+  - T9 browser identity — first subagent died at an API session limit ~80%
+    through; a second is finishing its tests. Files: `src/browser/**`,
+    `src/tools/observe/**`, `tests/fixtures/{frames,popup,rows}.html`.
+  - T4 typed output contract — new `src/contracts/**` and
+    `src/tools/setOutputContract/**` only; forbidden from editing existing
+    files, leaves an INTEGRATION comment for the primary agent.
+  - T6 bounded page JavaScript — new `src/evidence/**`,
+    `src/browser/browserJavaScript.ts`, `src/tools/executeJavascript/**`
+    only; same integration-comment rule.
+- Verified:
+  - `npx vitest run src/harness/verifier.test.ts src/harness/harness.test.ts src/cli/runTask.test.ts` — pass (37 tests)
+  - `npx vitest run src/loop/workerSession.test.ts src/run/runBudget.test.ts` and 85 hermetic suites / 804 tests across tui, cli, loop, run, harness, model, tracing, evals — pass
+  - Whole-tree `npm run typecheck` + `npm test`: NOT yet re-run since the
+    delegated browser work landed mid-tree. This is the outstanding gate.
+- Time check: `TIME_CHECK start=1786649718 now=1786654798 elapsed=01h:24m:40s remaining=00h:35m:20s`
+- Remaining: integrate the three delegated branches, re-run the whole-tree
+  gate, then flip T2/T3 (and any delegated task that passes) to `complete`.
+- Notes: T5, T7, T8, T10–T16 are untouched. The 120-minute window does not
+  contain them; they remain the next session's work in dependency order.
 
 ### 2026-08-13 12:55 — T1 complete
 
@@ -165,9 +210,11 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: T1
-- Safe next task: T2 (sequential core); T9 is now unlocked for parallel work
-- Parallel work currently unlocked: T9 (browser identity) in a separate area
+- Last completed task: T1 (fully gated). T2 and T3 are implemented with
+  passing focused tests, awaiting the whole-tree typecheck/full-suite gate
+- Safe next task: T5 (needs T4 landed first), then T7
+- Parallel work currently unlocked: T4, T6, T9 are in flight with subagents;
+  T10 unlocks once T9 lands
 - Known local state: `docs/adversarial-review-revised-browser-agent-proposal.md`
   is an untracked review input and must remain untouched unless explicitly
   requested
