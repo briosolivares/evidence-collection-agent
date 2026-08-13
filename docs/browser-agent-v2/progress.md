@@ -55,7 +55,7 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T9 | complete | delegated subagent, primary-verified | 70884d6 | Stable browser identity and observation |
 | T10 | in_progress | delegated subagent | — | Receipted browser actions |
 | T11 | in_progress | delegated subagent | — | Targeted observation and public resources |
-| T12 | in_progress | claude (impl session) | 6251588 | PDF, spreadsheet, and OCR adapters — all three landed |
+| T12 | complete | claude (impl session) | see log | PDF, spreadsheet, and OCR adapters |
 | T13 | not_started | — | — | Input-aware scheduler |
 | T14 | not_started | — | — | Bounded research jobs |
 | T15 | in_progress | claude (impl session) | 3d151fc | Cache-safe compact memory — context + compaction landed |
