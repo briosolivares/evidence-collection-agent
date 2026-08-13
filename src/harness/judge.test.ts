@@ -340,3 +340,106 @@ describe('runJudge', () => {
     expect(result.reason.length).toBeGreaterThan(0);
   });
 });
+
+describe('evidence scope (v2 diet)', () => {
+  /** Run one scripted tool call through the judge and return its
+   * tool_result block from the follow-up request. */
+  async function resultOfCall(call: {
+    id: string;
+    name: string;
+    input: unknown;
+  }): Promise<{ tool_use_id: string; content: string; is_error?: boolean }> {
+    const { callModel, requests } = scriptModel([toolResponse([call]), textResponse('DONE')]);
+    await runJudge({ taskText: TASK, runDir, callModel });
+    const followUp = requests[1]!;
+    const toolResultMessage = followUp[followUp.length - 1]!;
+    return toolResultMessage.content[0] as {
+      tool_use_id: string;
+      content: string;
+      is_error?: boolean;
+    };
+  }
+
+  it('a read_file into scratch/ returns a steering error naming the boundary, without executing', async () => {
+    mkdirSync(join(runDir, 'scratch'), { recursive: true });
+    writeFileSync(join(runDir, 'scratch', 'notes.md'), 'worker claims widget-3 is fine', 'utf8');
+
+    const block = await resultOfCall({
+      id: 't1',
+      name: 'read_file',
+      input: { file_path: 'scratch/notes.md' },
+    });
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('evidence scope');
+    expect(block.content).toContain('artifacts/');
+    // The steering error must not leak the file's content.
+    expect(block.content).not.toContain('widget-3 is fine');
+  });
+
+  it('root bookkeeping files (transcript, metrics) are off-diet even though they are in the run dir', async () => {
+    writeFileSync(join(runDir, 'transcript.jsonl'), '{"type":"turn_start"}\n', 'utf8');
+
+    const block = await resultOfCall({
+      id: 't1',
+      name: 'read_file',
+      input: { file_path: 'transcript.jsonl' },
+    });
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('evidence scope');
+  });
+
+  it('a traversal that resolves outside artifacts/ is caught on the resolved path', async () => {
+    mkdirSync(join(runDir, 'scratch'), { recursive: true });
+    writeFileSync(join(runDir, 'scratch', 'leak.txt'), 'secret', 'utf8');
+
+    const block = await resultOfCall({
+      id: 't1',
+      name: 'read_file',
+      input: { file_path: 'artifacts/../scratch/leak.txt' },
+    });
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('evidence scope');
+  });
+
+  it('the governing root files and artifacts/ remain readable', async () => {
+    for (const filePath of ['INTENT.md', 'CONTRACT.md', 'manifest.json', 'artifacts/report.md']) {
+      const block = await resultOfCall({ id: 't1', name: 'read_file', input: { file_path: filePath } });
+      expect(block.is_error, `for ${filePath}`).toBeUndefined();
+      expect(block.content.length, `for ${filePath}`).toBeGreaterThan(0);
+    }
+  });
+
+  it('grep with an explicit scratch/ path returns the steering error', async () => {
+    mkdirSync(join(runDir, 'scratch'), { recursive: true });
+    writeFileSync(join(runDir, 'scratch', 'leak.txt'), 'widget-9: ok', 'utf8');
+
+    const block = await resultOfCall({
+      id: 't1',
+      name: 'grep',
+      input: { pattern: 'widget', path: 'scratch' },
+    });
+    expect(block.is_error).toBe(true);
+    expect(block.content).toContain('evidence scope');
+  });
+
+  it('grep with no path searches artifacts/ only — off-diet files never match', async () => {
+    mkdirSync(join(runDir, 'scratch'), { recursive: true });
+    writeFileSync(join(runDir, 'scratch', 'leak.txt'), 'widget-9: unpublished claim', 'utf8');
+
+    const block = await resultOfCall({ id: 't1', name: 'grep', input: { pattern: 'widget' } });
+    expect(block.is_error).toBeUndefined();
+    expect(block.content).toContain('artifacts/report.md');
+    expect(block.content).not.toContain('scratch/');
+    expect(block.content).not.toContain('unpublished claim');
+  });
+
+  it('grep with an explicit root governing file path still works', async () => {
+    const block = await resultOfCall({
+      id: 't1',
+      name: 'grep',
+      input: { pattern: 'widget', path: 'CONTRACT.md' },
+    });
+    expect(block.is_error).toBeUndefined();
+    expect(block.content).toContain('CONTRACT.md');
+  });
+});

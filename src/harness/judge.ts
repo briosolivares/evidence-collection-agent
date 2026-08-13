@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve, sep } from 'node:path';
 
 import type {
   AssistantContentBlock,
@@ -11,6 +11,7 @@ import type {
 } from '../loop/messages.js';
 import { makeCallModel, type ProgressEvent } from '../model/callModel.js';
 import { ARTIFACTS_DIR, MANIFEST_FILENAME } from '../run/artifacts.js';
+import { resolveRunPath } from '../run/runDir.js';
 import { grepTool } from '../tools/grep/grep.js';
 import { executeToolCall, type ToolCallResult } from '../tools/pipeline.js';
 import { readFileTool } from '../tools/readFile/readFile.js';
@@ -23,7 +24,8 @@ import { CONTRACT_FILENAME, INTENT_FILENAME } from './initializer.js';
 // INTENT.md + CONTRACT.md (initializer-owned) and the run's published
 // evidence, then returns DONE or CONTINUE + a short reason. It never
 // re-collects evidence and never browses — its only tools are read_file and
-// grep, scoped to the run directory — and it never rewrites the contract.
+// grep, scoped to the run's published evidence (see evidenceScopeError) —
+// and it never rewrites the contract.
 //
 // This module is a much smaller sibling of runAgentLoop (agentLoop.ts): a
 // bounded mini-loop with the same content-decides-completion policy (no
@@ -87,11 +89,11 @@ const CORRECTIVE_VERDICT_PROMPT =
  */
 export const JUDGE_SYSTEM_PROMPT = `You are a fresh-context verifier for one evidence-collection run. You were not present for the work and have no memory of it: everything you know about this run comes from the task text, INTENT.md, and CONTRACT.md, plus the manifest and artifact listing, all given to you in the opening message.
 
-Your only job is to check whether the contract in CONTRACT.md is fully satisfied by what was actually produced. Go through every criterion in the contract and check it individually against the real artifacts: read the deliverable files named in CONTRACT.md and INTENT.md with read_file, and use grep when you need to confirm a pattern, a count, or the presence or absence of something across files. Verify structure — the exact fields, columns, or sections the contract requires — and field-level rules — formats, enum-like values, required non-emptiness — by inspecting the actual file content, never by assuming it was done correctly. Verify that every factual claim in the deliverables is backed by evidence surfaced somewhere in the run directory; a claim with no supporting evidence has not been proven, no matter how plausible it sounds.
+Your only job is to check whether the contract in CONTRACT.md is fully satisfied by what was actually produced. Go through every criterion in the contract and check it individually against the real artifacts: read the deliverable files named in CONTRACT.md and INTENT.md with read_file, and use grep when you need to confirm a pattern, a count, or the presence or absence of something across files. Verify structure — the exact fields, columns, or sections the contract requires — and field-level rules — formats, enum-like values, required non-emptiness — by inspecting the actual file content, never by assuming it was done correctly. Verify that every factual claim in the deliverables is backed by published evidence; a claim with no supporting evidence has not been proven, no matter how plausible it sounds.
 
 Be skeptical. An unproven claim fails the criterion it belongs to, even if it looks correct on its face. A criterion is satisfied only when you can point to the specific evidence that proves it; when you cannot, treat it as unsatisfied. Do not give the benefit of the doubt, and do not fill gaps with outside knowledge.
 
-You have exactly two tools, both read-only and both scoped to this run's directory: read_file and grep. You have no browser and cannot take new evidence, re-collect anything that should already be in the run directory, or edit any file. You must not rewrite, loosen, reinterpret, or add to the contract — apply it exactly as written. If the contract is genuinely ambiguous on a specific point, judge conservatively: prefer CONTINUE with a concrete question over guessing what was intended.
+You have exactly two tools, both read-only: read_file and grep. They are scoped to the run's published evidence — files under artifacts/, plus INTENT.md, CONTRACT.md, and manifest.json at the run-directory root — and reads anywhere else are refused. Published evidence is the only evidence: unpublished working files do not exist for you, and a claim whose only support would live outside the published evidence is unproven. A grep with no path searches artifacts/. You have no browser and cannot take new evidence, re-collect anything that should already be in the run directory, or edit any file. You must not rewrite, loosen, reinterpret, or add to the contract — apply it exactly as written. If the contract is genuinely ambiguous on a specific point, judge conservatively: prefer CONTINUE with a concrete question over guessing what was intended.
 
 Work turn by turn: call only the reads and searches you need to check the contract's criteria, then stop calling tools once you have enough evidence to decide. Do not pad the run with speculative exploration beyond what the contract requires you to verify.
 
@@ -139,8 +141,10 @@ const UNPARSEABLE_REASON = 'judge did not reach a parseable verdict';
  * (`executeToolCall`) against the judge's read-only registry (read_file and
  * grep only — a call naming any other tool gets the pipeline's structured
  * `unknown_tool` error, same as an unregistered tool anywhere else in this
- * codebase) and feed the results back as one tool_result message; otherwise
- * parse its text as the final verdict. Investigative calls are uncapped;
+ * codebase), subject to the evidence-scope guard (see executeJudgeToolUse:
+ * reads outside artifacts/ + the root governing files return a steering
+ * error instead of executing), and feed the results back as one tool_result
+ * message; otherwise parse its text as the final verdict. Investigative calls are uncapped;
  * the terminating guard is JUDGE_MAX_CONTEXT_TOKENS (context grows every
  * turn, so termination is guaranteed). When a response trips the guard
  * while still requesting tools, a single forced-verdict call follows
@@ -302,26 +306,127 @@ export function makeJudgeCallModel(config: JudgeCallModelConfig = {}): CallModel
 }
 
 /**
- * Execute one turn's tool_use blocks through the standard pipeline and
- * convert the results to tool_result blocks, in request order. Every block
- * in `toolUses` is a request the model made this turn; both allowed tools
- * (read_file, grep) are read-only, and a call naming anything else is
- * rejected by `executeToolCall` itself (JUDGE_TOOL_REGISTRY's unknown_tool
- * error, listing the tools that do exist) — so running them concurrently
- * carries none of the ordering risk `scheduleToolCalls` guards against for
- * the worker's mixed read/write registry (see loop/scheduler.ts); `Promise.all`
- * already preserves result order by index, which is all that is needed here.
+ * Execute one turn's tool_use blocks and convert the results to tool_result
+ * blocks, in request order. Every block in `toolUses` is a request the model
+ * made this turn; both allowed tools (read_file, grep) are read-only, and a
+ * call naming anything else is rejected by `executeToolCall` itself
+ * (JUDGE_TOOL_REGISTRY's unknown_tool error, listing the tools that do
+ * exist) — so running them concurrently carries none of the ordering risk
+ * `scheduleToolCalls` guards against for the worker's mixed read/write
+ * registry (see loop/scheduler.ts); `Promise.all` already preserves result
+ * order by index, which is all that is needed here.
  */
 async function executeJudgeToolUses(
   toolUses: readonly ToolUseBlock[],
   ctx: ToolCtx,
 ): Promise<ToolResultBlock[]> {
-  const results = await Promise.all(
-    toolUses.map((block) =>
-      executeToolCall(JUDGE_TOOL_REGISTRY, { id: block.id, name: block.name, input: block.input }, ctx),
-    ),
+  return Promise.all(toolUses.map((block) => executeJudgeToolUse(block, ctx)));
+}
+
+/**
+ * Execute one judge tool call: apply the evidence-scope guard (v2 ruling 1,
+ * judge-design.md "v2 revisions" — the judge grades only surfaced evidence),
+ * then delegate to the standard pipeline. A call targeting a path outside
+ * the published-evidence scope returns a steering error naming the boundary
+ * without executing anything; everything else runs through `executeToolCall`
+ * exactly as before, with one adjustment: a grep with no path is redirected
+ * from the tool's own default (the entire run directory — wider than the
+ * judge may see) to artifacts/ (see scopeGrepInput).
+ */
+async function executeJudgeToolUse(block: ToolUseBlock, ctx: ToolCtx): Promise<ToolResultBlock> {
+  const relPath = requestedPath(block);
+  if (relPath !== undefined) {
+    const scopeError = evidenceScopeError(ctx.runDir, relPath);
+    if (scopeError !== null) {
+      return { type: 'tool_result', tool_use_id: block.id, content: scopeError, is_error: true };
+    }
+  }
+  const result = await executeToolCall(
+    JUDGE_TOOL_REGISTRY,
+    { id: block.id, name: block.name, input: scopeGrepInput(block) },
+    ctx,
   );
-  return results.map(toResultBlock);
+  return toResultBlock(result);
+}
+
+/**
+ * Best-effort extraction of the run-dir-relative path a judge tool call
+ * targets: read_file's `file_path`, grep's optional `path`. Missing or
+ * non-string values (and unknown tool names) return undefined — the
+ * pipeline's zod validation reports malformed input in full; the scope
+ * guard only inspects paths that are actually there to inspect.
+ */
+function requestedPath(block: ToolUseBlock): string | undefined {
+  const input = block.input as Record<string, unknown> | null | undefined;
+  const field =
+    block.name === 'read_file'
+      ? input?.['file_path']
+      : block.name === 'grep'
+        ? input?.['path']
+        : undefined;
+  return typeof field === 'string' ? field : undefined;
+}
+
+/** The root files inside the judge's evidence scope. Everything else at the
+ * run-dir root (transcript, metrics, harness diagnostics) is bookkeeping,
+ * not evidence. */
+const ROOT_EVIDENCE_FILES: readonly string[] = [
+  INTENT_FILENAME,
+  CONTRACT_FILENAME,
+  MANIFEST_FILENAME,
+];
+
+/**
+ * The judge's evidence-scope check: only surfaced evidence is readable —
+ * files under artifacts/, plus INTENT.md, CONTRACT.md, and manifest.json at
+ * the run-dir root. Anywhere else (scratch/, the transcript, metrics) is
+ * off-diet: graders never see unpublished working files, so a verdict built
+ * on them would be a false calibration (a DONE from unpublished proof passes
+ * a run the grader will fail); the boundary also keeps backpressure on the
+ * worker to publish its proof, and keeps worker claims in scratch notes from
+ * self-confirming as evidence.
+ *
+ * @returns null when `relPath` resolves inside the scope; the steering-error
+ *   text to send back otherwise. A path that fails resolveRunPath's own
+ *   confinement (absolute, or escaping the run dir) also returns null: the
+ *   tool itself rejects it with the run-dir confinement error, and this
+ *   guard adds the narrower boundary rather than re-reporting the wider one.
+ */
+function evidenceScopeError(runDir: string, relPath: string): string | null {
+  let resolved: string;
+  try {
+    resolved = resolveRunPath(runDir, relPath);
+  } catch {
+    return null;
+  }
+  const root = resolve(runDir);
+  const artifactsRoot = join(root, ARTIFACTS_DIR);
+  const inArtifacts = resolved === artifactsRoot || resolved.startsWith(artifactsRoot + sep);
+  const isRootEvidenceFile = ROOT_EVIDENCE_FILES.some((name) => resolved === join(root, name));
+  if (inArtifacts || isRootEvidenceFile) return null;
+  return (
+    `Outside the judge's evidence scope: ${JSON.stringify(relPath)}. You may read only ` +
+    `published evidence: files under ${ARTIFACTS_DIR}/, plus ${INTENT_FILENAME}, ` +
+    `${CONTRACT_FILENAME}, and ${MANIFEST_FILENAME} at the run-directory root. ` +
+    'Unpublished working files are not evidence — a claim proven only there is unproven.'
+  );
+}
+
+/**
+ * The judge's grep input: a grep with no `path` is redirected to artifacts/.
+ * The tool's own default scope is the entire run directory — wider than the
+ * evidence scope — and an unscoped judge grep means "search all published
+ * evidence", which artifacts/ is. INTENT.md, CONTRACT.md, and the manifest
+ * arrive in full in the opening message, so excluding them from the default
+ * costs nothing, and an explicit path to any of them still works. Non-object
+ * input, or input already carrying a `path` key (string or not), passes
+ * through unchanged for the pipeline's zod validation to judge.
+ */
+function scopeGrepInput(block: ToolUseBlock): unknown {
+  if (block.name !== 'grep') return block.input;
+  const input = block.input;
+  if (typeof input !== 'object' || input === null || 'path' in input) return input;
+  return { ...input, path: ARTIFACTS_DIR };
 }
 
 /** Convert one pipeline result into the API-shaped tool_result block the
