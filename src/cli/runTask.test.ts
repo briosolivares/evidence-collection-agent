@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -7,6 +8,12 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
+import { HARNESS_FILENAME, type HarnessDiagnostics } from '../harness/harness.js';
+import {
+  CONTRACT_FILENAME,
+  INITIALIZER_MODEL,
+  INTENT_FILENAME,
+} from '../harness/initializer.js';
 import {
   METRICS_FILENAME,
   type RunMetrics,
@@ -33,7 +40,7 @@ const DEFAULT_USAGE: Usage = { input_tokens: 10, output_tokens: 2 };
 
 interface TranscriptEvent {
   type: string;
-  turn: number;
+  turn?: number;
   [key: string]: unknown;
 }
 
@@ -77,6 +84,27 @@ function scriptModel(responses: readonly ModelResponse[]): {
     return response;
   };
   return { callModel, requests };
+}
+
+// --- Harness-mode fakes: a well-formed initializer response, and judge
+// DONE/CONTINUE responses, all built on top of textResponse above (the
+// initializer's and judge's callModels are never offered tools, so every
+// scripted response here is text-only, matching initializer.test.ts and
+// judge.test.ts's own fakes).
+
+/** A well-formed initializer response: both sections, non-empty bodies. */
+function initializerResponse(intent: string, contract: string): ModelResponse {
+  return textResponse(`# INTENT\n${intent}\n\n# CONTRACT\n${contract}`);
+}
+
+/** A judge response proposing DONE. */
+function judgeDone(): ModelResponse {
+  return textResponse('DONE');
+}
+
+/** A judge response proposing CONTINUE with the given reason. */
+function judgeContinue(reason: string): ModelResponse {
+  return textResponse(`CONTINUE: ${reason}`);
 }
 
 async function readJson<T>(path: string): Promise<T> {
@@ -328,4 +356,297 @@ describe('runTask', () => {
     },
     TEST_TIMEOUT_MS,
   );
+
+  describe('harness mode (initializer → worker → judge outer loop)', () => {
+    it(
+      'is unaffected when config.harness is absent: single loop, no INTENT.md/CONTRACT.md/harness.json',
+      async () => {
+        const fake = scriptModel([textResponse('Completed with no harness configured.')]);
+
+        const result = await runTask('Plain task, harness absent.', {
+          browser,
+          runsBaseDir,
+          callModel: fake.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+        });
+
+        expect(result).toMatchObject({
+          status: 'completed',
+          finalText: 'Completed with no harness configured.',
+        });
+        expect(existsSync(join(result.runDir, INTENT_FILENAME))).toBe(false);
+        expect(existsSync(join(result.runDir, CONTRACT_FILENAME))).toBe(false);
+        expect(existsSync(join(result.runDir, HARNESS_FILENAME))).toBe(false);
+        await expect(
+          readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
+        ).resolves.toMatchObject({ status: 'completed', turns: 1 });
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'runs the initializer and one worker cycle, ending on a judge DONE verdict',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse(
+            'Collect and publish the widget roster.',
+            'artifacts/report.md must exist and list every widget.',
+          ),
+        ]);
+        const worker = scriptModel([textResponse('Report published.')]);
+        const judge = scriptModel([judgeDone()]);
+
+        const result = await runTask('Collect widgets and publish a report.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: judge.callModel,
+          },
+        });
+
+        expect(result).toMatchObject({ status: 'completed', finalText: 'Report published.' });
+
+        expect(await readFile(join(result.runDir, INTENT_FILENAME), 'utf8')).toBe(
+          'Collect and publish the widget roster.\n',
+        );
+        expect(await readFile(join(result.runDir, CONTRACT_FILENAME), 'utf8')).toBe(
+          'artifacts/report.md must exist and list every widget.\n',
+        );
+
+        const diagnostics = await readJson<HarnessDiagnostics>(
+          join(result.runDir, HARNESS_FILENAME),
+        );
+        expect(diagnostics).toEqual({
+          initializer: { model: INITIALIZER_MODEL },
+          cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'done' }],
+        });
+
+        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(rollup).toMatchObject({ status: 'completed', turns: 1 });
+        const cycle1Metrics = await readJson<RunMetrics>(
+          join(result.runDir, 'metrics-cycle-1.json'),
+        );
+        // A single-cycle run's rollup is exactly that cycle's own metrics.
+        expect(cycle1Metrics).toEqual(rollup);
+
+        const events = await readTranscript(result.runDir);
+        expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([1]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'runs a second worker cycle carrying the judge reason as feedback, then ends on DONE',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([
+          textResponse('First attempt at the report.'),
+          textResponse('Second attempt, column fixed.'),
+        ]);
+        const judge = scriptModel([
+          judgeContinue('artifacts/report.md is missing the required id column.'),
+          judgeDone(),
+        ]);
+
+        const result = await runTask('Collect widgets and publish a report.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: judge.callModel,
+          },
+        });
+
+        expect(result).toMatchObject({
+          status: 'completed',
+          finalText: 'Second attempt, column fixed.',
+        });
+        expect(worker.requests).toHaveLength(2);
+
+        // Cycle 2's opening message: taskText + judge feedback, plain text,
+        // no special framing (judge-design.md's "Judge-reason delivery").
+        const secondRequest = worker.requests[1];
+        expect(secondRequest).toHaveLength(1);
+        const secondOpeningText = (
+          secondRequest?.[0]?.content[0] as { text: string }
+        ).text;
+        expect(secondOpeningText).toContain('Collect widgets and publish a report.');
+        expect(secondOpeningText).toContain('Judge feedback:');
+        expect(secondOpeningText).toContain(
+          'artifacts/report.md is missing the required id column.',
+        );
+
+        const diagnostics = await readJson<HarnessDiagnostics>(
+          join(result.runDir, HARNESS_FILENAME),
+        );
+        expect(diagnostics).toEqual({
+          initializer: { model: INITIALIZER_MODEL },
+          cycles: [
+            {
+              cycle: 1,
+              workerStatus: 'completed',
+              verdict: 'continue',
+              reason: 'artifacts/report.md is missing the required id column.',
+            },
+            { cycle: 2, workerStatus: 'completed', verdict: 'done' },
+          ],
+        });
+
+        const events = await readTranscript(result.runDir);
+        expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([1, 2]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'ends at cycle exhaustion (maxWorkerCycles: 2) on a lingering CONTINUE verdict, still completed',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([
+          textResponse('First attempt.'),
+          textResponse('Second attempt.'),
+        ]);
+        const judge = scriptModel([
+          judgeContinue('First reason.'),
+          judgeContinue('Second reason.'),
+        ]);
+
+        const result = await runTask('Collect widgets and publish a report.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            maxWorkerCycles: 2,
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: judge.callModel,
+          },
+        });
+
+        expect(result).toMatchObject({ status: 'completed', finalText: 'Second attempt.' });
+        // Exactly two worker cycles ran — a third would have thrown against
+        // this fake's exhausted response script.
+        expect(worker.requests).toHaveLength(2);
+        expect(judge.requests).toHaveLength(2);
+
+        const diagnostics = await readJson<HarnessDiagnostics>(
+          join(result.runDir, HARNESS_FILENAME),
+        );
+        expect(diagnostics.cycles).toHaveLength(2);
+        expect(diagnostics.cycles[1]).toEqual({
+          cycle: 2,
+          workerStatus: 'completed',
+          verdict: 'continue',
+          reason: 'Second reason.',
+        });
+
+        const events = await readTranscript(result.runDir);
+        expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([1, 2]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'ends at a worker budget_exceeded without ever calling the judge',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([
+          toolResponse('navigate-harness-budget', 'navigate', {
+            url: fixtureServer.url('/'),
+          }),
+        ]);
+        // No responses scripted: a judge call here throws immediately,
+        // failing the test loudly instead of silently passing.
+        const judge = scriptModel([]);
+
+        const result = await runTask('Keep browsing until stopped.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 1,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: judge.callModel,
+          },
+        });
+
+        expect(result).toMatchObject({ status: 'budget_exceeded', reason: 'max_turns' });
+        expect(judge.requests).toHaveLength(0);
+
+        const diagnostics = await readJson<HarnessDiagnostics>(
+          join(result.runDir, HARNESS_FILENAME),
+        );
+        expect(diagnostics).toEqual({
+          initializer: { model: INITIALIZER_MODEL },
+          cycles: [{ cycle: 1, workerStatus: 'budget_exceeded' }],
+        });
+
+        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(rollup).toMatchObject({ status: 'budget_exceeded', turns: 1 });
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'rejects when the initializer fails on both attempts, and still finalizes the manifest',
+      async () => {
+        // Same malformed pair as initializer.test.ts's own "still malformed
+        // after the corrective retry" case: no headers at all, then INTENT
+        // present but no CONTRACT header.
+        const malformedOnce = textResponse('No headers at all here.');
+        const malformedTwice = textResponse('# INTENT\nGoal stated.\n\nNo contract header this time.');
+        const initializer = scriptModel([malformedOnce, malformedTwice]);
+        const worker = scriptModel([]);
+        const judge = scriptModel([]);
+
+        const before = new Set(await readdir(runsBaseDir));
+
+        await expect(
+          runTask('Initializer fails on both attempts.', {
+            browser,
+            runsBaseDir,
+            callModel: worker.callModel,
+            maxTurns: 4,
+            maxContextTokens: 10_000,
+            harness: {
+              initializerCallModel: initializer.callModel,
+              judgeCallModel: judge.callModel,
+            },
+          }),
+        ).rejects.toThrow(/CONTRACT/);
+
+        const after = await readdir(runsBaseDir);
+        const newDirs = after.filter((name) => !before.has(name));
+        expect(newDirs).toHaveLength(1);
+        const runDir = join(runsBaseDir, newDirs[0]!);
+
+        const manifest = await readJson<Manifest>(join(runDir, MANIFEST_FILENAME));
+        expect(manifest.finishedAt).toBeDefined();
+
+        // The run never got past the initializer: no harness bookkeeping,
+        // no governing documents, and the browser tab never opened.
+        expect(existsSync(join(runDir, HARNESS_FILENAME))).toBe(false);
+        expect(existsSync(join(runDir, INTENT_FILENAME))).toBe(false);
+        expect(existsSync(join(runDir, CONTRACT_FILENAME))).toBe(false);
+        expect(existsSync(join(runDir, METRICS_FILENAME))).toBe(false);
+      },
+      TEST_TIMEOUT_MS,
+    );
+  });
 });

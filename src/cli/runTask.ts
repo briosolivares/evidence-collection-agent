@@ -7,8 +7,25 @@ import {
 } from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
 import {
+  archiveCycleMetrics,
+  rollupCycleMetrics,
+  writeHarnessDiagnostics,
+  writeMetricsRollup,
+  type HarnessCycleRecord,
+} from '../harness/harness.js';
+import {
+  INITIALIZER_MODEL,
+  makeInitializerCallModel,
+  runInitializer,
+  writeInitializerFiles,
+} from '../harness/initializer.js';
+import { makeJudgeCallModel, runJudge } from '../harness/judge.js';
+import {
   runAgentLoop,
+  type LoopConfig,
+  type LoopDeps,
   type LoopResult,
+  type RunMetrics,
 } from '../loop/agentLoop.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
@@ -23,6 +40,7 @@ import {
 } from '../run/artifacts.js';
 import { generateRunId } from '../run/runId.js';
 import { createRunDir } from '../run/runDir.js';
+import { appendTranscriptEvent, type CycleStartEvent } from '../run/transcript.js';
 import {
   createRunTracing,
   type RunTracing,
@@ -76,6 +94,28 @@ export function usableStartUrl(startUrl: string | undefined): string | undefined
   }
 }
 
+/**
+ * Configuration for the initializer → worker → judge outer loop (see
+ * .agents/planning/2026-08-12-research-quality-harness/judge-design.md).
+ * Present iff `RunTaskConfig.harness` is present — when it is absent,
+ * `runTask` behaves exactly as it did before this loop existed: a single
+ * `runAgentLoop` call, no INTENT.md/CONTRACT.md/harness.json, no judge.
+ */
+export interface HarnessConfig {
+  /** Maximum number of worker cycles this run may spend; an integer >= 1.
+   * Defaults to 2 (the design's v1 cap). A judge 'continue' verdict on the
+   * final cycle still ends the run with that cycle's completed result —
+   * this caps spend, not correctness (post-hoc graders stay the arbiter of
+   * whether the run actually succeeded). */
+  maxWorkerCycles?: number;
+  /** Test seam for the initializer's single model call, mirroring
+   * `RunTaskConfig.callModel`. Production default: makeInitializerCallModel. */
+  initializerCallModel?: CallModel;
+  /** Test seam for the judge's read-only mini-loop, mirroring
+   * `RunTaskConfig.callModel`. Production default: makeJudgeCallModel. */
+  judgeCallModel?: CallModel;
+}
+
 /** Configuration for one complete evidence-collection run. */
 export interface RunTaskConfig {
   /** A live session browser with no active task tab. The caller owns and
@@ -115,6 +155,14 @@ export interface RunTaskConfig {
    * question dialog here). When omitted — evals, headless CLI — tools that
    * require user interaction fail closed in the pipeline. */
   requestPermission?: ToolCtx['requestPermission'];
+  /** Enables the initializer → worker → judge outer loop (see HarnessConfig
+   * and judge-design.md). Absent (the default): today's behavior,
+   * byte-for-byte — one runAgentLoop call, no INTENT.md/CONTRACT.md/
+   * harness.json, no judge. Present: the initializer writes INTENT.md and
+   * CONTRACT.md before the browser tab opens, then up to
+   * `maxWorkerCycles` worker cycles run against the same tab, each
+   * verified by the judge before deciding whether another cycle runs. */
+  harness?: HarnessConfig;
 }
 
 /** The finished run directory together with the loop's terminal outcome. */
@@ -123,14 +171,34 @@ export type RunTaskResult = { runDir: string } & LoopResult;
 /**
  * Run one task through the production evidence-collection stack.
  *
+ * Absent `config.harness`, this is exactly one `runAgentLoop` call: the
+ * worker gets the task text verbatim, and the run ends with whatever
+ * `LoopResult` that single call produces. Present `config.harness`, an
+ * initializer → worker → judge outer loop runs instead (see
+ * .agents/planning/2026-08-12-research-quality-harness/judge-design.md):
+ * the initializer derives INTENT.md and CONTRACT.md from the task text,
+ * then up to `harness.maxWorkerCycles` worker cycles run against the same
+ * run directory and the same browser tab — a `budget_exceeded` cycle ends
+ * the run without judging; a `completed` cycle is judged, and a `done`
+ * verdict, cycle exhaustion, or an unparseable verdict all end the run with
+ * that cycle's completed result, while a `continue` verdict with cycles
+ * remaining starts a fresh worker cycle whose opening message carries the
+ * judge's reason as plain feedback text. See runHarnessCycles for the loop
+ * itself.
+ *
  * @param taskText - the user's task, recorded verbatim in the manifest and
- *   sent as the first conversation message
+ *   sent as the first conversation message of cycle 1 (every later cycle's
+ *   opening message is derived from it — see runHarnessCycles)
  * @param config - a live browser session with no active task tab plus
- *   optional run location, starting page, model settings, and loop guards;
- *   `callModel` may replace the production client at this dependency seam
+ *   optional run location, starting page, model settings, loop guards, and
+ *   harness settings; `callModel` may replace the production worker client
+ *   at this dependency seam, and `harness.initializerCallModel`/
+ *   `harness.judgeCallModel` do the same for the other two roles
  * @returns the absolute run directory and terminal loop outcome; before the
- *   promise resolves, the transcript and metrics are complete, the manifest
- *   is finalized, and this run's tab is closed while the browser stays open
+ *   promise resolves, the transcript and metrics are complete (a rolled-up
+ *   metrics.json plus one metrics-cycle-N.json per worker cycle when the
+ *   harness ran), the manifest is finalized, and this run's tab is closed
+ *   while the browser stays open
  */
 export async function runTask(
   taskText: string,
@@ -140,6 +208,18 @@ export async function runTask(
   if (!Number.isInteger(maxOutputTokens) || maxOutputTokens < 1) {
     throw new Error(
       `maxOutputTokens must be a positive integer, got ${maxOutputTokens}`,
+    );
+  }
+
+  // Harness-mode-only guard: absent config.harness, maxWorkerCycles is never
+  // read, so a caller that never opts in can never trip this.
+  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 2;
+  if (
+    config.harness !== undefined
+    && (!Number.isInteger(maxWorkerCycles) || maxWorkerCycles < 1)
+  ) {
+    throw new Error(
+      `harness.maxWorkerCycles must be a positive integer, got ${maxWorkerCycles}`,
     );
   }
 
@@ -177,6 +257,19 @@ export async function runTask(
 
   let tabOpened = false;
   try {
+    // Harness mode: derive INTENT.md/CONTRACT.md from the task text alone,
+    // before any browsing starts, so a failure here still lets the finally
+    // below finalize the manifest. Deliberately outside tracing.traceRun and
+    // never through tracing.wrapCallModel — per the design, initializer and
+    // judge calls run untraced in v1 (tracing coverage for these two roles
+    // is future work, not required for the harness to function).
+    if (config.harness !== undefined) {
+      const initializerCallModel =
+        config.harness.initializerCallModel ?? makeInitializerCallModel({});
+      const initializerResult = await runInitializer(taskText, initializerCallModel);
+      writeInitializerFiles(runDir, initializerResult);
+    }
+
     const result = await tracing.traceRun(taskText, async () => {
       await config.browser.newTab();
       tabOpened = true;
@@ -185,20 +278,30 @@ export async function runTask(
         await config.browser.goto(config.startUrl);
       }
 
-      return runAgentLoop(
+      const loopDeps: LoopDeps = {
+        callModel,
+        registry: tracedRegistry,
+        runDir,
+        browser: config.browser,
+        credentials,
+        requestPermission: config.requestPermission,
+      };
+      const loopConfig: LoopConfig = {
+        maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+        maxContextTokens: config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS,
+      };
+
+      if (config.harness === undefined) {
+        return runAgentLoop(taskText, loopDeps, loopConfig);
+      }
+
+      return runHarnessCycles(
         taskText,
-        {
-          callModel,
-          registry: tracedRegistry,
-          runDir,
-          browser: config.browser,
-          credentials,
-          requestPermission: config.requestPermission,
-        },
-        {
-          maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
-          maxContextTokens: config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS,
-        },
+        runDir,
+        config.harness,
+        maxWorkerCycles,
+        loopDeps,
+        loopConfig,
       );
     });
     return { runDir, ...result };
@@ -215,4 +318,120 @@ export async function runTask(
       }
     }
   }
+}
+
+/**
+ * Run the initializer → worker → judge outer loop's worker-cycle phase: up
+ * to `maxWorkerCycles` fresh `runAgentLoop` invocations against the same run
+ * directory and the same (already-open) browser tab, each gated by a judge
+ * verdict before another cycle starts. By the time this runs, INTENT.md and
+ * CONTRACT.md already exist at the run-dir root (written by `runTask`
+ * before the tab opened); this function owns only the cycle loop itself —
+ * the `cycle_start` transcript events, each cycle's metrics archival, and
+ * the harness.json diagnostics and metrics.json rollup written once the
+ * loop ends.
+ *
+ * Loop, per cycle (1-based, see judge-design.md's "Loop" section):
+ * 1. Append a `cycle_start` transcript event, then run `runAgentLoop` with
+ *    this cycle's opening message (cycle 1: `taskText` unchanged; cycle
+ *    N>1: `taskText` plus the previous cycle's judge reason as plain
+ *    feedback text — no special framing, borrowed from Claude Code's
+ *    `/goal` stop-hook delivery, see judge-design.md's "Judge-reason
+ *    delivery").
+ * 2. Archive this cycle's metrics.json (runAgentLoop would otherwise
+ *    overwrite it on the next cycle) and record it for the eventual rollup.
+ * 3. `budget_exceeded` ends the run right here, without judging — budgets
+ *    end runs. `completed` runs the judge (`runJudge`): a `done` verdict, a
+ *    `continue` verdict with no cycles left, or an unparseable verdict (the
+ *    judge's own fail-safe default, never a false `done`) all end the run
+ *    with this cycle's completed result; a `continue` verdict with cycles
+ *    remaining carries its reason into the next cycle's opening message.
+ *
+ * Every ending writes harness.json (see HarnessDiagnostics) and a rolled-up
+ * metrics.json (see rollupCycleMetrics) before returning. Both are skipped
+ * if any cycle throws (an AbortError or any other error) — the error
+ * propagates unchanged, exactly like a single-cycle judge-less run's crash
+ * contract, and no rollup or diagnostics for a run that never finished
+ * ever gets written.
+ *
+ * @param taskText - the original task text; cycle 1's opening message
+ *   verbatim, and the stem every later cycle's opening message is built from
+ * @param runDir - the run directory; must already hold INTENT.md and
+ *   CONTRACT.md (the judge throws loudly if either is missing)
+ * @param harnessConfig - `config.harness` as the caller passed it (see
+ *   HarnessConfig); only `judgeCallModel` is read here — `maxWorkerCycles`
+ *   and `initializerCallModel` are already spent by the time this runs
+ * @param maxWorkerCycles - the validated cycle budget (integer >= 1)
+ * @param loopDeps - deps for each cycle's `runAgentLoop` call; the same
+ *   instance every cycle, so the same browser tab, registry, and callModel
+ *   carry over
+ * @param loopConfig - guards for each cycle's `runAgentLoop` call; the same
+ *   every cycle
+ * @returns the final cycle's LoopResult
+ */
+async function runHarnessCycles(
+  taskText: string,
+  runDir: string,
+  harnessConfig: HarnessConfig,
+  maxWorkerCycles: number,
+  loopDeps: LoopDeps,
+  loopConfig: LoopConfig,
+): Promise<LoopResult> {
+  const judgeCallModel = harnessConfig.judgeCallModel ?? makeJudgeCallModel();
+
+  const cycleRecords: HarnessCycleRecord[] = [];
+  const perCycleMetrics: RunMetrics[] = [];
+  let openingMessage = taskText;
+  let finalResult: LoopResult | undefined;
+
+  for (let cycle = 1; cycle <= maxWorkerCycles; cycle += 1) {
+    const cycleStartEvent: CycleStartEvent = { type: 'cycle_start', cycle };
+    appendTranscriptEvent(runDir, cycleStartEvent);
+
+    const result = await runAgentLoop(openingMessage, loopDeps, loopConfig);
+    perCycleMetrics.push(archiveCycleMetrics(runDir, cycle));
+
+    if (result.status === 'budget_exceeded') {
+      // Budgets end runs: no judge call, and no verdict/reason to record.
+      cycleRecords.push({ cycle, workerStatus: result.status });
+      finalResult = result;
+      break;
+    }
+
+    const verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
+    cycleRecords.push({
+      cycle,
+      workerStatus: result.status,
+      verdict: verdict.verdict,
+      // JudgeVerdict.reason is always '' on 'done' (see judge.ts) — nothing
+      // worth recording there.
+      ...(verdict.reason.length > 0 ? { reason: verdict.reason } : {}),
+    });
+
+    if (verdict.verdict === 'done' || cycle === maxWorkerCycles) {
+      // Cycle exhaustion on a lingering 'continue' still ends the run with
+      // the completed result — post-hoc graders decide; the harness only
+      // records (see judge-design.md's "Loop" section).
+      finalResult = result;
+      break;
+    }
+
+    openingMessage = `${taskText}\n\nJudge feedback:\n${verdict.reason}`;
+  }
+
+  if (finalResult === undefined) {
+    // Unreachable: maxWorkerCycles >= 1 (validated in runTask) guarantees at
+    // least one iteration, and every iteration either breaks with
+    // finalResult set or is the loop's last (cycle === maxWorkerCycles),
+    // which also breaks with finalResult set.
+    throw new Error('harness cycle loop ended without a result');
+  }
+
+  writeHarnessDiagnostics(runDir, {
+    initializer: { model: INITIALIZER_MODEL },
+    cycles: cycleRecords,
+  });
+  writeMetricsRollup(runDir, rollupCycleMetrics(finalResult.status, perCycleMetrics));
+
+  return finalResult;
 }

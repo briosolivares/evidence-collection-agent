@@ -14,6 +14,20 @@ export interface TranscriptEvent {
 }
 
 /**
+ * A worker-cycle boundary in a harness-mode run (see runTask.ts's
+ * initializer → worker → judge outer loop, and judge-design.md's "Loop"
+ * section). Appended once per worker cycle, immediately before that cycle's
+ * `runAgentLoop` invocation — so turn numbers, which restart at 1 in every
+ * fresh `runAgentLoop` call, stay interpretable against the run as a whole.
+ * Judge-less runs (no `config.harness`) never emit this event.
+ */
+export interface CycleStartEvent extends TranscriptEvent {
+  type: 'cycle_start';
+  /** 1-based index of the cycle about to run. */
+  cycle: number;
+}
+
+/**
  * Append one event to the run's transcript.
  *
  * @param runDir - absolute path to an existing, writable run directory
