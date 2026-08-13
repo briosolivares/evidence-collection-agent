@@ -61,6 +61,10 @@ export interface EvalReport {
  * a separate serial lane. Browser/model work is concurrent; fresh oracle
  * fetches and grading are serialized independently. Results always return
  * in requested task/trial order.
+ *
+ * A trial whose run or grading throws is recorded as an errored trial
+ * (zero accuracy, task fails) and the batch continues — one bad trial
+ * must not discard a long batch. Only caller cancellation aborts the run.
  */
 export async function runEvals(
   tasks: EvalTask[],
@@ -89,13 +93,31 @@ export async function runEvals(
   const jobs = createJobs(tasks, k, controller.signal);
   const normalJobs = jobs.filter((job) => !job.requiresAuth);
   const authenticatedJobs = jobs.filter((job) => job.requiresAuth);
-  let firstError: unknown;
   let gradingTail: Promise<void> = Promise.resolve();
 
-  const fail = (error: unknown) => {
-    if (firstError !== undefined) return;
-    firstError = error;
-    controller.abort(error);
+  // A throwing trial becomes a recorded, failed trial — never a dead batch.
+  // Only the caller's cancellation signal aborts the whole run.
+  const recordGrade = async (job: EvalTrialJob, grade: TrialGrade) => {
+    grades[job.taskIndex]![job.trialIndex] = grade;
+    await deps.onTrialGraded?.(job, grade);
+  };
+
+  const erroredGrade = (
+    error: unknown,
+    latencyMs: number,
+    runDir?: string,
+  ): TrialGrade => ({
+    ...(runDir === undefined ? {} : { runDir }),
+    assertions: [],
+    latencyMs,
+    error: error instanceof Error ? error.message : String(error),
+  });
+
+  const scheduleErroredTrial = (job: EvalTrialJob, latencyMs: number, error: unknown) => {
+    gradingTail = gradingTail.then(async () => {
+      if (controller.signal.aborted) return;
+      await recordGrade(job, erroredGrade(error, latencyMs));
+    });
   };
 
   const scheduleGrade = (
@@ -105,7 +127,7 @@ export async function runEvals(
     latencyMs: number,
   ) => {
     gradingTail = gradingTail.then(async () => {
-      if (firstError !== undefined) return;
+      if (controller.signal.aborted) return;
       try {
         // The grader receives exactly the run directory and freshly fetched
         // oracle data. Concurrent execution does not widen this boundary.
@@ -114,11 +136,10 @@ export async function runEvals(
         if (assertions.length === 0) {
           throw new Error(`grader for task "${task.name}" returned no assertions`);
         }
-        const grade: TrialGrade = { runDir, assertions, latencyMs };
-        grades[job.taskIndex]![job.trialIndex] = grade;
-        await deps.onTrialGraded?.(job, grade);
+        await recordGrade(job, { runDir, assertions, latencyMs });
       } catch (error) {
-        fail(error);
+        if (controller.signal.aborted) return;
+        await recordGrade(job, erroredGrade(error, latencyMs, runDir));
       }
     });
   };
@@ -130,17 +151,17 @@ export async function runEvals(
         const job = queue[nextIndex++];
         if (job === undefined) return;
         const task = tasks[job.taskIndex]!;
+        const runStart = performance.now();
         try {
           await deps.onTrialStarted?.(job);
-          const runStart = performance.now();
           const { runDir } = await deps.runTask(task.taskText, job);
           const latencyMs = performance.now() - runStart;
           if (controller.signal.aborted) return;
           await deps.onTrialRunFinished?.(job, runDir, latencyMs);
           scheduleGrade(task, job, runDir, latencyMs);
         } catch (error) {
-          fail(error);
-          return;
+          if (controller.signal.aborted) return;
+          scheduleErroredTrial(job, performance.now() - runStart, error);
         }
       }
     };
@@ -157,7 +178,6 @@ export async function runEvals(
     ]);
     await gradingTail;
 
-    if (firstError !== undefined) throw firstError;
     if (deps.signal?.aborted === true) throw new EvalRunCancelledError();
 
     const taskReports = tasks.map((task, taskIndex) => {

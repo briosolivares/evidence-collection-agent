@@ -76,7 +76,8 @@ describe('runEvals', () => {
     const runDirs = task.trials.map((t) => t.runDir);
     expect(new Set(runDirs).size).toBe(3);
     for (const dir of runDirs) {
-      expect(statSync(dir).isDirectory()).toBe(true);
+      expect(dir).toBeDefined();
+      expect(statSync(dir!).isDirectory()).toBe(true);
     }
 
     for (const trial of task.trials) {
@@ -162,7 +163,7 @@ describe('runEvals', () => {
         // must complete before the next trial can crash the process).
         await Promise.resolve();
         expect(grade.assertions.length).toBeGreaterThan(0);
-        seen.push({ taskName: job.taskName, trialIndex: job.trialIndex, runDir: grade.runDir });
+        seen.push({ taskName: job.taskName, trialIndex: job.trialIndex, runDir: grade.runDir! });
       },
     });
 
@@ -174,7 +175,7 @@ describe('runEvals', () => {
     }
   });
 
-  it('rejects k < 1, an empty task list, and a grader returning no assertions', async () => {
+  it('rejects k < 1 and an empty task list; a grader asserting nothing errors its trial', async () => {
     const deps = {
       runTask: makeFakeRunTask(baseDir),
       concurrency: 1,
@@ -189,9 +190,12 @@ describe('runEvals', () => {
     );
 
     const silent: Grader = () => [];
-    await expect(runEvals([{ ...stubTask(), grade: silent }], 1, deps)).rejects.toThrow(
-      /no assertions/,
-    );
+    const report = await runEvals([{ ...stubTask(), grade: silent }], 1, deps);
+    const trial = report.tasks[0]!.trials[0]!;
+    expect(trial.error).toMatch(/no assertions/);
+    expect(trial.completed).toBe(false);
+    expect(report.tasks[0]!.taskPassed).toBe(false);
+    expect(report.tasks[0]!.accuracy).toBe(0);
   });
 
   it('caps normal work at 3, auth work at 1, and allows all four to overlap', async () => {
@@ -317,32 +321,36 @@ describe('runEvals', () => {
     expect(maxGrading).toBe(1);
   });
 
-  it('stops dequeuing and aborts active work after the first fatal failure', async () => {
-    let started = 0;
-    let observedAbort = false;
-    const runTask: RunTaskFn = async (_taskText, opts) => {
-      started += 1;
+  it('records a throwing trial as errored and finishes the rest of the batch', async () => {
+    const fakeRunTask = makeFakeRunTask(baseDir);
+    const graded: Array<{ trialNumber: number; error?: string }> = [];
+    const runTask: RunTaskFn = async (taskText, opts) => {
       if (opts.trialIndex === 0) throw new Error('first trial failed');
-      return await new Promise<never>((_resolve, reject) => {
-        const abort = () => {
-          observedAbort = true;
-          reject(opts.signal.reason);
-        };
-        if (opts.signal.aborted) abort();
-        else opts.signal.addEventListener('abort', abort, { once: true });
-      });
+      return fakeRunTask(taskText, opts);
     };
 
-    await expect(
-      runEvals([passingTask('failure')], 5, {
-        runTask,
-        concurrency: 2,
-        model: 'fake-model',
-        toolProfile: 'atomic',
-      }),
-    ).rejects.toThrow('first trial failed');
-    expect(started).toBeLessThanOrEqual(2);
-    expect(observedAbort).toBe(true);
+    const report = await runEvals([passingTask('resilience')], 3, {
+      runTask,
+      concurrency: 2,
+      model: 'fake-model',
+      toolProfile: 'atomic',
+      onTrialGraded: (job, grade) => {
+        graded.push({ trialNumber: job.trialNumber, ...(grade.error === undefined ? {} : { error: grade.error }) });
+      },
+    });
+
+    const trials = report.tasks[0]!.trials;
+    expect(trials).toHaveLength(3);
+    expect(trials[0]).toMatchObject({ error: 'first trial failed', completed: false, assertions: [] });
+    expect(trials[0]!.runDir).toBeUndefined();
+    for (const trial of trials.slice(1)) {
+      expect(trial.error).toBeUndefined();
+      expect(trial.completed).toBe(true);
+    }
+    expect(report.tasks[0]!.taskPassed).toBe(false);
+    expect(report.tasks[0]!.accuracy).toBeCloseTo(2 / 3);
+    // The errored trial is persisted through the same serialized hook as grades.
+    expect(graded.find((g) => g.trialNumber === 1)).toEqual({ trialNumber: 1, error: 'first trial failed' });
   });
 
   it('propagates caller cancellation to every active trial and starts no more', async () => {

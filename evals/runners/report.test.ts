@@ -56,6 +56,27 @@ describe('formatReport', () => {
     expect(text).toContain('pass  answer.md exists');
     expect(text).toContain('0/1 tasks passed');
   });
+
+  it('renders an errored trial with its error and no assertion lines', () => {
+    const report: EvalReport = {
+      ...sampleReport(),
+      tasks: [
+        summarizeTask('stub', [
+          {
+            runDir: '/runs/r1',
+            assertions: [{ name: 'answer.md exists', passed: true, detail: 'found' }],
+            latencyMs: 40,
+          },
+          { assertions: [], latencyMs: 120_000, error: 'model stream ended unexpectedly' },
+        ]),
+      ],
+    };
+
+    const text = formatReport(report);
+    expect(text).toContain('stub: accuracy 50.0%  completion 1/2  task FAIL');
+    expect(text).toContain('trial 2: ERRORED  120000ms  (no run directory)');
+    expect(text).toContain('ERROR  model stream ended unexpectedly');
+  });
 });
 
 describe('writeResults', () => {

@@ -91,6 +91,12 @@ async function main(): Promise<void> {
         } catch (err: unknown) {
           console.warn(`warning: could not persist partial grade: ${err instanceof Error ? err.message : err}`);
         }
+        if (grade.error !== undefined) {
+          console.log(
+            `${trialLabel(job.taskName, job.trialNumber, job.k)} errored — ${grade.error}`,
+          );
+          return;
+        }
         const passed = grade.assertions.filter((assertion) => assertion.passed).length;
         console.log(
           `${trialLabel(job.taskName, job.trialNumber, job.k)} graded — ` +
