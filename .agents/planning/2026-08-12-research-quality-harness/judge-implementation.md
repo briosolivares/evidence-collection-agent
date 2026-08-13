@@ -262,3 +262,35 @@ proof is now the wikipedia bottleneck, not the cycle cap.** Candidate
 mitigations if ever needed (user ruled current state fine, 2026-08-13):
 a generic ordinal-skepticism prompt line, or a 2-vote panel on DONE
 verdicts only.
+
+## Addendum: mit unblocked for the full-suite rerun (2026-08-13)
+
+Two changes land ahead of the 11-task rerun, both proven by the morning's
+interactive mit run (8be7dd, 2 cycles, 202 rows):
+
+1. **TUI evals: live question dialog on the headed lane (b657059).** The
+   App's `requestPermission` resolver now threads through
+   `startEvalBatch` → eval runtime → the persistent-session runner, on
+   headed trials only (user ruling 2026-08-13: always-on for headed TUI
+   evals). The user can answer the agent's question and act in the
+   visible browser mid-trial — the mit Google-login blocker's designed
+   escape hatch. Headless trials deliberately never receive the resolver:
+   interactive tools fail closed there, keeping that lane comparable to
+   CLI batches. Honesty mechanism: every *answered* (allowed) dialog is
+   counted; a nonzero count is stamped on the results JSON as
+   `assistedDialogs` and the formatted report carries an
+   `ASSISTED:` banner, so assisted scores can never masquerade as
+   unassisted ones. Denied/dismissed dialogs assist nothing and are not
+   counted. The CLI runner never sets the field.
+
+2. **mit oracle: Pi Beta Phi 2026 waived (e289c22).** Ground truth per
+   the browser-first ruling: mit.pibetaphi.org/members lists Class of
+   2027/2028/2029 tables only — no senior table — and the Wayback
+   Machine has no capture of the URL (run 8be7dd published
+   `evidence_pibetaphi_no_sisters_page.png` and answer.md documents the
+   check). The oracle now carries
+   `optionalCohorts: [{ affiliation: 'Pi Beta Phi', classYear: 2026 }]`;
+   the cohort assertion waives absent optional cohorts but names them in
+   its detail (`absent but optional (unsourced on the live web)`), and
+   `minRows` drops 12 → 11 to match one member per *required* cohort.
+   Re-verify the live page before ever tightening this back.
