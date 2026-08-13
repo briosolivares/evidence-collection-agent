@@ -89,10 +89,14 @@ security hardening, signed evidence journals, strict origin policy, and
 adversarial prompt-injection work are deferred. The existing no-shell boundary
 should remain, along with inexpensive safeguards such as sending saved
 credentials only to the exact site they belong to and limiting download sizes.
+
 Page-scoped JavaScript in an authenticated tab can still access page-visible
 session data and make network requests. V1 accepts that capability risk
-explicitly; it should use dedicated, low-value test accounts and profiles rather
-than claiming the credential-store boundary solves it.
+explicitly. Dedicated, low-value test accounts and profiles are preferred, but
+they are not assumed to exist for every authenticated lane. Each authenticated
+session configuration must explicitly allow or deny JavaScript; allowing it for
+a non-disposable account records an accepted exposure rather than claiming the
+credential-store boundary solves it.
 
 ## Goals
 
@@ -224,6 +228,8 @@ type OutputSpec =
       filename: string;
       format: 'markdown' | 'text' | 'pdf';
       requiredSections?: string[];
+      evidenceRequirement?: 'none' | 'at_least_one' | 'per_required_section';
+      evidencePresentation?: 'hidden' | 'footnotes';
     }
   | {
       id: string;
@@ -274,6 +280,12 @@ The fields have narrow meanings:
 - `contentExpectations` holds requirements that need judgment, such as
   “explain the most material control gaps and support them with evidence.”
 - `assumptions` records only choices that materially affect the result.
+
+A document's `evidenceRequirement` defaults to `at_least_one`. Use
+`per_required_section` for evidence-heavy reports. `none` is valid only when
+the requested document contains no source-backed factual claims; the verifier
+still compares that choice with the original task. `evidencePresentation`
+defaults to `hidden`; use `footnotes` when the user asks for visible citations.
 
 The contract does not contain a research plan, browser steps, preferred sites,
 or per-entity progress. Its first revision can contain requirements visible in
@@ -472,8 +484,9 @@ interface PageChanges {
 }
 
 interface SettlePolicy {
+  successCheckTimeoutMs?: number;
   quietWindowMs?: number;
-  timeoutMs?: number;
+  settleTimeoutMs?: number;
 }
 
 interface BrowserActionReceipt {
@@ -557,13 +570,14 @@ through `resolveRunPath` and can reference only files already inside the run
 directory.
 
 After the final committed action, wait for its explicit success checks or
-expected navigation, then for a relevant-DOM quiet window. Start with a 250 ms
-quiet window and a 2 second hard timeout; cap caller overrides at 1 second and
-10 seconds respectively. These are tunable provider defaults, not promises
-that the whole network is idle. Do not rely on global `networkidle`, which never
-arrives on many live applications. If the hard timeout wins, return the best
-current snapshot with `settled: false`; never label a half-observed reaction as
-settled.
+expected navigation, then for a relevant-DOM quiet window. These waits have
+separate limits: start with 10 seconds for a success check, a 250 ms quiet
+window, and a 2 second settle timeout. Cap caller overrides at 30 seconds,
+1 second, and 10 seconds respectively. A failed success check returns
+`failed_check`; a settle timeout returns the best current snapshot with
+`settled: false`. These are tunable provider defaults, not promises that the
+whole network is idle. Do not rely on global `networkidle`, which never arrives
+on many live applications, and never label a half-observed reaction as settled.
 
 Classify recognizable login walls, CAPTCHAs, rate limits, and bot challenges as
 `blocked` rather than generic action failures. Respect bounded `Retry-After`
@@ -664,11 +678,14 @@ the page to a known state, it closes that page, invalidates its element
 references, and creates a replacement page. The result reports this recovery as
 a failed execution rather than leaving the run hung.
 
-Authenticated execution remains deliberately capable in V1. It is logged and
-uses dedicated low-value profiles, but is not falsely described as sandboxed:
-page-scoped code can access page-visible session state and make requests. A
-future hardened mode may deny configured origins or run in a disposable
-context, but capability comes first in this phase.
+Authenticated execution remains deliberately capable in V1. It is logged but
+is not falsely described as sandboxed: page-scoped code can access page-visible
+session state and make requests. The authenticated lane's configuration must
+set JavaScript to `allow` or `deny`. When a task requires a non-disposable
+account, `allow` is an explicit risk acceptance for that lane; the design does
+not pretend the account is low value. A future hardened mode may deny specific
+origins or run in a disposable context, but capability comes first in this
+phase.
 
 ### 6. Inspect the right kind of content for the job
 
@@ -733,6 +750,12 @@ visited or whose exact URL appeared on an observed page. The reader sends no
 profile cookies, authorization headers, or stored credentials. It may still use
 a real browser network stack and ordinary browser headers for public sites that
 reject lightweight HTTP clients.
+
+Because this tool is explicitly for public resources, resolve and validate
+every connection target and redirect. Reject credential-bearing URLs and
+loopback, private, link-local, and reserved IPv4 or IPv6 destinations. A future
+internal-source mode should be an explicit session policy, not an accidental
+side effect of a webpage-provided URL.
 
 Examples include:
 
@@ -957,6 +980,16 @@ are written directly; PDF is rendered from the same content by application
 code. `write_file` remains available for scratch work and supporting files, but
 does not bypass contract-bound document rendering.
 
+The evidence-marked source and the published document are separate artifacts.
+`write_document` first saves the marked source under
+`scratch/documents/<outputId>/` through `writeArtifact`. Completion code
+validates its markers and evidence requirement, then deterministically renders
+the requested output. With `evidencePresentation: 'hidden'`, internal markers
+are removed from the published file. With `footnotes`, they become readable
+source footnotes rather than raw evidence IDs. The clean requested output and
+the marked scratch source are both manifest-hashed, and the verifier receives
+both so it can check that the published wording came from the cited source.
+
 An `Evidence` object is an index, not the evidence itself. Screenshots,
 downloads, and saved network responses must point to a manifest-hashed artifact.
 Web-text evidence must contain either a captured artifact or an exact quote and
@@ -1078,7 +1111,8 @@ Checks with objective answers run first:
 - completeness evidence for every count-ruled table;
 - screenshot counts;
 - unfinished placeholders such as `TODO` or missing values;
-- row evidence and document citation linkage.
+- row evidence and document citation linkage;
+- each document's configured minimum or per-section evidence requirement.
 
 After the code checks pass, open one verifier session with fresh context. A
 small run may finish in one model call. A large run gets a limited set of
@@ -1141,10 +1175,10 @@ Factual rows and document citations ↔ Evidence
 
 Checking the original task prevents an incorrect contract from validating its
 own mistake. The verifier starts from small summaries and gets read-only tools
-for published artifacts, evidence files, screenshots, contract history, and
-code-check results. It does not receive the worker transcript, a mutable
-browser, or write tools. Code has already handled columns, counts, filenames,
-duplicates, and parseability.
+for published artifacts, marked document sources, evidence files, screenshots,
+contract history, and code-check results. It does not receive arbitrary scratch
+files, the worker transcript, a mutable browser, or write tools. Code has
+already handled columns, counts, filenames, duplicates, and parseability.
 
 Completeness is a named verifier decision, not an implication hidden inside
 general alignment: for each count-ruled table, the verifier must decide whether
@@ -1158,10 +1192,18 @@ pagination exhaustion, or a captured ranked view that includes the boundary.
 If verification fails, return its structured findings to the same worker. The
 worker corrects the run and submits again; it is not restarted.
 
-Every submission counts toward one default limit of three attempts: the first
-submission plus two corrections. This includes attempts that fail before the
-verifier. If problems remain after the limit, finalize an incomplete run rather
-than accepting it.
+Use two counters because the failures have different costs. Allow up to five
+submissions blocked before the verifier by a missing contract or failed code
+check. Allow three submissions that actually reach the verifier: the first
+review plus two semantic corrections. Both remain inside the whole-run turn,
+tool, token, and time budgets.
+
+`OutputSummary` should expose table-state, evidence-link, and completeness
+failures before submission, so the worker normally fixes them without spending
+a completion-check attempt. Rendering, file-write, and final artifact failures
+can appear only during submission and are returned through the same result.
+Repeated pre-verifier failures end the run as incomplete; they do not consume
+the verifier's correction allowance.
 
 `finalizeIncompleteRun()` tries to render every table's current rows through
 `writeArtifact`, even when count or completeness checks fail. These files keep
@@ -1180,6 +1222,7 @@ type RunOutcome =
       status: 'incomplete';
       reason:
         | 'verification_attempts'
+        | 'completion_check_failures'
         | 'verifier_unavailable'
         | 'budget_exceeded'
         | 'model_response_failed';
@@ -1303,6 +1346,12 @@ This is more accurate than one static `readOnly` flag. For example,
 `execute_javascript` always writes its selected page because generated code may
 change the DOM. It can still run beside work on another page.
 
+`observe` does not change the webpage, but it does advance the controller's
+observation ID and diff baseline. Treat it as a write to that page's observation
+state: two observations of the same page run in order, while observations of
+different pages may overlap. This serialization is deliberate; otherwise two
+snapshots could both claim to be the next baseline.
+
 Scheduling rules:
 
 - Actions that change one page remain sequential.
@@ -1375,6 +1424,18 @@ The coordinator receives a small completion notice and reads the typed result.
 It does not copy every child tool call into its own model context. Start with two
 or three concurrent jobs and measure the gain before raising the limit.
 
+Merge behavior is explicit and never last-write-wins. While results are staged,
+identify each row as `<jobId>:<rowId>`. Group candidates by the contract's
+uniqueness keys and validate cross-job rules before updating the shared table.
+Non-conflicting rows can merge automatically. Conflicting values, duplicate
+entities, or cross-job rule failures become structured merge failures for the
+coordinator, which is the only role allowed to choose the final row or request
+more research.
+
+Parallel browser jobs default to public, isolated, headless sessions. Keep
+authenticated or headed research at one concurrent job until load tests show
+that the machine and target site remain reliable.
+
 ### 13. Bound every resource explicitly
 
 Concurrency limits are not total-work limits. Every run needs independently
@@ -1395,6 +1456,7 @@ interface RunBudget {
   maxResearchJobs: number;
   maxDownloadedBytes: number;
   maxPublishedBytes: number;
+  maxCompletionCheckFailures: number;
   maxVerificationAttempts: number;
   maxVerifierModelCallsPerAttempt: number;
 }
@@ -1402,8 +1464,9 @@ interface RunBudget {
 
 Require positive finite safe integers for time, token, turn, and call limits.
 Byte limits may be zero to disable that capability; otherwise they follow the
-same validation. Response-repair, research-job, verification-attempt, and
-verifier-call limits must also be positive and finite.
+same validation. Response-repair, research-job, completion-check-failure,
+verification-attempt, and verifier-call limits must also be positive and
+finite.
 
 One run budget covers every role: optional initializer, worker, correction
 turns, research workers, and verifier. Starting another worker or verification
@@ -1506,8 +1569,9 @@ Other model roles receive smaller sets:
 
 - The optional initializer gets only `set_output_contract`, with tool choice
   forced.
-- The verifier gets read-only artifact and screenshot inspection plus
-  `report_verification`. It receives no browser or write tools.
+- The verifier gets read-only published-artifact, marked-document-source,
+  evidence, and screenshot inspection plus `report_verification`. It receives
+  no general scratch access, browser, or write tools.
 - Research workers get only the browser, evidence, and extraction tools needed
   for their assigned entity. They cannot submit the run or start more workers.
 
@@ -1526,6 +1590,7 @@ updates its records, and accepts completion only after validation succeeds.
 ~~~ts
 async function runTask(task: string): Promise<RunOutcome> {
   const session = await browser.createSession();
+  let completionCheckFailures = 0;
   let verificationAttempts = 0;
 
   while (!budget.expired()) {
@@ -1573,17 +1638,18 @@ async function runTask(task: string): Promise<RunOutcome> {
     worker.commitAssistantResponse(response);
 
     if (submission !== undefined) {
-      verificationAttempts += 1;
-
       if (contract === undefined) {
+        completionCheckFailures += 1;
         const contractFailure = {
           status: 'blocked',
           failures: ['Set a valid output contract before submitting.'],
         } as const;
         runEvents.recordToolResult(submission.toolUseId, contractFailure);
         worker.addToolResult(submission.toolUseId, contractFailure);
-        if (verificationAttempts >= budget.maxVerificationAttempts) {
-          return finalizeIncompleteRun({ reason: 'verification_attempts' });
+        if (completionCheckFailures >= budget.maxCompletionCheckFailures) {
+          return finalizeIncompleteRun({
+            reason: 'completion_check_failures',
+          });
         }
         continue;
       }
@@ -1596,14 +1662,18 @@ async function runTask(task: string): Promise<RunOutcome> {
       );
 
       if (codeChecks.status === 'blocked') {
+        completionCheckFailures += 1;
         runEvents.recordToolResult(submission.toolUseId, codeChecks);
         worker.addToolResult(submission.toolUseId, codeChecks);
-        if (verificationAttempts >= budget.maxVerificationAttempts) {
-          return finalizeIncompleteRun({ reason: 'verification_attempts' });
+        if (completionCheckFailures >= budget.maxCompletionCheckFailures) {
+          return finalizeIncompleteRun({
+            reason: 'completion_check_failures',
+          });
         }
         continue;
       }
 
+      verificationAttempts += 1;
       const verification = await verifier.review(
         {
           originalTask: task,
@@ -1638,7 +1708,7 @@ async function runTask(task: string): Promise<RunOutcome> {
 
     const results = await scheduler.execute(response.toolCalls, {
       outputContracts,
-      requireContractBeforeOtherCalls: true,
+      enforceContractOrdering: true,
     });
     runEvents.record(results);
     worker.addToolResults(results);
@@ -1653,11 +1723,11 @@ async function runTask(task: string): Promise<RunOutcome> {
 requires at least one tool call, enforces the per-turn call limit, and requires
 `submit_for_verification` to appear alone. Only then may tool execution start.
 
-`requireContractBeforeOtherCalls` implements the first-turn rule from Section
-1. A valid leading `set_output_contract` call unlocks later calls in that same
-response. A missing or invalid contract blocks them with an explicit result.
-Contract changes are scheduling barriers, so later calls never race ahead of
-validation.
+`enforceContractOrdering` implements the contract rule from Section 1. When no
+contract exists, a valid leading `set_output_contract` call unlocks later calls
+in that same response; a missing or invalid contract blocks them with an
+explicit result. After a contract exists, the option still makes every revision
+a scheduling barrier, so later calls never race ahead of validation.
 
 `prepareModelRetry` chooses the recovery that matches the failure. A temporary
 connection failure or early stream ending resends the same request content. A
@@ -1831,10 +1901,16 @@ Once the contract is typed, implement the smallest useful `CompletionCheck`:
 - table columns are exact and in order;
 - row counts, required values, and uniqueness rules pass;
 - requested screenshots and downloads exist;
+- document evidence requirements and markers pass;
 - obvious placeholders such as `TODO` are absent.
 
 Only semantic questions and evidence quality should reach the verifier. This
 should improve consistency while reducing judge turns and variance.
+
+Use the separate limits from Section 10: five pre-verifier completion-check
+failures and three verifier reviews by default. A malformed CSV or missing row
+must not consume the worker's opportunity to correct a semantic verifier
+finding.
 
 When verification requests a correction, continue the same worker conversation
 and return the structured findings as the result of
@@ -1851,13 +1927,29 @@ the entire browser state model. Bulk DOM extraction and embedded application
 data can remove many model decisions immediately, particularly on repeated
 roster, profile, and table pages.
 
-The first useful version needs explicit page targeting, JSON-only results,
-finite execution and output limits, transcript logging, and optional persisted
-extraction evidence. In the same change, add a way to stop a script that freezes
-the page and replace that page if it cannot recover. Do not prioritize another
-large batching schema until this
-capability is measured; the existing `browser_batch` experiment had no model
-adoption.
+The first useful version predates the full page/frame identity model, so it uses
+a deliberately smaller input:
+
+~~~ts
+interface EarlyExecuteJavaScriptInput {
+  target: 'selected_top_document';
+  code: string;
+  timeoutMs?: number;
+  captureEvidence?: boolean;
+}
+~~~
+
+The runtime locks the currently selected page, attaches its URL and internal
+document token to the result, and returns JSON only. It also enforces execution
+and output limits, logs the code, and can persist extraction evidence. Once
+Phase 1 adds stable page, frame, document, and observation identities, replace
+this narrow schema with the full Section 5 schema; do not make all identity
+fields optional in one ambiguous tool.
+
+In the same change, add a way to stop a script that freezes the page and replace
+that page if it cannot recover. Do not prioritize another large batching schema
+until this capability is measured; the existing `browser_batch` experiment had
+no model adoption.
 
 ### 6. Store rows as data before adding research subagents
 
@@ -1868,6 +1960,7 @@ boundary needed for safe parallel research.
 
 Only after that boundary exists should the runtime start several repeated
 research jobs at once.
+
 The MIT sororities task is a strong first evaluation because its six public-site
 investigations are independent while its CSV and Google Sheet are shared.
 Use a small coordinator-and-worker flow:
@@ -1884,7 +1977,7 @@ coordinator defines one output contract
 Research workers must not edit the shared table, Google Sheet, contract, or
 final requested outputs. They return typed rows and evidence only. Start with
 two or three concurrent public browser sessions rather than six, and keep the
-authenticated Sheet is still written only by the coordinator.
+authenticated Sheet under the coordinator's sole control.
 
 Every job gets its own cancellation signal, limits, transcript, and result file
 under `scratch/research-jobs/`. All jobs reuse the exact same prompt and tool
@@ -1947,6 +2040,8 @@ cancellation, refusal, and budget-exhaustion tests.
 - Add page-scoped `execute_javascript` with page locking, timeouts, bounded
   output, execution termination, page recovery, explicit frame targeting, and
   persisted extraction evidence.
+- Require every authenticated session policy to allow or deny JavaScript
+  explicitly; record non-disposable-account exposure when it is allowed.
 - Remove `browser_batch` only after the replacement preserves its current
   partial-commit diagnostics and improves measured outcomes.
 - Cache observed element descriptions instead of regenerating outlines.
@@ -1972,15 +2067,18 @@ false-stale rate, partial-batch recovery rate, and unsettled-result rate. Phase
   and mandatory completeness evidence for count-ruled tables.
 - Add persisted JavaScript-extraction and exact-text evidence; use inline
   evidence markers for prose instead of an undefined claim store.
-- Add contract-bound Markdown, text, and PDF document rendering.
+- Add contract-bound Markdown, text, and PDF document rendering. Preserve the
+  marked source in scratch, publish a clean or footnoted render, hash both, and
+  enforce the document's evidence requirement.
 - Add the exclusive `submit_for_verification` protocol and reject no-tool,
   truncated, refused, or malformed completion attempts. Its handler renders
   current table artifacts through `writeArtifact` before verification.
 - Connect that submission to the existing fresh verifier, which returns a
   structured verdict. A correction becomes the submission tool result in the
   same worker conversation.
-- Bound all verification submissions together and try to render partial table
-  artifacts when a run ends incomplete.
+- Bound pre-verifier code-check failures separately from submissions that reach
+  the verifier, and try to render partial table artifacts when a run ends
+  incomplete.
 - Derive output paths and whether files are deliverables or supporting evidence
   from the output contract.
 - Add derived `OutputSummary` and code-based `CompletionCheck`.
@@ -1992,7 +2090,8 @@ Primary metric: malformed structured-output rate, targeting zero.
 - Add targeted page-structure and text extraction.
 - Add table extraction.
 - Add anonymous `read_resource` with response evidence and UI/resource
-  reconciliation rules.
+  reconciliation rules; reject public-resource requests that resolve or
+  redirect to private, loopback, link-local, or reserved addresses.
 - Let the model inspect screenshots.
 - Add PDF and spreadsheet parsing.
 - Add element screenshots and optical character recognition (OCR) for
@@ -2015,6 +2114,10 @@ visual pages, PDFs, spreadsheets, and image-only documents.
 - Give each research job its own cancellation signal, limits, transcript, and
   typed result under `scratch/research-jobs/`. Restrict its tools and prohibit
   recursive workers.
+- Namespace staged row IDs, validate cross-job uniqueness before shared writes,
+  and return conflicts to the coordinator instead of choosing a last writer.
+- Keep headed or authenticated research jobs serial until explicit load tests
+  show that higher concurrency is reliable.
 - Reuse exactly the same worker prompt and tool prefix, appending only the
   entity-specific instruction. Return typed rows and evidence rather than the
   child conversation.
@@ -2056,12 +2159,15 @@ The architecture should be evaluated against:
 - total output, cache-read, cache-write, and uncached-input tokens;
 - output validation failures;
 - table rendering or artifact-validation failures at submission;
+- pre-verifier completion-check failures per run;
 - partial tables successfully preserved on incomplete runs;
 - count-ruled tables rejected for missing or weak completeness evidence;
+- documents rejected for missing configured evidence coverage;
 - contract defects found by the verifier;
 - evidence-backed contract revisions versus unsupported constraint relaxations;
 - verifier correction rate and added latency;
 - required table values found versus missing;
+- cross-job row conflicts requiring coordinator review;
 - UI/resource reconciliation disagreements;
 - unsupported-interaction failures;
 - evidence coverage per factual row or document citation.
