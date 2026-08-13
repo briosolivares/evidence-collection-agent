@@ -1,3 +1,11 @@
+// Type-only import: `browserActions.ts` imports BrowserRefNotFoundError
+// (a runtime value) from this module, so the dependency between the two
+// must stay one-directional at runtime. Keep this `import type`.
+import type {
+  BrowserActionOutput,
+  BrowserActionRequest,
+  BrowserDialog,
+} from './browserActions.js';
 import type {
   BrowserObservation,
   BrowserObserveRequest,
@@ -36,6 +44,28 @@ export interface BrowserDownloadResult {
 
 /** A browser-native download source: an observed page ref or verified URL. */
 export type BrowserDownloadTarget = { ref: string } | { url: string };
+
+/** How to answer one pending JavaScript dialog. */
+export interface HandleDialogRequest {
+  /** Dialog id from a `browser_action` result. */
+  dialogId: string;
+  /** `accept` presses OK (and submits `promptText` for a prompt);
+   * `dismiss` presses Cancel. */
+  action: 'accept' | 'dismiss';
+  /** Text to submit when accepting a `prompt`; ignored for other types. */
+  promptText?: string;
+}
+
+/** The outcome of answering one dialog. */
+export interface HandleDialogResult {
+  dialogId: string;
+  handled: 'accepted' | 'dismissed';
+  /** The page after the dialog was answered, absent when answering closed
+   * or destroyed it (a `beforeunload` accept can do exactly that). */
+  page?: BrowserPage;
+  /** Dialogs still awaiting a decision, across the session. */
+  pendingDialogs: BrowserDialog[];
+}
 
 /** Error raised when a ref from an outline no longer identifies an element. */
 export class BrowserRefNotFoundError extends Error {
@@ -194,6 +224,38 @@ export interface BrowserController {
    *   baseline degrades to `basis: 'full_snapshot'` — never an error.
    */
   observe(request?: BrowserObserveRequest): Promise<BrowserObservation>;
+
+  /**
+   * Execute a short action sequence against one page and document,
+   * returning a receipt per attempted action.
+   *
+   * @param request - page/document preconditions, 1–8 ordered actions,
+   *   optional success checks, settle overrides, and the run directory that
+   *   confines upload paths
+   * @returns what actually happened: one receipt per attempted action with
+   *   `effectsCommitted`, the first unexecuted index and stop reason when
+   *   the sequence stopped at a navigation/popup/dialog/failure, the
+   *   settle and success-check outcomes, and the resulting page with
+   *   bounded changes. Committed effects are never rolled back, so a failed
+   *   success check returns `failed_check` rather than implying the page is
+   *   unchanged. Rejects only when the request cannot be aimed at a page at
+   *   all (unknown page id, closed session)
+   */
+  browserAction(request: BrowserActionRequest): Promise<BrowserActionOutput>;
+
+  /**
+   * Answer one JavaScript dialog that is blocking a page.
+   *
+   * Dialogs are held open rather than auto-dismissed, because silently
+   * dismissing a `confirm` decides the user's business for them. While one
+   * is pending its page runs no script, so this is the only way forward.
+   *
+   * @param request - the dialog id, accept/dismiss, and prompt text
+   * @returns the decision, the page afterwards when it survives, and any
+   *   dialogs still pending. Rejects when the id names no pending dialog
+   *   (already answered, or its page closed)
+   */
+  handleDialog(request: HandleDialogRequest): Promise<HandleDialogResult>;
 
   /**
    * Select a tracked page as the target of the single-page methods

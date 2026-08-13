@@ -3,6 +3,7 @@ import { isAbsolute } from 'node:path';
 import {
   chromium,
   type BrowserContext,
+  type Dialog,
   type Download,
   type Frame,
   type Locator,
@@ -10,6 +11,23 @@ import {
   type Response,
 } from 'playwright';
 
+import {
+  performBrowserActions,
+  type ActionCapableSession,
+  type ActionTargetHandle,
+  type BlockSignals,
+  type BrowserActionOutput,
+  type BrowserActionRequest,
+  type BrowserDialog,
+  type DocumentSnapshot,
+  type DownloadInfo,
+  type PageActivity,
+  type PageWatch,
+  type ScrollAmount,
+  type ScrollDirection,
+  type SuccessCheck,
+  type SuccessCheckOutcome,
+} from './browserActions.js';
 import {
   createBrowserStateStore,
   diffObservations,
@@ -29,6 +47,8 @@ import {
   type BrowserDownloadTarget,
   type BrowserFetchResult,
   type BrowserScreenshotOptions,
+  type HandleDialogRequest,
+  type HandleDialogResult,
 } from './controller.js';
 import type { BrowserSessionProvider } from './sessionProvider.js';
 
@@ -44,10 +64,14 @@ const MAX_OBSERVED_ELEMENTS = 150;
 /** Per-view content bound so an evicted-baseline "full snapshot" stays
  * bounded even before the tool pipeline's byte cap. */
 const MAX_VIEW_CONTENT_CHARS = 60_000;
-/** Main-frame aria refs (`e12`). Subframe refs (`f1e12`) are skipped for
- * element identity until T11's targeted observation; frame identity itself
- * is already tracked through frame events. */
-const MAIN_FRAME_ARIA_REF_PATTERN = /^e\d+$/;
+/* Element identity is limited to the page's TOP document until T11 adds
+ * targeted per-frame observation — a subframe element stamped with the main
+ * frame's frameId/documentId would go stale for the wrong reason. The test
+ * is made *in the page* (see stampOutlineElements) rather than from the ref's
+ * syntax: Playwright prefixes refs with a frame ordinal (`f1e8`) once the
+ * page has navigated more than once, so a "bare `e12` means main frame"
+ * rule silently drops every element on any page reached by two navigations,
+ * which is precisely the page an action sequence lands on. */
 /** The attribute stamped on observed elements. It is the ref's exact-node
  * identity within its document: DOM moves and unrelated mutation keep it,
  * document replacement destroys it. */
@@ -75,6 +99,29 @@ const INTERACTIVE_ROLES: ReadonlySet<string> = new Set([
   'menuitemradio',
   'tab',
 ]);
+// --- T10 action bounds (all finite literals). ---
+/** Per-element-action deadline. Far below Playwright's 30s default: a
+ * sequence of eight actions must not be able to hold a turn for minutes,
+ * and an element that is not actionable within five seconds is better
+ * reported than waited on. */
+const ACTION_TIMEOUT_MS = 5_000;
+/** Deadline for a `navigate` action inside a sequence. Longer than an
+ * element action because a real page load legitimately takes seconds. */
+const ACTION_NAVIGATION_TIMEOUT_MS = 15_000;
+/** How often success checks are re-evaluated while waiting. */
+const CHECK_POLL_INTERVAL_MS = 50;
+/** Slack added to the in-page quiescence budget before the Node-side race
+ * gives up, so the page's own answer wins whenever it can produce one. */
+const QUIESCENCE_OVERHEAD_MS = 500;
+/** Page text collected for blocked classification. Bounded: the classifier
+ * looks for short distinctive phrases, never the whole document. */
+const MAX_BLOCK_TEXT_CHARS = 20_000;
+/** Frame URLs inspected for CAPTCHA/challenge widgets. */
+const MAX_BLOCK_FRAME_URLS = 20;
+/** Downloads remembered per page. Oldest are dropped: a sequence reports
+ * the downloads *it* started, and unbounded growth would be a leak. */
+const MAX_TRACKED_DOWNLOADS_PER_PAGE = 20;
+
 /** One outline entry: `- role "name" ... [ref=e12]` (name optional). */
 const OUTLINE_ELEMENT_PATTERN =
   /^\s*-\s+([A-Za-z]+)(?:\s+"((?:[^"\\]|\\.)*)")?.*?\[ref=([A-Za-z0-9]+)\]/;
@@ -87,6 +134,23 @@ interface PageRecord {
    * object across navigations, so the key survives exactly as long as the
    * frame's identity should. */
   frames: Map<Frame, FrameRecord>;
+  /** Main-frame document replacements seen so far. Monotonic; a
+   * {@link PageWatch} reads the delta rather than the absolute value. */
+  navigationCount: number;
+  /** Downloads this page started, oldest first, bounded. */
+  downloads: DownloadInfo[];
+  /** The most recent main-frame navigation response. Kept with its URL
+   * because Playwright emits `response` before `framenavigated`, so the
+   * document id at capture time is still the previous one; matching on the
+   * URL is what makes "this status belongs to the current document" safe. */
+  lastMainResponse?: { url: string; status: number; retryAfterHeader?: string };
+}
+
+/** One dialog waiting for a decision: the engine handle plus the
+ * model-facing description. */
+interface PendingDialogRecord {
+  dialog: Dialog;
+  info: BrowserDialog;
 }
 
 /** Identity of one tracked frame; `documentId` rotates on navigation. */
@@ -158,6 +222,17 @@ export class PlaywrightBrowserController implements BrowserController {
    * the listener — deterministic because the event always precedes the
    * newPage() resolution for the same page. */
   private pendingInternalPages = 0;
+  /** Dialogs held open awaiting an explicit decision, keyed by dialog id.
+   * Held rather than auto-dismissed: Playwright's default dismisses every
+   * dialog, which silently answers "Cancel" to questions a run may need to
+   * accept. The cost is that a page with an unanswered dialog runs no
+   * script until {@link handleDialog} is called — which is why an action
+   * sequence stops at a dialog and reports it. */
+  private readonly pendingDialogs = new Map<string, PendingDialogRecord>();
+  /** Sequence-scoped watchers subscribed to page activity (navigations,
+   * new pages, dialogs, downloads). */
+  private readonly activityListeners = new Set<() => void>();
+  private dialogSequence = 0;
 
   constructor(
     private readonly context: BrowserContext,
@@ -387,6 +462,64 @@ export class PlaywrightBrowserController implements BrowserController {
   }
 
   /**
+   * Execute a receipted action sequence against one page and document.
+   *
+   * @param request - see {@link BrowserController.browserAction}
+   * @returns the sequence's receipts, stop information, settle/check
+   *   outcomes, and resulting page. Rejects only when the request cannot be
+   *   aimed at a live page.
+   */
+  browserAction(request: BrowserActionRequest): Promise<BrowserActionOutput> {
+    this.requireOpenContext();
+    return performBrowserActions(this.actionSession(), request);
+  }
+
+  /**
+   * Answer one pending JavaScript dialog.
+   *
+   * @param request - see {@link BrowserController.handleDialog}
+   * @returns the decision, the page afterwards when it survived, and the
+   *   dialogs still pending
+   * @throws Error when no pending dialog has that id (already answered, or
+   *   its page closed)
+   */
+  async handleDialog(request: HandleDialogRequest): Promise<HandleDialogResult> {
+    this.requireOpenContext();
+    const pending = this.pendingDialogs.get(request.dialogId);
+    if (pending === undefined) {
+      throw new Error(
+        `No browser dialog is pending with id ${request.dialogId}. It was already ` +
+          `answered, or its page closed. Pending dialogs: ` +
+          `${[...this.pendingDialogs.keys()].join(', ') || '(none)'}.`,
+      );
+    }
+    // Removed before answering: a driver-level failure must not leave a
+    // dialog that can be "answered" twice, and a second call should report
+    // the unknown-id error rather than rejecting inside Playwright.
+    this.pendingDialogs.delete(request.dialogId);
+
+    if (request.action === 'accept') {
+      await pending.dialog.accept(request.promptText);
+    } else {
+      await pending.dialog.dismiss();
+    }
+    this.signalActivity();
+
+    const record = this.recordByPageId(pending.info.pageId);
+    const stillPending = [...this.pendingDialogs.values()].map((entry) => entry.info);
+    return {
+      dialogId: request.dialogId,
+      handled: request.action === 'accept' ? 'accepted' : 'dismissed',
+      // The page can be gone (accepting a beforeunload) — report the
+      // decision anyway rather than failing after it took effect.
+      ...(record !== undefined && !record.page.isClosed()
+        ? { page: await this.describePage(record) }
+        : {}),
+      pendingDialogs: stillPending,
+    };
+  }
+
+  /**
    * Resolve an {@link ElementRef} to an actionable locator.
    *
    * Resolution ladder: (1) the exact node via the marker stamped at
@@ -477,6 +610,8 @@ export class PlaywrightBrowserController implements BrowserController {
       pageId: this.state.createPageId(),
       page,
       frames: new Map(),
+      navigationCount: 0,
+      downloads: [],
     };
     this.trackedPages.set(page, record);
     for (const frame of page.frames()) {
@@ -497,18 +632,77 @@ export class PlaywrightBrowserController implements BrowserController {
       // for same-document navigations — rotating there too is conservative:
       // it can only force a re-observation, never a wrong-target action.)
       frameRecord.documentId = this.state.createDocumentId();
+      if (frame === page.mainFrame()) {
+        record.navigationCount += 1;
+        // Wake any in-flight action sequence: this is the boundary that
+        // makes its remaining actions unsafe to run.
+        this.signalActivity();
+      }
     });
     page.on('framedetached', (frame) => {
       record.frames.delete(frame);
     });
+    page.on('response', (response) => {
+      // Only the response that produced the current main document matters
+      // for blocked classification; subresources say nothing about the wall
+      // the user hit.
+      if (response.frame() !== page.mainFrame() || !response.request().isNavigationRequest()) {
+        return;
+      }
+      const retryAfterHeader = response.headers()['retry-after'];
+      record.lastMainResponse = {
+        url: response.url(),
+        status: response.status(),
+        ...(retryAfterHeader !== undefined ? { retryAfterHeader } : {}),
+      };
+    });
+    page.on('dialog', (dialog) => {
+      const dialogId = `dialog-${++this.dialogSequence}`;
+      const defaultValue = dialog.defaultValue();
+      this.pendingDialogs.set(dialogId, {
+        dialog,
+        info: {
+          dialogId,
+          pageId: record.pageId,
+          type: normalizeDialogType(dialog.type()),
+          message: dialog.message(),
+          ...(defaultValue !== '' ? { defaultValue } : {}),
+        },
+      });
+      this.signalActivity();
+    });
+    page.on('download', (download) => {
+      const suggestedFilename = download.suggestedFilename();
+      record.downloads.push({
+        pageId: record.pageId,
+        sourceUrl: download.url(),
+        ...(suggestedFilename !== '' ? { suggestedFilename } : {}),
+      });
+      while (record.downloads.length > MAX_TRACKED_DOWNLOADS_PER_PAGE) {
+        record.downloads.shift();
+      }
+      this.signalActivity();
+    });
     page.on('close', () => {
       this.trackedPages.delete(page);
       this.state.forgetPage(record.pageId);
+      // A closed page's dialogs can never be answered; dropping them keeps
+      // handle_dialog's "unknown dialog" error honest instead of handing
+      // out ids that would reject deep inside the driver.
+      for (const [dialogId, pending] of this.pendingDialogs) {
+        if (pending.info.pageId === record.pageId) {
+          this.pendingDialogs.delete(dialogId);
+        }
+      }
       if (this.activePage === page) {
         this.activePage = undefined;
       }
+      this.signalActivity();
     });
 
+    // A newly tracked page IS the popup signal an action sequence watches
+    // for; announce it after the record exists so watchers can describe it.
+    this.signalActivity();
     return record;
   }
 
@@ -544,6 +738,19 @@ export class PlaywrightBrowserController implements BrowserController {
   /** Build the engine-neutral view of one tracked page. Never records an
    * observation — `observationId` only reports the latest number. */
   private async describePage(record: PageRecord): Promise<BrowserPage> {
+    // Mid-navigation the title evaluation can fail; '' beats failing the
+    // whole listing.
+    return this.buildPage(record, await record.page.title().catch(() => ''));
+  }
+
+  /** The same view without touching the renderer. Used while a dialog has
+   * the page blocked: `page.title()` is a renderer read and would wait for
+   * the dialog to be answered, turning a reportable state into a hang. */
+  private describePageIdentity(record: PageRecord): BrowserPage {
+    return this.buildPage(record, '');
+  }
+
+  private buildPage(record: PageRecord, title: string): BrowserPage {
     const page = record.page;
     const mainFrame = page.mainFrame();
     const mainRecord = this.ensureFrameRecord(record, mainFrame);
@@ -565,11 +772,144 @@ export class PlaywrightBrowserController implements BrowserController {
       documentId: mainRecord.documentId,
       observationId: this.state.latestObservationId(record.pageId),
       url: page.url(),
-      // Mid-navigation the title evaluation can fail; '' beats failing the
-      // whole listing.
-      title: await page.title().catch(() => ''),
+      title,
       active: this.activePage === page && !page.isClosed(),
       frames,
+    };
+  }
+
+  /** Wake every sequence-scoped watcher. Iterated over a copy: a watcher
+   * may unsubscribe from inside its own callback. */
+  private signalActivity(): void {
+    for (const listener of [...this.activityListeners]) {
+      listener();
+    }
+  }
+
+  /**
+   * Adapt this controller to the engine-neutral action seam.
+   *
+   * Built fresh per call and holding no state of its own: all state lives
+   * in the controller, so a sequence cannot observe a stale view of the
+   * page registry. The seam deliberately exposes no page *selection* —
+   * acting on a page never changes which page legacy tools target.
+   */
+  private actionSession(): ActionCapableSession {
+    return {
+      resolvePageId: (pageId) =>
+        pageId === undefined
+          ? this.registerPage(this.requirePage()).pageId
+          : this.requireTrackedPage(pageId).pageId,
+      documentSnapshot: (pageId) => this.documentSnapshotFor(pageId),
+      describePage: (pageId) => this.describePage(this.requireTrackedPage(pageId)),
+      describePageIdentity: (pageId) =>
+        this.describePageIdentity(this.requireTrackedPage(pageId)),
+      latestObservationId: (pageId) => this.state.latestObservationId(pageId),
+      watchPage: (pageId) => this.createPageWatch(this.requireTrackedPage(pageId)),
+      resolveTarget: async (target) =>
+        actionTargetHandle(await this.resolveElementRef(target)),
+      navigate: async (pageId, url) => {
+        assertHttpUrl(url);
+        await this.requireTrackedPage(pageId).page.goto(url, {
+          waitUntil: 'load',
+          timeout: ACTION_NAVIGATION_TIMEOUT_MS,
+        });
+      },
+      pressKey: async (pageId, key) => {
+        // No timeout option exists (or is needed): a page-level keypress
+        // waits for no element, it just dispatches.
+        await this.requireTrackedPage(pageId).page.keyboard.press(key);
+      },
+      scrollPage: (pageId, direction, amount) =>
+        scrollPageBy(this.requireTrackedPage(pageId).page, direction, amount),
+      observe: (observeRequest) => this.observe(observeRequest),
+      waitForSuccessChecks: (pageId, checks, timeoutMs, activity) =>
+        waitForSuccessChecks(
+          this.requireTrackedPage(pageId).page,
+          checks,
+          timeoutMs,
+          activity,
+        ),
+      waitForDomQuiescence: (pageId, quietWindowMs, settleTimeoutMs) =>
+        waitForDomQuiescence(
+          this.requireTrackedPage(pageId).page,
+          quietWindowMs,
+          settleTimeoutMs,
+        ),
+      blockSignals: (pageId) => collectBlockSignals(this.requireTrackedPage(pageId)),
+    };
+  }
+
+  /** Identity of a page's current main document with no renderer reads —
+   * `page.url()` is driver-side state, so this is safe even mid-dialog. */
+  private documentSnapshotFor(pageId: string): DocumentSnapshot {
+    const record = this.requireTrackedPage(pageId);
+    return {
+      documentId: this.ensureFrameRecord(record, record.page.mainFrame()).documentId,
+      url: record.page.url(),
+    };
+  }
+
+  /**
+   * Start recording page activity for one action sequence.
+   *
+   * Everything is reported as a *delta* from the moment the watch started:
+   * pages that already existed, dialogs already pending, and downloads from
+   * an earlier call must never be attributed to this sequence.
+   */
+  private createPageWatch(record: PageRecord): PageWatch {
+    const startNavigations = record.navigationCount;
+    const startDownloads = record.downloads.length;
+    const priorDialogIds = new Set(this.pendingDialogs.keys());
+    const priorPageIds = new Set(
+      [...this.trackedPages.values()].map((tracked) => tracked.pageId),
+    );
+    const waiters = new Set<() => void>();
+    const listener = (): void => {
+      for (const waiter of [...waiters]) {
+        waiter();
+      }
+    };
+    this.activityListeners.add(listener);
+
+    const activity = (): PageActivity => ({
+      navigations: record.navigationCount - startNavigations,
+      openedPageIds: [...this.trackedPages.values()]
+        .filter((tracked) => !priorPageIds.has(tracked.pageId))
+        .map((tracked) => tracked.pageId),
+      dialogs: [...this.pendingDialogs.values()]
+        .filter(
+          (pending) =>
+            !priorDialogIds.has(pending.info.dialogId) &&
+            pending.info.pageId === record.pageId,
+        )
+        .map((pending) => pending.info),
+      downloads: record.downloads.slice(startDownloads),
+    });
+
+    return {
+      activity,
+      waitUntil: (predicate, timeoutMs) =>
+        new Promise<void>((resolve) => {
+          if (predicate(activity()) || timeoutMs <= 0) {
+            resolve();
+            return;
+          }
+          const finish = (): void => {
+            clearTimeout(timer);
+            waiters.delete(waiter);
+            resolve();
+          };
+          const waiter = (): void => {
+            if (predicate(activity())) finish();
+          };
+          const timer = setTimeout(finish, timeoutMs);
+          waiters.add(waiter);
+        }),
+      stop: () => {
+        waiters.clear();
+        this.activityListeners.delete(listener);
+      },
     };
   }
 
@@ -587,10 +927,7 @@ export class PlaywrightBrowserController implements BrowserController {
     const refs: ElementRef[] = [];
     const ordinals = new Map<string, number>();
     for (const entry of parseOutlineElements(outline).slice(0, MAX_OBSERVED_ELEMENTS)) {
-      if (!MAIN_FRAME_ARIA_REF_PATTERN.test(entry.ariaRef)) {
-        continue;
-      }
-      let id: string;
+      let id: string | null;
       try {
         // The attribute name travels as an argument rather than being
         // inlined in the page function: resolution reads the marker through
@@ -598,6 +935,11 @@ export class PlaywrightBrowserController implements BrowserController {
         // stamp the old name (every ref instantly stale) if it ever changed.
         id = await record.page.locator(`aria-ref=${entry.ariaRef}`).evaluate(
           (element, { attribute, proposedId }) => {
+            // Top-document-only identity, decided by the document itself.
+            const view = element.ownerDocument.defaultView;
+            if (view === null || view !== view.top) {
+              return null;
+            }
             const existing = element.getAttribute(attribute);
             if (existing !== null) {
               return existing;
@@ -611,8 +953,14 @@ export class PlaywrightBrowserController implements BrowserController {
           },
         );
       } catch {
-        // The element vanished between snapshot and stamping; observation
-        // stays best-effort rather than failing wholesale.
+        // The element vanished between snapshot and stamping (or lives in a
+        // frame this page-scoped locator cannot reach); observation stays
+        // best-effort rather than failing wholesale.
+        continue;
+      }
+      if (id === null) {
+        // An element inside a subframe: skipped, and its issued id is simply
+        // never used (ids are unique, not contiguous).
         continue;
       }
       // A literal NUL separator cannot appear in a role or an accessible
@@ -752,6 +1100,242 @@ export class PlaywrightBrowserController implements BrowserController {
     );
     return result;
   }
+}
+
+/**
+ * Wait for a set of success checks to all pass.
+ *
+ * This is the only wait that pursues a *caller-defined* outcome; the quiet
+ * window below is a heuristic. Checks are polled rather than event-driven so
+ * a check can be satisfied by anything (text, URL, a download, a popup)
+ * without the caller having to name the mechanism.
+ *
+ * @param page - the page the checks are evaluated against
+ * @param checks - checks in request order
+ * @param timeoutMs - finite total budget (already clamped by the caller)
+ * @param activity - live sequence activity, for download/popup checks
+ * @returns one outcome per check, in request order. A check that never
+ *   passes returns `passed: false` — never an exception, because a failed
+ *   check is a result (`failed_check`), not an error
+ */
+export async function waitForSuccessChecks(
+  page: Page,
+  checks: readonly SuccessCheck[],
+  timeoutMs: number,
+  activity: () => PageActivity,
+): Promise<SuccessCheckOutcome[]> {
+  const outcomes: SuccessCheckOutcome[] = checks.map((check) => ({
+    check,
+    passed: false,
+  }));
+  if (outcomes.length === 0) return outcomes;
+
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    for (const outcome of outcomes) {
+      if (!outcome.passed) {
+        outcome.passed = await evaluateSuccessCheck(page, outcome.check, activity());
+      }
+    }
+    if (outcomes.every((outcome) => outcome.passed) || Date.now() >= deadline) {
+      return outcomes;
+    }
+    await delay(CHECK_POLL_INTERVAL_MS);
+  }
+}
+
+/**
+ * Wait until the page's DOM stops changing.
+ *
+ * Deliberately NOT `networkidle`: on live applications with polling,
+ * analytics, or open sockets, network idle never arrives, so a run that
+ * waits for it either hangs or learns to ignore the wait entirely. A
+ * relevant-DOM quiet window is observable, bounded, and honest about what
+ * it measured.
+ *
+ * @param page - page to observe
+ * @param quietWindowMs - mutation-free span that counts as quiet
+ * @param settleTimeoutMs - total budget for reaching that span
+ * @returns true when a full quiet window elapsed; false when the budget ran
+ *   out (an animation, a poller) or quiescence could not be measured at all
+ *   (navigation destroyed the context, the renderer is blocked). Never
+ *   rejects: "not settled" is a fact the caller reports, not a failure
+ */
+export async function waitForDomQuiescence(
+  page: Page,
+  quietWindowMs: number,
+  settleTimeoutMs: number,
+): Promise<boolean> {
+  const inPage = page
+    .evaluate(
+      ({ quiet, budget }) =>
+        new Promise<boolean>((resolve) => {
+          let lastMutation = performance.now();
+          const started = lastMutation;
+          const observer = new MutationObserver(() => {
+            lastMutation = performance.now();
+          });
+          observer.observe(document, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            characterData: true,
+          });
+          const tick = (): void => {
+            const now = performance.now();
+            if (now - lastMutation >= quiet) {
+              observer.disconnect();
+              resolve(true);
+              return;
+            }
+            if (now - started >= budget) {
+              observer.disconnect();
+              resolve(false);
+              return;
+            }
+            setTimeout(tick, Math.min(quiet, 50));
+          };
+          setTimeout(tick, Math.min(quiet, 50));
+        }),
+      { quiet: quietWindowMs, budget: settleTimeoutMs },
+    )
+    // A navigation mid-wait destroys the execution context; the caller
+    // learns about the navigation from the observation, and quiescence
+    // simply was not observed.
+    .catch(() => false);
+
+  // Node-side backstop: a renderer that never runs our timers (frozen page,
+  // modal dialog) must not turn a bounded wait into a hang.
+  return Promise.race([
+    inPage,
+    delay(settleTimeoutMs + QUIESCENCE_OVERHEAD_MS).then(() => false),
+  ]);
+}
+
+/** Evaluate one success check. Any engine error counts as "not yet": the
+ * page may be mid-navigation, and the poll loop will ask again. */
+async function evaluateSuccessCheck(
+  page: Page,
+  check: SuccessCheck,
+  activity: PageActivity,
+): Promise<boolean> {
+  try {
+    switch (check.type) {
+      case 'url_matches':
+        return matchesUrlPattern(page.url(), check.pattern);
+      case 'element_exists':
+        return (
+          (await page
+            .getByRole(check.role as Parameters<Page['getByRole']>[0], {
+              name: check.name,
+            })
+            .count()) > 0
+        );
+      case 'text_present': {
+        const text = await page.evaluate(() => document.body?.innerText ?? '');
+        return text.includes(check.text);
+      }
+      case 'download_started':
+        return activity.downloads.length > 0;
+      case 'popup_opened':
+        return activity.openedPageIds.length > 0;
+    }
+  } catch {
+    return false;
+  }
+}
+
+/** Match a URL against a caller pattern: a regular expression when it
+ * compiles, plain containment otherwise. A model that writes
+ * `example.com/orders?id=1` means containment, and failing the check on a
+ * regex syntax error would hide a page that actually loaded. */
+function matchesUrlPattern(url: string, pattern: string): boolean {
+  try {
+    return new RegExp(pattern).test(url);
+  } catch {
+    return url.includes(pattern);
+  }
+}
+
+/** Wrap a revalidated locator as an action handle. Every op carries the
+ * finite {@link ACTION_TIMEOUT_MS} instead of Playwright's 30s default. */
+function actionTargetHandle(locator: Locator): ActionTargetHandle {
+  const options = { timeout: ACTION_TIMEOUT_MS };
+  return {
+    click: () => locator.click(options),
+    fill: (text) => locator.fill(text, options),
+    press: (key) => locator.press(key, options),
+    selectOptions: (values) => locator.selectOption([...values], options).then(() => undefined),
+    setChecked: (checked) => locator.setChecked(checked, options),
+    hover: () => locator.hover(options),
+    setFiles: (absolutePaths) => locator.setInputFiles([...absolutePaths], options),
+  };
+}
+
+/** Scroll one page by pixels or viewport multiples. The viewport height is
+ * read inside the page so the amount means what the page sees, not what a
+ * configured viewport claims. */
+async function scrollPageBy(
+  page: Page,
+  direction: ScrollDirection,
+  amount: ScrollAmount,
+): Promise<void> {
+  const sign = direction === 'up' ? -1 : 1;
+  await page.evaluate(
+    ({ unit, value, signum }) => {
+      const distance = unit === 'viewport' ? window.innerHeight * value : value;
+      window.scrollBy(0, distance * signum);
+    },
+    { unit: amount.unit, value: amount.value, signum: sign },
+  );
+  await page.waitForTimeout(SCROLL_SETTLE_MS);
+}
+
+/** Collect the evidence a blocked classification is drawn from. Bounded and
+ * best-effort: an unreadable page yields empty signals (classified as "not
+ * blocked") rather than failing the whole action result. */
+async function collectBlockSignals(record: PageRecord): Promise<BlockSignals> {
+  const page = record.page;
+  const probe = await page
+    .evaluate((maxChars) => {
+      const text = document.body?.innerText ?? '';
+      return {
+        text: text.slice(0, maxChars),
+        hasPasswordField: document.querySelector('input[type="password"]') !== null,
+      };
+    }, MAX_BLOCK_TEXT_CHARS)
+    .catch(() => ({ text: '', hasPasswordField: false }));
+
+  const url = page.url();
+  const response = record.lastMainResponse;
+  return {
+    url,
+    text: probe.text,
+    hasPasswordField: probe.hasPasswordField,
+    frameUrls: page
+      .frames()
+      .slice(0, MAX_BLOCK_FRAME_URLS)
+      .map((frame) => frame.url()),
+    // Only when the response really produced the document on screen; a
+    // stale 403 from a previous URL must not label this page blocked.
+    ...(response !== undefined && response.url === url
+      ? {
+          status: response.status,
+          ...(response.retryAfterHeader !== undefined
+            ? { retryAfterHeader: response.retryAfterHeader }
+            : {}),
+        }
+      : {}),
+  };
+}
+
+/** Map Playwright's dialog type string onto the reported union. Unknown
+ * types are reported as `alert`: the caller's only real decision is
+ * accept/dismiss, and an unmapped type must not break the result. */
+function normalizeDialogType(type: string): BrowserDialog['type'] {
+  return type === 'confirm' || type === 'prompt' || type === 'beforeunload'
+    ? type
+    : 'alert';
 }
 
 async function prepareSessionPage(context: BrowserContext): Promise<void> {

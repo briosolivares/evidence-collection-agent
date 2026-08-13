@@ -494,6 +494,113 @@ describe('Playwright browser controller', () => {
   );
 
   it(
+    'runs a receipted sequence with element and page-level keys, then settles',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/actions.html'));
+      const observation = await controller.observe();
+      const search = elementRef(observation, 'textbox', 'Search notes');
+
+      const output = await controller.browserAction({
+        pageId: observation.page.pageId,
+        documentId: observation.page.documentId,
+        basedOnObservationId: observation.page.observationId,
+        actions: [
+          { op: 'fill', target: search, text: 'quarterly controls' },
+          // No target: the key goes to the page, where the fill left focus.
+          { op: 'press', key: 'Enter' },
+          // Same key through an explicit target, proving both paths work.
+          { op: 'press', target: search, key: 'Enter' },
+        ],
+        successChecks: [
+          { type: 'text_present', text: 'Notes: searched quarterly controls' },
+          { type: 'element_exists', role: 'button', name: 'Save draft' },
+        ],
+      });
+
+      expect(output.status).toBe('completed');
+      expect(output.actionReceipts.map((receipt) => receipt.op)).toEqual([
+        'fill',
+        'press',
+        'press',
+      ]);
+      expect(output.actionReceipts.every((receipt) => receipt.effectsCommitted)).toBe(
+        true,
+      );
+      expect(output.checks.map((outcome) => outcome.passed)).toEqual([true, true]);
+      expect(output.settled).toBe(true);
+      expect(output.dialogs).toEqual([]);
+      expect(output.openedPages).toEqual([]);
+      expect(output.currentPage.observationId).toBe(
+        observation.page.observationId + 1,
+      );
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'waits for scroll-triggered content instead of a global network idle',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/lazy-load.html'));
+      const observation = await controller.observe();
+
+      const output = await controller.browserAction({
+        pageId: observation.page.pageId,
+        documentId: observation.page.documentId,
+        basedOnObservationId: observation.page.observationId,
+        actions: [
+          { op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } },
+        ],
+        successChecks: [{ type: 'text_present', text: 'All evidence loaded' }],
+      });
+
+      expect(output.status).toBe('completed');
+      expect(output.checks.map((outcome) => outcome.passed)).toEqual([true]);
+      expect(output.settled).toBe(true);
+      expect(output.changes.navigated).toBe(false);
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'reports downloads a sequence started and passes the download_started check',
+    async () => {
+      await controller.newTab();
+      // The fixture's download path needs the session cookie set by '/'.
+      await controller.goto(fixtureServer.url('/'));
+      await controller.goto(fixtureServer.url('/downloads.html'));
+      const observation = await controller.observe();
+
+      const output = await controller.browserAction({
+        pageId: observation.page.pageId,
+        documentId: observation.page.documentId,
+        basedOnObservationId: observation.page.observationId,
+        actions: [
+          {
+            op: 'click',
+            target: elementRef(
+              observation,
+              'button',
+              'Generate download with JavaScript',
+            ),
+          },
+        ],
+        successChecks: [{ type: 'download_started' }],
+      });
+
+      expect(output.status).toBe('completed');
+      expect(output.checks.map((outcome) => outcome.passed)).toEqual([true]);
+      expect(output.downloads).toHaveLength(1);
+      expect(output.downloads[0]).toMatchObject({
+        pageId: observation.page.pageId,
+        suggestedFilename: 'javascript-evidence.bin',
+      });
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
     'never admits download capture pages into the page registry',
     async () => {
       await controller.newTab();

@@ -11,6 +11,10 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
+  BrowserActionOutput,
+  BrowserActionRequest,
+} from '../browser/browserActions.js';
+import type {
   BrowserObservation,
   BrowserPage,
 } from '../browser/browserState.js';
@@ -20,6 +24,8 @@ import type {
   BrowserDownloadTarget,
   BrowserFetchResult,
   BrowserScreenshotOptions,
+  HandleDialogRequest,
+  HandleDialogResult,
 } from '../browser/controller.js';
 import { runTask } from '../cli/runTask.js';
 import {
@@ -122,6 +128,14 @@ class FakeBrowser implements BrowserController {
 
   async observe(): Promise<BrowserObservation> {
     throw new Error('Unexpected page observation.');
+  }
+
+  async browserAction(_request: BrowserActionRequest): Promise<BrowserActionOutput> {
+    throw new Error('Unexpected browser action sequence.');
+  }
+
+  async handleDialog(_request: HandleDialogRequest): Promise<HandleDialogResult> {
+    throw new Error('Unexpected browser dialog decision.');
   }
 
   async switchPage(_pageId: string): Promise<BrowserPage> {

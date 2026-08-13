@@ -3,8 +3,12 @@
 
 import { vi } from 'vitest';
 
+import type { BrowserActionRequest } from '../../src/browser/browserActions.js';
 import type { BrowserPage } from '../../src/browser/browserState.js';
-import type { BrowserController } from '../../src/browser/controller.js';
+import type {
+  BrowserController,
+  HandleDialogRequest,
+} from '../../src/browser/controller.js';
 
 /** The single page every stub identity method reports. */
 function stubPage(pageId = 'page-stub'): BrowserPage {
@@ -56,6 +60,41 @@ export function stubBrowser(): BrowserController {
         noLongerVisibleElementIds: [],
         updatedText: [],
       },
+    })),
+    // A stub sequence commits nothing and observes nothing: bridge tests
+    // assert loop/TUI behaviour, so the receipts only need to be shaped
+    // like a real result.
+    browserAction: vi.fn(async (request: BrowserActionRequest) => ({
+      status: 'completed' as const,
+      previousObservationId: 1,
+      actionReceipts: request.actions.map((action, index) => ({
+        index,
+        op: action.op,
+        status: 'completed' as const,
+        effectsCommitted: true,
+      })),
+      settled: true,
+      checks: [],
+      currentPage: stubPage(request.pageId),
+      changes: {
+        basis: 'full_snapshot' as const,
+        navigated: false,
+        newlyVisible: [],
+        noLongerVisibleElementIds: [],
+        updatedText: [],
+      },
+      changesTruncated: false,
+      openedPages: [],
+      dialogs: [],
+      downloads: [],
+    })),
+    handleDialog: vi.fn(async (request: HandleDialogRequest) => ({
+      dialogId: request.dialogId,
+      handled: (request.action === 'accept' ? 'accepted' : 'dismissed') as
+        | 'accepted'
+        | 'dismissed',
+      page: stubPage(),
+      pendingDialogs: [],
     })),
     switchPage: vi.fn(async (pageId: string) => stubPage(pageId)),
     close: vi.fn(async () => {}),

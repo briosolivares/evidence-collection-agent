@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browser Action Fixture</title>
+  </head>
+  <body>
+    <!-- Deterministic surface for receipted action sequences. Every control
+         reports its effect in visible text, so a test can tell "committed"
+         from "attempted" without reading DOM internals. Wording avoids
+         login/CAPTCHA/rate-limit phrases on purpose: this page must never be
+         classified as a blocked state. -->
+    <main>
+      <h1>Browser action fixture</h1>
+      <p id="status" role="status">No draft saved</p>
+      <p id="name-echo">Name echo: (empty)</p>
+      <p id="attachment">Attachment: (none)</p>
+      <p id="notes">Notes: (none)</p>
+      <p id="hover">Hover: none</p>
+
+      <!-- A GET submit to /second.html: clicking "Submit form" replaces the
+           document, which is the navigation boundary a sequence must stop
+           at instead of continuing against the new page. -->
+      <form id="draft" method="get" action="/second.html">
+        <label for="full-name">Full name</label>
+        <input id="full-name" name="name" type="text" />
+
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="text" />
+
+        <label for="plan">Plan</label>
+        <select id="plan" name="plan">
+          <option value="basic">Basic</option>
+          <option value="pro">Pro</option>
+        </select>
+
+        <label for="subscribe">Subscribe to updates</label>
+        <input id="subscribe" name="subscribe" type="checkbox" />
+
+        <button id="save" type="button">Save draft</button>
+        <button id="submit" type="submit">Submit form</button>
+      </form>
+
+      <label for="search">Search notes</label>
+      <input id="search" type="text" />
+
+      <label for="attachment-input">Attachment file</label>
+      <input id="attachment-input" type="file" />
+
+      <button id="hover-probe" type="button">Hover probe</button>
+      <button id="remove-email" type="button">Remove email field</button>
+      <button id="ask-confirm" type="button">Ask to delete draft</button>
+      <button id="ask-label" type="button">Ask for draft label</button>
+      <button id="noise" type="button">Start restless updates</button>
+      <a href="/second.html" target="_blank">Open action popup</a>
+
+      <section style="margin-top: 1600px" aria-label="Below-fold section">
+        <p id="below">Below-fold marker</p>
+      </section>
+    </main>
+
+    <script>
+      const status = document.querySelector('#status');
+      const notes = document.querySelector('#notes');
+
+      document.querySelector('#full-name').addEventListener('input', (event) => {
+        document.querySelector('#name-echo').textContent =
+          'Name echo: ' + (event.target.value || '(empty)');
+      });
+
+      document.querySelector('#save').addEventListener('click', () => {
+        const name = document.querySelector('#full-name').value || '(nobody)';
+        const plan = document.querySelector('#plan').value;
+        const subscribed = document.querySelector('#subscribe').checked
+          ? 'subscribed'
+          : 'not subscribed';
+        status.textContent =
+          'Draft saved for ' + name + ' on plan ' + plan + ' (' + subscribed + ')';
+      });
+
+      // preventDefault keeps Enter from implicitly submitting the form, so
+      // the press op can be tested without triggering a navigation.
+      document.querySelector('#search').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          notes.textContent = 'Notes: searched ' + (event.target.value || '(nothing)');
+        }
+      });
+
+      document
+        .querySelector('#attachment-input')
+        .addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          document.querySelector('#attachment').textContent =
+            'Attachment: ' + (file ? file.name : '(none)');
+        });
+
+      document.querySelector('#hover-probe').addEventListener('mouseenter', () => {
+        document.querySelector('#hover').textContent = 'Hover: probed';
+      });
+
+      // Destroys a later action's target mid-sequence: its ref must go
+      // stale rather than resolving to some other field.
+      document.querySelector('#remove-email').addEventListener('click', () => {
+        document.querySelector('label[for="email"]').remove();
+        document.querySelector('#email').remove();
+        status.textContent = 'Removed the email field';
+      });
+
+      document.querySelector('#ask-confirm').addEventListener('click', () => {
+        status.textContent = window.confirm('Delete the draft?')
+          ? 'Draft deleted'
+          : 'Kept the draft';
+      });
+
+      document.querySelector('#ask-label').addEventListener('click', () => {
+        const label = window.prompt('Label this draft', 'draft-1');
+        status.textContent = label === null ? 'Label cancelled' : 'Labeled ' + label;
+      });
+
+      // Never stops mutating: the page can therefore never reach a DOM quiet
+      // window, which is the honest "unsettled" case.
+      document.querySelector('#noise').addEventListener('click', () => {
+        let tick = 0;
+        setInterval(() => {
+          tick += 1;
+          notes.textContent = 'Notes: restless update ' + tick;
+        }, 25);
+      });
+    </script>
+  </body>
+</html>
