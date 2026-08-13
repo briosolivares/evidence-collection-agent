@@ -4,6 +4,7 @@ import { writeArtifact } from '../../run/artifacts.js';
 import type { ToolDef } from '../registry.js';
 import { requireBrowser } from '../shared/browser.js';
 import { artifactRolesInput, assertEvidencePath, type EvidenceResult } from '../shared/evidence.js';
+import { accessKey } from '../registry.js';
 
 const screenshotInputSchema = z
   .object({
@@ -45,6 +46,12 @@ export const screenshotTool: ToolDef<ScreenshotInput> = {
     'Returns the artifact path and byte size.',
   inputSchema: screenshotInputSchema,
   readOnly: false,
+  // Reads the page, writes a file and the manifest — so two screenshots of
+  // one page serialize, but a screenshot and a table update do not.
+  getAccess: (input) => ({
+    reads: [accessKey.selectedPage()],
+    writes: [accessKey.file(input.filename), accessKey.manifest()],
+  }),
   async execute(input, ctx): Promise<EvidenceResult> {
     const browser = requireBrowser(ctx);
     assertEvidencePath(ctx.runDir, input.filename);

@@ -6,6 +6,7 @@ import { ARTIFACTS_DIR, writeArtifact } from '../../run/artifacts.js';
 import type { ToolDef } from '../registry.js';
 import { requireBrowser } from '../shared/browser.js';
 import { artifactRolesInput, assertEvidencePath, type EvidenceResult } from '../shared/evidence.js';
+import { accessKey } from '../registry.js';
 
 const filenameSchema = z
   .string()
@@ -73,6 +74,7 @@ export const downloadTool: ToolDef<DownloadInput> = {
     'Saves the artifact under artifacts/ with final-URL provenance.',
   inputSchema: downloadInputSchema,
   readOnly: false,
+  getAccess: () => ({ reads: [accessKey.selectedPage()], writes: [accessKey.manifest()] }),
   async execute(input, ctx): Promise<EvidenceResult> {
     const browser = requireBrowser(ctx);
     if (input.filename !== undefined) {

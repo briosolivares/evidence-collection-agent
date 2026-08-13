@@ -1,98 +1,179 @@
 import { executeToolCall, type ToolCall, type ToolCallResult } from '../tools/pipeline.js';
-import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
+import {
+  accessesConflict,
+  EXCLUSIVE_ACCESS,
+  LEGACY_READ_ACCESS,
+  type ToolAccess,
+  type ToolCtx,
+  type ToolDef,
+  type ToolRegistry,
+} from '../tools/registry.js';
 
-/** Maximum number of read-only tool calls in flight at once. Parallel reads
- * buy speed at zero correctness risk, but an uncapped burst would spike
- * resource use — the design (five mechanisms, item 5) fixes the cap at 5. */
-export const MAX_CONCURRENT_READS = 5;
+/** Maximum tool calls in flight at once. Access safety says two calls CAN
+ * overlap; it does not say a dozen network or browser operations should. */
+export const MAX_CONCURRENT_CALLS = 5;
 
 /**
- * Execute one model response's tool calls: read-only tools in parallel,
- * state-changing tools one at a time, results in request order.
+ * One call with everything scheduling needs decided up front: its tool, its
+ * validated input, and what it touches.
  *
- * Scheduling contract — request order is preserved at batch granularity:
- * consecutive read-only calls (per the registry's `readOnly` flag) form one
- * batch and run concurrently with at most MAX_CONCURRENT_READS in flight;
- * state-changing calls run strictly one at a time; batches execute in
- * request order, one after another. A state-changing call is therefore a
- * barrier: every call requested before it finishes before it starts, and no
- * call requested after it starts until it finishes. (A read requested after
- * a write is usually meant to observe that write's effect — think `click`
- * then `inspect_page` — so hoisting it ahead of the write would hand the
- * model a stale observation. Claude Code interleaves the same way.) A call
- * naming an unknown tool is scheduled as state-changing — the conservative
- * guess — and the pipeline reports its structured unknown-tool error.
+ * The ordering matters. Access is derived from VALIDATED input, so every call
+ * is parsed before any call runs — which is what makes "an invalid response
+ * causes zero side effects" true rather than aspirational. Deciding access
+ * from raw model input would mean trusting a field the tool has not checked.
+ */
+export interface ValidatedToolCall {
+  call: ToolCall;
+  index: number;
+  /** Absent when the tool is unknown; the pipeline reports that per-call. */
+  tool?: ToolDef;
+  /** The parsed input, when the schema accepted it. */
+  input?: unknown;
+  /** What this call touches. EXCLUSIVE_ACCESS whenever anything is unknown. */
+  access: ToolAccess;
+  /** Set when validation failed, so the call is answered without executing. */
+  validationError?: string;
+}
+
+/**
+ * Parse and validate every call, then derive its access.
  *
- * @param calls - the tool invocations of one model response, in request order
- * @param registry - the tools available to this run; each call's `readOnly`
- *   flag decides how it is scheduled
- * @param ctx - per-run context passed through to every executor
- * @returns one result per call, positionally matching `calls` regardless of
- *   completion order (the API requires each tool_result to answer its
- *   tool_use). A failing call yields its structured error result in its
- *   slot without aborting the other calls; like the pipeline, this never
- *   throws.
+ * Nothing executes here. A call whose tool is unknown, whose input fails its
+ * schema, or whose `getAccess` throws is marked EXCLUSIVE and carries its
+ * error forward — the conservative reading in all three cases, since a call we
+ * cannot classify must never run beside another.
+ */
+export function validateToolCallsForScheduling(
+  calls: readonly ToolCall[],
+  registry: ToolRegistry,
+): ValidatedToolCall[] {
+  return calls.map((call, index) => {
+    const tool = registry.get(call.name);
+    if (tool === undefined) {
+      // Unknown tool: the pipeline produces the structured unknown_tool error.
+      return { call, index, access: EXCLUSIVE_ACCESS };
+    }
+
+    const parsed = tool.inputSchema.safeParse(call.input);
+    if (!parsed.success) {
+      return {
+        call,
+        index,
+        tool,
+        access: EXCLUSIVE_ACCESS,
+        validationError: parsed.error.message,
+      };
+    }
+
+    if (tool.getAccess === undefined) {
+      // Migration path: a tool that has not declared access falls back to the
+      // readOnly flag. Read-only tools may still overlap each other, which
+      // preserves today's parallelism; anything else runs alone.
+      return {
+        call,
+        index,
+        tool,
+        input: parsed.data,
+        access: tool.readOnly ? LEGACY_READ_ACCESS : EXCLUSIVE_ACCESS,
+      };
+    }
+
+    try {
+      return { call, index, tool, input: parsed.data, access: tool.getAccess(parsed.data) };
+    } catch {
+      // A buggy declaration degrades to serial, never to unsafe parallelism.
+      return { call, index, tool, input: parsed.data, access: EXCLUSIVE_ACCESS };
+    }
+  });
+}
+
+/**
+ * Group validated calls into consecutive runs that may execute concurrently.
+ *
+ * Order is preserved: a call joins the current group only if it conflicts with
+ * NO member of it. The first conflict closes the group. That keeps the
+ * long-standing guarantee that a call requested after a write observes that
+ * write — a read hoisted ahead of the write it was meant to observe would hand
+ * the model a stale answer — while letting genuinely disjoint work overlap.
+ */
+export function groupConcurrentCalls(
+  validated: readonly ValidatedToolCall[],
+): ValidatedToolCall[][] {
+  const groups: ValidatedToolCall[][] = [];
+  for (const entry of validated) {
+    const current = groups[groups.length - 1];
+    if (
+      current !== undefined &&
+      current.every((member) => !accessesConflict(member.access, entry.access))
+    ) {
+      current.push(entry);
+    } else {
+      groups.push([entry]);
+    }
+  }
+  return groups;
+}
+
+/**
+ * Execute one model response's tool calls, overlapping only what provably
+ * cannot race.
+ *
+ * Contract:
+ *  - Every call is validated BEFORE any call executes, so a response
+ *    containing an invalid call still produces zero side effects from it.
+ *  - Calls overlap only when neither writes a key the other reads or writes
+ *    (see accessesConflict). Same-page actions and same-table updates
+ *    serialize; independent pages, tables, files, and origins overlap.
+ *  - At most MAX_CONCURRENT_CALLS run at once.
+ *  - Results are committed in the model's original call order regardless of
+ *    completion order, so the model-visible sequence is deterministic even
+ *    though timing is not.
+ *  - A failing call yields its structured error in its own slot without
+ *    aborting the others; this never throws.
  */
 export async function scheduleToolCalls(
   calls: readonly ToolCall[],
   registry: ToolRegistry,
   ctx: ToolCtx,
 ): Promise<ToolCallResult[]> {
-  // Results land by original index, never by completion order — parallel
-  // reads finish in any order, but slot i must always answer call i.
-  const results = new Array<ToolCallResult>(calls.length);
-  const readSlots = new Semaphore(MAX_CONCURRENT_READS);
+  const validated = validateToolCallsForScheduling(calls, registry);
+  const buffered = new Array<ToolCallResult>(calls.length);
+  const slots = new Semaphore(MAX_CONCURRENT_CALLS);
 
-  for (const batch of partitionCalls(calls, registry)) {
-    if (batch.readOnly) {
-      await Promise.all(
-        batch.entries.map(async ({ call, index }) => {
-          await readSlots.acquire();
-          try {
-            results[index] = await executeToolCall(registry, call, ctx);
-          } finally {
-            readSlots.release();
-          }
-        }),
-      );
-    } else {
-      for (const { call, index } of batch.entries) {
-        results[index] = await executeToolCall(registry, call, ctx);
-      }
-    }
+  for (const group of groupConcurrentCalls(validated)) {
+    await Promise.all(
+      group.map(async (entry) => {
+        await slots.acquire();
+        try {
+          // Re-running the pipeline (which re-validates) keeps ONE validation
+          // authority rather than two that could disagree. The duplicate parse
+          // is cheap next to any real tool's work, and a second opinion about
+          // whether input is valid is exactly the bug worth avoiding.
+          buffered[entry.index] = await executeToolCall(registry, entry.call, ctx);
+        } finally {
+          slots.release();
+        }
+      }),
+    );
   }
 
-  return results;
+  return commitToolResultsInCallOrder(validated, buffered);
 }
 
-/** One call paired with its position in the original request. */
-interface IndexedCall {
-  call: ToolCall;
-  index: number;
-}
-
-/** A maximal run of consecutive same-kind calls: read-only batches execute
- * concurrently, state-changing batches one entry at a time. */
-interface Batch {
-  readOnly: boolean;
-  entries: IndexedCall[];
-}
-
-/** Split the calls into maximal consecutive same-kind batches, preserving
- * request order. A call whose tool is not in the registry counts as
- * state-changing (conservative: never parallelize what we can't classify). */
-function partitionCalls(calls: readonly ToolCall[], registry: ToolRegistry): Batch[] {
-  const batches: Batch[] = [];
-  calls.forEach((call, index) => {
-    const readOnly = registry.get(call.name)?.readOnly ?? false;
-    const lastBatch = batches[batches.length - 1];
-    if (lastBatch !== undefined && lastBatch.readOnly === readOnly) {
-      lastBatch.entries.push({ call, index });
-    } else {
-      batches.push({ readOnly, entries: [{ call, index }] });
-    }
-  });
-  return batches;
+/**
+ * Return results in the model's original call order.
+ *
+ * Buffering and committing separately is what makes out-of-order completion
+ * unobservable: slot i always answers call i, whatever finished first.
+ */
+export function commitToolResultsInCallOrder(
+  validated: readonly ValidatedToolCall[],
+  buffered: readonly ToolCallResult[],
+): ToolCallResult[] {
+  return validated
+    .slice()
+    .sort((left, right) => left.index - right.index)
+    .map((entry) => buffered[entry.index]!);
 }
 
 /** A counting semaphore: at most `slots` concurrent holders; a freed slot

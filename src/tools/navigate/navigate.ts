@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import type { ToolCtx, ToolDef } from '../registry.js';
 import { formatPageHeader, requireBrowser } from '../shared/browser.js';
+import { accessKey } from '../registry.js';
 
 const navigateInputSchema = z
   .object({
@@ -34,5 +35,9 @@ export const navigateTool: ToolDef<NavigateInput> = {
   description: 'Navigate the browser to an absolute HTTP or HTTPS URL.',
   inputSchema: navigateInputSchema,
   readOnly: false,
+  getAccess: () => ({
+    reads: [],
+    writes: [accessKey.selectedPage(), accessKey.observation('selected')],
+  }),
   execute: navigate,
 };

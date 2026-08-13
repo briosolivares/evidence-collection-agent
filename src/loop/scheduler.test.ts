@@ -6,8 +6,12 @@ import { z } from 'zod';
 
 import { initManifest } from '../run/artifacts.js';
 import type { ToolCall } from '../tools/pipeline.js';
-import { createRegistry, type ToolCtx, type ToolDef } from '../tools/registry.js';
-import { MAX_CONCURRENT_READS, scheduleToolCalls } from './scheduler.js';
+import { createRegistry, type ToolCtx, type ToolDef, type ToolAccess } from '../tools/registry.js';
+import {
+  MAX_CONCURRENT_CALLS,
+  scheduleToolCalls,
+  validateToolCallsForScheduling,
+} from './scheduler.js';
 
 // The scheduler's contract is about time — what overlaps, what doesn't, and
 // that results still land in request order. Every test drives instrumented
@@ -125,7 +129,7 @@ describe('scheduleToolCalls', () => {
     // All six were requested at once, but only the cap's worth may start.
     await tick();
     const started = timeline.events.filter((event) => event.startsWith('start '));
-    expect(started).toHaveLength(MAX_CONCURRENT_READS);
+    expect(started).toHaveLength(MAX_CONCURRENT_CALLS);
     expect(started).toEqual(['start r1', 'start r2', 'start r3', 'start r4', 'start r5']);
     expect(timeline.events).not.toContain('start r6');
 
@@ -207,5 +211,164 @@ describe('scheduleToolCalls', () => {
     expect(results[1]).toMatchObject({ toolCallId: 'id-r-boom', isError: true });
     expect(results[1].content).toContain('r-boom exploded');
     expect(results[2]).toEqual({ toolCallId: 'id-w-ok', isError: false, content: 'done w-ok' });
+  });
+});
+
+// --- T13: input-aware scheduling ---------------------------------------------
+
+describe('access-aware scheduling', () => {
+  /** A tool that declares access derived from its input, recording overlap. */
+  function accessTool(
+    name: string,
+    access: (input: { key: string; ms?: number }) => ToolAccess,
+    live: { count: number; peak: number },
+  ): ToolDef {
+    const def: ToolDef<{ key: string; ms?: number }> = {
+      name,
+      description: name,
+      inputSchema: z.object({ key: z.string(), ms: z.number().optional() }),
+      readOnly: false,
+      getAccess: access,
+      execute: async (input) => {
+        live.count += 1;
+        live.peak = Math.max(live.peak, live.count);
+        await new Promise((resolve) => setTimeout(resolve, input.ms ?? 10));
+        live.count -= 1;
+        return `${name}:${input.key}`;
+      },
+    };
+    return def as ToolDef;
+  }
+
+  function keyCall(name: string, key: string, ms = 10) {
+    return { id: `${name}-${key}`, name, input: { key, ms } };
+  }
+
+  it('overlaps writes to DIFFERENT resources', async () => {
+    // The whole gain over readOnly batching: two state-changing calls that
+    // cannot touch each other now run together.
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('act', (input) => ({ reads: [], writes: [`page:${input.key}`] }), live),
+    ]);
+
+    await scheduleToolCalls([keyCall('act', 'p1'), keyCall('act', 'p2')], registry, ctx);
+    expect(live.peak).toBe(2);
+  });
+
+  it('serializes writes to the SAME resource', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('act', (input) => ({ reads: [], writes: [`page:${input.key}`] }), live),
+    ]);
+
+    await scheduleToolCalls([keyCall('act', 'p1'), keyCall('act', 'p1')], registry, ctx);
+    expect(live.peak).toBe(1);
+  });
+
+  it('serializes a read against a write of the same resource', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('look', (input) => ({ reads: [`page:${input.key}`], writes: [] }), live),
+      accessTool('act', (input) => ({ reads: [], writes: [`page:${input.key}`] }), live),
+    ]);
+
+    await scheduleToolCalls([keyCall('look', 'p1'), keyCall('act', 'p1')], registry, ctx);
+    expect(live.peak).toBe(1);
+  });
+
+  it('overlaps two reads of the same resource', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('look', (input) => ({ reads: [`page:${input.key}`], writes: [] }), live),
+    ]);
+
+    await scheduleToolCalls([keyCall('look', 'p1'), keyCall('look', 'p1')], registry, ctx);
+    expect(live.peak).toBe(2);
+  });
+
+  it('runs a tool whose getAccess throws entirely alone', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool(
+        'broken',
+        () => {
+          throw new Error('bad declaration');
+        },
+        live,
+      ),
+      accessTool('look', (input) => ({ reads: [`page:${input.key}`], writes: [] }), live),
+    ]);
+
+    await scheduleToolCalls(
+      [keyCall('look', 'p1'), keyCall('broken', 'p2'), keyCall('look', 'p3')],
+      registry,
+      ctx,
+    );
+    // A buggy declaration degrades to serial, never to unsafe parallelism.
+    expect(live.peak).toBe(1);
+  });
+
+  it('commits results in call order even when a later call finishes first', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('act', (input) => ({ reads: [], writes: [`page:${input.key}`] }), live),
+    ]);
+
+    const results = await scheduleToolCalls(
+      [keyCall('act', 'slow', 40), keyCall('act', 'fast', 1)],
+      registry,
+      ctx,
+    );
+    expect(results.map((result) => result.content)).toEqual(['act:slow', 'act:fast']);
+  });
+});
+
+describe('validateToolCallsForScheduling', () => {
+  it('marks an unknown tool exclusive without executing anything', () => {
+    const registry = createRegistry([
+      probeTool('read', true, { events: [], startedAtMs: new Map(), finishedAtMs: new Map() }),
+    ]);
+    const validated = validateToolCallsForScheduling(
+      [{ id: 'x', name: 'nope', input: {} }],
+      registry,
+    );
+    expect(validated[0]?.tool).toBeUndefined();
+    expect(validated[0]?.access.exclusive).toBe(true);
+  });
+
+  it('marks an invalid input exclusive and records the error', () => {
+    const tool: ToolDef<{ key: string }> = {
+      name: 'strict',
+      description: 'strict',
+      inputSchema: z.object({ key: z.string() }),
+      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
+      execute: async () => 'ok',
+    };
+    const validated = validateToolCallsForScheduling(
+      [{ id: 'x', name: 'strict', input: { key: 42 } }],
+      createRegistry([tool as ToolDef]),
+    );
+    expect(validated[0]?.access.exclusive).toBe(true);
+    expect(validated[0]?.validationError).toBeDefined();
+    // Access was never derived from unvalidated input.
+    expect(validated[0]?.input).toBeUndefined();
+  });
+
+  it('derives access from the validated input', () => {
+    const tool: ToolDef<{ page: string }> = {
+      name: 'act',
+      description: 'act',
+      inputSchema: z.object({ page: z.string() }),
+      readOnly: false,
+      getAccess: (input) => ({ reads: [], writes: [`page:${input.page}`] }),
+      execute: async () => 'ok',
+    };
+    const validated = validateToolCallsForScheduling(
+      [{ id: 'x', name: 'act', input: { page: 'p7' } }],
+      createRegistry([tool as ToolDef]),
+    );
+    expect(validated[0]?.access.writes).toEqual(['page:p7']);
   });
 });

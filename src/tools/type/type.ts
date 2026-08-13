@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import type { ToolDef } from '../registry.js';
 import { actByRef, requireBrowser, requireRefDescription } from '../shared/browser.js';
+import { accessKey } from '../registry.js';
 
 const typeInputSchema = z.strictObject({
   ref: z.string().min(1).describe('Editable element ref from the latest inspect_page result'),
@@ -25,6 +26,10 @@ export const typeTool: ToolDef<TypeInput> = {
     'Replaces the value of an editable element by ref from inspect_page.',
   inputSchema: typeInputSchema,
   readOnly: false,
+  getAccess: () => ({
+    reads: [],
+    writes: [accessKey.selectedPage(), accessKey.observation('selected')],
+  }),
   async execute(input, ctx) {
     const browser = requireBrowser(ctx);
     const description = await requireRefDescription(browser, input.ref);

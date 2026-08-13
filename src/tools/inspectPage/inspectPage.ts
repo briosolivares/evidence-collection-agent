@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import type { ToolCtx, ToolDef } from '../registry.js';
 import { formatPageHeader, requireBrowser } from '../shared/browser.js';
+import { accessKey } from '../registry.js';
 
 const inspectPageInputSchema = z.object({}).strict();
 
@@ -37,5 +38,11 @@ export const inspectPageTool: ToolDef<InspectPageInput> = {
     'Inspect the current page as a compact semantic outline with refs for interactive elements.',
   inputSchema: inspectPageInputSchema,
   readOnly: true,
+  // Reads the selected page AND advances the observation the model will
+  // reason from, so it cannot overlap an action on that page.
+  getAccess: () => ({
+    reads: [accessKey.selectedPage()],
+    writes: [accessKey.observation('selected')],
+  }),
   execute: inspectPage,
 };

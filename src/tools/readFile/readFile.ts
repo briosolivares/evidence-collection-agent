@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { resolveRunPath } from '../../run/runDir.js';
 import type { ToolDef } from '../registry.js';
 import { splitLines } from '../shared/lines.js';
+import { accessKey } from '../registry.js';
 
 /** Width the line number is padded to in read_file output, matching Claude
  * Code's cat -n style rendering (e.g. "     1→content"). */
@@ -52,6 +53,7 @@ export const readFileTool: ToolDef<ReadFileInput> = {
     'Use offset and limit to read a portion of a large file.',
   inputSchema: readFileInputSchema,
   readOnly: true,
+  getAccess: (input) => ({ reads: [accessKey.file(input.file_path)], writes: [] }),
   execute(input, ctx) {
     const absPath = resolveRunPath(ctx.runDir, input.file_path);
     const content = readTextFile(absPath, input.file_path);

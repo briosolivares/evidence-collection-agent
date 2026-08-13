@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { resolveRunPath } from '../../run/runDir.js';
 import type { ToolDef } from '../registry.js';
 import { splitLines } from '../shared/lines.js';
+import { accessKey } from '../registry.js';
 
 const grepInputSchema = z.strictObject({
   pattern: z
@@ -45,6 +46,10 @@ export const grepTool: ToolDef<GrepInput> = {
     'Optionally restrict the search to a file or directory with path.',
   inputSchema: grepInputSchema,
   readOnly: true,
+  getAccess: (input) => ({
+    reads: [accessKey.file(input.path ?? '.')],
+    writes: [],
+  }),
   execute(input, ctx) {
     let regex: RegExp;
     try {

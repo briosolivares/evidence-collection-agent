@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import type { ToolDef } from '../registry.js';
 import { actByRef, requireBrowser, requireRefDescription } from '../shared/browser.js';
+import { accessKey } from '../registry.js';
 
 const clickInputSchema = z.strictObject({
   ref: z.string().min(1).describe('Element ref from the latest inspect_page result'),
@@ -24,6 +25,10 @@ export const clickTool: ToolDef<ClickInput> = {
     'Clicks an element by ref from inspect_page. Re-run inspect_page after page changes before reusing refs.',
   inputSchema: clickInputSchema,
   readOnly: false,
+  getAccess: () => ({
+    reads: [],
+    writes: [accessKey.selectedPage(), accessKey.observation('selected')],
+  }),
   async execute(input, ctx) {
     const browser = requireBrowser(ctx);
     const description = await requireRefDescription(browser, input.ref);

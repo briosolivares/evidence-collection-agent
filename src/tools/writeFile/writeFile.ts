@@ -5,6 +5,7 @@ import { ARTIFACTS_DIR, writeArtifact } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import type { ToolDef } from '../registry.js';
 import { artifactRolesInput, classifyWorkspacePath } from '../shared/evidence.js';
+import { accessKey } from '../registry.js';
 
 const writeFileInputSchema = z.strictObject({
   file_path: z
@@ -58,6 +59,10 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
     'Published files carry roles (default ["requested_output"]).',
   inputSchema: writeFileInputSchema,
   readOnly: false,
+  getAccess: (input) => ({
+    reads: [],
+    writes: [accessKey.file(input.file_path), accessKey.manifest()],
+  }),
   execute(input, ctx) {
     const area = classifyWorkspacePath(ctx.runDir, input.file_path);
     if (area === 'scratch' && input.roles !== undefined) {

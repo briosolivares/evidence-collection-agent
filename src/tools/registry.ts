@@ -50,6 +50,86 @@ export interface ToolCtx {
 }
 
 /**
+ * What a tool touches, derived from its VALIDATED input.
+ *
+ * Concrete keys, not categories: `page:p1`, `observation:p1`, `table:roster`,
+ * `file:artifacts/x.csv`, `origin:example.com`, `manifest`. Two calls may
+ * overlap only when neither writes a key the other reads or writes — which is
+ * strictly more permissive than the old read-only/state-changing split (two
+ * writes to DIFFERENT pages can now run together) and strictly safer (a
+ * "read-only" call that reads the page a concurrent write mutates no longer
+ * slips through).
+ *
+ * Deriving this from input is the whole point: `browser_action` on page p1 and
+ * `browser_action` on page p2 are the same TOOL with different access.
+ */
+export interface ToolAccess {
+  /** Keys this call reads and must see unchanged while it runs. */
+  reads: readonly string[];
+  /** Keys this call may modify. */
+  writes: readonly string[];
+  /**
+   * True when this call must run completely alone.
+   *
+   * An explicit flag rather than a sentinel key, because a sentinel only
+   * conflicts with calls that happen to name it — a call declaring
+   * `writes: ['*exclusive*']` does NOT conflict with one that merely reads
+   * something else, so a sentinel silently fails to be exclusive. That bug
+   * broke the write/read barrier when this was first written; the flag makes
+   * exclusivity unconditional.
+   */
+  exclusive?: boolean;
+}
+
+/** Access keys, built through helpers so a typo cannot silently create a key
+ * nothing else collides with — the failure mode would be invisible
+ * parallelism, not an error. */
+export const accessKey = {
+  page: (pageId: string): string => `page:${pageId}`,
+  observation: (pageId: string): string => `observation:${pageId}`,
+  table: (outputId: string): string => `table:${outputId}`,
+  file: (relPath: string): string => `file:${relPath}`,
+  origin: (host: string): string => `origin:${host}`,
+  /** The selected page, when a tool does not name one. Deliberately a single
+   * shared key: every unqualified browser action contends for it. */
+  selectedPage: (): string => 'page:selected',
+  contract: (): string => 'contract',
+  evidence: (): string => 'evidence',
+  manifest: (): string => 'manifest',
+} as const;
+
+/** Whether two access declarations conflict — a write against any read or
+ * write of the other. Read/read never conflicts, which is what allows
+ * unbounded parallel observation. */
+export function accessesConflict(left: ToolAccess, right: ToolAccess): boolean {
+  // Exclusivity is unconditional: an unclassifiable call conflicts with
+  // everything, including a call that touches nothing it names.
+  if (left.exclusive === true || right.exclusive === true) return true;
+  const leftWrites = new Set(left.writes);
+  const rightWrites = new Set(right.writes);
+  for (const key of rightWrites) {
+    if (leftWrites.has(key)) return true;
+  }
+  for (const key of left.reads) {
+    if (rightWrites.has(key)) return true;
+  }
+  for (const key of right.reads) {
+    if (leftWrites.has(key)) return true;
+  }
+  return false;
+}
+
+/** The fail-closed access for a call whose tool declares none, or whose
+ * declaration threw: it conflicts with everything, so it runs alone. */
+export const EXCLUSIVE_ACCESS: ToolAccess = { reads: [], writes: [], exclusive: true };
+
+/** The access a legacy read-only tool (one with no `getAccess`) gets during
+ * the migration: it touches nothing it can name, so two of them overlap —
+ * preserving today's parallel reads — while any exclusive call still forms a
+ * barrier around them. */
+export const LEGACY_READ_ACCESS: ToolAccess = { reads: [], writes: [] };
+
+/**
  * One tool, defined once: the model-facing contract (name, description,
  * input schema) together with the executor that does the work.
  *
@@ -64,9 +144,23 @@ export interface ToolDef<Input = unknown> {
   description: string;
   /** zod schema every input is validated against before `execute` runs. */
   inputSchema: z.ZodType<Input>;
-  /** True iff the tool never changes state — the scheduler (T8) runs
-   * read-only tools in parallel and serializes state-changing ones. */
+  /**
+   * True iff the tool never changes state.
+   *
+   * Retained as a COMPATIBILITY field only: the scheduler now prefers
+   * `getAccess()`, and this flag is the fallback for tools that do not yet
+   * declare access. T16 removes it once every production tool has migrated.
+   */
   readOnly: boolean;
+  /**
+   * What this call touches, derived from its validated input (see ToolAccess).
+   *
+   * Omitted means "unknown", which the scheduler treats as exclusive — a tool
+   * that cannot say what it touches must not run beside anything. A throw is
+   * treated identically, so a buggy declaration degrades to serial execution
+   * rather than to unsafe parallelism.
+   */
+  getAccess?(input: Input): ToolAccess;
   /** Maximum size in bytes of this tool's normalized result before the
    * pipeline offloads it to a file and hands the model a preview + path
    * (T5). Omitted means DEFAULT_MAX_RESULT_BYTES. */
