@@ -125,6 +125,20 @@ verbatim fidelity + provenance, so keep the scope to exactly that.
 construction if the agent uses the tool); spot-check that other tasks don't
 misuse it as a general scraper.
 
+**Addendum 2 (2026-08-13, first protocol validation):** merged_prs 100%
+(3/3 clean), hacker_news 100% (no prompt tax), yc zero missing-founder
+failures (the protocol's target class held) but 79.2% on residual slop.
+Forensics on the yc garbage row (trial 2c564d): a SINGLE 7,433-char
+write_file (chunking guidance ignored) whose content value ended with a
+training-convention `</content>` tag the model never opened — no harness
+source or tool result ever shows such tags, so it is model slop, not a
+write-path bug. The protocol's reconcile ran but only ONE direction:
+turn 89 read the file back, turn 90 grepped `^[A-Za-z]+ [A-Za-z]+,https`
+and confirmed 11/11 roster rows — a check blind to extra junk lines.
+Lesson for Proposal 1's next iteration (worktree agent): reconcile both
+directions — every roster entry in the output, AND every output line a
+valid contract row. A judge subagent (Proposal 2) catches this trivially.
+
 ## Proposal 5 — cheaper repeat-visit page representation (delta inspect)
 
 Origin: the cache-context-guard spec
