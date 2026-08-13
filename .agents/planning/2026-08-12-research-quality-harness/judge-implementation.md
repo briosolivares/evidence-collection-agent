@@ -119,3 +119,55 @@ proceed in parallel with 1–2 (prompt wording is self-contained) but lands
 with 3 so a single commit range flips the behavior. 5 after 3. 6 last.
 Commit style: enforcement/wiring last, per the established
 enforcement-last pattern.
+
+## Addendum — validation batch results (2026-08-13 ~3:45am)
+
+Batch: wikipedia, yc, hacker_news, merged_prs, k=3, headless, on
+feat/judge-harness (857d76d). Baseline = the 2026-08-13 ~1am protocol round.
+Experiment JSONs: `2026-08-13_03-46-10am_eval-wikipedia-reference-yc-w24-outreach_c91e7e.json`
++ regrade `2026-08-13_03-48-26am_eval-openclaw-merged-prs_d49faa.json`.
+
+| Task | Baseline | With judge | Notes |
+|---|---|---|---|
+| wikipedia | 58% | **66.7%** | failure class TRANSFORMED, see below |
+| yc | 79.2% | **87.5%** | garbage rows + email drift gone |
+| hacker_news (canary) | 100% | 94.4% | one stray `rank` column; judge caught it, worker didn't fix in cap |
+| merged_prs (canary) | 100% | **100%** | after regrade — two 403s were the worktree's missing .env, not runs |
+
+**Wikipedia headline:** all three trials now find the CORRECT reference
+(Beevor 2012) — the anchor-vs-displayed counting class is eliminated (the
+initializer's contract pins the counting scheme; the judge demands counting
+evidence). Remaining failure: answers transcribe the *rendered* Sources
+entry verbatim — "——— (2012). The Second World War…" (Wikipedia's
+repeated-author em-dash convention) — while the grader expects the
+normalized full form "Beevor, Antony (2012)…". Grader-calibration
+candidate under the browser-first/website-ground-truth ruling; agent-side
+the page shows exactly what was transcribed. Trial 3 additionally had real
+truncation-marker slop.
+
+**Judge fixes required first (857d76d, all measured live):** 8→16 turn cap
++ forced-verdict call at cap (close dangling tool_uses, demand verdict);
+one corrective re-ask on narration-instead-of-verdict; verdict accepted on
+first OR last line. Before these, every real run degraded to the generic
+unparseable fallback.
+
+**Observed judge value:** hacker_news trial-1 verdict exactly predicted the
+grader failure (extra rank column); one wikipedia run was caught with
+extraneous answer.md content in cycle 1, fixed in cycle 2, passed 3/4 with
+the correct reference; yc emails all passed quality assertions (judge
+pressure on the drift class).
+
+**Deviation from design, kept deliberately:** the judge reads the whole run
+dir (read_file is run-dir-scoped), not just artifacts/ + manifest — and the
+offloaded inspections in scratch/tool-output/ were exactly the evidence it
+used to verify the counting claim. Documented rather than restricted; note
+the calibration risk (judge may pass on unpublished evidence a grader
+never sees).
+
+**New watch items:** (1) judge cannot read PNG evidence — screenshot-backed
+proofs are invisible to it; (2) initializer can over-pin prose cosmetics
+(URL vs url header) — judge-strictness tax, extra cycles but no points
+lost; (3) cycle-2 rework can leave duplicate deliverables (two CSVs) —
+needs fix-in-place discipline in the feedback framing; (4) 2 cycles
+tax ~+50s on canary trials that trigger rework; (5) worktrees lack the
+gitignored .env → grader oracles rate-limit; copy .env into new worktrees.
