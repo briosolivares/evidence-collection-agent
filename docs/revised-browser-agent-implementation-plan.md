@@ -14,9 +14,9 @@
 `19d458f` is the minimum reviewed harness baseline. Also bring in the V2 design
 documents from `docs/browser-agent-v2-proposal`.
 
-## 150-minute execution protocol
+## 120-minute execution protocol
 
-Treat 2.5 hours as a hard limit for the assigned implementation session. This
+Treat 2 hours as a hard limit for the assigned implementation session. This
 roadmap is larger than one guaranteed session, so “complete” always means the
 explicitly assigned T-task(s), not unverified coverage of all T1–T16. If the
 assigned scope is not narrower, work in dependency order and maximize fully
@@ -46,7 +46,7 @@ exact number printed by the start command:
 ```bash
 BROWSER_V2_START_EPOCH=<START_EPOCH>
 BROWSER_V2_NOW_EPOCH="$(date +%s)"
-BROWSER_V2_TOTAL_SECONDS=9000
+BROWSER_V2_TOTAL_SECONDS=7200
 BROWSER_V2_ELAPSED_SECONDS=$((BROWSER_V2_NOW_EPOCH - BROWSER_V2_START_EPOCH))
 BROWSER_V2_REMAINING_SECONDS=$((BROWSER_V2_TOTAL_SECONDS - BROWSER_V2_ELAPSED_SECONDS))
 if [ "$BROWSER_V2_REMAINING_SECONDS" -lt 0 ]; then
@@ -64,7 +64,7 @@ printf 'TIME_CHECK start=%s now=%s elapsed=%02dh:%02dm:%02ds remaining=%02dh:%02
 ```
 
 Read the printed `TIME_CHECK` string and explicitly compare `elapsed` with the
-150-minute limit before choosing the next action. Print the line in the agent's
+120-minute limit before choosing the next action. Print the line in the agent's
 progress update; do not run the command silently. At each completed T-task,
 also copy its final time check into the task's entry in `progress.md`.
 
@@ -98,11 +98,11 @@ Immediately consolidate:
 5. Commit a coherent verified slice when possible. Preserve unfinished work and
    name its exact state, tests, blocker, and next command otherwise.
 6. Print one final `TIME_CHECK` and provide a concise handoff before the
-   150-minute limit.
+   120-minute limit.
 
 ## Table of contents
 
-- [150-minute execution protocol](#150-minute-execution-protocol)
+- [120-minute execution protocol](#120-minute-execution-protocol)
 - [What this plan optimizes for](#what-this-plan-optimizes-for)
 - [Starting point and working rules](#starting-point-and-working-rules)
 - [Task index](#task-index)

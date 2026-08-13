@@ -8,7 +8,7 @@
     "instruction": "Start from the current branch head, not a detached historical commit."
   },
   "executionPolicy": {
-    "sessionBudgetMinutes": 150,
+    "sessionBudgetMinutes": 120,
     "consolidationThresholdMinutes": 15,
     "timeCheckAfterEveryImplementationStep": true,
     "recordFinalTaskTimeCheckInProgressLog": true,

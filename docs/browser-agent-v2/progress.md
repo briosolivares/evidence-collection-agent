@@ -9,7 +9,7 @@
 **Implementation baseline:** current `feat/judge-harness` head; `19d458f` is the
 minimum reviewed harness baseline
 
-**Session limit:** 150 minutes; stop starting new work with 15 minutes remaining
+**Session limit:** 120 minutes; stop starting new work with 15 minutes remaining
 
 ## How agents should update these files
 
