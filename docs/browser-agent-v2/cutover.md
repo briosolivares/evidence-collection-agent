@@ -19,7 +19,7 @@ Nothing about the default run path changed. Concretely:
 | `harness.contractAuthor` | `'initializer'` | Only read when `outputContract` is true. |
 | Compact memory | unwired | `AgentContext` and `compactAtBoundary` exist and are tested; nothing calls them. Runs use the historical monotonic conversation plus `inspect_page` elision. |
 | `browser_batch` | registered | Retained for the parity comparison. `browser_action` is its receipted replacement. |
-| V2 tool registry | not default | `createProductionRegistry()` still builds the atomic surface. `createV2Registry()` exists with a frozen order and a snapshot test. |
+| V2 tool registry | built when the flag is on | `createProductionRegistry()` still builds the atomic surface by default. With `outputContract: true`, `runTask` assembles `createV2Registry()` at its frozen order (snapshot-tested). |
 | Verifier | live in harness mode | `report_verification` replaced the prose judge outright — this one was not gated behind a flag, because a prose verdict that cannot be trusted is not a configuration worth keeping. |
 
 So a run today behaves as it did before, with two exceptions that are strict
@@ -115,6 +115,34 @@ rejection, not a wash.
 
 ---
 
+## V2 registry — what is wired and what is not
+
+With `harness.outputContract: true`, `runTask` builds the run-scoped state
+(contract store, evidence store, content-reader registry, output table store)
+and assembles these tools at their frozen positions:
+
+**Wired and usable:** `set_output_contract`, `upsert_output_rows`,
+`delete_output_rows`, `set_table_completeness`, `observe`, `browser_action`,
+`switch_page`, `handle_dialog`, `inspect_document`, `screenshot`, `download`,
+`read_file`, `write_file`, `grep`, `fill_credentials`, `ask_user_question`, and
+`submit_for_verification` (offered as a control tool, intercepted by the
+session rather than executed).
+
+**Implemented and tested but NOT yet wired**, each needing one dependency the
+cutover has not plumbed:
+
+| Tool | Missing dependency |
+| --- | --- |
+| `write_document` | a PDF page opener (`Pick<Browser, 'newPage'>`) from the session provider |
+| `execute_javascript` | the page handle plus an explicit `javascriptPolicy` decision for the authenticated lane |
+| `read_resource` | the anonymous `PublicResourceReader` and the discovered-URL index, fed from navigation and observation |
+| `capture_text` | the text-capture page seam |
+| `run_research_jobs` | the research job runner |
+
+Each carries an `INTEGRATION` comment naming exactly what to pass. A run
+missing one of these simply does not offer that tool — `createV2Registry`
+omits rather than registering something broken, and a test asserts that.
+
 ## Legacy removal — what each deletion is waiting on
 
 | To remove | Gate | Status |
@@ -133,8 +161,8 @@ These are real and not hidden behind a flag:
   revalidation contract and a non-flaky fixture.
 - **`table` and `visual` observation needs**, and targeted-region observation,
   are not implemented (T11). `observe` supports `interactive` and `text`.
-- **`validateDocumentOutputs()`** is not implemented (T8), so a document output
-  hand-written with `write_file` is not yet rejected.
+- ~~`validateDocumentOutputs()`~~ — now implemented: a document with no
+  evidence-marked source is rejected as hand-written.
 - **Compaction is unwired** (T15), by decision rather than omission.
 - The **DNS-rebinding TOCTOU window** in `read_resource` is narrowed by per-hop
   re-resolution but not closed; a pinning HTTP client can be injected without
