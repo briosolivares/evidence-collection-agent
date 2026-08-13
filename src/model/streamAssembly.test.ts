@@ -5,6 +5,7 @@ import {
   assembleModelResponse,
   type ModelStreamEvent,
   type StreamProgressEvent,
+  type TruncatedStreamError,
 } from './streamAssembly.js';
 
 // Fixtures are typed as the SDK's own RawMessageStreamEvent so the compiler
@@ -259,6 +260,18 @@ describe('assembleModelResponse', () => {
     await expect(assembleModelResponse(replay(events))).rejects.toMatchObject({
       name: 'TruncatedStreamError',
     });
+    // Carries where-it-died diagnostics: which block was open, how much of
+    // its input had arrived, and the compact summary used in retry lines.
+    const error = await assembleModelResponse(replay(events)).catch((e: unknown) => e);
+    const truncation = error as TruncatedStreamError;
+    expect(truncation.diagnostics).toMatchObject({
+      eventCount: 3,
+      outputChars: '{"file_'.length,
+      openBlocks: ['write_file[7 chars json]'],
+    });
+    expect(truncation.diagnostics!.firstEventAtMs).toBeGreaterThanOrEqual(0);
+    expect(truncation.diagnosticsSummary).toContain('open: write_file[7 chars json]');
+    expect(truncation.message).toContain('3 events');
   });
 
   it('rejects a stream with no message_start', async () => {

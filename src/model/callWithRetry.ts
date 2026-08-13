@@ -97,9 +97,12 @@ export async function callWithRetry<T>(
 function transientReason(error: unknown): string | undefined {
   // Stream truncation is classified by error name, not message regex —
   // streamAssembly gives its two truncation throws this name and leaves
-  // its deterministic throws as plain Errors.
+  // its deterministic throws as plain Errors. The where-it-died summary
+  // rides along so retried-and-recovered truncations still leave a trace
+  // in the progress log.
   if (error instanceof Error && error.name === 'TruncatedStreamError') {
-    return 'truncated stream';
+    const summary = (error as { diagnosticsSummary?: string }).diagnosticsSummary;
+    return summary === undefined ? 'truncated stream' : `truncated stream (${summary})`;
   }
   if (error instanceof APIConnectionError) return 'connection error';
   if (error instanceof APIError) {
