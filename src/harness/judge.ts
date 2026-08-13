@@ -48,7 +48,32 @@ export const JUDGE_MODEL = 'claude-haiku-4-5-20251001';
  * evidence, which is out of scope for this role). Hitting the cap without a
  * parseable final response is treated as CONTINUE (see runJudge) — never as
  * a silent DONE. */
-export const JUDGE_MAX_TURNS = 8;
+export const JUDGE_MAX_TURNS = 16;
+
+/**
+ * The user message that demands a verdict once the inspection budget is
+ * exhausted. Sent exactly once, after JUDGE_MAX_TURNS responses that all
+ * still requested tools: it closes the final turn's unexecuted tool calls
+ * (the API requires every tool_use answered) and leaves no room for further
+ * inspection — measured live (wikipedia-class run dirs with offloaded
+ * inspections), a judge mid-investigation at the cap otherwise never gets
+ * asked for its verdict at all and every such run degrades to the generic
+ * fallback reason.
+ */
+const FORCED_VERDICT_PROMPT =
+  'Your inspection budget is exhausted — no further tool calls will be ' +
+  'executed. Based only on what you have already verified, respond now with ' +
+  'your final verdict and nothing else: DONE, or CONTINUE: <short, concrete ' +
+  'reason>. Treat any criterion you could not verify as unproven and answer ' +
+  'CONTINUE.';
+
+/** The corrective re-ask sent when a response contained neither tool calls
+ * nor a parseable verdict — the model narrated instead of deciding. Sent at
+ * most once per runJudge call. */
+const CORRECTIVE_VERDICT_PROMPT =
+  'That response was not a valid verdict. Respond now with exactly one of: ' +
+  'DONE, or CONTINUE: <short, concrete reason> — and no other text. If you ' +
+  'still need to inspect files first, make those tool calls instead.';
 
 /**
  * Dedicated system prompt for the judge's mini-loop. Deliberately generic
@@ -112,8 +137,11 @@ const UNPARSEABLE_REASON = 'judge did not reach a parseable verdict';
  * grep only — a call naming any other tool gets the pipeline's structured
  * `unknown_tool` error, same as an unregistered tool anywhere else in this
  * codebase) and feed the results back as one tool_result message; otherwise
- * parse its text as the final verdict. At most JUDGE_MAX_TURNS model calls
- * are made.
+ * parse its text as the final verdict. At most JUDGE_MAX_TURNS
+ * investigative model calls are made; if the model is still requesting
+ * tools on the last one, a single forced-verdict call follows (dangling
+ * tool calls closed with is_error results, then FORCED_VERDICT_PROMPT), so
+ * cap exhaustion produces a real verdict rather than the generic fallback.
  *
  * This function performs no run-directory writes of its own: it does not
  * append to transcript.jsonl and does not write metrics.json (those belong
@@ -134,9 +162,9 @@ const UNPARSEABLE_REASON = 'judge did not reach a parseable verdict';
  *   "DONE" (case-insensitive); `{verdict: 'continue', reason}` for a
  *   parseable "CONTINUE: <reason>" response (the reason is the rest of that
  *   line plus any further lines, trimmed), and also — the fail-safe default
- *   — for any response that parses as neither, and for hitting
- *   JUDGE_MAX_TURNS while the model is still requesting tools. The judge
- *   never fails toward a false DONE.
+ *   — for any response that parses as neither, including a forced-verdict
+ *   response that still requests tools. The judge never fails toward a
+ *   false DONE.
  * @throws if `INTENT.md` or `CONTRACT.md` is missing from `runDir` — a run
  *   reaching the judge without both documents is a harness bug, not a
  *   worker-fixable condition, and must fail loudly rather than silently
@@ -164,6 +192,8 @@ export async function runJudge(args: {
   ];
   const toolCtx: ToolCtx = { runDir };
 
+  let danglingToolUses: readonly ToolUseBlock[] = [];
+  let correctiveUsed = false;
   for (let turn = 1; turn <= JUDGE_MAX_TURNS; turn += 1) {
     const response = await callModel(messages);
     messages.push({ role: 'assistant', content: response.content });
@@ -172,18 +202,58 @@ export async function runJudge(args: {
       (block): block is ToolUseBlock => block.type === 'tool_use',
     );
     if (toolUses.length === 0) {
-      return parseVerdict(extractText(response.content));
+      const parsed = parseVerdict(extractText(response.content));
+      // A no-tool-call response that is not a verdict is usually the model
+      // thinking out loud (measured live: mid-investigation analysis prose
+      // with stop_reason end_turn). One corrective re-ask converts most of
+      // those into a real verdict; a second failure falls through to the
+      // fail-safe rather than looping.
+      if (parsed.reason !== UNPARSEABLE_REASON || correctiveUsed) {
+        return parsed;
+      }
+      correctiveUsed = true;
+      messages.push({
+        role: 'user',
+        content: [{ type: 'text', text: CORRECTIVE_VERDICT_PROMPT }],
+      });
+      continue;
     }
 
-    // The cap bounds model calls, not tool executions: on the last allowed
-    // turn there is no further call to feed results into, so stop here
-    // rather than executing tools whose results would never be seen.
-    if (turn === JUDGE_MAX_TURNS) break;
+    // The cap bounds investigative calls, not tool executions: on the last
+    // allowed turn nothing would ever read the results, so skip execution
+    // and fall through to the forced-verdict call below.
+    if (turn === JUDGE_MAX_TURNS) {
+      danglingToolUses = toolUses;
+      break;
+    }
 
     const resultBlocks = await executeJudgeToolUses(toolUses, toolCtx);
     messages.push({ role: 'user', content: resultBlocks });
   }
 
+  // Forced verdict: the cap hit while the model was still investigating.
+  // Close the dangling tool calls with is_error results (every tool_use
+  // must be answered before another user turn), then demand the verdict.
+  // One extra model call beyond JUDGE_MAX_TURNS, by design.
+  messages.push({
+    role: 'user',
+    content: [
+      ...danglingToolUses.map((block): ToolResultBlock => ({
+        type: 'tool_result',
+        tool_use_id: block.id,
+        content: "Not executed: the judge's inspection budget is exhausted.",
+        is_error: true,
+      })),
+      { type: 'text', text: FORCED_VERDICT_PROMPT },
+    ],
+  });
+  const finalResponse = await callModel(messages);
+  const finalToolUses = finalResponse.content.filter(
+    (block) => block.type === 'tool_use',
+  );
+  if (finalToolUses.length === 0) {
+    return parseVerdict(extractText(finalResponse.content));
+  }
   return { verdict: 'continue', reason: UNPARSEABLE_REASON };
 }
 
@@ -385,15 +455,50 @@ function parseVerdict(finalText: string): JudgeVerdict {
   if (firstNonEmptyIndex === -1) {
     return { verdict: 'continue', reason: UNPARSEABLE_REASON };
   }
-  const firstLine = lines[firstNonEmptyIndex]!.trim();
 
-  if (/^done$/i.test(firstLine)) {
+  // The compliant shape: verdict on the first non-empty line, with any
+  // further lines extending a CONTINUE reason.
+  const fromFirst = parseVerdictLine(
+    lines[firstNonEmptyIndex]!,
+    lines.slice(firstNonEmptyIndex + 1),
+  );
+  if (fromFirst !== null) return fromFirst;
+
+  // Measured live fallback: the model narrates a summary first and puts the
+  // verdict on the LAST line despite being told "nothing else". Accept a
+  // verdict there too — still an exact token match on one line, so contract
+  // text merely quoting "CONTINUE" mid-prose can never be misread.
+  const lastNonEmpty = [...lines].reverse().find((line) => line.trim() !== '');
+  const fromLast = lastNonEmpty === undefined ? null : parseVerdictLine(lastNonEmpty, []);
+  if (fromLast !== null) return fromLast;
+
+  return { verdict: 'continue', reason: UNPARSEABLE_REASON };
+}
+
+/**
+ * Parse one candidate verdict line, with cosmetic lenience only — "**DONE**",
+ * "# DONE", or a "Verdict:" prefix parse as their bare forms; anything
+ * structurally different returns null. Only leading decoration is stripped
+ * (plus trailing decoration on DONE, which carries no reason): a CONTINUE
+ * reason's own text must come through untouched.
+ *
+ * @param line - the candidate line
+ * @param trailingLines - lines after the candidate; joined into a CONTINUE
+ *   reason (the first-line shape) — pass [] for a last-line candidate
+ * @returns the verdict, or null if the line is not a verdict
+ */
+function parseVerdictLine(line: string, trailingLines: readonly string[]): JudgeVerdict | null {
+  const stripped = line
+    .trim()
+    .replace(/^[#>\s]*(?:verdict\s*:\s*)?[*_`]*/i, '')
+    .trim();
+
+  if (/^done[*_`.]*$/i.test(stripped)) {
     return { verdict: 'done', reason: '' };
   }
 
-  const continueMatch = /^continue\s*:?\s*(.*)$/i.exec(firstLine);
+  const continueMatch = /^continue[*_`]*\s*:?\s*[*_`]*\s*(.*)$/i.exec(stripped);
   if (continueMatch !== null) {
-    const trailingLines = lines.slice(firstNonEmptyIndex + 1);
     const reason = [continueMatch[1] ?? '', ...trailingLines].join('\n').trim();
     return {
       verdict: 'continue',
@@ -401,5 +506,5 @@ function parseVerdict(finalText: string): JudgeVerdict {
     };
   }
 
-  return { verdict: 'continue', reason: UNPARSEABLE_REASON };
+  return null;
 }

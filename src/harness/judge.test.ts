@@ -91,7 +91,7 @@ afterEach(() => {
 describe('constants', () => {
   it('pins the judge model id and turn cap', () => {
     expect(JUDGE_MODEL).toBe('claude-haiku-4-5-20251001');
-    expect(JUDGE_MAX_TURNS).toBe(8);
+    expect(JUDGE_MAX_TURNS).toBe(16);
   });
 });
 
@@ -148,25 +148,102 @@ describe('runJudge', () => {
     expect(result).toEqual({ verdict: 'continue', reason: 'missing rows\nalso check formatting' });
   });
 
-  it('an unparseable final response yields the generic continue reason', async () => {
-    const { callModel } = scriptModel([
+  it('an unparseable final response gets one corrective re-ask, then parses the retry', async () => {
+    const { callModel, requests } = scriptModel([
       textResponse('I looked around and things seem mostly fine, hard to say.'),
+      textResponse('CONTINUE: the report is missing widget-3.'),
+    ]);
+    const result = await runJudge({ taskText: TASK, runDir, callModel });
+
+    expect(result).toEqual({ verdict: 'continue', reason: 'the report is missing widget-3.' });
+    expect(requests).toHaveLength(2);
+    // The corrective message names the problem and re-demands the format.
+    const secondRequest = requests[1]!;
+    const corrective = secondRequest[secondRequest.length - 1]!;
+    expect(corrective.role).toBe('user');
+    expect((corrective.content[0] as { text: string }).text).toContain('not a valid verdict');
+  });
+
+  it('a second unparseable response yields the generic continue reason', async () => {
+    const { callModel, requests } = scriptModel([
+      textResponse('I looked around and things seem mostly fine, hard to say.'),
+      textResponse('Well, on reflection, the artifacts are broadly reasonable.'),
     ]);
     const result = await runJudge({ taskText: TASK, runDir, callModel });
 
     expect(result).toEqual({ verdict: 'continue', reason: 'judge did not reach a parseable verdict' });
+    expect(requests).toHaveLength(2);
   });
 
-  it('hitting the turn cap while the model keeps requesting tools yields the generic continue reason', async () => {
+  it('hitting the turn cap triggers one forced-verdict call that closes dangling tool calls', async () => {
     const responses = Array.from({ length: JUDGE_MAX_TURNS }, (_, i) =>
       toolResponse([{ id: `t${i}`, name: 'grep', input: { pattern: 'widget' } }]),
     );
+    // The forced-verdict call answers with a real verdict.
+    responses.push(textResponse('CONTINUE: could not finish verifying widget counts.'));
+    const { callModel, requests } = scriptModel(responses);
+    const result = await runJudge({ taskText: TASK, runDir, callModel });
+
+    expect(result).toEqual({
+      verdict: 'continue',
+      reason: 'could not finish verifying widget counts.',
+    });
+    // JUDGE_MAX_TURNS investigative calls plus exactly one forced-verdict call.
+    expect(requests).toHaveLength(JUDGE_MAX_TURNS + 1);
+    // The forced message closes the last turn's dangling tool_use with an
+    // is_error result (the API requires every tool_use answered) and then
+    // demands the verdict as a text block.
+    const forcedRequest = requests[JUDGE_MAX_TURNS]!;
+    const forcedMessage = forcedRequest[forcedRequest.length - 1]!;
+    expect(forcedMessage.role).toBe('user');
+    const [closing, demand] = forcedMessage.content as unknown as Array<Record<string, unknown>>;
+    expect(closing).toMatchObject({
+      type: 'tool_result',
+      tool_use_id: `t${JUDGE_MAX_TURNS - 1}`,
+      is_error: true,
+    });
+    expect(demand).toMatchObject({ type: 'text' });
+    expect(String((demand as { text: string }).text)).toContain('final verdict');
+  });
+
+  it('a forced-verdict response that still requests tools yields the generic continue reason', async () => {
+    const responses = Array.from({ length: JUDGE_MAX_TURNS }, (_, i) =>
+      toolResponse([{ id: `t${i}`, name: 'grep', input: { pattern: 'widget' } }]),
+    );
+    responses.push(toolResponse([{ id: 'tx', name: 'grep', input: { pattern: 'more' } }]));
     const { callModel, requests } = scriptModel(responses);
     const result = await runJudge({ taskText: TASK, runDir, callModel });
 
     expect(result).toEqual({ verdict: 'continue', reason: 'judge did not reach a parseable verdict' });
-    // Exactly JUDGE_MAX_TURNS calls — no call beyond the cap.
-    expect(requests).toHaveLength(JUDGE_MAX_TURNS);
+    expect(requests).toHaveLength(JUDGE_MAX_TURNS + 1);
+  });
+
+  it('accepts a verdict on the last line when the model narrates a summary first', async () => {
+    const { callModel } = scriptModel([
+      textResponse(
+        'Based on my investigation, I found an inconsistency:\n' +
+          '1. The notes contradict the audit trail.\n\n' +
+          'CONTINUE: the two scratch notes disagree about reference 275; re-verify and republish.',
+      ),
+    ]);
+    const result = await runJudge({ taskText: TASK, runDir, callModel });
+
+    expect(result).toEqual({
+      verdict: 'continue',
+      reason: 'the two scratch notes disagree about reference 275; re-verify and republish.',
+    });
+  });
+
+  it('parses cosmetically wrapped verdicts: markdown emphasis and a Verdict: prefix', async () => {
+    for (const [text, expected] of [
+      ['**DONE**', { verdict: 'done', reason: '' }],
+      ['Verdict: DONE.', { verdict: 'done', reason: '' }],
+      ['# CONTINUE: fix the header row', { verdict: 'continue', reason: 'fix the header row' }],
+    ] as const) {
+      const { callModel } = scriptModel([textResponse(text)]);
+      const result = await runJudge({ taskText: TASK, runDir, callModel });
+      expect(result, `for final text ${JSON.stringify(text)}`).toEqual(expected);
+    }
   });
 
   it('throws when CONTRACT.md is missing — a harness bug, not a worker-fixable condition', async () => {
