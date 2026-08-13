@@ -6,6 +6,7 @@ import type { OutputContract, OutputSpec } from '../contracts/outputContract.js'
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
+  SCRATCH_DIR,
   writeArtifact,
   type Manifest,
   type ManifestEntry,
@@ -77,6 +78,7 @@ export function runCompletionCheck(
   const failures: CompletionFailure[] = [
     ...validateManifestIntegrity(runDir),
     ...validateExpectedOutputs(runDir, contract),
+    ...validateDocumentOutputs(runDir, contract),
   ];
   return { ok: failures.length === 0, failures };
 }
@@ -723,4 +725,61 @@ export function validateEvidenceReferences(
     }
   }
   return failures;
+}
+
+/**
+ * Every contract-bound document output must have been produced by
+ * `write_document`, not hand-written with `write_file`.
+ *
+ * The evidence is the marked source: `write_document` always persists
+ * `scratch/documents/<outputId>/source.md` alongside the published file, and
+ * nothing else does. A published document with no corresponding source entry
+ * was therefore written by hand, which means its evidence markers were never
+ * parsed, its citation policy was never enforced, and its required sections
+ * were never checked against the contract.
+ *
+ * Without this check, `write_file` is a hole straight through the entire
+ * document pipeline: the model could satisfy a document requirement with
+ * unverified prose and the code checks would see a non-empty file and pass it.
+ */
+export function validateDocumentOutputs(
+  runDir: string,
+  contract: OutputContract,
+): CompletionFailure[] {
+  const failures: CompletionFailure[] = [];
+  const recorded = new Set(
+    publishedOrScratchFilenames(runDir).map((filename) => filename),
+  );
+
+  for (const output of contract.outputs) {
+    if (output.kind !== 'document') continue;
+    const publishedPath = `${ARTIFACTS_DIR}/${output.filename}`;
+    if (!recorded.has(publishedPath)) continue; // absence is reported elsewhere
+
+    const sourcePath = `${SCRATCH_DIR}/documents/${output.id}/source.md`;
+    if (!recorded.has(sourcePath)) {
+      failures.push({
+        outputId: output.id,
+        code: 'document_not_rendered',
+        message:
+          `${output.filename} exists but has no evidence-marked source at ${sourcePath}, ` +
+          'so it was hand-written rather than produced by write_document. Its citations ' +
+          'were never checked. Re-create it with write_document, which parses the ' +
+          '[evidence:E1] markers and enforces this output’s citation policy.',
+      });
+    }
+  }
+  return failures;
+}
+
+/** Every filename the manifest records, published or scratch. */
+function publishedOrScratchFilenames(runDir: string): string[] {
+  try {
+    const manifest = JSON.parse(
+      readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8'),
+    ) as Manifest;
+    return (manifest.artifacts ?? []).map((entry) => entry.filename);
+  } catch {
+    return [];
+  }
 }

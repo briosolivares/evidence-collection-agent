@@ -10,6 +10,7 @@ import {
   renderTableOutputs,
   runCompletionCheck,
   validateEvidenceReferences,
+  validateDocumentOutputs,
   validateManifestIntegrity,
   validateTableCompleteness,
 } from './completionCheck.js';
@@ -55,6 +56,18 @@ function publish(filename: string, content: string): void {
 
 function codes(result: { failures: Array<{ code: string }> }): string[] {
   return result.failures.map((failure) => failure.code);
+}
+
+/** Publish a document the way write_document does: the deliverable plus the
+ * evidence-marked source that proves it was rendered rather than hand-written
+ * (see validateDocumentOutputs). */
+function publishDocument(outputId: string, filename: string, content: string): void {
+  publish(filename, content);
+  writeArtifact(
+    runDir,
+    `scratch/documents/${outputId}/source.md`,
+    Buffer.from(`${content}[evidence:E1]\n`, 'utf8'),
+  );
 }
 
 describe('runCompletionCheck — table outputs', () => {
@@ -226,7 +239,7 @@ describe('runCompletionCheck — documents and captures', () => {
     }) as OutputSpec;
 
   it('reports a missing required section', () => {
-    publish('report.md', '# Summary\nAll good.\n');
+    publishDocument('report', 'report.md', '# Summary\nAll good.\n');
     const result = runCompletionCheck(
       runDir,
       contract([docSpec({ requiredSections: ['Summary', 'Findings'] })]),
@@ -236,7 +249,7 @@ describe('runCompletionCheck — documents and captures', () => {
   });
 
   it('accepts a document carrying every required section', () => {
-    publish('report.md', '# Summary\ntext\n\n# Findings\nmore\n');
+    publishDocument('report', 'report.md', '# Summary\ntext\n\n# Findings\nmore\n');
     expect(
       runCompletionCheck(
         runDir,
@@ -493,5 +506,52 @@ describe('validateEvidenceReferences', () => {
     tables.setTableCompleteness('roster', { method: 'counted', evidenceIds: ['E9'] });
     const failures = validateEvidenceReferences(contract([spec]), tables, () => false);
     expect(failures.map((f) => f.code)).toEqual(['dangling_completeness_evidence']);
+  });
+});
+
+describe('validateDocumentOutputs', () => {
+  const docSpec = {
+    id: 'report',
+    kind: 'document',
+    filename: 'report.md',
+    format: 'markdown',
+    evidenceRequirement: 'at_least_one',
+    evidencePresentation: 'hidden',
+  } as OutputSpec;
+
+  it('rejects a document hand-written with write_file', () => {
+    // write_file publishes the deliverable but leaves no marked source, so its
+    // citations were never parsed or enforced. Without this check, write_file
+    // is a hole straight through the document pipeline.
+    publish('report.md', '# Summary\nSome prose with no citations.\n');
+
+    const failures = validateDocumentOutputs(runDir, contract([docSpec]));
+    expect(failures.map((f) => f.code)).toEqual(['document_not_rendered']);
+    expect(failures[0]?.message).toMatch(/hand-written/);
+    expect(failures[0]?.message).toMatch(/write_document/);
+    // And the whole check fails, not just this helper.
+    expect(runCompletionCheck(runDir, contract([docSpec])).ok).toBe(false);
+  });
+
+  it('accepts a document that has its evidence-marked source alongside it', () => {
+    publish('report.md', '# Summary\nProse.\n');
+    writeArtifact(
+      runDir,
+      'scratch/documents/report/source.md',
+      Buffer.from('# Summary\nProse. [evidence:E1]\n', 'utf8'),
+    );
+
+    expect(validateDocumentOutputs(runDir, contract([docSpec]))).toEqual([]);
+  });
+
+  it('says nothing about a document that has not been written at all', () => {
+    // Absence is reported by the missing_file check; this one must not
+    // double-report it as a rendering problem.
+    expect(validateDocumentOutputs(runDir, contract([docSpec]))).toEqual([]);
+  });
+
+  it('ignores table and capture outputs', () => {
+    publish('roster.csv', 'name\nAlpha\n');
+    expect(validateDocumentOutputs(runDir, contract([tableSpec()]))).toEqual([]);
   });
 });
