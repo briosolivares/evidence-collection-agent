@@ -12,8 +12,18 @@
 // first of 'spawn' (launched) or 'error' (failed) — testable by driving
 // an injected fake child. The child's later lifetime is its own
 // business. Unsupported platform/action combinations resolve
-// { ok: false } with a notice and spawn nothing. (Plan item 10 polishes
-// missing-binary notices further.)
+// { ok: false } with a notice and spawn nothing. A missing binary
+// (ENOENT) renders as a capability-named notice ("Quick Look isn't
+// available here…"); every other launch failure keeps its raw detail.
+//
+// Ink-frame safety (verified for plan item 10): this module is the only
+// spawn site in src/tui, every launch flows through the single launch()
+// below, and the SpawnFn type pins the options literal to
+// { stdio: 'ignore', detached: true } — a child gets /dev/null for all
+// three stdio streams and its own process group, so it can never write
+// into the raw-mode TTY or receive the TUI's terminal signals. qlmanage
+// -p chattering on its own stdout is therefore harmless: that stream is
+// /dev/null, not our frame.
 
 import { spawn as nodeSpawn } from 'node:child_process';
 
@@ -51,8 +61,18 @@ export function openPath(
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
   const platform = deps.platform ?? process.platform;
-  if (platform === 'darwin') return launch('open', [absPath], deps);
-  if (platform === 'linux') return launch('xdg-open', [absPath], deps);
+  if (platform === 'darwin')
+    return launch({ command: 'open', args: [absPath], capability: 'Opening files' }, deps);
+  if (platform === 'linux')
+    return launch(
+      {
+        command: 'xdg-open',
+        args: [absPath],
+        capability: 'Opening files',
+        remedy: 'install xdg-utils',
+      },
+      deps,
+    );
   return notSupported(`Opening files is not supported on ${platform}`);
 }
 
@@ -62,7 +82,11 @@ export function revealPath(
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
   const platform = deps.platform ?? process.platform;
-  if (platform === 'darwin') return launch('open', ['-R', absPath], deps);
+  if (platform === 'darwin')
+    return launch(
+      { command: 'open', args: ['-R', absPath], capability: 'Reveal in Finder' },
+      deps,
+    );
   return notSupported(`Reveal in the file manager is not supported on ${platform}`);
 }
 
@@ -76,9 +100,33 @@ export function quickLookPath(
   deps: OpenExternalDeps = {},
 ): Promise<OpenExternalResult> {
   const platform = deps.platform ?? process.platform;
-  if (platform === 'darwin') return launch('qlmanage', ['-p', absPath], deps);
-  if (platform === 'linux') return launch('xdg-open', [absPath], deps);
+  if (platform === 'darwin')
+    return launch(
+      { command: 'qlmanage', args: ['-p', absPath], capability: 'Quick Look' },
+      deps,
+    );
+  if (platform === 'linux')
+    return launch(
+      {
+        command: 'xdg-open',
+        args: [absPath],
+        capability: 'Preview',
+        remedy: 'install xdg-utils',
+      },
+      deps,
+    );
   return notSupported(`Preview is not supported on ${platform}`);
+}
+
+/** One concrete launch: the command line plus how to talk about it when
+ * the binary is missing. */
+interface LaunchSpec {
+  command: string;
+  args: string[];
+  /** Named in the missing-binary notice, e.g. "Quick Look". */
+  capability: string;
+  /** Optional missing-binary remedy, e.g. "install xdg-utils". */
+  remedy?: string;
 }
 
 function notSupported(message: string): Promise<OpenExternalResult> {
@@ -86,17 +134,16 @@ function notSupported(message: string): Promise<OpenExternalResult> {
 }
 
 function launch(
-  command: string,
-  args: string[],
+  spec: LaunchSpec,
   deps: OpenExternalDeps,
 ): Promise<OpenExternalResult> {
   const spawnFn = deps.spawn ?? defaultSpawn;
   return new Promise((resolve) => {
     let child: SpawnedChild;
     try {
-      child = spawnFn(command, args, { stdio: 'ignore', detached: true });
+      child = spawnFn(spec.command, spec.args, { stdio: 'ignore', detached: true });
     } catch (error) {
-      resolve({ ok: false, message: launchFailure(command, error) });
+      resolve({ ok: false, message: launchFailure(spec, error) });
       return;
     }
     // Unref before the outcome is known: the TUI must never be kept
@@ -106,12 +153,29 @@ function launch(
     child.unref();
     child.once('spawn', () => resolve({ ok: true }));
     child.once('error', (error) =>
-      resolve({ ok: false, message: launchFailure(command, error) }),
+      resolve({ ok: false, message: launchFailure(spec, error) }),
     );
   });
 }
 
-function launchFailure(command: string, error: unknown): string {
+/**
+ * A missing binary (ENOENT — node sets `code` on the 'error' event's
+ * Error) gets a notice that names the capability and, when we know one,
+ * the remedy; anything else keeps the command and the raw detail, which
+ * is the only clue the user has for the odd failure.
+ */
+function launchFailure(spec: LaunchSpec, error: unknown): string {
+  if (isMissingBinary(error)) {
+    const remedy = spec.remedy === undefined ? '' : ` — ${spec.remedy}`;
+    return `${spec.capability} isn't available here (${spec.command} not found${remedy})`;
+  }
   const detail = error instanceof Error ? error.message : String(error);
-  return `${command} failed to launch: ${detail}`;
+  return `${spec.command} failed to launch: ${detail}`;
+}
+
+function isMissingBinary(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error as NodeJS.ErrnoException).code === 'ENOENT'
+  );
 }
