@@ -3,7 +3,7 @@
 // re-renders an item), the live run state that stays mutable until
 // finalized, and the single UiEvent stream the reducer consumes.
 
-import type { ManifestEntry } from '../../run/artifacts.js';
+import type { ArtifactRole, ManifestEntry } from '../../run/artifacts.js';
 
 /** Interaction modes; overlays are modes so exactly one surface owns input. */
 export type SessionMode =
@@ -71,6 +71,20 @@ export interface EvalTrialLive {
 }
 
 /**
+ * One artifact digest line of a completion item — filename · size ·
+ * role(s), the transcript's permanent, inert copy of the completion
+ * summary after the panel is superseded.
+ */
+export interface CompletionArtifact {
+  /** Run-dir-relative path, as the manifest records it. */
+  filename: string;
+  /** Size on disk at publish time; undefined if the stat failed. */
+  sizeBytes: number | undefined;
+  /** The published entry's roles (requested_output and/or evidence). */
+  roles: readonly ArtifactRole[];
+}
+
+/**
  * A finalized transcript entry, before its id is assigned. Items are
  * append-only and immutable once appended (the <Static> contract);
  * anything still changing lives in LiveRunState instead.
@@ -86,7 +100,16 @@ export type TranscriptItemBody =
       verbose?: { input: string; result: string };
     }
   | { kind: 'evidence'; line: string; sourceUrl?: string; verbose?: { input: string; result: string } }
-  | { kind: 'completion'; verb: string; elapsedMs: number; tokens: number; runDir: string }
+  | {
+      kind: 'completion';
+      verb: string;
+      elapsedMs: number;
+      tokens: number;
+      runDir: string;
+      /** Published-artifact digest, requested outputs first (the same
+       * order the summary panel shows). */
+      artifacts: readonly CompletionArtifact[];
+    }
   | { kind: 'cancelled'; elapsedMs: number; tokens: number }
   | { kind: 'error'; message: string }
   | { kind: 'notice'; text: string }

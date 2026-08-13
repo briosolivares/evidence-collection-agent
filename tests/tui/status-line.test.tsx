@@ -110,6 +110,7 @@ describe('completion line', () => {
           elapsedMs: 84_000,
           tokens: 31_200,
           runDir: '/runs/xyz',
+          artifacts: [],
         }}
       />,
     );

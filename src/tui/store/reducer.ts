@@ -18,6 +18,7 @@ import type {
   ArtifactUiState,
   AssertionView,
   BannerIdentity,
+  CompletionArtifact,
   LiveRunState,
   PublishedArtifact,
   SessionState,
@@ -167,6 +168,17 @@ export function orderArtifactsForSummary(
     ...artifacts.filter(isRequested),
     ...artifacts.filter((artifact) => !isRequested(artifact)),
   ];
+}
+
+/** The completion item's inert artifact digest, in summary order. */
+function completionDigest(
+  artifacts: readonly PublishedArtifact[],
+): readonly CompletionArtifact[] {
+  return orderArtifactsForSummary(artifacts).map((artifact) => ({
+    filename: artifact.entry.filename,
+    sizeBytes: artifact.sizeBytes,
+    roles: artifact.entry.roles ?? [],
+  }));
 }
 
 /** Append one finalized item, assigning its stable id. */
@@ -539,6 +551,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           elapsedMs,
           tokens,
           runDir: action.runDir,
+          artifacts: completionDigest(state.artifacts),
         });
         // Record the completion panel's summary — interactive runs only
         // (eval trials complete between trials, where no panel belongs).

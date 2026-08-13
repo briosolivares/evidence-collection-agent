@@ -812,6 +812,27 @@ describe('reduce (completion summary)', () => {
     expect(state.artifacts).toHaveLength(1);
   });
 
+  it('the completion item digests the published artifacts, requested outputs first', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      published(1, publishedEntry({ filename: 'artifacts/page.png' }), 2_048),
+      published(
+        2,
+        publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }),
+        96,
+      ),
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'completion',
+      artifacts: [
+        { filename: 'artifacts/top5.csv', sizeBytes: 96, roles: ['requested_output'] },
+        { filename: 'artifacts/page.png', sizeBytes: 2_048, roles: ['evidence'] },
+      ],
+    });
+  });
+
   it('a completed eval trial records no summary — no panel between trials', () => {
     const state = fold([
       { type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 },

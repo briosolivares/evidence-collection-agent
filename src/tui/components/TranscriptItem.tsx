@@ -1,8 +1,9 @@
 import { Box, Text } from 'ink';
 
-import { formatDuration, formatTokens } from '../format.js';
+import { formatBytes, formatDuration, formatTokens } from '../format.js';
 import type { TranscriptItem } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
+import { describeRoles } from './ArtifactDetail.js';
 import { WelcomeCard } from './WelcomeCard.js';
 
 /**
@@ -68,6 +69,16 @@ export function TranscriptItemView({
               {`${item.verb} in ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`}
             </Text>
           </Box>
+          {item.artifacts.map((artifact) => (
+            <Text key={artifact.filename}>
+              <Text color={theme.emphasis}>{`  ${glyphs.evidence} `}</Text>
+              <Text>{artifact.filename}</Text>
+              <Text color={theme.muted}>
+                {` · ${artifact.sizeBytes === undefined ? '?' : formatBytes(artifact.sizeBytes)}` +
+                  (artifact.roles.length > 0 ? ` · ${describeRoles(artifact.roles)}` : '')}
+              </Text>
+            </Text>
+          ))}
           <Text color={theme.muted}>{`  ${item.runDir}`}</Text>
         </Box>
       );

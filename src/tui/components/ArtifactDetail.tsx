@@ -1,5 +1,6 @@
 import { Box, Text } from 'ink';
 
+import type { ArtifactRole } from '../../run/artifacts.js';
 import { formatBytes } from '../format.js';
 import type { PublishedArtifact } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
@@ -9,6 +10,12 @@ const ROLE_LABELS = {
   requested_output: 'requested output',
   evidence: 'evidence',
 } as const;
+
+/** Human labels for an artifact's roles, ` · `-joined — shared by the
+ * detail card and the completion item's artifact digest lines. */
+export function describeRoles(roles: readonly ArtifactRole[]): string {
+  return roles.map((role) => ROLE_LABELS[role]).join(' · ');
+}
 
 interface ArtifactDetailProps {
   /** The published artifact whose provenance the card shows. */
@@ -26,7 +33,7 @@ interface ArtifactDetailProps {
  */
 export function ArtifactDetail({ artifact }: ArtifactDetailProps) {
   const { entry, sizeBytes } = artifact;
-  const roles = (entry.roles ?? []).map((role) => ROLE_LABELS[role]).join(' · ');
+  const roles = describeRoles(entry.roles ?? []);
   return (
     <Box flexDirection="column">
       <Text>
