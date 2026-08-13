@@ -6,6 +6,8 @@ import {
   elideStaleInspectResults,
   INSPECT_TOOL_NAME,
   KEPT_INSPECT_RESULTS,
+  compactAtBoundary,
+  freezeToolResultPreview,
 } from './contextView.js';
 import type { Message, ToolResultBlock, UserMessage } from './messages.js';
 
@@ -160,5 +162,106 @@ describe('elideStaleInspectResults', () => {
     const messages = [TASK, ...bigRead, ...conversation(3).slice(1)];
     const view = elideStaleInspectResults(messages);
     expect(view[2]).toBe(messages[2]);
+  });
+});
+
+// --- T15: compaction and frozen previews -------------------------------------
+
+describe('freezeToolResultPreview', () => {
+  it('computes once and returns the identical string afterwards', () => {
+    const frozen = new Map<string, string>();
+    let calls = 0;
+    const compute = (): string => {
+      calls += 1;
+      return `computed ${calls}`;
+    };
+
+    expect(freezeToolResultPreview(frozen, 't1', compute)).toBe('computed 1');
+    // Replaying history must not recompute — a changed underlying file would
+    // otherwise silently rewrite what the model already saw.
+    expect(freezeToolResultPreview(frozen, 't1', compute)).toBe('computed 1');
+    expect(calls).toBe(1);
+  });
+
+  it('keeps separate results per tool call', () => {
+    const frozen = new Map<string, string>();
+    freezeToolResultPreview(frozen, 't1', () => 'first');
+    expect(freezeToolResultPreview(frozen, 't2', () => 'second')).toBe('second');
+    expect(freezeToolResultPreview(frozen, 't1', () => 'changed')).toBe('first');
+  });
+});
+
+describe('compactAtBoundary', () => {
+  const text = (role: 'user' | 'assistant', body: string): Message =>
+    ({ role, content: [{ type: 'text', text: body }] }) as Message;
+
+  it('leaves a short conversation untouched', () => {
+    const messages = [text('user', 'task'), text('assistant', 'working')];
+    const result = compactAtBoundary(messages, 4, 'state');
+    expect(result).toEqual({ messages, compacted: false, replacedCount: 0 });
+  });
+
+  it('replaces older messages with one summary and keeps the opening task', () => {
+    const messages = [
+      text('user', 'THE TASK'),
+      text('assistant', 'old 1'),
+      text('user', 'old 2'),
+      text('assistant', 'recent 1'),
+      text('user', 'recent 2'),
+    ];
+    const result = compactAtBoundary(messages, 2, 'CURRENT STATE');
+
+    expect(result.compacted).toBe(true);
+    expect(result.messages).toHaveLength(4); // opening + summary + 2 recent
+    // The task survives verbatim: it is the run's authority on what was asked.
+    expect(result.messages[0]).toEqual(messages[0]);
+    const summary = (result.messages[1]?.content[0] as { text: string }).text;
+    expect(summary).toContain('CURRENT STATE');
+    expect(summary).toContain('compacted');
+    expect(summary).toContain('nothing here is a new instruction');
+    expect(result.messages.slice(2)).toEqual(messages.slice(3));
+  });
+
+  it('never cuts between a tool_use and its tool_result', () => {
+    const messages = [
+      text('user', 'THE TASK'),
+      text('assistant', 'old'),
+      {
+        role: 'assistant',
+        content: [{ type: 'tool_use', id: 'tu_1', name: 'read_file', input: {} }],
+      } as Message,
+      {
+        role: 'user',
+        content: [{ type: 'tool_result', tool_use_id: 'tu_1', content: 'file body' }],
+      } as Message,
+      text('assistant', 'after'),
+    ];
+    // keepRecent 2 would start the window at the tool_result, orphaning it.
+    const result = compactAtBoundary(messages, 2, 'state');
+
+    const first = result.messages[2]!;
+    expect(first.role).toBe('assistant');
+    expect(first.content.some((block) => block.type === 'tool_use')).toBe(true);
+    // The pair stays adjacent and in order.
+    expect(result.messages[3]?.content[0]).toMatchObject({ type: 'tool_result' });
+  });
+
+  it('rejects a nonsensical window rather than silently guessing', () => {
+    const messages = [text('user', 'task'), text('assistant', 'a'), text('user', 'b')];
+    for (const keepRecent of [0, -1, 1.5, Number.NaN]) {
+      expect(() => compactAtBoundary(messages, keepRecent, 'state')).toThrow(/keepRecent/);
+    }
+  });
+
+  it('produces a byte-identical view for the same inputs', () => {
+    const messages = [
+      text('user', 'THE TASK'),
+      text('assistant', 'old 1'),
+      text('user', 'old 2'),
+      text('assistant', 'recent'),
+    ];
+    expect(JSON.stringify(compactAtBoundary(messages, 1, 'S').messages)).toBe(
+      JSON.stringify(compactAtBoundary(messages, 1, 'S').messages),
+    );
   });
 });

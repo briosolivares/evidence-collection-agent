@@ -172,3 +172,115 @@ function extractPageHeader(content: string): string | undefined {
   }
   return undefined;
 }
+
+// --- T15: cache-safe compaction and frozen previews --------------------------
+
+/**
+ * Freeze a tool result's model-visible text the first time it is shown.
+ *
+ * Replaying history must reproduce byte-identical requests, or every replay
+ * breaks the prompt cache it was supposed to reuse. The offload/inline
+ * decision and the exact preview string are therefore decided once and
+ * remembered, rather than recomputed from the underlying content — which
+ * could legitimately differ later (a file grew, a cap changed) and silently
+ * rewrite history.
+ *
+ * @param frozen - the run's memo, keyed by tool-call id; mutated in place
+ * @param toolCallId - the call whose result is being shown
+ * @param compute - produces the text the FIRST time this id is seen
+ * @returns the frozen text — `compute`'s result on first call, the identical
+ *   string on every call after
+ */
+export function freezeToolResultPreview(
+  frozen: Map<string, string>,
+  toolCallId: string,
+  compute: () => string,
+): string {
+  const existing = frozen.get(toolCallId);
+  if (existing !== undefined) return existing;
+  const computed = compute();
+  frozen.set(toolCallId, computed);
+  return computed;
+}
+
+/** Where a compaction boundary was placed, and what it replaced. */
+export interface CompactionResult {
+  /** The messages to send, with everything before the boundary summarized. */
+  messages: readonly Message[];
+  /** True when a boundary was actually inserted. */
+  compacted: boolean;
+  /** How many messages were replaced by the summary. */
+  replacedCount: number;
+}
+
+/**
+ * Compact the conversation at an explicit boundary, turning everything before
+ * it into one summary message that becomes the new stable cached prefix.
+ *
+ * Two rules make this safe:
+ *
+ *  1. Compaction happens at a BOUNDARY, not continuously. A rolling window
+ *     would change the prefix on every turn and destroy the cache it was
+ *     meant to protect; one boundary produces one new prefix that many
+ *     subsequent turns can all reuse.
+ *  2. The summary must carry forward the state a worker cannot re-derive —
+ *     the caller supplies it (normally serializeAgentContext's output, which
+ *     always includes the current contract, output state, evidence index, and
+ *     unresolved repeated failures). Compaction therefore never removes those
+ *     facts; it removes the raw observations they were derived from.
+ *
+ * @param messages - the full conversation
+ * @param keepRecent - how many trailing messages stay verbatim; >= 1
+ * @param stateSummary - the text carried forward in place of what is dropped
+ * @returns the compacted view, or the input untouched when there is nothing
+ *   worth compacting (fewer messages than the window, or nothing but the
+ *   opening task before it)
+ */
+export function compactAtBoundary(
+  messages: readonly Message[],
+  keepRecent: number,
+  stateSummary: string,
+): CompactionResult {
+  if (!Number.isInteger(keepRecent) || keepRecent < 1) {
+    throw new Error(`keepRecent must be an integer >= 1, got ${keepRecent}`);
+  }
+  // The opening task message is never compacted away: it is the run's
+  // authority on what was actually asked, and every later check is against
+  // it. So compaction needs at least one message after it to be worth doing.
+  const boundary = messages.length - keepRecent;
+  if (boundary <= 1) {
+    return { messages, compacted: false, replacedCount: 0 };
+  }
+
+  const opening = messages[0]!;
+  const recent = messages.slice(boundary);
+  // A tool_result block must directly follow its tool_use, so a boundary that
+  // would orphan one is moved back to include the assistant message that
+  // issued it. Cutting mid-pair produces an API error, not a smaller prompt.
+  const adjusted = recent[0]?.role === 'user' && hasToolResult(recent[0]) ? boundary - 1 : boundary;
+  const safeRecent = messages.slice(adjusted);
+
+  const summaryMessage: Message = {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text:
+          `[Earlier turns compacted. ${adjusted - 1} message(s) of raw observations were ` +
+          'replaced by the current state below; nothing here is a new instruction.]\n\n' +
+          stateSummary,
+      },
+    ],
+  };
+
+  return {
+    messages: [opening, summaryMessage, ...safeRecent],
+    compacted: true,
+    replacedCount: adjusted - 1,
+  };
+}
+
+/** Whether a message carries any tool_result block. */
+function hasToolResult(message: Message): boolean {
+  return message.content.some((block) => block.type === 'tool_result');
+}
