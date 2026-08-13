@@ -3,10 +3,21 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import {
+  contractRevisionPath,
+  createOutputContractStore,
+} from '../contracts/outputContractStore.js';
+import { buildRequestParams } from '../model/callModel.js';
+import { initManifest } from '../run/artifacts.js';
+import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
+import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
+
 import type { Message, ModelResponse } from '../loop/messages.js';
 import {
   CONTRACT_FILENAME,
   INTENT_FILENAME,
+  CONTRACT_INITIALIZER_SYSTEM_PROMPT,
+  runContractInitializer,
   runInitializer,
   writeInitializerFiles,
   type InitializerResult,
@@ -158,5 +169,140 @@ describe('writeInitializerFiles', () => {
     // Written directly at the run-dir root — not under artifacts/ or scratch/.
     expect(INTENT_FILENAME).not.toContain('/');
     expect(CONTRACT_FILENAME).not.toContain('/');
+  });
+});
+
+// --- T4: contract-authoring initializer -------------------------------------
+
+describe('runContractInitializer', () => {
+  const VALID = {
+    contract: {
+      outputs: [
+        {
+          id: 'roster',
+          kind: 'table',
+          filename: 'roster.csv',
+          format: 'csv',
+          columns: [{ name: 'name', required: true, type: 'string' }],
+          rules: [],
+        },
+      ],
+    },
+  };
+
+  function contractCall(input: unknown, id = 'c1'): ModelResponse {
+    return {
+      content: [{ type: 'tool_use', id, name: 'set_output_contract', input }],
+      stop_reason: 'tool_use',
+      usage: { input_tokens: 10, output_tokens: 5 },
+    };
+  }
+
+  let runDir: string;
+  let store: ReturnType<typeof createOutputContractStore>;
+
+  beforeEach(() => {
+    runDir = mkdtempSync(join(tmpdir(), 'contract-init-test-'));
+    initManifest(runDir, 'Publish the roster.');
+    store = createOutputContractStore(runDir);
+  });
+
+  afterEach(() => {
+    rmSync(runDir, { recursive: true, force: true });
+  });
+
+  it('persists the contract from a single forced tool call', async () => {
+    const { callModel } = scriptModel([contractCall(VALID)]);
+    const outcome = await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(outcome).toEqual({ ok: true, revision: 1 });
+    expect(store.hasContract()).toBe(true);
+    expect(store.currentContract()?.outputs[0]?.id).toBe('roster');
+  });
+
+  it('stores byte-identically to a worker-authored contract for the same input', async () => {
+    // The plan requires the architecture not to depend on which author ran:
+    // same tool input, same stored bytes.
+    const { callModel } = scriptModel([contractCall(VALID)]);
+    await runContractInitializer('Publish the roster.', callModel, store);
+    const initializerBytes = readFileSync(
+      join(runDir, contractRevisionPath(1)),
+      'utf8',
+    );
+
+    const workerRunDir = mkdtempSync(join(tmpdir(), 'worker-authored-'));
+    initManifest(workerRunDir, 'Publish the roster.');
+    const workerStore = createOutputContractStore(workerRunDir);
+    workerStore.setOutputContract(VALID);
+    const workerBytes = readFileSync(join(workerRunDir, contractRevisionPath(1)), 'utf8');
+    rmSync(workerRunDir, { recursive: true, force: true });
+
+    expect(initializerBytes).toBe(workerBytes);
+  });
+
+  it('re-asks once when the response carries no contract call, then succeeds', async () => {
+    const { callModel, requests } = scriptModel([
+      textResponse('Here is what I think the contract should be...'),
+      contractCall(VALID),
+    ]);
+    const outcome = await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(outcome).toEqual({ ok: true, revision: 1 });
+    // The repair turn names the problem to the same conversation.
+    expect(JSON.stringify(requests[1])).toMatch(/no set_output_contract call/);
+  });
+
+  it('re-asks once when the contract is rejected, then succeeds', async () => {
+    const { callModel, requests } = scriptModel([
+      contractCall({ contract: { outputs: [VALID.contract.outputs[0], VALID.contract.outputs[0]] } }),
+      contractCall(VALID),
+    ]);
+    const outcome = await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(outcome).toEqual({ ok: true, revision: 1 });
+    expect(JSON.stringify(requests[1])).toMatch(/duplicate output id/);
+  });
+
+  it('fails after a second bad response rather than proceeding unvalidated', async () => {
+    const { callModel } = scriptModel([textResponse('no call'), textResponse('still no call')]);
+    const outcome = await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(outcome.ok).toBe(false);
+    expect(store.hasContract()).toBe(false);
+  });
+
+  it('rejects a response mixing the contract call with another tool call', async () => {
+    const mixed: ModelResponse = {
+      content: [
+        { type: 'tool_use', id: 'c1', name: 'set_output_contract', input: VALID },
+        { type: 'tool_use', id: 'x1', name: 'navigate', input: { url: 'https://example.com' } },
+      ],
+      stop_reason: 'tool_use',
+      usage: { input_tokens: 10, output_tokens: 5 },
+    };
+    const { callModel } = scriptModel([mixed, mixed]);
+    const outcome = await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(outcome.ok).toBe(false);
+    expect(store.hasContract()).toBe(false);
+  });
+});
+
+describe('makeContractInitializerModelDriver', () => {
+  it('offers only set_output_contract and forces the model to call it', () => {
+    const params = buildRequestParams(
+      {
+        system: CONTRACT_INITIALIZER_SYSTEM_PROMPT,
+        apiToolDefs: toApiToolDefs(createRegistry([setOutputContractTool as ToolDef])),
+        toolChoice: { type: 'tool', name: 'set_output_contract' },
+        maxOutputTokens: 4096,
+      },
+      [{ role: 'user', content: [{ type: 'text', text: 'task' }] }],
+    );
+
+    expect(params.tools?.map((t) => (t as { name: string }).name)).toEqual([
+      'set_output_contract',
+    ]);
+    expect(params.tool_choice).toEqual({ type: 'tool', name: 'set_output_contract' });
   });
 });

@@ -77,6 +77,10 @@ export interface CallModelConfig {
   maxOutputTokens: number;
   /** Optional live-progress callback (see ProgressEvent). */
   onProgress?: (event: ProgressEvent) => void;
+  /** Forces the model's tool use for every call — used by roles whose
+   * response IS a single tool call (the contract initializer). Part of the
+   * cached prefix, so it must stay fixed for the closure's lifetime. */
+  toolChoice?: Anthropic.Messages.ToolChoice;
   /** Cancellation carried into streaming and retry backoff. */
   signal?: AbortSignal;
   /** Per-response tool-call cap; the driver's default when omitted. */
@@ -125,6 +129,7 @@ export function buildRequestParams(
       // (and toApiToolDefs produces) a top-level {type: "object"} schema.
       input_schema: def.input_schema as Anthropic.Messages.Tool.InputSchema,
     })),
+    ...(config.toolChoice === undefined ? {} : { tool_choice: config.toolChoice }),
     system: [
       {
         type: 'text',
@@ -243,6 +248,7 @@ export function makeCallModel(config: CallModelConfig): CallModel {
       ? {}
       : { maxTokensRetryOutputTokens: config.maxTokensRetryOutputTokens }),
     ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
+    ...(config.toolChoice === undefined ? {} : { toolChoice: config.toolChoice }),
   });
   let turnCount = 0;
 

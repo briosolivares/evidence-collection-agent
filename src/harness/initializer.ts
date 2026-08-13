@@ -2,7 +2,11 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { AssistantContentBlock, CallModel, Message, TextBlock } from '../loop/messages.js';
+import { SET_OUTPUT_CONTRACT } from '../contracts/contractFirstGate.js';
+import type { OutputContractStore } from '../contracts/outputContractStore.js';
 import { makeCallModel, type ProgressEvent } from '../model/callModel.js';
+import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
+import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 
 // The initializer is the harness's first role (see
 // .agents/planning/2026-08-12-research-quality-harness/judge-design.md): from
@@ -248,6 +252,121 @@ export function makeInitializerCallModel(config: InitializerCallModelConfig): Ca
     model: INITIALIZER_MODEL,
     system: INITIALIZER_SYSTEM_PROMPT,
     apiToolDefs: [],
+    maxOutputTokens: config.maxOutputTokens ?? 4096,
+    onProgress: config.onProgress,
+  });
+}
+
+// --- T4: contract-authoring initializer -------------------------------------
+//
+// The initializer's V2 role. Instead of writing prose INTENT.md/CONTRACT.md
+// for something downstream to re-parse, it makes exactly one
+// `set_output_contract` call against the run's contract store — the same
+// tool, schema, validator, and stored bytes the worker-authored mode uses.
+// That symmetry is the point: a comparison between the two modes measures
+// the authoring decision and nothing else, and no code downstream can tell
+// which one ran.
+
+/** Which role states the run's output contract. Preserved as a
+ * configuration choice, not an architectural fork: both modes feed the same
+ * store, the same code checks, and the same verifier. */
+export type ContractAuthor = 'worker' | 'initializer';
+
+/** System prompt for the contract-authoring initializer. Deliberately
+ * generic protocol only — it must never name a task, site, or dataset. */
+export const CONTRACT_INITIALIZER_SYSTEM_PROMPT = `You derive one output contract from a task description, before any browsing happens.
+
+Your only job is to call set_output_contract exactly once, stating precisely what the finished run must contain: every required output file or capture, its format, its exact columns or required sections in the order the task implies, and the checkable rules that follow from the request.
+
+Rules:
+- Describe the END STATE only. Never include a research plan, browsing steps, preferred sites, or how the work should be carried out.
+- Copy exact column headers, filenames, formats, and enumerated values from the task wherever it states them. Do not rename or "improve" them.
+- State a row count only when the task itself fixes one. If the task implies a population whose size is unknown until the run looks, use a minimum the task clearly supports, or state no count rule at all.
+- Put requirements that need judgment in contentExpectations. Put choices you had to make that materially change the result in assumptions.
+- Do not invent outputs the task did not ask for.
+
+Respond with the set_output_contract call and nothing else.`;
+
+/** How the contract initializer finished. */
+export type ContractInitializerOutcome =
+  | { ok: true; revision: number }
+  | { ok: false; reason: string };
+
+/**
+ * Run the contract-authoring initializer: one forced `set_output_contract`
+ * call, validated and persisted through the run's store.
+ *
+ * @param taskText - the user's task, the sole content of the opening message
+ * @param callModel - the initializer's bound model call (see
+ *   makeContractInitializerModelDriver); a scripted fake drops in unchanged
+ * @param store - the run's contract store; the accepted revision is
+ *   persisted here exactly as a worker-authored one would be
+ * @returns `ok` with the accepted revision number, or the reason it failed.
+ *   One bounded repair is allowed: a response carrying no contract call, or
+ *   one the validator rejected, is re-asked once with the exact problem
+ *   named. A second failure returns `ok: false` — a run whose requirements
+ *   were never validated must not proceed as if they had been
+ */
+export async function runContractInitializer(
+  taskText: string,
+  callModel: CallModel,
+  store: OutputContractStore,
+): Promise<ContractInitializerOutcome> {
+  const messages: Message[] = [{ role: 'user', content: [{ type: 'text', text: taskText }] }];
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const response = await callModel(messages);
+    messages.push({ role: 'assistant', content: response.content });
+
+    const calls = response.content.filter(
+      (block): block is Extract<typeof block, { type: 'tool_use' }> =>
+        block.type === 'tool_use',
+    );
+    const contractCalls = calls.filter((call) => call.name === SET_OUTPUT_CONTRACT);
+
+    let problem: string;
+    if (contractCalls.length === 0) {
+      problem = `Your response made no ${SET_OUTPUT_CONTRACT} call. Prose is not read.`;
+    } else if (contractCalls.length > 1 || calls.length > 1) {
+      problem = `Respond with exactly one ${SET_OUTPUT_CONTRACT} call and no other tool calls.`;
+    } else {
+      const result = store.setOutputContract(contractCalls[0]!.input);
+      if (result.ok) return { ok: true, revision: result.revision.revision };
+      problem =
+        'The contract was rejected and NOT stored. Fix all of these:\n' +
+        result.errors.map((error) => `- ${error}`).join('\n');
+    }
+
+    if (attempt === 2) return { ok: false, reason: problem };
+    messages.push({
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: `${problem}\n\nRespond again with a single valid ${SET_OUTPUT_CONTRACT} call.`,
+        },
+      ],
+    });
+  }
+
+  // Unreachable: the loop returns on every path of both attempts.
+  return { ok: false, reason: 'contract initializer ended without an outcome' };
+}
+
+/**
+ * Build the production contract-initializer model binding: offered ONLY the
+ * `set_output_contract` tool, with tool choice forced to it, so the single
+ * call is the response's structural obligation rather than a request the
+ * model may narrate its way around.
+ */
+export function makeContractInitializerModelDriver(
+  config: InitializerCallModelConfig = {},
+): CallModel {
+  return makeCallModel({
+    model: INITIALIZER_MODEL,
+    system: CONTRACT_INITIALIZER_SYSTEM_PROMPT,
+    apiToolDefs: toApiToolDefs(createRegistry([setOutputContractTool as ToolDef])),
+    toolChoice: { type: 'tool', name: SET_OUTPUT_CONTRACT },
     maxOutputTokens: config.maxOutputTokens ?? 4096,
     onProgress: config.onProgress,
   });

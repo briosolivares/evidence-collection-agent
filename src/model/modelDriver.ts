@@ -280,6 +280,9 @@ export interface ModelDriverConfig {
   /** Per-response tool-call cap; a finite integer >= 1. Defaults to
    * DEFAULT_MAX_TOOL_CALLS_PER_TURN. */
   maxToolCallsPerTurn?: number;
+  /** Forces the model's tool use on every call (see CallModelConfig). Part
+   * of the cached prefix, so it is fixed for the driver's lifetime. */
+  toolChoice?: Anthropic.Messages.ToolChoice;
   /** Test seam: produces one response's raw event stream. The default
    * creates an Anthropic SDK stream carrying the abort signal (the client
    * is constructed lazily so a missing API key fails the first generate,
@@ -349,6 +352,7 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
                 system: config.system,
                 apiToolDefs: config.apiToolDefs,
                 maxOutputTokens: maxTokens,
+                ...(config.toolChoice === undefined ? {} : { toolChoice: config.toolChoice }),
               },
               options.messages,
             );
