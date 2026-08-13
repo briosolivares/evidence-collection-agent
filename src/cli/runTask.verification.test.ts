@@ -80,6 +80,50 @@ const writeCsv = (content = CSV) =>
 const submit = (id = 's1') =>
   toolResponse([{ id, name: 'submit_for_verification', input: { summary: 'Roster published.' } }]);
 
+// The typed-row path: mint one evidence record, cite it from a row and from
+// the completeness claim, and never touch write_file. Evidence ids start at
+// E1, so a scripted worker can cite the id its own first call will create.
+const captureEvidence = () =>
+  toolResponse([
+    {
+      id: 'j1',
+      name: 'execute_javascript',
+      input: { target: 'selected_top_document', code: '"Alpha"', captureEvidence: true },
+    },
+  ]);
+
+const upsertRow = () =>
+  toolResponse([
+    {
+      id: 'r1',
+      name: 'upsert_output_rows',
+      input: {
+        outputId: 'roster',
+        rows: [
+          {
+            rowId: '1',
+            values: { name: 'Alpha', url: 'https://example.com/alpha' },
+            evidenceIds: ['E1'],
+          },
+        ],
+      },
+    },
+  ]);
+
+const setCompleteness = () =>
+  toolResponse([
+    {
+      id: 't1',
+      name: 'set_table_completeness',
+      input: {
+        outputId: 'roster',
+        method: 'The page lists exactly one widget.',
+        evidenceIds: ['E1'],
+        statedTotal: 1,
+      },
+    },
+  ]);
+
 const reportVerified = () =>
   toolResponse([
     { id: 'v1', name: 'report_verification', input: { status: 'verified', findings: [] } },
@@ -357,6 +401,52 @@ describe('runTask V2 verification protocol', () => {
       expect(
         JSON.parse(await readFile(join(result.runDir, contractRevisionPath(1)), 'utf8')),
       ).toMatchObject({ revision: 1 });
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'renders the table deliverable from typed rows, with no write_file at all',
+    async () => {
+      // Every other test here hand-writes the CSV with write_file, which is
+      // why nothing noticed that renderTableOutputs had NO production caller:
+      // a run built valid rows, was told `missing_file`, and hand-wrote the
+      // deliverable to get past its own check. The rendered file IS the
+      // product of the typed-row pipeline; if code does not write it, the
+      // pipeline's whole reason for existing is absent.
+      const initializer = scriptModel([setContract()]);
+      const worker = scriptModel([captureEvidence(), upsertRow(), setCompleteness(), submit()]);
+      const verifier = scriptModel([reportVerified()]);
+
+      const result = await runTask('Publish the widget roster.', {
+        browser,
+        runsBaseDir,
+        callModel: worker.callModel,
+        maxTurns: 10,
+        maxContextTokens: 100_000,
+        harness: {
+          outputContract: true,
+          contractAuthor: 'initializer',
+          initializerCallModel: initializer.callModel,
+          verifierCallModel: verifier.callModel,
+        },
+      });
+
+      expect(result.status).toBe('verified');
+
+      const csv = await readFile(join(result.runDir, 'artifacts/roster.csv'), 'utf8');
+      expect(csv).toContain('name,url');
+      expect(csv).toContain('Alpha');
+
+      // Published as the deliverable graders select, and produced by code:
+      // the worker's script contains no write_file at all.
+      const manifest = JSON.parse(
+        await readFile(join(result.runDir, MANIFEST_FILENAME), 'utf8'),
+      ) as Manifest;
+      expect(
+        manifest.artifacts?.find((entry) => entry.filename === 'artifacts/roster.csv')?.roles,
+      ).toEqual(['requested_output']);
+      expect(JSON.stringify(worker.requests)).not.toContain('write_file');
     },
     TEST_TIMEOUT_MS,
   );

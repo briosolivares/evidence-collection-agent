@@ -263,6 +263,71 @@ describe('runContractInitializer', () => {
     expect(JSON.stringify(requests[1])).toMatch(/duplicate output id/);
   });
 
+  it('answers the replayed tool_use with a tool_result, not bare prose', async () => {
+    // The API rejects a conversation whose tool_use is followed by anything
+    // but a matching tool_result, with a 400 that kills the run. Asserting
+    // only that the problem text appears SOMEWHERE in the retry request is
+    // what let the broken shape reach a live run, so assert the shape itself.
+    const { callModel, requests } = scriptModel([
+      contractCall(
+        { contract: { outputs: [VALID.contract.outputs[0], VALID.contract.outputs[0]] } },
+        'c9',
+      ),
+      contractCall(VALID),
+    ]);
+    await runContractInitializer('Publish the roster.', callModel, store);
+
+    const retry = requests[1]!;
+    const replayed = retry[1]!;
+    const correction = retry[2]!;
+    expect(replayed.role).toBe('assistant');
+    expect(correction.role).toBe('user');
+    // Tool results come FIRST in the corrective turn: the API requires every
+    // id in the preceding assistant turn to be answered before any text.
+    expect(correction.content[0]).toMatchObject({
+      type: 'tool_result',
+      tool_use_id: 'c9',
+      is_error: true,
+    });
+    const answeredIds = correction.content
+      .filter((block) => block.type === 'tool_result')
+      .map((block) => (block as { tool_use_id: string }).tool_use_id);
+    const replayedIds = replayed.content
+      .filter((block) => block.type === 'tool_use')
+      .map((block) => (block as { id: string }).id);
+    expect(answeredIds).toEqual(replayedIds);
+  });
+
+  it('answers every id when the rejected response made more than one call', async () => {
+    const twoCalls: ModelResponse = {
+      content: [
+        { type: 'tool_use', id: 'a1', name: 'set_output_contract', input: VALID },
+        { type: 'tool_use', id: 'a2', name: 'set_output_contract', input: VALID },
+      ],
+      stop_reason: 'tool_use',
+      usage: { input_tokens: 10, output_tokens: 5 },
+    };
+    const { callModel, requests } = scriptModel([twoCalls, contractCall(VALID)]);
+    await runContractInitializer('Publish the roster.', callModel, store);
+
+    const answered = requests[1]![2]!.content
+      .filter((block) => block.type === 'tool_result')
+      .map((block) => (block as { tool_use_id: string }).tool_use_id);
+    // Leaving either id unanswered is the same 400 as answering neither.
+    expect(answered).toEqual(['a1', 'a2']);
+  });
+
+  it('uses a plain text correction when the rejected response made no call', async () => {
+    // Nothing to answer, so a tool_result would itself be invalid.
+    const { callModel, requests } = scriptModel([
+      textResponse('Here is some prose instead.'),
+      contractCall(VALID),
+    ]);
+    await runContractInitializer('Publish the roster.', callModel, store);
+
+    expect(requests[1]![2]!.content.every((block) => block.type === 'text')).toBe(true);
+  });
+
   it('fails after a second bad response rather than proceeding unvalidated', async () => {
     const { callModel } = scriptModel([textResponse('no call'), textResponse('still no call')]);
     const outcome = await runContractInitializer('Publish the roster.', callModel, store);

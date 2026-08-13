@@ -1,11 +1,18 @@
 # Browser Agent V2 — cutover state and the two prepared experiments
 
-**Status:** V2 is implemented and gated by hermetic tests. It is **not yet the
-production default.** This document records exactly what is live, what is
-dormant, what must be measured before the remaining switches are thrown, and
-how to run those measurements.
+**Status:** V2 is implemented, gated by hermetic tests, and **validated live on
+three short tasks** (2026-08-13: stub 2/2, openclaw_pr 3/3, hacker_news 6/6).
+It is **not yet the production default.** This document records exactly what is
+live, what is dormant, what must be measured before the remaining switches are
+thrown, and how to run those measurements.
 
 **Date:** 2026-08-13
+
+> **The first live runs found four bugs that hermetic tests could not see**,
+> two of which made the V2 path unable to start and one of which made
+> `execute_javascript` fail 100% of the time. See the live-validation section
+> of [`progress.md`](./progress.md). Treat "implemented and tested" as a
+> weaker claim than "has run" for everything still listed as unwired below.
 
 ---
 
@@ -123,20 +130,22 @@ and assembles these tools at their frozen positions:
 
 **Wired and usable:** `set_output_contract`, `upsert_output_rows`,
 `delete_output_rows`, `set_table_completeness`, `observe`, `browser_action`,
-`switch_page`, `handle_dialog`, `inspect_document`, `screenshot`, `download`,
-`read_file`, `write_file`, `grep`, `fill_credentials`, `ask_user_question`, and
-`submit_for_verification` (offered as a control tool, intercepted by the
-session rather than executed).
+`switch_page`, `handle_dialog`, `execute_javascript`, `inspect_document`,
+`screenshot`, `download`, `read_file`, `write_file`, `grep`,
+`fill_credentials`, `ask_user_question`, and `submit_for_verification`
+(offered as a control tool, intercepted by the session rather than executed).
+
+All of the above have now been exercised live except `handle_dialog`,
+`fill_credentials`, and `inspect_document`.
 
 **Implemented and tested but NOT yet wired**, each needing one dependency the
 cutover has not plumbed:
 
 | Tool | Missing dependency |
 | --- | --- |
-| `write_document` | a PDF page opener (`Pick<Browser, 'newPage'>`) from the session provider |
-| `execute_javascript` | the page handle plus an explicit `javascriptPolicy` decision for the authenticated lane |
+| `write_document` | a PDF page opener (`Pick<Browser, 'newPage'>`) from the session provider. **Blocks closing the hand-written-document hole.** |
 | `read_resource` | the anonymous `PublicResourceReader` and the discovered-URL index, fed from navigation and observation |
-| `capture_text` | the text-capture page seam |
+| `capture_text` | the text-capture page seam. **Binding constraint on table tasks** — see the known gaps below. |
 | `run_research_jobs` | the research job runner |
 
 Each carries an `INTEGRATION` comment naming exactly what to pass. A run
@@ -149,7 +158,7 @@ omits rather than registering something broken, and a test asserts that.
 | --- | --- | --- |
 | `browser_batch` | `browser_action` parity plus a user-authorized measured comparison | `browser_action` is implemented with receipts and reaches feature parity; the measurement has not been run. **Do not delete yet.** |
 | Prose `INTENT.md`/`CONTRACT.md` and `runInitializer` | `outputContract` becomes the default | Blocked on experiment 1. |
-| Raw model-authored requested-output CSV (`write_file` into a contract-bound path) | T7 table rendering becomes the only path | Renderers are live; `write_file` is still permitted, and the check that a document output must come from `write_document` is the one T8 item left unimplemented (it needs a `src/completion/` edit — see that INTEGRATION note). |
+| Raw model-authored requested-output CSV (`write_file` into a contract-bound path) | T7 table rendering becomes the only path | Rendering is now actually CALLED at submission and at incomplete finalization (it had no production caller until the 2026-08-13 live runs found a run hand-writing its own deliverable to pass its own check). `write_file` into a contract-bound path is still permitted, so this deletion is still open. |
 | `runAgentLoop` compatibility wrapper | no caller remains | Still used by the judge-less path and many tests. |
 | `readOnly` on `ToolDef` | every production tool declares `getAccess` | The ten atomic tools now declare it; the V2 factories need the same before the field can go. |
 
@@ -161,8 +170,19 @@ These are real and not hidden behind a flag:
   revalidation contract and a non-flaky fixture.
 - **`table` and `visual` observation needs**, and targeted-region observation,
   are not implemented (T11). `observe` supports `interactive` and `text`.
-- ~~`validateDocumentOutputs()`~~ — now implemented: a document with no
-  evidence-marked source is rejected as hand-written.
+- **`validateDocumentOutputs()` is implemented but BYPASSABLE.** It asks
+  whether `scratch/documents/<id>/source.md` is recorded in the manifest, which
+  is a question about a path rather than about provenance. In the first live
+  run the worker read the failure message, created that exact path with
+  `write_file`, resubmitted, and passed. The same hole exists for tables. Both
+  close together under one rule — a contract-bound deliverable may be written
+  only by the tool that owns it — and closing the document half requires
+  wiring `write_document` first, or every document task becomes unverifiable.
+- **`capture_text` being unwired is a binding constraint, not a gap.**
+  `upsert_output_rows` requires an evidence id per row, and with `capture_text`
+  and `read_resource` absent, `execute_javascript` is effectively the only
+  source of one for text. A table task therefore has exactly one route to a
+  cited row.
 - **Compaction is unwired** (T15), by decision rather than omission.
 - The **DNS-rebinding TOCTOU window** in `read_resource` is narrowed by per-hop
   re-resolution but not closed; a pinning HTTP client can be injected without

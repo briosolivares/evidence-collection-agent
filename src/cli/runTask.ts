@@ -13,6 +13,7 @@ import {
 } from '../harness/harness.js';
 import {
   INITIALIZER_MODEL,
+  makeContractInitializerModelDriver,
   makeInitializerCallModel,
   runContractInitializer,
   runInitializer,
@@ -277,6 +278,42 @@ export type RunTaskResult = { runDir: string } & (LoopResult | RunOutcome);
  *   harness ran), the manifest is finalized, and this run's tab is closed
  *   while the browser stays open
  */
+/**
+ * The two production initializer bindings, injectable so that WHICH ONE gets
+ * chosen is testable without a network call.
+ *
+ * Worth a seam of its own because the bindings are not interchangeable and
+ * nothing about either one, tested alone, reveals a wrong choice between them.
+ */
+export interface InitializerBindings {
+  /** Prose INTENT.md/CONTRACT.md author. Offered no tools. */
+  prose: () => CallModel;
+  /** Contract author: offered set_output_contract, tool choice forced to it. */
+  contract: () => CallModel;
+}
+
+/**
+ * Pick the initializer binding that matches the protocol about to consume it.
+ *
+ * This mattered in production: the prose binding is offered NO tools, so
+ * asking it for the `set_output_contract` call that `runContractInitializer`
+ * requires fails on every attempt — a model cannot call a tool it was never
+ * given. Both roles read the same `harness.contractAuthor`, so the default is
+ * chosen here rather than at the call site, where the two could drift apart.
+ *
+ * @param v2Protocol - true when `harness.outputContract` is on
+ * @param bindings - overridable for tests; defaults to the production pair
+ */
+export function defaultInitializerCallModel(
+  v2Protocol: boolean,
+  bindings: InitializerBindings = {
+    prose: () => makeInitializerCallModel({}),
+    contract: () => makeContractInitializerModelDriver({}),
+  },
+): CallModel {
+  return v2Protocol ? bindings.contract() : bindings.prose();
+}
+
 export async function runTask(
   taskText: string,
   config: RunTaskConfig,
@@ -452,12 +489,12 @@ export async function runTask(
     // design, initializer and judge calls run untraced in v1; their token
     // usage still lands on the shared budget via withBudgetAccounting.
     if (config.harness !== undefined) {
+      const author = config.harness.contractAuthor ?? 'initializer';
       const initializerCallModel = withBudgetAccounting(
-        config.harness.initializerCallModel ?? makeInitializerCallModel({}),
+        config.harness.initializerCallModel ?? defaultInitializerCallModel(v2Protocol),
         budget!,
         'initializer',
       );
-      const author = config.harness.contractAuthor ?? 'initializer';
       if (v2Protocol && author === 'initializer') {
         const authored = await runContractInitializer(
           taskText,
@@ -493,6 +530,7 @@ export async function runTask(
         credentials,
         requestPermission: config.requestPermission,
         ...(outputContracts === undefined ? {} : { outputContracts }),
+        ...(outputTables === undefined ? {} : { outputTables }),
         ...(v2Protocol ? { submissionProtocol: true } : {}),
       };
 
@@ -610,7 +648,10 @@ async function runVerificationHarness(
       // and only a submission that survives them reaches the verifier.
       const contract = contractStore?.currentContract();
       if (result.kind === 'submitted' && contract !== undefined) {
-        const checks = runCompletionCheck(runDir, contract);
+        // The table store renders the contract's table outputs as part of the
+        // check — without it, a run with valid typed rows is told its own
+        // deliverable is missing.
+        const checks = runCompletionCheck(runDir, contract, loopDeps.outputTables);
         if (!checks.ok) {
           completionCheckFailures += 1;
           appendTranscriptEvent(runDir, {
@@ -746,7 +787,7 @@ async function runVerificationHarness(
   // requirement is unmet are marked partial (see finalizeIncompleteRun).
   if (outcome.status === 'incomplete') {
     const contract = contractStore?.currentContract();
-    const finalization = finalizeIncompleteRun(runDir, contract);
+    const finalization = finalizeIncompleteRun(runDir, contract, loopDeps.outputTables);
     if (finalization.markedPartial.length > 0) {
       appendTranscriptEvent(runDir, {
         type: 'incomplete_finalization',

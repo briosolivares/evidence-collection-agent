@@ -387,7 +387,76 @@ code-level choices belong in code review, not here.
 
 | Date | Task | Focused tests | Typecheck | Full tests | Live eval |
 | --- | --- | --- | --- | --- | --- |
-| — | — | — | — | — | Not authorized |
+| 2026-08-13 | Live V2 validation | pass | 0 errors | 1514 pass; 19 browser/TUI load flakes, each file green in isolation | stub 2/2, openclaw_pr 3/3, hacker_news 6/6 (V2, k=1) |
+
+## Live validation, 2026-08-13
+
+First end-to-end runs of the V2 protocol against the real API, authorized by
+the user to test the stack on short no-auth tasks:
+
+```
+npm run evals -- --tasks <name> --k 1 --output-contract
+```
+
+`--output-contract` and `--contract-author` are new eval-CLI flags. Before
+them the V2 path was **unreachable from the eval harness** — `cliRuntime`
+hardcoded `harness: {}`. The results JSON now records which protocol a batch
+ran (`protocol` on `EvalReport`), because a contract-protocol batch and a
+prose batch are not comparable and were previously indistinguishable on disk.
+
+**Result: 3 tasks, 3 passes, 11/11 assertions.** Getting there took four
+production bug fixes. Every one was invisible to the hermetic suite, and each
+fix was confirmed to FAIL against the pre-fix code before being kept.
+
+| # | Bug | Why no test caught it |
+| --- | --- | --- |
+| 1 | `runTask` chose the PROSE initializer binding — offered no tools — under the contract protocol, then required a `set_output_contract` call. A model cannot call a tool it was never given, so the V2 path could not start at all. | Both bindings were correct in isolation; the wrong thing was the CHOICE between them. Now `defaultInitializerCallModel`, with the choice itself under test. |
+| 2 | The contract initializer's corrective retry replayed an assistant `tool_use` and answered it with plain text → API 400. A recoverable first rejection became a fatal run error. | The retry tests asserted the problem text appeared *somewhere* in the request, which stayed true for the invalid shape. The shape is now asserted. |
+| 3 | `execute_javascript` failed on EVERY call: `(() => { CODE })()` discards the value unless CODE has a top-level `return`, so bare expressions, IIFEs, and code ending in an expression all yielded undefined. 15/15 live failures, and the error text advised two forms that also failed. | Every existing test passed `return X;` — the one form that worked. |
+| 4 | `renderTableOutputs` had NO production caller. T7's guarantee that deliverables are written by code from typed rows was dead code: a run built 5 valid rows, was told `missing_file`, and hand-wrote the CSV with `write_file` to pass its own check. | Every vertical test hand-wrote the deliverable, so the typed-row path was never exercised through `runTask`. |
+
+Bug 3 alone cost 35 turns and 192 seconds on one task: `hacker_news` went from
+**282s / 51 turns to 90s / 16 turns**, same 6/6 grade.
+
+Bugs 3 and 4 were introduced by this plan's own implementation.
+
+### Open findings from these runs — NOT fixed
+
+1. **`validateDocumentOutputs` is bypassable, and its message is the recipe.**
+   The check asks whether `scratch/documents/<id>/source.md` is in the
+   manifest. `write_document` is unwired, so the worker read the failure text,
+   created that exact path with `write_file`, resubmitted, and passed. The
+   provenance claim — markers parsed, citations enforced, sections checked —
+   is currently unenforced. Closing it requires wiring `write_document`
+   first; closing it alone would make every document task unverifiable.
+2. **The same hole exists for tables.** Rendering now runs for tables that
+   have rows, but hand-writing a contract-bound CSV still satisfies the
+   check. Both holes close together under one rule: a contract-bound
+   deliverable may be written only by the tool that owns it.
+3. **The worker re-authors a contract that already exists.** Under
+   `contractAuthor: initializer` it is never told one is set, so it spends
+   turns writing revision 2 — byte-identical in both observed runs, but a
+   rewrite on a harder task would silently convert experiment 1's cell D into
+   cell B. Fix before running that experiment.
+4. **The worker reads `INTENT.md`/`CONTRACT.md` on turn 1 under V2**, where
+   those files do not exist, and collects two errors for it.
+5. **Evidence ids are hard to come by for text.** `upsert_output_rows`
+   requires at least one evidence id per row; with `capture_text` and
+   `read_resource` unwired, `execute_javascript` is effectively the only
+   source. While it was broken the worker had no legitimate route to a cited
+   row at all and asked the user for guidance mid-run (correctly refused in a
+   headless eval). `capture_text` being unwired is a binding constraint on
+   table tasks, not a cosmetic gap.
+6. **The verifier does not understand the scratch/artifacts partition.** On
+   the confirming `hacker_news` run it returned `needs_correction` twice over,
+   demanding that evidence held in `scratch/evidence/` be "published in
+   artifacts/ as verifiable evidence" — but scratch is exactly where evidence
+   belongs, and the manifest already records it. The worker complied by
+   writing a raw-evidence JSON into `artifacts/`, adding an unrequested file
+   to the graded deliverable set and costing a full extra cycle. Harmless
+   here because graders select by the `requested_output` role, but a task
+   graded on "only the requested outputs are present" would fail on it. The
+   verifier's prompt needs to state the partition.
 
 ## Handoff
 

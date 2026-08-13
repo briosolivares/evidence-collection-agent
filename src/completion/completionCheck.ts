@@ -64,23 +64,73 @@ const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
 /**
  * Run every objective check for a proposed completion.
  *
+ * Rendering happens FIRST, before any check reads the directory: a table
+ * output does not exist as a file until the renderer writes it, so checking
+ * for its presence beforehand reports `missing_file` for a table that is
+ * complete and correct. That is not hypothetical — before the store was
+ * passed in, a live run built five valid typed rows, was told its CSV did not
+ * exist, and hand-wrote the file with `write_file` to get past the check.
+ * Which is precisely the model-authored deliverable typed rows exist to
+ * replace.
+ *
  * @param runDir - the run directory
  * @param contract - the run's current contract; every requirement checked
  *   here comes from it, so a run with no contract has nothing objective to
  *   check and passes trivially
+ * @param tables - the run's table store. Omitted only by callers that have no
+ *   typed rows to render (and by tests that pre-write their fixtures); when
+ *   absent, a declared table output is checked as a plain file
  * @returns ok with no failures, or every defect found. Never throws for a
  *   defect — an unreadable or absent file IS a finding, not an exception
  */
 export function runCompletionCheck(
   runDir: string,
   contract: OutputContract,
+  tables?: OutputTableStore,
 ): CompletionCheckResult {
   const failures: CompletionFailure[] = [
+    // A table that cannot be rendered is reported as its own failure rather
+    // than surfacing later as a confusing missing_file.
+    ...(tables === undefined
+      ? []
+      : renderTableOutputs(runDir, onlyTablesWithRows(contract, tables), tables)),
     ...validateManifestIntegrity(runDir),
     ...validateExpectedOutputs(runDir, contract),
     ...validateDocumentOutputs(runDir, contract),
   ];
   return { ok: failures.length === 0, failures };
+}
+
+/**
+ * The contract narrowed to table outputs that actually have typed rows.
+ *
+ * Rendering at the submission boundary must not clobber a deliverable the run
+ * obtained some other way — a CSV downloaded straight from the site, say —
+ * with a header-only file built from an empty store. A table with no rows has
+ * nothing to publish, so the directory is left as it is and the presence and
+ * rule checks report the truth about it.
+ *
+ * A direct `renderTableOutputs` call still renders empties (that is its own
+ * tested contract); this is the boundary's policy, not the renderer's.
+ */
+function onlyTablesWithRows(
+  contract: OutputContract,
+  tables: OutputTableStore,
+): OutputContract {
+  // tables() lists only tables that were touched, so this never CREATES an
+  // empty table as a side effect of asking whether one exists.
+  const withRows = new Set(
+    tables
+      .tables()
+      .filter((table) => table.rows.length > 0)
+      .map((table) => table.outputId),
+  );
+  return {
+    ...contract,
+    outputs: contract.outputs.filter(
+      (output) => output.kind !== 'table' || withRows.has(output.id),
+    ),
+  };
 }
 
 /**

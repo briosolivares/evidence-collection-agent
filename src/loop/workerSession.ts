@@ -15,6 +15,7 @@ import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
 } from '../model/modelDriver.js';
+import type { OutputTableStore } from '../outputs/outputTable.js';
 import type { RunBudgetLimit, RunBudgetTracker, RunRoleUsage } from '../run/runBudget.js';
 import { appendTranscriptEvent } from '../run/transcript.js';
 import {
@@ -82,6 +83,10 @@ export interface WorkerSessionDeps {
    * gate: until a valid contract exists, only `set_output_contract` may
    * run. Absent (the judge-less path, fixture tests) leaves the gate off. */
   outputContracts?: ToolCtx['outputContracts'];
+  /** The run's typed-row store. Carried here so the submission path can
+   * RENDER the contract's table outputs before checking that they exist —
+   * a table is not a file until the renderer writes it. */
+  outputTables?: OutputTableStore;
   /** True when the run offers `submit_for_verification`, which makes
    * explicit submission the ONLY way to finish (see runWorkerTurn). The
    * legacy judge-less path leaves it unset and keeps implicit

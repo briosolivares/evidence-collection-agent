@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { OutputContract } from '../contracts/outputContract.js';
+import type { OutputTableStore } from '../outputs/outputTable.js';
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
@@ -38,6 +39,11 @@ export interface IncompleteFinalization {
  * @param contract - the run's contract, when it had one. Without a contract
  *   there is no requirement to compare against, so nothing is marked and
  *   the run is preserved untouched
+ * @param tables - the run's typed-row store, when it had one. Passed through
+ *   so the check RENDERS the table outputs: an unverified run that built
+ *   valid rows must still preserve the deliverable those rows describe, and
+ *   the marking below is what then labels it partial or complete. Without
+ *   this, such a run preserves no table file at all
  * @returns what was marked (see IncompleteFinalization). Best-effort by
  *   design: a marking failure must never prevent a run from being preserved,
  *   so an entry that cannot be updated is skipped rather than thrown
@@ -45,6 +51,7 @@ export interface IncompleteFinalization {
 export function finalizeIncompleteRun(
   runDir: string,
   contract?: OutputContract,
+  tables?: OutputTableStore,
 ): IncompleteFinalization {
   const result: IncompleteFinalization = {
     unsatisfiedOutputIds: [],
@@ -53,7 +60,7 @@ export function finalizeIncompleteRun(
   };
   if (contract === undefined) return result;
 
-  const check = runCompletionCheck(runDir, contract);
+  const check = runCompletionCheck(runDir, contract, tables);
   const unsatisfied = new Set(
     check.failures
       .map((failure) => failure.outputId)

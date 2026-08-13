@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { AssistantContentBlock, CallModel, Message, TextBlock } from '../loop/messages.js';
 import { SET_OUTPUT_CONTRACT } from '../contracts/contractFirstGate.js';
 import type { OutputContractStore } from '../contracts/outputContractStore.js';
-import { makeCallModel, type ProgressEvent } from '../model/callModel.js';
+import { makeCallModel, type CallModelConfig, type ProgressEvent } from '../model/callModel.js';
 import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 
@@ -232,6 +232,16 @@ export interface InitializerCallModelConfig {
    * (see ProgressEvent) — lets interactive surfaces show the initializer's
    * single turn the same way they show worker turns. */
   onProgress?: (event: ProgressEvent) => void;
+  /**
+   * Stream factory seam, forwarded to makeCallModel unchanged.
+   *
+   * Exists so a test can assert what these bindings actually PUT ON THE WIRE.
+   * Without it the only testable claim is that re-deriving the same constants
+   * yields the same params, which stays true even when the binding itself is
+   * wrong — and a binding offering the wrong tools is precisely the failure
+   * that reached a live run.
+   */
+  createStream?: CallModelConfig['createStream'];
 }
 
 /**
@@ -254,6 +264,7 @@ export function makeInitializerCallModel(config: InitializerCallModelConfig): Ca
     apiToolDefs: [],
     maxOutputTokens: config.maxOutputTokens ?? 4096,
     onProgress: config.onProgress,
+    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
   });
 }
 
@@ -338,19 +349,48 @@ export async function runContractInitializer(
     }
 
     if (attempt === 2) return { ok: false, reason: problem };
-    messages.push({
-      role: 'user',
-      content: [
-        {
-          type: 'text',
-          text: `${problem}\n\nRespond again with a single valid ${SET_OUTPUT_CONTRACT} call.`,
-        },
-      ],
-    });
+    messages.push(contractCorrectionMessage(problem, calls));
   }
 
   // Unreachable: the loop returns on every path of both attempts.
   return { ok: false, reason: 'contract initializer ended without an outcome' };
+}
+
+/**
+ * Build the corrective user turn that answers a rejected contract attempt.
+ *
+ * Every replayed `tool_use` MUST be answered by a `tool_result` carrying its
+ * id: the API rejects a conversation whose tool_use is followed by anything
+ * else with a 400, and the assistant turn has already been replayed by the
+ * time we know the contract was bad. Delivering the problem as plain text
+ * instead is what took the retry down in a live run — the first attempt's
+ * rejection was recoverable, and the recovery itself was the fatal error.
+ *
+ * A response with no tool_use at all (possible only if tool choice was not
+ * forced) takes plain text, which is then the correct shape.
+ */
+function contractCorrectionMessage(
+  problem: string,
+  calls: readonly { id: string }[],
+): Message {
+  const instruction = `${problem}\n\nRespond again with a single valid ${SET_OUTPUT_CONTRACT} call.`;
+  if (calls.length === 0) {
+    return { role: 'user', content: [{ type: 'text', text: instruction }] };
+  }
+  return {
+    role: 'user',
+    content: [
+      // One result per call, in order, so no id is left unanswered even when
+      // the problem was that the model made too many calls.
+      ...calls.map((call) => ({
+        type: 'tool_result' as const,
+        tool_use_id: call.id,
+        content: problem,
+        is_error: true,
+      })),
+      { type: 'text' as const, text: instruction },
+    ],
+  };
 }
 
 /**
@@ -369,5 +409,6 @@ export function makeContractInitializerModelDriver(
     toolChoice: { type: 'tool', name: SET_OUTPUT_CONTRACT },
     maxOutputTokens: config.maxOutputTokens ?? 4096,
     onProgress: config.onProgress,
+    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
   });
 }
