@@ -4,8 +4,10 @@ import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
 import {
   actionTools,
+  authTools,
   evidenceTools,
   fileTools,
+  interactionTools,
   observationTools,
 } from '../tools/index.js';
 import { createRegistry, toApiToolDefs } from '../tools/registry.js';
@@ -50,6 +52,8 @@ function productionConfig(): CallModelConfig {
     ...observationTools,
     ...actionTools,
     ...evidenceTools,
+    ...authTools,
+    ...interactionTools,
   ]);
   return {
     system: SYSTEM_PROMPT,
@@ -85,7 +89,22 @@ describe('SYSTEM_PROMPT', () => {
     );
   });
 
-  it('forms a byte-identical cached prefix with all ten production tools across unrelated task histories', () => {
+  it('teaches the authentication playbook lightly: fill first, never type, ask on failure', () => {
+    expect(SYSTEM_PROMPT).toContain('Authentication.');
+    expect(SYSTEM_PROMPT).toContain(
+      'use fill_credentials to fill the form — it knows which sites have ' +
+        'stored credentials and will tell you if none exist',
+    );
+    expect(SYSTEM_PROMPT).toContain(
+      'Never type usernames or passwords with the type tool.',
+    );
+    expect(SYSTEM_PROMPT).toContain(
+      'ask_user_question pauses the task so they can act in the browser window',
+    );
+    expect(SYSTEM_PROMPT).toContain('reinspect the page before continuing');
+  });
+
+  it('forms a byte-identical cached prefix with all twelve production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
 
@@ -99,7 +118,7 @@ describe('SYSTEM_PROMPT', () => {
     });
 
     expect(secondPrefix).toBe(firstPrefix);
-    expect(firstParams.tools).toHaveLength(10);
+    expect(firstParams.tools).toHaveLength(12);
     expect(firstParams.tools?.map((tool) => tool.name)).toEqual([
       'read_file',
       'write_file',
@@ -111,6 +130,8 @@ describe('SYSTEM_PROMPT', () => {
       'scroll',
       'screenshot',
       'download',
+      'fill_credentials',
+      'ask_user_question',
     ]);
 
     expect(firstParams.system).toEqual([
