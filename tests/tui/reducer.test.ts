@@ -35,14 +35,14 @@ describe('concurrent eval state', () => {
       task: 'alpha',
       trial: 1,
       k: 2,
-      requiresAuth: false,
+      headed: false,
     });
     state = reduce(state, {
       type: 'eval_trial_started',
       task: 'beta',
       trial: 1,
       k: 2,
-      requiresAuth: true,
+      headed: true,
     });
     state = reduce(state, {
       type: 'eval_trial_progress',
@@ -53,7 +53,7 @@ describe('concurrent eval state', () => {
 
     expect(Object.values(state.evalsLive ?? {})).toEqual([
       expect.objectContaining({ task: 'alpha', status: 'running navigate' }),
-      expect.objectContaining({ task: 'beta', status: 'starting', requiresAuth: true }),
+      expect.objectContaining({ task: 'beta', status: 'starting', headed: true }),
     ]);
 
     state = reduce(state, {

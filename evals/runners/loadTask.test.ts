@@ -17,28 +17,45 @@ describe('loadEvalTask', () => {
     expect(task.name).toBe('stub');
     expect(task.taskText).toContain('answer.md');
     expect(task.startUrl).toBe('about:blank');
-    expect(task.requiresAuth).toBe(false);
+    expect(task.headed).toBe(false);
     expect(typeof task.grade).toBe('function');
     await expect(task.fetchOracle()).resolves.toEqual({ expectedFile: 'artifacts/answer.md' });
   });
 
-  it('loads explicit authentication metadata without inferring from task text', async () => {
-    await expect(loadEvalTask(evalsDir, 'elon_tweets')).resolves.toMatchObject({
-      name: 'elon_tweets',
-      requiresAuth: true,
-    });
+  it('loads explicit headed-lane metadata without inferring from task text', async () => {
+    for (const name of ['elon_tweets', 'mit_sororities', 'edgar']) {
+      await expect(loadEvalTask(evalsDir, name)).resolves.toMatchObject({
+        name,
+        headed: true,
+      });
+    }
   });
 
-  it('rejects non-boolean authentication metadata', async () => {
-    const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-auth-test-'));
+  it('rejects non-boolean headed-lane metadata', async () => {
+    const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-headed-test-'));
     try {
       mkdirSync(join(tmpEvals, 'bad'));
       writeFileSync(
         join(tmpEvals, 'bad', 'task.json'),
-        '{"task":"bad auth metadata","requiresAuth":"yes"}',
+        '{"task":"bad lane metadata","headed":"yes"}',
       );
 
-      await expect(loadEvalTask(tmpEvals, 'bad')).rejects.toThrow(/requiresAuth.*boolean/);
+      await expect(loadEvalTask(tmpEvals, 'bad')).rejects.toThrow(/headed.*boolean/);
+    } finally {
+      rmSync(tmpEvals, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects the retired "requiresAuth" field instead of dropping the task to headless', async () => {
+    const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-legacy-test-'));
+    try {
+      mkdirSync(join(tmpEvals, 'stale'));
+      writeFileSync(
+        join(tmpEvals, 'stale', 'task.json'),
+        '{"task":"legacy lane metadata","requiresAuth":true}',
+      );
+
+      await expect(loadEvalTask(tmpEvals, 'stale')).rejects.toThrow(/renamed to "headed"/);
     } finally {
       rmSync(tmpEvals, { recursive: true, force: true });
     }

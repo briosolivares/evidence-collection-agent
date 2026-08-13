@@ -9,7 +9,7 @@ import type { EvalRunner } from './evalSession.js';
 import { startRun, type RunHandle, type RunSessionDeps } from './runSession.js';
 
 export interface TuiEvalRuntimeDeps {
-  /** Reuses Sherlock's lazy persistent headed controller for auth trials. */
+  /** Reuses Sherlock's lazy persistent headed controller for headed trials. */
   authenticatedRunner: (
     task: string,
     onEvent: (event: UiEvent) => void,
@@ -46,7 +46,7 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
 
   return {
     startRun(task, onEvent, opts) {
-      if (opts.requiresAuth) {
+      if (opts.headed) {
         return deps.authenticatedRunner(task, onEvent, {
           ...(opts.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
         });

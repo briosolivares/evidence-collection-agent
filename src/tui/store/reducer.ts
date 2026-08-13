@@ -71,7 +71,7 @@ export type UiAction =
       task: string;
       trial: number;
       k: number;
-      requiresAuth: boolean;
+      headed: boolean;
     }
   | { type: 'eval_trial_progress'; task: string; trial: number; status: string }
   | {
@@ -444,7 +444,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
             task: action.task,
             trial: action.trial,
             k: action.k,
-            requiresAuth: action.requiresAuth,
+            headed: action.headed,
             status: 'starting',
           },
         },

@@ -29,13 +29,13 @@ describe('discoverEvalTasks', () => {
     mkdirSync(join(fixtureDir, 'edgar'));
     writeFileSync(join(fixtureDir, 'edgar', 'task.json'), '{"task":"x"}');
     mkdirSync(join(fixtureDir, 'stub'));
-    writeFileSync(join(fixtureDir, 'stub', 'task.json'), '{"task":"y","requiresAuth":true}');
+    writeFileSync(join(fixtureDir, 'stub', 'task.json'), '{"task":"y","headed":true}');
     mkdirSync(join(fixtureDir, 'not-a-task'));
     writeFileSync(join(fixtureDir, 'loose-file.ts'), 'export {}');
 
     expect(discoverEvalTasks(fixtureDir)).toEqual([
-      { name: 'edgar', requiresAuth: false },
-      { name: 'stub', requiresAuth: true },
+      { name: 'edgar', headed: false },
+      { name: 'stub', headed: true },
     ]);
   });
 
@@ -95,7 +95,7 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
     name,
     taskText: `run the ${name} investigation`,
     startUrl: `https://start.example/${name}`,
-    requiresAuth: false,
+    headed: false,
     fetchOracle: async () => ({ oracleFor: name }),
     grade: (runDir, oracle) => {
       fixture.gradeCalls.push([runDir, oracle]);
@@ -270,7 +270,7 @@ describe('startEvalBatch', () => {
     const loadTask = async (_dir: string, name: string): Promise<EvalTask> => ({
       name,
       taskText: name,
-      requiresAuth: false,
+      headed: false,
       fetchOracle: async () => ({}),
       grade: async () => [{ name: 'ok', passed: true, detail: 'ok' }],
     });

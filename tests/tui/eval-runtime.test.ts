@@ -6,25 +6,25 @@ import { createTuiEvalRuntime } from '../../src/tui/bridge/evalRuntime.js';
 import type { RunSessionDeps } from '../../src/tui/bridge/runSession.js';
 import { stubBrowser } from './stubBrowser.js';
 
-function evalOptions(requiresAuth: boolean) {
+function evalOptions(headed: boolean) {
   return {
-    taskName: requiresAuth ? 'auth' : 'normal',
+    taskName: headed ? 'headed' : 'normal',
     trialIndex: 0,
     trialNumber: 1,
     k: 1,
     startUrl: 'https://example.com/',
-    requiresAuth,
+    headed,
     signal: new AbortController().signal,
   };
 }
 
 describe('createTuiEvalRuntime', () => {
-  it('uses isolated browsers for normal trials and delegates auth trials', async () => {
+  it('uses isolated browsers for normal trials and delegates headed trials', async () => {
     const browser = stubBrowser();
     const policies: boolean[] = [];
     const browserRuntime: EvalBrowserRuntime = {
-      withBrowser: async (requiresAuth, operation) => {
-        policies.push(requiresAuth);
+      withBrowser: async (headed, operation) => {
+        policies.push(headed);
         return operation(browser);
       },
       close: vi.fn(async () => undefined),
@@ -66,7 +66,7 @@ describe('createTuiEvalRuntime', () => {
     });
     const innerCancel = vi.fn();
     const browserRuntime: EvalBrowserRuntime = {
-      withBrowser: async (_requiresAuth, operation) => operation(await browserPromise),
+      withBrowser: async (_headed, operation) => operation(await browserPromise),
       close: vi.fn(async () => undefined),
     };
     const runtime = createTuiEvalRuntime({

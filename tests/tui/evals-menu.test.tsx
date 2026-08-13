@@ -42,9 +42,9 @@ describe('validateConcurrency', () => {
 
 describe('EvalsMenu', () => {
   const tasks = [
-    { name: 'edgar', requiresAuth: false },
-    { name: 'hacker_news', requiresAuth: false },
-    { name: 'stub', requiresAuth: true },
+    { name: 'edgar', headed: false },
+    { name: 'hacker_news', headed: false },
+    { name: 'stub', headed: true },
   ];
 
   it('toggles checkboxes with space and requires a selection', async () => {
@@ -161,7 +161,7 @@ describe('EvalsMenu', () => {
       <EvalsMenu tasks={tasks} onConfirm={() => {}} onClose={() => {}} />,
     );
     await tick();
-    expect(lastFrame()).toContain('stub [auth]');
+    expect(lastFrame()).toContain('stub [headed]');
     unmount();
   });
 });

@@ -30,18 +30,18 @@ function stubTask(): EvalTask {
     name: 'stub',
     taskText: 'write the answer',
     startUrl: 'about:blank',
-    requiresAuth: false,
+    headed: false,
     fetchOracle,
     grade,
   };
 }
 
-function passingTask(name: string, requiresAuth = false): EvalTask {
+function passingTask(name: string, headed = false): EvalTask {
   return {
     ...stubTask(),
     name,
     taskText: `run ${name}`,
-    requiresAuth,
+    headed,
     fetchOracle: async () => ({ task: name }),
     grade: async () => [{ name: 'complete', passed: true, detail: 'ok' }],
   };
@@ -198,19 +198,19 @@ describe('runEvals', () => {
     expect(report.tasks[0]!.accuracy).toBe(0);
   });
 
-  it('caps normal work at 3, auth work at 1, and allows all four to overlap', async () => {
+  it('caps headless work at 3, headed work at 1, and allows all four to overlap', async () => {
     const fourStarted = deferred();
     const release = deferred();
     let started = 0;
     let normalActive = 0;
-    let authActive = 0;
+    let headedActive = 0;
     let totalActive = 0;
     let maxNormal = 0;
-    let maxAuth = 0;
+    let maxHeaded = 0;
     let maxTotal = 0;
 
     const reportPromise = runEvals(
-      [passingTask('normal'), passingTask('auth', true)],
+      [passingTask('normal'), passingTask('headed', true)],
       3,
       {
         concurrency: 3,
@@ -218,15 +218,15 @@ describe('runEvals', () => {
         toolProfile: 'atomic',
         runTask: async (_taskText, opts) => {
           started += 1;
-          if (opts.requiresAuth) authActive += 1;
+          if (opts.headed) headedActive += 1;
           else normalActive += 1;
           totalActive += 1;
           maxNormal = Math.max(maxNormal, normalActive);
-          maxAuth = Math.max(maxAuth, authActive);
+          maxHeaded = Math.max(maxHeaded, headedActive);
           maxTotal = Math.max(maxTotal, totalActive);
           if (started === 4) fourStarted.resolve();
           await release.promise;
-          if (opts.requiresAuth) authActive -= 1;
+          if (opts.headed) headedActive -= 1;
           else normalActive -= 1;
           totalActive -= 1;
           return { runDir: `/runs/${opts.taskName}-${opts.trialIndex}` };
@@ -235,20 +235,20 @@ describe('runEvals', () => {
     );
 
     await fourStarted.promise;
-    expect({ normalActive, authActive, totalActive }).toEqual({
+    expect({ normalActive, headedActive, totalActive }).toEqual({
       normalActive: 3,
-      authActive: 1,
+      headedActive: 1,
       totalActive: 4,
     });
     release.resolve();
     const report = await reportPromise;
 
-    expect({ maxNormal, maxAuth, maxTotal }).toEqual({
+    expect({ maxNormal, maxHeaded, maxTotal }).toEqual({
       maxNormal: 3,
-      maxAuth: 1,
+      maxHeaded: 1,
       maxTotal: 4,
     });
-    expect(report.tasks.map((task) => task.task)).toEqual(['normal', 'auth']);
+    expect(report.tasks.map((task) => task.task)).toEqual(['normal', 'headed']);
   });
 
   it('keeps report slots ordered when concurrent trials finish in reverse order', async () => {

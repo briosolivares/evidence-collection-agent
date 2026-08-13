@@ -91,7 +91,7 @@ npx tsx --env-file=.env evals/runners/cli.ts \
   --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
 ```
 
-Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"requiresAuth": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/`; currently only `elon_tweets` uses that policy. The authenticated lane may overlap the normal pool.
+Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"headed": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/` — for tasks that need a real login or that bot-block headless browsers; currently `mit_sororities`, `edgar`, and `elon_tweets` use that policy. The headed lane may overlap the normal pool.
 
 Results print to stdout and persist to `evals/experiments/`. Task packages are the directories under `evals/datasets/`.
 

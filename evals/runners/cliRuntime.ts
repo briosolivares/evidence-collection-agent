@@ -20,7 +20,7 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
   const runTaskFn = options.runTaskFn ?? runTask;
   return (taskText, evalOptions) => {
     const startUrl = usableStartUrl(evalOptions.startUrl);
-    return options.browserRuntime.withBrowser(evalOptions.requiresAuth, (browser: BrowserController) =>
+    return options.browserRuntime.withBrowser(evalOptions.headed, (browser: BrowserController) =>
       runTaskFn(taskText, {
         browser,
         model: options.model,

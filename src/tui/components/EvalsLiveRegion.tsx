@@ -13,7 +13,7 @@ export function EvalsLiveRegion({ trials }: { trials: Readonly<Record<string, Ev
         <Text key={`${trial.task}-${trial.trial}`}>
           {`  ${trial.task} ${trial.trial}/${trial.k} · `}
           <Text color={theme.muted}>
-            {trial.requiresAuth ? 'headed auth' : 'headless'} · {trial.status}
+            {trial.headed ? 'headed' : 'headless'} · {trial.status}
           </Text>
         </Text>
       ))}

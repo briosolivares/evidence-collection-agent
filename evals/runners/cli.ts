@@ -38,8 +38,8 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `eval browsers: normal=headless isolated (concurrency ${args.concurrency}); ` +
-      'authenticated=headed persistent (serial)',
+    `eval browsers: default=headless isolated (concurrency ${args.concurrency}); ` +
+      'headed tasks=headed persistent logged-in (serial)',
   );
   const browserRuntime = createEvalBrowserRuntime({
     authenticatedProfileDir: PROFILE_DIR,
@@ -71,7 +71,7 @@ async function main(): Promise<void> {
       model: MODEL,
       toolProfile: args.toolProfile,
       onTrialStarted: (job) => {
-        const policy = job.requiresAuth ? 'headed authenticated' : 'headless isolated';
+        const policy = job.headed ? 'headed persistent' : 'headless isolated';
         console.log(`${trialLabel(job.taskName, job.trialNumber, job.k)} started — ${policy}`);
       },
       onTrialRunFinished: (job, runDir) => {

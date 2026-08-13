@@ -11,8 +11,8 @@ describe('createBrowserBackedRunTask', () => {
     const policies: boolean[] = [];
     const configs: RunTaskConfig[] = [];
     const browserRuntime: EvalBrowserRuntime = {
-      withBrowser: async (requiresAuth, operation) => {
-        policies.push(requiresAuth);
+      withBrowser: async (headed, operation) => {
+        policies.push(headed);
         return operation(browser);
       },
       close: vi.fn(),
@@ -33,12 +33,12 @@ describe('createBrowserBackedRunTask', () => {
     });
 
     await run('collect evidence', {
-      taskName: 'auth-task',
+      taskName: 'headed-task',
       trialIndex: 0,
       trialNumber: 1,
       k: 2,
       startUrl: 'https://example.com/',
-      requiresAuth: true,
+      headed: true,
       signal: new AbortController().signal,
     });
 
@@ -51,7 +51,7 @@ describe('createBrowserBackedRunTask', () => {
       startUrl: 'https://example.com/',
     });
     expect(progress).toEqual([
-      ['auth-task', 1, 2, { type: 'turn_start', turn: 1 }],
+      ['headed-task', 1, 2, { type: 'turn_start', turn: 1 }],
     ]);
   });
 
@@ -59,7 +59,7 @@ describe('createBrowserBackedRunTask', () => {
     const browser = { close: vi.fn() } as unknown as BrowserController;
     const configs: RunTaskConfig[] = [];
     const browserRuntime: EvalBrowserRuntime = {
-      withBrowser: async (_requiresAuth, operation) => operation(browser),
+      withBrowser: async (_headed, operation) => operation(browser),
       close: vi.fn(),
     };
     const runTaskFn = vi.fn(async (_taskText: string, config: RunTaskConfig) => {
@@ -80,7 +80,7 @@ describe('createBrowserBackedRunTask', () => {
       trialNumber: 1,
       k: 1,
       startUrl: 'about:blank',
-      requiresAuth: false,
+      headed: false,
       signal: new AbortController().signal,
     });
 

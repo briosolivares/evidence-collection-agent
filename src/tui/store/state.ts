@@ -66,7 +66,7 @@ export interface EvalTrialLive {
   task: string;
   trial: number;
   k: number;
-  requiresAuth: boolean;
+  headed: boolean;
   status: string;
 }
 

@@ -21,7 +21,7 @@ import type { RunHandle } from './runSession.js';
 
 export interface EvalTaskChoice {
   name: string;
-  requiresAuth: boolean;
+  headed: boolean;
 }
 
 /** Starts one eval trial with its selected browser policy. */
@@ -49,7 +49,7 @@ export interface EvalBatchHandle {
 
 export { usableStartUrl };
 
-/** Discover task packages and their auth marker, alphabetically. */
+/** Discover task packages and their browser-lane marker, alphabetically. */
 export function discoverEvalTasks(evalsDir: string): EvalTaskChoice[] {
   let names: string[];
   try {
@@ -67,7 +67,7 @@ export function discoverEvalTasks(evalsDir: string): EvalTaskChoice[] {
       }
     })
     .sort()
-    .map((name) => ({ name, requiresAuth: readRequiresAuth(join(evalsDir, name, 'task.json')) }));
+    .map((name) => ({ name, headed: readHeaded(join(evalsDir, name, 'task.json')) }));
 }
 
 /** Run one cancellable concurrent eval batch through the shared harness. */
@@ -133,7 +133,7 @@ export function startEvalBatch(
             task: job.taskName,
             trial: job.trialNumber,
             k: job.k,
-            requiresAuth: job.requiresAuth,
+            headed: job.headed,
           });
         },
         onTrialRunFinished: (job) => {
@@ -188,10 +188,10 @@ export function startEvalBatch(
   };
 }
 
-function readRequiresAuth(path: string): boolean {
+function readHeaded(path: string): boolean {
   try {
-    const parsed = JSON.parse(readFileSync(path, 'utf8')) as { requiresAuth?: unknown };
-    return parsed.requiresAuth === true;
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as { headed?: unknown };
+    return parsed.headed === true;
   } catch {
     return false;
   }

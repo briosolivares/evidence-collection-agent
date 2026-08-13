@@ -31,17 +31,19 @@ export interface EvalBrowserRuntimeOptions {
 export interface EvalBrowserRuntime {
   /** Run one trial with the browser policy selected by its task metadata. */
   withBrowser<T>(
-    requiresAuth: boolean,
+    headed: boolean,
     operation: (browser: BrowserController) => Promise<T>,
   ): Promise<T>;
-  /** Stop accepting work, await active trials, and close the auth session. */
+  /** Stop accepting work, await active trials, and close the headed session. */
   close(): Promise<void>;
 }
 
 /**
  * Own the two eval browser policies:
- * - normal trials each get a new headless Chrome and unique temporary profile;
- * - authenticated trials serialize through one lazy headed persistent session.
+ * - headless trials each get a new headless Chrome and unique temporary profile;
+ * - headed trials serialize through one lazy headed persistent (logged-in)
+ *   session, for tasks that need a real login or that bot-block headless
+ *   browsers.
  */
 export function createEvalBrowserRuntime(options: EvalBrowserRuntimeOptions): EvalBrowserRuntime {
   const createProvider =
@@ -149,9 +151,9 @@ export function createEvalBrowserRuntime(options: EvalBrowserRuntimeOptions): Ev
   };
 
   return {
-    withBrowser(requiresAuth, operation) {
+    withBrowser(headed, operation) {
       requireOpen();
-      return requiresAuth ? runAuthenticated(operation) : runNormal(operation);
+      return headed ? runAuthenticated(operation) : runNormal(operation);
     },
 
     close() {

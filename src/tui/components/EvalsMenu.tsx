@@ -105,7 +105,7 @@ export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
               </Text>
               <Text color={selected.has(task.name) ? theme.emphasis : undefined}>
                 {`[${selected.has(task.name) ? 'x' : ' '}] ${task.name}${
-                  task.requiresAuth ? ' [auth]' : ''
+                  task.headed ? ' [headed]' : ''
                 }`}
               </Text>
             </Box>
