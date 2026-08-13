@@ -604,6 +604,78 @@ describe('runTask', () => {
     );
 
     it(
+      'a judge crash never destroys a finished run: completed result, judgeError recorded',
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([textResponse('Report published.')]);
+        const crashingJudge: CallModel = async () => {
+          throw new Error('400 image dimensions exceed max allowed size');
+        };
+
+        const result = await runTask('Collect widgets and publish a report.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            judgeCallModel: crashingJudge,
+          },
+        });
+
+        // The worker's finished result survives its verifier's crash, with
+        // no rework cycle (there is no verdict to act on).
+        expect(result).toMatchObject({ status: 'completed', finalText: 'Report published.' });
+        const diagnostics = await readJson<HarnessDiagnostics>(
+          join(result.runDir, HARNESS_FILENAME),
+        );
+        expect(diagnostics.cycles).toEqual([
+          {
+            cycle: 1,
+            workerStatus: 'completed',
+            judgeError: '400 image dimensions exceed max allowed size',
+          },
+        ]);
+        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(rollup).toMatchObject({ status: 'completed', turns: 1 });
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      "an AbortError from the judge propagates — cancellation is the caller's, not the judge's",
+      async () => {
+        const initializer = scriptModel([
+          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
+        ]);
+        const worker = scriptModel([textResponse('Report published.')]);
+        const abortingJudge: CallModel = async () => {
+          const error = new Error('aborted');
+          error.name = 'AbortError';
+          throw error;
+        };
+
+        await expect(
+          runTask('Collect widgets and publish a report.', {
+            browser,
+            runsBaseDir,
+            callModel: worker.callModel,
+            maxTurns: 4,
+            maxContextTokens: 10_000,
+            harness: {
+              initializerCallModel: initializer.callModel,
+              judgeCallModel: abortingJudge,
+            },
+          }),
+        ).rejects.toThrow('aborted');
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
       'rejects when the initializer fails on both attempts, and still finalizes the manifest',
       async () => {
         // Same malformed pair as initializer.test.ts's own "still malformed

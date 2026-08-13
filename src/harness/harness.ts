@@ -34,6 +34,11 @@ export interface HarnessCycleRecord {
   verdict?: 'done' | 'continue';
   /** The judge's reason, when non-empty. */
   reason?: string;
+  /** The error message when the judge itself crashed this cycle (an
+   * infrastructure failure, never a verdict) — the run still ends with the
+   * worker's completed result, and this field is the diagnostic trail.
+   * Mutually exclusive with `verdict`/`reason`. */
+  judgeError?: string;
 }
 
 /** Harness-mode run diagnostics: the initializer's model plus one record

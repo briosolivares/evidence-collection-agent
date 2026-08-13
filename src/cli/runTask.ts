@@ -19,7 +19,7 @@ import {
   runInitializer,
   writeInitializerFiles,
 } from '../harness/initializer.js';
-import { makeJudgeCallModel, runJudge } from '../harness/judge.js';
+import { makeJudgeCallModel, runJudge, type JudgeVerdict } from '../harness/judge.js';
 import {
   runAgentLoop,
   type LoopConfig,
@@ -345,11 +345,16 @@ export async function runTask(
  *    `continue` verdict with no cycles left, or an unparseable verdict (the
  *    judge's own fail-safe default, never a false `done`) all end the run
  *    with this cycle's completed result; a `continue` verdict with cycles
- *    remaining carries its reason into the next cycle's opening message.
+ *    remaining carries its reason into the next cycle's opening message. A
+ *    judge that throws (infrastructure failure, not a verdict — an
+ *    AbortError excepted, which is the caller's cancellation and
+ *    propagates) also ends the run with this cycle's completed result,
+ *    recording the message as the cycle's `judgeError`: the worker's
+ *    finished work must never be destroyed by its verifier's crash.
  *
  * Every ending writes harness.json (see HarnessDiagnostics) and a rolled-up
  * metrics.json (see rollupCycleMetrics) before returning. Both are skipped
- * if any cycle throws (an AbortError or any other error) — the error
+ * if any worker cycle throws (an AbortError or any other error) — the error
  * propagates unchanged, exactly like a single-cycle judge-less run's crash
  * contract, and no rollup or diagnostics for a run that never finished
  * ever gets written.
@@ -398,7 +403,27 @@ async function runHarnessCycles(
       break;
     }
 
-    const verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
+    let verdict: JudgeVerdict;
+    try {
+      verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
+    } catch (thrown) {
+      // A cancellation is the caller's, not the judge's — honor it.
+      if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
+      // Anything else is judge infrastructure failing (an API rejection, a
+      // network fault) after the worker already finished its cycle. That
+      // must never destroy the finished run (measured live 2026-08-13: an
+      // API 400 on a judge request errored entire trials whose workers had
+      // completed) — record the failure and end the run with the worker's
+      // completed result. No rework cycle either: there is no verdict, so
+      // there is no feedback a worker could act on.
+      cycleRecords.push({
+        cycle,
+        workerStatus: result.status,
+        judgeError: thrown instanceof Error ? thrown.message : String(thrown),
+      });
+      finalResult = result;
+      break;
+    }
     cycleRecords.push({
       cycle,
       workerStatus: result.status,
