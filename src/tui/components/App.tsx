@@ -14,6 +14,7 @@ import { createDemoScript, playDemo } from '../demo.js';
 import { scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
+  deriveSuggestions,
   HELP_TEXT,
   reduce,
   routeInput,
@@ -75,10 +76,6 @@ export function App({
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
-  // Mirrors the composer's slash-suggestion panel visibility (reported
-  // via effect, read on the next keypress): while the panel is up, Tab
-  // belongs to suggestion completion, not the artifacts panel.
-  const suggestionsVisible = useRef(false);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
   const [evalTasks, setEvalTasks] = useState<readonly EvalTaskChoice[]>([]);
   const batchRunner = evalRunner ?? runner;
@@ -95,22 +92,14 @@ export function App({
   // cancels the current trial and skips the rest; the overlays handle
   // their own Esc. A no-op while idle.
   //
-  // Tab toggles focus on the completion artifacts panel (design decision
-  // 4): into 'artifacts' mode while the panel renders passively — unless
-  // the composer's slash-suggestion panel is up, whose own Tab completes
-  // the highlighted command — and back out to idle. Both keys live here
-  // so exactly one handler arbitrates them against mode.
+  // Tab is routed here whole, as one tab_pressed action: the reducer
+  // arbitrates its meaning — suggestion completion while the derived
+  // panel is up, otherwise artifacts focus/blur (design decision 4) —
+  // against the same state it mutates, so exactly one handler owns the
+  // key and no stale mirror of composer state is consulted.
   useInput((_input, key) => {
     if (key.tab) {
-      if (state.mode === 'artifacts') {
-        dispatch({ type: 'artifacts_blur' });
-      } else if (
-        state.mode === 'idle' &&
-        state.completedRun !== undefined &&
-        !suggestionsVisible.current
-      ) {
-        dispatch({ type: 'artifacts_focus' });
-      }
+      dispatch({ type: 'tab_pressed' });
       return;
     }
     if (!key.escape) return;
@@ -140,6 +129,9 @@ export function App({
   });
 
   const handleSubmit = (text: string) => {
+    // The field reset lives with the rest of the composer substate in
+    // the reducer; routing continues on the already-captured text.
+    dispatch({ type: 'composer_submitted' });
     const routed = routeInput(text);
     switch (routed.kind) {
       case 'task':
@@ -272,10 +264,10 @@ export function App({
         <Composer
           disabled={state.mode !== 'idle'}
           hint={composerHint}
+          composer={state.composer}
+          suggestions={deriveSuggestions(state)}
+          dispatch={dispatch}
           onSubmit={handleSubmit}
-          onSuggestionsVisibleChange={(visible) => {
-            suggestionsVisible.current = visible;
-          }}
         />
         <Text color={theme.muted}>  /help for commands</Text>
       </Box>

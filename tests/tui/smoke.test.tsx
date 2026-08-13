@@ -6,7 +6,7 @@ import { ArtifactsPanel } from '../../src/tui/components/ArtifactsPanel.js';
 import { Composer } from '../../src/tui/components/Composer.js';
 import { Transcript } from '../../src/tui/components/Transcript.js';
 import { createDemoScript } from '../../src/tui/demo.js';
-import { createInitialState, reduce } from '../../src/tui/store/reducer.js';
+import { createInitialState, deriveSuggestions, reduce } from '../../src/tui/store/reducer.js';
 import { renderAt, tick } from './helpers.js';
 
 // The full scripted run, folded through the real reducer — the exact
@@ -33,7 +33,13 @@ function fullShell(composerDisabled: boolean): ReactElement {
           dispatch={() => {}}
         />
       )}
-      <Composer disabled={composerDisabled} onSubmit={() => {}} />
+      <Composer
+        disabled={composerDisabled}
+        composer={finalState.composer}
+        suggestions={deriveSuggestions(finalState)}
+        dispatch={() => {}}
+        onSubmit={() => {}}
+      />
     </Box>
   );
 }

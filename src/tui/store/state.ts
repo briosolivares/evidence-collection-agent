@@ -197,6 +197,33 @@ export interface ArtifactUiState {
   view: 'rows' | 'detail';
 }
 
+/**
+ * The composer's input substate. Reducer-owned, not component-local, by
+ * the same rule that promoted ArtifactUiState (design decision 3):
+ * a globally-routed key's meaning depends on it — Tab completes the
+ * highlighted suggestion while the panel is up and only otherwise
+ * focuses/blurs the artifacts panel — so App's single 'tab_pressed'
+ * route must decide against the same state it mutates, never a
+ * one-frame-stale mirror. Suggestions and panel visibility are pure
+ * derivations of this substate plus the mode (deriveSuggestions in the
+ * reducer module); they are never stored.
+ */
+export interface ComposerState {
+  /** The input line as typed. */
+  value: string;
+  /** True after Esc dismissed the panel, until the input next changes. */
+  dismissed: boolean;
+  /** Selected suggestion row; clamped against the derived match list
+   * wherever it is read, so a shrinking list never strands it. */
+  selectedIndex: number;
+  /** Bumped on every Tab completion. TextInput only derives its internal
+   * cursor offset on mount (afterwards it merely clamps to a shrinking
+   * value), so an externally grown value would leave the cursor
+   * mid-word; keying the input on this count remounts it with the
+   * cursor at the end. */
+  completions: number;
+}
+
 /** The dynamic region's state — mutable until finalized into items. */
 export interface LiveRunState {
   /** Model prose still streaming (finalizes at tool batches / turn end). */
@@ -263,6 +290,9 @@ export interface SessionState {
   nextItemId: number;
   /** Completion-line verb, fixed at session start from config (R6). */
   completionVerb: string;
+  /** The composer's input line + suggestion selection; the suggestion
+   * panel derives from it (deriveSuggestions), never stored. */
+  composer: ComposerState;
   /** Present only while a run is active (running/cancelling). */
   live?: LiveRunState;
   /** Published artifacts of the current or most recent run, upserted by

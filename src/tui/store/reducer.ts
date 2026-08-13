@@ -12,12 +12,19 @@
 //   turn_start, or at run end.
 
 import { formatDuration, formatTokens } from '../format.js';
-import { findCommand, SLASH_COMMANDS, type CommandKind } from './commands.js';
+import {
+  filterCommands,
+  findCommand,
+  SLASH_COMMANDS,
+  type CommandKind,
+  type SlashCommand,
+} from './commands.js';
 import { deriveSemanticLine } from './semantic.js';
 import type {
   ArtifactUiState,
   AssertionView,
   BannerIdentity,
+  ComposerState,
   CompletionArtifact,
   LiveRunState,
   PublishedArtifact,
@@ -44,6 +51,11 @@ function compactDetail(value: unknown): string {
 export type UiAction =
   | { type: 'submit_task'; text: string }
   | { type: 'notice'; text: string }
+  | { type: 'composer_changed'; value: string }
+  | { type: 'composer_submitted' }
+  | { type: 'suggest_nav'; delta: -1 | 1 }
+  | { type: 'suggest_dismiss' }
+  | { type: 'tab_pressed' }
   | { type: 'cancel_requested' }
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
@@ -145,6 +157,7 @@ export function createInitialState(
     ],
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',
+    composer: initialComposer(),
     artifacts: [],
     artifactUi: initialArtifactUi(),
   };
@@ -153,6 +166,46 @@ export function createInitialState(
 /** The artifact rail/panel's rest state: first row, no detail open. */
 function initialArtifactUi(): ArtifactUiState {
   return { cursor: 0, view: 'rows' };
+}
+
+/** The composer's rest state: empty line, first row, panel undismissed. */
+function initialComposer(): ComposerState {
+  return { value: '', dismissed: false, selectedIndex: 0, completions: 0 };
+}
+
+/** The composer's derived suggestion view — recomputed from state, never
+ * stored (state.composer holds only what the user did). */
+export interface SuggestionView {
+  /** Commands the autosuggest panel offers (empty ⇒ panel hidden). */
+  suggestions: readonly SlashCommand[];
+  /** True while the panel renders — and while Tab means completion. */
+  panelVisible: boolean;
+  /** selectedIndex clamped into the match list, so a shrinking list can
+   * never strand the selection (-1 with no matches, never rendered). */
+  cursor: number;
+  /** The highlighted command, when the panel is up. */
+  selected: SlashCommand | undefined;
+}
+
+/**
+ * Derive the suggestion panel from the composer substate. The composer
+ * accepts input only while idle (App mounts it disabled in every other
+ * mode), so suggestions exist only there; Esc-dismissal holds until the
+ * input next changes.
+ */
+export function deriveSuggestions(state: SessionState): SuggestionView {
+  const suggestions =
+    state.mode === 'idle' && !state.composer.dismissed
+      ? filterCommands(state.composer.value)
+      : [];
+  const panelVisible = suggestions.length > 0;
+  const cursor = Math.min(state.composer.selectedIndex, suggestions.length - 1);
+  return {
+    suggestions,
+    panelVisible,
+    cursor,
+    selected: panelVisible ? suggestions[cursor] : undefined,
+  };
 }
 
 /** Clamp an artifact cursor into the list's current bounds. */
@@ -246,6 +299,76 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
 
     case 'notice':
       return append(state, { kind: 'notice', text: action.text });
+
+    case 'composer_changed':
+      // Every edit re-arms the panel (dismissal ends at the next change)
+      // and returns the selection to the top of the fresh match list.
+      return {
+        ...state,
+        composer: {
+          ...state.composer,
+          value: action.value,
+          selectedIndex: 0,
+          dismissed: false,
+        },
+      };
+
+    case 'composer_submitted':
+      // App dispatches this alongside routing the submitted text: the
+      // field clears for the next line. Idempotent — completions stays,
+      // since the controlled TextInput clamps its cursor on shrink.
+      return {
+        ...state,
+        composer: { ...state.composer, value: '', selectedIndex: 0, dismissed: false },
+      };
+
+    case 'suggest_nav': {
+      // ↑/↓ while the panel is up; clamped at both ends, from the
+      // derived (already-clamped) cursor.
+      const { panelVisible, cursor, suggestions } = deriveSuggestions(state);
+      if (!panelVisible) return state;
+      const selectedIndex = Math.max(
+        0,
+        Math.min(suggestions.length - 1, cursor + action.delta),
+      );
+      return { ...state, composer: { ...state.composer, selectedIndex } };
+    }
+
+    case 'suggest_dismiss':
+      // Esc while the panel is up hides it until the input next changes.
+      if (!deriveSuggestions(state).panelVisible) return state;
+      return { ...state, composer: { ...state.composer, dismissed: true } };
+
+    case 'tab_pressed': {
+      // App's single Tab route; the reducer arbitrates what Tab means
+      // against the same state it mutates. Precedence: suggestion
+      // completion beats the artifacts panel (a visible panel implies
+      // idle mode, so the branches below cannot also apply).
+      const { panelVisible, cursor, suggestions } = deriveSuggestions(state);
+      if (panelVisible) {
+        // Complete to "<name> " — the trailing space readies the line
+        // for arguments and, containing whitespace, hides the panel.
+        // Not a submission; completions keys the TextInput remount that
+        // puts the cursor after the grown value.
+        const selected = suggestions[cursor]!;
+        return {
+          ...state,
+          composer: {
+            ...state.composer,
+            value: `${selected.name} `,
+            selectedIndex: 0,
+            completions: state.composer.completions + 1,
+          },
+        };
+      }
+      // Toggle focus on the completion artifacts panel (design decision
+      // 4), reusing the guarded focus/blur cases verbatim.
+      if (state.mode === 'artifacts') return reduce(state, { type: 'artifacts_blur' });
+      if (state.mode === 'idle' && state.completedRun !== undefined) {
+        return reduce(state, { type: 'artifacts_focus' });
+      }
+      return state;
+    }
 
     case 'cancel_requested':
       // Esc is meaningful only while a run streams; a second press while

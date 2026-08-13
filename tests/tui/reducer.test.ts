@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createInitialState,
+  deriveSuggestions,
   HELP_TEXT,
   reduce,
   routeInput,
@@ -927,5 +928,186 @@ describe('reduce (artifacts focus mode)', () => {
     state = reduce(state, { type: 'artifact_close_detail' });
     expect(state.mode).toBe('artifacts');
     expect(state.artifactUi.view).toBe('rows');
+  });
+});
+
+// ————— Composer substate: reducer-owned input, derived suggestions —————
+
+describe('reduce (composer substate)', () => {
+  it('starts with an empty, undismissed line', () => {
+    expect(createInitialState().composer).toEqual({
+      value: '',
+      dismissed: false,
+      selectedIndex: 0,
+      completions: 0,
+    });
+  });
+
+  it('composer_changed sets the value and re-arms panel + selection', () => {
+    const state = fold([
+      { type: 'composer_changed', value: '/e' },
+      { type: 'suggest_nav', delta: 1 },
+      { type: 'suggest_dismiss' },
+      { type: 'composer_changed', value: '/ex' },
+    ]);
+    expect(state.composer).toMatchObject({
+      value: '/ex',
+      selectedIndex: 0,
+      dismissed: false,
+    });
+  });
+
+  it('deriveSuggestions filters while idle and hides on dismissal', () => {
+    const typed = fold([{ type: 'composer_changed', value: '/e' }]);
+    const view = deriveSuggestions(typed);
+    expect(view.suggestions.map((entry) => entry.name)).toEqual(['/evals', '/exit']);
+    expect(view).toMatchObject({
+      panelVisible: true,
+      cursor: 0,
+      selected: { name: '/evals' },
+    });
+    const dismissed = reduce(typed, { type: 'suggest_dismiss' });
+    expect(deriveSuggestions(dismissed)).toMatchObject({
+      panelVisible: false,
+      suggestions: [],
+      selected: undefined,
+    });
+  });
+
+  it('deriveSuggestions is empty outside idle — the composer is disabled there', () => {
+    const typed = fold([{ type: 'composer_changed', value: '/e' }]);
+    const running = fold(started, typed);
+    expect(running.mode).toBe('running');
+    // The typed line survives the mode change; only the panel hides.
+    expect(running.composer.value).toBe('/e');
+    expect(deriveSuggestions(running)).toMatchObject({
+      panelVisible: false,
+      suggestions: [],
+    });
+  });
+
+  it('suggest_nav moves the selection, clamped at both ends', () => {
+    let state = fold([{ type: 'composer_changed', value: '/e' }]);
+    state = reduce(state, { type: 'suggest_nav', delta: -1 });
+    expect(state.composer.selectedIndex).toBe(0); // clamped at the top
+    state = reduce(state, { type: 'suggest_nav', delta: 1 });
+    expect(state.composer.selectedIndex).toBe(1);
+    state = reduce(state, { type: 'suggest_nav', delta: 1 });
+    expect(state.composer.selectedIndex).toBe(1); // clamped at the bottom
+  });
+
+  it('suggest_nav and suggest_dismiss are no-ops with the panel hidden', () => {
+    const idle = createInitialState(); // '' matches nothing
+    expect(reduce(idle, { type: 'suggest_nav', delta: 1 })).toEqual(idle);
+    expect(reduce(idle, { type: 'suggest_dismiss' })).toEqual(idle);
+    const dismissed = fold([
+      { type: 'composer_changed', value: '/e' },
+      { type: 'suggest_dismiss' },
+    ]);
+    expect(reduce(dismissed, { type: 'suggest_nav', delta: 1 })).toEqual(dismissed);
+  });
+
+  it('composer_submitted clears the line, keeping the remount count', () => {
+    let state = fold([
+      { type: 'composer_changed', value: '/ev' },
+      { type: 'tab_pressed' }, // completes → "/evals ", completions 1
+    ]);
+    state = reduce(state, { type: 'composer_submitted' });
+    expect(state.composer).toEqual({
+      value: '',
+      dismissed: false,
+      selectedIndex: 0,
+      completions: 1,
+    });
+    // Idempotent: a second reset changes nothing.
+    expect(reduce(state, { type: 'composer_submitted' })).toEqual(state);
+  });
+});
+
+// ————— tab_pressed: the single Tab route and its precedence —————
+
+describe('reduce (tab_pressed routing)', () => {
+  /** A completed run with one artifact — the focusable-panel state. */
+  const completedRun: StoreAction[] = [
+    ...started,
+    { type: 'turn_start', turn: 1 },
+    published(1, publishedEntry({ filename: 'artifacts/a.png' })),
+    {
+      type: 'run_finished',
+      outcome: 'completed',
+      finalText: 'Saved.',
+      runDir: '/runs/abc',
+      at: 2_000,
+    },
+  ];
+
+  it('completes the highlighted suggestion while the panel is up', () => {
+    const state = fold([
+      { type: 'composer_changed', value: '/e' },
+      { type: 'suggest_nav', delta: 1 }, // /evals → /exit
+      { type: 'tab_pressed' },
+    ]);
+    expect(state.composer).toMatchObject({
+      value: '/exit ',
+      selectedIndex: 0,
+      completions: 1,
+    });
+    // The trailing space hides the panel; nothing was submitted.
+    expect(deriveSuggestions(state).panelVisible).toBe(false);
+    expect(state.mode).toBe('idle');
+    expect(state.transcript).toHaveLength(1); // still just the banner
+  });
+
+  it('clamps a stale selection into the match list before completing', () => {
+    const typed = fold([{ type: 'composer_changed', value: '/e' }]);
+    const stale: SessionState = {
+      ...typed,
+      composer: { ...typed.composer, selectedIndex: 4 },
+    };
+    const state = reduce(stale, { type: 'tab_pressed' });
+    expect(state.composer.value).toBe('/exit '); // suggestions[min(4, 1)]
+    expect(state.composer.completions).toBe(1);
+  });
+
+  it('completion wins over artifacts focus when both would apply', () => {
+    const state = fold([...completedRun, { type: 'composer_changed', value: '/ev' }]);
+    expect(state.completedRun).toBeDefined();
+    const next = reduce(state, { type: 'tab_pressed' });
+    expect(next.mode).toBe('idle'); // not focused
+    expect(next.composer).toMatchObject({ value: '/evals ', completions: 1 });
+  });
+
+  it('focuses the artifacts panel while idle with a completed run', () => {
+    const state = reduce(fold(completedRun), { type: 'tab_pressed' });
+    expect(state.mode).toBe('artifacts');
+    expect(state.artifactUi).toEqual({ cursor: 0, view: 'rows' });
+  });
+
+  it('blurs back to idle from artifacts mode, summary kept', () => {
+    let state = fold(completedRun);
+    state = reduce(state, { type: 'tab_pressed' }); // focus
+    state = reduce(state, { type: 'tab_pressed' }); // blur
+    expect(state.mode).toBe('idle');
+    expect(state.completedRun).toBeDefined();
+    expect(state.artifacts).toHaveLength(1);
+  });
+
+  it('keeps the artifacts_focus guard: no artifacts, no focus', () => {
+    const bare = fold([
+      ...started,
+      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+    ]);
+    expect(bare.completedRun).toBeDefined();
+    expect(reduce(bare, { type: 'tab_pressed' })).toEqual(bare);
+  });
+
+  it('is a no-op while idle without a completed run', () => {
+    const idle = createInitialState();
+    expect(reduce(idle, { type: 'tab_pressed' })).toEqual(idle);
+  });
+
+  it('is a no-op while a run is live', () => {
+    const running = fold([...started, { type: 'turn_start', turn: 1 }]);
+    expect(reduce(running, { type: 'tab_pressed' })).toEqual(running);
   });
 });
