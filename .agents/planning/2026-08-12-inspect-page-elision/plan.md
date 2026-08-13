@@ -1,8 +1,89 @@
 # Inspect-page elision: keep deep runs out of the decode-stall regime
 
-**Status: PLANNED — not implemented.** Decided 2026-08-12 evening after the
-truncation diagnosis (see `docs/reports/2026-08-12-full-suite-first-run.md`,
-failure mode 1, and commits `72f99f4`/`4b73864` for the diagnostics).
+**Status: IMPLEMENTED (`d3a8f4b` elision, `c2e8c80` cache frontier,
+`d14ddf9` truncation retries 4→8) — round-2 validation in flight.** Decided
+2026-08-12 evening after the truncation diagnosis (see
+`docs/reports/2026-08-12-full-suite-first-run.md`, failure mode 1, and
+commits `72f99f4`/`4b73864` for the diagnostics).
+
+## Validation round 1 (on `d3a8f4b`, 2026-08-12 evening)
+
+- **contributors k=1 regression: PASS twice** (7/7 both runs; peak context
+  62,134 vs ~130k before — target met; second run on `c2e8c80`).
+- **mit_sororities k=3: FAIL 0/3 — the context goal was met and the stall
+  happened anyway.** Trials ran 2–3× deeper than ever (turns 166/168/207 vs
+  dying at 90–160), peak contexts 87k/101k/90k — all under 140k — and every
+  trial still died on the same signature: write_file input stalled at 46
+  chars, ~60s stream age, clean message_stop, now labeled **stop_reason
+  max_tokens** (the model burns its whole output budget delivering ~100
+  chars). Four stall episodes in the batch; one survived on its 5th
+  attempt, three exhausted the 4-attempt ceiling (~6% per-attempt success).
+  **Conclusion: the stall is not a >170k-context phenomenon — context
+  reduction moved the onset much deeper into the run but does not clear
+  it.** Hence `d14ddf9`: TruncatedStreamError now gets 8 attempts (other
+  transients keep 4).
+
+## Validation round 2 (on `d14ddf9`) — inconclusive: credits ran out
+
+- Trials 1–2 died at ~13 min to a 400 billing error (**API credit balance
+  exhausted mid-batch**), both mid-stall-retry at attempts 2–3 — the
+  8-attempt ceiling never got a fair test.
+- Trial 3 produced **the first mit grade ever (3/7)** but for an unrelated
+  reason: Google blocked every search with reCAPTCHA ("unusual traffic" on
+  12+ queries), so the agent honestly declared the task incomplete and
+  shipped an empty CSV at turn 103 / 52k context. That is failure mode 2
+  (bot-detection vs headless isolated browsers) reaching mit via Google —
+  more weight for the per-task headed-lane item.
+
+## Revision: chunking un-demoted (`67c4941`)
+
+"NOT append-mode" below is superseded. The demotion assumed the stall
+trigger is positional (value start); round-1 data says it is the intended
+value LENGTH × context: across all three failed trials every *completed*
+write was ≤2,657 chars — dozens of them at the same turn depths (150–207)
+that killed the big writes — and the only payload ever recovered from a
+stall was 13.6k chars. Contributors, which never writes large values,
+has never stalled at any depth. `write_file` now takes `append: true`
+(manifest hash always covers the whole file) and the system prompt steers
+files over ~3,000 chars into pieces.
+
+## Validation round 3 (on `67c4941`+`23f5ce6`) — STALL ELIMINATED
+
+mit_sororities k=3, 2026-08-12 late evening: **3/3 trials graded (5/7,
+5/7, 4/7 — 66.7% accuracy), zero truncated streams across ~600 turns** —
+the workload that had died 10-for-10. Trials ran 160/218/222 turns, peak
+contexts 109k/132k/~120k. The model obeyed the chunking guidance
+throughout: every write_file piece in every trial was ≤3,103 chars,
+with append used for larger files. The 8-attempt retry ceiling was never
+needed.
+
+**Verdict: the infrastructure failure mode is closed.** The stack that
+did it: elision (context stays ~60% lower), chunked writes (removes the
+large-single-value trigger entirely), patient retries (unused backstop).
+
+Remaining mit failures are a different story:
+- **Google Sheets URL (0/3, likely structural):** the task requires
+  publishing a Google Sheet; headless isolated browsers have no Google
+  account. Candidate: per-task headed-lane opt-in (same as edgar /
+  failure mode 2).
+- **Cohort coverage/format (capability):** trial 2 collected all 182
+  members but wrote affiliations as "Alpha Chi Omega (MIT)" — unrequested
+  decoration the grader rightly rejects (exact-structure rule). Trials 1
+  and 3 each missed the same 3 cohorts (Alpha Chi Omega '26, Pi Beta Phi
+  '26/'27).
+
+**Discovery during validation — the cache-prefix argument below was wrong.**
+The server matches cached prefixes only ~20 content blocks back from a
+cache_control marker. A displacement turn's request diverges at the newly
+stubbed message — usually far more than 20 blocks before the tip marker —
+so all 28 displacement turns of the contributors run missed the *entire*
+messages region and re-paid it at write rates (1.07M cache-write tokens on
+a 62k-context run, ~$4 of a ~$4.90 trial). Fixed in `c2e8c80`: a second
+moving breakpoint rides the elision frontier (the newest stub), so
+displacement turns resume from the previous frontier's entry. Validated:
+misses fell to 6 (all during the first displacements, before a frontier
+entry exists) and cache writes halved. **Lesson for any future message-view
+rewriting: a mid-conversation edit needs its own moving breakpoint.**
 
 ## Problem
 

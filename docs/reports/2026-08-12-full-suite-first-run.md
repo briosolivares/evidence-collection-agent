@@ -105,6 +105,24 @@ like a service-side defect worth filing with Anthropic.
 - **Append-mode `write_file` is demoted**: the stall happens at the *start* of
 the content value, so chunking the write does not clearly dodge it.
 
+**Resolution (2026-08-12 late evening).** Iteration proved the remedies
+above half right. Elision of stale inspect_page results (commit `d3a8f4b`,
+plus a cache-frontier breakpoint `c2e8c80`) held deep runs to 87–101k
+tokens — and the stall struck anyway at those depths, refuting the
+pure-context-threshold theory. The new diagnostics showed every stall ends
+`stop_reason max_tokens`: the model burns the full 8,192-token budget at
+normal speed while ~100 chars arrive (the "~60s watchdog" was max_tokens ÷
+generation speed all along). The demotion of chunking above was the wrong
+call: the trigger is the *intended value length* at depth, not the value's
+start — every write that ever completed in the failed runs was ≤2,657
+chars. With `write_file` append mode and a prompt line capping pieces at
+~3,000 chars (`67c4941`), plus a truncation retry ceiling of 8 (`d14ddf9`),
+mit_sororities went **3/3 graded (5/7, 5/7, 4/7) with zero truncated
+streams across ~600 turns**. The infrastructure failure mode is closed;
+the task's remaining failures are the Google-Sheets auth requirement
+(headed-lane candidate, cf. failure mode 2) and research-completeness
+misses.
+
 
 
 ### 2. Bot-detection blocks headless isolated browsers (infrastructure, P0 for affected sites)
