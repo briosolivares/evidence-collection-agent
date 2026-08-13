@@ -35,21 +35,30 @@ export interface LocalChromeBrowserSessionOptions {
   executablePath?: string;
 }
 
+/** Launch the persistent-profile Chrome exactly as agent sessions do.
+ * Exported so the `login` helper opens the SAME profile with the SAME
+ * binary resolution — a second launch path would reintroduce the
+ * logged-into-the-wrong-profile failure the helper exists to kill. */
+export async function launchPersistentChrome(
+  options: LocalChromeBrowserSessionOptions,
+): Promise<BrowserContext> {
+  if (!isAbsolute(options.profileDir)) {
+    throw new TypeError('Browser profileDir must be an absolute path.');
+  }
+  return chromium.launchPersistentContext(options.profileDir, {
+    ...(options.executablePath !== undefined
+      ? { executablePath: options.executablePath }
+      : { channel: 'chrome' }),
+    headless: options.headless ?? false,
+  });
+}
+
 /** Creates persistent local Chrome sessions controlled through Playwright. */
 export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider {
   constructor(private readonly options: LocalChromeBrowserSessionOptions) {}
 
   async createSession(): Promise<BrowserController> {
-    if (!isAbsolute(this.options.profileDir)) {
-      throw new TypeError('Browser profileDir must be an absolute path.');
-    }
-
-    const context = await chromium.launchPersistentContext(this.options.profileDir, {
-      ...(this.options.executablePath !== undefined
-        ? { executablePath: this.options.executablePath }
-        : { channel: 'chrome' }),
-      headless: this.options.headless ?? false,
-    });
+    const context = await launchPersistentChrome(this.options);
 
     try {
       await prepareSessionPage(context);
