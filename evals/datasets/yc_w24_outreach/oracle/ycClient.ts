@@ -27,7 +27,13 @@ export interface YcClientDeps extends FetchRetryDeps {}
 
 /** Query the same public, search-only Algolia indexes the official YC
  * Startup and Founder directories use. Credentials are discovered fresh
- * from each directory page rather than committed or assumed stable. */
+ * from each directory page rather than committed or assumed stable.
+ *
+ * The whole W24 batch is fetched and AI-classified locally (isAiFocused)
+ * rather than tag-facet-filtered server-side: tag facets under-cover the
+ * directory an agent actually reads — Reprompt (W24, one-liner "AI Agents
+ * for Location") carries an EMPTY tags array in YC's index, so a tag
+ * filter rejects legitimate picks the page plainly presents as AI. */
 export async function fetchYcW24AiCompanies(deps: YcClientDeps = {}): Promise<YcW24AiOracle> {
   const [companyCredentials, founderCredentials] = await Promise.all([
     fetchDirectoryCredentials(COMPANY_DIRECTORY_URL, deps),
@@ -36,10 +42,7 @@ export async function fetchYcW24AiCompanies(deps: YcClientDeps = {}): Promise<Yc
   const [companyPayload, founderPayload] = await Promise.all([
     algoliaSearch(companyCredentials, COMPANY_INDEX, {
       query: '', hitsPerPage: 1000,
-      facetFilters: [
-        ['batch:Winter 2024'],
-        ['tags:Artificial Intelligence', 'tags:AI', 'tags:Generative AI', 'tags:Machine Learning'],
-      ],
+      facetFilters: [['batch:Winter 2024']],
       attributesToRetrieve: ['name', 'slug', 'one_liner', 'long_description', 'tags', 'batch'],
     }, deps),
     algoliaSearch(founderCredentials, FOUNDER_INDEX, {
@@ -47,7 +50,22 @@ export async function fetchYcW24AiCompanies(deps: YcClientDeps = {}): Promise<Yc
       attributesToRetrieve: ['first_name', 'last_name', 'company_slug', 'batches'],
     }, deps),
   ]);
-  return combineDirectoryResults(companyPayload, founderPayload);
+  const combined = combineDirectoryResults(companyPayload, founderPayload);
+  const companies = combined.companies.filter(isAiFocused);
+  if (companies.length < 5) {
+    throw new Error(`YC oracle found only ${companies.length} AI-focused W24 companies with public founders`);
+  }
+  return { companies };
+}
+
+const AI_TAGS = new Set(['artificial intelligence', 'ai', 'generative ai', 'machine learning', 'ml']);
+const AI_TEXT = /\b(?:ai|artificial intelligence|machine learning|deep learning|llms?|generative)\b/i;
+
+/** Whether a directory record reads as AI-focused — by tag, or by the
+ * one-liner/description an agent actually sees on the page. */
+export function isAiFocused(company: YcAiCompany): boolean {
+  if (company.tags.some((tag) => AI_TAGS.has(tag.toLowerCase()))) return true;
+  return AI_TEXT.test(company.oneLiner) || AI_TEXT.test(company.longDescription);
 }
 
 async function fetchDirectoryCredentials(url: string, deps: YcClientDeps): Promise<AlgoliaCredentials> {
