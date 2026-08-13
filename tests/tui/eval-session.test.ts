@@ -212,9 +212,14 @@ describe('startEvalBatch', () => {
     ).toBe(true);
   });
 
-  it('a failed trial run stops the batch with an error', async () => {
-    const fixture = makeFixture([{ status: 'failed', message: 'browser died' }]);
-    const handle = startEvalBatch(['stub'], 1, 1, {
+  it('a failed trial is recorded as an errored FAIL, not a dead batch', async () => {
+    // The contract since "A throwing trial is a recorded failure": one
+    // browser death must not discard the batch's remaining trials.
+    const fixture = makeFixture([
+      { status: 'failed', message: 'browser died' },
+      { status: 'completed', finalText: '', runDir: '/runs/t2' },
+    ]);
+    const handle = startEvalBatch(['stub'], 2, 1, {
       onAction: (action) => fixture.actions.push(action),
       evalsDir: fixtureDir,
       resultsDir: '/tmp/results-dir',
@@ -222,10 +227,25 @@ describe('startEvalBatch', () => {
       loadTask: fixture.loadTask,
       writeResultsFn: fixture.writeResultsFn,
     });
-    expect(await handle.done).toBe('failed');
+    expect(await handle.done).toBe('completed');
+
+    // The second trial still ran and graded; the batch reported normally.
+    expect(fixture.runnerCalls).toHaveLength(2);
+    expect(fixture.gradeCalls).toHaveLength(1);
     const types = fixture.actions.map((action) => action.type);
-    expect(types).toContain('eval_error');
+    expect(types).not.toContain('eval_error');
+    expect(types).toContain('eval_report_ready');
     expect(types.at(-1)).toBe('evals_finished');
+
+    // The dead trial persisted as an errored grade: no assertions, the
+    // run failure recorded verbatim, counted as a FAIL in the report.
+    expect(fixture.written).toHaveLength(1);
+    const trials = fixture.written[0]!.report.tasks[0]!.trials;
+    expect(trials).toHaveLength(2);
+    expect(trials[0]).toMatchObject({
+      assertions: [],
+      error: 'trial run failed: browser died',
+    });
   });
 
   it('Esc-style cancellation cancels every active trial and starts no queued work', async () => {

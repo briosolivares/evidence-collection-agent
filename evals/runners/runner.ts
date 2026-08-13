@@ -96,7 +96,8 @@ export async function runEvals(
   let gradingTail: Promise<void> = Promise.resolve();
 
   // A throwing trial becomes a recorded, failed trial — never a dead batch.
-  // Only the caller's cancellation signal aborts the whole run.
+  // Only cancellation (the caller's signal, or a cancelled trial echoing
+  // it back as EvalRunCancelledError) aborts the whole run.
   const recordGrade = async (job: EvalTrialJob, grade: TrialGrade) => {
     grades[job.taskIndex]![job.trialIndex] = grade;
     await deps.onTrialGraded?.(job, grade);
@@ -161,6 +162,13 @@ export async function runEvals(
           scheduleGrade(task, job, runDir, latencyMs);
         } catch (error) {
           if (controller.signal.aborted) return;
+          // Cancellation is an interrupt, never a trial verdict: a
+          // cancelled trial must not be recorded as a failed one (it
+          // would poison the accuracy report) — it stops the batch.
+          if (error instanceof EvalRunCancelledError) {
+            controller.abort(error);
+            return;
+          }
           scheduleErroredTrial(job, performance.now() - runStart, error);
         }
       }
@@ -178,7 +186,10 @@ export async function runEvals(
     ]);
     await gradingTail;
 
-    if (deps.signal?.aborted === true) throw new EvalRunCancelledError();
+    // The controller aborts for exactly one reason — cancellation, from
+    // the caller's signal or a cancelled trial echoing up — so an aborted
+    // batch reports cancelled, not a partial completion.
+    if (controller.signal.aborted) throw new EvalRunCancelledError();
 
     const taskReports = tasks.map((task, taskIndex) => {
       const taskGrades = grades[taskIndex]!.map((grade, trialIndex) => {
