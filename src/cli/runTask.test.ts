@@ -409,7 +409,8 @@ describe('runTask', () => {
           },
         });
 
-        expect(result).toMatchObject({ status: 'completed', finalText: 'Report published.' });
+        // A judge DONE verdict is the only success — and it reports as such.
+        expect(result).toMatchObject({ status: 'verified', finalText: 'Report published.' });
 
         expect(await readFile(join(result.runDir, INTENT_FILENAME), 'utf8')).toBe(
           'Collect and publish the widget roster.\n',
@@ -424,15 +425,18 @@ describe('runTask', () => {
         expect(diagnostics).toEqual({
           initializer: { model: INITIALIZER_MODEL },
           cycles: [{ cycle: 1, workerStatus: 'completed', verdict: 'done' }],
+          outcome: { status: 'verified' },
         });
 
-        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
-        expect(rollup).toMatchObject({ status: 'completed', turns: 1 });
-        const cycle1Metrics = await readJson<RunMetrics>(
-          join(result.runDir, 'metrics-cycle-1.json'),
-        );
-        // A single-cycle run's rollup is exactly that cycle's own metrics.
-        expect(cycle1Metrics).toEqual(rollup);
+        // One metrics.json for the whole run: aggregates plus every model
+        // role's own usage (initializer and verifier are no longer
+        // invisible in the accounting).
+        const metrics = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(metrics).toMatchObject({ status: 'verified', turns: 1 });
+        expect(metrics.roles?.worker?.turns).toBe(1);
+        expect(metrics.roles?.initializer?.turns).toBe(1);
+        expect(metrics.roles?.verifier?.turns).toBe(1);
+        expect(existsSync(join(result.runDir, 'metrics-cycle-1.json'))).toBe(false);
 
         const events = await readTranscript(result.runDir);
         expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([1]);
@@ -468,21 +472,29 @@ describe('runTask', () => {
         });
 
         expect(result).toMatchObject({
-          status: 'completed',
+          status: 'verified',
           finalText: 'Second attempt, column fixed.',
         });
         expect(worker.requests).toHaveLength(2);
 
-        // Cycle 2's opening message: taskText + judge feedback, plain text,
-        // no special framing (judge-design.md's "Judge-reason delivery").
+        // One persistent session: cycle 2's request replays the whole
+        // prior exchange — task, the worker's first attempt — and appends
+        // the judge's reason as plain feedback. The worker keeps its
+        // context instead of starting over.
         const secondRequest = worker.requests[1];
-        expect(secondRequest).toHaveLength(1);
-        const secondOpeningText = (
-          secondRequest?.[0]?.content[0] as { text: string }
-        ).text;
-        expect(secondOpeningText).toContain('Collect widgets and publish a report.');
-        expect(secondOpeningText).toContain('Judge feedback:');
-        expect(secondOpeningText).toContain(
+        expect(secondRequest).toHaveLength(3);
+        expect(secondRequest?.[0]).toEqual({
+          role: 'user',
+          content: [{ type: 'text', text: 'Collect widgets and publish a report.' }],
+        });
+        expect(secondRequest?.[1]?.role).toBe('assistant');
+        expect((secondRequest?.[1]?.content[0] as { text: string }).text).toBe(
+          'First attempt at the report.',
+        );
+        const feedbackText = (secondRequest?.[2]?.content[0] as { text: string }).text;
+        expect(secondRequest?.[2]?.role).toBe('user');
+        expect(feedbackText).toContain('Judge feedback:');
+        expect(feedbackText).toContain(
           'artifacts/report.md is missing the required id column.',
         );
 
@@ -500,6 +512,7 @@ describe('runTask', () => {
             },
             { cycle: 2, workerStatus: 'completed', verdict: 'done' },
           ],
+          outcome: { status: 'verified' },
         });
 
         const events = await readTranscript(result.runDir);
@@ -509,7 +522,7 @@ describe('runTask', () => {
     );
 
     it(
-      'ends at cycle exhaustion (maxWorkerCycles: 2) on a lingering CONTINUE verdict, still completed',
+      'ends at cycle exhaustion (maxWorkerCycles: 2) on a lingering CONTINUE as incomplete',
       async () => {
         const initializer = scriptModel([
           initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
@@ -536,7 +549,13 @@ describe('runTask', () => {
           },
         });
 
-        expect(result).toMatchObject({ status: 'completed', finalText: 'Second attempt.' });
+        // Exhausted corrections are not success: the last cycle's work
+        // stands, explicitly unverified.
+        expect(result).toMatchObject({
+          status: 'incomplete',
+          reason: 'verification_attempts',
+          finalText: 'Second attempt.',
+        });
         // Exactly two worker cycles ran — a third would have thrown against
         // this fake's exhausted response script.
         expect(worker.requests).toHaveLength(2);
@@ -552,6 +571,13 @@ describe('runTask', () => {
           verdict: 'continue',
           reason: 'Second reason.',
         });
+        expect(diagnostics.outcome).toMatchObject({
+          status: 'incomplete',
+          reason: 'verification_attempts',
+        });
+        await expect(
+          readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
+        ).resolves.toMatchObject({ status: 'incomplete' });
 
         const events = await readTranscript(result.runDir);
         expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([1, 2]);
@@ -590,9 +616,12 @@ describe('runTask', () => {
 
         // Under the old default of 2, cycle 2's CONTINUE would have ended
         // the run; the default of 3 lets the third cycle run to DONE.
-        expect(result).toMatchObject({ status: 'completed', finalText: 'Third attempt.' });
+        expect(result).toMatchObject({ status: 'verified', finalText: 'Third attempt.' });
         expect(worker.requests).toHaveLength(3);
         expect(judge.requests).toHaveLength(3);
+        // The persistent session accretes: attempt 1, feedback, attempt 2,
+        // feedback, then the third request sees the full history.
+        expect(worker.requests[2]).toHaveLength(5);
 
         const events = await readTranscript(result.runDir);
         expect(events.filter((e) => e.type === 'cycle_start').map((e) => e.cycle)).toEqual([
@@ -629,7 +658,9 @@ describe('runTask', () => {
           },
         });
 
-        expect(result).toMatchObject({ status: 'budget_exceeded', reason: 'max_turns' });
+        // Budget exhaustion inside the harness is an incomplete outcome —
+        // budgets end runs, and an unverified end is not success.
+        expect(result).toMatchObject({ status: 'incomplete', reason: 'budget_exceeded' });
         expect(judge.requests).toHaveLength(0);
 
         const diagnostics = await readJson<HarnessDiagnostics>(
@@ -638,16 +669,21 @@ describe('runTask', () => {
         expect(diagnostics).toEqual({
           initializer: { model: INITIALIZER_MODEL },
           cycles: [{ cycle: 1, workerStatus: 'budget_exceeded' }],
+          outcome: {
+            status: 'incomplete',
+            reason: 'budget_exceeded',
+            detail: "worker budget guard 'max_turns' tripped in cycle 1",
+          },
         });
 
-        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
-        expect(rollup).toMatchObject({ status: 'budget_exceeded', turns: 1 });
+        const metrics = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(metrics).toMatchObject({ status: 'incomplete', turns: 1 });
       },
       TEST_TIMEOUT_MS,
     );
 
     it(
-      'a judge crash never destroys a finished run: completed result, judgeError recorded',
+      'a judge crash preserves the finished run but reports incomplete: verifier_unavailable',
       async () => {
         const initializer = scriptModel([
           initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
@@ -669,9 +705,13 @@ describe('runTask', () => {
           },
         });
 
-        // The worker's finished result survives its verifier's crash, with
-        // no rework cycle (there is no verdict to act on).
-        expect(result).toMatchObject({ status: 'completed', finalText: 'Report published.' });
+        // The worker's artifacts survive its verifier's crash — but nobody
+        // trustworthy reviewed them, so the run is incomplete, not success.
+        expect(result).toMatchObject({
+          status: 'incomplete',
+          reason: 'verifier_unavailable',
+          finalText: 'Report published.',
+        });
         const diagnostics = await readJson<HarnessDiagnostics>(
           join(result.runDir, HARNESS_FILENAME),
         );
@@ -682,8 +722,12 @@ describe('runTask', () => {
             judgeError: '400 image dimensions exceed max allowed size',
           },
         ]);
-        const rollup = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
-        expect(rollup).toMatchObject({ status: 'completed', turns: 1 });
+        expect(diagnostics.outcome).toMatchObject({
+          status: 'incomplete',
+          reason: 'verifier_unavailable',
+        });
+        const metrics = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
+        expect(metrics).toMatchObject({ status: 'incomplete', turns: 1 });
       },
       TEST_TIMEOUT_MS,
     );

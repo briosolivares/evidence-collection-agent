@@ -687,7 +687,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       let next = settleDanglingPending(finalizeStreamingText(state));
       const elapsedMs = action.at - live.startedAt;
       const tokens = displayTokens(next.live!);
-      if (action.outcome === 'completed') {
+      if (action.outcome === 'completed' || action.outcome === 'verified') {
         next = append(next, {
           kind: 'completion',
           verb: state.completionVerb,
@@ -711,10 +711,15 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           };
         }
       } else {
+        // Incomplete is an early stop with the run preserved — rendered on
+        // the same "stopped early" line as a budget stop, never as a
+        // runtime failure (run_failed owns those).
         const reason =
-          action.reason === 'max_turns'
-            ? 'turn limit reached'
-            : 'context budget exhausted';
+          action.outcome === 'incomplete'
+            ? `incomplete — ${action.reason ?? 'unverified'}`
+            : action.reason === 'max_turns'
+              ? 'turn limit reached'
+              : 'context budget exhausted';
         next = append(next, {
           kind: 'error',
           message:

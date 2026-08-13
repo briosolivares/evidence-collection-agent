@@ -42,10 +42,15 @@ import type { UiEvent } from '../store/state.js';
 // Mirrors the core's (module-private) per-call output-token default.
 const MAX_OUTPUT_TOKENS = 8_192;
 
-/** How a bridged run ended, for callers awaiting `done`. */
+/** How a bridged run ended, for callers awaiting `done`. `verified` and
+ * `incomplete` arrive only from harness-mode runs (the TUI's interactive
+ * runs are judge-less today); incomplete is an early stop with the run
+ * preserved, kept distinct from `failed` (a runtime crash). */
 export type RunOutcome =
   | { status: 'completed'; finalText: string; runDir: string }
   | { status: 'budget_exceeded'; reason: string; runDir: string }
+  | { status: 'verified'; finalText: string; runDir: string }
+  | { status: 'incomplete'; reason: string; runDir: string }
   | { status: 'cancelled' }
   | { status: 'failed'; message: string };
 
@@ -246,32 +251,51 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
         ...(requestPermission === undefined ? {} : { requestPermission }),
       });
-      if (result.status === 'completed') {
-        emit({
-          type: 'run_finished',
-          outcome: 'completed',
-          finalText: result.finalText,
-          runDir: result.runDir,
-          at: now(),
-        });
-        return {
-          status: 'completed',
-          finalText: result.finalText,
-          runDir: result.runDir,
-        } as const;
+      switch (result.status) {
+        case 'completed':
+        case 'verified': {
+          emit({
+            type: 'run_finished',
+            outcome: result.status,
+            finalText: result.finalText,
+            runDir: result.runDir,
+            at: now(),
+          });
+          return {
+            status: result.status,
+            finalText: result.finalText,
+            runDir: result.runDir,
+          } as const;
+        }
+        case 'incomplete': {
+          emit({
+            type: 'run_finished',
+            outcome: 'incomplete',
+            reason: result.reason,
+            runDir: result.runDir,
+            at: now(),
+          });
+          return {
+            status: 'incomplete',
+            reason: result.reason,
+            runDir: result.runDir,
+          } as const;
+        }
+        case 'budget_exceeded': {
+          emit({
+            type: 'run_finished',
+            outcome: 'budget_exceeded',
+            reason: result.reason,
+            runDir: result.runDir,
+            at: now(),
+          });
+          return {
+            status: 'budget_exceeded',
+            reason: result.reason,
+            runDir: result.runDir,
+          } as const;
+        }
       }
-      emit({
-        type: 'run_finished',
-        outcome: 'budget_exceeded',
-        reason: result.reason,
-        runDir: result.runDir,
-        at: now(),
-      });
-      return {
-        status: 'budget_exceeded',
-        reason: result.reason,
-        runDir: result.runDir,
-      } as const;
     } catch (error) {
       if (signal.aborted) {
         emit({ type: 'run_cancelled', at: now() });

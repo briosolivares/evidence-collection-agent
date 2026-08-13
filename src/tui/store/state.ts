@@ -280,10 +280,15 @@ export type UiEvent =
   | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
   | {
       type: 'run_finished';
-      outcome: 'completed' | 'budget_exceeded';
+      /** 'completed'/'budget_exceeded' from judge-less runs; 'verified'
+       * (the only harness success) and 'incomplete' (judge crash,
+       * correction exhaustion, budget exhaustion — never a runtime
+       * failure, which stays run_failed) from harness runs. */
+      outcome: 'completed' | 'budget_exceeded' | 'verified' | 'incomplete';
       finalText?: string;
       runDir: string;
-      /** Which guard tripped, on budget_exceeded. */
+      /** Which guard tripped (budget_exceeded) or why the run is
+       * incomplete (incomplete). */
       reason?: string;
       at: number;
     }

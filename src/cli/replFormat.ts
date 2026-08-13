@@ -58,13 +58,16 @@ export function formatProgressEvent(event: ProgressEvent): string {
  * @param result - the value `runTask` resolves with: the absolute run
  *   directory plus the loop's terminal outcome (see RunTaskResult)
  * @returns a multi-line summary — the model's final message on
- *   `completed`, the guard name on `budget_exceeded` — followed by the
- *   absolute run directory path, ending in a single trailing newline
+ *   `completed`/`verified`, the guard name on `budget_exceeded`, the
+ *   explicit reason on `incomplete` — followed by the absolute run
+ *   directory path, ending in a single trailing newline
  */
 export function formatRunSummary(result: RunTaskResult): string {
   const outcome =
-    result.status === 'completed'
-      ? `completed: ${result.finalText}`
-      : `budget exceeded: ${result.reason}`;
+    result.status === 'completed' || result.status === 'verified'
+      ? `${result.status}: ${result.finalText}`
+      : result.status === 'incomplete'
+        ? `incomplete (${result.reason}): ${result.detail}`
+        : `budget exceeded: ${result.reason}`;
   return `\n${outcome}\nrun dir: ${result.runDir}\n`;
 }

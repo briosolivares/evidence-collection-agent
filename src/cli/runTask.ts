@@ -7,11 +7,9 @@ import {
 } from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
 import {
-  archiveCycleMetrics,
-  rollupCycleMetrics,
   writeHarnessDiagnostics,
-  writeMetricsRollup,
   type HarnessCycleRecord,
+  type HarnessOutcomeRecord,
 } from '../harness/harness.js';
 import {
   INITIALIZER_MODEL,
@@ -25,10 +23,22 @@ import {
   type LoopConfig,
   type LoopDeps,
   type LoopResult,
-  type RunMetrics,
 } from '../loop/agentLoop.js';
+import {
+  appendWorkerFeedback,
+  createWorkerSession,
+  recordWorkerSessionCrash,
+  runWorkerCycle,
+  writeWorkerSessionMetrics,
+} from '../loop/workerSession.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
+import {
+  createRunBudgetTracker,
+  withBudgetAccounting,
+  type RunBudgetTracker,
+} from '../run/runBudget.js';
+import type { RunOutcome } from '../run/runOutcome.js';
 import {
   DEFAULT_MODEL,
   makeCallModel,
@@ -107,11 +117,10 @@ export interface HarnessConfig {
    * 2026-08-13 v2 validation: on the one wikipedia trial that failed
    * grading, the judge's cycle-2 CONTINUE had named exactly the assertion
    * the grader failed — the cap, not the diagnosis, was the binding
-   * constraint. The extra cycle costs nothing unless the judge is still
-   * dissatisfied at cycle 2, a minority of runs). A judge 'continue'
-   * verdict on the final cycle still ends the run with that cycle's
-   * completed result — this caps spend, not correctness (post-hoc graders
-   * stay the arbiter of whether the run actually succeeded). */
+   * constraint). A judge 'continue' verdict on the final cycle ends the
+   * run `incomplete: verification_attempts` — the last cycle's artifacts
+   * are preserved, explicitly unverified; exhausting corrections is no
+   * longer reported as success. */
   maxWorkerCycles?: number;
   /** Test seam for the initializer's single model call, mirroring
    * `RunTaskConfig.callModel`. Production default: makeInitializerCallModel. */
@@ -170,26 +179,30 @@ export interface RunTaskConfig {
   harness?: HarnessConfig;
 }
 
-/** The finished run directory together with the loop's terminal outcome. */
-export type RunTaskResult = { runDir: string } & LoopResult;
+/**
+ * The finished run directory together with the run's terminal outcome.
+ * Judge-less runs end `completed` or `budget_exceeded` (the historical
+ * LoopResult contract, unchanged). Harness runs end `verified` — the only
+ * success state — or `incomplete` with an explicit reason: judge crash,
+ * exhausted correction attempts, and budget exhaustion can no longer
+ * masquerade as success (see RunOutcome).
+ */
+export type RunTaskResult = { runDir: string } & (LoopResult | RunOutcome);
 
 /**
  * Run one task through the production evidence-collection stack.
  *
  * Absent `config.harness`, this is exactly one `runAgentLoop` call: the
  * worker gets the task text verbatim, and the run ends with whatever
- * `LoopResult` that single call produces. Present `config.harness`, an
- * initializer → worker → judge outer loop runs instead (see
- * .agents/planning/2026-08-12-research-quality-harness/judge-design.md):
- * the initializer derives INTENT.md and CONTRACT.md from the task text,
- * then up to `harness.maxWorkerCycles` worker cycles run against the same
- * run directory and the same browser tab — a `budget_exceeded` cycle ends
- * the run without judging; a `completed` cycle is judged, and a `done`
- * verdict, cycle exhaustion, or an unparseable verdict all end the run with
- * that cycle's completed result, while a `continue` verdict with cycles
- * remaining starts a fresh worker cycle whose opening message carries the
- * judge's reason as plain feedback text. See runHarnessCycles for the loop
- * itself.
+ * `LoopResult` that single call produces. Present `config.harness`, the
+ * verification harness runs instead: the initializer derives the
+ * contract-authoring files from the task text, then ONE persistent worker
+ * session runs up to `harness.maxWorkerCycles` cycles against the same run
+ * directory and browser tab, every cycle charging one shared whole-run
+ * budget. `verified` (a judge `done` verdict) is the only success;
+ * a `budget_exceeded` cycle, a judge crash, and correction exhaustion end
+ * the run `incomplete` with an explicit reason and preserved artifacts.
+ * See runVerificationHarness for the loop itself.
  *
  * @param taskText - the user's task, recorded verbatim in the manifest and
  *   sent as the first conversation message of cycle 1 (every later cycle's
@@ -260,17 +273,41 @@ export async function runTask(
   );
   const tracedRegistry = tracing.wrapRegistry(registry);
 
+  // Harness mode: one budget tracker for the whole run — initializer,
+  // every worker cycle, and every judge call charge the same instance, and
+  // starting a correction resets nothing. Constructed (and validated) here
+  // so an invalid finite-limit configuration fails before the browser or
+  // any model starts.
+  const budget: RunBudgetTracker | undefined =
+    config.harness === undefined
+      ? undefined
+      : createRunBudgetTracker({
+          maxWorkerTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+          maxToolCalls: Infinity,
+          maxModelTokens: Infinity,
+          maxToolResultBytes: Infinity,
+          maxWallTimeMs: Infinity,
+          maxVerifierCorrections: maxWorkerCycles - 1,
+        });
+  const maxContextTokens = config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS;
+  if (Number.isNaN(maxContextTokens) || maxContextTokens < 0) {
+    throw new Error(`maxContextTokens must be >= 0, got ${maxContextTokens}`);
+  }
+
   let tabOpened = false;
   try {
-    // Harness mode: derive INTENT.md/CONTRACT.md from the task text alone,
-    // before any browsing starts, so a failure here still lets the finally
-    // below finalize the manifest. Deliberately outside tracing.traceRun and
-    // never through tracing.wrapCallModel — per the design, initializer and
-    // judge calls run untraced in v1 (tracing coverage for these two roles
-    // is future work, not required for the harness to function).
+    // Harness mode: derive the contract-authoring files from the task text
+    // alone, before any browsing starts, so a failure here still lets the
+    // finally below finalize the manifest. Deliberately outside
+    // tracing.traceRun and never through tracing.wrapCallModel — per the
+    // design, initializer and judge calls run untraced in v1; their token
+    // usage still lands on the shared budget via withBudgetAccounting.
     if (config.harness !== undefined) {
-      const initializerCallModel =
-        config.harness.initializerCallModel ?? makeInitializerCallModel({});
+      const initializerCallModel = withBudgetAccounting(
+        config.harness.initializerCallModel ?? makeInitializerCallModel({}),
+        budget!,
+        'initializer',
+      );
       const initializerResult = await runInitializer(taskText, initializerCallModel);
       writeInitializerFiles(runDir, initializerResult);
     }
@@ -291,22 +328,22 @@ export async function runTask(
         credentials,
         requestPermission: config.requestPermission,
       };
-      const loopConfig: LoopConfig = {
-        maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
-        maxContextTokens: config.maxContextTokens ?? DEFAULT_MAX_CONTEXT_TOKENS,
-      };
 
       if (config.harness === undefined) {
+        const loopConfig: LoopConfig = {
+          maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+          maxContextTokens,
+        };
         return runAgentLoop(taskText, loopDeps, loopConfig);
       }
 
-      return runHarnessCycles(
+      return runVerificationHarness(
         taskText,
         runDir,
         config.harness,
         maxWorkerCycles,
         loopDeps,
-        loopConfig,
+        { budget: budget!, maxContextTokens },
       );
     });
     return { runDir, ...result };
@@ -326,142 +363,156 @@ export async function runTask(
 }
 
 /**
- * Run the initializer → worker → judge outer loop's worker-cycle phase: up
- * to `maxWorkerCycles` fresh `runAgentLoop` invocations against the same run
- * directory and the same (already-open) browser tab, each gated by a judge
- * verdict before another cycle starts. By the time this runs, INTENT.md and
- * CONTRACT.md already exist at the run-dir root (written by `runTask`
- * before the tab opened); this function owns only the cycle loop itself —
- * the `cycle_start` transcript events, each cycle's metrics archival, and
- * the harness.json diagnostics and metrics.json rollup written once the
- * loop ends.
+ * Run the verification harness's worker/judge phase over ONE persistent
+ * WorkerSession. Cycle 1 opens with the task text; every later cycle is
+ * the same conversation continued — the judge's reason is appended as
+ * feedback (appendWorkerFeedback), so the worker keeps its browser
+ * knowledge and prior tool results instead of starting over. By the time
+ * this runs, the contract-authoring files already exist at the run-dir
+ * root (written by `runTask` before the tab opened).
  *
- * Loop, per cycle (1-based, see judge-design.md's "Loop" section):
- * 1. Append a `cycle_start` transcript event, then run `runAgentLoop` with
- *    this cycle's opening message (cycle 1: `taskText` unchanged; cycle
- *    N>1: `taskText` plus the previous cycle's judge reason as plain
- *    feedback text — no special framing, borrowed from Claude Code's
- *    `/goal` stop-hook delivery, see judge-design.md's "Judge-reason
- *    delivery").
- * 2. Archive this cycle's metrics.json (runAgentLoop would otherwise
- *    overwrite it on the next cycle) and record it for the eventual rollup.
- * 3. `budget_exceeded` ends the run right here, without judging — budgets
- *    end runs. `completed` runs the judge (`runJudge`): a `done` verdict, a
- *    `continue` verdict with no cycles left, or an unparseable verdict (the
- *    judge's own fail-safe default, never a false `done`) all end the run
- *    with this cycle's completed result; a `continue` verdict with cycles
- *    remaining carries its reason into the next cycle's opening message. A
- *    judge that throws (infrastructure failure, not a verdict — an
- *    AbortError excepted, which is the caller's cancellation and
- *    propagates) also ends the run with this cycle's completed result,
- *    recording the message as the cycle's `judgeError`: the worker's
- *    finished work must never be destroyed by its verifier's crash.
+ * Loop, per cycle (1-based):
+ * 1. Append a `cycle_start` transcript event, then advance the session
+ *    until the cycle ends (runWorkerCycle) — every turn charges the shared
+ *    whole-run budget, which no correction ever resets.
+ * 2. A `budget_exceeded` cycle ends the run as
+ *    `incomplete: budget_exceeded` without judging — budgets end runs,
+ *    and an unverified end is not success.
+ * 3. A `completed` cycle is judged. Verdict `done` → `verified` (the only
+ *    success). Verdict `continue` with cycles remaining → charge one
+ *    correction and continue the same session with the reason as
+ *    feedback. Verdict `continue` on the final cycle →
+ *    `incomplete: verification_attempts`. A judge that throws (an
+ *    AbortError excepted — that is the caller's cancellation and
+ *    propagates) → `incomplete: verifier_unavailable`, with the message
+ *    recorded as the cycle's `judgeError`; the worker's artifacts are
+ *    preserved in every incomplete case.
  *
- * Every ending writes harness.json (see HarnessDiagnostics) and a rolled-up
- * metrics.json (see rollupCycleMetrics) before returning. Both are skipped
- * if any worker cycle throws (an AbortError or any other error) — the error
- * propagates unchanged, exactly like a single-cycle judge-less run's crash
- * contract, and no rollup or diagnostics for a run that never finished
- * ever gets written.
+ * Every non-crash ending writes harness.json (diagnostics including the
+ * truthful outcome) and one metrics.json carrying whole-run aggregates
+ * plus per-role usage. A worker-cycle crash records failed metrics and
+ * propagates unchanged (no harness.json for a run that never finished).
  *
- * @param taskText - the original task text; cycle 1's opening message
- *   verbatim, and the stem every later cycle's opening message is built from
- * @param runDir - the run directory; must already hold INTENT.md and
- *   CONTRACT.md (the judge throws loudly if either is missing)
- * @param harnessConfig - `config.harness` as the caller passed it (see
- *   HarnessConfig); only `judgeCallModel` is read here — `maxWorkerCycles`
- *   and `initializerCallModel` are already spent by the time this runs
- * @param maxWorkerCycles - the validated cycle budget (integer >= 1)
- * @param loopDeps - deps for each cycle's `runAgentLoop` call; the same
- *   instance every cycle, so the same browser tab, registry, and callModel
- *   carry over
- * @param loopConfig - guards for each cycle's `runAgentLoop` call; the same
- *   every cycle
- * @returns the final cycle's LoopResult
+ * @returns the truthful RunOutcome — never a success shape for a judge
+ *   crash, exhausted corrections, or exhausted budget
  */
-async function runHarnessCycles(
+async function runVerificationHarness(
   taskText: string,
   runDir: string,
   harnessConfig: HarnessConfig,
   maxWorkerCycles: number,
   loopDeps: LoopDeps,
-  loopConfig: LoopConfig,
-): Promise<LoopResult> {
-  const judgeCallModel = harnessConfig.judgeCallModel ?? makeJudgeCallModel();
+  sessionConfig: { budget: RunBudgetTracker; maxContextTokens: number },
+): Promise<RunOutcome> {
+  const judgeCallModel = withBudgetAccounting(
+    harnessConfig.judgeCallModel ?? makeJudgeCallModel(),
+    sessionConfig.budget,
+    'verifier',
+  );
 
+  const session = createWorkerSession(taskText, loopDeps, sessionConfig);
   const cycleRecords: HarnessCycleRecord[] = [];
-  const perCycleMetrics: RunMetrics[] = [];
-  let openingMessage = taskText;
-  let finalResult: LoopResult | undefined;
+  let outcome: RunOutcome | undefined;
 
-  for (let cycle = 1; cycle <= maxWorkerCycles; cycle += 1) {
-    const cycleStartEvent: CycleStartEvent = { type: 'cycle_start', cycle };
-    appendTranscriptEvent(runDir, cycleStartEvent);
+  try {
+    for (let cycle = 1; cycle <= maxWorkerCycles; cycle += 1) {
+      const cycleStartEvent: CycleStartEvent = { type: 'cycle_start', cycle };
+      appendTranscriptEvent(runDir, cycleStartEvent);
 
-    const result = await runAgentLoop(openingMessage, loopDeps, loopConfig);
-    perCycleMetrics.push(archiveCycleMetrics(runDir, cycle));
+      const result = await runWorkerCycle(session);
 
-    if (result.status === 'budget_exceeded') {
-      // Budgets end runs: no judge call, and no verdict/reason to record.
-      cycleRecords.push({ cycle, workerStatus: result.status });
-      finalResult = result;
-      break;
-    }
+      if (result.kind === 'budget_exceeded') {
+        // Budgets end runs: no judge call, and no verdict/reason to record.
+        cycleRecords.push({ cycle, workerStatus: 'budget_exceeded' });
+        outcome = {
+          status: 'incomplete',
+          reason: 'budget_exceeded',
+          detail: `worker budget guard '${result.reason}' tripped in cycle ${cycle}`,
+          finalText: '',
+        };
+        break;
+      }
 
-    let verdict: JudgeVerdict;
-    try {
-      verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
-    } catch (thrown) {
-      // A cancellation is the caller's, not the judge's — honor it.
-      if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
-      // Anything else is judge infrastructure failing (an API rejection, a
-      // network fault) after the worker already finished its cycle. That
-      // must never destroy the finished run (measured live 2026-08-13: an
-      // API 400 on a judge request errored entire trials whose workers had
-      // completed) — record the failure and end the run with the worker's
-      // completed result. No rework cycle either: there is no verdict, so
-      // there is no feedback a worker could act on.
+      let verdict: JudgeVerdict;
+      try {
+        verdict = await runJudge({ taskText, runDir, callModel: judgeCallModel });
+      } catch (thrown) {
+        // A cancellation is the caller's, not the judge's — honor it.
+        if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
+        // Judge infrastructure failing is not a verdict, and it is not
+        // success either: the worker's finished artifacts are preserved,
+        // but nobody trustworthy reviewed them — the run is incomplete
+        // with the failure on record.
+        cycleRecords.push({
+          cycle,
+          workerStatus: 'completed',
+          judgeError: thrown instanceof Error ? thrown.message : String(thrown),
+        });
+        outcome = {
+          status: 'incomplete',
+          reason: 'verifier_unavailable',
+          detail: `judge failed in cycle ${cycle}: ${
+            thrown instanceof Error ? thrown.message : String(thrown)
+          }`,
+          finalText: result.finalText,
+        };
+        break;
+      }
       cycleRecords.push({
         cycle,
-        workerStatus: result.status,
-        judgeError: thrown instanceof Error ? thrown.message : String(thrown),
+        workerStatus: 'completed',
+        verdict: verdict.verdict,
+        // JudgeVerdict.reason is always '' on 'done' (see judge.ts) —
+        // nothing worth recording there.
+        ...(verdict.reason.length > 0 ? { reason: verdict.reason } : {}),
       });
-      finalResult = result;
-      break;
-    }
-    cycleRecords.push({
-      cycle,
-      workerStatus: result.status,
-      verdict: verdict.verdict,
-      // JudgeVerdict.reason is always '' on 'done' (see judge.ts) — nothing
-      // worth recording there.
-      ...(verdict.reason.length > 0 ? { reason: verdict.reason } : {}),
-    });
 
-    if (verdict.verdict === 'done' || cycle === maxWorkerCycles) {
-      // Cycle exhaustion on a lingering 'continue' still ends the run with
-      // the completed result — post-hoc graders decide; the harness only
-      // records (see judge-design.md's "Loop" section).
-      finalResult = result;
-      break;
-    }
+      if (verdict.verdict === 'done') {
+        outcome = { status: 'verified', finalText: result.finalText };
+        break;
+      }
+      if (cycle === maxWorkerCycles) {
+        // Correction attempts are spent. The last cycle's work stands,
+        // explicitly unverified — post-hoc graders and humans decide what
+        // it was worth; the harness no longer calls it success.
+        outcome = {
+          status: 'incomplete',
+          reason: 'verification_attempts',
+          detail:
+            `verifier still requested corrections after ${maxWorkerCycles} ` +
+            `worker cycle${maxWorkerCycles === 1 ? '' : 's'}`,
+          finalText: result.finalText,
+        };
+        break;
+      }
 
-    openingMessage = `${taskText}\n\nJudge feedback:\n${verdict.reason}`;
+      // Same session, same conversation: the correction arrives as
+      // feedback appended to everything the worker already knows.
+      sessionConfig.budget.recordCorrection();
+      appendWorkerFeedback(session, `Judge feedback:\n${verdict.reason}`);
+    }
+  } catch (error) {
+    recordWorkerSessionCrash(session, error);
+    throw error;
   }
 
-  if (finalResult === undefined) {
-    // Unreachable: maxWorkerCycles >= 1 (validated in runTask) guarantees at
-    // least one iteration, and every iteration either breaks with
-    // finalResult set or is the loop's last (cycle === maxWorkerCycles),
-    // which also breaks with finalResult set.
-    throw new Error('harness cycle loop ended without a result');
+  if (outcome === undefined) {
+    // Unreachable: maxWorkerCycles >= 1 guarantees at least one iteration,
+    // and every iteration either breaks with an outcome or is the loop's
+    // last (cycle === maxWorkerCycles), which also breaks with one.
+    throw new Error('verification harness ended without an outcome');
   }
 
+  const outcomeRecord: HarnessOutcomeRecord =
+    outcome.status === 'verified'
+      ? { status: 'verified' }
+      : { status: 'incomplete', reason: outcome.reason, detail: outcome.detail };
   writeHarnessDiagnostics(runDir, {
     initializer: { model: INITIALIZER_MODEL },
     cycles: cycleRecords,
+    outcome: outcomeRecord,
   });
-  writeMetricsRollup(runDir, rollupCycleMetrics(finalResult.status, perCycleMetrics));
+  writeWorkerSessionMetrics(session, outcome.status);
 
-  return finalResult;
+  return outcome;
 }
