@@ -14,6 +14,7 @@ import {
   BrowserRefNotFoundError,
   type BrowserController,
 } from './controller.js';
+import { toEarlyJavaScriptRequest } from './browserJavaScript.js';
 import {
   LocalChromeBrowserSessionProvider,
   PlaywrightBrowserController,
@@ -615,4 +616,102 @@ describe('Playwright browser controller', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+  describe('PlaywrightBrowserController.executeJavaScript', () => {
+    it(
+      'bulk-extracts a repeated list in one call, with the document URL and a token',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest(
+            'return Array.from(document.querySelectorAll("a")).map((a) => ({ text: a.textContent.trim(), href: a.href }));',
+            5_000,
+          ),
+        );
+
+        expect(Array.isArray(result.value)).toBe(true);
+        expect((result.value as unknown[]).length).toBeGreaterThan(0);
+        expect(result.url).toBe(fixtureServer.url('/'));
+        expect(result.documentToken).toMatch(/^doc-/);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'captures console output from the snippet',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('console.log("from the page"); return 1;', 5_000),
+        );
+        expect(result.logs.join('\n')).toContain('from the page');
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'gives a navigation a new document token, so two same-URL calls are distinguishable',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const first = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('return 1;', 5_000),
+        );
+        // Same tab, navigated again: a fresh document in the same page.
+        await controller.goto(fixtureServer.url('/'));
+        const second = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('return 1;', 5_000),
+        );
+        // Same URL, different document — which is exactly what the token is for.
+        expect(second.url).toBe(first.url);
+        expect(second.documentToken).not.toBe(first.documentToken);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'terminates a spinning snippet and leaves the run usable after replacement',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        await expect(
+          controller.executeJavaScript!(
+            toEarlyJavaScriptRequest('while (true) {}', 1_000),
+          ),
+        ).rejects.toMatchObject({ name: 'BrowserJavaScriptTimeoutError' });
+
+        // The page's event loop is not trustworthy after that, so it is replaced
+        // rather than reused — and the session keeps working.
+        // replaceUnresponsivePage already selected a fresh page — asking for
+        // another tab here would be the "already active" error, and the point
+        // is that the session is immediately usable again.
+        await controller.replaceUnresponsivePage!();
+        await controller.goto(fixtureServer.url('/second.html'));
+        expect(controller.currentUrl()).toBe(fixtureServer.url('/second.html'));
+      },
+      BROWSER_TEST_TIMEOUT_MS * 2,
+    );
+
+    it(
+      'surfaces a page-thrown error without replacing the page',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        await expect(
+          controller.executeJavaScript!(
+            toEarlyJavaScriptRequest('throw new Error("snippet blew up");', 5_000),
+          ),
+        ).rejects.toThrow(/snippet blew up/);
+
+        // An ordinary throw is the snippet's fault, not the page's: the page
+        // stays usable.
+        const after = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('return 42;', 5_000),
+        );
+        expect(after.value).toBe(42);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+  });
 });

@@ -50,6 +50,12 @@ import {
   type HandleDialogRequest,
   type HandleDialogResult,
 } from './controller.js';
+import {
+  BrowserJavaScriptNonJsonError,
+  BrowserJavaScriptTimeoutError,
+  type BrowserJavaScriptResult,
+  type EarlyJavaScriptRequest,
+} from './browserJavaScript.js';
 import type { BrowserSessionProvider } from './sessionProvider.js';
 
 const ARIA_REF_PATTERN = /^(?:f\d+)?e\d+$/;
@@ -575,6 +581,108 @@ export class PlaywrightBrowserController implements BrowserController {
     }
 
     throw new BrowserRefNotFoundError(ref.id);
+  }
+
+  /**
+   * Evaluate a snippet in the selected page's top document (T6).
+   *
+   * The page is resolved ONCE, up front, so a navigation mid-call cannot move
+   * execution to a different document than the one whose URL and token are
+   * reported. Console output is captured for the duration of the call only.
+   *
+   * The timeout is a Node-side race, NOT a Playwright option: `page.evaluate`
+   * accepts no timeout, and a snippet spinning in a tight loop cannot be
+   * interrupted from outside the renderer at all. So exceeding the deadline is
+   * TERMINAL — it rejects with BrowserJavaScriptTimeoutError while the snippet
+   * keeps running, and the caller must call replaceUnresponsivePage. There is
+   * no partial result to salvage, and retrying into the same page would hang
+   * again.
+   *
+   * The abandoned evaluation is deliberately left unawaited with its rejection
+   * swallowed: it belongs to a page that is about to be discarded, and letting
+   * it surface later would crash an unrelated turn.
+   */
+  async executeJavaScript(request: EarlyJavaScriptRequest): Promise<BrowserJavaScriptResult> {
+    const page = this.requirePage();
+    const logs: string[] = [];
+    const onConsole = (message: { text(): string }): void => {
+      // Bounded: a snippet that logs in a loop must not grow the result
+      // without limit.
+      if (logs.length < 100) logs.push(message.text());
+    };
+    page.on('console', onConsole);
+
+    try {
+      // The document's identity is read BEFORE evaluation and reported with
+      // the result, so a mid-call navigation is visible rather than silent.
+      const url = page.url();
+      const documentToken = await page.evaluate(
+        `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
+      );
+
+      let value: unknown;
+      try {
+        const evaluation = page.evaluate(`(() => { ${request.code} })()`);
+        let timer: NodeJS.Timeout | undefined;
+        const deadline = new Promise<never>((_resolve, reject) => {
+          timer = setTimeout(
+            () => reject(new BrowserJavaScriptTimeoutError(request.timeoutMs)),
+            request.timeoutMs,
+          );
+        });
+        try {
+          value = await Promise.race([evaluation, deadline]);
+        } finally {
+          if (timer !== undefined) clearTimeout(timer);
+          // The losing evaluation may still be spinning in a page that is
+          // about to be replaced; ignore its eventual outcome so it cannot
+          // surface as an unhandled rejection in a later turn.
+          void evaluation.catch(() => undefined);
+        }
+      } catch (error) {
+        if (error instanceof BrowserJavaScriptTimeoutError) throw error;
+        if (isTimeoutLikeError(error)) throw new BrowserJavaScriptTimeoutError(request.timeoutMs);
+        // A serialization failure from the engine becomes the typed non-JSON
+        // error, so the model is told how to fix its snippet rather than
+        // shown a Playwright internal.
+        if (isSerializationError(error)) {
+          throw new BrowserJavaScriptNonJsonError('value', 'not JSON-serializable');
+        }
+        throw error;
+      }
+
+      return {
+        value,
+        url,
+        documentToken: typeof documentToken === 'string' ? documentToken : 'unknown',
+        logs,
+      };
+    } finally {
+      page.off('console', onConsole);
+    }
+  }
+
+  /**
+   * Discard a page whose JavaScript could not be terminated, and select a
+   * replacement (T6).
+   *
+   * Serialized through the same tab-lifecycle chain as newTab/closeTab, so a
+   * replacement cannot interleave with another lifecycle operation. The old
+   * page is force-closed rather than awaited politely: its event loop is the
+   * thing that is untrustworthy.
+   */
+  async replaceUnresponsivePage(): Promise<void> {
+    await this.serializeTabLifecycle(async () => {
+      const doomed = this.activePage;
+      this.activePage = undefined;
+      if (doomed !== undefined) {
+        // Best effort: a wedged page may refuse to close, and the run still
+        // needs a usable page more than it needs a clean shutdown.
+        await doomed.close({ runBeforeUnload: false }).catch(() => undefined);
+      }
+      this.requireOpenContext();
+      this.activePage = await this.context.newPage();
+    });
   }
 
   async close(): Promise<void> {
@@ -1506,4 +1614,21 @@ function suggestedFilenameFromHeaders(
 
 function delay(milliseconds: number): Promise<void> {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+}
+
+/** Whether an error is Playwright's evaluation timeout. Matched on message
+ * because Playwright does not export a distinct timeout class for evaluate. */
+function isTimeoutLikeError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (/timeout/i.test(error.message) || error.name === 'TimeoutError')
+  );
+}
+
+/** Whether an error is the engine refusing to bring a value back as JSON. */
+function isSerializationError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    /serializ|circular|convert|clone/i.test(error.message)
+  );
 }

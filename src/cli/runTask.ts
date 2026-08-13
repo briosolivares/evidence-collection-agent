@@ -82,6 +82,11 @@ import {
 import { createPdfContentReader } from '../content/pdfContentReader.js';
 import { createSpreadsheetContentReader } from '../content/spreadsheetContentReader.js';
 import { createOcrContentReader } from '../content/ocrContentReader.js';
+import {
+  toEarlyJavaScriptRequest,
+  type BrowserJavaScriptPolicy,
+} from '../browser/browserJavaScript.js';
+import { createExecuteJavascriptTool } from '../tools/executeJavascript/executeJavascript.js';
 import type { OutputSpec } from '../contracts/outputContract.js';
 import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
 import { createOutputContractStore } from '../contracts/outputContractStore.js';
@@ -215,6 +220,14 @@ export interface RunTaskConfig {
    * question dialog here). When omitted — evals, headless CLI — tools that
    * require user interaction fail closed in the pipeline. */
   requestPermission?: ToolCtx['requestPermission'];
+  /** Whether this session runs with a logged-in profile's authority. An
+   * authenticated session must state `javascriptPolicy` explicitly — see
+   * resolveJavaScriptPolicy — because inheriting a default there would hide a
+   * real capability grant behind a convenience. */
+  authenticated?: boolean;
+  /** Whether page JavaScript may run. Required for authenticated sessions;
+   * anonymous sessions default to 'allow'. */
+  javascriptPolicy?: BrowserJavaScriptPolicy;
   /** Enables the initializer → worker → judge outer loop (see HarnessConfig
    * and judge-design.md). Absent (the default): today's behavior,
    * byte-for-byte — one runAgentLoop call, no INTENT.md/CONTRACT.md/
@@ -343,6 +356,40 @@ export async function runTask(
             'inspect_document',
             createInspectDocumentTool({ registry: contentReaders! }) as ToolDef,
           ],
+          // execute_javascript is offered only when the session actually
+          // provides the capability AND the policy allows it. An anonymous
+          // session defaults to 'allow'; an authenticated one must have stated
+          // its decision (resolveJavaScriptPolicy throws otherwise), so a
+          // capability grant is never inherited by accident.
+          ...(config.browser.executeJavaScript !== undefined
+            ? ([
+                [
+                  'execute_javascript',
+                  createExecuteJavascriptTool({
+                    // Read ONCE here, at configuration time: a per-call read
+                    // would let a later ctx mutation grant a capability no
+                    // operator approved.
+                    ...(config.javascriptPolicy === undefined
+                      ? {}
+                      : { policy: config.javascriptPolicy }),
+                    authenticatedSession: config.authenticated === true,
+                    page: (ctx) => ({
+                      evaluateJson: (code, timeoutMs) =>
+                        ctx.browser!.executeJavaScript!(
+                          toEarlyJavaScriptRequest(code, timeoutMs),
+                        ),
+                      replaceUnresponsivePage: () => ctx.browser!.replaceUnresponsivePage!(),
+                    }),
+                    evidenceStore: () => evidenceStore,
+                    onPolicyDecision: (line) =>
+                      appendTranscriptEvent(runDir, {
+                        type: 'javascript_policy',
+                        decision: line,
+                      }),
+                  }) as ToolDef,
+                ],
+              ] as Array<[string, ToolDef]>)
+            : []),
         ]),
       )
     : createProductionRegistry(config.toolProfile ?? DEFAULT_TOOL_PROFILE);

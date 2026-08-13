@@ -2,6 +2,10 @@
 // (a runtime value) from this module, so the dependency between the two
 // must stay one-directional at runtime. Keep this `import type`.
 import type {
+  BrowserJavaScriptResult,
+  EarlyJavaScriptRequest,
+} from './browserJavaScript.js';
+import type {
   BrowserActionOutput,
   BrowserActionRequest,
   BrowserDialog,
@@ -273,5 +277,29 @@ export interface BrowserController {
    * @returns nothing; all browser resources are released. Repeated calls are
    *   safe and no later browser operation may succeed.
    */
+  /**
+   * Evaluate a snippet in the selected page's top document (T6).
+   *
+   * OPTIONAL on purpose: a session may legitimately not offer page JavaScript
+   * (an authenticated lane configured `deny`, or a stub in a test that never
+   * needs it). A run wires the `execute_javascript` tool only when the session
+   * provides this, so an absent capability is an omitted tool rather than a
+   * tool that fails at call time.
+   *
+   * Every call is a page WRITE — the snippet can mutate the DOM — so it must
+   * never be scheduled as a read.
+   *
+   * @throws BrowserJavaScriptTimeoutError when the hard deadline is exceeded.
+   *   Terminal: a spinning snippet cannot be interrupted, so the caller must
+   *   call replaceUnresponsivePage rather than retry into the same page
+   * @throws BrowserJavaScriptNonJsonError when the completion value cannot
+   *   cross the boundary as JSON
+   */
+  executeJavaScript?(request: EarlyJavaScriptRequest): Promise<BrowserJavaScriptResult>;
+
+  /** Discard a page whose JavaScript could not be terminated and select a
+   * replacement, invalidating that document's refs and observations (T6).
+   * Present exactly when executeJavaScript is. */
+  replaceUnresponsivePage?(): Promise<void>;
   close(): Promise<void>;
 }
