@@ -111,6 +111,52 @@ verbatim fidelity + provenance, so keep the scope to exactly that.
 construction if the agent uses the tool); spot-check that other tasks don't
 misuse it as a general scraper.
 
+## Mapping to long-running-agent engineering (Bustamante) — the subagent angle
+
+Reviewed against
+https://nicolasbustamante.com/blog/long-running-agent-engineering
+(2026-08-12, user prompt: "I feel a bit off by the fact that we haven't used
+subagents yet"). Findings:
+
+- **We already implement half his stack, at the eval layer:** his durable
+  workspace state layer = our run dir (scratch/ + artifacts/ + manifest +
+  transcript; the elision fix added his record-to-disk discipline verbatim);
+  his verification-as-backpressure + test oracles + external judge = our
+  grader/oracle harness (judges only run-dir evidence, never the transcript);
+  budgets and append-only artifact capture likewise.
+- **The gap: the initializer/worker/judge triangle exists only *around* the
+  agent, not inside a trial.** Within a run the worker judges itself — and
+  his core claim (the entity incentivized to finish must not judge
+  completion) is exactly our failure data: the "(MIT)" decoration trial and
+  wikipedia trial 2 both finished confident and wrong.
+- **Proposal 2 therefore has a weak and a strong form.** Weak: prompt-only
+  self-review (same context, same biases). Strong: a **judge subagent** —
+  fresh context, reads only the task text + run dir (the grader's exact
+  information diet), checks artifacts against the task's stated criteria,
+  returns a punch list the worker must clear before finishing. Needs no
+  browser → one extra model call per trial; the cheapest first subagent.
+- **Proposals 1+3 are his "initializer" role:** roster = expanded feature
+  list, contract = spec, written before collection so the worker cannot
+  later invent a minimal definition of done (his phrasing; our
+  missing-cohorts failure).
+- **Ralph loop / fresh worker sessions = our escalation path, not a current
+  need.** We fixed context rot surgically (elision) because one live shared
+  browser session makes mid-investigation handoffs costly. If tasks outgrow
+  the elided window (hundreds of entities, multi-hour runs), per-roster-entry
+  workers rehydrating from scratch/roster.md is the architecture; the run
+  dir already supports it.
+- **Why no subagents so far, honestly:** tasks fit one context post-elision,
+  the single browser serializes work anyway, and subagents multiply cost.
+  All three are arguments against worker swarms — none applies to the judge.
+- **Deliberately not imported:** session-start smoke tests, git baselines,
+  sandbox rehydration — multi-day software-project machinery; our trials are
+  bounded 15–60 min single-goal runs. Adopt the roles, skip the ceremony.
+
+**Revised sequencing implication:** the judge subagent may deserve to jump
+the queue over prompt-only Proposal 2 — same validation batch, structurally
+stronger mechanism, and it establishes the subagent seam (a second
+callModel consumer against a run dir) that the initializer can later reuse.
+
 ## Eval-integrity guardrail (applies to all four)
 
 None of these may encode a grader's specific checks — that's overfitting to
