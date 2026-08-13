@@ -147,3 +147,49 @@ describe('write_file → read_file round trip', () => {
     expect(entries[0]?.sha256).toBe(createHash('sha256').update('final', 'utf8').digest('hex'));
   });
 });
+
+describe('write_file append mode', () => {
+  it('appends to an existing file; the manifest hash covers the whole resulting file', async () => {
+    // The decode-stall workaround: a large deliverable built in pieces must
+    // end up byte-identical to a single write, with full-file provenance.
+    await call('write_file', { file_path: 'artifacts/report.csv', content: 'a,b\n1,2\n' });
+    const second = await call('write_file', {
+      file_path: 'artifacts/report.csv',
+      content: '3,4\n',
+      append: true,
+    });
+
+    expect(second.isError).toBe(false);
+    expect(second.content).toMatch(/appended/i);
+    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe('a,b\n1,2\n3,4\n');
+
+    const entries = readManifestFile().artifacts.filter((a) => a.filename === 'artifacts/report.csv');
+    expect(entries).toHaveLength(1);
+    expect(entries[0]?.sha256).toBe(
+      createHash('sha256').update('a,b\n1,2\n3,4\n', 'utf8').digest('hex'),
+    );
+    expect(entries[0]?.roles).toEqual(['requested_output']);
+  });
+
+  it('append to a missing file creates it — the first piece needs no special-casing', async () => {
+    const result = await call('write_file', {
+      file_path: 'scratch/notes.md',
+      content: 'piece one',
+      append: true,
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content).toMatch(/created/i);
+    expect(readFileSync(join(runDir, 'scratch/notes.md'), 'utf8')).toBe('piece one');
+  });
+
+  it('three appended pieces reproduce a single write exactly', async () => {
+    const pieces = ['# Findings\n\n', 'First section.\n', 'Second section.\n'];
+    await call('write_file', { file_path: 'artifacts/answer.md', content: pieces[0]! });
+    for (const piece of pieces.slice(1)) {
+      await call('write_file', { file_path: 'artifacts/answer.md', content: piece, append: true });
+    }
+
+    expect(readFileSync(join(runDir, 'artifacts/answer.md'), 'utf8')).toBe(pieces.join(''));
+  });
+});
