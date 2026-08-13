@@ -118,3 +118,104 @@ export function createProductionRegistry(
     ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
   ]);
 }
+
+// --- T16: the frozen V2 tool order -------------------------------------------
+//
+// The V2 surface is declared as DATA, in one place, so the order that feeds the
+// cached prompt prefix is reviewable and a snapshot test can pin it. Prompt
+// caching is a byte-exact prefix match: reordering these names silently
+// invalidates every cached prefix and re-pays the whole conversation at write
+// rates, which is why the order is frozen rather than derived from whatever
+// sequence the modules happen to be imported in.
+//
+// Tools whose construction needs run-scoped state (the contract store, the
+// table store, the evidence store, a browser reader) are FACTORIES, so they
+// cannot appear in a static array. They are named here in their frozen
+// positions and built by runTask; V2_TOOL_ORDER is the authority on where each
+// one goes.
+
+/**
+ * Every V2 production tool name, in the exact order the registry must build
+ * them. `set_output_contract` is first because it gates everything else, and
+ * `submit_for_verification` is last because it ends the run.
+ */
+export const V2_TOOL_ORDER: readonly string[] = [
+  // The contract gate.
+  'set_output_contract',
+  // Typed output construction.
+  'upsert_output_rows',
+  'delete_output_rows',
+  'set_table_completeness',
+  'write_document',
+  // Observation and action.
+  'observe',
+  'browser_action',
+  'switch_page',
+  'handle_dialog',
+  'execute_javascript',
+  // Reading the world.
+  'read_resource',
+  'capture_text',
+  'inspect_document',
+  // Evidence capture.
+  'screenshot',
+  'download',
+  // Files, for scratch and supporting work.
+  'read_file',
+  'write_file',
+  'grep',
+  // Credentials and the human.
+  'fill_credentials',
+  'ask_user_question',
+  // Parallel research.
+  'run_research_jobs',
+  // Completion.
+  'submit_for_verification',
+];
+
+/**
+ * The V2 tools that are plain definitions, keyed by name — everything not
+ * requiring run-scoped construction. runTask merges these with the factories
+ * it builds, ordered by V2_TOOL_ORDER.
+ */
+export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, ToolDef>([
+  ['screenshot', screenshotTool],
+  ['download', downloadTool],
+  ['read_file', readFileTool as ToolDef],
+  ['write_file', writeFileTool as ToolDef],
+  ['grep', grepTool as ToolDef],
+  ['fill_credentials', fillCredentialsTool as ToolDef],
+  ['ask_user_question', askUserQuestionTool as ToolDef],
+]);
+
+/**
+ * Assemble a V2 registry from the static tools plus whatever run-scoped tools
+ * the caller built, ordered by V2_TOOL_ORDER.
+ *
+ * @param runScopedTools - factory-built tools, keyed by name
+ * @returns a registry whose iteration order matches V2_TOOL_ORDER, skipping
+ *   names the caller did not supply. Skipping rather than throwing is
+ *   deliberate: a run legitimately omits tools it cannot use (no credentials,
+ *   no research runner), and the order of what remains must still be stable
+ * @throws if a supplied tool's name is absent from V2_TOOL_ORDER — that means
+ *   a new tool was added without deciding where it belongs, which would let
+ *   its position drift and break the cached prefix
+ */
+export function createV2Registry(
+  runScopedTools: ReadonlyMap<string, ToolDef> = new Map(),
+): ToolRegistry {
+  const frozen = new Set(V2_TOOL_ORDER);
+  for (const name of runScopedTools.keys()) {
+    if (!frozen.has(name)) {
+      throw new Error(
+        `tool "${name}" is not in V2_TOOL_ORDER — add it there so its position is frozen`,
+      );
+    }
+  }
+  const ordered: ToolDef[] = [];
+  for (const name of V2_TOOL_ORDER) {
+    const tool = runScopedTools.get(name) ?? V2_STATIC_TOOLS.get(name);
+    if (tool !== undefined) ordered.push(tool);
+  }
+  return createRegistry(ordered);
+}

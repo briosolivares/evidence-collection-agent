@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 
-import { createProductionRegistry } from './index.js';
-import { toApiToolDefs } from './registry.js';
+import { createProductionRegistry,
+  V2_TOOL_ORDER,
+  createV2Registry,
+} from './index.js';
+import { toApiToolDefs, type ToolDef } from './registry.js';
 
 describe('production tool schemas', () => {
   // The Claude API rejects any tool whose input_schema lacks a top-level
@@ -42,5 +46,108 @@ describe('production tool schemas', () => {
     expect(batchEnabled.get('browser_batch')?.readOnly).toBe(false);
     const rebuilt = toApiToolDefs(createProductionRegistry('batch-enabled'));
     expect(JSON.stringify(rebuilt)).toBe(JSON.stringify(toApiToolDefs(batchEnabled)));
+  });
+});
+
+// --- T16: the frozen V2 tool order -------------------------------------------
+
+describe('V2 tool order', () => {
+  it('pins the exact frozen order', () => {
+    // A snapshot in the strictest sense: prompt caching is a byte-exact prefix
+    // match, so reordering these names silently invalidates every cached
+    // prefix and re-pays the whole conversation at cache-WRITE rates. If this
+    // assertion fails, the question is not "update the test" but "was the
+    // reorder intended, and is the cache cost understood?"
+    expect(V2_TOOL_ORDER).toEqual([
+      'set_output_contract',
+      'upsert_output_rows',
+      'delete_output_rows',
+      'set_table_completeness',
+      'write_document',
+      'observe',
+      'browser_action',
+      'switch_page',
+      'handle_dialog',
+      'execute_javascript',
+      'read_resource',
+      'capture_text',
+      'inspect_document',
+      'screenshot',
+      'download',
+      'read_file',
+      'write_file',
+      'grep',
+      'fill_credentials',
+      'ask_user_question',
+      'run_research_jobs',
+      'submit_for_verification',
+    ]);
+  });
+
+  it('puts the contract gate first and completion last', () => {
+    // Structural, not cosmetic: set_output_contract gates every other call,
+    // and submit_for_verification ends the run.
+    expect(V2_TOOL_ORDER[0]).toBe('set_output_contract');
+    expect(V2_TOOL_ORDER.at(-1)).toBe('submit_for_verification');
+  });
+
+  it('contains no duplicates', () => {
+    expect(new Set(V2_TOOL_ORDER).size).toBe(V2_TOOL_ORDER.length);
+  });
+
+  it('builds a registry in frozen order, skipping tools a run cannot supply', () => {
+    const registry = createV2Registry();
+    // Only the static tools are present, but in V2 order.
+    expect([...registry.keys()]).toEqual([
+      'screenshot',
+      'download',
+      'read_file',
+      'write_file',
+      'grep',
+      'fill_credentials',
+      'ask_user_question',
+    ]);
+  });
+
+  it('places a run-scoped tool at its frozen position, not where it was passed', () => {
+    const fake = (name: string): ToolDef =>
+      ({
+        name,
+        description: name,
+        inputSchema: z.object({}).strict(),
+        readOnly: true,
+        execute: async () => 'ok',
+      }) as ToolDef;
+
+    const registry = createV2Registry(
+      // Deliberately supplied in the WRONG order.
+      new Map([
+        ['submit_for_verification', fake('submit_for_verification')],
+        ['set_output_contract', fake('set_output_contract')],
+      ]),
+    );
+    const names = [...registry.keys()];
+    expect(names[0]).toBe('set_output_contract');
+    expect(names.at(-1)).toBe('submit_for_verification');
+  });
+
+  it('refuses a tool whose name is not in the frozen order', () => {
+    const rogue = {
+      name: 'surprise_tool',
+      description: 'x',
+      inputSchema: z.object({}).strict(),
+      readOnly: true,
+      execute: async () => 'ok',
+    } as ToolDef;
+    expect(() => createV2Registry(new Map([['surprise_tool', rogue]]))).toThrow(
+      /not in V2_TOOL_ORDER/,
+    );
+  });
+
+  it('serializes its API definitions byte-identically across calls', () => {
+    // The cached-prefix guarantee, asserted directly.
+    const first = JSON.stringify(toApiToolDefs(createV2Registry()));
+    const second = JSON.stringify(toApiToolDefs(createV2Registry()));
+    expect(first).toBe(second);
   });
 });
