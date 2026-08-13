@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { CallModel, Message, ModelResponse, Usage } from '../loop/messages.js';
-import { JUDGE_MAX_TURNS, JUDGE_MODEL, runJudge } from './judge.js';
+import { JUDGE_MAX_CONTEXT_TOKENS, JUDGE_MODEL, runJudge } from './judge.js';
 
 // Every test drives the judge with a scripted fake callModel — zero real API
 // calls anywhere in this file (hermetic-suite convention, matching
@@ -89,9 +89,9 @@ afterEach(() => {
 });
 
 describe('constants', () => {
-  it('pins the judge model id and turn cap', () => {
+  it('pins the judge model id and context guard', () => {
     expect(JUDGE_MODEL).toBe('claude-haiku-4-5-20251001');
-    expect(JUDGE_MAX_TURNS).toBe(16);
+    expect(JUDGE_MAX_CONTEXT_TOKENS).toBe(150_000);
   });
 });
 
@@ -175,12 +175,38 @@ describe('runJudge', () => {
     expect(requests).toHaveLength(2);
   });
 
-  it('hitting the turn cap triggers one forced-verdict call that closes dangling tool calls', async () => {
-    const responses = Array.from({ length: JUDGE_MAX_TURNS }, (_, i) =>
+  it('turns are uncapped below the guard: a long investigation still reaches its own verdict', async () => {
+    // 30 tool turns — nearly double the old fixed cap — under the context
+    // guard, then a real verdict from the model itself (no forced call).
+    const responses = Array.from({ length: 30 }, (_, i) =>
       toolResponse([{ id: `t${i}`, name: 'grep', input: { pattern: 'widget' } }]),
     );
-    // The forced-verdict call answers with a real verdict.
-    responses.push(textResponse('CONTINUE: could not finish verifying widget counts.'));
+    responses.push(textResponse('DONE'));
+    const { callModel, requests } = scriptModel(responses);
+    const result = await runJudge({ taskText: TASK, runDir, callModel });
+
+    expect(result).toEqual({ verdict: 'done', reason: '' });
+    expect(requests).toHaveLength(31);
+  });
+
+  it('tripping the context guard triggers one forced-verdict call that closes dangling tool calls', async () => {
+    const overBudget = {
+      input_tokens: JUDGE_MAX_CONTEXT_TOKENS,
+      output_tokens: 1,
+      cache_read_input_tokens: 0,
+      cache_creation_input_tokens: 0,
+    };
+    const responses = [
+      toolResponse([{ id: 't0', name: 'grep', input: { pattern: 'widget' } }]),
+      // Second investigative response overruns the guard while still
+      // requesting tools — its calls must not execute.
+      {
+        ...toolResponse([{ id: 't1', name: 'grep', input: { pattern: 'widget' } }]),
+        usage: overBudget,
+      },
+      // The forced-verdict call answers with a real verdict.
+      textResponse('CONTINUE: could not finish verifying widget counts.'),
+    ];
     const { callModel, requests } = scriptModel(responses);
     const result = await runJudge({ taskText: TASK, runDir, callModel });
 
@@ -188,34 +214,59 @@ describe('runJudge', () => {
       verdict: 'continue',
       reason: 'could not finish verifying widget counts.',
     });
-    // JUDGE_MAX_TURNS investigative calls plus exactly one forced-verdict call.
-    expect(requests).toHaveLength(JUDGE_MAX_TURNS + 1);
-    // The forced message closes the last turn's dangling tool_use with an
-    // is_error result (the API requires every tool_use answered) and then
-    // demands the verdict as a text block.
-    const forcedRequest = requests[JUDGE_MAX_TURNS]!;
+    // Two investigative calls plus exactly one forced-verdict call.
+    expect(requests).toHaveLength(3);
+    // The forced message closes the guard-tripping turn's dangling tool_use
+    // with an is_error result (the API requires every tool_use answered)
+    // and then demands the verdict as a text block.
+    const forcedRequest = requests[2]!;
     const forcedMessage = forcedRequest[forcedRequest.length - 1]!;
     expect(forcedMessage.role).toBe('user');
     const [closing, demand] = forcedMessage.content as unknown as Array<Record<string, unknown>>;
     expect(closing).toMatchObject({
       type: 'tool_result',
-      tool_use_id: `t${JUDGE_MAX_TURNS - 1}`,
+      tool_use_id: 't1',
       is_error: true,
     });
     expect(demand).toMatchObject({ type: 'text' });
     expect(String((demand as { text: string }).text)).toContain('final verdict');
   });
 
+  it('a verdict whose own turn overruns the guard is still returned — answer in hand', async () => {
+    const { callModel } = scriptModel([
+      {
+        ...textResponse('DONE'),
+        usage: {
+          input_tokens: JUDGE_MAX_CONTEXT_TOKENS + 1,
+          output_tokens: 1,
+          cache_read_input_tokens: 0,
+          cache_creation_input_tokens: 0,
+        },
+      },
+    ]);
+    const result = await runJudge({ taskText: TASK, runDir, callModel });
+
+    expect(result).toEqual({ verdict: 'done', reason: '' });
+  });
+
   it('a forced-verdict response that still requests tools yields the generic continue reason', async () => {
-    const responses = Array.from({ length: JUDGE_MAX_TURNS }, (_, i) =>
-      toolResponse([{ id: `t${i}`, name: 'grep', input: { pattern: 'widget' } }]),
-    );
-    responses.push(toolResponse([{ id: 'tx', name: 'grep', input: { pattern: 'more' } }]));
+    const responses = [
+      {
+        ...toolResponse([{ id: 't0', name: 'grep', input: { pattern: 'widget' } }]),
+        usage: {
+          input_tokens: JUDGE_MAX_CONTEXT_TOKENS,
+          output_tokens: 1,
+          cache_read_input_tokens: 0,
+          cache_creation_input_tokens: 0,
+        },
+      },
+      toolResponse([{ id: 'tx', name: 'grep', input: { pattern: 'more' } }]),
+    ];
     const { callModel, requests } = scriptModel(responses);
     const result = await runJudge({ taskText: TASK, runDir, callModel });
 
     expect(result).toEqual({ verdict: 'continue', reason: 'judge did not reach a parseable verdict' });
-    expect(requests).toHaveLength(JUDGE_MAX_TURNS + 1);
+    expect(requests).toHaveLength(2);
   });
 
   it('accepts a verdict on the last line when the model narrates a summary first', async () => {

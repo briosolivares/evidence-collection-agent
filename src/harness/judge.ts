@@ -42,23 +42,26 @@ import { CONTRACT_FILENAME, INTENT_FILENAME } from './initializer.js';
  * role table. */
 export const JUDGE_MODEL = 'claude-haiku-4-5-20251001';
 
-/** Maximum number of model calls in one judge run. Bounds the mini-loop
- * outright: verifying a contract needs at most a handful of targeted reads,
- * never an open-ended investigation (that would blur into re-collecting
- * evidence, which is out of scope for this role). Hitting the cap without a
- * parseable final response is treated as CONTINUE (see runJudge) — never as
- * a silent DONE. */
-export const JUDGE_MAX_TURNS = 16;
+/** Per-request context ceiling for the judge's mini-loop — its terminating
+ * guard, mirroring the worker loop's design (LoopConfig.maxContextTokens):
+ * turns are deliberately uncapped (v2 ruling; fixed caps of 8 and then 16
+ * were both exhausted mid-investigation by real run dirs), and because the
+ * conversation grows every turn, a context ceiling alone still guarantees
+ * termination. Measured the same way as the worker's guard: the response's
+ * input + cache creation + cache read + output tokens. 150k leaves ample
+ * headroom under the judge model's 200k window for the forced-verdict call
+ * that follows a guard trip. */
+export const JUDGE_MAX_CONTEXT_TOKENS = 150_000;
 
 /**
  * The user message that demands a verdict once the inspection budget is
- * exhausted. Sent exactly once, after JUDGE_MAX_TURNS responses that all
- * still requested tools: it closes the final turn's unexecuted tool calls
- * (the API requires every tool_use answered) and leaves no room for further
- * inspection — measured live (wikipedia-class run dirs with offloaded
- * inspections), a judge mid-investigation at the cap otherwise never gets
- * asked for its verdict at all and every such run degrades to the generic
- * fallback reason.
+ * exhausted. Sent exactly once, after a response whose context exceeded
+ * JUDGE_MAX_CONTEXT_TOKENS while still requesting tools: it closes that
+ * turn's unexecuted tool calls (the API requires every tool_use answered)
+ * and leaves no room for further inspection — measured live
+ * (wikipedia-class run dirs with offloaded inspections), a judge
+ * mid-investigation at the guard otherwise never gets asked for its verdict
+ * at all and every such run degrades to the generic fallback reason.
  */
 const FORCED_VERDICT_PROMPT =
   'Your inspection budget is exhausted — no further tool calls will be ' +
@@ -137,11 +140,13 @@ const UNPARSEABLE_REASON = 'judge did not reach a parseable verdict';
  * grep only — a call naming any other tool gets the pipeline's structured
  * `unknown_tool` error, same as an unregistered tool anywhere else in this
  * codebase) and feed the results back as one tool_result message; otherwise
- * parse its text as the final verdict. At most JUDGE_MAX_TURNS
- * investigative model calls are made; if the model is still requesting
- * tools on the last one, a single forced-verdict call follows (dangling
- * tool calls closed with is_error results, then FORCED_VERDICT_PROMPT), so
- * cap exhaustion produces a real verdict rather than the generic fallback.
+ * parse its text as the final verdict. Investigative calls are uncapped;
+ * the terminating guard is JUDGE_MAX_CONTEXT_TOKENS (context grows every
+ * turn, so termination is guaranteed). When a response trips the guard
+ * while still requesting tools, a single forced-verdict call follows
+ * (dangling tool calls closed with is_error results, then
+ * FORCED_VERDICT_PROMPT), so guard exhaustion produces a real verdict
+ * rather than the generic fallback.
  *
  * This function performs no run-directory writes of its own: it does not
  * append to transcript.jsonl and does not write metrics.json (those belong
@@ -194,7 +199,7 @@ export async function runJudge(args: {
 
   let danglingToolUses: readonly ToolUseBlock[] = [];
   let correctiveUsed = false;
-  for (let turn = 1; turn <= JUDGE_MAX_TURNS; turn += 1) {
+  while (true) {
     const response = await callModel(messages);
     messages.push({ role: 'assistant', content: response.content });
 
@@ -207,7 +212,9 @@ export async function runJudge(args: {
       // thinking out loud (measured live: mid-investigation analysis prose
       // with stop_reason end_turn). One corrective re-ask converts most of
       // those into a real verdict; a second failure falls through to the
-      // fail-safe rather than looping.
+      // fail-safe rather than looping. A parseable verdict returns even if
+      // its turn overran the context guard — the answer is already in hand,
+      // matching the worker loop's completion-before-guards order.
       if (parsed.reason !== UNPARSEABLE_REASON || correctiveUsed) {
         return parsed;
       }
@@ -219,10 +226,16 @@ export async function runJudge(args: {
       continue;
     }
 
-    // The cap bounds investigative calls, not tool executions: on the last
-    // allowed turn nothing would ever read the results, so skip execution
-    // and fall through to the forced-verdict call below.
-    if (turn === JUDGE_MAX_TURNS) {
+    // Terminating guard (turns are uncapped): once this response's full
+    // context exceeds the ceiling, executing more tools would only grow it
+    // further, so skip execution and fall through to the forced-verdict
+    // call below. Same context measure as the worker loop's guard.
+    const contextTokens =
+      response.usage.input_tokens
+      + (response.usage.cache_creation_input_tokens ?? 0)
+      + (response.usage.cache_read_input_tokens ?? 0)
+      + response.usage.output_tokens;
+    if (contextTokens > JUDGE_MAX_CONTEXT_TOKENS) {
       danglingToolUses = toolUses;
       break;
     }
