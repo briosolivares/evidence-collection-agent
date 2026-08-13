@@ -1,0 +1,726 @@
+{
+  "schemaVersion": 1,
+  "project": "Browser Agent V2",
+  "updatedAt": "2026-08-13",
+  "implementationBaseline": {
+    "branch": "feat/judge-harness",
+    "commit": "19d458f"
+  },
+  "documents": {
+    "design": "../revised-browser-agent-proposal.md",
+    "implementationPlan": "../revised-browser-agent-implementation-plan.md",
+    "progress": "./progress.md"
+  },
+  "allowedStatuses": [
+    "not_started",
+    "in_progress",
+    "blocked",
+    "complete"
+  ],
+  "statusRules": {
+    "not_started": "No implementation work for this item has begun.",
+    "in_progress": "Implementation or verification is actively underway.",
+    "blocked": "Work cannot proceed until the listed blocker is resolved.",
+    "complete": "All features and completion criteria pass, including the focused tests, typecheck, and full hermetic suite."
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Make model responses trustworthy",
+      "status": "not_started",
+      "dependsOn": [],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t1--make-model-responses-trustworthy",
+      "features": [
+        {
+          "id": "T1.1",
+          "description": "Require terminal message_delta, non-error stop reason, message_stop, and closed supported content blocks.",
+          "status": "not_started"
+        },
+        {
+          "id": "T1.2",
+          "description": "Buffer attempts before history or execution; retry one max_tokens response without committing the rejected attempt.",
+          "status": "not_started"
+        },
+        {
+          "id": "T1.3",
+          "description": "Use one cancellable ModelDriver for production and TUI request/stream handling.",
+          "status": "not_started"
+        },
+        {
+          "id": "T1.4",
+          "description": "Enforce finite call/output limits, maxToolCallsPerTurn, and the combined tool-result byte cap before side effects or the next request.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Truncation, refusal, context exhaustion, max_tokens, and over-cap responses cannot complete a run or execute tools.",
+        "Rejected attempts are absent from subsequent model history.",
+        "TUI and runTask use the same model driver and cancellation path."
+      ],
+      "focusedTestCommand": "npx vitest run src/model/streamAssembly.test.ts src/model/modelDriver.test.ts src/model/callModel.test.ts src/model/callWithRetry.test.ts src/loop/agentLoop.test.ts tests/tui/run-session.test.ts"
+    },
+    {
+      "id": "T2",
+      "title": "Preserve one worker session and report truthful outcomes",
+      "status": "not_started",
+      "dependsOn": [
+        "T1"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t2--preserve-one-worker-session-and-report-truthful-outcomes",
+      "features": [
+        {
+          "id": "T2.1",
+          "description": "Keep one WorkerSession and append verifier corrections without restarting the conversation.",
+          "status": "not_started"
+        },
+        {
+          "id": "T2.2",
+          "description": "Enforce one finite whole-run budget across initializer, worker, verifier, tools, time, and corrections.",
+          "status": "not_started"
+        },
+        {
+          "id": "T2.3",
+          "description": "Return verified, incomplete, failed, or cancelled outcomes without mapping judge failure or exhausted corrections to success.",
+          "status": "not_started"
+        },
+        {
+          "id": "T2.4",
+          "description": "Include every model role in run metrics while preserving current aggregate readers.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Corrections retain the existing worker messages and browser knowledge.",
+        "Budgets never reset between correction cycles.",
+        "Judge crash, correction exhaustion, and budget exhaustion are incomplete outcomes."
+      ],
+      "focusedTestCommand": "npx vitest run src/loop/workerSession.test.ts src/run/runBudget.test.ts src/harness/harness.test.ts src/cli/runTask.test.ts tests/tui/eval-session.test.ts tests/tui/run-session.test.ts"
+    },
+    {
+      "id": "T3",
+      "title": "Replace prose judge verdicts with a typed verifier result",
+      "status": "not_started",
+      "dependsOn": [
+        "T2"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t3--replace-prose-judge-verdicts-with-a-typed-verifier-result",
+      "features": [
+        {
+          "id": "T3.1",
+          "description": "Return verified or needs_correction through the schema-validated report_verification tool.",
+          "status": "not_started"
+        },
+        {
+          "id": "T3.2",
+          "description": "Give the verifier only scoped read/image tools and evidence-relevant run data.",
+          "status": "not_started"
+        },
+        {
+          "id": "T3.3",
+          "description": "Allow one bounded schema repair and fail closed as verifier_unavailable afterward.",
+          "status": "not_started"
+        },
+        {
+          "id": "T3.4",
+          "description": "Remove DONE and CONTINUE text parsing while preserving screenshot-aware review.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Ordinary verdict prose has no control-flow meaning.",
+        "Malformed, refused, truncated, or missing reports cannot verify a run.",
+        "The verifier checks task, contract, output, completeness, and evidence relationships."
+      ],
+      "focusedTestCommand": "npx vitest run src/harness/verifier.test.ts src/harness/harness.test.ts src/cli/runTask.test.ts"
+    },
+    {
+      "id": "T4",
+      "title": "Introduce one typed output contract",
+      "status": "not_started",
+      "dependsOn": [
+        "T3"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t4--introduce-one-typed-output-contract",
+      "features": [
+        {
+          "id": "T4.1",
+          "description": "Implement and cross-validate the OutputContract and OutputSpec schemas.",
+          "status": "not_started"
+        },
+        {
+          "id": "T4.2",
+          "description": "Persist numbered contract revisions and their evidence, assumption, or user basis through writeArtifact.",
+          "status": "not_started"
+        },
+        {
+          "id": "T4.3",
+          "description": "Require set_output_contract first and block all later calls when the first contract is missing or invalid.",
+          "status": "not_started"
+        },
+        {
+          "id": "T4.4",
+          "description": "Support worker and initializer ContractAuthor policies with the same schema and verifier path.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Both authoring modes produce the same stored representation for the same input.",
+        "Missing or invalid first contracts cause zero browser side effects and one result per attempted call.",
+        "Tool order and the static prompt prefix remain deterministic."
+      ],
+      "focusedTestCommand": "npx vitest run src/contracts/outputContract.test.ts src/contracts/outputContractStore.test.ts src/tools/setOutputContract/setOutputContract.test.ts src/harness/initializer.test.ts src/harness/verifier.test.ts src/tools/index.test.ts src/model/callModel.test.ts"
+    },
+    {
+      "id": "T5",
+      "title": "Add explicit submission and code-based completion checks",
+      "status": "not_started",
+      "dependsOn": [
+        "T4"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t5--add-explicit-submission-and-code-based-completion-checks",
+      "features": [
+        {
+          "id": "T5.1",
+          "description": "Make submit_for_verification an exclusive control tool and remove implicit no-tool completion.",
+          "status": "not_started"
+        },
+        {
+          "id": "T5.2",
+          "description": "Run objective manifest, file, schema, column, count, uniqueness, capture, marker, and placeholder checks before the verifier.",
+          "status": "not_started"
+        },
+        {
+          "id": "T5.3",
+          "description": "Return code and verifier findings to the same worker with separate failure counters.",
+          "status": "not_started"
+        },
+        {
+          "id": "T5.4",
+          "description": "Finalize incomplete runs truthfully and mark only unresolved usable artifacts partial.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Only submission followed by passing code checks and verification returns verified.",
+        "Mixed submission responses execute nothing.",
+        "A fake-model integration test completes the full protocol without a real API call."
+      ],
+      "focusedTestCommand": "npx vitest run src/completion/completionCheck.test.ts src/completion/workerResponseProtocol.test.ts src/cli/runTask.verification.test.ts src/harness/verifier.test.ts src/harness/harness.test.ts src/run/artifacts.test.ts"
+    },
+    {
+      "id": "T6",
+      "title": "Add bounded page-scoped JavaScript",
+      "status": "not_started",
+      "dependsOn": [
+        "T1",
+        "T4"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t6--add-bounded-page-scoped-javascript",
+      "features": [
+        {
+          "id": "T6.1",
+          "description": "Execute bounded JSON-returning JavaScript in the selected top document with page locking and result offload.",
+          "status": "not_started"
+        },
+        {
+          "id": "T6.2",
+          "description": "Persist JavaScript extraction evidence with code, result, URL, and document identity.",
+          "status": "not_started"
+        },
+        {
+          "id": "T6.3",
+          "description": "Terminate frozen execution and replace an unrecoverable page instead of hanging the run.",
+          "status": "not_started"
+        },
+        {
+          "id": "T6.4",
+          "description": "Require an explicit allow or deny JavaScript policy for authenticated sessions.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "A fixture list is bulk-extracted in one call with reviewable evidence.",
+        "Invalid, oversized, or frozen execution returns bounded failure while the run remains usable.",
+        "Authenticated execution cannot occur without an explicit policy."
+      ],
+      "focusedTestCommand": "npx vitest run src/tools/executeJavascript/executeJavascript.test.ts src/browser/playwrightBrowserController.test.ts src/tools/capResult.test.ts src/run/artifacts.test.ts src/cli/runTask.test.ts"
+    },
+    {
+      "id": "T7",
+      "title": "Store evidence-linked rows and render tables with code",
+      "status": "not_started",
+      "dependsOn": [
+        "T5",
+        "T6"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t7--store-evidence-linked-rows-and-render-tables-with-code",
+      "features": [
+        {
+          "id": "T7.1",
+          "description": "Add atomic, versioned output-row upsert/delete and table-completeness operations tied to the contract.",
+          "status": "not_started"
+        },
+        {
+          "id": "T7.2",
+          "description": "Validate exact fields, values, types, uniqueness, formula-leading strings, and evidence IDs before mutation.",
+          "status": "not_started"
+        },
+        {
+          "id": "T7.3",
+          "description": "Render exact CSV, JSON, or Markdown columns through deterministic application code.",
+          "status": "not_started"
+        },
+        {
+          "id": "T7.4",
+          "description": "Require completeness evidence for count-ruled tables and render usable partial tables on incomplete runs.",
+          "status": "not_started"
+        },
+        {
+          "id": "T7.5",
+          "description": "Return derived OutputSummary state so the worker sees table and evidence failures before submission.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Rendered outputs contain exactly the contract columns in order.",
+        "Invalid batches and version conflicts make no partial mutation.",
+        "Count-ruled tables require evidence-backed completeness and incomplete runs preserve parseable partial rows."
+      ],
+      "focusedTestCommand": "npx vitest run src/outputs/outputTable.test.ts src/outputs/renderTable.test.ts src/outputs/outputSummary.test.ts src/tools/upsertOutputRows/upsertOutputRows.test.ts src/tools/deleteOutputRows/deleteOutputRows.test.ts src/tools/setTableCompleteness/setTableCompleteness.test.ts src/completion/completionCheck.test.ts src/run/artifacts.test.ts evals/grading/manifestVerification.test.ts"
+    },
+    {
+      "id": "T8",
+      "title": "Render evidence-linked documents",
+      "status": "not_started",
+      "dependsOn": [
+        "T7"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t8--render-evidence-linked-documents",
+      "features": [
+        {
+          "id": "T8.1",
+          "description": "Parse evidence markers and enforce document-wide or per-section evidence requirements.",
+          "status": "not_started"
+        },
+        {
+          "id": "T8.2",
+          "description": "Save the evidence-marked source in scratch and render clean or footnoted requested outputs.",
+          "status": "not_started"
+        },
+        {
+          "id": "T8.3",
+          "description": "Render PDF from a fixed local template in a dedicated network-disabled page.",
+          "status": "not_started"
+        },
+        {
+          "id": "T8.4",
+          "description": "Give the verifier the marked source and published render without exposing unrelated scratch data.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Unknown or insufficient evidence markers fail before verification.",
+        "Marked and published artifacts have correct hashes and workspace roles.",
+        "Hidden output exposes no raw IDs and footnote output has readable stable references."
+      ],
+      "focusedTestCommand": "npx vitest run src/outputs/documentSource.test.ts src/outputs/renderDocument.test.ts src/tools/writeDocument/writeDocument.test.ts src/completion/completionCheck.test.ts src/harness/verifier.test.ts src/run/artifacts.test.ts"
+    },
+    {
+      "id": "T9",
+      "title": "Give the browser stable page and observation identity",
+      "status": "not_started",
+      "dependsOn": [
+        "T1"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t9--give-the-browser-stable-page-and-observation-identity",
+      "features": [
+        {
+          "id": "T9.1",
+          "description": "Track stable page/frame IDs, document replacement, observation snapshots, popups, and frame changes.",
+          "status": "not_started"
+        },
+        {
+          "id": "T9.2",
+          "description": "Bind ElementRef to page, frame, and document and re-resolve targets conservatively without ordinal retargeting.",
+          "status": "not_started"
+        },
+        {
+          "id": "T9.3",
+          "description": "Use basedOnObservationId as a diff baseline and return a full bounded snapshot after cache eviction.",
+          "status": "not_started"
+        },
+        {
+          "id": "T9.4",
+          "description": "Add observe while keeping legacy atomic browser tools working through adapters.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Document replacement invalidates old refs but unrelated mutation does not.",
+        "Duplicate reordered rows cannot redirect a mutating action.",
+        "Popup, frame, and observation identity remain correct across snapshots."
+      ],
+      "focusedTestCommand": "npx vitest run src/browser/playwrightBrowserController.test.ts src/tools/observe/observe.test.ts src/tools/inspectPage/inspectPage.test.ts src/tools/click/click.test.ts src/tools/type/type.test.ts"
+    },
+    {
+      "id": "T10",
+      "title": "Replace blind browser batches with receipted actions",
+      "status": "not_started",
+      "dependsOn": [
+        "T9"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t10--replace-blind-browser-batches-with-receipted-actions",
+      "features": [
+        {
+          "id": "T10.1",
+          "description": "Run one to eight same-document actions with per-action receipts and explicit committed effects.",
+          "status": "not_started"
+        },
+        {
+          "id": "T10.2",
+          "description": "Stop safely on navigation, replacement, popup, dialog, stale target, or failure and report the first unexecuted action.",
+          "status": "not_started"
+        },
+        {
+          "id": "T10.3",
+          "description": "Implement separate success-check, DOM-quiescence, and settle timeouts plus blocker classification.",
+          "status": "not_started"
+        },
+        {
+          "id": "T10.4",
+          "description": "Add switch_page and handle_dialog and upgrade JavaScript to explicit page/frame/document targeting.",
+          "status": "not_started"
+        },
+        {
+          "id": "T10.5",
+          "description": "Reach browser_batch behavioral and diagnostic parity before considering removal.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Tests distinguish untouched, partial, complete, failed-check, stale, unsettled, and blocked outcomes.",
+        "Mid-sequence navigation never executes against the replacement document.",
+        "Final-action navigation is reported as completed and uploads cannot escape the run directory."
+      ],
+      "focusedTestCommand": "npx vitest run src/browser/playwrightBrowserController.test.ts src/tools/browserAction/browserAction.test.ts src/tools/switchPage/switchPage.test.ts src/tools/handleDialog/handleDialog.test.ts src/tools/executeJavascript/executeJavascript.test.ts src/tools/browserBatch/browserBatch.test.ts"
+    },
+    {
+      "id": "T11",
+      "title": "Add targeted observation and anonymous public-resource reads",
+      "status": "not_started",
+      "dependsOn": [
+        "T6",
+        "T9"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t11--add-targeted-observation-and-anonymous-public-resource-reads",
+      "features": [
+        {
+          "id": "T11.1",
+          "description": "Index deliberately visited or observed URLs and allow only those public resource targets.",
+          "status": "not_started"
+        },
+        {
+          "id": "T11.2",
+          "description": "Read JSON, CSV, or HTML through an anonymous context and persist original response evidence.",
+          "status": "not_started"
+        },
+        {
+          "id": "T11.3",
+          "description": "Reject credentials, private/loopback/reserved addresses, and unsafe redirects.",
+          "status": "not_started"
+        },
+        {
+          "id": "T11.4",
+          "description": "Add targeted text, table, and visual observations plus exact capture_text evidence.",
+          "status": "not_started"
+        },
+        {
+          "id": "T11.5",
+          "description": "Require visible-UI spot reconciliation before endpoint data becomes final output data.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Observed public resources return bounded parsed previews and saved original bytes without profile credentials.",
+        "Unobserved and private-address targets are rejected.",
+        "Targeted table/visual/text observations retain identity and are smaller than full-page output."
+      ],
+      "focusedTestCommand": "npx vitest run src/browser/publicResourceReader.test.ts src/browser/discoveredUrlIndex.test.ts src/tools/readResource/readResource.test.ts src/tools/captureText/captureText.test.ts src/tools/observe/observe.test.ts src/evidence/evidenceStore.test.ts"
+    },
+    {
+      "id": "T12",
+      "title": "Add PDF, spreadsheet, and OCR content adapters",
+      "status": "not_started",
+      "dependsOn": [
+        "T11"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t12--add-pdf-spreadsheet-and-ocr-content-adapters",
+      "features": [
+        {
+          "id": "T12.1",
+          "description": "Detect trusted content type from bytes and media type and route through a ContentReader registry.",
+          "status": "not_started"
+        },
+        {
+          "id": "T12.2",
+          "description": "Extract bounded PDF page ranges with text/layout locators and optional page images.",
+          "status": "not_started"
+        },
+        {
+          "id": "T12.3",
+          "description": "Read bounded spreadsheet sheet/cell ranges with exact addresses and values.",
+          "status": "not_started"
+        },
+        {
+          "id": "T12.4",
+          "description": "Run cancellable OCR with engine/version/confidence metadata and retained source images.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "PDF, spreadsheet, and OCR fixture output retains page, cell, or image provenance.",
+        "Large sources return bounded chunks with continuation ranges.",
+        "Cancellation releases parsing work and preserves normal run finalization."
+      ],
+      "focusedTestCommand": "npx vitest run src/content/contentReader.test.ts src/content/pdfContentReader.test.ts src/content/spreadsheetContentReader.test.ts src/content/ocrContentReader.test.ts src/tools/inspectDocument/inspectDocument.test.ts src/tools/readResource/readResource.test.ts"
+    },
+    {
+      "id": "T13",
+      "title": "Make tool scheduling input-aware",
+      "status": "not_started",
+      "dependsOn": [
+        "T7",
+        "T10",
+        "T12"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t13--make-tool-scheduling-input-aware",
+      "features": [
+        {
+          "id": "T13.1",
+          "description": "Validate inputs before scheduling and derive page, observation, table, file, origin, and manifest access keys.",
+          "status": "not_started"
+        },
+        {
+          "id": "T13.2",
+          "description": "Overlap only calls with no write/read or write/write conflict and run undeclared tools serially.",
+          "status": "not_started"
+        },
+        {
+          "id": "T13.3",
+          "description": "Buffer model-visible results and derived state, then commit in original call order while serializing manifest writes.",
+          "status": "not_started"
+        },
+        {
+          "id": "T13.4",
+          "description": "Retain bounded concurrency and existing per-turn, whole-run, per-result, and combined-result caps.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Same-page and same-table calls serialize while independent resources overlap.",
+        "Invalid input causes zero side effects and out-of-order completion remains deterministic.",
+        "Missing access declarations fail safely to serial execution."
+      ],
+      "focusedTestCommand": "npx vitest run src/loop/scheduler.test.ts src/loop/agentLoop.test.ts src/tools/pipeline.test.ts src/tools/registry.test.ts src/tools/index.test.ts"
+    },
+    {
+      "id": "T14",
+      "title": "Add bounded research jobs",
+      "status": "not_started",
+      "dependsOn": [
+        "T2",
+        "T7",
+        "T10",
+        "T13"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t14--add-bounded-research-jobs",
+      "features": [
+        {
+          "id": "T14.1",
+          "description": "Run bounded entity jobs in isolated public headless sessions with linked cancellation and individual transcripts.",
+          "status": "not_started"
+        },
+        {
+          "id": "T14.2",
+          "description": "Reuse one stable worker prefix and restrict child tools and shared-state access.",
+          "status": "not_started"
+        },
+        {
+          "id": "T14.3",
+          "description": "Return typed rows, evidence, limitations, and usage rather than child conversations.",
+          "status": "not_started"
+        },
+        {
+          "id": "T14.4",
+          "description": "Merge in deterministic order, namespace row IDs, validate evidence, and surface conflicts without last-writer wins.",
+          "status": "not_started"
+        },
+        {
+          "id": "T14.5",
+          "description": "Limit public concurrency to two or three and keep headed/authenticated work serial under the coordinator.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Independent fixture jobs overlap without sharing browser or output-table state.",
+        "Failed children do not discard successful results and conflicts are explicit.",
+        "All child usage counts against parent budgets and metrics."
+      ],
+      "focusedTestCommand": "npx vitest run src/research/researchJob.test.ts src/research/researchRegistry.test.ts src/research/mergeResearchResults.test.ts src/tools/runResearchJobs/runResearchJobs.test.ts src/run/runBudget.test.ts src/model/callModel.test.ts"
+    },
+    {
+      "id": "T15",
+      "title": "Add cache-safe compact memory",
+      "status": "not_started",
+      "dependsOn": [
+        "T4",
+        "T7",
+        "T9"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t15--add-cache-safe-compact-memory",
+      "features": [
+        {
+          "id": "T15.1",
+          "description": "Derive AgentContext from contract, output summaries, browser pages, recent events, and repeated failures.",
+          "status": "not_started"
+        },
+        {
+          "id": "T15.2",
+          "description": "Keep the cached prefix stable and append state snapshots only when their source hash changes.",
+          "status": "not_started"
+        },
+        {
+          "id": "T15.3",
+          "description": "Compact only at explicit cache boundaries without removing current contract, output, evidence, or unresolved failure state.",
+          "status": "not_started"
+        },
+        {
+          "id": "T15.4",
+          "description": "Freeze tool-result inline/offload decisions and preview bytes across history replay.",
+          "status": "not_started"
+        },
+        {
+          "id": "T15.5",
+          "description": "Measure pass rate, cache use, cost, latency, context peak, and repeated-action rate against non-compact mode.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Unchanged state produces byte-identical history and cache markers.",
+        "Old repeated failures remain visible after raw history compaction.",
+        "Compact memory graduates only if pass rate holds and wall time or cost improves."
+      ],
+      "focusedTestCommand": "npx vitest run src/loop/agentContext.test.ts src/loop/contextView.test.ts src/loop/workerSession.test.ts src/model/callModel.test.ts"
+    },
+    {
+      "id": "T16",
+      "title": "Cut over to V2 and retire superseded paths",
+      "status": "not_started",
+      "dependsOn": [
+        "T3",
+        "T8",
+        "T12",
+        "T14",
+        "T15"
+      ],
+      "owner": null,
+      "startedAt": null,
+      "completedAt": null,
+      "blockedBy": [],
+      "planAnchor": "../revised-browser-agent-implementation-plan.md#t16--cut-over-to-v2-and-retire-superseded-paths",
+      "features": [
+        {
+          "id": "T16.1",
+          "description": "Freeze one deterministic V2 production tool order and static prompt snapshot.",
+          "status": "not_started"
+        },
+        {
+          "id": "T16.2",
+          "description": "Remove browser_batch, raw requested-output CSV, prose contract, and implicit completion paths only after their parity gates pass.",
+          "status": "not_started"
+        },
+        {
+          "id": "T16.3",
+          "description": "Propagate truthful RunOutcome through CLI, TUI, eval output, and reports while retaining legacy run readability.",
+          "status": "not_started"
+        },
+        {
+          "id": "T16.4",
+          "description": "Prepare the four-way contract-author/verifier comparison and run it only with user approval.",
+          "status": "not_started"
+        },
+        {
+          "id": "T16.5",
+          "description": "Update summaries, handoff state, demos, and production defaults after the measured decision.",
+          "status": "not_started"
+        }
+      ],
+      "completionCriteria": [
+        "Production has one driver, contract, verifier protocol, completion path, and frozen registry.",
+        "No false-success control path remains and old run directories are still readable.",
+        "Typecheck and full hermetic tests pass; live evaluation requires explicit user direction."
+      ],
+      "focusedTestCommand": "npm run typecheck && npm test"
+    }
+  ]
+}

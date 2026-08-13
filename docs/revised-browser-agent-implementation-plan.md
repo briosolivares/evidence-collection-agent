@@ -6,6 +6,10 @@
 
 **Design source:** [Browser Agent V2 — Revised Architecture Proposal](./revised-browser-agent-proposal.md)
 
+**Machine-readable checklist:** [Browser Agent V2 tasks](./browser-agent-v2/tasks.json)
+
+**Progress log:** [Browser Agent V2 progress](./browser-agent-v2/progress.md)
+
 **Implementation baseline:** `feat/judge-harness` at `19d458f`, plus the two
 V2 design documents from `docs/browser-agent-v2-proposal`
 
