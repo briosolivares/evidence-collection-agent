@@ -242,36 +242,36 @@
     {
       "id": "T6",
       "title": "Add bounded page-scoped JavaScript",
-      "status": "in_progress",
+      "status": "complete",
       "dependsOn": [
         "T1",
         "T4"
       ],
-      "owner": "delegated subagent (primary agent integrates and verifies)",
+      "owner": "delegated subagent, reviewed and verified by primary",
       "startedAt": "2026-08-13T14:40:00-07:00",
-      "completedAt": null,
+      "completedAt": "2026-08-13T15:20:00-07:00",
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t6--add-bounded-page-scoped-javascript",
       "features": [
         {
           "id": "T6.1",
           "description": "Execute bounded JSON-returning JavaScript in the selected top document with page locking and result offload.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T6.2",
           "description": "Persist JavaScript extraction evidence with code, result, URL, and document identity.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T6.3",
           "description": "Terminate frozen execution and replace an unrecoverable page instead of hanging the run.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T6.4",
           "description": "Require an explicit allow or deny JavaScript policy for authenticated sessions.",
-          "status": "not_started"
+          "status": "complete"
         }
       ],
       "completionCriteria": [
@@ -284,13 +284,13 @@
     {
       "id": "T7",
       "title": "Store evidence-linked rows and render tables with code",
-      "status": "not_started",
+      "status": "in_progress",
       "dependsOn": [
         "T5",
         "T6"
       ],
-      "owner": null,
-      "startedAt": null,
+      "owner": "claude (browser-agent-v2 impl session)",
+      "startedAt": "2026-08-13T15:10:00-07:00",
       "completedAt": null,
       "blockedBy": [],
       "planAnchor": "../revised-browser-agent-implementation-plan.md#t7--store-evidence-linked-rows-and-render-tables-with-code",
@@ -298,17 +298,17 @@
         {
           "id": "T7.1",
           "description": "Add atomic, versioned output-row upsert/delete and table-completeness operations tied to the contract.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T7.2",
           "description": "Validate exact fields, values, types, uniqueness, formula-leading strings, and evidence IDs before mutation.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T7.3",
           "description": "Render exact CSV, JSON, or Markdown columns through deterministic application code.",
-          "status": "not_started"
+          "status": "complete"
         },
         {
           "id": "T7.4",

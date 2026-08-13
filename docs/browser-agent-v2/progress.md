@@ -49,8 +49,8 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T3 | complete | claude (impl session) | 77f63d3 | Typed verifier result |
 | T4 | complete | claude (impl session) | 9703b57 | Typed output contract |
 | T5 | complete | claude (impl session) | 15fb0d1 | Explicit submission and code checks |
-| T6 | in_progress | delegated subagent | — | Bounded page JavaScript |
-| T7 | not_started | — | — | Evidence-linked output tables |
+| T6 | complete | delegated subagent, primary-verified | 60483ff | Bounded page JavaScript |
+| T7 | in_progress | claude (impl session) | c0798c1 | Evidence-linked output tables — store + renderer landed |
 | T8 | not_started | — | — | Evidence-linked documents |
 | T9 | complete | delegated subagent, primary-verified | 70884d6 | Stable browser identity and observation |
 | T10 | in_progress | delegated subagent | — | Receipted browser actions |
@@ -66,20 +66,19 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 Two delegated subagents are in flight. The primary agent owns integration,
 verification, and every status change in these files.
 
-### T6 — Bounded page-scoped JavaScript
+### T7 — Evidence-linked output tables
 
-- Owner: `delegated subagent`
-- Branch/worktree: `feat/browser-agent-v2` at `evidence-collection-agent-v2-impl`
-- Started: `2026-08-13T14:40:00-07:00`
-- Start epoch: `1786649718` (shared session clock)
-- Current feature: T6.1–T6.4; `src/evidence/evidenceStore.ts` (+ its test) and
-  `src/browser/browserJavaScript.ts` exist and are NUL-byte clean;
-  `src/tools/executeJavascript/executeJavascript.ts` written, its test pending
-- Allowed paths: `src/evidence/**`, `src/browser/browserJavaScript.ts`,
-  `src/tools/executeJavascript/**` only
-- Next action: finish `executeJavascript.test.ts`, then the primary agent
-  reviews the diff, wires `ToolCtx`/registry/`javascriptPolicy`, and gates it
-- Expected handoff: T7 (evidence-linked output tables) unblocks once T6 lands
+- Owner: `claude (browser-agent-v2 impl session)`
+- Started: `2026-08-13T15:10:00-07:00`
+- Landed so far (`c0798c1`): `src/outputs/outputTable.ts` (atomic versioned
+  evidence-linked row store) and `src/outputs/renderTable.ts` (deterministic
+  CSV/JSON/Markdown from the contract), 37 tests; pinned `csv-stringify`,
+  `date-fns`, `@date-fns/tz`
+- Remaining for T7: `outputSummary.ts`, the three row/completeness tools,
+  extending the evidence store to screenshot/download/network/web-text kinds,
+  completionCheck table/evidence/completeness validation plus
+  `renderTableOutputs()`, and partial-table rendering on incomplete runs
+- Next action: `src/outputs/outputSummary.ts` and the mutation tools
 
 ### T10 — Receipted browser actions
 
