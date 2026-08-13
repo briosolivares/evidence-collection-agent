@@ -309,7 +309,15 @@ function assertJsonCompatibleAt(
         value !== undefined
           ? typeof value
           : depth === 0
-            ? 'undefined (the snippet returned nothing — end it with the value itself, or a return inside an IIFE)'
+            ? // Names the two forms that actually work. The old wording said
+              // "end it with the value itself, or a return inside an IIFE" —
+              // both of which returned undefined under the old wrapping, so
+              // the advice sent the model in circles for 15 straight calls.
+              'undefined (the snippet produced no value — either make the whole ' +
+              'snippet a single expression, e.g. `document.title`, or use an ' +
+              'explicit top-level `return` after your statements; a bare ' +
+              'expression as the LAST statement of a multi-statement snippet ' +
+              'is not returned)'
             : 'undefined (JSON would drop this key silently; omit it or use null)',
       );
   }

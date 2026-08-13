@@ -622,22 +622,28 @@ export class PlaywrightBrowserController implements BrowserController {
 
       let value: unknown;
       try {
-        const evaluation = page.evaluate(`(() => { ${request.code} })()`);
-        let timer: NodeJS.Timeout | undefined;
-        const deadline = new Promise<never>((_resolve, reject) => {
-          timer = setTimeout(
-            () => reject(new BrowserJavaScriptTimeoutError(request.timeoutMs)),
-            request.timeoutMs,
-          );
-        });
-        try {
-          value = await Promise.race([evaluation, deadline]);
-        } finally {
-          if (timer !== undefined) clearTimeout(timer);
-          // The losing evaluation may still be spinning in a page that is
-          // about to be replaced; ignore its eventual outcome so it cannot
-          // surface as an unhandled rejection in a later turn.
-          void evaluation.catch(() => undefined);
+        // Expression semantics FIRST, statement semantics as the fallback.
+        //
+        // A braced arrow body discards its last expression, so wrapping every
+        // snippet as `(() => { CODE })()` returned undefined for a bare
+        // expression, for a self-invoking function, and for code ending in an
+        // expression statement — every natural form. The only shape that
+        // worked was a top-level `return`, which is illegal in a real script.
+        // A live run made 15 calls and got 15 failures, including on
+        // `document.querySelectorAll(...).length`.
+        const sources = evaluationSources(request.code);
+        for (let attempt = 0; attempt < sources.length; attempt += 1) {
+          try {
+            value = await this.raceEvaluation(page, sources[attempt]!, request.timeoutMs);
+            break;
+          } catch (error) {
+            // Fall through to statement semantics ONLY on a syntax error:
+            // that proves nothing executed, so re-running cannot repeat a
+            // side effect. A runtime error means the snippet already ran, and
+            // silently running it a second time could double-submit a form.
+            const canRetry = attempt < sources.length - 1 && isSyntaxErrorLike(error);
+            if (!canRetry) throw error;
+          }
         }
       } catch (error) {
         if (error instanceof BrowserJavaScriptTimeoutError) throw error;
@@ -659,6 +665,34 @@ export class PlaywrightBrowserController implements BrowserController {
       };
     } finally {
       page.off('console', onConsole);
+    }
+  }
+
+  /**
+   * Await one evaluation against the Node-side deadline.
+   *
+   * Extracted so the expression/statement attempts share exactly one timeout
+   * implementation — see executeJavaScript's note on why the deadline is
+   * terminal and the losing evaluation is abandoned unawaited.
+   */
+  private async raceEvaluation(
+    page: { evaluate(source: string): Promise<unknown> },
+    source: string,
+    timeoutMs: number,
+  ): Promise<unknown> {
+    const evaluation = page.evaluate(source);
+    let timer: NodeJS.Timeout | undefined;
+    const deadline = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => reject(new BrowserJavaScriptTimeoutError(timeoutMs)), timeoutMs);
+    });
+    try {
+      return await Promise.race([evaluation, deadline]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      // The losing evaluation may still be spinning in a page that is about
+      // to be replaced; ignore its eventual outcome so it cannot surface as
+      // an unhandled rejection in a later turn.
+      void evaluation.catch(() => undefined);
     }
   }
 
@@ -1631,4 +1665,44 @@ function isSerializationError(error: unknown): boolean {
     error instanceof Error &&
     /serializ|circular|convert|clone/i.test(error.message)
   );
+}
+
+/**
+ * True for a parse failure, which is the one error class where re-running the
+ * snippet under different wrapping is safe: a snippet that failed to parse
+ * never executed, so it cannot have left a side effect behind.
+ */
+function isSyntaxErrorLike(error: unknown): boolean {
+  return error instanceof Error && /SyntaxError|Unexpected (token|identifier|end)/i.test(
+    error.message,
+  );
+}
+
+/**
+ * The wrappings to try for a model-supplied snippet, in order.
+ *
+ * 1. **Expression** — `return (CODE)`. Covers a bare expression
+ *    (`document.title`) and a self-invoking function, the two forms a person
+ *    writing a console one-liner reaches for first. A trailing semicolon is
+ *    stripped because `return (x;)` will not parse.
+ * 2. **Statement** — the raw body. Covers multi-statement code with an
+ *    explicit top-level `return`, and is the only shape that can express
+ *    early returns or declarations.
+ *
+ * Both are wrapped in an ASYNC arrow so `await` works at the snippet's top
+ * level; Playwright resolves the returned promise before serializing, so a
+ * synchronous snippet is unaffected.
+ *
+ * Deliberately no attempt to make a *statement body ending in an expression*
+ * (`const x = 1; x;`) yield that expression: getting completion-value
+ * semantics right needs a real parser, and guessing by rewriting the last
+ * line would silently change what the model's code means. That form returns
+ * undefined, and the error text names the two forms that work.
+ */
+export function evaluationSources(code: string): string[] {
+  const expression = code.trim().replace(/;+$/, '');
+  return [
+    `(async () => { return (\n${expression}\n); })()`,
+    `(async () => {\n${code}\n})()`,
+  ];
 }

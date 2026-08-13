@@ -637,6 +637,124 @@ describe('Playwright browser controller', () => {
       BROWSER_TEST_TIMEOUT_MS,
     );
 
+    // Every other test in this describe passes `return X;` — the one form that
+    // worked under the old wrapping, which is why 15-of-15 live failures went
+    // unnoticed. These cover the forms a person actually writes.
+    it(
+      'returns the value of a bare expression',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('document.querySelectorAll("a").length', 5_000),
+        );
+
+        expect(typeof result.value).toBe('number');
+        expect(result.value as number).toBeGreaterThan(0);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'returns the value of a self-invoking function, trailing semicolon and all',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest(
+            '(function () {\n  const links = document.querySelectorAll("a");\n  return { count: links.length };\n})();',
+            5_000,
+          ),
+        );
+
+        expect(result.value).toMatchObject({ count: expect.any(Number) });
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'supports await at the top level of the snippet',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('await Promise.resolve(7)', 5_000),
+        );
+
+        expect(result.value).toBe(7);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'still returns undefined for a statement body ending in a bare expression',
+      async () => {
+        // The documented limitation: completion-value semantics need a real
+        // parser, so this form yields undefined rather than being rewritten.
+        // Pinned as a test so it stays a known shape, not a surprise.
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('const n = document.querySelectorAll("a").length;\nn;', 5_000),
+        );
+
+        expect(result.value).toBeUndefined();
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'never runs a snippet twice when it throws at runtime',
+      async () => {
+        // The fallback exists for PARSE failures, where nothing ran. A snippet
+        // that parsed and then threw has already had its side effects; running
+        // it again could double-submit a form or double-click a button.
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+
+        // Valid as an expression, so it runs on the FIRST attempt and throws.
+        await expect(
+          controller.executeJavaScript!(
+            toEarlyJavaScriptRequest(
+              '(() => { window.__runs = (window.__runs || 0) + 1; throw new Error("boom"); })()',
+              5_000,
+            ),
+          ),
+        ).rejects.toThrow(/boom/);
+
+        const runs = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('window.__runs', 5_000),
+        );
+        expect(runs.value).toBe(1);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'runs a snippet once when only the expression wrapping fails to parse',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+
+        // `const` cannot appear in expression position, so attempt 1 is a
+        // SyntaxError that executed nothing; attempt 2 runs the body once.
+        await expect(
+          controller.executeJavaScript!(
+            toEarlyJavaScriptRequest(
+              'const before = window.__fallback || 0;\nwindow.__fallback = before + 1;\nthrow new Error("after the side effect");',
+              5_000,
+            ),
+          ),
+        ).rejects.toThrow(/after the side effect/);
+
+        const runs = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest('window.__fallback', 5_000),
+        );
+        expect(runs.value).toBe(1);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
     it(
       'captures console output from the snippet',
       async () => {
