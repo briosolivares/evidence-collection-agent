@@ -57,49 +57,59 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T11 | complete | delegated subagent, primary-verified | 7e81be7 | Anonymous public resources (table/visual observe deferred) |
 | T12 | complete | claude (impl session) | see log | PDF, spreadsheet, and OCR adapters |
 | T13 | complete | claude (impl session) | see log | Input-aware scheduler |
-| T14 | not_started | — | — | Bounded research jobs |
+| T14 | complete | delegated subagent, primary-verified | b302224 | Bounded research jobs |
 | T15 | complete | claude (impl session) | 3d151fc | Cache-safe compact memory (unwired by decision) |
-| T16 | in_progress | claude (impl session) | d50f59a | V2 cutover — order frozen, comparisons documented |
+| T16 | complete | claude (impl session) | see log | V2 cutover (legacy removal awaits the deferred comparison) |
 
 ## Active work
 
-Two delegated subagents are in flight. The primary agent owns integration,
-verification, and every status change in these files.
-
-### T8 — Evidence-linked documents (delegated)
-
-- Owner: `delegated subagent`; allowed paths `src/outputs/documentSource.ts`,
-  `src/outputs/renderDocument.ts`, `src/tools/writeDocument/**` only
-- Building on the committed contract, evidence store, and T7 renderers
-
-### T11 — Targeted observation and public resources (delegated)
-
-- Owner: `delegated subagent`; allowed paths
-  `src/browser/publicResourceReader.ts`, `src/browser/discoveredUrlIndex.ts`,
-  `src/tools/readResource/**`, `src/tools/captureText/**` only
-- Brief emphasizes the SSRF surface: loopback/private/link-local/multicast/
-  reserved rejection, encoded-IPv4 and IPv4-mapped-IPv6 spellings, per-hop
-  redirect re-resolution, and proving no profile cookie reaches the server
-
-### T10 — Receipted browser actions
-
-- Owner: `delegated subagent`
-- Branch/worktree: `feat/browser-agent-v2` at `evidence-collection-agent-v2-impl`
-- Started: `2026-08-13T14:40:00-07:00`
-- Start epoch: `1786649718` (shared session clock)
-- Current feature: T10.1–T10.5, building on the landed T9 browser state
-- Allowed paths: `src/browser/**` except `browserJavaScript.ts`,
-  `src/tools/{browserAction,switchPage,handleDialog}/**`, `tests/fixtures/**`,
-  `tests/tui/stubBrowser.ts`, `src/tracing/runTracing.test.ts`
-- Next action: real-Chrome fixture tests distinguishing untouched / partial /
-  committed / failed-check / stale / unsettled / blocked outcomes
-- Expected handoff: T13 needs T7 + T10 + T12; `browser_batch` stays
-  registered until T16's parity comparison
+No task is currently active. All sixteen T-tasks are recorded complete; see
+[`cutover.md`](./cutover.md) for what is live, what is dormant, and the two
+experiments deferred by user decision.
 
 ## Progress log
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 17:05 — T13, T14, T16 complete; all sixteen tasks recorded
+
+- Owner: claude (browser-agent-v2 impl session), with delegated subagents on
+  T8, T9, T10, T11, T14 and the T4 schema draft
+- Whole-tree gate: `npm run typecheck` 0 errors; `npm test` 140 files /
+  1514 tests, exit 0. A byte sweep reports zero control characters in any
+  `src/` or `tests/` file.
+- T13: scheduling derives what each call TOUCHES from its validated input, so
+  two actions on different pages overlap while same-page or same-table calls
+  serialize. Every call is validated before any call runs; unknown tool,
+  invalid input, and a throwing `getAccess` all fail closed to exclusive.
+- T14: bounded research jobs — isolated sessions, typed results, conflicts
+  reported rather than last-writer-wins, child usage charged to the run, and a
+  test proving the cached prompt prefix is byte-identical across entities.
+- T16: the V2 tool order is frozen as data with a snapshot test that says a
+  failure is a question about cache cost, not an invitation to update the
+  expectation. `runTask` assembles the V2 registry at that order;
+  `execute_javascript` is wired end to end against real Chrome.
+- Bugs found in the primary agent's OWN work, each caught by a test rather
+  than by inspection:
+  1. Scheduler exclusivity was a sentinel write key, which does not conflict
+     with a call that merely reads something else — the write/read barrier
+     silently broke. Now an explicit unconditional flag.
+  2. `page.evaluate` was passed a `{ timeout }` option it does not accept, with
+     the type error silenced by `as never`. `while (true) {}` then hung for 30s.
+     Now a Node-side race, matching the contract's own statement that a
+     spinning snippet is uninterruptible and the page must be replaced.
+  3. A literal NUL byte in `completionCheck.ts` — found by a subagent, in the
+     same defect class the primary agent had just fixed in two of theirs. Three
+     more of its own files were affected.
+- Deferred by user decision, not blocked: the compact-vs-non-compact
+  comparison and the four-way contract-author x verifier matrix. Non-compact
+  ships; `harness.outputContract` stays opt-in; `browser_batch` and the prose
+  contract path stay until the comparison exists.
+- Known gaps, all recorded in `cutover.md`: no `drag` action, no `table`/
+  `visual` observation needs, four V2 tools implemented but not yet wired
+  (`write_document`, `read_resource`, `capture_text`, `run_research_jobs`), and
+  a narrowed-but-open DNS-rebinding window in `read_resource`.
 
 ### 2026-08-13 15:35 — T6 and T7 complete
 
@@ -381,9 +391,10 @@ code-level choices belong in code review, not here.
 
 ## Handoff
 
-- Last completed task: T1, T2, T3, T4, T5, T9 — all fully gated (typecheck 0
-  errors, full suite 113 files / 1040 tests)
-- Safe next task: T7 (unblocked once T6 lands; needs T5 + T6). T8 follows T7
+- Last completed task: all sixteen (T1–T16) are recorded complete and gated
+- Safe next work: wire the four remaining V2 tools (each needs one named
+  dependency — see cutover.md), then run the two deferred experiments when the
+  user asks
 - Parallel work currently unlocked: T4 and T10 can proceed in parallel (T4
   owns src/contracts + the contract tool; T10 owns src/browser/browserActions
   + the action tools). Assign ONE owner to src/tools/index.ts,
