@@ -41,6 +41,10 @@ export interface TruncatedStreamDiagnostics {
   outputChars: number;
   /** Human-readable descriptions of blocks still open at stream end. */
   openBlocks: string[];
+  /** stop_reason reported by a message_delta before the stream ended, if
+   * any — a non-null value on a truncated stream means the server ended
+   * the message deliberately (e.g. "refusal"), not a dropped connection. */
+  stopReason?: string;
 }
 
 /** Render diagnostics as the compact parenthetical used in error messages
@@ -56,6 +60,7 @@ export function formatTruncationDiagnostics(d: TruncatedStreamDiagnostics): stri
   }
   parts.push(`${d.eventCount} events`, `~${d.outputChars} output chars`);
   if (d.openBlocks.length > 0) parts.push(`open: ${d.openBlocks.join(', ')}`);
+  if (d.stopReason !== undefined) parts.push(`stop_reason ${d.stopReason}`);
   return parts.join(', ');
 }
 
@@ -139,6 +144,7 @@ export async function assembleModelResponse(
         ? `${open.block.name}[${open.partialJson.length} chars json]`
         : `text[${open.block.text.length} chars]`,
     ),
+    ...(stopReason === null ? {} : { stopReason }),
   });
 
   for await (const event of events) {
