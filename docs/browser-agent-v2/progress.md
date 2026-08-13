@@ -50,11 +50,11 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 | T4 | complete | claude (impl session) | 9703b57 | Typed output contract |
 | T5 | complete | claude (impl session) | 15fb0d1 | Explicit submission and code checks |
 | T6 | complete | delegated subagent, primary-verified | 60483ff | Bounded page JavaScript |
-| T7 | in_progress | claude (impl session) | c0798c1 | Evidence-linked output tables — store + renderer landed |
-| T8 | not_started | — | — | Evidence-linked documents |
+| T7 | complete | claude (impl session) | fef9588 | Evidence-linked output tables |
+| T8 | in_progress | delegated subagent | — | Evidence-linked documents |
 | T9 | complete | delegated subagent, primary-verified | 70884d6 | Stable browser identity and observation |
 | T10 | in_progress | delegated subagent | — | Receipted browser actions |
-| T11 | not_started | — | — | Targeted observation and public resources |
+| T11 | in_progress | delegated subagent | — | Targeted observation and public resources |
 | T12 | not_started | — | — | PDF, spreadsheet, and OCR adapters |
 | T13 | not_started | — | — | Input-aware scheduler |
 | T14 | not_started | — | — | Bounded research jobs |
@@ -66,19 +66,20 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 Two delegated subagents are in flight. The primary agent owns integration,
 verification, and every status change in these files.
 
-### T7 — Evidence-linked output tables
+### T8 — Evidence-linked documents (delegated)
 
-- Owner: `claude (browser-agent-v2 impl session)`
-- Started: `2026-08-13T15:10:00-07:00`
-- Landed so far (`c0798c1`): `src/outputs/outputTable.ts` (atomic versioned
-  evidence-linked row store) and `src/outputs/renderTable.ts` (deterministic
-  CSV/JSON/Markdown from the contract), 37 tests; pinned `csv-stringify`,
-  `date-fns`, `@date-fns/tz`
-- Remaining for T7: `outputSummary.ts`, the three row/completeness tools,
-  extending the evidence store to screenshot/download/network/web-text kinds,
-  completionCheck table/evidence/completeness validation plus
-  `renderTableOutputs()`, and partial-table rendering on incomplete runs
-- Next action: `src/outputs/outputSummary.ts` and the mutation tools
+- Owner: `delegated subagent`; allowed paths `src/outputs/documentSource.ts`,
+  `src/outputs/renderDocument.ts`, `src/tools/writeDocument/**` only
+- Building on the committed contract, evidence store, and T7 renderers
+
+### T11 — Targeted observation and public resources (delegated)
+
+- Owner: `delegated subagent`; allowed paths
+  `src/browser/publicResourceReader.ts`, `src/browser/discoveredUrlIndex.ts`,
+  `src/tools/readResource/**`, `src/tools/captureText/**` only
+- Brief emphasizes the SSRF surface: loopback/private/link-local/multicast/
+  reserved rejection, encoded-IPv4 and IPv4-mapped-IPv6 spellings, per-hop
+  redirect re-resolution, and proving no profile cookie reaches the server
 
 ### T10 — Receipted browser actions
 
@@ -99,6 +100,33 @@ verification, and every status change in these files.
 
 Append newest entries first. Do not rewrite older entries except to correct a
 factual error.
+
+### 2026-08-13 15:35 — T6 and T7 complete
+
+- Owner: claude (browser-agent-v2 impl session)
+- Commits: `60483ff` (T6, delegated + reviewed), `c0798c1` / `fef9588` /
+  the completion-check slice (T7)
+- T6: bounded page JavaScript. Timeouts rejected rather than silently clamped;
+  evidence ids assigned only after a successful write; policy resolved at
+  FACTORY time so "authenticated without an explicit policy fails at
+  configuration time" is literally true; the returned VALUE capped rather than
+  the envelope so an offloaded result never carries the Evidence ID away from
+  the model. 67 hermetic tests.
+- T7: the model proposes rows, code owns the file. Atomic batches, versioned
+  rows with conflict reporting, evidence required per row, formula-leading
+  strings REJECTED rather than silently prefixed (quoting is not a formula
+  safeguard, and altering a requested value changes the deliverable's data),
+  deterministic CSV/JSON/Markdown from the contract, a derived OutputSummary
+  that reuses the code check's own rule logic so preview and gate cannot
+  disagree, and completeness evidence required for any count-ruled table
+  because "I found 12" and "there are exactly 12" are different claims.
+- Verified: `npx vitest run src/outputs/` (46), `src/completion/` (42),
+  T6's 67; typecheck clean for every file this session owns. NOTE: a
+  whole-tree `npm test` / typecheck is NOT green right now — three delegated
+  agents (T8, T10, T11) have in-flight edits, and T10's
+  `src/browser/browserActions.ts` currently has a known type error its owner
+  is still working through. The whole-tree gate re-runs when they land.
+- Remaining: T8, T10, T11 in flight; T12–T16 not started.
 
 ### 2026-08-13 15:05 — T5 complete
 
