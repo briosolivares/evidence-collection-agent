@@ -12,7 +12,11 @@
     "consolidationThresholdMinutes": 15,
     "timeCheckAfterEveryImplementationStep": true,
     "recordFinalTaskTimeCheckInProgressLog": true,
-    "completionRequiresRequiredTests": true
+    "completionRequiresRequiredTests": true,
+    "useFastLowCostSubagentsForBoundedIndependentWork": true,
+    "recommendedMaximumConcurrentSubagents": 3,
+    "subagentsSharePrimaryDeadline": true,
+    "primaryAgentOwnsIntegrationAndTracking": true
   },
   "documents": {
     "design": "../revised-browser-agent-proposal.md",

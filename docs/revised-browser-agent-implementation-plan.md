@@ -84,6 +84,46 @@ services rather than pretending those processes are instantaneous.
 - Do not wait idly. If one safe check is running, prepare the next independent
   review or progress update.
 
+### Delegate bounded work to fast subagents
+
+When the environment supports delegation, use cheap, fast subagents to reduce
+wall-clock time. Delegate only concrete work that can proceed independently;
+the primary agent remains responsible for architecture, integration, the clock,
+status tracking, and final correctness.
+
+Good delegation targets include:
+
+- locating affected code and reporting exact symbols and tests;
+- adding or extending one isolated fixture/test file;
+- implementing a leaf adapter whose interface is already decided;
+- reviewing a scoped diff for missed edge cases;
+- running an independent focused test group and returning the exact output.
+
+Do not delegate an architectural decision, the shared completion loop, final
+integration, or vague instructions such as “implement T4.” Before delegating:
+
+1. Confirm the dependency graph says the work is unlocked.
+2. Give the subagent one bounded deliverable, exact allowed paths, required
+   tests, completion criteria, and a short time limit measured in minutes.
+3. Prefer a fast, lower-cost model for mechanical searches, fixtures, leaf
+   implementations, and review. Keep subtle control-flow and cross-component
+   reasoning with the primary agent.
+4. Assign one owner per file. Subagents must not edit the same file or shared
+   integration points such as `src/cli/runTask.ts`, `src/tools/index.ts`, or
+   `src/tools/registry.ts` concurrently.
+5. Tell the subagent not to change unrelated files, task statuses, or
+   `progress.md`; the primary agent owns tracking and integration.
+
+Use at most three subagents at once, and fewer when the work is coupled. All
+subagents share the original 120-minute deadline; delegation does not start a
+new clock. The primary agent should continue useful independent work instead of
+waiting idly, then inspect every returned diff and rerun the relevant tests.
+A subagent's “done” message is evidence to review, not proof of completion.
+
+When 15 minutes remain, create no new delegation. Collect or stop outstanding
+work, integrate only coherent verified changes, and record unfinished subagent
+work in the handoff without marking its feature complete.
+
 ### Reserve the last 15 minutes
 
 When `remaining` is 15 minutes or less, start no new T-task and no new feature.

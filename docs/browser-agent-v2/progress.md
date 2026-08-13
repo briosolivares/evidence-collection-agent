@@ -32,6 +32,8 @@ minimum reviewed harness baseline
 9. Run and print the implementation plan's `TIME_CHECK` after every numbered
    implementation item. Copy the final check for each T-task into its progress
    entry.
+10. Record bounded delegated work under the owning T-task. The primary agent
+    alone updates task status, integrates returned changes, and verifies them.
 
 Use ISO 8601 timestamps with the local offset, for example
 `2026-08-13T14:30:00-07:00`.
@@ -74,6 +76,7 @@ When work begins, replace the sentence above with one section per active task:
 - Start epoch: `<exact BROWSER_V2_START_EPOCH output>`
 - Latest time check: `<exact TIME_CHECK output>`
 - Current feature: `<Tn.m and short description>`
+- Delegated work: `<subagent, bounded scope, owned paths, status, or none>`
 - Next action: `<single concrete next action>`
 - Expected handoff: `<what another agent can safely start afterward>`
 ```
@@ -90,6 +93,7 @@ factual error.
 - Commit: `<sha>` or `not committed`
 - Features: <IDs completed or started>
 - Changed: <short description with links to important files>
+- Delegated: <subagent scopes and outcomes, or none>
 - Verified:
   - `<command>` — pass/fail and concise result
 - Time check: `<exact final TIME_CHECK output for this task>`
