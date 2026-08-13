@@ -50,6 +50,10 @@ security hardening, signed evidence journals, strict origin policy, and
 adversarial prompt-injection work are deferred. The existing no-shell boundary
 should remain, along with inexpensive safeguards such as sending saved
 credentials only to the exact site they belong to and limiting download sizes.
+Page-scoped JavaScript in an authenticated tab can still access page-visible
+session data and make network requests. V1 accepts that capability risk
+explicitly; it should use dedicated, low-value test accounts and profiles rather
+than claiming the credential-store boundary solves it.
 
 ## Goals
 
@@ -73,6 +77,9 @@ credentials only to the exact site they belong to and limiting download sizes.
   object; evaluate planning tools independently before adding them.
 - Cryptographically signed evidence bundles.
 - A complete enterprise security-policy engine.
+- A robust JavaScript sandbox for authenticated pages. A configurable origin
+  denylist can be added later, but a partial cookie or network shim must not be
+  presented as isolation.
 - A new browser engine.
 - Task-specific selectors or hidden-eval tuning.
 
@@ -92,7 +99,8 @@ credentials only to the exact site they belong to and limiting download sizes.
 
 ### Remove or defer
 
-- `browser_batch`.
+- `browser_batch`, after `browser_action` proves behavioral and observability
+  parity in tests and evals.
 - Restarting the worker every time the verifier asks for a correction.
 - Free-form `INTENT.md` and `CONTRACT.md` planning files.
 - A separate initializer or contract-writer model call before the worker starts.
@@ -158,8 +166,10 @@ type OutputSpec =
   | {
       id: string;
       kind: 'download';
-      filename?: string;
+      count: { exact: number } | { minimum: number };
+      filenamePattern?: string;
       allowedMediaTypes?: string[];
+      sourceUrlPattern?: string;
     };
 
 interface OutputContract {
@@ -168,14 +178,23 @@ interface OutputContract {
   assumptions?: string[];
 }
 
+type ContractRevisionBasis =
+  | {
+      kind: 'evidence_discovery';
+      summary: string;
+      evidenceIds: [string, ...string[]];
+    }
+  | { kind: 'assumption_correction'; summary: string }
+  | { kind: 'user_clarification'; summary: string };
+
 interface SetOutputContractInput {
   contract: OutputContract;
-  revisionReason?: string;
+  revisionBasis?: ContractRevisionBasis;
 }
 
 interface OutputContractRevision {
   revision: number;
-  reason?: string;
+  basis?: ContractRevisionBasis;
   contract: OutputContract;
 }
 ~~~
@@ -184,21 +203,42 @@ interface OutputContractRevision {
 material control gaps and support them with evidence.” `assumptions` contains
 only choices that materially affect the result. Both are optional. The contract
 contains no research plan, browser steps, source list, goal hierarchy, or
-per-entity state.
+per-entity state. It does not preselect which sites to research. The first
+contract contains requirements visible in the task
+and clearly labeled assumptions; it must not invent site facts that can only be
+known after browsing.
+
+Code checks screenshot counts and filename patterns; `mustShow` is deliberately
+semantic and is checked by the multimodal verifier against the actual image.
+Download count and its filename, media-type, and source-URL constraints are
+mechanical.
 
 On the first turn, `set_output_contract` must be the first tool call. The runtime
 validates and stores it before executing later calls from the same response. If
-the contract is invalid, later calls do not run. This adds no extra model round
-trip.
+the contract is missing, every tool call in that response receives a structured
+`output_contract_required` error and none executes. If it is present but
+invalid, its call receives the validation errors and every later call receives
+`blocked_by_invalid_contract`. Returning one result for every tool use keeps the
+provider conversation valid. The worker fixes the contract on its next turn;
+the “no extra round trip” benefit applies to the valid happy path only.
 
 Structural validation rejects duplicate output IDs or paths, unsafe filenames,
 duplicate table columns, non-positive counts, and conflicting table rules. The
-accepted contract is written through `writeArtifact` under
-`scratch/output-contract/`. If the worker explicitly changes the contract, save
-a new numbered revision with a required `revisionReason` instead of silently
-overwriting the previous one. The final verifier sees the latest contract and
-the revision history, so the worker cannot hide a mistake by moving the
-goalposts.
+download variant also requires at least one filename, media-type, or source-URL
+constraint, so an arbitrary download cannot satisfy it. The accepted contract
+is written through `writeArtifact` under
+`scratch/output-contract/`. Later changes are normal: new evidence often reveals
+an exact population, field rule, or better assumption. Save each change as a
+numbered revision with a required `revisionBasis` instead of silently
+overwriting the previous one. The first revision forbids `revisionBasis`; every
+later revision requires it.
+
+Evidence-backed and assumption-correcting revisions are expected and carry no
+penalty. A revision is suspicious only when it relaxes something stated in the
+original task, contradicts its cited evidence, or has no adequate basis. An
+original-task constraint may be relaxed only after an actual user
+clarification. The final verifier sees the latest contract and its history so
+it can apply this narrow goalpost test without discouraging legitimate learning.
 
 The original task remains authoritative. The contract is an execution target,
 not a replacement for the request, and the final verifier checks that the two
@@ -206,6 +246,11 @@ agree.
 
 Do not add a dedicated contract-writer call unless evals show that first-turn
 contract defects are common enough to justify the added latency.
+
+This decision explicitly supersedes the separate initializer portion of the
+earlier `Initializer → Worker → Judge` plan. It retains the valuable part—a
+fresh independent verifier—without paying for a second model to interpret the
+task before work can begin.
 
 ### 2. Derive output status instead of maintaining task state
 
@@ -242,7 +287,9 @@ missing.
 The browser controller—not the model—should track tabs, embedded frames,
 documents, observations, and element identity. A `documentId` changes only when
 navigation, reload, or frame replacement creates a new document. An
-`observationId` identifies the page snapshot used to calculate what changed.
+`observationId` increments only when the runtime returns a new page snapshot.
+`basedOnObservationId` selects the baseline for the returned diff; it is not a
+page-wide optimistic lock.
 
 ~~~ts
 interface ElementRef {
@@ -254,6 +301,7 @@ interface ElementRef {
   backendNodeId?: number;
   role: string;
   name: string;
+  /** A display hint only; never sufficient for a mutating fallback match. */
   ordinal?: number;
 }
 
@@ -274,14 +322,17 @@ Before every action, revalidate its element reference in this order:
    expected document.
 2. Otherwise try the stable locator saved when the element was observed, within
    that same document.
-3. Otherwise match its role, visible name, and position—but only if there is
-   exactly one safe match.
+3. Otherwise match its role and visible name only when that pair is unique in
+   the expected document. A saved ordinal may help explain a stale error, but
+   must never retarget a mutating action after a list reorders.
 4. If none of those works, report that the reference is stale and inspect the
    page again.
 
-Unrelated DOM mutations do not invalidate every element on the page. This keeps
-the useful human description (“the Submit button”) while avoiding both stale
-actions and constant reinspection on live pages.
+Unrelated DOM mutations and an old `observationId` do not invalidate every
+element on the page. `stale` means the expected document was replaced or the
+specific target can no longer be resolved uniquely. This keeps the useful
+human description (“the Submit button”) while avoiding both wrong-row actions
+and constant reinspection on live pages.
 
 ### 4. Use `browser_action` for normal browser interaction
 
@@ -296,7 +347,15 @@ type BrowserAction =
   | { op: 'fill'; target: ElementRef; text: string }
   | { op: 'press'; target?: ElementRef; key: string }
   | { op: 'select'; target: ElementRef; values: string[] }
-  | { op: 'scroll'; direction: 'up' | 'down'; amount?: number };
+  | { op: 'check'; target: ElementRef; checked: boolean }
+  | { op: 'hover'; target: ElementRef }
+  | { op: 'drag'; source: ElementRef; target: ElementRef }
+  | { op: 'upload'; target: ElementRef; runPath: string }
+  | {
+      op: 'scroll';
+      direction: 'up' | 'down';
+      amount: { unit: 'pixels' | 'viewport'; value: number };
+    };
 
 type SuccessCheck =
   | { type: 'url_matches'; pattern: string }
@@ -306,6 +365,7 @@ type SuccessCheck =
   | { type: 'popup_opened' };
 
 interface PageChanges {
+  basis: 'requested_observation' | 'full_snapshot';
   navigated: boolean;
   url?: { before: string; after: string };
   newlyVisible: ElementRef[];
@@ -313,29 +373,77 @@ interface PageChanges {
   updatedText: Array<{ elementId?: string; text: string }>;
 }
 
+interface SettlePolicy {
+  quietWindowMs?: number;
+  timeoutMs?: number;
+}
+
+interface BrowserActionReceipt {
+  index: number;
+  op: BrowserAction['op'];
+  status: 'completed' | 'failed' | 'stale';
+  effectsCommitted: boolean;
+  error?: string;
+}
+
+interface DownloadInfo {
+  pageId: string;
+  sourceUrl: string;
+  suggestedFilename?: string;
+  mediaType?: string;
+  bytes?: number;
+  artifactPath?: string;
+}
+
+interface BrowserDialog {
+  dialogId: string;
+  pageId: string;
+  type: 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+  message: string;
+  defaultValue?: string;
+}
+
+type BrowserBlockReason =
+  | 'login'
+  | 'captcha'
+  | 'rate_limit'
+  | 'bot_challenge'
+  | 'permission';
+
 interface BrowserActionInput {
   pageId: string;
   documentId: string;
   basedOnObservationId: number;
   actions: [BrowserAction, ...BrowserAction[]];
   successChecks?: SuccessCheck[];
+  settle?: SettlePolicy;
 }
 
 interface BrowserActionOutput {
-  status: 'completed' | 'stale' | 'blocked' | 'failed';
+  status: 'completed' | 'partial' | 'stale' | 'blocked' | 'failed_check' | 'failed';
   previousObservationId: number;
+  actionReceipts: BrowserActionReceipt[];
+  stoppedBeforeIndex?: number;
+  stopReason?: 'navigation' | 'document_replaced' | 'popup' | 'dialog' | 'failure';
+  settled: boolean;
+  checks: Array<{ check: SuccessCheck; passed: boolean }>;
   currentPage: BrowserPage;
   changes: PageChanges;
   openedPages: BrowserPage[];
+  dialogs: BrowserDialog[];
   downloads: DownloadInfo[];
+  blockedReason?: BrowserBlockReason;
+  retryAfterMs?: number;
   error?: string;
 }
 ~~~
 
-The output should include the landed URL and title, relevant content and
-controls that changed, new pages, dialogs, downloads, and whether navigation
-occurred. `PageChanges` means the useful difference between the page before and
-after the action.
+The output includes the landed URL and title, relevant content and controls that
+changed, new pages, dialogs, downloads, and whether navigation occurred. Each
+receipt says whether that action's effects committed. Earlier effects are never
+rolled back. If a success check fails after a click or fill succeeds, the result
+is `failed_check` with `effectsCommitted: true`, not a generic failure that
+suggests the page is unchanged.
 
 The Zod schema allows one to eight actions, all against one page and document.
 The runtime revalidates every target immediately before use. Navigation,
@@ -344,9 +452,34 @@ Page switching uses a separate `switch_page` tool and cannot be mixed with
 element actions. This gains the speed of batching without blindly continuing
 and replaces the separate `browser_batch` tool.
 
+An action that triggers navigation still completed. If it is the last action,
+the whole sequence can be `completed`; otherwise the result is `partial`, names
+the first unexecuted index, and returns the new document. Upload paths go
+through `resolveRunPath` and can reference only files already inside the run
+directory.
+
+After the final committed action, wait for its explicit success checks or
+expected navigation, then for a relevant-DOM quiet window. Start with a 250 ms
+quiet window and a 2 second hard timeout; cap caller overrides at 1 second and
+10 seconds respectively. These are tunable provider defaults, not promises
+that the whole network is idle. Do not rely on global `networkidle`, which never
+arrives on many live applications. If the hard timeout wins, return the best
+current snapshot with `settled: false`; never label a half-observed reaction as
+settled.
+
+Classify recognizable login walls, CAPTCHAs, rate limits, and bot challenges as
+`blocked` rather than generic action failures. Respect bounded `Retry-After`
+delays; interactive runs may use `ask_user_question` for login or CAPTCHA
+handoff, while unattended runs preserve the blocker and partial artifacts. The
+caller chooses headed, headless, or authenticated session policy—never infer it
+from a task name or task text.
+
 `PageChanges` contains only the affected or previously observed regions and is
 size-capped. Larger changes use the existing scratch offload mechanism rather
 than serializing the entire page into every action result.
+If the requested observation baseline has been evicted, return a bounded full
+snapshot with `basis: 'full_snapshot'`; do not call the page stale merely
+because a diff cache entry expired.
 
 ~~~text
 Current: observe → click → observe → fill → click → observe
@@ -363,23 +496,35 @@ unusual controls.
 ~~~ts
 interface ExecuteJavaScriptInput {
   pageId: string;
+  frameId: string;
   documentId: string;
   basedOnObservationId: number;
   code: string;
   timeoutMs?: number;
   successChecks?: SuccessCheck[];
+  settle?: SettlePolicy;
+  captureEvidence?: {
+    label?: string;
+    includeDomSnapshot?: boolean;
+  };
 }
 
 interface ExecuteJavaScriptOutput {
-  status: 'completed' | 'stale' | 'blocked' | 'failed';
+  status: 'completed' | 'stale' | 'blocked' | 'failed_check' | 'failed';
   previousObservationId: number;
   result?: JsonValue;
+  resultOffloadedTo?: string;
+  evidence?: Evidence;
   pageChanged: boolean;
+  settled: boolean;
+  checks: Array<{ check: SuccessCheck; passed: boolean }>;
   currentPage: BrowserPage;
   changes: PageChanges;
   openedPages: BrowserPage[];
+  dialogs: BrowserDialog[];
   downloads: DownloadInfo[];
   logs: string[];
+  blockedReason?: BrowserBlockReason;
   error?: string;
 }
 ~~~
@@ -398,6 +543,15 @@ application also captures page changes, navigation, popups, dialogs, downloads,
 logs, and errors. A caller-supplied timeout is capped by the provider's finite
 maximum.
 
+`frameId` makes execution target one explicit document, including an embedded
+frame. Results use the same per-result and combined-result caps as every other
+tool: a large value is written through `writeArtifact` under
+`scratch/tool-output/`, while the model receives a bounded preview and path.
+When `captureEvidence` is set, save a manifest-hashed evidence artifact
+containing the source URL, document identity, executed code, complete extracted
+result, and—when requested—a supporting DOM snapshot. The returned evidence ID
+can support every row produced by that bulk extraction.
+
 The tool definition remains static and deterministic. Page-specific data belongs
 in the tool input, so adding this capability does not make the cached prompt
 prefix vary between runs.
@@ -412,6 +566,12 @@ the page to a known state, it closes that page, invalidates its element
 references, and creates a replacement page. The result reports this recovery as
 a failed execution rather than leaving the run hung.
 
+Authenticated execution remains deliberately capable in V1. It is logged and
+uses dedicated low-value profiles, but is not falsely described as sandboxed:
+page-scoped code can access page-visible session state and make requests. A
+future hardened mode may deny configured origins or run in a disposable
+context, but capability comes first in this phase.
+
 ### 6. Inspect the right kind of content for the job
 
 No single page representation works everywhere. Accessibility data is good for
@@ -424,7 +584,6 @@ interface ObserveRequest {
   pageId: string;
   target?: ElementRef | { text: string };
   need: Array<'interactive' | 'text' | 'table' | 'visual' | 'document'>;
-  depth?: number;
 }
 ~~~
 
@@ -449,8 +608,8 @@ durable output for the auditor.
 
 Many “browser” tasks involve data that a webpage already loads from a JSON
 endpoint, CSV export, PDF, or HTML table. Once the browser has discovered such
-a public URL, the agent should be able to read it through the same browser
-session instead of clicking through hundreds of rows.
+a public URL, the agent should be able to read it through an anonymous browser
+context instead of clicking through hundreds of rows.
 
 ~~~ts
 interface ReadResourceRequest {
@@ -462,10 +621,22 @@ interface ReadResourceRequest {
     table?: number;
   };
 }
+
+interface ReadResourceOutput {
+  preview: JsonValue | string;
+  parsedResultOffloadedTo?: string;
+  evidence: Evidence;
+}
 ~~~
 
 Use this only after the agent has found or reasonably derived the relevant
-public resource URL, such as:
+public resource URL. Mechanically require an HTTP(S) URL whose origin was
+visited or whose exact URL was surfaced by an observed page. The reader sends
+no profile cookies, authorization headers, or stored credentials. It may still
+use a real browser network stack and ordinary browser headers for public sites
+that reject lightweight HTTP clients.
+
+Examples include:
 
 - GitHub JSON endpoints;
 - page-embedded JSON;
@@ -474,8 +645,19 @@ public resource URL, such as:
 - PDFs;
 - HTML tables.
 
-This can replace many slow pagination steps with one read. Keep the source URL
-and, when useful for audit evidence, the original response bytes.
+This can replace many slow pagination steps with one read. Every successful
+call saves the bounded original response bytes as a `network_response` evidence
+artifact and returns only a parsed preview or offload path to the model. The
+tool is therefore state-changing for scheduling purposes even though its
+network operation is read-only.
+
+The task's named source and deliberate starting page define semantic
+authority. A resource endpoint is a transport optimization, not permission to
+silently switch datasets. Before using it for final values, reconcile a small
+sample and ordering against the authoritative page. If they disagree, use the
+task-named source or record the ambiguity and ask the user when it materially
+changes the answer. This preserves browser-grounded results while retaining
+the speed of direct reads when both views are equivalent.
 
 `execute_javascript` operates on the live webpage. `read_resource` retrieves a
 raw public resource such as a large JSON response, CSV, PDF, or binary file.
@@ -489,16 +671,46 @@ hand-write CSV text. The corresponding table `OutputSpec` in the contract is
 the only source of truth for its filename, format, columns, and rules.
 
 ~~~ts
-interface OutputColumn {
+type DateOutputFormat =
+  | { kind: 'iso_date' }
+  | { kind: 'iso_datetime' }
+  | {
+      kind: 'unicode_pattern';
+      /** Unicode Technical Standard #35 tokens. */
+      pattern: string;
+      locale: string;
+    };
+
+type OutputColumn = {
   name: string;
   required: boolean;
-  type: 'string' | 'integer' | 'url' | 'date';
-}
+} & (
+  | { type: 'string' | 'integer' | 'number' | 'boolean' | 'url' }
+  | { type: 'enum'; values: [string, ...string[]] }
+  | {
+      type: 'date' | 'datetime';
+      format: DateOutputFormat;
+      timezone?: string;
+    }
+);
 
 interface OutputRow {
+  rowId: string;
   values: Record<string, unknown>;
   evidenceIds: string[];
 }
+
+type TableCompletenessEvidence =
+  | {
+      method: 'authoritative_list' | 'pagination_exhausted' | 'ranked_view';
+      evidenceIds: [string, ...string[]];
+      note?: string;
+    }
+  | {
+      method: 'explicit_assumption';
+      note: string;
+      evidenceIds?: string[];
+    };
 
 type TableRule =
   | { type: 'exact_row_count'; value: number }
@@ -517,6 +729,25 @@ interface OutputTable {
   outputId: string;
   version: number;
   rows: OutputRow[];
+  completenessEvidence?: TableCompletenessEvidence;
+}
+
+interface UpsertOutputRowsInput {
+  outputId: string;
+  expectedVersion?: number;
+  rows: [OutputRow, ...OutputRow[]];
+}
+
+interface DeleteOutputRowsInput {
+  outputId: string;
+  expectedVersion?: number;
+  rowIds: [string, ...string[]];
+}
+
+interface SetTableCompletenessInput {
+  outputId: string;
+  expectedVersion?: number;
+  evidence: TableCompletenessEvidence;
 }
 ~~~
 
@@ -525,11 +756,33 @@ When rows are added, the application looks up the contract's `OutputSpec` by
 
 - missing required values;
 - unexpected columns;
-- invalid URLs or integers;
+- values that do not match their URL, numeric, enum, date, datetime, format,
+  or timezone contract;
 - duplicates when disallowed;
-- malformed dates;
 - rows without required evidence;
 - values that spreadsheet programs could accidentally execute as formulas.
+
+Every factual row requires at least one valid evidence ID by default; this is
+not an optional worker-selected rule. `upsert_output_rows` inserts or replaces
+stable `rowId` values atomically, `delete_output_rows` removes mistakes without
+rebuilding a table, and both advance `version`. `expectedVersion` provides
+optional optimistic concurrency feedback while the scheduler still serializes
+updates to one table.
+
+Dates and datetimes are stored internally as Temporal-compatible ISO values.
+Rendering supports ISO date, ISO datetime, or a pinned Unicode Technical
+Standard #35 pattern; timezones are validated IANA names and the implementation
+must freeze one formatter version. Source-text dates whose meaning should not
+be normalized use `type: 'string'`. This prevents a vague `date` type from
+recreating grader-breaking time-format drift.
+
+Any table with an exact or minimum count rule must also carry
+`completenessEvidence`. This is a narrow proof attached to that output—not a
+general `Dataset`, checklist, or coverage state machine. It records whether the
+worker used an authoritative list, reached the end of pagination, captured a
+ranked view, or had to make an explicit assumption. Missing completeness
+evidence is a mechanical failure; the verifier judges whether the cited proof
+actually supports the claimed population.
 
 The model does not need a separate “finalize table” tool. When it calls
 `submit_for_verification`, application code validates the current rows against
@@ -546,7 +799,8 @@ those values were unknown when the first contract was created, adding this rule
 requires an explicit numbered contract revision whose `source` names the
 supporting evidence IDs. Values stated directly by the user can instead name
 the original task as their source. A rule is never silently attached to the
-table.
+table, and every evidence-backed source list must cite at least one valid
+evidence ID.
 
 This prevents malformed rows, avoids repeatedly reading and rewriting a growing
 file, and uses far fewer model output tokens.
@@ -554,35 +808,63 @@ file, and uses far fewer model output tokens.
 ### 9. Link every important fact to its evidence
 
 Each output row or factual statement should record which screenshot, webpage
-text, download, or network response supports it.
+text, JavaScript extraction, download, or network response supports it.
 
 ~~~ts
-interface Evidence {
+interface EvidenceBase {
   id: string;
-  kind: 'screenshot' | 'web_text' | 'download' | 'network_response';
   sourceUrl: string;
   capturedAt: string;
-  artifactPath?: string;
-  quote?: string;
-  locator?: ElementRef;
 }
 
-interface Claim {
-  id: string;
-  text: string;
-  evidenceIds: string[];
-}
+type Evidence = EvidenceBase &
+  (
+    | {
+        kind: 'screenshot' | 'download' | 'network_response';
+        artifactPath: string;
+      }
+    | {
+        kind: 'web_text';
+        artifactPath: string;
+        quote?: string;
+        locator?: ElementRef;
+      }
+    | {
+        kind: 'web_text';
+        quote: string;
+        locator: ElementRef;
+        artifactPath?: string;
+      }
+    | {
+        kind: 'javascript_extraction';
+        artifactPath: string;
+        pageId: string;
+        frameId: string;
+        documentId: string;
+      }
+  );
 ~~~
 
-`OutputRow.evidenceIds` and `Claim.evidenceIds` are the links; do not maintain a
-second evidence-link index that can drift out of sync. They make review and
-debugging much easier: an auditor can move from a fact to its source, and the
-agent can recollect one weak fact without repeating the entire task.
+`OutputRow.evidenceIds` is the table link; do not maintain a second evidence
+index that can drift out of sync. Natural-language outputs use inline markers
+such as `[evidence:E17]`. Completion code parses those markers, confirms every
+ID exists, and passes the cited document spans and evidence to the verifier.
+This avoids introducing a `Claim` store and claim-creation tool before the
+product has demonstrated that it needs them.
+
+Final prose uses `write_document({ outputId, content })`, which looks up the
+contract rather than accepting another filename or format. Markdown and text
+are written directly; PDF is rendered from the same content by application
+code. `write_file` remains available for scratch work and supporting files, but
+does not bypass contract-bound document rendering.
 
 An `Evidence` object is an index, not the evidence itself. Screenshots,
 downloads, and saved network responses must point to a manifest-hashed artifact.
 Web-text evidence must contain either a captured artifact or an exact quote and
-locator. This keeps every reference reviewable from the run directory.
+locator. A JavaScript extraction points to the artifact containing its code,
+complete result, source document identity, and optional DOM snapshot. This
+keeps every reference reviewable from the run directory rather than relying on
+the worker transcript.
 
 The current manifest hashing is sufficient for the initial capability-focused
 version. Stronger signing can be added later.
@@ -607,12 +889,13 @@ interface SubmitForVerificationInput {
 async function runCompletionCheck(
   revision: OutputContractRevision,
   tables: OutputTable[],
-  claims: Claim[],
   evidence: Evidence[],
 ): Promise<CompletionCheckResult> {
+  const currentOutputs = publishedOutputs.all();
   const stateFailures = [
     ...validateTableRules(revision.contract, tables),
-    ...validateEvidenceReferences(revision.contract, tables, claims, evidence),
+    ...validateTableCompleteness(revision.contract, tables, evidence),
+    ...validateEvidenceReferences(tables, currentOutputs, evidence),
   ];
 
   if (stateFailures.length > 0) {
@@ -644,6 +927,13 @@ block, or transport EOF never indicates completion. Mechanical or verifier
 failures return as the tool result for the same submission call, allowing the
 worker to correct them on its next turn.
 
+Treat each model response as a proposal until its protocol shape is accepted.
+If it mixes submission with other calls or exceeds the per-turn call limit,
+record it in the audit transcript as rejected but do not commit that assistant
+message to model history; retry with protocol feedback. This avoids orphaned
+`tool_use` blocks. Once an assistant message is committed, every tool use gets
+exactly one result, including validation and blocked-call errors.
+
 Checks with objective answers run first:
 
 - every contract output has an actual published artifact;
@@ -653,11 +943,16 @@ Checks with objective answers run first:
 - whether files can be parsed;
 - row counts;
 - uniqueness and exact matches against any discovered source list;
+- completeness evidence for every count-ruled table;
 - screenshot counts;
 - unfinished placeholders such as `TODO` or missing values;
-- evidence linkage.
+- row evidence and document citation linkage.
 
-After mechanical checks pass, run one verifier call with fresh context:
+After mechanical checks pass, open one verifier session with fresh context. A
+small run may finish in one model call. A large run uses a bounded read-only
+mini-loop: verify outputs separately, read tables in chunks, inspect screenshots
+as actual multimodal image content, and aggregate the findings. Do not inline an
+unbounded run into one prompt.
 
 ~~~ts
 interface VerificationResult {
@@ -671,10 +966,9 @@ interface VerificationInput {
   originalTask: string;
   contract: OutputContract;
   contractHistory: OutputContractRevision[];
-  outputs: PublishedOutput[];
-  tables: OutputTable[];
-  claims: Claim[];
-  evidence: Evidence[];
+  outputs: PublishedOutputSummary[];
+  tables: OutputTableSummary[];
+  evidence: EvidenceSummary[];
   mechanicalChecks: CompletionCheckResult;
   reportedLimitations: string[];
 }
@@ -686,53 +980,83 @@ The verifier checks four relationships:
 Original task ↔ Output contract
 Output contract ↔ Produced outputs
 Original task ↔ Produced outputs
-Claims and rows ↔ Evidence
+Factual rows and document citations ↔ Evidence
 ~~~
 
 Checking the original task prevents an incorrect contract from validating its
-own mistake. The verifier gets read-only access to the published artifacts,
-evidence files, screenshots, contract history, and mechanical results. It does
-not receive the worker transcript, a mutable browser, or write tools. Code
-handles columns, counts, filenames, duplicates, and parseability before this
-call.
+own mistake. The verifier starts from bounded summaries and gets read-only
+tools for published artifacts, evidence files, screenshots, contract history,
+and mechanical results. It does not receive the worker transcript, a mutable
+browser, or write tools. Code handles columns, counts, filenames, duplicates,
+and parseability before this session.
+
+Completeness is a named verifier decision, not an implication hidden inside
+general alignment: for each count-ruled table, the verifier must decide whether
+the cited enumeration method could reasonably establish the claimed
+population. An explicit assumption is acceptable only when the source offers no
+stronger proof and the limitation is visible in the output. It can explain an
+incomplete run or a requested sample, but it is never sufficient to prove an
+exact population or top-N boundary. Those require an authoritative list,
+pagination exhaustion, or a captured ranked view that includes the boundary.
 
 If verification fails, return the specific contract, output, and evidence
 problems to the same worker. The worker corrects the run and requests
-verification again; it is not restarted from scratch. Default to at most two
-verification-repair cycles. If they remain unresolved, finalize an incomplete
-run rather than accepting it.
+verification again; it is not restarted from scratch. Every submission—whether
+it fails mechanical checks or reaches the verifier—counts toward one default
+limit of three attempts: the initial submission plus two corrections. If they
+remain unresolved, finalize an incomplete run rather than accepting it.
+
+`finalizeIncompleteRun()` best-effort renders every table's current rows through
+`writeArtifact`, even when count or completeness rules fail. These artifacts
+retain `requested_output`, add `completionStatus: 'partial'` in the manifest,
+and remain visibly attached to an incomplete run. Rendering failures are
+recorded but cannot prevent the manifest, transcript, and metrics from closing.
+This preserves partial work and eval signal without pretending it passed the
+contract.
 
 ### 11. Keep the audit log, but give the model a compact memory
 
-The full transcript should remain available as the audit record. It should not
-be resent to the model on every turn. Instead, each turn should contain a
-compact view of the current task and the information needed for the next
-decision.
+The full transcript remains the audit record. Do not replace the current
+append-only, cache-friendly conversation with a wholly rebuilt prompt every
+turn: measured deep runs already benefit heavily from moving prompt-cache
+breakpoints. Use a hybrid layout instead.
+
+Keep system tools and the original task as a stable cached prefix. Append tool
+conversation normally within a rolling recent window. Add a compact structured
+snapshot at the tail only when its underlying state changes, and create
+summaries at explicit compaction boundaries that can themselves become cached
+prefixes. A contract revision changes the prefix only from that revision
+forward; it does not force unrelated earlier state to be regenerated.
 
 That compact view should contain:
 
-- the original task;
-- the output contract;
+- the current contract revision;
 - the derived output summary;
 - current page states;
 - recent actions and failures;
-- only the notes relevant to the current decision;
-- outstanding work.
+- repeated failure fingerprints derived by code, so an old failed strategy is
+  not retried after its raw turn leaves the recent window.
 
 ~~~ts
 interface AgentContext {
-  originalTask: string;
-  contract?: OutputContract;
+  contractRevision?: OutputContractRevision;
   outputs: OutputSummary[];
   pages: BrowserPage[];
   recentEvents: RunEvent[];
-  relevantNotes: string[];
+  repeatedFailures: Array<{
+    actionFingerprint: string;
+    reason: string;
+    count: number;
+    lastTurn: number;
+  }>;
 }
 ~~~
 
-Record each event once. Do not copy the entire previous model request into the
-transcript again on every turn. Summarize or restart a session only when context
-size is actually becoming a problem.
+There is no model-maintained notes tool or hidden retrieval subsystem in V1.
+Record each event once in the audit log, and derive the compact state from
+authoritative stores. Gate rollout on A/B measurements of pass rate, wall time,
+time to first token, cache reads and writes, and total cost per run—not raw
+prompt length alone.
 
 ### 12. Run only clearly independent work in parallel
 
@@ -750,15 +1074,16 @@ Good candidates include:
 - evidence validation.
 
 This does not require a `WorkNode`, `ScheduledTask`, or general dependency-graph
-primitive. The existing scheduler can group ordinary tool calls by the resource
-they use—for example, page ID, public origin, or output table—and apply the
-rules below.
+primitive. Extend the current read-versus-mutating scheduler with resource keys
+such as page ID, public origin, or output table; the existing implementation
+does not provide this grouping yet.
 
 Scheduling rules:
 
 - Actions that change one page remain sequential.
 - Independent pages may run concurrently.
-- Public data reads can use more concurrency than browser pages.
+- Independent public resources may fetch concurrently, but their evidence
+  artifacts commit through the serialized manifest chokepoint.
 - Output-table updates are serialized, and published files still go through
   `writeArtifact`.
 - Reject a response that exceeds `maxToolCallsPerTurn` before executing any of
@@ -768,6 +1093,11 @@ Scheduling rules:
   result must not let many small results overflow the next model request.
 - A failed call is returned immediately, while successful independent results
   remain usable.
+
+Parallelism is an optimization, not the planning model. The worker may issue a
+few independent calls in one response, but it does not maintain N autonomous
+research threads. Measure the gain and keep concurrency low enough that the
+returned page states remain understandable in one turn.
 
 ### 13. Bound every resource explicitly
 
@@ -786,17 +1116,18 @@ interface RunBudget {
   maxToolCalls: number;
   maxDownloadedBytes: number;
   maxPublishedBytes: number;
-  maxVerificationRepairs: number;
+  maxVerificationAttempts: number;
+  maxVerifierModelCallsPerAttempt: number;
 }
 ~~~
 
 Require positive finite safe integers for time, token, turn, and call limits.
-Byte and verifier-repair limits may be zero to disable that capability;
-otherwise they have the same validation. `maxTotalModelTokens` counts prompt
-and output tokens across the run. Enforce each limit while work runs—not only
-after a model call or download has already exceeded it. For example, check a
-tool-call batch before scheduling it and stop a streamed download at its byte
-limit.
+Byte limits may be zero to disable that capability; otherwise they have the
+same validation. Verification attempts and verifier calls per attempt must be
+positive. `maxTotalModelTokens` counts worker and verifier prompt/output tokens
+across the run. Enforce each limit while work runs—not only after a model call
+or download has already exceeded it. For example, check a tool-call batch
+before scheduling it and stop a streamed download at its byte limit.
 
 ### 14. Use one model and streaming driver everywhere
 
@@ -820,8 +1151,45 @@ The TUI observes typed lifecycle events and cancels through `AbortSignal`; it
 does not copy the production model client. The driver returns a complete
 response only after the provider's required terminal event and stop reason. A
 network stream that ends early (transport EOF), incomplete content blocks,
-refusal, and token-limit termination are typed non-success outcomes. This
-prevents UI-specific behavior from silently diverging from eval behavior.
+provider-level refusal, and token-limit termination are typed non-success
+outcomes. Plain text that merely looks like a refusal is not guessed from a
+heuristic; because it contains no `submit_for_verification` call, it cannot
+complete the run anyway. This prevents UI-specific behavior from silently
+diverging from eval behavior.
+
+### 15. Make the complete tool surface explicit
+
+V2 should expose the following model-visible capabilities. Exact schemas still
+need implementation specs, but no required operation should exist only as an
+implication in prose.
+
+| Tool | Purpose | Read-only |
+| --- | --- | --- |
+| `set_output_contract` | Create or revise the output contract | No |
+| `observe` | Return a targeted interactive, text, table, visual, or document view | Yes |
+| `browser_action` | Navigate or perform a short, receipted action sequence, including fill, select, check, hover, drag, upload, and conditional settling | No |
+| `switch_page` | Select a tracked page without mixing page identity into an action sequence | No |
+| `handle_dialog` | Accept or dismiss a tracked browser dialog with optional prompt text | No |
+| `execute_javascript` | Inspect, extract, or interact inside one explicit page/frame document | No |
+| `read_resource` | Read a discovered public resource anonymously and save its response as evidence | No |
+| `capture_text` | Save exact page text plus locator and source as evidence | No |
+| `screenshot` | Save a viewport, element, or full-page image as evidence/requested output | No |
+| `download` | Save browser-captured bytes as evidence/requested output | No |
+| `upsert_output_rows` | Insert or replace stable rows in one output table | No |
+| `delete_output_rows` | Remove rows by stable ID | No |
+| `set_table_completeness` | Attach the enumeration method and evidence to a table | No |
+| `write_document` | Render a contract-bound Markdown, text, or PDF document with inline evidence markers | No |
+| `read_file` / `grep` | Inspect run-directory state and artifacts | Yes |
+| `write_file` | Write scratch state or supporting files through `writeArtifact` | No |
+| `fill_credentials` | Fill credentials only for their configured origin | No |
+| `ask_user_question` | Pause for ambiguity, login, CAPTCHA, or other human input | No |
+| `submit_for_verification` | Materialize current table outputs and request independent review | No |
+
+There is no arbitrary sleep tool. Waiting is tied to an observable condition,
+navigation, dialog, download, or the bounded settle policy. All new tool
+definitions remain deterministic. During incremental rollout, append rather
+than reorder existing definitions; after cutover, freeze one V2 registration
+order so the prompt prefix stays byte-stable between runs.
 
 ## Revised core loop
 
@@ -833,7 +1201,7 @@ updates its records, and accepts completion only after validation succeeds.
 async function runTask(task: string): Promise<VerifiedRun> {
   const session = await browser.createSession();
   let contract: OutputContract | undefined;
-  let verificationRepairsUsed = 0;
+  let verificationAttempts = 0;
 
   while (!budget.expired()) {
     const outputs = contract
@@ -846,8 +1214,7 @@ async function runTask(task: string): Promise<VerifiedRun> {
       : [];
 
     const context = buildAgentContext({
-      originalTask: task,
-      contract,
+      contractRevision: outputContracts.currentRevisionOrUndefined(),
       outputs,
       browser: session.state(),
     });
@@ -857,7 +1224,7 @@ async function runTask(task: string): Promise<VerifiedRun> {
 
     if (!isUsableModelResponse(response)) {
       runEvents.recordFailure('Truncated, refused, or malformed model response');
-      worker.addFeedback([
+      worker.rejectResponse(response, [
         'The previous response was unusable and did not complete the run.',
       ]);
       continue;
@@ -866,7 +1233,7 @@ async function runTask(task: string): Promise<VerifiedRun> {
     const { submission, protocolError } = parseExclusiveSubmission(response);
 
     if (protocolError !== undefined) {
-      worker.addFeedback([protocolError]);
+      worker.rejectResponse(response, [protocolError]);
       continue;
     }
 
@@ -878,16 +1245,19 @@ async function runTask(task: string): Promise<VerifiedRun> {
         continue;
       }
 
+      verificationAttempts += 1;
       const contractRevision = outputContracts.currentRevision();
       const mechanicalChecks = await runCompletionCheck(
         contractRevision,
         outputTables.all(),
-        claimStore.all(),
         evidenceStore.all(),
       );
 
       if (mechanicalChecks.status !== 'verified') {
         worker.addToolResult(submission.toolUseId, mechanicalChecks.failures);
+        if (verificationAttempts >= budget.maxVerificationAttempts) {
+          return finalizeIncompleteRun({ reason: 'verification_attempts' });
+        }
         continue;
       }
 
@@ -895,10 +1265,9 @@ async function runTask(task: string): Promise<VerifiedRun> {
         originalTask: task,
         contract,
         contractHistory: outputContracts.all(),
-        outputs: mechanicalChecks.outputs,
-        tables: outputTables.all(),
-        claims: claimStore.all(),
-        evidence: evidenceStore.all(),
+        outputs: summarizePublishedOutputs(mechanicalChecks.outputs),
+        tables: summarizeTables(outputTables.all()),
+        evidence: summarizeEvidence(evidenceStore.all()),
         mechanicalChecks,
         reportedLimitations: submission.input.unresolvedLimitations ?? [],
       });
@@ -908,22 +1277,19 @@ async function runTask(task: string): Promise<VerifiedRun> {
         return finalizeRun();
       }
 
-      if (verificationRepairsUsed >= budget.maxVerificationRepairs) {
-        runEvents.recordToolResult(submission.toolUseId, verification);
-        return finalizeIncompleteRun(verification);
-      }
-
-      verificationRepairsUsed += 1;
       worker.addToolResult(submission.toolUseId, [
         ...verification.contractProblems,
         ...verification.outputProblems,
         ...verification.evidenceProblems,
       ]);
+      if (verificationAttempts >= budget.maxVerificationAttempts) {
+        return finalizeIncompleteRun({ reason: 'verification_attempts' });
+      }
       continue;
     }
 
     if (response.toolCalls.length === 0) {
-      worker.addFeedback([
+      worker.rejectResponse(response, [
         'Continue working or call submit_for_verification explicitly.',
       ]);
       continue;
@@ -936,7 +1302,7 @@ async function runTask(task: string): Promise<VerifiedRun> {
     contract = outputContracts.current();
   }
 
-  return finalizeIncompleteRun();
+  return finalizeIncompleteRun({ reason: budget.reason() });
 }
 ~~~
 
@@ -960,25 +1326,29 @@ V2 would handle it as follows:
 1. In its first response, the worker calls `set_output_contract` with one table
    output and one screenshot output. It may navigate in the same response.
 2. The model opens the repository and finds the contributor list. It can use
-   `execute_javascript` to extract the visible list or `read_resource` if the
-   page exposes the same data as public JSON.
+   `execute_javascript` with evidence capture to extract the visible list, or
+   `read_resource` if the page exposes equivalent public JSON and a sample
+   reconciles against the visible ranking.
 3. The contract defines a 30-row rule, exact columns, and unique profile URLs.
    If a complete contributor list becomes available, the worker can add an
    evidence-backed exact-value rule through an explicit contract revision.
-4. Each `OutputTable` row stores the evidence supporting its values.
+4. Each `OutputTable` row stores the evidence supporting its values. The table
+   also records `ranked_view` completeness evidence pointing to the captured
+   leaderboard.
 5. The screenshot tool saves the leaderboard as both requested output and
    evidence.
 6. The worker calls `submit_for_verification` as its only tool call.
-   `CompletionCheck` verifies exactly 30 unique rows, renders the CSV, then
-   checks the actual file's three columns, profile URLs, required screenshot,
-   and evidence links.
+   `CompletionCheck` verifies exactly 30 unique rows and their completeness
+   evidence, renders the CSV, then checks the actual file's three columns,
+   profile URLs, required screenshot, and evidence links.
 7. The verifier independently compares the original task, output contract,
    finished CSV, screenshot, and evidence before accepting the run.
 
-If only 29 contributors were collected, the application would return one clear
+If only 29 contributors were collected, the application returns one clear
 failure—“expected 30 rows; found 29.” If an authoritative list is available, it
-can name the missing profile URL instead of asking the model to reread the
-entire conversation and discover the omission itself.
+can name the missing profile URL. If the source genuinely exposes only 29, the
+worker reports that limitation rather than weakening an explicit user request
+for 30.
 
 ## Implementation sequence
 
@@ -994,6 +1364,8 @@ improvement.
   token-limit stops, and refusals as completion.
 - Add finite per-turn and whole-run token, tool-call, byte, time, and repair
   budgets. Enforce them before or during the operation that consumes them.
+- Make rejected model responses transactional: audit them without committing
+  orphaned tool uses to provider history.
 - Until `submit_for_verification` lands in Phase 2, require a clean provider
   stop before accepting the existing no-tool completion signal.
 
@@ -1004,27 +1376,43 @@ cancellation, refusal, and budget-exhaustion tests.
 
 - Add `BrowserPage`, document IDs, observation IDs, frame tracking, and popup
   tracking.
-- Add per-element revalidation and `browser_action` sequences capped at eight
-  same-document actions.
+- Define bounded settle behavior and observation IDs as diff baselines, not
+  page-wide stale locks.
+- Add conservative per-element revalidation and `browser_action` sequences
+  capped at eight same-document actions, with one receipt per attempted action
+  and explicit partial-commit behavior.
 - Add page-scoped `execute_javascript` with page locking, timeouts, bounded
-  output, execution termination, and page recovery.
-- Remove `browser_batch`.
+  output, execution termination, page recovery, explicit frame targeting, and
+  persisted extraction evidence.
+- Remove `browser_batch` only after the replacement preserves its current
+  partial-commit diagnostics and improves measured outcomes.
 - Cache observed element descriptions instead of regenerating outlines.
-- Add keyboard and select operations plus a separate `switch_page` operation.
+- Add keyboard, select, check, hover, drag, and run-confined upload operations;
+  separate tools handle page switching and dialogs.
+- Classify login, CAPTCHA, rate-limit, and bot-challenge blockers and preserve
+  partial artifacts when unattended recovery is impossible.
 
-Primary metric: model calls per successful page operation. A lower number means
-less latency and cost without relying on a faster model.
+Primary metrics: model calls per successful page operation, wrong-target rate,
+false-stale rate, partial-batch recovery rate, and unsettled-result rate. Phase
+1 does not graduate on turn reduction alone.
 
 ### Phase 2 — eliminate output failures
 
 - Add the validated `set_output_contract` tool and store numbered contract
-  revisions under `scratch/output-contract/` through `writeArtifact`.
+  revisions and their evidence/assumption basis under
+  `scratch/output-contract/` through `writeArtifact`.
 - Add schema-free, versioned `OutputTable` row state keyed to the contract
   output ID.
-- Add batch row insertion and `TableRule` validation.
+- Add row upsert/delete, exact type/format validation, `TableRule` validation,
+  and mandatory completeness evidence for count-ruled tables.
+- Add persisted JavaScript-extraction and exact-text evidence; use inline
+  evidence markers for prose instead of an undefined claim store.
+- Add contract-bound Markdown, text, and PDF document rendering.
 - Add the exclusive `submit_for_verification` protocol and reject no-tool,
   truncated, refused, or malformed completion attempts. Its handler renders
   current table artifacts through `writeArtifact` before verification.
+- Bound all verification submissions together and best-effort materialize
+  partial table artifacts when a run ends incomplete.
 - Derive output paths and whether files are deliverables or supporting evidence
   from the output contract.
 - Add derived `OutputSummary` and code-based `CompletionCheck`.
@@ -1035,6 +1423,8 @@ Primary metric: malformed structured-output rate, targeting zero.
 
 - Add targeted page-structure and text extraction.
 - Add table extraction.
+- Add anonymous `read_resource` with response evidence and UI/resource
+  reconciliation rules.
 - Let the model inspect screenshots.
 - Add PDF and spreadsheet parsing.
 - Add element screenshots and optical character recognition (OCR) for
@@ -1047,12 +1437,15 @@ visual pages, PDFs, spreadsheets, and image-only documents.
 
 - Add the current contract and derived `OutputSummary` to `AgentContext`; do not
   introduce a separate goal, collection-item, or coverage state machine.
-- Record each new event once instead of storing repeated copies of prior model
-  requests.
+- Preserve the stable cached prefix and append-only recent history; add state
+  snapshots only on change and compact only at cache-friendly boundaries.
+- Derive repeated-failure fingerprints from recorded events; do not add a
+  model-maintained notes tool or an unspecified retrieval subsystem.
 - Run a limited number of independent page and public-data jobs concurrently.
 - Extend the scheduler with page, origin, and output-table resource keys; do not
   add a general dependency-graph system.
-- Retrieve only relevant past information and summarize history when needed.
+- A/B the hybrid context against the current moving-breakpoint implementation
+  on pass rate, cost, wall time, time to first token, and cache reads/writes.
 
 Primary metrics: median and slow-case model turns, latency, page data sent to
 the model, and repeated inspections that revealed nothing new.
@@ -1060,10 +1453,11 @@ the model, and repeated inspections that revealed nothing new.
 ### Phase 5 — add independent verification and reusable site knowledge
 
 - Add the fresh-context verifier. It checks task-to-contract,
-  contract-to-output, task-to-output, and claim-to-evidence alignment after
-  mechanical checks pass.
-- Give it only read access to actual artifacts and evidence, and cap repair
-  cycles at two by default.
+  contract-to-output, task-to-output, completeness proof, and
+  fact-to-evidence alignment after mechanical checks pass.
+- Give it a bounded read-only artifact loop, chunk large outputs, and provide
+  actual screenshots as multimodal inputs. The worker receives at most two
+  correction opportunities by default.
 - Add data-only, site-specific interaction recipes. Each recipe should name the
   site it applies to, define how success is checked, and expire so stale site
   behavior is not trusted forever.
@@ -1082,16 +1476,21 @@ The architecture should be evaluated against:
 - total browser observations;
 - redundant observation rate;
 - stale-element retries and false-stale rate;
+- wrong-target actions, partial batches, and unsettled action results;
 - JavaScript termination and page-recovery rate;
 - largest model input during a run;
-- total output and cached-input tokens;
+- total output, cache-read, cache-write, and uncached-input tokens;
 - output validation failures;
 - table materialization or artifact-validation failures at submission;
+- partial tables successfully preserved on incomplete runs;
+- count-ruled tables rejected for missing or weak completeness evidence;
 - contract defects found by the verifier;
+- evidence-backed contract revisions versus unsupported constraint relaxations;
 - verifier correction rate and added latency;
 - required table values found versus missing;
+- UI/resource reconciliation disagreements;
 - unsupported-interaction failures;
-- evidence coverage per claim or row.
+- evidence coverage per factual row or document citation.
 
 The primary performance target should be fewer model decisions. Prompt caching
 can make repeated context cheaper, but it does not remove the latency or failure
