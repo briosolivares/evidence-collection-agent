@@ -252,6 +252,10 @@ export function App({
       evalsDir: config.evalsDir,
       resultsDir: config.evalResultsDir,
       runner: batchRunner,
+      // Headed trials get the live question dialog (always-on, user ruling
+      // 2026-08-13) — the eval runtime forwards this only on the headed
+      // lane, and answered dialogs label the report as assisted.
+      requestPermission,
     });
     void evalHandle.current.done.finally(() => {
       evalHandle.current = undefined;

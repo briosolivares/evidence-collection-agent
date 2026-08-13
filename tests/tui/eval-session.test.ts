@@ -248,6 +248,66 @@ describe('startEvalBatch', () => {
     });
   });
 
+  it('counts answered dialogs and stamps the report ASSISTED; denials count for nothing', async () => {
+    const fixture = makeFixture([]);
+    const decisions = [
+      { behavior: 'allow', updatedInput: { answer: 'human completed the login' } } as const,
+      { behavior: 'deny', feedback: 'not now' } as const,
+    ];
+    let trial = 0;
+    const runner: EvalRunner = (_task, _onEvent, opts) => {
+      const decision = decisions[trial]!;
+      const runDir = `/runs/t${trial + 1}`;
+      trial += 1;
+      const done = (async (): Promise<RunOutcome> => {
+        // The trial asks the user a question (e.g. a login blocker) through
+        // the resolver the batch threaded in.
+        expect(await opts.requestPermission?.({ toolName: 'ask_user_question', input: {} })).toEqual(decision);
+        return { status: 'completed', finalText: '', runDir };
+      })();
+      return { cancel: vi.fn(), done };
+    };
+    let dialog = 0;
+
+    const handle = startEvalBatch(['stub'], 2, 1, {
+      onAction: (action) => fixture.actions.push(action),
+      evalsDir: fixtureDir,
+      resultsDir: '/tmp/results-dir',
+      runner,
+      requestPermission: async () => decisions[dialog++]!,
+      loadTask: fixture.loadTask,
+      writeResultsFn: fixture.writeResultsFn,
+    });
+    expect(await handle.done).toBe('completed');
+
+    // One allow, one deny → exactly one assist, stamped and labeled.
+    expect(fixture.written[0]?.report.assistedDialogs).toBe(1);
+    const reportAction = fixture.actions.find((action) => action.type === 'eval_report_ready');
+    expect((reportAction as { text: string }).text).toContain('ASSISTED: a human answered 1 interactive dialog(s)');
+  });
+
+  it('a batch that never needed a dialog stays unlabeled even with a resolver present', async () => {
+    const fixture = makeFixture([
+      { status: 'completed', finalText: '', runDir: '/runs/t1' },
+      { status: 'completed', finalText: '', runDir: '/runs/t2' },
+    ]);
+
+    const handle = startEvalBatch(['stub'], 2, 1, {
+      onAction: (action) => fixture.actions.push(action),
+      evalsDir: fixtureDir,
+      resultsDir: '/tmp/results-dir',
+      runner: fixture.runner,
+      requestPermission: async () => ({ behavior: 'allow', updatedInput: {} }),
+      loadTask: fixture.loadTask,
+      writeResultsFn: fixture.writeResultsFn,
+    });
+    expect(await handle.done).toBe('completed');
+
+    expect(fixture.written[0]?.report).not.toHaveProperty('assistedDialogs');
+    const reportAction = fixture.actions.find((action) => action.type === 'eval_report_ready');
+    expect((reportAction as { text: string }).text).not.toContain('ASSISTED');
+  });
+
   it('Esc-style cancellation cancels every active trial and starts no queued work', async () => {
     const actions: StoreAction[] = [];
     const cancels: Array<ReturnType<typeof vi.fn>> = [];

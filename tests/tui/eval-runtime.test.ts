@@ -59,6 +59,47 @@ describe('createTuiEvalRuntime', () => {
     expect(browserRuntime.close).toHaveBeenCalledTimes(1);
   });
 
+  it('forwards the dialog resolver to headed trials only — headless trials stay unassisted', async () => {
+    const browser = stubBrowser();
+    const browserRuntime: EvalBrowserRuntime = {
+      withBrowser: async (_headed, operation) => operation(browser),
+      close: vi.fn(async () => undefined),
+    };
+    const seenDeps: RunSessionDeps[] = [];
+    const startRunFn = vi.fn((_task: string, deps: RunSessionDeps) => {
+      seenDeps.push(deps);
+      return {
+        cancel: vi.fn(),
+        done: Promise.resolve({ status: 'completed', finalText: '', runDir: '/runs/normal' } as const),
+      };
+    });
+    const authenticatedRunner = vi.fn(() => ({
+      cancel: vi.fn(),
+      done: Promise.resolve({ status: 'completed', finalText: '', runDir: '/runs/auth' } as const),
+    }));
+    const runtime = createTuiEvalRuntime({
+      authenticatedRunner,
+      authenticatedProfileDir: '/persistent/profile',
+      browserRuntime,
+      startRunFn,
+    });
+    const requestPermission = vi.fn();
+
+    await runtime.startRun('auth task', () => {}, { ...evalOptions(true), requestPermission }).done;
+    await runtime.startRun('normal task', () => {}, { ...evalOptions(false), requestPermission })
+      .done;
+
+    // Headed: the resolver rides through to the persistent-session runner.
+    expect(authenticatedRunner).toHaveBeenCalledWith(
+      'auth task',
+      expect.any(Function),
+      expect.objectContaining({ requestPermission }),
+    );
+    // Headless: deliberately withheld — interactive tools fail closed,
+    // keeping this lane's scores comparable to CLI batches.
+    expect(seenDeps[0]).not.toHaveProperty('requestPermission');
+  });
+
   it('cancels a normal run whose browser is still being acquired', async () => {
     let releaseBrowser!: (browser: BrowserController) => void;
     const browserPromise = new Promise<BrowserController>((resolve) => {

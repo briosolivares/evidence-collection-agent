@@ -13,7 +13,7 @@ export interface TuiEvalRuntimeDeps {
   authenticatedRunner: (
     task: string,
     onEvent: (event: UiEvent) => void,
-    opts?: { startUrl?: string },
+    opts?: { startUrl?: string; requestPermission?: RunSessionDeps['requestPermission'] },
   ) => RunHandle;
   authenticatedProfileDir: string;
   browserExecutablePath?: string;
@@ -47,8 +47,18 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
   return {
     startRun(task, onEvent, opts) {
       if (opts.headed) {
+        // Headed trials run in the user's visible persistent browser, so
+        // the question dialog is live here (user ruling 2026-08-13:
+        // always-on for headed TUI evals) — the user can answer questions
+        // and act in the browser mid-trial (e.g. complete a login). The
+        // batch's report is labeled whenever a dialog was actually
+        // answered (see evalSession's assistedDialogs), so assisted scores
+        // never masquerade as unassisted ones.
         return deps.authenticatedRunner(task, onEvent, {
           ...(opts.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
+          ...(opts.requestPermission === undefined
+            ? {}
+            : { requestPermission: opts.requestPermission }),
         });
       }
 
@@ -56,6 +66,10 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
       let cancelled = false;
       const done = browserRuntime
         .withBrowser(false, async (browser) => {
+          // Deliberately no requestPermission: headless trials run in an
+          // invisible isolated browser (nothing for a human to act in) and
+          // are the lane whose scores stay comparable to CLI batches —
+          // interactive tools fail closed here, same as the CLI runner.
           inner = startRunFn(task, {
             browser,
             onEvent,

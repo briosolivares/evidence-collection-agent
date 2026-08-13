@@ -52,6 +52,12 @@ export interface EvalReport {
   model: string;
   /** Tool condition every trial used. */
   toolProfile: ToolProfile;
+  /** Number of interactive dialogs a human answered during the batch (TUI
+   * headed-lane assists — see the TUI's evalSession). Present only when
+   * nonzero: an assisted batch's scores are not comparable to unassisted
+   * ones, and this field is the label that keeps them honest. The CLI
+   * runner never sets it. */
+  assistedDialogs?: number;
   /** One aggregated report per task, in the order the tasks were given. */
   tasks: TaskReport[];
 }

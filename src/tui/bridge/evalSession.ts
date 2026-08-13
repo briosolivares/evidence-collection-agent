@@ -17,18 +17,20 @@ import { DEFAULT_MODEL } from '../../model/callModel.js';
 import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../tools/index.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
-import type { RunHandle } from './runSession.js';
+import type { RunHandle, RunSessionDeps } from './runSession.js';
 
 export interface EvalTaskChoice {
   name: string;
   headed: boolean;
 }
 
-/** Starts one eval trial with its selected browser policy. */
+/** Starts one eval trial with its selected browser policy. The optional
+ * dialog resolver rides along for headed trials only — the eval runtime
+ * forwards it exclusively on the headed lane (see evalRuntime.ts). */
 export type EvalRunner = (
   task: string,
   onEvent: (event: UiEvent) => void,
-  opts: EvalRunOptions,
+  opts: EvalRunOptions & { requestPermission?: RunSessionDeps['requestPermission'] },
 ) => RunHandle;
 
 export interface EvalSessionDeps {
@@ -36,6 +38,12 @@ export interface EvalSessionDeps {
   evalsDir: string;
   resultsDir: string;
   runner: EvalRunner;
+  /** The App's question-dialog resolver. Present in the real TUI: headed
+   * trials get live dialogs — the user can answer questions and act in the
+   * visible browser mid-trial (e.g. complete a login). Absent, every trial
+   * runs unassisted. Answered (allowed) dialogs are counted and stamped on
+   * the report as `assistedDialogs`, so assisted scores are always labeled. */
+  requestPermission?: RunSessionDeps['requestPermission'];
   toolProfile?: ToolProfile;
   loadTask?: (evalsDir: string, name: string) => Promise<EvalTask>;
   formatReportFn?: (report: EvalReport) => string;
@@ -84,6 +92,21 @@ export function startEvalBatch(
   const controller = new AbortController();
   let cancelled = false;
 
+  // Count answered dialogs so the report can be labeled: an allow decision
+  // means information flowed from the human into a trial, and that trial's
+  // score is no longer comparable to unassisted batches. Denied/dismissed
+  // dialogs assist nothing and are not counted.
+  let assistedDialogs = 0;
+  const askUser = deps.requestPermission;
+  const countingRequestPermission =
+    askUser === undefined
+      ? undefined
+      : (request: Parameters<NonNullable<RunSessionDeps['requestPermission']>>[0]) =>
+          askUser(request).then((decision) => {
+            if (decision.behavior === 'allow') assistedDialogs += 1;
+            return decision;
+          });
+
   emit({ type: 'evals_started', tasks: [...taskNames], k, concurrency });
 
   const done: Promise<'completed' | 'cancelled' | 'failed'> = (async () => {
@@ -110,7 +133,13 @@ export function startEvalBatch(
                 });
               }
             },
-            { ...opts, ...(startUrl === undefined ? { startUrl: undefined } : { startUrl }) },
+            {
+              ...opts,
+              ...(startUrl === undefined ? { startUrl: undefined } : { startUrl }),
+              ...(countingRequestPermission === undefined
+                ? {}
+                : { requestPermission: countingRequestPermission }),
+            },
           );
           const abort = () => handle.cancel();
           opts.signal.addEventListener('abort', abort, { once: true });
@@ -156,10 +185,12 @@ export function startEvalBatch(
         },
       });
 
-      const resultsPath = writeResultsFn(report, deps.resultsDir);
+      const finalReport: EvalReport =
+        assistedDialogs > 0 ? { ...report, assistedDialogs } : report;
+      const resultsPath = writeResultsFn(finalReport, deps.resultsDir);
       emit({
         type: 'eval_report_ready',
-        text: `${formatReportFn(report)}\n\nresults JSON: ${resultsPath}`,
+        text: `${formatReportFn(finalReport)}\n\nresults JSON: ${resultsPath}`,
       });
       emit({ type: 'evals_finished' });
       return 'completed';

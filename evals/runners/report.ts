@@ -51,6 +51,14 @@ export function formatReport(report: EvalReport): string {
 
   const passedTasks = report.tasks.filter((t) => t.taskPassed).length;
   lines.push('', `${passedTasks}/${report.tasks.length} tasks passed`);
+  if (report.assistedDialogs !== undefined) {
+    lines.push(
+      '',
+      `ASSISTED: a human answered ${report.assistedDialogs} interactive dialog(s) mid-run — ` +
+        'scores are not comparable to unassisted batches.',
+    );
+  }
+
   return lines.join('\n');
 }
 

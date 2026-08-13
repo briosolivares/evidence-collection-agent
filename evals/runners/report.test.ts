@@ -57,6 +57,14 @@ describe('formatReport', () => {
     expect(text).toContain('0/1 tasks passed');
   });
 
+  it('labels an assisted batch and stays silent for unassisted ones', () => {
+    expect(formatReport(sampleReport())).not.toContain('ASSISTED');
+
+    const assisted = formatReport({ ...sampleReport(), assistedDialogs: 2 });
+    expect(assisted).toContain('ASSISTED: a human answered 2 interactive dialog(s) mid-run');
+    expect(assisted).toContain('not comparable to unassisted batches');
+  });
+
   it('renders an errored trial with its error and no assertion lines', () => {
     const report: EvalReport = {
       ...sampleReport(),
