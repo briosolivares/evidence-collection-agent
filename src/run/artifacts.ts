@@ -1,5 +1,13 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  closeSync,
+  constants as fsConstants,
+  fstatSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { resolveRunPath } from './runDir.js';
@@ -94,6 +102,24 @@ export function initManifest(runDir: string, taskText: string): void {
   writeFileSync(manifestPath(runDir), serializeManifest(manifest), { flag: 'wx' });
   mkdirSync(join(runDir, ARTIFACTS_DIR), { recursive: true });
   mkdirSync(join(runDir, SCRATCH_DIR), { recursive: true });
+}
+
+/**
+ * Read the run's manifest as it stands on disk, without mutating it.
+ *
+ * At least three ad hoc manifest readers already exist elsewhere in the
+ * codebase (`src/completion/completionCheck.ts` and
+ * `src/completion/finalizeIncompleteRun.ts`), each re-implementing "read
+ * manifest.json, JSON.parse it, throw if that fails" inline. Consolidating
+ * them onto this function is deliberately out of scope here — this only
+ * keeps the count from growing for callers written from now on.
+ *
+ * @param runDir - absolute path to a run directory whose manifest has been
+ *   initialized; throws if the manifest file is missing or is not valid JSON
+ * @returns the manifest exactly as stored, unmodified
+ */
+export function readManifest(runDir: string): Manifest {
+  return loadManifest(runDir);
 }
 
 /**
@@ -257,4 +283,136 @@ export function setArtifactCompletionStatus(
   manifest.artifacts[index] = updated;
   writeFileSync(manifestPath(runDir), serializeManifest(manifest));
   return updated;
+}
+
+/**
+ * Drop one scratch file's manifest entry after the caller has already
+ * observed the file itself is gone from disk.
+ *
+ * This is bookkeeping only — deliberately no filesystem access here. The
+ * intended caller (a post-command reconciliation pass over scratch/workspace)
+ * has already established absence by walking the directory; touching the
+ * filesystem again here would just be a second, redundant source of truth to
+ * keep in sync with the first.
+ *
+ * @param runDir - absolute path to a run directory with an initialized
+ *   manifest; throws if the manifest is missing
+ * @param relPath - run-dir-relative path of the scratch entry to drop; must
+ *   resolve under scratch/ — throws for an artifacts/ path (published
+ *   provenance is never silently dropped this way) or a path that escapes
+ *   the run directory
+ * @returns nothing; every other entry is preserved untouched, and the
+ *   manifest is rewritten through the same serialization helper every other
+ *   write uses. A path with no matching manifest entry is a no-op — nothing
+ *   is written — which is what makes repeating a reconciliation pass over
+ *   the same removal harmless
+ */
+export function removeScratchArtifactEntry(runDir: string, relPath: string): void {
+  const filename = relative(resolve(runDir), resolveRunPath(runDir, relPath));
+  if (!filename.startsWith(`${SCRATCH_DIR}${sep}`)) {
+    throw new Error(
+      `removeScratchArtifactEntry only removes ${SCRATCH_DIR}/ entries, never published ` +
+        `provenance: ${JSON.stringify(relPath)}`,
+    );
+  }
+
+  const manifest = loadManifest(runDir);
+  const remaining = manifest.artifacts.filter((entry) => entry.filename !== filename);
+  if (remaining.length === manifest.artifacts.length) return; // already absent: no-op
+  manifest.artifacts = remaining;
+  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+}
+
+/**
+ * Recovery-time integrity check: every manifest entry must resolve inside
+ * the run directory, exist as a regular, non-symlink file, and match its
+ * recorded SHA-256.
+ *
+ * Hash verification of manifest entries already exists as
+ * `validateManifestIntegrity` in `src/completion/completionCheck.ts`, and
+ * this function deliberately does not become a third implementation of that
+ * comparison — but it cannot delegate to it either. That module imports
+ * `ARTIFACTS_DIR`, `writeArtifact`, and other names from this one, so an
+ * import the other way would be a cycle. More importantly, delegating would
+ * silently drop the guarantee this function exists to add:
+ * `validateManifestIntegrity` reads entries with `existsSync`/`readFileSync`,
+ * which both follow symlinks, so a symlink planted where a manifest entry
+ * expects a plain file would be "verified" against bytes that live somewhere
+ * else on disk entirely. That gap is tolerable on the ordinary
+ * submission-time path it serves, but recovery runs over a run directory a
+ * crashed or untrusted worker left behind, where a planted symlink is
+ * exactly the kind of thing recovery needs to catch rather than trust.
+ *
+ * @param runDir - absolute path to the run directory being recovered
+ * @throws one Error listing every failing entry — a path that escapes the
+ *   run directory, a missing file, a non-regular file (symlink, socket,
+ *   FIFO, device), or a hash mismatch — collected in one pass so recovery
+ *   sees the whole picture instead of stopping at the first problem;
+ *   returns normally only when every entry matches
+ */
+export function verifyManifestFiles(runDir: string): void {
+  const manifest = loadManifest(runDir);
+  const problems: string[] = [];
+
+  for (const entry of manifest.artifacts) {
+    let absPath: string;
+    try {
+      absPath = resolveRunPath(runDir, entry.filename);
+    } catch {
+      problems.push(`${entry.filename}: does not resolve inside the run directory`);
+      continue;
+    }
+
+    // O_NOFOLLOW refuses to open a path that is itself a symlink at all
+    // (the open fails with ELOOP) rather than silently opening whatever it
+    // points to. O_NONBLOCK keeps a FIFO from hanging this pass forever
+    // waiting for a writer that will never come; it has no effect on the
+    // regular-file read below once fstat has confirmed the type. Both flags
+    // are undefined on platforms that lack them (Windows), where the fstat
+    // check below is the only remaining defense.
+    const flags =
+      fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
+    let fd: number;
+    try {
+      fd = openSync(absPath, flags);
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code === 'ENOENT') {
+        problems.push(`${entry.filename}: recorded in the manifest but no longer exists`);
+      } else if (code === 'ELOOP') {
+        problems.push(`${entry.filename}: is a symlink, not a regular file`);
+      } else {
+        problems.push(
+          `${entry.filename}: could not be opened (${
+            error instanceof Error ? error.message : String(error)
+          })`,
+        );
+      }
+      continue;
+    }
+
+    try {
+      if (!fstatSync(fd).isFile()) {
+        problems.push(`${entry.filename}: is not a regular file`);
+        continue;
+      }
+      const actual = createHash('sha256').update(readFileSync(fd)).digest('hex');
+      if (actual !== entry.sha256) {
+        problems.push(
+          `${entry.filename}: changed after it was recorded (manifest hash ` +
+            `${entry.sha256.slice(0, 12)}…, actual ${actual.slice(0, 12)}…)`,
+        );
+      }
+    } finally {
+      closeSync(fd);
+    }
+  }
+
+  if (problems.length > 0) {
+    throw new Error(
+      `manifest verification failed for ${problems.length} of ${manifest.artifacts.length} ` +
+        `entr${problems.length === 1 ? 'y' : 'ies'} in ${runDir}:\n` +
+        problems.map((problem) => `  - ${problem}`).join('\n'),
+    );
+  }
 }

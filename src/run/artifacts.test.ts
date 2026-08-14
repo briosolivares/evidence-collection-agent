@@ -1,10 +1,19 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { finalizeManifest, initManifest, MANIFEST_FILENAME, writeArtifact, type Manifest } from './artifacts.js';
+import {
+  finalizeManifest,
+  initManifest,
+  MANIFEST_FILENAME,
+  readManifest,
+  removeScratchArtifactEntry,
+  verifyManifestFiles,
+  writeArtifact,
+  type Manifest,
+} from './artifacts.js';
 
 /** SHA-256 of the ASCII bytes "abc" — the classic FIPS 180 known-answer vector. */
 const SHA256_OF_ABC = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad';
@@ -209,5 +218,162 @@ describe('manifest lifecycle', () => {
 
   it('finalizeManifest without a manifest throws', () => {
     expect(() => finalizeManifest(runDir)).toThrow();
+  });
+});
+
+describe('readManifest', () => {
+  it('returns the existing manifest shape without mutating it', () => {
+    initManifest(runDir, 'read task');
+    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
+
+    const before = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
+    const manifest = readManifest(runDir);
+
+    expect(manifest.task).toBe('read task');
+    expect(manifest.artifacts).toHaveLength(2);
+    expect(manifest).toEqual(readManifestFile());
+    // Reading must not itself write — the file on disk is byte-for-byte the
+    // same as before the call.
+    expect(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')).toBe(before);
+  });
+
+  it('fails loudly when the manifest is missing', () => {
+    expect(() => readManifest(runDir)).toThrow(/manifest/);
+  });
+
+  it('fails loudly when the manifest is not valid JSON', () => {
+    writeFileSync(join(runDir, MANIFEST_FILENAME), 'not json');
+    expect(() => readManifest(runDir)).toThrow();
+  });
+});
+
+describe('removeScratchArtifactEntry', () => {
+  beforeEach(() => {
+    initManifest(runDir, 'scratch removal task');
+  });
+
+  it('removes only the named scratch entry, preserving every unrelated entry', () => {
+    writeArtifact(runDir, 'artifacts/keep.csv', Buffer.from('keep'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'scratch/keep.tmp', Buffer.from('scratch keep'));
+    writeArtifact(runDir, 'scratch/drop.tmp', Buffer.from('scratch drop'));
+
+    removeScratchArtifactEntry(runDir, 'scratch/drop.tmp');
+
+    const manifest = readManifestFile();
+    expect(manifest.artifacts.map((entry) => entry.filename).sort()).toEqual([
+      'artifacts/keep.csv',
+      'scratch/keep.tmp',
+    ]);
+  });
+
+  it('touches only the manifest — a file the caller already knows is gone is not looked for', () => {
+    writeArtifact(runDir, 'scratch/drop.tmp', Buffer.from('x'));
+
+    // The file is deliberately left on disk: removeScratchArtifactEntry must
+    // not need (or attempt) to check or delete it.
+    removeScratchArtifactEntry(runDir, 'scratch/drop.tmp');
+
+    expect(existsSync(join(runDir, 'scratch/drop.tmp'))).toBe(true);
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+
+  it('rejects removing an artifacts/ entry, leaving it on record', () => {
+    writeArtifact(runDir, 'artifacts/published.csv', Buffer.from('x'), {
+      roles: ['requested_output'],
+    });
+
+    expect(() => removeScratchArtifactEntry(runDir, 'artifacts/published.csv')).toThrow(
+      /scratch/,
+    );
+    expect(readManifestFile().artifacts).toHaveLength(1);
+  });
+
+  it('rejects an escaping or absolute path', () => {
+    expect(() => removeScratchArtifactEntry(runDir, '../evil.tmp')).toThrow();
+    expect(() => removeScratchArtifactEntry(runDir, '/tmp/evil.tmp')).toThrow();
+  });
+
+  it('is idempotent — repeating a removal is harmless', () => {
+    writeArtifact(runDir, 'scratch/drop.tmp', Buffer.from('x'));
+
+    removeScratchArtifactEntry(runDir, 'scratch/drop.tmp');
+    expect(() => removeScratchArtifactEntry(runDir, 'scratch/drop.tmp')).not.toThrow();
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+
+  it('is a no-op for a scratch path the manifest never tracked', () => {
+    expect(() => removeScratchArtifactEntry(runDir, 'scratch/never-written.tmp')).not.toThrow();
+    expect(readManifestFile().artifacts).toHaveLength(0);
+  });
+});
+
+describe('verifyManifestFiles', () => {
+  beforeEach(() => {
+    initManifest(runDir, 'verify task');
+  });
+
+  it('returns normally when every entry matches its recorded hash and is a regular file', () => {
+    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
+
+    expect(() => verifyManifestFiles(runDir)).not.toThrow();
+  });
+
+  it('detects a missing file', () => {
+    writeArtifact(runDir, 'artifacts/gone.txt', Buffer.from('x'), {
+      roles: ['requested_output'],
+    });
+    rmSync(join(runDir, 'artifacts/gone.txt'));
+
+    expect(() => verifyManifestFiles(runDir)).toThrow(/gone\.txt/);
+  });
+
+  it('detects a symlink substituted for a regular file', () => {
+    writeArtifact(runDir, 'artifacts/real.txt', Buffer.from('real bytes'), {
+      roles: ['requested_output'],
+    });
+    const target = join(runDir, 'link-target.txt');
+    writeFileSync(target, 'real bytes');
+    rmSync(join(runDir, 'artifacts/real.txt'));
+    symlinkSync(target, join(runDir, 'artifacts/real.txt'));
+
+    // The symlink's target holds byte-identical content to what was
+    // recorded — only the file-type check catches this, not a hash diff.
+    expect(() => verifyManifestFiles(runDir)).toThrow(/real\.txt/);
+  });
+
+  it('detects a byte/hash mismatch', () => {
+    writeArtifact(runDir, 'artifacts/data.txt', Buffer.from('original'), {
+      roles: ['requested_output'],
+    });
+    writeFileSync(join(runDir, 'artifacts/data.txt'), 'tampered');
+
+    expect(() => verifyManifestFiles(runDir)).toThrow(/data\.txt/);
+  });
+
+  it('reports ALL mismatches in one error, not just the first', () => {
+    writeArtifact(runDir, 'artifacts/missing.txt', Buffer.from('a'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'artifacts/tampered.txt', Buffer.from('original'), {
+      roles: ['requested_output'],
+    });
+    rmSync(join(runDir, 'artifacts/missing.txt'));
+    writeFileSync(join(runDir, 'artifacts/tampered.txt'), 'tampered');
+
+    let caught: unknown;
+    try {
+      verifyManifestFiles(runDir);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBeInstanceOf(Error);
+    const message = (caught as Error).message;
+    expect(message).toMatch(/missing\.txt/);
+    expect(message).toMatch(/tampered\.txt/);
   });
 });
