@@ -1,3 +1,5 @@
+import { normalize, sep } from 'node:path';
+
 import { z } from 'zod';
 
 import type { CredentialStore } from '../auth/credentialStore.js';
@@ -107,23 +109,78 @@ export const accessKey = {
   manifest: (): string => 'manifest',
 } as const;
 
+const FILE_KEY_PREFIX = 'file:';
+
+/** Normalize a `file:` key's path portion so `.`, `./foo`, and `foo/` all
+ * compare equal to `foo` — and the whole-run-dir key (`.`) reduces to `''`,
+ * the sentinel `filePathsOverlap` treats as containing everything. Collapsing
+ * this once here is what lets `grep`'s directory-scoped read key
+ * (`accessKey.file(input.path ?? '.')`) line up with a sibling tool's
+ * single-file write key (`accessKey.file(input.file_path)`) without either
+ * side having to agree on a shared string representation. */
+function normalizeFileKeyPath(relPath: string): string {
+  const normalized = normalize(relPath);
+  if (normalized === '.') return '';
+  return normalized.endsWith(sep) ? normalized.slice(0, -sep.length) : normalized;
+}
+
+/**
+ * Whether two `file:`-key paths overlap: equal, or one is an ancestor
+ * directory of (or the run-dir root containing) the other.
+ *
+ * This is the piece plain string equality cannot express. A directory-scoped
+ * read key like `file:.` (grep's default, or `file:artifacts`) must conflict
+ * with a nested single-file write key like `file:artifacts/report.csv` —
+ * the write happens inside the tree the read is scanning — even though the
+ * two strings share no exact match. Comparing by path segment (via the
+ * `sep`-joined prefix check, not a bare `startsWith`) is what keeps
+ * `file:foo` from wrongly overlapping `file:foobar`.
+ */
+function filePathsOverlap(leftPath: string, rightPath: string): boolean {
+  const left = normalizeFileKeyPath(leftPath);
+  const right = normalizeFileKeyPath(rightPath);
+  if (left === right) return true;
+  if (left === '' || right === '') return true; // '' is the whole run dir.
+  return left.startsWith(right + sep) || right.startsWith(left + sep);
+}
+
+/** Whether two access keys name overlapping resources. Every key but `file:`
+ * is an opaque atom compared by exact equality; `file:` keys are paths and
+ * compared by containment (see `filePathsOverlap`), since a tool may declare
+ * a directory it reads or writes rather than a single file. */
+function keysOverlap(left: string, right: string): boolean {
+  if (left.startsWith(FILE_KEY_PREFIX) && right.startsWith(FILE_KEY_PREFIX)) {
+    return filePathsOverlap(left.slice(FILE_KEY_PREFIX.length), right.slice(FILE_KEY_PREFIX.length));
+  }
+  return left === right;
+}
+
 /** Whether two access declarations conflict — a write against any read or
  * write of the other. Read/read never conflicts, which is what allows
- * unbounded parallel observation. */
+ * unbounded parallel observation.
+ *
+ * Pairwise rather than Set-based: overlap between two `file:` keys is a path
+ * containment check, not a hash lookup, so every key on one side must be
+ * compared against every key on the other. Each side's `reads`/`writes` is a
+ * handful of concrete keys at most, so this stays cheap. */
 export function accessesConflict(left: ToolAccess, right: ToolAccess): boolean {
   // Exclusivity is unconditional: an unclassifiable call conflicts with
   // everything, including a call that touches nothing it names.
   if (left.exclusive === true || right.exclusive === true) return true;
-  const leftWrites = new Set(left.writes);
-  const rightWrites = new Set(right.writes);
-  for (const key of rightWrites) {
-    if (leftWrites.has(key)) return true;
+  for (const leftKey of left.writes) {
+    for (const rightKey of right.writes) {
+      if (keysOverlap(leftKey, rightKey)) return true;
+    }
   }
-  for (const key of left.reads) {
-    if (rightWrites.has(key)) return true;
+  for (const leftKey of left.reads) {
+    for (const rightKey of right.writes) {
+      if (keysOverlap(leftKey, rightKey)) return true;
+    }
   }
-  for (const key of right.reads) {
-    if (leftWrites.has(key)) return true;
+  for (const rightKey of right.reads) {
+    for (const leftKey of left.writes) {
+      if (keysOverlap(leftKey, rightKey)) return true;
+    }
   }
   return false;
 }

@@ -6,7 +6,13 @@ import { z } from 'zod';
 
 import { initManifest } from '../run/artifacts.js';
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
-import { createRegistry, type ToolCtx, type ToolDef, type ToolAccess } from '../tools/registry.js';
+import {
+  accessKey,
+  createRegistry,
+  type ToolCtx,
+  type ToolDef,
+  type ToolAccess,
+} from '../tools/registry.js';
 import {
   MAX_CONCURRENT_CALLS,
   scheduleToolCalls,
@@ -329,6 +335,52 @@ describe('access-aware scheduling', () => {
     );
     // A buggy declaration degrades to serial, never to unsafe parallelism.
     expect(live.peak).toBe(1);
+  });
+
+  it('serializes a directory-scoped read (grep) against a write nested inside that directory', async () => {
+    // Regression for the grep/write_file race: grep declares reads:
+    // [accessKey.file(path ?? '.')] — a directory, not a single file — while
+    // write_file declares writes: [accessKey.file(file_path), manifest()]
+    // for one file inside it. Exact-key matching ("file:." vs
+    // "file:artifacts/report.csv") missed this conflict entirely, letting
+    // the write run concurrently with a grep scanning the tree it writes
+    // into.
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('grep', (input) => ({ reads: [accessKey.file(input.key)], writes: [] }), live),
+      accessTool('write_file', (input) => ({ reads: [], writes: [accessKey.file(input.key)] }), live),
+    ]);
+
+    await scheduleToolCalls(
+      [
+        { id: 'id-grep', name: 'grep', input: { key: '.', ms: 20 } },
+        { id: 'id-write', name: 'write_file', input: { key: 'artifacts/report.csv', ms: 5 } },
+      ],
+      registry,
+      ctx,
+    );
+    expect(live.peak).toBe(1);
+  });
+
+  it('still overlaps a directory-scoped read against a write OUTSIDE that directory', async () => {
+    // The fix must not over-serialize: a grep scoped to "artifacts" and a
+    // write to an unrelated "scratch/notes.txt" share no path containment
+    // and must still run concurrently.
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('grep', (input) => ({ reads: [accessKey.file(input.key)], writes: [] }), live),
+      accessTool('write_file', (input) => ({ reads: [], writes: [accessKey.file(input.key)] }), live),
+    ]);
+
+    await scheduleToolCalls(
+      [
+        { id: 'id-grep', name: 'grep', input: { key: 'artifacts', ms: 20 } },
+        { id: 'id-write', name: 'write_file', input: { key: 'scratch/notes.txt', ms: 5 } },
+      ],
+      registry,
+      ctx,
+    );
+    expect(live.peak).toBe(2);
   });
 
   it('commits results in call order even when a later call finishes first', async () => {
