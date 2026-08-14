@@ -15,8 +15,8 @@ import type {
 import { navigateTool } from '../navigate/navigate.js';
 import { observeTool } from '../observe/observe.js';
 import { executeToolCall } from '../pipeline.js';
-import { createRegistry } from '../registry.js';
-import { browserActionTool } from './browserAction.js';
+import { accessesConflict, accessKey, createRegistry } from '../registry.js';
+import { browserActionTool, type BrowserActionInput } from './browserAction.js';
 
 describe('browser_action tool', () => {
   const suite = setupBrowserToolSuite('browser-action-tool');
@@ -528,4 +528,74 @@ describe('browser_action tool', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+
+  describe('getAccess', () => {
+    function access(input: Partial<BrowserActionInput> & { actions: BrowserActionInput['actions'] }) {
+      return browserActionTool.getAccess!(input as BrowserActionInput);
+    }
+
+    it('declares a page write and an observation write keyed by the acted-on page, defaulting to "selected"', () => {
+      expect(access({ actions: [{ op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } }] })).toEqual({
+        reads: [],
+        writes: [accessKey.page('selected'), accessKey.observation('selected')],
+      });
+      expect(
+        access({
+          pageId: 'p1',
+          actions: [{ op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } }],
+        }),
+      ).toEqual({
+        reads: [],
+        writes: [accessKey.page('p1'), accessKey.observation('p1')],
+      });
+    });
+
+    it('reads the uploaded file, so it serializes behind a concurrent write to that exact path', () => {
+      expect(
+        access({
+          actions: [
+            {
+              op: 'upload',
+              target: {
+                id: 'e1',
+                pageId: 'p1',
+                frameId: 'f1',
+                documentId: 'd1',
+                role: 'button',
+                name: 'Attach',
+              },
+              runPath: 'artifacts/exhibit.txt',
+            },
+          ],
+        }),
+      ).toEqual({
+        reads: [accessKey.file('artifacts/exhibit.txt')],
+        writes: [accessKey.page('selected'), accessKey.observation('selected')],
+      });
+    });
+
+    it('two calls on DIFFERENT pages do not conflict — the exact parallelism ToolAccess is documented for', () => {
+      const onP1 = browserActionTool.getAccess!({
+        pageId: 'p1',
+        actions: [{ op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } }],
+      } as BrowserActionInput);
+      const onP2 = browserActionTool.getAccess!({
+        pageId: 'p2',
+        actions: [{ op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } }],
+      } as BrowserActionInput);
+      expect(accessesConflict(onP1, onP2)).toBe(false);
+    });
+
+    it('two calls on the SAME page conflict', () => {
+      const first = browserActionTool.getAccess!({
+        pageId: 'p1',
+        actions: [{ op: 'scroll', direction: 'down', amount: { unit: 'viewport', value: 1 } }],
+      } as BrowserActionInput);
+      const second = browserActionTool.getAccess!({
+        pageId: 'p1',
+        actions: [{ op: 'hover', target: { id: 'e1', pageId: 'p1', frameId: 'f1', documentId: 'd1', role: 'link', name: 'x' } }],
+      } as BrowserActionInput);
+      expect(accessesConflict(first, second)).toBe(true);
+    });
+  });
 });

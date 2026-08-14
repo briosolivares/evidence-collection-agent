@@ -6,7 +6,7 @@ import {
   type BrowserAction,
   type BrowserActionRequest,
 } from '../../browser/browserActions.js';
-import type { ToolDef } from '../registry.js';
+import { accessKey, type ToolDef } from '../registry.js';
 import { requireBrowser } from '../shared/browser.js';
 
 /**
@@ -196,6 +196,31 @@ export const browserActionTool: ToolDef<BrowserActionInput> = {
     'success looks like; use switch_page to change pages and handle_dialog to answer a dialog.',
   inputSchema: browserActionInputSchema,
   readOnly: false,
+  // Leaving getAccess undefined here falls back to full EXCLUSIVE_ACCESS —
+  // every browser_action call serializing against every other tool call in
+  // the run, no matter which page it names. That directly contradicts the
+  // design ToolAccess documents in registry.ts: "`browser_action` on page p1
+  // and `browser_action` on page p2 are the same TOOL with different
+  // access" — i.e. this is the paradigm case an input-aware getAccess exists
+  // for. The sequence mutates the acted-on page's content (each action) and
+  // — because finishSequence() calls session.observe() to build the
+  // returned page and diff — also advances that page's observation
+  // baseline, exactly as observe.ts's own getAccess does. An 'upload'
+  // action additionally reads a file from the run directory (the attached
+  // file), which must serialize behind a concurrent write to that same
+  // path (write_file, edit_file, download, ...) or the upload could read
+  // bytes that were never fully written.
+  getAccess: (input) => {
+    const pageId = input.pageId ?? 'selected';
+    return {
+      reads: input.actions
+        .filter((action): action is typeof action & { op: 'upload'; runPath: string } =>
+          action.op === 'upload',
+        )
+        .map((action) => accessKey.file(action.runPath)),
+      writes: [accessKey.page(pageId), accessKey.observation(pageId)],
+    };
+  },
   async execute(input, ctx) {
     const browser = requireBrowser(ctx);
     const request: BrowserActionRequest = {

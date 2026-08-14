@@ -13,7 +13,7 @@ import { browserActionTool } from '../browserAction/browserAction.js';
 import { navigateTool } from '../navigate/navigate.js';
 import { observeTool } from '../observe/observe.js';
 import { executeToolCall } from '../pipeline.js';
-import { createRegistry } from '../registry.js';
+import { accessesConflict, accessKey, createRegistry } from '../registry.js';
 import { switchPageTool, type SwitchPageResult } from './switchPage.js';
 
 describe('switch_page tool', () => {
@@ -137,4 +137,39 @@ describe('switch_page tool', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+
+  describe('getAccess', () => {
+    it('writes only the shared "selected page" pointer, not the target page or its observation state', () => {
+      expect(switchPageTool.getAccess?.({ pageId: 'popup-1' })).toEqual({
+        reads: [],
+        writes: [accessKey.selectedPage()],
+      });
+    });
+
+    it('conflicts with an unqualified click/type/navigate/scroll-style write to page:selected', () => {
+      const switching = switchPageTool.getAccess!({ pageId: 'popup-1' });
+      // The exact shape click/navigate/type/scroll declare for their
+      // hardcoded "selected" target.
+      const unqualifiedAction = {
+        reads: [],
+        writes: [accessKey.selectedPage(), accessKey.observation('selected')],
+      };
+      expect(accessesConflict(switching, unqualifiedAction)).toBe(true);
+    });
+
+    it('conflicts with observe/browser_action/capture_text reading the selected page by default', () => {
+      const switching = switchPageTool.getAccess!({ pageId: 'popup-1' });
+      const observeDefault = { reads: [accessKey.page('selected')], writes: [accessKey.observation('selected')] };
+      expect(accessesConflict(switching, observeDefault)).toBe(true);
+    });
+
+    it('does not conflict with a call explicitly aimed at a different, already-known page', () => {
+      const switching = switchPageTool.getAccess!({ pageId: 'popup-1' });
+      const explicitOtherPage = {
+        reads: [],
+        writes: [accessKey.page('page-main'), accessKey.observation('page-main')],
+      };
+      expect(accessesConflict(switching, explicitOtherPage)).toBe(false);
+    });
+  });
 });

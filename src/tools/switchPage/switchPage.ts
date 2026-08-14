@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import type { BrowserPage } from '../../browser/browserState.js';
-import type { ToolDef } from '../registry.js';
+import { accessKey, type ToolDef } from '../registry.js';
 import { requireBrowser } from '../shared/browser.js';
 
 const switchPageInputSchema = z.strictObject({
@@ -41,6 +41,20 @@ export const switchPageTool: ToolDef<SwitchPageInput> = {
     'elsewhere.',
   inputSchema: switchPageInputSchema,
   readOnly: false,
+  // Repoints the shared "selected page" pointer every unqualified
+  // click/type/navigate/scroll/browser_action/observe call resolves through
+  // (see accessKey.selectedPage's doc comment: "every unqualified browser
+  // action contends for it"). That write already conflicts with anything
+  // that reads OR writes page:selected — which is every one of those
+  // tools' own declared access, whether by name (selectedPage()) or by
+  // input-aware default (accessKey.page(input.pageId ?? 'selected')) — so
+  // switch_page still serializes against exactly the calls it must, without
+  // falling back to the full EXCLUSIVE_ACCESS that would also serialize it
+  // against unrelated work like a bash command or a browser_action aimed at
+  // an explicit, different pageId. It does not touch the target page's own
+  // content or observation baseline: selecting a page does not change what
+  // is on it.
+  getAccess: () => ({ reads: [], writes: [accessKey.selectedPage()] }),
   async execute(input, ctx): Promise<SwitchPageResult> {
     const browser = requireBrowser(ctx);
     const selected = await browser.switchPage(input.pageId);

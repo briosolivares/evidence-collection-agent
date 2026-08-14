@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { OutputTableStore, TableMutationResult } from '../../outputs/outputTable.js';
 import { formatOutputSummary, summarizeOutputs, type OutputSummaryDeps } from '../../outputs/outputSummary.js';
-import type { ToolDef } from '../registry.js';
+import { accessKey, type ToolDef } from '../registry.js';
 
 // The three row-level tools. They are grouped in one module because they
 // share one contract with the model: propose typed rows, get back either a
@@ -81,6 +81,23 @@ function settle(
   };
 }
 
+/**
+ * Access for one table mutation: `table:<outputId>` is the key
+ * `accessKey.table` exists for (see registry.ts), so two calls mutating the
+ * SAME output's rows serialize while calls to different outputs run in
+ * parallel instead of falling back to full EXCLUSIVE_ACCESS. `manifest()`
+ * is also a write because a successful mutation persists the table's whole
+ * state through `writeArtifact` (see OutputTableStore's `persist`), which
+ * reads-then-rewrites the run's shared manifest.json — the same reason
+ * write_file/edit_file/screenshot/download all declare it too. That means
+ * two mutations on DIFFERENT tables still serialize with each other (both
+ * write manifest()), but no longer serialize against unrelated tools like
+ * browser actions or bash that never touch a table or the manifest.
+ */
+function tableAccess(outputId: string): { reads: string[]; writes: string[] } {
+  return { reads: [], writes: [accessKey.table(outputId), accessKey.manifest()] };
+}
+
 /** Build the three row tools over one run's stores. */
 export function createOutputRowTools(deps: OutputRowToolsDeps): ToolDef[] {
   const upsertOutputRowsTool: ToolDef<{ outputId: string; rows: z.infer<typeof rowInputSchema>[] }> = {
@@ -95,6 +112,7 @@ export function createOutputRowTools(deps: OutputRowToolsDeps): ToolDef[] {
       rows: z.array(rowInputSchema).min(1).describe('The rows to add or update.'),
     }),
     readOnly: false,
+    getAccess: (input) => tableAccess(input.outputId),
     execute: (input) => settle(input.outputId, deps.tables.upsertOutputRows(input.outputId, input.rows), deps),
   };
 
@@ -108,6 +126,7 @@ export function createOutputRowTools(deps: OutputRowToolsDeps): ToolDef[] {
       rowIds: z.array(z.string().min(1)).min(1),
     }),
     readOnly: false,
+    getAccess: (input) => tableAccess(input.outputId),
     execute: (input) =>
       settle(input.outputId, deps.tables.deleteOutputRows(input.outputId, input.rowIds), deps),
   };
@@ -144,6 +163,7 @@ export function createOutputRowTools(deps: OutputRowToolsDeps): ToolDef[] {
         .describe('Anything the method could not settle, stated plainly.'),
     }),
     readOnly: false,
+    getAccess: (input) => tableAccess(input.outputId),
     execute: (input) =>
       settle(
         input.outputId,
