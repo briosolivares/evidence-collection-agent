@@ -1,4 +1,5 @@
-import { isAbsolute } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { isAbsolute, join } from 'node:path';
 
 import {
   chromium,
@@ -48,6 +49,7 @@ import {
   type BrowserDownloadTarget,
   type BrowserFetchResult,
   type BrowserScreenshotOptions,
+  type BrowserScriptSetup,
   type BrowserTextCaptureRequest,
   type HandleDialogRequest,
   type HandleDialogResult,
@@ -64,6 +66,25 @@ const ARIA_REF_PATTERN = /^(?:f\d+)?e\d+$/;
 const DOWNLOAD_EVENT_TIMEOUT_MS = 5_000;
 const DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS = 1_000;
 const SCROLL_SETTLE_MS = 50;
+
+// --- Browser-script CDP endpoint (see launchPersistentChrome, prepareForBrowserScript). ---
+/** Chrome writes this file into the user-data-dir asynchronously after
+ * launch, once `--remote-debugging-port=0` gave it an ephemeral port to
+ * bind. First line: the port. Second line: the browser's CDP websocket
+ * path (unused here — the HTTP origin alone is a valid endpoint for
+ * `chromium.connectOverCDP`). */
+const DEVTOOLS_ACTIVE_PORT_FILENAME = 'DevToolsActivePort';
+/** How often to re-check for the file while it has not appeared yet. */
+const DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS = 25;
+/** Bounded wait for the file to appear. Chrome writes it well under this in
+ * practice; a launch that never produces it must fail loudly rather than
+ * hang a session indefinitely on a CDP endpoint that will never exist. */
+const DEVTOOLS_ACTIVE_PORT_DEADLINE_MS = 5_000;
+/** Only a loopback host is ever trusted as a CDP endpoint: it is read from a
+ * file Chrome writes into a profile directory this process itself owns, and
+ * treating anything else as equally trustworthy would be a privilege
+ * escalation bug wearing a parsing bug's clothes. */
+const CDP_LOOPBACK_HOST = '127.0.0.1';
 
 // --- T9 observation bounds (all finite literals). ---
 /** Elements stamped per interactive observation; the outline itself still
@@ -193,7 +214,82 @@ export async function launchPersistentChrome(
       ? { executablePath: options.executablePath }
       : { channel: 'chrome' }),
     headless: options.headless ?? false,
+    // Opens a SECOND, loopback-only CDP TCP endpoint alongside Playwright's
+    // own pipe-based control channel, so a browser script can attach an
+    // independent Playwright client to this exact browser via
+    // `chromium.connectOverCDP` without disturbing this controller's own
+    // connection. Port 0 asks Chrome for an ephemeral port; the port Chrome
+    // actually chose is read back from DevToolsActivePort in the SAME
+    // profile directory (see readDevToolsActivePortUrl). This is the first
+    // `args` entry this codebase has ever passed to Chrome.
+    args: ['--remote-debugging-port=0'],
   });
+}
+
+/**
+ * Read the loopback CDP HTTP endpoint Chrome opened for a profile launched
+ * by {@link launchPersistentChrome}.
+ *
+ * Chrome writes `DevToolsActivePort` asynchronously after launch, so this
+ * polls with a bounded deadline instead of reading once.
+ *
+ * @param profileDir - the EXACT directory passed to `launchPersistentChrome`
+ *   as `profileDir` (Chrome's user-data-dir); the file is written there and
+ *   nowhere else
+ * @returns a loopback (`127.0.0.1`) HTTP CDP URL, e.g. `http://127.0.0.1:54213`
+ * @throws Error when the file never appears within the deadline, does not
+ *   contain a valid port, or (defensively) would resolve to a non-loopback
+ *   host
+ */
+async function readDevToolsActivePortUrl(profileDir: string): Promise<string> {
+  const path = join(profileDir, DEVTOOLS_ACTIVE_PORT_FILENAME);
+  const deadline = Date.now() + DEVTOOLS_ACTIVE_PORT_DEADLINE_MS;
+  let lastError: unknown;
+  for (;;) {
+    try {
+      const contents = await readFile(path, 'utf8');
+      const portLine = contents.split('\n')[0]?.trim();
+      const port = Number(portLine);
+      if (portLine === undefined || portLine === '' || !Number.isInteger(port) || port <= 0) {
+        throw new Error(
+          `${DEVTOOLS_ACTIVE_PORT_FILENAME} at ${path} did not contain a valid port on its ` +
+            `first line: ${JSON.stringify(portLine)}`,
+        );
+      }
+      const cdpUrl = `http://${CDP_LOOPBACK_HOST}:${port}`;
+      assertLoopbackCdpUrl(cdpUrl);
+      return cdpUrl;
+    } catch (error) {
+      lastError = error;
+      if (Date.now() >= deadline) {
+        throw new Error(
+          `Chrome never wrote a usable ${DEVTOOLS_ACTIVE_PORT_FILENAME} into ${profileDir} ` +
+            `within ${DEVTOOLS_ACTIVE_PORT_DEADLINE_MS}ms; its CDP debugging port never became ` +
+            'available. Browser scripts will be unavailable for this session. Last error: ' +
+            `${lastError instanceof Error ? lastError.message : String(lastError)}`,
+        );
+      }
+      await delay(DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS);
+    }
+  }
+}
+
+/** Require a CDP URL's host to be loopback. Shared by the endpoint reader
+ * above and {@link PlaywrightBrowserController.prepareForBrowserScript}'s
+ * caller-facing contract so both sides of the browser-script handoff agree
+ * on what counts as trustworthy. */
+function assertLoopbackCdpUrl(cdpUrl: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(cdpUrl);
+  } catch {
+    throw new TypeError(`CDP URL is not a valid URL: ${cdpUrl}`);
+  }
+  if (parsed.hostname !== CDP_LOOPBACK_HOST && parsed.hostname !== 'localhost') {
+    throw new TypeError(
+      `CDP URL must use a loopback host, got ${JSON.stringify(parsed.hostname)}: ${cdpUrl}`,
+    );
+  }
 }
 
 /** Creates persistent local Chrome sessions controlled through Playwright. */
@@ -204,8 +300,15 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
     const context = await launchPersistentChrome(this.options);
 
     try {
-      await prepareSessionPage(context);
-      return new PlaywrightBrowserController(context);
+      const preexistingSessionPage = await prepareSessionPage(context);
+      // Read from the SAME profileDir passed to launchPersistentChrome — the
+      // only directory Chrome could have written DevToolsActivePort into.
+      // A read failure fails the whole session loudly rather than silently
+      // shipping a controller with no browser-script support: the launch
+      // args above are always present, so a missing file means Chrome's CDP
+      // port genuinely never came up.
+      const cdpUrl = await readDevToolsActivePortUrl(this.options.profileDir);
+      return new PlaywrightBrowserController(context, undefined, cdpUrl, preexistingSessionPage);
     } catch (error) {
       await context.close();
       throw error;
@@ -242,11 +345,43 @@ export class PlaywrightBrowserController implements BrowserController {
   private readonly activityListeners = new Set<() => void>();
   private dialogSequence = 0;
 
+  /**
+   * Present iff this controller was constructed with a CDP endpoint (see
+   * the constructor's `cdpUrl` parameter). Assigned conditionally in the
+   * constructor, rather than declared as an always-present method that
+   * throws, so `typeof controller.prepareForBrowserScript === 'function'`
+   * — the feature-detection {@link assertBrowserScriptSupportIsPaired} and
+   * a run's tool-wiring rely on — genuinely reflects whether THIS instance
+   * supports browser scripts, exactly as an omitted method would on a
+   * provider that never implements this pair at all.
+   */
+  readonly prepareForBrowserScript?: () => Promise<BrowserScriptSetup>;
+  /** Paired with {@link prepareForBrowserScript}; see there. */
+  readonly refreshAfterBrowserScript?: () => Promise<void>;
+
   constructor(
     private readonly context: BrowserContext,
     stateStore: BrowserStateStore = createBrowserStateStore(),
+    /** Loopback CDP HTTP endpoint for this session's Chrome, when launched
+     * with the debugging port {@link launchPersistentChrome} opens. Absent
+     * for any provider that has none to offer (a remote session, a test
+     * double) — in which case this controller offers neither
+     * {@link prepareForBrowserScript} nor {@link refreshAfterBrowserScript}. */
+    private readonly cdpUrl?: string,
+    /** The one pre-existing page {@link prepareSessionPage} leaves open
+     * (the profile's original tab, or a fresh replacement) — permanently
+     * excluded from the page registry, exactly as before this class ever
+     * inspected `context.pages()` directly. Without this, a
+     * `refreshAfterBrowserScript` rescan of `context.pages()` would adopt
+     * it as a "tracked page" the first time a browser script ran, silently
+     * changing what {@link pages} and popup/task-tab fallbacks report. */
+    private readonly preexistingSessionPage?: Page,
   ) {
     this.state = stateStore;
+    if (this.cdpUrl !== undefined) {
+      this.prepareForBrowserScript = () => this.doPrepareForBrowserScript();
+      this.refreshAfterBrowserScript = () => this.doRefreshAfterBrowserScript();
+    }
     // Track every page the browser creates. Task tabs register themselves in
     // newTab() (registerPage dedupes), so the pages that reach registerPage
     // *only* through this listener are popups — including `noopener` popups,
@@ -799,6 +934,141 @@ export class PlaywrightBrowserController implements BrowserController {
       this.requireOpenContext();
       this.activePage = await this.context.newPage();
     });
+  }
+
+  /**
+   * Implementation behind the conditionally-assigned `prepareForBrowserScript`
+   * field (see the constructor) — reachable only when this controller was
+   * given a CDP endpoint.
+   *
+   * Attaches a throwaway CDP session to the selected page purely to read its
+   * PUBLIC target id via `Target.getTargetInfo`, then detaches immediately;
+   * nothing here is held open past this call, and no private Playwright
+   * field (`page._delegate`, `_targetId`, ...) is ever touched.
+   */
+  private async doPrepareForBrowserScript(): Promise<BrowserScriptSetup> {
+    this.requireOpenContext();
+    if (this.cdpUrl === undefined) {
+      // Unreachable through the public field — it is only assigned when
+      // cdpUrl is defined — kept as a direct guard so this method can never
+      // silently return a BrowserScriptSetup with a missing cdpUrl if it is
+      // ever called another way (e.g. a future internal caller).
+      throw new Error('This browser session has no CDP endpoint configured.');
+    }
+    const page = this.requirePage();
+    const session = await this.context.newCDPSession(page);
+    try {
+      const { targetInfo } = await session.send('Target.getTargetInfo');
+      return { cdpUrl: this.cdpUrl, selectedPageTargetId: targetInfo.targetId };
+    } finally {
+      await session.detach().catch(() => undefined);
+    }
+  }
+
+  /**
+   * Implementation behind the conditionally-assigned `refreshAfterBrowserScript`
+   * field; see {@link doPrepareForBrowserScript} for why it is reachable only
+   * that way.
+   *
+   * Four steps, all reconciliation rather than rollback — a script's actions
+   * are never undone:
+   *
+   * 1. Rescan `context.pages()` and register anything untracked.
+   *    `registerPage` already dedupes by Page identity, so this is purely
+   *    additive: a page the script opened should already be tracked through
+   *    the constructor's `context.on('page')` listener, because CDP events
+   *    reach every client attached to the same browser, including this
+   *    controller's own connection. This rescan only closes a timing gap.
+   * 2. Conservatively invalidate observation state for EVERY tracked page,
+   *    using only mechanisms that already exist: rotate each tracked frame's
+   *    documentId via `this.state.createDocumentId()` — exactly what the
+   *    `framenavigated` handler does for a real navigation — so every
+   *    pre-script {@link ElementRef} becomes stale and `resolveElementRef`
+   *    rejects it, and drop each page's cached observation baselines via
+   *    `this.state.forgetPage` so no diff can be computed against a
+   *    since-mutated DOM. An external script can mutate the DOM with no
+   *    navigation at all, which is exactly the case nothing else here would
+   *    ever notice. This is deliberately conservative: at worst it forces a
+   *    redundant re-observation, and it can NEVER cause a wrong-target
+   *    action, because a stale ref is rejected rather than silently resolved
+   *    to the wrong node.
+   * 3. Reconcile the selected page. A still-live selection is left alone.
+   *    This is the one behavior change confined to this refresh path: the
+   *    ordinary `close` event handler leaves `activePage` undefined with no
+   *    fallback (unchanged), but here a closed selection falls back to a
+   *    remaining live tracked page, or a fresh task page when none remain,
+   *    so the session stays usable after a script closes the tab it was
+   *    handed.
+   * 4. If the entire browser/context was closed by the script, fail loudly:
+   *    recreating a session mid-run is out of scope, and every later browser
+   *    tool stays unavailable for the rest of it.
+   *
+   * Idempotent: calling this again once controller state already matches the
+   * live browser repeats step 2's invalidation (harmless — it can only force
+   * another re-observation) and finds nothing to reconcile in steps 1 and 3.
+   */
+  private async doRefreshAfterBrowserScript(): Promise<void> {
+    this.requireOpenContext();
+    if (this.context.isClosed()) {
+      throw new Error(
+        'The browser script closed the entire browser session (its BrowserContext is ' +
+          'closed). Recreating a session mid-run is not supported: every later browser tool ' +
+          'will be unavailable for the rest of this run.',
+      );
+    }
+
+    let livePages: Page[];
+    try {
+      livePages = this.context.pages();
+    } catch (error) {
+      throw new Error(
+        `The browser script left the browser session unusable: ${describeError(error)}. ` +
+          'Recreating a session mid-run is not supported: every later browser tool will be ' +
+          'unavailable for the rest of this run.',
+      );
+    }
+
+    // Step 1. The pre-existing session page is excluded exactly as it always
+    // has been (see the constructor's preexistingSessionPage doc) — this is
+    // the first code path that ever calls context.pages() directly, and
+    // without the exclusion it would silently adopt that page into the
+    // registry the moment any browser script ran.
+    for (const page of livePages) {
+      if (page === this.preexistingSessionPage) {
+        continue;
+      }
+      this.registerPage(page);
+    }
+
+    // Step 2.
+    for (const record of this.trackedPages.values()) {
+      for (const frameRecord of record.frames.values()) {
+        frameRecord.documentId = this.state.createDocumentId();
+      }
+      this.state.forgetPage(record.pageId);
+    }
+
+    // Step 3 (and step 4's newPage fallback).
+    if (this.activePage === undefined || this.activePage.isClosed()) {
+      const liveTracked = [...this.trackedPages.values()].filter(
+        (record) => !record.page.isClosed(),
+      );
+      if (liveTracked.length > 0) {
+        this.activePage = liveTracked[0]!.page;
+      } else {
+        try {
+          const page = await this.context.newPage();
+          this.registerPage(page);
+          this.activePage = page;
+        } catch (error) {
+          throw new Error(
+            `The browser script left the browser session unusable: ${describeError(error)}. ` +
+              'Recreating a session mid-run is not supported: every later browser tool will ' +
+              'be unavailable for the rest of this run.',
+          );
+        }
+      }
+    }
   }
 
   async close(): Promise<void> {
@@ -1580,7 +1850,17 @@ function normalizeDialogType(type: string): BrowserDialog['type'] {
     : 'alert';
 }
 
-async function prepareSessionPage(context: BrowserContext): Promise<void> {
+/**
+ * @returns the surviving pre-existing session page — never tracked, never
+ *   closed by this codebase, and deliberately excluded from
+ *   {@link PlaywrightBrowserController}'s page registry for the whole
+ *   session. The caller threads it into the controller's constructor so a
+ *   later `context.pages()` rescan (see `doRefreshAfterBrowserScript`) can
+ *   keep excluding it too, instead of accidentally adopting it as a
+ *   "tracked page" the first time anything inspects `context.pages()`
+ *   directly.
+ */
+async function prepareSessionPage(context: BrowserContext): Promise<Page> {
   const pages = context.pages();
   const sessionPage = pages[0] ?? (await context.newPage());
 
@@ -1591,6 +1871,8 @@ async function prepareSessionPage(context: BrowserContext): Promise<void> {
   if (sessionPage.url() !== 'about:blank') {
     await sessionPage.goto('about:blank');
   }
+
+  return sessionPage;
 }
 
 /** Dedupe requested needs preserving order; an omitted request means the
@@ -1748,6 +2030,11 @@ function suggestedFilenameFromHeaders(
 
 function delay(milliseconds: number): Promise<void> {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+}
+
+/** Render any thrown value as a message fragment for an error string. */
+function describeError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 /** Whether an error is Playwright's evaluation timeout. Matched on message

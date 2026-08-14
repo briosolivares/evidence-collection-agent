@@ -696,7 +696,7 @@ const { connectSelectedPage } = await import(
   process.env.SHERLOCK_PLAYWRIGHT_HELPER_URL
 );
 
-const { page } = await connectSelectedPage();
+const { browser, page } = await connectSelectedPage();
 
 await page.getByRole("button", { name: "Load more" }).click();
 const rows = await page
@@ -706,6 +706,9 @@ const rows = await page
   );
 
 await writeFile("rows.json", JSON.stringify(rows, null, 2));
+
+// REQUIRED, and not merely tidy: see below.
+await browser.close();
 ```
 
 Run it with:
@@ -718,8 +721,29 @@ Run it with:
 ```
 
 The script writes into its current scratch workspace. The helper selects the
-page by CDP target ID, returns real Playwright objects, and never closes the
-owning browser. Process exit disconnects the secondary CDP client.
+page by CDP target ID and returns real Playwright objects.
+
+**A connected script MUST call `await browser.close()` before it finishes.**
+The first draft of this specification said the opposite — that the helper
+"never closes the owning browser" and that "process exit disconnects the
+secondary CDP client" — and that was wrong in a way only a live run exposed.
+`connectOverCDP` holds an open WebSocket, which keeps Node's event loop
+alive; a script that merely runs off the end of its module never exits, and
+Node will not fire `beforeExit` while that handle is open. Every such command
+therefore ran to completion, produced correct output, and then hung until the
+tool killed it at its timeout.
+
+Closing is safe, and this was measured rather than assumed: for a browser
+obtained by connecting (as opposed to launching), Playwright's `close()`
+disconnects the client and disposes only the contexts that client created. The
+owning Chrome, its pages, and the controller's selection are untouched — the
+harness's own session keeps working normally afterward.
+
+Two consequences worth stating plainly. The helper cannot paper over this on
+the script's behalf, so the requirement belongs in the worker's instructions,
+not only here. And the failure mode is maximally confusing if undocumented:
+the work succeeds, the files are written, and the tool still reports
+`timed_out`.
 
 `connectSelectedPage()` validates every required environment value, connects
 only to a loopback CDP URL, and requires exactly one live page matching
@@ -1352,7 +1376,11 @@ must never overwrite the directory with a new run.
   a refresh-path-only behavior change from the pre-existing "closed selection
   leaves `activePage` undefined" default (F8);
 - `observe()`/`inspect_page` after Bash sees the external changes;
-- process exit disconnects the secondary CDP client without closing Chrome;
+- a script that calls `await browser.close()` exits promptly, and doing so
+  leaves the owning Chrome, its pages, and the controller's selection intact;
+- a script that does NOT close its connection is the documented hang: assert
+  that it is killed at its timeout rather than silently succeeding, so the
+  behavior is pinned instead of rediscovered;
 - a provider without browser-script support rejects `uses_browser: true`
   before spawn while ordinary Bash still works;
 - repeated preparation and refresh are idempotent;
