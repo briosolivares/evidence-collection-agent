@@ -166,8 +166,15 @@ interface PageRecord {
   /** Main-frame document replacements seen so far. Monotonic; a
    * {@link PageWatch} reads the delta rather than the absolute value. */
   navigationCount: number;
-  /** Downloads this page started, oldest first, bounded. */
+  /** Downloads this page started, oldest first, bounded — old entries are
+   * evicted from the front once the array exceeds
+   * {@link MAX_TRACKED_DOWNLOADS_PER_PAGE}. */
   downloads: DownloadInfo[];
+  /** Every download this page has EVER started, monotonic and never
+   * decremented by eviction — unlike `downloads.length`, this is a stable
+   * count a {@link PageWatch} can diff against even after eviction has
+   * shifted `downloads`' indices out from under a remembered offset. */
+  totalDownloadsEver: number;
   /** The most recent main-frame navigation response. Kept with its URL
    * because Playwright emits `response` before `framenavigated`, so the
    * document id at capture time is still the previous one; matching on the
@@ -854,11 +861,25 @@ export class PlaywrightBrowserController implements BrowserController {
             value = await this.raceEvaluation(page, sources[attempt]!, request.timeoutMs);
             break;
           } catch (error) {
-            // Fall through to statement semantics ONLY on a syntax error:
-            // that proves nothing executed, so re-running cannot repeat a
-            // side effect. A runtime error means the snippet already ran, and
-            // silently running it a second time could double-submit a form.
-            const canRetry = attempt < sources.length - 1 && isSyntaxErrorLike(error);
+            // Fall through to statement semantics ONLY when THIS candidate
+            // never actually parsed: that alone proves nothing executed, so
+            // re-running cannot repeat a side effect. A runtime error means
+            // the snippet already ran, and silently running it a second
+            // time could double-submit a form.
+            //
+            // Deciding this from the error's MESSAGE (isSyntaxErrorLike)
+            // rather than by re-checking whether the candidate parses is
+            // unsound: evaluationSources already parse-checks asExpression
+            // and asCompletionValue with `parses()` before ever including
+            // them, so by the time either one reaches this catch, we
+            // already know it parsed — any error it throws, even one whose
+            // message happens to match /SyntaxError|Unexpected token/ (e.g.
+            // the snippet's own `JSON.parse(bad)`), is a genuine runtime
+            // failure. `parses()` re-answers the real question — did THIS
+            // exact wrapped source fail to parse at all — using the same
+            // Node/V8 check evaluationSources itself relies on, instead of
+            // pattern-matching a message that can't tell the two apart.
+            const canRetry = attempt < sources.length - 1 && !parses(sources[attempt]!);
             if (!canRetry) throw error;
           }
         }
@@ -1123,6 +1144,7 @@ export class PlaywrightBrowserController implements BrowserController {
       frames: new Map(),
       navigationCount: 0,
       downloads: [],
+      totalDownloadsEver: 0,
     };
     this.trackedPages.set(page, record);
     for (const frame of page.frames()) {
@@ -1189,6 +1211,7 @@ export class PlaywrightBrowserController implements BrowserController {
         sourceUrl: download.url(),
         ...(suggestedFilename !== '' ? { suggestedFilename } : {}),
       });
+      record.totalDownloadsEver += 1;
       while (record.downloads.length > MAX_TRACKED_DOWNLOADS_PER_PAGE) {
         record.downloads.shift();
       }
@@ -1377,7 +1400,12 @@ export class PlaywrightBrowserController implements BrowserController {
    */
   private createPageWatch(record: PageRecord): PageWatch {
     const startNavigations = record.navigationCount;
-    const startDownloads = record.downloads.length;
+    // NOT `record.downloads.length`: that array evicts from the front past
+    // MAX_TRACKED_DOWNLOADS_PER_PAGE, which would shift every remembered
+    // index out from under a watch that outlives an eviction.
+    // `totalDownloadsEver` never shrinks, so the delta below is correct
+    // regardless of how much eviction happened while this watch was open.
+    const startDownloadsEver = record.totalDownloadsEver;
     const priorDialogIds = new Set(this.pendingDialogs.keys());
     const priorPageIds = new Set(
       [...this.trackedPages.values()].map((tracked) => tracked.pageId),
@@ -1402,7 +1430,19 @@ export class PlaywrightBrowserController implements BrowserController {
             pending.info.pageId === record.pageId,
         )
         .map((pending) => pending.info),
-      downloads: record.downloads.slice(startDownloads),
+      // The FIFO's front-eviction only ever removes the OLDEST entries and
+      // pushes only append at the end, so "the last N entries" is always
+      // exactly "the N most recently added" regardless of how many older
+      // ones were evicted — computing the slice point from the current
+      // length (rather than reusing a start-of-watch array index) is what
+      // survives eviction. Clamped to 0: if more downloads happened since
+      // the watch started than the array can retain, some have already
+      // been evicted and cannot be recovered — reporting every entry
+      // still held is the closest available answer, not a silent
+      // undercount.
+      downloads: record.downloads.slice(
+        Math.max(0, record.downloads.length - (record.totalDownloadsEver - startDownloadsEver)),
+      ),
     });
 
     return {
@@ -2068,17 +2108,6 @@ function isSerializationError(error: unknown): boolean {
   return (
     error instanceof Error &&
     /serializ|circular|convert|clone/i.test(error.message)
-  );
-}
-
-/**
- * True for a parse failure, which is the one error class where re-running the
- * snippet under different wrapping is safe: a snippet that failed to parse
- * never executed, so it cannot have left a side effect behind.
- */
-function isSyntaxErrorLike(error: unknown): boolean {
-  return error instanceof Error && /SyntaxError|Unexpected (token|identifier|end)/i.test(
-    error.message,
   );
 }
 
