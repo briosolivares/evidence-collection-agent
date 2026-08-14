@@ -166,7 +166,7 @@ export function createBashTool(deps: BashToolDeps): ToolDef<BashInput> {
       'write_file under artifacts/. Set uses_browser: true only for a command (typically a ' +
       'generated Node/Playwright script) that must drive a browser page over CDP; set pageId ' +
       'to name which page the script attaches to (omit for the selected page); call ' +
-      'inspect_page again afterward before trusting page state, since this tool never reports it.',
+      'observe again afterward before trusting page state, since this tool never reports it.',
     inputSchema: bashInputSchema,
     // A shell command can touch anything on the host, so — unlike every
     // access-scoped browser/file tool — it declares no keys at all and

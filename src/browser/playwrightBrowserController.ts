@@ -221,8 +221,13 @@ export async function launchPersistentChrome(
  * Merged rather than overwritten, and best-effort: this profile may be a real
  * logged-in one whose other preferences must survive, and a preferences file
  * this cannot parse must not stop a session from launching.
+ *
+ * Exported for its own test: the leak this closes was timing-dependent (the
+ * producing test leaked only when run after the other 51 in its file), so the
+ * merge and best-effort behavior are pinned directly rather than left to be
+ * inferred from whether a full-suite run happens to stay clean.
  */
-function pinProfileDownloadDirectory(profileDir: string): void {
+export function pinProfileDownloadDirectory(profileDir: string): void {
   try {
     const downloadDir = join(profileDir, 'downloads');
     mkdirSync(downloadDir, { recursive: true });

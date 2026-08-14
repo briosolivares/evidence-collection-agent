@@ -15,8 +15,8 @@ console.log(`created run dir: ${runDir}`);
 appendTranscriptEvent(runDir, { type: 'run_started', task: 'demo: exercise the transcript' });
 appendTranscriptEvent(runDir, {
   type: 'tool_call',
-  name: 'inspect_page',
-  input: { url: 'https://example.com' },
+  name: 'observe',
+  input: { need: ['interactive'] },
 });
 appendTranscriptEvent(runDir, { type: 'run_completed', turns: 1 });
 

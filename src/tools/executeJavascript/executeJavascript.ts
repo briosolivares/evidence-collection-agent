@@ -260,8 +260,8 @@ export function createExecuteJavascriptTool(
       if (policy === 'deny') {
         throw new Error(
           `Page JavaScript is disabled for this run (javascriptPolicy=deny). ` +
-            `Do not retry ${EXECUTE_JAVASCRIPT_TOOL_NAME}; extract with observe/inspect_page, ` +
-            `scroll, and download instead.`,
+            `Do not retry ${EXECUTE_JAVASCRIPT_TOOL_NAME}; extract with observe, ` +
+            `browser_action scroll, and download instead.`,
         );
       }
 

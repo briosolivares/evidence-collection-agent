@@ -31,7 +31,7 @@ const downloadInputSchema = z
       .string()
       .min(1)
       .optional()
-      .describe('Ref for a download link or control from inspect_page'),
+      .describe('Ref for a download link or control from observe'),
     url: httpUrlSchema
       .optional()
       .describe(
@@ -75,7 +75,7 @@ export type DownloadInput = z.infer<typeof downloadInputSchema>;
 export const downloadTool: ToolDef<DownloadInput> = {
   name: 'download',
   description:
-    'Download exact bytes through Chrome using either an inspect_page ref or a verified ' +
+    'Download exact bytes through Chrome using either an observe ref or a verified ' +
     'direct HTTP(S) URL (provide exactly one). Supports ordinary document responses, ' +
     'attachment links, and JavaScript-triggered browser downloads. Use a direct URL when ' +
     'an observed link is only a viewer or redirect wrapper. Set pageId to name the page the ref ' +

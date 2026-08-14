@@ -45,9 +45,6 @@ export type ObserveInput = z.infer<typeof observeRequestSchema>;
  * Returns the page (stable pageId, current documentId, incremented
  * observationId), the requested bounded views, interactive elements bound
  * to page/frame/document, and changes relative to the requested baseline.
- *
- * NOT registered in the production registry yet — the session owner
- * integrates it in a later task.
  */
 export const observeTool: ToolDef<ObserveInput> = {
   name: 'observe',

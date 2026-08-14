@@ -222,9 +222,11 @@ export interface WorkerSession {
  * retried billed real tokens upstream but reported no usage here.
  */
 export interface RunMetrics {
-  /** How the run ended. 'completed'/'budget_exceeded' come from judge-less
-   * runs; 'verified'/'incomplete' from harness runs; 'failed' is written
-   * only when the run crashed (never returned as a result). */
+  /** How the run ended. A harness run — which, since the V2-only cutover,
+   * is every real run — writes 'verified' or 'incomplete'; 'failed' is
+   * written only when the run crashed (never returned as a result).
+   * 'completed'/'budget_exceeded' survive for the demos, which drive a
+   * worker session directly and record its outcome without a judge. */
   status: 'completed' | 'budget_exceeded' | 'verified' | 'incomplete' | 'failed';
   /** Worker model calls made. */
   turns: number;

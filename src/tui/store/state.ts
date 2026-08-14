@@ -280,10 +280,14 @@ export type UiEvent =
   | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
   | {
       type: 'run_finished';
-      /** 'completed'/'budget_exceeded' from judge-less runs; 'verified'
-       * (the only harness success) and 'incomplete' (judge crash,
-       * correction exhaustion, budget exhaustion — never a runtime
-       * failure, which stays run_failed) from harness runs. */
+      /** A real run emits only 'verified' (the one harness success) or
+       * 'incomplete' (judge crash, correction exhaustion, budget
+       * exhaustion — never a runtime failure, which stays run_failed):
+       * since the V2-only cutover every run goes through the harness, so
+       * the bridge switches over a status union of just those two.
+       * 'completed'/'budget_exceeded' outlive the judge-less path they came
+       * from because the synthetic `--demo` stream still emits them and the
+       * reducer still renders them; they are unreachable from a real run. */
       outcome: 'completed' | 'budget_exceeded' | 'verified' | 'incomplete';
       finalText?: string;
       runDir: string;

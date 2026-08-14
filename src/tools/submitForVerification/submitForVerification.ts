@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { SUBMIT_FOR_VERIFICATION } from '../../completion/workerResponseProtocol.js';
-import { EXCLUSIVE_ACCESS, type ApiToolDef, type ToolAccess } from '../registry.js';
+import type { ApiToolDef } from '../registry.js';
 
 // The submission control tool. It is deliberately NOT a ToolDef: it never
 // runs through executeToolCall, has no executor, and touches nothing. The
@@ -13,26 +13,15 @@ import { EXCLUSIVE_ACCESS, type ApiToolDef, type ToolAccess } from '../registry.
 // the exclusivity rule enforceable: there is no code path where a
 // submission executes alongside a write.
 
-/**
- * The access this control tool WOULD declare if it were ever routed through
- * `deriveAccess`/the scheduler: `EXCLUSIVE_ACCESS`. It never is — a
- * submission is not a `ToolDef` and carries no `getAccess`, because
- * `validateWorkerResponse` (see workerResponseProtocol.ts) rejects any
- * response that mixes `submit_for_verification` with another call, and a
- * valid submission is intercepted by the worker session before
- * `scheduleToolCalls` ever sees it — so no scheduling decision is ever made
- * about it at all.
- *
- * This constant exists purely as documentation, not as wiring: it names the
- * invariant "submission is exclusive" as a concrete, checkable value (see
- * this module's test) rather than leaving a future reader to take the
- * `validateWorkerResponse` comment's word for it. Ending a run is the
- * single most exclusive thing a call can do — nothing may be mid-flight
- * when the model claims the deliverables are finished — which is exactly
- * why the harness enforces it a layer earlier than the scheduler instead of
- * trusting a declaration to be checked here.
- */
-export const SUBMIT_FOR_VERIFICATION_ACCESS: ToolAccess = EXCLUSIVE_ACCESS;
+// Were it ever routed through `deriveAccess`/the scheduler, the access it
+// would declare is EXCLUSIVE_ACCESS. It never is: `validateWorkerResponse`
+// (see workerResponseProtocol.ts) rejects any response that mixes
+// `submit_for_verification` with another call, and a valid submission is
+// intercepted by the worker session before `scheduleToolCalls` ever sees it,
+// so no scheduling decision is made about it at all. Ending a run is the
+// single most exclusive thing a call can do — nothing may be mid-flight when
+// the model claims the deliverables are finished — which is exactly why the
+// harness enforces it a layer earlier than the scheduler.
 
 /** What the worker states when it submits. */
 export const submitForVerificationInputSchema = z

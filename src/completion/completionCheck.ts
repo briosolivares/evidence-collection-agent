@@ -256,18 +256,10 @@ export function validateManifestIntegrity(runDir: string): CompletionFailure[] {
  * contains its required sections, and holds no leftover placeholders.
  * Screenshot and download outputs are checked by count and filename
  * pattern against the manifest's published entries.
- */
-export function validateExpectedOutputs(
-  runDir: string,
-  contract: OutputContract,
-): CompletionFailure[] {
-  return expectedOutputsOutcome(runDir, contract).failures;
-}
-
-/**
- * The same pass, keeping the settled facts the failure-only view discards.
- * One parse feeds both halves — see {@link SettledFact} for why the verifier
- * is given the positive half at all.
+ *
+ * Returns the settled facts alongside the failures — see {@link SettledFact}
+ * for why the verifier is given the positive half at all. One parse feeds
+ * both halves.
  */
 function expectedOutputsOutcome(
   runDir: string,
