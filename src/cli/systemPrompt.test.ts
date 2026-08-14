@@ -133,6 +133,17 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('reinspect the page before continuing');
   });
 
+  it('requires human handoff for bot checks outside authentication', () => {
+    expect(SYSTEM_PROMPT).toContain('Human handoff.');
+    expect(SYSTEM_PROMPT).toContain('Cloudflare or other security verification');
+    expect(SYSTEM_PROMPT).toContain(
+      'including on search results and ordinary content pages, not only during login',
+    );
+    expect(SYSTEM_PROMPT).toContain('immediately use ask_user_question');
+    expect(SYSTEM_PROMPT).toContain('do not try to bypass it');
+    expect(SYSTEM_PROMPT).toContain('do not claim that a search was exhaustive');
+  });
+
   it('forms a byte-identical cached prefix with all twelve production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
