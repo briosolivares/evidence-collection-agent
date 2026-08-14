@@ -42,11 +42,13 @@ import {
 } from './browserState.js';
 import {
   BrowserRefNotFoundError,
+  type BrowserCapturedText,
   type BrowserController,
   type BrowserDownloadResult,
   type BrowserDownloadTarget,
   type BrowserFetchResult,
   type BrowserScreenshotOptions,
+  type BrowserTextCaptureRequest,
   type HandleDialogRequest,
   type HandleDialogResult,
 } from './controller.js';
@@ -451,6 +453,61 @@ export class PlaywrightBrowserController implements BrowserController {
     this.state.recordObservation(record.pageId, { documentId, url, elements });
     const changes = diffObservations(baseline, { documentId, url, elements });
     return { page: await this.describePage(record), views, elements, changes };
+  }
+
+  /**
+   * Capture exact rendered text for evidence (T11).
+   *
+   * Deliberately NOT built on `observe`: the text view is bounded, and the
+   * interactive outline is normalized — a capture must be quotable byte for
+   * byte later. Records no observation and issues no refs, so capturing
+   * cannot invalidate a ref the caller is holding.
+   */
+  async captureText(request: BrowserTextCaptureRequest = {}): Promise<BrowserCapturedText> {
+    this.requireOpenContext();
+    const record =
+      request.pageId !== undefined
+        ? this.requireTrackedPage(request.pageId)
+        : this.registerPage(this.requirePage());
+    const page = record.page;
+    const observationId = this.state.latestObservationId(record.pageId);
+    // Title mid-navigation can fail; an empty title beats failing a capture
+    // whose text read fine (describePage takes the same view).
+    const title = await page.title().catch(() => '');
+
+    if (request.elementId === undefined) {
+      const documentId = this.ensureFrameRecord(record, page.mainFrame()).documentId;
+      // The page's own rendered text, not observe's view: innerText respects
+      // visibility and layout, and nothing here truncates it.
+      const text = await page.evaluate(() => document.body?.innerText ?? '');
+      return {
+        text,
+        url: page.url(),
+        title,
+        pageId: record.pageId,
+        documentId,
+        ...(observationId > 0 ? { observationId } : {}),
+        locator: 'body',
+      };
+    }
+
+    const ref = this.state.findObservedElement(record.pageId, request.elementId);
+    if (ref === undefined) throw new BrowserRefNotFoundError(request.elementId);
+    // resolveElementRef rejects a ref whose document was replaced, so a
+    // capture can never quote text from a document that is already gone.
+    const locator = await this.resolveElementRef(ref);
+    const text = await locator.innerText();
+    return {
+      text,
+      url: page.url(),
+      title,
+      pageId: record.pageId,
+      // The ref's own document, which for a subframe element is the frame's
+      // rather than the page's — that is what rendered the text.
+      documentId: ref.documentId,
+      ...(observationId > 0 ? { observationId } : {}),
+      locator: ref.stableLocator ?? `${ref.role}[name=${JSON.stringify(ref.name)}]`,
+    };
   }
 
   switchPage(pageId: string): Promise<BrowserPage> {

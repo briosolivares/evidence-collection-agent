@@ -92,6 +92,13 @@ const captureEvidence = () =>
     },
   ]);
 
+// The same evidence, minted WITHOUT page scripting. Until capture_text was
+// wired, execute_javascript was the only source of the evidence id every
+// typed row requires — so every table task silently depended on the
+// JavaScript policy allowing execution.
+const captureText = () =>
+  toolResponse([{ id: 'x1', name: 'capture_text', input: { label: 'Widget roster' } }]);
+
 const upsertRow = () =>
   toolResponse([
     {
@@ -447,6 +454,47 @@ describe('runTask V2 verification protocol', () => {
         manifest.artifacts?.find((entry) => entry.filename === 'artifacts/roster.csv')?.roles,
       ).toEqual(['requested_output']);
       expect(JSON.stringify(worker.requests)).not.toContain('write_file');
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'sources a row\'s evidence from capture_text, and briefs the worker on the protocol',
+    async () => {
+      const initializer = scriptModel([setContract()]);
+      const worker = scriptModel([captureText(), upsertRow(), setCompleteness(), submit()]);
+      const verifier = scriptModel([reportVerified()]);
+
+      const result = await runTask('Publish the widget roster.', {
+        browser,
+        runsBaseDir,
+        callModel: worker.callModel,
+        maxTurns: 10,
+        maxContextTokens: 100_000,
+        harness: {
+          outputContract: true,
+          contractAuthor: 'initializer',
+          initializerCallModel: initializer.callModel,
+          verifierCallModel: verifier.callModel,
+        },
+      });
+
+      expect(result.status).toBe('verified');
+      // The capture minted E1, which the row and the completeness claim
+      // cited — no execute_javascript anywhere in the run.
+      expect(JSON.stringify(worker.requests)).not.toContain('execute_javascript');
+      const evidence = JSON.parse(
+        await readFile(join(result.runDir, 'scratch/evidence/E1.json'), 'utf8'),
+      ) as { summary: string; detail: { recordType: string; locator: string } };
+      expect(evidence.summary).toContain('Widget roster');
+      expect(evidence.detail).toMatchObject({ recordType: 'web_text', locator: 'body' });
+
+      // The opening message tells the worker the contract is already set and
+      // that this protocol writes no INTENT.md/CONTRACT.md — the two things
+      // the first live V2 runs wasted turns discovering.
+      const opening = JSON.stringify(worker.requests[0]?.[0]);
+      expect(opening).toContain('revision 1 is already set');
+      expect(opening).toContain('no INTENT.md and no CONTRACT.md');
     },
     TEST_TIMEOUT_MS,
   );

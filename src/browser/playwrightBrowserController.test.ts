@@ -272,6 +272,64 @@ describe('Playwright browser controller', () => {
   );
 
   it(
+    'captures a page and an element as exact text with the identity to re-read it',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
+      const observation = await controller.observe();
+
+      const page = await playwright.captureText();
+      // Rendered text, whole — not the outline, which normalizes the
+      // paragraph away, and not a bounded view.
+      expect(page.text).toContain('Browser controller fixture');
+      expect(page.text).toContain(
+        'This deterministic page exercises semantic browser observations.',
+      );
+      expect(page).toMatchObject({
+        locator: 'body',
+        pageId: observation.page.pageId,
+        documentId: observation.page.documentId,
+        url: fixtureServer.url('/'),
+        title: 'Browser Controller Fixture',
+        observationId: observation.page.observationId,
+      });
+
+      // A text-only observation records NO elements, so an id-to-ref lookup
+      // that only consulted the latest observation would lose a ref the
+      // caller legitimately still holds.
+      await controller.observe({ need: ['text'] });
+      const announce = elementRef(observation, 'button', 'Announce ready');
+      const element = await playwright.captureText({ elementId: announce.id });
+      expect(element.text).toBe('Announce ready');
+      expect(element.documentId).toBe(announce.documentId);
+      expect(element.locator).not.toBe('body');
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'refuses to capture an unknown element id, or one whose document is gone',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
+      const observation = await controller.observe();
+      const announce = elementRef(observation, 'button', 'Announce ready');
+
+      await expect(
+        playwright.captureText({ elementId: 'el-does-not-exist' }),
+      ).rejects.toBeInstanceOf(BrowserRefNotFoundError);
+
+      // Navigation replaces the document, so the text that ref named is no
+      // longer on screen — a capture must never quote a page that is gone.
+      await controller.goto(fixtureServer.url('/second.html'));
+      await expect(
+        playwright.captureText({ elementId: announce.id }),
+      ).rejects.toBeInstanceOf(BrowserRefNotFoundError);
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
     'invalidates prior-document element refs on navigation',
     async () => {
       await controller.newTab();

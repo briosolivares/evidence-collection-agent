@@ -396,6 +396,31 @@ describe('runVerifier evidence scope and screenshots', () => {
     expect(feedback).not.toContain('private worker notes');
   });
 
+  it('reads a cited evidence record, which lives under scratch/', async () => {
+    // The other half of the same boundary: a typed row cites E1 and the only
+    // record of what E1 captured is scratch/evidence/E1.json. Refusing it
+    // made every evidence-cited row unprovable by construction — the
+    // verifier was required to check facts against evidence and forbidden
+    // from reading the evidence.
+    const evidenceDir = join(runDir, 'scratch', 'evidence');
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(
+      join(evidenceDir, 'E1.json'),
+      JSON.stringify({ id: 'E1', detail: { text: 'Widget A — 412 units' } }),
+    );
+    const script = scriptModel([
+      toolCallResponse([
+        { id: 'r1', name: 'read_file', input: { file_path: 'scratch/evidence/E1.json' } },
+      ]),
+      reportResponse({ status: 'verified', findings: [] }),
+    ]);
+    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+
+    const feedback = JSON.stringify(script.requests[1]);
+    expect(feedback).not.toContain("Outside the verifier's evidence scope");
+    expect(feedback).toContain('Widget A');
+  });
+
   it('returns a published PNG as an image block for visual review', async () => {
     publishArtifact('shot.png', pngBytes(800, 600));
     const script = scriptModel([

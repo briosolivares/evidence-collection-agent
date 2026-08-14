@@ -130,13 +130,15 @@ and assembles these tools at their frozen positions:
 
 **Wired and usable:** `set_output_contract`, `upsert_output_rows`,
 `delete_output_rows`, `set_table_completeness`, `observe`, `browser_action`,
-`switch_page`, `handle_dialog`, `execute_javascript`, `inspect_document`,
-`screenshot`, `download`, `read_file`, `write_file`, `grep`,
-`fill_credentials`, `ask_user_question`, and `submit_for_verification`
-(offered as a control tool, intercepted by the session rather than executed).
+`switch_page`, `handle_dialog`, `execute_javascript`, `capture_text`,
+`inspect_document`, `screenshot`, `download`, `read_file`, `write_file`,
+`grep`, `fill_credentials`, `ask_user_question`, and
+`submit_for_verification` (offered as a control tool, intercepted by the
+session rather than executed).
 
-All of the above have now been exercised live except `handle_dialog`,
-`fill_credentials`, and `inspect_document`.
+All of the above have been exercised live except `handle_dialog`,
+`fill_credentials`, `inspect_document`, and `capture_text` — the last was
+wired after the live runs and is covered by real-browser tests only.
 
 **Implemented and tested but NOT yet wired**, each needing one dependency the
 cutover has not plumbed:
@@ -145,7 +147,6 @@ cutover has not plumbed:
 | --- | --- |
 | `write_document` | a PDF page opener (`Pick<Browser, 'newPage'>`) from the session provider. **Blocks closing the hand-written-document hole.** |
 | `read_resource` | the anonymous `PublicResourceReader` and the discovered-URL index, fed from navigation and observation |
-| `capture_text` | the text-capture page seam. **Binding constraint on table tasks** — see the known gaps below. |
 | `run_research_jobs` | the research job runner |
 
 Each carries an `INTEGRATION` comment naming exactly what to pass. A run
@@ -178,11 +179,10 @@ These are real and not hidden behind a flag:
   close together under one rule — a contract-bound deliverable may be written
   only by the tool that owns it — and closing the document half requires
   wiring `write_document` first, or every document task becomes unverifiable.
-- **`capture_text` being unwired is a binding constraint, not a gap.**
-  `upsert_output_rows` requires an evidence id per row, and with `capture_text`
-  and `read_resource` absent, `execute_javascript` is effectively the only
-  source of one for text. A table task therefore has exactly one route to a
-  cited row.
+- **Evidence sources for text are now two, not one.** `upsert_output_rows`
+  requires an evidence id per row. `capture_text` is wired (2026-08-13), so a
+  table task no longer depends on the JavaScript policy allowing
+  `execute_javascript`. `read_resource` remains absent.
 - **Compaction is unwired** (T15), by decision rather than omission.
 - The **DNS-rebinding TOCTOU window** in `read_resource` is narrowed by per-hop
   re-resolution but not closed; a pinning HTTP client can be injected without

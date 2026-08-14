@@ -11,6 +11,8 @@ import {
   decideContractGate,
   SET_OUTPUT_CONTRACT,
 } from '../contracts/contractFirstGate.js';
+import type { OutputSpec } from '../contracts/outputContract.js';
+import { contractRevisionPath } from '../contracts/outputContractStore.js';
 import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
@@ -183,6 +185,91 @@ export interface RunMetrics {
   roles?: Partial<Record<string, RunRoleUsage>>;
 }
 
+/** One line summarizing what an output requires, for the protocol brief. */
+function outputBriefLine(output: OutputSpec): string {
+  switch (output.kind) {
+    case 'table':
+      return (
+        `- ${output.id} (table, ${output.format} -> artifacts/${output.filename}): ` +
+        `columns ${output.columns.map((column) => column.name).join(', ')}`
+      );
+    case 'document':
+      return `- ${output.id} (document, ${output.format} -> artifacts/${output.filename})`;
+    case 'screenshots':
+      return `- ${output.id} (screenshots)`;
+    case 'download':
+      return `- ${output.id} (downloads)`;
+  }
+}
+
+/**
+ * The opening message's protocol brief for a typed-contract run, or
+ * undefined for the legacy prose path.
+ *
+ * Why this exists in the conversation and not in SYSTEM_PROMPT: the system
+ * prompt is the byte-stable cached prefix, and everything here is per-run
+ * (which protocol, which revision, which outputs). The first live V2 runs
+ * showed what its absence costs — the worker restated an already-accepted
+ * contract, and it went looking for the INTENT.md and CONTRACT.md that the
+ * system prompt describes and this protocol does not produce. Both wasted
+ * turns; the first would also silently convert an initializer-authored run
+ * into a worker-authored one.
+ */
+export function workerProtocolBrief(
+  deps: Pick<WorkerSessionDeps, 'outputContracts' | 'submissionProtocol'>,
+): string | undefined {
+  const contracts = deps.outputContracts;
+  if (contracts === undefined) return undefined;
+
+  const lines = [
+    'Run protocol: typed output contract.',
+    '',
+    'This run has no INTENT.md and no CONTRACT.md — disregard the system ' +
+      "prompt's paragraph about those two files. This run's contract is the " +
+      'typed output contract, held by the runtime and enforced by code ' +
+      'before any verifier sees your work.',
+    '',
+  ];
+
+  const revision = contracts.currentRevision();
+  if (revision === undefined) {
+    lines.push(
+      `No contract is set yet, so your first action must be a single ` +
+        `${SET_OUTPUT_CONTRACT} call stating this run's required outputs. ` +
+        `Until one is accepted, every other tool call is refused unanswered.`,
+    );
+  } else {
+    lines.push(
+      `Contract revision ${revision.revision} is already set and stored at ` +
+        `${contractRevisionPath(revision.revision)}. It requires:`,
+      ...revision.contract.outputs.map(outputBriefLine),
+      '',
+      `Do not call ${SET_OUTPUT_CONTRACT} to restate what is already set. ` +
+        `Call it only when something you actually observed makes the current ` +
+        `contract wrong or impossible to satisfy, and then include a ` +
+        `revisionBasis (evidence_discovery, assumption_correction, or ` +
+        `user_clarification) naming what changed.`,
+    );
+  }
+
+  lines.push(
+    '',
+    'Fill a table output with upsert_output_rows — one call per batch of ' +
+      'rows, each row citing the evidence id it came from — and mark it with ' +
+      'set_table_completeness when the rows are final. The runtime renders ' +
+      'the file itself from those rows, so do not write a contract-bound ' +
+      'deliverable by hand.',
+  );
+  if (deps.submissionProtocol === true) {
+    lines.push(
+      '',
+      `Finish by calling ${SUBMIT_FOR_VERIFICATION} on its own. A response ` +
+        'with no tool call does not finish the run.',
+    );
+  }
+  return lines.join('\n');
+}
+
 /**
  * Create one worker session.
  *
@@ -201,11 +288,23 @@ export function createWorkerSession(
   if (Number.isNaN(config.maxContextTokens) || config.maxContextTokens < 0) {
     throw new Error(`maxContextTokens must be >= 0, got ${config.maxContextTokens}`);
   }
+  // Task text stays the first block verbatim; the protocol brief follows it
+  // as a second block of the same message rather than being spliced into
+  // the user's own words.
+  const brief = workerProtocolBrief(deps);
   return {
     deps,
     config,
     state: {
-      messages: [{ role: 'user', content: [{ type: 'text', text: taskText }] }],
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: taskText },
+            ...(brief === undefined ? [] : [{ type: 'text' as const, text: brief }]),
+          ],
+        },
+      ],
       turnCount: 0,
     },
     peakContextTokens: 0,

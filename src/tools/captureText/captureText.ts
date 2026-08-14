@@ -1,68 +1,41 @@
 /**
- * INTEGRATION (T11) — `capture_text` is complete and tested but deliberately
- * NOT registered: `src/tools/index.ts`, `src/tools/registry.ts`, and the
- * browser controller belong to other owners. What remains:
- *
- * 1. `src/tools/registry.ts` — add to `ToolCtx`:
- *      `evidenceStore?: EvidenceStore`   (src/evidence/evidenceStore.js)
- *
- * 2. `src/browser/controller.ts` — expose the two capabilities the adapter
- *    below needs on `BrowserController` (the Playwright class already
- *    implements `resolveElementRef`; it is simply not on the interface):
- *      `resolveElementRef(ref: ElementRef): Promise<Locator>`
- *      `observedElement(pageId: string, elementId: string): ElementRef | undefined`
- *    The second is a lookup into the page's latest recorded observation
- *    (`BrowserStateStore.getObservation`), which is what turns the
- *    `elementId` this tool takes back into the full `ElementRef` that
- *    `resolveElementRef` requires — an id alone cannot carry the
- *    frame/document identity that makes a ref stale on navigation.
- *
- *    Then adapt a controller to this task's narrow seam:
- *      const page = (ctx: ToolCtx): TextCapturePage => {
- *        const browser = requireBrowser(ctx);
- *        return {
- *          async captureText({ pageId, elementId }) {
- *            const target = pageId ?? (await browser.pages()).find((p) => p.active)!.pageId;
- *            if (elementId === undefined) {
- *              const page = await browser.pageState(target);
- *              return { ...page, locator: 'body', text: await browser.pageText(target) };
- *            }
- *            const ref = browser.observedElement(target, elementId);
- *            if (ref === undefined) throw new BrowserRefNotFoundError(elementId);
- *            const locator = await browser.resolveElementRef(ref);
- *            return { ..., locator: ref.stableLocator ?? `${ref.role}[name=${ref.name}]`,
- *                     text: await locator.innerText() };
- *          },
- *        };
- *      };
- *    Whole-page capture must read the page's rendered text directly
- *    (`document.body.innerText`), NOT `observe`'s `text` view: that view is
- *    cut at a per-view bound, and a quotation cut mid-sentence is exactly
- *    what this tool exists to prevent.
- *
- * 3. `src/tools/index.ts` — export a `resourceTools` array containing this
- *    tool and `read_resource`, and spread it LAST inside
- *    `createProductionRegistry` so no existing tool's index moves and the
- *    cached prompt prefix keeps its bytes.
- *
- * 4. Evidence kind: records are filed under `javascript_extraction` with
- *    `detail.recordType = 'web_text'` until `src/evidence/evidenceStore.ts`
- *    accepts `web_text` (see {@link PENDING_WEB_TEXT_EVIDENCE_KIND}).
- *
- * The plan's `captureTextTool` symbol is the value
- * {@link createCaptureTextTool} returns; a module-level constant is not
- * possible while the capture seam reaches the tool through a factory rather
- * than `ToolCtx`.
+ * `capture_text` (T11): save exact rendered text as citable evidence.
  *
  * Why this tool exists at all: an observation is transient and normalized —
  * the interactive outline collapses whitespace and drops nodes, and the text
  * view is bounded and never persisted. A number that will appear in an answer
  * has to be quotable later, byte for byte, from a file an auditor can re-read.
  * That is a *capture*, not an observation.
+ *
+ * WIRED as of 2026-08-13. The capture seam is
+ * `BrowserController.captureText`, optional on the interface for the same
+ * reason `executeJavaScript` is: a session that cannot capture makes
+ * `runTask` omit this tool rather than register one that fails when called.
+ * The controller owns turning an `elementId` back into a full `ElementRef`
+ * (`BrowserStateStore.findObservedElement`) — an id alone cannot carry the
+ * frame/document identity that makes a ref stale on navigation — and the
+ * whole-page path reads `document.body.innerText` directly rather than
+ * `observe`'s text view, which is cut at a per-view bound.
+ *
+ * Still pending: the evidence store does not accept a `web_text` kind, so
+ * records are filed under `javascript_extraction` with
+ * `detail.recordType = 'web_text'` (see
+ * {@link PENDING_WEB_TEXT_EVIDENCE_KIND}). Nothing outside this module reads
+ * the kind to route behaviour, so the placeholder is a labelling debt rather
+ * than a correctness one.
+ *
+ * The plan's `captureTextTool` symbol is the value
+ * {@link createCaptureTextTool} returns; a module-level constant is not
+ * possible while the capture seam reaches the tool through a factory rather
+ * than `ToolCtx`.
  */
 
 import { z } from 'zod';
 
+import type {
+  BrowserCapturedText,
+  BrowserTextCaptureRequest,
+} from '../../browser/controller.js';
 import { recordEvidence, type EvidenceKind, type EvidenceStore } from '../../evidence/evidenceStore.js';
 import {
   DEFAULT_MAX_RESULT_BYTES,
@@ -100,35 +73,15 @@ const ENVELOPE_RESERVE_BYTES = 12_000;
 /** Characters of a label kept; a label is a caption, not a paragraph. */
 const MAX_LABEL_CHARS = 200;
 
-/** What the tool asks the browser for. */
-export interface TextCaptureRequest {
-  /** Page to capture from; omitted means the selected page. */
-  pageId?: string;
-  /** Element id from a prior observation; omitted captures the whole page. */
-  elementId?: string;
-}
+/** What the tool asks the browser for. Defined in the browser layer, where
+ * the capability lives; aliased here because this tool's own API — and its
+ * tests — name it. */
+export type TextCaptureRequest = BrowserTextCaptureRequest;
 
 /** Exactly what was read, and what it was read from. Every field is part of
  * the evidence record: without page/document identity, a captured string
  * cannot be traced back to the thing that rendered it. */
-export interface CapturedPageText {
-  /** The text exactly as rendered — no normalization, no truncation. */
-  text: string;
-  /** URL of the document the text came from. */
-  url: string;
-  /** Title of that document. */
-  title: string;
-  /** Stable page id the text came from. */
-  pageId: string;
-  /** Document id at capture time; a later rotation means the source is
-   * gone, which is why it is recorded rather than inferred. */
-  documentId: string;
-  /** The page's observation number at capture time, when known. */
-  observationId?: number;
-  /** Engine-resolvable locator of what was read ('body' for a whole page).
-   * This is the part that makes a capture reproducible. */
-  locator: string;
-}
+export type CapturedPageText = BrowserCapturedText;
 
 /** The narrow browser seam this tool needs. */
 export interface TextCapturePage {

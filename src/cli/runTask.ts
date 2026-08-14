@@ -88,6 +88,8 @@ import {
   type BrowserJavaScriptPolicy,
 } from '../browser/browserJavaScript.js';
 import { createExecuteJavascriptTool } from '../tools/executeJavascript/executeJavascript.js';
+import { createCaptureTextTool } from '../tools/captureText/captureText.js';
+import { requireBrowser } from '../tools/shared/browser.js';
 import type { OutputSpec } from '../contracts/outputContract.js';
 import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
 import { createOutputContractStore } from '../contracts/outputContractStore.js';
@@ -423,6 +425,23 @@ export async function runTask(
                         type: 'javascript_policy',
                         decision: line,
                       }),
+                  }) as ToolDef,
+                ],
+              ] as Array<[string, ToolDef]>)
+            : []),
+          // capture_text is offered on the same terms: only when the session
+          // provides the capture seam. Without it, execute_javascript is the
+          // only way to obtain the evidence id every typed row requires,
+          // which makes a table task depend on page scripting being allowed.
+          ...(config.browser.captureText !== undefined
+            ? ([
+                [
+                  'capture_text',
+                  createCaptureTextTool({
+                    page: (ctx) => ({
+                      captureText: (request) => requireBrowser(ctx).captureText!(request),
+                    }),
+                    evidenceStore: () => evidenceStore,
                   }) as ToolDef,
                 ],
               ] as Array<[string, ToolDef]>)

@@ -71,6 +71,39 @@ export interface HandleDialogResult {
   pendingDialogs: BrowserDialog[];
 }
 
+/** What text to capture: a whole page, or one element observed on it. */
+export interface BrowserTextCaptureRequest {
+  /** Page to capture from; omitted means the selected page. */
+  pageId?: string;
+  /** Element id from a prior observation; omitted captures the whole page. */
+  elementId?: string;
+}
+
+/**
+ * Exactly what was read, and what it was read from. Every field is part of
+ * the evidence record the capture produces: without page and document
+ * identity, a captured string cannot be traced back to the thing that
+ * rendered it.
+ */
+export interface BrowserCapturedText {
+  /** The text exactly as rendered — no normalization, no truncation. */
+  text: string;
+  /** URL of the document the text came from. */
+  url: string;
+  /** Title of that document. */
+  title: string;
+  /** Stable page id the text came from. */
+  pageId: string;
+  /** Document id at capture time; a later rotation means the source is
+   * gone, which is why it is recorded rather than inferred. */
+  documentId: string;
+  /** The page's observation number at capture time, when known. */
+  observationId?: number;
+  /** Engine-resolvable locator of what was read ('body' for a whole page).
+   * This is the part that makes a capture reproducible. */
+  locator: string;
+}
+
 /** Error raised when a ref from an outline no longer identifies an element. */
 export class BrowserRefNotFoundError extends Error {
   /** Ref that could not be resolved. */
@@ -301,5 +334,27 @@ export interface BrowserController {
    * replacement, invalidating that document's refs and observations (T6).
    * Present exactly when executeJavaScript is. */
   replaceUnresponsivePage?(): Promise<void>;
+
+  /**
+   * Read a page's, or one observed element's, exact rendered text for
+   * capture as evidence (T11).
+   *
+   * Distinct from {@link observe}'s text view on purpose: that view is
+   * normalized and cut at a per-view bound, and a quotation cut
+   * mid-sentence is precisely what a capture exists to prevent. This
+   * returns the rendered text whole, plus the identity needed to re-read it
+   * later.
+   *
+   * OPTIONAL for the same reason executeJavaScript is: a run wires
+   * `capture_text` only when the session provides this, so a session that
+   * cannot capture omits the tool instead of offering one that fails when
+   * called.
+   *
+   * @param request - page and optional element selection
+   * @returns the text plus the identity of what produced it
+   * @throws BrowserRefNotFoundError when `elementId` names no element in a
+   *   retained observation of that page, or its document has been replaced
+   */
+  captureText?(request?: BrowserTextCaptureRequest): Promise<BrowserCapturedText>;
   close(): Promise<void>;
 }

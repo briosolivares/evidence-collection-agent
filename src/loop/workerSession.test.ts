@@ -258,6 +258,63 @@ describe('WorkerSession contract-first gate', () => {
     };
   }
 
+  it("tells a worker whose contract is already set not to restate it, and that the prose files do not exist", () => {
+    const store = createOutputContractStore(runDir);
+    expect(store.setOutputContract(VALID_CONTRACT).ok).toBe(true);
+    const { session } = (() => {
+      const { callModel } = scriptModel([]);
+      return {
+        session: createWorkerSession(
+          TASK,
+          {
+            callModel,
+            registry: gatedRegistry([]),
+            runDir,
+            outputContracts: store,
+            submissionProtocol: true,
+          },
+          { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+        ),
+      };
+    })();
+
+    const opening = session.state.messages[0]!;
+    // The task text stays the first block, verbatim and unwrapped.
+    expect(opening.content[0]).toEqual({ type: 'text', text: TASK });
+    const brief = (opening.content[1] as { text: string }).text;
+    // Finding 4: the system prompt promises INTENT.md/CONTRACT.md, which this
+    // protocol never writes — the worker went looking for them.
+    expect(brief).toContain('no INTENT.md and no CONTRACT.md');
+    // Finding 3: it re-authored a contract that was already accepted.
+    expect(brief).toContain('revision 1 is already set');
+    expect(brief).toContain('scratch/output-contract/revision-1.json');
+    expect(brief).toContain('Do not call set_output_contract to restate');
+    expect(brief).toContain('revisionBasis');
+    // The contract's actual requirements, so the worker need not go read them.
+    expect(brief).toContain('roster (table, csv -> artifacts/roster.csv): columns name');
+    expect(brief).toContain('submit_for_verification');
+  });
+
+  it('tells a worker with no contract yet to author one first', () => {
+    const { session } = contractSession([]);
+    const brief = (session.state.messages[0]!.content[1] as { text: string }).text;
+
+    expect(brief).toContain('No contract is set yet');
+    expect(brief).toContain('every other tool call is refused');
+    expect(brief).not.toContain('already set');
+    // No submission protocol on this session, so nothing claims one.
+    expect(brief).not.toContain('submit_for_verification');
+  });
+
+  it('adds no brief at all on the legacy prose path', () => {
+    const { session } = makeSession([textResponse('Done.')]);
+
+    expect(session.state.messages[0]).toEqual({
+      role: 'user',
+      content: [{ type: 'text', text: TASK }],
+    });
+  });
+
   it('executes nothing when the first response skips the contract', async () => {
     const { session, touched, store } = contractSession([
       callsResponse([

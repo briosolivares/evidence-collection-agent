@@ -202,6 +202,22 @@ export interface BrowserStateStore {
    *   snapshot, never a stale error.
    */
   getObservation(pageId: string, observationId: number): StoredObservation | undefined;
+  /**
+   * Find the full ref for an element id, searching the page's retained
+   * observations newest-first.
+   *
+   * Newest-first rather than latest-only because an observation records only
+   * the elements its requested needs produced: a text-only observe records
+   * none at all, so "the page's latest observation" routinely does not
+   * contain a ref the model legitimately still holds. Searching the retained
+   * window keeps an id usable until it is evicted, and loses no safety —
+   * the returned ref carries the documentId it was seen in, and resolving it
+   * rejects a rotated document.
+   *
+   * @returns the ref as recorded, or undefined when no retained observation
+   *   of that page contains the id
+   */
+  findObservedElement(pageId: string, elementId: string): ElementRef | undefined;
   /** The page's latest observation number, or 0 before any observation. */
   latestObservationId(pageId: string): number;
   /** Drop all state for a closed page. Its ids are never reused. */
@@ -268,6 +284,16 @@ export function createBrowserStateStore(
       return cachedObservations
         .get(pageId)
         ?.find((stored) => stored.observationId === observationId);
+    },
+
+    findObservedElement(pageId, elementId) {
+      const cache = cachedObservations.get(pageId);
+      if (cache === undefined) return undefined;
+      for (let index = cache.length - 1; index >= 0; index -= 1) {
+        const found = cache[index]!.elements.find((element) => element.id === elementId);
+        if (found !== undefined) return found;
+      }
+      return undefined;
     },
 
     latestObservationId(pageId) {

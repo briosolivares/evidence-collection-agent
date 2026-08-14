@@ -420,7 +420,13 @@ Bug 3 alone cost 35 turns and 192 seconds on one task: `hacker_news` went from
 
 Bugs 3 and 4 were introduced by this plan's own implementation.
 
-### Open findings from these runs — NOT fixed
+### Findings from these runs
+
+Findings 3, 4, 5, and 6 were fixed on 2026-08-13 (no further live evals — the
+user scoped verification to typecheck plus hermetic tests). Findings 1 and 2
+are deliberately still open: they need `write_document` wired plus a policy
+decision, and closing the document half alone would make every document task
+unverifiable.
 
 1. **`validateDocumentOutputs` is bypassable, and its message is the recipe.**
    The check asks whether `scratch/documents/<id>/source.md` is in the
@@ -433,30 +439,61 @@ Bugs 3 and 4 were introduced by this plan's own implementation.
    have rows, but hand-writing a contract-bound CSV still satisfies the
    check. Both holes close together under one rule: a contract-bound
    deliverable may be written only by the tool that owns it.
-3. **The worker re-authors a contract that already exists.** Under
-   `contractAuthor: initializer` it is never told one is set, so it spends
+3. **FIXED — the worker re-authored a contract that already existed.** Under
+   `contractAuthor: initializer` it was never told one is set, so it spent
    turns writing revision 2 — byte-identical in both observed runs, but a
    rewrite on a harder task would silently convert experiment 1's cell D into
-   cell B. Fix before running that experiment.
-4. **The worker reads `INTENT.md`/`CONTRACT.md` on turn 1 under V2**, where
-   those files do not exist, and collects two errors for it.
-5. **Evidence ids are hard to come by for text.** `upsert_output_rows`
-   requires at least one evidence id per row; with `capture_text` and
-   `read_resource` unwired, `execute_javascript` is effectively the only
-   source. While it was broken the worker had no legitimate route to a cited
-   row at all and asked the user for guidance mid-run (correctly refused in a
-   headless eval). `capture_text` being unwired is a binding constraint on
-   table tasks, not a cosmetic gap.
-6. **The verifier does not understand the scratch/artifacts partition.** On
-   the confirming `hacker_news` run it returned `needs_correction` twice over,
-   demanding that evidence held in `scratch/evidence/` be "published in
-   artifacts/ as verifiable evidence" — but scratch is exactly where evidence
-   belongs, and the manifest already records it. The worker complied by
-   writing a raw-evidence JSON into `artifacts/`, adding an unrequested file
-   to the graded deliverable set and costing a full extra cycle. Harmless
-   here because graders select by the `requested_output` role, but a task
-   graded on "only the requested outputs are present" would fail on it. The
-   verifier's prompt needs to state the partition.
+   cell B, which had to be fixed before running that experiment.
+4. **FIXED — the worker read `INTENT.md`/`CONTRACT.md` on turn 1 under V2**,
+   where those files do not exist, and collected two errors for it.
+
+   3 and 4 share one fix: `workerProtocolBrief` in `src/loop/workerSession.ts`
+   appends a per-run protocol brief to the worker's opening message — the
+   contract is already set (with its revision, its stored path, and its
+   outputs), a further `set_output_contract` needs a `revisionBasis` and an
+   observed reason, this protocol writes no `INTENT.md`/`CONTRACT.md`, and
+   table rows go in through `upsert_output_rows` because the runtime renders
+   the file. It lives in the conversation, NOT in `SYSTEM_PROMPT`: the system
+   prompt is the byte-stable cached prefix, and all of this is per-run. The
+   task text stays the first content block, verbatim.
+5. **FIXED — evidence ids were hard to come by for text.**
+   `upsert_output_rows` requires at least one evidence id per row; with
+   `capture_text` and `read_resource` unwired, `execute_javascript` was
+   effectively the only source, so a table task silently depended on the
+   JavaScript policy allowing execution. While it was broken (bug 3) the
+   worker had no legitimate route to a cited row at all and asked the user for
+   guidance mid-run — correctly refused in a headless eval.
+
+   `capture_text` is now wired. The seam is
+   `BrowserController.captureText?()`, optional exactly as
+   `executeJavaScript?()` is, so a session that cannot capture makes `runTask`
+   omit the tool rather than offer one that fails when called. The controller
+   owns resolving an `elementId` back to a full `ElementRef` through the new
+   `BrowserStateStore.findObservedElement`, which searches retained
+   observations newest-first — latest-only would lose refs constantly, because
+   a text-only `observe` records no elements at all. Whole-page capture reads
+   `document.body.innerText` rather than `observe`'s text view, which is cut
+   at 60k chars. `read_resource` and `write_document` remain unwired.
+6. **FIXED — and it was not what it first looked like.** On the confirming
+   `hacker_news` run the verifier returned `needs_correction` twice, demanding
+   that evidence held in `scratch/evidence/` be "published in artifacts/ as
+   verifiable evidence". That reads like a prompt misunderstanding, but the
+   verifier was right about its own situation: `evidenceScopeError` **refused
+   every read outside `artifacts/`**, so a row citing `E1` was unprovable by
+   construction — the verifier was required to check facts against evidence
+   and forbidden from reading the evidence. Guaranteed `needs_correction`, and
+   the worker "fixed" it by copying raw evidence JSON into `artifacts/`,
+   adding an unrequested file to the graded deliverable set.
+
+   The scope now admits `scratch/evidence/` — and nothing else under
+   `scratch/`. The distinction is provenance versus prose: an evidence record
+   is written by the capture tool, carries the source URL and timestamp, and
+   is hashed into the manifest, which is the same standing a published
+   screenshot has. Worker notes elsewhere in `scratch/` stay out, because
+   self-confirming claims are exactly what the boundary exists to prevent.
+   `VERIFIER_SYSTEM_PROMPT` states the wider scope, tells the verifier that a
+   cited `E<n>` resolves to `scratch/evidence/<id>.json`, and no longer
+   assumes `INTENT.md`/`CONTRACT.md` exist — under V2 they do not.
 
 ## Handoff
 

@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
 
+import { EVIDENCE_DIR } from '../evidence/evidenceStore.js';
 import type { ImageBlock, ToolResultBlock, ToolUseBlock } from '../loop/messages.js';
 import { ARTIFACTS_DIR, MANIFEST_FILENAME } from '../run/artifacts.js';
 import { resolveRunPath } from '../run/runDir.js';
@@ -15,7 +16,8 @@ import { CONTRACT_FILENAME, INTENT_FILENAME } from './initializer.js';
 // of its opening message. Control flow (the report_verification mini-loop)
 // lives in verifier.ts; this module owns the I/O the verifier is allowed to
 // perform — and, by omission, everything it is not: no browser, no writes,
-// no scratch files, no worker transcript.
+// no working notes, no worker transcript. The one scratch/ subtree it may
+// read is the evidence ledger; evidenceScopeError explains why.
 
 /** Size cap for a verifier-viewed image, in raw file bytes. The API rejects
  * images over ~5MB of encoded data; 3.75MB of raw bytes is 5MB once
@@ -336,12 +338,25 @@ const ROOT_EVIDENCE_FILES: readonly string[] = [
 
 /**
  * The verifier's evidence-scope check: only surfaced evidence is readable —
- * files under artifacts/, plus INTENT.md, CONTRACT.md, and manifest.json at
- * the run-dir root. Anywhere else (scratch/, the transcript, metrics) is
- * off-diet: graders never see unpublished working files, so a verdict built
- * on them would be a false calibration; the boundary also keeps
- * backpressure on the worker to publish its proof, and keeps worker claims
- * in scratch notes from self-confirming as evidence.
+ * files under artifacts/ and under scratch/evidence/, plus INTENT.md,
+ * CONTRACT.md, and manifest.json at the run-dir root. Anywhere else
+ * (the rest of scratch/, the transcript, metrics) is off-diet: graders never
+ * see unpublished working files, so a verdict built on them would be a false
+ * calibration; the boundary also keeps backpressure on the worker to publish
+ * its proof, and keeps worker claims in scratch notes from self-confirming
+ * as evidence.
+ *
+ * Why `scratch/evidence/` is inside the scope even though it is under
+ * scratch/. The T6 ledger is where cited provenance lives: a typed row or a
+ * document footnote cites `E3`, and the only record of what `E3` captured is
+ * `scratch/evidence/E3.json`. Excluding it made every evidence-cited row
+ * unprovable by construction — the verifier was required to check facts
+ * against evidence and forbidden from reading the evidence, which can only
+ * end in needs_correction. These records are also not the thing the boundary
+ * exists to exclude: each one is written by the capture tool rather than
+ * typed by the model, carries the source URL and timestamp of the capture,
+ * and is hashed into the manifest, so it is provenance in the same sense a
+ * published screenshot is. Model prose in the rest of scratch/ stays out.
  *
  * @returns null when `relPath` resolves inside the scope; the steering-error
  *   text to send back otherwise. A path that fails resolveRunPath's own
@@ -357,15 +372,18 @@ export function evidenceScopeError(runDir: string, relPath: string): string | nu
     return null;
   }
   const root = resolve(runDir);
-  const artifactsRoot = join(root, ARTIFACTS_DIR);
-  const inArtifacts = resolved === artifactsRoot || resolved.startsWith(artifactsRoot + sep);
+  const inSubtree = (dir: string): boolean => {
+    const dirRoot = join(root, dir);
+    return resolved === dirRoot || resolved.startsWith(dirRoot + sep);
+  };
   const isRootEvidenceFile = ROOT_EVIDENCE_FILES.some((name) => resolved === join(root, name));
-  if (inArtifacts || isRootEvidenceFile) return null;
+  if (inSubtree(ARTIFACTS_DIR) || inSubtree(EVIDENCE_DIR) || isRootEvidenceFile) return null;
   return (
     `Outside the verifier's evidence scope: ${JSON.stringify(relPath)}. You may read only ` +
-    `published evidence: files under ${ARTIFACTS_DIR}/, plus ${INTENT_FILENAME}, ` +
-    `${CONTRACT_FILENAME}, and ${MANIFEST_FILENAME} at the run-directory root. ` +
-    'Unpublished working files are not evidence — a claim proven only there is unproven.'
+    `published evidence and recorded provenance: files under ${ARTIFACTS_DIR}/ and ` +
+    `${EVIDENCE_DIR}/, plus ${INTENT_FILENAME}, ${CONTRACT_FILENAME}, and ` +
+    `${MANIFEST_FILENAME} at the run-directory root. Other unpublished working files ` +
+    'are not evidence — a claim proven only there is unproven.'
   );
 }
 
