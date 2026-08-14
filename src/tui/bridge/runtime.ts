@@ -25,7 +25,7 @@ export interface TuiRuntimeDeps {
   /** Extra per-run configuration forwarded to the bridge. */
   runConfig?: Pick<
     RunSessionDeps,
-    'model' | 'toolProfile' | 'maxTurns' | 'maxContextTokens' | 'tracingDelegate'
+    'model' | 'harness' | 'maxTurns' | 'maxContextTokens' | 'tracingDelegate'
   >;
   /** Test seam: clock for event stamps. */
   now?: () => number;

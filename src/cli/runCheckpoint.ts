@@ -100,12 +100,12 @@ export interface RunCheckpointWriter {
   saveInitializing(): Promise<void>;
   /**
    * After the initializer phase accepts something durable, still
-   * `runStatus: 'initializing'`. Called more than once on the prose path —
-   * once with the accepted `{intent, contract}` BEFORE the files are
-   * written, once more with `filesWritten: true` after — so a crash between
-   * the two lets resumeTask finish the (deterministic, model-free) file
-   * writes without re-asking the initializer. See runTask.ts's initializer
-   * block for exactly where each call sits.
+   * `runStatus: 'initializing'`. `runTask.ts` calls this once, right after
+   * the contract-authoring initializer's forced `set_output_contract` call
+   * is accepted (mode `'contract'`) — or, when `contractAuthor` is
+   * `'worker'`, once with no accepted revision yet, purely to record which
+   * protocol this run is on. See runTask.ts's initializer block for exactly
+   * where each call sits.
    */
   saveInitializerAccepted(initializer: CheckpointInitializer): Promise<void>;
   /** Once the `WorkerSession` exists, and again every time the harness loop

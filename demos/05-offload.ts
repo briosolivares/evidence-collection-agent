@@ -20,7 +20,9 @@ const dumpLog: ToolDef<{ lines: number }> = {
   name: 'dump_log',
   description: 'Emit a large synthetic log, one numbered line at a time.',
   inputSchema: z.object({ lines: z.number() }),
-  readOnly: true,
+  // Touches nothing named by its input — the modern equivalent of the old
+  // `readOnly: true`.
+  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) =>
     Array.from(
       { length: input.lines },

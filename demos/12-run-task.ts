@@ -1,7 +1,7 @@
 // Demo for T14: run the complete evidence-collection agent against a live
 // website with a visible, persistent Chrome profile. Run with:
 //
-//   npx tsx demos/14-run-task.ts "Create a CSV of the top 5 Hacker News stories with title, URL, and points"
+//   npx tsx demos/12-run-task.ts "Create a CSV of the top 5 Hacker News stories with title, URL, and points"
 //
 // Requires ANTHROPIC_API_KEY (or another SDK-supported credential source).
 // This spends real tokens and accesses a live site, so it is intentionally
@@ -12,7 +12,7 @@ import { join, resolve } from 'node:path';
 
 import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
 import { runTask } from '../src/cli/runTask.js';
-import { METRICS_FILENAME, type RunMetrics } from '../src/loop/agentLoop.js';
+import { METRICS_FILENAME, type RunMetrics } from '../src/loop/workerSession.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
 
 const DEFAULT_TASK =

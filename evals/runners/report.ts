@@ -14,11 +14,11 @@ import type { EvalReport } from './runner.js';
  * @returns the rendered multi-line text, without a trailing newline;
  *   printing is left to the caller (the CLI edge)
  */
-/** The protocol as one header token. An absent protocol reads as 'prose',
- * which is what every report written before the switch existed actually ran. */
+/** The protocol as one header token. An absent protocol reads as
+ * 'output-contract', which is what every report ran once the flag was removed. */
 function formatProtocol(report: EvalReport): string {
   const protocol = report.protocol;
-  if (protocol === undefined || protocol.completion === 'prose') return 'prose';
+  if (protocol === undefined) return 'output-contract';
   return protocol.contractAuthor === undefined
     ? 'output-contract'
     : `output-contract/${protocol.contractAuthor}`;
@@ -27,8 +27,7 @@ function formatProtocol(report: EvalReport): string {
 export function formatReport(report: EvalReport): string {
   const lines: string[] = [
     `Eval report — k=${report.k}, concurrency ${report.concurrency}, model ${report.model}, ` +
-      `tool profile ${report.toolProfile}, protocol ${formatProtocol(report)}, ` +
-      `started ${report.startedAt}`,
+      `protocol ${formatProtocol(report)}, started ${report.startedAt}`,
   ];
 
   for (const task of report.tasks) {

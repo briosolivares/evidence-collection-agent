@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
+import type { CallModel } from '../../src/loop/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import {
   createTuiRuntime,
@@ -14,6 +15,43 @@ import { createInitialState, reduce, type StoreAction } from '../../src/tui/stor
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
+
+// A scripted `set_output_contract` call, hermetic and immediate — this
+// module's own `createStream` seam is shared across every role's model
+// client (worker, initializer, verifier: see runSession.ts and
+// runTask.ts), so leaving the initializer to fall back to its production
+// `makeContractInitializerModelDriver` default would make it consume this
+// suite's `dyingStream` and throw exactly as the worker does, but for the
+// wrong reason (an initializer failure instead of a WORKER mid-stream
+// failure). Scripting `harness.initializerCallModel`/`verifierCallModel`
+// directly keeps those roles off both the network and the dying stream.
+const initializerCallModel: CallModel = async () => ({
+  content: [
+    {
+      type: 'tool_use',
+      id: 'tu_contract',
+      name: 'set_output_contract',
+      input: {
+        contract: {
+          outputs: [{ id: 'notes', kind: 'screenshots', count: { minimum: 1 } }],
+        },
+      },
+    },
+  ],
+  stop_reason: 'tool_use',
+  usage: { input_tokens: 100, output_tokens: 20 },
+});
+
+// Never actually reached by this suite's dying-worker test (the worker's
+// stream dies before any submission), but scripted anyway so nothing about
+// this file depends on the verifier's production default staying unreached.
+const verifierCallModel: CallModel = async () => ({
+  content: [
+    { type: 'tool_use', id: 'tu_verify', name: 'report_verification', input: { status: 'verified', findings: [] } },
+  ],
+  stop_reason: 'tool_use',
+  usage: { input_tokens: 10, output_tokens: 2 },
+});
 
 let runsBaseDir: string;
 
@@ -42,6 +80,11 @@ describe('mid-stream failure', () => {
       browser: stubBrowser(),
       onEvent: (event) => events.push(event),
       runsBaseDir,
+      // The initializer and verifier are scripted off the network entirely
+      // (see the module-level fakes above); createStream below is consumed
+      // ONLY by the worker's own model client, so it is the only role whose
+      // stream dies.
+      harness: { initializerCallModel, verifierCallModel },
       createStream: () => dyingStream(),
     });
     const outcome = await handle.done;
@@ -102,7 +145,7 @@ describe('browser relaunch on next submit', () => {
               status: 'failed',
               message: 'browserContext.newPage: Target page, context or browser has been closed',
             } as const)
-          : ({ status: 'completed', finalText: 'ok', runDir: '/runs/x' } as const);
+          : ({ status: 'verified', finalText: 'ok', runDir: '/runs/x' } as const);
       return { cancel: vi.fn(), done: Promise.resolve(outcome) };
     });
 
@@ -118,7 +161,7 @@ describe('browser relaunch on next submit', () => {
     expect(createSession).toHaveBeenCalledTimes(1); // first run launched lazily
 
     const second = await runtime.startRun('recovers', () => {}).done;
-    expect(second.status).toBe('completed');
+    expect(second.status).toBe('verified');
     expect(createSession).toHaveBeenCalledTimes(2); // relaunched on next submit
     expect(seen[1]?.browser).toBe(controllers[1]); // the fresh session
     expect(controllers[0]?.close).toHaveBeenCalled(); // corpse cleaned up

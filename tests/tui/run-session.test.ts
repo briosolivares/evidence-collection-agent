@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import type { CallModel, ModelResponse } from '../../src/loop/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
@@ -11,7 +12,12 @@ import { stubBrowser } from './stubBrowser.js';
 
 // These tests drive the REAL runTask (run directories, manifest, loop,
 // tool pipeline) against a stub browser and fully scripted SDK streams —
-// no live API, no Chrome.
+// no live API, no Chrome. Every run goes through the initializer → worker
+// → verifier harness now, so every test forces `contractAuthor: 'worker'`
+// (the worker states its own contract, or none — see the minimal
+// `{ outputs: [] }` contract below — skipping a live initializer network
+// call) and, whenever a run is expected to reach verification, scripts
+// `verifierCallModel` to report `verified` immediately.
 
 let runsBaseDir: string;
 
@@ -28,24 +34,85 @@ function collect(): { events: UiEvent[]; onEvent: (event: UiEvent) => void } {
   return { events, onEvent: (event) => events.push(event) };
 }
 
+/** A verifier response reporting `verified` (no findings) — the only
+ * tool call the fake verifier's single scripted turn ever makes. */
+function verifierVerified(): ModelResponse {
+  return {
+    content: [
+      {
+        type: 'tool_use',
+        id: 'v1',
+        name: 'report_verification',
+        input: { status: 'verified', findings: [] },
+      },
+    ],
+    stop_reason: 'tool_use',
+    usage: { input_tokens: 10, output_tokens: 2 },
+  };
+}
+const verifierCallModel: CallModel = async () => verifierVerified();
+
+/** A minimal, always-valid output contract — one declared output, since the
+ * schema requires at least one (`outputContractSchema.outputs.min(1)`) — for
+ * tests whose point is the tool pipeline or progress events, not contract
+ * validation. Required before any tool but `set_output_contract` may run
+ * (the contract-first gate). */
+const contractResponse = () =>
+  scriptedResponse(
+    [
+      {
+        type: 'tool_use',
+        id: 'tu_contract',
+        name: 'set_output_contract',
+        input: {
+          contract: {
+            outputs: [{ id: 'notes', kind: 'screenshots', count: { minimum: 1 } }],
+          },
+        },
+      },
+    ],
+    { input: 100, output: 20 },
+    'tool_use',
+  );
+
+const submitResponse = (summary = 'Done.') =>
+  scriptedResponse(
+    [{ type: 'tool_use', id: 'tu_submit', name: 'submit_for_verification', input: { summary } }],
+    { input: 1500, output: 40 },
+    'tool_use',
+  );
+
 describe('startRun (RunSession bridge)', () => {
   it('re-emits all four progress events in order for a text-only run', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([
-      scriptedResponse([{ type: 'text', text: 'Answer ready.' }], { input: 1200, output: 180 }),
+      scriptedResponse(
+        [
+          { type: 'text', text: 'Answer ready.' },
+          {
+            type: 'tool_use',
+            id: 'tu_submit',
+            name: 'submit_for_verification',
+            input: { summary: 'Answer ready.' },
+          },
+        ],
+        { input: 1200, output: 180 },
+        'tool_use',
+      ),
     ]);
 
     const handle = startRun('simple question', {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
       now: () => 42,
     });
     const outcome = await handle.done;
 
-    expect(outcome.status).toBe('completed');
-    if (outcome.status !== 'completed') throw new Error('unreachable');
+    expect(outcome.status).toBe('verified');
+    if (outcome.status !== 'verified') throw new Error('unreachable');
     expect(outcome.finalText).toBe('Answer ready.');
     expect(outcome.runDir.startsWith(runsBaseDir)).toBe(true);
 
@@ -60,16 +127,17 @@ describe('startRun (RunSession bridge)', () => {
     const finished = events.at(-1);
     expect(finished).toMatchObject({
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'Answer ready.',
       runDir: outcome.runDir,
       at: 42,
     });
   });
 
-  it('orders turns and tool_pending faithfully across a two-turn tool run', async () => {
+  it('orders turns and tool_pending faithfully across a multi-turn tool run', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([
+      contractResponse(),
       scriptedResponse(
         [
           { type: 'text', text: 'Saving the notes.' },
@@ -83,11 +151,11 @@ describe('startRun (RunSession bridge)', () => {
         { input: 1000, output: 200 },
         'tool_use',
       ),
-      scriptedResponse([{ type: 'text', text: 'Done.' }], {
-        input: 2400,
-        output: 60,
-        cacheRead: 900,
-      }),
+      scriptedResponse(
+        [{ type: 'tool_use', id: 'tu_submit', name: 'submit_for_verification', input: { summary: 'Done.' } }],
+        { input: 2400, output: 60, cacheRead: 900 },
+        'tool_use',
+      ),
     ]);
 
     const browser = stubBrowser();
@@ -95,42 +163,48 @@ describe('startRun (RunSession bridge)', () => {
       browser,
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
     });
     const outcome = await handle.done;
-    expect(outcome.status).toBe('completed');
-    if (outcome.status !== 'completed') throw new Error('unreachable');
+    expect(outcome.status).toBe('verified');
+    if (outcome.status !== 'verified') throw new Error('unreachable');
 
-    const types = events.map((event) =>
-      event.type === 'turn_start' ? `turn_start:${event.turn}` : event.type,
+    const types = events.map((event) => event.type);
+    expect(types[0]).toBe('run_started');
+    expect(types.at(-1)).toBe('run_finished');
+
+    // write_file's tool_pending arrives after the contract turn settles and
+    // before the write_file batch's own turn_end.
+    const writePendingIndex = events.findIndex(
+      (event) => event.type === 'tool_pending' && event.name === 'write_file',
     );
-    const compact = types.filter((type) => type !== 'text_delta');
-    expect(compact).toEqual([
-      'run_started',
-      'turn_start:1',
-      'tool_pending',
-      'turn_end',
-      'run_dir',
-      'tool_exec_start',
-      'artifact_published',
-      'tool_exec_end',
-      'turn_start:2',
-      'turn_end',
-      'run_finished',
-    ]);
+    const turnEnds = events.filter((event) => event.type === 'turn_end');
+    expect(turnEnds).toHaveLength(3);
+    const secondTurnEndIndex = events.indexOf(turnEnds[1]!);
+    expect(writePendingIndex).toBeGreaterThan(-1);
+    expect(writePendingIndex).toBeLessThan(secondTurnEndIndex);
+
+    // write_file executed through the real pipeline: exec start, an
+    // artifact_published receipt, then exec end — in that order, and
+    // before the final submission turn starts.
+    const execStart = events.findIndex(
+      (event) => event.type === 'tool_exec_start' && event.name === 'write_file',
+    );
+    const published = events.findIndex((event) => event.type === 'artifact_published');
+    const execEnd = events.findIndex(
+      (event, index) => event.type === 'tool_exec_end' && index > execStart,
+    );
+    expect(execStart).toBeGreaterThan(-1);
+    expect(execStart).toBeLessThan(published);
+    expect(published).toBeLessThan(execEnd);
+
     const runDirEvent = events.find((event) => event.type === 'run_dir');
     expect(runDirEvent).toMatchObject({ runDir: outcome.runDir });
 
-    // tool_pending arrives after turn 1's prose and before its turn_end.
-    const pendingIndex = events.findIndex((event) => event.type === 'tool_pending');
-    const firstTurnEnd = events.findIndex((event) => event.type === 'turn_end');
-    expect(events[pendingIndex]).toMatchObject({ name: 'write_file' });
-    expect(pendingIndex).toBeLessThan(firstTurnEnd);
-
     // Usage totals are faithful per turn, including cache reads.
-    const usages = events.filter((event) => event.type === 'turn_end');
-    expect(usages[0]).toMatchObject({ usage: { input: 1000, output: 200 } });
-    expect(usages[1]).toMatchObject({ usage: { input: 2400, output: 60, cacheRead: 900 } });
+    expect(turnEnds[1]).toMatchObject({ usage: { input: 1000, output: 200 } });
+    expect(turnEnds[2]).toMatchObject({ usage: { input: 2400, output: 60, cacheRead: 900 } });
 
     // The real pipeline ran: the artifact and manifest exist on disk.
     expect(readFileSync(join(outcome.runDir, 'artifacts/notes.md'), 'utf8')).toBe('hello evidence');
@@ -142,51 +216,63 @@ describe('startRun (RunSession bridge)', () => {
     expect(existsSync(join(outcome.runDir, 'metrics.json'))).toBe(true);
   });
 
-  it('uses the same batch-enabled profile for model definitions and execution', async () => {
+  it('offers the real worker tool surface and executes browser_action for real', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([
+      contractResponse(),
       scriptedResponse(
         [
           {
             type: 'tool_use',
-            id: 'tu_batch',
-            name: 'browser_batch',
-            input: {
-              actions: [
-                { tool: 'navigate', input: { url: 'https://example.test/' } },
-                { tool: 'inspect_page', input: {} },
-              ],
-            },
+            id: 'tu_action',
+            name: 'browser_action',
+            input: { actions: [{ op: 'navigate', url: 'https://example.test/' }] },
           },
         ],
         { input: 1000, output: 200 },
         'tool_use',
       ),
-      scriptedResponse([{ type: 'text', text: 'Done.' }], {
-        input: 1500,
-        output: 40,
-      }),
+      // The contract's one declared output is a screenshot (min. 1); a real
+      // capture here is what lets the completion check pass and the run
+      // reach the verifier at all — its own turn, since a batch mixing a
+      // browser_action with a screenshot call is a distinct scheduling case
+      // this test isn't about.
+      scriptedResponse(
+        [{ type: 'tool_use', id: 'tu_shot', name: 'screenshot', input: { filename: 'artifacts/page.png' } }],
+        { input: 300, output: 40 },
+        'tool_use',
+      ),
+      submitResponse(),
     ]);
 
-    const handle = startRun('use a browser batch', {
+    const handle = startRun('use the browser', {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
-      toolProfile: 'batch-enabled',
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
     });
-    await expect(handle.done).resolves.toMatchObject({ status: 'completed' });
+    await expect(handle.done).resolves.toMatchObject({ status: 'verified' });
 
+    // runSession.ts now drives every run through runTask's own real
+    // toolchain (see its module header) rather than a locally-built
+    // approximation — browser_action and bash must both be on the wire so
+    // the model can call them.
     const firstParams = factory.calls[0]?.params as {
       tools?: Array<{ name: string }>;
     };
-    expect(firstParams.tools?.map((tool) => tool.name).at(-1)).toBe('browser_batch');
-    expect(events.filter((event) => event.type === 'tool_exec_start')).toEqual([
-      expect.objectContaining({ name: 'browser_batch' }),
-    ]);
-    expect(events.filter((event) => event.type === 'tool_exec_end')).toEqual([
-      expect.objectContaining({ ok: true }),
-    ]);
+    const toolNames = firstParams.tools?.map((tool) => tool.name) ?? [];
+    expect(toolNames).toContain('browser_action');
+    expect(toolNames).toContain('bash');
+
+    const actionStart = events.findIndex(
+      (event) => event.type === 'tool_exec_start' && event.name === 'browser_action',
+    );
+    expect(actionStart).toBeGreaterThan(-1);
+    const actionEnd = events.find(
+      (event, index) => event.type === 'tool_exec_end' && index > actionStart,
+    );
+    expect(actionEnd).toMatchObject({ ok: true });
   });
 
   it('maps budget exhaustion to a distinct outcome and event', async () => {
@@ -210,18 +296,19 @@ describe('startRun (RunSession bridge)', () => {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker' },
       createStream: factory.createStream,
       maxTurns: 1,
     });
     const outcome = await handle.done;
 
-    expect(outcome.status).toBe('budget_exceeded');
-    if (outcome.status !== 'budget_exceeded') throw new Error('unreachable');
-    expect(outcome.reason).toBe('max_turns');
+    expect(outcome.status).toBe('incomplete');
+    if (outcome.status !== 'incomplete') throw new Error('unreachable');
+    expect(outcome.reason).toBe('budget_exceeded');
     expect(events.at(-1)).toMatchObject({
       type: 'run_finished',
-      outcome: 'budget_exceeded',
-      reason: 'max_turns',
+      outcome: 'incomplete',
+      reason: 'budget_exceeded',
     });
   });
 
@@ -231,6 +318,7 @@ describe('startRun (RunSession bridge)', () => {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker' },
       createStream: () => {
         throw new Error('api unreachable');
       },
@@ -270,6 +358,7 @@ describe('startRun (RunSession bridge)', () => {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker' },
       createStream: (_params, signal) => hangingStream(signal),
     });
 
@@ -284,37 +373,40 @@ describe('startRun (RunSession bridge)', () => {
 
   it('aborting during a tool batch lets the batch settle before cancelling', async () => {
     const { events, onEvent } = collect();
-    let releaseGoto: () => void = () => {};
-    const gotoBlocked = new Promise<void>((resolve) => {
-      releaseGoto = resolve;
+    let releaseAction: () => void = () => {};
+    const actionBlocked = new Promise<void>((resolve) => {
+      releaseAction = resolve;
     });
-    let gotoStarted: () => void = () => {};
-    const gotoStartedPromise = new Promise<void>((resolve) => {
-      gotoStarted = resolve;
+    let actionStarted: () => void = () => {};
+    const actionStartedPromise = new Promise<void>((resolve) => {
+      actionStarted = resolve;
     });
-    let gotoFinished = false;
+    let actionFinished = false;
 
     const browser = stubBrowser();
-    browser.goto = async () => {
-      gotoStarted();
-      await gotoBlocked;
-      gotoFinished = true;
-    };
+    const defaultBrowserAction = browser.browserAction.bind(browser);
+    browser.browserAction = (async (request: Parameters<typeof browser.browserAction>[0]) => {
+      actionStarted();
+      await actionBlocked;
+      actionFinished = true;
+      return defaultBrowserAction(request);
+    }) as typeof browser.browserAction;
 
     const factory = scriptedStreamFactory([
+      contractResponse(),
       scriptedResponse(
         [
           {
             type: 'tool_use',
             id: 'tu_1',
-            name: 'navigate',
-            input: { url: 'https://example.com/slow' },
+            name: 'browser_action',
+            input: { actions: [{ op: 'navigate', url: 'https://example.com/slow' }] },
           },
         ],
         { input: 100, output: 20 },
         'tool_use',
       ),
-      // A second scripted response exists but must never be requested: the
+      // A third scripted response exists but must never be requested: the
       // bridge's callModel checks the aborted signal at entry.
       scriptedResponse([{ type: 'text', text: 'should never stream' }], {
         input: 1,
@@ -326,30 +418,30 @@ describe('startRun (RunSession bridge)', () => {
       browser,
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker' },
       createStream: factory.createStream,
     });
 
-    await gotoStartedPromise;
+    await actionStartedPromise;
     handle.cancel(); // mid-batch: the model call already returned
-    expect(gotoFinished).toBe(false);
-    releaseGoto();
+    expect(actionFinished).toBe(false);
+    releaseAction();
     const outcome = await handle.done;
 
-    expect(gotoFinished).toBe(true); // the batch settled first
+    expect(actionFinished).toBe(true); // the batch settled first
     expect(outcome).toEqual({ status: 'cancelled' });
     expect(events.at(-1)?.type).toBe('run_cancelled');
-    expect(factory.calls).toHaveLength(1); // no second model call
+    expect(factory.calls).toHaveLength(2); // contract, then the browser_action call — no third
   });
 
   it('passes the abort signal to every stream request', async () => {
     const { onEvent } = collect();
-    const factory = scriptedStreamFactory([
-      scriptedResponse([{ type: 'text', text: 'ok' }], { input: 10, output: 5 }),
-    ]);
+    const factory = scriptedStreamFactory([submitResponse('ok')]);
     const handle = startRun('check signal', {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
     });
     await handle.done;
@@ -373,11 +465,25 @@ describe('startRun permission channel', () => {
     );
   }
 
+  // The contract's one declared output is a screenshot (min. 1); any test
+  // whose run reaches submission needs a real capture first, or the
+  // completion check rejects the submission and demands a correction the
+  // scripted factory has no response for.
+  function screenshotResponse() {
+    return scriptedResponse(
+      [{ type: 'tool_use', id: 'tu_shot', name: 'screenshot', input: { filename: 'artifacts/page.png' } }],
+      { input: 300, output: 40 },
+      'tool_use',
+    );
+  }
+
   it('announces the pause, then resumes the run with the dialog answers', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([
+      contractResponse(),
+      screenshotResponse(),
       askResponse(),
-      scriptedResponse([{ type: 'text', text: 'Resuming.' }], { input: 1000, output: 20 }),
+      submitResponse('Resuming.'),
     ]);
     const seen: unknown[] = [];
 
@@ -385,6 +491,7 @@ describe('startRun permission channel', () => {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
       requestPermission: async (request) => {
         seen.push(request);
@@ -399,14 +506,21 @@ describe('startRun permission channel', () => {
     });
     const outcome = await handle.done;
 
-    expect(outcome.status).toBe('completed');
+    expect(outcome.status).toBe('verified');
     expect(seen).toEqual([{ toolName: 'ask_user_question', input: askInput }]);
     expect(
       events.find((event) => event.type === 'permission_request'),
     ).toMatchObject({ toolName: 'ask_user_question', input: askInput });
     // The tool executed with the merged answers and echoed them as prose —
     // the round-trip reached the model as an ordinary tool result.
-    expect(events.find((event) => event.type === 'tool_exec_end')).toMatchObject({
+    const askExecStart = events.find(
+      (event) => event.type === 'tool_exec_start' && event.name === 'ask_user_question',
+    ) as { id?: number } | undefined;
+    expect(
+      events.find(
+        (event) => event.type === 'tool_exec_end' && event.id === askExecStart?.id,
+      ),
+    ).toMatchObject({
       ok: true,
       result: 'User answered: "yes, all done"',
     });
@@ -414,7 +528,7 @@ describe('startRun permission channel', () => {
 
   it('cancel during a pause denies the question and ends run_cancelled', async () => {
     const { events, onEvent } = collect();
-    const factory = scriptedStreamFactory([askResponse()]);
+    const factory = scriptedStreamFactory([contractResponse(), askResponse()]);
     let reachPause!: () => void;
     const paused = new Promise<void>((resolve) => {
       reachPause = resolve;
@@ -424,6 +538,7 @@ describe('startRun permission channel', () => {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker' },
       createStream: factory.createStream,
       // The dialog never answers — only the abort race can settle it.
       requestPermission: () => {
@@ -442,27 +557,31 @@ describe('startRun permission channel', () => {
   it('fails closed without a dialog: no pause, and the model routes around it', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([
+      contractResponse(),
+      screenshotResponse(),
       askResponse(),
-      scriptedResponse([{ type: 'text', text: 'Proceeding without the user.' }], {
-        input: 1000,
-        output: 20,
-      }),
+      submitResponse('Proceeding without the user.'),
     ]);
 
     const handle = startRun('headless ask', {
       browser: stubBrowser(),
       onEvent,
       runsBaseDir,
+      harness: { contractAuthor: 'worker', verifierCallModel },
       createStream: factory.createStream,
     });
     const outcome = await handle.done;
 
-    expect(outcome.status).toBe('completed');
+    expect(outcome.status).toBe('verified');
     expect(events.some((event) => event.type === 'permission_request')).toBe(false);
-    // Execute never ran (no exec events); the model saw the structured
-    // fail-closed error in its next request instead.
-    expect(events.some((event) => event.type === 'tool_exec_start')).toBe(false);
-    expect(JSON.stringify(factory.calls[1]?.params)).toContain(
+    // ask_user_question never ran (the contract call is the only exec); the
+    // model saw the structured fail-closed error in its next request instead.
+    expect(
+      events.some(
+        (event) => event.type === 'tool_exec_start' && event.name === 'ask_user_question',
+      ),
+    ).toBe(false);
+    expect(JSON.stringify(factory.calls[3]?.params)).toContain(
       'does not support',
     );
   });

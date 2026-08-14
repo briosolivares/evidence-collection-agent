@@ -2,7 +2,11 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { OutputContract, OutputSpec } from '../contracts/outputContract.js';
+import {
+  matchesFilenamePattern,
+  type OutputContract,
+  type OutputSpec,
+} from '../contracts/outputContract.js';
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
@@ -610,8 +614,9 @@ export function validateTableRules(
         break;
       }
       case 'matches_expected_values': {
-        const present = new Set(rows.map((row) => (row[rule.column] ?? '').trim()));
-        const missing = rule.expected.filter((value) => !present.has(value));
+        const present = rows.map((row) => (row[rule.column] ?? '').trim());
+        const presentSet = new Set(present);
+        const missing = rule.expected.filter((value) => !presentSet.has(value));
         if (missing.length > 0) {
           failures.push({
             outputId: output.id,
@@ -620,6 +625,25 @@ export function validateTableRules(
               `${output.filename} column "${rule.column}" is missing required value(s): ` +
               `${missing.join(', ')}.`,
           });
+        }
+        // An exhaustive expectation names the complete set of row keys, so a
+        // value that is not in it is a row nobody asked for — an invented
+        // entity, a duplicate under a different spelling, or a stray line. Code
+        // settles that from the same bytes the verifier would squint at, and
+        // reports every offender at once rather than the first.
+        if (rule.exhaustive === true) {
+          const allowed = new Set(rule.expected);
+          const unexpected = [...new Set(present)].filter((value) => !allowed.has(value));
+          if (unexpected.length > 0) {
+            failures.push({
+              outputId: output.id,
+              code: 'unexpected_values',
+              message:
+                `${output.filename} column "${rule.column}" contains value(s) the contract does ` +
+                `not list: ${unexpected.map((value) => JSON.stringify(value)).join(', ')}. ` +
+                'The contract names the complete set of rows for this table.',
+            });
+          }
         }
         break;
       }
@@ -659,7 +683,7 @@ function checkCaptureOutput(
   const pattern = output.filenamePattern;
   const matches = published.filter((entry) => {
     const base = entry.filename.slice(entry.filename.lastIndexOf('/') + 1);
-    return pattern === undefined ? true : matchesGlob(base, pattern);
+    return pattern === undefined ? true : matchesFilenamePattern(base, pattern);
   });
 
   const label = output.kind === 'screenshots' ? 'screenshot' : 'download';
@@ -712,12 +736,6 @@ function checkPlaceholders(
     }
   }
   return [];
-}
-
-/** Minimal `*`-only glob match against a bare filename. */
-function matchesGlob(name: string, pattern: string): boolean {
-  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
-  return new RegExp(`^${escaped}$`).test(name);
 }
 
 /** Coerce a parsed JSON row into the string map the rule checks use. */
@@ -889,7 +907,7 @@ export function validateTableCompleteness(
         code: 'missing_completeness_evidence',
         message:
           `${output.filename} declares a row-count rule, which is a claim about the whole ` +
-          'population. Record how you established it with set_table_completeness — the ' +
+          'population. Record how you established it with update_table\'s completeness section — the ' +
           'number of rows found cannot prove the number that exist.',
       });
     }

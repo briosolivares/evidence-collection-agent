@@ -67,13 +67,13 @@ const runner = (
     onEvent({ type: 'turn_end', usage: { input: 1200, output: 60 } });
     onEvent({
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'Resumed after the human handoff and finished.',
       runDir: '/tmp/pty-harness-run',
       at: Date.now(),
     });
     resolveDone({
-      status: 'completed',
+      status: 'verified',
       finalText: 'Resumed after the human handoff and finished.',
       runDir: '/tmp/pty-harness-run',
     });

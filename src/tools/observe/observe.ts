@@ -54,14 +54,13 @@ export const observeTool: ToolDef<ObserveInput> = {
   description:
     'Observe a browser page: a compact interactive outline and/or exact text with stable page, document, and element identity, plus changes since a prior observation.',
   inputSchema: observeRequestSchema,
-  // readOnly: true alone would be conceptually WRONG — observe advances the
-  // page's observation id and diff baseline (a write to observation state),
-  // and two concurrent observations of one page must not both claim the next
-  // baseline. getAccess below is the input-aware access declaration that
-  // fixes it: an explicit read of the page plus a write of its observation
+  // Declaring only a page READ would be conceptually WRONG — observe advances
+  // the page's observation id and diff baseline (a write to observation
+  // state), and two concurrent observations of one page must not both claim
+  // the next baseline. This is the input-aware access declaration that gets
+  // it right: an explicit read of the page plus a write of its observation
   // state, so the scheduler serializes this against another observe (or a
   // navigate/click/etc.) on the same page instead of racing it.
-  readOnly: true,
   getAccess: (input) => {
     const pageId = input.pageId ?? 'selected';
     return { reads: [accessKey.page(pageId)], writes: [accessKey.observation(pageId)] };

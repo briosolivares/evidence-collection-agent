@@ -204,7 +204,7 @@ describe('write_document publication', () => {
       contracts.setOutputContract({ contract: { outputs: [withDocument('v1.md', 'hidden')] } }).ok,
     ).toBe(true);
 
-    // Exactly the wiring the INTEGRATION note prescribes.
+    // Exactly the documentSpecs wiring runTask.ts uses in production.
     const contractDeps = deps([], {
       documentSpecs: (ctx) =>
         (ctx.outputContracts?.currentContract()?.outputs ?? []).filter(

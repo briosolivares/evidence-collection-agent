@@ -2,10 +2,7 @@ import { Buffer } from 'node:buffer';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import {
-  SUBMIT_FOR_VERIFICATION,
-  validateWorkerResponse,
-} from '../completion/workerResponseProtocol.js';
+import { validateWorkerResponse } from '../completion/workerResponseProtocol.js';
 import {
   blockedByInvalidContractResults,
   decideContractGate,
@@ -128,9 +125,37 @@ export interface WorkerSessionDeps {
   toolHooks?: ToolCallLifecycleHooks;
 }
 
+/**
+ * The run's hard guards, at the granularity `runTask` configures them with.
+ * A finite `maxTurns` bounds the turn count outright; `maxContextTokens`
+ * bounds how large any single request may grow — and because the
+ * conversation grows every turn, the context ceiling alone still guarantees
+ * termination when `maxTurns` is Infinity. Boundary semantics: a run may
+ * *complete* on the final allowed turn; guards are checked after tool
+ * execution; the context guard measures the request the model just
+ * answered. `maxTurns` becomes `RunBudgetConfig.maxWorkerTurns` (see
+ * `WorkerSessionConfig.budget`); `maxContextTokens` becomes
+ * `WorkerSessionConfig.maxContextTokens` directly.
+ */
+export interface LoopConfig {
+  /** Maximum number of model calls (turns); an integer >= 1, or Infinity. */
+  maxTurns: number;
+  /** Per-request context ceiling, >= 0 (see WorkerSessionConfig). */
+  maxContextTokens: number;
+}
+
+/**
+ * How a run ended, at the granularity a single worker cycle can produce:
+ * `completed` when the model responded without tool calls (the legacy
+ * no-submission protocol); `budget_exceeded` when a guard ended the run
+ * before the model finished, naming which one.
+ */
+export type LoopResult =
+  | { status: 'completed'; finalText: string }
+  | { status: 'budget_exceeded'; reason: WorkerBudgetReason };
+
 /** The session's guards: the shared whole-run budget plus the per-request
- * context ceiling (see the old LoopConfig.maxContextTokens contract —
- * semantics unchanged). */
+ * context ceiling (see LoopConfig.maxContextTokens — semantics unchanged). */
 export interface WorkerSessionConfig {
   /** The run's single budget; shared with every other model role. */
   budget: RunBudgetTracker;
@@ -235,33 +260,30 @@ function outputBriefLine(output: OutputSpec): string {
 }
 
 /**
- * The opening message's protocol brief for a typed-contract run, or
- * undefined for the legacy prose path.
+ * The opening message's protocol brief: the per-run facts about this run's
+ * contract.
  *
  * Why this exists in the conversation and not in SYSTEM_PROMPT: the system
- * prompt is the byte-stable cached prefix, and everything here is per-run
- * (which protocol, which revision, which outputs). The first live V2 runs
- * showed what its absence costs — the worker restated an already-accepted
- * contract, and it went looking for the INTENT.md and CONTRACT.md that the
- * system prompt describes and this protocol does not produce. Both wasted
- * turns; the first would also silently convert an initializer-authored run
- * into a worker-authored one.
+ * prompt is the byte-stable cached prefix, and everything here varies per run
+ * — which revision is set, which outputs it requires. The first live V2 runs
+ * showed what its absence costs: the worker restated an already-accepted
+ * contract, which wasted a turn and would have silently converted an
+ * initializer-authored run into a worker-authored one.
+ *
+ * This brief states ONLY what the system prompt cannot. It used to also spend
+ * three sentences correcting the prompt — telling the worker to disregard the
+ * paragraph about INTENT.md/CONTRACT.md, and restating how to finish. The
+ * prompt now describes the typed contract and `submit_for_verification`
+ * directly, so those corrections are gone rather than duplicated here; two
+ * descriptions of one protocol is how they drift apart.
  */
 export function workerProtocolBrief(
-  deps: Pick<WorkerSessionDeps, 'outputContracts' | 'submissionProtocol'>,
+  deps: Pick<WorkerSessionDeps, 'outputContracts'>,
 ): string | undefined {
   const contracts = deps.outputContracts;
   if (contracts === undefined) return undefined;
 
-  const lines = [
-    'Run protocol: typed output contract.',
-    '',
-    'This run has no INTENT.md and no CONTRACT.md — disregard the system ' +
-      "prompt's paragraph about those two files. This run's contract is the " +
-      'typed output contract, held by the runtime and enforced by code ' +
-      'before any verifier sees your work.',
-    '',
-  ];
+  const lines = ["This run's output contract:", ''];
 
   const revision = contracts.currentRevision();
   if (revision === undefined) {
@@ -286,22 +308,15 @@ export function workerProtocolBrief(
 
   lines.push(
     '',
-    'Fill a table output with upsert_output_rows — one call per batch of ' +
-      'rows, each row citing the evidence id it came from — and mark it with ' +
-      'set_table_completeness when the rows are final. The runtime renders ' +
-      'the file itself from those rows, so do not write a contract-bound ' +
-      'deliverable by hand. That file does not exist until you submit — ' +
-      'reading its path before then returns a not-found error, and the row ' +
-      'state each upsert_output_rows call returns is how you check your work ' +
-      'instead.',
+    'Fill a table output with update_table: supply rows in its upsert ' +
+      'section, each citing the evidence id it came from, and record its ' +
+      'completeness section once the rows are final — one call may carry ' +
+      'both. The runtime renders the file itself from those rows, so do not ' +
+      'write a contract-bound deliverable by hand. That file does not exist ' +
+      'until you submit — reading its path before then returns a not-found ' +
+      'error, and the row state each update_table call returns is how you ' +
+      'check your work instead.',
   );
-  if (deps.submissionProtocol === true) {
-    lines.push(
-      '',
-      `Finish by calling ${SUBMIT_FOR_VERIFICATION} on its own. A response ` +
-        'with no tool call does not finish the run.',
-    );
-  }
   return lines.join('\n');
 }
 

@@ -133,7 +133,10 @@ const browserActionInputSchema = z.strictObject({
     .string()
     .min(1)
     .optional()
-    .describe('Page to act on, from observe or switch_page; omit for the selected page'),
+    .describe(
+      "Page to act on, from an observe result's otherOpenPages or a browser_action result's " +
+        'openedPages; omit for the selected page',
+    ),
   documentId: z
     .string()
     .min(1)
@@ -179,11 +182,6 @@ export type BrowserActionInput = z.infer<typeof browserActionInputSchema>;
  *
  * Upload paths resolve only through `resolveRunPath`, so a sequence cannot
  * read a file outside the run directory.
- *
- * INTEGRATION: not registered in `src/tools/index.ts` yet. The session
- * owner registers `browser_action`, `switch_page`, and `handle_dialog`
- * together, and `browser_batch` stays registered until the parity
- * comparison retires it.
  */
 export const browserActionTool: ToolDef<BrowserActionInput> = {
   name: 'browser_action',
@@ -193,13 +191,13 @@ export const browserActionTool: ToolDef<BrowserActionInput> = {
     'prior observe result. Returns one receipt per attempted action saying whether its effects ' +
     'committed, and stops at the first navigation, popup, dialog, stale target, or failure, naming the ' +
     'first action it did not run. Completed effects are never undone. Add successChecks to state what ' +
-    'success looks like; use switch_page to change pages and handle_dialog to answer a dialog.',
+    "success looks like; pass a different pageId (from an observe result's otherOpenPages or this " +
+    "tool's own openedPages) to act on another page, and use handle_dialog to answer a dialog.",
   inputSchema: browserActionInputSchema,
-  readOnly: false,
-  // Leaving getAccess undefined here falls back to full EXCLUSIVE_ACCESS —
-  // every browser_action call serializing against every other tool call in
-  // the run, no matter which page it names. That directly contradicts the
-  // design ToolAccess documents in registry.ts: "`browser_action` on page p1
+  // A hardcoded EXCLUSIVE_ACCESS here — every browser_action call
+  // serializing against every other tool call in the run, no matter which
+  // page it names — would directly contradict the design ToolAccess
+  // documents in registry.ts: "`browser_action` on page p1
   // and `browser_action` on page p2 are the same TOOL with different
   // access" — i.e. this is the paradigm case an input-aware getAccess exists
   // for. The sequence mutates the acted-on page's content (each action) and

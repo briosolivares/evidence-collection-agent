@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { inspectPageTool } from '../tools/inspectPage/inspectPage.js';
+import { observeTool } from '../tools/observe/observe.js';
 import {
   ELISION_MARKER,
   elideStaleInspectResults,
-  INSPECT_TOOL_NAME,
-  KEPT_INSPECT_RESULTS,
+  KEPT_OBSERVE_RESULTS,
+  OBSERVE_TOOL_NAME,
   compactAtBoundary,
   freezeToolResultPreview,
 } from './contextView.js';
@@ -13,22 +13,42 @@ import type { Message, ToolResultBlock, UserMessage } from './messages.js';
 
 const TASK: Message = { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] };
 
-/** A full inspect_page result as the tool produces it: header + outline. */
-function inspectContent(n: number): string {
-  return `URL: https://site.test/page-${n}\nTitle: Page ${n}\n\n- heading "Page ${n}" [ref=r1]\n${'- item\n'.repeat(50)}`;
+/** A full observe result as the tool produces it: JSON.stringify of a
+ * BrowserObservation (see src/browser/browserState.ts). */
+function observeContent(n: number): string {
+  return JSON.stringify({
+    page: {
+      pageId: 'page-1',
+      documentId: 'doc-1',
+      observationId: n,
+      url: `https://site.test/page-${n}`,
+      title: `Page ${n}`,
+      active: true,
+      frames: [],
+    },
+    views: [
+      {
+        need: 'interactive',
+        content: `- heading "Page ${n}" [ref=r1]\n${'- item\n'.repeat(50)}`,
+        truncated: false,
+      },
+    ],
+    elements: [{ id: 'r1', pageId: 'page-1', frameId: 'f1', documentId: 'doc-1', role: 'heading', name: `Page ${n}` }],
+    changes: { basis: 'full_snapshot', navigated: false, newlyVisible: [], noLongerVisibleElementIds: [], updatedText: [] },
+  });
 }
 
-/** One inspect_page exchange: the assistant's call and the user's result. */
-function inspectTurn(n: number, content = inspectContent(n)): Message[] {
+/** One observe exchange: the assistant's call and the user's result. */
+function observeTurn(n: number, content = observeContent(n)): Message[] {
   return [
-    { role: 'assistant', content: [{ type: 'tool_use', id: `i${n}`, name: 'inspect_page', input: {} }] },
+    { role: 'assistant', content: [{ type: 'tool_use', id: `i${n}`, name: 'observe', input: {} }] },
     { role: 'user', content: [{ type: 'tool_result', tool_use_id: `i${n}`, content }] },
   ];
 }
 
-/** A conversation with `count` inspect exchanges after the task. */
+/** A conversation with `count` observe exchanges after the task. */
 function conversation(count: number): Message[] {
-  return [TASK, ...Array.from({ length: count }, (_, i) => inspectTurn(i + 1)).flat()];
+  return [TASK, ...Array.from({ length: count }, (_, i) => observeTurn(i + 1)).flat()];
 }
 
 function resultBlock(view: readonly Message[], messageIndex: number, blockIndex = 0): ToolResultBlock {
@@ -36,17 +56,17 @@ function resultBlock(view: readonly Message[], messageIndex: number, blockIndex 
 }
 
 describe('elideStaleInspectResults', () => {
-  it('matches the registry name of the real inspect_page tool', () => {
+  it('matches the registry name of the real observe tool', () => {
     // The view keys on this literal so the loop stays free of tool
     // implementations; this pin is what keeps the two from drifting apart.
-    expect(INSPECT_TOOL_NAME).toBe(inspectPageTool.name);
+    expect(OBSERVE_TOOL_NAME).toBe(observeTool.name);
   });
 
-  it('returns the conversation untouched (by identity) while inspections fit the kept window', () => {
+  it('returns the conversation untouched (by identity) while observations fit the kept window', () => {
     const none = [TASK];
     expect(elideStaleInspectResults(none)).toBe(none);
 
-    const two = conversation(KEPT_INSPECT_RESULTS);
+    const two = conversation(KEPT_OBSERVE_RESULTS);
     expect(elideStaleInspectResults(two)).toBe(two);
   });
 
@@ -60,7 +80,7 @@ describe('elideStaleInspectResults', () => {
     expect(stub.content).toContain(ELISION_MARKER);
     expect(stub.content).toContain('URL: https://site.test/page-1');
     expect(stub.content).toContain('Title: Page 1');
-    expect(stub.content).toContain('inspect_page again');
+    expect(stub.content).toContain('Run observe again');
     expect(stub.content).not.toContain('[ref=r1]');
 
     // ...the two most recent results and every other message are shared by
@@ -70,12 +90,12 @@ describe('elideStaleInspectResults', () => {
     for (const [index, message] of view.entries()) {
       if (index !== 2) expect(message).toBe(messages[index]);
     }
-    expect(resultBlock(messages, 2).content).toBe(inspectContent(1));
+    expect(resultBlock(messages, 2).content).toBe(observeContent(1));
   });
 
-  it('never stubs a failed inspection and never counts it toward the kept window', () => {
+  it('never stubs a failed observation and never counts it toward the kept window', () => {
     const error: Message[] = [
-      { role: 'assistant', content: [{ type: 'tool_use', id: 'e1', name: 'inspect_page', input: {} }] },
+      { role: 'assistant', content: [{ type: 'tool_use', id: 'e1', name: 'observe', input: {} }] },
       {
         role: 'user',
         content: [
@@ -85,38 +105,42 @@ describe('elideStaleInspectResults', () => {
     ];
     // Two successes then a failure: the failure is not the "third result",
     // so nothing goes stale.
-    const twoPlusError = [TASK, ...inspectTurn(1), ...inspectTurn(2), ...error];
+    const twoPlusError = [TASK, ...observeTurn(1), ...observeTurn(2), ...error];
     expect(elideStaleInspectResults(twoPlusError)).toBe(twoPlusError);
 
     // Three successes around a failure: the oldest success is stubbed, the
     // failure survives verbatim.
-    const threePlusError = [TASK, ...inspectTurn(1), ...error, ...inspectTurn(2), ...inspectTurn(3)];
+    const threePlusError = [TASK, ...observeTurn(1), ...error, ...observeTurn(2), ...observeTurn(3)];
     const view = elideStaleInspectResults(threePlusError);
     expect(resultBlock(view, 2).content).toContain(ELISION_MARKER);
     expect(view[4]).toBe(threePlusError[4]);
   });
 
   it('recovers the URL/title header from an offloaded result via its preview', () => {
+    // The offload envelope capResult.ts produces: `preview` is a
+    // byte-truncated prefix of the full observation JSON, cut mid-object —
+    // still readable for url/title since `page` is the first key.
+    const fullJson = observeContent(1);
     const offloaded = JSON.stringify({
-      preview: 'URL: https://site.test/big\nTitle: Big Page\n\n- heading',
-      offloadedTo: 'scratch/tool-output/inspect_page-1.txt',
+      preview: fullJson.slice(0, 200),
+      offloadedTo: 'scratch/tool-output/observe-1.txt',
       note: 'Output was 60000 bytes, over this tool’s 50000-byte limit.',
     });
-    const messages = [TASK, ...inspectTurn(1, offloaded), ...inspectTurn(2), ...inspectTurn(3)];
+    const messages = [TASK, ...observeTurn(1, offloaded), ...observeTurn(2), ...observeTurn(3)];
     const stub = resultBlock(elideStaleInspectResults(messages), 2);
-    expect(stub.content).toContain('URL: https://site.test/big');
-    expect(stub.content).toContain('Title: Big Page');
+    expect(stub.content).toContain('URL: https://site.test/page-1');
+    expect(stub.content).toContain('Title: Page 1');
   });
 
   it('omits the header — but still stubs — when none is recognizable', () => {
-    const messages = [TASK, ...inspectTurn(1, 'unexpected shape'), ...inspectTurn(2), ...inspectTurn(3)];
+    const messages = [TASK, ...observeTurn(1, 'unexpected shape'), ...observeTurn(2), ...observeTurn(3)];
     const stub = resultBlock(elideStaleInspectResults(messages), 2);
     expect(stub.content).toContain(ELISION_MARKER);
     expect(stub.content).not.toContain('URL:');
   });
 
-  it('keeps already-stubbed messages byte-identical as new inspections displace the window', () => {
-    // The prompt-cache property: a fourth inspection stubs the second
+  it('keeps already-stubbed messages byte-identical as new observations displace the window', () => {
+    // The prompt-cache property: a fourth observation stubs the second
     // result, and the first result's stubbed message re-serializes exactly
     // as it did the turn before.
     const viewOfThree = elideStaleInspectResults(conversation(3));
@@ -124,28 +148,28 @@ describe('elideStaleInspectResults', () => {
 
     expect(JSON.stringify(viewOfFour[2])).toBe(JSON.stringify(viewOfThree[2]));
     expect(resultBlock(viewOfFour, 4).content).toContain(ELISION_MARKER);
-    expect(resultBlock(viewOfFour, 6).content).toBe(inspectContent(3));
-    expect(resultBlock(viewOfFour, 8).content).toBe(inspectContent(4));
+    expect(resultBlock(viewOfFour, 6).content).toBe(observeContent(3));
+    expect(resultBlock(viewOfFour, 8).content).toBe(observeContent(4));
   });
 
-  it('stubs only the inspect result inside a mixed parallel batch', () => {
+  it('stubs only the observe result inside a mixed parallel batch', () => {
     const mixedBatch: Message[] = [
       {
         role: 'assistant',
         content: [
-          { type: 'tool_use', id: 'i1', name: 'inspect_page', input: {} },
+          { type: 'tool_use', id: 'i1', name: 'observe', input: {} },
           { type: 'tool_use', id: 'g1', name: 'grep', input: { pattern: 'x' } },
         ],
       },
       {
         role: 'user',
         content: [
-          { type: 'tool_result', tool_use_id: 'i1', content: inspectContent(1) },
+          { type: 'tool_result', tool_use_id: 'i1', content: observeContent(1) },
           { type: 'tool_result', tool_use_id: 'g1', content: 'scratch/notes.md:3:x marks it' },
         ],
       },
     ];
-    const messages = [TASK, ...mixedBatch, ...inspectTurn(2), ...inspectTurn(3)];
+    const messages = [TASK, ...mixedBatch, ...observeTurn(2), ...observeTurn(3)];
     const view = elideStaleInspectResults(messages);
 
     const batch = view[2] as UserMessage;

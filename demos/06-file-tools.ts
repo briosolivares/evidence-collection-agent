@@ -10,11 +10,11 @@ import { join } from 'node:path';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { fileTools } from '../src/tools/index.js';
+import { editFileTool, grepTool, readFileTool, writeFileTool } from '../src/tools/index.js';
 import { executeToolCall, type ToolCall } from '../src/tools/pipeline.js';
 import { createRegistry } from '../src/tools/registry.js';
 
-const registry = createRegistry(fileTools);
+const registry = createRegistry([readFileTool, writeFileTool, editFileTool, grepTool]);
 const runDir = createRunDir('runs', generateRunId('demo file-tools'));
 initManifest(runDir, 'demo: file tools through the pipeline');
 console.log(`created run dir: ${runDir}`);
@@ -29,7 +29,7 @@ async function demoCall(name: string, input: ToolCall['input']): Promise<void> {
 
 // 1. write_file: a deliverable lands in the run dir — and in the manifest.
 await demoCall('write_file', {
-  file_path: 'notes/observations.md',
+  file_path: 'scratch/notes/observations.md',
   content: [
     '# Observations',
     '',
@@ -40,12 +40,12 @@ await demoCall('write_file', {
 });
 
 // 2. read_file: line-numbered content back, whole file then a window.
-await demoCall('read_file', { file_path: 'notes/observations.md' });
-await demoCall('read_file', { file_path: 'notes/observations.md', offset: 3, limit: 2 });
+await demoCall('read_file', { file_path: 'scratch/notes/observations.md' });
+await demoCall('read_file', { file_path: 'scratch/notes/observations.md', offset: 3, limit: 2 });
 
 // 3. grep: pattern search across the run dir, results as path:line: match.
 await demoCall('grep', { pattern: 'tier' });
-await demoCall('grep', { pattern: 'price|Screenshot', path: 'notes' });
+await demoCall('grep', { pattern: 'price|Screenshot', path: 'scratch/notes' });
 
 // 4. Confinement: an escaping path comes back as a structured error the
 // model can read — nothing outside the run dir is ever touched.

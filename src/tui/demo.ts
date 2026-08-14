@@ -43,15 +43,17 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       500,
       "I'll start with recent funding coverage, then confirm the names against the primary filing.",
     ),
-    { delayMs: 400, action: { type: 'tool_pending', name: 'navigate' } },
+    { delayMs: 400, action: { type: 'tool_pending', name: 'browser_action' } },
     { delayMs: 300, action: { type: 'turn_end', usage: { input: 1200, output: 180 } } },
     {
       delayMs: 200,
       action: {
         type: 'tool_exec_start',
         id: 1,
-        name: 'navigate',
-        input: { url: 'https://techcrunch.com/2026/05/14/acme-series-b' },
+        name: 'browser_action',
+        input: {
+          actions: [{ op: 'navigate', url: 'https://techcrunch.com/2026/05/14/acme-series-b' }],
+        },
       },
     },
     { delayMs: 1400, action: { type: 'tool_exec_end', id: 1, ok: true, result: 'Loaded techcrunch.com — Acme Corp raises $85M Series B' } },
@@ -62,12 +64,12 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The coverage is up. Reading the page for investor names and capturing the article as evidence.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'inspect_page' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'observe' } },
     { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 3400, output: 240 } } },
     {
       delayMs: 200,
-      action: { type: 'tool_exec_start', id: 2, name: 'inspect_page', input: {} },
+      action: { type: 'tool_exec_start', id: 2, name: 'observe', input: {} },
     },
     { delayMs: 1200, action: { type: 'tool_exec_end', id: 2, ok: true, result: 'outline: article — "Acme Corp raises $85M Series B led by Meridian Growth"' } },
     {
@@ -104,22 +106,31 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The article names three investors — Meridian Growth, Halcyon Partners, and Northgate Capital. The filing should confirm the amounts.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'navigate' } },
-    { delayMs: 100, action: { type: 'tool_pending', name: 'click' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'browser_action' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'browser_action' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 4200, output: 260 } } },
     {
       delayMs: 200,
       action: {
         type: 'tool_exec_start',
         id: 4,
-        name: 'navigate',
-        input: { url: 'https://www.sec.gov/cgi-bin/browse-edgar?company=acme' },
+        name: 'browser_action',
+        input: {
+          actions: [
+            { op: 'navigate', url: 'https://www.sec.gov/cgi-bin/browse-edgar?company=acme' },
+          ],
+        },
       },
     },
     { delayMs: 1300, action: { type: 'tool_exec_end', id: 4, ok: true, result: 'Loaded sec.gov EDGAR company search' } },
     {
       delayMs: 150,
-      action: { type: 'tool_exec_start', id: 5, name: 'click', input: { ref: 'e42' } },
+      action: {
+        type: 'tool_exec_start',
+        id: 5,
+        name: 'browser_action',
+        input: { actions: [{ op: 'click', target: 'e42' }] },
+      },
     },
     {
       delayMs: 900,
@@ -137,13 +148,13 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The link moved after the page settled — re-inspecting, then capturing the filing and saving the confirmed list as evidence.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'inspect_page' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'observe' } },
     { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
     { delayMs: 100, action: { type: 'tool_pending', name: 'write_file' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 4300, output: 420 } } },
     {
       delayMs: 200,
-      action: { type: 'tool_exec_start', id: 6, name: 'inspect_page', input: {} },
+      action: { type: 'tool_exec_start', id: 6, name: 'observe', input: {} },
     },
     { delayMs: 1000, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'outline: Form D — Acme Corp, total offering $85,000,000' } },
     {

@@ -1,28 +1,43 @@
 /**
- * The agent's tool set, one directory per tool, grouped here in stable
- * registration order. `createRegistry` and `toApiToolDefs` depend on these
- * arrays being deterministic — reordering them changes the prompt prefix
- * and breaks prompt caching.
+ * The agent's tool set: one directory per tool, assembled here in one frozen
+ * order.
+ *
+ * The surface is declared as DATA, in one place, so the order that feeds the
+ * cached prompt prefix is reviewable and a snapshot test can pin it. Prompt
+ * caching is a byte-exact prefix match: reordering these names silently
+ * invalidates every cached prefix and re-pays the whole conversation at write
+ * rates, which is why the order is frozen rather than derived from whatever
+ * sequence the modules happen to be imported in.
+ *
+ * Tools whose construction needs run-scoped state (the contract store, the
+ * table store, the evidence store, a content reader) are FACTORIES, so they
+ * cannot appear in a static map. They are named in `V2_TOOL_ORDER` at their
+ * frozen positions and built by `runTask`; that array is the single authority
+ * on where each one goes.
+ *
+ * The file tools borrow Claude Code's shapes — tool and parameter names
+ * (file_path / offset / limit, pattern / path), cat -n style line-numbered
+ * reads, grep results one match per line — because the model has seen those
+ * exact contracts in training and uses familiar tools correctly more often.
+ * The implementations are minimal Node reimplementations confined to the run
+ * directory: every model-supplied path goes through `resolveRunPath`, and every
+ * write goes through `writeArtifact` so the manifest records it. Their shared
+ * error contract: a violated precondition (escaping path, missing file,
+ * invalid pattern) throws with a model-readable message, and the pipeline
+ * converts the throw into a structured error result, so callers never see an
+ * exception.
  */
 import { createRegistry, type ToolDef, type ToolRegistry } from './registry.js';
 
 import { askUserQuestionTool } from './askUserQuestion/askUserQuestion.js';
-import { browserBatchTool } from './browserBatch/browserBatch.js';
-import { observeTool } from './observe/observe.js';
 import { browserActionTool } from './browserAction/browserAction.js';
-import { switchPageTool } from './switchPage/switchPage.js';
-import { handleDialogTool } from './handleDialog/handleDialog.js';
-import { setOutputContractTool } from './setOutputContract/setOutputContract.js';
-import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
 import { editFileTool } from './editFile/editFile.js';
 import { grepTool } from './grep/grep.js';
-import { inspectPageTool } from './inspectPage/inspectPage.js';
-import { navigateTool } from './navigate/navigate.js';
+import { handleDialogTool } from './handleDialog/handleDialog.js';
+import { observeTool } from './observe/observe.js';
 import { readFileTool } from './readFile/readFile.js';
-import { screenshotTool } from './screenshot/screenshot.js';
-import { scrollTool } from './scroll/scroll.js';
-import { typeTool } from './type/type.js';
+import { setOutputContractTool } from './setOutputContract/setOutputContract.js';
 import { writeFileTool } from './writeFile/writeFile.js';
 
 export {
@@ -30,152 +45,38 @@ export {
   type AskUserAnswers,
   type AskUserQuestionInput,
 } from './askUserQuestion/askUserQuestion.js';
-export { clickTool } from './click/click.js';
-export {
-  browserBatchTool,
-  type BrowserBatchAction,
-  type BrowserBatchActionResult,
-  type BrowserBatchInput,
-  type BrowserBatchResult,
-} from './browserBatch/browserBatch.js';
-export { downloadTool, type DownloadInput } from './download/download.js';
-export { editFileTool, type EditFileResult } from './editFile/editFile.js';
 export {
   createBashTool,
   type BashInput,
   type BashResult,
   type BashToolDeps,
 } from './bash/bash.js';
+export { downloadTool, type DownloadInput } from './download/download.js';
+export { editFileTool, type EditFileResult } from './editFile/editFile.js';
 export { grepTool } from './grep/grep.js';
-export { inspectPageTool, type InspectPageInput } from './inspectPage/inspectPage.js';
-export { navigateTool, type NavigateInput } from './navigate/navigate.js';
 export { readFileTool } from './readFile/readFile.js';
-export { screenshotTool, type ScreenshotInput } from './screenshot/screenshot.js';
-export { scrollTool } from './scroll/scroll.js';
-export { typeTool } from './type/type.js';
+export {
+  createScreenshotTool,
+  type ScreenshotInput,
+  type ScreenshotToolDeps,
+} from './screenshot/screenshot.js';
 export { writeFileTool } from './writeFile/writeFile.js';
 export { type EvidenceResult } from './shared/evidence.js';
 
-// The three file tools borrow Claude Code's shapes — tool and parameter
-// names (file_path / offset / limit, pattern / path), cat -n style
-// line-numbered reads, grep results one match per line — because the model
-// has seen those exact contracts in training and uses familiar tools
-// correctly more often. The implementations are minimal Node reimplementations
-// confined to the run directory: every model-supplied path goes through
-// resolveRunPath, and every write goes through writeArtifact so the manifest
-// records it (the design's invisible-plumbing rule).
-//
-// Error contract shared by all three: a violated precondition (escaping
-// path, missing file, invalid pattern) throws with a model-readable message;
-// the pipeline (executeToolCall) converts the throw into a structured error
-// result, so callers never see an exception.
-
-/** The file tools in registration order, ready for `createRegistry`.
- *
- * `edit_file` sits between `write_file` and `grep`: create a file with
- * `write_file`, change one exact substring with `edit_file`. Inserting it here
- * rather than appending shifts `grep`'s position, which is a deliberate,
- * one-time prompt-prefix change — see the note on `createProductionRegistry`. */
-export const fileTools: readonly ToolDef[] = [
-  readFileTool as ToolDef,
-  writeFileTool as ToolDef,
-  editFileTool as ToolDef,
-  grepTool as ToolDef,
-];
-
-/** Browser observation tools in stable registration order. */
-export const observationTools: readonly ToolDef[] = [
-  navigateTool,
-  inspectPageTool,
-];
-
-/** The state-changing browser action tools in stable registration order. */
-export const actionTools: readonly ToolDef[] = [clickTool, typeTool, scrollTool];
-
-/** Browser evidence tools in stable registration order. */
-export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
-
-/** User-interaction tools in stable registration order. Only these pass
- * through the pipeline's permission gate; headless environments fail them
- * closed. */
-export const interactionTools: readonly ToolDef[] = [
-  askUserQuestionTool as ToolDef,
-];
-
-/** Deterministic model/runtime tool surfaces used by production entry points. */
-export type ToolProfile = 'atomic' | 'batch-enabled';
-
-/** The regression-safe production default during the browser-batch experiment. */
-export const DEFAULT_TOOL_PROFILE: ToolProfile = 'atomic';
-
 /**
- * Build one complete production registry. The atomic profile keeps the browser
- * tools and their exact order (plus the appended auth tools); the treatment
- * appends the composite browser tool without replacing any atomic capability.
- *
- * `bash` is a FACTORY (it closes over the run's secret-env denylist), so it
- * cannot live in a static array like the others. The caller passes the built
- * tool in and it lands directly after the file tools; a caller that supplies
- * none gets a registry WITHOUT `bash`, mirroring `createV2Registry`'s rule that
- * a tool whose dependencies are unavailable is omitted rather than registered
- * broken. `runTask` always supplies it, so production runs always have it.
- *
- * Both this order and V2_TOOL_ORDER changed once, deliberately, when
- * `edit_file` and `bash` were added. Prompt caching is a byte-exact prefix
- * match, so that change re-paid every cached conversation once and made
- * earlier eval baselines non-comparable. Both orders are pinned by tests; if
- * one fails, the question is whether the reorder was intended.
- *
- * @param profile - which browser surface to expose
- * @param opts.bash - the run-scoped `bash` tool, omitted when unavailable
- */
-export function createProductionRegistry(
-  profile: ToolProfile = DEFAULT_TOOL_PROFILE,
-  opts: { bash?: ToolDef } = {},
-): ToolRegistry {
-  return createRegistry([
-    ...fileTools,
-    ...(opts.bash === undefined ? [] : [opts.bash]),
-    ...observationTools,
-    ...actionTools,
-    ...evidenceTools,
-    ...interactionTools,
-    ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
-  ]);
-}
-
-// --- T16: the frozen V2 tool order -------------------------------------------
-//
-// The V2 surface is declared as DATA, in one place, so the order that feeds the
-// cached prompt prefix is reviewable and a snapshot test can pin it. Prompt
-// caching is a byte-exact prefix match: reordering these names silently
-// invalidates every cached prefix and re-pays the whole conversation at write
-// rates, which is why the order is frozen rather than derived from whatever
-// sequence the modules happen to be imported in.
-//
-// Tools whose construction needs run-scoped state (the contract store, the
-// table store, the evidence store, a browser reader) are FACTORIES, so they
-// cannot appear in a static array. They are named here in their frozen
-// positions and built by runTask; V2_TOOL_ORDER is the authority on where each
-// one goes.
-
-/**
- * Every V2 production tool name, in the exact order the registry must build
- * them. `set_output_contract` is first because it gates everything else, and
+ * Every production tool name, in the exact order the registry must build them.
+ * `set_output_contract` is first because it gates everything else, and
  * `submit_for_verification` is last because it ends the run.
  */
 export const V2_TOOL_ORDER: readonly string[] = [
   // The contract gate.
   'set_output_contract',
   // Typed output construction.
-  'upsert_output_rows',
-  'delete_output_rows',
-  'set_table_completeness',
+  'update_table',
   'write_document',
   // Observation and action.
   'observe',
   'browser_action',
-  'switch_page',
   'handle_dialog',
   'execute_javascript',
   // Reading the world.
@@ -201,39 +102,40 @@ export const V2_TOOL_ORDER: readonly string[] = [
 ];
 
 /**
- * The V2 tools that are plain definitions, keyed by name — everything not
- * requiring run-scoped construction. runTask merges these with the factories
- * it builds, ordered by V2_TOOL_ORDER.
+ * The tools that are plain definitions, keyed by name — everything not
+ * requiring run-scoped construction. `runTask` merges these with the factories
+ * it builds, ordered by `V2_TOOL_ORDER`.
  */
 export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, ToolDef>([
   // Browser tools that take their session from ToolCtx and so need no
   // run-scoped construction.
   ['observe', observeTool as ToolDef],
   ['browser_action', browserActionTool as ToolDef],
-  ['switch_page', switchPageTool as ToolDef],
   ['handle_dialog', handleDialogTool as ToolDef],
   ['set_output_contract', setOutputContractTool as ToolDef],
-  ['screenshot', screenshotTool],
   ['download', downloadTool],
   ['read_file', readFileTool as ToolDef],
   ['write_file', writeFileTool as ToolDef],
   ['edit_file', editFileTool as ToolDef],
   ['grep', grepTool as ToolDef],
-  // NOTE: 'bash' is deliberately absent — it is a factory, so runTask builds
-  // it and supplies it as a run-scoped tool at its frozen position.
+  // NOTE: 'bash' and 'screenshot' are deliberately absent — both are
+  // factories (bash closes over the secret-env denylist, screenshot over the
+  // output contract), so runTask builds them and supplies them as run-scoped
+  // tools at their frozen positions.
   ['ask_user_question', askUserQuestionTool as ToolDef],
 ]);
 
 /**
- * Assemble a V2 registry from the static tools plus whatever run-scoped tools
- * the caller built, ordered by V2_TOOL_ORDER.
+ * Assemble the registry from the static tools plus whatever run-scoped tools
+ * the caller built, ordered by `V2_TOOL_ORDER`.
  *
  * @param runScopedTools - factory-built tools, keyed by name
- * @returns a registry whose iteration order matches V2_TOOL_ORDER, skipping
+ * @returns a registry whose iteration order matches `V2_TOOL_ORDER`, skipping
  *   names the caller did not supply. Skipping rather than throwing is
- *   deliberate: a run legitimately omits tools it cannot use (no credentials,
- *   no research runner), and the order of what remains must still be stable
- * @throws if a supplied tool's name is absent from V2_TOOL_ORDER — that means
+ *   deliberate: a run legitimately omits a tool whose capability its session
+ *   cannot provide (no page scripting, no PDF page source), and the order of
+ *   what remains must still be stable
+ * @throws if a supplied tool's name is absent from `V2_TOOL_ORDER` — that means
  *   a new tool was added without deciding where it belongs, which would let
  *   its position drift and break the cached prefix
  */

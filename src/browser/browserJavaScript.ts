@@ -55,15 +55,16 @@ export const DEFAULT_JAVASCRIPT_TIMEOUT_MS = 5_000;
 export const MAX_JAVASCRIPT_TIMEOUT_MS = 30_000;
 
 /**
- * The early (T6) JavaScript request. `target` is a required literal, not an
- * optional page/frame id: T10 adds real page/frame/document targeting, and
- * an optional field now would silently mean "whatever is selected" in code
- * written against the later, explicit model.
+ * The early (T6) JavaScript request. `pageId` names the page whose top
+ * document runs the snippet; omitted means the selected page — the same
+ * optional-`pageId` convention every other page-addressable request in this
+ * codebase (observe, browserAction, captureText) already uses. Frame- and
+ * document-level targeting within a page remain future work (T10).
  */
 export interface EarlyJavaScriptRequest {
-  /** The only target this early schema supports: the top document of the
-   * currently selected page. */
-  target: 'selected_top_document';
+  /** Page whose top document runs the snippet; omitted means the selected
+   * page. */
+  pageId?: string;
   /** Complete JavaScript to evaluate; its completion value is returned. */
   code: string;
   /** Already-clamped hard deadline in milliseconds. Never the raw
@@ -227,8 +228,9 @@ export function describeJavaScriptPolicyDecision(
  * @param timeoutMs - the already-bounded deadline in milliseconds; must be a
  *   positive safe integer no greater than {@link MAX_JAVASCRIPT_TIMEOUT_MS}
  *   (safe-integer implies finite, so NaN and Infinity are rejected)
- * @returns the request naming the only T6 target, so the literal lives in
- *   exactly one place as T10 widens targeting
+ * @param pageId - page whose top document runs the snippet; omitted means
+ *   the selected page
+ * @returns the engine-level request
  * @throws TypeError for blank code, or a `timeoutMs` that is not a positive
  *   safe integer within the ceiling. These duplicate the tool's zod schema
  *   deliberately: this is the seam every future caller (batch tools,
@@ -238,6 +240,7 @@ export function describeJavaScriptPolicyDecision(
 export function toEarlyJavaScriptRequest(
   code: string,
   timeoutMs: number,
+  pageId?: string,
 ): EarlyJavaScriptRequest {
   if (code.trim() === '') {
     throw new TypeError('code must be a non-empty JavaScript snippet');
@@ -250,7 +253,7 @@ export function toEarlyJavaScriptRequest(
       `timeoutMs must be at most ${MAX_JAVASCRIPT_TIMEOUT_MS}ms: ${String(timeoutMs)}`,
     );
   }
-  return { target: 'selected_top_document', code, timeoutMs };
+  return { ...(pageId !== undefined ? { pageId } : {}), code, timeoutMs };
 }
 
 /**

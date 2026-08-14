@@ -11,20 +11,20 @@ import { resolveRunPath } from '../run/runDir.js';
 // quoting, and formatting are derived from the contract, so a model that
 // drifts mid-run cannot silently change the artifact's structure.
 //
-// Three properties this store guarantees, each tested directly:
+// There is exactly one way to mutate a table: `updateTable`, which applies
+// any combination of an upsert, a delete, and a completeness record as one
+// atomic call. Three properties this store guarantees, each tested directly:
 //
-//  1. Atomic upserts. A batch validates completely before anything mutates,
-//     so a partially-wrong batch leaves the table exactly as it was. A model
-//     retrying after an error must never find half its previous attempt
-//     applied.
-//  2. Versioned rows. Every row carries a monotonically increasing version,
-//     and a caller may pass `expectedVersion` to detect a lost update. A
-//     conflict changes nothing and reports the current version.
-//  3. Evidence-linked facts. Every factual row must cite at least one
+//  1. Atomic batches. Every section supplied to a call is validated against
+//     the pre-call state before any of them apply, so a bad section can
+//     never leave a good section's change in place, and a partially-wrong
+//     call leaves the table exactly as it was. A model retrying after an
+//     error must never find half its previous attempt applied.
+//  2. Evidence-linked facts. Every factual row must cite at least one
 //     Evidence ID, and the store rejects IDs that do not exist. A row nobody
 //     can trace to a source is exactly the kind of plausible fabrication the
 //     whole architecture exists to prevent.
-//  4. Optional durability. Without a `runDir` the store is exactly what it
+//  3. Optional durability. Without a `runDir` the store is exactly what it
 //     always was: purely in-memory. With one, every successful mutation
 //     writes that table's whole current state to
 //     `scratch/tables/<outputId>.json`, so a resume can rebuild the same
@@ -49,8 +49,6 @@ export interface OutputRow {
   values: Record<string, string | number | boolean | null>;
   /** Evidence records supporting this row's facts; at least one. */
   evidenceIds: string[];
-  /** Monotonically increasing per row, starting at 1. */
-  version: number;
 }
 
 /** Proof that a count-ruled table enumerates its whole population. Required
@@ -82,32 +80,34 @@ export interface OutputTable {
 export interface TableMutationRejected {
   ok: false;
   errors: [string, ...string[]];
-  /** Current versions of the rows a conflict was detected on. */
-  currentVersions?: Record<string, number>;
 }
 
-/** An applied mutation. */
-export interface TableMutationApplied {
-  ok: true;
-  /** Rows created by this call. */
-  created: string[];
-  /** Rows updated by this call. */
-  updated: string[];
-  /** Row count after the mutation. */
-  rowCount: number;
-}
-
-export type TableMutationResult = TableMutationApplied | TableMutationRejected;
-
-/** One row as proposed by a caller (version is assigned by the store). */
+/** One row as proposed by a caller. */
 export interface OutputRowInput {
   rowId: string;
   values: Record<string, string | number | boolean | null>;
   evidenceIds: string[];
-  /** When given, the mutation applies only if the stored row is at this
-   * version — a lost-update guard for concurrent research jobs (T14). */
-  expectedVersion?: number;
 }
+
+/** Any combination of the three mutation kinds, applied by `updateTable` as
+ * one atomic call — see that method's doc for the atomicity mechanism. */
+export interface TableUpdateSections {
+  upsert?: { rows: readonly OutputRowInput[] };
+  delete?: { rowIds: readonly string[] };
+  completeness?: TableCompletenessEvidence;
+}
+
+/** An applied `updateTable` call. `deleted` is reported separately from
+ * `updated` since a single call may do both. */
+export interface TableUpdateApplied {
+  ok: true;
+  created: string[];
+  updated: string[];
+  deleted: string[];
+  rowCount: number;
+}
+
+export type TableUpdateResult = TableUpdateApplied | TableMutationRejected;
 
 /** The run's tables, created lazily from contract table specs. */
 export interface OutputTableStore {
@@ -117,15 +117,12 @@ export interface OutputTableStore {
   table(outputId: string): OutputTable;
   /** Every table that has been touched, in creation order. */
   tables(): OutputTable[];
-  /** Validate and apply a batch of rows atomically. */
-  upsertOutputRows(outputId: string, rows: readonly OutputRowInput[]): TableMutationResult;
-  /** Delete rows by id. Unknown ids are an error and nothing is deleted. */
-  deleteOutputRows(outputId: string, rowIds: readonly string[]): TableMutationResult;
-  /** Record a table's completeness proof. */
-  setTableCompleteness(
-    outputId: string,
-    evidence: TableCompletenessEvidence,
-  ): TableMutationResult;
+  /** Apply any combination of an upsert, a delete, and a completeness record
+   * as ONE atomic call: every section supplied is validated against the
+   * table's state before the call started, and only if every section is
+   * valid does any of them apply. A bad delete alongside a good upsert
+   * therefore leaves the table completely unchanged, not half-upserted. */
+  updateTable(outputId: string, sections: TableUpdateSections): TableUpdateResult;
 }
 
 /** What the store needs from the run to validate rows. */
@@ -158,10 +155,8 @@ export function createOutputTableStore(deps: OutputTableStoreDeps): OutputTableS
   //
   // Suspended while `restoreOutputTableStore` replays a snapshot: those
   // writes would be pure waste, since each one rewrites the whole table AND
-  // the manifest to arrive at bytes already on disk — and replay re-applies
-  // a row once per version it accumulated, so a 30-row table whose rows
-  // averaged three edits would rewrite the manifest ninety times to
-  // reproduce the file it was reading.
+  // the manifest to arrive at bytes already on disk that replay is simply
+  // reading back in.
   let replaying = false;
 
   const persist = (current: OutputTable): void => {
@@ -190,137 +185,145 @@ export function createOutputTableStore(deps: OutputTableStoreDeps): OutputTableS
     return existing;
   };
 
+  // Each mutation kind below is split into a VALIDATE step (pure — reads
+  // `current`, never writes it) and an APPLY step (mutates `current`,
+  // assuming validation already passed). `updateTable` is what the split is
+  // FOR: it runs every section's validate step against the same untouched
+  // `current` before running any section's apply step, so a multi-section
+  // call is atomic across sections, not just within one.
+
+  const validateUpsert = (
+    spec: Extract<OutputSpec, { kind: 'table' }>,
+    rows: readonly OutputRowInput[],
+  ): string[] => {
+    if (rows.length === 0) return ['no rows supplied'];
+    const errors: string[] = [];
+    const seenIds = new Set<string>();
+    for (const row of rows) {
+      const label = `row "${row.rowId}"`;
+      if (typeof row.rowId !== 'string' || row.rowId.trim() === '') {
+        errors.push('every row needs a non-empty rowId');
+        continue;
+      }
+      if (seenIds.has(row.rowId)) {
+        errors.push(`${label} appears twice in one batch`);
+      }
+      seenIds.add(row.rowId);
+
+      errors.push(...validateRowValues(spec, row, label));
+      errors.push(...validateRowEvidence(deps, row, label));
+    }
+    return errors;
+  };
+
+  const applyUpsert = (
+    current: OutputTable,
+    rows: readonly OutputRowInput[],
+  ): { created: string[]; updated: string[] } => {
+    const created: string[] = [];
+    const updated: string[] = [];
+    for (const row of rows) {
+      const index = current.rows.findIndex((candidate) => candidate.rowId === row.rowId);
+      const stored: OutputRow = { rowId: row.rowId, values: { ...row.values }, evidenceIds: [...row.evidenceIds] };
+      if (index >= 0) {
+        current.rows[index] = stored;
+        updated.push(row.rowId);
+      } else {
+        current.rows.push(stored);
+        created.push(row.rowId);
+      }
+    }
+    return { created, updated };
+  };
+
+  const validateDelete = (current: OutputTable, rowIds: readonly string[]): string[] => {
+    if (rowIds.length === 0) return ['no rowIds supplied'];
+    const missing = rowIds.filter((rowId) => !current.rows.some((row) => row.rowId === rowId));
+    if (missing.length > 0) return [`unknown rowId(s): ${missing.join(', ')}`];
+    return [];
+  };
+
+  const applyDelete = (current: OutputTable, rowIds: readonly string[]): string[] => {
+    const removing = new Set(rowIds);
+    current.rows = current.rows.filter((row) => !removing.has(row.rowId));
+    return [...removing];
+  };
+
+  const validateCompleteness = (evidence: TableCompletenessEvidence): string[] => {
+    const errors: string[] = [];
+    if (typeof evidence.method !== 'string' || evidence.method.trim() === '') {
+      errors.push('completeness evidence needs a non-empty method');
+    }
+    if (!Array.isArray(evidence.evidenceIds) || evidence.evidenceIds.length === 0) {
+      errors.push('completeness evidence needs at least one evidence id');
+    } else {
+      for (const id of evidence.evidenceIds) {
+        if (!deps.evidenceExists(id)) {
+          errors.push(`completeness evidence cites unknown evidence id "${id}"`);
+        }
+      }
+    }
+    if (
+      evidence.statedTotal !== undefined &&
+      (!Number.isInteger(evidence.statedTotal) || evidence.statedTotal < 0)
+    ) {
+      errors.push(
+        `completeness statedTotal must be a non-negative integer, got ${evidence.statedTotal}`,
+      );
+    }
+    return errors;
+  };
+
+  const applyCompleteness = (current: OutputTable, evidence: TableCompletenessEvidence): void => {
+    current.completeness = {
+      method: evidence.method,
+      evidenceIds: [...evidence.evidenceIds],
+      ...(evidence.statedTotal !== undefined ? { statedTotal: evidence.statedTotal } : {}),
+      ...(evidence.limitations !== undefined ? { limitations: [...evidence.limitations] } : {}),
+    };
+  };
+
   const store: OutputTableStore = {
     table,
     tables: () => [...tables.values()],
 
-    upsertOutputRows(outputId, rows): TableMutationResult {
+    updateTable(outputId, sections): TableUpdateResult {
       const spec = requireSpec(outputId);
       const current = table(outputId);
+
+      // Validate every supplied section against `current` BEFORE applying
+      // any of them. This — not "apply in order, roll back on failure" — is
+      // what makes the call atomic across sections: nothing here mutates
+      // `current`, so there is nothing to undo, and no intermediate state is
+      // ever persisted to disk for a call that ultimately fails. A rollback
+      // approach would need to re-apply (and re-persist) a compensating
+      // mutation after the fact, which cannot undo a crash landing between
+      // the failed section and the rollback; validating first has no such
+      // window because the table is never touched until every section here
+      // is already known-good.
       const errors: string[] = [];
-      const conflicts: Record<string, number> = {};
-
-      if (rows.length === 0) {
-        return { ok: false, errors: ['no rows supplied'] };
-      }
-
-      const seenIds = new Set<string>();
-      for (const row of rows) {
-        const label = `row "${row.rowId}"`;
-        if (typeof row.rowId !== 'string' || row.rowId.trim() === '') {
-          errors.push('every row needs a non-empty rowId');
-          continue;
-        }
-        if (seenIds.has(row.rowId)) {
-          errors.push(`${label} appears twice in one batch`);
-        }
-        seenIds.add(row.rowId);
-
-        errors.push(...validateRowValues(spec, row, label));
-        errors.push(...validateRowEvidence(deps, row, label));
-
-        const stored = current.rows.find((candidate) => candidate.rowId === row.rowId);
-        if (row.expectedVersion !== undefined) {
-          const actual = stored?.version ?? 0;
-          if (actual !== row.expectedVersion) {
-            errors.push(
-              `${label} expected version ${row.expectedVersion} but the stored version is ${actual}`,
-            );
-            conflicts[row.rowId] = actual;
-          }
-        }
-      }
-
-      if (errors.length > 0) {
-        // Atomic: nothing above mutated anything.
-        return {
-          ok: false,
-          errors: errors as [string, ...string[]],
-          ...(Object.keys(conflicts).length > 0 ? { currentVersions: conflicts } : {}),
-        };
-      }
-
-      const created: string[] = [];
-      const updated: string[] = [];
-      for (const row of rows) {
-        const index = current.rows.findIndex((candidate) => candidate.rowId === row.rowId);
-        if (index >= 0) {
-          const previous = current.rows[index]!;
-          current.rows[index] = {
-            rowId: row.rowId,
-            values: { ...row.values },
-            evidenceIds: [...row.evidenceIds],
-            version: previous.version + 1,
-          };
-          updated.push(row.rowId);
-        } else {
-          current.rows.push({
-            rowId: row.rowId,
-            values: { ...row.values },
-            evidenceIds: [...row.evidenceIds],
-            version: 1,
-          });
-          created.push(row.rowId);
-        }
-      }
-      persist(current);
-      return { ok: true, created, updated, rowCount: current.rows.length };
-    },
-
-    deleteOutputRows(outputId, rowIds): TableMutationResult {
-      requireSpec(outputId);
-      const current = table(outputId);
-      if (rowIds.length === 0) return { ok: false, errors: ['no rowIds supplied'] };
-
-      const missing = rowIds.filter(
-        (rowId) => !current.rows.some((row) => row.rowId === rowId),
-      );
-      if (missing.length > 0) {
-        return {
-          ok: false,
-          errors: [`unknown rowId(s): ${missing.join(', ')}`],
-        };
-      }
-      const removing = new Set(rowIds);
-      current.rows = current.rows.filter((row) => !removing.has(row.rowId));
-      persist(current);
-      return { ok: true, created: [], updated: [...removing], rowCount: current.rows.length };
-    },
-
-    setTableCompleteness(outputId, evidence): TableMutationResult {
-      requireSpec(outputId);
-      const current = table(outputId);
-      const errors: string[] = [];
-      if (typeof evidence.method !== 'string' || evidence.method.trim() === '') {
-        errors.push('completeness evidence needs a non-empty method');
-      }
-      if (!Array.isArray(evidence.evidenceIds) || evidence.evidenceIds.length === 0) {
-        errors.push('completeness evidence needs at least one evidence id');
-      } else {
-        for (const id of evidence.evidenceIds) {
-          if (!deps.evidenceExists(id)) {
-            errors.push(`completeness evidence cites unknown evidence id "${id}"`);
-          }
-        }
-      }
-      if (
-        evidence.statedTotal !== undefined &&
-        (!Number.isInteger(evidence.statedTotal) || evidence.statedTotal < 0)
-      ) {
-        errors.push(
-          `completeness statedTotal must be a non-negative integer, got ${evidence.statedTotal}`,
-        );
-      }
+      if (sections.upsert !== undefined) errors.push(...validateUpsert(spec, sections.upsert.rows));
+      if (sections.delete !== undefined) errors.push(...validateDelete(current, sections.delete.rowIds));
+      if (sections.completeness !== undefined) errors.push(...validateCompleteness(sections.completeness));
       if (errors.length > 0) return { ok: false, errors: errors as [string, ...string[]] };
 
-      current.completeness = {
-        method: evidence.method,
-        evidenceIds: [...evidence.evidenceIds],
-        ...(evidence.statedTotal !== undefined ? { statedTotal: evidence.statedTotal } : {}),
-        ...(evidence.limitations !== undefined ? { limitations: [...evidence.limitations] } : {}),
-      };
+      let created: string[] = [];
+      let updated: string[] = [];
+      let deleted: string[] = [];
+      if (sections.upsert !== undefined) {
+        ({ created, updated } = applyUpsert(current, sections.upsert.rows));
+      }
+      if (sections.delete !== undefined) {
+        deleted = applyDelete(current, sections.delete.rowIds);
+      }
+      if (sections.completeness !== undefined) {
+        applyCompleteness(current, sections.completeness);
+      }
+      // One persist for the whole call, not one per section — the snapshot
+      // is the table's whole state regardless, so writing it three times
+      // would just triplicate identical disk/manifest I/O.
       persist(current);
-      return { ok: true, created: [], updated: [], rowCount: current.rows.length };
+      return { ok: true, created, updated, deleted, rowCount: current.rows.length };
     },
   };
 
@@ -353,14 +356,13 @@ const replayRunners = new WeakMap<OutputTableStore, (replay: () => void) => void
  *
  * Snapshots are found through the manifest — the run's authority on which
  * files are real — never by scanning `scratch/tables/` directly. Each one is
- * replayed through the store's own public mutation path
- * (`upsertOutputRows`, then `setTableCompleteness`): the restored store is
- * therefore incapable of holding a row the live store would have rejected.
- * A row's version is reproduced by re-applying its final values once per
- * version it accumulated — every one of those calls goes through the same
- * validation as a live call, it only ever advances the row's version
- * counter, so a row a live store would reject fails on the first
- * application, before any wrong version is recorded.
+ * replayed through the store's own public mutation path, `updateTable`: the
+ * restored store is therefore incapable of holding a row the live store
+ * would have rejected. Each snapshot's rows carry only their final values
+ * already — a snapshot is the table's whole current state, not a change
+ * log — so one `updateTable` call per table reproduces it exactly, and that
+ * call goes through the same validation as a live call, so a row a live
+ * store would reject fails the same way on restore.
  *
  * @param deps - same as {@link createOutputTableStore}, but `runDir` is
  *   required: restoring only makes sense against a run directory that has
@@ -388,8 +390,8 @@ export function restoreOutputTableStore(
     .sort((a, b) => a.outputId.localeCompare(b.outputId));
 
   // Replay writes nothing back: the snapshots being read ARE the persisted
-  // state, so re-persisting each intermediate version would rewrite the
-  // manifest many times over to reproduce bytes already on disk.
+  // state, so re-persisting after every row applied during replay would
+  // rewrite the manifest once per row to reproduce bytes already on disk.
   const runReplay = replayRunners.get(store);
   if (runReplay === undefined) {
     throw new Error('output table store was not built by createOutputTableStore');
@@ -406,36 +408,35 @@ export function restoreOutputTableStore(
 }
 
 /** Replay one table's snapshot into `store` through its public mutation
- * methods only — see {@link restoreOutputTableStore}. */
+ * path, `updateTable`, only — see {@link restoreOutputTableStore}. A
+ * snapshot's rows are already deduplicated to their final values (it is the
+ * table's whole state, not a change log), so one call reproduces the whole
+ * table; an empty `rows` array is omitted rather than sent as an upsert
+ * section, since an upsert of zero rows is itself a validation error. */
 function replaySnapshot(store: OutputTableStore, outputId: string, snapshot: OutputTable): void {
-  for (const row of snapshot.rows) {
-    const input: OutputRowInput = {
-      rowId: row.rowId,
-      values: row.values,
-      evidenceIds: row.evidenceIds,
+  const sections: TableUpdateSections = {};
+  if (snapshot.rows.length > 0) {
+    sections.upsert = {
+      rows: snapshot.rows.map(
+        (row): OutputRowInput => ({
+          rowId: row.rowId,
+          values: row.values,
+          evidenceIds: row.evidenceIds,
+        }),
+      ),
     };
-    // Re-applying the same values `version` times reproduces that exact
-    // version through the public API alone — no direct write to the
-    // internal map is needed or allowed.
-    for (let applied = 0; applied < row.version; applied += 1) {
-      const result = store.upsertOutputRows(outputId, [input]);
-      if (!result.ok) {
-        throw new Error(
-          `cannot restore output table "${outputId}": row "${row.rowId}" no longer validates — ` +
-            result.errors.join('; '),
-        );
-      }
-    }
   }
-
   if (snapshot.completeness !== undefined) {
-    const result = store.setTableCompleteness(outputId, snapshot.completeness);
-    if (!result.ok) {
-      throw new Error(
-        `cannot restore output table "${outputId}": completeness evidence no longer validates — ` +
-          result.errors.join('; '),
-      );
-    }
+    sections.completeness = snapshot.completeness;
+  }
+  if (sections.upsert === undefined && sections.completeness === undefined) return;
+
+  const result = store.updateTable(outputId, sections);
+  if (!result.ok) {
+    throw new Error(
+      `cannot restore output table "${outputId}": snapshot no longer validates — ` +
+        result.errors.join('; '),
+    );
   }
 }
 

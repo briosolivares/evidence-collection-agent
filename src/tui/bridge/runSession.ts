@@ -2,54 +2,58 @@
 // the TUI's single ordered UiEvent stream, with Esc-able cancellation —
 // all with zero agent-core changes (R11).
 //
-// The load-bearing seam: passing `config.callModel` to runTask silently
-// bypasses `config.onProgress` (the core only wires onProgress into its
-// *default* client). This module's injected callModel therefore re-emits
-// the progress events itself — turn_start, text_delta, tool_use_start (as
-// tool_pending), turn_end — around the same strict ModelDriver runTask's
-// default client uses (createAnthropicModelDriver): TUI and non-TUI
-// callers differ only in callbacks and cancellation, never in request or
-// acceptance semantics. Aborting rejects the in-flight model call; the
-// error propagates out of the loop (no interior catch) through runTask's
-// `finally` (tab closed, manifest finalized) and rejects the runTask
-// promise. Deltas from an attempt the driver later rejects are ephemeral
+// This module drives every run through runTask's OWN production model
+// client: it forwards `onProgress` (mapped to UiEvent below), `signal`, and
+// `createStream` into RunTaskConfig and lets runTask build and own the
+// client, rather than injecting a second hand-rolled one. That used to be
+// impossible — runTask built its own `makeCallModel` client whenever
+// `config.callModel` was omitted, but did not forward `config.signal` into
+// it, so an aborted signal reached only tool execution
+// (`ToolCtx.abortSignal`), never an in-flight model request. Fixed on the
+// `RunTaskConfig`/`ResumeTaskConfig` side (see runTask.ts): both now accept
+// `signal` and `createStream` and thread them into every model role they
+// build. With that gap closed, this module no longer needs its own
+// `callModel`, which also means the run drives through runTask's REAL tool
+// surface (`update_table`, `write_document`, `execute_javascript`,
+// `capture_text`, `inspect_document`, and the run-scoped stores they need)
+// instead of the best-effort approximation a locally-built registry could
+// offer.
+//
+// Progress mapping is a straight passthrough of `ProgressEvent` (see
+// model/callModel.ts) onto this module's `UiEvent`s: turn_start →
+// turn_start; text_delta → text_delta; tool_use_start → tool_pending;
+// turn_end → turn_end with usage read off the response's `Usage`. `retry`
+// is intentionally dropped (no corresponding UiEvent exists). Aborting
+// rejects the in-flight model call; the error propagates out of the loop
+// (no interior catch) through runTask's `finally` (tab closed, manifest
+// finalized) and rejects the runTask promise — this module's outer `catch`
+// then maps ANY rejection observed after `controller.abort()` to
+// `run_cancelled`, regardless of the error's shape, so it does not depend
+// on a particular AbortError normalization happening inside the model
+// client. Deltas from an attempt the driver later rejects are ephemeral
 // live output only — rejected attempts never reach the transcript or the
 // conversation.
 
-import type Anthropic from '@anthropic-ai/sdk';
-
 import type { BrowserController } from '../../browser/controller.js';
-import type { CallModel } from '../../loop/messages.js';
-import { runTask, type RunTaskConfig, type RunTaskResult } from '../../cli/runTask.js';
-import { SYSTEM_PROMPT } from '../../cli/systemPrompt.js';
-import { DEFAULT_MODEL } from '../../model/callModel.js';
-import { createAnthropicModelDriver } from '../../model/modelDriver.js';
-import type { ModelStreamEvent } from '../../model/streamAssembly.js';
+import {
+  runTask,
+  type HarnessConfig,
+  type RunTaskConfig,
+  type RunTaskResult,
+} from '../../cli/runTask.js';
+import type { ProgressEvent } from '../../model/callModel.js';
+import type { ModelDriverConfig } from '../../model/modelDriver.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
-import {
-  createBashTool,
-  createProductionRegistry,
-  DEFAULT_TOOL_PROFILE,
-  type ToolProfile,
-} from '../../tools/index.js';
-import {
-  toApiToolDefs,
-  type PermissionDecision,
-  type PermissionRequest,
-} from '../../tools/registry.js';
+import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 
-// Mirrors the core's (module-private) per-call output-token default.
-const MAX_OUTPUT_TOKENS = 8_192;
-
 /** How a bridged run ended, for callers awaiting `done`. `verified` and
- * `incomplete` arrive only from harness-mode runs (the TUI's interactive
- * runs are judge-less today); incomplete is an early stop with the run
- * preserved, kept distinct from `failed` (a runtime crash). */
+ * `incomplete` are the only outcomes `runTask` itself can produce (every
+ * run now goes through the initializer → worker → verifier harness);
+ * `incomplete` is an early stop with the run preserved, kept distinct from
+ * `failed` (a runtime crash outside the harness's own accounting). */
 export type RunOutcome =
-  | { status: 'completed'; finalText: string; runDir: string }
-  | { status: 'budget_exceeded'; reason: string; runDir: string }
   | { status: 'verified'; finalText: string; runDir: string }
   | { status: 'incomplete'; reason: string; runDir: string }
   | { status: 'cancelled' }
@@ -72,10 +76,17 @@ export interface RunSessionDeps {
   onEvent: (event: UiEvent) => void;
   runsBaseDir?: string;
   model?: string;
-  toolProfile?: ToolProfile;
   maxTurns?: number;
   maxContextTokens?: number;
   startUrl?: string;
+  /** Tuning for the initializer → worker → verifier harness every run now
+   * goes through; forwarded to `runTask` verbatim. Omitted — the
+   * production default — gets every default (a live initializer call,
+   * three worker cycles, a live verifier). Tests use this to inject
+   * `contractAuthor: 'worker'` plus a scripted `verifierCallModel`, so a
+   * bridge test never makes a second, unscripted model role's network
+   * call. */
+  harness?: HarnessConfig;
   /** Tracing the TUI's adapter delegates to; defaults to the core's
    * createRunTracing() so Langfuse observability is preserved. */
   tracingDelegate?: RunTracing;
@@ -86,31 +97,9 @@ export interface RunSessionDeps {
   runTaskFn?: (taskText: string, config: RunTaskConfig) => Promise<RunTaskResult>;
   /** Test seam: produces one model response's raw event stream. The
    * default creates an Anthropic SDK stream carrying the abort signal. */
-  createStream?: (
-    params: Anthropic.Messages.MessageStreamParams,
-    signal: AbortSignal | undefined,
-  ) => AsyncIterable<ModelStreamEvent>;
+  createStream?: ModelDriverConfig['createStream'];
   /** Test seam: clock for event stamps. */
   now?: () => number;
-}
-
-/** The production tool surface, rebuilt exactly as runTask registers it —
- * needed here only to serialize the same stable API tool definitions.
- *
- * `bash` is run-scoped, so it must be constructed in order to be described.
- * The instance built here is never executed: the TUI supplies
- * `config.callModel`, so this side only produces the model-facing definition,
- * while the instance `runTask` builds — with the run's real secret-env
- * denylist — is the one that actually runs commands. The denylist does not
- * affect these bytes. It must still be present, though: an `apiToolDefs` list
- * missing `bash` would silently offer TUI runs a smaller surface than the
- * registry executing them, and a model cannot call a tool it was never given. */
-function buildApiToolDefs(profile: ToolProfile) {
-  return toApiToolDefs(
-    createProductionRegistry(profile, {
-      bash: createBashTool({ secretEnvDenylist: [] }),
-    }),
-  );
 }
 
 /**
@@ -129,72 +118,41 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const runTaskFn = deps.runTaskFn ?? runTask;
   const controller = new AbortController();
   const { signal } = controller;
-  const toolProfile = deps.toolProfile ?? DEFAULT_TOOL_PROFILE;
 
-  // The shared strict driver — the exact acceptance, retry, and request
-  // semantics runTask's default client uses. Client construction stays
-  // lazy inside the driver (a missing API key fails the first model call
-  // and routes through the normal run_failed path, not submit).
-  const driver = createAnthropicModelDriver({
-    model: deps.model ?? DEFAULT_MODEL,
-    system: SYSTEM_PROMPT,
-    apiToolDefs: buildApiToolDefs(toolProfile),
-    maxOutputTokens: MAX_OUTPUT_TOKENS,
-    ...(deps.createStream === undefined ? {} : { createStream: deps.createStream }),
-  });
-
-  let turn = 0;
-  const callModel: CallModel = async (messages) => {
-    if (signal.aborted) {
-      throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
+  // 1:1 with ProgressEvent (see model/callModel.ts), forwarded into
+  // RunTaskConfig.onProgress so runTask's own model client — worker,
+  // initializer, and verifier alike — reports through this bridge instead
+  // of a second client built here: turn_start → turn_start; text_delta →
+  // text_delta; tool_use_start → tool_pending; turn_end → turn_end with
+  // usage read off the response's Usage. `retry` has no corresponding
+  // UiEvent and is dropped.
+  const onProgress = (event: ProgressEvent): void => {
+    switch (event.type) {
+      case 'turn_start':
+        emit({ type: 'turn_start', turn: event.turn });
+        break;
+      case 'text_delta':
+        emit({ type: 'text_delta', text: event.text });
+        break;
+      case 'tool_use_start':
+        emit({ type: 'tool_pending', name: event.toolName });
+        break;
+      case 'turn_end':
+        emit({
+          type: 'turn_end',
+          usage: {
+            input: event.usage.input_tokens,
+            output: event.usage.output_tokens,
+            ...(event.usage.cache_read_input_tokens === null ||
+            event.usage.cache_read_input_tokens === undefined
+              ? {}
+              : { cacheRead: event.usage.cache_read_input_tokens }),
+          },
+        });
+        break;
+      case 'retry':
+        break;
     }
-    turn += 1;
-    const thisTurn = turn;
-    emit({ type: 'turn_start', turn: thisTurn });
-
-    // The driver retries transport failures across stream creation AND
-    // consumption and re-asks one max_tokens overflow; an abort rejects
-    // immediately, including out of a backoff sleep. A retried attempt may
-    // re-emit text_deltas the failed attempt already streamed — accepted
-    // cosmetic wart (see ProgressEvent in callModel.ts); a rejected
-    // attempt's deltas are never committed anywhere downstream.
-    const accepted = await driver
-      .generate({
-        messages,
-        signal,
-        onEvent: (event) => {
-          if (event.type === 'text_delta') {
-            emit({ type: 'text_delta', text: event.text });
-          } else if (event.type === 'tool_use_start') {
-            emit({ type: 'tool_pending', name: event.toolName });
-          }
-        },
-      })
-      .catch((error: unknown) => {
-        // Any failure observed after abort IS the cancellation. Normalize
-        // its name — the SDK's abort error keeps the default 'Error', and a
-        // killed stream can surface as truncation — so the loop's abort
-        // carve-out (cancelled runs get no failed-metrics bookkeeping)
-        // fires regardless of shape.
-        if (signal.aborted && !(error instanceof Error && error.name === 'AbortError')) {
-          throw Object.assign(new Error('run cancelled'), { name: 'AbortError' });
-        }
-        throw error;
-      });
-
-    const response = accepted.response;
-    emit({
-      type: 'turn_end',
-      usage: {
-        input: response.usage.input_tokens,
-        output: response.usage.output_tokens,
-        ...(response.usage.cache_read_input_tokens === null ||
-        response.usage.cache_read_input_tokens === undefined
-          ? {}
-          : { cacheRead: response.usage.cache_read_input_tokens }),
-      },
-    });
-    return response;
   };
 
   // The pause/ask/answer channel: announce the question on the event
@@ -253,9 +211,9 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
     try {
       const result = await runTaskFn(task, {
         browser: deps.browser,
-        callModel,
+        onProgress,
         tracing,
-        toolProfile,
+        ...(deps.harness === undefined ? {} : { harness: deps.harness }),
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
@@ -264,15 +222,16 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
         ...(requestPermission === undefined ? {} : { requestPermission }),
-        // The same signal the wrapped callModel above checks, handed to the
-        // tools as well. Cancelling used to take effect only at the next model
-        // call; a `bash` command can hold a process group for two minutes, so
-        // without this a cancelled run would return while its command kept
+        ...(deps.createStream === undefined ? {} : { createStream: deps.createStream }),
+        // Reaches both an in-flight model request (runTask forwards this into
+        // its own model client) and an in-flight tool (`ToolCtx.abortSignal`).
+        // Cancelling used to take effect only at the next model call; a
+        // `bash` command can hold a process group for two minutes, so without
+        // the tool half a cancelled run would return while its command kept
         // running.
         signal,
       });
       switch (result.status) {
-        case 'completed':
         case 'verified': {
           emit({
             type: 'run_finished',
@@ -297,20 +256,6 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           });
           return {
             status: 'incomplete',
-            reason: result.reason,
-            runDir: result.runDir,
-          } as const;
-        }
-        case 'budget_exceeded': {
-          emit({
-            type: 'run_finished',
-            outcome: 'budget_exceeded',
-            reason: result.reason,
-            runDir: result.runDir,
-            at: now(),
-          });
-          return {
-            status: 'budget_exceeded',
             reason: result.reason,
             runDir: result.runDir,
           } as const;

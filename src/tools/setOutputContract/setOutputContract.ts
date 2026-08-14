@@ -1,6 +1,6 @@
 import { setOutputContractInputSchema } from '../../contracts/outputContract.js';
 import { contractRevisionPath } from '../../contracts/outputContractStore.js';
-import type { ToolDef } from '../registry.js';
+import { accessKey, type ToolDef } from '../registry.js';
 
 // The model's only way to state what the run must produce. Everything
 // downstream — the code-based completion checks, the renderers, the
@@ -57,7 +57,12 @@ export const setOutputContractTool: ToolDef<
     'later only when evidence, a corrected assumption, or the user requires it, supplying ' +
     'revisionBasis; the full history is kept and reviewed.',
   inputSchema: setOutputContractInputSchema,
-  readOnly: false,
+  // Writes the run's contract — the exact resource accessKey.contract()
+  // exists for. Every later read of the current contract (write_document,
+  // the completion checks, the verifier's own read) must not observe a
+  // half-applied revision, so this serializes against them without needing
+  // to serialize against everything else in the run.
+  getAccess: () => ({ reads: [], writes: [accessKey.contract()] }),
   execute: (input, ctx): SetOutputContractResult => {
     const store = ctx.outputContracts;
     if (store === undefined) {

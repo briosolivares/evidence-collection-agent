@@ -14,7 +14,6 @@ import {
 import type { EvalRunOptions, EvalTask } from '../../../evals/types.js';
 import { usableStartUrl } from '../../cli/runTask.js';
 import { DEFAULT_MODEL } from '../../model/callModel.js';
-import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../tools/index.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
 import type { RunHandle, RunSessionDeps } from './runSession.js';
@@ -44,7 +43,6 @@ export interface EvalSessionDeps {
    * runs unassisted. Answered (allowed) dialogs are counted and stamped on
    * the report as `assistedDialogs`, so assisted scores are always labeled. */
   requestPermission?: RunSessionDeps['requestPermission'];
-  toolProfile?: ToolProfile;
   loadTask?: (evalsDir: string, name: string) => Promise<EvalTask>;
   formatReportFn?: (report: EvalReport) => string;
   writeResultsFn?: (report: EvalReport, resultsDir: string) => string;
@@ -115,7 +113,6 @@ export function startEvalBatch(
       const report = await runEvals(tasks, k, {
         concurrency,
         model: DEFAULT_MODEL,
-        toolProfile: deps.toolProfile ?? DEFAULT_TOOL_PROFILE,
         signal: controller.signal,
         runTask: async (taskText, opts) => {
           if (controller.signal.aborted) throw new EvalRunCancelledError();

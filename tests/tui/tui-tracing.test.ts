@@ -51,14 +51,14 @@ function makeRegistry() {
       name: 'echo',
       description: 'echoes',
       inputSchema: z.object({ value: z.string() }),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async (input: { value: string }) => `echo:${input.value}`,
     },
     {
       name: 'boom',
       description: 'always fails',
       inputSchema: z.object({}),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async () => {
         throw new Error('kaboom');
       },
@@ -67,7 +67,7 @@ function makeRegistry() {
       name: 'write_file',
       description: 'fake evidence writer',
       inputSchema: z.object({ file_path: z.string() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async (input: { file_path: string }) => ({ path: input.file_path, size: 3 }),
     },
   ]);
@@ -145,7 +145,7 @@ describe('createTuiTracing', () => {
           name: 'publish',
           description: 'writes one published artifact',
           inputSchema: publishInput,
-          readOnly: false,
+          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: PublishInput, ctx: ToolCtx) => {
             const entry = publish(input, ctx);
             return { path: entry.filename, size: input.content.length };
@@ -155,7 +155,7 @@ describe('createTuiTracing', () => {
           name: 'batch',
           description: 'browser_batch shape: several inner writes, one exec',
           inputSchema: z.object({ items: z.array(publishInput) }),
-          readOnly: false,
+          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: { items: PublishInput[] }, ctx: ToolCtx) => {
             for (const item of input.items) publish(item, ctx);
             return { results: input.items.length };
@@ -165,7 +165,7 @@ describe('createTuiTracing', () => {
           name: 'offload',
           description: 'capResult shape: a private scratch write, no roles',
           inputSchema: z.object({ file_path: z.string(), content: z.string() }),
-          readOnly: false,
+          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (
             input: { file_path: string; content: string },
             ctx: ToolCtx,
@@ -178,7 +178,7 @@ describe('createTuiTracing', () => {
           name: 'publish_boom',
           description: 'publishes, then fails',
           inputSchema: z.object({}),
-          readOnly: false,
+          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (_input: unknown, ctx: ToolCtx) => {
             writeArtifact(ctx.runDir, 'artifacts/partial.png', Buffer.from('png'), {
               roles: ['evidence'],

@@ -8,13 +8,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { METRICS_FILENAME, runAgentLoop } from '../src/loop/agentLoop.js';
+import {
+  createWorkerSession,
+  METRICS_FILENAME,
+  runWorkerCycle,
+  writeWorkerSessionMetrics,
+} from '../src/loop/workerSession.js';
 import type { ModelResponse } from '../src/loop/messages.js';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
+import { createRunBudgetTracker } from '../src/run/runBudget.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { TRANSCRIPT_FILENAME } from '../src/run/transcript.js';
-import { fileTools } from '../src/tools/index.js';
+import { editFileTool, grepTool, readFileTool, writeFileTool } from '../src/tools/index.js';
 import { createRegistry } from '../src/tools/registry.js';
 
 const TASK = 'Write a haiku about evidence collection to haiku.txt, then finish.';
@@ -35,7 +41,7 @@ const script: ModelResponse[] = [
         type: 'tool_use',
         id: 'call-1',
         name: 'write_file',
-        input: { file_path: 'haiku.txt', content: HAIKU },
+        input: { file_path: 'artifacts/haiku.txt', content: HAIKU },
       },
     ],
     stop_reason: 'tool_use',
@@ -44,7 +50,7 @@ const script: ModelResponse[] = [
   {
     content: [
       { type: 'text', text: 'Verifying the file before finishing.' },
-      { type: 'tool_use', id: 'call-2', name: 'read_file', input: { file_path: 'haiku.txt' } },
+      { type: 'tool_use', id: 'call-2', name: 'read_file', input: { file_path: 'artifacts/haiku.txt' } },
     ],
     stop_reason: 'tool_use',
     usage: { input_tokens: 1320, output_tokens: 70, cache_read_input_tokens: 1150 },
@@ -96,19 +102,26 @@ function summarize(event: Record<string, any>): string {
   }
 }
 
-const registry = createRegistry(fileTools);
+const registry = createRegistry([readFileTool, writeFileTool, editFileTool, grepTool]);
 const runDir = createRunDir('runs', generateRunId('demo loop-fake-model'));
 initManifest(runDir, TASK);
 console.log(`run dir: ${runDir}`);
 console.log(`task:    ${TASK}`);
 
-const result = await runAgentLoop(TASK, { callModel, registry, runDir }, {
-  maxTurns: 5,
-  maxContextTokens: 100_000,
+const budget = createRunBudgetTracker({
+  maxWorkerTurns: 5,
+  maxToolCalls: Infinity,
+  maxModelTokens: Infinity,
+  maxToolResultBytes: Infinity,
+  maxWallTimeMs: Infinity,
+  maxVerifierCorrections: 0,
 });
+const session = createWorkerSession(TASK, { callModel, registry, runDir }, { budget, maxContextTokens: 100_000 });
+const outcome = await runWorkerCycle(session);
+writeWorkerSessionMetrics(session, outcome.kind === 'completed' ? 'completed' : 'budget_exceeded');
 finalizeManifest(runDir);
 
-console.log(`\nresult after ${served} turns: ${JSON.stringify(result)}`);
+console.log(`\nresult after ${served} turns: ${JSON.stringify(outcome)}`);
 
 console.log('\n--- transcript.jsonl (replayed) ---');
 for (const line of readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8').trimEnd().split('\n')) {
@@ -116,7 +129,7 @@ for (const line of readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8').trimE
 }
 
 console.log('\n--- haiku.txt ---');
-console.log(readFileSync(join(runDir, 'haiku.txt'), 'utf8'));
+console.log(readFileSync(join(runDir, 'artifacts/haiku.txt'), 'utf8'));
 
 console.log('--- manifest.json ---');
 console.log(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8'));

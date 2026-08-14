@@ -32,6 +32,7 @@ import {
 import {
   createBrowserStateStore,
   diffObservations,
+  MAX_OTHER_OPEN_PAGES,
   type BrowserFrame,
   type BrowserObservation,
   type BrowserObserveRequest,
@@ -40,6 +41,7 @@ import {
   type ElementRef,
   type ObservationNeed,
   type ObservationView,
+  type OtherOpenPage,
 } from './browserState.js';
 import {
   BrowserRefNotFoundError,
@@ -368,7 +370,7 @@ export class PlaywrightBrowserController implements BrowserController {
    * supports browser scripts, exactly as an omitted method would on a
    * provider that never implements this pair at all.
    */
-  readonly prepareForBrowserScript?: () => Promise<BrowserScriptSetup>;
+  readonly prepareForBrowserScript?: (pageId?: string) => Promise<BrowserScriptSetup>;
   /** Paired with {@link prepareForBrowserScript}; see there. */
   readonly refreshAfterBrowserScript?: () => Promise<void>;
 
@@ -392,7 +394,7 @@ export class PlaywrightBrowserController implements BrowserController {
   ) {
     this.state = stateStore;
     if (this.cdpUrl !== undefined) {
-      this.prepareForBrowserScript = () => this.doPrepareForBrowserScript();
+      this.prepareForBrowserScript = (pageId?: string) => this.doPrepareForBrowserScript(pageId);
       this.refreshAfterBrowserScript = () => this.doRefreshAfterBrowserScript();
     }
     // Track every page the browser creates. Task tabs register themselves in
@@ -453,55 +455,14 @@ export class PlaywrightBrowserController implements BrowserController {
     );
   }
 
-  async click(ref: string): Promise<void> {
-    const locator = await this.locatorForRef(ref);
-    try {
-      await locator.click();
-    } catch (error) {
-      throw await normalizeRefActionError(locator, ref, error);
-    }
-  }
-
-  async type(ref: string, text: string): Promise<void> {
-    const locator = await this.locatorForRef(ref);
-    try {
-      await locator.fill(text);
-    } catch (error) {
-      throw await normalizeRefActionError(locator, ref, error);
-    }
-  }
-
-  async scroll(): Promise<void> {
-    const page = this.requirePage();
-    await this.withRendererDeadline(
-      () => page.evaluate(() => window.scrollBy(0, window.innerHeight)),
-      RENDERER_READ_TIMEOUT_MS,
-    );
-    await page.waitForTimeout(SCROLL_SETTLE_MS);
-  }
-
   async screenshot(
     options: BrowserScreenshotOptions = {},
   ): Promise<Uint8Array> {
-    const bytes = await this.requirePage().screenshot({
+    const bytes = await this.pageFor(options.pageId).screenshot({
       fullPage: options.fullPage ?? false,
       type: 'png',
     });
     return new Uint8Array(bytes);
-  }
-
-  async resolveHref(ref: string): Promise<string | null> {
-    const locator = await this.locatorForRef(ref);
-    try {
-      return await locator.evaluate((element) => {
-        const href = element.getAttribute('href');
-        return href === null
-          ? null
-          : new URL(href, element.ownerDocument.baseURI).href;
-      });
-    } catch (error) {
-      throw await normalizeRefActionError(locator, ref, error);
-    }
   }
 
   async fetch(url: string): Promise<BrowserFetchResult> {
@@ -522,13 +483,14 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult> {
     this.requireOpenContext();
+    const page = this.pageFor(target.pageId);
 
     if ('url' in target) {
       assertHttpUrl(target.url);
-      return this.captureUrlThroughChrome(target.url);
+      return this.captureUrlThroughChrome(target.url, page);
     }
 
-    const locator = await this.locatorForRef(target.ref);
+    const locator = await this.locatorForRef(page, target.ref);
     let href: string | null;
     try {
       href = await locator.evaluate((element) => {
@@ -540,19 +502,19 @@ export class PlaywrightBrowserController implements BrowserController {
     }
 
     if (href !== null && isHttpUrl(href)) {
-      return this.captureUrlThroughChrome(href);
+      return this.captureUrlThroughChrome(href, page);
     }
 
-    return this.captureClickDownload(locator, target.ref);
+    return this.captureClickDownload(locator, target.ref, page);
   }
 
-  currentUrl(): string {
-    return this.requirePage().url();
+  currentUrl(pageId?: string): string {
+    return this.pageFor(pageId).url();
   }
 
-  async title(): Promise<string> {
-    const page = this.requirePage();
-    return this.withRendererDeadline(() => page.title(), RENDERER_READ_TIMEOUT_MS);
+  async title(pageId?: string): Promise<string> {
+    const page = this.pageFor(pageId);
+    return this.withRendererDeadline(() => page.title(), RENDERER_READ_TIMEOUT_MS, undefined, pageId);
   }
 
   async pages(): Promise<BrowserPage[]> {
@@ -591,6 +553,8 @@ export class PlaywrightBrowserController implements BrowserController {
         const outline = await this.withRendererDeadline(
           () => page.ariaSnapshot({ mode: 'ai' }),
           RENDERER_READ_TIMEOUT_MS,
+          undefined,
+          request.pageId,
         );
         elements = await this.stampOutlineElements(
           record,
@@ -605,6 +569,8 @@ export class PlaywrightBrowserController implements BrowserController {
         const text = await this.withRendererDeadline(
           () => page.evaluate(() => document.body?.innerText ?? ''),
           RENDERER_READ_TIMEOUT_MS,
+          undefined,
+          request.pageId,
         );
         views.push(makeBoundedView('text', text));
       }
@@ -618,7 +584,31 @@ export class PlaywrightBrowserController implements BrowserController {
         : undefined;
     this.state.recordObservation(record.pageId, { documentId, url, elements });
     const changes = diffObservations(baseline, { documentId, url, elements });
-    return { page: await this.describePage(record), views, elements, changes };
+    const otherOpenPages = await this.describeOtherOpenPages(record);
+    return {
+      page: await this.describePage(record),
+      views,
+      elements,
+      changes,
+      ...(otherOpenPages.length > 0 ? { otherOpenPages } : {}),
+    };
+  }
+
+  /** Other live tracked pages besides `record`, for the sibling-page
+   * listing an observation carries — see {@link BrowserObservation.otherOpenPages}.
+   * Bounded by {@link MAX_OTHER_OPEN_PAGES} and empty (never populated on the
+   * result) when this is the only live page. */
+  private async describeOtherOpenPages(record: PageRecord): Promise<OtherOpenPage[]> {
+    const others = [...this.trackedPages.values()].filter(
+      (candidate) => candidate !== record && !candidate.page.isClosed(),
+    );
+    if (others.length === 0) return [];
+    return Promise.all(
+      others.slice(0, MAX_OTHER_OPEN_PAGES).map(async (candidate) => {
+        const described = await this.describePage(candidate);
+        return { pageId: described.pageId, url: described.url, title: described.title };
+      }),
+    );
   }
 
   /**
@@ -643,6 +633,7 @@ export class PlaywrightBrowserController implements BrowserController {
       () => page.title(),
       RENDERER_READ_TIMEOUT_MS,
       '',
+      request.pageId,
     ).catch(() => '');
 
     if (request.elementId === undefined) {
@@ -652,6 +643,8 @@ export class PlaywrightBrowserController implements BrowserController {
       const text = await this.withRendererDeadline(
         () => page.evaluate(() => document.body?.innerText ?? ''),
         RENDERER_READ_TIMEOUT_MS,
+        undefined,
+        request.pageId,
       );
       return {
         text,
@@ -681,20 +674,6 @@ export class PlaywrightBrowserController implements BrowserController {
       ...(observationId > 0 ? { observationId } : {}),
       locator: ref.stableLocator ?? `${ref.role}[name=${JSON.stringify(ref.name)}]`,
     };
-  }
-
-  switchPage(pageId: string): Promise<BrowserPage> {
-    // Serialized with newTab/closeTab/close so page selection cannot race
-    // a tab lifecycle transition.
-    return this.serializeTabLifecycle(async () => {
-      this.requireOpenContext();
-      const record = this.recordByPageId(pageId);
-      if (record === undefined || record.page.isClosed()) {
-        throw new Error(`Unknown or closed browser pageId: ${pageId}`);
-      }
-      this.activePage = record.page;
-      return this.describePage(record);
-    });
   }
 
   /**
@@ -814,9 +793,10 @@ export class PlaywrightBrowserController implements BrowserController {
   }
 
   /**
-   * Evaluate a snippet in the selected page's top document (T6).
+   * Evaluate a snippet in a page's top document (T6).
    *
-   * The page is resolved ONCE, up front, so a navigation mid-call cannot move
+   * The page is resolved ONCE, up front — the requested `pageId`, or the
+   * selected page when omitted — so a navigation mid-call cannot move
    * execution to a different document than the one whose URL and token are
    * reported. Console output is captured for the duration of the call only.
    *
@@ -833,7 +813,7 @@ export class PlaywrightBrowserController implements BrowserController {
    * it surface later would crash an unrelated turn.
    */
   async executeJavaScript(request: EarlyJavaScriptRequest): Promise<BrowserJavaScriptResult> {
-    const page = this.requirePage();
+    const page = this.pageFor(request.pageId);
     const logs: string[] = [];
     const onConsole = (message: { text(): string }): void => {
       // Bounded: a snippet that logs in a loop must not grow the result
@@ -852,6 +832,8 @@ export class PlaywrightBrowserController implements BrowserController {
             `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
           ),
         RENDERER_READ_TIMEOUT_MS,
+        undefined,
+        request.pageId,
       );
 
       let value: unknown;
@@ -972,12 +954,13 @@ export class PlaywrightBrowserController implements BrowserController {
    * field (see the constructor) — reachable only when this controller was
    * given a CDP endpoint.
    *
-   * Attaches a throwaway CDP session to the selected page purely to read its
-   * PUBLIC target id via `Target.getTargetInfo`, then detaches immediately;
-   * nothing here is held open past this call, and no private Playwright
-   * field (`page._delegate`, `_targetId`, ...) is ever touched.
+   * Attaches a throwaway CDP session to the resolved page (the requested
+   * `pageId`, or the selected page when omitted) purely to read its PUBLIC
+   * target id via `Target.getTargetInfo`, then detaches immediately; nothing
+   * here is held open past this call, and no private Playwright field
+   * (`page._delegate`, `_targetId`, ...) is ever touched.
    */
-  private async doPrepareForBrowserScript(): Promise<BrowserScriptSetup> {
+  private async doPrepareForBrowserScript(pageId?: string): Promise<BrowserScriptSetup> {
     this.requireOpenContext();
     if (this.cdpUrl === undefined) {
       // Unreachable through the public field — it is only assigned when
@@ -986,7 +969,7 @@ export class PlaywrightBrowserController implements BrowserController {
       // ever called another way (e.g. a future internal caller).
       throw new Error('This browser session has no CDP endpoint configured.');
     }
-    const page = this.requirePage();
+    const page = this.pageFor(pageId);
     const session = await this.context.newCDPSession(page);
     try {
       const { targetInfo } = await session.send('Target.getTargetInfo');
@@ -1343,7 +1326,7 @@ export class PlaywrightBrowserController implements BrowserController {
    * Built fresh per call and holding no state of its own: all state lives
    * in the controller, so a sequence cannot observe a stale view of the
    * page registry. The seam deliberately exposes no page *selection* —
-   * acting on a page never changes which page legacy tools target.
+   * acting on a page never changes which page the selected pointer names.
    */
   private actionSession(): ActionCapableSession {
     return {
@@ -1565,8 +1548,11 @@ export class PlaywrightBrowserController implements BrowserController {
     return page;
   }
 
-  private async captureUrlThroughChrome(url: string): Promise<BrowserDownloadResult> {
-    const referringUrl = this.requirePage().url();
+  private async captureUrlThroughChrome(
+    url: string,
+    referringPage: Page,
+  ): Promise<BrowserDownloadResult> {
+    const referringUrl = referringPage.url();
     // A throwaway plumbing page: counted out of the page registry (see the
     // constructor's 'page' listener) so pages() never shows it and no
     // identity is ever bound to it.
@@ -1624,8 +1610,8 @@ export class PlaywrightBrowserController implements BrowserController {
   private async captureClickDownload(
     locator: Locator,
     ref: string,
+    page: Page,
   ): Promise<BrowserDownloadResult> {
-    const page = this.requirePage();
     const downloadPromise = page.waitForEvent('download', {
       timeout: DOWNLOAD_EVENT_TIMEOUT_MS,
     });
@@ -1642,17 +1628,17 @@ export class PlaywrightBrowserController implements BrowserController {
       }
       throw new Error(
         `Browser ref ${ref} has no HTTP(S) href and did not start a browser download. ` +
-          'Re-run inspect_page and choose a download link or control, or pass a verified direct URL.',
+          'Observe the page again and choose a download link or control, or pass a verified direct URL.',
       );
     }
   }
 
-  private async locatorForRef(ref: string): Promise<Locator> {
+  private async locatorForRef(page: Page, ref: string): Promise<Locator> {
     if (!ARIA_REF_PATTERN.test(ref)) {
       throw new BrowserRefNotFoundError(ref);
     }
 
-    const locator = this.requirePage().locator(`aria-ref=${ref}`);
+    const locator = page.locator(`aria-ref=${ref}`);
     if ((await countRefMatches(locator)) !== 1) {
       throw new BrowserRefNotFoundError(ref);
     }
@@ -1670,29 +1656,60 @@ export class PlaywrightBrowserController implements BrowserController {
   }
 
   /**
-   * Bound a read that depends on the page's main thread, on THIS
-   * controller's single selected/active page — see the module-level
-   * {@link withRendererDeadline} for the actual timeout mechanics.
+   * Bound a read that depends on the page's main thread — see the
+   * module-level {@link withRendererDeadline} for the actual timeout
+   * mechanics.
    *
    * On timeout, the abandoned read is registered with `this.busyRegistry`
-   * (when set) as a possibly-still-busy READ on `accessKey.selectedPage()`
-   * — correct because every call site that reaches this METHOD (as opposed
-   * to the free function below) reads via `this.requirePage()`, i.e. this
-   * controller's one active page, never an explicit non-selected one. See
-   * `BusyResourceRegistry`'s module doc for why registering it as a read
-   * still lets a later WRITE (a click, type, or navigate on the same page)
+   * (when set) as a possibly-still-busy READ on `accessKey.page(pageId ??
+   * 'selected')` — the SAME key a tool's own `getAccess()` computes from its
+   * own optional `pageId` input (see `captureText.ts`/`observe.ts`), so an
+   * abandoned read here forms a barrier against exactly the later calls that
+   * would actually race it: an omitted `pageId` collapses to the shared
+   * `'page:selected'` key every unqualified call contends for, and a named
+   * `pageId` collapses to that one page's own key instead. Passing the
+   * caller's OWN optional `pageId` argument through — not the concretely
+   * resolved page's stable id — is what keeps this aligned with the
+   * tool-layer's pre-execution declaration, which can only ever know "named
+   * page X" or "whichever page is selected", never a resolved identity.
+   * See `BusyResourceRegistry`'s module doc for why registering it as a read
+   * still lets a later WRITE (a fill, click, or navigate on the same page)
    * wait for it, which is the actual race this closes: a stuck read left
    * running in the background while a later action starts mutating the
    * page it never finished reading.
    */
-  private withRendererDeadline<T>(read: () => Promise<T>, timeoutMs: number, fallback?: T): Promise<T> {
+  private withRendererDeadline<T>(
+    read: () => Promise<T>,
+    timeoutMs: number,
+    fallback?: T,
+    pageId?: string,
+  ): Promise<T> {
     return withRendererDeadline(read, timeoutMs, fallback, (started) => {
       if (this.busyRegistry !== undefined) {
-        this.busyRegistry.markAbandoned({ reads: [accessKey.selectedPage()], writes: [] }, started);
+        this.busyRegistry.markAbandoned(
+          { reads: [accessKey.page(pageId ?? 'selected')], writes: [] },
+          started,
+        );
       } else {
         void started.catch(() => undefined);
       }
     });
+  }
+
+  /**
+   * Resolve the page an implicit-page-or-explicit-`pageId` method
+   * (screenshot, download, currentUrl, title, executeJavaScript,
+   * prepareForBrowserScript) should act on.
+   *
+   * @param pageId - explicit page, or undefined for the selected page
+   * @returns the selected task tab when `pageId` is omitted, or exactly the
+   *   named tracked page otherwise — never a fallback like "the first open
+   *   tab"
+   * @throws Error when `pageId` is omitted and no task tab is active, or a
+   *   named `pageId` is unknown or closed
+   */
+  private pageFor(pageId?: string): Page {
+    return pageId === undefined ? this.requirePage() : this.requireTrackedPage(pageId).page;
   }
 }
 

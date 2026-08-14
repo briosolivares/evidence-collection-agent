@@ -12,7 +12,6 @@ import type {
   BrowserObservation,
   ElementRef,
 } from '../../browser/browserState.js';
-import { navigateTool } from '../navigate/navigate.js';
 import { observeTool } from '../observe/observe.js';
 import { executeToolCall } from '../pipeline.js';
 import { accessesConflict, accessKey, createRegistry } from '../registry.js';
@@ -20,7 +19,7 @@ import { browserActionTool, type BrowserActionInput } from './browserAction.js';
 
 describe('browser_action tool', () => {
   const suite = setupBrowserToolSuite('browser-action-tool');
-  const registry = createRegistry([navigateTool, observeTool, browserActionTool]);
+  const registry = createRegistry([observeTool, browserActionTool]);
 
   function call(name: string, input: unknown) {
     return executeToolCall(
@@ -32,7 +31,9 @@ describe('browser_action tool', () => {
 
   /** Load the action fixture and return its first observation. */
   async function openFixture(path = '/actions.html'): Promise<BrowserObservation> {
-    await call('navigate', { url: suite.server().url(path) });
+    await call('browser_action', {
+      actions: [{ op: 'navigate', url: suite.server().url(path) }],
+    });
     const result = await call('observe', {});
     expect(result.isError).toBe(false);
     return JSON.parse(result.content) as BrowserObservation;
@@ -379,11 +380,17 @@ describe('browser_action tool', () => {
       // The second click never ran: the draft is still unsaved.
       expect(await pageText()).toContain('No draft saved');
 
-      // Close the popup so later tests see only their own tab.
+      // There is no longer a switch_page to move the selected pointer onto
+      // the popup, and closeTab() only ever closes the task tab newTab()
+      // opened — a popup can never become that page. So rather than
+      // switching to the popup to close it, address it directly by its own
+      // pageId to confirm it is exactly the page browser_action reported,
+      // and leave it open: later tests navigate and observe the task tab by
+      // its own pageId, which an unrelated open popup does not affect, and
+      // the whole session (every page it owns) is torn down at suite end.
       const popupId = output.openedPages[0]?.pageId ?? '';
-      await suite.controller().switchPage(popupId);
-      await suite.controller().closeTab();
-      await suite.controller().switchPage(observation.page.pageId);
+      const livePages = await suite.controller().pages();
+      expect(livePages.some((page) => page.pageId === popupId)).toBe(true);
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

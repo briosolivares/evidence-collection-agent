@@ -88,7 +88,7 @@ const captureEvidence = () =>
     {
       id: 'j1',
       name: 'execute_javascript',
-      input: { target: 'selected_top_document', code: '"Alpha"', captureEvidence: true },
+      input: { code: '"Alpha"', captureEvidence: true },
     },
   ]);
 
@@ -103,16 +103,18 @@ const upsertRow = () =>
   toolResponse([
     {
       id: 'r1',
-      name: 'upsert_output_rows',
+      name: 'update_table',
       input: {
         outputId: 'roster',
-        rows: [
-          {
-            rowId: '1',
-            values: { name: 'Alpha', url: 'https://example.com/alpha' },
-            evidenceIds: ['E1'],
-          },
-        ],
+        upsert: {
+          rows: [
+            {
+              rowId: '1',
+              values: { name: 'Alpha', url: 'https://example.com/alpha' },
+              evidenceIds: ['E1'],
+            },
+          ],
+        },
       },
     },
   ]);
@@ -121,12 +123,14 @@ const setCompleteness = () =>
   toolResponse([
     {
       id: 't1',
-      name: 'set_table_completeness',
+      name: 'update_table',
       input: {
         outputId: 'roster',
-        method: 'The page lists exactly one widget.',
-        evidenceIds: ['E1'],
-        statedTotal: 1,
+        completeness: {
+          method: 'The page lists exactly one widget.',
+          evidenceIds: ['E1'],
+          statedTotal: 1,
+        },
       },
     },
   ]);
@@ -189,7 +193,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 8,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           verifierCallModel: verifier.callModel,
         },
@@ -240,7 +243,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 12,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           verifierCallModel: verifier.callModel,
         },
@@ -279,7 +281,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 12,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           verifierCallModel: verifier.callModel,
         },
@@ -320,7 +321,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 12,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           verifierCallModel: verifier.callModel,
         },
@@ -361,7 +361,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 12,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           verifierCallModel: verifier.callModel,
         },
@@ -396,7 +395,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 12,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'worker',
           maxWorkerCycles: 2,
           verifierCallModel: verifier.callModel,
@@ -434,7 +432,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 8,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'initializer',
           initializerCallModel: initializer.callModel,
           verifierCallModel: verifier.callModel,
@@ -472,7 +469,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 10,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'initializer',
           initializerCallModel: initializer.callModel,
           verifierCallModel: verifier.callModel,
@@ -512,7 +508,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 10,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'initializer',
           initializerCallModel: initializer.callModel,
           verifierCallModel: verifier.callModel,
@@ -530,11 +525,13 @@ describe('runTask V2 verification protocol', () => {
       expect(evidence.detail).toMatchObject({ recordType: 'web_text', locator: 'body' });
 
       // The opening message tells the worker the contract is already set and
-      // that this protocol writes no INTENT.md/CONTRACT.md — the two things
-      // the first live V2 runs wasted turns discovering.
+      // that a table deliverable is rendered by the runtime from typed rows,
+      // never hand-authored — the prose INTENT.md/CONTRACT.md authoring mode
+      // this test used to check for is gone entirely (see harness/initializer.ts's
+      // module comment), so the equivalent modern guidance is checked instead.
       const opening = JSON.stringify(worker.requests[0]?.[0]);
       expect(opening).toContain('revision 1 is already set');
-      expect(opening).toContain('no INTENT.md and no CONTRACT.md');
+      expect(opening).toContain('do not write a contract-bound deliverable by hand');
     },
     TEST_TIMEOUT_MS,
   );
@@ -558,7 +555,6 @@ describe('runTask V2 verification protocol', () => {
         maxTurns: 10,
         maxContextTokens: 100_000,
         harness: {
-          outputContract: true,
           contractAuthor: 'initializer',
           initializerCallModel: initializer.callModel,
           verifierCallModel: verifier.callModel,

@@ -56,18 +56,16 @@ export function formatProgressEvent(event: ProgressEvent): string {
  * `runTask` resolves and before the session prompts for the next task.
  *
  * @param result - the value `runTask` resolves with: the absolute run
- *   directory plus the loop's terminal outcome (see RunTaskResult)
- * @returns a multi-line summary — the model's final message on
- *   `completed`/`verified`, the guard name on `budget_exceeded`, the
- *   explicit reason on `incomplete` — followed by the absolute run
+ *   directory plus the harness's terminal outcome (see RunTaskResult) —
+ *   `verified` (the only success) or `incomplete` (a reason plus specifics)
+ * @returns a multi-line summary — the model's final message on `verified`,
+ *   the reason and detail on `incomplete` — followed by the absolute run
  *   directory path, ending in a single trailing newline
  */
 export function formatRunSummary(result: RunTaskResult): string {
   const outcome =
-    result.status === 'completed' || result.status === 'verified'
-      ? `${result.status}: ${result.finalText}`
-      : result.status === 'incomplete'
-        ? `incomplete (${result.reason}): ${result.detail}`
-        : `budget exceeded: ${result.reason}`;
+    result.status === 'verified'
+      ? `verified: ${result.finalText}`
+      : `incomplete (${result.reason}): ${result.detail}`;
   return `\n${outcome}\nrun dir: ${result.runDir}\n`;
 }

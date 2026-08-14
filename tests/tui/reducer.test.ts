@@ -452,12 +452,12 @@ describe('reduce (semantic activity + evidence)', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
-      { type: 'tool_pending', name: 'navigate' },
+      { type: 'tool_pending', name: 'browser_action' },
       {
         type: 'tool_exec_start',
         id: 1,
-        name: 'navigate',
-        input: { url: 'https://www.sec.gov/cgi-bin/browse-edgar' },
+        name: 'browser_action',
+        input: { actions: [{ op: 'navigate', url: 'https://www.sec.gov/cgi-bin/browse-edgar' }] },
       },
     ]);
     expect(state.live?.pendingTools).toHaveLength(1);
@@ -631,8 +631,8 @@ describe('reduce (published artifacts)', () => {
       {
         type: 'tool_exec_start',
         id: 4,
-        name: 'browser_batch',
-        input: { actions: [{ tool: 'click', input: { ref: 'e1' } }] },
+        name: 'browser_action',
+        input: { actions: [{ op: 'click', target: { ref: 'e1' } }] },
       },
       published(4, publishedEntry({ filename: 'artifacts/notes.csv', roles: ['requested_output'] })),
       published(4, publishedEntry({ filename: 'artifacts/shot.png', sourceUrl: 'https://x.test/b' })),
@@ -640,7 +640,7 @@ describe('reduce (published artifacts)', () => {
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'evidence',
-      line: 'Running 1 browser steps',
+      line: 'Clicking',
       sourceUrl: 'https://x.test/b',
     });
     expect(state.artifacts).toHaveLength(2);
@@ -669,8 +669,8 @@ describe('reduce (published artifacts)', () => {
       {
         type: 'tool_exec_start',
         id: 5,
-        name: 'browser_batch',
-        input: { actions: [{ tool: 'screenshot', input: {} }, { tool: 'click', input: {} }] },
+        name: 'browser_action',
+        input: { actions: [{ op: 'click', target: { ref: 'e1' } }, { op: 'click', target: { ref: 'e2' } }] },
       },
       published(5, publishedEntry({ filename: 'artifacts/partial.png', sourceUrl: 'https://x.test/a' })),
       { type: 'tool_exec_end', id: 5, ok: false, error: 'step 2 failed' },

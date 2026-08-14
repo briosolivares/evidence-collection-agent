@@ -45,7 +45,6 @@ function baseCheckpoint(overrides: Partial<RunCheckpointV1> = {}): RunCheckpoint
     updatedAt: new Date(0).toISOString(),
     runConfiguration: {
       model: 'claude-sonnet-5',
-      toolProfile: 'browser-v2',
       maxOutputTokens: 8192,
       maxTurns: UNBOUNDED_CEILING,
       maxContextTokens: 180_000,
@@ -295,7 +294,6 @@ describe('openRunCheckpointStore: save/load round trip', () => {
       runStatus: 'executing_tools',
       runConfiguration: {
         model: 'claude-sonnet-5',
-        toolProfile: 'browser-v2',
         maxOutputTokens: 8192,
         maxTurns: UNBOUNDED_CEILING,
         maxContextTokens: 180_000,
@@ -303,7 +301,6 @@ describe('openRunCheckpointStore: save/load round trip', () => {
         harness: {
           maxWorkerCycles: 6,
           maxCompletionCheckFailures: 2,
-          outputContract: true,
           contractAuthor: 'initializer',
         },
       },

@@ -6,15 +6,6 @@ import { resolveRunPath } from '../../run/runDir.js';
 import { offloadResult, PREVIEW_MAX_BYTES } from '../capResult.js';
 import { accessKey, type ToolDef } from '../registry.js';
 
-// INTEGRATION (primary agent, at cutover):
-//  1. Build with createInspectDocumentTool({ registry }) where `registry` is
-//     createContentReaderRegistry([...]) over the PDF, spreadsheet, and OCR
-//     adapters — and, for OCR, with `persistImage` wired to the run's evidence
-//     store so a recognized image is retained.
-//  2. Append to the V2 registry after read_resource.
-//  3. read_resource and observe should route non-HTML bytes through the same
-//     registry instance, so a PDF found by either path reads identically.
-
 /**
  * `inspect_document`: read a bounded slice of a non-HTML document already in
  * the run directory.
@@ -107,7 +98,6 @@ export function createInspectDocumentTool(deps: InspectDocumentDeps): ToolDef<In
     // falls back to the empty-reads LEGACY_READ_ACCESS) is what makes the
     // scheduler serialize this behind a concurrent write to the same path —
     // e.g. a download or write_file targeting the exact file being read.
-    readOnly: true,
     getAccess: (input) => ({ reads: [accessKey.file(input.path)], writes: [] }),
     execute: async (input, ctx): Promise<InspectDocumentResult> => {
       // The model supplies this path, so confinement is not optional.

@@ -20,7 +20,7 @@ const tools: ToolDef[] = [
     inputSchema: z.strictObject({
       file_path: z.string().describe('Path relative to the run directory'),
     }),
-    readOnly: true,
+    getAccess: () => ({ reads: [], writes: [] }),
     execute: () => 'unused',
   },
   {
@@ -30,7 +30,7 @@ const tools: ToolDef[] = [
       file_path: z.string().describe('Path relative to the run directory'),
       content: z.string().describe('Exact content to write'),
     }),
-    readOnly: false,
+    getAccess: () => ({ reads: [], writes: [] }),
     execute: () => 'unused',
   },
 ];

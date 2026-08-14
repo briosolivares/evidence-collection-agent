@@ -81,10 +81,10 @@ describe('formatProgressEvent', () => {
 });
 
 describe('formatRunSummary', () => {
-  it('reports the final message and run dir on a completed run', () => {
+  it('reports the final message and run dir on a verified run', () => {
     const result: RunTaskResult = {
       runDir: '/runs/2026-08-10T00-00-00-abcd',
-      status: 'completed',
+      status: 'verified',
       finalText: 'Wrote answer.md with the requested totals.',
     };
     const summary = formatRunSummary(result);
@@ -92,14 +92,17 @@ describe('formatRunSummary', () => {
     expect(summary).toContain('/runs/2026-08-10T00-00-00-abcd');
   });
 
-  it('reports the guard name and run dir on a budget_exceeded run', () => {
+  it('reports the reason, detail, and run dir on an incomplete run', () => {
     const result: RunTaskResult = {
       runDir: '/runs/2026-08-10T00-00-00-efgh',
-      status: 'budget_exceeded',
-      reason: 'max_turns',
+      status: 'incomplete',
+      reason: 'budget_exceeded',
+      detail: 'max_turns exceeded',
+      finalText: '',
     };
     const summary = formatRunSummary(result);
-    expect(summary).toContain('max_turns');
+    expect(summary).toContain('budget_exceeded');
+    expect(summary).toContain('max_turns exceeded');
     expect(summary).toContain('/runs/2026-08-10T00-00-00-efgh');
   });
 });

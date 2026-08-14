@@ -12,11 +12,12 @@ import {
   SCRATCH_TABLES_DIR,
   type OutputRowInput,
   type OutputTableStore,
-  type TableMutationResult,
+  type TableCompletenessEvidence,
+  type TableUpdateResult,
 } from './outputTable.js';
 
-// The store's three guarantees, tested directly: atomic batches, versioned
-// rows, and evidence-linked facts.
+// The store's guarantees, tested directly: atomic batches and
+// evidence-linked facts.
 
 const SPEC: Extract<OutputSpec, { kind: 'table' }> = {
   id: 'roster',
@@ -88,9 +89,30 @@ function row(overrides: Partial<OutputRowInput> = {}): OutputRowInput {
   };
 }
 
-function errorsOf(result: TableMutationResult): string[] {
+function errorsOf(result: TableUpdateResult): string[] {
   if (result.ok) throw new Error('expected the mutation to be rejected');
   return result.errors;
+}
+
+/** Drive the store's one mutator, `updateTable`, for a single upsert —
+ * so call sites read like the old single-purpose method without repeating
+ * the section wrapper everywhere. */
+function upsert(s: OutputTableStore, outputId: string, rows: readonly OutputRowInput[]): TableUpdateResult {
+  return s.updateTable(outputId, { upsert: { rows } });
+}
+
+/** Same, for a single delete. */
+function del(s: OutputTableStore, outputId: string, rowIds: readonly string[]): TableUpdateResult {
+  return s.updateTable(outputId, { delete: { rowIds } });
+}
+
+/** Same, for a single completeness record. */
+function complete(
+  s: OutputTableStore,
+  outputId: string,
+  evidence: TableCompletenessEvidence,
+): TableUpdateResult {
+  return s.updateTable(outputId, { completeness: evidence });
 }
 
 describe('createOutputTableStore', () => {
@@ -104,28 +126,27 @@ describe('createOutputTableStore', () => {
   });
 });
 
-describe('upsertOutputRows', () => {
-  it('inserts a valid row at version 1', () => {
+describe('updateTable — upsert', () => {
+  it('inserts a valid row', () => {
     const s = store();
-    const result = s.upsertOutputRows('roster', [row()]);
+    const result = upsert(s, 'roster', [row()]);
 
-    expect(result).toEqual({ ok: true, created: ['r1'], updated: [], rowCount: 1 });
-    expect(s.table('roster').rows[0]).toMatchObject({ rowId: 'r1', version: 1 });
+    expect(result).toEqual({ ok: true, created: ['r1'], updated: [], deleted: [], rowCount: 1 });
+    expect(s.table('roster').rows[0]).toMatchObject({ rowId: 'r1' });
   });
 
-  it('updates an existing row and bumps its version', () => {
+  it('updates an existing row', () => {
     const s = store();
-    s.upsertOutputRows('roster', [row()]);
-    const result = s.upsertOutputRows('roster', [row({ values: { ...row().values, name: 'Beta' } })]);
+    upsert(s, 'roster', [row()]);
+    const result = upsert(s, 'roster', [row({ values: { ...row().values, name: 'Beta' } })]);
 
-    expect(result).toEqual({ ok: true, created: [], updated: ['r1'], rowCount: 1 });
-    expect(s.table('roster').rows[0]).toMatchObject({ version: 2 });
+    expect(result).toEqual({ ok: true, created: [], updated: ['r1'], deleted: [], rowCount: 1 });
     expect(s.table('roster').rows[0]?.values.name).toBe('Beta');
   });
 
   it('makes NO partial change when any row in the batch is invalid', () => {
     const s = store();
-    const result = s.upsertOutputRows('roster', [
+    const result = upsert(s, 'roster', [
       row({ rowId: 'good' }),
       row({ rowId: 'bad', values: { name: '', url: 'https://e.com/b', count: 1, status: 'active' } }),
     ]);
@@ -136,12 +157,12 @@ describe('upsertOutputRows', () => {
   });
 
   it('rejects an empty batch', () => {
-    expect(errorsOf(store().upsertOutputRows('roster', []))).toEqual(['no rows supplied']);
+    expect(errorsOf(upsert(store(), 'roster', []))).toEqual(['no rows supplied']);
   });
 
   it('rejects a duplicate rowId within one batch', () => {
     expect(
-      errorsOf(store().upsertOutputRows('roster', [row(), row()])).join('\n'),
+      errorsOf(upsert(store(), 'roster', [row(), row()])).join('\n'),
     ).toMatch(/appears twice/);
   });
 
@@ -149,14 +170,14 @@ describe('upsertOutputRows', () => {
     const s = store();
     expect(
       errorsOf(
-        s.upsertOutputRows('roster', [
+        upsert(s, 'roster', [
           row({ values: { name: 'A', url: 'https://e.com/a', count: 1 } as never }),
         ]),
       ).join('\n'),
     ).toMatch(/missing column "status"/);
     expect(
       errorsOf(
-        s.upsertOutputRows('roster', [
+        upsert(s, 'roster', [
           row({ values: { ...row().values, extra: 'x' } as never }),
         ]),
       ).join('\n'),
@@ -166,7 +187,7 @@ describe('upsertOutputRows', () => {
   it('validates value types per column', () => {
     const s = store();
     const bad = (values: Record<string, unknown>): string =>
-      errorsOf(s.upsertOutputRows('roster', [row({ values: values as never })])).join('\n');
+      errorsOf(upsert(s, 'roster', [row({ values: values as never })])).join('\n');
 
     expect(bad({ ...row().values, count: 1.5 })).toMatch(/must be an integer/);
     expect(bad({ ...row().values, url: 'not-a-url' })).toMatch(/not a valid URL/);
@@ -178,13 +199,13 @@ describe('upsertOutputRows', () => {
   it('allows an empty optional column but not an empty required one', () => {
     const s = store();
     expect(
-      s.upsertOutputRows('roster', [
+      upsert(s, 'roster', [
         row({ values: { name: 'A', url: null, count: null, status: null } }),
       ]).ok,
     ).toBe(true);
     expect(
       errorsOf(
-        s.upsertOutputRows('roster', [
+        upsert(s, 'roster', [
           row({ rowId: 'r2', values: { name: null, url: null, count: null, status: null } }),
         ]),
       ).join('\n'),
@@ -195,7 +216,7 @@ describe('upsertOutputRows', () => {
     const s = store();
     for (const dangerous of ['=SUM(A1:A9)', '+1', '-2', '@import']) {
       const errors = errorsOf(
-        s.upsertOutputRows('roster', [row({ values: { ...row().values, name: dangerous } })]),
+        upsert(s, 'roster', [row({ values: { ...row().values, name: dangerous } })]),
       ).join('\n');
       expect(errors).toMatch(/formula character/);
     }
@@ -207,48 +228,20 @@ describe('upsertOutputRows', () => {
   it('requires at least one existing evidence id per row', () => {
     const s = store();
     expect(
-      errorsOf(s.upsertOutputRows('roster', [row({ evidenceIds: [] })])).join('\n'),
+      errorsOf(upsert(s, 'roster', [row({ evidenceIds: [] })])).join('\n'),
     ).toMatch(/cites no evidence/);
     expect(
-      errorsOf(s.upsertOutputRows('roster', [row({ evidenceIds: ['E9'] })])).join('\n'),
+      errorsOf(upsert(s, 'roster', [row({ evidenceIds: ['E9'] })])).join('\n'),
     ).toMatch(/unknown evidence id "E9"/);
-    expect(s.upsertOutputRows('roster', [row({ evidenceIds: ['E1', 'E2'] })]).ok).toBe(true);
-  });
-
-  it('reports a version conflict, changes nothing, and returns current versions', () => {
-    const s = store();
-    s.upsertOutputRows('roster', [row()]); // version 1
-
-    const result = s.upsertOutputRows('roster', [
-      row({ expectedVersion: 5, values: { ...row().values, name: 'Stale' } }),
-    ]);
-
-    expect(result.ok).toBe(false);
-    if (result.ok) throw new Error('unreachable');
-    expect(result.currentVersions).toEqual({ r1: 1 });
-    // Unchanged.
-    expect(s.table('roster').rows[0]).toMatchObject({ version: 1 });
-    expect(s.table('roster').rows[0]?.values.name).toBe('Alpha');
-  });
-
-  it('accepts a matching expectedVersion', () => {
-    const s = store();
-    s.upsertOutputRows('roster', [row()]);
-    expect(s.upsertOutputRows('roster', [row({ expectedVersion: 1 })]).ok).toBe(true);
-  });
-
-  it('treats expectedVersion 0 as "must not exist yet"', () => {
-    const s = store();
-    expect(s.upsertOutputRows('roster', [row({ expectedVersion: 0 })]).ok).toBe(true);
-    expect(s.upsertOutputRows('roster', [row({ expectedVersion: 0 })]).ok).toBe(false);
+    expect(upsert(s, 'roster', [row({ evidenceIds: ['E1', 'E2'] })]).ok).toBe(true);
   });
 });
 
-describe('deleteOutputRows', () => {
+describe('updateTable — delete', () => {
   it('deletes known rows', () => {
     const s = store();
-    s.upsertOutputRows('roster', [row(), row({ rowId: 'r2' })]);
-    const result = s.deleteOutputRows('roster', ['r1']);
+    upsert(s, 'roster', [row(), row({ rowId: 'r2' })]);
+    const result = del(s, 'roster', ['r1']);
 
     expect(result).toMatchObject({ ok: true, rowCount: 1 });
     expect(s.table('roster').rows.map((r) => r.rowId)).toEqual(['r2']);
@@ -256,20 +249,20 @@ describe('deleteOutputRows', () => {
 
   it('deletes nothing when any id is unknown', () => {
     const s = store();
-    s.upsertOutputRows('roster', [row()]);
-    expect(errorsOf(s.deleteOutputRows('roster', ['r1', 'ghost'])).join('\n')).toMatch(/ghost/);
+    upsert(s, 'roster', [row()]);
+    expect(errorsOf(del(s, 'roster', ['r1', 'ghost'])).join('\n')).toMatch(/ghost/);
     expect(s.table('roster').rows).toHaveLength(1);
   });
 
   it('rejects an empty id list', () => {
-    expect(errorsOf(store().deleteOutputRows('roster', []))).toEqual(['no rowIds supplied']);
+    expect(errorsOf(del(store(), 'roster', []))).toEqual(['no rowIds supplied']);
   });
 });
 
-describe('setTableCompleteness', () => {
+describe('updateTable — completeness', () => {
   it('records a valid completeness proof', () => {
     const s = store();
-    const result = s.setTableCompleteness('roster', {
+    const result = complete(s, 'roster', {
       method: 'The directory header states the member count.',
       evidenceIds: ['E1'],
       statedTotal: 12,
@@ -282,14 +275,14 @@ describe('setTableCompleteness', () => {
   it('requires a method and at least one existing evidence id', () => {
     const s = store();
     expect(
-      errorsOf(s.setTableCompleteness('roster', { method: '  ', evidenceIds: ['E1'] })).join('\n'),
+      errorsOf(complete(s, 'roster', { method: '  ', evidenceIds: ['E1'] })).join('\n'),
     ).toMatch(/non-empty method/);
     expect(
-      errorsOf(s.setTableCompleteness('roster', { method: 'counted', evidenceIds: [] })).join('\n'),
+      errorsOf(complete(s, 'roster', { method: 'counted', evidenceIds: [] })).join('\n'),
     ).toMatch(/at least one evidence id/);
     expect(
       errorsOf(
-        s.setTableCompleteness('roster', { method: 'counted', evidenceIds: ['E9'] }),
+        complete(s, 'roster', { method: 'counted', evidenceIds: ['E9'] }),
       ).join('\n'),
     ).toMatch(/unknown evidence id "E9"/);
   });
@@ -299,7 +292,7 @@ describe('setTableCompleteness', () => {
     for (const statedTotal of [-1, 2.5]) {
       expect(
         errorsOf(
-          s.setTableCompleteness('roster', {
+          complete(s, 'roster', {
             method: 'counted',
             evidenceIds: ['E1'],
             statedTotal,
@@ -340,11 +333,11 @@ describe('persistence via runDir', () => {
     const untouched = mkdtempSync(join(tmpdir(), 'output-table-no-rundir-'));
     try {
       const s = store(); // no runDir override — the default, in-memory store
-      expect(s.upsertOutputRows('roster', [row()]).ok).toBe(true);
+      expect(upsert(s, 'roster', [row()]).ok).toBe(true);
       expect(
-        s.setTableCompleteness('roster', { method: 'counted', evidenceIds: ['E1'] }).ok,
+        complete(s, 'roster', { method: 'counted', evidenceIds: ['E1'] }).ok,
       ).toBe(true);
-      expect(s.deleteOutputRows('roster', ['r1']).ok).toBe(true);
+      expect(del(s, 'roster', ['r1']).ok).toBe(true);
 
       expect(readdirSync(untouched)).toEqual([]);
     } finally {
@@ -354,7 +347,7 @@ describe('persistence via runDir', () => {
 
   it('persists a table snapshot after a successful upsert and records it in the manifest', () => {
     const s = store(SPEC, { runDir });
-    const result = s.upsertOutputRows('roster', [row()]);
+    const result = upsert(s, 'roster', [row()]);
     expect(result.ok).toBe(true);
 
     const path = snapshotPath('roster');
@@ -370,8 +363,8 @@ describe('persistence via runDir', () => {
 
   it('replaces, rather than duplicates, the manifest entry across repeated writes', () => {
     const s = store(SPEC, { runDir });
-    s.upsertOutputRows('roster', [row()]);
-    s.upsertOutputRows('roster', [row({ rowId: 'r2' })]);
+    upsert(s, 'roster', [row()]);
+    upsert(s, 'roster', [row({ rowId: 'r2' })]);
 
     const entries = manifestOf().artifacts.filter((a) => a.filename === 'scratch/tables/roster.json');
     expect(entries).toHaveLength(1);
@@ -379,24 +372,23 @@ describe('persistence via runDir', () => {
 
   it('leaves the persisted snapshot byte-identical when a mutation is rejected', () => {
     const s = store(SPEC, { runDir });
-    s.upsertOutputRows('roster', [row()]);
+    upsert(s, 'roster', [row()]);
     const before = readFileSync(snapshotPath('roster'));
 
-    const rejected = s.upsertOutputRows('roster', [row({ evidenceIds: ['E9'] })]);
+    const rejected = upsert(s, 'roster', [row({ evidenceIds: ['E9'] })]);
     expect(rejected.ok).toBe(false);
 
     const after = readFileSync(snapshotPath('roster'));
     expect(after.equals(before)).toBe(true);
   });
 
-  it('writes nothing back to disk while replaying a snapshot', () => {
+  it('writes nothing back to disk while replaying a snapshot, and restores a repeatedly-upserted row at its LATEST values', () => {
     const s = store(SPEC, { runDir });
-    // Three versions of the same row: replay re-applies a row once per
-    // version it accumulated, so this is where redundant writes would pile
-    // up if replay persisted.
-    s.upsertOutputRows('roster', [row()]);
-    s.upsertOutputRows('roster', [row({ values: { ...row().values, name: 'Second' } })]);
-    s.upsertOutputRows('roster', [row({ values: { ...row().values, name: 'Third' } })]);
+    // Upsert the same row three times: replay must reproduce only the final
+    // values, not resurrect an intermediate write or write anything itself.
+    upsert(s, 'roster', [row()]);
+    upsert(s, 'roster', [row({ values: { ...row().values, name: 'Second' } })]);
+    upsert(s, 'roster', [row({ values: { ...row().values, name: 'Third' } })]);
 
     // Nanosecond mtime, deliberately not `capturedAt` or the bytes: replay
     // rewrites the same content it just read, and its writes can easily land
@@ -406,27 +398,27 @@ describe('persistence via runDir', () => {
     const before = mtimeNs(snapshotPath('roster'));
 
     const restored = restoreOutputTableStore({ ...multiTableDeps(runDir), tableSpec: () => SPEC });
-    expect(restored.table('roster').rows[0]?.version).toBe(3);
+    expect(restored.table('roster').rows[0]?.values.name).toBe('Third');
     expect(mtimeNs(snapshotPath('roster'))).toBe(before);
 
     // Persistence resumes once replay is done: the restored store is a live
     // store, and a mutation made through it must still be durable.
-    expect(restored.upsertOutputRows('roster', [row({ rowId: 'r9' })]).ok).toBe(true);
+    expect(upsert(restored, 'roster', [row({ rowId: 'r9' })]).ok).toBe(true);
     expect(mtimeNs(snapshotPath('roster'))).not.toBe(before);
   });
 
   it('round-trips rows across several tables plus completeness through restoreOutputTableStore', () => {
     const s = createOutputTableStore(multiTableDeps(runDir));
-    s.upsertOutputRows('roster', [row(), row({ rowId: 'r2', values: { ...row().values, name: 'Beta' } })]);
-    // Bump r1 to version 2, so the round trip also has to reproduce a
-    // version greater than 1.
-    s.upsertOutputRows('roster', [row({ values: { ...row().values, name: 'Alpha v2' } })]);
-    s.upsertOutputRows('sponsors', [
+    upsert(s, 'roster', [row(), row({ rowId: 'r2', values: { ...row().values, name: 'Beta' } })]);
+    // Upsert r1 again with new values, so the round trip also has to
+    // reproduce a row that was overwritten after its first insert.
+    upsert(s, 'roster', [row({ values: { ...row().values, name: 'Alpha v2' } })]);
+    upsert(s, 'sponsors', [
       { rowId: 's1', values: { name: 'Acme', amount: 500 }, evidenceIds: ['E2'] },
     ]);
     // Completeness on one table only, so the round trip exercises both the
     // present and the absent case.
-    s.setTableCompleteness('roster', {
+    complete(s, 'roster', {
       method: 'counted heads at the meeting',
       evidenceIds: ['E1'],
       statedTotal: 2,
@@ -435,12 +427,13 @@ describe('persistence via runDir', () => {
     const restored = restoreOutputTableStore(multiTableDeps(runDir));
 
     expect(restored.tables()).toEqual(s.tables());
+    expect(restored.table('roster').rows.find((r) => r.rowId === 'r1')?.values.name).toBe('Alpha v2');
   });
 
   it('does not resurrect a deleted row on restore', () => {
     const s = store(SPEC, { runDir });
-    s.upsertOutputRows('roster', [row(), row({ rowId: 'r2' })]);
-    s.deleteOutputRows('roster', ['r1']);
+    upsert(s, 'roster', [row(), row({ rowId: 'r2' })]);
+    del(s, 'roster', ['r1']);
 
     const restored = restoreOutputTableStore({
       tableSpec: (outputId) => (outputId === SPEC.id ? SPEC : undefined),
@@ -453,7 +446,7 @@ describe('persistence via runDir', () => {
 
   it('throws, naming the outputId, when a persisted row no longer satisfies a revised contract', () => {
     const s = store(SPEC, { runDir });
-    s.upsertOutputRows('roster', [row()]); // values.status: 'active', valid when persisted
+    upsert(s, 'roster', [row()]); // values.status: 'active', valid when persisted
 
     // Simulate a contract revision between the checkpoint and the resume:
     // "active" is no longer an accepted status value.

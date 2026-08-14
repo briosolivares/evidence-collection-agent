@@ -136,8 +136,11 @@ describe('set_output_contract', () => {
     expect(result.content).toMatch(/no output-contract store/);
   });
 
-  it('is not read-only: the scheduler must serialize it', () => {
-    expect(setOutputContractTool.readOnly).toBe(false);
+  it('is not read-only: the scheduler must serialize it against other contract reads/writes', () => {
+    expect(setOutputContractTool.getAccess({ contract: contract() })).toEqual({
+      reads: [],
+      writes: ['contract'],
+    });
   });
 
   it('exposes a deterministic API schema the model can be shown', () => {

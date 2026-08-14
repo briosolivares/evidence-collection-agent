@@ -113,3 +113,51 @@ describe('size cap integration (T5)', () => {
     expect(offloaded.startsWith(replacement.preview)).toBe(true);
   });
 });
+
+describe('binary files are refused, not silently mangled', () => {
+  // Node's lenient utf8 decode turns arbitrary bytes into U+FFFD instead of
+  // throwing, so before this guard a PNG read "succeeded" and the model
+  // reasoned over replacement characters as if they were content. Detection is
+  // by magic number, never by extension: a deliverable's filename is
+  // model-supplied and proves nothing about its bytes.
+  it.each([
+    ['a PDF', 'report.pdf', Buffer.from('%PDF-1.7\n%\xe2\xe3\xcf\xd3\n', 'latin1'), 'is a PDF'],
+    [
+      'an XLSX',
+      'book.xlsx',
+      // ZIP local-file header plus an `xl/` entry, which is what separates a
+      // spreadsheet from any other ZIP.
+      Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.from('....xl/workbook.xml')]),
+      'is a spreadsheet',
+    ],
+    [
+      'a PNG',
+      'shot.png',
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x01]),
+      'is an image',
+    ],
+  ])('refuses %s and names the tool that can read it', async (_label, name, bytes, expected) => {
+    writeFileSync(join(runDir, name), bytes);
+    const result = await call({ file_path: name });
+    expect(result.isError).toBe(true);
+    expect(result.content).toContain(expected);
+    expect(result.content).toContain('inspect_document');
+  });
+
+  it('refuses text-shaped bytes that are not valid UTF-8', async () => {
+    // No magic number matches, so this is caught by the strict decode rather
+    // than by format detection — the other half of the guard.
+    writeFileSync(join(runDir, 'mojibake.txt'), Buffer.from([0x68, 0x69, 0xff, 0xfe, 0x0a]));
+    const result = await call({ file_path: 'mojibake.txt' });
+    expect(result.isError).toBe(true);
+    expect(result.content).toContain('not valid UTF-8');
+  });
+
+  it('still reads text whose bytes are multi-byte UTF-8', async () => {
+    // The guard must not reject legitimate non-ASCII content.
+    writeFileSync(join(runDir, 'utf8.txt'), 'Ünïcödé — 日本語\n', 'utf8');
+    const result = await call({ file_path: 'utf8.txt' });
+    expect(result.isError).toBe(false);
+    expect(result.content).toContain('Ünïcödé — 日本語');
+  });
+});

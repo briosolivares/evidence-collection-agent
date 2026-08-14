@@ -24,7 +24,7 @@ const echo: ToolDef<{ message: string }> = {
   name: 'echo',
   description: 'Echo the message back.',
   inputSchema: z.object({ message: z.string() }),
-  readOnly: true,
+  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) => `echo: ${input.message}`,
 };
 
@@ -32,7 +32,7 @@ const inventory: ToolDef<{ item: string }> = {
   name: 'inventory',
   description: 'Look up an item, returning structured data.',
   inputSchema: z.object({ item: z.string() }),
-  readOnly: true,
+  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) => ({ item: input.item, count: 3 }),
 };
 
@@ -40,7 +40,7 @@ const explode: ToolDef<Record<string, never>> = {
   name: 'explode',
   description: 'Always throws.',
   inputSchema: z.object({}),
-  readOnly: true,
+  getAccess: () => ({ reads: [], writes: [] }),
   execute: async () => {
     throw new Error('boiler pressure too high');
   },
@@ -145,7 +145,7 @@ describe('executeToolCall result capping (stage 5)', () => {
       name: 'flood',
       description: 'Emit the requested number of bytes.',
       inputSchema: z.object({ bytes: z.number() }),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       ...(maxBytes !== undefined ? { maxBytes } : {}),
       execute: async (input) => 'x'.repeat(input.bytes),
     };
@@ -203,7 +203,7 @@ describe('executeToolCall permission gate', () => {
       name: 'interactive',
       description: 'Requires a user decision before running.',
       inputSchema: z.object({ question: z.string() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [] }),
       requiresUserInteraction: true,
       execute: async (input) => {
         executed.push(input);
@@ -341,7 +341,7 @@ describe('executeToolCall execution deadline', () => {
     name: 'wedged',
     description: 'Never returns.',
     inputSchema: z.object({}).strict(),
-    readOnly: true,
+    getAccess: () => ({ reads: [], writes: [] }),
     timeoutMs: 40,
     execute: () => new Promise<never>(() => undefined),
   };
@@ -370,7 +370,7 @@ describe('executeToolCall execution deadline', () => {
       name: 'late_throw',
       description: 'Rejects after its deadline.',
       inputSchema: z.object({}).strict(),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       timeoutMs: 20,
       execute: () => new Promise<never>((_resolve, reject) => { rejectLate = reject; }),
     };
@@ -408,7 +408,7 @@ describe('executeToolCall execution deadline', () => {
       name: 'patient',
       description: 'Slow but legitimate.',
       inputSchema: z.object({}).strict(),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       timeoutMs: Infinity,
       execute: async () => {
         await new Promise((resolve) => setTimeout(resolve, 60));
@@ -435,7 +435,6 @@ describe('executeToolCall busy-resource gate', () => {
     name: 'writes_page',
     description: 'Writes the named page.',
     inputSchema: z.object({ pageId: z.string() }),
-    readOnly: false,
     getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
     execute: async (input) => `wrote ${input.pageId}`,
   };
@@ -447,7 +446,7 @@ describe('executeToolCall busy-resource gate', () => {
       name: 'never_starts',
       description: 'Would run, but the gate should refuse it first.',
       inputSchema: z.object({}).strict(),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: () => {
         executed = true;
         return 'ran';
@@ -478,7 +477,6 @@ describe('executeToolCall busy-resource gate', () => {
       name: 'wedged_write',
       description: 'Times out, then eventually resolves in the background.',
       inputSchema: z.object({ pageId: z.string() }),
-      readOnly: false,
       timeoutMs: 20,
       getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
       execute: () => new Promise<string>((resolve) => { resolveWedged = resolve; }),
@@ -520,7 +518,6 @@ describe('executeToolCall busy-resource gate', () => {
       name: 'wedged_write_2',
       description: 'Times out and never settles for this test.',
       inputSchema: z.object({ pageId: z.string() }),
-      readOnly: false,
       timeoutMs: 20,
       getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
       execute: () => new Promise<never>(() => undefined),

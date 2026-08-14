@@ -285,7 +285,7 @@ describe('App /evals workflow', () => {
           onEvent({ type: 'turn_end', usage: { input: 500, output: 100 } });
           onEvent({
             type: 'run_finished',
-            outcome: 'completed',
+            outcome: 'verified',
             finalText: 'done',
             runDir: '/runs/eval-trial',
             at: 9_000,
@@ -293,7 +293,7 @@ describe('App /evals workflow', () => {
           return {
             cancel: bridge.cancel,
             done: Promise.resolve({
-              status: 'completed',
+              status: 'verified',
               finalText: 'done',
               runDir: '/runs/eval-trial',
             }),

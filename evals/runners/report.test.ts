@@ -15,7 +15,6 @@ function sampleReport(): EvalReport {
     k: 2,
     concurrency: 3,
     model: 'claude-sonnet-5',
-    toolProfile: 'batch-enabled',
     tasks: [
       summarizeTask('stub', [
         {
@@ -46,7 +45,7 @@ describe('formatReport', () => {
     expect(text).toContain('k=2');
     expect(text).toContain('concurrency 3');
     expect(text).toContain('model claude-sonnet-5');
-    expect(text).toContain('tool profile batch-enabled');
+    expect(text).toContain('protocol output-contract');
     expect(text).toContain('stub: accuracy 75.0%  completion 1/2  task FAIL  mean latency 50ms');
     expect(text).toContain('trial 1: 2/2 assertions');
     expect(text).toContain('trial 2: 1/2 assertions');
@@ -55,6 +54,14 @@ describe('formatReport', () => {
     expect(text).toContain('FAIL  hash verifies — sha256 mismatch on disk');
     expect(text).toContain('pass  answer.md exists');
     expect(text).toContain('0/1 tasks passed');
+  });
+
+  it('appends the contract author to the protocol token when the report names one', () => {
+    const withAuthor = formatReport({
+      ...sampleReport(),
+      protocol: { completion: 'output-contract', contractAuthor: 'worker' },
+    });
+    expect(withAuthor).toContain('protocol output-contract/worker');
   });
 
   it('labels an assisted batch and stays silent for unassisted ones', () => {

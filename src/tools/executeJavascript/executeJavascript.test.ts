@@ -143,7 +143,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page, evidenceStore: () => store });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: BULK_CODE,
       captureEvidence: true,
     });
@@ -171,7 +170,7 @@ describe('execute_javascript tool', () => {
     expect(record.summary).toContain('25 items with keys name, batch, href');
     expect(record.sourceUrl).toBe('https://example.test/companies');
     expect(record.detail).toEqual({
-      target: 'selected_top_document',
+      pageId: null,
       code: BULK_CODE,
       url: 'https://example.test/companies',
       documentToken: 'doc-token-7',
@@ -192,7 +191,7 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     const parsed = parseResult(
-      (await callTool(tool, { target: 'selected_top_document', code: 'x' })).content,
+      (await callTool(tool, { code: 'x' })).content,
     );
 
     expect(parsed.value).toEqual({ total: 42 });
@@ -212,7 +211,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'window.rows',
     });
 
@@ -232,7 +230,7 @@ describe('execute_javascript tool', () => {
     const { page } = fakePage({ value });
     const tool = buildTool({ page: () => page });
 
-    const result = await callTool(tool, { target: 'selected_top_document', code: 'x' });
+    const result = await callTool(tool, { code: 'x' });
 
     expect(result.isError).toBe(true);
     expect(result.content).toContain(expected);
@@ -245,7 +243,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'while (true) {}',
       timeoutMs: 2_500,
     });
@@ -266,7 +263,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'while (true) {}',
       timeoutMs: 2_500,
     });
@@ -283,7 +279,7 @@ describe('execute_javascript tool', () => {
     });
     const tool = buildTool({ page: () => page });
 
-    const result = await callTool(tool, { target: 'selected_top_document', code: 'x.y' });
+    const result = await callTool(tool, { code: 'x.y' });
 
     expect(result.isError).toBe(true);
     expect(result.content).toContain('Page JavaScript failed: TypeError: cannot read x');
@@ -303,7 +299,6 @@ describe('execute_javascript tool', () => {
       valueMaxBytes: 4_000,
     });
     const input = {
-      target: 'selected_top_document',
       code: BULK_CODE,
       captureEvidence: true,
     };
@@ -355,7 +350,6 @@ describe('execute_javascript tool', () => {
     const parsed = parseResult(
       (
         await callTool(tool, {
-          target: 'selected_top_document',
           code: 'x',
           captureEvidence: true,
         })
@@ -393,7 +387,6 @@ describe('execute_javascript tool', () => {
     }) as unknown as ToolDef;
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'document.title',
     });
 
@@ -449,7 +442,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'x',
       timeoutMs,
     });
@@ -464,7 +456,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page });
 
     await callTool(tool, {
-      target: 'selected_top_document',
       code: 'x',
       timeoutMs: MAX_JAVASCRIPT_TIMEOUT_MS,
     });
@@ -477,7 +468,6 @@ describe('execute_javascript tool', () => {
     const tool = buildTool({ page: () => page, evidenceStore: () => undefined });
 
     const result = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'x',
       captureEvidence: true,
     });
@@ -489,22 +479,46 @@ describe('execute_javascript tool', () => {
     expect(calls).toEqual([]);
   });
 
-  it('rejects a target other than the one early literal, and unknown fields', async () => {
+  it('rejects an unknown field, a blank pageId, and a blank code', async () => {
     const { page } = fakePage({ value: [] });
     const tool = buildTool({ page: () => page });
 
-    const wrongTarget = await callTool(tool, { target: 'frame', code: 'x' });
     const extraField = await callTool(tool, {
-      target: 'selected_top_document',
       code: 'x',
       frameId: 'f1',
     });
-    const blankCode = await callTool(tool, { target: 'selected_top_document', code: '' });
+    const blankPageId = await callTool(tool, { code: 'x', pageId: '' });
+    const blankCode = await callTool(tool, { code: '' });
 
-    expect(wrongTarget).toMatchObject({ isError: true, errorKind: 'invalid_input' });
-    expect(wrongTarget.content).toContain('selected_top_document');
     expect(extraField).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+    expect(blankPageId).toMatchObject({ isError: true, errorKind: 'invalid_input' });
     expect(blankCode).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+  });
+
+  it('accepts an explicit pageId and threads it to page resolution and the evidence record', async () => {
+    const { page } = fakePage({ value: 'ok' });
+    const store = createEvidenceStore(runDir);
+    const resolvedPageIds: Array<string | undefined> = [];
+    const tool = createExecuteJavascriptTool({
+      policy: 'allow',
+      now: fakeClock(),
+      page: (_ctx, pageId) => {
+        resolvedPageIds.push(pageId);
+        return page;
+      },
+      evidenceStore: () => store,
+    });
+
+    const result = await callTool(tool, {
+      code: 'x',
+      pageId: 'popup-1',
+      captureEvidence: true,
+    });
+
+    expect(result.isError).toBe(false);
+    expect(resolvedPageIds).toEqual(['popup-1']);
+    const record = store.get(parseResult(result.content).evidenceId!)!;
+    expect((record.detail as { pageId: string | null }).pageId).toBe('popup-1');
   });
 
   it('is declared a page write, never read-only', () => {
@@ -512,7 +526,9 @@ describe('execute_javascript tool', () => {
     const tool = createExecuteJavascriptTool({ page: () => page, policy: 'allow' });
 
     expect(tool.name).toBe('execute_javascript');
-    expect(tool.readOnly).toBe(false);
+    // Fully exclusive: arbitrary code can touch anything, so it must never
+    // be scheduled beside other page work.
+    expect(tool.getAccess({ code: '1' })).toEqual({ reads: [], writes: [], exclusive: true });
     expect(tool.description).toContain('page WRITE');
     expect(tool.description).toContain('not a sandbox');
     expect(tool.requiresUserInteraction).toBeUndefined();
@@ -532,7 +548,6 @@ describe('execute_javascript tool', () => {
   it('exposes the early input schema for the API tool definition', () => {
     expect(
       earlyExecuteJavaScriptInputSchema.safeParse({
-        target: 'selected_top_document',
         code: 'document.title',
       }).success,
     ).toBe(true);

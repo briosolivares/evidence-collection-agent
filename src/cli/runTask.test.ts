@@ -9,15 +9,8 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { BrowserController } from '../browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
 import { HARNESS_FILENAME, type HarnessDiagnostics } from '../harness/harness.js';
-import {
-  CONTRACT_FILENAME,
-  INITIALIZER_MODEL,
-  INTENT_FILENAME,
-} from '../harness/initializer.js';
-import {
-  METRICS_FILENAME,
-  type RunMetrics,
-} from '../loop/agentLoop.js';
+import { INITIALIZER_MODEL } from '../harness/initializer.js';
+import { METRICS_FILENAME, type RunMetrics } from '../loop/workerSession.js';
 import type {
   CallModel,
   Message,
@@ -86,16 +79,14 @@ function scriptModel(responses: readonly ModelResponse[]): {
   return { callModel, requests };
 }
 
-// --- Harness-mode fakes: a well-formed initializer response (text-only —
-// the initializer is never offered tools), plus verifier responses that
+// --- Harness-mode fakes: a forced set_output_contract call for the
+// initializer (the only shape it can produce — see
+// makeContractInitializerModelDriver), plus verifier responses that
 // conclude the only way the verifier now can: one schema-valid
-// report_verification tool call. Prose verdicts are deliberately NOT used
-// here; DONE/CONTINUE text no longer carries any control-flow meaning.
+// report_verification tool call.
 
-/** A well-formed initializer response: both sections, non-empty bodies. */
-function initializerResponse(intent: string, contract: string): ModelResponse {
-  return textResponse(`# INTENT\n${intent}\n\n# CONTRACT\n${contract}`);
-}
+const submit = (id = 's1', summary = 'done') =>
+  toolResponse(id, 'submit_for_verification', { summary });
 
 /** A verifier response reporting `verified` (no findings). */
 function verifierVerified(): ModelResponse {
@@ -162,12 +153,28 @@ describe('runTask', () => {
         'Inspect the local evidence fixture and write its title and URL to stories.csv.';
       const fixtureUrl = fixtureServer.url('/');
       const csv = `title,url\nBrowser Controller Fixture,${fixtureUrl}\n`;
+      const contract = {
+        contract: {
+          outputs: [
+            { id: 'stories', kind: 'download', count: { exact: 1 }, filenamePattern: 'stories.csv' },
+          ],
+        },
+      };
       const fake = scriptModel([
-        toolResponse('navigate-1', 'navigate', { url: fixtureUrl }, {
-          input_tokens: 11,
-          output_tokens: 3,
+        toolResponse('c1', 'set_output_contract', contract, {
+          input_tokens: 9,
+          output_tokens: 2,
         }),
-        toolResponse('inspect-1', 'inspect_page', {}, {
+        toolResponse(
+          'navigate-1',
+          'browser_action',
+          { actions: [{ op: 'navigate', url: fixtureUrl }] },
+          {
+            input_tokens: 11,
+            output_tokens: 3,
+          },
+        ),
+        toolResponse('inspect-1', 'observe', {}, {
           input_tokens: 13,
           output_tokens: 4,
           cache_read_input_tokens: 2,
@@ -182,12 +189,9 @@ describe('runTask', () => {
             cache_read_input_tokens: 3,
           },
         ),
-        textResponse('The CSV deliverable is complete.', {
-          input_tokens: 19,
-          output_tokens: 6,
-          cache_read_input_tokens: 4,
-        }),
+        submit('s1', 'The CSV deliverable is complete.'),
       ]);
+      const verifier = scriptModel([verifierVerified()]);
 
       const result = await runTask(taskText, {
         browser,
@@ -195,52 +199,30 @@ describe('runTask', () => {
         callModel: fake.callModel,
         maxTurns: 8,
         maxContextTokens: 10_000,
+        harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
       });
 
-      expect(result.status).toBe('completed');
-      if (result.status !== 'completed') {
-        throw new Error(`Expected a completed run, got ${result.status}.`);
-      }
-      expect(result.finalText).toBe('The CSV deliverable is complete.');
+      expect(result.status).toBe('verified');
       expect(await readFile(join(result.runDir, 'artifacts/stories.csv'), 'utf8')).toBe(csv);
 
-      // The third request can only contain this page data if navigate and
-      // inspect_page ran through the real browser controller in the prior turns.
+      // The third request can only contain this page data if browser_action
+      // and observe ran through the real browser controller in the prior turns.
       expect(JSON.stringify(fake.requests[2])).toContain(fixtureUrl);
       expect(JSON.stringify(fake.requests[2])).toContain('Browser Controller Fixture');
-      expect(fake.requests).toHaveLength(4);
+      expect(fake.requests).toHaveLength(5);
 
       const events = await readTranscript(result.runDir);
-      expect(events.map((event) => [event.type, event.turn])).toEqual([
-        ['model_request', 1],
-        ['model_response', 1],
-        ['tool_call', 1],
-        ['tool_result', 1],
-        ['model_request', 2],
-        ['model_response', 2],
-        ['tool_call', 2],
-        ['tool_result', 2],
-        ['model_request', 3],
-        ['model_response', 3],
-        ['tool_call', 3],
-        ['tool_result', 3],
-        ['model_request', 4],
-        ['model_response', 4],
-      ]);
       expect(
         events
           .filter((event) => event.type === 'tool_call')
           .map((event) => (event.call as { name: string }).name),
-      ).toEqual(['navigate', 'inspect_page', 'write_file']);
+      ).toEqual(['set_output_contract', 'browser_action', 'observe', 'write_file']);
       expect(
         events
           .filter((event) => event.type === 'tool_result')
-          .map((event) => event.result),
-      ).toEqual([
-        expect.objectContaining({ toolCallId: 'navigate-1', isError: false }),
-        expect.objectContaining({ toolCallId: 'inspect-1', isError: false }),
-        expect.objectContaining({ toolCallId: 'write-1', isError: false }),
-      ]);
+          .map((event) => (event.result as { toolCallId: string; isError: boolean }).toolCallId),
+      ).toEqual(['c1', 'navigate-1', 'inspect-1', 'write-1', 's1']);
+      expect(events.some((event) => event.type === 'submission')).toBe(true);
 
       const manifest = await readJson<Manifest>(
         join(result.runDir, MANIFEST_FILENAME),
@@ -250,9 +232,9 @@ describe('runTask', () => {
       expect(Date.parse(manifest.finishedAt ?? '')).toBeGreaterThanOrEqual(
         Date.parse(manifest.startedAt),
       );
-      expect(manifest.artifacts).toHaveLength(1);
-      expect(manifest.artifacts[0]?.filename).toBe('artifacts/stories.csv');
-      const recordedArtifact = manifest.artifacts[0];
+      const recordedArtifact = manifest.artifacts.find(
+        (artifact) => artifact.filename === 'artifacts/stories.csv',
+      );
       if (recordedArtifact === undefined) {
         throw new Error('Expected stories.csv in the finalized manifest.');
       }
@@ -266,13 +248,7 @@ describe('runTask', () => {
       const metrics = await readJson<RunMetrics>(
         join(result.runDir, METRICS_FILENAME),
       );
-      expect(metrics).toMatchObject({
-        status: 'completed',
-        turns: 4,
-        inputTokens: 60,
-        outputTokens: 18,
-        cacheReadInputTokens: 9,
-      });
+      expect(metrics).toMatchObject({ status: 'verified', turns: 5 });
       expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
 
       // A successful run owns and closes only its task tab, not the session.
@@ -291,26 +267,26 @@ describe('runTask', () => {
       const responses = Array.from({ length: 23 }, (_, index) =>
         toolResponse(`inspect-default-${index + 1}`, 'inspect_page', {}),
       );
-      const fake = scriptModel([
-        ...responses,
-        textResponse('Completed on the default final turn.'),
-      ]);
+      const fake = scriptModel([...responses, submit('s1', 'Completed on the default final turn.')]);
+      const verifier = scriptModel([verifierVerified()]);
 
       const result = await runTask('Use the complete default turn budget.', {
         browser,
         runsBaseDir,
         callModel: fake.callModel,
         maxContextTokens: 10_000,
+        harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
       });
 
-      expect(result).toMatchObject({
-        status: 'completed',
-        finalText: 'Completed on the default final turn.',
-      });
+      // No contract is ever established (every inspect_page call is refused
+      // by the contract-first gate — that refusal is the point: it proves
+      // the run kept going for the full 23 refused turns before submitting,
+      // which is all this test asserts about the default turn budget).
+      expect(result.status).toBe('verified');
       expect(fake.requests).toHaveLength(24);
       await expect(
         readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
-      ).resolves.toMatchObject({ status: 'completed', turns: 24 });
+      ).resolves.toMatchObject({ status: 'verified', turns: 24 });
     },
     TEST_TIMEOUT_MS,
   );
@@ -329,79 +305,54 @@ describe('runTask', () => {
         callModel: budgetFake.callModel,
         maxTurns: 1,
         maxContextTokens: 10_000,
+        harness: { contractAuthor: 'worker' },
       });
 
       expect(budgetResult).toMatchObject({
-        status: 'budget_exceeded',
-        reason: 'max_turns',
+        status: 'incomplete',
+        reason: 'budget_exceeded',
       });
       expect(() => browser.currentUrl()).toThrow(/No browser task tab/);
       const budgetManifest = await readJson<Manifest>(
         join(budgetResult.runDir, MANIFEST_FILENAME),
       );
       expect(budgetManifest.finishedAt).toBeDefined();
-      await expect(
-        readJson(join(budgetResult.runDir, METRICS_FILENAME)),
-      ).resolves.toMatchObject({ status: 'budget_exceeded', turns: 1 });
 
       // runTask itself must be able to acquire the next fresh tab on the
       // same persistent browser session after the guarded ending.
-      const nextFake = scriptModel([textResponse('Next run completed.')]);
+      const nextFake = scriptModel([submit('s1', 'Next run completed.')]);
+      const nextVerifier = scriptModel([verifierVerified()]);
       const nextResult = await runTask('Complete immediately.', {
         browser,
         runsBaseDir,
         callModel: nextFake.callModel,
         maxTurns: 2,
         maxContextTokens: 10_000,
+        harness: { contractAuthor: 'worker', verifierCallModel: nextVerifier.callModel },
       });
-      expect(nextResult).toMatchObject({
-        status: 'completed',
-        finalText: 'Next run completed.',
-      });
+      expect(nextResult.status).toBe('verified');
       expect(nextResult.runDir).not.toBe(budgetResult.runDir);
       expect(() => browser.currentUrl()).toThrow(/No browser task tab/);
     },
     TEST_TIMEOUT_MS,
   );
 
-  describe('harness mode (initializer → worker → judge outer loop)', () => {
-    it(
-      'is unaffected when config.harness is absent: single loop, no INTENT.md/CONTRACT.md/harness.json',
-      async () => {
-        const fake = scriptModel([textResponse('Completed with no harness configured.')]);
-
-        const result = await runTask('Plain task, harness absent.', {
-          browser,
-          runsBaseDir,
-          callModel: fake.callModel,
-          maxTurns: 4,
-          maxContextTokens: 10_000,
-        });
-
-        expect(result).toMatchObject({
-          status: 'completed',
-          finalText: 'Completed with no harness configured.',
-        });
-        expect(existsSync(join(result.runDir, INTENT_FILENAME))).toBe(false);
-        expect(existsSync(join(result.runDir, CONTRACT_FILENAME))).toBe(false);
-        expect(existsSync(join(result.runDir, HARNESS_FILENAME))).toBe(false);
-        await expect(
-          readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
-        ).resolves.toMatchObject({ status: 'completed', turns: 1 });
-      },
-      TEST_TIMEOUT_MS,
-    );
-
+  describe('harness cycles (initializer → worker → judge outer loop)', () => {
     it(
       'runs the initializer and one worker cycle, ending on a judge DONE verdict',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse(
-            'Collect and publish the widget roster.',
-            'artifacts/report.md must exist and list every widget.',
-          ),
+        const contract = {
+          contract: {
+            outputs: [
+              { id: 'report', kind: 'download', count: { exact: 1 }, filenamePattern: '*.md' },
+            ],
+          },
+        };
+        const initializer = scriptModel([toolResponse('c1', 'set_output_contract', contract)]);
+        const worker = scriptModel([
+          toolResponse('w1', 'write_file', { file_path: 'artifacts/report.md', content: '# Report\n' }),
+          submit('s1', 'Report published.'),
         ]);
-        const worker = scriptModel([textResponse('Report published.')]);
         const verifier = scriptModel([verifierVerified()]);
 
         const result = await runTask('Collect widgets and publish a report.', {
@@ -411,20 +362,15 @@ describe('runTask', () => {
           maxTurns: 4,
           maxContextTokens: 10_000,
           harness: {
+            contractAuthor: 'initializer',
             initializerCallModel: initializer.callModel,
             verifierCallModel: verifier.callModel,
           },
         });
 
         // A judge DONE verdict is the only success — and it reports as such.
-        expect(result).toMatchObject({ status: 'verified', finalText: 'Report published.' });
-
-        expect(await readFile(join(result.runDir, INTENT_FILENAME), 'utf8')).toBe(
-          'Collect and publish the widget roster.\n',
-        );
-        expect(await readFile(join(result.runDir, CONTRACT_FILENAME), 'utf8')).toBe(
-          'artifacts/report.md must exist and list every widget.\n',
-        );
+        // The submission call carries no text of its own, so finalText is empty.
+        expect(result).toMatchObject({ status: 'verified', finalText: '' });
 
         const diagnostics = await readJson<HarnessDiagnostics>(
           join(result.runDir, HARNESS_FILENAME),
@@ -439,8 +385,8 @@ describe('runTask', () => {
         // role's own usage (initializer and verifier are no longer
         // invisible in the accounting).
         const metrics = await readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME));
-        expect(metrics).toMatchObject({ status: 'verified', turns: 1 });
-        expect(metrics.roles?.worker?.turns).toBe(1);
+        expect(metrics).toMatchObject({ status: 'verified', turns: 2 });
+        expect(metrics.roles?.worker?.turns).toBe(2);
         expect(metrics.roles?.initializer?.turns).toBe(1);
         expect(metrics.roles?.verifier?.turns).toBe(1);
         expect(existsSync(join(result.runDir, 'metrics-cycle-1.json'))).toBe(false);
@@ -454,12 +400,13 @@ describe('runTask', () => {
     it(
       'runs a second worker cycle carrying the judge reason as feedback, then ends on DONE',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
+        // Deliberately worker-authored with no contract ever set: every
+        // submission is unconditional, so this test stays about the
+        // persistent-session/correction mechanic and not about contract
+        // validity — that is runTask.verification.test.ts's job.
         const worker = scriptModel([
-          textResponse('First attempt at the report.'),
-          textResponse('Second attempt, column fixed.'),
+          submit('s1', 'First attempt at the report.'),
+          submit('s2', 'Second attempt, column fixed.'),
         ]);
         const verifier = scriptModel([
           verifierNeedsCorrection('artifacts/report.md is missing the required id column.'),
@@ -472,35 +419,30 @@ describe('runTask', () => {
           callModel: worker.callModel,
           maxTurns: 4,
           maxContextTokens: 10_000,
-          harness: {
-            initializerCallModel: initializer.callModel,
-            verifierCallModel: verifier.callModel,
-          },
+          harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
         });
 
-        expect(result).toMatchObject({
-          status: 'verified',
-          finalText: 'Second attempt, column fixed.',
-        });
+        expect(result).toMatchObject({ status: 'verified', finalText: '' });
         expect(worker.requests).toHaveLength(2);
 
         // One persistent session: cycle 2's request replays the whole
-        // prior exchange — task, the worker's first attempt — and appends
-        // the judge's reason as plain feedback. The worker keeps its
-        // context instead of starting over.
+        // prior exchange — task, the worker's first submission, the
+        // verifier's correction answering it — before the worker acts
+        // again. The worker keeps its context instead of starting over.
         const secondRequest = worker.requests[1];
         expect(secondRequest).toHaveLength(3);
-        expect(secondRequest?.[0]).toEqual({
-          role: 'user',
-          content: [{ type: 'text', text: 'Collect widgets and publish a report.' }],
+        expect(secondRequest?.[0]?.role).toBe('user');
+        expect(secondRequest?.[0]?.content[0]).toEqual({
+          type: 'text',
+          text: 'Collect widgets and publish a report.',
         });
         expect(secondRequest?.[1]?.role).toBe('assistant');
-        expect((secondRequest?.[1]?.content[0] as { text: string }).text).toBe(
-          'First attempt at the report.',
+        expect((secondRequest?.[1]?.content[0] as { name: string }).name).toBe(
+          'submit_for_verification',
         );
-        const feedbackText = (secondRequest?.[2]?.content[0] as { text: string }).text;
+        const feedbackText = (secondRequest?.[2]?.content[0] as { content: string }).content;
         expect(secondRequest?.[2]?.role).toBe('user');
-        expect(feedbackText).toContain('Verification findings:');
+        expect(feedbackText).toContain('Verification found problems');
         expect(feedbackText).toContain(
           'artifacts/report.md is missing the required id column.',
         );
@@ -531,13 +473,7 @@ describe('runTask', () => {
     it(
       'ends at cycle exhaustion (maxWorkerCycles: 2) on a lingering CONTINUE as incomplete',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
-        const worker = scriptModel([
-          textResponse('First attempt.'),
-          textResponse('Second attempt.'),
-        ]);
+        const worker = scriptModel([submit('s1', 'First attempt.'), submit('s2', 'Second attempt.')]);
         const verifier = scriptModel([
           verifierNeedsCorrection('First reason.'),
           verifierNeedsCorrection('Second reason.'),
@@ -551,7 +487,7 @@ describe('runTask', () => {
           maxContextTokens: 10_000,
           harness: {
             maxWorkerCycles: 2,
-            initializerCallModel: initializer.callModel,
+            contractAuthor: 'worker',
             verifierCallModel: verifier.callModel,
           },
         });
@@ -561,7 +497,7 @@ describe('runTask', () => {
         expect(result).toMatchObject({
           status: 'incomplete',
           reason: 'verification_attempts',
-          finalText: 'Second attempt.',
+          finalText: '',
         });
         // Exactly two worker cycles ran — a third would have thrown against
         // this fake's exhausted response script.
@@ -595,13 +531,10 @@ describe('runTask', () => {
     it(
       'the default cycle cap permits a third worker cycle (maxWorkerCycles omitted)',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
         const worker = scriptModel([
-          textResponse('First attempt.'),
-          textResponse('Second attempt.'),
-          textResponse('Third attempt.'),
+          submit('s1', 'First attempt.'),
+          submit('s2', 'Second attempt.'),
+          submit('s3', 'Third attempt.'),
         ]);
         const verifier = scriptModel([
           verifierNeedsCorrection('First reason.'),
@@ -615,19 +548,16 @@ describe('runTask', () => {
           callModel: worker.callModel,
           maxTurns: 4,
           maxContextTokens: 10_000,
-          harness: {
-            initializerCallModel: initializer.callModel,
-            verifierCallModel: verifier.callModel,
-          },
+          harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
         });
 
         // Under the old default of 2, cycle 2's CONTINUE would have ended
         // the run; the default of 3 lets the third cycle run to DONE.
-        expect(result).toMatchObject({ status: 'verified', finalText: 'Third attempt.' });
+        expect(result).toMatchObject({ status: 'verified', finalText: '' });
         expect(worker.requests).toHaveLength(3);
         expect(verifier.requests).toHaveLength(3);
-        // The persistent session accretes: attempt 1, feedback, attempt 2,
-        // feedback, then the third request sees the full history.
+        // The persistent session accretes: attempt 1, correction, attempt 2,
+        // correction, then the third request sees the full history.
         expect(worker.requests[2]).toHaveLength(5);
 
         const events = await readTranscript(result.runDir);
@@ -641,9 +571,10 @@ describe('runTask', () => {
     it(
       'ends at a worker budget_exceeded without ever calling the judge',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
+        // A single navigate call, refused by the contract-first gate (no
+        // contract has been set) — the refusal still charges a worker turn,
+        // so this trips the max_turns guard immediately without needing any
+        // initializer call or real network access.
         const worker = scriptModel([
           toolResponse('navigate-harness-budget', 'navigate', {
             url: fixtureServer.url('/'),
@@ -659,10 +590,7 @@ describe('runTask', () => {
           callModel: worker.callModel,
           maxTurns: 1,
           maxContextTokens: 10_000,
-          harness: {
-            initializerCallModel: initializer.callModel,
-            verifierCallModel: verifier.callModel,
-          },
+          harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
         });
 
         // Budget exhaustion inside the harness is an incomplete outcome —
@@ -692,10 +620,7 @@ describe('runTask', () => {
     it(
       'a judge crash preserves the finished run but reports incomplete: verifier_unavailable',
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
-        const worker = scriptModel([textResponse('Report published.')]);
+        const worker = scriptModel([submit('s1', 'Report published.')]);
         const crashingVerifier: CallModel = async () => {
           throw new Error('400 image dimensions exceed max allowed size');
         };
@@ -706,10 +631,7 @@ describe('runTask', () => {
           callModel: worker.callModel,
           maxTurns: 4,
           maxContextTokens: 10_000,
-          harness: {
-            initializerCallModel: initializer.callModel,
-            verifierCallModel: crashingVerifier,
-          },
+          harness: { contractAuthor: 'worker', verifierCallModel: crashingVerifier },
         });
 
         // The worker's artifacts survive its verifier's crash — but nobody
@@ -717,7 +639,7 @@ describe('runTask', () => {
         expect(result).toMatchObject({
           status: 'incomplete',
           reason: 'verifier_unavailable',
-          finalText: 'Report published.',
+          finalText: '',
         });
         const diagnostics = await readJson<HarnessDiagnostics>(
           join(result.runDir, HARNESS_FILENAME),
@@ -742,10 +664,7 @@ describe('runTask', () => {
     it(
       "an AbortError from the judge propagates — cancellation is the caller's, not the judge's",
       async () => {
-        const initializer = scriptModel([
-          initializerResponse('Collect the widget roster.', 'artifacts/report.md must exist.'),
-        ]);
-        const worker = scriptModel([textResponse('Report published.')]);
+        const worker = scriptModel([submit('s1', 'Report published.')]);
         const abortingVerifier: CallModel = async () => {
           const error = new Error('aborted');
           error.name = 'AbortError';
@@ -759,10 +678,7 @@ describe('runTask', () => {
             callModel: worker.callModel,
             maxTurns: 4,
             maxContextTokens: 10_000,
-            harness: {
-              initializerCallModel: initializer.callModel,
-              verifierCallModel: abortingVerifier,
-            },
+            harness: { contractAuthor: 'worker', verifierCallModel: abortingVerifier },
           }),
         ).rejects.toThrow('aborted');
       },
@@ -772,12 +688,11 @@ describe('runTask', () => {
     it(
       'rejects when the initializer fails on both attempts, and still finalizes the manifest',
       async () => {
-        // Same malformed pair as initializer.test.ts's own "still malformed
-        // after the corrective retry" case: no headers at all, then INTENT
-        // present but no CONTRACT header.
-        const malformedOnce = textResponse('No headers at all here.');
-        const malformedTwice = textResponse('# INTENT\nGoal stated.\n\nNo contract header this time.');
-        const initializer = scriptModel([malformedOnce, malformedTwice]);
+        // Same malformed pair as initializer.test.ts's own "fails after a
+        // second bad response" case: a response with no set_output_contract
+        // call at all, twice.
+        const malformed = textResponse('I will not call any tool.');
+        const initializer = scriptModel([malformed, malformed]);
         const worker = scriptModel([]);
         const verifier = scriptModel([]);
 
@@ -791,11 +706,12 @@ describe('runTask', () => {
             maxTurns: 4,
             maxContextTokens: 10_000,
             harness: {
+              contractAuthor: 'initializer',
               initializerCallModel: initializer.callModel,
               verifierCallModel: verifier.callModel,
             },
           }),
-        ).rejects.toThrow(/CONTRACT/);
+        ).rejects.toThrow(/set_output_contract/);
 
         const after = await readdir(runsBaseDir);
         const newDirs = after.filter((name) => !before.has(name));
@@ -806,10 +722,8 @@ describe('runTask', () => {
         expect(manifest.finishedAt).toBeDefined();
 
         // The run never got past the initializer: no harness bookkeeping,
-        // no governing documents, and the browser tab never opened.
+        // and the browser tab never opened.
         expect(existsSync(join(runDir, HARNESS_FILENAME))).toBe(false);
-        expect(existsSync(join(runDir, INTENT_FILENAME))).toBe(false);
-        expect(existsSync(join(runDir, CONTRACT_FILENAME))).toBe(false);
         expect(existsSync(join(runDir, METRICS_FILENAME))).toBe(false);
       },
       TEST_TIMEOUT_MS,

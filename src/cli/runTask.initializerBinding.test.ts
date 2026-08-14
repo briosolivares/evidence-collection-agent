@@ -1,36 +1,26 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import { describe, expect, it } from 'vitest';
 
-import {
-  makeContractInitializerModelDriver,
-  makeInitializerCallModel,
-} from '../harness/initializer.js';
+import { makeContractInitializerModelDriver } from '../harness/initializer.js';
 import { createVerifierRegistry } from '../harness/verifierTools.js';
 import type { CallModel } from '../loop/messages.js';
 import type { ModelStreamEvent } from '../model/streamAssembly.js';
-import {
-  createBashTool,
-  createProductionRegistry,
-  createV2Registry,
-  V2_TOOL_ORDER,
-} from '../tools/index.js';
+import { createBashTool, createV2Registry, V2_TOOL_ORDER } from '../tools/index.js';
 import type { ToolDef } from '../tools/registry.js';
 import { createWriteDocumentTool } from '../tools/writeDocument/writeDocument.js';
 import { defaultInitializerCallModel } from './runTask.js';
 
 /**
- * Which initializer binding production picks, and what that binding actually
- * puts on the wire.
+ * What the initializer's default binding actually puts on the wire.
  *
- * These exist because of a bug that reached a live run: `runTask` chose the
- * PROSE initializer binding — offered no tools at all — even under the
- * contract protocol, whose `runContractInitializer` requires a
- * `set_output_contract` call. Every attempt failed with "made no
- * set_output_contract call", because a model cannot call a tool it was never
- * given, and the run aborted before opening a page.
- *
- * No test of either binding alone could have caught it: both were correct.
- * The wrong thing was the CHOICE between them, so that is what this asserts.
+ * A second, prose-authoring binding used to live alongside this one, chosen
+ * by a runtime flag — a live run once picked the wrong one, offering the
+ * initializer no tools at all while `runContractInitializer` demanded a
+ * `set_output_contract` call it could never make. That binding, and the
+ * choice between the two, are gone along with the prose protocol; only the
+ * wire-level assertion survives, since a binding offering the wrong tools is
+ * exactly the failure that reached a live run and exactly what re-deriving
+ * the same constants in a test would not catch.
  */
 
 /** A createStream seam that records request params and returns one minimal
@@ -76,15 +66,9 @@ async function firstRequest(
 }
 
 describe('defaultInitializerCallModel', () => {
-  it('picks the contract binding under the output-contract protocol', () => {
+  it('always returns the contract binding', () => {
     const chosen: string[] = [];
-    defaultInitializerCallModel(true, {
-      prose: () => {
-        chosen.push('prose');
-        return (async () => {
-          throw new Error('unused');
-        }) as unknown as CallModel;
-      },
+    defaultInitializerCallModel({
       contract: () => {
         chosen.push('contract');
         return (async () => {
@@ -96,32 +80,11 @@ describe('defaultInitializerCallModel', () => {
     expect(chosen).toEqual(['contract']);
   });
 
-  it('picks the prose binding when the protocol is off', () => {
-    const chosen: string[] = [];
-    defaultInitializerCallModel(false, {
-      prose: () => {
-        chosen.push('prose');
-        return (async () => {
-          throw new Error('unused');
-        }) as unknown as CallModel;
-      },
-      contract: () => {
-        chosen.push('contract');
-        return (async () => {
-          throw new Error('unused');
-        }) as unknown as CallModel;
-      },
-    });
-
-    expect(chosen).toEqual(['prose']);
-  });
-
-  it('defaults to a binding that offers set_output_contract when the protocol is on', async () => {
+  it('defaults to a binding that offers set_output_contract', async () => {
     // The end-to-end claim, asserted on the wire rather than on the choice:
-    // production's V2 default must actually offer the tool it will demand.
+    // production's default must actually offer the tool it will demand.
     const stream = recordingStream();
-    const callModel = defaultInitializerCallModel(true, {
-      prose: () => makeInitializerCallModel({ createStream: stream.createStream }),
+    const callModel = defaultInitializerCallModel({
       contract: () => makeContractInitializerModelDriver({ createStream: stream.createStream }),
     });
 
@@ -131,20 +94,6 @@ describe('defaultInitializerCallModel', () => {
       'set_output_contract',
     ]);
     expect(request.tool_choice).toEqual({ type: 'tool', name: 'set_output_contract' });
-  });
-
-  it('defaults to a tool-free binding when the protocol is off', async () => {
-    const stream = recordingStream();
-    const callModel = defaultInitializerCallModel(false, {
-      prose: () => makeInitializerCallModel({ createStream: stream.createStream }),
-      contract: () => makeContractInitializerModelDriver({ createStream: stream.createStream }),
-    });
-
-    const request = await firstRequest(callModel, stream.calls);
-
-    // The prose initializer writes INTENT/CONTRACT text and calls nothing.
-    expect(request.tools ?? []).toEqual([]);
-    expect(request.tool_choice).toBeUndefined();
   });
 });
 
@@ -186,18 +135,31 @@ describe('worker-only tool isolation', () => {
     for (const mutation of MUTATION_TOOLS) {
       expect(names).not.toContain(mutation);
     }
-    // Read-only in fact, not merely by omission.
-    for (const tool of createVerifierRegistry().values()) {
-      expect(tool.readOnly).toBe(true);
+    // Read-only in fact, not merely by omission: each tool's own declared
+    // access has no writes and claims no exclusivity, for a representative
+    // input.
+    const sampleInput: Record<string, unknown> = {
+      read_file: { file_path: 'artifacts/report.md' },
+      grep: { pattern: 'x' },
+    };
+    for (const [name, tool] of createVerifierRegistry()) {
+      const access = tool.getAccess(sampleInput[name]);
+      expect(access.writes).toEqual([]);
+      expect(access.exclusive).not.toBe(true);
     }
   });
 
   it('does give the worker both tools, so the isolation above is a boundary and not an absence', () => {
     // Without this half, the assertions above could pass for the wrong reason.
+    // The same construction buildRunToolchain uses: the worker's real V2
+    // registry, built with only a bash tool as run-scoped input — edit_file
+    // is a V2_STATIC_TOOLS entry, so it is present without any factory input.
     const workerNames = [
-      ...createProductionRegistry('atomic', {
-        bash: createBashTool({ secretEnvDenylist: [] }),
-      }).keys(),
+      ...createV2Registry(
+        new Map<string, ToolDef>([
+          ['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef],
+        ]),
+      ).keys(),
     ];
     for (const mutation of MUTATION_TOOLS) {
       expect(workerNames).toContain(mutation);
@@ -235,9 +197,9 @@ describe('write_document isolation', () => {
 
     // Not just "present somewhere" — in the exact relative order
     // V2_TOOL_ORDER declares, filtered to what this registry actually holds
-    // (upsert_output_rows/delete_output_rows/set_table_completeness are not
-    // supplied here and are not static, so they are absent — exactly as
-    // createV2Registry's own "skip what's missing" contract promises).
+    // (update_table is not supplied here and is not static, so it is absent
+    // — exactly as createV2Registry's own "skip what's missing" contract
+    // promises).
     const present = new Set(names);
     expect(names).toEqual(V2_TOOL_ORDER.filter((name) => present.has(name)));
 

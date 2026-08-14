@@ -37,6 +37,14 @@ const downloadInputSchema = z
       .describe(
         'Verified direct resource URL when the visible page link is a viewer or redirect wrapper',
       ),
+    pageId: z
+      .string()
+      .min(1)
+      .optional()
+      .describe(
+        'Page to download from (the page a ref was observed on, or the page whose context ' +
+          'frames a direct URL fetch); omit for the selected page',
+      ),
     filename: filenameSchema,
     roles: artifactRolesInput.describe(
       'Roles recorded for the download. Defaults to ["evidence"]; ' +
@@ -70,19 +78,23 @@ export const downloadTool: ToolDef<DownloadInput> = {
     'Download exact bytes through Chrome using either an inspect_page ref or a verified ' +
     'direct HTTP(S) URL (provide exactly one). Supports ordinary document responses, ' +
     'attachment links, and JavaScript-triggered browser downloads. Use a direct URL when ' +
-    'an observed link is only a viewer or redirect wrapper. ' +
+    'an observed link is only a viewer or redirect wrapper. Set pageId to name the page the ref ' +
+    'was observed on; omit it for the selected page. ' +
     'Saves the artifact under artifacts/ with final-URL provenance.',
   inputSchema: downloadInputSchema,
-  readOnly: false,
   // When `filename` is given, it's known at getAccess() time and declared
   // as its own write — matching write_file/screenshot — so a concurrent
   // read_file/grep/inspect_document on that exact path is serialized behind
   // this call instead of racing the writeArtifact() that happens only after
   // the (slow, network-bound) browser.download() resolves. The
   // default-suggested-filename case has no path to declare until then, so
-  // it still relies on the manifest write alone.
+  // it still relies on the manifest write alone. The page read is keyed by
+  // input.pageId (defaulting to 'selected') rather than the fixed
+  // accessKey.selectedPage(), so a download named at a different page does
+  // not wrongly serialize against work on the task tab, and two downloads
+  // naming different pages can run concurrently.
   getAccess: (input) => ({
-    reads: [accessKey.selectedPage()],
+    reads: [accessKey.page(input.pageId ?? 'selected')],
     writes: [
       accessKey.manifest(),
       ...(input.filename !== undefined ? [accessKey.file(input.filename)] : []),
@@ -93,9 +105,11 @@ export const downloadTool: ToolDef<DownloadInput> = {
     if (input.filename !== undefined) {
       assertEvidencePath(ctx.runDir, input.filename);
     }
-    const initiatingPageUrl = browser.currentUrl();
+    const initiatingPageUrl = browser.currentUrl(input.pageId);
     const response = await browser.download(
-      input.ref !== undefined ? { ref: input.ref } : { url: input.url! },
+      input.ref !== undefined
+        ? { ref: input.ref, ...(input.pageId !== undefined ? { pageId: input.pageId } : {}) }
+        : { url: input.url!, ...(input.pageId !== undefined ? { pageId: input.pageId } : {}) },
     );
     if (
       response.status !== undefined

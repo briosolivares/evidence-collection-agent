@@ -7,16 +7,13 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
-import { CONTRACT_FILENAME, INTENT_FILENAME, writeInitializerFiles } from '../harness/initializer.js';
 import type { CallModel, Message, ModelResponse, Usage } from '../loop/messages.js';
-import { createWorkerSession, type WorkerSessionDeps } from '../loop/workerSession.js';
+import { createWorkerSession, type WorkerSessionDeps, type RunMetrics } from '../loop/workerSession.js';
 import { createRunBudgetTracker } from '../run/runBudget.js';
 import { openRunCheckpointStore, type RunCheckpointV1 } from '../run/runCheckpointStore.js';
 import { createRunDir } from '../run/runDir.js';
 import { generateRunId } from '../run/runId.js';
 import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
-import type { RunMetrics } from '../loop/agentLoop.js';
-import type { ToolProfile } from '../tools/index.js';
 import { createRunCheckpointWriter } from './runCheckpoint.js';
 import { resumeTask, runTask, type RunTaskResult } from './runTask.js';
 
@@ -44,10 +41,6 @@ function toolResponse(
   };
 }
 
-function textResponse(text: string, usage: Usage = DEFAULT_USAGE): ModelResponse {
-  return { content: [{ type: 'text', text }], stop_reason: 'end_turn', usage };
-}
-
 function scriptModel(responses: readonly ModelResponse[]): {
   callModel: CallModel;
   requests: Message[][];
@@ -64,10 +57,6 @@ function scriptModel(responses: readonly ModelResponse[]): {
     return response;
   };
   return { callModel, requests };
-}
-
-function initializerResponse(intent: string, contract: string): ModelResponse {
-  return textResponse(`# INTENT\n${intent}\n\n# CONTRACT\n${contract}`);
 }
 
 function verifierVerified(): ModelResponse {
@@ -106,13 +95,20 @@ async function newRunDir(runsBaseDir: string, before: Set<string>): Promise<stri
   return join(runsBaseDir, added[0]!);
 }
 
-/** A minimal, valid CONTRACT_INPUT for the typed-protocol test: one
- * `download` output checked purely by manifest presence and filename
- * pattern (see completionCheck.ts's checkCaptureOutput) — satisfiable with
- * a plain `write_file` call, no evidence and no `write_document` (a V2 tool
- * this codebase's registry construction does not yet wire up; out of scope
- * to add here — see the module note on why a `table`/`download`/
- * `screenshots` output is used instead of `document` in this suite). */
+/** A minimal, valid contract for a `download`-kind output: checked purely by
+ * manifest presence and filename pattern (see completionCheck.ts's
+ * checkCaptureOutput) — satisfiable with a plain `write_file` call, no
+ * evidence and no `write_document`. Used by every test that just needs SOME
+ * valid, easily-satisfied contract, without caring about its content. */
+const NOTE_CONTRACT_INPUT = {
+  contract: {
+    outputs: [{ id: 'note', kind: 'download', count: { exact: 1 }, filenamePattern: '*.txt' }],
+  },
+};
+
+/** Same shape, publishing under a different name/pattern — kept separate
+ * from NOTE_CONTRACT_INPUT because the "typed path" tests below assert on
+ * the specific published filename. */
 const CONTRACT_INPUT = {
   contract: {
     outputs: [{ id: 'report', kind: 'download', count: { exact: 1 }, filenamePattern: '*.md' }],
@@ -145,17 +141,17 @@ describe('runTask checkpointing and resumeTask', () => {
     if (tempRoot !== undefined) await rm(tempRoot, { recursive: true, force: true });
   });
 
-  /** A complete, one-cycle, prose-path harness run that writes one
-   * manifest-tracked artifact and ends 'verified' — the shared fixture for
-   * every test that just needs SOME finished checkpointed run to inspect or
-   * resume, without caring about the specific task content. */
+  /** A complete, one-cycle, worker-authored-contract harness run that writes
+   * one manifest-tracked artifact and ends 'verified' — the shared fixture
+   * for every test that just needs SOME finished checkpointed run to inspect
+   * or resume, without caring about the specific task content. */
   async function runSimpleVerifiedHarnessRun(
     taskText: string,
   ): Promise<{ result: RunTaskResult; runDir: string }> {
-    const initializer = scriptModel([initializerResponse('Goal.', 'Criteria.')]);
     const worker = scriptModel([
+      toolResponse('c1', 'set_output_contract', NOTE_CONTRACT_INPUT),
       toolResponse('w1', 'write_file', { file_path: 'artifacts/note.txt', content: 'hello\n' }),
-      textResponse('All done.'),
+      toolResponse('s1', 'submit_for_verification', { summary: 'done' }),
     ]);
     const verifier = scriptModel([verifierVerified()]);
     const result = await runTask(taskText, {
@@ -164,10 +160,7 @@ describe('runTask checkpointing and resumeTask', () => {
       callModel: worker.callModel,
       maxTurns: 8,
       maxContextTokens: 100_000,
-      harness: {
-        initializerCallModel: initializer.callModel,
-        verifierCallModel: verifier.callModel,
-      },
+      harness: { contractAuthor: 'worker', verifierCallModel: verifier.callModel },
     });
     return { result, runDir: result.runDir };
   }
@@ -177,25 +170,19 @@ describe('runTask checkpointing and resumeTask', () => {
    * carrying exactly the given pendingTurn tool calls — the shape a real
    * `runTask` would have left behind had the process died mid-batch (see
    * runCheckpoint.ts's `saveExecutingTools`). Built directly rather than via
-   * a genuine crash, the same technique
-   * "resume of an interrupted prose initializer" above uses: there is no
-   * awaited call between a state-changing tool call starting and its result
-   * landing that this suite could interrupt from the outside.
+   * a genuine crash, the same technique other tests in this suite use: there
+   * is no awaited call between a state-changing tool call starting and its
+   * result landing that this suite could interrupt from the outside.
    *
-   * Uses the prose (non-typed) harness path so no contract or initializer
-   * call is needed to reach a valid checkpoint — this run never actually
-   * executes past `'initializing'`, so nothing here depends on
-   * INTENT.md/CONTRACT.md having been written.
-   *
-   * `toolProfile` defaults to `'atomic'` (every caller but the
-   * toolProfile-resume regression test wants the default surface); pass
-   * `'batch-enabled'` when the checkpoint being built needs to record that
-   * choice for `resumeTask` to read back.
+   * No contract is ever established here — the fabricated interrupted turn
+   * is dropped wholesale on resume (see `dropUnansweredAssistantTurn`), so
+   * what it names is irrelevant to whether the run can go on to finish; only
+   * the continuation script (supplied by the caller, after resuming)
+   * actually needs a working contract.
    */
   async function buildExecutingToolsRunDir(
     taskText: string,
     toolCalls: NonNullable<RunCheckpointV1['pendingTurn']>['toolCalls'],
-    toolProfile: ToolProfile = 'atomic',
   ): Promise<string> {
     const runDir = createRunDir(runsBaseDir, generateRunId(taskText));
     initManifest(runDir, taskText);
@@ -212,30 +199,18 @@ describe('runTask checkpointing and resumeTask', () => {
     const writer = createRunCheckpointWriter(store, {
       runConfiguration: {
         model: 'claude-sonnet-5',
-        toolProfile,
         maxOutputTokens: 8192,
         maxTurns: 'unbounded',
         maxContextTokens: 100_000,
         harness: {
           maxWorkerCycles: 2,
           maxCompletionCheckFailures: 5,
-          outputContract: false,
-          contractAuthor: 'initializer',
+          contractAuthor: 'worker',
         },
       },
       budget,
     });
-    // The prose path's verifier reads INTENT.md/CONTRACT.md straight off
-    // disk (see harness/verifierTools.ts's buildVerificationInput) — a real
-    // run would have written these before ever reaching 'ready_for_model',
-    // so a hand-built checkpoint must too, or the resumed verifier call
-    // fails on a missing-file error unrelated to what this test checks.
-    writeInitializerFiles(runDir, { intent: 'Goal.', contract: 'Criteria.' });
-    await writer.saveInitializerAccepted({
-      mode: 'prose',
-      proseAccepted: { intent: 'Goal.', contract: 'Criteria.' },
-      filesWritten: true,
-    });
+    await writer.saveInitializerAccepted({ mode: 'contract' });
 
     // Never actually called: this session exists only to be snapshotted into
     // the checkpoint below, not to run.
@@ -282,7 +257,8 @@ describe('runTask checkpointing and resumeTask', () => {
       const { result, runDir } = await runSimpleVerifiedHarnessRun(
         'Write a checkpointed note and verify it.',
       );
-      expect(result).toMatchObject({ status: 'verified', finalText: 'All done.' });
+      // The submission call carries no text of its own, so finalText is empty.
+      expect(result).toMatchObject({ status: 'verified', finalText: '' });
 
       // runTask's own finally already closed the store; opening a fresh
       // instance to inspect it proves the lock was actually released, not
@@ -292,29 +268,12 @@ describe('runTask checkpointing and resumeTask', () => {
         const checkpoint = store.load();
         expect(checkpoint).toBeDefined();
         expect(checkpoint?.runStatus).toBe('terminal');
-        expect(checkpoint?.finalOutcome).toEqual({ status: 'verified', finalText: 'All done.' });
+        expect(checkpoint?.finalOutcome).toEqual({ status: 'verified', finalText: '' });
         expect(checkpoint?.workerSession).toBeDefined();
         expect(checkpoint?.checkpointRevision).toBeGreaterThan(1);
       } finally {
         await store.close();
       }
-    },
-    TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'a judge-less run writes NO checkpoint',
-    async () => {
-      const worker = scriptModel([textResponse('Completed with no harness configured.')]);
-      const result = await runTask('Plain task, harness absent.', {
-        browser,
-        runsBaseDir,
-        callModel: worker.callModel,
-        maxTurns: 4,
-        maxContextTokens: 10_000,
-      });
-      expect(result.status).toBe('completed');
-      expect(existsSync(join(result.runDir, 'harness'))).toBe(false);
     },
     TEST_TIMEOUT_MS,
   );
@@ -377,13 +336,17 @@ describe('runTask checkpointing and resumeTask', () => {
       const taskText = 'Collect a widget note, get corrected once, then finish after a crash.';
       const before = new Set(await readdir(runsBaseDir));
 
-      const initializer = scriptModel([initializerResponse('Collect a note.', 'artifacts/note.txt must exist.')]);
-      // Cycle 1: a tool call, then a completion. Cycle 2 never gets a
-      // scripted response — the attempt to call the model for it is the
-      // simulated crash.
+      // Cycle 1: a tool call the contract-first gate refuses (no contract
+      // exists yet — the same mechanism runTask.verification.test.ts's own
+      // gate test exercises, reused here purely as a cheap way to give this
+      // cycle two turns), then a submission with no contract ever
+      // established (skipping completion checks entirely, so this test
+      // stays about resume mechanics and not about contract validity).
+      // Cycle 2 never gets a scripted response — the attempt to call the
+      // model for it is the simulated crash.
       const worker = scriptModel([
-        toolResponse('w1', 'write_file', { file_path: 'artifacts/note.txt', content: 'hello\n' }),
-        textResponse('First attempt.'),
+        toolResponse('n1', 'navigate', { url: 'https://example.com' }),
+        toolResponse('s1', 'submit_for_verification', { summary: 'first attempt' }),
       ]);
       const verifier = scriptModel([verifierNeedsCorrection('Needs a second pass.')]);
 
@@ -396,7 +359,7 @@ describe('runTask checkpointing and resumeTask', () => {
           maxContextTokens: 100_000,
           harness: {
             maxWorkerCycles: 2,
-            initializerCallModel: initializer.callModel,
+            contractAuthor: 'worker',
             verifierCallModel: verifier.callModel,
           },
         }),
@@ -413,7 +376,9 @@ describe('runTask checkpointing and resumeTask', () => {
       expect(crashedCheckpoint?.runProgress.currentCycle).toBe(2);
       expect(crashedCheckpoint?.workerSession?.turnCount).toBe(2);
 
-      const continuation = scriptModel([textResponse('Second attempt, corrected.')]);
+      const continuation = scriptModel([
+        toolResponse('s2', 'submit_for_verification', { summary: 'second attempt' }),
+      ]);
       const continuationVerifier = scriptModel([verifierVerified()]);
 
       const result = await resumeTask(runDir, {
@@ -423,30 +388,27 @@ describe('runTask checkpointing and resumeTask', () => {
         harness: { verifierCallModel: continuationVerifier.callModel },
       });
 
-      expect(result).toMatchObject({
-        runDir,
-        status: 'verified',
-        finalText: 'Second attempt, corrected.',
-      });
+      expect(result).toMatchObject({ runDir, status: 'verified' });
 
       // The restored request replays the ENTIRE prior conversation exactly,
       // then the recovery notice, exactly once — no more, no less.
       expect(continuation.requests).toHaveLength(1);
       const restored = continuation.requests[0]!;
       expect(restored).toHaveLength(6);
-      expect(restored[0]).toEqual({
-        role: 'user',
-        content: [{ type: 'text', text: taskText }],
-      });
-      expect(restored[1]?.role).toBe('assistant');
-      expect((restored[1]?.content[0] as { name: string }).name).toBe('write_file');
-      expect(restored[2]?.role).toBe('user'); // the write_file tool_result
-      expect(restored[3]).toEqual({
-        role: 'assistant',
-        content: [{ type: 'text', text: 'First attempt.' }],
-      });
-      const feedbackText = (restored[4]?.content[0] as { text: string }).text;
-      expect(feedbackText).toContain('Verification findings:');
+      // The opening message carries the task text plus the contract
+      // protocol brief as a second content block (see workerProtocolBrief).
+      expect(restored[0]?.role).toBe('user');
+      expect(restored[0]?.content[0]).toEqual({ type: 'text', text: taskText });
+      expect(restored[1]?.role).toBe('assistant'); // the refused navigate call
+      expect((restored[1]?.content[0] as { name: string }).name).toBe('navigate');
+      expect(restored[2]?.role).toBe('user'); // the gate's refusal result
+      expect(JSON.stringify(restored[2])).toContain('output_contract_required');
+      expect(restored[3]?.role).toBe('assistant'); // the first submission
+      expect((restored[3]?.content[0] as { name: string }).name).toBe('submit_for_verification');
+      const feedback = restored[4]!;
+      expect(feedback.role).toBe('user'); // the verifier's correction, answering s1
+      const feedbackText = (feedback.content[0] as { content: string }).content;
+      expect(feedbackText).toContain('Verification found problems');
       expect(feedbackText).toContain('Needs a second pass.');
       const noticeText = (restored[5]?.content[0] as { text: string }).text;
       expect(noticeText).toContain('recovered after an interruption');
@@ -464,7 +426,8 @@ describe('runTask checkpointing and resumeTask', () => {
       expect(metrics.turns).toBe(3);
       expect(metrics.roles?.worker?.turns).toBe(3);
       expect(metrics.roles?.verifier?.turns).toBe(2);
-      expect(metrics.roles?.initializer?.turns).toBe(1);
+      // contractAuthor 'worker' never invokes the initializer role at all.
+      expect(metrics.roles?.initializer).toBeUndefined();
 
       const finalStore = await openRunCheckpointStore(runDir);
       const finalCheckpoint = finalStore.load();
@@ -481,13 +444,14 @@ describe('runTask checkpointing and resumeTask', () => {
       const taskText = 'Ready-for-model crash produces the plain notice only, never the executing_tools one.';
       const before = new Set(await readdir(runsBaseDir));
 
-      const initializer = scriptModel([initializerResponse('Goal.', 'Criteria.')]);
-      // Cycle 1 finishes with a plain no-tool completion: the checkpoint this
-      // crash leaves is 'ready_for_model', never 'executing_tools', so the
-      // resumed notice must never mention any tool call at all — that
-      // sentence is specific to describeInterruptedBatch, which only fires
-      // for 'executing_tools'.
-      const worker = scriptModel([textResponse('First attempt.')]);
+      // Cycle 1 finishes with a single submission and no contract ever
+      // established: the checkpoint this crash leaves is 'ready_for_model',
+      // never 'executing_tools', so the resumed notice must never mention
+      // any tool call at all — that sentence is specific to
+      // describeInterruptedBatch, which only fires for 'executing_tools'.
+      const worker = scriptModel([
+        toolResponse('s1', 'submit_for_verification', { summary: 'first attempt' }),
+      ]);
       const verifier = scriptModel([verifierNeedsCorrection('Needs a second pass.')]);
 
       await expect(
@@ -499,7 +463,7 @@ describe('runTask checkpointing and resumeTask', () => {
           maxContextTokens: 100_000,
           harness: {
             maxWorkerCycles: 2,
-            initializerCallModel: initializer.callModel,
+            contractAuthor: 'worker',
             verifierCallModel: verifier.callModel,
           },
         }),
@@ -511,7 +475,9 @@ describe('runTask checkpointing and resumeTask', () => {
       await crashedStore.close();
       expect(crashedCheckpoint?.runStatus).toBe('ready_for_model');
 
-      const continuation = scriptModel([textResponse('Second attempt, corrected.')]);
+      const continuation = scriptModel([
+        toolResponse('s2', 'submit_for_verification', { summary: 'second attempt' }),
+      ]);
       const continuationVerifier = scriptModel([verifierVerified()]);
 
       const result = await resumeTask(runDir, {
@@ -565,7 +531,9 @@ describe('runTask checkpointing and resumeTask', () => {
         { request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } }, executionStatus: 'running' },
       ]);
 
-      const continuation = scriptModel([textResponse('Finishing up.')]);
+      const continuation = scriptModel([
+        toolResponse('s1', 'submit_for_verification', { summary: 'done' }),
+      ]);
       const continuationVerifier = scriptModel([verifierVerified()]);
 
       const result = await resumeTask(runDir, {
@@ -622,7 +590,9 @@ describe('runTask checkpointing and resumeTask', () => {
         },
       ]);
 
-      const continuation = scriptModel([textResponse('Finishing up.')]);
+      const continuation = scriptModel([
+        toolResponse('s1', 'submit_for_verification', { summary: 'done' }),
+      ]);
       const continuationVerifier = scriptModel([verifierVerified()]);
 
       const result = await resumeTask(runDir, {
@@ -650,76 +620,6 @@ describe('runTask checkpointing and resumeTask', () => {
   );
 
   it(
-    "resume of an interrupted prose initializer finishes INTENT.md/CONTRACT.md without a second initializer call",
-    async () => {
-      const taskText = 'Interrupted prose initializer.';
-      const runDir = createRunDir(runsBaseDir, generateRunId(taskText));
-      initManifest(runDir, taskText);
-
-      // Hand-build exactly the checkpoint runTask would have left behind had
-      // it crashed between recording the accepted {intent, contract} and
-      // calling writeInitializerFiles — a window with no awaited call in it
-      // to interrupt from the outside, so this is constructed directly
-      // rather than through a real crash (see the module note on
-      // resumeTask's 'initializing' handling for why this is the one
-      // deterministic recovery step that needs no model call to finish).
-      const budget = createRunBudgetTracker({
-        maxWorkerTurns: Infinity,
-        maxToolCalls: Infinity,
-        maxModelTokens: Infinity,
-        maxToolResultBytes: Infinity,
-        maxWallTimeMs: Infinity,
-        maxVerifierCorrections: 2,
-      });
-      const store = await openRunCheckpointStore(runDir);
-      const writer = createRunCheckpointWriter(store, {
-        runConfiguration: {
-          model: 'claude-sonnet-5',
-          toolProfile: 'atomic',
-          maxOutputTokens: 8192,
-          maxTurns: 'unbounded',
-          maxContextTokens: 100_000,
-          harness: {
-            maxWorkerCycles: 3,
-            maxCompletionCheckFailures: 5,
-            outputContract: false,
-            contractAuthor: 'initializer',
-          },
-        },
-        budget,
-      });
-      await writer.saveInitializing();
-      await writer.saveInitializerAccepted({
-        mode: 'prose',
-        proseAccepted: { intent: 'Collect one note.', contract: 'artifacts/note.txt must exist.' },
-      });
-      await writer.close();
-
-      expect(existsSync(join(runDir, INTENT_FILENAME))).toBe(false);
-      expect(existsSync(join(runDir, CONTRACT_FILENAME))).toBe(false);
-
-      const worker = scriptModel([
-        toolResponse('w1', 'write_file', { file_path: 'artifacts/note.txt', content: 'hello\n' }),
-        textResponse('Done.'),
-      ]);
-      const verifier = scriptModel([verifierVerified()]);
-
-      const result = await resumeTask(runDir, {
-        browser,
-        callModel: worker.callModel,
-        harness: { verifierCallModel: verifier.callModel },
-      });
-
-      expect(result).toMatchObject({ runDir, status: 'verified', finalText: 'Done.' });
-      expect(await readFile(join(runDir, INTENT_FILENAME), 'utf8')).toBe('Collect one note.\n');
-      expect(await readFile(join(runDir, CONTRACT_FILENAME), 'utf8')).toBe(
-        'artifacts/note.txt must exist.\n',
-      );
-    },
-    TEST_TIMEOUT_MS,
-  );
-
-  it(
     'resume on the typed path rehydrates the contract store to the same current revision',
     async () => {
       const taskText = 'Typed contract, crash after acceptance, resume and finish.';
@@ -740,7 +640,6 @@ describe('runTask checkpointing and resumeTask', () => {
           maxTurns: 8,
           maxContextTokens: 100_000,
           harness: {
-            outputContract: true,
             contractAuthor: 'worker',
             maxWorkerCycles: 2,
             verifierCallModel: verifier.callModel,
@@ -753,9 +652,9 @@ describe('runTask checkpointing and resumeTask', () => {
 
       // If the resumed run's contract store were NOT rehydrated,
       // `submit_for_verification` would reach runVerifier with no contract
-      // and no INTENT.md/CONTRACT.md to fall back on, which throws — so a
-      // clean 'verified' result here is itself the proof that rehydration
-      // put the SAME contract back in the run-scoped store.
+      // to fall back on, which the completion check would reject outright —
+      // so a clean 'verified' result here is itself the proof that
+      // rehydration put the SAME contract back in the run-scoped store.
       const continuation = scriptModel([
         toolResponse('w1', 'write_file', { file_path: 'artifacts/report.md', content: '# Report\n' }),
         toolResponse('s1', 'submit_for_verification', { summary: 'done' }),
@@ -773,10 +672,9 @@ describe('runTask checkpointing and resumeTask', () => {
       expect(await readFile(join(runDir, 'artifacts/report.md'), 'utf8')).toBe('# Report\n');
 
       // The verifier saw the SAME contract (revision 1's single 'report'
-      // output), not the prose compatibility path.
+      // output).
       const verifierRequestText = JSON.stringify(continuationVerifier.requests[0]);
       expect(verifierRequestText).toContain('report');
-      expect(verifierRequestText).not.toContain('INTENT.md');
 
       const manifest = await readJson<Manifest>(join(runDir, MANIFEST_FILENAME));
       expect(manifest.artifacts.some((a) => a.filename === 'artifacts/report.md')).toBe(true);
@@ -818,7 +716,6 @@ describe('runTask checkpointing and resumeTask', () => {
           maxTurns: 8,
           maxContextTokens: 100_000,
           harness: {
-            outputContract: true,
             contractAuthor: 'worker',
             maxWorkerCycles: 2,
             verifierCallModel: abortingVerifier,
@@ -867,68 +764,6 @@ describe('runTask checkpointing and resumeTask', () => {
       const submissionAnswer = finalMessages.at(-1) as { content: Array<{ content: string }> };
       expect(submissionAnswer.content[0]?.content).toContain('recovered after an interruption');
       expect(submissionAnswer.content[0]?.content).toContain('"status":"verified"');
-    },
-    TEST_TIMEOUT_MS,
-  );
-
-  it(
-    "resume rebuilds the toolchain from the checkpoint's own toolProfile, not a hardcoded default — browser_batch survives a resume of a 'batch-enabled' run",
-    async () => {
-      const taskText =
-        "Batch-enabled run crashes mid-tool-batch and must resume with browser_batch still offered.";
-      const runDir = await buildExecutingToolsRunDir(
-        taskText,
-        [
-          {
-            request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } },
-            executionStatus: 'running',
-          },
-        ],
-        'batch-enabled',
-      );
-
-      // The regression this guards: resumeTask used to call buildRunToolchain
-      // with `toolProfile: undefined`, which silently falls back to the
-      // 'atomic' default (see buildRunToolchain / DEFAULT_TOOL_PROFILE) and
-      // drops browser_batch from the resumed registry even though this
-      // checkpoint recorded 'batch-enabled'. Calling browser_batch below
-      // would then come back as the pipeline's own "unknown tool" error
-      // instead of actually running.
-      const continuation = scriptModel([
-        toolResponse('batch-1', 'browser_batch', {
-          actions: [{ tool: 'inspect_page', input: {} }],
-        }),
-        textResponse('Finishing up.'),
-      ]);
-      const continuationVerifier = scriptModel([verifierVerified()]);
-
-      const result = await resumeTask(runDir, {
-        browser,
-        confirmPreviousCommandStopped: true,
-        callModel: continuation.callModel,
-        harness: { verifierCallModel: continuationVerifier.callModel },
-      });
-
-      expect(result).toMatchObject({ runDir, status: 'verified' });
-
-      // The second worker call's messages carry the tool_result answering
-      // the browser_batch call above — assert it actually ran rather than
-      // being rejected as an unknown tool.
-      expect(continuation.requests).toHaveLength(2);
-      let toolResultBlock: { content: string | unknown[]; is_error?: boolean } | undefined;
-      for (const message of continuation.requests[1]!) {
-        for (const block of message.content) {
-          if (block.type === 'tool_result' && block.tool_use_id === 'batch-1') {
-            toolResultBlock = block;
-          }
-        }
-      }
-      expect(toolResultBlock).toBeDefined();
-      expect(toolResultBlock?.is_error).not.toBe(true);
-      expect(typeof toolResultBlock?.content).toBe('string');
-      const toolResultText = toolResultBlock?.content as string;
-      expect(toolResultText).not.toContain('Unknown tool');
-      expect(toolResultText).toContain('"status":"completed"');
     },
     TEST_TIMEOUT_MS,
   );

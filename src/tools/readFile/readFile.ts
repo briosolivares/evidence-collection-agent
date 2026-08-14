@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { z } from 'zod';
 
+import { detectContentFormat } from '../../content/contentReader.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import type { ToolDef } from '../registry.js';
 import { splitLines } from '../shared/lines.js';
@@ -41,18 +42,19 @@ type ReadFileInput = z.infer<typeof readFileInputSchema>;
  * `limit` selecting a window of lines), returns the file's content with
  * cat -n style line numbers, numbered by true position in the file. An empty
  * file, or an offset past the last line, returns a warning message rather
- * than an error. A path escaping the run directory, a missing file, or a
- * directory throws with a message naming the problem — surfaced to the model
- * as a structured error result by the pipeline.
+ * than an error. A path escaping the run directory, a missing file, a
+ * directory, or a file that is not text throws with a message naming the
+ * problem — surfaced to the model as a structured error result by the
+ * pipeline.
  */
 export const readFileTool: ToolDef<ReadFileInput> = {
   name: 'read_file',
   description:
-    'Reads a file from the run directory. The file_path must be relative to the run directory. ' +
+    'Reads a text file from the run directory. The file_path must be relative to the run directory. ' +
     'Returns the content with line numbers (cat -n style). ' +
-    'Use offset and limit to read a portion of a large file.',
+    'Use offset and limit to read a portion of a large file. ' +
+    'Binary files (PDFs, spreadsheets, images) are refused — read those with inspect_document.',
   inputSchema: readFileInputSchema,
-  readOnly: true,
   getAccess: (input) => ({ reads: [accessKey.file(input.file_path)], writes: [] }),
   execute(input, ctx) {
     const absPath = resolveRunPath(ctx.runDir, input.file_path);
@@ -77,15 +79,56 @@ export const readFileTool: ToolDef<ReadFileInput> = {
   },
 };
 
-/** Read a file as UTF-8, converting the two expected failures (missing file,
- * directory) into model-readable errors that name the offending path. */
+/** How each detected binary format should actually be read. */
+const BINARY_FORMAT_ADVICE: Readonly<Record<string, string>> = {
+  pdf: 'a PDF',
+  spreadsheet: 'a spreadsheet',
+  image: 'an image',
+};
+
+/**
+ * Read a file as text, refusing bytes that are not text.
+ *
+ * Node's `utf8` decoding never throws on arbitrary bytes: it substitutes
+ * U+FFFD and returns a string. So reading a PNG or an .xlsx used to "succeed"
+ * and hand the model a page of replacement characters, which it would then
+ * reason over as if it were the file's content — a silent wrong answer, and
+ * the worst failure shape available. Detection is by magic number and a strict
+ * decode, never by extension, because a deliverable's name is model-supplied.
+ *
+ * The error names the format and the tool that can actually read it, so the
+ * refusal costs one turn rather than a retry loop.
+ *
+ * @throws a model-readable error for a missing file, a directory, or
+ *   non-text bytes
+ */
 function readTextFile(absPath: string, givenPath: string): string {
+  let bytes: Buffer;
   try {
-    return readFileSync(absPath, 'utf8');
+    bytes = readFileSync(absPath);
   } catch (thrown) {
     const code = (thrown as NodeJS.ErrnoException).code;
     if (code === 'ENOENT') throw new Error(`File does not exist: ${givenPath}`);
     if (code === 'EISDIR') throw new Error(`Path is a directory, not a file: ${givenPath}`);
     throw thrown;
+  }
+
+  const advice = BINARY_FORMAT_ADVICE[detectContentFormat({ bytes, filename: givenPath })];
+  if (advice !== undefined) {
+    throw new Error(
+      `${givenPath} is ${advice}, not text — read_file only reads text. ` +
+        'Use inspect_document to extract its content.',
+    );
+  }
+
+  try {
+    // fatal: true is the point — it rejects exactly the byte sequences the
+    // lenient decode would have turned into U+FFFD.
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new Error(
+      `${givenPath} is not valid UTF-8 text — read_file only reads text. ` +
+        'Use inspect_document if it is a document, or download it as an artifact.',
+    );
   }
 }

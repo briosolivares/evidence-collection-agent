@@ -1,8 +1,29 @@
 import { describe, expect, it } from 'vitest';
 
 import type { OutputContract, OutputSpec } from '../contracts/outputContract.js';
-import { createOutputTableStore, type OutputTableStore } from './outputTable.js';
+import {
+  createOutputTableStore,
+  type OutputRowInput,
+  type OutputTableStore,
+  type TableCompletenessEvidence,
+} from './outputTable.js';
 import { formatOutputSummary, summarizeOutputs, type OutputSummaryDeps } from './outputSummary.js';
+
+/** Drive the store's one mutator, `updateTable`, for a single upsert — so
+ * call sites read like the old single-purpose method without repeating the
+ * section wrapper everywhere. */
+function upsert(tables: OutputTableStore, outputId: string, rows: readonly OutputRowInput[]): void {
+  tables.updateTable(outputId, { upsert: { rows } });
+}
+
+/** Same, for a single completeness record. */
+function complete(
+  tables: OutputTableStore,
+  outputId: string,
+  evidence: TableCompletenessEvidence,
+): void {
+  tables.updateTable(outputId, { completeness: evidence });
+}
 
 // The summary must be DERIVED, never asserted: every number here is computed
 // from the contract plus live table state, so it cannot claim a row count the
@@ -49,7 +70,7 @@ describe('summarizeOutputs', () => {
   it('reports a live row count and readiness for a satisfied table', () => {
     const outputs = [tableSpec()];
     const tables = storeFor(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -62,7 +83,7 @@ describe('summarizeOutputs', () => {
   it('surfaces a row-count rule failure before a submission is spent', () => {
     const outputs = [tableSpec({ rules: [{ type: 'exact_row_count', value: 3 }] })];
     const tables = storeFor(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -74,7 +95,7 @@ describe('summarizeOutputs', () => {
   it('requires completeness evidence for a count-ruled table', () => {
     const outputs = [tableSpec({ rules: [{ type: 'minimum_row_count', value: 1 }] })];
     const tables = storeFor(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -83,7 +104,7 @@ describe('summarizeOutputs', () => {
     expect(summary.tables[0]?.completenessProvided).toBe(false);
     expect(summary.blockers.join('\n')).toMatch(/completeness evidence/);
 
-    tables.setTableCompleteness('roster', { method: 'header count', evidenceIds: ['E1'] });
+    complete(tables, 'roster', { method: 'header count', evidenceIds: ['E1'] });
     summary = summarizeOutputs(deps(outputs, tables));
     expect(summary.readyForSubmission).toBe(true);
   });
@@ -97,7 +118,7 @@ describe('summarizeOutputs', () => {
   it('reports evidence that stopped resolving', () => {
     const outputs = [tableSpec()];
     const tables = storeFor(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
     // The evidence disappears from under the row.
@@ -137,7 +158,7 @@ describe('formatOutputSummary', () => {
   it('renders row counts, completeness state, and outstanding work', () => {
     const outputs = [tableSpec({ rules: [{ type: 'exact_row_count', value: 2 }] })];
     const tables = storeFor(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
     const text = formatOutputSummary(summarizeOutputs(deps(outputs, tables)));

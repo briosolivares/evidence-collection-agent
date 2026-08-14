@@ -16,7 +16,9 @@ const echo: ToolDef<{ message: string }> = {
   name: 'echo',
   description: 'Echo the message back, prefixed with "echo:".',
   inputSchema: z.object({ message: z.string() }),
-  readOnly: true,
+  // Touches nothing named by its input, so it neither reads nor writes any
+  // access key — the modern equivalent of the old `readOnly: true`.
+  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) => `echo: ${input.message}`,
 };
 

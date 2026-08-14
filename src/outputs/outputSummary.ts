@@ -86,7 +86,7 @@ export function summarizeOutputs(deps: OutputSummaryDeps): OutputSummary {
       if (summary.completenessRequired && !summary.completenessProvided) {
         blockers.push(
           `${output.id}: this table declares a row-count rule, so it needs completeness ` +
-            'evidence (set_table_completeness) proving the population it enumerates.',
+            "evidence (update_table's completeness section) proving the population it enumerates.",
         );
       }
       if (summary.danglingEvidenceIds.length > 0) {

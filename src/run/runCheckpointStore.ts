@@ -141,13 +141,11 @@ const runRoleUsageSchema: z.ZodType<RunRoleUsage> = z.strictObject({
 const runConfigurationHarnessSchema = z.strictObject({
   maxWorkerCycles: z.number().int().positive(),
   maxCompletionCheckFailures: z.number().int().nonnegative(),
-  outputContract: z.boolean(),
   contractAuthor: z.enum(['worker', 'initializer']),
 });
 
 const runConfigurationSchema = z.strictObject({
   model: z.string().min(1),
-  toolProfile: z.string().min(1),
   maxOutputTokens: z.number().int().positive(),
   maxTurns: ceilingSchema,
   maxContextTokens: z.number().int().nonnegative(),

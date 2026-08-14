@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { chromium } from 'playwright';
 
 import { startFixtureServer, type FixtureServer } from '../../tests/fixtures/server.js';
 import {
@@ -25,6 +26,41 @@ import {
 
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 const BROWSER_TEST_TIMEOUT_MS = 15_000;
+
+/**
+ * Close a tracked page for suite hygiene, WITHOUT ever selecting it: with
+ * `switch_page` gone, production has no way to close a page other than the
+ * active task tab, so a test that opens an extra page (a popup) closes it
+ * exactly as an external browser script would — over the SAME loopback CDP
+ * endpoint `prepareForBrowserScript` exposes, addressed by `pageId` alone.
+ * This never touches this controller's own selected pointer.
+ */
+async function closeTrackedPageForCleanup(
+  controller: BrowserController,
+  pageId: string,
+): Promise<void> {
+  const setup = await controller.prepareForBrowserScript!(pageId);
+  const remote = await chromium.connectOverCDP(setup.cdpUrl);
+  try {
+    for (const context of remote.contexts()) {
+      for (const page of context.pages()) {
+        const session = await context.newCDPSession(page);
+        try {
+          const { targetInfo } = await session.send('Target.getTargetInfo');
+          if (targetInfo.targetId === setup.selectedPageTargetId) {
+            await page.close();
+            return;
+          }
+        } finally {
+          await session.detach().catch(() => undefined);
+        }
+      }
+    }
+    throw new Error(`closeTrackedPageForCleanup: no live page matches target id ${setup.selectedPageTargetId}`);
+  } finally {
+    await remote.close();
+  }
+}
 
 function refFor(outline: string, roleAndName: string): string {
   const escapedRoleAndName = roleAndName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -89,7 +125,7 @@ describe('Playwright browser controller', () => {
   });
 
   it(
-    'round-trips an outline ref to the intended interactive element',
+    'preserves an outline ref across consecutive calls on an unchanged page',
     async () => {
       await controller.newTab();
       await controller.goto(fixtureServer.url('/'));
@@ -99,13 +135,6 @@ describe('Playwright browser controller', () => {
       const secondOutline = await controller.outline();
 
       expect(refFor(secondOutline, 'button "Announce ready"')).toBe(buttonRef);
-      await controller.click(buttonRef);
-      expect(await controller.outline()).toContain('Ready');
-
-      await controller.goto(fixtureServer.url('/second.html'));
-      await expect(controller.click(buttonRef)).rejects.toBeInstanceOf(
-        BrowserRefNotFoundError,
-      );
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -153,19 +182,10 @@ describe('Playwright browser controller', () => {
   );
 
   it(
-    'supports ref-based typing, href resolution, and PNG capture',
+    'captures the selected page as PNG bytes',
     async () => {
       await controller.newTab();
       await controller.goto(fixtureServer.url('/'));
-      const outline = await controller.outline();
-      const inputRef = refFor(outline, 'textbox "Evidence query"');
-      const linkRef = refFor(outline, 'link "Visit second page"');
-
-      await controller.type(inputRef, 'quarterly controls');
-      expect(await controller.outline()).toContain('quarterly controls');
-      expect(await controller.resolveHref(linkRef)).toBe(
-        fixtureServer.url('/second.html'),
-      );
 
       const png = await controller.screenshot();
       expect(Array.from(png.subarray(0, PNG_MAGIC.length))).toEqual(PNG_MAGIC);
@@ -407,7 +427,7 @@ describe('Playwright browser controller', () => {
   );
 
   it(
-    'tracks popup identity across observations and switches selection to it',
+    'tracks popup identity across observations, addressed by pageId with no selection change',
     async () => {
       await controller.newTab();
       await controller.goto(fixtureServer.url('/popup.html'));
@@ -434,7 +454,8 @@ describe('Playwright browser controller', () => {
         )
         .toContain('/second.html');
 
-      // Identity survives more than one observation of the popup.
+      // Identity survives more than one observation of the popup — reached
+      // entirely by pageId, with no `switch_page` to move a selection.
       const first = await controller.observe({ pageId: popup?.pageId ?? '' });
       const second = await controller.observe({
         pageId: popup?.pageId ?? '',
@@ -447,17 +468,63 @@ describe('Playwright browser controller', () => {
       expect(second.changes.basis).toBe('requested_observation');
       expect(second.changes.navigated).toBe(false);
 
-      await expect(controller.switchPage('page-nope')).rejects.toThrow(
-        'Unknown or closed browser pageId',
+      // The popup's own identity (title) is reachable by pageId too, and
+      // reading it never moves the selected pointer off the task tab.
+      expect(await controller.title(popup?.pageId)).toBe('Second Fixture Page');
+      const stillMain = (await controller.pages()).find(
+        (page) => page.pageId === main?.pageId,
       );
-      const selected = await controller.switchPage(popup?.pageId ?? '');
-      expect(selected.active).toBe(true);
-      expect(await controller.title()).toBe('Second Fixture Page');
-
-      // Close the popup and reselect the original tab for suite cleanup.
-      await controller.closeTab();
-      await controller.switchPage(main?.pageId ?? '');
+      expect(stillMain?.active).toBe(true);
       expect(controller.currentUrl()).toBe(fixtureServer.url('/popup.html'));
+
+      await closeTrackedPageForCleanup(controller, popup!.pageId);
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'lists sibling pages on an observation only when more than one page is open',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/popup.html'));
+
+      // A single live page: the sibling listing is omitted entirely, not an
+      // empty array — the common case pays nothing for it.
+      const solo = await controller.observe();
+      expect(solo.otherOpenPages).toBeUndefined();
+
+      const opener = elementRef(solo, 'link', 'Open popup fixture');
+      await (await playwright.resolveElementRef(opener)).click();
+      await expect
+        .poll(async () => (await controller.pages()).length, { timeout: 10_000 })
+        .toBe(2);
+      const popup = (await controller.pages()).find((page) => page.pageId !== solo.page.pageId);
+      expect(popup).toBeDefined();
+      await expect
+        .poll(
+          async () =>
+            (await controller.pages()).find((page) => page.pageId === popup?.pageId)
+              ?.url ?? '',
+          { timeout: 10_000 },
+        )
+        .toContain('/second.html');
+
+      const withPopup = await controller.observe();
+      expect(withPopup.otherOpenPages).toHaveLength(1);
+      expect(withPopup.otherOpenPages?.[0]).toMatchObject({
+        pageId: popup?.pageId,
+        title: 'Second Fixture Page',
+      });
+      expect(withPopup.otherOpenPages?.[0]?.url).toContain('/second.html');
+      // The sibling listing never names the observed page itself.
+      expect(withPopup.otherOpenPages?.[0]?.pageId).not.toBe(withPopup.page.pageId);
+
+      // Observing the POPUP instead reports the main tab as its one sibling.
+      const fromPopup = await controller.observe({ pageId: popup!.pageId });
+      expect(fromPopup.otherOpenPages).toHaveLength(1);
+      expect(fromPopup.otherOpenPages?.[0]?.pageId).toBe(solo.page.pageId);
+
+      await closeTrackedPageForCleanup(controller, popup!.pageId);
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -1136,7 +1203,7 @@ describe('Playwright browser controller', () => {
     );
 
     it(
-      'connects the helper to exactly the selected page, never a different open tab',
+      'connects the helper to exactly the named page, never a different open tab',
       async () => {
         await controller.newTab();
         await controller.goto(fixtureServer.url('/popup.html'));
@@ -1149,16 +1216,22 @@ describe('Playwright browser controller', () => {
           .toBe(2);
         const popup = (await controller.pages()).find((page) => page.pageId !== main?.pageId);
         expect(popup).toBeDefined();
-        // Select the POPUP, not main: a helper that ever fell back to "the
-        // first open tab" would silently connect to main instead, and this
-        // makes that failure mode visible rather than accidentally passing.
-        await controller.switchPage(popup!.pageId);
 
-        const setup = await controller.prepareForBrowserScript!();
+        // Prepare against the POPUP's pageId explicitly; main stays selected
+        // throughout (there is no switch_page to move it). A helper that
+        // ever fell back to "the selected page" — or to "the first open
+        // tab" — would silently connect to main instead, and naming the
+        // popup here makes that failure mode visible rather than
+        // accidentally passing.
+        const setup = await controller.prepareForBrowserScript!(popup!.pageId);
         const { stdout, stderr, exitCode } = await runBrowserScript(
           setup,
           "const { browser, page } = await connectSelectedPage();\n" +
             "console.log(JSON.stringify({ url: page.url(), title: await page.title() }));\n" +
+            // The script closes the page it was handed itself: with no
+            // switch_page, this is how a test (or a real script) tears down
+            // a popup it is done with, never by selecting it first.
+            "await page.close();\n" +
             "await browser.close();",
         );
         expect(exitCode, stderr).toBe(0);
@@ -1167,11 +1240,13 @@ describe('Playwright browser controller', () => {
           title: 'Second Fixture Page',
         });
 
+        // Main was never touched: still selected, still on popup.html.
+        expect(controller.currentUrl()).toBe(fixtureServer.url('/popup.html'));
+
         await controller.refreshAfterBrowserScript!();
-        // Cleanup so later tests in this describe block see one tracked
-        // page again: close the popup (still selected) and restore main.
-        await controller.closeTab();
-        await controller.switchPage(main!.pageId);
+        await expect
+          .poll(async () => (await controller.pages()).length, { timeout: 10_000 })
+          .toBe(1);
       },
       BROWSER_TEST_TIMEOUT_MS,
     );
@@ -1274,13 +1349,16 @@ describe('Playwright browser controller', () => {
         expect(pages).toHaveLength(2);
         const popupPage = pages.find((page) => page.url.includes('/second.html'));
         expect(popupPage).toBeDefined();
+        // Main was never selected away from popup.html: nothing above ever
+        // named it, since there is no switch_page to move the pointer.
+        expect(pages.find((page) => page.active)?.url).toContain('/popup.html');
 
-        // Cleanup for later tests.
-        await controller.switchPage(popupPage!.pageId);
-        await controller.closeTab();
-        await controller.switchPage(
-          pages.find((page) => page.url.includes('/popup.html'))!.pageId,
-        );
+        // Cleanup for later tests: close the popup by pageId, the same way a
+        // browser script would, without ever selecting it.
+        await closeTrackedPageForCleanup(controller, popupPage!.pageId);
+        await expect
+          .poll(async () => (await controller.pages()).length, { timeout: 10_000 })
+          .toBe(1);
       },
       BROWSER_TEST_TIMEOUT_MS,
     );

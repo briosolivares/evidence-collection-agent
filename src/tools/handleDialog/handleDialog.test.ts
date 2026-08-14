@@ -11,7 +11,6 @@ import type {
 } from '../../browser/browserState.js';
 import type { HandleDialogResult } from '../../browser/controller.js';
 import { browserActionTool } from '../browserAction/browserAction.js';
-import { navigateTool } from '../navigate/navigate.js';
 import { observeTool } from '../observe/observe.js';
 import { executeToolCall } from '../pipeline.js';
 import { createRegistry } from '../registry.js';
@@ -19,12 +18,7 @@ import { handleDialogTool } from './handleDialog.js';
 
 describe('handle_dialog tool', () => {
   const suite = setupBrowserToolSuite('handle-dialog-tool');
-  const registry = createRegistry([
-    navigateTool,
-    observeTool,
-    browserActionTool,
-    handleDialogTool,
-  ]);
+  const registry = createRegistry([observeTool, browserActionTool, handleDialogTool]);
 
   function call(name: string, input: unknown) {
     return executeToolCall(
@@ -35,7 +29,9 @@ describe('handle_dialog tool', () => {
   }
 
   async function openFixture(): Promise<BrowserObservation> {
-    await call('navigate', { url: suite.server().url('/actions.html') });
+    await call('browser_action', {
+      actions: [{ op: 'navigate', url: suite.server().url('/actions.html') }],
+    });
     const result = await call('observe', {});
     expect(result.isError).toBe(false);
     return JSON.parse(result.content) as BrowserObservation;

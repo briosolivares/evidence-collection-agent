@@ -5,12 +5,12 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { CallModel, Message, ModelResponse, Usage } from '../loop/messages.js';
 import { initManifest } from '../run/artifacts.js';
-import { CONTRACT_FILENAME, INTENT_FILENAME } from './initializer.js';
 import {
   REPORT_VERIFICATION_TOOL,
   runVerifier,
   verificationResultSchema,
   VERIFIER_MAX_CONTEXT_TOKENS,
+  VERIFIER_SYSTEM_PROMPT,
   type VerifierOutcome,
 } from './verifier.js';
 import { VERIFIER_MAX_IMAGE_DIMENSION_PX } from './verifierTools.js';
@@ -23,13 +23,18 @@ import { VERIFIER_MAX_IMAGE_DIMENSION_PX } from './verifierTools.js';
 const TASK = 'Collect the widget roster and publish a report.';
 const DEFAULT_USAGE: Usage = { input_tokens: 100, output_tokens: 20 };
 
+/** The run's typed contract — a required argument to runVerifier, so every
+ * case supplies one; there is no contract-less path to test. */
+const CONTRACT = {
+  outputs: [{ id: 'roster', kind: 'table', filename: 'roster.csv', format: 'csv' }],
+};
+const CONTRACTS = { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] };
+
 let runDir: string;
 
 beforeEach(() => {
   runDir = mkdtempSync(join(tmpdir(), 'verifier-test-'));
   initManifest(runDir, TASK);
-  writeFileSync(join(runDir, INTENT_FILENAME), 'Publish the widget roster.\n');
-  writeFileSync(join(runDir, CONTRACT_FILENAME), 'artifacts/report.md must list every widget.\n');
 });
 
 afterEach(() => {
@@ -78,7 +83,12 @@ function scriptModel(responses: readonly ModelResponse[]): {
 }
 
 async function verify(responses: readonly ModelResponse[]): Promise<VerifierOutcome> {
-  return runVerifier({ taskText: TASK, runDir, callModel: scriptModel(responses).callModel });
+  return runVerifier({
+    taskText: TASK,
+    runDir,
+    callModel: scriptModel(responses).callModel,
+    contracts: CONTRACTS,
+  });
 }
 
 describe('verificationResultSchema', () => {
@@ -177,7 +187,7 @@ describe('runVerifier typed reporting', () => {
       ]),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     expect(outcome.status).toBe('verified');
     // The second request carries the real file content as a tool result.
@@ -206,7 +216,7 @@ describe('runVerifier fails closed', () => {
       textResponse('I think everything looks fine.'),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     expect(outcome).toEqual({ status: 'verified', findings: [] });
     // The repair turn names the protocol violation to the same session.
@@ -218,7 +228,7 @@ describe('runVerifier fails closed', () => {
       reportResponse({ status: 'verified', findings: [{ area: 'output', code: 'c', message: 'm' }] }),
       reportResponse({ status: 'needs_correction', findings: [{ area: 'output', code: 'c', message: 'm' }] }),
     ]);
-    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     expect(outcome.status).toBe('needs_correction');
     expect(JSON.stringify(script.requests[1])).toContain('failed validation');
@@ -258,7 +268,7 @@ describe('runVerifier fails closed', () => {
     const failing: CallModel = async () => {
       throw new Error('400 refusal from the provider');
     };
-    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: failing });
+    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: failing, contracts: CONTRACTS });
     expect(outcome.status).toBe('verifier_unavailable');
     if (outcome.status !== 'verifier_unavailable') throw new Error('unreachable');
     expect(outcome.reason).toContain('400 refusal');
@@ -269,7 +279,7 @@ describe('runVerifier fails closed', () => {
       throw Object.assign(new Error('aborted'), { name: 'AbortError' });
     };
     await expect(
-      runVerifier({ taskText: TASK, runDir, callModel: aborting }),
+      runVerifier({ taskText: TASK, runDir, callModel: aborting, contracts: CONTRACTS }),
     ).rejects.toThrow('aborted');
   });
 
@@ -288,7 +298,7 @@ describe('runVerifier fails closed', () => {
         findings: [{ area: 'completeness', code: 'unverified', message: 'Budget exhausted.' }],
       }),
     ]);
-    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    const outcome = await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     expect(outcome.status).toBe('needs_correction');
     // The dangling inspection call is closed and the report demanded.
@@ -309,26 +319,16 @@ describe('runVerifier fails closed', () => {
     expect(outcome.status).toBe('verifier_unavailable');
   });
 
-  it('throws when the contract documents are missing — a harness bug, not a verdict', async () => {
-    rmSync(join(runDir, CONTRACT_FILENAME));
-    await expect(
-      verify([reportResponse({ status: 'verified', findings: [] })]),
-    ).rejects.toThrow(/CONTRACT/);
-  });
 });
 
 describe('runVerifier typed-contract input', () => {
-  const CONTRACT = {
-    outputs: [{ id: 'roster', kind: 'table', filename: 'roster.csv', format: 'csv' }],
-  };
-
   it('shows the current contract and flags a single-revision history', async () => {
     const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
     await runVerifier({
       taskText: TASK,
       runDir,
       callModel: script.callModel,
-      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+      contracts: CONTRACTS,
     });
 
     const opening = JSON.stringify(script.requests[0]);
@@ -370,7 +370,7 @@ describe('runVerifier typed-contract input', () => {
       taskText: TASK,
       runDir,
       callModel: script.callModel,
-      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+      contracts: CONTRACTS,
       settled: [
         {
           outputId: 'roster',
@@ -391,25 +391,11 @@ describe('runVerifier typed-contract input', () => {
       taskText: TASK,
       runDir,
       callModel: bare.callModel,
-      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+      contracts: CONTRACTS,
     });
     expect(JSON.stringify(bare.requests[0])).not.toContain('Already established by code');
   });
 
-  it('needs no prose contract documents when a typed contract is supplied', async () => {
-    rmSync(join(runDir, CONTRACT_FILENAME));
-    rmSync(join(runDir, INTENT_FILENAME));
-    const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
-
-    await expect(
-      runVerifier({
-        taskText: TASK,
-        runDir,
-        callModel: script.callModel,
-        contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
-      }),
-    ).resolves.toEqual({ status: 'verified', findings: [] });
-  });
 });
 
 describe('runVerifier evidence scope and screenshots', () => {
@@ -421,7 +407,7 @@ describe('runVerifier evidence scope and screenshots', () => {
       ]),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     const feedback = JSON.stringify(script.requests[1]);
     expect(feedback).toContain("Outside the verifier's evidence scope");
@@ -446,7 +432,7 @@ describe('runVerifier evidence scope and screenshots', () => {
       ]),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     const feedback = JSON.stringify(script.requests[1]);
     expect(feedback).not.toContain("Outside the verifier's evidence scope");
@@ -461,7 +447,7 @@ describe('runVerifier evidence scope and screenshots', () => {
       ]),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     const message = script.requests[1]?.[2];
     const block = (message?.content[0] as { content: unknown }).content as Array<{ type: string }>;
@@ -476,7 +462,7 @@ describe('runVerifier evidence scope and screenshots', () => {
       ]),
       reportResponse({ status: 'verified', findings: [] }),
     ]);
-    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel });
+    await runVerifier({ taskText: TASK, runDir, callModel: script.callModel, contracts: CONTRACTS });
 
     expect(JSON.stringify(script.requests[1])).toContain('Image too large to view');
   });
@@ -493,3 +479,41 @@ function pngBytes(width: number, height: number): Buffer {
   header.writeUInt32BE(height, 20);
   return header;
 }
+
+describe('VERIFIER_SYSTEM_PROMPT', () => {
+  // Both of these cost real correction cycles in live runs, and neither is
+  // enforceable in code: whether a column holds the field the contract named,
+  // and whether a finding is worth a cycle, are exactly the judgments the
+  // verifier exists to make. The prompt is the only place they can be stated,
+  // so these assertions pin the direction rather than the wording.
+  it('refuses a proxy field in both directions', () => {
+    expect(VERIFIER_SYSTEM_PROMPT).toContain(
+      'A named field means that field, not a near neighbour.',
+    );
+    // Accepting an adjacent value.
+    expect(VERIFIER_SYSTEM_PROMPT).toContain('does not satisfy the field');
+    // Demanding a substitute the contract never named.
+    expect(VERIFIER_SYSTEM_PROMPT).toContain(
+      'Never propose, request, or accept a substitute column',
+    );
+    expect(VERIFIER_SYSTEM_PROMPT).toContain(
+      'redesigning the deliverable rather than verifying it',
+    );
+  });
+
+  it('spends correction cycles only on unmet criteria and unevidenced claims', () => {
+    expect(VERIFIER_SYSTEM_PROMPT).toContain(
+      'A finding must name a contract criterion that is not met, or a claim that is not evidenced.',
+    );
+    expect(VERIFIER_SYSTEM_PROMPT).toContain('Do not report one for anything the contract does not require');
+    expect(VERIFIER_SYSTEM_PROMPT).toContain(
+      'the verdict is "verified" even when you can imagine a better deliverable',
+    );
+  });
+
+  it('describes one contract form, not two', () => {
+    expect(VERIFIER_SYSTEM_PROMPT).toContain('typed output contract together with its full revision history');
+    expect(VERIFIER_SYSTEM_PROMPT).not.toContain('INTENT.md');
+    expect(VERIFIER_SYSTEM_PROMPT).not.toContain('CONTRACT.md');
+  });
+});

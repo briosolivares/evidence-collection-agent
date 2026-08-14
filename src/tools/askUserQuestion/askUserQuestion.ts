@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ToolDef } from '../registry.js';
+import type { ToolAccess, ToolDef } from '../registry.js';
 
 const optionSchema = z.strictObject({
   label: z.string().min(1).describe('The choice as shown to the user'),
@@ -63,7 +63,14 @@ export const askUserQuestionTool: ToolDef<AskUserQuestionInput> = {
     'answer space is known; the user can always reply in free text. While ' +
     'paused, the user may also act directly in the browser window.',
   inputSchema: askUserQuestionInputSchema,
-  readOnly: false,
+  // Pauses the ENTIRE run for a human, for however long they take to
+  // answer. Nothing else may be mid-flight while that wait is open: a
+  // concurrent call could finish and mutate state the user cannot see
+  // while deciding, or the user's eventual answer could steer a decision
+  // the concurrent call has already acted on. It cannot name a narrower
+  // key than "everything" — the whole point is that the run itself is
+  // paused, not any one resource.
+  getAccess: (): ToolAccess => ({ reads: [], writes: [], exclusive: true }),
   requiresUserInteraction: true,
   execute(input) {
     const answers = (input as { answers?: AskUserAnswers }).answers;

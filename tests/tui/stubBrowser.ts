@@ -30,9 +30,6 @@ export function stubBrowser(): BrowserController {
     closeTab: vi.fn(async () => {}),
     goto: vi.fn(async () => {}),
     outline: vi.fn(async () => '- page: empty'),
-    click: vi.fn(async () => {}),
-    type: vi.fn(async () => {}),
-    scroll: vi.fn(async () => {}),
     screenshot: vi.fn(async () => new Uint8Array([137, 80])),
     download: vi.fn(async () => ({
       finalUrl: 'https://stub.example/file',
@@ -40,7 +37,6 @@ export function stubBrowser(): BrowserController {
       headers: {},
       bytes: new Uint8Array(),
     })),
-    resolveHref: vi.fn(async () => null),
     fetch: vi.fn(async () => ({
       status: 200,
       headers: {},
@@ -96,7 +92,6 @@ export function stubBrowser(): BrowserController {
       page: stubPage(),
       pendingDialogs: [],
     })),
-    switchPage: vi.fn(async (pageId: string) => stubPage(pageId)),
     close: vi.fn(async () => {}),
   };
 }

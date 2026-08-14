@@ -84,9 +84,17 @@ const bashInputSchema = z.strictObject({
     .optional()
     .describe(
       'Set true only when this command (typically a generated Node/Playwright script) must ' +
-        'connect to the currently selected browser page over CDP. Leave false (the default) ' +
+        'connect to a browser page over CDP. Leave false (the default) ' +
         'for plain shell commands — true prepares and refreshes browser state around the ' +
         'call even when unused, and fails up front if this session cannot support it.',
+    ),
+  pageId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'Page the script attaches to, from an observe result; only meaningful with ' +
+        'uses_browser: true. Omit for the selected page.',
     ),
 });
 
@@ -156,14 +164,16 @@ export function createBashTool(deps: BashToolDeps): ToolDef<BashInput> {
       'stdout/stderr to see what happened. Keep intermediate files under scratch/workspace ' +
       '(they are reconciled into changed_files automatically) and publish final outputs with ' +
       'write_file under artifacts/. Set uses_browser: true only for a command (typically a ' +
-      'generated Node/Playwright script) that must drive the currently selected browser page ' +
-      'over CDP; call inspect_page again afterward before trusting page state, since this ' +
-      'tool never reports it.',
+      'generated Node/Playwright script) that must drive a browser page over CDP; set pageId ' +
+      'to name which page the script attaches to (omit for the selected page); call ' +
+      'inspect_page again afterward before trusting page state, since this tool never reports it.',
     inputSchema: bashInputSchema,
-    readOnly: false,
     // A shell command can touch anything on the host, so — unlike every
     // access-scoped browser/file tool — it declares no keys at all and
-    // instead runs completely alone.
+    // instead runs completely alone. That stays true whether or not pageId
+    // is set: naming a page narrows which CDP target a uses_browser script
+    // attaches to, not what the command is free to do once running, so
+    // there is no narrower access declaration pageId could justify.
     getAccess: () => ({ reads: [], writes: [], exclusive: true }),
     timeoutMs: BASH_TOOL_TIMEOUT_MS,
     execute: (input, ctx) => executeBash(input, ctx, deps.secretEnvDenylist, helperUrl),
@@ -227,7 +237,7 @@ async function executeBash(
             'run does not provide. Retry with uses_browser: false for a plain shell command.',
         );
       }
-      browserSetup = await browser.prepareForBrowserScript();
+      browserSetup = await browser.prepareForBrowserScript(input.pageId);
     }
 
     const env = buildChildEnv(secretEnvDenylist, browserSetup, helperUrl);

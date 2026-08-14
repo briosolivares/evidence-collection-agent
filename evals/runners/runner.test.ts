@@ -61,13 +61,11 @@ describe('runEvals', () => {
       runTask: makeFakeRunTask(baseDir),
       concurrency: 2,
       model: 'fake-model',
-      toolProfile: 'batch-enabled',
     });
 
     expect(report.k).toBe(3);
     expect(report.concurrency).toBe(2);
     expect(report.model).toBe('fake-model');
-    expect(report.toolProfile).toBe('batch-enabled');
     expect(report.tasks).toHaveLength(1);
     const task = report.tasks[0]!;
     expect(task.task).toBe('stub');
@@ -107,7 +105,6 @@ describe('runEvals', () => {
       runTask: flaky,
       concurrency: 1,
       model: 'fake-model',
-      toolProfile: 'atomic',
     });
 
     const task = report.tasks[0]!;
@@ -128,7 +125,6 @@ describe('runEvals', () => {
       runTask: makeFakeRunTask(baseDir),
       concurrency: 1,
       model: 'fake-model',
-      toolProfile: 'atomic',
     });
 
     expect(calls).toHaveLength(2);
@@ -157,7 +153,6 @@ describe('runEvals', () => {
       runTask: makeFakeRunTask(baseDir),
       concurrency: 1,
       model: 'fake-model',
-      toolProfile: 'atomic',
       onTrialGraded: async (job, grade) => {
         // Async on purpose: the runner must await the hook (persistence
         // must complete before the next trial can crash the process).
@@ -180,7 +175,6 @@ describe('runEvals', () => {
       runTask: makeFakeRunTask(baseDir),
       concurrency: 1,
       model: 'fake-model',
-      toolProfile: 'atomic' as const,
     };
 
     await expect(runEvals([stubTask()], 0, deps)).rejects.toThrow(/positive integer/);
@@ -215,7 +209,6 @@ describe('runEvals', () => {
       {
         concurrency: 3,
         model: 'fake-model',
-        toolProfile: 'atomic',
         runTask: async (_taskText, opts) => {
           started += 1;
           if (opts.headed) headedActive += 1;
@@ -260,7 +253,6 @@ describe('runEvals', () => {
       {
         concurrency: 4,
         model: 'fake-model',
-        toolProfile: 'atomic',
         runTask: async (_taskText, opts) => {
           const key = `${opts.taskName}-${opts.trialIndex}`;
           const gate = deferred();
@@ -305,7 +297,6 @@ describe('runEvals', () => {
     const reportPromise = runEvals([task], 3, {
       concurrency: 2,
       model: 'fake-model',
-      toolProfile: 'atomic',
       runTask: async (_taskText, opts) => {
         if (opts.trialIndex === 0) return { runDir: '/runs/pipeline-0' };
         if (opts.trialIndex === 2) thirdRunStarted.resolve();
@@ -333,7 +324,6 @@ describe('runEvals', () => {
       runTask,
       concurrency: 2,
       model: 'fake-model',
-      toolProfile: 'atomic',
       onTrialGraded: (job, grade) => {
         graded.push({ trialNumber: job.trialNumber, ...(grade.error === undefined ? {} : { error: grade.error }) });
       },
@@ -371,7 +361,6 @@ describe('runEvals', () => {
         runTask,
         concurrency: 1,
         model: 'fake-model',
-        toolProfile: 'atomic',
         onTrialGraded: (job) => {
           graded.push(job.trialNumber);
         },
@@ -392,7 +381,6 @@ describe('runEvals', () => {
     const reportPromise = runEvals([passingTask('cancel')], 5, {
       concurrency: 2,
       model: 'fake-model',
-      toolProfile: 'atomic',
       signal: controller.signal,
       runTask: async (_taskText, opts) => {
         started += 1;

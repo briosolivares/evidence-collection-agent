@@ -52,6 +52,21 @@ export const RESERVED_OUTPUT_FILENAMES: readonly string[] = [
   'metrics.json',
 ];
 
+/**
+ * Whether a bare filename satisfies a `filenamePattern` from a `screenshots`
+ * or `download` output spec. `*` matches any run of characters; everything
+ * else is literal.
+ *
+ * Lives here, beside the field it interprets, because TWO places must agree on
+ * it: the capture tools check a filename before writing it, and the submission
+ * checks count the captures that matched. Two implementations would let a tool
+ * accept a name the submission check then rejects.
+ */
+export function matchesFilenamePattern(name: string, pattern: string): boolean {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+  return new RegExp(`^${escaped}$`).test(name);
+}
+
 /** A string that carries information: present, non-empty, and not just
  * whitespace. `min(1)` alone would accept `"   "`, which reads as a filled-in
  * field while saying nothing. */
@@ -147,6 +162,15 @@ export const tableRuleSchema = z.discriminatedUnion('type', [
     type: z.literal('matches_expected_values'),
     column: nonBlankString.describe('Declared column the expected values apply to'),
     expected: z.array(nonBlankString).min(1).describe('Values that must appear in that column'),
+    exhaustive: z
+      .boolean()
+      .optional()
+      .describe(
+        'True when the expected values are the COMPLETE set of row keys: the column must ' +
+          'contain every one of them and nothing else. Set this whenever the population is ' +
+          'known up front, so code catches an invented or duplicated row instead of leaving ' +
+          'it to the verifier',
+      ),
     source: z
       .discriminatedUnion('kind', [
         // Where the expectation came from. The verifier needs this to tell an

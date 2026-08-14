@@ -7,7 +7,7 @@
  * has to be quotable later, byte for byte, from a file an auditor can re-read.
  * That is a *capture*, not an observation.
  *
- * WIRED as of 2026-08-13. The capture seam is
+ * The capture seam is
  * `BrowserController.captureText`, optional on the interface for the same
  * reason `executeJavaScript` is: a session that cannot capture makes
  * `runTask` omit this tool rather than register one that fails when called.
@@ -148,7 +148,10 @@ export interface CaptureTextResult {
 }
 
 /** Everything the tool needs from the session that `ToolCtx` cannot carry
- * yet (see the INTEGRATION note above). */
+ * yet: the capture seam and the evidence ledger are both session-scoped
+ * decisions made where the browser session is built, so this tool is a
+ * factory rather than a module-level definition (see `createCaptureTextTool`
+ * below). */
 export interface CaptureTextDeps {
   /** Resolve the capture seam for one call. Called per call, never cached:
    * pages can be replaced between calls. */
@@ -196,7 +199,6 @@ export function createCaptureTextTool(deps: CaptureTextDeps): ToolDef<CaptureTex
     // fall back to the empty-reads LEGACY_READ_ACCESS) is what makes the
     // scheduler serialize this behind a concurrent navigate/click/etc. on
     // the same page instead of letting it race a write it should observe.
-    readOnly: true,
     getAccess: (input) => ({ reads: [accessKey.page(input.pageId ?? 'selected')], writes: [] }),
     async execute(input, ctx): Promise<CaptureTextResult> {
       // Resolved before the page is read: a capture that cannot be recorded
@@ -222,8 +224,8 @@ export function createCaptureTextTool(deps: CaptureTextDeps): ToolDef<CaptureTex
         // Uncapped and complete: this record is the auditable copy, and the
         // result below is only a view of it.
         detail: {
-          // Carries the kind the store cannot express yet; see the
-          // INTEGRATION note at the top of this file.
+          // Carries the kind the store cannot express yet; see
+          // PENDING_WEB_TEXT_EVIDENCE_KIND's module doc above.
           recordType: PENDING_WEB_TEXT_EVIDENCE_KIND,
           ...(input.label !== undefined ? { label: input.label } : {}),
           url: captured.url,

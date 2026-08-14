@@ -93,7 +93,9 @@ describe('capture_text contract', () => {
   it('is a named, read-only tool with a strict schema', () => {
     const definition = tool(captured());
     expect(definition.name).toBe(CAPTURE_TEXT_TOOL_NAME);
-    expect(definition.readOnly).toBe(true);
+    // Read-only: declares a page READ and no writes, so it never conflicts
+    // with another concurrent capture/observe of the same or another page.
+    expect(definition.getAccess({})).toEqual({ reads: ['page:selected'], writes: [] });
 
     expect(captureTextInputSchema.safeParse({}).success).toBe(true);
     expect(captureTextInputSchema.safeParse({ pageId: 'page-1', elementId: 'el-1' }).success).toBe(

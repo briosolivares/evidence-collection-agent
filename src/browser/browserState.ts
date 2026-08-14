@@ -39,8 +39,10 @@ export interface BrowserPage {
   url: string;
   /** The page's current document title ('' when unavailable mid-navigation). */
   title: string;
-  /** True iff this is the selected page that legacy single-page tools
-   * (goto/outline/click/...) currently operate on. */
+  /** True iff this is the selected page — the one `goto`/`outline`, and
+   * every other implicit-page method (screenshot, download, currentUrl,
+   * title, executeJavaScript, prepareForBrowserScript, ...) when its
+   * `pageId` is omitted, currently operate on. */
   active: boolean;
   /** Every live frame, main frame first, so an {@link ElementRef.frameId}
    * always names an entry here. */
@@ -128,6 +130,24 @@ export interface PageChanges {
   updatedText: Array<{ elementId?: string; text: string }>;
 }
 
+/**
+ * A live page besides the one an observation describes, surfaced purely so
+ * a second page (a popup, a `target=_blank` tab) is discoverable at all: with
+ * no `switch_page` tool, {@link BrowserObservation.page} is the only page
+ * identity a caller would otherwise ever see. Advisory only — not part of
+ * the observed page's own identity, and never itself the target of a diff.
+ */
+export interface OtherOpenPage {
+  pageId: string;
+  url: string;
+  title: string;
+}
+
+/** Other live pages kept per observation. Bounded so one session with many
+ * popups cannot balloon a result that exists only to make them
+ * discoverable, not to describe them. */
+export const MAX_OTHER_OPEN_PAGES = 20;
+
 /** A fresh page snapshot: the page's identity, the requested views, the
  * observed interactive elements, and changes vs the requested baseline. */
 export interface BrowserObservation {
@@ -141,6 +161,11 @@ export interface BrowserObservation {
   elements: ElementRef[];
   /** Diff vs the requested baseline (see {@link PageChanges.basis}). */
   changes: PageChanges;
+  /** Other live pages besides {@link page} (see {@link OtherOpenPage}),
+   * bounded by {@link MAX_OTHER_OPEN_PAGES}. Omitted — never an empty array
+   * — when this is the only live page, so the common single-page case pays
+   * nothing for it. */
+  otherOpenPages?: OtherOpenPage[];
 }
 
 /** The element-level facts one recorded observation keeps for later diffs. */

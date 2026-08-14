@@ -1,52 +1,3 @@
-/**
- * INTEGRATION (T8) — this tool is complete and tested but deliberately NOT
- * registered: registry.ts, index.ts, the controller, and completionCheck.ts
- * belong to other agents. Five wiring steps remain, and nothing in this file
- * needs to change for them:
- *
- * 1. `src/tools/registry.ts` — add one optional field to `ToolCtx` (T6 adds
- *    the same one, so this may already be there):
- *      `evidenceStore?: EvidenceStore`   (src/evidence/evidenceStore.js)
- *    `outputContracts?: OutputContractStore` already exists and is what the
- *    `documentSpecs` dep below reads.
- *
- * 2. Build the tool where the run's registry is built:
- *      createWriteDocumentTool({
- *        documentSpecs: (ctx) =>
- *          (ctx.outputContracts?.currentContract()?.outputs ?? [])
- *            .filter((output) => output.kind === 'document'),
- *        evidence: (ctx) =>
- *          ctx.evidenceStore === undefined ? undefined : (id) => ctx.evidenceStore!.get(id),
- *        openPdfPage: createPlaywrightPdfPageOpener(browser),
- *      })
- *    Both resolvers are read PER CALL, on purpose: a contract revision must
- *    apply to the very next write, and the ledger is run-scoped.
- *
- * 3. `openPdfPage` needs a Playwright `Browser` (preferred) or
- *    `BrowserContext` that is NOT the worker's page. Today
- *    `LocalChromeBrowserSessionProvider` keeps its context private, so expose
- *    one accessor there — e.g. `pdfPageSource(): Pick<Browser, 'newPage'>` on
- *    `BrowserController` — and pass it straight to
- *    `createPlaywrightPdfPageOpener`. Omitting the dep is safe: a `pdf`
- *    document then fails with an explicit "this run cannot render PDFs"
- *    error before anything is written, rather than publishing a text file
- *    with a .pdf name.
- *
- * 4. `src/tools/index.ts` — export a `documentTools` array and spread it LAST
- *    inside `createProductionRegistry`, after the existing conditional tools.
- *    Appending last is the only position where no existing tool's index moves,
- *    so the cached prompt prefix keeps its bytes.
- *
- * 5. `src/completion/completionCheck.ts` — `validateDocumentOutputs()` (plan
- *    step 6): a contract-bound document output must be satisfiable ONLY through
- *    this tool. `checkDocumentOutput` already checks existence, required
- *    sections, and placeholders; what is missing is the negative check — a
- *    document output whose published file has no matching
- *    `scratch/documents/<outputId>/source.md` manifest entry was hand-written
- *    with write_file and must fail the check. Both paths are already in the
- *    manifest, so this needs no new bookkeeping.
- */
-
 import { z } from 'zod';
 
 import {
@@ -63,7 +14,7 @@ import {
   type PdfRenderPage,
 } from '../../outputs/renderDocument.js';
 import { ARTIFACTS_DIR, writeArtifact } from '../../run/artifacts.js';
-import type { ToolCtx, ToolDef } from '../registry.js';
+import { accessKey, type ToolCtx, type ToolDef } from '../registry.js';
 import { classifyWorkspacePath } from '../shared/evidence.js';
 
 // Publishing a prose deliverable. The model supplies ONE thing — the
@@ -142,8 +93,8 @@ export interface WriteDocumentResult {
 /**
  * Everything the tool needs from the run that `ToolCtx` cannot yet give it.
  * A factory rather than a module-level tool because the PDF page source is a
- * session-scoped decision made where the browser is created (see the
- * INTEGRATION note above).
+ * session-scoped decision made where the browser session is built (see
+ * `createWriteDocumentTool` below).
  */
 export interface WriteDocumentDeps {
   /**
@@ -199,9 +150,22 @@ export function createWriteDocumentTool(
       'requires. Use write_file only for scratch and supporting files, never for a ' +
       'contract document output.',
     inputSchema: writeDocumentInputSchema,
-    // Publishes a graded deliverable: the scheduler must serialize it against
-    // every other state change.
-    readOnly: false,
+    // Reads the contract to resolve outputId -> spec (filename, format,
+    // required sections), so it conflicts with a concurrent set_output_contract
+    // revision — never render against a contract that is being replaced out
+    // from under it. Writes the marked source at documentSourcePath(outputId),
+    // a path that is a pure function of the input and thus exactly nameable
+    // (unlike the published artifacts/<filename> path, which is only known
+    // once the contract is consulted at execute time): two write_document
+    // calls for the SAME outputId therefore serialize on that source-file key,
+    // while different outputs run in parallel, matching how
+    // screenshot/download key their own writes on the one path they can name.
+    // manifest() is a write like every other artifact-producing tool, since
+    // both the source and the published file update it.
+    getAccess: (input) => ({
+      reads: [accessKey.contract()],
+      writes: [accessKey.file(documentSourcePath(input.outputId)), accessKey.manifest()],
+    }),
     async execute(input, ctx): Promise<WriteDocumentResult> {
       const spec = requireDocumentSpec(deps, ctx, input.outputId);
       const lookup = requireLookup(deps, ctx, spec, input.content);

@@ -1,4 +1,3 @@
-import type { ToolProfile } from '../../src/tools/index.js';
 import { summarizeTask, type TaskReport, type TrialGrade } from '../metrics/metrics.js';
 import type { EvalRunOptions, EvalTask, RunTaskFn } from '../types.js';
 
@@ -23,9 +22,7 @@ export interface EvalRunnerDeps {
   concurrency: number;
   /** Name of the model every trial uses, recorded verbatim. */
   model: string;
-  /** Deterministic tool surface every trial uses. */
-  toolProfile: ToolProfile;
-  /** Completion protocol every trial ran; omitted means the prose path. */
+  /** Completion protocol every trial ran. */
   protocol?: EvalProtocol;
   /** Optional batch cancellation signal. */
   signal?: AbortSignal;
@@ -43,16 +40,14 @@ export interface EvalRunnerDeps {
 /**
  * Which completion protocol a batch ran.
  *
- * Recorded on the report because the two are not comparable: `prose` scores
- * an INTENT.md/CONTRACT.md run, `output-contract` scores a typed-contract run
- * with code checks and `submit_for_verification`. A results file that does not
- * name its protocol cannot be distinguished from one that ran the other, which
- * is exactly the confusion the contract-author experiment cannot afford.
+ * Every batch runs the typed output contract now; this records who authored
+ * it (initializer or worker), since the contract-author experiment compares
+ * those two live sub-paths.
  */
 export interface EvalProtocol {
-  /** 'prose' | 'output-contract' — the completion path under test. */
-  completion: 'prose' | 'output-contract';
-  /** Who authored the contract. Absent under 'prose', which has no author choice. */
+  /** The completion path under test. Only 'output-contract' exists now. */
+  completion: 'output-contract';
+  /** Who authored the contract. */
   contractAuthor?: 'initializer' | 'worker';
 }
 
@@ -68,10 +63,8 @@ export interface EvalReport {
   concurrency: number;
   /** Name of the model every trial ran with. */
   model: string;
-  /** Tool condition every trial used. */
-  toolProfile: ToolProfile;
   /** Completion protocol every trial ran. Absent on reports written before
-   * the protocol switch existed, which were all prose runs. */
+   * the protocol field existed. */
   protocol?: EvalProtocol;
   /** Number of interactive dialogs a human answered during the batch (TUI
    * headed-lane assists — see the TUI's evalSession). Present only when
@@ -236,7 +229,6 @@ export async function runEvals(
       k,
       concurrency: deps.concurrency,
       model: deps.model,
-      toolProfile: deps.toolProfile,
       ...(deps.protocol === undefined ? {} : { protocol: deps.protocol }),
       tasks: taskReports,
     };

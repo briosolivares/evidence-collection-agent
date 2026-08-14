@@ -3,15 +3,16 @@
 // and the on-disk transcript's tool_result events keep every result in
 // full; only what the model sees each turn is reshaped here.
 //
-// Why it exists: inspect_page results are the conversation's whales — a
-// full-page semantic outline every observation — and a deep run drags
-// dozens of stale ones along forever. At 170k+ tokens of context, long
-// tool-input generation stalls against a ~60s server watchdog and the
-// stream dies (see docs/reports/2026-08-12-full-suite-first-run.md,
-// failure mode 1). Collapsing all but the most recent page snapshots keeps
-// deep runs below that regime; the system prompt teaches the model that
-// lasting facts belong in scratch//artifacts/ files and refs come from its
-// latest inspections.
+// Why it exists: observe results are the conversation's whales — a
+// full-page interactive outline (plus text/changes) every observation — and
+// a deep run drags dozens of stale ones along forever. At 170k+ tokens of
+// context, long tool-input generation stalls against a ~60s server watchdog
+// and the stream dies (see docs/reports/2026-08-12-full-suite-first-run.md,
+// failure mode 1, from the era when the page-observation tool was
+// inspect_page — the failure mode is identical under observe). Collapsing
+// all but the most recent page snapshots keeps deep runs below that regime;
+// the system prompt teaches the model that lasting facts belong in
+// scratch/ or artifacts/ files and refs come from its latest observations.
 
 import type { Message, ToolResultBlock } from './messages.js';
 
@@ -19,24 +20,26 @@ import type { Message, ToolResultBlock } from './messages.js';
  * Registry name of the tool whose results the view elides. A literal, not
  * an import from the tools package — the loop stays free of tool
  * implementations; contextView.test.ts pins this to the real tool's name.
+ * Was `inspect_page` until the V2 tool cutover retired it in favor of
+ * `observe` (src/tools/observe/observe.ts); this constant tracks whichever
+ * tool is the live page-observation surface.
  */
-export const INSPECT_TOOL_NAME = 'inspect_page';
+export const OBSERVE_TOOL_NAME = 'observe';
 
 /**
- * How many of the most recent successful inspect_page results survive
- * intact. Two, per the elision plan: the latest inspection carries the
- * live refs, and one predecessor covers compare-against-previous-page
- * reasoning.
+ * How many of the most recent successful observe results survive intact.
+ * Two, per the elision plan: the latest observation carries the live refs,
+ * and one predecessor covers compare-against-previous-page reasoning.
  */
-export const KEPT_INSPECT_RESULTS = 2;
+export const KEPT_OBSERVE_RESULTS = 2;
 
 /** Opening line of every stub — also the marker tests and humans can grep
  * a transcript for. */
-export const ELISION_MARKER = '[Stale inspect_page result elided — only the two most recent page inspections stay in the conversation.]';
+export const ELISION_MARKER = '[Stale observe result elided — only the two most recent page observations stay in the conversation.]';
 
-/** Closing guidance of every stub: the recovery path is re-inspection. */
+/** Closing guidance of every stub: the recovery path is re-observing. */
 const REINSPECT_LINE =
-  'Its content and refs are gone from this view. Run inspect_page again if this page is needed; durable facts belong in scratch/ or artifacts/ files.';
+  'Its content and refs are gone from this view. Run observe again if this page is needed; durable facts belong in scratch/ or artifacts/ files.';
 
 /**
  * Whether a tool_result block is one of this view's stubs. Content-based
@@ -55,9 +58,9 @@ export function isElisionStub(block: { type: string; content?: unknown }): boole
 }
 
 /**
- * Build the API message view: replace every successful inspect_page
- * tool_result except the last KEPT_INSPECT_RESULTS with a short stub
- * (URL/title when recoverable, plus re-inspect guidance).
+ * Build the API message view: replace every successful observe tool_result
+ * except the last KEPT_OBSERVE_RESULTS with a short stub (URL/title when
+ * recoverable, plus re-observe guidance).
  *
  * Contract:
  * - Pure and non-mutating: `messages`, its messages, and their blocks are
@@ -66,15 +69,19 @@ export function isElisionStub(block: { type: string; content?: unknown }): boole
  * - Deterministic: the stub for a given result depends only on that
  *   result's content, so once a result goes stale its stubbed message is
  *   byte-identical in every later view — the prompt-cache prefix survives;
- *   each new inspection invalidates the cache only from the message of the
+ *   each new observation invalidates the cache only from the message of the
  *   result it displaces.
  * - Structure-preserving: a stub keeps its block's tool_use_id, position,
  *   and type; only `content` is replaced. The API still sees a well-formed
  *   tool_use/tool_result pairing.
- * - Failed inspections (is_error) are never stubbed and never counted
+ * - Failed observations (is_error) are never stubbed and never counted
  *   toward the kept window: they are small, they carry what went wrong,
  *   and eliding one would hide the error while a stale success elsewhere
  *   survived.
+ *
+ * The exported name predates the V2 cutover (it targeted inspect_page) and
+ * is kept as-is here: src/loop/workerSession.ts and src/model/callModel.ts
+ * import it by this name and are outside this change's scope.
  *
  * @param messages - the loop's full conversation for this turn
  * @returns the conversation to send to the model: `messages` itself when
@@ -82,36 +89,36 @@ export function isElisionStub(block: { type: string; content?: unknown }): boole
  *   message by identity
  */
 export function elideStaleInspectResults(messages: readonly Message[]): readonly Message[] {
-  // Which tool_use ids belong to inspect_page. Results are matched through
-  // the id, never by sniffing content — a read_file of a page dump must
-  // not be mistaken for an inspection.
-  const inspectIds = new Set<string>();
+  // Which tool_use ids belong to observe. Results are matched through the
+  // id, never by sniffing content — a read_file of a page dump must not be
+  // mistaken for an observation.
+  const observeIds = new Set<string>();
   for (const message of messages) {
     if (message.role !== 'assistant') continue;
     for (const block of message.content) {
-      if (block.type === 'tool_use' && block.name === INSPECT_TOOL_NAME) {
-        inspectIds.add(block.id);
+      if (block.type === 'tool_use' && block.name === OBSERVE_TOOL_NAME) {
+        observeIds.add(block.id);
       }
     }
   }
-  if (inspectIds.size <= KEPT_INSPECT_RESULTS) return messages;
+  if (observeIds.size <= KEPT_OBSERVE_RESULTS) return messages;
 
   // Locate every elidable result in conversation order; all but the last
-  // KEPT_INSPECT_RESULTS go stale.
+  // KEPT_OBSERVE_RESULTS go stale.
   const found: Array<{ messageIndex: number; blockIndex: number }> = [];
   messages.forEach((message, messageIndex) => {
     if (message.role !== 'user') return;
     message.content.forEach((block, blockIndex) => {
       if (
         block.type === 'tool_result' &&
-        inspectIds.has(block.tool_use_id) &&
+        observeIds.has(block.tool_use_id) &&
         block.is_error !== true
       ) {
         found.push({ messageIndex, blockIndex });
       }
     });
   });
-  const stale = found.slice(0, Math.max(0, found.length - KEPT_INSPECT_RESULTS));
+  const stale = found.slice(0, Math.max(0, found.length - KEPT_OBSERVE_RESULTS));
   if (stale.length === 0) return messages;
 
   const staleBlocksByMessage = new Map<number, Set<number>>();
@@ -136,11 +143,13 @@ export function elideStaleInspectResults(messages: readonly Message[]): readonly
 }
 
 /** The stub that replaces a stale result: marker line, the page's URL/title
- * header when it can be recovered, and the re-inspect guidance. */
+ * header when it can be recovered, and the re-observe guidance. */
 function stubResultBlock(block: ToolResultBlock): ToolResultBlock {
-  // inspect_page results are always plain text; the string check is for the
-  // type system (ToolResultBlock.content also admits image-carrying arrays,
-  // which only the judge produces and which are never elidable).
+  // observe results are always structured JSON text (a BrowserObservation,
+  // or the {preview, offloadedTo, note} offload envelope); the string check
+  // is for the type system (ToolResultBlock.content also admits
+  // image-carrying arrays, which only the judge produces and which are
+  // never elidable).
   const header = typeof block.content === 'string' ? extractPageHeader(block.content) : undefined;
   const content = [ELISION_MARKER, ...(header === undefined ? [] : [header]), REINSPECT_LINE].join(
     '\n',
@@ -149,28 +158,63 @@ function stubResultBlock(block: ToolResultBlock): ToolResultBlock {
 }
 
 /**
- * Recover the `URL: …\nTitle: …` header an inspect_page result opens with
- * (see formatPageHeader). Results that were offloaded by a size cap are the
- * JSON replacement object whose `preview` opens with the same header, so
- * the preview is consulted when the content parses as one. Returns
+ * Recover a `URL: …\nTitle: …` header from an observe result's page
+ * identity (`BrowserObservation.page.url` / `.title` — see
+ * src/browser/browserState.ts). A normal result is
+ * `JSON.stringify(BrowserObservation)`, which parses cleanly and exposes
+ * those fields directly. A result oversized enough to be offloaded (see
+ * capResult.ts) is instead `{preview, offloadedTo, note}`, where `preview`
+ * is a byte-truncated prefix of that same JSON — `page` is the
+ * observation's first key, so url/title are ordinarily still inside the
+ * preview, but the prefix can be cut mid-string, so it is read with a
+ * tolerant field-level scan rather than a nested `JSON.parse`. Returns
  * undefined when no header is recognizable — the stub then simply omits it.
  */
 function extractPageHeader(content: string): string | undefined {
-  let source = content;
-  if (content.startsWith('{')) {
-    try {
-      const parsed: unknown = JSON.parse(content);
-      const preview = (parsed as { preview?: unknown }).preview;
-      if (typeof preview === 'string') source = preview;
-    } catch {
-      // Not the offload replacement — read the content as-is.
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return undefined;
+  }
+  const page = (parsed as { page?: unknown }).page;
+  if (page !== null && typeof page === 'object') {
+    const url = (page as { url?: unknown }).url;
+    const title = (page as { title?: unknown }).title;
+    if (typeof url === 'string' && typeof title === 'string') {
+      return `URL: ${url}\nTitle: ${title}`;
     }
   }
-  const [urlLine, titleLine] = source.split('\n', 2);
-  if (urlLine?.startsWith('URL: ') === true && titleLine?.startsWith('Title: ') === true) {
-    return `${urlLine}\n${titleLine}`;
+  const preview = (parsed as { preview?: unknown }).preview;
+  if (typeof preview === 'string') {
+    const url = extractJsonStringField(preview, 'url');
+    const title = extractJsonStringField(preview, 'title');
+    if (url !== undefined && title !== undefined) {
+      return `URL: ${url}\nTitle: ${title}`;
+    }
   }
   return undefined;
+}
+
+/**
+ * Pull a `"field":"value"` JSON string field's decoded value out of text that
+ * may be truncated mid-object (an offload preview), without requiring the
+ * whole text to parse as JSON.
+ *
+ * Takes the FIRST match, which is the page's own field only because `page` is
+ * the first key an observation serializes. That assumption is safe to make
+ * here and nowhere else: the value feeds an optional stub header, so a wrong
+ * or missing match costs a line of context detail and can never suppress the
+ * elision itself.
+ */
+function extractJsonStringField(text: string, field: string): string | undefined {
+  const match = new RegExp(`"${field}":"((?:\\\\.|[^"\\\\])*)"`).exec(text);
+  if (match?.[1] === undefined) return undefined;
+  try {
+    return JSON.parse(`"${match[1]}"`) as string;
+  } catch {
+    return undefined;
+  }
 }
 
 // --- T15: cache-safe compaction and frozen previews --------------------------

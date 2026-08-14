@@ -426,7 +426,7 @@ describe('edit_file — contract-bound refusal', () => {
     writeArtifactFixture('artifacts/notes.md', 'audit notes\n');
   });
 
-  it('refuses to edit the published file of a contract-bound table output, naming upsert_output_rows', async () => {
+  it('refuses to edit the published file of a contract-bound table output, naming update_table', async () => {
     const accepted = store.setOutputContract({ contract: tableContract('roster.csv') });
     expect(accepted.ok).toBe(true);
 
@@ -436,7 +436,7 @@ describe('edit_file — contract-bound refusal', () => {
       { outputContracts: store },
     );
     expect(result).toMatchObject({ isError: true, errorKind: 'execution_error' });
-    expect(result.content).toContain('upsert_output_rows');
+    expect(result.content).toContain('update_table');
     expect(readFileSync(join(runDir, 'artifacts/roster.csv'), 'utf8')).toBe('name\nAda\n');
   });
 
@@ -488,7 +488,7 @@ describe('edit_file — contract-bound refusal', () => {
       { outputContracts: store },
     );
     expect(afterRevision).toMatchObject({ isError: true, errorKind: 'execution_error' });
-    expect(afterRevision.content).toContain('upsert_output_rows');
+    expect(afterRevision.content).toContain('update_table');
     // Still holds the value the (allowed) first edit produced.
     expect(readFileSync(join(runDir, 'artifacts/roster.csv'), 'utf8')).toBe('name\nGrace\n');
   });

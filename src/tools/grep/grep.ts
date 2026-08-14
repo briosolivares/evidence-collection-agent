@@ -45,7 +45,6 @@ export const grepTool: ToolDef<GrepInput> = {
     'Returns matching lines as path:line: match. ' +
     'Optionally restrict the search to a file or directory with path.',
   inputSchema: grepInputSchema,
-  readOnly: true,
   getAccess: (input) => ({
     reads: [accessKey.file(input.path ?? '.')],
     writes: [],

@@ -186,26 +186,18 @@ export function accessesConflict(left: ToolAccess, right: ToolAccess): boolean {
   return false;
 }
 
-/** The fail-closed access for a call whose tool declares none, or whose
- * declaration threw: it conflicts with everything, so it runs alone. */
+/** The fail-closed access for a call whose declaration threw: it conflicts
+ * with everything, so it runs alone. */
 export const EXCLUSIVE_ACCESS: ToolAccess = { reads: [], writes: [], exclusive: true };
-
-/** The access a legacy read-only tool (one with no `getAccess`) gets during
- * the migration: it touches nothing it can name, so two of them overlap —
- * preserving today's parallel reads — while any exclusive call still forms a
- * barrier around them. */
-export const LEGACY_READ_ACCESS: ToolAccess = { reads: [], writes: [] };
 
 /** Derive a tool call's access the same way for both scheduling (grouping
  * concurrent calls) and execution (gating/registering against abandoned
  * work) — one implementation, so the two can never silently disagree about
- * what a call touches. See `ToolDef.getAccess`'s own doc for why an absent
- * or throwing declaration degrades to serial rather than to unsafe
- * parallelism. */
+ * what a call touches. `getAccess` is mandatory on `ToolDef` (T16), so the
+ * only failure mode left is a declaration that THROWS; that still degrades
+ * to `EXCLUSIVE_ACCESS` rather than to unsafe parallelism — see
+ * `ToolDef.getAccess`'s own doc. */
 export function deriveAccess(tool: ToolDef, input: unknown): ToolAccess {
-  if (tool.getAccess === undefined) {
-    return tool.readOnly ? LEGACY_READ_ACCESS : EXCLUSIVE_ACCESS;
-  }
   try {
     return tool.getAccess(input);
   } catch {
@@ -310,22 +302,16 @@ export interface ToolDef<Input = unknown> {
   /** zod schema every input is validated against before `execute` runs. */
   inputSchema: z.ZodType<Input>;
   /**
-   * True iff the tool never changes state.
-   *
-   * Retained as a COMPATIBILITY field only: the scheduler now prefers
-   * `getAccess()`, and this flag is the fallback for tools that do not yet
-   * declare access. T16 removes it once every production tool has migrated.
-   */
-  readOnly: boolean;
-  /**
    * What this call touches, derived from its validated input (see ToolAccess).
    *
-   * Omitted means "unknown", which the scheduler treats as exclusive — a tool
-   * that cannot say what it touches must not run beside anything. A throw is
-   * treated identically, so a buggy declaration degrades to serial execution
-   * rather than to unsafe parallelism.
+   * Mandatory (T16): every production tool must be able to say what it
+   * touches, so there is no fallback left to reach for when a declaration is
+   * merely forgotten. A THROWING declaration is still tolerated — it
+   * degrades to `EXCLUSIVE_ACCESS` (see `deriveAccess`) rather than to unsafe
+   * parallelism — but an absent one is now a type error, not a silent
+   * "unknown".
    */
-  getAccess?(input: Input): ToolAccess;
+  getAccess(input: Input): ToolAccess;
   /** Maximum size in bytes of this tool's normalized result before the
    * pipeline offloads it to a file and hands the model a preview + path
    * (T5). Omitted means DEFAULT_MAX_RESULT_BYTES. */

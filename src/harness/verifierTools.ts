@@ -10,7 +10,6 @@ import { grepTool } from '../tools/grep/grep.js';
 import { executeToolCall, type ToolCallResult } from '../tools/pipeline.js';
 import { readFileTool } from '../tools/readFile/readFile.js';
 import { createRegistry, type ToolCtx, type ToolDef, type ToolRegistry } from '../tools/registry.js';
-import { CONTRACT_FILENAME, INTENT_FILENAME } from './initializer.js';
 
 // The verifier's read-only inspection surface: its tool registry, its
 // evidence-scope guard, its screenshot-as-image handling, and the assembly
@@ -47,20 +46,17 @@ export function createVerifierRegistry(): ToolRegistry {
 
 /**
  * Assemble the verifier's opening user message: the original task, the
- * contract, the manifest's raw content, and the artifacts/ listing —
- * everything the evidence diet promises up front, so tool calls can go
- * straight to specific files instead of discovering what exists.
+ * contract and its full revision history, the manifest's raw content, and
+ * the artifacts/ listing — everything the evidence diet promises up front,
+ * so tool calls can go straight to specific files instead of discovering
+ * what exists.
  *
- * The contract arrives in one of two forms. When the run has a typed
- * `OutputContract` (T4), the latest revision AND the full revision history
- * are supplied: the verifier needs the history to tell evidence-driven
- * strengthening from drift that quietly weakened an original requirement,
- * which is a judgment only it can make. Otherwise the compatibility path
- * reads the prose INTENT.md/CONTRACT.md pair.
+ * The history is supplied, not just the latest revision: the verifier needs
+ * it to tell evidence-driven strengthening from drift that quietly weakened
+ * an original requirement, which is a judgment only it can make.
  *
- * The original task is always included, whichever form the contract takes —
- * checking task ↔ contract is what stops a mis-stated contract from
- * validating its own mistake.
+ * The original task is always included — checking task ↔ contract is what
+ * stops a mis-stated contract from validating its own mistake.
  *
  * Code-settled facts are included when the caller has them (see
  * {@link SettledFact}). They are stated as facts, not hints: the verifier
@@ -68,16 +64,13 @@ export function createVerifierRegistry(): ToolRegistry {
  * bytes, because doing so can only introduce error — measured live, it cost
  * two correction cycles on a file that was correct.
  *
- * @param contracts - the run's contract history, when the run has one
+ * @param contracts - the run's current contract and its revision history
  * @param settled - what the code checks positively established
- * @throws if no typed contract is supplied and INTENT.md or CONTRACT.md is
- *   missing — a run reaching the verifier with neither is a harness bug and
- *   must fail loudly
  */
 export function buildVerificationInput(
   runDir: string,
   taskText: string,
-  contracts?: { current: unknown; history: readonly unknown[] },
+  contracts: { current: unknown; history: readonly unknown[] },
   settled: readonly SettledFact[] = [],
 ): string {
   const manifestRaw = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
@@ -85,27 +78,18 @@ export function buildVerificationInput(
   const artifactsSection =
     artifactListing.length > 0 ? artifactListing.join('\n') : '(no files published)';
 
-  const contractSections =
-    contracts === undefined
-      ? [
-          `# Intent (${INTENT_FILENAME})`,
-          readRequiredRunDirFile(runDir, INTENT_FILENAME),
-          '',
-          `# Contract (${CONTRACT_FILENAME})`,
-          readRequiredRunDirFile(runDir, CONTRACT_FILENAME),
-        ]
-      : [
-          '# Output contract (current revision)',
-          JSON.stringify(contracts.current, null, 2),
-          '',
-          '# Contract revision history',
-          // Every revision in order, each with the basis its author gave.
-          // A later revision that weakened an original explicit requirement
-          // is visible here and nowhere else.
-          contracts.history.length <= 1
-            ? '(single revision — the contract was never changed)'
-            : JSON.stringify(contracts.history, null, 2),
-        ];
+  const contractSections = [
+    '# Output contract (current revision)',
+    JSON.stringify(contracts.current, null, 2),
+    '',
+    '# Contract revision history',
+    // Every revision in order, each with the basis its author gave. A later
+    // revision that weakened an original explicit requirement is visible
+    // here and nowhere else.
+    contracts.history.length <= 1
+      ? '(single revision — the contract was never changed)'
+      : JSON.stringify(contracts.history, null, 2),
+  ];
 
   return [
     '# Task',
@@ -349,19 +333,10 @@ function requestedPath(block: ToolUseBlock): string | undefined {
   return typeof field === 'string' ? field : undefined;
 }
 
-/** The root files inside the verifier's evidence scope. Everything else at
- * the run-dir root (transcript, metrics, harness diagnostics) is
- * bookkeeping, not evidence. */
-const ROOT_EVIDENCE_FILES: readonly string[] = [
-  INTENT_FILENAME,
-  CONTRACT_FILENAME,
-  MANIFEST_FILENAME,
-];
-
 /**
  * The verifier's evidence-scope check: only surfaced evidence is readable —
- * files under artifacts/ and under scratch/evidence/, plus INTENT.md,
- * CONTRACT.md, and manifest.json at the run-dir root. Anywhere else
+ * files under artifacts/ and under scratch/evidence/, plus manifest.json at
+ * the run-dir root. Anywhere else
  * (the rest of scratch/, the transcript, metrics) is off-diet: graders never
  * see unpublished working files, so a verdict built on them would be a false
  * calibration; the boundary also keeps backpressure on the worker to publish
@@ -398,13 +373,13 @@ export function evidenceScopeError(runDir: string, relPath: string): string | nu
     const dirRoot = join(root, dir);
     return resolved === dirRoot || resolved.startsWith(dirRoot + sep);
   };
-  const isRootEvidenceFile = ROOT_EVIDENCE_FILES.some((name) => resolved === join(root, name));
+  const isRootEvidenceFile = resolved === join(root, MANIFEST_FILENAME);
   if (inSubtree(ARTIFACTS_DIR) || inSubtree(EVIDENCE_DIR) || isRootEvidenceFile) return null;
   return (
     `Outside the verifier's evidence scope: ${JSON.stringify(relPath)}. You may read only ` +
     `published evidence and recorded provenance: files under ${ARTIFACTS_DIR}/ and ` +
-    `${EVIDENCE_DIR}/, plus ${INTENT_FILENAME}, ${CONTRACT_FILENAME}, and ` +
-    `${MANIFEST_FILENAME} at the run-directory root. Other unpublished working files ` +
+    `${EVIDENCE_DIR}/, plus ${MANIFEST_FILENAME} at the run-directory root. ` +
+    'Other unpublished working files ' +
     'are not evidence — a claim proven only there is unproven.'
   );
 }
@@ -413,10 +388,9 @@ export function evidenceScopeError(runDir: string, relPath: string): string | nu
  * The verifier's grep input: a grep with no `path` is redirected to
  * artifacts/. The tool's own default scope is the entire run directory —
  * wider than the evidence scope — and an unscoped verifier grep means
- * "search all published evidence", which artifacts/ is. INTENT.md,
- * CONTRACT.md, and the manifest arrive in full in the opening message, so
- * excluding them from the default costs nothing, and an explicit path to
- * any of them still works. Non-object input, or input already carrying a
+ * "search all published evidence", which artifacts/ is. The contract and the
+ * manifest arrive in full in the opening message, so excluding the manifest
+ * from the default costs nothing, and an explicit path to it still works. Non-object input, or input already carrying a
  * `path` key (string or not), passes through unchanged for the pipeline's
  * zod validation to judge.
  */
@@ -436,28 +410,6 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
     content: result.content,
     ...(result.isError ? { is_error: true } : {}),
   };
-}
-
-/**
- * Read one required file from the run-dir root.
- *
- * @param filename - a fixed, harness-known filename at the run-dir root
- *   (never model- or worker-supplied, so no path-escape confinement is
- *   needed here)
- * @throws with a message naming the missing file if it does not exist
- */
-function readRequiredRunDirFile(runDir: string, filename: string): string {
-  try {
-    return readFileSync(join(runDir, filename), 'utf8');
-  } catch (thrown) {
-    if ((thrown as NodeJS.ErrnoException).code === 'ENOENT') {
-      throw new Error(
-        `${filename} is missing from the run directory (${runDir}) — the harness must write ` +
-          'the contract documents before the verifier runs.',
-      );
-    }
-    throw thrown;
-  }
 }
 
 /**

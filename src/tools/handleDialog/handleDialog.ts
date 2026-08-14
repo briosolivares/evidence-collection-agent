@@ -31,9 +31,6 @@ export type HandleDialogInput = z.infer<typeof handleDialogInputSchema>;
  * action, not even a title read — so answering it is the only way forward,
  * and `browser_action` stops and reports the dialog rather than burning its
  * timeouts against a blocked renderer.
- *
- * INTEGRATION: not registered in `src/tools/index.ts` yet — registered
- * together with `browser_action` and `switch_page` by the session owner.
  */
 export const handleDialogTool: ToolDef<HandleDialogInput> = {
   name: 'handle_dialog',
@@ -43,7 +40,11 @@ export const handleDialogTool: ToolDef<HandleDialogInput> = {
     'entirely, so answer it before observing or acting again. Returns the page after the decision and ' +
     'any dialogs still pending.',
   inputSchema: handleDialogInputSchema,
-  readOnly: false,
+  // Addressed by dialogId, not pageId — the input has no page-scoped key to
+  // name, and a pending dialog can block ANY page in the session, not
+  // necessarily the currently selected one. Unable to name what it touches,
+  // so exclusive.
+  getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   async execute(input, ctx) {
     const browser = requireBrowser(ctx);
     const request: HandleDialogRequest = {

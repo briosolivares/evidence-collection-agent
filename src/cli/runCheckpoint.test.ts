@@ -49,14 +49,12 @@ function fakeStore(): { store: RunCheckpointStore; saved: RunCheckpointV1[] } {
 
 const RUN_CONFIGURATION: RunCheckpointV1['runConfiguration'] = {
   model: 'claude-sonnet-5',
-  toolProfile: 'atomic',
   maxOutputTokens: 8192,
   maxTurns: UNBOUNDED_CEILING,
   maxContextTokens: 180_000,
   harness: {
     maxWorkerCycles: 3,
     maxCompletionCheckFailures: 5,
-    outputContract: true,
     contractAuthor: 'worker',
   },
 };

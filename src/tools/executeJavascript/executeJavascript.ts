@@ -1,56 +1,3 @@
-/**
- * INTEGRATION (T6) — this tool is complete and tested but deliberately NOT
- * registered: registry.ts, the controller, and runTask.ts belong to the
- * primary agent. Exactly four wiring steps remain, and nothing here needs to
- * change for them:
- *
- * 1. `src/tools/registry.ts` — add two optional fields to `ToolCtx`:
- *      `evidenceStore?: EvidenceStore`            (src/evidence/evidenceStore.js)
- *      `javascriptPolicy?: BrowserJavaScriptPolicy` (src/browser/browserJavaScript.js)
- *    `evidenceStore` is read per call (a run-scoped ledger). `javascriptPolicy`
- *    is read ONCE, where the registry is built, and handed to the factory
- *    below — see `ExecuteJavascriptDeps.policy` for why it must not become a
- *    per-call read.
- *
- * 2. `src/browser/controller.ts` + `src/browser/playwrightBrowserController.ts`
- *    — add the two engine methods the plan names:
- *      `executeJavaScript(request: EarlyJavaScriptRequest): Promise<BrowserJavaScriptResult>`
- *      `replaceUnresponsivePage(): Promise<void>`
- *    then adapt a `BrowserController` to this task's narrow seam:
- *      const page = (ctx: ToolCtx): JavaScriptCapablePage => {
- *        const browser = requireBrowser(ctx);
- *        return {
- *          evaluateJson: (code, timeoutMs) =>
- *            browser.executeJavaScript(toEarlyJavaScriptRequest(code, timeoutMs)),
- *          replaceUnresponsivePage: () => browser.replaceUnresponsivePage(),
- *        };
- *      };
- *    `executeJavaScript` must resolve and LOCK the selected page once, up
- *    front, so a concurrent `switchPage` cannot move the target mid-call, and
- *    must read the URL and document token from the page it actually ran in.
- *    The Playwright side owns the timeout race and MUST reject with
- *    `BrowserJavaScriptTimeoutError`; that class is this tool's only signal
- *    that the page has to be discarded rather than reused.
- *
- * 3. `src/tools/index.ts` — export a `javascriptTools` array and spread it
- *    LAST inside `createProductionRegistry`, i.e. after the conditional
- *    `browserBatchTool`:
- *      ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
- *      ...javascriptTools,
- *    Appending last is the only position where no existing tool's index moves
- *    in either profile, so the cached prompt prefix keeps its bytes.
- *
- * 4. `src/cli/runTask.ts` — add `javascriptPolicy?: 'allow' | 'deny'` to
- *    `RunTaskConfig`, resolve it once at session setup with
- *    `assertJavaScriptPolicy(config.javascriptPolicy, sessionIsAuthenticated)`,
- *    and log the returned decision via `describeJavaScriptPolicyDecision`
- *    (wire `deps.onPolicyDecision` to the run log). `sessionIsAuthenticated`
- *    is true for the headed/persistent-profile lanes (mit, edgar,
- *    elon_tweets) and any run carrying a credential store — those runs then
- *    fail at configuration time until an operator states the policy, which is
- *    the point.
- */
-
 import { z } from 'zod';
 
 import {
@@ -116,17 +63,21 @@ const MAX_SUMMARY_URL_BYTES = 200;
 const MAX_ERROR_MESSAGE_BYTES = 1_000;
 
 /**
- * The early (T6) input contract. `target` is a required literal rather than
- * an optional page/frame id: T10 introduces real targeting, and an optional
- * field today would silently mean "whatever happens to be selected" to code
- * written against the later, explicit model. `timeoutMs` is bounded by the
- * schema — over-budget callers are rejected here, before the page is touched.
+ * The input contract. `pageId` names the page whose top document runs the
+ * snippet, following the same optional-`pageId` convention every other
+ * page-addressable tool (observe, browser_action, capture_text) already
+ * uses; omitted means the selected page. Frame-level targeting within a page
+ * remains future work. `timeoutMs` is bounded by the schema — over-budget
+ * callers are rejected here, before the page is touched.
  */
 export const earlyExecuteJavaScriptInputSchema = z.strictObject({
-  target: z
-    .literal('selected_top_document')
+  pageId: z
+    .string()
+    .min(1)
+    .optional()
     .describe(
-      "Must be 'selected_top_document': code runs in the top document of the currently selected page. Iframes and other pages are not addressable yet.",
+      'Page whose top document runs the snippet, from an observe result; omit for the selected page. ' +
+        'Iframes and other documents within a page are not addressable yet.',
     ),
   code: z
     .string()
@@ -195,15 +146,16 @@ export interface ExecuteJavascriptResult {
  * Everything the tool needs from the run that it cannot get from `ToolCtx`
  * yet. A factory rather than a module-level tool because two of these — the
  * page seam and the policy — are session-scoped decisions made where the
- * browser is created (see the INTEGRATION note above).
+ * browser session is built (see `createExecuteJavascriptTool` below).
  */
 export interface ExecuteJavascriptDeps {
   /**
-   * Resolve the JavaScript-capable page for one call. Called per call, never
-   * cached: a timeout replaces the page, so a handle held across calls would
-   * point at a closed one.
+   * Resolve the JavaScript-capable page for one call, addressed by the
+   * call's optional `pageId` (undefined meaning the selected page). Called
+   * per call, never cached: a timeout replaces the page, so a handle held
+   * across calls would point at a closed one.
    */
-  page: (ctx: ToolCtx) => JavaScriptCapablePage;
+  page: (ctx: ToolCtx, pageId?: string) => JavaScriptCapablePage;
   /**
    * Resolve the run's evidence ledger, or undefined for a run without one
    * (fixture tests, contract-less paths). A `captureEvidence` call then fails
@@ -280,7 +232,10 @@ export function createExecuteJavascriptTool(
   return {
     name: EXECUTE_JAVASCRIPT_TOOL_NAME,
     description:
-      'Run JavaScript in the selected page and return its JSON value. Use it to extract every row of a repeated structure in ONE call instead of many observations, and to read values the accessibility outline flattens (table cells, data attributes, hrefs). ' +
+      'Run JavaScript in a page and return its JSON value. Set pageId to target a specific page ' +
+      '(from an observe result); omit it to run in the selected page. Use it to extract every ' +
+      'row of a repeated structure in ONE call instead of many observations, and to read values ' +
+      'the accessibility outline flattens (table cells, data attributes, hrefs). ' +
       'Return only JSON — strings, finite numbers, booleans, null, arrays, plain objects; a DOM node, a Date, or a Map is an error. ' +
       'This is a page WRITE: the snippet can mutate the DOM, submit forms, or navigate, so it is never scheduled in parallel with other page work. ' +
       'It is also not a sandbox — the code runs with this page\'s full authority. ' +
@@ -288,10 +243,16 @@ export function createExecuteJavascriptTool(
     inputSchema: earlyExecuteJavaScriptInputSchema,
     // Every call is a page write, full stop. A snippet that "only reads the
     // DOM" is indistinguishable from one that clicks a button — nothing about
-    // read-only intent is checkable, and the scheduler (T8) must never run
-    // this concurrently with other page work on the promise that it might be
-    // harmless.
-    readOnly: false,
+    // read-only intent is checkable, and the scheduler must never run this
+    // concurrently with other page work on the promise that it might be
+    // harmless. Naming a pageId narrows WHICH page the snippet targets, but
+    // not WHAT it can do once there: arbitrary code can still navigate away,
+    // open new pages, or close the very page it was told to run in — effects
+    // an input-aware getAccess (like browser_action's) could never enumerate
+    // in advance. So unlike screenshot/download, whose pageId narrows their
+    // declared access, this tool's only honest declaration stays the fully
+    // exclusive one, regardless of pageId.
+    getAccess: () => ({ reads: [], writes: [], exclusive: true }),
     async execute(input, ctx): Promise<ExecuteJavascriptResult> {
       // Enforced before the page is touched at all: `deny` means the page
       // never sees model-authored code, not that we inspect the code first
@@ -307,6 +268,7 @@ export function createExecuteJavascriptTool(
       const request = toEarlyJavaScriptRequest(
         input.code,
         input.timeoutMs ?? DEFAULT_JAVASCRIPT_TIMEOUT_MS,
+        input.pageId,
       );
       // Resolved before execution: a snippet that may mutate the page must
       // not run at all when the evidence it was asked to produce could never
@@ -314,13 +276,17 @@ export function createExecuteJavascriptTool(
       // unrecoverable ordering.
       const store =
         input.captureEvidence === true ? requireEvidenceStore(deps, ctx) : undefined;
-      const page = deps.page(ctx);
+      const page = deps.page(ctx, request.pageId);
 
       const startedAt = now();
       let evaluated;
       try {
         evaluated = await page.evaluateJson(request.code, request.timeoutMs);
       } catch (thrown) {
+        // The engine owns the timeout race, not this tool, and
+        // BrowserJavaScriptTimeoutError is the only signal it gives that the
+        // underlying page must be discarded rather than reused — any other
+        // thrown value is treated as an ordinary page-script failure below.
         if (thrown instanceof BrowserJavaScriptTimeoutError) {
           throw await recoverFromTimeout(page, thrown);
         }
@@ -353,7 +319,7 @@ export function createExecuteJavascriptTool(
               // Uncapped and complete — the record is the auditable copy, and
               // the model-facing result above is only a view of it.
               detail: {
-                target: request.target,
+                pageId: request.pageId ?? null,
                 code: request.code,
                 url: evaluated.url,
                 documentToken: evaluated.documentToken,

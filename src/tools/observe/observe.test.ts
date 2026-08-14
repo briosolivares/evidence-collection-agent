@@ -4,7 +4,7 @@ import {
   BROWSER_TEST_TIMEOUT_MS,
   setupBrowserToolSuite,
 } from '../../../tests/helpers/browserToolSuite.js';
-import { refFor } from '../../../tests/helpers/outline.js';
+import { toEarlyJavaScriptRequest } from '../../browser/browserJavaScript.js';
 import {
   createBrowserStateStore,
   DEFAULT_MAX_CACHED_OBSERVATIONS_PER_PAGE,
@@ -13,9 +13,6 @@ import {
   type BrowserObservation,
   type ElementRef,
 } from '../../browser/browserState.js';
-import { clickTool } from '../click/click.js';
-import { inspectPageTool } from '../inspectPage/inspectPage.js';
-import { navigateTool } from '../navigate/navigate.js';
 import { executeToolCall } from '../pipeline.js';
 import { createRegistry } from '../registry.js';
 import { observeTool } from './observe.js';
@@ -151,7 +148,7 @@ describe('observation diffs', () => {
 
 describe('observe tool', () => {
   const suite = setupBrowserToolSuite('observe-tool');
-  const registry = createRegistry([navigateTool, inspectPageTool, clickTool, observeTool]);
+  const registry = createRegistry([observeTool]);
 
   function call(name: string, input: unknown) {
     return executeToolCall(
@@ -159,6 +156,18 @@ describe('observe tool', () => {
       { id: `call-${name}`, name, input },
       { runDir: suite.runDir(), browser: suite.controller() },
     );
+  }
+
+  /** Load a fixture page through the controller directly, not a tool call:
+   * a plain page-setup step has no reason to touch the tool pipeline, and
+   * (unlike browser_action, whose own finishSequence() always calls
+   * session.observe() to build its returned diff) this never advances the
+   * page's observation counter, exactly like the deleted `navigate` tool
+   * never did. Several assertions below depend on the FIRST explicit
+   * `observe` call landing on observationId 1; routing setup through
+   * browser_action would burn that slot on the navigate step itself. */
+  async function navigateTo(path: string): Promise<void> {
+    await suite.controller().goto(suite.server().url(path));
   }
 
   async function observe(input: unknown): Promise<BrowserObservation> {
@@ -170,7 +179,7 @@ describe('observe tool', () => {
   it(
     'returns the interactive view with stable identity by default',
     async () => {
-      await call('navigate', { url: suite.server().url('/') });
+      await navigateTo('/');
 
       const observation = await observe({});
 
@@ -195,7 +204,7 @@ describe('observe tool', () => {
   it(
     'returns exact text alongside the outline when both needs are requested',
     async () => {
-      await call('navigate', { url: suite.server().url('/') });
+      await navigateTo('/');
 
       const observation = await observe({ need: ['interactive', 'text'] });
 
@@ -214,13 +223,23 @@ describe('observe tool', () => {
   it(
     'diffs against a recent baseline and full-snapshots an evicted one',
     async () => {
-      await call('navigate', { url: suite.server().url('/rows.html') });
+      await navigateTo('/rows.html');
       const first = await observe({});
 
-      // Mutate through the legacy path — adapters and observe share a page.
-      const inspected = await call('inspect_page', {});
-      const mutateRef = refFor(inspected.content, 'button "Add unrelated note"');
-      await call('click', { ref: mutateRef });
+      // Mutate through the browser controller's own JavaScript evaluation —
+      // the engine mechanism the now-deleted inspect_page/click tools wrapped
+      // (click(ref) itself is gone with them) — rather than through observe
+      // or browser_action. This is deliberate, not a convenience shortcut: it
+      // proves observe's diff reflects the page's actual DOM state, not
+      // merely state that observe/browser_action themselves recorded, AND it
+      // never touches the observation cache. (browser_action would not work
+      // as a substitute here even though it exposes a 'click' op: its own
+      // finishSequence() calls session.observe() internally to build its
+      // returned diff, which would silently consume a slot in the
+      // eviction-cache accounting below.)
+      await suite.controller().executeJavaScript!(
+        toEarlyJavaScriptRequest("document.getElementById('mutate').click();", 5_000),
+      );
 
       const second = await observe({
         basedOnObservationId: first.page.observationId,
@@ -247,7 +266,7 @@ describe('observe tool', () => {
   it(
     'rejects malformed requests before touching the browser',
     async () => {
-      await call('navigate', { url: suite.server().url('/') });
+      await navigateTo('/');
 
       for (const input of [
         { basedOnObservationId: 0 },

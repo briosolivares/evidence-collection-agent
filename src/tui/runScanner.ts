@@ -9,7 +9,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest } from '../run/artifacts.js';
-import type { RunMetrics } from '../loop/agentLoop.js';
+import type { RunMetrics } from '../loop/workerSession.js';
 import type { ManifestView, MetricsView } from './store/state.js';
 
 /** One row of the /runs list. */

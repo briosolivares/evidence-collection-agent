@@ -1,14 +1,12 @@
 import type { BrowserController } from '../../src/browser/controller.js';
 import { runTask, usableStartUrl, type RunTaskConfig } from '../../src/cli/runTask.js';
 import type { ProgressEvent } from '../../src/model/callModel.js';
-import type { ToolProfile } from '../../src/tools/index.js';
 import type { RunTaskFn } from '../types.js';
 import type { EvalBrowserRuntime } from './browserRuntime.js';
 
 export interface BrowserBackedRunTaskOptions {
   browserRuntime: EvalBrowserRuntime;
   model: string;
-  toolProfile: ToolProfile;
   runsBaseDir: string;
   /**
    * Protocol settings layered over the eval harness defaults — the switches
@@ -18,10 +16,7 @@ export interface BrowserBackedRunTaskOptions {
    * the harness's own default instead of forcing every caller to restate all
    * of them.
    */
-  harness?: Pick<
-    NonNullable<RunTaskConfig['harness']>,
-    'outputContract' | 'contractAuthor'
-  >;
+  harness?: Pick<NonNullable<RunTaskConfig['harness']>, 'contractAuthor'>;
   onProgress?: (taskName: string, trialNumber: number, k: number, event: ProgressEvent) => void;
   /** Test seam for the production composition root. */
   runTaskFn?: (taskText: string, config: RunTaskConfig) => Promise<{ runDir: string }>;
@@ -36,7 +31,6 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
       runTaskFn(taskText, {
         browser,
         model: options.model,
-        toolProfile: options.toolProfile,
         runsBaseDir: options.runsBaseDir,
         // Eval batches always run the initializer→worker→verifier harness
         // (judge-design.md step 5): defaults apply (2 worker cycles,

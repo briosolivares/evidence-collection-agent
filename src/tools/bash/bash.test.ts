@@ -80,8 +80,7 @@ describe('bash tool', () => {
 
   describe('tool definition', () => {
     it('declares itself state-changing and fully exclusive, since a shell command can touch anything', () => {
-      expect(tool.readOnly).toBe(false);
-      expect(tool.getAccess?.({ command: 'x' } as BashInput)).toEqual({
+      expect(tool.getAccess({ command: 'x' } as BashInput)).toEqual({
         reads: [],
         writes: [],
         exclusive: true,
@@ -473,6 +472,23 @@ describe('bash tool', () => {
       );
       expect(prepare).toHaveBeenCalledTimes(1);
       expect(refresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes an explicit pageId through to prepareForBrowserScript', async () => {
+      const { browser, prepare } = fakeBrowserWithScriptSupport();
+      const result = await call(
+        { command: 'echo hi', uses_browser: true, pageId: 'popup-1' },
+        { browser },
+      );
+      expect(result.isError).toBe(false);
+      expect(prepare).toHaveBeenCalledWith('popup-1');
+    });
+
+    it('calls prepareForBrowserScript with no pageId when omitted (the selected page)', async () => {
+      const { browser, prepare } = fakeBrowserWithScriptSupport();
+      const result = await call({ command: 'echo hi', uses_browser: true }, { browser });
+      expect(result.isError).toBe(false);
+      expect(prepare).toHaveBeenCalledWith(undefined);
     });
 
     it('resolves a default helper URL from its own module location when deps.helperUrl is omitted', async () => {

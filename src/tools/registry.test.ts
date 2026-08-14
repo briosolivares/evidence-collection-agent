@@ -8,7 +8,6 @@ import {
   createRegistry,
   deriveAccess,
   EXCLUSIVE_ACCESS,
-  LEGACY_READ_ACCESS,
   toApiToolDefs,
   type ToolDef,
 } from './registry.js';
@@ -19,14 +18,14 @@ function makeTools(): ToolDef[] {
     name: 'echo',
     description: 'Echo the message back.',
     inputSchema: z.object({ message: z.string() }),
-    readOnly: true,
+    getAccess: () => ({ reads: [], writes: [] }),
     execute: async (input) => `echo: ${input.message}`,
   };
   const save: ToolDef<{ path: string; content: string }> = {
     name: 'save',
     description: 'Save content to a path.',
     inputSchema: z.object({ path: z.string(), content: z.string() }),
-    readOnly: false,
+    getAccess: (input) => ({ reads: [], writes: [accessKey.file(input.path)] }),
     execute: async () => 'saved',
   };
   return [echo, save];
@@ -36,8 +35,6 @@ describe('createRegistry', () => {
   it('contains exactly the given tools in registration order', () => {
     const registry = createRegistry(makeTools());
     expect([...registry.keys()]).toEqual(['echo', 'save']);
-    expect(registry.get('echo')?.readOnly).toBe(true);
-    expect(registry.get('save')?.readOnly).toBe(false);
   });
 
   it('throws on a duplicate tool name', () => {
@@ -157,34 +154,15 @@ describe('accessesConflict', () => {
 });
 
 describe('deriveAccess', () => {
-  it("falls back to LEGACY_READ_ACCESS for a readOnly tool with no getAccess", () => {
-    const tool: ToolDef = {
-      name: 'legacy_read',
-      description: '',
-      inputSchema: z.object({}),
-      readOnly: true,
-      execute: () => undefined,
-    };
-    expect(deriveAccess(tool, {})).toBe(LEGACY_READ_ACCESS);
-  });
-
-  it('falls back to EXCLUSIVE_ACCESS for a non-readOnly tool with no getAccess', () => {
-    const tool: ToolDef = {
-      name: 'legacy_write',
-      description: '',
-      inputSchema: z.object({}),
-      readOnly: false,
-      execute: () => undefined,
-    };
-    expect(deriveAccess(tool, {})).toBe(EXCLUSIVE_ACCESS);
-  });
-
+  // getAccess is mandatory on ToolDef (T16), so "no getAccess" is no longer
+  // a state this function can be called with — the type system rules it out
+  // at the call site, not this function. The only remaining fallback is a
+  // declaration that THROWS, which must still degrade to EXCLUSIVE_ACCESS.
   it('degrades to EXCLUSIVE_ACCESS when getAccess throws, never to unsafe parallelism', () => {
     const tool: ToolDef = {
       name: 'buggy',
       description: '',
       inputSchema: z.object({}),
-      readOnly: true,
       getAccess: () => {
         throw new Error('boom');
       },
@@ -198,7 +176,6 @@ describe('deriveAccess', () => {
       name: 'paged',
       description: '',
       inputSchema: z.object({ pageId: z.string() }),
-      readOnly: false,
       getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
       execute: () => undefined,
     };

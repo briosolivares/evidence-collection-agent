@@ -1,11 +1,7 @@
 import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 
-import { createProductionRegistry,
-  createBashTool,
-  V2_TOOL_ORDER,
-  createV2Registry,
-} from './index.js';
+import { createBashTool, V2_TOOL_ORDER, createV2Registry } from './index.js';
 import { toApiToolDefs, type ToolDef } from './registry.js';
 
 describe('production tool schemas', () => {
@@ -14,56 +10,18 @@ describe('production tool schemas', () => {
   // and 400s every run on turn 1 (download regressed this way, 2026-08-11).
   // registry.test.ts only checks stub tools; this guards the real ones.
   it('every registered tool converts to a top-level object schema', () => {
-    for (const profile of ['atomic', 'batch-enabled'] as const) {
-      const defs = toApiToolDefs(createProductionRegistry(profile));
-      expect(defs.length).toBeGreaterThan(0);
-      for (const def of defs) {
-        expect(def.input_schema, `${profile} tool "${def.name}"`).toMatchObject({
-          type: 'object',
-        });
-      }
-    }
-  });
-
-  it('omits bash when the caller supplies no run-scoped bash tool', () => {
-    // bash closes over the run's secret-env denylist, so it cannot be a static
-    // definition. A registry built without it is missing bash rather than
-    // carrying a broken one — the same rule createV2Registry follows.
-    expect([...createProductionRegistry().keys()]).not.toContain('bash');
-  });
-
-  it('keeps atomic stable and appends browser_batch only in its explicit profile', () => {
-    const bashTool = createBashTool({ secretEnvDenylist: [] });
-    const atomicNames = [...createProductionRegistry('atomic', { bash: bashTool }).keys()];
-    expect(atomicNames).toEqual([
-      'read_file',
-      'write_file',
-      'edit_file',
-      'grep',
-      'bash',
-      'navigate',
-      'inspect_page',
-      'click',
-      'type',
-      'scroll',
-      'screenshot',
-      'download',
-      'ask_user_question',
-    ]);
-
-    const batchEnabled = createProductionRegistry('batch-enabled', { bash: bashTool });
-    expect([...batchEnabled.keys()]).toEqual([...atomicNames, 'browser_batch']);
-    expect(batchEnabled.get('browser_batch')?.readOnly).toBe(false);
-    const rebuilt = toApiToolDefs(
-      createProductionRegistry('batch-enabled', { bash: bashTool }),
+    const registry = createV2Registry(
+      new Map<string, ToolDef>([['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef]]),
     );
-    expect(JSON.stringify(rebuilt)).toBe(JSON.stringify(toApiToolDefs(batchEnabled)));
+    const defs = toApiToolDefs(registry);
+    expect(defs.length).toBeGreaterThan(0);
+    for (const def of defs) {
+      expect(def.input_schema, `tool "${def.name}"`).toMatchObject({ type: 'object' });
+    }
   });
 });
 
-// --- T16: the frozen V2 tool order -------------------------------------------
-
-describe('V2 tool order', () => {
+describe('the frozen tool order', () => {
   it('pins the exact frozen order', () => {
     // A snapshot in the strictest sense: prompt caching is a byte-exact prefix
     // match, so reordering these names silently invalidates every cached
@@ -72,13 +30,10 @@ describe('V2 tool order', () => {
     // reorder intended, and is the cache cost understood?"
     expect(V2_TOOL_ORDER).toEqual([
       'set_output_contract',
-      'upsert_output_rows',
-      'delete_output_rows',
-      'set_table_completeness',
+      'update_table',
       'write_document',
       'observe',
       'browser_action',
-      'switch_page',
       'handle_dialog',
       'execute_javascript',
       'capture_text',
@@ -114,9 +69,7 @@ describe('V2 tool order', () => {
       'set_output_contract',
       'observe',
       'browser_action',
-      'switch_page',
       'handle_dialog',
-      'screenshot',
       'download',
       'read_file',
       'write_file',
@@ -132,13 +85,15 @@ describe('V2 tool order', () => {
     // must be an omission, never a silently broken tool.
     const names = new Set(createV2Registry().keys());
     for (const runScoped of [
-      'upsert_output_rows',
-      'delete_output_rows',
-      'set_table_completeness',
+      'update_table',
       'write_document',
       'execute_javascript',
       'capture_text',
       'inspect_document',
+      // bash closes over the run's secret-env denylist and screenshot over the
+      // output contract, so both must be supplied rather than built statically.
+      'bash',
+      'screenshot',
     ]) {
       expect(names.has(runScoped)).toBe(false);
     }
@@ -150,7 +105,7 @@ describe('V2 tool order', () => {
         name,
         description: name,
         inputSchema: z.object({}).strict(),
-        readOnly: true,
+        getAccess: () => ({ reads: [], writes: [] }),
         execute: async () => 'ok',
       }) as ToolDef;
 
@@ -171,7 +126,7 @@ describe('V2 tool order', () => {
       name: 'surprise_tool',
       description: 'x',
       inputSchema: z.object({}).strict(),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async () => 'ok',
     } as ToolDef;
     expect(() => createV2Registry(new Map([['surprise_tool', rogue]]))).toThrow(

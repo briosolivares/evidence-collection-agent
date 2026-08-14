@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
-import { createProductionRegistry, createBashTool } from '../tools/index.js';
-import { toApiToolDefs } from '../tools/registry.js';
+import { createBashTool, createV2Registry } from '../tools/index.js';
+import { toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 const firstTask = 'Collect the first fixture record and write it as CSV.';
@@ -17,14 +17,7 @@ const secondTaskHistory: readonly Message[] = [
   { role: 'user', content: [{ type: 'text', text: secondTask }] },
   {
     role: 'assistant',
-    content: [
-      {
-        type: 'tool_use',
-        id: 'toolu_fixture',
-        name: 'inspect_page',
-        input: {},
-      },
-    ],
+    content: [{ type: 'tool_use', id: 'toolu_fixture', name: 'observe', input: {} }],
   },
   {
     role: 'user',
@@ -41,12 +34,14 @@ const secondTaskHistory: readonly Message[] = [
 /** Build a fresh production prompt prefix instead of sharing registry or API-tool objects. */
 function productionConfig(): CallModelConfig {
   // Built through the real production builder rather than by re-listing the
-  // groups: bash is run-scoped (it closes over the secret-env denylist), so
-  // hand-assembling the groups would silently omit it and this test would stop
-  // describing the prefix production actually sends.
-  const registry = createProductionRegistry('atomic', {
-    bash: createBashTool({ secretEnvDenylist: [] }),
-  });
+  // tools: `bash` is run-scoped (it closes over the secret-env denylist), so
+  // hand-assembling would silently omit it and this test would stop describing
+  // the prefix production actually sends. The exact tool set and its frozen
+  // order are pinned once, in tools/index.test.ts; what matters here is that
+  // whatever that set is serializes identically on every call.
+  const registry = createV2Registry(
+    new Map<string, ToolDef>([['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef]]),
+  );
   return {
     system: SYSTEM_PROMPT,
     apiToolDefs: toApiToolDefs(registry),
@@ -71,7 +66,7 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('Treat output requirements as exact.');
     expect(SYSTEM_PROMPT).toContain('Do not add unrequested fields');
     expect(SYSTEM_PROMPT).toContain(
-      'At the start of a run, inspect the current page before navigating elsewhere.',
+      'At the start of a run, observe the current page before navigating elsewhere.',
     );
     expect(SYSTEM_PROMPT).toContain(
       'A nonblank initial page is deliberately provided task context',
@@ -81,35 +76,32 @@ describe('SYSTEM_PROMPT', () => {
     );
   });
 
-  it('teaches the multi-entity protocol: roster and contract before collecting, reconcile before finishing', () => {
+  it('teaches the multi-entity protocol: roster before collecting, reconcile before finishing', () => {
     expect(SYSTEM_PROMPT).toContain('plan before collecting');
     expect(SYSTEM_PROMPT).toContain(
       'write a roster of every entity to cover into a scratch/ file',
     );
-    // The worker no longer authors the contract itself — it defers to
-    // CONTRACT.md when the harness provided one, falling back to the
-    // task's own stated structure otherwise.
-    expect(SYSTEM_PROMPT).toContain('The output contract is CONTRACT.md when present');
-    expect(SYSTEM_PROMPT).toContain(
-      "otherwise the task's own stated columns, fields, and field-level rules",
-    );
-    expect(SYSTEM_PROMPT).toContain('enum-like values copied verbatim with nothing added');
     expect(SYSTEM_PROMPT).toContain('reconcile in both directions');
     expect(SYSTEM_PROMPT).toContain('its absence justified by observed evidence');
-    expect(SYSTEM_PROMPT).toContain('every line of the output is a valid row under the contract');
+    expect(SYSTEM_PROMPT).toContain('every row of the output is a valid row under the contract');
   });
 
-  it('teaches the conditional INTENT.md/CONTRACT.md protocol for harness-managed runs', () => {
-    // These files exist only when the initializer→worker→judge harness
-    // wrote them; REPL/interactive runs and many existing tests are
-    // judge-less, so the language must be conditional on presence.
-    expect(SYSTEM_PROMPT).toContain('may also contain INTENT.md and CONTRACT.md at its root');
-    expect(SYSTEM_PROMPT).toContain('When present, read both before starting work');
-    expect(SYSTEM_PROMPT).toContain('consult the contract every time you write output');
+  it('names the typed output contract as the run\'s requirements, deferring per-run detail', () => {
+    // The static prompt states that a typed contract governs the run and that
+    // the runtime owns rendering; WHICH revision and WHICH outputs are per-run
+    // facts and belong to workerProtocolBrief, not here. Nothing in this
+    // paragraph may contradict that brief.
+    expect(SYSTEM_PROMPT).toContain('a typed output contract');
+    expect(SYSTEM_PROMPT).toContain('enforced by code before any verifier sees your work');
+    expect(SYSTEM_PROMPT).toContain('The opening message tells you whether a contract is already set');
     expect(SYSTEM_PROMPT).toContain(
-      'do not consider the task done until every contract criterion is satisfied and proven',
+      'do not consider the task done until every criterion is satisfied and proven',
     );
-    expect(SYSTEM_PROMPT).toContain('These files cannot be modified.');
+    expect(SYSTEM_PROMPT).toContain('build those through the output tools rather than writing the file yourself');
+    // The V1 prose protocol is gone: no run writes these files any more, and
+    // mentioning them sent workers hunting for files that never appear.
+    expect(SYSTEM_PROMPT).not.toContain('INTENT.md');
+    expect(SYSTEM_PROMPT).not.toContain('CONTRACT.md');
   });
 
   it('teaches chunked writes: large files are built with append, in small pieces', () => {
@@ -119,14 +111,25 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('append: true');
   });
 
-  it('teaches the inspection window: stale inspections collapse, facts go to files, refs stay fresh', () => {
+  it('teaches the observation window: stale observations collapse, facts go to files, refs stay fresh', () => {
     // Must match the loop's actual behavior (contextView.ts): only the two
-    // most recent inspect_page results survive in the conversation.
+    // most recent observe results survive in the conversation.
     expect(SYSTEM_PROMPT).toContain(
-      'Only your two most recent page inspections stay in the conversation',
+      'Only your two most recent observations stay in the conversation',
     );
     expect(SYSTEM_PROMPT).toContain('record lasting facts in scratch/ or artifacts/ files');
-    expect(SYSTEM_PROMPT).toContain('re-inspect a page if you need it again');
+    expect(SYSTEM_PROMPT).toContain('observe a page again if you need it');
+  });
+
+  it('names only tools the V2 registry actually offers', () => {
+    // A prompt that names a deleted tool costs a wasted turn and an error the
+    // model cannot act on, so this pins the direction of the cutover.
+    for (const live of ['observe', 'browser_action', 'submit_for_verification']) {
+      expect(SYSTEM_PROMPT).toContain(live);
+    }
+    for (const dead of ['inspect_page', 'fill_credentials', 'read_resource']) {
+      expect(SYSTEM_PROMPT).not.toContain(dead);
+    }
   });
 
   it('teaches the authentication playbook lightly: never type secrets, hand off instead', () => {
@@ -134,32 +137,26 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain(
       'you hold no credentials, so a login wall is always a handoff',
     );
-    expect(SYSTEM_PROMPT).toContain(
-      'Never type usernames or passwords yourself',
-    );
+    expect(SYSTEM_PROMPT).toContain('Never type usernames or passwords yourself');
     expect(SYSTEM_PROMPT).toContain(
       'ask_user_question pauses the task so they can act in the browser window',
     );
-    expect(SYSTEM_PROMPT).toContain('reinspect the page before continuing');
+    expect(SYSTEM_PROMPT).toContain('observe the page before continuing');
   });
 
-  it('frames finishing as a proposal for verification, not a claim of success', () => {
-    // The judge harness reviews the worker's no-tool-call response as a
-    // completion proposal rather than trusting it as a success claim.
+  it('frames finishing as a submission for verification, not a claim of success', () => {
     expect(SYSTEM_PROMPT).toContain(
       'Finishing is a handoff for verification, not a claim of success.',
     );
     expect(SYSTEM_PROMPT).toContain(
-      'Only propose completion after all requested artifacts have been written and verified.',
+      'Only propose completion after all requested artifacts have been written and verified',
     );
-    expect(SYSTEM_PROMPT).toContain('There is no finish tool: propose completion');
-    expect(SYSTEM_PROMPT).toContain(
-      'your response submits the run for verification rather than declaring success',
-    );
+    expect(SYSTEM_PROMPT).toContain('call submit_for_verification on its own');
+    expect(SYSTEM_PROMPT).toContain('A response with no tool call does not finish the run.');
     expect(SYSTEM_PROMPT).toContain('briefly name the files you produced');
   });
 
-  it('forms a byte-identical cached prefix with all thirteen production tools across unrelated task histories', () => {
+  it('forms a byte-identical cached prefix across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
 
@@ -173,23 +170,7 @@ describe('SYSTEM_PROMPT', () => {
     });
 
     expect(secondPrefix).toBe(firstPrefix);
-    expect(firstParams.tools).toHaveLength(13);
-    expect(firstParams.tools?.map((tool) => tool.name)).toEqual([
-      'read_file',
-      'write_file',
-      'edit_file',
-      'grep',
-      'bash',
-      'navigate',
-      'inspect_page',
-      'click',
-      'type',
-      'scroll',
-      'screenshot',
-      'download',
-      'ask_user_question',
-    ]);
-
+    expect(firstParams.tools?.length).toBeGreaterThan(0);
     expect(firstParams.system).toEqual([
       {
         type: 'text',

@@ -801,8 +801,9 @@ function preflightSequence(
           stopReason: 'failure',
           error:
             `Action ${index} targets an element observed on page ${target.pageId}, but the ` +
-            `sequence runs on page ${pageId}. One sequence acts on one page; use switch_page ` +
-            `or send a separate call. Nothing was executed.`,
+            `sequence runs on page ${pageId}. One sequence acts on one page; send a separate ` +
+            `browser_action call with pageId ${JSON.stringify(target.pageId)} instead. Nothing ` +
+            `was executed.`,
         };
       }
       if (target.documentId !== document.documentId) {

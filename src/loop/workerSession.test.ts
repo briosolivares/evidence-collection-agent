@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -8,8 +8,10 @@ import {
   createOutputContractStore,
   type OutputContractStore,
 } from '../contracts/outputContractStore.js';
-import { initManifest } from '../run/artifacts.js';
+import { ModelResponseRejectedError } from '../model/modelDriver.js';
+import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
 import { createRunBudgetTracker, type RunBudgetConfig } from '../run/runBudget.js';
+import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
 import type { Message, ModelResponse, Usage } from './messages.js';
@@ -18,7 +20,9 @@ import {
   appendWorkerFeedback,
   captureWorkerSessionSnapshot,
   createWorkerSession,
+  MAX_PROTOCOL_CORRECTIONS_PER_RUN,
   METRICS_FILENAME,
+  recordWorkerSessionCrash,
   restoreWorkerSession,
   runWorkerCycle,
   runWorkerTurn,
@@ -80,7 +84,7 @@ function echoRegistry(): ToolRegistry {
     name: 'echo',
     description: 'Echo the message back.',
     inputSchema: z.object({ message: z.string() }),
-    readOnly: true,
+    getAccess: () => ({ reads: [], writes: [] }),
     execute: async (input) => `echo: ${input.message}`,
   };
   return createRegistry([echo as ToolDef]);
@@ -212,7 +216,7 @@ describe('WorkerSession contract-first gate', () => {
       name: 'touch',
       description: 'Record a side effect.',
       inputSchema: z.object({ what: z.string() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [], exclusive: true }),
       execute: async (input) => {
         touched.push(input.what);
         return `touched ${input.what}`;
@@ -262,7 +266,7 @@ describe('WorkerSession contract-first gate', () => {
     };
   }
 
-  it("tells a worker whose contract is already set not to restate it, and that the prose files do not exist", () => {
+  it('tells a worker whose contract is already set not to restate it', () => {
     const store = createOutputContractStore(runDir);
     expect(store.setOutputContract(VALID_CONTRACT).ok).toBe(true);
     const { session } = (() => {
@@ -286,9 +290,6 @@ describe('WorkerSession contract-first gate', () => {
     // The task text stays the first block, verbatim and unwrapped.
     expect(opening.content[0]).toEqual({ type: 'text', text: TASK });
     const brief = (opening.content[1] as { text: string }).text;
-    // Finding 4: the system prompt promises INTENT.md/CONTRACT.md, which this
-    // protocol never writes — the worker went looking for them.
-    expect(brief).toContain('no INTENT.md and no CONTRACT.md');
     // Finding 3: it re-authored a contract that was already accepted.
     expect(brief).toContain('revision 1 is already set');
     expect(brief).toContain('scratch/output-contract/revision-1.json');
@@ -296,7 +297,18 @@ describe('WorkerSession contract-first gate', () => {
     expect(brief).toContain('revisionBasis');
     // The contract's actual requirements, so the worker need not go read them.
     expect(brief).toContain('roster (table, csv -> artifacts/roster.csv): columns name');
-    expect(brief).toContain('submit_for_verification');
+    // How to fill a table — named for the tool that exists.
+    expect(brief).toContain('update_table');
+
+    // The brief states only per-run facts. It used to spend three sentences
+    // correcting SYSTEM_PROMPT — disregard its INTENT.md/CONTRACT.md paragraph,
+    // and here is how to finish — but the prompt now describes the typed
+    // contract and submit_for_verification itself. Two descriptions of one
+    // protocol is how they drift apart, so the brief must not repeat either.
+    expect(brief).not.toContain('INTENT.md');
+    expect(brief).not.toContain('CONTRACT.md');
+    expect(brief).not.toContain('disregard');
+    expect(brief).not.toContain('submit_for_verification');
   });
 
   it('tells a worker with no contract yet to author one first', () => {
@@ -306,8 +318,6 @@ describe('WorkerSession contract-first gate', () => {
     expect(brief).toContain('No contract is set yet');
     expect(brief).toContain('every other tool call is refused');
     expect(brief).not.toContain('already set');
-    // No submission protocol on this session, so nothing claims one.
-    expect(brief).not.toContain('submit_for_verification');
   });
 
   it('adds no brief at all on the legacy prose path', () => {
@@ -446,7 +456,7 @@ describe('WorkerSession toolHooks', () => {
       name: 'write',
       description: 'Write something.',
       inputSchema: z.object({ what: z.string() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [], exclusive: true }),
       execute: async (input) => `wrote ${input.what}`,
     };
     return createRegistry([write as ToolDef]);
@@ -494,9 +504,9 @@ describe('WorkerSession toolHooks', () => {
 
     await runWorkerTurn(session);
 
-    // `write` declares no getAccess and readOnly: false, so both calls get
-    // EXCLUSIVE_ACCESS — which conflicts with everything, including itself —
-    // so the scheduler runs them as two serial groups, not overlapped.
+    // `write` declares an explicit EXCLUSIVE_ACCESS, which conflicts with
+    // everything, including itself — so the scheduler runs them as two
+    // serial groups, not overlapped.
     // Interleaved hook firing (both befores before either after) would mean
     // a resume could not trust "before" seen without a matching "after" to
     // mean "this call's effect is unconfirmed".
@@ -510,7 +520,7 @@ describe('WorkerSession toolHooks', () => {
       name: 'touch',
       description: 'Record a side effect.',
       inputSchema: z.object({ what: z.string() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [], exclusive: true }),
       execute: async (input) => {
         touched.push(input.what);
         return `touched ${input.what}`;
@@ -602,7 +612,7 @@ describe('WorkerSession abortSignal', () => {
       name: 'probe',
       description: 'Record the abort signal ctx received.',
       inputSchema: z.object({ ok: z.boolean() }),
-      readOnly: false,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async (_input, ctx) => {
         captured.push(ctx.abortSignal);
         return 'probed';
@@ -821,5 +831,551 @@ describe('WorkerSession snapshot/restore', () => {
       role: 'user',
       content: [{ type: 'text', text: 'Resume feedback.' }],
     });
+  });
+});
+
+// The following describe blocks were ported from the deleted
+// src/loop/agentLoop.ts's own test file (agentLoop.test.ts). agentLoop.ts
+// was a thin compatibility wrapper over runWorkerCycle/runWorkerTurn with no
+// logic of its own beyond LoopResult mapping and config validation (both
+// covered elsewhere), so most of its test file duplicated coverage this file
+// already had through runWorkerCycle/runWorkerTurn. These blocks are the
+// exception: each one exercises real runWorkerTurn logic that no other test
+// file (this one, scheduler.test.ts, contextView.test.ts, capResult.test.ts,
+// runBudget.test.ts, modelDriver.test.ts, runTask's own suites) actually
+// covers. See the comment on each block for exactly what would go dark
+// without it.
+
+// Content, never stop_reason, decides whether a response completes a cycle
+// — a documented invariant (see runWorkerTurn's own doc comment) that
+// nothing else in this file exercises, since every other test here scripts
+// truthful stop_reason values.
+describe('WorkerSession completion policy: content decides, not stop_reason', () => {
+  it('a stop_reason claiming end_turn while content has tool_use continues', async () => {
+    const lyingToolResponse: ModelResponse = {
+      content: [{ type: 'tool_use', id: 't1', name: 'echo', input: { message: 'hi' } }],
+      stop_reason: 'end_turn',
+      usage: { ...DEFAULT_USAGE },
+    };
+    const { session, requests } = makeSession([lyingToolResponse, textResponse('Done.')]);
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Done.' });
+    expect(requests).toHaveLength(2);
+  });
+
+  it('a stop_reason claiming tool_use with no tool_use content completes', async () => {
+    const lyingTextResponse: ModelResponse = {
+      content: [
+        { type: 'text', text: 'First.' },
+        { type: 'text', text: 'Second.' },
+      ],
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+    const { session, requests } = makeSession([lyingTextResponse]);
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'First.\nSecond.' });
+    expect(requests).toHaveLength(1);
+  });
+
+  it('an unrecognized tool call comes back as is_error and the run continues', async () => {
+    const badCall: ModelResponse = {
+      content: [{ type: 'tool_use', id: 't1', name: 'no_such_tool', input: {} }],
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+    const { session, requests } = makeSession([badCall, textResponse('Recovered.')]);
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Recovered.' });
+    const feedback = requests[1]![2]!;
+    expect(feedback.role).toBe('user');
+    expect(feedback.content[0]).toMatchObject({
+      type: 'tool_result',
+      tool_use_id: 't1',
+      is_error: true,
+    });
+    expect((feedback.content[0] as { content: string }).content).toContain('no_such_tool');
+  });
+});
+
+// The per-request context ceiling is the run's other terminating guard
+// (alongside maxWorkerTurns) and the one that makes maxTurns: Infinity safe
+// — the architectural guarantee runTask.ts's own module comments lean on.
+// Nothing else exercises the actual runtime check (contextTokens vs
+// config.maxContextTokens inside runWorkerTurn): WorkerSession
+// configuration's own test only proves the ceiling is VALIDATED at
+// construction, never that it is ENFORCED turn to turn.
+describe('WorkerSession context ceiling guard', () => {
+  function contextToolResponse(id: string, usage: Usage): ModelResponse {
+    return {
+      content: [{ type: 'tool_use', id, name: 'echo', input: { message: id } }],
+      stop_reason: 'tool_use',
+      usage,
+    };
+  }
+
+  function contextTextResponse(text: string, usage: Usage): ModelResponse {
+    return { content: [{ type: 'text', text }], stop_reason: 'end_turn', usage };
+  }
+
+  function makeContextSession(
+    responses: ModelResponse[],
+    maxContextTokens: number,
+  ): { session: WorkerSession; requests: Message[][] } {
+    const { callModel, requests } = scriptModel(responses);
+    const budget = createRunBudgetTracker(UNBOUNDED);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: echoRegistry(), runDir },
+      { budget, maxContextTokens },
+    );
+    return { session, requests };
+  }
+
+  it('one response whose context strictly exceeds the cap ends the run context_budget', async () => {
+    // Per-request context = input + cache_creation + cache_read + output.
+    // Turn 1 sits at 15 and passes; turn 2 reaches 30 against a 29 cap.
+    const { session, requests } = makeContextSession(
+      [
+        contextToolResponse('t1', { ...DEFAULT_USAGE }),
+        contextToolResponse('t2', { input_tokens: 20, output_tokens: 10 }),
+        contextTextResponse('Never reached.', { ...DEFAULT_USAGE }),
+      ],
+      29,
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'budget_exceeded', reason: 'context_budget' });
+    expect(requests).toHaveLength(2);
+  });
+
+  it('a response sitting exactly at the context cap continues — the cap is spendable in full', async () => {
+    // Turn 1's context is exactly 30 against a 30 cap: turn 2 must happen.
+    const { session, requests } = makeContextSession(
+      [
+        contextToolResponse('t1', { input_tokens: 20, output_tokens: 10 }),
+        contextTextResponse('Made it.', { ...DEFAULT_USAGE }),
+      ],
+      30,
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Made it.' });
+    expect(requests).toHaveLength(2);
+  });
+
+  it("cache reads and cache writes count toward a response's context", async () => {
+    // 10 in + 5 out + 20 cache reads + 10 cache writes = 45 > 44; without
+    // the cache fields it would be 15 and the cycle would (wrongly) ask for
+    // an unscripted second response.
+    const { session, requests } = makeContextSession(
+      [
+        contextToolResponse('t1', {
+          input_tokens: 10,
+          output_tokens: 5,
+          cache_read_input_tokens: 20,
+          cache_creation_input_tokens: 10,
+        }),
+      ],
+      44,
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'budget_exceeded', reason: 'context_budget' });
+    expect(requests).toHaveLength(1);
+  });
+
+  it('a run whose cumulative tokens far exceed the cap completes when every request stays under', async () => {
+    // Five turns at 15 context each: cumulative 75 against a 20 cap. A
+    // cumulative guard would die on turn 2; the per-request guard never
+    // trips because no single request exceeds the cap.
+    const { session, requests } = makeContextSession(
+      [
+        contextToolResponse('t1', { ...DEFAULT_USAGE }),
+        contextToolResponse('t2', { ...DEFAULT_USAGE }),
+        contextToolResponse('t3', { ...DEFAULT_USAGE }),
+        contextToolResponse('t4', { ...DEFAULT_USAGE }),
+        contextTextResponse('Deep run finished.', { ...DEFAULT_USAGE }),
+      ],
+      20,
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Deep run finished.' });
+    expect(requests).toHaveLength(5);
+  });
+
+  it('a final response with no tool calls completes even when it blows the context cap', async () => {
+    const { session } = makeContextSession(
+      [contextTextResponse('Done.', { input_tokens: 999, output_tokens: 999 })],
+      10,
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    // The answer is in hand — completion is checked before the guards.
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Done.' });
+  });
+});
+
+// maxWorkerTurns boundary behavior at the runWorkerTurn integration level:
+// runBudget.test.ts proves the tracker's own ceiling math, and this file's
+// 'a correction does not reset the whole-run turn budget' proves the guard
+// fires across a correction — but neither proves the specific loop-order
+// guarantee runTask.ts's docs promise: a cycle may *complete* exactly on the
+// final allowed turn, and Infinity never trips across an arbitrarily deep
+// trajectory.
+describe('WorkerSession maxWorkerTurns guard', () => {
+  it('maxWorkerTurns ends a run that would otherwise loop forever', async () => {
+    const { session, requests } = makeSession(
+      [toolResponse('t1'), toolResponse('t2'), toolResponse('t3')],
+      { maxWorkerTurns: 3 },
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'budget_exceeded', reason: 'max_turns' });
+    expect(requests).toHaveLength(3);
+  });
+
+  it('completing exactly at the turn ceiling is a completion, not budget_exceeded', async () => {
+    const { session, requests } = makeSession(
+      [toolResponse('t1'), toolResponse('t2'), textResponse('Finished on the last allowed turn.')],
+      { maxWorkerTurns: 3 },
+    );
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Finished on the last allowed turn.' });
+    expect(requests).toHaveLength(3);
+  });
+
+  it('maxWorkerTurns: Infinity never trips — the run follows its trajectory to completion', async () => {
+    const responses = [
+      ...Array.from({ length: 12 }, (_, i) => toolResponse(`t${i + 1}`)),
+      textResponse('Trajectory complete.'),
+    ];
+    const { session, requests } = makeSession(responses, { maxWorkerTurns: Infinity });
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Trajectory complete.' });
+    expect(requests).toHaveLength(13);
+  });
+});
+
+// runWorkerTurn's ModelResponseRejectedError handling (T1's strict-driver
+// rejection recovery: bounded protocol corrections, context_exhausted
+// mapping, and refusal propagation) has no other test anywhere in this
+// codebase — modelDriver.test.ts covers only the error's own construction
+// and detection, never a consumer's reaction to it.
+describe('WorkerSession rejected model responses', () => {
+  function rejection(
+    reason: ConstructorParameters<typeof ModelResponseRejectedError>[0],
+    feedback = 'Your previous response was discarded. Adjust and continue.',
+  ): ModelResponseRejectedError {
+    return new ModelResponseRejectedError(reason, `scripted ${reason} rejection`, feedback, {
+      input_tokens: 7,
+      output_tokens: 3,
+    });
+  }
+
+  function sessionWithRejections(
+    script: Array<ModelResponse | ModelResponseRejectedError>,
+  ): { session: WorkerSession; requests: Message[][] } {
+    const requests: Message[][] = [];
+    const callModel = async (messages: readonly Message[]): Promise<ModelResponse> => {
+      requests.push(structuredClone(messages) as Message[]);
+      const next = script[requests.length - 1];
+      if (next === undefined) throw new Error('script exhausted');
+      if (next instanceof ModelResponseRejectedError) throw next;
+      return next;
+    };
+    const budget = createRunBudgetTracker(UNBOUNDED);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: echoRegistry(), runDir },
+      { budget, maxContextTokens: 1_000_000 },
+    );
+    return { session, requests };
+  }
+
+  it('a protocol-correctable rejection appends only the correction — never the rejected content', async () => {
+    const feedback = 'Too many tool calls; use fewer per turn.';
+    const { session, requests } = sessionWithRejections([
+      rejection('too_many_tool_calls', feedback),
+      textResponse('Recovered.'),
+    ]);
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Recovered.' });
+    // The retry request holds the task and the correction — no assistant
+    // message exists for the rejected attempt.
+    expect(requests[1]).toEqual([
+      { role: 'user', content: [{ type: 'text', text: TASK }] },
+      { role: 'user', content: [{ type: 'text', text: feedback }] },
+    ]);
+    const transcript = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
+    expect(transcript).toContain('model_response_rejected');
+    // The rejected attempt's usage still counts toward the run totals.
+    writeWorkerSessionMetrics(session, 'completed');
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics.inputTokens).toBe(7 + DEFAULT_USAGE.input_tokens);
+    expect(metrics.outputTokens).toBe(3 + DEFAULT_USAGE.output_tokens);
+  });
+
+  it('context exhaustion ends the run as budget_exceeded, not completed', async () => {
+    const { session } = sessionWithRejections([rejection('context_exhausted')]);
+
+    const outcome = await runWorkerCycle(session);
+
+    expect(outcome).toEqual({ kind: 'budget_exceeded', reason: 'context_budget' });
+  });
+
+  it('a refusal cannot complete the run — it propagates out of the cycle', async () => {
+    const { session } = sessionWithRejections([rejection('refusal')]);
+
+    await expect(runWorkerCycle(session)).rejects.toMatchObject({
+      name: 'ModelResponseRejectedError',
+      reason: 'refusal',
+    });
+  });
+
+  it('corrections are bounded: the rejection after the cap propagates', async () => {
+    const script = Array.from(
+      { length: MAX_PROTOCOL_CORRECTIONS_PER_RUN + 1 },
+      () => rejection('malformed_tool_call'),
+    );
+    const { session, requests } = sessionWithRejections(script);
+
+    await expect(runWorkerCycle(session)).rejects.toMatchObject({ reason: 'malformed_tool_call' });
+    expect(requests).toHaveLength(MAX_PROTOCOL_CORRECTIONS_PER_RUN + 1);
+  });
+});
+
+// recordWorkerSessionCrash is exported specifically for callers (runTask.ts's
+// runHarnessCycles) to invoke from their own catch block — but nothing
+// anywhere else in this codebase's test suite actually drives it.
+describe('WorkerSession crash bookkeeping', () => {
+  it('a genuine crash records failed metrics and a run_error transcript event', async () => {
+    const scripted = scriptModel([toolResponse('t1')]);
+    const boom = new Error('overloaded_error: upstream fell over mid-stream');
+    let modelCalls = 0;
+    const callModel = async (messages: readonly Message[]): Promise<ModelResponse> => {
+      modelCalls += 1;
+      if (modelCalls === 2) throw boom;
+      return scripted.callModel(messages);
+    };
+    const budget = createRunBudgetTracker(UNBOUNDED);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: echoRegistry(), runDir },
+      { budget, maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session); // turn 1 succeeds
+    await expect(runWorkerTurn(session)).rejects.toBe(boom); // turn 2 crashes
+    recordWorkerSessionCrash(session, boom);
+
+    const metrics = JSON.parse(readFileSync(join(runDir, METRICS_FILENAME), 'utf8')) as RunMetrics;
+    expect(metrics).toMatchObject({
+      status: 'failed',
+      turns: 2, // the crash happened on turn 2
+      inputTokens: 10, // turn 1's usage only — turn 2 never reported any
+      outputTokens: 5,
+      peakContextTokens: 15,
+    });
+
+    const events = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+    expect(events.at(-1)).toEqual({
+      type: 'run_error',
+      turn: 2,
+      message: 'overloaded_error: upstream fell over mid-stream',
+    });
+  });
+
+  it('an AbortError gets no crash bookkeeping — cancelled is "stopped", not "crashed"', async () => {
+    const { session } = makeSession([toolResponse('t1')]);
+    await runWorkerTurn(session); // some transcript content to check against
+
+    const cancelled = Object.assign(new Error('run cancelled'), { name: 'AbortError' });
+    recordWorkerSessionCrash(session, cancelled);
+
+    expect(existsSync(join(runDir, METRICS_FILENAME))).toBe(false);
+    const transcript = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
+    expect(transcript).not.toContain('run_error');
+  });
+});
+
+// The cache-miss tripwire (cache_read_input_tokens === 0 from turn 2 onward)
+// has no other test anywhere in this codebase.
+describe('WorkerSession cache-miss warning', () => {
+  it('appends cache_miss_warning for turns >= 2 with zero cache reads — and only those', async () => {
+    // Turn 1 never warns (nothing is cached yet); turn 2 reads cache and
+    // stays quiet; turn 3 reports zero reads — the prefix broke — and the
+    // warning lands even though the run completes there.
+    const { session } = makeSession([
+      toolResponse('t1'),
+      {
+        content: [{ type: 'tool_use', id: 't2', name: 'echo', input: { message: 't2' } }],
+        stop_reason: 'tool_use',
+        usage: { input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 40 },
+      },
+      textResponse('Done.'),
+    ]);
+
+    await runWorkerCycle(session);
+
+    const warnings = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>)
+      .filter((event) => event.type === 'cache_miss_warning');
+    expect(warnings).toEqual([{ type: 'cache_miss_warning', turn: 3 }]);
+  });
+});
+
+// capResultBatch — the per-MESSAGE combined tool-result byte cap — is a
+// private function inside workerSession.ts with no test coverage anywhere
+// else: capResult.test.ts covers only the per-RESULT cap it builds on.
+describe('WorkerSession per-message batch cap', () => {
+  /** A registry with one read-only `blob` tool returning `size` bytes of x —
+   * each result legal under the 50k per-result cap, so only the batch cap
+   * can touch them. */
+  function blobRegistry(): ToolRegistry {
+    const blob: ToolDef<{ size: number }> = {
+      name: 'blob',
+      description: 'Return size bytes of filler.',
+      inputSchema: z.object({ size: z.number().int().positive() }),
+      getAccess: () => ({ reads: [], writes: [] }),
+      execute: async (input) => 'x'.repeat(input.size),
+    };
+    return createRegistry([blob as ToolDef]);
+  }
+
+  function blobToolResponse(sizes: number[]): ModelResponse {
+    return {
+      content: sizes.map((size, index) => ({
+        type: 'tool_use' as const,
+        id: `t${index + 1}`,
+        name: 'blob',
+        input: { size },
+      })),
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+  }
+
+  function makeBlobSession(
+    responses: ModelResponse[],
+  ): { session: WorkerSession; requests: Message[][] } {
+    const { callModel, requests } = scriptModel(responses);
+    const budget = createRunBudgetTracker(UNBOUNDED);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: blobRegistry(), runDir },
+      { budget, maxContextTokens: 1_000_000 },
+    );
+    return { session, requests };
+  }
+
+  it('a batch at or under 200k bytes passes through untouched', async () => {
+    const { session, requests } = makeBlobSession([
+      blobToolResponse([45_000, 45_000, 45_000, 45_000]), // 180k combined
+      textResponse('Done.'),
+    ]);
+
+    await runWorkerCycle(session);
+
+    const feedback = requests[1]![2]!;
+    expect(feedback.content).toHaveLength(4);
+    for (const block of feedback.content) {
+      expect((block as { content: string }).content).toBe('x'.repeat(45_000));
+    }
+  });
+
+  it('offloads the largest results first until the batch fits, previews and hashes preserved', async () => {
+    // 45k + 44k + 4×40k = 249k > 200k. One offload leaves ~206k (still
+    // over), so the two largest go to disk — largest first — and the four
+    // 40k results stay inline.
+    const { session, requests } = makeBlobSession([
+      blobToolResponse([45_000, 44_000, 40_000, 40_000, 40_000, 40_000]),
+      textResponse('Done.'),
+    ]);
+
+    await runWorkerCycle(session);
+
+    const feedback = requests[1]![2]!;
+    const contents = feedback.content.map((block) => (block as { content: string }).content);
+
+    const first = JSON.parse(contents[0]!) as { preview: string; offloadedTo: string; note: string };
+    const second = JSON.parse(contents[1]!) as { preview: string; offloadedTo: string; note: string };
+    expect(first.offloadedTo).toBe('scratch/tool-output/blob-1.txt');
+    expect(second.offloadedTo).toBe('scratch/tool-output/blob-2.txt');
+    expect(first.note).toContain('combined limit');
+    expect(first.preview.length).toBeGreaterThan(0);
+    expect(readFileSync(join(runDir, first.offloadedTo), 'utf8')).toBe('x'.repeat(45_000));
+    expect(readFileSync(join(runDir, second.offloadedTo), 'utf8')).toBe('x'.repeat(44_000));
+    for (const content of contents.slice(2)) {
+      expect(content).toBe('x'.repeat(40_000));
+    }
+    const combined = contents.reduce((sum, content) => sum + content.length, 0);
+    expect(combined).toBeLessThanOrEqual(200_000);
+    const manifest = JSON.parse(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')) as Manifest;
+    for (const relPath of [first.offloadedTo, second.offloadedTo]) {
+      expect(manifest.artifacts.some((artifact) => artifact.filename === relPath)).toBe(true);
+    }
+    const toolResults = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8')
+      .trimEnd()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, any>)
+      .filter((event) => event.type === 'tool_result');
+    expect(toolResults[0]!.result.content).toBe(contents[0]);
+    expect(toolResults[2]!.result.content).toBe(contents[2]);
+  });
+
+  it('offloads many individually small results with note-only replacements rather than returning an over-limit message', async () => {
+    // 130 × 1.9k = 247k, every result under the 2k preview size — the excess
+    // offloads with compact path/note replacements (no preview) rather than
+    // returning an over-limit message.
+    const sizes = Array.from({ length: 130 }, () => 1_900);
+    const { session, requests } = makeBlobSession([blobToolResponse(sizes), textResponse('Done.')]);
+
+    await runWorkerCycle(session);
+
+    const feedback = requests[1]![2]!;
+    const contents = feedback.content.map((block) => (block as { content: string }).content);
+    const combined = contents.reduce(
+      (sum, content) => sum + Buffer.byteLength(content, 'utf8'),
+      0,
+    );
+    expect(combined).toBeLessThanOrEqual(200_000);
+
+    const offloadedContents = contents.filter((content) => content.startsWith('{'));
+    expect(offloadedContents.length).toBeGreaterThan(0);
+    const first = JSON.parse(offloadedContents[0]!) as {
+      preview: string;
+      offloadedTo: string;
+      note: string;
+    };
+    expect(first.preview).toBe('');
+    expect(first.note).toContain('combined limit');
+    expect(readFileSync(join(runDir, first.offloadedTo), 'utf8')).toBe('x'.repeat(1_900));
+    const untouched = contents.filter((content) => !content.startsWith('{'));
+    for (const content of untouched) expect(content).toBe('x'.repeat(1_900));
   });
 });

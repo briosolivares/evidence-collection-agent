@@ -10,9 +10,9 @@ import {
 } from '../../../tests/helpers/browserToolSuite.js';
 import { refFor } from '../../../tests/helpers/outline.js';
 import { MANIFEST_FILENAME, type Manifest } from '../../run/artifacts.js';
-import { observationTools } from '../index.js';
+import { browserActionTool } from '../browserAction/browserAction.js';
 import { executeToolCall } from '../pipeline.js';
-import { createRegistry } from '../registry.js';
+import { accessesConflict, createRegistry } from '../registry.js';
 import type { EvidenceResult } from '../shared/evidence.js';
 import { downloadTool } from './download.js';
 
@@ -24,7 +24,7 @@ const BROWSER_DOCUMENT_BYTES = Buffer.from(
 
 describe('download tool', () => {
   const suite = setupBrowserToolSuite('download-tool');
-  const registry = createRegistry([...observationTools, downloadTool]);
+  const registry = createRegistry([downloadTool]);
 
   function call(name: string, input: unknown) {
     return executeToolCall(
@@ -41,14 +41,14 @@ describe('download tool', () => {
   }
 
   beforeEach(async () => {
-    await successfulCall('navigate', { url: suite.server().url('/') });
-    await successfulCall('navigate', { url: suite.server().url('/downloads.html') });
+    await suite.controller().goto(suite.server().url('/'));
+    await suite.controller().goto(suite.server().url('/downloads.html'));
   });
 
   it(
     'downloads exact authenticated bytes with a URL-derived name and provenance',
     async () => {
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const ref = refFor(outline, 'link "Download authenticated evidence"');
       const result = JSON.parse(
         await successfulCall('download', { ref }),
@@ -66,7 +66,8 @@ describe('download tool', () => {
           roles: ['evidence'],
         }),
       );
-      expect(downloadTool.readOnly).toBe(false);
+      // State-changing: always writes the manifest, regardless of input.
+      expect(downloadTool.getAccess({}).writes).toContain('manifest');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -77,7 +78,7 @@ describe('download tool', () => {
       const url = suite.server().url('/browser-only-document.htm');
       await expect(suite.controller().fetch(url)).resolves.toMatchObject({ status: 403 });
 
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const ref = refFor(outline, 'link "View browser-only document"');
       const result = JSON.parse(
         await successfulCall('download', { ref }),
@@ -124,7 +125,7 @@ describe('download tool', () => {
   it(
     'uses the browser-suggested filename for an attachment response',
     async () => {
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const ref = refFor(outline, 'link "Download browser-only evidence"');
       const result = JSON.parse(
         await successfulCall('download', { ref }),
@@ -141,7 +142,7 @@ describe('download tool', () => {
   it(
     'captures a JavaScript-triggered browser download from a ref without an href',
     async () => {
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const ref = refFor(outline, 'button "Generate download with JavaScript"');
       const result = JSON.parse(
         await successfulCall('download', { ref }),
@@ -203,7 +204,7 @@ describe('download tool', () => {
   it(
     'returns a structured error for a ref that does not start a download',
     async () => {
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const ref = refFor(outline, 'button "Do nothing"');
       const result = await call('download', { ref, filename: 'artifacts/should-not-exist.bin' });
 
@@ -213,7 +214,7 @@ describe('download tool', () => {
         errorKind: 'execution_error',
       });
       expect(result.content).toContain('did not start a browser download');
-      expect(result.content).toContain('Re-run inspect_page');
+      expect(result.content).toContain('Observe the page again');
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
@@ -221,7 +222,7 @@ describe('download tool', () => {
   it(
     'rejects reserved run metadata paths without corrupting the manifest',
     async () => {
-      const outline = await successfulCall('inspect_page', {});
+      const outline = await suite.controller().outline();
       const linkRef = refFor(outline, 'link "Download authenticated evidence"');
 
       const result = await call('download', {
@@ -239,6 +240,81 @@ describe('download tool', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+
+  it(
+    'downloads through a named page that is not the selected one',
+    async () => {
+      // Open a popup while the task tab briefly visits popup.html, then move
+      // the task tab back to downloads.html — the popup stays open as a
+      // genuinely different, non-selected page for the rest of the test.
+      await suite.controller().goto(suite.server().url('/popup.html'));
+      const observation = await suite.controller().observe({ need: ['interactive'] });
+      const link = observation.elements.find(
+        (element) => element.role === 'link' && element.name === 'Open popup fixture',
+      );
+      if (link === undefined) throw new Error('Open popup fixture link not found');
+      const opened = await suite.controller().browserAction({
+        actions: [{ op: 'click', target: link }],
+        runDir: suite.runDir(),
+      });
+      const popupId = opened.openedPages[0]?.pageId;
+      if (popupId === undefined) throw new Error('browser_action did not report an opened page');
+      await suite.controller().goto(suite.server().url('/downloads.html'));
+      expect(suite.controller().currentUrl()).toBe(suite.server().url('/downloads.html'));
+      expect(suite.controller().currentUrl(popupId)).toBe(suite.server().url('/second.html'));
+
+      const url = suite.server().url('/browser-only-document.htm');
+      const result = JSON.parse(
+        await successfulCall('download', {
+          url,
+          pageId: popupId,
+          filename: 'artifacts/from-popup.htm',
+        }),
+      ) as EvidenceResult;
+
+      expect(readFileSync(join(suite.runDir(), result.path))).toEqual(BROWSER_DOCUMENT_BYTES);
+      // The selected page never moved off downloads.html for this call.
+      expect(suite.controller().currentUrl()).toBe(suite.server().url('/downloads.html'));
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'fails distinctly for an unknown pageId, proving pageId reaches the browser rather than silently falling back to the selected page',
+    async () => {
+      const result = await call('download', {
+        url: suite.server().url('/browser-only-document.htm'),
+        pageId: 'no-such-page',
+        filename: 'artifacts/should-not-exist.htm',
+      });
+
+      expect(result).toMatchObject({ isError: true, errorKind: 'execution_error' });
+      expect(result.content).toContain('no-such-page');
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it('scopes access to the named page: a different page\'s browser_action never conflicts, the same page\'s does', () => {
+    const downloadOnP1 = downloadTool.getAccess({ url: 'https://example.test/x', pageId: 'p1' });
+    const actionOnP1 = browserActionTool.getAccess({
+      pageId: 'p1',
+      actions: [{ op: 'navigate', url: 'https://example.test' }],
+    });
+    const actionOnP2 = browserActionTool.getAccess({
+      pageId: 'p2',
+      actions: [{ op: 'navigate', url: 'https://example.test' }],
+    });
+    const actionOnTaskTab = browserActionTool.getAccess({
+      actions: [{ op: 'navigate', url: 'https://example.test' }],
+    });
+
+    expect(accessesConflict(downloadOnP1, actionOnP1)).toBe(true);
+    expect(accessesConflict(downloadOnP1, actionOnP2)).toBe(false);
+    expect(accessesConflict(downloadOnP1, actionOnTaskTab)).toBe(false);
+
+    const downloadOnSelected = downloadTool.getAccess({ url: 'https://example.test/y' });
+    expect(accessesConflict(downloadOnSelected, actionOnTaskTab)).toBe(true);
+  });
 });
 
 function readManifest(runDir: string): Manifest {

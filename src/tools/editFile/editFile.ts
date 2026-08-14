@@ -91,11 +91,9 @@ export const editFileTool: ToolDef<EditFileInput> = {
     'normalization of line endings, whitespace, Unicode form, or quote style is performed — and ' +
     'must appear exactly once unless replace_all is set. Cannot create a file (use write_file for ' +
     'that) and cannot edit a file that is a contract-bound table or document output (use ' +
-    'upsert_output_rows or write_document for those instead).',
+    'update_table or write_document for those instead).',
   inputSchema: editFileInputSchema,
-  readOnly: false,
-  // The scheduler derives concurrency from this, not from readOnly: a
-  // state-changing call must declare exactly what it touches so it can be
+  // A state-changing call must declare exactly what it touches so it can be
   // serialized against every other call that touches the same file or the
   // manifest.
   getAccess: (input) => ({
@@ -133,7 +131,7 @@ export const editFileTool: ToolDef<EditFileInput> = {
     // Contract-bound refusal, resolved PER CALL (never cached), so a
     // contract revision accepted a moment ago applies to this very edit. A
     // contract-bound table or document output is rendered by the tool that
-    // owns it (upsert_output_rows, write_document) from data or evidence
+    // owns it (update_table, write_document) from data or evidence
     // this codebase can check; if edit_file could also touch that same
     // published file, it would become a second, unchecked way to hand-edit a
     // rendered deliverable until it happens to pass the run's own completion
@@ -142,7 +140,7 @@ export const editFileTool: ToolDef<EditFileInput> = {
     // legacy path, fixture tests) has nothing to protect this way.
     const protectedOutput = findContractProtectedOutput(ctx, normalizedPath);
     if (protectedOutput !== undefined) {
-      const ownerTool = protectedOutput.kind === 'table' ? 'upsert_output_rows' : 'write_document';
+      const ownerTool = protectedOutput.kind === 'table' ? 'update_table' : 'write_document';
       throw new Error(
         `Cannot edit_file ${JSON.stringify(input.file_path)}: it is the published output of ` +
           `contract-bound ${protectedOutput.kind} output ${JSON.stringify(protectedOutput.id)}. ` +

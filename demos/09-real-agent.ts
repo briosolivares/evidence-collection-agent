@@ -21,12 +21,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { METRICS_FILENAME, runAgentLoop, type RunMetrics } from '../src/loop/agentLoop.js';
+import {
+  createWorkerSession,
+  METRICS_FILENAME,
+  runWorkerCycle,
+  writeWorkerSessionMetrics,
+  type RunMetrics,
+} from '../src/loop/workerSession.js';
 import { makeCallModel, type ProgressEvent } from '../src/model/callModel.js';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
+import { createRunBudgetTracker } from '../src/run/runBudget.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
-import { fileTools } from '../src/tools/index.js';
+import { editFileTool, grepTool, readFileTool, writeFileTool } from '../src/tools/index.js';
 import { createRegistry, toApiToolDefs } from '../src/tools/registry.js';
 
 const DEFAULT_TASK = 'Write a limerick about auditors to limerick.txt';
@@ -101,7 +108,7 @@ if (!process.env.ANTHROPIC_API_KEY) {
   );
 }
 
-const registry = createRegistry(fileTools);
+const registry = createRegistry([readFileTool, writeFileTool, editFileTool, grepTool]);
 const runDir = createRunDir('runs', generateRunId('demo real-agent'));
 initManifest(runDir, task);
 console.log(`run dir: ${runDir}`);
@@ -114,13 +121,20 @@ const callModel = makeCallModel({
   onProgress: printProgress,
 });
 
-const result = await runAgentLoop(task, { callModel, registry, runDir }, {
-  maxTurns: 12,
-  maxContextTokens: 200_000,
+const budget = createRunBudgetTracker({
+  maxWorkerTurns: 12,
+  maxToolCalls: Infinity,
+  maxModelTokens: Infinity,
+  maxToolResultBytes: Infinity,
+  maxWallTimeMs: Infinity,
+  maxVerifierCorrections: 0,
 });
+const session = createWorkerSession(task, { callModel, registry, runDir }, { budget, maxContextTokens: 200_000 });
+const outcome = await runWorkerCycle(session);
+writeWorkerSessionMetrics(session, outcome.kind === 'completed' ? 'completed' : 'budget_exceeded');
 finalizeManifest(runDir);
 
-console.log(`\nfinal status: ${JSON.stringify(result)}`);
+console.log(`\nfinal status: ${JSON.stringify(outcome)}`);
 console.log(`run dir:      ${runDir}`);
 
 console.log('\n--- manifest.json ---');

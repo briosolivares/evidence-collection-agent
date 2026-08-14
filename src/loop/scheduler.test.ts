@@ -68,13 +68,20 @@ const probeInput = z.object({
 type ProbeInput = z.infer<typeof probeInput>;
 
 /** A probe tool: logs start, idles delayMs, logs finish, then returns
- * "done <label>" — or throws "<label> exploded" when told to fail. */
-function probeTool(name: string, readOnly: boolean, timeline: Timeline): ToolDef {
+ * "done <label>" — or throws "<label> exploded" when told to fail.
+ *
+ * `behavesAsRead` selects the probe's declared access, mirroring exactly
+ * what the old readOnly-fallback used to derive before getAccess became
+ * mandatory: a "read" probe touches nothing nameable (so two never
+ * conflict with each other), a "write" probe is fully exclusive (so it
+ * serializes against everything, itself included). */
+function probeTool(name: string, behavesAsRead: boolean, timeline: Timeline): ToolDef {
   const tool: ToolDef<ProbeInput> = {
     name,
-    description: `Instrumented ${readOnly ? 'read-only' : 'state-changing'} probe.`,
+    description: `Instrumented ${behavesAsRead ? 'read-only' : 'state-changing'} probe.`,
     inputSchema: probeInput,
-    readOnly,
+    getAccess: () =>
+      behavesAsRead ? { reads: [], writes: [] } : { reads: [], writes: [], exclusive: true },
     execute: async ({ label, delayMs, fail }) => {
       timeline.events.push(`start ${label}`);
       timeline.startedAtMs.set(label, Date.now());
@@ -138,7 +145,7 @@ describe('scheduleToolCalls', () => {
       name: 'gated_read',
       description: 'Read-only probe that waits for the test to open its gate.',
       inputSchema: z.object({ label: z.string() }),
-      readOnly: true,
+      getAccess: () => ({ reads: [], writes: [] }),
       execute: async ({ label }) => {
         timeline.events.push(`start ${label}`);
         await new Promise<void>((open) => gates.set(label, open));
@@ -255,7 +262,6 @@ describe('access-aware scheduling', () => {
       name,
       description: name,
       inputSchema: z.object({ key: z.string(), ms: z.number().optional() }),
-      readOnly: false,
       getAccess: access,
       execute: async (input) => {
         live.count += 1;
@@ -273,8 +279,8 @@ describe('access-aware scheduling', () => {
   }
 
   it('overlaps writes to DIFFERENT resources', async () => {
-    // The whole gain over readOnly batching: two state-changing calls that
-    // cannot touch each other now run together.
+    // The whole gain over the old readOnly-fallback split: two
+    // state-changing calls that cannot touch each other now run together.
     const live = { count: 0, peak: 0 };
     const registry = createRegistry([
       accessTool('act', (input) => ({ reads: [], writes: [`page:${input.key}`] }), live),
@@ -312,6 +318,16 @@ describe('access-aware scheduling', () => {
     ]);
 
     await scheduleToolCalls([keyCall('look', 'p1'), keyCall('look', 'p1')], registry, ctx);
+    expect(live.peak).toBe(2);
+  });
+
+  it('overlaps two reads of DIFFERENT resources (a fortiori, since even same-resource reads overlap)', async () => {
+    const live = { count: 0, peak: 0 };
+    const registry = createRegistry([
+      accessTool('look', (input) => ({ reads: [`page:${input.key}`], writes: [] }), live),
+    ]);
+
+    await scheduleToolCalls([keyCall('look', 'p1'), keyCall('look', 'p2')], registry, ctx);
     expect(live.peak).toBe(2);
   });
 
@@ -416,7 +432,6 @@ describe('validateToolCallsForScheduling', () => {
       name: 'strict',
       description: 'strict',
       inputSchema: z.object({ key: z.string() }),
-      readOnly: true,
       getAccess: () => ({ reads: [], writes: [] }),
       execute: async () => 'ok',
     };
@@ -435,7 +450,6 @@ describe('validateToolCallsForScheduling', () => {
       name: 'act',
       description: 'act',
       inputSchema: z.object({ page: z.string() }),
-      readOnly: false,
       getAccess: (input) => ({ reads: [], writes: [`page:${input.page}`] }),
       execute: async () => 'ok',
     };

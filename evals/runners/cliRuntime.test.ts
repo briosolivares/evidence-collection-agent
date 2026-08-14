@@ -26,7 +26,6 @@ describe('createBrowserBackedRunTask', () => {
     const run = createBrowserBackedRunTask({
       browserRuntime,
       model: 'test-model',
-      toolProfile: 'batch-enabled',
       runsBaseDir: '/runs',
       runTaskFn,
       onProgress: (...args) => progress.push(args),
@@ -46,7 +45,6 @@ describe('createBrowserBackedRunTask', () => {
     expect(configs[0]).toMatchObject({
       browser,
       model: 'test-model',
-      toolProfile: 'batch-enabled',
       runsBaseDir: '/runs',
       startUrl: 'https://example.com/',
       // Eval batches always enable the judge harness with defaults.
@@ -71,7 +69,6 @@ describe('createBrowserBackedRunTask', () => {
     const run = createBrowserBackedRunTask({
       browserRuntime,
       model: 'test-model',
-      toolProfile: 'atomic',
       runsBaseDir: '/runs',
       runTaskFn,
     });

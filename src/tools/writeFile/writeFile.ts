@@ -58,7 +58,6 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
     'keep intermediate working files under scratch/, which is private and never graded or shown. ' +
     'Published files carry roles (default ["requested_output"]).',
   inputSchema: writeFileInputSchema,
-  readOnly: false,
   getAccess: (input) => ({
     reads: [],
     writes: [accessKey.file(input.file_path), accessKey.manifest()],

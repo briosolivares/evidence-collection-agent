@@ -4,7 +4,12 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { OutputContract, OutputSpec } from '../contracts/outputContract.js';
-import { createOutputTableStore } from '../outputs/outputTable.js';
+import {
+  createOutputTableStore,
+  type OutputRowInput,
+  type OutputTableStore,
+  type TableCompletenessEvidence,
+} from '../outputs/outputTable.js';
 import { initManifest, writeArtifact } from '../run/artifacts.js';
 import {
   renderTableOutputs,
@@ -14,6 +19,22 @@ import {
   validateManifestIntegrity,
   validateTableCompleteness,
 } from './completionCheck.js';
+
+/** Drive the store's one mutator, `updateTable`, for a single upsert — so
+ * call sites read like the old single-purpose method without repeating the
+ * section wrapper everywhere. */
+function upsert(tables: OutputTableStore, outputId: string, rows: readonly OutputRowInput[]): void {
+  tables.updateTable(outputId, { upsert: { rows } });
+}
+
+/** Same, for a single completeness record. */
+function complete(
+  tables: OutputTableStore,
+  outputId: string,
+  evidence: TableCompletenessEvidence,
+): void {
+  tables.updateTable(outputId, { completeness: evidence });
+}
 
 const TASK = 'Publish the widget roster.';
 
@@ -242,6 +263,78 @@ describe('runCompletionCheck — table outputs', () => {
     expect(result.failures[0]?.message).toMatch(/\bB\b/);
   });
 
+  it('accepts extra rows when the expectation is not exhaustive', () => {
+    // The default stays "these values must appear": a contract that names a
+    // few known entities must not fail a run for finding more.
+    publish('roster.csv', 'name,url\nA,https://e.com/a\nZ,https://e.com/z\n');
+    const result = runCompletionCheck(
+      runDir,
+      contract([
+        tableSpec({
+          rules: [
+            {
+              type: 'matches_expected_values',
+              column: 'name',
+              expected: ['A'],
+              source: { kind: 'original_task' },
+            },
+          ],
+        }),
+      ]),
+    );
+    expect(codes(result)).not.toContain('unexpected_values');
+  });
+
+  it('rejects a row key the contract does not list when the expectation is exhaustive', () => {
+    // The mechanical half of "did the run produce exactly the requested rows":
+    // an invented entity is caught here rather than left to the verifier's eye.
+    publish('roster.csv', 'name,url\nA,https://e.com/a\nZ,https://e.com/z\n');
+    const result = runCompletionCheck(
+      runDir,
+      contract([
+        tableSpec({
+          rules: [
+            {
+              type: 'matches_expected_values',
+              column: 'name',
+              expected: ['A', 'B'],
+              exhaustive: true,
+              source: { kind: 'original_task' },
+            },
+          ],
+        }),
+      ]),
+    );
+    // Both halves report together: B is absent AND Z was invented.
+    expect(codes(result)).toContain('missing_expected_values');
+    expect(codes(result)).toContain('unexpected_values');
+    expect(result.failures.map((f) => f.message).join('\n')).toContain('"Z"');
+  });
+
+  it('passes an exhaustive expectation the rows match exactly', () => {
+    publish('roster.csv', 'name,url\nB,https://e.com/b\nA,https://e.com/a\n');
+    const result = runCompletionCheck(
+      runDir,
+      contract([
+        tableSpec({
+          rules: [
+            {
+              type: 'matches_expected_values',
+              column: 'name',
+              expected: ['A', 'B'],
+              exhaustive: true,
+              source: { kind: 'original_task' },
+            },
+          ],
+        }),
+      ]),
+    );
+    // Set equality, not order equality — the contract names which rows, and
+    // row order is a separate concern.
+    expect(codes(result)).not.toContain('unexpected_values');
+    expect(codes(result)).not.toContain('missing_expected_values');
+  });
+
   it('reports leftover placeholder text', () => {
     publish('roster.csv', 'name,url\nTODO,https://e.com/a\n');
     expect(codes(runCompletionCheck(runDir, contract([tableSpec()])))).toContain(
@@ -433,7 +526,7 @@ describe('renderTableOutputs', () => {
   it('writes each table through writeArtifact with the requested_output role', () => {
     const outputs = [spec()];
     const tables = tableStore(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -452,7 +545,7 @@ describe('renderTableOutputs', () => {
   it('marks a partial render partial while keeping the requested-output role', () => {
     const outputs = [spec()];
     const tables = tableStore(outputs);
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -501,7 +594,7 @@ describe('validateTableCompleteness', () => {
 
   it('accepts a count-ruled table once completeness is recorded', () => {
     const tables = tableStore([ruled]);
-    tables.setTableCompleteness('roster', { method: 'header states 1', evidenceIds: ['E1'] });
+    complete(tables, 'roster', { method: 'header states 1', evidenceIds: ['E1'] });
     expect(validateTableCompleteness(contract([ruled]), tables)).toEqual([]);
   });
 
@@ -526,7 +619,7 @@ describe('validateEvidenceReferences', () => {
       tableSpec: () => spec as never,
       evidenceExists: () => true,
     });
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
 
@@ -541,7 +634,7 @@ describe('validateEvidenceReferences', () => {
       tableSpec: () => spec as never,
       evidenceExists: () => true,
     });
-    tables.upsertOutputRows('roster', [
+    upsert(tables, 'roster', [
       { rowId: 'r1', values: { name: 'Alpha' }, evidenceIds: ['E1'] },
     ]);
     expect(validateEvidenceReferences(contract([spec]), tables, () => true)).toEqual([]);
@@ -552,7 +645,7 @@ describe('validateEvidenceReferences', () => {
       tableSpec: () => spec as never,
       evidenceExists: () => true,
     });
-    tables.setTableCompleteness('roster', { method: 'counted', evidenceIds: ['E9'] });
+    complete(tables, 'roster', { method: 'counted', evidenceIds: ['E9'] });
     const failures = validateEvidenceReferences(contract([spec]), tables, () => false);
     expect(failures.map((f) => f.code)).toEqual(['dangling_completeness_evidence']);
   });

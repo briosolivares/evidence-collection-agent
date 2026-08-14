@@ -30,6 +30,8 @@ import type { BusyResourceRegistry } from '../tools/registry.js';
 export interface BrowserScreenshotOptions {
   /** Capture the entire scrollable page instead of only the viewport. */
   fullPage?: boolean;
+  /** Page to capture; omitted means the selected page. */
+  pageId?: string;
 }
 
 /** An HTTP response fetched through the browser session. */
@@ -56,8 +58,12 @@ export interface BrowserDownloadResult {
   suggestedFilename?: string;
 }
 
-/** A browser-native download source: an observed page ref or verified URL. */
-export type BrowserDownloadTarget = { ref: string } | { url: string };
+/** A browser-native download source: an observed page ref or verified URL.
+ * `pageId` names which page to act on — the page the ref was observed on,
+ * or the page whose context frames a direct URL fetch (a temporary page
+ * still performs the actual capture regardless); omitted means the
+ * selected page. */
+export type BrowserDownloadTarget = { pageId?: string } & ({ ref: string } | { url: string });
 
 /** How to answer one pending JavaScript dialog. */
 export interface HandleDialogRequest {
@@ -123,9 +129,11 @@ export interface BrowserScriptSetup {
   /** Loopback CDP HTTP endpoint (e.g. `http://127.0.0.1:54213`) the
    * secondary client connects to via `chromium.connectOverCDP`. */
   cdpUrl: string;
-  /** CDP target id of the currently selected page, so the secondary client
-   * can find that exact tab among possibly several open ones — and must
-   * never fall back to guessing (e.g. "the first page"). */
+  /** CDP target id of the resolved page — the page named by
+   * {@link BrowserController.prepareForBrowserScript}'s `pageId`, or the
+   * selected page when it was omitted — so the secondary client can find
+   * that exact tab among possibly several open ones — and must never fall
+   * back to guessing (e.g. "the first page"). */
   selectedPageTargetId: string;
 }
 
@@ -147,6 +155,14 @@ export class BrowserRefNotFoundError extends Error {
  * A session owns at most one task tab at a time. Calling {@link newTab}
  * starts a run with a fresh page; calling {@link closeTab} ends that run
  * without closing the underlying browser session or its shared state.
+ *
+ * The active tab is otherwise immutable for the run's whole life: nothing on
+ * this interface moves the selected pointer away from the page {@link newTab}
+ * opened, so every other page (a popup, a second tab) must be addressed
+ * explicitly by `pageId` rather than selected first. An implementation may
+ * still re-point the pointer when {@link refreshAfterBrowserScript} finds the
+ * selected page closed out from under it — that is a liveness guard so the
+ * session stays usable after external interference, not a selection feature.
  */
 export interface BrowserController {
   /**
@@ -185,48 +201,13 @@ export interface BrowserController {
   outline(): Promise<string>;
 
   /**
-   * Click the element identified by a ref from the latest outline.
+   * Capture a page as PNG bytes.
    *
-   * @param ref - exact element ref returned by {@link outline}
-   * @returns nothing; the click has completed. Rejects with
-   *   {@link BrowserRefNotFoundError} when the ref is invalid or stale.
-   */
-  click(ref: string): Promise<void>;
-
-  /**
-   * Replace an editable element's value using a ref from the latest outline.
-   *
-   * @param ref - exact element ref returned by {@link outline}
-   * @param text - complete text value to place in the element
-   * @returns nothing; the value has been filled. Rejects with
-   *   {@link BrowserRefNotFoundError} when the ref is invalid or stale.
-   */
-  type(ref: string, text: string): Promise<void>;
-
-  /**
-   * Scroll the active page downward by approximately one viewport height.
-   *
-   * @returns nothing; the page has been scrolled before resolution
-   */
-  scroll(): Promise<void>;
-
-  /**
-   * Capture the active page as PNG bytes.
-   *
-   * @param options - optional viewport or full-page capture selection
+   * @param options - optional page selection, and viewport or full-page
+   *   capture selection; an omitted `pageId` means the selected page
    * @returns the complete PNG file bytes without writing an artifact
    */
   screenshot(options?: BrowserScreenshotOptions): Promise<Uint8Array>;
-
-  /**
-   * Resolve an element's link destination from a ref in the latest outline.
-   *
-   * @param ref - exact element ref returned by {@link outline}
-   * @returns the absolute link URL, or null when the element has no href.
-   *   Rejects with {@link BrowserRefNotFoundError} when the ref is invalid or
-   *   stale.
-   */
-  resolveHref(ref: string): Promise<string | null>;
 
   /**
    * Fetch a URL through the browser session's request layer.
@@ -240,30 +221,35 @@ export interface BrowserController {
   /**
    * Capture a resource through Chrome's page network stack.
    *
-   * HTTP(S) refs and URLs are opened in a temporary page so the active task
-   * page remains unchanged; the main navigation response or resulting browser
+   * HTTP(S) refs and URLs are opened in a temporary page so the acted-on page
+   * remains unchanged; the main navigation response or resulting browser
    * download is captured exactly. Refs without an HTTP(S) href are clicked on
-   * the active page and must trigger a browser download event.
+   * the target page and must trigger a browser download event.
    *
-   * @param target - an inspected page ref or an absolute HTTP(S) URL
+   * @param target - an inspected page ref or an absolute HTTP(S) URL, plus an
+   *   optional `pageId`; omitted means the selected page
    * @returns exact bytes plus the final URL and available response metadata
    */
   download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult>;
 
   /**
-   * Read the active task tab's current URL.
+   * Read a page's current URL.
    *
+   * @param pageId - page to read; omitted means the selected page
    * @returns the absolute current URL, including the landed URL after a
-   *   redirect. Throws when no task tab is active.
+   *   redirect. Throws when no task tab is active (pageId omitted) or the
+   *   named page is unknown or closed.
    */
-  currentUrl(): string;
+  currentUrl(pageId?: string): string;
 
   /**
-   * Read the active task tab's document title.
+   * Read a page's document title.
    *
-   * @returns the current document title. Rejects when no task tab is active.
+   * @param pageId - page to read; omitted means the selected page
+   * @returns the current document title. Rejects when no task tab is active
+   *   (pageId omitted) or the named page is unknown or closed.
    */
-  title(): Promise<string>;
+  title(pageId?: string): Promise<string>;
 
   /**
    * List every tracked page (task tab and popups) with stable identity.
@@ -320,23 +306,13 @@ export interface BrowserController {
   handleDialog(request: HandleDialogRequest): Promise<HandleDialogResult>;
 
   /**
-   * Select a tracked page as the target of the single-page methods
-   * (goto/outline/click/type/...) — how legacy tools reach a popup.
-   *
-   * @param pageId - a page id from {@link pages} or an observation
-   * @returns the selected page's current state with `active: true`.
-   *   Rejects when the id names no live tracked page.
-   */
-  switchPage(pageId: string): Promise<BrowserPage>;
-
-  /**
    * Close the browser session and every page it owns.
    *
    * @returns nothing; all browser resources are released. Repeated calls are
    *   safe and no later browser operation may succeed.
    */
   /**
-   * Evaluate a snippet in the selected page's top document (T6).
+   * Evaluate a snippet in a page's top document (T6).
    *
    * OPTIONAL on purpose: a session may legitimately not offer page JavaScript
    * (an authenticated lane configured `deny`, or a stub in a test that never
@@ -347,6 +323,8 @@ export interface BrowserController {
    * Every call is a page WRITE — the snippet can mutate the DOM — so it must
    * never be scheduled as a read.
    *
+   * @param request - the page (via `pageId`, omitted meaning the selected
+   *   page), the snippet, and its clamped deadline
    * @throws BrowserJavaScriptTimeoutError when the hard deadline is exceeded.
    *   Terminal: a spinning snippet cannot be interrupted, so the caller must
    *   call replaceUnresponsivePage rather than retry into the same page
@@ -385,8 +363,9 @@ export interface BrowserController {
   /**
    * Prepare this session to be driven by an external browser script: a
    * short-lived process that opens its OWN Playwright connection to the SAME
-   * running Chrome over CDP, so it can act on the exact tab this controller
-   * currently has selected.
+   * running Chrome over CDP, so it can act on one exact tab of this
+   * controller's — the named page, or the selected page when `pageId` is
+   * omitted — without this controller ever selecting that page itself.
    *
    * OPTIONAL, and a PAIRED capability with {@link refreshAfterBrowserScript}:
    * a controller implements both or neither. {@link
@@ -407,11 +386,14 @@ export interface BrowserController {
    * second time. Calling it again before {@link refreshAfterBrowserScript}
    * runs is safe and returns the current facts.
    *
-   * @returns the CDP endpoint and the selected page's CDP target id
-   * @throws Error when no task tab is currently active, or this controller
-   *   has no CDP endpoint configured
+   * @param pageId - page to hand to the script; omitted means the selected
+   *   page
+   * @returns the CDP endpoint and the resolved page's CDP target id
+   * @throws Error when the resolved page does not exist (no task tab active,
+   *   for an omitted `pageId`; an unknown or closed page, for a named one),
+   *   or this controller has no CDP endpoint configured
    */
-  prepareForBrowserScript?(): Promise<BrowserScriptSetup>;
+  prepareForBrowserScript?(pageId?: string): Promise<BrowserScriptSetup>;
 
   /**
    * Reconcile this controller's state after an external browser script has
