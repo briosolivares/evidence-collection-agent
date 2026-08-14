@@ -2,7 +2,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -54,6 +54,36 @@ describe('installed package', () => {
       expect(launched.status).not.toBe(0);
       expect(launched.stderr.trim()).toMatch(/interactive terminal|TTY/i);
       expect(launched.stderr).not.toMatch(/ERR_MODULE_NOT_FOUND|Cannot find module/i);
+
+      // The non-TTY preflight above runs before JSX is evaluated. Simulate the
+      // small part of a terminal Ink needs, launch the demo, and require the
+      // welcome card to render. This catches a packaged tsx loader silently
+      // falling back from react-jsx to the classic `React.createElement` mode.
+      const installedLauncher = join(installedPackage, 'bin/sherlock.mjs');
+      const terminalSmokeSource = [
+        "Object.defineProperty(process.stdin, 'isTTY', { value: true });",
+        "Object.defineProperty(process.stdout, 'isTTY', { value: true });",
+        'process.stdin.setRawMode = () => process.stdin;',
+        "process.argv.push('--demo');",
+        'setTimeout(() => process.exit(0), 5_000);',
+        `await import(${JSON.stringify(pathToFileURL(installedLauncher).href)});`,
+      ].join('\n');
+      const terminalLaunch = spawnSync(
+        process.execPath,
+        ['--input-type=module', '--eval', terminalSmokeSource],
+        {
+          cwd: temporaryRoot,
+          env: { ...process.env, HOME: temporaryHome, TERM: 'dumb' },
+          encoding: 'utf8',
+          timeout: 30_000,
+        },
+      );
+
+      expect(terminalLaunch.status).toBe(0);
+      expect(terminalLaunch.stderr).not.toMatch(
+        /React is not defined|ERR_MODULE_NOT_FOUND|Cannot find module/i,
+      );
+      expect(terminalLaunch.stdout).toMatch(/Sherlock|Welcome back/i);
     } finally {
       rmSync(temporaryRoot, { recursive: true, force: true });
     }
