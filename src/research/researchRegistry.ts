@@ -75,6 +75,15 @@ export const FORBIDDEN_RESEARCH_TOOL_NAMES: readonly string[] = [
   'fill_credentials',
   'ask_user_question',
   'run_research_jobs',
+  // Local code execution and file mutation, for two independent reasons.
+  // `write_file` above is already forbidden, and `bash` would hand that power
+  // straight back — a shell can write anywhere the process can. And research
+  // jobs run CONCURRENTLY, while local execution is specified as one command
+  // per run: several children each starting a process group, all racing on the
+  // same scratch workspace and the same selected browser page, is not a
+  // configuration this design supports.
+  'bash',
+  'edit_file',
 ];
 
 /** Everything a research registry needs from the child's own session. Every

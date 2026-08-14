@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 
 import { createProductionRegistry,
+  createBashTool,
   V2_TOOL_ORDER,
   createV2Registry,
 } from './index.js';
@@ -24,12 +25,22 @@ describe('production tool schemas', () => {
     }
   });
 
+  it('omits bash when the caller supplies no run-scoped bash tool', () => {
+    // bash closes over the run's secret-env denylist, so it cannot be a static
+    // definition. A registry built without it is missing bash rather than
+    // carrying a broken one — the same rule createV2Registry follows.
+    expect([...createProductionRegistry().keys()]).not.toContain('bash');
+  });
+
   it('keeps atomic stable and appends browser_batch only in its explicit profile', () => {
-    const atomicNames = [...createProductionRegistry().keys()];
+    const bashTool = createBashTool({ secretEnvDenylist: [] });
+    const atomicNames = [...createProductionRegistry('atomic', { bash: bashTool }).keys()];
     expect(atomicNames).toEqual([
       'read_file',
       'write_file',
+      'edit_file',
       'grep',
+      'bash',
       'navigate',
       'inspect_page',
       'click',
@@ -41,10 +52,12 @@ describe('production tool schemas', () => {
       'ask_user_question',
     ]);
 
-    const batchEnabled = createProductionRegistry('batch-enabled');
+    const batchEnabled = createProductionRegistry('batch-enabled', { bash: bashTool });
     expect([...batchEnabled.keys()]).toEqual([...atomicNames, 'browser_batch']);
     expect(batchEnabled.get('browser_batch')?.readOnly).toBe(false);
-    const rebuilt = toApiToolDefs(createProductionRegistry('batch-enabled'));
+    const rebuilt = toApiToolDefs(
+      createProductionRegistry('batch-enabled', { bash: bashTool }),
+    );
     expect(JSON.stringify(rebuilt)).toBe(JSON.stringify(toApiToolDefs(batchEnabled)));
   });
 });
@@ -76,7 +89,9 @@ describe('V2 tool order', () => {
       'download',
       'read_file',
       'write_file',
+      'edit_file',
       'grep',
+      'bash',
       'fill_credentials',
       'ask_user_question',
       'run_research_jobs',
@@ -109,6 +124,7 @@ describe('V2 tool order', () => {
       'download',
       'read_file',
       'write_file',
+      'edit_file',
       'grep',
       'fill_credentials',
       'ask_user_question',

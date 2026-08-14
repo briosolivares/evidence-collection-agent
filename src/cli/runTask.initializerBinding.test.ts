@@ -5,8 +5,14 @@ import {
   makeContractInitializerModelDriver,
   makeInitializerCallModel,
 } from '../harness/initializer.js';
+import { createVerifierRegistry } from '../harness/verifierTools.js';
 import type { CallModel } from '../loop/messages.js';
 import type { ModelStreamEvent } from '../model/streamAssembly.js';
+import {
+  createBashTool,
+  createProductionRegistry,
+  V2_TOOL_ORDER,
+} from '../tools/index.js';
 import { defaultInitializerCallModel } from './runTask.js';
 
 /**
@@ -136,5 +142,64 @@ describe('defaultInitializerCallModel', () => {
     // The prose initializer writes INTENT/CONTRACT text and calls nothing.
     expect(request.tools ?? []).toEqual([]);
     expect(request.tool_choice).toBeUndefined();
+  });
+});
+
+/**
+ * `bash` and `edit_file` are WORKER-ONLY.
+ *
+ * The worker may mutate the run directory and run local commands; the two
+ * roles that judge the work may not. An initializer that could run a shell
+ * could satisfy a contract it is simultaneously authoring, and a verifier that
+ * could edit files could repair the very defect it exists to report — either
+ * way the run's own check ends up grading work the checker did.
+ *
+ * Nothing asserted this before these tools existed, because there was nothing
+ * to keep out. That is precisely why it is worth pinning now: the isolation is
+ * a property of three independently hand-written tool lists, not of any shared
+ * read-only filter, so nothing would complain if a fourth list picked up the
+ * worker's registry by accident.
+ */
+describe('worker-only tool isolation', () => {
+  const MUTATION_TOOLS = ['bash', 'edit_file'];
+
+  it('offers the contract initializer nothing but set_output_contract', async () => {
+    const stream = recordingStream();
+    const request = await firstRequest(
+      makeContractInitializerModelDriver({ createStream: stream.createStream }),
+      stream.calls,
+    );
+
+    const names = request.tools?.map((tool) => (tool as { name: string }).name) ?? [];
+    expect(names).toEqual(['set_output_contract']);
+    for (const mutation of MUTATION_TOOLS) {
+      expect(names).not.toContain(mutation);
+    }
+  });
+
+  it('gives the verifier only read-only inspection tools', () => {
+    const names = [...createVerifierRegistry().keys()];
+    expect(names).toEqual(['read_file', 'grep']);
+    for (const mutation of MUTATION_TOOLS) {
+      expect(names).not.toContain(mutation);
+    }
+    // Read-only in fact, not merely by omission.
+    for (const tool of createVerifierRegistry().values()) {
+      expect(tool.readOnly).toBe(true);
+    }
+  });
+
+  it('does give the worker both tools, so the isolation above is a boundary and not an absence', () => {
+    // Without this half, the assertions above could pass for the wrong reason.
+    const workerNames = [
+      ...createProductionRegistry('atomic', {
+        bash: createBashTool({ secretEnvDenylist: [] }),
+      }).keys(),
+    ];
+    for (const mutation of MUTATION_TOOLS) {
+      expect(workerNames).toContain(mutation);
+    }
+    expect(V2_TOOL_ORDER).toContain('bash');
+    expect(V2_TOOL_ORDER).toContain('edit_file');
   });
 });

@@ -1,11 +1,15 @@
-import { dirname, resolve } from 'node:path';
+import { accessSync, constants as fsConstants, mkdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
   FileCredentialStore,
   type CredentialStore,
 } from '../auth/credentialStore.js';
-import type { BrowserController } from '../browser/controller.js';
+import {
+  assertBrowserScriptSupportIsPaired,
+  type BrowserController,
+} from '../browser/controller.js';
 import {
   writeHarnessDiagnostics,
   type HarnessCycleRecord,
@@ -62,6 +66,7 @@ import {
 import {
   finalizeManifest,
   initManifest,
+  SCRATCH_DIR,
 } from '../run/artifacts.js';
 import { generateRunId } from '../run/runId.js';
 import { createRunDir } from '../run/runDir.js';
@@ -71,6 +76,7 @@ import {
   type RunTracing,
 } from '../tracing/runTracing.js';
 import {
+  createBashTool,
   createProductionRegistry,
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
@@ -129,6 +135,62 @@ const DEFAULT_MAX_CONTEXT_TOKENS = 900_000;
  * a code-check failure is cheap, objective, and usually a one-line fix, so
  * spending a scarce verifier attempt on one would be waste. */
 const DEFAULT_MAX_COMPLETION_CHECK_FAILURES = 5;
+
+/**
+ * Environment variables the `bash` child must never inherit — THE one place a
+ * new harness credential has to be added.
+ *
+ * Every name here was found by enumerating what this codebase actually reads
+ * from `process.env`, not by guessing at a general list of scary-looking
+ * names. Prefix entries end with `_` and strip a whole family.
+ *
+ * Be clear about what this does and does not buy. It is reproducibility and
+ * blast-radius hygiene: a generated script cannot casually read the model key
+ * out of its own environment and spend it, or exfiltrate tracing credentials
+ * because it happened to run `env`. It is NOT a security boundary. Commands
+ * run as the same operating-system user as this process, so anything that user
+ * can read — including the credentials file this list deliberately hides the
+ * PATH to — is still reachable by a command that goes looking. Treat the
+ * denylist as removing an easy accident, never as containing a determined one.
+ */
+export const BASH_SECRET_ENV_DENYLIST: readonly string[] = [
+  // Model provider credentials.
+  'ANTHROPIC_API_KEY',
+  'ANTHROPIC_AUTH_TOKEN',
+  // Tracing credentials (LANGFUSE_PUBLIC_KEY / _SECRET_KEY / _BASE_URL).
+  'LANGFUSE_',
+  // Where stored site logins live. The file's own permissions still guard it;
+  // this only avoids handing over its location for free.
+  'CREDENTIALS_FILE',
+  // A token present in developer shells that no generated script needs.
+  'GITHUB_TOKEN',
+];
+
+/** The shell `bash` invokes. Fixed rather than configurable until a concrete
+ * environment needs otherwise. */
+const BASH_SHELL_PATH = '/bin/bash';
+
+/**
+ * Fail before the first model call if local execution cannot work.
+ *
+ * Both checks are cheap and both are things the worker would otherwise
+ * discover mid-run, having already spent tokens planning around a tool that
+ * was never going to run. `scratch/workspace` is created owner-only; an
+ * existing directory is validated rather than silently re-permissioned, since
+ * quietly widening a mode nobody asked us to change is worse than reporting it.
+ */
+function prepareLocalExecution(runDir: string): void {
+  try {
+    accessSync(BASH_SHELL_PATH, fsConstants.X_OK);
+  } catch {
+    throw new Error(
+      `local code execution requires an executable ${BASH_SHELL_PATH}, which this ` +
+        'host does not provide',
+    );
+  }
+  const workspace = join(runDir, SCRATCH_DIR, 'workspace');
+  mkdirSync(workspace, { recursive: true, mode: 0o700 });
+}
 
 /**
  * Keep only start URLs runTask can actually open: `goto` accepts HTTP(S)
@@ -235,14 +297,27 @@ export interface RunTaskConfig {
   /** Whether page JavaScript may run. Required for authenticated sessions;
    * anonymous sessions default to 'allow'. */
   javascriptPolicy?: BrowserJavaScriptPolicy;
-  /** Enables the initializer → worker → judge outer loop (see HarnessConfig
-   * and judge-design.md). Absent (the default): today's behavior,
-   * byte-for-byte — one runAgentLoop call, no INTENT.md/CONTRACT.md/
-   * harness.json, no judge. Present: the initializer writes INTENT.md and
-   * CONTRACT.md before the browser tab opens, then up to
-   * `maxWorkerCycles` worker cycles run against the same tab, each
-   * verified by the judge before deciding whether another cycle runs. */
+  /** Enables the initializer → worker → verifier outer loop (see
+   * HarnessConfig). Absent (the default): today's behavior, byte-for-byte —
+   * one runAgentLoop call, no INTENT.md/CONTRACT.md/harness.json, no
+   * verifier. Present: the initializer writes INTENT.md and CONTRACT.md
+   * before the browser tab opens, then up to `maxWorkerCycles` worker cycles
+   * run against the same tab, each verified before deciding whether another
+   * cycle runs. */
   harness?: HarnessConfig;
+  /**
+   * Cancellation for the run's tools, reaching work the model-call boundary
+   * cannot.
+   *
+   * Aborting a model call already ends a run: the rejection propagates out of
+   * the loop. But that only takes effect BETWEEN calls, so it could never stop
+   * something already executing — which was harmless while every tool was a
+   * short filesystem or page operation, and stops being harmless once `bash`
+   * can hold a process group for two minutes. This signal reaches
+   * `ToolCtx.abortSignal`, so cancelling a run terminates an in-flight command
+   * instead of orphaning it.
+   */
+  signal?: AbortSignal;
 }
 
 /**
@@ -354,6 +429,19 @@ export async function runTask(
   const runDir = runDirForRun;
   initManifest(runDir, taskText);
 
+  // Before any model call: prove the shell exists and the command workspace is
+  // there, so `bash` is either genuinely available or the run fails now rather
+  // than after the worker has planned around it.
+  prepareLocalExecution(runDir);
+  assertBrowserScriptSupportIsPaired(config.browser);
+
+  // One bash tool per run, closing over this run's denylist. Supplied to
+  // whichever registry gets built — it is a factory precisely so the policy
+  // travels with the run rather than living in a module-level array.
+  const bashTool = createBashTool({
+    secretEnvDenylist: BASH_SECRET_ENV_DENYLIST,
+  }) as ToolDef;
+
   // Run-scoped V2 state. Built here, before the registry, because several
   // tools close over it — a tool cannot be constructed without the store it
   // mutates.
@@ -450,9 +538,15 @@ export async function runTask(
                 ],
               ] as Array<[string, ToolDef]>)
             : []),
+          // Local code execution, at its frozen position in V2_TOOL_ORDER.
+          // Run-scoped for the same reason the stores above are: it carries
+          // this run's secret-env denylist.
+          ['bash', bashTool],
         ]),
       )
-    : createProductionRegistry(config.toolProfile ?? DEFAULT_TOOL_PROFILE);
+    : createProductionRegistry(config.toolProfile ?? DEFAULT_TOOL_PROFILE, {
+        bash: bashTool,
+      });
 
   // The model's tool surface follows the registry exactly, plus the submission
   // CONTROL tool — offered to the model but never executed through the
@@ -552,6 +646,9 @@ export async function runTask(
         browser: config.browser,
         credentials,
         requestPermission: config.requestPermission,
+        // Reaches an in-flight command, unlike the model-call boundary the
+        // TUI's cancellation already covers.
+        ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
         ...(outputContracts === undefined ? {} : { outputContracts }),
         ...(outputTables === undefined ? {} : { outputTables }),
         ...(v2Protocol ? { submissionProtocol: true } : {}),

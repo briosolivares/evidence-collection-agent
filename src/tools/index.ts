@@ -15,6 +15,7 @@ import { handleDialogTool } from './handleDialog/handleDialog.js';
 import { setOutputContractTool } from './setOutputContract/setOutputContract.js';
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
+import { editFileTool } from './editFile/editFile.js';
 import { fillCredentialsTool } from './fillCredentials/fillCredentials.js';
 import { grepTool } from './grep/grep.js';
 import { inspectPageTool } from './inspectPage/inspectPage.js';
@@ -39,6 +40,13 @@ export {
   type BrowserBatchResult,
 } from './browserBatch/browserBatch.js';
 export { downloadTool, type DownloadInput } from './download/download.js';
+export { editFileTool, type EditFileResult } from './editFile/editFile.js';
+export {
+  createBashTool,
+  type BashInput,
+  type BashResult,
+  type BashToolDeps,
+} from './bash/bash.js';
 export {
   fillCredentialsTool,
   type FillCredentialsInput,
@@ -67,10 +75,16 @@ export { type EvidenceResult } from './shared/evidence.js';
 // the pipeline (executeToolCall) converts the throw into a structured error
 // result, so callers never see an exception.
 
-/** The file tools in registration order, ready for `createRegistry`. */
+/** The file tools in registration order, ready for `createRegistry`.
+ *
+ * `edit_file` sits between `write_file` and `grep`: create a file with
+ * `write_file`, change one exact substring with `edit_file`. Inserting it here
+ * rather than appending shifts `grep`'s position, which is a deliberate,
+ * one-time prompt-prefix change — see the note on `createProductionRegistry`. */
 export const fileTools: readonly ToolDef[] = [
   readFileTool as ToolDef,
   writeFileTool as ToolDef,
+  editFileTool as ToolDef,
   grepTool as ToolDef,
 ];
 
@@ -105,16 +119,33 @@ export type ToolProfile = 'atomic' | 'batch-enabled';
 export const DEFAULT_TOOL_PROFILE: ToolProfile = 'atomic';
 
 /**
- * Build one complete production registry. The atomic profile retains the
- * existing ten tools and their exact order (plus the appended auth tools);
- * the treatment appends the composite browser tool without replacing any
- * atomic capability.
+ * Build one complete production registry. The atomic profile keeps the browser
+ * tools and their exact order (plus the appended auth tools); the treatment
+ * appends the composite browser tool without replacing any atomic capability.
+ *
+ * `bash` is a FACTORY (it closes over the run's secret-env denylist), so it
+ * cannot live in a static array like the others. The caller passes the built
+ * tool in and it lands directly after the file tools; a caller that supplies
+ * none gets a registry WITHOUT `bash`, mirroring `createV2Registry`'s rule that
+ * a tool whose dependencies are unavailable is omitted rather than registered
+ * broken. `runTask` always supplies it, so production runs always have it.
+ *
+ * Both this order and V2_TOOL_ORDER changed once, deliberately, when
+ * `edit_file` and `bash` were added. Prompt caching is a byte-exact prefix
+ * match, so that change re-paid every cached conversation once and made
+ * earlier eval baselines non-comparable. Both orders are pinned by tests; if
+ * one fails, the question is whether the reorder was intended.
+ *
+ * @param profile - which browser surface to expose
+ * @param opts.bash - the run-scoped `bash` tool, omitted when unavailable
  */
 export function createProductionRegistry(
   profile: ToolProfile = DEFAULT_TOOL_PROFILE,
+  opts: { bash?: ToolDef } = {},
 ): ToolRegistry {
   return createRegistry([
     ...fileTools,
+    ...(opts.bash === undefined ? [] : [opts.bash]),
     ...observationTools,
     ...actionTools,
     ...evidenceTools,
@@ -168,7 +199,13 @@ export const V2_TOOL_ORDER: readonly string[] = [
   // Files, for scratch and supporting work.
   'read_file',
   'write_file',
+  'edit_file',
   'grep',
+  // Local code execution, worker-only. Last of the file group because a
+  // command is the heaviest thing this group can do, and because `bash` is
+  // built per run (it closes over the secret-env denylist) rather than being
+  // a static definition like the tools above it.
+  'bash',
   // Credentials and the human.
   'fill_credentials',
   'ask_user_question',
@@ -195,7 +232,10 @@ export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, Too
   ['download', downloadTool],
   ['read_file', readFileTool as ToolDef],
   ['write_file', writeFileTool as ToolDef],
+  ['edit_file', editFileTool as ToolDef],
   ['grep', grepTool as ToolDef],
+  // NOTE: 'bash' is deliberately absent — it is a factory, so runTask builds
+  // it and supplies it as a run-scoped tool at its frozen position.
   ['fill_credentials', fillCredentialsTool as ToolDef],
   ['ask_user_question', askUserQuestionTool as ToolDef],
 ]);

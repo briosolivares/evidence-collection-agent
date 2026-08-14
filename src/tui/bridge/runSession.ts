@@ -28,6 +28,7 @@ import type { ModelStreamEvent } from '../../model/streamAssembly.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import {
+  createBashTool,
   createProductionRegistry,
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
@@ -94,9 +95,22 @@ export interface RunSessionDeps {
 }
 
 /** The production tool surface, rebuilt exactly as runTask registers it —
- * needed here only to serialize the same stable API tool definitions. */
+ * needed here only to serialize the same stable API tool definitions.
+ *
+ * `bash` is run-scoped, so it must be constructed in order to be described.
+ * The instance built here is never executed: the TUI supplies
+ * `config.callModel`, so this side only produces the model-facing definition,
+ * while the instance `runTask` builds — with the run's real secret-env
+ * denylist — is the one that actually runs commands. The denylist does not
+ * affect these bytes. It must still be present, though: an `apiToolDefs` list
+ * missing `bash` would silently offer TUI runs a smaller surface than the
+ * registry executing them, and a model cannot call a tool it was never given. */
 function buildApiToolDefs(profile: ToolProfile) {
-  return toApiToolDefs(createProductionRegistry(profile));
+  return toApiToolDefs(
+    createProductionRegistry(profile, {
+      bash: createBashTool({ secretEnvDenylist: [] }),
+    }),
+  );
 }
 
 /**
@@ -250,6 +264,12 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
         ...(requestPermission === undefined ? {} : { requestPermission }),
+        // The same signal the wrapped callModel above checks, handed to the
+        // tools as well. Cancelling used to take effect only at the next model
+        // call; a `bash` command can hold a process group for two minutes, so
+        // without this a cancelled run would return while its command kept
+        // running.
+        signal,
       });
       switch (result.status) {
         case 'completed':

@@ -22,8 +22,18 @@ explicitly assigned T-task(s), not unverified coverage of all T1–T16. If the
 assigned scope is not narrower, work in dependency order and maximize fully
 tested, reviewable tasks rather than touching many tasks partially.
 
-The shell commands below are for the coding agent's terminal. They do **not**
-authorize adding a `bash` tool to the browser agent itself.
+The shell commands below are for the coding agent's terminal. They are not the
+browser agent's own shell access, and they do not widen it.
+
+> **Superseded on 2026-08-13.** This document originally said these commands
+> "do not authorize adding a `bash` tool to the browser agent itself." A
+> worker-only local `bash` tool, plus `edit_file`, has since been specified and
+> implemented — see
+> [the local code-execution specification](./browser-agent-local-code-execution-spec.md).
+> The agent's shell is confined to `scratch/workspace/`, bounded in time and
+> output, exposed to the **worker only**, and reconciled into the manifest
+> before the tool returns. The initializer and the verifier remain incapable of
+> shell execution or file mutation.
 
 ### Start the clock before inspecting or editing
 
@@ -209,10 +219,18 @@ review input and is not part of this plan's commit.
   only requested outputs selected from `manifest.json`.
 - Keep `SYSTEM_PROMPT` and API tool definitions deterministic. Runtime state
   belongs in messages or tool inputs, never in a per-run system prompt.
-- Keep the no-shell boundary. `execute_javascript` runs only inside a selected
-  browser document.
+- `execute_javascript` runs only inside a selected browser document. The
+  former absolute no-shell boundary is superseded (see the note near the top):
+  the worker also has a finite, local, worker-only `bash` tool whose working
+  directory is `scratch/workspace/`. It is a lifecycle and provenance boundary,
+  **not** a security boundary — the initializer and verifier still get neither
+  shell nor file mutation.
 - Route every write through `writeArtifact()` and every model-supplied path
-  through `resolveRunPath()`.
+  through `resolveRunPath()`. The single exception is `scratch/workspace/`,
+  where a `bash` command creates files directly: `syncScratchWorkspace()` must
+  pass every surviving regular file through the artifact module before the tool
+  returns, so the manifest is truthful even though the bytes did not arrive
+  through the chokepoint.
 - Add no task-name checks, site selectors for an eval task, or hidden-eval
   special cases.
 - Validate finite numeric limits. Reject `NaN`, `Infinity`, negative values,

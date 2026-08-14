@@ -2,15 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
-import {
-  actionTools,
-  authTools,
-  evidenceTools,
-  fileTools,
-  interactionTools,
-  observationTools,
-} from '../tools/index.js';
-import { createRegistry, toApiToolDefs } from '../tools/registry.js';
+import { createProductionRegistry, createBashTool } from '../tools/index.js';
+import { toApiToolDefs } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 const firstTask = 'Collect the first fixture record and write it as CSV.';
@@ -47,14 +40,13 @@ const secondTaskHistory: readonly Message[] = [
 
 /** Build a fresh production prompt prefix instead of sharing registry or API-tool objects. */
 function productionConfig(): CallModelConfig {
-  const registry = createRegistry([
-    ...fileTools,
-    ...observationTools,
-    ...actionTools,
-    ...evidenceTools,
-    ...authTools,
-    ...interactionTools,
-  ]);
+  // Built through the real production builder rather than by re-listing the
+  // groups: bash is run-scoped (it closes over the secret-env denylist), so
+  // hand-assembling the groups would silently omit it and this test would stop
+  // describing the prefix production actually sends.
+  const registry = createProductionRegistry('atomic', {
+    bash: createBashTool({ secretEnvDenylist: [] }),
+  });
   return {
     system: SYSTEM_PROMPT,
     apiToolDefs: toApiToolDefs(registry),
@@ -168,7 +160,7 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('briefly name the files you produced');
   });
 
-  it('forms a byte-identical cached prefix with all twelve production tools across unrelated task histories', () => {
+  it('forms a byte-identical cached prefix with all fourteen production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
 
@@ -182,11 +174,13 @@ describe('SYSTEM_PROMPT', () => {
     });
 
     expect(secondPrefix).toBe(firstPrefix);
-    expect(firstParams.tools).toHaveLength(12);
+    expect(firstParams.tools).toHaveLength(14);
     expect(firstParams.tools?.map((tool) => tool.name)).toEqual([
       'read_file',
       'write_file',
+      'edit_file',
       'grep',
+      'bash',
       'navigate',
       'inspect_page',
       'click',
