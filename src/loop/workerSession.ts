@@ -17,6 +17,7 @@ import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
 } from '../model/modelDriver.js';
+import type { EvidenceStore } from '../evidence/evidenceStore.js';
 import type { OutputTableStore } from '../outputs/outputTable.js';
 import type { RunBudgetLimit, RunBudgetTracker, RunRoleUsage } from '../run/runBudget.js';
 import { appendTranscriptEvent } from '../run/transcript.js';
@@ -102,6 +103,11 @@ export interface WorkerSessionDeps {
    * RENDER the contract's table outputs before checking that they exist —
    * a table is not a file until the renderer writes it. */
   outputTables?: OutputTableStore;
+  /** The run's evidence ledger. Carried here so the submission path can
+   * check that a row's cited evidence still resolves before the check
+   * passes to the verifier (see runCompletionCheck's evidenceExists param).
+   * Absent leaves that check off, exactly like the legacy judge-less path. */
+  evidenceStore?: EvidenceStore;
   /** True when the run offers `submit_for_verification`, which makes
    * explicit submission the ONLY way to finish (see runWorkerTurn). The
    * legacy judge-less path leaves it unset and keeps implicit

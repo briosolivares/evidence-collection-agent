@@ -110,6 +110,10 @@ const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
  * @param tables - the run's table store. Omitted only by callers that have no
  *   typed rows to render (and by tests that pre-write their fixtures); when
  *   absent, a declared table output is checked as a plain file
+ * @param evidenceExists - looks up whether an evidence id still resolves.
+ *   Omitted only by callers with no evidence store; when absent, dangling
+ *   evidence references are not checked (there is nothing to check them
+ *   against)
  * @returns ok with no failures, or every defect found, plus the facts code
  *   settled along the way. Never throws for a defect — an unreadable or
  *   absent file IS a finding, not an exception
@@ -118,6 +122,7 @@ export function runCompletionCheck(
   runDir: string,
   contract: OutputContract,
   tables?: OutputTableStore,
+  evidenceExists?: (evidenceId: string) => boolean,
 ): CompletionCheckResult {
   const failures: CompletionFailure[] = [
     // A table that cannot be rendered is reported as its own failure rather
@@ -126,6 +131,17 @@ export function runCompletionCheck(
       ? []
       : renderTableOutputs(runDir, onlyTablesWithRows(contract, tables), tables)),
     ...validateManifestIntegrity(runDir),
+    // A count-ruled table's own row count can never prove a claim about the
+    // whole population — see validateTableCompleteness's own docstring. This
+    // must run whether or not there is an evidence store to check references
+    // against, so it is gated on `tables` alone.
+    ...(tables === undefined ? [] : validateTableCompleteness(contract, tables)),
+    // A row's citation can stop resolving after it was upserted, which
+    // neither rendering nor the manifest check above catches — see
+    // validateEvidenceReferences's own docstring.
+    ...(tables === undefined || evidenceExists === undefined
+      ? []
+      : validateEvidenceReferences(contract, tables, evidenceExists)),
   ];
   // Failures and settled facts come from the SAME parse of the same bytes, so
   // the two can never disagree about the file they describe.

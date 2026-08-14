@@ -890,6 +890,7 @@ export async function runTask(
         ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
         ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
         ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),
+        ...(toolchain.evidenceStore === undefined ? {} : { evidenceStore: toolchain.evidenceStore }),
         ...(v2Protocol ? { submissionProtocol: true } : {}),
       };
 
@@ -1559,6 +1560,7 @@ export async function resumeTask(
       ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
       ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
       ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),
+      ...(toolchain.evidenceStore === undefined ? {} : { evidenceStore: toolchain.evidenceStore }),
       ...(v2Protocol ? { submissionProtocol: true } : {}),
     };
     const sessionConfig = { budget, maxContextTokens };
@@ -1832,8 +1834,17 @@ async function runHarnessCycles(args: {
       if (result.kind === 'submitted' && contract !== undefined) {
         // The table store renders the contract's table outputs as part of the
         // check — without it, a run with valid typed rows is told its own
-        // deliverable is missing.
-        const checks = runCompletionCheck(runDir, contract, session.deps.outputTables);
+        // deliverable is missing. The evidence predicate lets the same call
+        // catch a row whose citation stopped resolving, and a count-ruled
+        // table with no completeness evidence on file.
+        const checks = runCompletionCheck(
+          runDir,
+          contract,
+          session.deps.outputTables,
+          session.deps.evidenceStore === undefined
+            ? undefined
+            : (id) => session.deps.evidenceStore!.get(id) !== undefined,
+        );
         settled = checks.settled;
         if (!checks.ok) {
           completionCheckFailures += 1;

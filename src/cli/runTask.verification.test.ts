@@ -170,7 +170,16 @@ describe('runTask V2 verification protocol', () => {
   it(
     'completes contract → write → submit → code check → verified without a real API call',
     async () => {
-      const worker = scriptModel([setContract(), writeCsv(), submit()]);
+      // A count-ruled table requires completeness evidence on file, even
+      // though this fixture publishes the CSV by hand with write_file
+      // rather than through the typed-row pipeline.
+      const worker = scriptModel([
+        setContract(),
+        writeCsv(),
+        captureEvidence(),
+        setCompleteness(),
+        submit(),
+      ]);
       const verifier = scriptModel([reportVerified()]);
 
       const result = await runTask('Publish the widget roster.', {
@@ -215,6 +224,11 @@ describe('runTask V2 verification protocol', () => {
         writeCsv(`${CSV}Beta,https://example.com/beta\n`),
         submit('s1'),
         writeCsv(),
+        // The row count is fixed now, but the table still has no recorded
+        // completeness — the second submission must mint it before it can
+        // pass the code checks.
+        captureEvidence(),
+        setCompleteness(),
         submit('s2'),
       ]);
       const verifier = scriptModel([reportVerified()]);
@@ -252,6 +266,8 @@ describe('runTask V2 verification protocol', () => {
         setContract(),
         writeCsv(),
         textResponse('All done — the roster is complete.'),
+        captureEvidence(),
+        setCompleteness(),
         submit(),
       ]);
       const verifier = scriptModel([reportVerified()]);
@@ -279,7 +295,19 @@ describe('runTask V2 verification protocol', () => {
   it(
     'a verifier correction reaches the same worker conversation and can then verify',
     async () => {
-      const worker = scriptModel([setContract(), writeCsv(), submit('s1'), writeCsv(), submit('s2')]);
+      // Completeness must be on file before the FIRST submission — otherwise
+      // it is rejected by the code checks rather than reaching the verifier
+      // at all, which is a different failure than the one this test is
+      // exercising.
+      const worker = scriptModel([
+        setContract(),
+        writeCsv(),
+        captureEvidence(),
+        setCompleteness(),
+        submit('s1'),
+        writeCsv(),
+        submit('s2'),
+      ]);
       const verifier = scriptModel([
         reportNeedsCorrection('The url column must use https.'),
         reportVerified(),
@@ -300,8 +328,11 @@ describe('runTask V2 verification protocol', () => {
 
       expect(result.status).toBe('verified');
       // The findings arrived as the submission's result, and the worker's
-      // whole prior conversation was still present.
-      const afterFindings = JSON.stringify(worker.requests[3]);
+      // whole prior conversation was still present. Two more calls than
+      // before the completeness step was inserted ahead of the first
+      // submission (setContract, writeCsv, captureEvidence, setCompleteness,
+      // submit('s1') — five calls, so index 5 is the one right after).
+      const afterFindings = JSON.stringify(worker.requests[5]);
       expect(afterFindings).toMatch(/Verification found problems/);
       expect(afterFindings).toMatch(/must use https/);
       expect(afterFindings).toMatch(/set_output_contract/); // history retained
@@ -317,6 +348,8 @@ describe('runTask V2 verification protocol', () => {
         toolResponse([{ id: 'n1', name: 'navigate', input: { url: 'https://example.com' } }]),
         setContract(),
         writeCsv(),
+        captureEvidence(),
+        setCompleteness(),
         submit(),
       ]);
       const verifier = scriptModel([reportVerified()]);
@@ -343,7 +376,14 @@ describe('runTask V2 verification protocol', () => {
   it(
     'exhausted verifier corrections end incomplete and mark the output partial',
     async () => {
-      const worker = scriptModel([setContract(), writeCsv(), submit('s1'), submit('s2')]);
+      const worker = scriptModel([
+        setContract(),
+        writeCsv(),
+        captureEvidence(),
+        setCompleteness(),
+        submit('s1'),
+        submit('s2'),
+      ]);
       const verifier = scriptModel([
         reportNeedsCorrection('Still wrong.'),
         reportNeedsCorrection('Still wrong again.'),
@@ -384,7 +424,7 @@ describe('runTask V2 verification protocol', () => {
     'the initializer can author the contract instead of the worker',
     async () => {
       const initializer = scriptModel([setContract()]);
-      const worker = scriptModel([writeCsv(), submit()]);
+      const worker = scriptModel([writeCsv(), captureEvidence(), setCompleteness(), submit()]);
       const verifier = scriptModel([reportVerified()]);
 
       const result = await runTask('Publish the widget roster.', {
