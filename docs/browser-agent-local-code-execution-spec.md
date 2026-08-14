@@ -7,12 +7,28 @@
 **Scope:** Worker-only local Bash execution, exact file editing, durable worker
 state, and Playwright code-as-action integration
 
-**Implementation target:** `feat/judge-harness`, currently at `cb2e22d`. This
-specification is authored on `feat/browser-agent-code-execution` and will be
-ported to that branch for implementation. It relies on the judge branch's
-existing `runAgentLoop()` and initializer → worker → judge loop; later Browser
-V2 components such as `WorkerSession`, `RunBudgetTracker`, output contracts,
-and stable observations are not prerequisites.
+**Implementation target:** `feat/judge-harness`, fast-forwarded to
+`feat/browser-agent-v2` at `658450e` (Node v22.17.0). Browser Agent V2 is
+merged and is this specification's baseline, not a later phase to design
+around. The run already has a single persistent `WorkerSession`, a whole-run
+`RunBudgetTracker`, a durable typed output-contract store, a contract-first
+gate, and a verifier that replaced the prose judge; this design is written
+against that baseline throughout, not against the pre-V2 loop.
+
+| V2 component          | Lives at                                      | Baseline behavior this spec assumes                                            |
+| ---------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------- |
+| `WorkerSession`        | `src/loop/workerSession.ts`                   | One persistent conversation for the whole run; no fresh conversation per cycle |
+| `RunBudgetTracker`     | `src/run/runBudget.ts`                        | One whole-run, closure-local tracker shared by every model role                |
+| Output contract store  | `src/contracts/outputContractStore.ts`        | Durable, typed contract revisions; no `INTENT.md`/`CONTRACT.md` on this path   |
+| Contract-first gate    | `src/contracts/contractFirstGate.ts`          | Gates on contract existence before any other worker tool call may run          |
+| Verifier               | `src/harness/verifier.ts`                     | Typed replacement for the deleted prose judge                                  |
+| V2 tool registry       | `src/tools/index.ts` (`V2_TOOL_ORDER`)        | 22-tool frozen order, built only when `harness.outputContract` is on           |
+
+Terminology note: this runtime has no judge. `src/harness/judge.ts` is
+deleted; the verifier (`src/harness/verifier.ts`) plays that role, and
+`runVerificationHarness` (`src/cli/runTask.ts:627-840`) is the outer loop
+that used to be called the judge-harness cycle. This document says
+"verifier" throughout, including where the pre-V2 draft said "judge."
 
 ## 1. Overview
 
@@ -28,8 +44,8 @@ code-as-action:
   durable home for generated scripts;
 - let generated scripts attach to the browser agent's selected Chrome page and
   use Playwright locators, waits, loops, and extraction;
-- keep orchestration, model history, usage/limit state, judge state, manifests,
-  and checkpoints in the harness rather than in a command process;
+- keep orchestration, model history, usage/limit state, verifier state,
+  manifests, and checkpoints in the harness rather than in a command process;
 - recover a run from its run directory if the harness or command process dies.
 
 This design does **not** use any remote sandbox. Bash runs locally as the same
@@ -50,7 +66,7 @@ and persistence boundary, not a security boundary.
    transcript.
 7. Resume from a durable checkpoint without replaying an uncertain
    state-changing operation.
-8. Keep Bash and edit capabilities out of the initializer and judge.
+8. Keep Bash and edit capabilities out of the initializer and verifier.
 
 ## 3. Non-goals
 
@@ -67,11 +83,12 @@ and persistence boundary, not a security boundary.
 - Supporting background commands in the first version.
 - Treating the transcript as the recovery database.
 - Allowing generated scripts to publish deliverables without the normal
-  manifest and judge-harness checks.
-- Replacing `write_file`, `read_file`, `grep`, or browser tools. If
-  page-scoped `execute_javascript` is ported later, it remains available for
-  simple DOM work.
-- Giving Bash, file writes, or browser mutation to the initializer or judge.
+  manifest and verification-harness checks.
+- Replacing `write_file`, `read_file`, `grep`, or browser tools, including
+  page-scoped `execute_javascript` (V2 tool order only), which remains
+  available for simple DOM work.
+- Giving Bash, file writes, or browser mutation to the initializer or
+  verifier.
 
 ## 4. Binding decisions
 
@@ -89,9 +106,12 @@ and persistence boundary, not a security boundary.
 | File edit matching                     | Exact code-unit match only; no quote, whitespace, newline, indentation, or Unicode normalization |
 | File edit persistence                  | Entire resulting byte sequence is written through `writeArtifact()`                              |
 | Workspace file sync limit              | 256 MiB per regular file; larger files fail before being read into memory                        |
-| Bash scheduling                        | State-changing barrier; one command at a time                                                    |
+| Bash scheduling                        | `getAccess` reports `{ reads: [], writes: [], exclusive: true }`; one command at a time          |
 | Background processes                   | Not supported initially                                                                          |
-| Tool exposure                          | Main worker only; initializer and judge remain incapable of mutation                             |
+| Tool exposure                          | Main worker only; initializer and verifier remain incapable of mutation                          |
+| Contract-bound deliverables            | `edit_file` refuses any path matching a `filename` in the current output contract; the worker uses `upsert_output_rows` or `write_document` instead |
+| Tool scheduling model                  | `getAccess`/`ToolAccess` conflict detection (`accessesConflict`), not the legacy `readOnly` binary |
+| Tool-deadline ceiling                  | `bash` declares an explicit `timeoutMs` well above the pipeline's 120 s `DEFAULT_TOOL_TIMEOUT_MS`, covering its own timeout ceiling plus SIGTERM grace and sync/refresh headroom |
 
 ## 5. Architecture
 
@@ -223,13 +243,18 @@ and raw exit reporting already provide the behavior this agent needs.
   manifest.json                    existing provenance index
   transcript.jsonl                 existing append-only audit log
   metrics.json                     existing terminal metrics
-  harness/                         harness-private durable state
+  harness.json                     existing terminal harness diagnostics, written once at run end
+  harness/                         new harness-private durable state (distinct from harness.json above)
     run.lock                       exclusive ownership of a resumable run
     checkpoint.json                atomically replaced resumable state
   artifacts/                       published outputs and evidence
   scratch/
-    workspace/                     Bash working directory
     tool-output/                   existing oversized result offloads, including Bash output
+    evidence/                      existing evidence captures
+    output-contract/               existing contract revision history
+    documents/                     existing rendered documents
+    research-jobs/                 existing research job state
+    workspace/                     new: Bash working directory
 ```
 
 `scratch/workspace` is private, durable working state. It is not graded or
@@ -241,9 +266,13 @@ scripts through `write_file`, modify them through `edit_file`, and execute
 them through `bash`.
 
 `harness/` is not part of the agent workspace and is never exposed as a valid
-model-supplied file-tool path. `scratch/tool-output/` remains the single home
-for oversized tool results; Bash does not introduce a parallel
-`command-output/` convention.
+model-supplied file-tool path. It coexists with the existing root-level
+`harness.json` file (`src/harness/harness.ts:20,78-84`), written once at the
+end of a harness-mode run's cycle loop: one is a directory holding resumable
+control state, the other a flat diagnostics summary, and the two never
+collide on disk. `scratch/tool-output/` remains the single home for
+oversized tool results; Bash does not introduce a parallel `command-output/`
+convention.
 
 Create new `harness/` and `scratch/workspace/` directories with mode `0700` and
 harness-state files with mode `0600` on POSIX systems. Existing directories are
@@ -297,41 +326,61 @@ local Claude Code contract it is based on, `file_path` is run-directory
 relative rather than absolute because every model-supplied path remains behind
 `resolveRunPath()`.
 
+`edit_file` declares `getAccess`, not merely `readOnly: false`: it returns
+`{ reads: [], writes: [accessKey.file(path), accessKey.manifest()] }`
+(`src/tools/registry.ts:66-99`), so the scheduler's `accessesConflict`
+(`registry.ts:103`) serializes it against any other call reading or writing
+the same file or the manifest, while an edit to an unrelated file, or a
+concurrent read, remains free to overlap.
+
 #### Required behavior
 
 1. Classify the requested path using the same workspace partition logic as
    `write_file`. Only existing regular files under `artifacts/` or `scratch/`
    are editable.
-2. Resolve the path through `resolveRunPath()`.
-3. Fail if the file is absent, is a directory, or is a symbolic link.
-4. Read the file size before its contents and fail before allocation when it
+2. Resolve `ctx.outputContracts?.currentContract()` fresh on every call —
+   never cached, so a revision accepted a moment ago applies to this very
+   edit — and refuse the call if `file_path` matches a `filename` declared by
+   any `table` or `document` output in that contract. A contract-bound
+   deliverable may be written only by the tool that owns it: direct the
+   worker to `upsert_output_rows` for a `table` output or `write_document`
+   for a `document` output instead. This narrows, rather than widens, the
+   existing hole V2 already documents for `validateDocumentOutputs` (which
+   checks a path, not provenance); `write_file` keeps the same hole, and
+   closing that is out of scope here. A run with no output-contract store
+   (the legacy path, fixture tests) has nothing to protect this way.
+3. Resolve the path through `resolveRunPath()`.
+4. Fail if the file is absent, is a directory, or is a symbolic link.
+5. Read the file size before its contents and fail before allocation when it
    exceeds the fixed 64 MiB edit limit.
-5. Read the file as bytes.
-6. Decode only byte-stable UTF-8. Re-encoding the decoded string must reproduce
+6. Read the file as bytes.
+7. Decode only byte-stable UTF-8. Re-encoding the decoded string must reproduce
    the original bytes exactly before any edit is attempted. This preserves a
    UTF-8 BOM and rejects invalid UTF-8 or unsupported encodings instead of
    corrupting them.
-7. Reject an empty `old_string`. File creation and insertion without an exact
+8. Reject an empty `old_string`. File creation and insertion without an exact
    anchor belong to `write_file`.
-8. Reject `old_string === new_string` as a no-op.
-9. Count exact, non-overlapping occurrences of `old_string` without any
-   normalization.
-10. Fail if there are zero occurrences.
-11. When `replace_all` is false or omitted, require exactly one occurrence.
+9. Reject `old_string === new_string` as a no-op.
+10. Count exact, non-overlapping occurrences of `old_string` without any
+    normalization.
+11. Fail if there are zero occurrences.
+12. When `replace_all` is false or omitted, require exactly one occurrence.
     Multiple occurrences fail with the count and instruct the worker to add
     context or set `replace_all: true`.
-12. When `replace_all` is true, replace every exact occurrence and report the
+13. When `replace_all` is true, replace every exact occurrence and report the
     count. Apply replacements with a callback or equivalent literal operation so
     JavaScript replacement tokens such as `$&` and `$1` inside `new_string` are
     inserted verbatim.
-13. Encode the complete resulting string as UTF-8 and write those complete
+14. Encode the complete resulting string as UTF-8 and write those complete
     bytes through `writeArtifact()`.
-14. For a scratch file, pass no roles. For a published file, require its
+15. For a scratch file, pass no roles. For a published file, require its
     existing manifest entry and preserve its roles. A content edit clears
-    `sourceUrl`; edited bytes are no longer an exact capture. If
-    `completionStatus` is ported to the judge branch before implementation, clear
-    it as well so edited bytes must pass completion again.
-15. Return `EditFileResult` using the normalized run-relative path. The updated
+    `sourceUrl`; edited bytes are no longer an exact capture. `completionStatus`
+    exists in V2 (`ManifestEntry.completionStatus?: 'complete' | 'partial'`,
+    `src/run/artifacts.ts:27-48`) and is unconditionally cleared through
+    `setArtifactCompletionStatus` (`artifacts.ts:243`) by the same edit, so
+    edited bytes must pass completion again.
+16. Return `EditFileResult` using the normalized run-relative path. The updated
     hash already lives in the manifest and is not duplicated in the tool result.
 
 There is intentionally no fuzzy matching. The implementation must not:
@@ -345,13 +394,15 @@ There is intentionally no fuzzy matching. The implementation must not:
 - create a missing file.
 
 The operation is synchronous from the execution-time read through
-`writeArtifact()` and is a state-changing scheduler barrier. Do not perform an
-asynchronous operation between the final read, match validation, replacement,
-and write. Validation that touches the filesystem is repeated inside
-`execute`; a successful earlier schema/permission check is never treated as a
-current file snapshot. The exact `old_string` also acts as an optimistic
-concurrency guard: if the file no longer contains what the model read, the
-edit fails instead of guessing.
+`writeArtifact()`, serialized by its `getAccess` declaration against any
+other call on the same file or the manifest — not a blanket barrier across
+every other tool call, the way an `exclusive` declaration would be. Do not
+perform an asynchronous operation between the final read, match validation,
+replacement, and write. Validation that touches the filesystem is repeated
+inside `execute`; a successful earlier schema/permission check is never
+treated as a current file snapshot. The exact `old_string` also acts as an
+optimistic concurrency guard: if the file no longer contains what the model
+read, the edit fails instead of guessing.
 
 #### Example errors
 
@@ -395,6 +446,31 @@ before a checkpoint transition, browser
 preparation, or process spawn; timeout values above the maximum are rejected
 rather than silently clamped.
 
+`bash` declares `getAccess` explicitly as `{ reads: [], writes: [],
+exclusive: true }` rather than depending on the registry's fail-closed
+`EXCLUSIVE_ACCESS` default for a tool that declares no `getAccess`
+(`src/tools/registry.ts:131`). A shell command can touch anything on the
+host, so its exclusivity is stated in the tool definition rather than left to
+an omission the scheduler happens to treat safely.
+
+The tool's own `ToolDef.timeoutMs` — the pipeline's wall-clock ceiling for
+this call — is a separate value from the model-facing `timeout_ms` above, and
+must exceed it by a wide margin. `withToolDeadline`
+(`src/tools/pipeline.ts:218-235`) ABANDONS rather than cancels a call once
+`DEFAULT_TOOL_TIMEOUT_MS` (120 s, `pipeline.ts:45`) elapses, and `timeout_ms`'s
+own maximum is also 120 s: without a distinct, larger `timeoutMs`, the
+pipeline deadline could fire at the same moment as the command's own timeout
+and abandon a live process group mid-cleanup, leaking it. Summing the worst
+case — the 120 s command ceiling, the fixed two-second SIGTERM-then-SIGKILL
+grace period, the post-exit stray-descendant kill and stream-drain deadline
+(roughly 3.5 s more), `syncScratchWorkspace()` (bounded generously at 10 s,
+since a workspace file may be up to 256 MiB), and, for `uses_browser` calls,
+`refreshAfterBrowserScript()` (a CDP round trip, bounded generously at 5 s) —
+comes to roughly 140.5 s. `bash` therefore declares `timeoutMs` at 150,000 ms
+(2.5 minutes), comfortably clear of every legitimate completion path, so
+tripping the pipeline deadline at that point means something is genuinely
+wedged, not that Bash was merely slow.
+
 #### Model-facing result
 
 ```ts
@@ -434,9 +510,17 @@ scheme.
 2. Create `scratch/workspace/` with owner-only permissions if absent. Do not
    pre-create or require an internal directory taxonomy.
 3. Create a command-specific abort controller linked to
-   `ToolCtx.abortSignal`. If it is already aborted, do not spawn; return a
-   terminal `cancelled` result. `RunTaskConfig` gains the corresponding optional
-   signal, and the TUI passes its existing run-cancellation signal through.
+   `ToolCtx.abortSignal`. `ToolCtx` has no `abortSignal` today
+   (`src/tools/registry.ts:29-50`) and neither does `RunTaskConfig`; no
+   tool-level cancellation exists anywhere in the codebase, since the only
+   existing cancellation is the TUI wrapping `config.callModel` with its own
+   AbortController (`src/tui/bridge/runSession.ts:112-184`), which lands only
+   at the next model-call boundary. This feature adds `ToolCtx.abortSignal`
+   and a corresponding optional `RunTaskConfig.signal`, and the TUI forwards
+   its existing run-cancellation signal through — the first tool-level
+   cancellation the codebase gains; every other tool remains uncancellable
+   once started. If the signal is already aborted, do not spawn; return a
+   terminal `cancelled` result.
 4. When `uses_browser` is true, require both browser-script lifecycle methods,
    call `browserController.prepareForBrowserScript()`, and add the bundled
    helper URL plus the returned CDP values to the command environment. Then
@@ -542,11 +626,12 @@ workspace that it synchronizes.
 
 ## 9. Playwright code-as-action
 
-When page-scoped `execute_javascript` is available, it remains the cheapest
-tool for DOM-only extraction. It is not present on the judge-branch baseline
-and is not required here. Bash is valuable when the task needs Playwright
-locators, auto-waiting, loops, branching, popups, downloads, or a reusable
-script.
+`execute_javascript` is part of the frozen V2 tool order
+(`src/tools/index.ts:160`) and remains the cheapest tool for DOM-only
+extraction; the legacy atomic registry has no page-scoped JavaScript
+equivalent. Bash is valuable when the task needs Playwright locators,
+auto-waiting, loops, branching, popups, downloads, or a reusable script —
+capabilities `execute_javascript` does not offer.
 
 ### 9.1 Preparing the browser for a generated script
 
@@ -568,8 +653,8 @@ interface BrowserController {
 
 `prepareForBrowserScript()` returns the two values needed to connect to the
 currently selected page. The Bash tool maps them to `SHERLOCK_CDP_URL` and
-`SHERLOCK_SELECTED_PAGE_TARGET_ID`. The existing state-changing scheduler
-prevents another browser tool from running alongside Bash, so no ownership
+`SHERLOCK_SELECTED_PAGE_TARGET_ID`. `bash`'s `exclusive: true` access (§11)
+prevents another browser tool from running alongside it, so no ownership
 mechanism or retained setup state is necessary.
 
 Browser-script support exists only when both optional methods are present; a
@@ -581,6 +666,12 @@ The local Playwright provider launches Chrome with an ephemeral loopback CDP
 endpoint and is the only provider implementing these methods in the first
 version. Other providers omit both methods. Ordinary Bash still runs;
 `uses_browser: true` fails before spawn with a capability-unavailable error.
+
+`launchPersistentChrome` (`src/browser/playwrightBrowserController.ts:186-198`)
+passes no `args` array today and never sets `--remote-debugging-port`; there
+is zero existing CDP usage anywhere in the codebase — no `newCDPSession`, no
+`connectOverCDP`, no `Target.getTargetInfo`. This feature adds the first
+`args` array and the first CDP client the codebase has ever launched.
 
 The provider starts Chrome with `--remote-debugging-port=0`, reads the resulting
 `DevToolsActivePort` from its user-data directory, validates that the endpoint
@@ -640,29 +731,65 @@ can decide whether to retry, inspect the page, or continue with ordinary Bash.
 ### 9.3 Refreshing browser state after the script
 
 `refreshAfterBrowserScript()` always runs after the command settles when
-preparation succeeded. On the judge-branch controller it inventories live
-`BrowserContext.pages()` and reconciles the selected `activePage`. That
-controller has no separate document/observation store, so this feature does
-not add one solely for refresh. If stable browser identity is ported later,
-refresh must also invalidate old element refs and observation baselines.
+preparation succeeded. It inventories live `BrowserContext.pages()` and
+reconciles the selected `activePage`. The controller does have a separate
+document/observation state store — `BrowserStateStore`
+(`src/browser/browserState.ts:241-308`) holds the monotonic id sequences, a
+bounded LRU of `cachedObservations`, and `observationCounters` — so this
+feature does not need to invent one; it needs to use it. In-place DOM
+mutation with no navigation does not rotate `documentId`
+(`playwrightBrowserController.ts:848-865` rotates it only inside the
+`framenavigated` handler) and therefore does not invalidate element refs or
+cached observation baselines. Nothing proactively purges them today —
+staleness is normally detected lazily, at use — so a generated script that
+mutates the DOM without navigating would otherwise leave stamped refs and
+cached observations silently valid-looking but stale. `refreshAfterBrowserScript()`
+must therefore conservatively invalidate every tracked page's observation
+state as part of this reconciliation: rotate each tracked frame's
+`documentId` (the same mechanism `framenavigated` uses for a real
+navigation) so every pre-script ref becomes stale and `resolveElementRef`
+rejects it, and drop each page's cached observation baselines (the same
+effect as `BrowserStateStore.forgetPage`) so no diff can be computed against
+a since-mutated DOM. This is deliberately conservative: at worst it forces a
+redundant re-observation, and it can never cause a wrong-target action,
+because a stale ref is rejected rather than silently resolved to the wrong
+node.
 
-If the selected page was closed, the controller selects a remaining live page
-or creates a fresh task page. If the script closed the entire browser
-session, refresh fails loudly and later browser tools remain unavailable;
-recreating a session mid-run is outside the first version. Repeated refresh is
-a no-op once controller state matches the live browser.
+`observe()` is the only way to re-mint refs and record a fresh baseline under
+V2, and is therefore the required follow-up call after Bash, not
+`inspect_page` — the atomic-registry tool `inspect_page` is absent from
+`V2_TOOL_ORDER` and plays that role only on the legacy path.
 
-The Bash result does not pretend to describe current browser state. The system
-prompt instructs the model to call `inspect_page` after browser automation,
-often in the same response after the Bash call, so the scheduler executes it
-after Bash's state-changing barrier.
+If the selected page was closed, the controller today leaves `activePage`
+`undefined` with no automatic fallback (`playwrightBrowserController.ts:910-925`).
+This feature's refresh path changes that deliberately: `refreshAfterBrowserScript()`
+selects a remaining live tracked page, or creates a fresh task page when none
+remain. This behavior change is confined to the refresh path; it does not
+alter what happens when a page closes outside of a Bash call. If the script
+closed the entire browser session, refresh fails loudly and later browser
+tools remain unavailable; recreating a session mid-run is outside the first
+version. Repeated refresh is a no-op beyond another conservative invalidation
+pass once controller state matches the live browser.
+
+The Bash result does not pretend to describe current browser state. The
+system prompt instructs the model to call `observe()` under V2 (or
+`inspect_page` on the legacy path) after browser automation, often in the
+same response after the Bash call, so the scheduler executes it after Bash's
+exclusive barrier.
 
 ## 10. Durable harness state
 
-The judge branch's `runAgentLoop()` state and `runHarnessCycles()` progress are
-memory-only. The new design makes the state required for continuation explicit
-and serializable without introducing a `WorkerSession` class or changing the
-judge harness's current fresh-conversation-per-cycle behavior.
+V2 already gives a run two pieces of long-lived, in-memory state: the single
+persistent `WorkerSession` (`src/loop/workerSession.ts`) that spans every
+correction cycle — used identically by the compatibility `runAgentLoop()`
+wrapper (`src/loop/agentLoop.ts:12`) for a single-cycle run and by
+`runVerificationHarness` (`src/cli/runTask.ts:627-840`) for a multi-cycle one
+— and the whole-run `RunBudgetTracker` (`src/run/runBudget.ts`) every model
+role charges into. Neither is checkpointed today, and neither offers a
+restore seam: `createWorkerSession` and `createRunBudgetTracker` only ever
+build fresh state. This design adds the serialization and restore machinery
+both need, rather than inventing a competing state model or reintroducing the
+pre-V2 fresh-conversation-per-cycle behavior V2 deliberately removed.
 
 ### 10.1 Run ownership
 
@@ -702,7 +829,7 @@ interface RunCheckpointV1 {
     | "initializing"
     | "ready_for_model"
     | "executing_tools"
-    | "judging"
+    | "verifying"
     | "terminal";
   updatedAt: string;
 
@@ -710,37 +837,65 @@ interface RunCheckpointV1 {
     model: string;
     toolProfile: ToolProfile;
     maxOutputTokens: number;
-    maxTurns: number | "unbounded";
     maxContextTokens: number;
     startUrl?: string;
+    /** `config.harness?.outputContract` (v2Protocol) — governs whether
+     * `initializerFiles` or `contract` below applies. */
+    outputContract: boolean;
     harness?: {
       maxWorkerCycles: number;
+      maxCompletionCheckFailures: number;
+      contractAuthor: ContractAuthor;
     };
   };
 
-  initializer?: {
+  /** Every RunBudgetConfig field, Infinity encoded as "unbounded" — see the
+   * discussion below for why this now covers all six ceilings, not only
+   * worker turns. */
+  budgetConfig: {
+    maxWorkerTurns: number | "unbounded";
+    maxToolCalls: number | "unbounded";
+    maxModelTokens: number | "unbounded";
+    maxToolResultBytes: number | "unbounded";
+    maxWallTimeMs: number | "unbounded";
+    maxVerifierCorrections: number | "unbounded";
+  };
+  /** RunBudgetSnapshot (src/run/runBudget.ts), captured with
+   * captureRunBudgetSnapshot() and restored by passing it as
+   * createRunBudgetTracker(config, { restore: snapshot }). Absent only
+   * while runStatus is "initializing". */
+  budget?: RunBudgetSnapshot;
+
+  /** Prose path only (runConfiguration.outputContract === false): mirrors
+   * today's INTENT.md/CONTRACT.md flow. Absent on the typed path, where V2
+   * writes neither file. */
+  initializerFiles?: {
     acceptedOutput?: InitializerResult;
     filesWritten: boolean;
   };
 
-  agentLoop?: {
-    messages: Message[];
-    turnCount: number;
-    inputTokens: number;
-    outputTokens: number;
-    cacheReadInputTokens: number;
-    cacheCreationInputTokens: number;
-    peakContextTokens: number;
-    elapsedWallTimeMs: number;
+  /** Typed path only (runConfiguration.outputContract === true). The
+   * revisions themselves are never duplicated here — see 10.5 for why this
+   * is a cross-check value, not the recovery source of truth. */
+  contract?: {
+    lastKnownRevision: number;
   };
 
+  /** WorkerSessionSnapshot (src/loop/workerSession.ts), captured with
+   * captureWorkerSessionSnapshot() and restored with restoreWorkerSession().
+   * Absent only while runStatus is "initializing". */
+  workerSession?: WorkerSessionSnapshot;
+
   runProgress: {
-    mode: "single_worker" | "judge_harness";
+    /** Which outer driver to resume into: the compatibility runAgentLoop()
+     * wrapper (one cycle, no verifier) or runVerificationHarness (up to
+     * maxWorkerCycles cycles, each checked by the verifier). Both wrap the
+     * same WorkerSession/RunBudgetTracker machinery underneath. */
+    mode: "single_worker" | "verification_harness";
+    /** Meaningful only for verification_harness; always 1 for single_worker. */
     currentCycle: number;
-    openingMessage: string;
+    completionCheckFailures: number;
     cycleRecords: HarnessCycleRecord[];
-    completedCycleMetrics: RunMetrics[];
-    completedWorkerResult?: LoopResult;
   };
 
   pendingTurn?: {
@@ -753,26 +908,37 @@ interface RunCheckpointV1 {
     }>;
   };
 
-  finalResult?: LoopResult;
+  finalResult?: LoopResult | RunOutcome;
 }
 ```
 
-The checkpoint stores current control state, not copies of artifact bytes. The
-initializer output is included only until its deterministic `INTENT.md` and
-`CONTRACT.md` writes are confirmed. `completedCycleMetrics` is the small
-in-memory input needed for the existing final metrics rollup; the archived
-cycle files remain the audit copies.
+The checkpoint stores current control state, not copies of artifact bytes.
+On the prose path the initializer output is included only until its
+deterministic `INTENT.md` and `CONTRACT.md` writes are confirmed; on the
+typed path, `contract.lastKnownRevision` exists only so recovery can assert
+the store it rebuilds from disk (10.5) agrees with the last state a
+checkpoint saw — the revisions are never re-serialized into the checkpoint
+itself. There is no `completedCycleMetrics`/`completedWorkerResult` parking
+lot: V2's per-cycle metrics archival is gone along with the
+fresh-loop-per-cycle model it served (`src/harness/harness.ts:9-14`), and the
+"worker cycle awaiting verification" state is just the pending
+`submit_for_verification` call already captured by `pendingTurn` — see 10.4.
 
-`agentLoop` may be absent only while `runStatus` is `initializing`, before the
-first worker cycle begins. It is required for `ready_for_model`,
-`executing_tools`, `judging`, and `terminal` checkpoints.
+`workerSession` and `budget` may be absent only while `runStatus` is
+`initializing`, before the first worker turn begins. Both are required for
+`ready_for_model`, `executing_tools`, `verifying`, and `terminal`
+checkpoints, in every mode: both the compatibility wrapper and the
+verification harness build their own `WorkerSession` and `RunBudgetTracker`,
+so there is exactly one state shape to checkpoint regardless of `mode`.
 
-The judge branch has no `RunBudgetTracker`. Its actual limits and accounting
-live in `LoopConfig`, the agent-loop token totals, turn count, peak context,
-elapsed time, and `maxWorkerCycles`. The checkpoint persists those exact values
-so restart does not reset a turn, context, usage, wall-time, or cycle limit.
-`'unbounded'` represents the existing `Infinity` max-turns value because JSON
-cannot encode `Infinity` faithfully.
+Every `RunBudgetConfig` field routinely holds `Infinity` — in production
+today only `maxWorkerTurns` and `maxVerifierCorrections` are finite, and the
+other four are hardcoded `Infinity` — and `JSON.stringify` turns `Infinity`
+into `null`. `'unbounded'` therefore represents `Infinity` for every ceiling
+in `budgetConfig`, not only worker turns: encoding `null` for an unbounded
+tool-call, token, byte, or wall-time ceiling would be indistinguishable from
+an absent or invalid value on read-back, whereas the existing draft's
+treatment of max-turns alone would leave five of six ceilings ambiguous.
 
 ### 10.3 Atomic persistence
 
@@ -816,18 +982,29 @@ validation detects tampering or accidental writes.
 
 Save after every durable state transition:
 
-1. initial run configuration, before the optional initializer call;
-2. acceptance of initializer output, before writing `INTENT.md` and
-   `CONTRACT.md`, and again after those files exist;
-3. creation or restoration of the current agent-loop state;
+1. initial run configuration and the whole-run budget tracker's starting
+   state, before the optional initializer call;
+2. on the prose path (`runConfiguration.outputContract === false`),
+   acceptance of initializer output, before writing `INTENT.md` and
+   `CONTRACT.md`, and again after those files exist; on the typed path,
+   after each accepted `set_output_contract` revision (the revision itself is
+   already durable — see 10.5 — so this save only advances
+   `contract.lastKnownRevision`);
+3. creation or restoration of the current `WorkerSession` state;
 4. acceptance of a complete worker model response, before any requested tool
    runs;
 5. before each state-changing tool starts (`executionStatus: running`);
-6. after each tool result is saved (`executionStatus: finished`);
-7. after a worker cycle and its metrics are complete, before the judge runs;
-8. after the judge verdict or failure updates the cycle record, next opening
-   message, or final result;
-9. when the run reaches a terminal outcome.
+6. after each tool result is saved (`executionStatus: finished`), including
+   the code-level completion checks that run before a submission reaches the
+   verifier;
+7. after a rejected submission decrements `cycle` and the worker continues
+   the same conversation (`runProgress.completionCheckFailures` incremented);
+8. after a worker cycle completes or exhausts budget, before the verifier
+   runs (`runStatus: "verifying"`);
+9. after `appendSubmissionResult` resolves the pending
+   `submit_for_verification` call with the verifier's outcome, updating the
+   cycle record and either the next opening message or `finalResult`;
+10. when the run reaches a terminal outcome.
 
 The transcript is written alongside these transitions for auditability, but
 recovery does not reconstruct model messages by heuristically replaying JSONL.
@@ -868,13 +1045,38 @@ It performs the following sequence:
    `config.confirmPreviousCommandStopped === true`, then run
    `syncScratchWorkspace()` so surviving command-created files are reflected in
    the manifest.
-4. Verify every current manifest entry still matches its file and hash.
-5. If initialization was interrupted after its output was accepted, finish the
-   deterministic `INTENT.md` and `CONTRACT.md` writes without another
-   initializer call. If no initializer output was accepted, the read-only model
-   call may be retried.
-6. Restore agent-loop messages, usage counters, elapsed time, current judge
-   cycle, completed cycle records, and archived-metrics inputs.
+4. Verify every current manifest entry still matches its file and hash. V2
+   already has this exact check — `verifyManifestFiles`
+   (`src/run/artifacts.ts`) — built deliberately independent of
+   `validateManifestIntegrity` (`src/completion/completionCheck.ts:178-230`)
+   because that function follows symlinks via `existsSync`/`readFileSync`,
+   which is tolerable on its ordinary submission-time path but not for
+   recovering a run directory a crashed or untrusted worker left behind.
+   Recovery reuses `verifyManifestFiles`, not a fourth ad hoc reader.
+5. On the prose path, if initialization was interrupted after its output was
+   accepted, finish the deterministic `INTENT.md` and `CONTRACT.md` writes
+   without another initializer call; if no initializer output was accepted,
+   the read-only model call may be retried. On the typed path there is no
+   `INTENT.md`/`CONTRACT.md` to finish: instead, rebuild the output-contract
+   store by reading back every `scratch/output-contract/revision-<n>.json`
+   file in order and reconstructing the store's in-memory `history` from
+   them, without re-running `setOutputContract`'s acceptance validation — the
+   files were already accepted once, and re-validating them could reject a
+   revision that was legal when it landed but violates a rule tightened
+   since. `createOutputContractStore` has no such restore path today; this
+   feature adds one. Confirm the rebuilt history's highest revision matches
+   `contract.lastKnownRevision`.
+6. Restore the `WorkerSession` with `restoreWorkerSession(snapshot, deps,
+   config)` (`src/loop/workerSession.ts`) from the checkpoint's
+   `workerSession` snapshot plus freshly supplied `deps`/`config` — it does
+   not re-run `workerProtocolBrief`, because the snapshot's `messages` already
+   contain the real opening message and history; replaying the brief would
+   duplicate per-run protocol text the model already saw and has been acting
+   on. Restore the `RunBudgetTracker` with `createRunBudgetTracker(config, {
+   restore: budgetSnapshot })`, which backdates its internal `startedAt` by
+   the snapshot's `elapsedWallTimeMs` so `maxWallTimeMs` accounting picks up
+   exactly where the prior instance left off in a new process, rather than
+   silently resetting or double-counting harness downtime.
 7. Open a fresh task tab in the newly supplied browser.
    `runForegroundCommand()` is stateless and needs no rehydration.
 8. If every call in a pending turn is still `pending`, continue that turn.
@@ -887,11 +1089,14 @@ It performs the following sequence:
     old browser refs or IDs.
 12. Append one recovery notice to the worker conversation explaining that
     scratch/artifacts survived but browser state was recreated.
-13. If recovery starts in `judging`, run the judge against the stored completed
-    worker result without repeating that worker cycle. Otherwise continue the
-    current fresh judge-cycle conversation from `ready_for_model`.
+13. If recovery starts in `verifying`, resolve the pending
+    `submit_for_verification` call by running the verifier — its code-level
+    completion checks already passed, or the run would not have reached this
+    status — without repeating the worker cycle that produced it. Otherwise
+    continue the current worker turn from `ready_for_model`.
 14. If the checkpoint is terminal, complete any idempotent manifest/metrics
-    finalization and return its stored `LoopResult` without a model or tool call.
+    finalization and return its stored `finalResult` without a model or tool
+    call.
 
 An example interruption result is:
 
@@ -907,36 +1112,98 @@ claimed for arbitrary shell effects.
 
 ## 11. Scheduling and concurrency
 
-- `edit_file` is always state-changing.
-- `bash` is always state-changing, even when the command appears read-only.
-- Both remain barriers under the existing scheduler.
+V2's scheduler (`src/loop/scheduler.ts`) no longer groups calls by a
+read-only/state-changing binary. It derives each call's `ToolAccess` —
+`{ reads, writes, exclusive? }` — from validated input via `ToolDef.getAccess`
+and overlaps two calls only when `accessesConflict` (`src/tools/registry.ts:103`)
+says neither writes a key the other reads or writes. `readOnly` survives only
+as the compatibility fallback for a tool that declares no `getAccess`.
+
+- `edit_file` declares `getAccess` returning `{ reads: [],
+  writes: [accessKey.file(path), accessKey.manifest()] }`. It conflicts with
+  any other call reading or writing the same file or the manifest, but not
+  with an edit or read of an unrelated file — strictly more parallelism than
+  the old binary allowed, and strictly safer, since a call that happens to
+  read the same file a concurrent edit writes no longer slips through.
+- `bash` declares `getAccess` returning `{ reads: [], writes: [],
+  exclusive: true }`. `exclusive` is unconditional under `accessesConflict`:
+  a Bash call conflicts with every other call, including one that names
+  nothing Bash touches, so it always runs alone — not because the scheduler
+  treats an unclassifiable tool as exclusive by default (`EXCLUSIVE_ACCESS`,
+  `registry.ts:131`, is that fallback), but because `bash` states its own
+  exclusivity directly.
 - The first version runs only one Bash process per run.
-- The existing state-changing barrier excludes browser actions and
-  `inspect_page` until Bash and its final browser refresh finish. If page
-  JavaScript or page switching is ported later, the same barrier covers them.
-- `read_file` and `grep` may run in parallel only when no earlier
-  state-changing barrier is outstanding, preserving the current scheduler
-  contract.
-- No static command parser attempts to infer whether a command is read-only.
+- Because Bash is `exclusive`, it forms a barrier around browser actions,
+  `observe()`/`inspect_page`, and any other tool call in the same scheduler
+  group, until Bash and its final `refreshAfterBrowserScript()` call finish.
+  This follows directly from `exclusive: true`, not from a separate
+  read-only/state-changing classification.
+- `read_file` and `grep` overlap each other and any other call touching
+  unrelated keys, exactly as before; either still conflicts with a concurrent
+  `edit_file` on the same file or any outstanding `bash` call.
+- No static command parser attempts to infer whether a command is read-only;
+  `bash`'s `exclusive: true` is declared, never inferred from its argument.
 
 ## 12. Tool registration and prompt stability
 
-`edit_file` belongs in the existing file-tools source group immediately after
-`write_file`:
+There are two production registries, and this feature adds `edit_file` and
+`bash` to **both** (decision 1), because `harness.outputContract` defaults to
+`false`: `createProductionRegistry` is what an ordinary REPL/TUI run actually
+gets, so a V2-only registration would leave both tools unavailable there.
+
+Legacy registry (`src/tools/index.ts`, `fileTools`), `edit_file` and `bash`
+joining the existing file-tools group:
 
 ```ts
-export const fileTools = [readFileTool, writeFileTool, editFileTool, grepTool];
+export const fileTools = [readFileTool, writeFileTool, editFileTool, grepTool, bashTool];
 ```
 
-`bashTool` is appended directly after `fileTools` in the worker's production
-registry. Initializer and judge model calls remain tool-less.
+V2 registry (`V2_TOOL_ORDER`), the same five-tool group in the same order,
+appended to the existing "Files, for scratch and supporting work" section:
 
-The resulting production tool order is frozen and deterministic. Enabling the
-feature requires one intentional prompt-prefix version change; it must not
-vary based on task text, current workspace contents, dependencies, or whether
-browser-script support is presently available. Browser-script availability
-belongs in tool results and dynamic context, not in the static system prompt or
-tool schema.
+```ts
+// Files, for scratch and supporting work.
+'read_file', 'write_file', 'edit_file', 'grep', 'bash',
+```
+
+Decision 2: the files group order is exactly `read_file, write_file,
+edit_file, grep, bash` in both registries — `edit_file` immediately after
+`write_file` (both create/modify file bytes), `bash` last (it can invoke
+either of the others indirectly via a script, so it reads most naturally as
+the group's most capable member).
+
+Decision 3: `harness.outputContract` is **not** default-enabled by this
+feature. The V2 cutover — flipping that default — is a separate decision;
+this feature's default architecture is unchanged, and `createProductionRegistry`
+remains what most runs get.
+
+Decision 4: initializer and verifier tool surfaces are unchanged by this
+feature. The initializer keeps its sole forced `set_output_contract` call on
+the typed path (`src/harness/initializer.ts:402-414`) and zero tools on the
+prose path (`apiToolDefs: []`, `initializer.ts:260-269`); the verifier keeps
+read-only `read_file`/`grep` (`createRegistry([readFileTool, grepTool])`,
+`src/harness/verifierTools.ts:44-46`) plus the non-executing
+`report_verification` (`src/harness/verifier.ts:80-111`), further restricted
+to an evidence scope (`verifierTools.ts:389-410`). Neither role ever receives
+`bash` or `edit_file`.
+
+Decision 5: both prompt prefixes therefore change exactly once, intentionally
+— the legacy atomic prefix (pinned at length 12 by
+`src/cli/systemPrompt.test.ts:171-213`) and the V2 prefix both grow by two
+tools. Prior eval baselines are not byte-comparable afterward, on either
+path: prompt caching is a byte-exact prefix match, so this is a one-time,
+deliberate cost, not a regression to chase.
+
+The resulting production tool order is frozen and deterministic in both
+registries. Enabling the feature requires one intentional prompt-prefix
+version change; it must not vary based on task text, current workspace
+contents, dependencies, or whether browser-script support is presently
+available. `SYSTEM_PROMPT` is a static const, and this is why: per-run facts
+— which protocol is in effect, whether `uses_browser` support exists this
+run, the current output-contract revision — belong in the conversation, via
+`workerProtocolBrief` (`src/loop/workerSession.ts:218-274`) and tool results,
+never in the byte-stable system prompt or tool schema. Browser-script
+availability is exactly this kind of per-run fact.
 
 The system prompt gains concise instructions:
 
@@ -945,12 +1212,14 @@ The system prompt gains concise instructions:
 - use `write_file` to create and `edit_file` for exact changes;
 - Bash starts in `scratch/workspace`;
 - set `uses_browser: true` for commands that run Playwright automation;
-- when page JavaScript is available, prefer it for simple DOM extraction and
-  Playwright scripts for multi-step or reusable automation;
+- prefer `execute_javascript` for simple DOM extraction and Playwright
+  scripts for multi-step or reusable automation, on registries where
+  `execute_javascript` is present;
 - publish deliverables through normal artifact tools;
-- call `inspect_page` after Playwright automation;
-- never modify `manifest.json`, `transcript.jsonl`, `metrics.json`, or
-  anything under `harness/`.
+- call `observe()` under V2, or `inspect_page` on the legacy path, after
+  Playwright automation;
+- never modify `manifest.json`, `transcript.jsonl`, `metrics.json`,
+  `harness.json`, or anything under `harness/`.
 
 The repository's existing no-shell rule and V2 proposal/plan language conflict
 with this feature. Its write-chokepoint rule also needs one explicit exception:
@@ -1018,11 +1287,19 @@ must never overwrite the directory with a new run.
   allocated;
 - straight quotes do not match curly quotes and vice versa;
 - scratch edits retain no roles;
-- artifact edits preserve roles, clear stale capture metadata, and update the
-  manifest hash; if completion status exists on the target by then, it is
-  cleared too;
+- artifact edits preserve roles, clear stale capture metadata, and
+  unconditionally clear `completionStatus` on the target;
+- a path matching a `filename` in the current output contract is refused,
+  naming the owning tool (`upsert_output_rows` or `write_document`) instead
+  of editing (F1); the refusal is re-evaluated per call against
+  `ctx.outputContracts?.currentContract()`, so a revision accepted between
+  two edits changes the answer on the very next one, and a run with no
+  contract store (legacy path, fixture tests) has nothing to protect;
 - the result reports the normalized path and exact replacement count;
-- the real tool pipeline returns structured errors and caps results.
+- the real tool pipeline returns structured errors and caps results;
+- `getAccess` reports the file and manifest keys it declares, so the
+  scheduler serializes two edits of the same file but overlaps edits of
+  different files.
 
 ### Bash tests
 
@@ -1044,10 +1321,18 @@ must never overwrite the directory with a new run.
 - a workspace file over 256 MiB fails synchronization before allocation;
 - a generated script survives harness recreation and executes again;
 - `uses_browser: false` does not call either browser lifecycle method;
-- Bash remains a scheduler barrier;
+- `bash` declares `getAccess` as `{ reads: [], writes: [], exclusive: true }`,
+  never inferred from the command text (F4), so it is always a barrier;
+- `bash`'s own `timeoutMs` exceeds the pipeline's `DEFAULT_TOOL_TIMEOUT_MS`
+  by the documented margin, so a command that runs to its own `timeout_ms`
+  ceiling finishes cleanup before the pipeline deadline could abandon its
+  process group (F2);
+- an aborted `ToolCtx.abortSignal` before spawn returns a terminal
+  `cancelled` result without starting a process, and an abort mid-command
+  triggers the same terminate-then-cleanup path as a timeout (F3);
 - abort listeners, timers, streams, and process handles are released once;
 - graceful shutdown cancels the command and flushes durable harness state;
-- initializer and judge model calls never receive Bash or edit tool
+- initializer and verifier model calls never receive Bash or edit tool
   definitions.
 
 ### Browser-script lifecycle tests
@@ -1056,9 +1341,17 @@ must never overwrite the directory with a new run.
 - `uses_browser: true` injects the exact loopback CDP URL and selected target;
 - Playwright locators click, fill, wait, loop, and extract in one Bash call;
 - another browser tool cannot run between preparation and refresh;
-- navigation or DOM mutation is reflected by the next fresh `inspect_page`;
-- selected-page closure and popups reconcile to a live active page;
-- `inspect_page` after Bash sees the external changes;
+- navigation or DOM mutation is reflected by the next fresh `observe()` (V2)
+  or `inspect_page` (legacy path);
+- an in-place DOM mutation with no navigation still invalidates every tracked
+  page's element refs and cached observation baselines after refresh — a ref
+  minted before the script is rejected, not silently resolved, and the next
+  `observe()`/`inspect_page` re-baselines rather than diffing against a stale
+  cache (F7);
+- selected-page closure and popups reconcile to a live active page — this is
+  a refresh-path-only behavior change from the pre-existing "closed selection
+  leaves `activePage` undefined" default (F8);
+- `observe()`/`inspect_page` after Bash sees the external changes;
 - process exit disconnects the secondary CDP client without closing Chrome;
 - a provider without browser-script support rejects `uses_browser: true`
   before spawn while ordinary Bash still works;
@@ -1073,9 +1366,13 @@ Use deterministic fault injection at each checkpoint boundary:
 - after `edit_file` changes the file but before its result checkpoint;
 - while Bash is running;
 - after Bash exits but before its result checkpoint;
-- after initializer output but before its files are written;
-- after a worker cycle but before the judge;
-- before and after judge execution;
+- on the prose path, after initializer output but before its files are
+  written; on the typed path, after a `set_output_contract` revision is
+  accepted but before `contract.lastKnownRevision` advances;
+- after a worker cycle but before the verifier;
+- before and after verifier execution;
+- after a rejected submission decrements `cycle` but before
+  `completionCheckFailures` is checkpointed;
 - after terminal checkpoint but before returning to the caller.
 
 Every case must prove conversation continuity, monotonic usage and limits, no
@@ -1084,6 +1381,25 @@ cycle, valid manifest hashes, preserved scripts, and honest terminal status.
 
 For a `running` Bash checkpoint, recovery must refuse without
 `confirmPreviousCommandStopped` and continue without replay when it is true.
+
+Also verify, specifically for the F5 restore seams this feature adds:
+
+- `restoreWorkerSession(snapshot, deps, config)` reproduces the exact prior
+  `messages`, `turnCount`, `peakContextTokens`, and `protocolCorrections`
+  without re-appending `workerProtocolBrief` (which would duplicate per-run
+  protocol text the model already saw);
+- `createRunBudgetTracker(config, { restore: snapshot })` resumes every
+  role's usage, `toolCalls`, `toolResultBytes`, and `corrections` unchanged,
+  and its wall-time accounting continues from the snapshot's
+  `elapsedWallTimeMs` rather than resetting or double-counting harness
+  downtime;
+- a malformed budget or session snapshot (negative, NaN, or empty messages)
+  fails restoration loudly rather than silently seeding an under- or
+  over-counted tracker;
+- on the typed path, the output-contract store rebuilt from
+  `scratch/output-contract/revision-<n>.json` files matches the live store's
+  history from before the simulated crash, including its current contract
+  and revision count.
 
 Also verify that checkpoint saves serialize, stale `checkpointRevision` values
 are rejected, stale temporary files are ignored, and graceful shutdown waits
@@ -1095,8 +1411,9 @@ and idempotent cleanup.
 ### Repository gates
 
 - focused tests for file tools, `runForegroundCommand`,
-  `syncScratchWorkspace`, scheduler, browser controller, agent loop,
-  judge-harness cycle state, `RunCheckpointStore`, and `runTask` recovery;
+  `syncScratchWorkspace`, scheduler, browser controller, `WorkerSession`,
+  `RunBudgetTracker`, the output-contract store, verification-harness cycle
+  state, `RunCheckpointStore`, and `runTask` recovery;
 - `npm run typecheck`;
 - `npm test`;
 - `git diff --check`;
@@ -1113,10 +1430,11 @@ and idempotent cleanup.
    Playwright helper.
 4. Add versioned checkpoint save/restore and fault-injection tests before
    advertising crash recovery.
-5. Enable the tools only for the primary worker initially. Keep current
-   initializer and judge calls tool-less.
-6. Measure code-as-action against the atomic-tool path and, if it is later
-   ported, page JavaScript. Treat adoption, turn reduction, long-horizon
+5. Enable the tools only for the primary worker initially, in both the
+   legacy and V2 registries (decision 1). Keep current initializer and
+   verifier calls tool-less beyond what decision 4 already grants them.
+6. Measure code-as-action against the atomic-tool path and against
+   `execute_javascript`. Treat adoption, turn reduction, long-horizon
    success, script reuse, command interruption, and browser-refresh errors as
    primary metrics.
 
@@ -1127,6 +1445,13 @@ select deliverables only from manifest entries carrying
 `roles: ["requested_output"]`; scratch scripts and checkpoints never become
 deliverables.
 
+Landing `edit_file` and `bash` grows both production prompt prefixes by two
+tools each, exactly once (decision 5). Every eval baseline recorded before
+this lands is not byte-comparable to one recorded after, on either the
+legacy or the V2 path — prompt caching is a byte-exact prefix match, so this
+is a deliberate, one-time cost of shipping the feature, not a regression to
+chase down.
+
 ## 16. Acceptance criteria
 
 The feature is ready when all of the following are true:
@@ -1136,18 +1461,29 @@ The feature is ready when all of the following are true:
 2. The same script and its generated intermediate files survive recreation of
    the harness process.
 3. A harness restart restores the exact current-cycle conversation, usage
-   counters, limits, cycle number, completed cycle records, and pending judge
-   state from `harness/checkpoint.json`.
+   counters, limits, cycle number, completed cycle records, and pending
+   verifier state from `harness/checkpoint.json`.
 4. Once its prior process tree has ended, a command interrupted by restart is
    reported honestly and is not replayed.
 5. Every surviving file created inside the scratch workspace is represented by
    a current manifest hash before Bash returns.
-6. `edit_file` never changes bytes outside the requested exact replacement.
+6. `edit_file` never changes bytes outside the requested exact replacement,
+   and refuses any path matching a `filename` declared by the current output
+   contract, directing the worker to the tool that owns it.
 7. Process lifetime and output are bounded. Exit status, workspace changes,
-   and browser-refresh failures are visible in the transcript; browser effects
-   are visible in the required follow-up `inspect_page`.
-8. Initializer and judge model calls cannot invoke Bash or mutate files.
-9. Existing requested-output selection and judge-harness behavior continue to
-   operate from the same run-directory outputs.
+   and browser-refresh failures are visible in the transcript; browser
+   effects are visible in the required follow-up `observe()` call (or
+   `inspect_page` on the legacy path).
+8. Initializer and verifier model calls cannot invoke Bash or mutate files.
+9. Existing requested-output selection and verification-harness behavior
+   continue to operate from the same run-directory outputs.
 10. A second live harness cannot mutate the same run, while a fresh harness can
     recover ownership after the prior process dies.
+11. `restoreWorkerSession` and `createRunBudgetTracker(config, { restore })`
+    reproduce a resumed run's exact prior conversation and whole-run usage
+    counters, and neither resets nor double-counts wall-time elapsed while
+    the harness was down.
+12. On the typed output-contract path, recovery rebuilds the contract store's
+    in-memory history from its durable `scratch/output-contract/revision-<n>.json`
+    files and it matches what the checkpoint last recorded, with no
+    `INTENT.md`/`CONTRACT.md` produced or expected.
