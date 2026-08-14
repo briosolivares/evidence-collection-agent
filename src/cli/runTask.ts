@@ -1,4 +1,4 @@
-import { accessSync, constants as fsConstants, mkdirSync } from 'node:fs';
+import { accessSync, constants as fsConstants, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -36,27 +36,43 @@ import {
   type LoopDeps,
   type LoopResult,
 } from '../loop/agentLoop.js';
+import type { AssistantContentBlock, TextBlock } from '../loop/messages.js';
 import {
   appendSubmissionResult,
   appendWorkerFeedback,
   createWorkerSession,
   recordWorkerSessionCrash,
-  runWorkerCycle,
+  restoreWorkerSession,
+  runWorkerTurn,
   writeWorkerSessionMetrics,
+  type WorkerSession,
+  type WorkerSessionDeps,
+  type WorkerSessionSnapshot,
+  type WorkerTurnOutcome,
 } from '../loop/workerSession.js';
 import {
   runCompletionCheck,
   type CompletionFailure,
   type SettledFact,
 } from '../completion/completionCheck.js';
+import { SUBMIT_FOR_VERIFICATION } from '../completion/workerResponseProtocol.js';
 import { finalizeIncompleteRun } from '../completion/finalizeIncompleteRun.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
 import {
   createRunBudgetTracker,
   withBudgetAccounting,
+  type RunBudgetConfig,
   type RunBudgetTracker,
 } from '../run/runBudget.js';
+import {
+  ceilingFromCheckpoint,
+  ceilingToCheckpoint,
+  openRunCheckpointStore,
+  type RunCheckpointV1,
+} from '../run/runCheckpointStore.js';
+import { createRunCheckpointWriter, type RunCheckpointWriter } from './runCheckpoint.js';
+import { syncScratchWorkspace } from '../run/syncScratchWorkspace.js';
 import type { RunOutcome } from '../run/runOutcome.js';
 import {
   DEFAULT_MODEL,
@@ -66,6 +82,8 @@ import {
 import {
   finalizeManifest,
   initManifest,
+  readManifest,
+  verifyManifestFiles,
   SCRATCH_DIR,
 } from '../run/artifacts.js';
 import { generateRunId } from '../run/runId.js';
@@ -81,12 +99,18 @@ import {
   DEFAULT_TOOL_PROFILE,
   type ToolProfile,
 } from '../tools/index.js';
-import { toApiToolDefs, type ToolCtx, type ToolDef } from '../tools/registry.js';
+import {
+  toApiToolDefs,
+  type ApiToolDef,
+  type ToolCtx,
+  type ToolDef,
+  type ToolRegistry,
+} from '../tools/registry.js';
 import { createV2Registry } from '../tools/index.js';
 import { createOutputRowTools } from '../tools/outputRows/outputRows.js';
 import { createInspectDocumentTool } from '../tools/inspectDocument/inspectDocument.js';
-import { createOutputTableStore } from '../outputs/outputTable.js';
-import { createEvidenceStore } from '../evidence/evidenceStore.js';
+import { createOutputTableStore, type OutputTableStore } from '../outputs/outputTable.js';
+import { createEvidenceStore, type EvidenceStore } from '../evidence/evidenceStore.js';
 import {
   createContentReaderRegistry,
 } from '../content/contentReader.js';
@@ -102,7 +126,11 @@ import { createCaptureTextTool } from '../tools/captureText/captureText.js';
 import { requireBrowser } from '../tools/shared/browser.js';
 import type { OutputSpec } from '../contracts/outputContract.js';
 import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
-import { createOutputContractStore } from '../contracts/outputContractStore.js';
+import {
+  contractRevisionPath,
+  createOutputContractStore,
+  type OutputContractStore,
+} from '../contracts/outputContractStore.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
 // Default runs base when the caller passes none: the checkout's runs/
@@ -303,7 +331,9 @@ export interface RunTaskConfig {
    * verifier. Present: the initializer writes INTENT.md and CONTRACT.md
    * before the browser tab opens, then up to `maxWorkerCycles` worker cycles
    * run against the same tab, each verified before deciding whether another
-   * cycle runs. */
+   * cycle runs. Present also means the run is durably checkpointed (see
+   * `resumeTask`) — a judge-less run (harness absent) never opens a
+   * checkpoint store and behaves byte-for-byte as it always has. */
   harness?: HarnessConfig;
   /**
    * Cancellation for the run's tools, reaching work the model-call boundary
@@ -330,35 +360,6 @@ export interface RunTaskConfig {
  */
 export type RunTaskResult = { runDir: string } & (LoopResult | RunOutcome);
 
-/**
- * Run one task through the production evidence-collection stack.
- *
- * Absent `config.harness`, this is exactly one `runAgentLoop` call: the
- * worker gets the task text verbatim, and the run ends with whatever
- * `LoopResult` that single call produces. Present `config.harness`, the
- * verification harness runs instead: the initializer derives the
- * contract-authoring files from the task text, then ONE persistent worker
- * session runs up to `harness.maxWorkerCycles` cycles against the same run
- * directory and browser tab, every cycle charging one shared whole-run
- * budget. `verified` (a judge `done` verdict) is the only success;
- * a `budget_exceeded` cycle, a judge crash, and correction exhaustion end
- * the run `incomplete` with an explicit reason and preserved artifacts.
- * See runVerificationHarness for the loop itself.
- *
- * @param taskText - the user's task, recorded verbatim in the manifest and
- *   sent as the first conversation message of cycle 1 (every later cycle's
- *   opening message is derived from it — see runHarnessCycles)
- * @param config - a live browser session with no active task tab plus
- *   optional run location, starting page, model settings, loop guards, and
- *   harness settings; `callModel` may replace the production worker client
- *   at this dependency seam, and `harness.initializerCallModel`/
- *   `harness.judgeCallModel` do the same for the other two roles
- * @returns the absolute run directory and terminal loop outcome; before the
- *   promise resolves, the transcript and metrics are complete (a rolled-up
- *   metrics.json plus one metrics-cycle-N.json per worker cycle when the
- *   harness ran), the manifest is finalized, and this run's tab is closed
- *   while the browser stays open
- */
 /**
  * The two production initializer bindings, injectable so that WHICH ONE gets
  * chosen is testable without a network call.
@@ -395,52 +396,70 @@ export function defaultInitializerCallModel(
   return v2Protocol ? bindings.contract() : bindings.prose();
 }
 
-export async function runTask(
-  taskText: string,
-  config: RunTaskConfig,
-): Promise<RunTaskResult> {
-  const maxOutputTokens = config.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
-  if (!Number.isInteger(maxOutputTokens) || maxOutputTokens < 1) {
-    throw new Error(
-      `maxOutputTokens must be a positive integer, got ${maxOutputTokens}`,
-    );
-  }
+/**
+ * Build this run's static, checkpoint-durable configuration record.
+ *
+ * Shared by a fresh `runTask` start (which assembles it from `RunTaskConfig`
+ * plus the values it already resolved) and `resumeTask`'s scalar-config
+ * cross-check (which compares a caller's optional overrides against
+ * whatever a PRIOR call to this same function recorded) — one function, so
+ * the two can never describe "this run's configuration" differently.
+ */
+function buildCheckpointRunConfiguration(args: {
+  model: string;
+  toolProfile: ToolProfile;
+  maxOutputTokens: number;
+  maxTurns: number;
+  maxContextTokens: number;
+  startUrl?: string;
+  maxWorkerCycles: number;
+  maxCompletionCheckFailures: number;
+  outputContract: boolean;
+  contractAuthor: ContractAuthor;
+}): RunCheckpointV1['runConfiguration'] {
+  return {
+    model: args.model,
+    toolProfile: args.toolProfile,
+    maxOutputTokens: args.maxOutputTokens,
+    maxTurns: ceilingToCheckpoint(args.maxTurns),
+    maxContextTokens: args.maxContextTokens,
+    ...(args.startUrl === undefined ? {} : { startUrl: args.startUrl }),
+    harness: {
+      maxWorkerCycles: args.maxWorkerCycles,
+      maxCompletionCheckFailures: args.maxCompletionCheckFailures,
+      outputContract: args.outputContract,
+      contractAuthor: args.contractAuthor,
+    },
+  };
+}
 
-  // Harness-mode-only guard: absent config.harness, maxWorkerCycles is never
-  // read, so a caller that never opts in can never trip this.
-  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 3;
-  if (
-    config.harness !== undefined
-    && (!Number.isInteger(maxWorkerCycles) || maxWorkerCycles < 1)
-  ) {
-    throw new Error(
-      `harness.maxWorkerCycles must be a positive integer, got ${maxWorkerCycles}`,
-    );
-  }
+/** Everything a run's tool surface needs beyond the bash tool: the V2
+ * run-scoped stores (contract, evidence, tables) when the typed protocol is
+ * on, the assembled registry, and the API-facing tool definitions built from
+ * it. Shared by a fresh `runTask` start and `resumeTask` — both build a
+ * brand-new toolchain (a resumed run's output-contract STORE is then
+ * rehydrated from disk; its output-TABLE and evidence stores are not, see
+ * resumeTask's module note on why that gap is left open). */
+interface RunToolchainInputs {
+  runDir: string;
+  v2Protocol: boolean;
+  toolProfile: ToolProfile | undefined;
+  browser: BrowserController;
+  javascriptPolicy: BrowserJavaScriptPolicy | undefined;
+  authenticated: boolean | undefined;
+  bashTool: ToolDef;
+}
 
-  const v2Protocol = config.harness?.outputContract === true;
+interface RunToolchain {
+  outputContracts?: OutputContractStore;
+  evidenceStore?: EvidenceStore;
+  outputTables?: OutputTableStore;
+  registry: ToolRegistry;
+  apiToolDefs: ApiToolDef[];
+}
 
-  const runDirForRun = createRunDir(
-    config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
-    // The task text names the run dir (slugified), so listings read like a
-    // history of what was asked rather than a wall of timestamps.
-    generateRunId(taskText),
-  );
-  const runDir = runDirForRun;
-  initManifest(runDir, taskText);
-
-  // Before any model call: prove the shell exists and the command workspace is
-  // there, so `bash` is either genuinely available or the run fails now rather
-  // than after the worker has planned around it.
-  prepareLocalExecution(runDir);
-  assertBrowserScriptSupportIsPaired(config.browser);
-
-  // One bash tool per run, closing over this run's denylist. Supplied to
-  // whichever registry gets built — it is a factory precisely so the policy
-  // travels with the run rather than living in a module-level array.
-  const bashTool = createBashTool({
-    secretEnvDenylist: BASH_SECRET_ENV_DENYLIST,
-  }) as ToolDef;
+function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
+  const { runDir, v2Protocol } = inputs;
 
   // Run-scoped V2 state. Built here, before the registry, because several
   // tools close over it — a tool cannot be constructed without the store it
@@ -492,7 +511,7 @@ export async function runTask(
           // session defaults to 'allow'; an authenticated one must have stated
           // its decision (resolveJavaScriptPolicy throws otherwise), so a
           // capability grant is never inherited by accident.
-          ...(config.browser.executeJavaScript !== undefined
+          ...(inputs.browser.executeJavaScript !== undefined
             ? ([
                 [
                   'execute_javascript',
@@ -500,10 +519,10 @@ export async function runTask(
                     // Read ONCE here, at configuration time: a per-call read
                     // would let a later ctx mutation grant a capability no
                     // operator approved.
-                    ...(config.javascriptPolicy === undefined
+                    ...(inputs.javascriptPolicy === undefined
                       ? {}
-                      : { policy: config.javascriptPolicy }),
-                    authenticatedSession: config.authenticated === true,
+                      : { policy: inputs.javascriptPolicy }),
+                    authenticatedSession: inputs.authenticated === true,
                     page: (ctx) => ({
                       evaluateJson: (code, timeoutMs) =>
                         ctx.browser!.executeJavaScript!(
@@ -525,7 +544,7 @@ export async function runTask(
           // provides the capture seam. Without it, execute_javascript is the
           // only way to obtain the evidence id every typed row requires,
           // which makes a table task depend on page scripting being allowed.
-          ...(config.browser.captureText !== undefined
+          ...(inputs.browser.captureText !== undefined
             ? ([
                 [
                   'capture_text',
@@ -541,11 +560,11 @@ export async function runTask(
           // Local code execution, at its frozen position in V2_TOOL_ORDER.
           // Run-scoped for the same reason the stores above are: it carries
           // this run's secret-env denylist.
-          ['bash', bashTool],
+          ['bash', inputs.bashTool],
         ]),
       )
-    : createProductionRegistry(config.toolProfile ?? DEFAULT_TOOL_PROFILE, {
-        bash: bashTool,
+    : createProductionRegistry(inputs.toolProfile ?? DEFAULT_TOOL_PROFILE, {
+        bash: inputs.bashTool,
       });
 
   // The model's tool surface follows the registry exactly, plus the submission
@@ -555,37 +574,98 @@ export async function runTask(
   const apiToolDefs = v2Protocol
     ? [...toApiToolDefs(registry), submitForVerificationTool]
     : toApiToolDefs(registry);
-  const baseCallModel = config.callModel ?? makeCallModel({
-    model: config.model,
-    system: SYSTEM_PROMPT,
+
+  return {
+    ...(outputContracts === undefined ? {} : { outputContracts }),
+    ...(evidenceStore === undefined ? {} : { evidenceStore }),
+    ...(outputTables === undefined ? {} : { outputTables }),
+    registry,
     apiToolDefs,
-    maxOutputTokens,
-    onProgress: config.onProgress,
-  });
+  };
+}
 
-  const credentials =
-    config.credentials ??
-    new FileCredentialStore(
-      process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
+/**
+ * Run one task through the production evidence-collection stack.
+ *
+ * Absent `config.harness`, this is exactly one `runAgentLoop` call: the
+ * worker gets the task text verbatim, and the run ends with whatever
+ * `LoopResult` that single call produces. Present `config.harness`, the
+ * verification harness runs instead: the initializer derives the
+ * contract-authoring files from the task text, then ONE persistent worker
+ * session runs up to `harness.maxWorkerCycles` cycles against the same run
+ * directory and browser tab, every cycle charging one shared whole-run
+ * budget. `verified` (a judge `done` verdict) is the only success;
+ * a `budget_exceeded` cycle, a judge crash, and correction exhaustion end
+ * the run `incomplete` with an explicit reason and preserved artifacts.
+ * See runVerificationHarness for the loop itself, and resumeTask for
+ * recovering a harness-mode run this same process (or a later one) never
+ * finished.
+ *
+ * @param taskText - the user's task, recorded verbatim in the manifest and
+ *   sent as the first conversation message of cycle 1 (every later cycle's
+ *   opening message is derived from it — see runHarnessCycles)
+ * @param config - a live browser session with no active task tab plus
+ *   optional run location, starting page, model settings, loop guards, and
+ *   harness settings; `callModel` may replace the production worker client
+ *   at this dependency seam, and `harness.initializerCallModel`/
+ *   `harness.judgeCallModel` do the same for the other two roles
+ * @returns the absolute run directory and terminal loop outcome; before the
+ *   promise resolves, the transcript and metrics are complete (a rolled-up
+ *   metrics.json plus one metrics-cycle-N.json per worker cycle when the
+ *   harness ran), the manifest is finalized, and this run's tab is closed
+ *   while the browser stays open
+ */
+export async function runTask(
+  taskText: string,
+  config: RunTaskConfig,
+): Promise<RunTaskResult> {
+  const maxOutputTokens = config.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
+  if (!Number.isInteger(maxOutputTokens) || maxOutputTokens < 1) {
+    throw new Error(
+      `maxOutputTokens must be a positive integer, got ${maxOutputTokens}`,
     );
+  }
 
-  const tracing = config.tracing ?? createRunTracing();
-  const callModel = tracing.wrapCallModel(
-    baseCallModel,
-    config.model ?? DEFAULT_MODEL,
+  // Harness-mode-only guard: absent config.harness, maxWorkerCycles is never
+  // read, so a caller that never opts in can never trip this.
+  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 3;
+  if (
+    config.harness !== undefined
+    && (!Number.isInteger(maxWorkerCycles) || maxWorkerCycles < 1)
+  ) {
+    throw new Error(
+      `harness.maxWorkerCycles must be a positive integer, got ${maxWorkerCycles}`,
+    );
+  }
+
+  const v2Protocol = config.harness?.outputContract === true;
+  const contractAuthor: ContractAuthor = config.harness?.contractAuthor ?? 'initializer';
+  const maxCompletionCheckFailures =
+    config.harness?.maxCompletionCheckFailures ?? DEFAULT_MAX_COMPLETION_CHECK_FAILURES;
+  const resolvedModel = config.model ?? DEFAULT_MODEL;
+  const resolvedToolProfile = config.toolProfile ?? DEFAULT_TOOL_PROFILE;
+  const resolvedMaxTurns = config.maxTurns ?? DEFAULT_MAX_TURNS;
+
+  const runDirForRun = createRunDir(
+    config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
+    // The task text names the run dir (slugified), so listings read like a
+    // history of what was asked rather than a wall of timestamps.
+    generateRunId(taskText),
   );
-  const tracedRegistry = tracing.wrapRegistry(registry);
+  const runDir = runDirForRun;
+  initManifest(runDir, taskText);
 
   // Harness mode: one budget tracker for the whole run — initializer,
   // every worker cycle, and every judge call charge the same instance, and
   // starting a correction resets nothing. Constructed (and validated) here
-  // so an invalid finite-limit configuration fails before the browser or
-  // any model starts.
+  // — right after the run directory exists, matching where this
+  // construction (and its validation) has always sat, and before the
+  // registry so the checkpoint writer below has a live tracker to read from.
   const budget: RunBudgetTracker | undefined =
     config.harness === undefined
       ? undefined
       : createRunBudgetTracker({
-          maxWorkerTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+          maxWorkerTurns: resolvedMaxTurns,
           maxToolCalls: Infinity,
           maxModelTokens: Infinity,
           maxToolResultBytes: Infinity,
@@ -597,6 +677,70 @@ export async function runTask(
     throw new Error(`maxContextTokens must be >= 0, got ${maxContextTokens}`);
   }
 
+  // Checkpointing applies to harness-mode runs only: a judge-less run never
+  // opens harness/run.lock or harness/checkpoint.json, and its behavior is
+  // untouched by any of this — see the module note on runHarnessCycles for
+  // what "durable" does and does not mean here.
+  const checkpointWriter: RunCheckpointWriter | undefined =
+    config.harness === undefined
+      ? undefined
+      : createRunCheckpointWriter(await openRunCheckpointStore(runDir), {
+          runConfiguration: buildCheckpointRunConfiguration({
+            model: resolvedModel,
+            toolProfile: resolvedToolProfile,
+            maxOutputTokens,
+            maxTurns: resolvedMaxTurns,
+            maxContextTokens,
+            ...(config.startUrl === undefined ? {} : { startUrl: config.startUrl }),
+            maxWorkerCycles,
+            maxCompletionCheckFailures,
+            outputContract: v2Protocol,
+            contractAuthor,
+          }),
+          budget: budget!,
+        });
+
+  // Before any model call: prove the shell exists and the command workspace is
+  // there, so `bash` is either genuinely available or the run fails now rather
+  // than after the worker has planned around it.
+  prepareLocalExecution(runDir);
+  assertBrowserScriptSupportIsPaired(config.browser);
+
+  // One bash tool per run, closing over this run's denylist. Supplied to
+  // whichever registry gets built — it is a factory precisely so the policy
+  // travels with the run rather than living in a module-level array.
+  const bashTool = createBashTool({
+    secretEnvDenylist: BASH_SECRET_ENV_DENYLIST,
+  }) as ToolDef;
+
+  const toolchain = buildRunToolchain({
+    runDir,
+    v2Protocol,
+    toolProfile: config.toolProfile,
+    browser: config.browser,
+    javascriptPolicy: config.javascriptPolicy,
+    authenticated: config.authenticated,
+    bashTool,
+  });
+
+  const baseCallModel = config.callModel ?? makeCallModel({
+    model: config.model,
+    system: SYSTEM_PROMPT,
+    apiToolDefs: toolchain.apiToolDefs,
+    maxOutputTokens,
+    onProgress: config.onProgress,
+  });
+
+  const credentials =
+    config.credentials ??
+    new FileCredentialStore(
+      process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
+    );
+
+  const tracing = config.tracing ?? createRunTracing();
+  const callModel = tracing.wrapCallModel(baseCallModel, resolvedModel);
+  const tracedRegistry = tracing.wrapRegistry(toolchain.registry);
+
   let tabOpened = false;
   try {
     // Harness mode: derive the contract-authoring files from the task text
@@ -606,29 +750,52 @@ export async function runTask(
     // design, initializer and judge calls run untraced in v1; their token
     // usage still lands on the shared budget via withBudgetAccounting.
     if (config.harness !== undefined) {
-      const author = config.harness.contractAuthor ?? 'initializer';
+      await checkpointWriter!.saveInitializing();
       const initializerCallModel = withBudgetAccounting(
         config.harness.initializerCallModel ?? defaultInitializerCallModel(v2Protocol),
         budget!,
         'initializer',
       );
-      if (v2Protocol && author === 'initializer') {
+      if (v2Protocol && contractAuthor === 'initializer') {
         const authored = await runContractInitializer(
           taskText,
           initializerCallModel,
-          outputContracts!,
+          toolchain.outputContracts!,
         );
         if (!authored.ok) {
           // A run whose requirements were never validated must not proceed
           // as if they had been.
           throw new Error(`Contract initializer failed: ${authored.reason}`);
         }
+        await checkpointWriter!.saveInitializerAccepted({
+          mode: 'contract',
+          contractRevision: authored.revision,
+        });
       } else if (!v2Protocol) {
         const initializerResult = await runInitializer(taskText, initializerCallModel);
+        // Recorded BEFORE the files are written: a crash between this save
+        // and writeInitializerFiles lets resumeTask finish the write
+        // deterministically, without a second (billable, non-reproducible)
+        // initializer call.
+        await checkpointWriter!.saveInitializerAccepted({
+          mode: 'prose',
+          proseAccepted: initializerResult,
+        });
         writeInitializerFiles(runDir, initializerResult);
+        await checkpointWriter!.saveInitializerAccepted({
+          mode: 'prose',
+          proseAccepted: initializerResult,
+          filesWritten: true,
+        });
+      } else {
+        // v2Protocol with contractAuthor 'worker': the worker states the
+        // contract itself on its first response (the contract-first gate) —
+        // there is no initializer call to accept here. Still record which
+        // protocol this run is on, so a resume from a checkpoint saved
+        // before any contract exists knows the typed path is active without
+        // re-deriving it from runConfiguration alone.
+        await checkpointWriter!.saveInitializerAccepted({ mode: 'contract' });
       }
-      // v2Protocol with contractAuthor 'worker': the worker states the
-      // contract itself on its first response (the contract-first gate).
     }
 
     const result = await tracing.traceRun(taskText, async () => {
@@ -649,14 +816,14 @@ export async function runTask(
         // Reaches an in-flight command, unlike the model-call boundary the
         // TUI's cancellation already covers.
         ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
-        ...(outputContracts === undefined ? {} : { outputContracts }),
-        ...(outputTables === undefined ? {} : { outputTables }),
+        ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
+        ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),
         ...(v2Protocol ? { submissionProtocol: true } : {}),
       };
 
       if (config.harness === undefined) {
         const loopConfig: LoopConfig = {
-          maxTurns: config.maxTurns ?? DEFAULT_MAX_TURNS,
+          maxTurns: resolvedMaxTurns,
           maxContextTokens,
         };
         return runAgentLoop(taskText, loopDeps, loopConfig);
@@ -669,6 +836,7 @@ export async function runTask(
         maxWorkerCycles,
         loopDeps,
         { budget: budget!, maxContextTokens },
+        checkpointWriter!,
       );
     });
     return { runDir, ...result };
@@ -679,79 +847,686 @@ export async function runTask(
       }
     } finally {
       try {
-        finalizeManifest(runDir);
+        // Closed before finalizeManifest, without masking an in-flight
+        // error: an ordinary awaited call in its own finally layer, exactly
+        // like closeTab/tracing.close beside it — a failure here propagates
+        // normally rather than being swallowed.
+        await checkpointWriter?.close();
       } finally {
-        await tracing.close();
+        try {
+          finalizeManifest(runDir);
+        } finally {
+          await tracing.close();
+        }
       }
     }
   }
 }
 
-/**
- * Run the verification harness's worker/judge phase over ONE persistent
- * WorkerSession. Cycle 1 opens with the task text; every later cycle is
- * the same conversation continued — the judge's reason is appended as
- * feedback (appendWorkerFeedback), so the worker keeps its browser
- * knowledge and prior tool results instead of starting over. By the time
- * this runs, the contract-authoring files already exist at the run-dir
- * root (written by `runTask` before the tab opened).
- *
- * Loop, per cycle (1-based):
- * 1. Append a `cycle_start` transcript event, then advance the session
- *    until the cycle ends (runWorkerCycle) — every turn charges the shared
- *    whole-run budget, which no correction ever resets.
- * 2. A `budget_exceeded` cycle ends the run as
- *    `incomplete: budget_exceeded` without judging — budgets end runs,
- *    and an unverified end is not success.
- * 3. A `completed` cycle is judged. Verdict `done` → `verified` (the only
- *    success). Verdict `continue` with cycles remaining → charge one
- *    correction and continue the same session with the reason as
- *    feedback. Verdict `continue` on the final cycle →
- *    `incomplete: verification_attempts`. A judge that throws (an
- *    AbortError excepted — that is the caller's cancellation and
- *    propagates) → `incomplete: verifier_unavailable`, with the message
- *    recorded as the cycle's `judgeError`; the worker's artifacts are
- *    preserved in every incomplete case.
- *
- * Every non-crash ending writes harness.json (diagnostics including the
- * truthful outcome) and one metrics.json carrying whole-run aggregates
- * plus per-role usage. A worker-cycle crash records failed metrics and
- * propagates unchanged (no harness.json for a run that never finished).
- *
- * @returns the truthful RunOutcome — never a success shape for a judge
- *   crash, exhausted corrections, or exhausted budget
- */
-async function runVerificationHarness(
-  taskText: string,
-  runDir: string,
-  harnessConfig: HarnessConfig,
-  maxWorkerCycles: number,
-  loopDeps: LoopDeps,
-  sessionConfig: { budget: RunBudgetTracker; maxContextTokens: number },
-): Promise<RunOutcome> {
-  const verifierCallModel = withBudgetAccounting(
-    harnessConfig.verifierCallModel ?? makeVerifierModelDriver(),
-    sessionConfig.budget,
-    'verifier',
-  );
+// ---------------------------------------------------------------------------
+// resumeTask
+// ---------------------------------------------------------------------------
 
-  const session = createWorkerSession(taskText, loopDeps, sessionConfig);
-  const contractStore = loopDeps.outputContracts;
-  const maxCompletionCheckFailures =
-    harnessConfig.maxCompletionCheckFailures ?? DEFAULT_MAX_COMPLETION_CHECK_FAILURES;
-  let completionCheckFailures = 0;
-  const cycleRecords: HarnessCycleRecord[] = [];
+/**
+ * The non-serializable half of `RunTaskConfig`: everything a resumed run
+ * needs that a checkpoint cannot hold — a live browser, live model-call
+ * seams, and the recovery-specific confirmation below. Every scalar
+ * `RunTaskConfig` field the checkpoint already remembers (model, toolProfile,
+ * maxOutputTokens, maxTurns, maxContextTokens, startUrl, and every
+ * `harness.*` scalar) is read from the checkpoint, not from this config —
+ * `resumeTask` cannot silently continue a run under different settings than
+ * it started with. Repeating one of those fields here is optional and
+ * purely a safety check: when given, it must match what the checkpoint
+ * recorded, or `resumeTask` fails loudly rather than guessing which one is
+ * right (see `assertScalarConfigMatches`).
+ */
+export interface ResumeTaskConfig {
+  /** A live session browser with no active task tab — ALWAYS a fresh
+   * controller, never the one the interrupted process held. See the module
+   * note on why prior page/element refs cannot be reused. */
+  browser: BrowserController;
+  /** Safety check against `runConfiguration.model`; omit to trust the
+   * checkpoint. */
+  model?: string;
+  /** Safety check against `runConfiguration.toolProfile`; omit to trust the
+   * checkpoint. */
+  toolProfile?: ToolProfile;
+  /** Safety check against `runConfiguration.maxOutputTokens`; omit to trust
+   * the checkpoint. */
+  maxOutputTokens?: number;
+  /** Safety check against `runConfiguration.maxTurns`; omit to trust the
+   * checkpoint. */
+  maxTurns?: number;
+  /** Safety check against `runConfiguration.maxContextTokens`; omit to trust
+   * the checkpoint. */
+  maxContextTokens?: number;
+  /** Safety check against `runConfiguration.startUrl`; omit to trust the
+   * checkpoint. */
+  startUrl?: string;
+  /** Optional live-progress callback for the resumed worker's model calls. */
+  onProgress?: (event: ProgressEvent) => void;
+  /** Optional model implementation for the resumed WORKER's calls (tests or
+   * alternate clients). The initializer is never re-invoked on resume (see
+   * the module note on `resumeTask`'s 'initializing' handling), so there is
+   * no `initializerCallModel` seam here. */
+  callModel?: CallModel;
+  /** Optional run-scoped tracing implementation for the resumed run's
+   * segment (a resumed run's trace is a NEW segment, not a continuation of
+   * the original run's trace — tracing state is not part of the
+   * checkpoint). */
+  tracing?: RunTracing;
+  /** Optional credential store consulted by fill_credentials. */
+  credentials?: CredentialStore;
+  /** Optional resolver for interactive tool calls. */
+  requestPermission?: ToolCtx['requestPermission'];
+  /** See RunTaskConfig.authenticated. */
+  authenticated?: boolean;
+  /** See RunTaskConfig.javascriptPolicy. */
+  javascriptPolicy?: BrowserJavaScriptPolicy;
+  harness?: {
+    /** Safety check against `runConfiguration.harness.maxWorkerCycles`. */
+    maxWorkerCycles?: number;
+    /** Safety check against `runConfiguration.harness.maxCompletionCheckFailures`. */
+    maxCompletionCheckFailures?: number;
+    /** Safety check against `runConfiguration.harness.outputContract`. */
+    outputContract?: boolean;
+    /** Safety check against `runConfiguration.harness.contractAuthor`. */
+    contractAuthor?: ContractAuthor;
+    /** Test seam for the verifier's read-only mini-loop — the only
+     * harness-role model binding a resumed run can still need. */
+    verifierCallModel?: CallModel;
+  };
+  /** See RunTaskConfig.signal. */
+  signal?: AbortSignal;
+  /**
+   * Must be `true` whenever the checkpoint being resumed could have left a
+   * `bash` command running in `scratch/workspace` when the process stopped
+   * — i.e. whenever `runStatus` is `'ready_for_model'` (see the module note
+   * on why the other statuses can never have a command in flight).
+   * `resumeTask` throws instead of guessing when this is required and not
+   * given; once given, it triggers `syncScratchWorkspace` before any hash
+   * verification, so the manifest catches up with whatever the interrupted
+   * command left behind.
+   */
+  confirmPreviousCommandStopped?: boolean;
+}
+
+/** Cross-check every scalar the caller chose to repeat against what the
+ * checkpoint recorded; throws one Error listing every mismatch (never just
+ * the first) if any disagree. Fields the caller omits are trusted from the
+ * checkpoint without comment — see ResumeTaskConfig's module note on why
+ * none of these are required. */
+function assertScalarConfigMatches(
+  stored: RunCheckpointV1['runConfiguration'],
+  config: ResumeTaskConfig,
+): void {
+  const problems: string[] = [];
+  const check = (name: string, given: unknown, expected: unknown): void => {
+    if (given !== undefined && given !== expected) {
+      problems.push(
+        `${name}: resume was given ${JSON.stringify(given)} but the checkpoint recorded ${JSON.stringify(expected)}`,
+      );
+    }
+  };
+  check('model', config.model, stored.model);
+  check('toolProfile', config.toolProfile, stored.toolProfile);
+  check('maxOutputTokens', config.maxOutputTokens, stored.maxOutputTokens);
+  check('maxTurns', config.maxTurns, ceilingFromCheckpoint(stored.maxTurns));
+  check('maxContextTokens', config.maxContextTokens, stored.maxContextTokens);
+  check('startUrl', config.startUrl, stored.startUrl);
+  check('harness.maxWorkerCycles', config.harness?.maxWorkerCycles, stored.harness?.maxWorkerCycles);
+  check(
+    'harness.maxCompletionCheckFailures',
+    config.harness?.maxCompletionCheckFailures,
+    stored.harness?.maxCompletionCheckFailures,
+  );
+  check('harness.outputContract', config.harness?.outputContract, stored.harness?.outputContract);
+  check('harness.contractAuthor', config.harness?.contractAuthor, stored.harness?.contractAuthor);
+  if (problems.length > 0) {
+    throw new Error(
+      `cannot resume: the request's configuration does not match this run's checkpoint:\n${problems
+        .map((problem) => `  - ${problem}`)
+        .join('\n')}`,
+    );
+  }
+}
+
+/** Narrow a checkpoint's opaque `finalOutcome` back to a `RunOutcome`,
+ * failing loudly on anything else — a corrupt or foreign value here must
+ * never be handed back to a caller as if it were a trustworthy result. */
+function validateStoredOutcome(outcome: unknown, runDir: string): RunOutcome {
+  if (
+    typeof outcome === 'object' &&
+    outcome !== null &&
+    'status' in outcome &&
+    ((outcome as { status: unknown }).status === 'verified' ||
+      (outcome as { status: unknown }).status === 'incomplete')
+  ) {
+    return outcome as RunOutcome;
+  }
+  throw new Error(
+    `checkpoint at ${runDir} has runStatus 'terminal' but no valid finalOutcome recorded`,
+  );
+}
+
+/**
+ * Rehydrate a fresh `OutputContractStore` from its own durable history.
+ *
+ * The store itself starts every process with empty history (see
+ * createOutputContractStore) — it is an in-memory index over files it wrote,
+ * not something that reads its own directory back at construction. On
+ * resume, every revision the run ever accepted is still on disk at
+ * `scratch/output-contract/revision-<n>.json` (already integrity-checked by
+ * `verifyManifestFiles` before this ever runs), so replaying them through
+ * the SAME `setOutputContract` validator the original run used rebuilds an
+ * identical store: same current contract, same history, same revision
+ * count — without trusting the file's bytes any more than the model's
+ * original call was trusted.
+ */
+function rehydrateContractStore(runDir: string, store: OutputContractStore): void {
+  for (let revisionNumber = 1; ; revisionNumber += 1) {
+    const path = join(runDir, contractRevisionPath(revisionNumber));
+    if (!existsSync(path)) return;
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as {
+      contract: unknown;
+      basis?: unknown;
+    };
+    const result = store.setOutputContract({
+      contract: parsed.contract,
+      ...(parsed.basis === undefined ? {} : { revisionBasis: parsed.basis }),
+    });
+    if (!result.ok) {
+      throw new Error(
+        `failed to rehydrate contract revision ${revisionNumber} from ${path}: ` +
+          `${result.errors.join('; ')}`,
+      );
+    }
+    if (result.revision.revision !== revisionNumber) {
+      throw new Error(
+        `contract rehydration produced revision ${result.revision.revision} for ${path}, ` +
+          `expected ${revisionNumber}`,
+      );
+    }
+  }
+}
+
+/** A response's prose: its text blocks joined with newlines ("" if none).
+ * Deliberately duplicated from workerSession.ts's private extractText (not
+ * exported there) — the same established pattern initializer.ts already
+ * follows for the identical one-line contract (see its own comment on why). */
+function extractAssistantText(content: readonly AssistantContentBlock[]): string {
+  return content
+    .filter((block): block is TextBlock => block.type === 'text')
+    .map((block) => block.text)
+    .join('\n');
+}
+
+/**
+ * Reconstruct the `WorkerTurnOutcome` a `'verifying'` checkpoint was saved
+ * for, from the just-restored session's own conversation — never by
+ * re-running the worker cycle that already produced it (see the module note
+ * on `runHarnessCycles` for why that distinction matters).
+ *
+ * This works because `saveVerifying` happens at an exact, code-controlled
+ * boundary: after `runWorkerCycle` returns a `'submitted'` or `'completed'`
+ * result and any completion checks already passed, but BEFORE anything else
+ * touches the conversation. So the restored session's LAST message is
+ * exactly that cycle's final assistant turn — for the typed protocol, an
+ * unanswered `submit_for_verification` tool_use; for the legacy protocol, a
+ * plain text-only response. Which shape to expect is fully determined by
+ * `v2Protocol` (a static, checkpoint-recorded fact — see runWorkerTurn's own
+ * completion-protocol branch), so nothing here needs to guess.
+ */
+function reconstructPendingResult(
+  session: WorkerSession,
+  v2Protocol: boolean,
+): Extract<WorkerTurnOutcome, { kind: 'submitted' | 'completed' }> {
+  const lastMessage = session.state.messages.at(-1);
+  if (lastMessage === undefined || lastMessage.role !== 'assistant') {
+    throw new Error(
+      "cannot resume a 'verifying' checkpoint: the restored conversation does not end with " +
+        'the assistant turn that finished this cycle',
+    );
+  }
+  const finalText = extractAssistantText(lastMessage.content);
+  if (!v2Protocol) {
+    return { kind: 'completed', finalText };
+  }
+  const submission = lastMessage.content.find(
+    (block) => block.type === 'tool_use' && block.name === SUBMIT_FOR_VERIFICATION,
+  );
+  if (submission === undefined || submission.type !== 'tool_use') {
+    throw new Error(
+      "cannot resume a 'verifying' checkpoint: expected the restored conversation's last " +
+        `assistant message to contain an unanswered ${SUBMIT_FOR_VERIFICATION} call`,
+    );
+  }
+  return {
+    kind: 'submitted',
+    call: { id: submission.id, name: submission.name, input: submission.input },
+    input: submission.input,
+    finalText,
+  };
+}
+
+/** Text appended to the resumed conversation exactly once (see
+ * `runHarnessCycles`'s `pendingNotice` handling for the one case — resuming
+ * a `'verifying'` checkpoint on the typed protocol — where it cannot be
+ * appended immediately and is instead folded into the next feedback this
+ * run produces). */
+const RECOVERY_NOTICE =
+  'This run was recovered after an interruption. Your scratch files and published ' +
+  'artifacts survived exactly as they were. The browser session was recreated: any page ' +
+  'or element refs from before the interruption are no longer valid — call outline (or ' +
+  'navigate) again to get fresh refs before interacting with the page.';
+
+/**
+ * Resume a harness-mode run this process (or an earlier one) checkpointed
+ * but never finished.
+ *
+ * Never usable on a judge-less run: `runTask` opens a checkpoint store only
+ * when `config.harness` is present, so a run directory with no
+ * `harness/checkpoint.json` has nothing to resume — this throws rather than
+ * inventing a starting point.
+ *
+ * Recovery sequence (see the inline comments below for exactly where each
+ * check sits): open the store (which acquires `harness/run.lock` first, so
+ * two resume attempts on the same run directory can never race); validate
+ * the checkpoint against the request; sync `scratch/workspace` and verify
+ * every manifest-tracked file's bytes BEFORE any model call; finish an
+ * interrupted deterministic initializer write, if there is one; restore the
+ * worker session and budget from their durable snapshots; rehydrate the
+ * typed contract store; open a fresh browser tab; append the one-time
+ * recovery notice; and continue the harness loop from exactly where the
+ * checkpoint left off.
+ *
+ * Fault windows this does NOT close (see also runCheckpoint.ts's module
+ * comment): a crash mid-tool-batch is recovered by discarding the whole
+ * in-flight worker turn, never at per-call granularity; any output-table
+ * rows or evidence records minted since the run's last submission live only
+ * in that crashed process's memory and are not restored (the typed output
+ * CONTRACT is rehydrated from its own durable revision files — see
+ * `rehydrateContractStore` — but rows upserted after the last successful
+ * `submit_for_verification` are not, because `OutputTableStore` and
+ * `EvidenceStore` are both pure in-memory indexes over files they already
+ * wrote, with no "replay my own directory" constructor); and a resumed
+ * run's tracing is a new segment, never a continuation of the original
+ * run's trace.
+ */
+export async function resumeTask(
+  runDir: string,
+  config: ResumeTaskConfig,
+): Promise<RunTaskResult> {
+  const store = await openRunCheckpointStore(runDir);
+  try {
+    const checkpoint = store.load();
+    if (checkpoint === undefined) {
+      throw new Error(
+        `no checkpoint to resume at ${runDir} — only harness-mode runs are checkpointed`,
+      );
+    }
+    assertScalarConfigMatches(checkpoint.runConfiguration, config);
+
+    // A bash command can only ever be running between a 'ready_for_model'
+    // save and the next one: 'initializing' never reaches a tool call (the
+    // initializer makes at most one forced set_output_contract call, never
+    // bash), and 'verifying' is saved only after a cycle's own turn (or
+    // turns) have all already returned — the sole thing that runs between a
+    // 'verifying' save and the next is runVerifier's read-only, tool-free
+    // model call.
+    const mayHaveCommandInFlight = checkpoint.runStatus === 'ready_for_model';
+    if (mayHaveCommandInFlight) {
+      if (config.confirmPreviousCommandStopped !== true) {
+        throw new Error(
+          `cannot resume ${runDir}: this checkpoint (status '${checkpoint.runStatus}') may ` +
+            'have left a bash command running in scratch/workspace when the process stopped. ' +
+            'Confirm the previous process is actually gone, then pass ' +
+            'confirmPreviousCommandStopped: true to resume.',
+        );
+      }
+      // Before any hash verification: catches up the manifest with whatever
+      // an interrupted command left in scratch/workspace, so a legitimate
+      // change there is never mistaken for tampering by the check below.
+      syncScratchWorkspace(runDir);
+    }
+    // Changed bytes fail recovery before any model call — a run that
+    // resumes on top of silently altered evidence or artifacts is worse
+    // than a run that refuses to resume at all.
+    verifyManifestFiles(runDir);
+
+    if (checkpoint.runStatus === 'terminal') {
+      // Zero model and tool calls: the run already ended, and idempotent
+      // finalization is all that is left to do — the original process may
+      // have crashed after saveTerminal but before finalizeManifest ran.
+      const outcome = validateStoredOutcome(checkpoint.finalOutcome, runDir);
+      finalizeManifest(runDir);
+      return { runDir, ...outcome };
+    }
+
+    prepareLocalExecution(runDir);
+    assertBrowserScriptSupportIsPaired(config.browser);
+
+    const harnessConfiguration = checkpoint.runConfiguration.harness;
+    if (harnessConfiguration === undefined) {
+      throw new Error(
+        `checkpoint at ${runDir} has no harness configuration — only harness-mode runs are ` +
+          'checkpointed',
+      );
+    }
+    const v2Protocol = harnessConfiguration.outputContract;
+    const maxWorkerCycles = harnessConfiguration.maxWorkerCycles;
+    const maxContextTokens = checkpoint.runConfiguration.maxContextTokens;
+    const taskText = readManifest(runDir).task;
+
+    // Finish an interrupted prose initializer deterministically, without a
+    // second (billable, non-reproducible) initializer model call. Only ever
+    // relevant while runStatus is still 'initializing': every later status
+    // implies the initializer phase already ran to completion (runTask
+    // never opens the browser tab, and therefore never reaches
+    // 'ready_for_model', until it has).
+    if (checkpoint.runStatus === 'initializing') {
+      if (!v2Protocol) {
+        if (checkpoint.initializer?.proseAccepted === undefined) {
+          throw new Error(
+            `cannot resume ${runDir}: the initializer's own model call was never durably ` +
+              'recorded before the interruption. There is no salvageable initializer state ' +
+              '— start a fresh run with runTask instead.',
+          );
+        }
+        if (checkpoint.initializer.filesWritten !== true) {
+          writeInitializerFiles(runDir, checkpoint.initializer.proseAccepted);
+        }
+      }
+      // Typed path (either contractAuthor): nothing to finish
+      // deterministically. An initializer-authored contract accepted before
+      // the crash is already durable on disk and picked back up by
+      // rehydrateContractStore below; if the initializer's own call never
+      // completed, the worker's own set_output_contract call — offered
+      // unconditionally on the typed protocol regardless of contractAuthor
+      // — can still establish revision 1 once the resumed session starts.
+    }
+
+    const bashTool = createBashTool({ secretEnvDenylist: BASH_SECRET_ENV_DENYLIST }) as ToolDef;
+    const toolchain = buildRunToolchain({
+      runDir,
+      v2Protocol,
+      toolProfile: undefined,
+      browser: config.browser,
+      javascriptPolicy: config.javascriptPolicy,
+      authenticated: config.authenticated,
+      bashTool,
+    });
+
+    if (v2Protocol && toolchain.outputContracts !== undefined) {
+      rehydrateContractStore(runDir, toolchain.outputContracts);
+    }
+
+    const credentials =
+      config.credentials ??
+      new FileCredentialStore(
+        process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
+      );
+    const tracing = config.tracing ?? createRunTracing();
+    const baseCallModel = config.callModel ?? makeCallModel({
+      model: checkpoint.runConfiguration.model,
+      system: SYSTEM_PROMPT,
+      apiToolDefs: toolchain.apiToolDefs,
+      maxOutputTokens: checkpoint.runConfiguration.maxOutputTokens,
+      onProgress: config.onProgress,
+    });
+    const callModel = tracing.wrapCallModel(baseCallModel, checkpoint.runConfiguration.model);
+    const tracedRegistry = tracing.wrapRegistry(toolchain.registry);
+
+    const budgetConfig: RunBudgetConfig = {
+      maxWorkerTurns: ceilingFromCheckpoint(checkpoint.budget.config.maxWorkerTurns),
+      maxToolCalls: ceilingFromCheckpoint(checkpoint.budget.config.maxToolCalls),
+      maxModelTokens: ceilingFromCheckpoint(checkpoint.budget.config.maxModelTokens),
+      maxToolResultBytes: ceilingFromCheckpoint(checkpoint.budget.config.maxToolResultBytes),
+      maxWallTimeMs: ceilingFromCheckpoint(checkpoint.budget.config.maxWallTimeMs),
+      maxVerifierCorrections: ceilingFromCheckpoint(checkpoint.budget.config.maxVerifierCorrections),
+    };
+    // restore backdates startedAt by the snapshot's already-elapsed wall
+    // time (see createRunBudgetTracker) — a restart never refills headroom.
+    const budget = createRunBudgetTracker(budgetConfig, {
+      restore: {
+        elapsedWallTimeMs: checkpoint.budget.elapsedWallTimeMs,
+        roles: checkpoint.budget.roles,
+        toolCalls: checkpoint.budget.toolCalls,
+        toolResultBytes: checkpoint.budget.toolResultBytes,
+        corrections: checkpoint.budget.corrections,
+      },
+    });
+
+    const checkpointWriter = createRunCheckpointWriter(store, {
+      runConfiguration: checkpoint.runConfiguration,
+      budget,
+    });
+
+    const sessionDeps: WorkerSessionDeps = {
+      callModel,
+      registry: tracedRegistry,
+      runDir,
+      browser: config.browser,
+      credentials,
+      requestPermission: config.requestPermission,
+      ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
+      ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),
+      ...(v2Protocol ? { submissionProtocol: true } : {}),
+    };
+    const sessionConfig = { budget, maxContextTokens };
+    // Present exactly when runStatus already left 'initializing' (see
+    // runCheckpointV1Schema's own superRefine) — a fresh WorkerSession is
+    // built otherwise, exactly as a brand-new runTask call would.
+    const session: WorkerSession =
+      checkpoint.workerSession === undefined
+        ? createWorkerSession(taskText, sessionDeps, sessionConfig)
+        : restoreWorkerSession(
+            // Opaque cargo as far as the checkpoint schema is concerned
+            // (see runCheckpointStore.ts's module comment) — this writer's
+            // own assembleSession put exactly this shape there.
+            checkpoint.workerSession as unknown as WorkerSessionSnapshot,
+            sessionDeps,
+            sessionConfig,
+          );
+
+    let tabOpened = false;
+    try {
+      // A NEW BrowserController every time: the interrupted process's tab,
+      // page refs, and element refs are gone with it. Reusing them would be
+      // reusing state that no longer corresponds to anything real.
+      await config.browser.newTab();
+      tabOpened = true;
+      if (checkpoint.runConfiguration.startUrl !== undefined) {
+        await config.browser.goto(checkpoint.runConfiguration.startUrl);
+      }
+
+      // Exactly one recovery notice. Safe to append immediately here for
+      // every case except resuming a 'verifying' checkpoint on the typed
+      // protocol, where the conversation's last message is an unanswered
+      // submit_for_verification tool_use — inserting a plain user message
+      // before that call is answered would make the next request invalid.
+      // That one case defers the notice into runHarnessCycles's pendingNotice
+      // instead (folded into the first feedback this run produces).
+      const deferNotice = checkpoint.runStatus === 'verifying' && v2Protocol;
+      if (!deferNotice) {
+        appendWorkerFeedback(session, RECOVERY_NOTICE);
+      }
+
+      const verifierCallModel = withBudgetAccounting(
+        config.harness?.verifierCallModel ?? makeVerifierModelDriver(),
+        budget,
+        'verifier',
+      );
+
+      const cycleRecords = [...(checkpoint.runProgress.cycleRecords as HarnessCycleRecord[])];
+      const start =
+        checkpoint.workerSession === undefined
+          ? { cycle: 1, completionCheckFailures: 0, cycleRecords: [] as HarnessCycleRecord[] }
+          : {
+              cycle: checkpoint.runProgress.currentCycle,
+              completionCheckFailures: checkpoint.runProgress.completionCheckFailures,
+              cycleRecords,
+              ...(checkpoint.runStatus === 'verifying'
+                ? { precomputedResult: reconstructPendingResult(session, v2Protocol) }
+                : {}),
+              ...(deferNotice ? { pendingNotice: RECOVERY_NOTICE } : {}),
+            };
+
+      const result = await runHarnessCycles({
+        taskText,
+        runDir,
+        maxWorkerCycles,
+        maxCompletionCheckFailures: harnessConfiguration.maxCompletionCheckFailures,
+        session,
+        verifierCallModel,
+        checkpointWriter,
+        start,
+      });
+      return { runDir, ...result };
+    } finally {
+      try {
+        if (tabOpened) {
+          await config.browser.closeTab();
+        }
+      } finally {
+        try {
+          finalizeManifest(runDir);
+        } finally {
+          await tracing.close();
+        }
+      }
+    }
+  } finally {
+    // Idempotent (see RunCheckpointStore.close) — safe even when
+    // checkpointWriter.close() was never reached above (the terminal
+    // short-circuit, or any throw before it), and safe as the second call
+    // if it was.
+    await store.close();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The harness cycle loop
+// ---------------------------------------------------------------------------
+
+/**
+ * Run the harness's worker/judge cycles from an explicit starting point.
+ *
+ * Shared by a fresh run (`runVerificationHarness`: cycle 1, no prior
+ * records, nothing precomputed) and `resumeTask` (whatever cycle, failure
+ * count, and per-cycle diagnostic trail the checkpoint recorded) — one
+ * function, so a resumed run's loop can never drift from a fresh run's.
+ *
+ * `start.precomputedResult`, when given, stands in for a worker cycle that
+ * already finished before a crash (a `'verifying'` checkpoint resume, via
+ * `reconstructPendingResult`) — this loop's first iteration uses it INSTEAD
+ * of running the cycle's turns, consumed exactly once. Every later iteration
+ * runs a fresh cycle normally. This is the one rule that makes the
+ * fault-window promise in the module comments true: a completed worker
+ * cycle is never re-run, even across a crash.
+ *
+ * Checkpoint saves sit at exactly three boundaries, chosen because they are
+ * the only ones this function (not `scheduleToolCalls`, which it does not
+ * control) can observe:
+ *  - `saveReadyForModel`, immediately before every `runWorkerTurn` call —
+ *    not just once per cycle: a cycle that takes several turns (tool calls
+ *    before the final completion or submission) gets a fresh save before
+ *    EACH of them, by calling `runWorkerTurn` directly in a loop here
+ *    rather than treating `runWorkerCycle` as an unobservable black box (see
+ *    the inline comment where this loop lives). This covers the session's
+ *    very first turn, every later turn of a multi-turn cycle, a same-cycle
+ *    retry after a rejected submission, and the next cycle after a
+ *    correction. The instant after a correction's feedback is appended has
+ *    zero synchronous work before this save fires (`cycle += 1`, nothing
+ *    else), so a separate "save right after the verdict" call would be
+ *    redundant with it — this single rule already covers that moment.
+ *  - `saveVerifying`, after a cycle's completion checks (if any) already
+ *    passed and BEFORE `runVerifier` — the boundary that makes re-running
+ *    the (read-only) verifier after a crash acceptable while re-running the
+ *    worker cycle it belongs to is not.
+ *  - `saveTerminal`, once, right before returning — covers every ending
+ *    (verified, every incomplete reason) uniformly.
+ *
+ * What this still does NOT cover: a crash INSIDE `runWorkerTurn` itself —
+ * mid-model-call, or mid-`scheduleToolCalls` batch, which this function does
+ * not control and was not asked to instrument — rolls back to whatever the
+ * last per-turn save captured, discarding that one turn's work (its model
+ * response and any tool calls it made) as if it had never been attempted.
+ * The worker turns are never billed twice for the same content, since the
+ * budget only records USAGE a model call actually reported, and a
+ * genuinely-interrupted call reports none.
+ */
+async function runHarnessCycles(args: {
+  taskText: string;
+  runDir: string;
+  maxWorkerCycles: number;
+  maxCompletionCheckFailures: number;
+  session: WorkerSession;
+  verifierCallModel: CallModel;
+  checkpointWriter: RunCheckpointWriter;
+  start: {
+    cycle: number;
+    completionCheckFailures: number;
+    cycleRecords: HarnessCycleRecord[];
+    precomputedResult?: Extract<WorkerTurnOutcome, { kind: 'submitted' | 'completed' }>;
+    /** Recovery-notice text to fold into the very next feedback this run
+     * produces (see resumeTask's `deferNotice`), consumed exactly once. */
+    pendingNotice?: string;
+  };
+}): Promise<RunOutcome> {
+  const { taskText, runDir, maxWorkerCycles, session, verifierCallModel, checkpointWriter } = args;
+  const contractStore = session.deps.outputContracts;
+  const maxCompletionCheckFailures = args.maxCompletionCheckFailures;
+  let completionCheckFailures = args.start.completionCheckFailures;
+  const cycleRecords: HarnessCycleRecord[] = [...args.start.cycleRecords];
+  let pendingResult = args.start.precomputedResult;
+  let pendingNotice = args.start.pendingNotice;
   let outcome: RunOutcome | undefined;
+  let cycle = args.start.cycle;
+
+  const progressSnapshot = (): { currentCycle: number; completionCheckFailures: number; cycleRecords: HarnessCycleRecord[] } => ({
+    currentCycle: cycle,
+    completionCheckFailures,
+    cycleRecords: [...cycleRecords],
+  });
+
+  /** Fold in the one-time recovery notice, if one is still pending. */
+  const withPendingNotice = (content: string): string => {
+    if (pendingNotice === undefined) return content;
+    const notice = pendingNotice;
+    pendingNotice = undefined;
+    return `${notice}\n\n${content}`;
+  };
 
   try {
-    for (let cycle = 1; cycle <= maxWorkerCycles; cycle += 1) {
-      const cycleStartEvent: CycleStartEvent = { type: 'cycle_start', cycle };
-      appendTranscriptEvent(runDir, cycleStartEvent);
-
-      const result = await runWorkerCycle(session);
+    for (; cycle <= maxWorkerCycles; cycle += 1) {
+      let result: Exclude<WorkerTurnOutcome, { kind: 'working' }>;
+      if (pendingResult !== undefined) {
+        result = pendingResult;
+        pendingResult = undefined;
+      } else {
+        const cycleStartEvent: CycleStartEvent = { type: 'cycle_start', cycle };
+        appendTranscriptEvent(runDir, cycleStartEvent);
+        // Reimplements runWorkerCycle's own loop (call runWorkerTurn until it
+        // stops returning 'working') rather than calling runWorkerCycle as a
+        // black box, specifically so a checkpoint lands before EVERY turn of
+        // a cycle, not only before the cycle's first one. runWorkerTurn is a
+        // public export of workerSession.ts for exactly this kind of
+        // composition — this is still "a boundary runTask can observe", just
+        // a finer one than the cycle itself. The payoff: a crash on a
+        // cycle's second (or later) turn resumes from THAT turn, with every
+        // earlier turn's tool results already in the restored conversation,
+        // instead of silently discarding the whole cycle back to its start.
+        let turnOutcome: WorkerTurnOutcome;
+        for (;;) {
+          await checkpointWriter.saveReadyForModel({ session, progress: progressSnapshot() });
+          turnOutcome = await runWorkerTurn(session);
+          if (turnOutcome.kind !== 'working') break;
+        }
+        result = turnOutcome;
+      }
 
       if (result.kind === 'budget_exceeded') {
-        // Budgets end runs: no verifier call, no verdict/reason to record.
         cycleRecords.push({ cycle, workerStatus: 'budget_exceeded' });
         outcome = {
           status: 'incomplete',
@@ -774,7 +1549,7 @@ async function runVerificationHarness(
         // The table store renders the contract's table outputs as part of the
         // check — without it, a run with valid typed rows is told its own
         // deliverable is missing.
-        const checks = runCompletionCheck(runDir, contract, loopDeps.outputTables);
+        const checks = runCompletionCheck(runDir, contract, session.deps.outputTables);
         settled = checks.settled;
         if (!checks.ok) {
           completionCheckFailures += 1;
@@ -806,13 +1581,17 @@ async function runVerificationHarness(
           appendSubmissionResult(
             session,
             result.call,
-            `Automated checks rejected this submission. Nothing was verified. Fix all of ` +
-              `these and submit again:\n${formatCheckFailures(checks.failures)}`,
+            withPendingNotice(
+              `Automated checks rejected this submission. Nothing was verified. Fix all of ` +
+                `these and submit again:\n${formatCheckFailures(checks.failures)}`,
+            ),
           );
           cycle -= 1; // a rejected submission is not a verification cycle
           continue;
         }
       }
+
+      await checkpointWriter.saveVerifying({ session, progress: progressSnapshot() });
 
       // Only a harness bug throws out of runVerifier (a run dir missing its
       // contract documents) or a caller cancellation (an AbortError); every
@@ -861,7 +1640,12 @@ async function runVerificationHarness(
 
       if (verification.status === 'verified') {
         if (result.kind === 'submitted') {
-          appendSubmissionResult(session, result.call, JSON.stringify({ status: 'verified' }), false);
+          appendSubmissionResult(
+            session,
+            result.call,
+            withPendingNotice(JSON.stringify({ status: 'verified' })),
+            false,
+          );
         }
         outcome = { status: 'verified', finalText: result.finalText };
         break;
@@ -884,15 +1668,15 @@ async function runVerificationHarness(
       // Same session, same conversation: the correction arrives as
       // feedback appended to everything the worker already knows. When the
       // cycle ended in a submission, the findings answer that exact call.
-      sessionConfig.budget.recordCorrection();
+      session.config.budget.recordCorrection();
       if (result.kind === 'submitted') {
         appendSubmissionResult(
           session,
           result.call,
-          `Verification found problems. Fix these and submit again:\n${findingsText}`,
+          withPendingNotice(`Verification found problems. Fix these and submit again:\n${findingsText}`),
         );
       } else {
-        appendWorkerFeedback(session, `Verification findings:\n${findingsText}`);
+        appendWorkerFeedback(session, withPendingNotice(`Verification findings:\n${findingsText}`));
       }
     }
   } catch (error) {
@@ -912,7 +1696,7 @@ async function runVerificationHarness(
   // requirement is unmet are marked partial (see finalizeIncompleteRun).
   if (outcome.status === 'incomplete') {
     const contract = contractStore?.currentContract();
-    const finalization = finalizeIncompleteRun(runDir, contract, loopDeps.outputTables);
+    const finalization = finalizeIncompleteRun(runDir, contract, session.deps.outputTables);
     if (finalization.markedPartial.length > 0) {
       appendTranscriptEvent(runDir, {
         type: 'incomplete_finalization',
@@ -933,7 +1717,52 @@ async function runVerificationHarness(
   });
   writeWorkerSessionMetrics(session, outcome.status);
 
+  await checkpointWriter.saveTerminal({ session, progress: progressSnapshot(), outcome });
+
   return outcome;
+}
+
+/**
+ * Run the verification harness's worker/judge phase over ONE persistent
+ * WorkerSession, starting fresh at cycle 1. Cycle 1 opens with the task
+ * text; every later cycle is the same conversation continued — the judge's
+ * reason is appended as feedback (appendWorkerFeedback), so the worker keeps
+ * its browser knowledge and prior tool results instead of starting over. By
+ * the time this runs, the contract-authoring files already exist at the
+ * run-dir root (written by `runTask` before the tab opened).
+ *
+ * The loop itself lives in `runHarnessCycles`, shared with `resumeTask` — see
+ * its own doc comment for the per-cycle mechanics, checkpoint boundaries, and
+ * every ending this can produce.
+ */
+async function runVerificationHarness(
+  taskText: string,
+  runDir: string,
+  harnessConfig: HarnessConfig,
+  maxWorkerCycles: number,
+  loopDeps: LoopDeps,
+  sessionConfig: { budget: RunBudgetTracker; maxContextTokens: number },
+  checkpointWriter: RunCheckpointWriter,
+): Promise<RunOutcome> {
+  const verifierCallModel = withBudgetAccounting(
+    harnessConfig.verifierCallModel ?? makeVerifierModelDriver(),
+    sessionConfig.budget,
+    'verifier',
+  );
+  const maxCompletionCheckFailures =
+    harnessConfig.maxCompletionCheckFailures ?? DEFAULT_MAX_COMPLETION_CHECK_FAILURES;
+  const session = createWorkerSession(taskText, loopDeps, sessionConfig);
+
+  return runHarnessCycles({
+    taskText,
+    runDir,
+    maxWorkerCycles,
+    maxCompletionCheckFailures,
+    session,
+    verifierCallModel,
+    checkpointWriter,
+    start: { cycle: 1, completionCheckFailures: 0, cycleRecords: [] },
+  });
 }
 
 /**
