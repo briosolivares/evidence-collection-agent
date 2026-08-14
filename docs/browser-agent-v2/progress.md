@@ -388,6 +388,7 @@ code-level choices belong in code review, not here.
 | Date | Task | Focused tests | Typecheck | Full tests | Live eval |
 | --- | --- | --- | --- | --- | --- |
 | 2026-08-13 | Live V2 validation | pass | 0 errors | 1514 pass; 19 browser/TUI load flakes, each file green in isolation | stub 2/2, openclaw_pr 3/3, hacker_news 6/6 (V2, k=1) |
+| 2026-08-13 | Findings 3–6 | pass (13 files, 206 tests; plus 8 cli/browser files, 87 tests) | 0 errors | 1537/1540 then 1539/1540 — the failing set DIFFERED between the two runs (browserAction + 2 TUI, then preflight alone) and every file passed in isolation: the known load flake | none run, by user direction |
 
 ## Live validation, 2026-08-13
 
