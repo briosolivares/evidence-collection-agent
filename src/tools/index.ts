@@ -209,8 +209,6 @@ export const V2_TOOL_ORDER: readonly string[] = [
   // Credentials and the human.
   'fill_credentials',
   'ask_user_question',
-  // Parallel research.
-  'run_research_jobs',
   // Completion.
   'submit_for_verification',
 ];

@@ -94,7 +94,6 @@ describe('V2 tool order', () => {
       'bash',
       'fill_credentials',
       'ask_user_question',
-      'run_research_jobs',
       'submit_for_verification',
     ]);
   });
@@ -145,7 +144,6 @@ describe('V2 tool order', () => {
       'read_resource',
       'capture_text',
       'inspect_document',
-      'run_research_jobs',
     ]) {
       expect(names.has(runScoped)).toBe(false);
     }
