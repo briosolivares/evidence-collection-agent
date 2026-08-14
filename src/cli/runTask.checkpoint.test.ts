@@ -16,6 +16,7 @@ import { createRunDir } from '../run/runDir.js';
 import { generateRunId } from '../run/runId.js';
 import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
 import type { RunMetrics } from '../loop/agentLoop.js';
+import type { ToolProfile } from '../tools/index.js';
 import { createRunCheckpointWriter } from './runCheckpoint.js';
 import { resumeTask, runTask, type RunTaskResult } from './runTask.js';
 
@@ -185,10 +186,16 @@ describe('runTask checkpointing and resumeTask', () => {
    * call is needed to reach a valid checkpoint — this run never actually
    * executes past `'initializing'`, so nothing here depends on
    * INTENT.md/CONTRACT.md having been written.
+   *
+   * `toolProfile` defaults to `'atomic'` (every caller but the
+   * toolProfile-resume regression test wants the default surface); pass
+   * `'batch-enabled'` when the checkpoint being built needs to record that
+   * choice for `resumeTask` to read back.
    */
   async function buildExecutingToolsRunDir(
     taskText: string,
     toolCalls: NonNullable<RunCheckpointV1['pendingTurn']>['toolCalls'],
+    toolProfile: ToolProfile = 'atomic',
   ): Promise<string> {
     const runDir = createRunDir(runsBaseDir, generateRunId(taskText));
     initManifest(runDir, taskText);
@@ -205,7 +212,7 @@ describe('runTask checkpointing and resumeTask', () => {
     const writer = createRunCheckpointWriter(store, {
       runConfiguration: {
         model: 'claude-sonnet-5',
-        toolProfile: 'atomic',
+        toolProfile,
         maxOutputTokens: 8192,
         maxTurns: 'unbounded',
         maxContextTokens: 100_000,
@@ -860,6 +867,68 @@ describe('runTask checkpointing and resumeTask', () => {
       const submissionAnswer = finalMessages.at(-1) as { content: Array<{ content: string }> };
       expect(submissionAnswer.content[0]?.content).toContain('recovered after an interruption');
       expect(submissionAnswer.content[0]?.content).toContain('"status":"verified"');
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "resume rebuilds the toolchain from the checkpoint's own toolProfile, not a hardcoded default — browser_batch survives a resume of a 'batch-enabled' run",
+    async () => {
+      const taskText =
+        "Batch-enabled run crashes mid-tool-batch and must resume with browser_batch still offered.";
+      const runDir = await buildExecutingToolsRunDir(
+        taskText,
+        [
+          {
+            request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } },
+            executionStatus: 'running',
+          },
+        ],
+        'batch-enabled',
+      );
+
+      // The regression this guards: resumeTask used to call buildRunToolchain
+      // with `toolProfile: undefined`, which silently falls back to the
+      // 'atomic' default (see buildRunToolchain / DEFAULT_TOOL_PROFILE) and
+      // drops browser_batch from the resumed registry even though this
+      // checkpoint recorded 'batch-enabled'. Calling browser_batch below
+      // would then come back as the pipeline's own "unknown tool" error
+      // instead of actually running.
+      const continuation = scriptModel([
+        toolResponse('batch-1', 'browser_batch', {
+          actions: [{ tool: 'inspect_page', input: {} }],
+        }),
+        textResponse('Finishing up.'),
+      ]);
+      const continuationVerifier = scriptModel([verifierVerified()]);
+
+      const result = await resumeTask(runDir, {
+        browser,
+        confirmPreviousCommandStopped: true,
+        callModel: continuation.callModel,
+        harness: { verifierCallModel: continuationVerifier.callModel },
+      });
+
+      expect(result).toMatchObject({ runDir, status: 'verified' });
+
+      // The second worker call's messages carry the tool_result answering
+      // the browser_batch call above — assert it actually ran rather than
+      // being rejected as an unknown tool.
+      expect(continuation.requests).toHaveLength(2);
+      let toolResultBlock: { content: string | unknown[]; is_error?: boolean } | undefined;
+      for (const message of continuation.requests[1]!) {
+        for (const block of message.content) {
+          if (block.type === 'tool_result' && block.tool_use_id === 'batch-1') {
+            toolResultBlock = block;
+          }
+        }
+      }
+      expect(toolResultBlock).toBeDefined();
+      expect(toolResultBlock?.is_error).not.toBe(true);
+      expect(typeof toolResultBlock?.content).toBe('string');
+      const toolResultText = toolResultBlock?.content as string;
+      expect(toolResultText).not.toContain('Unknown tool');
+      expect(toolResultText).toContain('"status":"completed"');
     },
     TEST_TIMEOUT_MS,
   );

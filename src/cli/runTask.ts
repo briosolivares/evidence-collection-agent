@@ -1494,7 +1494,7 @@ export async function resumeTask(
     const toolchain = buildRunToolchain({
       runDir,
       v2Protocol,
-      toolProfile: undefined,
+      toolProfile: checkpoint.runConfiguration.toolProfile as ToolProfile,
       browser: config.browser,
       javascriptPolicy: config.javascriptPolicy,
       authenticated: config.authenticated,
