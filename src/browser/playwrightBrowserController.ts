@@ -174,6 +174,30 @@ export interface LocalChromeBrowserSessionOptions {
   executablePath?: string;
 }
 
+/**
+ * Turn off Chrome's Device Bound Session Credentials.
+ *
+ * With DBSC on, Google stops storing a long-lived auth cookie and instead
+ * mints short-lived ones from a key bound to the browser instance. A
+ * Playwright-launched Chrome cannot complete that binding refresh, so a
+ * profile signed in by hand reads as signed OUT the moment automation opens
+ * it — verified headed and headless, and no amount of hiding the automation
+ * flags changes it, because the missing piece is a key handshake rather than
+ * a fingerprint.
+ *
+ * Disabled here so Google falls back to an ordinary persistent cookie, which
+ * a profile can actually carry from a manual sign-in into an automated run.
+ * Both feature names are listed: Chrome has shipped this under two, and
+ * naming one that does not exist in a given build is harmless.
+ *
+ * Must be identical on the manual sign-in launch and every automated launch.
+ * If the sign-in happens with DBSC on, the session is bound at issue time and
+ * disabling the feature afterwards cannot unbind it — hence the shared
+ * constant rather than two hand-written flag strings.
+ */
+export const DISABLE_DEVICE_BOUND_SESSIONS_FLAG =
+  '--disable-features=DeviceBoundSessionCredentials,StandardDeviceBoundSessionCredentials';
+
 /** Launch the persistent-profile Chrome exactly as agent sessions do.
  * Exported so the `login` helper opens the SAME profile with the SAME
  * binary resolution — a second launch path would reintroduce the
@@ -197,9 +221,11 @@ export async function launchPersistentChrome(
     // `chromium.connectOverCDP` without disturbing this controller's own
     // connection. Port 0 asks Chrome for an ephemeral port; the port Chrome
     // actually chose is read back from DevToolsActivePort in the SAME
-    // profile directory (see readDevToolsActivePortUrl). This is the first
-    // `args` entry this codebase has ever passed to Chrome.
-    args: ['--remote-debugging-port=0'],
+    // profile directory (see readDevToolsActivePortUrl).
+    //
+    // The second flag keeps a hand-signed-in Google session usable here —
+    // see DISABLE_DEVICE_BOUND_SESSIONS_FLAG.
+    args: ['--remote-debugging-port=0', DISABLE_DEVICE_BOUND_SESSIONS_FLAG],
   });
 }
 
