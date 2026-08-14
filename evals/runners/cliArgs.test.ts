@@ -9,12 +9,14 @@ describe('parseEvalArgs', () => {
       k: 2,
       concurrency: 3,
       contractAuthor: 'initializer',
+      skipLoginCheck: false,
     });
     expect(parseEvalArgs(['--tasks', 'hacker_news,edgar', '--k=3'])).toEqual({
       tasks: ['hacker_news', 'edgar'],
       k: 3,
       concurrency: 3,
       contractAuthor: 'initializer',
+      skipLoginCheck: false,
     });
   });
 
@@ -62,5 +64,17 @@ describe('parseEvalArgs', () => {
     expect(() => parseEvalArgs(['--tasks', ','])).toThrow(/at least one/);
     expect(() => parseEvalArgs(['--tasks', 'stub', '--verbose'])).toThrow(/unknown argument/);
     expect(() => parseEvalArgs(['--tasks'])).toThrow(/missing value/);
+  });
+});
+
+describe('--skip-login-check', () => {
+  it('defaults to running the login gate', () => {
+    expect(parseEvalArgs(['--tasks', 'stub']).skipLoginCheck).toBe(false);
+  });
+
+  it('is a bare flag that consumes no value', () => {
+    const args = parseEvalArgs(['--tasks', 'stub', '--skip-login-check', '--k', '2']);
+    expect(args.skipLoginCheck).toBe(true);
+    expect(args.k).toBe(2);
   });
 });

@@ -228,7 +228,10 @@ describe('executeToolCall permission gate', () => {
       errorKind: 'permission_denied',
     });
     expect(result.content).toContain('does not support');
-    expect(result.content).toContain('Proceed without it');
+    // Not "proceed without it": an agent blocked by a login wall took that
+    // as licence to find another way in, and tried to create an account.
+    expect(result.content).toMatch(/do not create an account/i);
+    expect(result.content).toMatch(/report the blocker/i);
     expect(executed).toEqual([]);
   });
 

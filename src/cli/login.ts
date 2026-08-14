@@ -26,12 +26,8 @@ import {
   findDevRoot,
   resolveSherlockPaths,
 } from '../config/paths.js';
-import {
-  HEADED_LANE_SERVICES,
-  settleProbe,
-  type LoginService,
-  type LoginState,
-} from './loginProbe.js';
+import { probeServices } from './loginCheck.js';
+import { HEADED_LANE_SERVICES, allLoggedIn, formatLoginState } from './loginProbe.js';
 
 const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
 
@@ -42,34 +38,12 @@ const checkOnly = process.argv.includes('--check');
 console.log(`Chrome profile: ${paths.profileDir}`);
 console.log('(the exact directory headed eval trials launch — logins anywhere else do not count)');
 
-async function probeService(context: BrowserContext, service: LoginService): Promise<LoginState> {
-  const page = await context.newPage();
-  try {
-    await page.goto(service.probeUrl, {
-      waitUntil: 'domcontentloaded',
-      timeout: PROBE_NAVIGATION_TIMEOUT_MS,
-    });
-    return await settleProbe(service, () => page.url(), (ms) => page.waitForTimeout(ms));
-  } catch {
-    return 'pending';
-  } finally {
-    await page.close().catch(() => undefined);
-  }
-}
-
 /** Probe every headed-lane service, print one status line each. */
 async function verifyAll(context: BrowserContext): Promise<boolean> {
-  let allLoggedIn = true;
-  for (const service of HEADED_LANE_SERVICES) {
-    const state = await probeService(context, service);
-    const label =
-      state === 'logged-in' ? 'LOGGED IN' :
-      state === 'logged-out' ? 'NOT LOGGED IN' :
-      'UNVERIFIED (page never reached a recognizable destination)';
-    console.log(`  ${service.name}: ${label}`);
-    if (state !== 'logged-in') allLoggedIn = false;
-  }
-  return allLoggedIn;
+  const statuses = await probeServices(context, HEADED_LANE_SERVICES, (status) => {
+    console.log(`  ${status.service.name}: ${formatLoginState(status.state)}`);
+  });
+  return allLoggedIn(statuses);
 }
 
 const context = await launchPersistentChrome({

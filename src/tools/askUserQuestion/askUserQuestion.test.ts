@@ -146,6 +146,9 @@ describe('ask_user_question tool', () => {
       isError: true,
       errorKind: 'permission_denied',
     });
-    expect(result.content).toContain('Proceed without it');
+    // The fail-closed error is the only guidance the agent gets at a login
+    // wall it cannot pass, so it names the wrong move explicitly.
+    expect(result.content).toMatch(/do not create an account/i);
+    expect(result.content).toMatch(/report the blocker/i);
   });
 });

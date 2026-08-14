@@ -86,3 +86,60 @@ describe('createBrowserBackedRunTask', () => {
     expect(configs[0]).not.toHaveProperty('startUrl');
   });
 });
+
+describe('unanswerable questions in an unattended batch', () => {
+  const runOnce = async () => {
+    const browser = { close: vi.fn() } as unknown as BrowserController;
+    const browserRuntime: EvalBrowserRuntime = {
+      withBrowser: async (_headed, operation) => operation(browser),
+      close: vi.fn(),
+    };
+    const notices: string[] = [];
+    let decision: unknown;
+    const runTaskFn = vi.fn(async (_taskText: string, config: RunTaskConfig) => {
+      decision = await config.requestPermission?.({
+        toolName: 'ask_user_question',
+        input: { question: 'Please sign in to Google, then tell me when done.' },
+      });
+      return { runDir: '/runs/one' };
+    });
+
+    await createBrowserBackedRunTask({
+      browserRuntime,
+      model: 'test-model',
+      runsBaseDir: '/runs',
+      runTaskFn,
+      onHumanNeeded: (message) => notices.push(message),
+    })('collect evidence', {
+      taskName: 'mit_sororities',
+      trialIndex: 0,
+      trialNumber: 2,
+      k: 3,
+      headed: true,
+      signal: new AbortController().signal,
+    });
+
+    return { notices, decision };
+  };
+
+  it('announces the blocked trial, naming the task, trial, and question', async () => {
+    const { notices } = await runOnce();
+
+    expect(notices).toHaveLength(1);
+    expect(notices[0]).toContain('HUMAN NEEDED');
+    expect(notices[0]).toContain('mit_sororities trial 2/3');
+    expect(notices[0]).toContain('Please sign in to Google');
+  });
+
+  // The recorded failure: told to "proceed without it", an agent blocked by a
+  // signed-out Google account went looking for a way around the wall and
+  // started creating an account. The denial has to close that door explicitly.
+  it('denies with instructions to report the blocker, not to work around it', async () => {
+    const { decision } = await runOnce();
+
+    expect(decision).toMatchObject({ behavior: 'deny' });
+    const feedback = (decision as { feedback: string }).feedback;
+    expect(feedback).toMatch(/do not create an account/i);
+    expect(feedback).toMatch(/report the blocker/i);
+  });
+});

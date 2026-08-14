@@ -83,6 +83,16 @@ export interface EvalTask {
    * (SEC EDGAR, Google Search).
    */
   headed: boolean;
+  /**
+   * Login service ids this task cannot be completed without (see
+   * `src/cli/loginProbe.ts`). Distinct from `headed`: a task can need the
+   * headed lane purely to dodge bot-blocking and require no session at all
+   * (edgar), while another is dead in the water without one (mit_sororities
+   * → `google-sheets`). The batch preflight probes exactly this union, so a
+   * signed-out profile fails before the first token is spent rather than
+   * mid-run, where the agent has nobody to ask.
+   */
+  requiresLogin: readonly string[];
   /** Fetches this task's ground truth; called at grading time (Tier A oracles must be fresh). */
   fetchOracle: () => Promise<unknown>;
   /** The task's grader; see Grader for the standing rule it lives under. */

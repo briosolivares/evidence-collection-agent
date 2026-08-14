@@ -11,12 +11,16 @@ export interface EvalCliArgs {
   concurrency: number;
   /** Who states the typed output contract every batch runs. */
   contractAuthor: ContractAuthor;
+  /** Skip the pre-batch login gate and run even if a required session is
+   * missing — the escape hatch for deliberately measuring what the agent
+   * does at a login wall. */
+  skipLoginCheck: boolean;
 }
 
 /**
  * Parse the eval CLI's arguments: `--tasks <a,b,c>` (required) and
  * `--k <n>` (optional, default 1). Both `--flag value` and `--flag=value`
- * are accepted.
+ * are accepted. `--skip-login-check` is a bare boolean flag.
  *
  * @param argv - the arguments after the script name (process.argv.slice(2))
  * @returns the task names (comma-split, trimmed, blanks dropped) and k;
@@ -28,6 +32,7 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
   let kRaw: string | undefined;
   let concurrencyRaw: string | undefined;
   let contractAuthorRaw: string | undefined;
+  let skipLoginCheck = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
@@ -46,10 +51,11 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     else if (flag === '--k') kRaw = takeValue();
     else if (flag === '--concurrency') concurrencyRaw = takeValue();
     else if (flag === '--contract-author') contractAuthorRaw = takeValue();
+    else if (flag === '--skip-login-check') skipLoginCheck = true;
     else throw new Error(
       `unknown argument ${JSON.stringify(arg)} ` +
         '(usage: --tasks <a,b,c> [--k <n>] [--concurrency <n>] ' +
-          '[--contract-author initializer|worker])',
+          '[--contract-author initializer|worker] [--skip-login-check])',
     );
   }
 
@@ -89,5 +95,5 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     );
   }
 
-  return { tasks, k, concurrency, contractAuthor };
+  return { tasks, k, concurrency, contractAuthor, skipLoginCheck };
 }

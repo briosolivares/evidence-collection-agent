@@ -96,6 +96,7 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
     taskText: `run the ${name} investigation`,
     startUrl: `https://start.example/${name}`,
     headed: false,
+    requiresLogin: [],
     fetchOracle: async () => ({ oracleFor: name }),
     grade: (runDir, oracle) => {
       fixture.gradeCalls.push([runDir, oracle]);
@@ -331,6 +332,7 @@ describe('startEvalBatch', () => {
       name,
       taskText: name,
       headed: false,
+      requiresLogin: [],
       fetchOracle: async () => ({}),
       grade: async () => [{ name: 'ok', passed: true, detail: 'ok' }],
     });

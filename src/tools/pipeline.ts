@@ -148,7 +148,10 @@ export async function executeToolCall(
         errorKind: 'permission_denied',
         content:
           `Tool "${call.name}" requires user interaction, which this ` +
-          `environment does not support. Proceed without it.`,
+          `environment does not support. Nobody can answer, and there is no ` +
+          `workaround to find: do not create an account, sign up, or enter ` +
+          `credentials. Complete what you can reach, then report the blocker ` +
+          `in your deliverables and finish the run.`,
       };
     }
     const decision = await ctx.requestPermission({

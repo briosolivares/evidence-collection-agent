@@ -13,7 +13,13 @@
 /** What a probe navigation revealed about the session. */
 export type LoginState = 'logged-in' | 'logged-out' | 'pending';
 
+/** Stable identifier a caller can name in data — an eval task.json says
+ * `"requiresLogin": ["google-sheets"]`, not a URL or a display name. */
+export type LoginServiceId = 'google-sheets' | 'x';
+
 export interface LoginService {
+  /** Stable id used in configuration and task metadata. */
+  id: LoginServiceId;
   /** Human label used in status lines. */
   name: string;
   /** URL whose post-redirect destination reveals the session state. */
@@ -26,6 +32,7 @@ export interface LoginService {
 /** Sheets home: signed out server-redirects to accounts.google.com;
  * signed in it stays on docs.google.com/spreadsheets. */
 export const GOOGLE_SHEETS: LoginService = {
+  id: 'google-sheets',
   name: 'Google (Sheets)',
   probeUrl: 'https://docs.google.com/spreadsheets/u/0/',
   classify: (url) => {
@@ -43,6 +50,7 @@ export const GOOGLE_SHEETS: LoginService = {
  * settle loop's confirmation re-check exists for exactly this); signed
  * in it stays on /home. */
 export const X_HOME: LoginService = {
+  id: 'x',
   name: 'X',
   probeUrl: 'https://x.com/home',
   classify: (url) => {
@@ -60,6 +68,51 @@ export const X_HOME: LoginService = {
 /** Every service the headed lane needs: mit → Google Sheets;
  * edgar + elon_tweets → X. */
 export const HEADED_LANE_SERVICES: readonly LoginService[] = [GOOGLE_SHEETS, X_HOME];
+
+/**
+ * Resolve service ids to probes, in the order `HEADED_LANE_SERVICES`
+ * declares them, dropping duplicates.
+ *
+ * @param ids - service ids, e.g. from eval task metadata
+ * @returns the matching probes; throws naming the unknown id, because a
+ *   silently-dropped requirement is a batch that reports "login OK" for a
+ *   service it never checked
+ */
+export function loginServicesForIds(ids: Iterable<string>): LoginService[] {
+  const wanted = new Set<string>();
+  for (const id of ids) {
+    const known = HEADED_LANE_SERVICES.some((service) => service.id === id);
+    if (!known) {
+      throw new Error(
+        `unknown login service ${JSON.stringify(id)} ` +
+          `(known: ${HEADED_LANE_SERVICES.map((s) => s.id).join(', ')})`,
+      );
+    }
+    wanted.add(id);
+  }
+  return HEADED_LANE_SERVICES.filter((service) => wanted.has(service.id));
+}
+
+/** One service's verdict. */
+export interface ServiceLoginStatus {
+  service: LoginService;
+  state: LoginState;
+}
+
+/** Whether every probed service is signed in. `pending` counts as not
+ * ready: an unverified session is exactly the case that burned two
+ * batches, so it must never pass a gate. */
+export function allLoggedIn(statuses: readonly ServiceLoginStatus[]): boolean {
+  return statuses.every((status) => status.state === 'logged-in');
+}
+
+/** Terminal-facing label for a probe verdict, shared by every caller so
+ * "NOT LOGGED IN" reads identically in the helper and in a batch preflight. */
+export function formatLoginState(state: LoginState): string {
+  if (state === 'logged-in') return 'LOGGED IN';
+  if (state === 'logged-out') return 'NOT LOGGED IN';
+  return 'UNVERIFIED (page never reached a recognizable destination)';
+}
 
 export interface SettleOptions {
   /** Give up and report `pending` after this long. */

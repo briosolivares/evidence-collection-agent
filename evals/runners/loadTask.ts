@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { loginServicesForIds } from '../../src/cli/loginProbe.js';
 import type { EvalTask, Grader } from '../types.js';
 
 /**
@@ -24,7 +25,7 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     );
   }
   const taskDir = join(resolve(evalsDir), name);
-  const { task, startUrl, headed } = readTaskJson(taskDir, name);
+  const { task, startUrl, headed, requiresLogin } = readTaskJson(taskDir, name);
 
   const fetchOracle = await importTaskFunction(taskDir, name, 'oracle/oracle.ts', 'fetchOracle');
   const grade = await importTaskFunction(taskDir, name, 'grader/grader.ts', 'grade');
@@ -34,21 +35,29 @@ export async function loadEvalTask(evalsDir: string, name: string): Promise<Eval
     taskText: task,
     startUrl,
     headed,
+    requiresLogin,
     fetchOracle: fetchOracle as EvalTask['fetchOracle'],
     grade: grade as Grader,
   };
 }
 
 /**
- * Read and validate <taskDir>/task.json: { task, startUrl?, headed? }.
+ * Read and validate <taskDir>/task.json:
+ * { task, startUrl?, headed?, requiresLogin? }.
+ *
  * `headed` puts the task on the serial headed persistent-profile browser
  * lane — for tasks that need a real login or that bot-block headless
  * browsers. Defaults to false (headless isolated pool).
+ *
+ * `requiresLogin` names the sessions the task genuinely cannot run without,
+ * and is validated against the known probes here rather than at preflight
+ * time: a typo must fail when the dataset is loaded, not be silently
+ * skipped by the gate meant to catch it. Defaults to none.
  */
 function readTaskJson(
   taskDir: string,
   name: string,
-): { task: string; startUrl?: string; headed: boolean } {
+): { task: string; startUrl?: string; headed: boolean; requiresLogin: string[] } {
   const jsonPath = join(taskDir, 'task.json');
 
   let raw: string;
@@ -65,7 +74,13 @@ function readTaskJson(
     throw new Error(`task "${name}": task.json is not valid JSON`);
   }
 
-  const obj = parsed as { task?: unknown; startUrl?: unknown; headed?: unknown; requiresAuth?: unknown };
+  const obj = parsed as {
+    task?: unknown;
+    startUrl?: unknown;
+    headed?: unknown;
+    requiresAuth?: unknown;
+    requiresLogin?: unknown;
+  };
   if (typeof parsed !== 'object' || parsed === null || typeof obj.task !== 'string' || obj.task === '') {
     throw new Error(`task "${name}": task.json must have a non-empty string "task" field`);
   }
@@ -81,10 +96,30 @@ function readTaskJson(
   if (obj.headed !== undefined && typeof obj.headed !== 'boolean') {
     throw new Error(`task "${name}": task.json "headed" must be a boolean when present`);
   }
+
+  let requiresLogin: string[] = [];
+  if (obj.requiresLogin !== undefined) {
+    if (!Array.isArray(obj.requiresLogin) || obj.requiresLogin.some((id) => typeof id !== 'string')) {
+      throw new Error(
+        `task "${name}": task.json "requiresLogin" must be an array of service id strings when present`,
+      );
+    }
+    try {
+      requiresLogin = loginServicesForIds(obj.requiresLogin as string[]).map(
+        (service) => service.id,
+      );
+    } catch (err) {
+      throw new Error(
+        `task "${name}": task.json "requiresLogin" — ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
   return {
     task: obj.task,
     ...(obj.startUrl !== undefined ? { startUrl: obj.startUrl } : {}),
     headed: obj.headed ?? false,
+    requiresLogin,
   };
 }
 

@@ -46,6 +46,43 @@ describe('loadEvalTask', () => {
     }
   });
 
+  it('reads the sessions a task cannot run without, defaulting to none', async () => {
+    await expect(loadEvalTask(evalsDir, 'mit_sororities')).resolves.toMatchObject({
+      requiresLogin: ['google-sheets'],
+    });
+    await expect(loadEvalTask(evalsDir, 'elon_tweets')).resolves.toMatchObject({
+      requiresLogin: ['x'],
+    });
+    // edgar is headed to dodge bot-blocking, not for a session: the two
+    // properties are independent and the loader must not conflate them.
+    await expect(loadEvalTask(evalsDir, 'edgar')).resolves.toMatchObject({
+      headed: true,
+      requiresLogin: [],
+    });
+    await expect(loadEvalTask(evalsDir, 'stub')).resolves.toMatchObject({ requiresLogin: [] });
+  });
+
+  it('rejects an unknown or malformed login requirement at load time', async () => {
+    const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-login-test-'));
+    try {
+      mkdirSync(join(tmpEvals, 'typo'));
+      writeFileSync(
+        join(tmpEvals, 'typo', 'task.json'),
+        '{"task":"typo","requiresLogin":["gogle-sheets"]}',
+      );
+      await expect(loadEvalTask(tmpEvals, 'typo')).rejects.toThrow(/unknown login service/);
+
+      mkdirSync(join(tmpEvals, 'shape'));
+      writeFileSync(
+        join(tmpEvals, 'shape', 'task.json'),
+        '{"task":"shape","requiresLogin":"google-sheets"}',
+      );
+      await expect(loadEvalTask(tmpEvals, 'shape')).rejects.toThrow(/must be an array/);
+    } finally {
+      rmSync(tmpEvals, { recursive: true, force: true });
+    }
+  });
+
   it('rejects the retired "requiresAuth" field instead of dropping the task to headless', async () => {
     const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-legacy-test-'));
     try {

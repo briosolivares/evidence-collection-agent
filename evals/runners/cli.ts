@@ -10,6 +10,8 @@
 import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { checkProfileLogins } from '../../src/cli/loginCheck.js';
+import { allLoggedIn, formatLoginState, loginServicesForIds } from '../../src/cli/loginProbe.js';
 import { chromeExecutablePath } from '../../src/config/paths.js';
 import { generateRunId } from '../../src/run/runId.js';
 import { DATASETS_DIR, EXPERIMENTS_DIR, MODEL, PROFILE_DIR, RUNS_DIR } from '../config.js';
@@ -17,6 +19,7 @@ import { parseEvalArgs } from './cliArgs.js';
 import { createEvalBrowserRuntime } from './browserRuntime.js';
 import { createBrowserBackedRunTask } from './cliRuntime.js';
 import { loadEvalTask } from './loadTask.js';
+import { formatLoginPreflightFailure, requiredLogins } from './loginPreflight.js';
 import { formatReport, writeResults } from './report.js';
 import { runEvals, type EvalProtocol } from './runner.js';
 import { formatEvalProgress, trialLabel } from './progress.js';
@@ -34,6 +37,35 @@ async function main(): Promise<void> {
     console.warn(
       'warning: ANTHROPIC_API_KEY is not set — the SDK will try its other ambient ' +
         'credential sources; without any, the first model call will fail.',
+    );
+  }
+
+  // Before any tokens are spent: does the profile hold the sessions this
+  // batch's tasks cannot run without? See loginPreflight.ts.
+  const requirements = requiredLogins(tasks);
+  if (requirements.length > 0 && !args.skipLoginCheck) {
+    console.log(
+      `login preflight: ${requirements.map((req) => req.id).join(', ')} ` +
+        `(profile ${PROFILE_DIR})`,
+    );
+    const statuses = await checkProfileLogins({
+      profileDir: PROFILE_DIR,
+      executablePath: chromeExecutablePath(),
+      services: loginServicesForIds(requirements.map((req) => req.id)),
+      headless: true,
+      onStatus: (status) => {
+        console.log(`  ${status.service.name}: ${formatLoginState(status.state)}`);
+      },
+    });
+    if (!allLoggedIn(statuses)) {
+      console.error(formatLoginPreflightFailure(statuses, requirements));
+      process.exitCode = 1;
+      return;
+    }
+  } else if (requirements.length > 0) {
+    console.log(
+      `login preflight: SKIPPED (--skip-login-check); ` +
+        `${requirements.map((req) => `${req.id} → ${req.tasks.join('/')}`).join(', ')} unverified`,
     );
   }
 

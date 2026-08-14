@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { GOOGLE_SHEETS, X_HOME, settleProbe } from './loginProbe.js';
+import {
+  GOOGLE_SHEETS,
+  X_HOME,
+  allLoggedIn,
+  formatLoginState,
+  loginServicesForIds,
+  settleProbe,
+} from './loginProbe.js';
 
 describe('GOOGLE_SHEETS.classify', () => {
   it('reads an accounts.google.com redirect as logged out', () => {
@@ -73,5 +80,50 @@ describe('settleProbe', () => {
       timeoutMs: 1_000,
     });
     expect(state).toBe('pending');
+  });
+});
+
+describe('loginServicesForIds', () => {
+  it('resolves ids to probes in declaration order, deduplicated', () => {
+    expect(loginServicesForIds(['x', 'google-sheets', 'x']).map((s) => s.id)).toEqual([
+      'google-sheets',
+      'x',
+    ]);
+  });
+
+  it('returns nothing for an empty requirement list', () => {
+    expect(loginServicesForIds([])).toEqual([]);
+  });
+
+  // A typo must not become "no login required" — that turns the gate into a
+  // rubber stamp for exactly the batch it was added to stop.
+  it('throws on an unknown id rather than silently dropping the requirement', () => {
+    expect(() => loginServicesForIds(['gogle-sheets'])).toThrow(/unknown login service/);
+    expect(() => loginServicesForIds(['gogle-sheets'])).toThrow(/google-sheets, x/);
+  });
+});
+
+describe('allLoggedIn', () => {
+  it('is true only when every probed service is signed in', () => {
+    expect(allLoggedIn([{ service: X_HOME, state: 'logged-in' }])).toBe(true);
+    expect(allLoggedIn([])).toBe(true);
+    expect(
+      allLoggedIn([
+        { service: X_HOME, state: 'logged-in' },
+        { service: GOOGLE_SHEETS, state: 'logged-out' },
+      ]),
+    ).toBe(false);
+  });
+
+  it('treats an unverified probe as not ready', () => {
+    expect(allLoggedIn([{ service: GOOGLE_SHEETS, state: 'pending' }])).toBe(false);
+  });
+});
+
+describe('formatLoginState', () => {
+  it('labels each verdict distinguishably', () => {
+    expect(formatLoginState('logged-in')).toBe('LOGGED IN');
+    expect(formatLoginState('logged-out')).toBe('NOT LOGGED IN');
+    expect(formatLoginState('pending')).toContain('UNVERIFIED');
   });
 });
