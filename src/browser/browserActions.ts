@@ -1068,10 +1068,21 @@ async function detectInterruption(
   // predate the action being judged. Navigation stays a per-action document
   // comparison, because an earlier `navigate` in the same sequence
   // legitimately leaves a navigation on the record.
-  const interrupted = (activity: PageActivity): boolean =>
-    activity.dialogs.length > 0 ||
-    activity.openedPageIds.length > 0 ||
-    session.documentSnapshot(pageId).documentId !== knownDocument.documentId;
+  const interrupted = (activity: PageActivity): boolean => {
+    if (activity.dialogs.length > 0 || activity.openedPageIds.length > 0) return true;
+    try {
+      return session.documentSnapshot(pageId).documentId !== knownDocument.documentId;
+    } catch {
+      // The page itself closed. This predicate can run SYNCHRONOUSLY inside
+      // the controller's own 'close' event handling (via
+      // watch.waitUntil -> signalActivity, fired the moment the page's
+      // tracking record is torn down) — documentSnapshot throwing there is
+      // not a distinct failure to propagate, it IS the page-closed signal,
+      // unmistakably an interruption. Letting it escape instead would throw
+      // synchronously from inside Playwright's own event dispatch.
+      return true;
+    }
+  };
   if (window > 0 && !interrupted(watch.activity())) {
     await watch.waitUntil(interrupted, window);
   }
