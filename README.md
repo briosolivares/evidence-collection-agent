@@ -66,7 +66,7 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 npm install
 ```
 
-Copy `.env.example` to `.env` at the repo root and fill in your keys (gitignored; `sherlock` loads it automatically, every other entry point takes it explicitly with `--env-file`):
+Copy `.env.example` to `.env` at the repo root and fill in your keys (gitignored; `sherlock` and `npm run evals` load it automatically, every other entry point takes it explicitly with `--env-file`):
 
 ```
 ANTHROPIC_API_KEY=...
@@ -87,9 +87,10 @@ npx tsx --env-file=.env src/cli/repl.ts
 **Evals** — each task runs k independent trials, then a grader checks the run directory against live ground truth (the grader never sees the agent's conversation):
 
 ```bash
-npx tsx --env-file=.env evals/runners/cli.ts \
-  --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
+npm run evals -- --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
 ```
+
+Set `GITHUB_TOKEN` before running any GitHub-graded task. Without it the oracles fall back to GitHub's unauthenticated 60 requests/hour, which a k=3 batch exhausts partway through — and because grading happens *after* a run completes, the batch reports correct runs as failures. The first unauthenticated request warns; `evals/runners/regrade.ts` re-grades finished run directories once the token is in place.
 
 Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"headed": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/` — for tasks that need a real login or that bot-block headless browsers; currently `mit_sororities`, `edgar`, and `elon_tweets` use that policy. The headed lane may overlap the normal pool.
 
