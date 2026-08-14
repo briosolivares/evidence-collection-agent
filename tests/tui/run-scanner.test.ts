@@ -129,15 +129,15 @@ describe('loadRunSummary', () => {
   });
 });
 
-// --- T16: legacy and V2 run directories must both stay readable ---------------
+// --- legacy and current run directories must both stay readable ---------------
 
-describe('run-directory compatibility across the V2 cutover', () => {
-  it('reads a pre-V2 run directory unchanged', () => {
+describe('run-directory compatibility across the cutover', () => {
+  it('reads a legacy run directory unchanged', () => {
     // The historical shape: no roles beyond requested_output, no
     // completionStatus, no per-role metrics, status 'completed'.
     const runDir = writeFixtureRun(baseDir, {
       id: '2026-08-01T10-00-00-000Z-legacy',
-      task: 'a pre-V2 run',
+      task: 'a legacy run',
       startedAt: '2026-08-01T10:00:00.000Z',
       finishedAt: '2026-08-01T10:02:00.000Z',
       metrics: {
@@ -163,10 +163,10 @@ describe('run-directory compatibility across the V2 cutover', () => {
     expect(summary.manifest.artifacts).toHaveLength(1);
   });
 
-  it('reads a V2 verified run, including per-role metrics it does not model', () => {
+  it('reads a current verified run, including per-role metrics it does not model', () => {
     const runDir = writeFixtureRun(baseDir, {
       id: '2026-08-13T10-00-00-000Z-verified',
-      task: 'a V2 run',
+      task: 'a current run',
       startedAt: '2026-08-13T10:00:00.000Z',
       finishedAt: '2026-08-13T10:03:00.000Z',
       metrics: {
@@ -197,12 +197,12 @@ describe('run-directory compatibility across the V2 cutover', () => {
     expect(summary.metrics?.turns).toBe(6);
   });
 
-  it('reads a V2 incomplete run and keeps its partial output visible', () => {
+  it('reads a current incomplete run and keeps its partial output visible', () => {
     // The truthfulness guarantee at the reader boundary: an unverified run is
     // still listed, with its artifacts, and its status says so.
     const runDir = writeFixtureRun(baseDir, {
       id: '2026-08-13T11-00-00-000Z-incomplete',
-      task: 'a V2 run that did not verify',
+      task: 'a current run that did not verify',
       startedAt: '2026-08-13T11:00:00.000Z',
       finishedAt: '2026-08-13T11:04:00.000Z',
       metrics: {
@@ -230,7 +230,7 @@ describe('run-directory compatibility across the V2 cutover', () => {
     expect(summary.manifest.artifacts[0]?.filename).toBe('roster.csv');
   });
 
-  it('lists legacy and V2 runs side by side', () => {
+  it('lists legacy and current runs side by side', () => {
     // A runs/ directory accumulated across the cutover holds both shapes; the
     // browser must list them together rather than choking on either.
     const metrics = (status: string) => ({

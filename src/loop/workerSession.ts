@@ -25,7 +25,7 @@ import {
 } from '../tools/capResult.js';
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
-import { elideStaleInspectResults } from './contextView.js';
+import { elideStaleObserveResults } from './contextView.js';
 import { scheduleToolCalls, type ToolCallLifecycleHooks } from './scheduler.js';
 import type {
   AssistantContentBlock,
@@ -110,11 +110,6 @@ export interface WorkerSessionDeps {
    * passes to the verifier (see runCompletionCheck's evidenceExists param).
    * Absent leaves that check off, exactly like the legacy judge-less path. */
   evidenceStore?: EvidenceStore;
-  /** True when the run offers `submit_for_verification`, which makes
-   * explicit submission the ONLY way to finish (see runWorkerTurn). The
-   * legacy judge-less path leaves it unset and keeps implicit
-   * no-tool completion. */
-  submissionProtocol?: boolean;
   /** Optional per-tool-call lifecycle seam (see scheduler.ToolCallLifecycleHooks),
    * threaded straight through to every scheduleToolCalls call site. This is
    * what lets the runtime observe "about to run this state-changing call"
@@ -188,11 +183,14 @@ export type WorkerBudgetReason =
 
 /** What one advanced turn concluded. `working`: tools ran, the
  * conversation grew, call again. The other two are terminal for the
- * current cycle (though a `completed` session can continue after
- * appendWorkerFeedback — that is the whole point). */
+ * current cycle (though a `submitted` session can continue after
+ * appendWorkerFeedback — that is the whole point). There is no `completed`
+ * variant: finishing always requires an explicit `submit_for_verification`
+ * call (see runWorkerTurn), so a bare no-tool response never produces a
+ * terminal outcome by itself — it comes back as `working`, with protocol
+ * feedback appended to the conversation. */
 export type WorkerTurnOutcome =
   | { kind: 'working' }
-  | { kind: 'completed'; finalText: string }
   /** The worker called `submit_for_verification` alone. The harness now runs
    * the code checks and, if they pass, the verifier — then answers this
    * exact call with the result, so feedback lands in the same conversation. */
@@ -265,7 +263,7 @@ function outputBriefLine(output: OutputSpec): string {
  *
  * Why this exists in the conversation and not in SYSTEM_PROMPT: the system
  * prompt is the byte-stable cached prefix, and everything here varies per run
- * — which revision is set, which outputs it requires. The first live V2 runs
+ * — which revision is set, which outputs it requires. The first live runs
  * showed what its absence costs: the worker restated an already-accepted
  * contract, which wasted a turn and would have silently converted an
  * initializer-authored run into a worker-authored one.
@@ -549,7 +547,7 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   state.turnCount += 1;
   const turn = state.turnCount;
 
-  const requestMessages = elideStaleInspectResults(state.messages);
+  const requestMessages = elideStaleObserveResults(state.messages);
   appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: requestMessages });
   const turnStartedMs = Date.now();
   let response: ModelResponse;
@@ -618,13 +616,12 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   );
   const finalText = extractText(response.content);
 
-  // Two completion protocols coexist during the migration. When the run
-  // offers `submit_for_verification` (the V2 harness path), finishing
-  // requires calling it: a no-tool response is an invalid working response,
-  // never success. Otherwise — the legacy judge-less path — the historical
-  // rule stands: no tool_use blocks means the model is done. Either way the
-  // decision reads the response's CONTENT, never its stop_reason.
-  if (deps.submissionProtocol === true) {
+  // A single completion protocol: finishing requires an explicit
+  // `submit_for_verification` call. A no-tool response is an invalid
+  // working response, never a success — the model must call it, alone, when
+  // the deliverables are genuinely ready. The decision reads the response's
+  // CONTENT, never its stop_reason.
+  {
     const calls: ToolCall[] = toolUses.map((block) => ({
       id: block.id,
       name: block.name,
@@ -670,8 +667,6 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
       }
       return { kind: 'working' };
     }
-  } else if (toolUses.length === 0) {
-    return { kind: 'completed', finalText };
   }
 
   // Execution is delegated to the scheduler — read-only tools in parallel
@@ -754,8 +749,8 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   return { kind: 'working' };
 }
 
-/** Advance the session until the current cycle ends: completed or budget
- * exceeded. After a `completed` outcome the session remains usable —
+/** Advance the session until the current cycle ends: submitted or budget
+ * exceeded. After a `submitted` outcome the session remains usable —
  * append feedback and call again for a correction cycle. */
 export async function runWorkerCycle(
   session: WorkerSession,

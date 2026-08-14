@@ -14,6 +14,7 @@ import { createRunBudgetTracker, type RunBudgetConfig } from '../run/runBudget.j
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
+import { SUBMIT_FOR_VERIFICATION } from '../completion/workerResponseProtocol.js';
 import type { Message, ModelResponse, Usage } from './messages.js';
 import type { ToolCallLifecycleHooks } from './scheduler.js';
 import {
@@ -54,6 +55,31 @@ function textResponse(text: string): ModelResponse {
     content: [{ type: 'text', text }],
     stop_reason: 'end_turn',
     usage: { ...DEFAULT_USAGE },
+  };
+}
+
+/** A cycle-ending response under the single completion protocol: prose plus a
+ * lone `submit_for_verification` call. `textResponse` alone no longer finishes
+ * a cycle — a no-tool response is an invalid working response — so every
+ * response that used to terminate a cycle is now one of these. */
+function submitResponse(text: string, id = 'submit-1'): ModelResponse {
+  return {
+    content: [
+      { type: 'text', text },
+      { type: 'tool_use', id, name: SUBMIT_FOR_VERIFICATION, input: { summary: text } },
+    ],
+    stop_reason: 'tool_use',
+    usage: { ...DEFAULT_USAGE },
+  };
+}
+
+/** The outcome `submitResponse` produces, for exact `toEqual` assertions. */
+function submitted(text: string, id = 'submit-1') {
+  return {
+    kind: 'submitted' as const,
+    call: { id, name: SUBMIT_FOR_VERIFICATION, input: { summary: text } },
+    input: { summary: text },
+    finalText: text,
   };
 }
 
@@ -119,17 +145,17 @@ describe('WorkerSession corrections', () => {
   it('a correction continues the same conversation: prior messages plus the feedback exactly once', async () => {
     const { session, requests } = makeSession([
       toolResponse('t1'),
-      textResponse('First attempt.'),
-      textResponse('Corrected attempt.'),
+      submitResponse('First attempt.'),
+      submitResponse('Corrected attempt.'),
     ]);
 
     const first = await runWorkerCycle(session);
-    expect(first).toEqual({ kind: 'completed', finalText: 'First attempt.' });
+    expect(first).toEqual(submitted('First attempt.'));
     expect(session.state.turnCount).toBe(2);
 
     appendWorkerFeedback(session, 'Judge feedback:\nFix the id column.');
     const second = await runWorkerCycle(session);
-    expect(second).toEqual({ kind: 'completed', finalText: 'Corrected attempt.' });
+    expect(second).toEqual(submitted('Corrected attempt.'));
     expect(session.state.turnCount).toBe(3);
 
     // The correction turn's request replays the entire prior exchange —
@@ -159,12 +185,12 @@ describe('WorkerSession corrections', () => {
 
   it('a correction does not reset the whole-run turn budget', async () => {
     const { session } = makeSession(
-      [toolResponse('t1'), textResponse('Done within budget.'), toolResponse('t2')],
+      [toolResponse('t1'), submitResponse('Done within budget.'), toolResponse('t2')],
       { maxWorkerTurns: 3 },
     );
 
     // Cycle 1 spends 2 turns and completes.
-    expect(await runWorkerCycle(session)).toMatchObject({ kind: 'completed' });
+    expect(await runWorkerCycle(session)).toMatchObject({ kind: 'submitted' });
 
     // The correction cycle inherits the spent budget: its first tool turn
     // is the run's third — the ceiling — so the guard ends it.
@@ -177,7 +203,7 @@ describe('WorkerSession corrections', () => {
 
 describe('WorkerSession metrics', () => {
   it('writes aggregate fields old readers parse plus per-role usage', async () => {
-    const { session } = makeSession([toolResponse('t1'), textResponse('Done.')]);
+    const { session } = makeSession([toolResponse('t1'), submitResponse('Done.')]);
     // A verifier's usage recorded on the same tracker lands in the same
     // metrics file under its own role.
     session.config.budget.recordModelUsage(
@@ -279,7 +305,6 @@ describe('WorkerSession contract-first gate', () => {
             registry: gatedRegistry([]),
             runDir,
             outputContracts: store,
-            submissionProtocol: true,
           },
           { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
         ),
@@ -321,7 +346,7 @@ describe('WorkerSession contract-first gate', () => {
   });
 
   it('adds no brief at all on the legacy prose path', () => {
-    const { session } = makeSession([textResponse('Done.')]);
+    const { session } = makeSession([submitResponse('Done.')]);
 
     expect(session.state.messages[0]).toEqual({
       role: 'user',
@@ -574,7 +599,7 @@ describe('WorkerSession toolHooks', () => {
   it('a session with no toolHooks still executes tool calls normally (regression guard)', async () => {
     const { callModel } = scriptModel([
       multiCallResponse([{ id: 'w1', name: 'write', input: { what: 'a' } }]),
-      textResponse('Done.'),
+      submitResponse('Done.'),
     ]);
     const session = createWorkerSession(
       TASK,
@@ -588,7 +613,7 @@ describe('WorkerSession toolHooks', () => {
     expect(resultBlock.content).toBe('wrote a');
 
     const second = await runWorkerTurn(session);
-    expect(second).toEqual({ kind: 'completed', finalText: 'Done.' });
+    expect(second).toEqual(submitted('Done.'));
   });
 });
 
@@ -694,7 +719,7 @@ describe('WorkerSession configuration', () => {
 // round-trip, not about anything the checkpoint step itself will do.
 describe('WorkerSession snapshot/restore', () => {
   it('capture -> restore round-trips messages, turn count, peak context, protocol corrections, and startedMs exactly', async () => {
-    const { session } = makeSession([toolResponse('t1'), textResponse('First attempt.')]);
+    const { session } = makeSession([toolResponse('t1'), submitResponse('First attempt.')]);
     await runWorkerCycle(session);
     // Simulate a run that has already spent some protocol corrections and
     // seen a larger context window than its first two turns produced.
@@ -723,7 +748,7 @@ describe('WorkerSession snapshot/restore', () => {
 
   it('a restored session does not duplicate the opening message or the protocol brief', () => {
     const store = createOutputContractStore(runDir);
-    const { callModel } = scriptModel([textResponse('Done.')]);
+    const { callModel } = scriptModel([submitResponse('Done.')]);
     const session = createWorkerSession(
       TASK,
       { callModel, registry: echoRegistry(), runDir, outputContracts: store },
@@ -750,7 +775,7 @@ describe('WorkerSession snapshot/restore', () => {
   });
 
   it('mutating the session after capture does not alter the captured snapshot', () => {
-    const { session } = makeSession([textResponse('Done.')]);
+    const { session } = makeSession([submitResponse('Done.')]);
     const snapshot = captureWorkerSessionSnapshot(session);
     const originalLength = snapshot.messages.length;
 
@@ -802,12 +827,12 @@ describe('WorkerSession snapshot/restore', () => {
   });
 
   it("a restored session's next turn continues the conversation: prior history plus the new exchange", async () => {
-    const { session } = makeSession([toolResponse('t1'), textResponse('First attempt.')]);
+    const { session } = makeSession([toolResponse('t1'), submitResponse('First attempt.')]);
     await runWorkerCycle(session);
     const snapshot = captureWorkerSessionSnapshot(session);
 
     const { callModel: resumedCallModel, requests: resumedRequests } = scriptModel([
-      textResponse('Continued after restore.'),
+      submitResponse('Continued after restore.'),
     ]);
     const restored = restoreWorkerSession(
       snapshot,
@@ -817,7 +842,7 @@ describe('WorkerSession snapshot/restore', () => {
 
     appendWorkerFeedback(restored, 'Resume feedback.');
     const outcome = await runWorkerTurn(restored);
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Continued after restore.' });
+    expect(outcome).toEqual(submitted('Continued after restore.'));
 
     // The request replays the pre-restore history (task, tool round-trip,
     // first answer) plus the resume feedback, exactly once.
@@ -857,15 +882,18 @@ describe('WorkerSession completion policy: content decides, not stop_reason', ()
       stop_reason: 'end_turn',
       usage: { ...DEFAULT_USAGE },
     };
-    const { session, requests } = makeSession([lyingToolResponse, textResponse('Done.')]);
+    const { session, requests } = makeSession([lyingToolResponse, submitResponse('Done.')]);
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Done.' });
+    expect(outcome).toEqual(submitted('Done.'));
     expect(requests).toHaveLength(2);
   });
 
-  it('a stop_reason claiming tool_use with no tool_use content completes', async () => {
+  it('a stop_reason claiming tool_use with no tool_use content does not finish the run', async () => {
+    // The point is unchanged: CONTENT decides, never stop_reason. What changed
+    // is what content-with-no-tool-call means — it is an invalid working
+    // response now, so the run continues and the model is told to submit.
     const lyingTextResponse: ModelResponse = {
       content: [
         { type: 'text', text: 'First.' },
@@ -874,12 +902,16 @@ describe('WorkerSession completion policy: content decides, not stop_reason', ()
       stop_reason: 'tool_use',
       usage: { ...DEFAULT_USAGE },
     };
-    const { session, requests } = makeSession([lyingTextResponse]);
+    const { session, requests } = makeSession([
+      lyingTextResponse,
+      submitResponse('Actually finished.'),
+    ]);
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'First.\nSecond.' });
-    expect(requests).toHaveLength(1);
+    expect(outcome).toEqual(submitted('Actually finished.'));
+    // Two requests: the lying response did not end the cycle.
+    expect(requests).toHaveLength(2);
   });
 
   it('an unrecognized tool call comes back as is_error and the run continues', async () => {
@@ -888,11 +920,11 @@ describe('WorkerSession completion policy: content decides, not stop_reason', ()
       stop_reason: 'tool_use',
       usage: { ...DEFAULT_USAGE },
     };
-    const { session, requests } = makeSession([badCall, textResponse('Recovered.')]);
+    const { session, requests } = makeSession([badCall, submitResponse('Recovered.')]);
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Recovered.' });
+    expect(outcome).toEqual(submitted('Recovered.'));
     const feedback = requests[1]![2]!;
     expect(feedback.role).toBe('user');
     expect(feedback.content[0]).toMatchObject({
@@ -922,6 +954,20 @@ describe('WorkerSession context ceiling guard', () => {
 
   function contextTextResponse(text: string, usage: Usage): ModelResponse {
     return { content: [{ type: 'text', text }], stop_reason: 'end_turn', usage };
+  }
+
+  /** A cycle-ending response with caller-chosen usage. Separate from
+   * `contextTextResponse` because a bare text response no longer ends a
+   * cycle — these tests are about the context guard, not the protocol. */
+  function contextSubmitResponse(text: string, usage: Usage): ModelResponse {
+    return {
+      content: [
+        { type: 'text', text },
+        { type: 'tool_use', id: 'submit-1', name: SUBMIT_FOR_VERIFICATION, input: { summary: text } },
+      ],
+      stop_reason: 'tool_use',
+      usage,
+    };
   }
 
   function makeContextSession(
@@ -961,14 +1007,14 @@ describe('WorkerSession context ceiling guard', () => {
     const { session, requests } = makeContextSession(
       [
         contextToolResponse('t1', { input_tokens: 20, output_tokens: 10 }),
-        contextTextResponse('Made it.', { ...DEFAULT_USAGE }),
+        contextSubmitResponse('Made it.', { ...DEFAULT_USAGE }),
       ],
       30,
     );
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Made it.' });
+    expect(outcome).toEqual(submitted('Made it.'));
     expect(requests).toHaveLength(2);
   });
 
@@ -1004,27 +1050,27 @@ describe('WorkerSession context ceiling guard', () => {
         contextToolResponse('t2', { ...DEFAULT_USAGE }),
         contextToolResponse('t3', { ...DEFAULT_USAGE }),
         contextToolResponse('t4', { ...DEFAULT_USAGE }),
-        contextTextResponse('Deep run finished.', { ...DEFAULT_USAGE }),
+        contextSubmitResponse('Deep run finished.', { ...DEFAULT_USAGE }),
       ],
       20,
     );
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Deep run finished.' });
+    expect(outcome).toEqual(submitted('Deep run finished.'));
     expect(requests).toHaveLength(5);
   });
 
-  it('a final response with no tool calls completes even when it blows the context cap', async () => {
+  it('a submission is honored even when it blows the context cap', async () => {
     const { session } = makeContextSession(
-      [contextTextResponse('Done.', { input_tokens: 999, output_tokens: 999 })],
+      [contextSubmitResponse('Done.', { input_tokens: 999, output_tokens: 999 })],
       10,
     );
 
     const outcome = await runWorkerCycle(session);
 
-    // The answer is in hand — completion is checked before the guards.
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Done.' });
+    // The submission is in hand — it is honored before the guards run.
+    expect(outcome).toEqual(submitted('Done.'));
   });
 });
 
@@ -1050,26 +1096,26 @@ describe('WorkerSession maxWorkerTurns guard', () => {
 
   it('completing exactly at the turn ceiling is a completion, not budget_exceeded', async () => {
     const { session, requests } = makeSession(
-      [toolResponse('t1'), toolResponse('t2'), textResponse('Finished on the last allowed turn.')],
+      [toolResponse('t1'), toolResponse('t2'), submitResponse('Finished on the last allowed turn.')],
       { maxWorkerTurns: 3 },
     );
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Finished on the last allowed turn.' });
+    expect(outcome).toEqual(submitted('Finished on the last allowed turn.'));
     expect(requests).toHaveLength(3);
   });
 
   it('maxWorkerTurns: Infinity never trips — the run follows its trajectory to completion', async () => {
     const responses = [
       ...Array.from({ length: 12 }, (_, i) => toolResponse(`t${i + 1}`)),
-      textResponse('Trajectory complete.'),
+      submitResponse('Trajectory complete.'),
     ];
     const { session, requests } = makeSession(responses, { maxWorkerTurns: Infinity });
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Trajectory complete.' });
+    expect(outcome).toEqual(submitted('Trajectory complete.'));
     expect(requests).toHaveLength(13);
   });
 });
@@ -1114,12 +1160,12 @@ describe('WorkerSession rejected model responses', () => {
     const feedback = 'Too many tool calls; use fewer per turn.';
     const { session, requests } = sessionWithRejections([
       rejection('too_many_tool_calls', feedback),
-      textResponse('Recovered.'),
+      submitResponse('Recovered.'),
     ]);
 
     const outcome = await runWorkerCycle(session);
 
-    expect(outcome).toEqual({ kind: 'completed', finalText: 'Recovered.' });
+    expect(outcome).toEqual(submitted('Recovered.'));
     // The retry request holds the task and the correction — no assistant
     // message exists for the rejected attempt.
     expect(requests[1]).toEqual([
@@ -1235,7 +1281,7 @@ describe('WorkerSession cache-miss warning', () => {
         stop_reason: 'tool_use',
         usage: { input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 40 },
       },
-      textResponse('Done.'),
+      submitResponse('Done.'),
     ]);
 
     await runWorkerCycle(session);
@@ -1296,7 +1342,7 @@ describe('WorkerSession per-message batch cap', () => {
   it('a batch at or under 200k bytes passes through untouched', async () => {
     const { session, requests } = makeBlobSession([
       blobToolResponse([45_000, 45_000, 45_000, 45_000]), // 180k combined
-      textResponse('Done.'),
+      submitResponse('Done.'),
     ]);
 
     await runWorkerCycle(session);
@@ -1314,7 +1360,7 @@ describe('WorkerSession per-message batch cap', () => {
     // 40k results stay inline.
     const { session, requests } = makeBlobSession([
       blobToolResponse([45_000, 44_000, 40_000, 40_000, 40_000, 40_000]),
-      textResponse('Done.'),
+      submitResponse('Done.'),
     ]);
 
     await runWorkerCycle(session);
@@ -1353,7 +1399,7 @@ describe('WorkerSession per-message batch cap', () => {
     // offloads with compact path/note replacements (no preview) rather than
     // returning an over-limit message.
     const sizes = Array.from({ length: 130 }, () => 1_900);
-    const { session, requests } = makeBlobSession([blobToolResponse(sizes), textResponse('Done.')]);
+    const { session, requests } = makeBlobSession([blobToolResponse(sizes), submitResponse('Done.')]);
 
     await runWorkerCycle(session);
 

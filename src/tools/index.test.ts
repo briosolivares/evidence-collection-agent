@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 
-import { createBashTool, V2_TOOL_ORDER, createV2Registry } from './index.js';
+import { createBashTool, TOOL_ORDER, createToolRegistry } from './index.js';
 import { toApiToolDefs, type ToolDef } from './registry.js';
 
 describe('production tool schemas', () => {
@@ -10,7 +10,7 @@ describe('production tool schemas', () => {
   // and 400s every run on turn 1 (download regressed this way, 2026-08-11).
   // registry.test.ts only checks stub tools; this guards the real ones.
   it('every registered tool converts to a top-level object schema', () => {
-    const registry = createV2Registry(
+    const registry = createToolRegistry(
       new Map<string, ToolDef>([['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef]]),
     );
     const defs = toApiToolDefs(registry);
@@ -28,7 +28,7 @@ describe('the frozen tool order', () => {
     // prefix and re-pays the whole conversation at cache-WRITE rates. If this
     // assertion fails, the question is not "update the test" but "was the
     // reorder intended, and is the cache cost understood?"
-    expect(V2_TOOL_ORDER).toEqual([
+    expect(TOOL_ORDER).toEqual([
       'set_output_contract',
       'update_table',
       'write_document',
@@ -53,17 +53,17 @@ describe('the frozen tool order', () => {
   it('puts the contract gate first and completion last', () => {
     // Structural, not cosmetic: set_output_contract gates every other call,
     // and submit_for_verification ends the run.
-    expect(V2_TOOL_ORDER[0]).toBe('set_output_contract');
-    expect(V2_TOOL_ORDER.at(-1)).toBe('submit_for_verification');
+    expect(TOOL_ORDER[0]).toBe('set_output_contract');
+    expect(TOOL_ORDER.at(-1)).toBe('submit_for_verification');
   });
 
   it('contains no duplicates', () => {
-    expect(new Set(V2_TOOL_ORDER).size).toBe(V2_TOOL_ORDER.length);
+    expect(new Set(TOOL_ORDER).size).toBe(TOOL_ORDER.length);
   });
 
   it('builds a registry in frozen order, skipping tools a run cannot supply', () => {
-    const registry = createV2Registry();
-    // Every statically-constructible tool, in V2 order — and nothing that
+    const registry = createToolRegistry();
+    // Every statically-constructible tool, in frozen order — and nothing that
     // needs run-scoped state, which a caller must supply explicitly.
     expect([...registry.keys()]).toEqual([
       'set_output_contract',
@@ -83,7 +83,7 @@ describe('the frozen tool order', () => {
     // These need a table store, an evidence store, a content registry, or a
     // browser reader, so they cannot be constructed statically. Their absence
     // must be an omission, never a silently broken tool.
-    const names = new Set(createV2Registry().keys());
+    const names = new Set(createToolRegistry().keys());
     for (const runScoped of [
       'update_table',
       'write_document',
@@ -109,7 +109,7 @@ describe('the frozen tool order', () => {
         execute: async () => 'ok',
       }) as ToolDef;
 
-    const registry = createV2Registry(
+    const registry = createToolRegistry(
       // Deliberately supplied in the WRONG order.
       new Map([
         ['submit_for_verification', fake('submit_for_verification')],
@@ -129,15 +129,15 @@ describe('the frozen tool order', () => {
       getAccess: () => ({ reads: [], writes: [] }),
       execute: async () => 'ok',
     } as ToolDef;
-    expect(() => createV2Registry(new Map([['surprise_tool', rogue]]))).toThrow(
-      /not in V2_TOOL_ORDER/,
+    expect(() => createToolRegistry(new Map([['surprise_tool', rogue]]))).toThrow(
+      /not in TOOL_ORDER/,
     );
   });
 
   it('serializes its API definitions byte-identically across calls', () => {
     // The cached-prefix guarantee, asserted directly.
-    const first = JSON.stringify(toApiToolDefs(createV2Registry()));
-    const second = JSON.stringify(toApiToolDefs(createV2Registry()));
+    const first = JSON.stringify(toApiToolDefs(createToolRegistry()));
+    const second = JSON.stringify(toApiToolDefs(createToolRegistry()));
     expect(first).toBe(second);
   });
 });

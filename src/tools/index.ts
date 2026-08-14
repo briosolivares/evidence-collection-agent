@@ -11,7 +11,7 @@
  *
  * Tools whose construction needs run-scoped state (the contract store, the
  * table store, the evidence store, a content reader) are FACTORIES, so they
- * cannot appear in a static map. They are named in `V2_TOOL_ORDER` at their
+ * cannot appear in a static map. They are named in `TOOL_ORDER` at their
  * frozen positions and built by `runTask`; that array is the single authority
  * on where each one goes.
  *
@@ -68,7 +68,7 @@ export { type EvidenceResult } from './shared/evidence.js';
  * `set_output_contract` is first because it gates everything else, and
  * `submit_for_verification` is last because it ends the run.
  */
-export const V2_TOOL_ORDER: readonly string[] = [
+export const TOOL_ORDER: readonly string[] = [
   // The contract gate.
   'set_output_contract',
   // Typed output construction.
@@ -104,9 +104,9 @@ export const V2_TOOL_ORDER: readonly string[] = [
 /**
  * The tools that are plain definitions, keyed by name — everything not
  * requiring run-scoped construction. `runTask` merges these with the factories
- * it builds, ordered by `V2_TOOL_ORDER`.
+ * it builds, ordered by `TOOL_ORDER`.
  */
-export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, ToolDef>([
+export const STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, ToolDef>([
   // Browser tools that take their session from ToolCtx and so need no
   // run-scoped construction.
   ['observe', observeTool as ToolDef],
@@ -127,32 +127,32 @@ export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, Too
 
 /**
  * Assemble the registry from the static tools plus whatever run-scoped tools
- * the caller built, ordered by `V2_TOOL_ORDER`.
+ * the caller built, ordered by `TOOL_ORDER`.
  *
  * @param runScopedTools - factory-built tools, keyed by name
- * @returns a registry whose iteration order matches `V2_TOOL_ORDER`, skipping
+ * @returns a registry whose iteration order matches `TOOL_ORDER`, skipping
  *   names the caller did not supply. Skipping rather than throwing is
  *   deliberate: a run legitimately omits a tool whose capability its session
  *   cannot provide (no page scripting, no PDF page source), and the order of
  *   what remains must still be stable
- * @throws if a supplied tool's name is absent from `V2_TOOL_ORDER` — that means
+ * @throws if a supplied tool's name is absent from `TOOL_ORDER` — that means
  *   a new tool was added without deciding where it belongs, which would let
  *   its position drift and break the cached prefix
  */
-export function createV2Registry(
+export function createToolRegistry(
   runScopedTools: ReadonlyMap<string, ToolDef> = new Map(),
 ): ToolRegistry {
-  const frozen = new Set(V2_TOOL_ORDER);
+  const frozen = new Set(TOOL_ORDER);
   for (const name of runScopedTools.keys()) {
     if (!frozen.has(name)) {
       throw new Error(
-        `tool "${name}" is not in V2_TOOL_ORDER — add it there so its position is frozen`,
+        `tool "${name}" is not in TOOL_ORDER — add it there so its position is frozen`,
       );
     }
   }
   const ordered: ToolDef[] = [];
-  for (const name of V2_TOOL_ORDER) {
-    const tool = runScopedTools.get(name) ?? V2_STATIC_TOOLS.get(name);
+  for (const name of TOOL_ORDER) {
+    const tool = runScopedTools.get(name) ?? STATIC_TOOLS.get(name);
     if (tool !== undefined) ordered.push(tool);
   }
   return createRegistry(ordered);

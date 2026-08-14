@@ -17,27 +17,14 @@ import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.j
 // response — so this module has no best-effort fallback path.
 //
 // A prose INTENT.md/CONTRACT.md authoring mode used to live here too, before
-// the typed contract protocol became the run's only completion protocol; it
-// is gone, along with the judge-less path it served. INTENT_FILENAME and
-// CONTRACT_FILENAME survive below only because src/harness/verifierTools.ts
-// still names them as a fallback source for a verifier opening message when
-// no typed contract is supplied — a path this codebase's own production
-// caller (runTask.ts) no longer takes, since it always supplies one.
+// the typed contract protocol became the run's only completion protocol. It is
+// gone, along with the judge-less path it served and the verifier's
+// no-typed-contract fallback that was the last thing naming those two files.
 
 /** Model the initializer runs on. Sonnet tier: turning task prose into an
  * exhaustive, precisely-worded contract is worth the larger model even
  * though the call itself is small and one-shot (plus at most one retry). */
 export const INITIALIZER_MODEL = 'claude-sonnet-5';
-
-/** Filename of the intent document at the run-dir root. No longer written by
- * this module (see the module comment); kept only because
- * harness/verifierTools.ts still reads it on its no-typed-contract fallback
- * path. */
-export const INTENT_FILENAME = 'INTENT.md';
-
-/** Filename of the contract document at the run-dir root. Same status as
- * INTENT_FILENAME above. */
-export const CONTRACT_FILENAME = 'CONTRACT.md';
 
 /** Config for the production initializer CallModel: only what the caller
  * may reasonably want to override (see makeContractInitializerModelDriver). */

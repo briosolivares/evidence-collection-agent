@@ -23,7 +23,7 @@ import type { ToolCall } from '../tools/pipeline.js';
 // The run's durable checkpoint. Nothing in this repo persists a resumable
 // snapshot of a live run today — no checkpoint, no lock file, no `harness/`
 // directory exist before this module. It is built standalone: it knows the
-// shape of a V2 run (one persistent worker conversation, one whole-run
+// shape of a run (one persistent worker conversation, one whole-run
 // budget, a typed output contract, a verifier — see workerSession.ts,
 // runBudget.ts, contracts/, and harness/harness.ts) well enough to hold a
 // faithful snapshot of it, but it owns none of that machinery itself. A

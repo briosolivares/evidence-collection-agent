@@ -29,8 +29,8 @@ const HAIKU = ['Quiet browser hums —', 'the agent saves what it saw,', 'hashes
   '\n',
 );
 
-// The scripted run: write the haiku, read it back to verify, then finish
-// with a plain-text response (no tool_use = the completion signal). The
+// The scripted run: write the haiku, read it back to verify, then finish by
+// calling submit_for_verification (the only way a run ends). The
 // stop_reason labels and usage numbers are fake but API-shaped; note the
 // cache_read_input_tokens from turn 2 on, as a real cached run would show.
 const script: ModelResponse[] = [
@@ -56,8 +56,15 @@ const script: ModelResponse[] = [
     usage: { input_tokens: 1320, output_tokens: 70, cache_read_input_tokens: 1150 },
   },
   {
-    content: [{ type: 'text', text: 'haiku.txt is written and verified. Done.' }],
-    stop_reason: 'end_turn',
+    content: [
+      {
+        type: 'tool_use',
+        id: 'call-3',
+        name: 'submit_for_verification',
+        input: { summary: 'haiku.txt is written and verified.' },
+      },
+    ],
+    stop_reason: 'tool_use',
     usage: { input_tokens: 1400, output_tokens: 40, cache_read_input_tokens: 1150 },
   },
 ];
@@ -118,7 +125,7 @@ const budget = createRunBudgetTracker({
 });
 const session = createWorkerSession(TASK, { callModel, registry, runDir }, { budget, maxContextTokens: 100_000 });
 const outcome = await runWorkerCycle(session);
-writeWorkerSessionMetrics(session, outcome.kind === 'completed' ? 'completed' : 'budget_exceeded');
+writeWorkerSessionMetrics(session, outcome.kind === 'submitted' ? 'completed' : 'budget_exceeded');
 finalizeManifest(runDir);
 
 console.log(`\nresult after ${served} turns: ${JSON.stringify(outcome)}`);

@@ -6,7 +6,7 @@ describe('deriveSemanticLine — the live tool table', () => {
   // One row per tool the registry actually offers. A tool missing from this
   // table renders as its bare registry name in the transcript, which is the
   // regression this suite exists to catch — so keep it in step with
-  // src/tools/index.ts's V2_TOOL_ORDER.
+  // src/tools/index.ts's TOOL_ORDER.
   const table: Array<{
     name: string;
     input: unknown;

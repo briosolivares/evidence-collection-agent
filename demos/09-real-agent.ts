@@ -131,7 +131,7 @@ const budget = createRunBudgetTracker({
 });
 const session = createWorkerSession(task, { callModel, registry, runDir }, { budget, maxContextTokens: 200_000 });
 const outcome = await runWorkerCycle(session);
-writeWorkerSessionMetrics(session, outcome.kind === 'completed' ? 'completed' : 'budget_exceeded');
+writeWorkerSessionMetrics(session, outcome.kind === 'submitted' ? 'completed' : 'budget_exceeded');
 finalizeManifest(runDir);
 
 console.log(`\nfinal status: ${JSON.stringify(outcome)}`);

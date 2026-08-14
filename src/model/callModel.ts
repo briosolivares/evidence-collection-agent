@@ -19,9 +19,9 @@ import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDrive
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
 //    turn. A second marker rides the elision frontier — the newest
-//    inspect_page stub in the API message view (see loop/contextView.ts).
+//    observe stub in the API message view (see loop/contextView.ts).
 //    It exists because the server matches cached prefixes only up to ~20
-//    content blocks back from a marker: when a new inspection stubs the
+//    content blocks back from a marker: when a new observation stubs the
 //    third-most-recent one, the request diverges at that stub — usually
 //    far more than 20 blocks before the tip — and without a marker there
 //    the whole conversation misses and is re-paid at cache-write rates

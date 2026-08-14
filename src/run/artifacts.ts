@@ -47,7 +47,7 @@ export interface ManifestEntry {
   capturedAt: string;
   /** Whether this artifact fully satisfies what the contract asked of it.
    * Absent means "not tracked" — the historical shape, and what every
-   * pre-V2 run directory carries, so existing readers keep working.
+   * legacy run directory carries, so existing readers keep working.
    * `partial` is written only by incomplete-run finalization, and only for
    * outputs whose contract requirement is unmet: an already-satisfied
    * screenshot or download stays `complete`. Graders and humans can then

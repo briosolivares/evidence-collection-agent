@@ -5,7 +5,7 @@ import { makeContractInitializerModelDriver } from '../harness/initializer.js';
 import { createVerifierRegistry } from '../harness/verifierTools.js';
 import type { CallModel } from '../loop/messages.js';
 import type { ModelStreamEvent } from '../model/streamAssembly.js';
-import { createBashTool, createV2Registry, V2_TOOL_ORDER } from '../tools/index.js';
+import { createBashTool, createToolRegistry, TOOL_ORDER } from '../tools/index.js';
 import type { ToolDef } from '../tools/registry.js';
 import { createWriteDocumentTool } from '../tools/writeDocument/writeDocument.js';
 import { defaultInitializerCallModel } from './runTask.js';
@@ -151,11 +151,11 @@ describe('worker-only tool isolation', () => {
 
   it('does give the worker both tools, so the isolation above is a boundary and not an absence', () => {
     // Without this half, the assertions above could pass for the wrong reason.
-    // The same construction buildRunToolchain uses: the worker's real V2
+    // The same construction buildRunToolchain uses: the worker's real
     // registry, built with only a bash tool as run-scoped input — edit_file
-    // is a V2_STATIC_TOOLS entry, so it is present without any factory input.
+    // is a STATIC_TOOLS entry, so it is present without any factory input.
     const workerNames = [
-      ...createV2Registry(
+      ...createToolRegistry(
         new Map<string, ToolDef>([
           ['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef],
         ]),
@@ -164,26 +164,26 @@ describe('worker-only tool isolation', () => {
     for (const mutation of MUTATION_TOOLS) {
       expect(workerNames).toContain(mutation);
     }
-    expect(V2_TOOL_ORDER).toContain('bash');
-    expect(V2_TOOL_ORDER).toContain('edit_file');
+    expect(TOOL_ORDER).toContain('bash');
+    expect(TOOL_ORDER).toContain('edit_file');
   });
 });
 
 /**
- * `write_document` is a V2-only tool: it was in `V2_TOOL_ORDER` but was
- * never CONSTRUCTED anywhere the runtime actually builds a registry, so a
- * typed `document` output was impossible to satisfy no matter what the
- * model did — the tool simply was not there to call. Mirrors the
- * `createV2Registry` call `buildRunToolchain` makes (the same static tools,
- * the same frozen order), so this exercises the actual mechanism production
- * relies on, not a restatement of it.
+ * `write_document` is declared in `TOOL_ORDER` but was never CONSTRUCTED
+ * anywhere the runtime actually builds a registry, so a typed `document`
+ * output was impossible to satisfy no matter what the model did — the tool
+ * simply was not there to call. Mirrors the `createToolRegistry` call
+ * `buildRunToolchain` makes (the same static tools, the same frozen order),
+ * so this exercises the actual mechanism production relies on, not a
+ * restatement of it.
  *
  * Same isolation shape as the block above: worker has it, the two roles
  * that judge the work do not.
  */
 describe('write_document isolation', () => {
-  function v2RegistryWithWriteDocument() {
-    return createV2Registry(
+  function registryWithWriteDocument() {
+    return createToolRegistry(
       new Map<string, ToolDef>([
         ['write_document', createWriteDocumentTool({ documentSpecs: () => [] }) as ToolDef],
         ['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef],
@@ -191,20 +191,20 @@ describe('write_document isolation', () => {
     );
   }
 
-  it("is in the worker's V2 registry, at its frozen V2_TOOL_ORDER position", () => {
-    const names = [...v2RegistryWithWriteDocument().keys()];
+  it("is in the worker's registry, at its frozen TOOL_ORDER position", () => {
+    const names = [...registryWithWriteDocument().keys()];
     expect(names).toContain('write_document');
 
     // Not just "present somewhere" — in the exact relative order
-    // V2_TOOL_ORDER declares, filtered to what this registry actually holds
+    // TOOL_ORDER declares, filtered to what this registry actually holds
     // (update_table is not supplied here and is not static, so it is absent
-    // — exactly as createV2Registry's own "skip what's missing" contract
+    // — exactly as createToolRegistry's own "skip what's missing" contract
     // promises).
     const present = new Set(names);
-    expect(names).toEqual(V2_TOOL_ORDER.filter((name) => present.has(name)));
+    expect(names).toEqual(TOOL_ORDER.filter((name) => present.has(name)));
 
     // Anchored to its two frozen neighbors directly, so a reorder of
-    // V2_TOOL_ORDER around it would fail here even if the filter above
+    // TOOL_ORDER around it would fail here even if the filter above
     // passed vacuously.
     expect(names.indexOf('write_document')).toBe(names.indexOf('set_output_contract') + 1);
     expect(names.indexOf('observe')).toBe(names.indexOf('write_document') + 1);

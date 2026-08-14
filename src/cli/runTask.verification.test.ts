@@ -13,7 +13,7 @@ import { runTask } from './runTask.js';
 
 // The vertical T5 test: contract → file write → submit → code check →
 // verified, driven entirely by scripted models. No real API call, no
-// network. This is the test that proves the whole V2 completion protocol
+// network. This is the test that proves the whole completion protocol
 // holds together, not just its parts.
 
 const TEST_TIMEOUT_MS = 30_000;
@@ -152,7 +152,7 @@ const reportNeedsCorrection = (message: string) =>
     },
   ]);
 
-describe('runTask V2 verification protocol', () => {
+describe('runTask verification protocol', () => {
   let browser: BrowserController;
   let tempRoot: string;
   let runsBaseDir: string;

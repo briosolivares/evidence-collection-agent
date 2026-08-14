@@ -94,7 +94,7 @@ import {
 } from '../tools/registry.js';
 import type { ToolCall } from '../tools/pipeline.js';
 import type { ToolCallLifecycleHooks } from '../loop/scheduler.js';
-import { createV2Registry } from '../tools/index.js';
+import { createToolRegistry } from '../tools/index.js';
 import { createOutputRowTools } from '../tools/updateTable/updateTable.js';
 import { createInspectDocumentTool } from '../tools/inspectDocument/inspectDocument.js';
 import { createScreenshotTool } from '../tools/screenshot/screenshot.js';
@@ -540,10 +540,10 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
     evidenceExists: (evidenceId) => evidenceStore.get(evidenceId) !== undefined,
   });
 
-  // The V2 registry, assembled at its frozen order (see V2_TOOL_ORDER).
+  // The V2 registry, assembled at its frozen order (see TOOL_ORDER).
   // Tools whose dependencies this run cannot satisfy are simply absent rather
   // than present-and-broken.
-  const registry = createV2Registry(
+  const registry = createToolRegistry(
     new Map<string, ToolDef>([
       ...createOutputRowTools({
         tables: outputTables,
@@ -646,7 +646,7 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
               }),
         }) as ToolDef,
       ],
-      // Local code execution, at its frozen position in V2_TOOL_ORDER.
+      // Local code execution, at its frozen position in TOOL_ORDER.
       // Run-scoped for the same reason the stores above are: it carries
       // this run's secret-env denylist.
       ['bash', inputs.bashTool],
@@ -880,7 +880,6 @@ export async function runTask(
         outputContracts: toolchain.outputContracts,
         outputTables: toolchain.outputTables,
         evidenceStore: toolchain.evidenceStore,
-        submissionProtocol: true,
       };
 
       return runVerificationHarness(
@@ -1516,7 +1515,6 @@ export async function resumeTask(
       outputContracts: toolchain.outputContracts,
       outputTables: toolchain.outputTables,
       evidenceStore: toolchain.evidenceStore,
-      submissionProtocol: true,
     };
     const sessionConfig = { budget, maxContextTokens };
     // Present exactly when runStatus already left 'initializing' (see
@@ -1699,7 +1697,7 @@ async function runHarnessCycles(args: {
     cycle: number;
     completionCheckFailures: number;
     cycleRecords: HarnessCycleRecord[];
-    precomputedResult?: Extract<WorkerTurnOutcome, { kind: 'submitted' | 'completed' }>;
+    precomputedResult?: Extract<WorkerTurnOutcome, { kind: 'submitted' }>;
     /** Recovery-notice text to fold into the very next feedback this run
      * produces (see resumeTask's `deferNotice`), consumed exactly once. */
     pendingNotice?: string;

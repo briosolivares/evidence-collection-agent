@@ -249,13 +249,13 @@ describe('createRunTracing with runTask', () => {
   });
 
   it('is a clean no-op without Langfuse credentials', async () => {
-    // Rewritten for the V2-only harness architecture: every run always goes
-    // through initializer -> worker -> verifier, and `submit_for_verification`
-    // is the only way a worker cycle ends (see runTask.ts's HarnessConfig
-    // module comment) — the single-turn no-tool-response 'completed' path
-    // this test used to exercise no longer exists. The no-op-tracing claim
-    // itself is unchanged: only its shape (contract, one write, one
-    // submission, one verified verdict) had to catch up.
+    // Every run goes through initializer -> worker -> verifier, and
+    // `submit_for_verification` is the only way a worker cycle ends (see
+    // runTask.ts's HarnessConfig module comment) — the single-turn
+    // no-tool-response 'completed' path this test used to exercise no longer
+    // exists. The no-op-tracing claim itself is unchanged: only its shape
+    // (contract, one write, one submission, one verified verdict) had to
+    // catch up.
     vi.stubEnv('LANGFUSE_PUBLIC_KEY', '');
     vi.stubEnv('LANGFUSE_SECRET_KEY', '');
     vi.stubEnv('LANGFUSE_BASE_URL', '');
@@ -285,7 +285,7 @@ describe('createRunTracing with runTask', () => {
     expect(browser.sessionClosed).toBe(false);
 
     const transcript = await readTranscript(result.runDir);
-    // Every stage the V2 harness now goes through for one write + one
+    // Every stage the harness goes through for one write + one
     // submission: the cycle marker, the write turn (request/response/tool
     // call/tool result), the submission turn (request/response), and the
     // submission call's own answer once the verifier reports `verified`.

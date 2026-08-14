@@ -88,7 +88,7 @@ export function isElisionStub(block: { type: string; content?: unknown }): boole
  *   nothing needs eliding, otherwise a new array sharing every untouched
  *   message by identity
  */
-export function elideStaleInspectResults(messages: readonly Message[]): readonly Message[] {
+export function elideStaleObserveResults(messages: readonly Message[]): readonly Message[] {
   // Which tool_use ids belong to observe. Results are matched through the
   // id, never by sniffing content — a read_file of a page dump must not be
   // mistaken for an observation.

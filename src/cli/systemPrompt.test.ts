@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message } from '../loop/messages.js';
 import { buildRequestParams, type CallModelConfig } from '../model/callModel.js';
-import { createBashTool, createV2Registry } from '../tools/index.js';
+import { createBashTool, createToolRegistry } from '../tools/index.js';
 import { toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import { SYSTEM_PROMPT } from './systemPrompt.js';
 
@@ -39,7 +39,7 @@ function productionConfig(): CallModelConfig {
   // the prefix production actually sends. The exact tool set and its frozen
   // order are pinned once, in tools/index.test.ts; what matters here is that
   // whatever that set is serializes identically on every call.
-  const registry = createV2Registry(
+  const registry = createToolRegistry(
     new Map<string, ToolDef>([['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef]]),
   );
   return {
@@ -121,7 +121,7 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('observe a page again if you need it');
   });
 
-  it('names only tools the V2 registry actually offers', () => {
+  it('names only tools the registry actually offers', () => {
     // A prompt that names a deleted tool costs a wasted turn and an error the
     // model cannot act on, so this pins the direction of the cutover.
     for (const live of ['observe', 'browser_action', 'submit_for_verification']) {
