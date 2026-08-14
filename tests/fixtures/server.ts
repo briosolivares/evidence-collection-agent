@@ -21,12 +21,6 @@ const BROWSER_ONLY_DOCUMENT = Buffer.from(
 );
 const SESSION_COOKIE = 'fixture-session=ready';
 
-/** The credentials most recently POSTed to the login fixture. */
-export interface RecordedLogin {
-  username: string;
-  password: string;
-}
-
 export interface FixtureServer {
   /** Absolute HTTP origin on the IPv4 loopback interface. */
   readonly baseUrl: string;
@@ -38,14 +32,6 @@ export interface FixtureServer {
    * @returns an absolute loopback URL for the requested fixture path
    */
   url(pathname?: string): string;
-
-  /**
-   * Read the credentials last submitted to the login fixture (login.html →
-   * POST /login), so tests can assert what the browser actually sent.
-   *
-   * @returns the most recent submission, or undefined before any login
-   */
-  lastLogin(): RecordedLogin | undefined;
 
   /**
    * Stop accepting fixture requests and release the ephemeral port.
@@ -62,11 +48,8 @@ export interface FixtureServer {
  *   deterministic, idempotent cleanup
  */
 export async function startFixtureServer(): Promise<FixtureServer> {
-  let lastLogin: RecordedLogin | undefined;
   const server = createServer((request, response) => {
-    void serveFixture(request, response, (login) => {
-      lastLogin = login;
-    });
+    void serveFixture(request, response);
   });
 
   await new Promise<void>((resolveListen, rejectListen) => {
@@ -96,9 +79,6 @@ export async function startFixtureServer(): Promise<FixtureServer> {
       const originRelativePath = pathname.replace(/^\/+/, '');
       return new URL(`./${originRelativePath}`, `${baseUrl}/`).href;
     },
-    lastLogin() {
-      return lastLogin;
-    },
     close() {
       closePromise ??= new Promise<void>((resolveClose, rejectClose) => {
         if (!server.listening) {
@@ -123,11 +103,10 @@ export async function startFixtureServer(): Promise<FixtureServer> {
 async function serveFixture(
   request: IncomingMessage,
   response: ServerResponse,
-  recordLogin: (login: RecordedLogin) => void,
 ): Promise<void> {
   const { method } = request;
   if (method === 'POST' && request.url === '/login') {
-    await serveLoginFixture(request, response, recordLogin);
+    await serveLoginFixture(request, response);
     return;
   }
   if (method !== 'GET' && method !== 'HEAD') {
@@ -221,20 +200,15 @@ function serveAuthenticatedFixture(
   response.end(method === 'HEAD' ? undefined : AUTHENTICATED_BODY);
 }
 
+/** Drains the submission and redirects, so `login.html` behaves like a real
+ * form for navigation tests. Nothing inspects what was posted. */
 async function serveLoginFixture(
   request: IncomingMessage,
   response: ServerResponse,
-  recordLogin: (login: RecordedLogin) => void,
 ): Promise<void> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of request) {
-    chunks.push(chunk as Buffer);
+  for await (const _chunk of request) {
+    // Drained and discarded; the fixture only needs the redirect.
   }
-  const body = new URLSearchParams(Buffer.concat(chunks).toString('utf8'));
-  recordLogin({
-    username: body.get('username') ?? '',
-    password: body.get('password') ?? '',
-  });
   response.writeHead(303, { Location: '/login-success.html' });
   response.end();
 }

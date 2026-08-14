@@ -2,7 +2,6 @@ import { normalize, sep } from 'node:path';
 
 import { z } from 'zod';
 
-import type { CredentialStore } from '../auth/credentialStore.js';
 import type { BrowserController } from '../browser/controller.js';
 import type { OutputContractStore } from '../contracts/outputContractStore.js';
 
@@ -35,10 +34,6 @@ export interface ToolCtx {
   /** Browser session for tools that observe or act on a page. File-only
    * tool registries may omit it. */
   browser?: BrowserController;
-  /** Stored login credentials for fill_credentials. Environments without
-   * any omit it; fills then degrade to the no-credentials error and the
-   * model falls back to human handoff. */
-  credentials?: CredentialStore;
   /** Interactive environments resolve tool permission requests here (the
    * TUI dialog). Headless environments omit it; tools that require user
    * interaction then fail closed. */

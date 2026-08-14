@@ -129,14 +129,13 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('re-inspect a page if you need it again');
   });
 
-  it('teaches the authentication playbook lightly: fill first, never type, ask on failure', () => {
+  it('teaches the authentication playbook lightly: never type secrets, hand off instead', () => {
     expect(SYSTEM_PROMPT).toContain('Authentication.');
     expect(SYSTEM_PROMPT).toContain(
-      'use fill_credentials to fill the form — it knows which sites have ' +
-        'stored credentials and will tell you if none exist',
+      'you hold no credentials, so a login wall is always a handoff',
     );
     expect(SYSTEM_PROMPT).toContain(
-      'Never type usernames or passwords with the type tool.',
+      'Never type usernames or passwords yourself',
     );
     expect(SYSTEM_PROMPT).toContain(
       'ask_user_question pauses the task so they can act in the browser window',
@@ -160,7 +159,7 @@ describe('SYSTEM_PROMPT', () => {
     expect(SYSTEM_PROMPT).toContain('briefly name the files you produced');
   });
 
-  it('forms a byte-identical cached prefix with all fourteen production tools across unrelated task histories', () => {
+  it('forms a byte-identical cached prefix with all thirteen production tools across unrelated task histories', () => {
     const firstParams = buildRequestParams(productionConfig(), firstTaskHistory);
     const secondParams = buildRequestParams(productionConfig(), secondTaskHistory);
 
@@ -174,7 +173,7 @@ describe('SYSTEM_PROMPT', () => {
     });
 
     expect(secondPrefix).toBe(firstPrefix);
-    expect(firstParams.tools).toHaveLength(14);
+    expect(firstParams.tools).toHaveLength(13);
     expect(firstParams.tools?.map((tool) => tool.name)).toEqual([
       'read_file',
       'write_file',
@@ -188,7 +187,6 @@ describe('SYSTEM_PROMPT', () => {
       'scroll',
       'screenshot',
       'download',
-      'fill_credentials',
       'ask_user_question',
     ]);
 

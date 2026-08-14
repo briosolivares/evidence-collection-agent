@@ -31,7 +31,7 @@ function wait(ms: number): Promise<void> {
 }
 
 /** A minimal browser stub, only ever cast through `as unknown as
- * BrowserController` — the same pattern `fillCredentials.test.ts` uses —
+ * BrowserController` — the same pattern the browser tool suites use —
  * since these tests never launch a real browser. */
 function fakeBrowserWithScriptSupport(
   setup: { cdpUrl: string; selectedPageTargetId: string } = {

@@ -16,7 +16,6 @@ import { setOutputContractTool } from './setOutputContract/setOutputContract.js'
 import { clickTool } from './click/click.js';
 import { downloadTool } from './download/download.js';
 import { editFileTool } from './editFile/editFile.js';
-import { fillCredentialsTool } from './fillCredentials/fillCredentials.js';
 import { grepTool } from './grep/grep.js';
 import { inspectPageTool } from './inspectPage/inspectPage.js';
 import { navigateTool } from './navigate/navigate.js';
@@ -47,10 +46,6 @@ export {
   type BashResult,
   type BashToolDeps,
 } from './bash/bash.js';
-export {
-  fillCredentialsTool,
-  type FillCredentialsInput,
-} from './fillCredentials/fillCredentials.js';
 export { grepTool } from './grep/grep.js';
 export { inspectPageTool, type InspectPageInput } from './inspectPage/inspectPage.js';
 export { navigateTool, type NavigateInput } from './navigate/navigate.js';
@@ -100,11 +95,6 @@ export const actionTools: readonly ToolDef[] = [clickTool, typeTool, scrollTool]
 /** Browser evidence tools in stable registration order. */
 export const evidenceTools: readonly ToolDef[] = [screenshotTool, downloadTool];
 
-/** Authentication tools in stable registration order. Appended after the
- * original ten so their order — and the cached prompt prefix bytes they
- * contribute — never shifts. */
-export const authTools: readonly ToolDef[] = [fillCredentialsTool as ToolDef];
-
 /** User-interaction tools in stable registration order. Only these pass
  * through the pipeline's permission gate; headless environments fail them
  * closed. */
@@ -149,7 +139,6 @@ export function createProductionRegistry(
     ...observationTools,
     ...actionTools,
     ...evidenceTools,
-    ...authTools,
     ...interactionTools,
     ...(profile === 'batch-enabled' ? [browserBatchTool] : []),
   ]);
@@ -190,7 +179,6 @@ export const V2_TOOL_ORDER: readonly string[] = [
   'handle_dialog',
   'execute_javascript',
   // Reading the world.
-  'read_resource',
   'capture_text',
   'inspect_document',
   // Evidence capture.
@@ -206,8 +194,7 @@ export const V2_TOOL_ORDER: readonly string[] = [
   // built per run (it closes over the secret-env denylist) rather than being
   // a static definition like the tools above it.
   'bash',
-  // Credentials and the human.
-  'fill_credentials',
+  // The human.
   'ask_user_question',
   // Completion.
   'submit_for_verification',
@@ -234,7 +221,6 @@ export const V2_STATIC_TOOLS: ReadonlyMap<string, ToolDef> = new Map<string, Too
   ['grep', grepTool as ToolDef],
   // NOTE: 'bash' is deliberately absent — it is a factory, so runTask builds
   // it and supplies it as a run-scoped tool at its frozen position.
-  ['fill_credentials', fillCredentialsTool as ToolDef],
   ['ask_user_question', askUserQuestionTool as ToolDef],
 ]);
 

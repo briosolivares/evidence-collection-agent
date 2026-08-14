@@ -3,10 +3,6 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  FileCredentialStore,
-  type CredentialStore,
-} from '../auth/credentialStore.js';
-import {
   assertBrowserScriptSupportIsPaired,
   type BrowserController,
 } from '../browser/controller.js';
@@ -203,9 +199,6 @@ export const BASH_SECRET_ENV_DENYLIST: readonly string[] = [
   'ANTHROPIC_AUTH_TOKEN',
   // Tracing credentials (LANGFUSE_PUBLIC_KEY / _SECRET_KEY / _BASE_URL).
   'LANGFUSE_',
-  // Where stored site logins live. The file's own permissions still guard it;
-  // this only avoids handing over its location for free.
-  'CREDENTIALS_FILE',
   // A token present in developer shells that no generated script needs.
   'GITHUB_TOKEN',
 ];
@@ -325,10 +318,6 @@ export interface RunTaskConfig {
   /** Optional run-scoped tracing implementation. When omitted, tracing is
    * configured from LANGFUSE_* environment variables or becomes a no-op. */
   tracing?: RunTracing;
-  /** Optional credential store consulted by fill_credentials. When omitted,
-   * reads the gitignored `.credentials.json` at the repo root, or the file
-   * named by the CREDENTIALS_FILE environment variable. */
-  credentials?: CredentialStore;
   /** Optional resolver for interactive tool calls (the TUI wires its
    * question dialog here). When omitted — evals, headless CLI — tools that
    * require user interaction fail closed in the pipeline. */
@@ -812,12 +801,6 @@ export async function runTask(
     onProgress: config.onProgress,
   });
 
-  const credentials =
-    config.credentials ??
-    new FileCredentialStore(
-      process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
-    );
-
   const tracing = config.tracing ?? createRunTracing();
   const callModel = tracing.wrapCallModel(baseCallModel, resolvedModel);
   const tracedRegistry = tracing.wrapRegistry(toolchain.registry);
@@ -898,7 +881,6 @@ export async function runTask(
         registry: tracedRegistry,
         runDir,
         browser: config.browser,
-        credentials,
         requestPermission: config.requestPermission,
         toolHooks: toolCheckpoint.hooks,
         busyRegistry: toolchain.busyRegistry,
@@ -1006,8 +988,6 @@ export interface ResumeTaskConfig {
    * the original run's trace — tracing state is not part of the
    * checkpoint). */
   tracing?: RunTracing;
-  /** Optional credential store consulted by fill_credentials. */
-  credentials?: CredentialStore;
   /** Optional resolver for interactive tool calls. */
   requestPermission?: ToolCtx['requestPermission'];
   /** See RunTaskConfig.authenticated. */
@@ -1523,11 +1503,6 @@ export async function resumeTask(
       restore: true,
     });
 
-    const credentials =
-      config.credentials ??
-      new FileCredentialStore(
-        process.env.CREDENTIALS_FILE ?? resolve(PACKAGE_ROOT, '.credentials.json'),
-      );
     const tracing = config.tracing ?? createRunTracing();
     const baseCallModel = config.callModel ?? makeCallModel({
       model: checkpoint.runConfiguration.model,
@@ -1571,7 +1546,6 @@ export async function resumeTask(
       registry: tracedRegistry,
       runDir,
       browser: config.browser,
-      credentials,
       requestPermission: config.requestPermission,
       toolHooks: toolCheckpoint.hooks,
       busyRegistry: toolchain.busyRegistry,

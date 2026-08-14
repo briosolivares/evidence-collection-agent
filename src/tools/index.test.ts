@@ -48,7 +48,6 @@ describe('production tool schemas', () => {
       'scroll',
       'screenshot',
       'download',
-      'fill_credentials',
       'ask_user_question',
     ]);
 
@@ -82,7 +81,6 @@ describe('V2 tool order', () => {
       'switch_page',
       'handle_dialog',
       'execute_javascript',
-      'read_resource',
       'capture_text',
       'inspect_document',
       'screenshot',
@@ -92,7 +90,6 @@ describe('V2 tool order', () => {
       'edit_file',
       'grep',
       'bash',
-      'fill_credentials',
       'ask_user_question',
       'submit_for_verification',
     ]);
@@ -125,7 +122,6 @@ describe('V2 tool order', () => {
       'write_file',
       'edit_file',
       'grep',
-      'fill_credentials',
       'ask_user_question',
     ]);
   });
@@ -141,7 +137,6 @@ describe('V2 tool order', () => {
       'set_table_completeness',
       'write_document',
       'execute_javascript',
-      'read_resource',
       'capture_text',
       'inspect_document',
     ]) {

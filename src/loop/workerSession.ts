@@ -78,8 +78,6 @@ export interface WorkerSessionDeps {
   runDir: string;
   /** Browser session for runs whose registry includes browser tools. */
   browser?: ToolCtx['browser'];
-  /** Stored login credentials for fill_credentials. */
-  credentials?: ToolCtx['credentials'];
   /** Resolver for interactive tool calls; omitted in headless runs. */
   requestPermission?: ToolCtx['requestPermission'];
   /** Cancellation for tools that own a long-running external resource — a
@@ -360,7 +358,7 @@ export function createWorkerSession(
 /**
  * A `WorkerSession`'s plainly serializable memory: the conversation, the
  * counters, and the wall-clock start. Everything else on `WorkerSessionDeps`
- * / `WorkerSessionConfig` (callModel, registry, browser, credentials,
+ * / `WorkerSessionConfig` (callModel, registry, browser,
  * requestPermission, outputContracts, outputTables, budget) is a live handle
  * a resuming caller must re-supply — a checkpoint cannot serialize a
  * function or an open browser session, so this snapshot deliberately does
@@ -676,7 +674,6 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   const toolCtx: ToolCtx = {
     runDir: deps.runDir,
     browser: deps.browser,
-    credentials: deps.credentials,
     requestPermission: deps.requestPermission,
     outputContracts: deps.outputContracts,
     abortSignal: deps.abortSignal,
