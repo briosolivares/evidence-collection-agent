@@ -24,7 +24,7 @@ Nothing about the default run path changed. Concretely:
 | --- | --- | --- |
 | `harness.outputContract` | `false` | The prose `INTENT.md`/`CONTRACT.md` path runs. The typed contract, contract-first gate, code checks, and submission protocol are all built and tested but not engaged. |
 | `harness.contractAuthor` | `'initializer'` | Only read when `outputContract` is true. |
-| Compact memory | unwired | `AgentContext` and `compactAtBoundary` exist and are tested; nothing calls them. Runs use the historical monotonic conversation plus `inspect_page` elision. |
+| Compact memory | unwired | `AgentContext` and `compactAtBoundary` exist and are tested; nothing calls them. Runs use the historical monotonic conversation plus `inspect_page` collapse. |
 | `browser_batch` | registered | Retained for the parity comparison. `browser_action` is its receipted replacement. |
 | V2 tool registry | built when the flag is on | `createProductionRegistry()` still builds the atomic surface by default. With `outputContract: true`, `runTask` assembles `createV2Registry()` at its frozen order (snapshot-tested). |
 | Verifier | live in harness mode | `report_verification` replaced the prose judge outright — this one was not gated behind a flag, because a prose verdict that cannot be trusted is not a configuration worth keeping. |

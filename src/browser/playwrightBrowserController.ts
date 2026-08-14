@@ -5,17 +5,14 @@ import {
   chromium,
   type BrowserContext,
   type Dialog,
-  type Download,
   type Frame,
   type Locator,
   type Page,
-  type Response,
 } from 'playwright';
 
 import {
   performBrowserActions,
   type ActionCapableSession,
-  type ActionTargetHandle,
   type BlockSignals,
   type BrowserActionOutput,
   type BrowserActionRequest,
@@ -57,17 +54,28 @@ import {
   type HandleDialogResult,
 } from './controller.js';
 import {
-  BrowserJavaScriptNonJsonError,
   BrowserJavaScriptTimeoutError,
   type BrowserJavaScriptResult,
   type EarlyJavaScriptRequest,
 } from './browserJavaScript.js';
 import type { BrowserSessionProvider } from './sessionProvider.js';
 import { accessKey, type BusyResourceRegistry } from '../tools/registry.js';
+import {
+  actionTargetHandle,
+  locatorForRef,
+  normalizeRefActionError,
+  resolveRefInRecord,
+  stampOutlineElements,
+} from './pageElementRefs.js';
+import { evaluateJavaScript } from './pageJavaScript.js';
+import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
+import {
+  assertLoopbackCdpUrl,
+  CDP_LOOPBACK_HOST,
+  prepareBrowserScriptTarget,
+  reconcileAfterBrowserScript,
+} from './browserScriptSetup.js';
 
-const ARIA_REF_PATTERN = /^(?:f\d+)?e\d+$/;
-const DOWNLOAD_EVENT_TIMEOUT_MS = 5_000;
-const DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS = 1_000;
 const SCROLL_SETTLE_MS = 50;
 
 // --- Browser-script CDP endpoint (see launchPersistentChrome, prepareForBrowserScript). ---
@@ -83,60 +91,18 @@ const DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS = 25;
  * practice; a launch that never produces it must fail loudly rather than
  * hang a session indefinitely on a CDP endpoint that will never exist. */
 const DEVTOOLS_ACTIVE_PORT_DEADLINE_MS = 5_000;
-/** Only a loopback host is ever trusted as a CDP endpoint: it is read from a
- * file Chrome writes into a profile directory this process itself owns, and
- * treating anything else as equally trustworthy would be a privilege
- * escalation bug wearing a parsing bug's clothes. */
-const CDP_LOOPBACK_HOST = '127.0.0.1';
 
 // --- T9 observation bounds (all finite literals). ---
-/** Elements stamped per interactive observation; the outline itself still
- * lists everything, this only bounds per-element identity work. */
-const MAX_OBSERVED_ELEMENTS = 150;
 /** Per-view content bound so an evicted-baseline "full snapshot" stays
  * bounded even before the tool pipeline's byte cap. */
 const MAX_VIEW_CONTENT_CHARS = 60_000;
-/* Element identity is limited to the page's TOP document until T11 adds
- * targeted per-frame observation — a subframe element stamped with the main
- * frame's frameId/documentId would go stale for the wrong reason. The test
- * is made *in the page* (see stampOutlineElements) rather than from the ref's
- * syntax: Playwright prefixes refs with a frame ordinal (`f1e8`) once the
- * page has navigated more than once, so a "bare `e12` means main frame"
- * rule silently drops every element on any page reached by two navigations,
- * which is precisely the page an action sequence lands on. */
-/** The attribute stamped on observed elements. It is the ref's exact-node
- * identity within its document: DOM moves and unrelated mutation keep it,
- * document replacement destroys it. */
-const ELEMENT_MARKER_ATTRIBUTE = 'data-sherlock-el';
-/** Element ids are store-issued (`el-7`); enforcing the shape keeps the
- * marker CSS selector injection-proof even for a crafted ref. */
-const ELEMENT_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
-/** Roles worth element identity for the `interactive` need. The outline
- * shows every visible node; only action targets need durable refs. */
-const INTERACTIVE_ROLES: ReadonlySet<string> = new Set([
-  'button',
-  'link',
-  'textbox',
-  'searchbox',
-  'combobox',
-  'listbox',
-  'option',
-  'checkbox',
-  'radio',
-  'switch',
-  'slider',
-  'spinbutton',
-  'menuitem',
-  'menuitemcheckbox',
-  'menuitemradio',
-  'tab',
-]);
 // --- T10 action bounds (all finite literals). ---
 /** Per-element-action deadline. Far below Playwright's 30s default: a
  * sequence of eight actions must not be able to hold a turn for minutes,
  * and an element that is not actionable within five seconds is better
- * reported than waited on. */
-const ACTION_TIMEOUT_MS = 5_000;
+ * reported than waited on. Exported for {@link actionTargetHandle} in
+ * pageElementRefs.ts, the only other place it is used. */
+export const ACTION_TIMEOUT_MS = 5_000;
 /** Deadline for a `navigate` action inside a sequence. Longer than an
  * element action because a real page load legitimately takes seconds. */
 const ACTION_NAVIGATION_TIMEOUT_MS = 15_000;
@@ -154,12 +120,10 @@ const MAX_BLOCK_FRAME_URLS = 20;
  * the downloads *it* started, and unbounded growth would be a leak. */
 const MAX_TRACKED_DOWNLOADS_PER_PAGE = 20;
 
-/** One outline entry: `- role "name" ... [ref=e12]` (name optional). */
-const OUTLINE_ELEMENT_PATTERN =
-  /^\s*-\s+([A-Za-z]+)(?:\s+"((?:[^"\\]|\\.)*)")?.*?\[ref=([A-Za-z0-9]+)\]/;
-
-/** Runtime tracking for one page: its stable id plus per-frame records. */
-interface PageRecord {
+/** Runtime tracking for one page: its stable id plus per-frame records.
+ * Exported so pageElementRefs.ts and downloadCapture.ts can type the record
+ * they are handed explicitly, without reaching into controller state. */
+export interface PageRecord {
   pageId: string;
   page: Page;
   /** Keyed by the live Playwright Frame — Playwright reuses the same Frame
@@ -236,6 +200,7 @@ export async function launchPersistentChrome(
   });
 }
 
+
 /**
  * Read the loopback CDP HTTP endpoint Chrome opened for a profile launched
  * by {@link launchPersistentChrome}.
@@ -281,24 +246,6 @@ async function readDevToolsActivePortUrl(profileDir: string): Promise<string> {
       }
       await delay(DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS);
     }
-  }
-}
-
-/** Require a CDP URL's host to be loopback. Shared by the endpoint reader
- * above and {@link PlaywrightBrowserController.prepareForBrowserScript}'s
- * caller-facing contract so both sides of the browser-script handoff agree
- * on what counts as trustworthy. */
-function assertLoopbackCdpUrl(cdpUrl: string): void {
-  let parsed: URL;
-  try {
-    parsed = new URL(cdpUrl);
-  } catch {
-    throw new TypeError(`CDP URL is not a valid URL: ${cdpUrl}`);
-  }
-  if (parsed.hostname !== CDP_LOOPBACK_HOST && parsed.hostname !== 'localhost') {
-    throw new TypeError(
-      `CDP URL must use a loopback host, got ${JSON.stringify(parsed.hostname)}: ${cdpUrl}`,
-    );
   }
 }
 
@@ -490,7 +437,7 @@ export class PlaywrightBrowserController implements BrowserController {
       return this.captureUrlThroughChrome(target.url, page);
     }
 
-    const locator = await this.locatorForRef(page, target.ref);
+    const locator = await locatorForRef(page, target.ref);
     let href: string | null;
     try {
       href = await locator.evaluate((element) => {
@@ -505,7 +452,26 @@ export class PlaywrightBrowserController implements BrowserController {
       return this.captureUrlThroughChrome(href, page);
     }
 
-    return this.captureClickDownload(locator, target.ref, page);
+    return captureClickDownload(locator, target.ref, page);
+  }
+
+  /** Capture a download reached by navigating a throwaway page straight to
+   * `url`; see {@link captureUrlThroughChrome} in downloadCapture.ts for the
+   * mechanics, and its doc for why the `pendingInternalPages` counter is
+   * threaded through as two explicit callbacks rather than that module
+   * reaching into this controller's state directly. */
+  private captureUrlThroughChrome(url: string, referringPage: Page): Promise<BrowserDownloadResult> {
+    return captureUrlThroughChrome(
+      this.context,
+      url,
+      referringPage,
+      () => {
+        this.pendingInternalPages += 1;
+      },
+      () => {
+        this.pendingInternalPages = Math.max(0, this.pendingInternalPages - 1);
+      },
+    );
   }
 
   currentUrl(pageId?: string): string {
@@ -556,11 +522,12 @@ export class PlaywrightBrowserController implements BrowserController {
           undefined,
           request.pageId,
         );
-        elements = await this.stampOutlineElements(
+        elements = await stampOutlineElements(
           record,
           mainFrameRecord.frameId,
           documentId,
           outline,
+          () => this.state.createElementId(),
         );
         views.push(makeBoundedView('interactive', outline));
       } else {
@@ -737,12 +704,10 @@ export class PlaywrightBrowserController implements BrowserController {
   /**
    * Resolve an {@link ElementRef} to an actionable locator.
    *
-   * Resolution ladder: (1) the exact node via the marker stamped at
-   * observation time — survives reorders and unrelated DOM mutation within
-   * the same document; (2) a unique role/name match in the ref's document.
-   * A saved ordinal is deliberately NEVER used to retarget: after a list
-   * reorder it would silently mutate the wrong row, the exact failure this
-   * ladder exists to prevent.
+   * Locates the ref's page record in the registry — the one piece of this
+   * that genuinely needs controller state — then delegates the resolution
+   * ladder (exact-node marker, then a unique role/name fallback) to
+   * {@link resolveRefInRecord} in pageElementRefs.ts.
    *
    * @param ref - an element ref from a prior observation
    * @returns a locator matching exactly one element
@@ -756,40 +721,7 @@ export class PlaywrightBrowserController implements BrowserController {
     if (record === undefined || record.page.isClosed()) {
       throw new BrowserRefNotFoundError(ref.id);
     }
-    const frameEntry = [...record.frames.entries()].find(
-      ([, frameRecord]) => frameRecord.frameId === ref.frameId,
-    );
-    if (frameEntry === undefined) {
-      throw new BrowserRefNotFoundError(ref.id);
-    }
-    const [frame, frameRecord] = frameEntry;
-    if (frameRecord.documentId !== ref.documentId || frame.isDetached()) {
-      // The document the element lived in was replaced — stale by
-      // definition, regardless of what similar elements now exist.
-      throw new BrowserRefNotFoundError(ref.id);
-    }
-
-    if (ELEMENT_ID_PATTERN.test(ref.id)) {
-      const stamped = frame.locator(`[${ELEMENT_MARKER_ATTRIBUTE}="${ref.id}"]`);
-      if ((await countRefMatches(stamped)) === 1) {
-        return stamped;
-      }
-    }
-
-    // Marker gone (e.g. the page stripped attributes): fall back to a
-    // role/name match only when it is unique in the document. An empty
-    // name can never be unique enough for a mutating action.
-    if (ref.name !== '') {
-      const byRole = frame.getByRole(ref.role as Parameters<Frame['getByRole']>[0], {
-        name: ref.name,
-        exact: true,
-      });
-      if ((await countRefMatches(byRole)) === 1) {
-        return byRole;
-      }
-    }
-
-    throw new BrowserRefNotFoundError(ref.id);
+    return resolveRefInRecord(record, ref);
   }
 
   /**
@@ -813,89 +745,20 @@ export class PlaywrightBrowserController implements BrowserController {
    * it surface later would crash an unrelated turn.
    */
   async executeJavaScript(request: EarlyJavaScriptRequest): Promise<BrowserJavaScriptResult> {
+    // Resolve and LOCK the target page up front: everything downstream reports
+    // the URL and document token of the page it actually ran in, so a
+    // concurrent change must not be able to move the target mid-call.
     const page = this.pageFor(request.pageId);
-    const logs: string[] = [];
-    const onConsole = (message: { text(): string }): void => {
-      // Bounded: a snippet that logs in a loop must not grow the result
-      // without limit.
-      if (logs.length < 100) logs.push(message.text());
-    };
-    page.on('console', onConsole);
-
-    try {
-      // The document's identity is read BEFORE evaluation and reported with
-      // the result, so a mid-call navigation is visible rather than silent.
-      const url = page.url();
-      const documentToken = await this.withRendererDeadline(
-        () =>
-          page.evaluate(
-            `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
-          ),
-        RENDERER_READ_TIMEOUT_MS,
-        undefined,
-        request.pageId,
-      );
-
-      let value: unknown;
-      try {
-        // Expression semantics FIRST, statement semantics as the fallback.
-        //
-        // A braced arrow body discards its last expression, so wrapping every
-        // snippet as `(() => { CODE })()` returned undefined for a bare
-        // expression, for a self-invoking function, and for code ending in an
-        // expression statement — every natural form. The only shape that
-        // worked was a top-level `return`, which is illegal in a real script.
-        // A live run made 15 calls and got 15 failures, including on
-        // `document.querySelectorAll(...).length`.
-        const sources = evaluationSources(request.code);
-        for (let attempt = 0; attempt < sources.length; attempt += 1) {
-          try {
-            value = await this.raceEvaluation(page, sources[attempt]!, request.timeoutMs);
-            break;
-          } catch (error) {
-            // Fall through to statement semantics ONLY when THIS candidate
-            // never actually parsed: that alone proves nothing executed, so
-            // re-running cannot repeat a side effect. A runtime error means
-            // the snippet already ran, and silently running it a second
-            // time could double-submit a form.
-            //
-            // Deciding this from the error's MESSAGE (isSyntaxErrorLike)
-            // rather than by re-checking whether the candidate parses is
-            // unsound: evaluationSources already parse-checks asExpression
-            // and asCompletionValue with `parses()` before ever including
-            // them, so by the time either one reaches this catch, we
-            // already know it parsed — any error it throws, even one whose
-            // message happens to match /SyntaxError|Unexpected token/ (e.g.
-            // the snippet's own `JSON.parse(bad)`), is a genuine runtime
-            // failure. `parses()` re-answers the real question — did THIS
-            // exact wrapped source fail to parse at all — using the same
-            // Node/V8 check evaluationSources itself relies on, instead of
-            // pattern-matching a message that can't tell the two apart.
-            const canRetry = attempt < sources.length - 1 && !parses(sources[attempt]!);
-            if (!canRetry) throw error;
-          }
-        }
-      } catch (error) {
-        if (error instanceof BrowserJavaScriptTimeoutError) throw error;
-        if (isTimeoutLikeError(error)) throw new BrowserJavaScriptTimeoutError(request.timeoutMs);
-        // A serialization failure from the engine becomes the typed non-JSON
-        // error, so the model is told how to fix its snippet rather than
-        // shown a Playwright internal.
-        if (isSerializationError(error)) {
-          throw new BrowserJavaScriptNonJsonError('value', 'not JSON-serializable');
-        }
-        throw error;
-      }
-
-      return {
-        value,
-        url,
-        documentToken: typeof documentToken === 'string' ? documentToken : 'unknown',
-        logs,
-      };
-    } finally {
-      page.off('console', onConsole);
-    }
+    return evaluateJavaScript(
+      page,
+      request,
+      // Passed as a bound closure rather than `this`, so the module never
+      // reaches into the busy registry an abandoned renderer read registers
+      // against — see withRendererDeadline.
+      <T>(read: () => Promise<T>, timeoutMs: number, fallback?: T, pageId?: string) =>
+        this.withRendererDeadline(read, timeoutMs, fallback, pageId),
+      RENDERER_READ_TIMEOUT_MS,
+    );
   }
 
   /**
@@ -952,13 +815,9 @@ export class PlaywrightBrowserController implements BrowserController {
   /**
    * Implementation behind the conditionally-assigned `prepareForBrowserScript`
    * field (see the constructor) — reachable only when this controller was
-   * given a CDP endpoint.
-   *
-   * Attaches a throwaway CDP session to the resolved page (the requested
-   * `pageId`, or the selected page when omitted) purely to read its PUBLIC
-   * target id via `Target.getTargetInfo`, then detaches immediately; nothing
-   * here is held open past this call, and no private Playwright field
-   * (`page._delegate`, `_targetId`, ...) is ever touched.
+   * given a CDP endpoint. Resolves the target page and guards on the CDP
+   * endpoint's presence; the CDP mechanics themselves live in
+   * {@link prepareBrowserScriptTarget} (browserScriptSetup.ts).
    */
   private async doPrepareForBrowserScript(pageId?: string): Promise<BrowserScriptSetup> {
     this.requireOpenContext();
@@ -970,119 +829,32 @@ export class PlaywrightBrowserController implements BrowserController {
       throw new Error('This browser session has no CDP endpoint configured.');
     }
     const page = this.pageFor(pageId);
-    const session = await this.context.newCDPSession(page);
-    try {
-      const { targetInfo } = await session.send('Target.getTargetInfo');
-      return { cdpUrl: this.cdpUrl, selectedPageTargetId: targetInfo.targetId };
-    } finally {
-      await session.detach().catch(() => undefined);
-    }
+    return prepareBrowserScriptTarget(this.context, page, this.cdpUrl);
   }
 
   /**
    * Implementation behind the conditionally-assigned `refreshAfterBrowserScript`
    * field; see {@link doPrepareForBrowserScript} for why it is reachable only
-   * that way.
-   *
-   * Four steps, all reconciliation rather than rollback — a script's actions
-   * are never undone:
-   *
-   * 1. Rescan `context.pages()` and register anything untracked.
-   *    `registerPage` already dedupes by Page identity, so this is purely
-   *    additive: a page the script opened should already be tracked through
-   *    the constructor's `context.on('page')` listener, because CDP events
-   *    reach every client attached to the same browser, including this
-   *    controller's own connection. This rescan only closes a timing gap.
-   * 2. Conservatively invalidate observation state for EVERY tracked page,
-   *    using only mechanisms that already exist: rotate each tracked frame's
-   *    documentId via `this.state.createDocumentId()` — exactly what the
-   *    `framenavigated` handler does for a real navigation — so every
-   *    pre-script {@link ElementRef} becomes stale and `resolveElementRef`
-   *    rejects it, and drop each page's cached observation baselines via
-   *    `this.state.forgetPage` so no diff can be computed against a
-   *    since-mutated DOM. An external script can mutate the DOM with no
-   *    navigation at all, which is exactly the case nothing else here would
-   *    ever notice. This is deliberately conservative: at worst it forces a
-   *    redundant re-observation, and it can NEVER cause a wrong-target
-   *    action, because a stale ref is rejected rather than silently resolved
-   *    to the wrong node.
-   * 3. Reconcile the selected page. A still-live selection is left alone.
-   *    This is the one behavior change confined to this refresh path: the
-   *    ordinary `close` event handler leaves `activePage` undefined with no
-   *    fallback (unchanged), but here a closed selection falls back to a
-   *    remaining live tracked page, or a fresh task page when none remain,
-   *    so the session stays usable after a script closes the tab it was
-   *    handed.
-   * 4. If the entire browser/context was closed by the script, fail loudly:
-   *    recreating a session mid-run is out of scope, and every later browser
-   *    tool stays unavailable for the rest of it.
-   *
-   * Idempotent: calling this again once controller state already matches the
-   * live browser repeats step 2's invalidation (harmless — it can only force
-   * another re-observation) and finds nothing to reconcile in steps 1 and 3.
+   * that way. The reconciliation mechanics (rescan, invalidate, reselect —
+   * four steps, all documented there) live in
+   * {@link reconcileAfterBrowserScript} (browserScriptSetup.ts); this method
+   * only enforces the controller's own open/closed contract before handing
+   * off its private collaborators as explicit closures.
    */
   private async doRefreshAfterBrowserScript(): Promise<void> {
     this.requireOpenContext();
-    if (this.context.isClosed()) {
-      throw new Error(
-        'The browser script closed the entire browser session (its BrowserContext is ' +
-          'closed). Recreating a session mid-run is not supported: every later browser tool ' +
-          'will be unavailable for the rest of this run.',
-      );
-    }
-
-    let livePages: Page[];
-    try {
-      livePages = this.context.pages();
-    } catch (error) {
-      throw new Error(
-        `The browser script left the browser session unusable: ${describeError(error)}. ` +
-          'Recreating a session mid-run is not supported: every later browser tool will be ' +
-          'unavailable for the rest of this run.',
-      );
-    }
-
-    // Step 1. The pre-existing session page is excluded exactly as it always
-    // has been (see the constructor's preexistingSessionPage doc) — this is
-    // the first code path that ever calls context.pages() directly, and
-    // without the exclusion it would silently adopt that page into the
-    // registry the moment any browser script ran.
-    for (const page of livePages) {
-      if (page === this.preexistingSessionPage) {
-        continue;
-      }
-      this.registerPage(page);
-    }
-
-    // Step 2.
-    for (const record of this.trackedPages.values()) {
-      for (const frameRecord of record.frames.values()) {
-        frameRecord.documentId = this.state.createDocumentId();
-      }
-      this.state.forgetPage(record.pageId);
-    }
-
-    // Step 3 (and step 4's newPage fallback).
-    if (this.activePage === undefined || this.activePage.isClosed()) {
-      const liveTracked = [...this.trackedPages.values()].filter(
-        (record) => !record.page.isClosed(),
-      );
-      if (liveTracked.length > 0) {
-        this.activePage = liveTracked[0]!.page;
-      } else {
-        try {
-          const page = await this.context.newPage();
-          this.registerPage(page);
-          this.activePage = page;
-        } catch (error) {
-          throw new Error(
-            `The browser script left the browser session unusable: ${describeError(error)}. ` +
-              'Recreating a session mid-run is not supported: every later browser tool will ' +
-              'be unavailable for the rest of this run.',
-          );
-        }
-      }
-    }
+    await reconcileAfterBrowserScript({
+      context: this.context,
+      preexistingSessionPage: this.preexistingSessionPage,
+      trackedPages: this.trackedPages,
+      createDocumentId: () => this.state.createDocumentId(),
+      forgetPage: (pageId) => this.state.forgetPage(pageId),
+      registerPage: (page) => this.registerPage(page),
+      getActivePage: () => this.activePage,
+      setActivePage: (page) => {
+        this.activePage = page;
+      },
+    });
   }
 
   pdfPageSource(): Pick<BrowserContext, 'newPage'> {
@@ -1464,79 +1236,6 @@ export class PlaywrightBrowserController implements BrowserController {
     };
   }
 
-  /** Give every interactive outline entry durable identity: stamp (or
-   * re-read) the marker attribute on the exact node behind each aria ref.
-   * Stamping is write-once per node, so re-observing an unchanged document
-   * returns the SAME element ids — that stability is what makes
-   * observation diffs and cross-observation refs meaningful. */
-  private async stampOutlineElements(
-    record: PageRecord,
-    frameId: string,
-    documentId: string,
-    outline: string,
-  ): Promise<ElementRef[]> {
-    const refs: ElementRef[] = [];
-    const ordinals = new Map<string, number>();
-    for (const entry of parseOutlineElements(outline).slice(0, MAX_OBSERVED_ELEMENTS)) {
-      let id: string | null;
-      try {
-        // The attribute name travels as an argument rather than being
-        // inlined in the page function: resolution reads the marker through
-        // ELEMENT_MARKER_ATTRIBUTE, and a hardcoded copy here would silently
-        // stamp the old name (every ref instantly stale) if it ever changed.
-        id = await record.page.locator(`aria-ref=${entry.ariaRef}`).evaluate(
-          (element, { attribute, proposedId }) => {
-            // Top-document-only identity, decided by the document itself.
-            const view = element.ownerDocument.defaultView;
-            if (view === null || view !== view.top) {
-              return null;
-            }
-            const existing = element.getAttribute(attribute);
-            if (existing !== null) {
-              return existing;
-            }
-            element.setAttribute(attribute, proposedId);
-            return proposedId;
-          },
-          {
-            attribute: ELEMENT_MARKER_ATTRIBUTE,
-            proposedId: this.state.createElementId(),
-          },
-        );
-      } catch {
-        // The element vanished between snapshot and stamping (or lives in a
-        // frame this page-scoped locator cannot reach); observation stays
-        // best-effort rather than failing wholesale.
-        continue;
-      }
-      if (id === null) {
-        // An element inside a subframe: skipped, and its issued id is simply
-        // never used (ids are unique, not contiguous).
-        continue;
-      }
-      // A literal NUL separator cannot appear in a role or an accessible
-      // name, so no `role`/`name` pair can collide with another; written
-      // as an escape because a raw NUL byte makes this file binary to
-      // grep and other text tooling.
-      const ordinalKey = `${entry.role}\u0000${entry.name}`;
-      const ordinal = ordinals.get(ordinalKey) ?? 0;
-      ordinals.set(ordinalKey, ordinal + 1);
-      refs.push({
-        id,
-        pageId: record.pageId,
-        frameId,
-        documentId,
-        // backendNodeId deliberately unset: the stamped marker already
-        // provides same-document exact-node identity without CDP coupling.
-        stableLocator: `[${ELEMENT_MARKER_ATTRIBUTE}="${id}"]`,
-        role: entry.role,
-        name: entry.name,
-        ordinal,
-      });
-    }
-    return refs;
-  }
-
   private requirePage(): Page {
     this.requireOpenContext();
     const page = this.activePage;
@@ -1546,104 +1245,6 @@ export class PlaywrightBrowserController implements BrowserController {
     }
 
     return page;
-  }
-
-  private async captureUrlThroughChrome(
-    url: string,
-    referringPage: Page,
-  ): Promise<BrowserDownloadResult> {
-    const referringUrl = referringPage.url();
-    // A throwaway plumbing page: counted out of the page registry (see the
-    // constructor's 'page' listener) so pages() never shows it and no
-    // identity is ever bound to it.
-    this.pendingInternalPages += 1;
-    let capturePage: Page;
-    try {
-      capturePage = await this.context.newPage();
-    } catch (error) {
-      // newPage failed before (or, vanishingly rarely, after) its 'page'
-      // event; rebalance without going negative so a later popup cannot be
-      // misclassified as internal.
-      this.pendingInternalPages = Math.max(0, this.pendingInternalPages - 1);
-      throw error;
-    }
-
-    try {
-      const downloadOutcome = capturePage
-        .waitForEvent('download', { timeout: 0 })
-        .then((download) => ({ kind: 'download' as const, download }));
-      const navigationOutcome = capturePage
-        .goto(url, {
-          waitUntil: 'commit',
-          ...(isHttpUrl(referringUrl) ? { referer: referringUrl } : {}),
-        })
-        .then(
-          (response) => ({ kind: 'response' as const, response }),
-          (error: unknown) => ({ kind: 'navigation_error' as const, error }),
-        );
-
-      const outcome = await Promise.race([downloadOutcome, navigationOutcome]);
-      if (outcome.kind === 'download') {
-        return await readBrowserDownload(outcome.download);
-      }
-
-      if (outcome.kind === 'response') {
-        if (outcome.response === null) {
-          throw new Error(`Browser navigation produced no response: ${url}`);
-        }
-        return await readNavigationResponse(outcome.response);
-      }
-
-      const lateDownload = await Promise.race([
-        downloadOutcome,
-        delay(DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS).then(() => undefined),
-      ]);
-      if (lateDownload !== undefined) {
-        return await readBrowserDownload(lateDownload.download);
-      }
-      throw outcome.error;
-    } finally {
-      await capturePage.close();
-    }
-  }
-
-  private async captureClickDownload(
-    locator: Locator,
-    ref: string,
-    page: Page,
-  ): Promise<BrowserDownloadResult> {
-    const downloadPromise = page.waitForEvent('download', {
-      timeout: DOWNLOAD_EVENT_TIMEOUT_MS,
-    });
-    void downloadPromise.catch(() => undefined);
-    let clickCompleted = false;
-
-    try {
-      await locator.click();
-      clickCompleted = true;
-      return await readBrowserDownload(await downloadPromise);
-    } catch (error) {
-      if (!clickCompleted) {
-        throw await normalizeRefActionError(locator, ref, error);
-      }
-      throw new Error(
-        `Browser ref ${ref} has no HTTP(S) href and did not start a browser download. ` +
-          'Observe the page again and choose a download link or control, or pass a verified direct URL.',
-      );
-    }
-  }
-
-  private async locatorForRef(page: Page, ref: string): Promise<Locator> {
-    if (!ARIA_REF_PATTERN.test(ref)) {
-      throw new BrowserRefNotFoundError(ref);
-    }
-
-    const locator = page.locator(`aria-ref=${ref}`);
-    if ((await countRefMatches(locator)) !== 1) {
-      throw new BrowserRefNotFoundError(ref);
-    }
-
-    return locator;
   }
 
   private serializeTabLifecycle<T>(operation: () => Promise<T>): Promise<T> {
@@ -1872,21 +1473,6 @@ function matchesUrlPattern(url: string, pattern: string): boolean {
   }
 }
 
-/** Wrap a revalidated locator as an action handle. Every op carries the
- * finite {@link ACTION_TIMEOUT_MS} instead of Playwright's 30s default. */
-function actionTargetHandle(locator: Locator): ActionTargetHandle {
-  const options = { timeout: ACTION_TIMEOUT_MS };
-  return {
-    click: () => locator.click(options),
-    fill: (text) => locator.fill(text, options),
-    press: (key) => locator.press(key, options),
-    selectOptions: (values) => locator.selectOption([...values], options).then(() => undefined),
-    setChecked: (checked) => locator.setChecked(checked, options),
-    hover: () => locator.hover(options),
-    setFiles: (absolutePaths) => locator.setInputFiles([...absolutePaths], options),
-  };
-}
-
 /** Scroll one page by pixels or viewport multiples. The viewport height is
  * read inside the page so the amount means what the page sees, not what a
  * configured viewport claims. */
@@ -2009,53 +1595,6 @@ function makeBoundedView(need: ObservationNeed, content: string): ObservationVie
   return { need, content: content.slice(0, MAX_VIEW_CONTENT_CHARS), truncated: true };
 }
 
-/** Parse the interactive entries out of an AI-mode aria snapshot: role,
- * unescaped accessible name, and the snapshot-scoped aria ref. Entries
- * whose role is not an action target (headings, generics, lists, ...) are
- * skipped — the outline text still shows them. */
-function parseOutlineElements(
-  outline: string,
-): Array<{ role: string; name: string; ariaRef: string }> {
-  const entries: Array<{ role: string; name: string; ariaRef: string }> = [];
-  for (const line of outline.split('\n')) {
-    const match = OUTLINE_ELEMENT_PATTERN.exec(line);
-    if (match === null) {
-      continue;
-    }
-    const role = match[1] ?? '';
-    if (!INTERACTIVE_ROLES.has(role)) {
-      continue;
-    }
-    entries.push({
-      role,
-      // The snapshot backslash-escapes quotes inside names; undo that.
-      name: (match[2] ?? '').replace(/\\(.)/g, '$1'),
-      ariaRef: match[3] ?? '',
-    });
-  }
-  return entries;
-}
-
-async function normalizeRefActionError(
-  locator: Locator,
-  ref: string,
-  error: unknown,
-): Promise<unknown> {
-  if ((await countRefMatches(locator)) === 0) {
-    return new BrowserRefNotFoundError(ref);
-  }
-
-  return error;
-}
-
-async function countRefMatches(locator: Locator): Promise<number> {
-  try {
-    return await locator.count();
-  } catch {
-    return 0;
-  }
-}
-
 function assertHttpUrl(url: string): void {
   let parsed: URL;
   try {
@@ -2069,7 +1608,8 @@ function assertHttpUrl(url: string): void {
   }
 }
 
-function isHttpUrl(url: string): boolean {
+/** Exported for downloadCapture.ts, the only other place this is used. */
+export function isHttpUrl(url: string): boolean {
   try {
     const protocol = new URL(url).protocol;
     return protocol === 'http:' || protocol === 'https:';
@@ -2078,90 +1618,9 @@ function isHttpUrl(url: string): boolean {
   }
 }
 
-async function readNavigationResponse(
-  response: Response,
-): Promise<BrowserDownloadResult> {
-  const headers = response.headers();
-  return {
-    finalUrl: response.url(),
-    status: response.status(),
-    headers,
-    bytes: new Uint8Array(await response.body()),
-    ...(suggestedFilenameFromHeaders(headers) !== undefined
-      ? { suggestedFilename: suggestedFilenameFromHeaders(headers) }
-      : {}),
-  };
-}
-
-async function readBrowserDownload(
-  download: Download,
-): Promise<BrowserDownloadResult> {
-  const failure = await download.failure();
-  if (failure !== null) {
-    throw new Error(`Browser download failed: ${failure}`);
-  }
-
-  const stream = await download.createReadStream();
-  if (stream === null) {
-    throw new Error('Browser download completed without a readable byte stream.');
-  }
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-
-  return {
-    finalUrl: download.url(),
-    headers: {},
-    bytes: new Uint8Array(Buffer.concat(chunks)),
-    suggestedFilename: download.suggestedFilename(),
-  };
-}
-
-function suggestedFilenameFromHeaders(
-  headers: Readonly<Record<string, string>>,
-): string | undefined {
-  const disposition = headers['content-disposition'];
-  if (disposition === undefined) return undefined;
-
-  const encoded = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
-  if (encoded !== undefined) {
-    try {
-      return decodeURIComponent(encoded.trim());
-    } catch {
-      return encoded.trim();
-    }
-  }
-
-  return disposition.match(/filename="([^"]+)"/i)?.[1]
-    ?? disposition.match(/filename=([^;]+)/i)?.[1]?.trim();
-}
-
-function delay(milliseconds: number): Promise<void> {
+/** Exported for downloadCapture.ts, the only other place this is used. */
+export function delay(milliseconds: number): Promise<void> {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
-}
-
-/** Render any thrown value as a message fragment for an error string. */
-function describeError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-/** Whether an error is Playwright's evaluation timeout. Matched on message
- * because Playwright does not export a distinct timeout class for evaluate. */
-function isTimeoutLikeError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    (/timeout/i.test(error.message) || error.name === 'TimeoutError')
-  );
-}
-
-/** Whether an error is the engine refusing to bring a value back as JSON. */
-function isSerializationError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    /serializ|circular|convert|clone/i.test(error.message)
-  );
 }
 
 /**
@@ -2169,8 +1628,14 @@ function isSerializationError(error: unknown): boolean {
  * SyntaxError without executing a single statement of it, so this answers a
  * pure syntax question and runs nothing. Node and the page are both V8,
  * which is what makes an answer here trustworthy about there.
+ *
+ * Exported for pageJavaScript.ts, which re-checks a candidate with this same
+ * function to decide whether execute-JavaScript's expression/statement retry
+ * is safe (see {@link evaluationSources} below for the two candidates, and
+ * pageJavaScript.ts's `evaluateJavaScript` for how the retry decision uses
+ * this).
  */
-function parses(source: string): boolean {
+export function parses(source: string): boolean {
   try {
     new Function(`return ${source};`);
     return true;

@@ -25,7 +25,7 @@ import {
 } from '../tools/capResult.js';
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
-import { elideStaleObserveResults } from './contextView.js';
+import { collapseStaleObservations } from './contextView.js';
 import { scheduleToolCalls, type ToolCallLifecycleHooks } from './scheduler.js';
 import type {
   AssistantContentBlock,
@@ -530,7 +530,7 @@ function budgetReasonForLimit(limit: RunBudgetLimit): WorkerBudgetReason {
  * tools run through the scheduler (parallel capped reads, serialized
  * writes, request order preserved); one message's combined results are
  * bounded by the batch cap with offload as the remedy; the model sees the
- * elided API message view while state keeps every result; transcript
+ * collapsed API message view while state keeps every result; transcript
  * events (model_request/model_response/tool_call/tool_result/
  * cache_miss_warning/model_response_rejected) record everything, with
  * every guard checked after tool execution, max_turns first.
@@ -547,7 +547,7 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   state.turnCount += 1;
   const turn = state.turnCount;
 
-  const requestMessages = elideStaleObserveResults(state.messages);
+  const requestMessages = collapseStaleObservations(state.messages);
   appendTranscriptEvent(deps.runDir, { type: 'model_request', turn, messages: requestMessages });
   const turnStartedMs = Date.now();
   let response: ModelResponse;

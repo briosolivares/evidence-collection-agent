@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-import { isElisionStub } from '../loop/contextView.js';
+import { isCollapsedStub } from '../loop/contextView.js';
 import type { CallModel, Message, Usage } from '../loop/messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
 import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
@@ -18,7 +18,7 @@ import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDrive
 //    last content block of the last message on every request, so turn N+1
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
-//    turn. A second marker rides the elision frontier — the newest
+//    turn. A second marker rides the collapse frontier — the newest
 //    observe stub in the API message view (see loop/contextView.ts).
 //    It exists because the server matches cached prefixes only up to ~20
 //    content blocks back from a marker: when a new observation stubs the
@@ -103,11 +103,11 @@ export interface CallModelConfig {
  *   system block carries the `cache_control` breakpoint that ends the
  *   prefix (the API renders tools before system, so it caches both). A
  *   second, moving `cache_control` breakpoint rides the last content block
- *   of the last message, and a third rides the elision frontier — the
+ *   of the last message, and a third rides the collapse frontier — the
  *   newest inspect_page stub — when the view contains one (marked
  *   messages are clones; `messages` and its blocks are never mutated), so
  *   each turn's request resumes from a previous turn's cache entry even
- *   when elision edited a message mid-conversation — see the file header.
+ *   when collapsing edited a message mid-conversation — see the file header.
  *   All other messages pass through untouched. Thinking is explicitly disabled: on
  *   claude-sonnet-5 it defaults to on, but thinking blocks must be
  *   replayed verbatim in later turns and the loop's message types (text
@@ -157,7 +157,7 @@ interface BlockPosition {
 /**
  * The conversation as API message params, with the moving cache
  * breakpoints in place: one on the last content block of the last message
- * (the tip), and one on the elision frontier when the view contains
+ * (the tip), and one on the collapse frontier when the view contains
  * inspect_page stubs (see the file header for why). Marked messages and
  * blocks are clones — the input array (owned by the loop, logged live to
  * the transcript) is never mutated, and all other messages pass through
@@ -200,7 +200,7 @@ function tipPosition(messages: readonly Message[]): BlockPosition | undefined {
   return blockIndex < 0 ? undefined : { messageIndex, blockIndex };
 }
 
-/** The elision frontier: the newest inspect_page stub in the view — the
+/** The collapse frontier: the newest inspect_page stub in the view — the
  * block where a displacement turn's request diverges from the previous
  * turn's, and therefore where its cache entry must end. */
 function frontierPosition(messages: readonly Message[]): BlockPosition | undefined {
@@ -208,7 +208,7 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     const message = messages[messageIndex]!;
     if (message.role !== 'user') continue;
     for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
-      if (isElisionStub(message.content[blockIndex]!)) return { messageIndex, blockIndex };
+      if (isCollapsedStub(message.content[blockIndex]!)) return { messageIndex, blockIndex };
     }
   }
   return undefined;

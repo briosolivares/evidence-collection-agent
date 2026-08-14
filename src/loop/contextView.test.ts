@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { observeTool } from '../tools/observe/observe.js';
 import {
-  ELISION_MARKER,
-  elideStaleObserveResults,
+  COLLAPSED_MARKER,
+  collapseStaleObservations,
   KEPT_OBSERVE_RESULTS,
   OBSERVE_TOOL_NAME,
   compactAtBoundary,
@@ -55,7 +55,7 @@ function resultBlock(view: readonly Message[], messageIndex: number, blockIndex 
   return (view[messageIndex] as UserMessage).content[blockIndex] as ToolResultBlock;
 }
 
-describe('elideStaleObserveResults', () => {
+describe('collapseStaleObservations', () => {
   it('matches the registry name of the real observe tool', () => {
     // The view keys on this literal so the loop stays free of tool
     // implementations; this pin is what keeps the two from drifting apart.
@@ -64,20 +64,20 @@ describe('elideStaleObserveResults', () => {
 
   it('returns the conversation untouched (by identity) while observations fit the kept window', () => {
     const none = [TASK];
-    expect(elideStaleObserveResults(none)).toBe(none);
+    expect(collapseStaleObservations(none)).toBe(none);
 
     const two = conversation(KEPT_OBSERVE_RESULTS);
-    expect(elideStaleObserveResults(two)).toBe(two);
+    expect(collapseStaleObservations(two)).toBe(two);
   });
 
   it('stubs the oldest result once a third arrives: marker, URL/title, guidance, same tool_use_id', () => {
     const messages = conversation(3);
-    const view = elideStaleObserveResults(messages);
+    const view = collapseStaleObservations(messages);
 
     // The first result (message index 2) is now the stub...
     const stub = resultBlock(view, 2);
     expect(stub.tool_use_id).toBe('i1');
-    expect(stub.content).toContain(ELISION_MARKER);
+    expect(stub.content).toContain(COLLAPSED_MARKER);
     expect(stub.content).toContain('URL: https://site.test/page-1');
     expect(stub.content).toContain('Title: Page 1');
     expect(stub.content).toContain('Run observe again');
@@ -106,13 +106,13 @@ describe('elideStaleObserveResults', () => {
     // Two successes then a failure: the failure is not the "third result",
     // so nothing goes stale.
     const twoPlusError = [TASK, ...observeTurn(1), ...observeTurn(2), ...error];
-    expect(elideStaleObserveResults(twoPlusError)).toBe(twoPlusError);
+    expect(collapseStaleObservations(twoPlusError)).toBe(twoPlusError);
 
     // Three successes around a failure: the oldest success is stubbed, the
     // failure survives verbatim.
     const threePlusError = [TASK, ...observeTurn(1), ...error, ...observeTurn(2), ...observeTurn(3)];
-    const view = elideStaleObserveResults(threePlusError);
-    expect(resultBlock(view, 2).content).toContain(ELISION_MARKER);
+    const view = collapseStaleObservations(threePlusError);
+    expect(resultBlock(view, 2).content).toContain(COLLAPSED_MARKER);
     expect(view[4]).toBe(threePlusError[4]);
   });
 
@@ -127,15 +127,15 @@ describe('elideStaleObserveResults', () => {
       note: 'Output was 60000 bytes, over this tool’s 50000-byte limit.',
     });
     const messages = [TASK, ...observeTurn(1, offloaded), ...observeTurn(2), ...observeTurn(3)];
-    const stub = resultBlock(elideStaleObserveResults(messages), 2);
+    const stub = resultBlock(collapseStaleObservations(messages), 2);
     expect(stub.content).toContain('URL: https://site.test/page-1');
     expect(stub.content).toContain('Title: Page 1');
   });
 
   it('omits the header — but still stubs — when none is recognizable', () => {
     const messages = [TASK, ...observeTurn(1, 'unexpected shape'), ...observeTurn(2), ...observeTurn(3)];
-    const stub = resultBlock(elideStaleObserveResults(messages), 2);
-    expect(stub.content).toContain(ELISION_MARKER);
+    const stub = resultBlock(collapseStaleObservations(messages), 2);
+    expect(stub.content).toContain(COLLAPSED_MARKER);
     expect(stub.content).not.toContain('URL:');
   });
 
@@ -143,11 +143,11 @@ describe('elideStaleObserveResults', () => {
     // The prompt-cache property: a fourth observation stubs the second
     // result, and the first result's stubbed message re-serializes exactly
     // as it did the turn before.
-    const viewOfThree = elideStaleObserveResults(conversation(3));
-    const viewOfFour = elideStaleObserveResults(conversation(4));
+    const viewOfThree = collapseStaleObservations(conversation(3));
+    const viewOfFour = collapseStaleObservations(conversation(4));
 
     expect(JSON.stringify(viewOfFour[2])).toBe(JSON.stringify(viewOfThree[2]));
-    expect(resultBlock(viewOfFour, 4).content).toContain(ELISION_MARKER);
+    expect(resultBlock(viewOfFour, 4).content).toContain(COLLAPSED_MARKER);
     expect(resultBlock(viewOfFour, 6).content).toBe(observeContent(3));
     expect(resultBlock(viewOfFour, 8).content).toBe(observeContent(4));
   });
@@ -170,10 +170,10 @@ describe('elideStaleObserveResults', () => {
       },
     ];
     const messages = [TASK, ...mixedBatch, ...observeTurn(2), ...observeTurn(3)];
-    const view = elideStaleObserveResults(messages);
+    const view = collapseStaleObservations(messages);
 
     const batch = view[2] as UserMessage;
-    expect((batch.content[0] as ToolResultBlock).content).toContain(ELISION_MARKER);
+    expect((batch.content[0] as ToolResultBlock).content).toContain(COLLAPSED_MARKER);
     // The sibling result is untouched — same object, not a copy.
     expect(batch.content[1]).toBe((messages[2] as UserMessage).content[1]);
   });
@@ -184,7 +184,7 @@ describe('elideStaleObserveResults', () => {
       { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'r1', content: 'x'.repeat(40_000) }] },
     ];
     const messages = [TASK, ...bigRead, ...conversation(3).slice(1)];
-    const view = elideStaleObserveResults(messages);
+    const view = collapseStaleObservations(messages);
     expect(view[2]).toBe(messages[2]);
   });
 });

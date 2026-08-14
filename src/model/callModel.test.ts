@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { ELISION_MARKER } from '../loop/contextView.js';
+import { COLLAPSED_MARKER } from '../loop/contextView.js';
 import type { Message } from '../loop/messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import {
@@ -117,7 +117,7 @@ describe('buildRequestParams', () => {
       // tool_result later), so each request resumes the previous turn's
       // cache entry.
       expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
-      // With no elision stubs in the view there is exactly one
+      // With no collapsed stubs in the view there is exactly one
       // message-level marker: 2 breakpoints per request total
       // (system + moving), within the API's max of 4.
       const markers = contents
@@ -127,9 +127,9 @@ describe('buildRequestParams', () => {
     }
   });
 
-  it('marks the elision frontier — the newest stub — alongside the tip when the view has stubs', () => {
+  it('marks the collapse frontier — the newest stub — alongside the tip when the view has stubs', () => {
     const stub = (n: number): string =>
-      `${ELISION_MARKER}\nURL: https://site.test/page-${n}\nTitle: Page ${n}\nRun inspect_page again.`;
+      `${COLLAPSED_MARKER}\nURL: https://site.test/page-${n}\nTitle: Page ${n}\nRun inspect_page again.`;
     const history = frozen([
       { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] },
       { role: 'assistant', content: [{ type: 'tool_use', id: 'i1', name: 'inspect_page', input: {} }] },
@@ -168,7 +168,7 @@ describe('buildRequestParams', () => {
       { role: 'assistant', content: [{ type: 'tool_use', id: 'i1', name: 'inspect_page', input: {} }] },
       {
         role: 'user',
-        content: [{ type: 'tool_result', tool_use_id: 'i1', content: `${ELISION_MARKER}\nRun inspect_page again.` }],
+        content: [{ type: 'tool_result', tool_use_id: 'i1', content: `${COLLAPSED_MARKER}\nRun inspect_page again.` }],
       },
     ]);
     const params = buildRequestParams(makeConfig(), history);

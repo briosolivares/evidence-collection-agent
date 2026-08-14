@@ -17,7 +17,7 @@
 import type { Message, ToolResultBlock } from './messages.js';
 
 /**
- * Registry name of the tool whose results the view elides. A literal, not
+ * Registry name of the tool whose results the view collapses. A literal, not
  * an import from the tools package — the loop stays free of tool
  * implementations; contextView.test.ts pins this to the real tool's name.
  * Was `inspect_page` until the V2 tool cutover retired it in favor of
@@ -28,14 +28,14 @@ export const OBSERVE_TOOL_NAME = 'observe';
 
 /**
  * How many of the most recent successful observe results survive intact.
- * Two, per the elision plan: the latest observation carries the live refs,
+ * Two, per the collapse plan: the latest observation carries the live refs,
  * and one predecessor covers compare-against-previous-page reasoning.
  */
 export const KEPT_OBSERVE_RESULTS = 2;
 
 /** Opening line of every stub — also the marker tests and humans can grep
  * a transcript for. */
-export const ELISION_MARKER = '[Stale observe result elided — only the two most recent page observations stay in the conversation.]';
+export const COLLAPSED_MARKER = '[Older observation collapsed — only the two most recent page observations stay in the conversation.]';
 
 /** Closing guidance of every stub: the recovery path is re-observing. */
 const REINSPECT_LINE =
@@ -49,11 +49,11 @@ const REINSPECT_LINE =
  * (say, a read_file of a saved transcript) is not mistaken for one; a
  * false positive would misplace a cache marker, never corrupt a request.
  */
-export function isElisionStub(block: { type: string; content?: unknown }): boolean {
+export function isCollapsedStub(block: { type: string; content?: unknown }): boolean {
   return (
     block.type === 'tool_result' &&
     typeof block.content === 'string' &&
-    block.content.startsWith(ELISION_MARKER)
+    block.content.startsWith(COLLAPSED_MARKER)
   );
 }
 
@@ -76,19 +76,15 @@ export function isElisionStub(block: { type: string; content?: unknown }): boole
  *   tool_use/tool_result pairing.
  * - Failed observations (is_error) are never stubbed and never counted
  *   toward the kept window: they are small, they carry what went wrong,
- *   and eliding one would hide the error while a stale success elsewhere
+ *   and collapsing one would hide the error while a stale success elsewhere
  *   survived.
- *
- * The exported name predates the V2 cutover (it targeted inspect_page) and
- * is kept as-is here: src/loop/workerSession.ts and src/model/callModel.ts
- * import it by this name and are outside this change's scope.
  *
  * @param messages - the loop's full conversation for this turn
  * @returns the conversation to send to the model: `messages` itself when
- *   nothing needs eliding, otherwise a new array sharing every untouched
+ *   nothing needs collapsing, otherwise a new array sharing every untouched
  *   message by identity
  */
-export function elideStaleObserveResults(messages: readonly Message[]): readonly Message[] {
+export function collapseStaleObservations(messages: readonly Message[]): readonly Message[] {
   // Which tool_use ids belong to observe. Results are matched through the
   // id, never by sniffing content — a read_file of a page dump must not be
   // mistaken for an observation.
@@ -103,7 +99,7 @@ export function elideStaleObserveResults(messages: readonly Message[]): readonly
   }
   if (observeIds.size <= KEPT_OBSERVE_RESULTS) return messages;
 
-  // Locate every elidable result in conversation order; all but the last
+  // Locate every collapsible result in conversation order; all but the last
   // KEPT_OBSERVE_RESULTS go stale.
   const found: Array<{ messageIndex: number; blockIndex: number }> = [];
   messages.forEach((message, messageIndex) => {
@@ -149,9 +145,9 @@ function stubResultBlock(block: ToolResultBlock): ToolResultBlock {
   // or the {preview, offloadedTo, note} offload envelope); the string check
   // is for the type system (ToolResultBlock.content also admits
   // image-carrying arrays, which only the judge produces and which are
-  // never elidable).
+  // never collapsible).
   const header = typeof block.content === 'string' ? extractPageHeader(block.content) : undefined;
-  const content = [ELISION_MARKER, ...(header === undefined ? [] : [header]), REINSPECT_LINE].join(
+  const content = [COLLAPSED_MARKER, ...(header === undefined ? [] : [header]), REINSPECT_LINE].join(
     '\n',
   );
   return { ...block, content };
@@ -205,7 +201,7 @@ function extractPageHeader(content: string): string | undefined {
  * the first key an observation serializes. That assumption is safe to make
  * here and nowhere else: the value feeds an optional stub header, so a wrong
  * or missing match costs a line of context detail and can never suppress the
- * elision itself.
+ * collapse itself.
  */
 function extractJsonStringField(text: string, field: string): string | undefined {
   const match = new RegExp(`"${field}":"((?:\\\\.|[^"\\\\])*)"`).exec(text);
