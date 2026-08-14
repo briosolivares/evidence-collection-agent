@@ -1,8 +1,22 @@
-import { describe, expect, it, vi } from 'vitest';
+import { mkdir, mkdtemp, readdir, rm, utimes, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { LocalChromeBrowserSessionOptions } from '../../src/browser/playwrightBrowserController.js';
 import { createEvalBrowserRuntime } from './browserRuntime.js';
+
+/**
+ * Keeps a test out of the orphaned-profile reaper. Without it the runtime
+ * scans the real system temp directory on construction, which would make these
+ * tests non-hermetic and let a developer's leftover profiles show up in their
+ * warning and event assertions.
+ */
+const noReaping = async (): Promise<string[]> => [];
+
+const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
 
 function deferred(): { promise: Promise<void>; resolve: () => void } {
   let resolve!: () => void;
@@ -27,6 +41,7 @@ describe('createEvalBrowserRuntime', () => {
     let profile = 0;
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
+      listTempProfiles: noReaping,
       executablePath: '/opt/custom-chrome',
       createTempProfile: async () => `/tmp/eval-profile-${++profile}`,
       createProvider: (options) => {
@@ -74,6 +89,7 @@ describe('createEvalBrowserRuntime', () => {
     const firstStarted = deferred();
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
+      listTempProfiles: noReaping,
       executablePath: '/opt/custom-chrome',
       createProvider: (options) => {
         providerOptions.push(options);
@@ -118,6 +134,7 @@ describe('createEvalBrowserRuntime', () => {
     const warnings: string[] = [];
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
+      listTempProfiles: noReaping,
       createTempProfile: async () => '/tmp/failing-profile',
       createProvider: () => ({
         createSession: async () =>
@@ -149,6 +166,7 @@ describe('createEvalBrowserRuntime', () => {
     const options: LocalChromeBrowserSessionOptions[] = [];
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
+      listTempProfiles: noReaping,
       createTempProfile: async () => '/tmp/normal-only',
       createProvider: (providerOptions) => {
         options.push(providerOptions);
@@ -167,6 +185,7 @@ describe('createEvalBrowserRuntime', () => {
   it('explains the persistent-profile singleton lock', async () => {
     const runtime = createEvalBrowserRuntime({
       authenticatedProfileDir: '/persistent/auth-profile',
+      listTempProfiles: noReaping,
       createProvider: () => ({
         createSession: async () => {
           throw new Error('Failed to create a ProcessSingleton for your profile directory');
@@ -178,5 +197,128 @@ describe('createEvalBrowserRuntime', () => {
       /authenticated Chrome profile is already in use.*close the other Sherlock/i,
     );
     await runtime.close();
+  });
+});
+
+// Exercised against a real fixture directory rather than fakes: the whole point
+// is that readdir/stat/rm behave as assumed on actual profile directories, and
+// a mocked filesystem would have agreed with the buggy version too.
+describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
+  let root: string;
+
+  /**
+   * Create a profile directory under the fixture root with a real mtime.
+   *
+   * @param name - directory name, prefixed or not
+   * @param ageMs - how long ago it was last written; 0 means just now
+   * @returns the directory's absolute path
+   */
+  async function profileDir(name: string, ageMs: number): Promise<string> {
+    const dir = join(root, name);
+    await mkdir(dir);
+    // Nested content proves removal is recursive, as a live Chrome profile is.
+    await mkdir(join(dir, 'Default'));
+    await writeFile(join(dir, 'Default', 'Cookies'), 'x');
+    if (ageMs > 0) {
+      const when = new Date(Date.now() - ageMs);
+      await utimes(dir, when, when);
+    }
+    return dir;
+  }
+
+  beforeEach(async () => {
+    root = await mkdtemp(join(tmpdir(), 'eval-reaper-fixture-'));
+  });
+
+  afterEach(async () => {
+    await rm(root, { recursive: true, force: true });
+  });
+
+  it('removes profiles abandoned hours ago and spares live ones', async () => {
+    const warnings: string[] = [];
+    await profileDir('evidence-agent-eval-chrome-abandoned', FOUR_HOURS_MS + 60_000);
+    await profileDir('evidence-agent-eval-chrome-live', 0);
+    await profileDir('unrelated-tool-cache', FOUR_HOURS_MS + 60_000);
+    await writeFile(join(root, 'evidence-agent-eval-chrome-notadir'), 'x');
+
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      tempProfileRoot: root,
+      onWarning: (message) => warnings.push(message),
+    });
+    await runtime.close();
+
+    // A live trial's profile is touched continuously, so mtime is the guard
+    // against reaping one out from under a concurrently running batch.
+    expect((await readdir(root)).sort()).toEqual([
+      'evidence-agent-eval-chrome-live',
+      'evidence-agent-eval-chrome-notadir',
+      'unrelated-tool-cache',
+    ]);
+    expect(warnings).toEqual([]);
+  });
+
+  it('leaves a profile alone right up to the staleness threshold', async () => {
+    await profileDir('evidence-agent-eval-chrome-borderline', FOUR_HOURS_MS - 60_000);
+
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      tempProfileRoot: root,
+    });
+    await runtime.close();
+
+    expect(await readdir(root)).toEqual(['evidence-agent-eval-chrome-borderline']);
+  });
+
+  it('warns instead of failing the batch when the temp directory cannot be read', async () => {
+    const warnings: string[] = [];
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      tempProfileRoot: join(root, 'does-not-exist'),
+      onWarning: (message) => warnings.push(message),
+    });
+
+    await expect(runtime.close()).resolves.toBeUndefined();
+    expect(warnings).toEqual([expect.stringContaining('could not scan for orphaned Chrome')]);
+  });
+
+  it('keeps sweeping after one removal fails, and warns per failure', async () => {
+    const warnings: string[] = [];
+    const attempted: string[] = [];
+    const first = await profileDir('evidence-agent-eval-chrome-aaa', FOUR_HOURS_MS + 60_000);
+    const second = await profileDir('evidence-agent-eval-chrome-bbb', FOUR_HOURS_MS + 60_000);
+
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      tempProfileRoot: root,
+      removeTempProfile: async (dir) => {
+        attempted.push(dir);
+        if (dir === first) throw new Error('EPERM');
+      },
+      onWarning: (message) => warnings.push(message),
+    });
+    await runtime.close();
+
+    expect(attempted.sort()).toEqual([first, second].sort());
+    expect(warnings).toEqual([
+      expect.stringContaining(`could not remove orphaned Chrome profile ${first}: EPERM`),
+    ]);
+  });
+
+  it('is complete by the time close() resolves', async () => {
+    let removalFinished = false;
+    await profileDir('evidence-agent-eval-chrome-slow', FOUR_HOURS_MS + 60_000);
+
+    const runtime = createEvalBrowserRuntime({
+      authenticatedProfileDir: '/persistent/auth-profile',
+      tempProfileRoot: root,
+      removeTempProfile: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        removalFinished = true;
+      },
+    });
+    await runtime.close();
+
+    expect(removalFinished).toBe(true);
   });
 });
