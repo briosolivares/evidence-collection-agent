@@ -2,11 +2,13 @@
 
 A code-review pass over this branch's uncommitted diff fixed a batch of bugs
 and flagged two findings as architecture-level rather than safe surgical
-patches. Both were investigated properly rather than taken on faith. One
-turned out to have a real, scoped, safe fix and is now fixed (with tests).
-The other was confirmed to genuinely need an architecture decision this pass
-should not make unilaterally, and is recorded here instead of attempted as a
-half-measure.
+patches. Both were investigated properly rather than taken on faith, and
+both are now fixed. Finding 1 had a real, scoped, safe fix from the start.
+Finding 2 was correctly judged to need a cross-cutting design decision the
+original review pass had no authority to make unilaterally — that decision
+was made explicitly on a later pass (reusing `DEFAULT_TOOL_TIMEOUT_MS` as
+the gate's bound, snapshot rather than dynamic conflict-waiting, no special
+resume handling) and is recorded below alongside the mechanism it closes.
 
 This file is separate from `docs/open-followups-2026-08-14.md` (a different,
 already-fully-resolved batch found while validating `3091a81` earlier the
@@ -106,12 +108,16 @@ tool's declared `getAccess` needed to change.
 
 ---
 
-## 2. "Abandon, don't cancel" timeouts let the scheduler treat a still-running call as settled — investigated, NOT fixed; real architecture gap
+## 2. "Abandon, don't cancel" timeouts let the scheduler treat a still-running call as settled — FIXED
 
-**Conclusion: the original code-review's judgment was right.** This needs a
-cross-cutting design decision this pass should not make unilaterally.
-Documented here in full rather than attempted as a partial patch, per the
-explicit instruction to avoid a half-measure.
+**The original code-review's architecture-level judgment was right** — this
+needed the cross-cutting design decision described below, not a surgical
+patch — but "needs a decision" turned out to mean exactly that: something to
+decide and build, not something to leave open indefinitely. Fixed on a later
+pass, once asked to close it, by making the policy calls the "why this can't
+be closed with a narrow patch" reasoning (kept below for the diagnosis) had
+identified as blocking, and building the registry across the same five files
+the original "what a correct fix would require" list named.
 
 ### The mechanism, confirmed
 
@@ -135,7 +141,7 @@ next group — or an entirely new `scheduleToolCalls` call from a later model
 turn — proceeds as if the resource were free. The real work can still be
 running.
 
-### Why this can't be closed with a narrow patch
+### Why this couldn't be closed with a narrow patch (the diagnosis, kept for context)
 
 1. **The abandoned promise's handle doesn't escape where it would need to.**
    `started` in `withToolDeadline` is a local variable inside that function's
@@ -225,31 +231,77 @@ running.
    cannot) is the crux of why bash needed no equivalent of this fix and
    browser tools do.
 
-### What a correct fix would require (for whoever picks this up)
+### What was actually built
 
-At minimum, coordinated changes across:
-- `src/tools/registry.ts` — a new busy-resource registry type keyed by
-  `ToolAccess`-style keys, with a bounded `waitUntilFree`.
-- `src/tools/pipeline.ts` — `withToolDeadline` (or `executeToolCall` around
-  it) needs the call's derived `ToolAccess` to register abandonment, and
-  must keep a handle on `started` so the registry can clear the key on real
-  settlement.
-- `src/loop/scheduler.ts` — every call start (not just intra-batch grouping)
-  needs to consult the registry before proceeding, bounded, with a new
-  fail-closed error kind when the bound elapses.
-- `src/loop/workerSession.ts` — the registry needs to be owned by
-  `WorkerSession`/threaded through `WorkerSessionDeps`, not rebuilt per-turn
-  like `toolCtx` is today.
-- `src/browser/playwrightBrowserController.ts` — its ~10
-  `withRendererDeadline` call sites need to thread through and register
-  against the relevant page's access key, which requires giving the
-  controller a concept it doesn't have today.
+A `BusyResourceRegistry` (`src/tools/registry.ts`) — `markAbandoned(access,
+settles)` records that a call touching `access` was abandoned, clearing
+itself the moment `settles` (the real, still-running `started` promise)
+finally resolves or rejects; `waitUntilFree(access, timeoutMs)` resolves
+`true` immediately if nothing currently marked conflicts (via the same
+`accessesConflict` the scheduler already used), or waits for every
+currently-conflicting entry to clear, or gives up and resolves `false` after
+`timeoutMs`. One instance per run, created unconditionally (not gated on the
+v2 protocol) in `buildRunToolchain` (`src/cli/runTask.ts`).
 
-Each of those needs a policy answer this pass has no authority to pick
-unilaterally (the gate's bound; whether repeated abandonment compounds the
-busy window; whether/how this interacts with resume, since the registry
-would be in-memory and would not survive a crash — though the browser session
-itself is also not expected to survive one). That combination — new
-cross-cutting state, several non-obvious policy decisions, and changes
-spanning two abstraction layers — is what makes this architecture-level. Left
-open; not attempted as a partial patch.
+- `src/tools/pipeline.ts` — `executeToolCall` derives the call's `ToolAccess`
+  once (via a new shared `deriveAccess`, also now used by
+  `validateToolCallsForScheduling` in `src/loop/scheduler.ts`, so scheduling
+  and execution can never disagree about what a call touches), gates on
+  `ctx.busyRegistry.waitUntilFree(access, BUSY_RESOURCE_GATE_TIMEOUT_MS)`
+  right before `execute()` runs (a new `resource_busy` `ToolErrorKind` when
+  it doesn't clear in time), and `withToolDeadline` now calls
+  `busyRegistry.markAbandoned(access, started)` — instead of silently
+  swallowing `started`'s eventual rejection — specifically on the timeout
+  path (not the success path, which never touches the registry at all).
+- `src/loop/workerSession.ts` — `WorkerSessionDeps.busyRegistry`, threaded
+  into `toolCtx` unchanged on every turn (unlike `toolCtx` itself, which is
+  still rebuilt fresh each turn) — the same instance across turns is what
+  lets an abandonment from turn N gate a conflicting call in turn N+1.
+- `src/browser/controller.ts` / `playwrightBrowserController.ts` — a new
+  optional `BrowserController.setBusyRegistry` capability method, called
+  once from `buildRunToolchain`. `withRendererDeadline` (the inner 5s
+  renderer-read layer) became a private controller method for the 9 call
+  sites that read via `this.requirePage()` — this controller's one active
+  page, so `accessKey.selectedPage()` is always the correct key — registering
+  an abandoned read there as a **read**: never blocks a later read (read/read
+  still never conflicts) but always blocks a later **write** (a click, type,
+  or navigate on the same page), which is the actual race this closes.
+
+**The three policy questions, decided:**
+1. **The gate's bound** is `BUSY_RESOURCE_GATE_TIMEOUT_MS = DEFAULT_TOOL_TIMEOUT_MS`
+   (120s) — reusing the existing ceiling rather than inventing a new number:
+   the abandoned call already got one full deadline once, so the resource
+   gets one more before a caller gives up and fails closed with
+   `resource_busy`.
+2. **Repeated abandonment does not compound the busy window.** A busy entry
+   is created only when real work is abandoned (inside `withToolDeadline`),
+   never when a call merely fails to clear the gate — a call that never
+   started never has anything to mark abandoned. So the window a later
+   waiter faces is always exactly as long as the ORIGINAL abandoned call
+   takes to genuinely settle, not extended by however many callers queued
+   behind it.
+3. **Resume needs no special handling.** The registry is in-memory and does
+   not survive a crash, which is correct rather than a gap: `resumeTask`
+   always builds a fresh `BrowserController` (never the interrupted
+   process's), so an orphaned Playwright operation from a killed process is
+   moot the moment the process holding it is gone.
+
+**Residual, honest scope:** three call sites
+(`evaluateSuccessCheck`/`scrollPageBy`/`collectBlockSignals` in
+`playwrightBrowserController.ts`) are free-standing helpers used during
+`browser_action`'s own multi-step sequence execution — they take an explicit,
+possibly non-selected `Page`/`PageRecord`, so `accessKey.selectedPage()`
+would sometimes be the wrong key. They still call the original
+`withRendererDeadline` free function with no `onAbandoned` callback, which
+preserves the exact pre-fix behavior (swallow and forget) rather than risk
+registering an abandonment under a key that might not be the page it
+actually concerns. The dominant failure mode for these three is already
+covered regardless: a hang spanning the WHOLE `browser_action` sequence
+trips the outer 120s layer, which registers under `browser_action`'s own
+`getAccess` (correctly keyed to the actual `pageId` being acted on, not
+'selected'). What's left open is narrower — the inner 5s timeout firing on
+one of these three specifically while the overall sequence still returns
+within its own 120s deadline — and would need threading a resolved pageId
+(not just a `Page` object) through `performBrowserActions`' action-sequence
+plumbing to close correctly, which was judged separate, plumbing-level work
+rather than something to guess at inside this fix.
