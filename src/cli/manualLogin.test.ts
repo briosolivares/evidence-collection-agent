@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { DISABLE_DEVICE_BOUND_SESSIONS_FLAG } from '../browser/playwrightBrowserController.js';
 import {
   MANUAL_LOGIN_START_URL,
   manualLoginArgs,
@@ -54,22 +53,5 @@ describe('manualLoginArgs', () => {
 
   it('continues to Sheets, the page the probe classifies', () => {
     expect(MANUAL_LOGIN_START_URL).toContain('docs.google.com/spreadsheets');
-  });
-});
-
-describe('device-bound session handling', () => {
-  // Google binds a session when it is ISSUED. Sign in without this flag and
-  // the resulting session is unusable by any automated launch, no matter how
-  // the trials are configured afterwards — so the manual launch and the
-  // automated one must carry the identical flag, from one constant.
-  it('disables DBSC with the same flag the automated launch uses', () => {
-    const args = manualLoginArgs('/repo/chrome-profile', MANUAL_LOGIN_START_URL);
-    expect(args).toContain(DISABLE_DEVICE_BOUND_SESSIONS_FLAG);
-  });
-
-  it('names both feature spellings Chrome has shipped', () => {
-    expect(DISABLE_DEVICE_BOUND_SESSIONS_FLAG).toMatch(/^--disable-features=/);
-    expect(DISABLE_DEVICE_BOUND_SESSIONS_FLAG).toContain('DeviceBoundSessionCredentials');
-    expect(DISABLE_DEVICE_BOUND_SESSIONS_FLAG).toContain('StandardDeviceBoundSessionCredentials');
   });
 });

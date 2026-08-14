@@ -17,8 +17,6 @@
 
 import { existsSync } from 'node:fs';
 
-import { DISABLE_DEVICE_BOUND_SESSIONS_FLAG } from '../browser/playwrightBrowserController.js';
-
 /** Where a real Chrome lives, per platform, when nothing overrides it.
  * Ordered most- to least-preferred; the first that exists wins. */
 const DEFAULT_CHROME_PATHS: Readonly<Record<string, readonly string[]>> = {
@@ -67,18 +65,12 @@ export function resolveRealChromePath(
  * nothing that hints at automation. `--user-data-dir` is the whole point:
  * it aims the session at the profile the eval trials launch, so a login
  * that succeeds lands where the trials will look for it.
- *
- * The DBSC flag must match the automated launch exactly. Google binds a
- * session at the moment it is issued, so signing in WITHOUT this flag
- * produces a session no automated launch can ever use, however the trials
- * are later configured — the sign-in is the only chance to get it right.
  */
 export function manualLoginArgs(profileDir: string, startUrl: string): string[] {
   return [
     `--user-data-dir=${profileDir}`,
     '--no-first-run',
     '--no-default-browser-check',
-    DISABLE_DEVICE_BOUND_SESSIONS_FLAG,
     startUrl,
   ];
 }
