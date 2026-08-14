@@ -74,7 +74,20 @@ export const downloadTool: ToolDef<DownloadInput> = {
     'Saves the artifact under artifacts/ with final-URL provenance.',
   inputSchema: downloadInputSchema,
   readOnly: false,
-  getAccess: () => ({ reads: [accessKey.selectedPage()], writes: [accessKey.manifest()] }),
+  // When `filename` is given, it's known at getAccess() time and declared
+  // as its own write — matching write_file/screenshot — so a concurrent
+  // read_file/grep/inspect_document on that exact path is serialized behind
+  // this call instead of racing the writeArtifact() that happens only after
+  // the (slow, network-bound) browser.download() resolves. The
+  // default-suggested-filename case has no path to declare until then, so
+  // it still relies on the manifest write alone.
+  getAccess: (input) => ({
+    reads: [accessKey.selectedPage()],
+    writes: [
+      accessKey.manifest(),
+      ...(input.filename !== undefined ? [accessKey.file(input.filename)] : []),
+    ],
+  }),
   async execute(input, ctx): Promise<EvidenceResult> {
     const browser = requireBrowser(ctx);
     if (input.filename !== undefined) {

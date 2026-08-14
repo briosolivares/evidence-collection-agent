@@ -42,7 +42,7 @@ import {
   offloadResult,
   type OffloadedResult,
 } from '../capResult.js';
-import type { ToolCtx, ToolDef } from '../registry.js';
+import { accessKey, type ToolCtx, type ToolDef } from '../registry.js';
 
 /** Registry name of this tool, also the stem of its offload filenames. */
 export const CAPTURE_TEXT_TOOL_NAME = 'capture_text';
@@ -191,8 +191,13 @@ export function createCaptureTextTool(deps: CaptureTextDeps): ToolDef<CaptureTex
     inputSchema: captureTextInputSchema,
     // Reads the page and appends an evidence record; it changes no page
     // state. Evidence ids are issued synchronously inside one record() call,
-    // so parallel captures cannot interleave into the same id.
+    // so parallel captures cannot interleave into the same id. Declaring the
+    // page as a READ (rather than leaving getAccess undefined, which would
+    // fall back to the empty-reads LEGACY_READ_ACCESS) is what makes the
+    // scheduler serialize this behind a concurrent navigate/click/etc. on
+    // the same page instead of letting it race a write it should observe.
     readOnly: true,
+    getAccess: (input) => ({ reads: [accessKey.page(input.pageId ?? 'selected')], writes: [] }),
     async execute(input, ctx): Promise<CaptureTextResult> {
       // Resolved before the page is read: a capture that cannot be recorded
       // is not a capture, and returning the text anyway would invite the

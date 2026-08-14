@@ -4,7 +4,7 @@ import { z } from 'zod';
 import type { ContentReaderRegistry, ContentRange } from '../../content/contentReader.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { offloadResult, PREVIEW_MAX_BYTES } from '../capResult.js';
-import type { ToolDef } from '../registry.js';
+import { accessKey, type ToolDef } from '../registry.js';
 
 // INTEGRATION (primary agent, at cutover):
 //  1. Build with createInspectDocumentTool({ registry }) where `registry` is
@@ -103,7 +103,12 @@ export function createInspectDocumentTool(deps: InspectDocumentDeps): ToolDef<In
       'range rather than expecting everything at once. OCR text is never exact: check the ' +
       'reported confidence before using a recognized number or name as a final value.',
     inputSchema: inspectDocumentInputSchema,
+    // Declaring the read (rather than leaving getAccess undefined, which
+    // falls back to the empty-reads LEGACY_READ_ACCESS) is what makes the
+    // scheduler serialize this behind a concurrent write to the same path —
+    // e.g. a download or write_file targeting the exact file being read.
     readOnly: true,
+    getAccess: (input) => ({ reads: [accessKey.file(input.path)], writes: [] }),
     execute: async (input, ctx): Promise<InspectDocumentResult> => {
       // The model supplies this path, so confinement is not optional.
       const absPath = resolveRunPath(ctx.runDir, input.path);
