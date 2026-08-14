@@ -356,7 +356,16 @@ function buildChildEnv(
   helperUrl: string,
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env };
-  for (const name of secretEnvDenylist) delete env[name];
+  // A denylist entry matches by exact name (`ANTHROPIC_API_KEY`) OR as a
+  // prefix (`LANGFUSE_`, meant to strip the whole LANGFUSE_PUBLIC_KEY /
+  // _SECRET_KEY / _BASE_URL family) — an exact-match-only `delete env[name]`
+  // silently no-ops on a prefix entry, since no variable is ever literally
+  // named e.g. "LANGFUSE_", leaving the family it names untouched.
+  for (const key of Object.keys(env)) {
+    if (secretEnvDenylist.some((name) => key === name || key.startsWith(name))) {
+      delete env[key];
+    }
+  }
   for (const name of SHELL_STARTUP_HOOK_ENV_KEYS) delete env[name];
 
   env.GIT_EDITOR = 'true';

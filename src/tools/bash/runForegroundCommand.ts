@@ -76,13 +76,29 @@ function decodeRetainedBytes(chunks: Buffer[]): string {
     cut -= 1;
     continuationBytes += 1;
   }
-  if (cut === 0 || continuationBytes === 0) return buffer.toString('utf8');
+  // cut === 0: the whole tail (up to 3 bytes) was continuation bytes with no
+  // lead byte before them at all — pathological input; leave it alone.
+  if (cut === 0) return buffer.toString('utf8');
   const lead = buffer[cut - 1]!;
+  // Plain ASCII (or any byte with the high bit clear) ends the buffer: there
+  // is no multibyte sequence to check at all, complete or not — this also
+  // covers continuationBytes === 0 by way of `cut` never having moved.
+  if ((lead & 0b1000_0000) === 0) return buffer.toString('utf8');
   // How many bytes the lead byte says its sequence needs, in total.
   const expected = lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
-  // Complete already (or not a lead byte at all — invalid input we leave
-  // alone rather than silently reshaping).
-  if (expected === 1 || expected <= continuationBytes) return buffer.toString('utf8');
+  // Not a lead byte at all (a stray continuation byte the walk-back stopped
+  // on, e.g. because it hit the 3-continuation-byte cap) — invalid input we
+  // leave alone rather than silently reshaping.
+  if (expected === 1) return buffer.toString('utf8');
+  // Complete iff the lead byte plus every continuation byte found together
+  // account for the whole sequence the lead byte declares. A genuinely
+  // complete trailing character always has exactly `expected - 1`
+  // continuation bytes, so comparing `expected` to `continuationBytes`
+  // directly (as opposed to `continuationBytes + 1`, the lead byte
+  // included) can never recognize a complete sequence as complete.
+  if (continuationBytes + 1 >= expected) return buffer.toString('utf8');
+  // Incomplete: drop the dangling lead byte and whatever continuation bytes
+  // were captured with it, keeping everything decodable before it.
   return buffer.subarray(0, cut - 1).toString('utf8');
 }
 
@@ -203,13 +219,25 @@ export function runForegroundCommand(
     function appendChunk(target: Buffer[], chunk: Buffer): void {
       if (settled) return;
       const remaining = maxOutputBytes - totalBytes;
-      if (remaining <= 0) return;
+      if (remaining <= 0) {
+        // Already at or over budget from an earlier chunk that exactly
+        // filled it (see below) — triggerTermination is idempotent, so this
+        // just guarantees the kill path fires even if that earlier chunk's
+        // own check somehow didn't.
+        triggerTermination('output_limit_exceeded');
+        return;
+      }
       // Byte ceiling, enforced on the raw Buffer length — never on decoded
       // string length, which would undercount multibyte UTF-8 text.
       const toKeep = chunk.length <= remaining ? chunk : chunk.subarray(0, remaining);
       target.push(toKeep);
       totalBytes += toKeep.length;
-      if (toKeep.length < chunk.length) {
+      // Checked against the running total, not `toKeep.length < chunk.length`:
+      // a chunk that exactly fills the remaining budget needs no truncation
+      // (toKeep === chunk) but still means the ceiling is now fully spent —
+      // the old per-chunk-truncation check missed exactly that boundary and
+      // left the output-limit kill path unreachable from it.
+      if (totalBytes >= maxOutputBytes) {
         triggerTermination('output_limit_exceeded');
       }
     }
