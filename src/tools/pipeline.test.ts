@@ -324,3 +324,99 @@ describe('executeToolCall permission gate', () => {
     expect(asked).toBe(false);
   });
 });
+
+describe('executeToolCall execution deadline', () => {
+  /** A tool that never returns — the failure mode this deadline exists for.
+   * Measured live 2026-08-13: a browser_action fill stopped returning and the
+   * run sat dead for ten minutes, because every budget guard is checked only
+   * AFTER a call completes. */
+  const wedged: ToolDef<Record<string, never>> = {
+    name: 'wedged',
+    description: 'Never returns.',
+    inputSchema: z.object({}).strict(),
+    readOnly: true,
+    timeoutMs: 40,
+    execute: () => new Promise<never>(() => undefined),
+  };
+
+  it('reports a hung tool as a timeout instead of hanging the run', async () => {
+    const result = await executeToolCall(
+      createRegistry([wedged as ToolDef]),
+      { id: 'hang-1', name: 'wedged', input: {} },
+      ctx,
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.isError === true && result.errorKind).toBe('timeout');
+    // The model must not read this as "nothing happened" — a fill that hung
+    // may well have filled the field before wedging.
+    expect(result.content).toContain('may have taken effect');
+    expect(result.content).toContain('40ms');
+  });
+
+  it('does not let a late rejection from abandoned work escape', async () => {
+    // The abandoned promise cannot be cancelled, so it may reject long after
+    // its call was reported. Unhandled, that would take the process down in
+    // some later, unrelated turn.
+    let rejectLate: ((error: Error) => void) | undefined;
+    const lateThrow: ToolDef<Record<string, never>> = {
+      name: 'late_throw',
+      description: 'Rejects after its deadline.',
+      inputSchema: z.object({}).strict(),
+      readOnly: true,
+      timeoutMs: 20,
+      execute: () => new Promise<never>((_resolve, reject) => { rejectLate = reject; }),
+    };
+    const unhandled: unknown[] = [];
+    const onUnhandled = (error: unknown): void => { unhandled.push(error); };
+    process.on('unhandledRejection', onUnhandled);
+    try {
+      const result = await executeToolCall(
+        createRegistry([lateThrow as ToolDef]),
+        { id: 'hang-2', name: 'late_throw', input: {} },
+        ctx,
+      );
+      expect(result.isError === true && result.errorKind).toBe('timeout');
+      rejectLate?.(new Error('too late to matter'));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      expect(unhandled).toEqual([]);
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+    }
+  });
+
+  it('leaves a tool that returns in time completely untouched', async () => {
+    const result = await executeToolCall(
+      registry,
+      { id: 'fast-1', name: 'echo', input: { message: 'hi' } },
+      ctx,
+    );
+    expect(result).toEqual({ toolCallId: 'fast-1', isError: false, content: 'echo: hi' });
+  });
+
+  it('lets a tool opt out of the deadline entirely', async () => {
+    // Infinity is for waiting that is legitimately unbounded. Proven by a
+    // tool that resolves well past a deadline it does not have.
+    const patient: ToolDef<Record<string, never>> = {
+      name: 'patient',
+      description: 'Slow but legitimate.',
+      inputSchema: z.object({}).strict(),
+      readOnly: true,
+      timeoutMs: Infinity,
+      execute: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 60));
+        return 'worth the wait';
+      },
+    };
+    const result = await executeToolCall(
+      createRegistry([patient as ToolDef]),
+      { id: 'patient-1', name: 'patient', input: {} },
+      ctx,
+    );
+    expect(result).toEqual({
+      toolCallId: 'patient-1',
+      isError: false,
+      content: 'worth the wait',
+    });
+  });
+});

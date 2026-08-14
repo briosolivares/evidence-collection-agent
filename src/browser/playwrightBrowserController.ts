@@ -294,7 +294,11 @@ export class PlaywrightBrowserController implements BrowserController {
   }
 
   async outline(): Promise<string> {
-    return this.requirePage().ariaSnapshot({ mode: 'ai' });
+    const page = this.requirePage();
+    return withRendererDeadline(
+      () => page.ariaSnapshot({ mode: 'ai' }),
+      RENDERER_READ_TIMEOUT_MS,
+    );
   }
 
   async click(ref: string): Promise<void> {
@@ -317,7 +321,10 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async scroll(): Promise<void> {
     const page = this.requirePage();
-    await page.evaluate(() => window.scrollBy(0, window.innerHeight));
+    await withRendererDeadline(
+      () => page.evaluate(() => window.scrollBy(0, window.innerHeight)),
+      RENDERER_READ_TIMEOUT_MS,
+    );
     await page.waitForTimeout(SCROLL_SETTLE_MS);
   }
 
@@ -392,7 +399,8 @@ export class PlaywrightBrowserController implements BrowserController {
   }
 
   async title(): Promise<string> {
-    return this.requirePage().title();
+    const page = this.requirePage();
+    return withRendererDeadline(() => page.title(), RENDERER_READ_TIMEOUT_MS);
   }
 
   async pages(): Promise<BrowserPage[]> {
@@ -428,7 +436,10 @@ export class PlaywrightBrowserController implements BrowserController {
     const views: ObservationView[] = [];
     for (const need of needs) {
       if (need === 'interactive') {
-        const outline = await page.ariaSnapshot({ mode: 'ai' });
+        const outline = await withRendererDeadline(
+          () => page.ariaSnapshot({ mode: 'ai' }),
+          RENDERER_READ_TIMEOUT_MS,
+        );
         elements = await this.stampOutlineElements(
           record,
           mainFrameRecord.frameId,
@@ -439,7 +450,10 @@ export class PlaywrightBrowserController implements BrowserController {
       } else {
         // Exact rendered text (innerText respects visibility and layout),
         // for quotation-grade reads the outline normalizes away.
-        const text = await page.evaluate(() => document.body?.innerText ?? '');
+        const text = await withRendererDeadline(
+          () => page.evaluate(() => document.body?.innerText ?? ''),
+          RENDERER_READ_TIMEOUT_MS,
+        );
         views.push(makeBoundedView('text', text));
       }
     }
@@ -473,13 +487,20 @@ export class PlaywrightBrowserController implements BrowserController {
     const observationId = this.state.latestObservationId(record.pageId);
     // Title mid-navigation can fail; an empty title beats failing a capture
     // whose text read fine (describePage takes the same view).
-    const title = await page.title().catch(() => '');
+    const title = await withRendererDeadline(
+      () => page.title(),
+      RENDERER_READ_TIMEOUT_MS,
+      '',
+    ).catch(() => '');
 
     if (request.elementId === undefined) {
       const documentId = this.ensureFrameRecord(record, page.mainFrame()).documentId;
       // The page's own rendered text, not observe's view: innerText respects
       // visibility and layout, and nothing here truncates it.
-      const text = await page.evaluate(() => document.body?.innerText ?? '');
+      const text = await withRendererDeadline(
+        () => page.evaluate(() => document.body?.innerText ?? ''),
+        RENDERER_READ_TIMEOUT_MS,
+      );
       return {
         text,
         url: page.url(),
@@ -673,8 +694,12 @@ export class PlaywrightBrowserController implements BrowserController {
       // The document's identity is read BEFORE evaluation and reported with
       // the result, so a mid-call navigation is visible rather than silent.
       const url = page.url();
-      const documentToken = await page.evaluate(
-        `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
+      const documentToken = await withRendererDeadline(
+        () =>
+          page.evaluate(
+            `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
+          ),
+        RENDERER_READ_TIMEOUT_MS,
       );
 
       let value: unknown;
@@ -939,7 +964,14 @@ export class PlaywrightBrowserController implements BrowserController {
   private async describePage(record: PageRecord): Promise<BrowserPage> {
     // Mid-navigation the title evaluation can fail; '' beats failing the
     // whole listing.
-    return this.buildPage(record, await record.page.title().catch(() => ''));
+    return this.buildPage(
+      record,
+      await withRendererDeadline(
+        () => record.page.title(),
+        RENDERER_READ_TIMEOUT_MS,
+        '',
+      ).catch(() => ''),
+    );
   }
 
   /** The same view without touching the renderer. Used while a dialog has
@@ -1431,7 +1463,11 @@ async function evaluateSuccessCheck(
             .count()) > 0
         );
       case 'text_present': {
-        const text = await page.evaluate(() => document.body?.innerText ?? '');
+        const text = await withRendererDeadline(
+          () => page.evaluate(() => document.body?.innerText ?? ''),
+          RENDERER_READ_TIMEOUT_MS,
+          '',
+        );
         return text.includes(check.text);
       }
       case 'download_started':
@@ -1480,12 +1516,16 @@ async function scrollPageBy(
   amount: ScrollAmount,
 ): Promise<void> {
   const sign = direction === 'up' ? -1 : 1;
-  await page.evaluate(
-    ({ unit, value, signum }) => {
-      const distance = unit === 'viewport' ? window.innerHeight * value : value;
-      window.scrollBy(0, distance * signum);
-    },
-    { unit: amount.unit, value: amount.value, signum: sign },
+  await withRendererDeadline(
+    () =>
+      page.evaluate(
+        ({ unit, value, signum }) => {
+          const distance = unit === 'viewport' ? window.innerHeight * value : value;
+          window.scrollBy(0, distance * signum);
+        },
+        { unit: amount.unit, value: amount.value, signum: sign },
+      ),
+    RENDERER_READ_TIMEOUT_MS,
   );
   await page.waitForTimeout(SCROLL_SETTLE_MS);
 }
@@ -1495,15 +1535,18 @@ async function scrollPageBy(
  * blocked") rather than failing the whole action result. */
 async function collectBlockSignals(record: PageRecord): Promise<BlockSignals> {
   const page = record.page;
-  const probe = await page
-    .evaluate((maxChars) => {
-      const text = document.body?.innerText ?? '';
-      return {
-        text: text.slice(0, maxChars),
-        hasPasswordField: document.querySelector('input[type="password"]') !== null,
-      };
-    }, MAX_BLOCK_TEXT_CHARS)
-    .catch(() => ({ text: '', hasPasswordField: false }));
+  const probe = await withRendererDeadline(
+    () =>
+      page.evaluate((maxChars) => {
+        const text = document.body?.innerText ?? '';
+        return {
+          text: text.slice(0, maxChars),
+          hasPasswordField: document.querySelector('input[type="password"]') !== null,
+        };
+      }, MAX_BLOCK_TEXT_CHARS),
+    RENDERER_READ_TIMEOUT_MS,
+    { text: '', hasPasswordField: false },
+  ).catch(() => ({ text: '', hasPasswordField: false }));
 
   const url = page.url();
   const response = record.lastMainResponse;
@@ -1754,6 +1797,63 @@ function parses(source: string): boolean {
  * completion-value split. A handful covers real snippets, and the bound keeps
  * a pathological body from turning into hundreds of compiles. */
 const MAX_COMPLETION_SPLIT_CANDIDATES = 12;
+
+/**
+ * Bound a read that depends on the page's main thread.
+ *
+ * `page.evaluate`, `page.title`, and `page.ariaSnapshot` all run code in the
+ * renderer and none of them accepts a timeout, so a page whose main thread is
+ * saturated — a heavy app re-rendering on every keystroke, say — makes them
+ * wait indefinitely. Note that `.catch()` on such a call bounds a REJECTION,
+ * not a hang: a wedged renderer never settles either way, which is why
+ * several reads here looked protected and were not. Measured live on
+ * 2026-08-13, a `browser_action` fill stopped returning for ten minutes on
+ * exactly this.
+ *
+ * @param read - starts the renderer read; called immediately
+ * @param fallback - value to use when the deadline wins, for reads where a
+ *   missing answer is survivable (a page title, block-detection text). A read
+ *   whose absence would silently corrupt an observation passes none, and its
+ *   rejection propagates instead.
+ */
+async function withRendererDeadline<T>(
+  read: () => Promise<T>,
+  timeoutMs: number,
+  fallback?: T,
+): Promise<T> {
+  const started = read();
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    return await Promise.race([
+      started,
+      new Promise<T>((resolve, reject) => {
+        timer = setTimeout(() => {
+          if (fallback === undefined) {
+            reject(
+              new Error(
+                `The page stopped responding to reads for ${timeoutMs}ms; its main ` +
+                  `thread is likely busy. Observe it again, or take a different route.`,
+              ),
+            );
+            return;
+          }
+          resolve(fallback);
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+    // The abandoned read may settle much later, or never. Either way nobody
+    // is listening, and an unhandled rejection must not surface in a later
+    // turn that has nothing to do with it.
+    void started.catch(() => undefined);
+  }
+}
+
+/** Ceiling for one renderer read (see withRendererDeadline). Generous beside a
+ * healthy read, which returns in single-digit milliseconds: a read that needs
+ * five seconds is a page in trouble, not a page being slow. */
+const RENDERER_READ_TIMEOUT_MS = 5_000;
 
 /**
  * Rewrite `STATEMENTS; EXPRESSION` into `STATEMENTS; return (EXPRESSION);` —

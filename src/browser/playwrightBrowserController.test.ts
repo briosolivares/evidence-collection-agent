@@ -921,6 +921,36 @@ describe('Playwright browser controller', () => {
     );
 
     it(
+      'fails renderer reads on a wedged page instead of waiting forever',
+      async () => {
+        // The live hang: a page whose main thread is saturated makes
+        // page.evaluate / title / ariaSnapshot wait indefinitely, because none
+        // of them accepts a timeout. A .catch() on those calls bounds a
+        // rejection, not a hang, so several reads only LOOKED protected. Here
+        // the renderer is genuinely wedged, and every read must still settle.
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        await expect(
+          controller.executeJavaScript!(toEarlyJavaScriptRequest('while (true) {}', 1_000)),
+        ).rejects.toMatchObject({ name: 'BrowserJavaScriptTimeoutError' });
+
+        // A listing degrades: the title is survivable, so it comes back empty
+        // rather than failing the whole call.
+        const listed = await controller.pages();
+        expect(listed.length).toBeGreaterThan(0);
+
+        // An observation does NOT degrade: a silently truncated outline would
+        // be worse than an error, so it rejects and says what to do.
+        await expect(controller.observe()).rejects.toThrow(/stopped responding/);
+
+        await controller.replaceUnresponsivePage!();
+        await controller.goto(fixtureServer.url('/second.html'));
+        expect(controller.currentUrl()).toBe(fixtureServer.url('/second.html'));
+      },
+      BROWSER_TEST_TIMEOUT_MS * 4,
+    );
+
+    it(
       'surfaces a page-thrown error without replacing the page',
       async () => {
         await controller.newTab();

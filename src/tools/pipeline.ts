@@ -15,12 +15,34 @@ export interface ToolCall {
 
 /** Which pipeline stage rejected a call. `permission_denied` separates
  * "the human said no / nobody was there to ask" from execution failures in
- * transcripts and metrics. */
+ * transcripts and metrics; `timeout` separates "never came back" from
+ * "failed", which are diagnosed completely differently. */
 export type ToolErrorKind =
   | 'unknown_tool'
   | 'invalid_input'
   | 'permission_denied'
-  | 'execution_error';
+  | 'execution_error'
+  | 'timeout';
+
+/**
+ * Wall-clock ceiling for one tool execution when the tool declares none.
+ *
+ * Why this lives at the pipeline and not only inside each tool: a tool that
+ * never returns cannot be stopped by anything downstream of it. Every budget
+ * guard — `wall_time` included — is checked AFTER a tool call completes, so
+ * an execution that hangs forever hangs the entire run: no result, no
+ * transcript entry, no outcome, indefinitely. Measured live on 2026-08-13, a
+ * `browser_action` fill on a heavy React page stopped returning and the run
+ * sat dead for ten minutes with no guard able to fire. Tools bounding their
+ * own work is necessary but not sufficient — the next unbounded call
+ * reintroduces the identical failure — so this is the one ceiling no tool
+ * can forget to apply.
+ *
+ * Two minutes is deliberately generous, well past any legitimate call
+ * (`browser_action`'s own worst case is 8 actions x 5s plus settle), so that
+ * tripping it means something is genuinely wrong rather than merely slow.
+ */
+export const DEFAULT_TOOL_TIMEOUT_MS = 120_000;
 
 /**
  * The outcome of one tool call, always model-readable: `content` is the
@@ -125,7 +147,11 @@ export async function executeToolCall(
   // execution error rather than crashing the pipeline.
   let content: string;
   try {
-    const normalized = normalizeOutput(await tool.execute(input, ctx));
+    const normalized = normalizeOutput(
+      await withToolDeadline(tool.name, tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS, () =>
+        tool.execute(input, ctx),
+      ),
+    );
     const capped = capResult(
       ctx.runDir,
       tool.name,
@@ -136,6 +162,19 @@ export async function executeToolCall(
     // model receives it JSON-serialized.
     content = typeof capped === 'string' ? capped : JSON.stringify(capped);
   } catch (thrown) {
+    if (thrown instanceof ToolTimeoutError) {
+      return {
+        toolCallId: call.id,
+        isError: true,
+        errorKind: 'timeout',
+        content:
+          `Tool "${call.name}" did not return within ${thrown.timeoutMs}ms and was ` +
+          `abandoned. Whatever it had already done may have taken effect, so treat ` +
+          `the result as unknown rather than as "nothing happened": observe the ` +
+          `current state before acting again, and prefer a different approach — the ` +
+          `same call may well hang the same way.`,
+      };
+    }
     const message = thrown instanceof Error ? thrown.message : String(thrown);
     return {
       toolCallId: call.id,
@@ -147,6 +186,59 @@ export async function executeToolCall(
 
   // Stage 7: return.
   return { toolCallId: call.id, isError: false, content };
+}
+
+/** Raised when a tool execution outlives its deadline. Distinct from any
+ * error a tool itself throws, because the two mean different things: a
+ * throw means the work finished badly, this means it never finished. */
+export class ToolTimeoutError extends Error {
+  readonly toolName: string;
+  readonly timeoutMs: number;
+
+  constructor(toolName: string, timeoutMs: number) {
+    super(`Tool "${toolName}" exceeded its ${timeoutMs}ms deadline.`);
+    this.name = 'ToolTimeoutError';
+    this.toolName = toolName;
+    this.timeoutMs = timeoutMs;
+  }
+}
+
+/**
+ * Run one execution under a wall-clock ceiling.
+ *
+ * The abandoned work is NOT cancelled — it cannot be. A wedged renderer or a
+ * socket that never answers keeps its promise pending forever, and there is
+ * no way to reach in and stop it. What this buys is that the RUN continues:
+ * the call becomes a failed result the model can read and route around, and
+ * the loop's budget guards get to run again. A rejection arriving later from
+ * the abandoned work is swallowed deliberately — nobody is listening for it
+ * any more, and an unhandled rejection would take the process down long after
+ * the call it belonged to was reported.
+ *
+ * A non-finite `timeoutMs` opts out entirely, for a tool whose waiting is
+ * legitimately unbounded. Note that the human wait in `ask_user_question`
+ * needs no such opt-out: it happens in the permission gate, before execute,
+ * which this never wraps.
+ */
+async function withToolDeadline<T>(
+  toolName: string,
+  timeoutMs: number,
+  work: () => Promise<T> | T,
+): Promise<T> {
+  if (!Number.isFinite(timeoutMs)) return await work();
+  const started = Promise.resolve(work());
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      started,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => reject(new ToolTimeoutError(toolName, timeoutMs)), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+    void started.catch(() => undefined);
+  }
 }
 
 /** Normalize an executor's raw output to model-readable text: strings pass

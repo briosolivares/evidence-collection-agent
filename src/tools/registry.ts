@@ -171,6 +171,15 @@ export interface ToolDef<Input = unknown> {
    * permission_denied error. */
   requiresUserInteraction?: boolean;
   /**
+   * Wall-clock ceiling for one execution of this tool, in milliseconds.
+   * Omitted means DEFAULT_TOOL_TIMEOUT_MS. Declare a larger value for work
+   * that is legitimately slow (a large download, OCR, parallel research), or
+   * `Infinity` to opt out — which only a tool whose waiting is genuinely
+   * unbounded should do, since this deadline is what keeps one wedged call
+   * from hanging the entire run.
+   */
+  timeoutMs?: number;
+  /**
    * Do the tool's work.
    *
    * @param input - the call's input, already validated against `inputSchema`
