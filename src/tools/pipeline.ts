@@ -1,5 +1,11 @@
 import { capResult, DEFAULT_MAX_RESULT_BYTES } from './capResult.js';
-import type { ToolCtx, ToolRegistry } from './registry.js';
+import {
+  deriveAccess,
+  type BusyResourceRegistry,
+  type ToolAccess,
+  type ToolCtx,
+  type ToolRegistry,
+} from './registry.js';
 
 /** One tool invocation as requested by the model (a `tool_use` block). */
 export interface ToolCall {
@@ -16,13 +22,17 @@ export interface ToolCall {
 /** Which pipeline stage rejected a call. `permission_denied` separates
  * "the human said no / nobody was there to ask" from execution failures in
  * transcripts and metrics; `timeout` separates "never came back" from
- * "failed", which are diagnosed completely differently. */
+ * "failed", which are diagnosed completely differently. `resource_busy`
+ * separates "never even started" from both: the call was refused before
+ * `execute` ever ran, because a resource it needs was left possibly still
+ * busy by an earlier abandoned call (see `BusyResourceRegistry`). */
 export type ToolErrorKind =
   | 'unknown_tool'
   | 'invalid_input'
   | 'permission_denied'
   | 'execution_error'
-  | 'timeout';
+  | 'timeout'
+  | 'resource_busy';
 
 /**
  * Wall-clock ceiling for one tool execution when the tool declares none.
@@ -43,6 +53,23 @@ export type ToolErrorKind =
  * tripping it means something is genuinely wrong rather than merely slow.
  */
 export const DEFAULT_TOOL_TIMEOUT_MS = 120_000;
+
+/**
+ * Wall-clock ceiling for the busy-resource gate: how long a call waits for a
+ * resource an earlier, abandoned call left possibly still busy to be
+ * confirmed free before failing closed with `resource_busy`.
+ *
+ * Reuses `DEFAULT_TOOL_TIMEOUT_MS` rather than a new arbitrary number: the
+ * abandoned call was itself already given a full deadline's worth of time
+ * once; giving the SAME resource one more full deadline before concluding
+ * it is genuinely wedged (not merely slow) applies the same standard twice
+ * rather than inventing a second one. An unbounded wait was rejected
+ * deliberately — the abandoned work may never settle, and waiting forever
+ * for it would silently reintroduce the exact "run hangs forever" failure
+ * this whole mechanism exists to prevent, just moved one call later and
+ * hidden behind a gate instead of a raw hang.
+ */
+export const BUSY_RESOURCE_GATE_TIMEOUT_MS = DEFAULT_TOOL_TIMEOUT_MS;
 
 /**
  * The outcome of one tool call, always model-readable: `content` is the
@@ -139,6 +166,30 @@ export async function executeToolCall(
     input = decision.updatedInput;
   }
 
+  // Stage 3.5: the busy-resource gate. Derived once here — and reused by
+  // withToolDeadline below to register THIS call's own abandonment, if it
+  // times out — so a call that is about to touch a resource an earlier,
+  // abandoned call left possibly still busy waits for it (bounded) rather
+  // than racing it blind. See BusyResourceRegistry's module doc for why
+  // this cannot just be "wait forever": an abandoned call may never settle.
+  const access = deriveAccess(tool, input);
+  if (ctx.busyRegistry !== undefined) {
+    const free = await ctx.busyRegistry.waitUntilFree(access, BUSY_RESOURCE_GATE_TIMEOUT_MS);
+    if (!free) {
+      return {
+        toolCallId: call.id,
+        isError: true,
+        errorKind: 'resource_busy',
+        content:
+          `Tool "${call.name}" was not started: a resource it needs was left possibly ` +
+          `still busy by an earlier abandoned call, which has not been confirmed done ` +
+          `within ${BUSY_RESOURCE_GATE_TIMEOUT_MS}ms. That earlier call may still be ` +
+          `running. Observe the current state before trying again, and prefer a ` +
+          `different resource or approach if this keeps happening.`,
+      };
+    }
+  }
+
   // Stages 4–6: execute, normalize the output to model-readable text, then
   // cap its size — oversize output is offloaded to a file in the run
   // directory and `content` becomes a preview + path replacement, so no
@@ -148,8 +199,12 @@ export async function executeToolCall(
   let content: string;
   try {
     const normalized = normalizeOutput(
-      await withToolDeadline(tool.name, tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS, () =>
-        tool.execute(input, ctx),
+      await withToolDeadline(
+        tool.name,
+        tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS,
+        () => tool.execute(input, ctx),
+        ctx.busyRegistry,
+        access,
       ),
     );
     const capped = capResult(
@@ -210,10 +265,16 @@ export class ToolTimeoutError extends Error {
  * socket that never answers keeps its promise pending forever, and there is
  * no way to reach in and stop it. What this buys is that the RUN continues:
  * the call becomes a failed result the model can read and route around, and
- * the loop's budget guards get to run again. A rejection arriving later from
- * the abandoned work is swallowed deliberately — nobody is listening for it
- * any more, and an unhandled rejection would take the process down long after
- * the call it belonged to was reported.
+ * the loop's budget guards get to run again.
+ *
+ * On timeout, `access`'s keys are registered with `busyRegistry` (when one
+ * is given) as possibly still busy until `started` itself eventually
+ * settles — see `BusyResourceRegistry`'s module doc for why a later call
+ * touching the same keys needs to know that, rather than treating this
+ * call's timeout as proof the resource is free. Without a registry, the
+ * abandoned promise's eventual rejection is swallowed the old way: nobody is
+ * listening for it any more, and an unhandled rejection must not take the
+ * process down long after the call it belonged to was reported.
  *
  * A non-finite `timeoutMs` opts out entirely, for a tool whose waiting is
  * legitimately unbounded. Note that the human wait in `ask_user_question`
@@ -224,6 +285,8 @@ async function withToolDeadline<T>(
   toolName: string,
   timeoutMs: number,
   work: () => Promise<T> | T,
+  busyRegistry: BusyResourceRegistry | undefined,
+  access: ToolAccess,
 ): Promise<T> {
   if (!Number.isFinite(timeoutMs)) return await work();
   const started = Promise.resolve(work());
@@ -235,9 +298,17 @@ async function withToolDeadline<T>(
         timer = setTimeout(() => reject(new ToolTimeoutError(toolName, timeoutMs)), timeoutMs);
       }),
     ]);
+  } catch (error) {
+    if (error instanceof ToolTimeoutError) {
+      if (busyRegistry !== undefined) {
+        busyRegistry.markAbandoned(access, started);
+      } else {
+        void started.catch(() => undefined);
+      }
+    }
+    throw error;
   } finally {
     clearTimeout(timer);
-    void started.catch(() => undefined);
   }
 }
 

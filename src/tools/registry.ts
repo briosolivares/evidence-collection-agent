@@ -58,6 +58,12 @@ export interface ToolCtx {
    * executing. Present in interactive environments that support cancelling
    * an in-flight run; tools that do not own such a resource can ignore it. */
   abortSignal?: AbortSignal;
+  /** This run's ledger of resources an abandoned (timed-out) call might
+   * still be touching — see `BusyResourceRegistry`. Always present for a
+   * run built through `buildRunToolchain`; absent only in tests that build
+   * a bare `ToolCtx` by hand, in which case the pipeline skips the gate and
+   * behaves exactly as it did before the registry existed. */
+  busyRegistry?: BusyResourceRegistry;
 }
 
 /**
@@ -194,6 +200,104 @@ export const EXCLUSIVE_ACCESS: ToolAccess = { reads: [], writes: [], exclusive: 
  * preserving today's parallel reads — while any exclusive call still forms a
  * barrier around them. */
 export const LEGACY_READ_ACCESS: ToolAccess = { reads: [], writes: [] };
+
+/** Derive a tool call's access the same way for both scheduling (grouping
+ * concurrent calls) and execution (gating/registering against abandoned
+ * work) — one implementation, so the two can never silently disagree about
+ * what a call touches. See `ToolDef.getAccess`'s own doc for why an absent
+ * or throwing declaration degrades to serial rather than to unsafe
+ * parallelism. */
+export function deriveAccess(tool: ToolDef, input: unknown): ToolAccess {
+  if (tool.getAccess === undefined) {
+    return tool.readOnly ? LEGACY_READ_ACCESS : EXCLUSIVE_ACCESS;
+  }
+  try {
+    return tool.getAccess(input);
+  } catch {
+    return EXCLUSIVE_ACCESS;
+  }
+}
+
+/**
+ * The run's ledger of resources an abandoned (timed-out) call might still be
+ * touching.
+ *
+ * `withToolDeadline` cannot cancel a wedged tool call — nothing in this
+ * codebase can reach into Playwright and stop it — so giving up on waiting
+ * for it does not mean the real work stopped. Without this registry, the
+ * scheduler's mutual-exclusion guarantee (two calls that write the same key
+ * never run concurrently) silently breaks the moment a call times out: the
+ * abandoned call's slot is released as an ordinary settled call, and
+ * whatever runs next on the same resource races work that may still be in
+ * flight. This registry is what lets a LATER call notice "the previous
+ * occupant of this key never confirmed it was done" and wait for it (or a
+ * bounded timeout of its own) instead of racing it blind.
+ *
+ * Deliberately NOT keyed by an id or ToolCall — only by the abandoned call's
+ * `ToolAccess`, checked via the same `accessesConflict` the scheduler
+ * already uses. A read that finishes late never blocks a later read (read/
+ * read still never conflicts), but it does block a later write to the same
+ * key — which is exactly the guarantee that was silently breaking.
+ */
+export interface BusyResourceRegistry {
+  /** Record that a call touching `access` was abandoned — `settles`
+   * resolves or rejects whenever the real, still-running work eventually
+   * finishes, however long that takes. The entry clears itself the moment
+   * `settles` settles; nothing else needs to remove it. */
+  markAbandoned(access: ToolAccess, settles: Promise<unknown>): void;
+  /** Resolve `true` once nothing currently marked abandoned conflicts with
+   * `access` (immediately, in the common case where nothing is marked),
+   * or `false` once `timeoutMs` elapses first. A conflicting entry added
+   * AFTER this call starts waiting is not included — see the module note
+   * on why that snapshot is intentional, not a race. */
+  waitUntilFree(access: ToolAccess, timeoutMs: number): Promise<boolean>;
+}
+
+/** Build an empty `BusyResourceRegistry`. One instance per run, shared by
+ * every tool call through `ToolCtx.busyRegistry` and by the browser
+ * controller's own internal renderer-read timeouts (see
+ * `PlaywrightBrowserController.setBusyRegistry`) — the same abandoned work
+ * must be visible to both layers, or a call gated at one layer could still
+ * race an abandonment the other layer never told it about.
+ *
+ * Snapshot semantics in `waitUntilFree`: a call that starts waiting sees
+ * only the entries that exist at that instant, and waits for exactly those
+ * to clear (or its own bound to elapse) — it does not keep growing its wait
+ * for entries added afterward. This is safe rather than merely convenient:
+ * every call that could ever conflict with a given key must itself pass
+ * through this same gate before it is allowed to start touching that key,
+ * so the only way a NEW conflicting entry can appear while an existing
+ * waiter is waiting is for its own call to have already found the key
+ * clear at the moment ITS gate ran — at which point the resource genuinely
+ * was momentarily free, and both waiters proceeding is correct.
+ */
+export function createBusyResourceRegistry(): BusyResourceRegistry {
+  const abandoned = new Set<{ access: ToolAccess; cleared: Promise<void> }>();
+
+  return {
+    markAbandoned(access, settles) {
+      const entry = {
+        access,
+        cleared: settles.then(
+          () => undefined,
+          () => undefined,
+        ),
+      };
+      abandoned.add(entry);
+      void entry.cleared.then(() => {
+        abandoned.delete(entry);
+      });
+    },
+    async waitUntilFree(access, timeoutMs) {
+      const conflicting = [...abandoned].filter((entry) => accessesConflict(entry.access, access));
+      if (conflicting.length === 0) return true;
+      return Promise.race([
+        Promise.all(conflicting.map((entry) => entry.cleared)).then(() => true),
+        new Promise<false>((resolve) => setTimeout(() => resolve(false), timeoutMs)),
+      ]);
+    },
+  };
+}
 
 /**
  * One tool, defined once: the model-facing contract (name, description,

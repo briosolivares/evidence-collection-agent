@@ -101,8 +101,10 @@ import {
   type ToolProfile,
 } from '../tools/index.js';
 import {
+  createBusyResourceRegistry,
   toApiToolDefs,
   type ApiToolDef,
+  type BusyResourceRegistry,
   type ToolCtx,
   type ToolDef,
   type ToolRegistry,
@@ -474,12 +476,25 @@ interface RunToolchain {
   outputContracts?: OutputContractStore;
   evidenceStore?: EvidenceStore;
   outputTables?: OutputTableStore;
+  /** This run's busy-resource ledger (see BusyResourceRegistry). Unlike the
+   * V2-only stores above, this is unconditional: the "abandon, don't
+   * cancel" timeout gap it closes applies to every tool call in every
+   * protocol, not only the typed-output path. */
+  busyRegistry: BusyResourceRegistry;
   registry: ToolRegistry;
   apiToolDefs: ApiToolDef[];
 }
 
 function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
   const { runDir, v2Protocol } = inputs;
+
+  // Unconditional, and built before anything else touches the browser
+  // controller: the SAME instance is threaded into every tool call via
+  // ToolCtx below AND into the controller's own internal renderer-read
+  // timeouts, or an abandonment recorded on one side would be invisible to
+  // a gate check on the other.
+  const busyRegistry = createBusyResourceRegistry();
+  inputs.browser.setBusyRegistry?.(busyRegistry);
 
   // Run-scoped V2 state. Built here, before the registry, because several
   // tools close over it — a tool cannot be constructed without the store it
@@ -644,6 +659,7 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
     ...(outputContracts === undefined ? {} : { outputContracts }),
     ...(evidenceStore === undefined ? {} : { evidenceStore }),
     ...(outputTables === undefined ? {} : { outputTables }),
+    busyRegistry,
     registry,
     apiToolDefs,
   };
@@ -885,6 +901,7 @@ export async function runTask(
         credentials,
         requestPermission: config.requestPermission,
         toolHooks: toolCheckpoint.hooks,
+        busyRegistry: toolchain.busyRegistry,
         // Reaches an in-flight command, unlike the model-call boundary the
         // TUI's cancellation already covers.
         ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
@@ -1557,6 +1574,7 @@ export async function resumeTask(
       credentials,
       requestPermission: config.requestPermission,
       toolHooks: toolCheckpoint.hooks,
+      busyRegistry: toolchain.busyRegistry,
       ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
       ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
       ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),

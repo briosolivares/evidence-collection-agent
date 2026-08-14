@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { accessesConflict, accessKey, createRegistry, toApiToolDefs, type ToolDef } from './registry.js';
+import {
+  accessesConflict,
+  accessKey,
+  createBusyResourceRegistry,
+  createRegistry,
+  deriveAccess,
+  EXCLUSIVE_ACCESS,
+  LEGACY_READ_ACCESS,
+  toApiToolDefs,
+  type ToolDef,
+} from './registry.js';
 
 /** A small two-tool registry exercising distinct schema shapes. */
 function makeTools(): ToolDef[] {
@@ -143,5 +153,133 @@ describe('accessesConflict', () => {
         { reads: [accessKey.file('artifacts/report.csv')], writes: [] },
       ),
     ).toBe(false);
+  });
+});
+
+describe('deriveAccess', () => {
+  it("falls back to LEGACY_READ_ACCESS for a readOnly tool with no getAccess", () => {
+    const tool: ToolDef = {
+      name: 'legacy_read',
+      description: '',
+      inputSchema: z.object({}),
+      readOnly: true,
+      execute: () => undefined,
+    };
+    expect(deriveAccess(tool, {})).toBe(LEGACY_READ_ACCESS);
+  });
+
+  it('falls back to EXCLUSIVE_ACCESS for a non-readOnly tool with no getAccess', () => {
+    const tool: ToolDef = {
+      name: 'legacy_write',
+      description: '',
+      inputSchema: z.object({}),
+      readOnly: false,
+      execute: () => undefined,
+    };
+    expect(deriveAccess(tool, {})).toBe(EXCLUSIVE_ACCESS);
+  });
+
+  it('degrades to EXCLUSIVE_ACCESS when getAccess throws, never to unsafe parallelism', () => {
+    const tool: ToolDef = {
+      name: 'buggy',
+      description: '',
+      inputSchema: z.object({}),
+      readOnly: true,
+      getAccess: () => {
+        throw new Error('boom');
+      },
+      execute: () => undefined,
+    };
+    expect(deriveAccess(tool, {})).toBe(EXCLUSIVE_ACCESS);
+  });
+
+  it("returns the tool's own declared access, derived from the given input", () => {
+    const tool: ToolDef<{ pageId: string }> = {
+      name: 'paged',
+      description: '',
+      inputSchema: z.object({ pageId: z.string() }),
+      readOnly: false,
+      getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
+      execute: () => undefined,
+    };
+    expect(deriveAccess(tool, { pageId: 'p1' })).toEqual({
+      reads: [],
+      writes: [accessKey.page('p1')],
+    });
+  });
+});
+
+describe('createBusyResourceRegistry', () => {
+  it('reports free immediately when nothing is marked abandoned', async () => {
+    const registry = createBusyResourceRegistry();
+    await expect(
+      registry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 50),
+    ).resolves.toBe(true);
+  });
+
+  it('does not block a non-conflicting access', async () => {
+    const registry = createBusyResourceRegistry();
+    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, new Promise(() => undefined));
+    await expect(
+      registry.waitUntilFree({ reads: [], writes: [accessKey.page('p2')] }, 50),
+    ).resolves.toBe(true);
+  });
+
+  it('never blocks a conflicting READ — only a write conflicts with an abandoned read', () => {
+    const registry = createBusyResourceRegistry();
+    registry.markAbandoned({ reads: [accessKey.page('p1')], writes: [] }, new Promise(() => undefined));
+    return expect(
+      registry.waitUntilFree({ reads: [accessKey.page('p1')], writes: [] }, 50),
+    ).resolves.toBe(true);
+  });
+
+  it('blocks a conflicting write until the abandoned call actually settles, then frees it', async () => {
+    const registry = createBusyResourceRegistry();
+    let resolveAbandoned: (() => void) | undefined;
+    const abandoned = new Promise<void>((resolve) => {
+      resolveAbandoned = resolve;
+    });
+    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, abandoned);
+
+    let settled = false;
+    const waiting = registry
+      .waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 5_000)
+      .then((free) => {
+        settled = true;
+        return free;
+      });
+
+    // Still pending immediately after starting the wait — proves this is a
+    // real wait, not an accidental instant resolve.
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(settled).toBe(false);
+
+    resolveAbandoned!();
+    await expect(waiting).resolves.toBe(true);
+  });
+
+  it('times out and reports not-free when the abandoned call never settles in time', async () => {
+    const registry = createBusyResourceRegistry();
+    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, new Promise(() => undefined));
+    await expect(
+      registry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 20),
+    ).resolves.toBe(false);
+  });
+
+  it('clears the entry once settled via REJECTION too, not only resolution', async () => {
+    const registry = createBusyResourceRegistry();
+    let rejectAbandoned: ((error: Error) => void) | undefined;
+    const abandoned = new Promise<never>((_resolve, reject) => {
+      rejectAbandoned = reject;
+    });
+    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, abandoned);
+    rejectAbandoned!(new Error('the abandoned work eventually failed'));
+
+    // Give the internal cleanup .then() a microtask to run.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await expect(
+      registry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 50),
+    ).resolves.toBe(true);
   });
 });

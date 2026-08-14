@@ -61,6 +61,7 @@ import {
   type EarlyJavaScriptRequest,
 } from './browserJavaScript.js';
 import type { BrowserSessionProvider } from './sessionProvider.js';
+import { accessKey, type BusyResourceRegistry } from '../tools/registry.js';
 
 const ARIA_REF_PATTERN = /^(?:f\d+)?e\d+$/;
 const DOWNLOAD_EVENT_TIMEOUT_MS = 5_000;
@@ -351,6 +352,11 @@ export class PlaywrightBrowserController implements BrowserController {
    * new pages, dialogs, downloads). */
   private readonly activityListeners = new Set<() => void>();
   private dialogSequence = 0;
+  /** Set via {@link setBusyRegistry}; undefined until the run's toolchain
+   * wires it up (see runTask.ts's buildRunToolchain), or in a test that
+   * constructs this controller directly. See {@link withRendererDeadline}
+   * for what it protects. */
+  private busyRegistry: BusyResourceRegistry | undefined;
 
   /**
    * Present iff this controller was constructed with a CDP endpoint (see
@@ -403,6 +409,10 @@ export class PlaywrightBrowserController implements BrowserController {
     });
   }
 
+  setBusyRegistry(registry: BusyResourceRegistry): void {
+    this.busyRegistry = registry;
+  }
+
   newTab(): Promise<void> {
     return this.serializeTabLifecycle(async () => {
       this.requireOpenContext();
@@ -437,7 +447,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async outline(): Promise<string> {
     const page = this.requirePage();
-    return withRendererDeadline(
+    return this.withRendererDeadline(
       () => page.ariaSnapshot({ mode: 'ai' }),
       RENDERER_READ_TIMEOUT_MS,
     );
@@ -463,7 +473,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async scroll(): Promise<void> {
     const page = this.requirePage();
-    await withRendererDeadline(
+    await this.withRendererDeadline(
       () => page.evaluate(() => window.scrollBy(0, window.innerHeight)),
       RENDERER_READ_TIMEOUT_MS,
     );
@@ -542,7 +552,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async title(): Promise<string> {
     const page = this.requirePage();
-    return withRendererDeadline(() => page.title(), RENDERER_READ_TIMEOUT_MS);
+    return this.withRendererDeadline(() => page.title(), RENDERER_READ_TIMEOUT_MS);
   }
 
   async pages(): Promise<BrowserPage[]> {
@@ -578,7 +588,7 @@ export class PlaywrightBrowserController implements BrowserController {
     const views: ObservationView[] = [];
     for (const need of needs) {
       if (need === 'interactive') {
-        const outline = await withRendererDeadline(
+        const outline = await this.withRendererDeadline(
           () => page.ariaSnapshot({ mode: 'ai' }),
           RENDERER_READ_TIMEOUT_MS,
         );
@@ -592,7 +602,7 @@ export class PlaywrightBrowserController implements BrowserController {
       } else {
         // Exact rendered text (innerText respects visibility and layout),
         // for quotation-grade reads the outline normalizes away.
-        const text = await withRendererDeadline(
+        const text = await this.withRendererDeadline(
           () => page.evaluate(() => document.body?.innerText ?? ''),
           RENDERER_READ_TIMEOUT_MS,
         );
@@ -629,7 +639,7 @@ export class PlaywrightBrowserController implements BrowserController {
     const observationId = this.state.latestObservationId(record.pageId);
     // Title mid-navigation can fail; an empty title beats failing a capture
     // whose text read fine (describePage takes the same view).
-    const title = await withRendererDeadline(
+    const title = await this.withRendererDeadline(
       () => page.title(),
       RENDERER_READ_TIMEOUT_MS,
       '',
@@ -639,7 +649,7 @@ export class PlaywrightBrowserController implements BrowserController {
       const documentId = this.ensureFrameRecord(record, page.mainFrame()).documentId;
       // The page's own rendered text, not observe's view: innerText respects
       // visibility and layout, and nothing here truncates it.
-      const text = await withRendererDeadline(
+      const text = await this.withRendererDeadline(
         () => page.evaluate(() => document.body?.innerText ?? ''),
         RENDERER_READ_TIMEOUT_MS,
       );
@@ -836,7 +846,7 @@ export class PlaywrightBrowserController implements BrowserController {
       // The document's identity is read BEFORE evaluation and reported with
       // the result, so a mid-call navigation is visible rather than silent.
       const url = page.url();
-      const documentToken = await withRendererDeadline(
+      const documentToken = await this.withRendererDeadline(
         () =>
           page.evaluate(
             `(() => { const w = globalThis; w.__sherlockDoc ??= 'doc-' + Math.random().toString(36).slice(2, 10); return w.__sherlockDoc; })()`,
@@ -1276,7 +1286,7 @@ export class PlaywrightBrowserController implements BrowserController {
     // whole listing.
     return this.buildPage(
       record,
-      await withRendererDeadline(
+      await this.withRendererDeadline(
         () => record.page.title(),
         RENDERER_READ_TIMEOUT_MS,
         '',
@@ -1657,6 +1667,32 @@ export class PlaywrightBrowserController implements BrowserController {
       () => undefined,
     );
     return result;
+  }
+
+  /**
+   * Bound a read that depends on the page's main thread, on THIS
+   * controller's single selected/active page — see the module-level
+   * {@link withRendererDeadline} for the actual timeout mechanics.
+   *
+   * On timeout, the abandoned read is registered with `this.busyRegistry`
+   * (when set) as a possibly-still-busy READ on `accessKey.selectedPage()`
+   * — correct because every call site that reaches this METHOD (as opposed
+   * to the free function below) reads via `this.requirePage()`, i.e. this
+   * controller's one active page, never an explicit non-selected one. See
+   * `BusyResourceRegistry`'s module doc for why registering it as a read
+   * still lets a later WRITE (a click, type, or navigate on the same page)
+   * wait for it, which is the actual race this closes: a stuck read left
+   * running in the background while a later action starts mutating the
+   * page it never finished reading.
+   */
+  private withRendererDeadline<T>(read: () => Promise<T>, timeoutMs: number, fallback?: T): Promise<T> {
+    return withRendererDeadline(read, timeoutMs, fallback, (started) => {
+      if (this.busyRegistry !== undefined) {
+        this.busyRegistry.markAbandoned({ reads: [accessKey.selectedPage()], writes: [] }, started);
+      } else {
+        void started.catch(() => undefined);
+      }
+    });
   }
 }
 
@@ -2131,6 +2167,12 @@ function parses(source: string): boolean {
  * a pathological body from turning into hundreds of compiles. */
 const MAX_COMPLETION_SPLIT_CANDIDATES = 12;
 
+/** Ceiling for one renderer read (see the class's withRendererDeadline
+ * method). Generous beside a healthy read, which returns in single-digit
+ * milliseconds: a read that needs five seconds is a page in trouble, not a
+ * page being slow. */
+const RENDERER_READ_TIMEOUT_MS = 5_000;
+
 /**
  * Bound a read that depends on the page's main thread.
  *
@@ -2148,19 +2190,34 @@ const MAX_COMPLETION_SPLIT_CANDIDATES = 12;
  *   missing answer is survivable (a page title, block-detection text). A read
  *   whose absence would silently corrupt an observation passes none, and its
  *   rejection propagates instead.
+ * @param onAbandoned - called once, only on an actual timeout, with the
+ *   still-running `started` promise — the caller's chance to register it
+ *   with a `BusyResourceRegistry` under the correct access key instead of
+ *   silently swallowing it. Omitted callers (the three free-standing
+ *   action-sequence helpers below, which read an explicit, possibly
+ *   non-selected `Page` rather than `this.requirePage()` and so have no
+ *   single unambiguous key to register under) get the old behavior exactly:
+ *   the abandoned read's eventual rejection is swallowed, since nobody is
+ *   listening for it any more and an unhandled rejection must not surface in
+ *   a later turn that has nothing to do with it. See
+ *   `PlaywrightBrowserController.withRendererDeadline` for the wrapper every
+ *   OTHER call site uses, which always supplies one.
  */
 async function withRendererDeadline<T>(
   read: () => Promise<T>,
   timeoutMs: number,
   fallback?: T,
+  onAbandoned?: (started: Promise<T>) => void,
 ): Promise<T> {
   const started = read();
   let timer: NodeJS.Timeout | undefined;
+  let timedOut = false;
   try {
     return await Promise.race([
       started,
       new Promise<T>((resolve, reject) => {
         timer = setTimeout(() => {
+          timedOut = true;
           if (fallback === undefined) {
             reject(
               new Error(
@@ -2176,17 +2233,15 @@ async function withRendererDeadline<T>(
     ]);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
-    // The abandoned read may settle much later, or never. Either way nobody
-    // is listening, and an unhandled rejection must not surface in a later
-    // turn that has nothing to do with it.
-    void started.catch(() => undefined);
+    if (timedOut) {
+      if (onAbandoned !== undefined) {
+        onAbandoned(started);
+      } else {
+        void started.catch(() => undefined);
+      }
+    }
   }
 }
-
-/** Ceiling for one renderer read (see withRendererDeadline). Generous beside a
- * healthy read, which returns in single-digit milliseconds: a read that needs
- * five seconds is a page in trouble, not a page being slow. */
-const RENDERER_READ_TIMEOUT_MS = 5_000;
 
 /**
  * Rewrite `STATEMENTS; EXPRESSION` into `STATEMENTS; return (EXPRESSION);` —

@@ -22,6 +22,9 @@ import type {
   BrowserObserveRequest,
   BrowserPage,
 } from './browserState.js';
+// Type-only, erased at runtime — registry.ts already imports `type
+// BrowserController` from this module, so this stays one-directional.
+import type { BusyResourceRegistry } from '../tools/registry.js';
 
 /** Options controlling a browser screenshot. */
 export interface BrowserScreenshotOptions {
@@ -455,6 +458,18 @@ export interface BrowserController {
    *   Playwright's own types and could drift from them silently.
    */
   pdfPageSource?(): Pick<Browser, 'newPage'>;
+
+  /**
+   * Give this controller the run's busy-resource registry, so its own
+   * internal renderer-read timeouts (a controller-level concern below the
+   * tool-level `ToolCtx.busyRegistry` gate) register their abandonments in
+   * the SAME ledger a later tool call's gate checks against.
+   *
+   * OPTIONAL: a controller with no internal timeout of its own (a test
+   * double, a future non-Playwright backend) omits it, and simply gets no
+   * protection from abandoned-read races — exactly today's behavior.
+   */
+  setBusyRegistry?(registry: BusyResourceRegistry): void;
 
   close(): Promise<void>;
 }

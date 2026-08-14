@@ -7,7 +7,14 @@ import { z } from 'zod';
 import { initManifest } from '../run/artifacts.js';
 import { DEFAULT_MAX_RESULT_BYTES, type OffloadedResult } from './capResult.js';
 import { executeToolCall } from './pipeline.js';
-import { createRegistry, type ToolCtx, type ToolDef } from './registry.js';
+import {
+  accessKey,
+  createBusyResourceRegistry,
+  createRegistry,
+  type BusyResourceRegistry,
+  type ToolCtx,
+  type ToolDef,
+} from './registry.js';
 
 // Tool executions in these tests never touch the filesystem, so any
 // syntactically valid absolute path serves as the run directory.
@@ -418,5 +425,138 @@ describe('executeToolCall execution deadline', () => {
       isError: false,
       content: 'worth the wait',
     });
+  });
+});
+
+describe('executeToolCall busy-resource gate', () => {
+  /** A write tool whose access is entirely driven by input, matching the
+   * real getAccess pattern (page(pageId), not a hardcoded key). */
+  const writesPage: ToolDef<{ pageId: string }> = {
+    name: 'writes_page',
+    description: 'Writes the named page.',
+    inputSchema: z.object({ pageId: z.string() }),
+    readOnly: false,
+    getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
+    execute: async (input) => `wrote ${input.pageId}`,
+  };
+  const registryWithPageWriter = createRegistry([writesPage as ToolDef]);
+
+  it('refuses to start, without executing, when the gate reports the resource is not free', async () => {
+    let executed = false;
+    const neverStarts: ToolDef<Record<string, never>> = {
+      name: 'never_starts',
+      description: 'Would run, but the gate should refuse it first.',
+      inputSchema: z.object({}).strict(),
+      readOnly: true,
+      execute: () => {
+        executed = true;
+        return 'ran';
+      },
+    };
+    const stubRegistry: BusyResourceRegistry = {
+      markAbandoned: () => undefined,
+      waitUntilFree: async () => false,
+    };
+    const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry: stubRegistry };
+
+    const result = await executeToolCall(
+      createRegistry([neverStarts as ToolDef]),
+      { id: 'gate-1', name: 'never_starts', input: {} },
+      gatedCtx,
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.isError === true && result.errorKind).toBe('resource_busy');
+    expect(executed).toBe(false);
+  });
+
+  it('registers a timed-out call under its own access, so a later conflicting call waits for it instead of racing it', async () => {
+    const busyRegistry = createBusyResourceRegistry();
+    const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
+    let resolveWedged: ((value: string) => void) | undefined;
+    const wedgedWrite: ToolDef<{ pageId: string }> = {
+      name: 'wedged_write',
+      description: 'Times out, then eventually resolves in the background.',
+      inputSchema: z.object({ pageId: z.string() }),
+      readOnly: false,
+      timeoutMs: 20,
+      getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
+      execute: () => new Promise<string>((resolve) => { resolveWedged = resolve; }),
+    };
+    const registry = createRegistry([wedgedWrite as ToolDef, writesPage as ToolDef]);
+
+    const abandoned = await executeToolCall(
+      registry,
+      { id: 'abandon-1', name: 'wedged_write', input: { pageId: 'p1' } },
+      gatedCtx,
+    );
+    expect(abandoned.isError === true && abandoned.errorKind).toBe('timeout');
+
+    // A second call on the SAME page must wait for the abandoned call to
+    // actually settle rather than starting immediately — proven by checking
+    // it has not settled yet, then unblocking it and confirming it proceeds.
+    let secondSettled = false;
+    const second = executeToolCall(
+      registry,
+      { id: 'gate-2', name: 'writes_page', input: { pageId: 'p1' } },
+      gatedCtx,
+    ).then((result) => {
+      secondSettled = true;
+      return result;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    expect(secondSettled).toBe(false);
+
+    resolveWedged!('finally done');
+    const result = await second;
+    expect(secondSettled).toBe(true);
+    expect(result).toEqual({ toolCallId: 'gate-2', isError: false, content: 'wrote p1' });
+  });
+
+  it('does not gate a call on an unrelated page, even while another page has an abandoned call outstanding', async () => {
+    const busyRegistry = createBusyResourceRegistry();
+    const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
+    const wedgedWrite: ToolDef<{ pageId: string }> = {
+      name: 'wedged_write_2',
+      description: 'Times out and never settles for this test.',
+      inputSchema: z.object({ pageId: z.string() }),
+      readOnly: false,
+      timeoutMs: 20,
+      getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
+      execute: () => new Promise<never>(() => undefined),
+    };
+    const registry = createRegistry([wedgedWrite as ToolDef, writesPage as ToolDef]);
+
+    const abandoned = await executeToolCall(
+      registry,
+      { id: 'abandon-2', name: 'wedged_write_2', input: { pageId: 'p1' } },
+      gatedCtx,
+    );
+    expect(abandoned.isError === true && abandoned.errorKind).toBe('timeout');
+
+    const result = await executeToolCall(
+      registry,
+      { id: 'gate-3', name: 'writes_page', input: { pageId: 'p2' } },
+      gatedCtx,
+    );
+    expect(result).toEqual({ toolCallId: 'gate-3', isError: false, content: 'wrote p2' });
+  });
+
+  it('leaves a tool that returns in time with no lingering busy entry', async () => {
+    const busyRegistry = createBusyResourceRegistry();
+    const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
+    await executeToolCall(
+      registryWithPageWriter,
+      { id: 'fast-2', name: 'writes_page', input: { pageId: 'p1' } },
+      gatedCtx,
+    );
+    // If the fast path had registered (then cleared) an entry, this would
+    // still resolve true — the real assertion is that nothing is left
+    // BLOCKING; a stub that always returns false would fail this if the
+    // gate were reached, but the point here is just: no timeout, no
+    // registration, next call unaffected.
+    await expect(
+      busyRegistry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 50),
+    ).resolves.toBe(true);
   });
 });

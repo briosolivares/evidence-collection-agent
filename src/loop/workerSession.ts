@@ -99,6 +99,13 @@ export interface WorkerSessionDeps {
    * gate: until a valid contract exists, only `set_output_contract` may
    * run. Absent (the judge-less path, fixture tests) leaves the gate off. */
   outputContracts?: ToolCtx['outputContracts'];
+  /** This run's busy-resource ledger (see BusyResourceRegistry). Built once
+   * per run and passed here UNCHANGED on every turn — unlike `toolCtx`
+   * itself, which this session rebuilds fresh each turn, the registry must
+   * be the same instance across turns, or an abandonment marked in turn N
+   * would be invisible to turn N+1's gate. Absent only in tests that build
+   * a bare ToolCtx by hand; the gate and registration are then skipped. */
+  busyRegistry?: ToolCtx['busyRegistry'];
   /** The run's typed-row store. Carried here so the submission path can
    * RENDER the contract's table outputs before checking that they exist —
    * a table is not a file until the renderer writes it. */
@@ -673,6 +680,7 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
     requestPermission: deps.requestPermission,
     outputContracts: deps.outputContracts,
     abortSignal: deps.abortSignal,
+    busyRegistry: deps.busyRegistry,
   };
 
   // Contract-first gate (T4.3): until a valid contract exists, the only

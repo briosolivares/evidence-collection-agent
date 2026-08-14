@@ -1,8 +1,8 @@
 import { executeToolCall, type ToolCall, type ToolCallResult } from '../tools/pipeline.js';
 import {
   accessesConflict,
+  deriveAccess,
   EXCLUSIVE_ACCESS,
-  LEGACY_READ_ACCESS,
   type ToolAccess,
   type ToolCtx,
   type ToolDef,
@@ -65,25 +65,10 @@ export function validateToolCallsForScheduling(
       };
     }
 
-    if (tool.getAccess === undefined) {
-      // Migration path: a tool that has not declared access falls back to the
-      // readOnly flag. Read-only tools may still overlap each other, which
-      // preserves today's parallelism; anything else runs alone.
-      return {
-        call,
-        index,
-        tool,
-        input: parsed.data,
-        access: tool.readOnly ? LEGACY_READ_ACCESS : EXCLUSIVE_ACCESS,
-      };
-    }
-
-    try {
-      return { call, index, tool, input: parsed.data, access: tool.getAccess(parsed.data) };
-    } catch {
-      // A buggy declaration degrades to serial, never to unsafe parallelism.
-      return { call, index, tool, input: parsed.data, access: EXCLUSIVE_ACCESS };
-    }
+    // deriveAccess is shared with executeToolCall's own busy-registry
+    // gate/registration, so scheduling and execution can never derive two
+    // different answers for the same call.
+    return { call, index, tool, input: parsed.data, access: deriveAccess(tool, parsed.data) };
   });
 }
 
