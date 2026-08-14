@@ -7,5 +7,12 @@ import { configDefaults, defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     exclude: [...configDefaults.exclude, '.claude/**'],
+    // Ink colorizes whenever the shell reports color support, while every
+    // assertion under tests/tui/ matches plain strings — so the same tree
+    // passed in a pipe and failed 51 tests in a colored terminal, reading
+    // like a rendering regression rather than an environment difference.
+    // Pin the suite to uncolored output so it does not depend on who runs
+    // it or whether a TTY is attached.
+    env: { FORCE_COLOR: '0' },
   },
 });
