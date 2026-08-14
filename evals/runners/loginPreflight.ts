@@ -60,10 +60,20 @@ export function formatLoginPreflightFailure(
         (blocked.length > 0 ? ` — blocks ${blocked.join(', ')}` : ''),
     );
   }
+  // Google refuses its sign-in flow inside an automated browser, so the
+  // default helper cannot fix a Google failure however many times you run
+  // it. Point at the mode that can — see src/cli/manualLogin.ts.
+  const needsManual = statuses.some(
+    (status) => status.state !== 'logged-in' && status.service.id === 'google-sheets',
+  );
   lines.push(
     '',
-    'Fix it with:  npm run login',
-    '(a Chrome window opens; sign in by hand, press Enter to verify)',
+    needsManual
+      ? 'Fix it with:  npm run login -- --manual\n' +
+        '(a plain Chrome opens on the same profile — Google only accepts its\n' +
+        ' sign-in flow there; sign in, quit Chrome, and it verifies itself)'
+      : 'Fix it with:  npm run login\n' +
+        '(a Chrome window opens; sign in by hand, press Enter to verify)',
     '',
     'Then re-run the batch. To run anyway and let the blocked tasks fail,',
     'pass --skip-login-check.',
