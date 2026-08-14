@@ -546,7 +546,13 @@ const rowValueSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 const candidateRowSchema = z.strictObject({
   rowId: z.string().min(1).max(200),
   values: z.record(z.string(), rowValueSchema),
-  evidenceIds: z.array(z.string().min(1)).min(1),
+  // No `.min(1)` on the array itself: that would make one row with no
+  // evidence fail the WHOLE report's schema (researchReportSchema.rows is
+  // one array of these), discarding every other, otherwise-valid row in the
+  // same batch. mergeResearchResults.ts's rejectionFor already rejects a
+  // no-evidence row individually (reason: 'no_evidence') — exactly the
+  // per-row rejection this schema-level constraint was silently bypassing.
+  evidenceIds: z.array(z.string().min(1)),
   dedupeKey: z.string().min(1).max(400).optional(),
 });
 
@@ -583,8 +589,13 @@ export function parseResearchReport(text: string): ResearchReportParse {
     };
   }
   let lastError = 'no candidate block parsed as the report shape';
-  // Last first: the answer follows any illustration of it.
-  for (const candidate of [...candidates].reverse()) {
+  // Last fenced block first (the answer follows any illustration of it),
+  // then earlier fenced blocks, and the bare-brace fallback tried LAST —
+  // reversing the already-concatenated `candidates` array instead would put
+  // the fallback ahead of every fenced block, the opposite of this
+  // function's documented priority.
+  const orderedCandidates = [...collectFencedBlocks(text).reverse(), ...bareObjectCandidates(text)];
+  for (const candidate of orderedCandidates) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(candidate);

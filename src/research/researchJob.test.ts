@@ -882,10 +882,17 @@ describe('parseResearchReport', () => {
     expect(parsed.ok && parsed.limitations).toEqual(['no 1998 data']);
   });
 
-  it('refuses a report with no evidence citation', () => {
+  it('accepts a report with an uncited row — rejection is per-row at merge time, not here', () => {
+    // mergeResearchResults.ts's rejectionFor rejects a no-evidence row
+    // individually (reason: 'no_evidence') so one bad row in a batch never
+    // takes down every other, otherwise-valid row parsed from the same
+    // report. Refusing the whole report here for one uncited row would
+    // reintroduce exactly that: an uncited row alongside a cited one would
+    // fail this parse and discard the cited row too.
     const parsed = parseResearchReport('```json\n{"rows":[{"rowId":"a","values":{"n":1},"evidenceIds":[]}]}\n```');
 
-    expect(parsed.ok).toBe(false);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.ok && parsed.rows).toEqual([{ rowId: 'a', values: { n: 1 }, evidenceIds: [] }]);
   });
 
   it('refuses a report inventing fields, rather than ignoring them', () => {
