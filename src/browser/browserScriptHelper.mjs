@@ -302,46 +302,59 @@ export async function connectSelectedPage() {
   /** @type {Array<{ context: PlaywrightBrowserContext, page: PlaywrightPage }>} */
   const matches = [];
   try {
-    await withDeadline(
-      (async () => {
-        for (const context of browser.contexts()) {
-          for (const page of context.pages()) {
-            const targetId = await targetIdOf(context, page);
-            if (targetId === selectedPageTargetId) {
-              matches.push({ context, page });
+    try {
+      await withDeadline(
+        (async () => {
+          for (const context of browser.contexts()) {
+            for (const page of context.pages()) {
+              const targetId = await targetIdOf(context, page);
+              if (targetId === selectedPageTargetId) {
+                matches.push({ context, page });
+              }
             }
           }
-        }
-      })(),
-      PAGE_SEARCH_TIMEOUT_MS,
-      'Searching the connected browser for the selected page',
-    );
-  } catch (error) {
-    if (error instanceof BrowserScriptConnectionError) {
-      throw error;
+        })(),
+        PAGE_SEARCH_TIMEOUT_MS,
+        'Searching the connected browser for the selected page',
+      );
+    } catch (error) {
+      if (error instanceof BrowserScriptConnectionError) {
+        throw error;
+      }
+      throw new BrowserScriptConnectionError(
+        `Connected to the browser over CDP at ${cdpUrl}, but failed while looking for the ` +
+          `selected page: ${error instanceof Error ? error.message : String(error)}.`,
+        error,
+      );
     }
-    throw new BrowserScriptConnectionError(
-      `Connected to the browser over CDP at ${cdpUrl}, but failed while looking for the ` +
-        `selected page: ${error instanceof Error ? error.message : String(error)}.`,
-      error,
-    );
-  }
 
-  if (matches.length === 0) {
-    throw new BrowserScriptPageNotFoundError(
-      `No live page matches the selected CDP target id ${selectedPageTargetId}. The tab this ` +
-        'script was meant to act on has likely been closed, or replaced by a navigation that ' +
-        'gave it a new target. This function never falls back to "the first page" — re-observe ' +
-        'and re-select a page (or re-run prepareForBrowserScript) rather than retrying blindly.',
-    );
-  }
-  if (matches.length > 1) {
-    // Not expected in practice (CDP target ids are unique), but a script
-    // must never guess between candidates when identity is ambiguous.
-    throw new BrowserScriptPageNotFoundError(
-      `${matches.length} live pages unexpectedly match the selected CDP target id ` +
-        `${selectedPageTargetId}; refusing to guess which one is correct.`,
-    );
+    if (matches.length === 0) {
+      throw new BrowserScriptPageNotFoundError(
+        `No live page matches the selected CDP target id ${selectedPageTargetId}. The tab this ` +
+          'script was meant to act on has likely been closed, or replaced by a navigation that ' +
+          'gave it a new target. This function never falls back to "the first page" — re-observe ' +
+          'and re-select a page (or re-run prepareForBrowserScript) rather than retrying blindly.',
+      );
+    }
+    if (matches.length > 1) {
+      // Not expected in practice (CDP target ids are unique), but a script
+      // must never guess between candidates when identity is ambiguous.
+      throw new BrowserScriptPageNotFoundError(
+        `${matches.length} live pages unexpectedly match the selected CDP target id ` +
+          `${selectedPageTargetId}; refusing to guess which one is correct.`,
+      );
+    }
+  } catch (error) {
+    // Every throw above happens AFTER connectOverCDP already succeeded, and
+    // none of them return `browser` to the caller — so nothing downstream
+    // will ever get the chance to close it. Per this function's own doc
+    // comment, an unclosed CDP connection hangs the process forever, so
+    // close it here, on every failure path, before propagating the real
+    // error. A close failure is swallowed deliberately: the original error
+    // is what the caller needs to see, not a problem closing a connection
+    // that is already broken enough to be worth abandoning.
+    await browser.close().catch(() => undefined);
+    throw error;
   }
 
   const { context, page } = matches[0];
