@@ -704,6 +704,12 @@ function createLinkedJobBudget(
       correctionsUsed: () => child.correctionsUsed(),
       workerTurnsUsed: () => child.workerTurnsUsed(),
       totalModelTokens: () => child.totalModelTokens(),
+      // The CHILD's clock, not the parent's: this is the job's own elapsed
+      // time, which is what the job's `maxWallTimeMs` is measured against.
+      // A linked job budget is never checkpointed — `captureRunBudgetSnapshot`
+      // rejects any tracker it did not build — so this exists to satisfy the
+      // interface honestly, not to make a job resumable.
+      elapsedWallTimeMs: () => child.elapsedWallTimeMs(),
       exceededLimit: () => child.exceededLimit() ?? parent.exceededLimit(),
       roleUsage: () => child.roleUsage(),
     },

@@ -74,12 +74,30 @@ export interface RunBudgetTracker {
   workerTurnsUsed(): number;
   /** Total model tokens charged so far, all roles. */
   totalModelTokens(): number;
+  /** Wall-clock milliseconds elapsed since the run started — for a tracker
+   * created with `opts.restore`, that means since the ORIGINAL run started,
+   * not since this process did (see `createRunBudgetTracker`). */
+  elapsedWallTimeMs(): number;
   /** The first exhausted ceiling, or undefined while all headroom remains.
    * Deterministic order: worker_turns, tool_calls, model_tokens,
    * tool_result_bytes, wall_time, verifier_corrections. */
   exceededLimit(): RunBudgetLimit | undefined;
   /** Per-role usage snapshot (copies — mutating them changes nothing). */
   roleUsage(): Partial<Record<ModelRole, RunRoleUsage>>;
+}
+
+/**
+ * The tracker's plainly serializable state, for a later checkpoint/resume
+ * step. `roles` mirrors `roleUsage()`'s shape exactly (copies, not the
+ * internal Map) so this snapshot can never alias — and be silently mutated
+ * through — the tracker's own bookkeeping.
+ */
+export interface RunBudgetSnapshot {
+  elapsedWallTimeMs: number;
+  roles: Partial<Record<ModelRole, RunRoleUsage>>;
+  toolCalls: number;
+  toolResultBytes: number;
+  corrections: number;
 }
 
 function assertBudgetField(name: string, value: number, minimum: number): void {
@@ -103,25 +121,103 @@ export function validateRunBudgetConfig(config: RunBudgetConfig): void {
   assertBudgetField('maxVerifierCorrections', config.maxVerifierCorrections, 0);
 }
 
+const ROLE_USAGE_NUMERIC_FIELDS = [
+  'turns',
+  'inputTokens',
+  'outputTokens',
+  'cacheReadInputTokens',
+  'cacheCreationInputTokens',
+  'wallClockMs',
+] as const;
+
+function assertSnapshotField(name: string, value: number): void {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`RunBudgetSnapshot.${name} must be a finite number >= 0, got ${value}`);
+  }
+}
+
 /**
- * Create the run's single budget tracker. Wall time counts from this call.
+ * Validate a restore snapshot before it seeds a tracker; throws naming the
+ * first bad field. A malformed snapshot (negative, NaN, Infinity) must fail
+ * loudly here rather than silently seed a tracker that under-counts —
+ * which would hand a resumed run headroom the original run never had.
+ */
+function assertValidRunBudgetSnapshot(snapshot: RunBudgetSnapshot): void {
+  assertSnapshotField('elapsedWallTimeMs', snapshot.elapsedWallTimeMs);
+  assertSnapshotField('toolCalls', snapshot.toolCalls);
+  assertSnapshotField('toolResultBytes', snapshot.toolResultBytes);
+  assertSnapshotField('corrections', snapshot.corrections);
+  for (const [role, usage] of Object.entries(snapshot.roles)) {
+    if (usage === undefined) continue;
+    for (const field of ROLE_USAGE_NUMERIC_FIELDS) {
+      assertSnapshotField(`roles.${role}.${field}`, usage[field]);
+    }
+  }
+}
+
+/** Keyed by tracker identity so `captureRunBudgetSnapshot` can read the
+ * counters (`toolCalls`, `toolResultBytes`, `corrections`) that stay
+ * closure-local to `createRunBudgetTracker` and are deliberately NOT
+ * promoted to ad-hoc accessors on the public interface — every other
+ * consumer reads totals through `roleUsage()` / `exceededLimit()`, and
+ * checkpointing is the one seam that needs the raw numbers. */
+const snapshotCapturers = new WeakMap<RunBudgetTracker, () => RunBudgetSnapshot>();
+
+/**
+ * Capture a tracker's serializable state for a later checkpoint/resume step.
+ *
+ * Reuses `roleUsage()` for the `roles` field rather than reaching into the
+ * tracker's internal Map — it already returns per-role copies, so this
+ * snapshot cannot drift as the run continues to record against the live
+ * tracker.
+ */
+export function captureRunBudgetSnapshot(tracker: RunBudgetTracker): RunBudgetSnapshot {
+  const capture = snapshotCapturers.get(tracker);
+  if (capture === undefined) {
+    throw new Error('captureRunBudgetSnapshot: tracker was not created by createRunBudgetTracker');
+  }
+  return capture();
+}
+
+/**
+ * Create the run's single budget tracker. Wall time counts from this call —
+ * unless `opts.restore` is given, in which case wall time counts from
+ * whenever the ORIGINAL run started (see the `startedAt` computation below).
  *
  * @param config - validated ceilings (see RunBudgetConfig; throws on any
  *   invalid field before anything else starts)
  * @param opts.now - test seam for the clock; defaults to Date.now
+ * @param opts.restore - a snapshot from `captureRunBudgetSnapshot`, taken on
+ *   a prior (crashed or checkpointed) instance of this same run's tracker.
+ *   Validated before anything else starts; a malformed snapshot throws
+ *   rather than silently under-counting.
  */
 export function createRunBudgetTracker(
   config: RunBudgetConfig,
-  opts: { now?: () => number } = {},
+  opts: { now?: () => number; restore?: RunBudgetSnapshot } = {},
 ): RunBudgetTracker {
   validateRunBudgetConfig(config);
+  const restore = opts.restore;
+  if (restore !== undefined) assertValidRunBudgetSnapshot(restore);
   const now = opts.now ?? Date.now;
-  const startedAt = now();
+  // The single most important restore rule: a restart must NOT reset the
+  // wall clock. Backdating startedAt by the snapshot's already-elapsed time
+  // means `now() - startedAt` (what exceededLimit checks against
+  // maxWallTimeMs, and what elapsedWallTimeMs reports) picks up exactly
+  // where the prior instance left off, in a brand-new process with a
+  // brand-new `now()` origin. Using `now()` unadjusted here would silently
+  // hand a resumed run a fresh maxWallTimeMs window it never budgeted for.
+  const startedAt = restore !== undefined ? now() - restore.elapsedWallTimeMs : now();
 
   const roles = new Map<ModelRole, RunRoleUsage>();
-  let toolCalls = 0;
-  let toolResultBytes = 0;
-  let corrections = 0;
+  if (restore !== undefined) {
+    for (const [role, usage] of Object.entries(restore.roles)) {
+      if (usage !== undefined) roles.set(role as ModelRole, { ...usage });
+    }
+  }
+  let toolCalls = restore?.toolCalls ?? 0;
+  let toolResultBytes = restore?.toolResultBytes ?? 0;
+  let corrections = restore?.corrections ?? 0;
 
   const roleEntry = (role: ModelRole): RunRoleUsage => {
     let entry = roles.get(role);
@@ -151,7 +247,7 @@ export function createRunBudgetTracker(
     return sum;
   };
 
-  return {
+  const tracker: RunBudgetTracker = {
     config: Object.freeze({ ...config }),
 
     recordModelUsage(role, usage, wallClockMs = 0): void {
@@ -185,6 +281,7 @@ export function createRunBudgetTracker(
     correctionsUsed: () => corrections,
     workerTurnsUsed: () => roles.get('worker')?.turns ?? 0,
     totalModelTokens: totalTokens,
+    elapsedWallTimeMs: () => now() - startedAt,
 
     exceededLimit(): RunBudgetLimit | undefined {
       if ((roles.get('worker')?.turns ?? 0) >= config.maxWorkerTurns) return 'worker_turns';
@@ -202,6 +299,16 @@ export function createRunBudgetTracker(
       return snapshot;
     },
   };
+
+  snapshotCapturers.set(tracker, () => ({
+    elapsedWallTimeMs: tracker.elapsedWallTimeMs(),
+    roles: tracker.roleUsage(),
+    toolCalls,
+    toolResultBytes,
+    corrections,
+  }));
+
+  return tracker;
 }
 
 /**

@@ -15,13 +15,16 @@ import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/regist
 import type { Message, ModelResponse, Usage } from './messages.js';
 import {
   appendWorkerFeedback,
+  captureWorkerSessionSnapshot,
   createWorkerSession,
   METRICS_FILENAME,
+  restoreWorkerSession,
   runWorkerCycle,
   runWorkerTurn,
   writeWorkerSessionMetrics,
   type RunMetrics,
   type WorkerSession,
+  type WorkerSessionSnapshot,
 } from './workerSession.js';
 
 // Session-level tests for what T2 changes: one persistent conversation
@@ -450,5 +453,152 @@ describe('WorkerSession configuration', () => {
     });
     const outcome = await runWorkerTurn(session);
     expect(outcome).toEqual({ kind: 'budget_exceeded', reason: 'model_tokens' });
+  });
+});
+
+// A run has exactly ONE persistent worker conversation; a later checkpoint
+// step needs to serialize it and rebuild a live session from that snapshot
+// plus freshly-supplied deps/config (callModel, registry, browser, budget —
+// none of that is plainly serializable). These tests are about that
+// round-trip, not about anything the checkpoint step itself will do.
+describe('WorkerSession snapshot/restore', () => {
+  it('capture -> restore round-trips messages, turn count, peak context, protocol corrections, and startedMs exactly', async () => {
+    const { session } = makeSession([toolResponse('t1'), textResponse('First attempt.')]);
+    await runWorkerCycle(session);
+    // Simulate a run that has already spent some protocol corrections and
+    // seen a larger context window than its first two turns produced.
+    session.protocolCorrections = 2;
+    session.peakContextTokens = 12_345;
+
+    const snapshot = captureWorkerSessionSnapshot(session);
+    expect(snapshot.messages).toEqual(session.state.messages);
+    expect(snapshot.turnCount).toBe(session.state.turnCount);
+    expect(snapshot.peakContextTokens).toBe(12_345);
+    expect(snapshot.protocolCorrections).toBe(2);
+    expect(snapshot.startedMs).toBe(session.startedMs);
+
+    const restored = restoreWorkerSession(
+      snapshot,
+      { callModel: scriptModel([]).callModel, registry: echoRegistry(), runDir },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    expect(restored.state.messages).toEqual(snapshot.messages);
+    expect(restored.state.turnCount).toBe(snapshot.turnCount);
+    expect(restored.peakContextTokens).toBe(12_345);
+    expect(restored.protocolCorrections).toBe(2);
+    expect(restored.startedMs).toBe(snapshot.startedMs);
+  });
+
+  it('a restored session does not duplicate the opening message or the protocol brief', () => {
+    const store = createOutputContractStore(runDir);
+    const { callModel } = scriptModel([textResponse('Done.')]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: echoRegistry(), runDir, outputContracts: store },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+    // The opening message already carries the task plus the protocol brief
+    // as its two content blocks — that is the run's real history.
+    const snapshot = captureWorkerSessionSnapshot(session);
+    expect(snapshot.messages).toHaveLength(1);
+    expect(snapshot.messages[0]?.content).toHaveLength(2);
+
+    const restored = restoreWorkerSession(
+      snapshot,
+      { callModel: scriptModel([]).callModel, registry: echoRegistry(), runDir, outputContracts: store },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    // Restoring must not rebuild the opening message or re-append the brief
+    // as if this were turn one — that would duplicate protocol text the
+    // worker already saw and has already acted on.
+    expect(restored.state.messages).toHaveLength(1);
+    expect(restored.state.messages[0]?.content).toHaveLength(2);
+    expect(restored.state.messages).toEqual(snapshot.messages);
+  });
+
+  it('mutating the session after capture does not alter the captured snapshot', () => {
+    const { session } = makeSession([textResponse('Done.')]);
+    const snapshot = captureWorkerSessionSnapshot(session);
+    const originalLength = snapshot.messages.length;
+
+    appendWorkerFeedback(session, 'more feedback');
+    session.state.messages[0]!.content.push({ type: 'text', text: 'mutated!' });
+
+    expect(snapshot.messages).toHaveLength(originalLength);
+    expect(JSON.stringify(snapshot.messages)).not.toContain('mutated!');
+    expect(JSON.stringify(snapshot.messages)).not.toContain('more feedback');
+  });
+
+  describe('restoreWorkerSession validation', () => {
+    const validSnapshot: WorkerSessionSnapshot = {
+      messages: [{ role: 'user', content: [{ type: 'text', text: TASK }] }],
+      turnCount: 1,
+      peakContextTokens: 10,
+      protocolCorrections: 0,
+      startedMs: 1_000,
+    };
+    const deps = () => ({ callModel: scriptModel([]).callModel, registry: echoRegistry(), runDir });
+    const config = () => ({ budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000 });
+
+    it('rejects an empty messages array — a restored session must be a real prior conversation', () => {
+      expect(() => restoreWorkerSession({ ...validSnapshot, messages: [] }, deps(), config())).toThrow(
+        /messages/,
+      );
+    });
+
+    it('rejects a negative turn count', () => {
+      expect(() => restoreWorkerSession({ ...validSnapshot, turnCount: -1 }, deps(), config())).toThrow(
+        /turnCount/,
+      );
+    });
+
+    it('rejects a negative startedMs', () => {
+      expect(() => restoreWorkerSession({ ...validSnapshot, startedMs: -1 }, deps(), config())).toThrow(
+        /startedMs/,
+      );
+    });
+
+    it('rejects NaN and negative context ceilings, same as createWorkerSession', () => {
+      expect(() =>
+        restoreWorkerSession(validSnapshot, deps(), { ...config(), maxContextTokens: Number.NaN }),
+      ).toThrow(/maxContextTokens/);
+      expect(() =>
+        restoreWorkerSession(validSnapshot, deps(), { ...config(), maxContextTokens: -1 }),
+      ).toThrow(/maxContextTokens/);
+    });
+  });
+
+  it("a restored session's next turn continues the conversation: prior history plus the new exchange", async () => {
+    const { session } = makeSession([toolResponse('t1'), textResponse('First attempt.')]);
+    await runWorkerCycle(session);
+    const snapshot = captureWorkerSessionSnapshot(session);
+
+    const { callModel: resumedCallModel, requests: resumedRequests } = scriptModel([
+      textResponse('Continued after restore.'),
+    ]);
+    const restored = restoreWorkerSession(
+      snapshot,
+      { callModel: resumedCallModel, registry: echoRegistry(), runDir },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    appendWorkerFeedback(restored, 'Resume feedback.');
+    const outcome = await runWorkerTurn(restored);
+    expect(outcome).toEqual({ kind: 'completed', finalText: 'Continued after restore.' });
+
+    // The request replays the pre-restore history (task, tool round-trip,
+    // first answer) plus the resume feedback, exactly once.
+    const request = resumedRequests[0]!;
+    expect(request).toHaveLength(5);
+    expect(request[0]).toEqual({ role: 'user', content: [{ type: 'text', text: TASK }] });
+    expect(request[1]?.role).toBe('assistant'); // tool_use turn
+    expect(request[2]?.role).toBe('user'); // tool result
+    expect(request[3]?.role).toBe('assistant'); // first answer
+    expect(request[4]).toEqual({
+      role: 'user',
+      content: [{ type: 'text', text: 'Resume feedback.' }],
+    });
   });
 });

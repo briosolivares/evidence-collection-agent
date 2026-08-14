@@ -273,6 +273,15 @@ export function workerProtocolBrief(
   return lines.join('\n');
 }
 
+/** Shared by `createWorkerSession` and `restoreWorkerSession`: the same
+ * ceiling check either way, so a caller cannot get a laxer validation just
+ * by going through the restore path. */
+function assertValidContextCeiling(maxContextTokens: number): void {
+  if (Number.isNaN(maxContextTokens) || maxContextTokens < 0) {
+    throw new Error(`maxContextTokens must be >= 0, got ${maxContextTokens}`);
+  }
+}
+
 /**
  * Create one worker session.
  *
@@ -288,9 +297,7 @@ export function createWorkerSession(
   deps: WorkerSessionDeps,
   config: WorkerSessionConfig,
 ): WorkerSession {
-  if (Number.isNaN(config.maxContextTokens) || config.maxContextTokens < 0) {
-    throw new Error(`maxContextTokens must be >= 0, got ${config.maxContextTokens}`);
-  }
+  assertValidContextCeiling(config.maxContextTokens);
   // Task text stays the first block verbatim; the protocol brief follows it
   // as a second block of the same message rather than being spliced into
   // the user's own words.
@@ -313,6 +320,95 @@ export function createWorkerSession(
     peakContextTokens: 0,
     protocolCorrections: 0,
     startedMs: Date.now(),
+  };
+}
+
+/**
+ * A `WorkerSession`'s plainly serializable memory: the conversation, the
+ * counters, and the wall-clock start. Everything else on `WorkerSessionDeps`
+ * / `WorkerSessionConfig` (callModel, registry, browser, credentials,
+ * requestPermission, outputContracts, outputTables, budget) is a live handle
+ * a resuming caller must re-supply — a checkpoint cannot serialize a
+ * function or an open browser session, so this snapshot deliberately does
+ * not try.
+ */
+export interface WorkerSessionSnapshot {
+  messages: Message[];
+  turnCount: number;
+  peakContextTokens: number;
+  protocolCorrections: number;
+  startedMs: number;
+}
+
+/**
+ * Capture a session's serializable state for later resumption.
+ *
+ * `messages` is deep-copied (via `structuredClone`) so that a later
+ * `runWorkerTurn` mutating the live session's array — or a caller mutating
+ * one of its message objects — can never reach back and change an
+ * already-captured snapshot. A snapshot is a fact about the past; it must
+ * stay one.
+ */
+export function captureWorkerSessionSnapshot(session: WorkerSession): WorkerSessionSnapshot {
+  return {
+    messages: structuredClone(session.state.messages),
+    turnCount: session.state.turnCount,
+    peakContextTokens: session.peakContextTokens,
+    protocolCorrections: session.protocolCorrections,
+    startedMs: session.startedMs,
+  };
+}
+
+/**
+ * Rebuild a live `WorkerSession` from a snapshot plus freshly-supplied deps
+ * and config.
+ *
+ * The subtle failure mode this function exists to avoid: `createWorkerSession`
+ * builds the opening message (task text + `workerProtocolBrief`) because it
+ * is starting a conversation that does not exist yet. A restore is the
+ * opposite situation — `snapshot.messages` already IS the run's real
+ * history, opening message included. Rebuilding that opening message here,
+ * or re-appending `workerProtocolBrief` as if this were turn one, would
+ * duplicate per-run protocol text the model already saw once and has
+ * already been acting on. So this function does not call
+ * `workerProtocolBrief` at all; it only validates and copies what the
+ * snapshot already contains.
+ *
+ * `messages` is deep-copied on the way in too, so the restored session owns
+ * an independent array — mutating it (appendWorkerFeedback, runWorkerTurn)
+ * can never reach back into the snapshot the caller passed in.
+ *
+ * Validation mirrors `createWorkerSession`'s context-ceiling check and adds
+ * the checks specific to resuming: a snapshot with no messages, a negative
+ * turn count, or a negative start time cannot be a real prior conversation,
+ * so restoring one would silently manufacture a session that never
+ * happened.
+ */
+export function restoreWorkerSession(
+  snapshot: WorkerSessionSnapshot,
+  deps: WorkerSessionDeps,
+  config: WorkerSessionConfig,
+): WorkerSession {
+  assertValidContextCeiling(config.maxContextTokens);
+  if (snapshot.messages.length === 0) {
+    throw new Error('WorkerSessionSnapshot.messages must not be empty');
+  }
+  if (Number.isNaN(snapshot.turnCount) || snapshot.turnCount < 0) {
+    throw new Error(`WorkerSessionSnapshot.turnCount must be >= 0, got ${snapshot.turnCount}`);
+  }
+  if (Number.isNaN(snapshot.startedMs) || snapshot.startedMs < 0) {
+    throw new Error(`WorkerSessionSnapshot.startedMs must be >= 0, got ${snapshot.startedMs}`);
+  }
+  return {
+    deps,
+    config,
+    state: {
+      messages: structuredClone(snapshot.messages),
+      turnCount: snapshot.turnCount,
+    },
+    peakContextTokens: snapshot.peakContextTokens,
+    protocolCorrections: snapshot.protocolCorrections,
+    startedMs: snapshot.startedMs,
   };
 }
 

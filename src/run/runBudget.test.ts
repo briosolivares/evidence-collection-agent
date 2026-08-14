@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest';
 import type { Message, ModelResponse } from '../loop/messages.js';
 import { ModelResponseRejectedError } from '../model/modelDriver.js';
 import {
+  captureRunBudgetSnapshot,
   createRunBudgetTracker,
   validateRunBudgetConfig,
   withBudgetAccounting,
   type RunBudgetConfig,
+  type RunBudgetSnapshot,
 } from './runBudget.js';
 
 const UNBOUNDED: RunBudgetConfig = {
@@ -124,6 +126,152 @@ describe('createRunBudgetTracker', () => {
     expect(() => tracker.recordToolCalls(-1)).toThrow(/integer/);
     expect(() => tracker.recordToolCalls(Number.NaN)).toThrow(/integer/);
     expect(() => tracker.recordToolResultBytes(1.5)).toThrow(/integer/);
+  });
+});
+
+// The tracker is ONE unresettable whole-run budget shared by initializer,
+// worker, and verifier. These tests are about a later checkpoint/resume
+// step's needs: capturing that whole-run state and rebuilding a tracker
+// that keeps enforcing it — a restart must never refill headroom, wall time
+// included.
+describe('RunBudgetTracker snapshot/restore', () => {
+  it('capture -> restore round-trips role usage, tool calls, tool-result bytes, and corrections', () => {
+    const tracker = createRunBudgetTracker(UNBOUNDED);
+    tracker.recordModelUsage('worker', USAGE, 40);
+    tracker.recordModelUsage('verifier', USAGE, 25);
+    tracker.recordToolCalls(3);
+    tracker.recordToolResultBytes(512);
+    tracker.recordCorrection();
+
+    const snapshot = captureRunBudgetSnapshot(tracker);
+    expect(snapshot.roles).toEqual(tracker.roleUsage());
+    expect(snapshot.corrections).toBe(1);
+
+    const restored = createRunBudgetTracker(UNBOUNDED, { restore: snapshot });
+    expect(restored.roleUsage()).toEqual(tracker.roleUsage());
+    expect(restored.correctionsUsed()).toBe(1);
+    expect(restored.workerTurnsUsed()).toBe(1);
+    expect(restored.totalModelTokens()).toBe(tracker.totalModelTokens());
+  });
+
+  it('restored toolCalls and toolResultBytes keep enforcing their ceilings without refill', () => {
+    const config = { ...UNBOUNDED, maxToolCalls: 5, maxToolResultBytes: 100 };
+    const tracker = createRunBudgetTracker(config);
+    tracker.recordToolCalls(5);
+    tracker.recordToolResultBytes(100);
+    const snapshot = captureRunBudgetSnapshot(tracker);
+
+    // Exactly at the ceiling, not yet over it — same boundary a live
+    // tracker would report.
+    const restoredAtCeiling = createRunBudgetTracker(config, { restore: snapshot });
+    expect(restoredAtCeiling.exceededLimit()).toBeUndefined();
+
+    const restoredCalls = createRunBudgetTracker(config, { restore: snapshot });
+    restoredCalls.recordToolCalls(1);
+    expect(restoredCalls.exceededLimit()).toBe('tool_calls');
+
+    const restoredBytes = createRunBudgetTracker(config, { restore: snapshot });
+    restoredBytes.recordToolResultBytes(1);
+    expect(restoredBytes.exceededLimit()).toBe('tool_result_bytes');
+  });
+
+  it('restored elapsed wall time is preserved: a near-exhausted snapshot trips wall_time almost immediately', () => {
+    let nowMs = 1_000_000;
+    const tracker = createRunBudgetTracker(
+      { ...UNBOUNDED, maxWallTimeMs: 10_000 },
+      { now: () => nowMs },
+    );
+    nowMs += 9_900; // almost the whole window already spent
+    const snapshot = captureRunBudgetSnapshot(tracker);
+    expect(snapshot.elapsedWallTimeMs).toBe(9_900);
+
+    // A brand-new process clock, unrelated to the original run's.
+    let restoredNowMs = 5_000_000;
+    const restored = createRunBudgetTracker(
+      { ...UNBOUNDED, maxWallTimeMs: 10_000 },
+      { now: () => restoredNowMs, restore: snapshot },
+    );
+    // The restored tracker reports the SAME elapsed time the snapshot held,
+    // even though this process's clock started somewhere else entirely.
+    expect(restored.elapsedWallTimeMs()).toBe(9_900);
+    expect(restored.exceededLimit()).toBeUndefined();
+
+    restoredNowMs += 101; // only 101ms of real new time...
+    // ...but 9900 + 101 > 10000: the ceiling trips almost immediately,
+    // rather than getting a fresh 10s window.
+    expect(restored.exceededLimit()).toBe('wall_time');
+  });
+
+  it('a restored tracker keeps enforcing maxWorkerTurns from the restored count, so a restart cannot refill headroom', () => {
+    const config = { ...UNBOUNDED, maxWorkerTurns: 2 };
+    const tracker = createRunBudgetTracker(config);
+    tracker.recordModelUsage('worker', USAGE);
+    const snapshot = captureRunBudgetSnapshot(tracker);
+
+    const restored = createRunBudgetTracker(config, { restore: snapshot });
+    expect(restored.workerTurnsUsed()).toBe(1);
+    expect(restored.exceededLimit()).toBeUndefined();
+    // A fresh tracker would tolerate two calls before tripping; this one,
+    // seeded with one already spent, trips on its first new call.
+    restored.recordModelUsage('worker', USAGE);
+    expect(restored.exceededLimit()).toBe('worker_turns');
+  });
+
+  it('a restored tracker keeps enforcing maxVerifierCorrections from the restored count, so a restart cannot refill headroom', () => {
+    const config = { ...UNBOUNDED, maxVerifierCorrections: 1 };
+    const tracker = createRunBudgetTracker(config);
+    tracker.recordCorrection();
+    const snapshot = captureRunBudgetSnapshot(tracker);
+
+    const restored = createRunBudgetTracker(config, { restore: snapshot });
+    expect(restored.correctionsUsed()).toBe(1);
+    expect(restored.exceededLimit()).toBeUndefined();
+    restored.recordCorrection();
+    expect(restored.exceededLimit()).toBe('verifier_corrections');
+  });
+
+  it('rejects a malformed snapshot instead of restoring a budget that under-counts', () => {
+    const valid = captureRunBudgetSnapshot(createRunBudgetTracker(UNBOUNDED));
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, { restore: { ...valid, elapsedWallTimeMs: -1 } }),
+    ).toThrow(/elapsedWallTimeMs/);
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, { restore: { ...valid, toolCalls: Number.NaN } }),
+    ).toThrow(/toolCalls/);
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, { restore: { ...valid, toolResultBytes: Infinity } }),
+    ).toThrow(/toolResultBytes/);
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, { restore: { ...valid, corrections: -3 } }),
+    ).toThrow(/corrections/);
+
+    const malformedRoles: RunBudgetSnapshot = {
+      ...valid,
+      roles: {
+        worker: {
+          turns: -1,
+          inputTokens: 0,
+          outputTokens: 0,
+          cacheReadInputTokens: 0,
+          cacheCreationInputTokens: 0,
+          wallClockMs: 0,
+        },
+      },
+    };
+    expect(() => createRunBudgetTracker(UNBOUNDED, { restore: malformedRoles })).toThrow(
+      /roles\.worker\.turns/,
+    );
+  });
+
+  it('capture deep-copies role usage so later recording cannot mutate the snapshot', () => {
+    const tracker = createRunBudgetTracker(UNBOUNDED);
+    tracker.recordModelUsage('worker', USAGE, 10);
+    const snapshot = captureRunBudgetSnapshot(tracker);
+
+    tracker.recordModelUsage('worker', USAGE, 10);
+
+    expect(snapshot.roles.worker?.turns).toBe(1);
+    expect(tracker.roleUsage().worker?.turns).toBe(2);
   });
 });
 

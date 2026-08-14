@@ -5,12 +5,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import { initManifest } from '../run/artifacts.js';
-import type { ToolCall } from '../tools/pipeline.js';
+import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import { createRegistry, type ToolCtx, type ToolDef, type ToolAccess } from '../tools/registry.js';
 import {
   MAX_CONCURRENT_CALLS,
   scheduleToolCalls,
   validateToolCallsForScheduling,
+  type ToolCallLifecycleHooks,
 } from './scheduler.js';
 
 // The scheduler's contract is about time — what overlaps, what doesn't, and
@@ -23,6 +24,27 @@ const sleep = (ms: number): Promise<void> => new Promise((wake) => setTimeout(wa
 
 /** Flush timers and microtasks so every runnable call has actually started. */
 const tick = (): Promise<void> => new Promise((wake) => setTimeout(wake, 0));
+
+/**
+ * Tick until `condition` holds, or fail loudly after a bounded number of
+ * attempts.
+ *
+ * Prefer this over counting `tick()` calls whenever the thing being waited on
+ * sits behind an unknown number of scheduler, validation, and tool hops: a
+ * fixed count encodes today's hop count into the test and breaks the moment a
+ * layer is added, while the failure it produces ("expected [...] to include
+ * ...") says nothing about why.
+ */
+async function until(
+  condition: () => boolean,
+  { attempts = 50, what = 'condition' }: { attempts?: number; what?: string } = {},
+): Promise<void> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (condition()) return;
+    await tick();
+  }
+  throw new Error(`${what} did not hold within ${attempts} ticks`);
+}
 
 /** One instrumented execution record. */
 interface Timeline {
@@ -370,5 +392,200 @@ describe('validateToolCallsForScheduling', () => {
       createRegistry([tool as ToolDef]),
     );
     expect(validated[0]?.access.writes).toEqual(['page:p7']);
+  });
+});
+
+// --- lifecycle hooks (checkpoint/resume seam) --------------------------------
+
+describe('scheduleToolCalls lifecycle hooks', () => {
+  it('beforeStateChangingCall fires for a write and for an unknown tool, not for a pure read', async () => {
+    const registry = createRegistry([
+      probeTool('read', true, timeline),
+      probeTool('write', false, timeline),
+    ]);
+    const seen: Array<{ call: ToolCall; access: ToolAccess }> = [];
+    const hooks: ToolCallLifecycleHooks = {
+      beforeStateChangingCall: async (call, access) => {
+        seen.push({ call, access });
+      },
+    };
+
+    await scheduleToolCalls(
+      [
+        probeCall('read', 'r1'),
+        probeCall('write', 'w1'),
+        { id: 'id-unknown', name: 'nope', input: {} },
+      ],
+      registry,
+      ctx,
+      hooks,
+    );
+
+    expect(seen.map((entry) => entry.call.name)).toEqual(['write', 'nope']);
+    // The unknown tool's fail-closed EXCLUSIVE_ACCESS is exactly why it
+    // fired: an unclassifiable call is treated as state-changing.
+    expect(seen[1]?.access.exclusive).toBe(true);
+  });
+
+  it('afterCallResult fires once per call, including error results, matching what is returned', async () => {
+    const registry = createRegistry([
+      probeTool('read', true, timeline),
+      probeTool('write', false, timeline),
+    ]);
+    const seen: ToolCallResult[] = [];
+    const hooks: ToolCallLifecycleHooks = {
+      afterCallResult: async (_call, result) => {
+        seen.push(result);
+      },
+    };
+
+    const results = await scheduleToolCalls(
+      [probeCall('read', 'r-ok'), probeCall('read', 'r-boom', 0, true), probeCall('write', 'w-ok')],
+      registry,
+      ctx,
+      hooks,
+    );
+
+    expect(seen).toHaveLength(3);
+    const byId = new Map(seen.map((result) => [result.toolCallId, result]));
+    for (const result of results) {
+      expect(byId.get(result.toolCallId)).toEqual(result);
+    }
+  });
+
+  it('beforeStateChangingCall is awaited: a pending hook delays the call from starting', async () => {
+    const registry = createRegistry([probeTool('write', false, timeline)]);
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const hooks: ToolCallLifecycleHooks = {
+      beforeStateChangingCall: async () => {
+        await gate;
+      },
+    };
+
+    const pending = scheduleToolCalls([probeCall('write', 'w1')], registry, ctx, hooks);
+    await tick();
+    expect(timeline.events).not.toContain('start w1');
+
+    release();
+    await pending;
+    expect(timeline.events).toContain('start w1');
+  });
+
+  it('afterCallResult is awaited: scheduleToolCalls does not resolve before a pending hook does', async () => {
+    const registry = createRegistry([probeTool('read', true, timeline)]);
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let hookResolved = false;
+    const hooks: ToolCallLifecycleHooks = {
+      afterCallResult: async () => {
+        await gate;
+        hookResolved = true;
+      },
+    };
+
+    const pending = scheduleToolCalls([probeCall('read', 'r1')], registry, ctx, hooks);
+    // Wait for the CONDITION, not for a fixed number of macrotasks: reaching
+    // `finish r1` crosses the semaphore, zod validation, the deadline wrapper,
+    // and the probe's own sleep(0), whose timer is queued after any tick()
+    // registered here — so a tick count that happens to work is luck, and this
+    // assertion is about the hook's effect, not about how many hops precede it.
+    await until(() => timeline.events.includes('finish r1'));
+    // The tool call itself already finished...
+    expect(timeline.events).toContain('finish r1');
+    let settled = false;
+    void pending.then(() => {
+      settled = true;
+    });
+    await tick();
+    // ...but the batch has not, because the hook is still pending.
+    expect(settled).toBe(false);
+
+    release();
+    await pending;
+    expect(hookResolved).toBe(true);
+  });
+
+  it('omitting hooks reproduces the existing grouping, concurrency, and result order exactly', async () => {
+    // Same scenario as "a mixed batch returns results in request order even
+    // when a slow read finishes last" above, run with `hooks` left
+    // undefined — the fourth parameter must be a no-op when absent.
+    const registry = createRegistry([
+      probeTool('read', true, timeline),
+      probeTool('write', false, timeline),
+    ]);
+    const results = await scheduleToolCalls(
+      [
+        probeCall('write', 'w1', 5),
+        probeCall('read', 'slow-read', 50),
+        probeCall('read', 'fast-read', 5),
+      ],
+      registry,
+      ctx,
+    );
+
+    expect(at(timeline, 'start fast-read')).toBeLessThan(at(timeline, 'finish slow-read'));
+    expect(results.map((result) => result.toolCallId)).toEqual([
+      'id-w1',
+      'id-slow-read',
+      'id-fast-read',
+    ]);
+  });
+
+  it('a throwing beforeStateChangingCall fails only its own call, never corrupting the batch', async () => {
+    const registry = createRegistry([
+      probeTool('read', true, timeline),
+      probeTool('write', false, timeline),
+    ]);
+    const hooks: ToolCallLifecycleHooks = {
+      beforeStateChangingCall: async (call) => {
+        if (call.id === 'id-w-boom') throw new Error('hook exploded');
+      },
+    };
+
+    const results = await scheduleToolCalls(
+      [probeCall('read', 'r-ok'), probeCall('write', 'w-boom'), probeCall('write', 'w-ok')],
+      registry,
+      ctx,
+      hooks,
+    );
+
+    expect(results).toHaveLength(3);
+    expect(results.map((result) => result.toolCallId)).toEqual(['id-r-ok', 'id-w-boom', 'id-w-ok']);
+    expect(results[0]).toMatchObject({ toolCallId: 'id-r-ok', isError: false });
+    expect(results[1]).toMatchObject({ toolCallId: 'id-w-boom', isError: true });
+    expect(results[1]!.content).toContain('hook exploded');
+    expect(results[2]).toMatchObject({ toolCallId: 'id-w-ok', isError: false });
+    // The underlying write never ran because its hook failed first.
+    expect(timeline.events).not.toContain('start w-boom');
+    expect(timeline.events).toContain('start w-ok');
+  });
+
+  it('a throwing afterCallResult still returns a dense, correctly ordered array', async () => {
+    const registry = createRegistry([probeTool('read', true, timeline)]);
+    const hooks: ToolCallLifecycleHooks = {
+      afterCallResult: async (call) => {
+        if (call.id === 'id-r2') throw new Error('after hook exploded');
+      },
+    };
+
+    const results = await scheduleToolCalls(
+      [probeCall('read', 'r1'), probeCall('read', 'r2'), probeCall('read', 'r3')],
+      registry,
+      ctx,
+      hooks,
+    );
+
+    expect(results.map((result) => result.toolCallId)).toEqual(['id-r1', 'id-r2', 'id-r3']);
+    expect(results[0]).toMatchObject({ isError: false, content: 'done r1' });
+    // Documented choice: a post-hoc hook failure overwrites the (otherwise
+    // successful) result — see hookFailureResult's comment in scheduler.ts.
+    expect(results[1]).toMatchObject({ isError: true });
+    expect(results[1]!.content).toContain('after hook exploded');
+    expect(results[2]).toMatchObject({ isError: false, content: 'done r3' });
   });
 });
