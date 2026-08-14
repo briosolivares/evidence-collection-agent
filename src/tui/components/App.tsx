@@ -1,13 +1,11 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useEffect, useReducer, useRef, useState } from 'react';
 
-import {
-  discoverEvalTasks,
-  startEvalBatch,
-  type EvalBatchHandle,
-  type EvalRunner,
-  type EvalTaskChoice,
-} from '../bridge/evalSession.js';
+import type {
+  EvalBatchHandle,
+  EvalsFeature,
+  EvalTaskChoice,
+} from '../bridge/evalsFeature.js';
 import type { RunHandle } from '../bridge/runSession.js';
 import type {
   PermissionDecision,
@@ -20,7 +18,7 @@ import { scanRuns, type RunListEntry } from '../runScanner.js';
 import {
   createInitialState,
   deriveSuggestions,
-  HELP_TEXT,
+  helpText,
   reduce,
   routeInput,
   unknownCommandNotice,
@@ -30,9 +28,7 @@ import { theme } from '../theme.js';
 import { ArtifactRail } from './ArtifactRail.js';
 import { ArtifactsPanel } from './ArtifactsPanel.js';
 import { Composer } from './Composer.js';
-import { EvalsMenu } from './EvalsMenu.js';
 import { QuestionDialog } from './QuestionDialog.js';
-import { EvalsLiveRegion } from './EvalsLiveRegion.js';
 import { LiveRegion } from './LiveRegion.js';
 import { RunsList } from './RunsList.js';
 import { Transcript } from './Transcript.js';
@@ -59,8 +55,10 @@ interface AppProps {
       ) => Promise<PermissionDecision>;
     },
   ) => RunHandle;
-  /** Eval-specific runner: isolated headless normally, persistent headed for auth. */
-  evalRunner?: EvalRunner;
+  /** Whether the checkout-only /evals command is visible. */
+  evalsEnabled?: boolean;
+  /** Checkout-only eval UI and runtime adapter. */
+  evals?: EvalsFeature;
   /** Test seam for /exit; defaults to Ink's app exit. */
   onExit?: () => void;
 }
@@ -76,13 +74,19 @@ export function App({
   identity,
   demo = false,
   runner,
-  evalRunner,
+  evalsEnabled = true,
+  evals,
   onExit,
 }: AppProps) {
   const { exit } = useApp();
   const [state, dispatch] = useReducer(
     reduce,
-    { apiKeyPresent, completionVerb: config.completionVerb, identity },
+    {
+      apiKeyPresent,
+      completionVerb: config.completionVerb,
+      identity,
+      evalsEnabled,
+    },
     createInitialState,
   );
   const runHandle = useRef<RunHandle | undefined>(undefined);
@@ -99,7 +103,6 @@ export function App({
       }
     | undefined
   >(undefined);
-  const batchRunner = evalRunner ?? runner;
 
   const settleQuestion = (decision: PermissionDecision) => {
     setQuestion((current) => {
@@ -192,7 +195,7 @@ export function App({
     // The field reset lives with the rest of the composer substate in
     // the reducer; routing continues on the already-captured text.
     dispatch({ type: 'composer_submitted' });
-    const routed = routeInput(text);
+    const routed = routeInput(text, state.evalsEnabled);
     switch (routed.kind) {
       case 'task':
         dispatch({ type: 'submit_task', text: routed.text });
@@ -206,7 +209,7 @@ export function App({
         }
         return;
       case 'help':
-        dispatch({ type: 'notice', text: HELP_TEXT });
+        dispatch({ type: 'notice', text: helpText(state.evalsEnabled) });
         return;
       case 'runs':
         setRunEntries(scanRuns(config.runsBaseDir));
@@ -226,14 +229,14 @@ export function App({
         dispatch({ type: 'artifacts_focus' });
         return;
       case 'evals':
-        if (batchRunner === undefined) {
+        if (evals === undefined) {
           dispatch({
             type: 'notice',
             text: 'Evals need a live browser session — not available in --demo.',
           });
           return;
         }
-        setEvalTasks(discoverEvalTasks(config.evalsDir));
+        setEvalTasks(evals.listTasks());
         dispatch({ type: 'open_evals' });
         return;
       case 'exit':
@@ -246,19 +249,16 @@ export function App({
   };
 
   const startEvals = (tasks: string[], k: number, concurrency: number) => {
-    if (batchRunner === undefined) return;
-    evalHandle.current = startEvalBatch(tasks, k, concurrency, {
-      onAction: dispatch,
-      evalsDir: config.evalsDir,
-      resultsDir: config.evalResultsDir,
-      runner: batchRunner,
-    });
+    if (evals === undefined) return;
+    evalHandle.current = evals.startBatch(tasks, k, concurrency, dispatch);
     void evalHandle.current.done.finally(() => {
       evalHandle.current = undefined;
     });
   };
 
   const running = state.mode === 'running' || state.mode === 'cancelling';
+  const EvalsMenu = evals?.Menu;
+  const EvalsLiveRegion = evals?.LiveRegion;
   const composerHint =
     question !== undefined
       ? '(answer the question above)'
@@ -292,7 +292,9 @@ export function App({
           active={question === undefined}
         />
       )}
-      {state.mode === 'evalsRunning' && state.evalsLive !== undefined && (
+      {EvalsLiveRegion !== undefined &&
+        state.mode === 'evalsRunning' &&
+        state.evalsLive !== undefined && (
         <EvalsLiveRegion trials={state.evalsLive} />
       )}
       {state.mode === 'runsList' && (
@@ -301,7 +303,7 @@ export function App({
           onClose={() => dispatch({ type: 'close_overlay' })}
         />
       )}
-      {state.mode === 'evalsMenu' && (
+      {EvalsMenu !== undefined && state.mode === 'evalsMenu' && (
         <EvalsMenu
           tasks={evalTasks}
           onClose={() => dispatch({ type: 'close_overlay' })}

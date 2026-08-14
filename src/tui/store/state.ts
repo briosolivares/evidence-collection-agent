@@ -298,6 +298,8 @@ export interface SessionState {
   nextItemId: number;
   /** Completion-line verb, fixed at session start from config (R6). */
   completionVerb: string;
+  /** Whether checkout-only eval commands appear in routing and help. */
+  evalsEnabled: boolean;
   /** The composer's input line + suggestion selection; the suggestion
    * panel derives from it (deriveSuggestions), never stored. */
   composer: ComposerState;

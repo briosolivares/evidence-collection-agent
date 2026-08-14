@@ -5,7 +5,7 @@ import {
   findCommand,
   SLASH_COMMANDS,
 } from '../../src/tui/store/commands.js';
-import { HELP_TEXT, routeInput } from '../../src/tui/store/reducer.js';
+import { HELP_TEXT, helpText, routeInput } from '../../src/tui/store/reducer.js';
 
 describe('SLASH_COMMANDS registry', () => {
   it('lists exactly the five commands, each with a description', () => {
@@ -25,6 +25,16 @@ describe('SLASH_COMMANDS registry', () => {
     expect(findCommand('/runs')?.name).toBe('/runs');
     expect(findCommand('/run')).toBeUndefined();
     expect(findCommand('runs')).toBeUndefined();
+  });
+
+  it('omits the checkout-only eval command when evals are disabled', () => {
+    expect(findCommand('/evals', false)).toBeUndefined();
+    expect(filterCommands('/', false).map((entry) => entry.name)).toEqual([
+      '/help',
+      '/runs',
+      '/artifacts',
+      '/exit',
+    ]);
   });
 });
 
@@ -78,6 +88,14 @@ describe('registry drives routeInput and HELP_TEXT', () => {
       kind: 'unknown',
       command: '/frobnicate',
     });
+  });
+
+  it('treats /evals as unavailable and removes it from help when disabled', () => {
+    expect(routeInput('/evals', false)).toEqual({
+      kind: 'unknown',
+      command: '/evals',
+    });
+    expect(helpText(false)).not.toContain('/evals');
   });
 
   it('HELP_TEXT lists every registry name with its description', () => {

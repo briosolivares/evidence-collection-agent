@@ -18,11 +18,7 @@ import { DEFAULT_TOOL_PROFILE, type ToolProfile } from '../../tools/index.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
 import type { RunHandle } from './runSession.js';
-
-export interface EvalTaskChoice {
-  name: string;
-  headed: boolean;
-}
+import type { EvalBatchHandle, EvalTaskChoice } from './evalsFeature.js';
 
 /** Starts one eval trial with its selected browser policy. */
 export type EvalRunner = (
@@ -40,11 +36,6 @@ export interface EvalSessionDeps {
   loadTask?: (evalsDir: string, name: string) => Promise<EvalTask>;
   formatReportFn?: (report: EvalReport) => string;
   writeResultsFn?: (report: EvalReport, resultsDir: string) => string;
-}
-
-export interface EvalBatchHandle {
-  cancel(): void;
-  done: Promise<'completed' | 'cancelled' | 'failed'>;
 }
 
 export { usableStartUrl };

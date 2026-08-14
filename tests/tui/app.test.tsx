@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { RunHandle, RunOutcome } from '../../src/tui/bridge/runSession.js';
 import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
+import { createEvalsFeature } from '../../src/tui/developmentEvals.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { ENTER, ESC, tick, typeText } from './helpers.js';
 
@@ -48,6 +49,19 @@ describe('App slash routing and transcript', () => {
     expect(output).toContain('/evals');
     expect(output).toContain('/exit');
     expect(output).toContain('Esc');
+    unmount();
+  });
+
+  it('hides checkout-only evals when development features are disabled', async () => {
+    const { frames, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} evalsEnabled={false} />,
+    );
+    await tick();
+    await submitLine(stdin, '/help');
+    await submitLine(stdin, '/evals');
+    const output = frames.join('\n');
+    expect(output).not.toContain('Run eval tasks');
+    expect(output).toContain("/evals isn't a command I know");
     unmount();
   });
 
@@ -302,7 +316,16 @@ describe('App /evals workflow', () => {
       );
 
       const { frames, lastFrame, stdin, unmount } = render(
-        <App config={evalsConfig} apiKeyPresent={true} runner={runner} />,
+        <App
+          config={evalsConfig}
+          apiKeyPresent={true}
+          runner={runner}
+          evals={createEvalsFeature({
+            evalsDir: evalsConfig.evalsDir,
+            resultsDir: evalsConfig.evalResultsDir,
+            runner,
+          })}
+        />,
       );
       await tick();
       await submitLine(stdin, '/evals');
