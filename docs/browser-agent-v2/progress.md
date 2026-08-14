@@ -65,7 +65,9 @@ The table mirrors `tasks.json` for human scanning. Update both together.
 
 No task is currently active. All sixteen T-tasks are recorded complete; see
 [`cutover.md`](./cutover.md) for what is live, what is dormant, and the two
-experiments deferred by user decision.
+experiments deferred by user decision. **Start at
+[Handoff](#handoff--2026-08-13-end-of-day)** for the current state and the
+decision the work is waiting on.
 
 ## Progress log
 
@@ -389,6 +391,8 @@ code-level choices belong in code review, not here.
 | --- | --- | --- | --- | --- | --- |
 | 2026-08-13 | Live V2 validation | pass | 0 errors | 1514 pass; 19 browser/TUI load flakes, each file green in isolation | stub 2/2, openclaw_pr 3/3, hacker_news 6/6 (V2, k=1) |
 | 2026-08-13 | Findings 3–6 | pass (13 files, 206 tests; plus 8 cli/browser files, 87 tests) | 0 errors | 1537/1540 then 1539/1540 — the failing set DIFFERED between the two runs (browserAction + 2 TUI, then preflight alone) and every file passed in isolation: the known load flake | none run, by user direction |
+| 2026-08-13 | JS completion value + settled facts | pass (55 files, 677 tests) | 0 errors | not re-run at full scope | hacker_news 6/6 k=1 (32s, 1 cycle), then 18/18 k=3 |
+| 2026-08-13 | Tool-call deadlines | pass (pipeline 17, browser 35) | 0 errors | 11 files failed at Chrome LAUNCH (`beforeAll` 30s timeouts + `ENOTEMPTY` profile-cleanup races) after six browser directories were run in parallel right behind a killed eval; `click.test.ts` then failed in 1.4s from teardown contention and passed in 26s a moment later. Environmental, not the diff — the tell is that no assertion failed | none (the fix came out of the killed yc run) |
 
 ## Live validation, 2026-08-13
 
@@ -496,12 +500,61 @@ unverifiable.
    cited `E<n>` resolves to `scratch/evidence/<id>.json`, and no longer
    assumes `INTENT.md`/`CONTRACT.md` exist — under V2 they do not.
 
-## Handoff
+## Handoff — 2026-08-13 end of day
 
-- Last completed task: all sixteen (T1–T16) are recorded complete and gated
-- Safe next work: wire the four remaining V2 tools (each needs one named
-  dependency — see cutover.md), then run the two deferred experiments when the
-  user asks
+**Read this first if you are picking the work up cold.**
+
+State: worktree `evidence-collection-agent-v2-impl`, branch
+`feat/browser-agent-v2`, clean tree at `c40faa4`, typecheck 0 errors, five
+commits today, **nothing merged to main**.
+
+| Commit | What |
+| --- | --- |
+| `eae4b32` | eval CLI `--output-contract` / `--contract-author`; `protocol` on `EvalReport` |
+| `fac0ea8` | `execute_javascript` value-discarding (bare expressions, IIFEs) |
+| `c6260d3` | initializer binding choice, corrective-retry shape, `renderTableOutputs` wired |
+| `570f916` | findings 3–6: worker protocol brief, verifier evidence scope, `capture_text` wired |
+| `172f1b5` | JS completion-value form; code-settled facts handed to the verifier |
+| `c40faa4` | tool-call deadlines (pipeline + renderer reads) |
+
+### The decision this is waiting on
+
+Not "what breaks next" — the fix/run/find loop will always produce another
+defect and does not terminate on its own. The open question is a choice:
+
+1. **Make V2 the default?** Needs experiment 1 (contract author) run on pass
+   rate, not latency. Blocked on nothing now.
+2. **Close the fake-deliverable hole first?** Findings 1–2 below. The agent can
+   hand-write a document and pass the check meant to prove our tool wrote it,
+   which undercuts the point of the harness. Needs `write_document` wired.
+3. **Park the branch** until one of the above is wanted.
+
+### Honest caveats on today's work
+
+- **Six live trials total** informed six behavioural changes. Each fix is
+  narrow, typechecked, and pinned by a test verified to fail against the
+  pre-fix code — but the system gained real intricacy in one day on n=1
+  evidence, reviewed by nobody but the implementing agent. Worth a read-through
+  before building further on it.
+- **Latency is NOT a settled comparison and should not be treated as one.**
+  hacker_news reached 32s/33s median (k=1, k=3) against a 20s prose median, but
+  that prose baseline is 25 trials from a different day and checkout. The one
+  yc_w24 V2 trial took 261s against a ~127s median for fully-passing prose
+  trials — and it ran beside a hung sibling trial and produced 13 rows where
+  the prose sample produced 9, so it is confounded twice over. **Latency parity
+  plausibly holds on small extractions and does not hold on research tasks;
+  the verifier's cost scales with the number of evidence-cited rows** (2 turns /
+  9s on hacker_news, 10 turns / 105s on yc). Chasing this number further was a
+  dead end once already.
+- `capture_text` was used heavily and correctly on its first live outing (yc
+  trial 1: five evidence records, one per company, each row citing its own).
+
+### Safe next work
+
+- Wire the three remaining V2 tools — `write_document`, `read_resource`,
+  `run_research_jobs`. Each needs one named dependency; see cutover.md. This is
+  mechanical, and `capture_text` in `570f916` is the worked example
+- Then the two deferred experiments, when the user asks
 - Parallel work currently unlocked: T4 and T10 can proceed in parallel (T4
   owns src/contracts + the contract tool; T10 owns src/browser/browserActions
   + the action tools). Assign ONE owner to src/tools/index.ts,
@@ -515,3 +568,9 @@ unverifiable.
   is an untracked review input and must remain untouched unless explicitly
   requested
 - Re-baseline status: not authorized
+- **Full `npm test` flakes hard under parallel browser load.** Six browser
+  directories at once produce ~11 files failing at Chrome LAUNCH (`beforeAll`
+  timeouts, `ENOTEMPTY` profile cleanup). The tell that it is environmental:
+  no assertion fails, and the failing set changes between runs. Rerun the
+  failing files in isolation — and give Chrome a moment to finish tearing down
+  first, or the isolated rerun inherits the same contention
