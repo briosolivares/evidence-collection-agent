@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join } from 'node:path';
 
@@ -183,6 +184,8 @@ export async function launchPersistentChrome(
   if (!isAbsolute(options.profileDir)) {
     throw new TypeError('Browser profileDir must be an absolute path.');
   }
+  // Must happen BEFORE the launch: Chrome reads this preference at startup.
+  pinProfileDownloadDirectory(options.profileDir);
   return chromium.launchPersistentContext(options.profileDir, {
     ...(options.executablePath !== undefined
       ? { executablePath: options.executablePath }
@@ -200,6 +203,50 @@ export async function launchPersistentChrome(
   });
 }
 
+
+/**
+ * Point Chrome's own download directory inside the profile.
+ *
+ * Chrome — not Playwright — decides where a download it handles itself lands,
+ * and it reads `download.default_directory` from the profile's Preferences at
+ * startup. Unset, that resolves to the OS Downloads folder, so a download the
+ * run never consumes is written into the user's home directory and left there.
+ * The test suite deposited one file per run that way.
+ *
+ * Playwright's own `downloadsPath` does not cover this: it governs downloads
+ * Playwright accepts and hands back as `Download` objects, and the leaking
+ * case is one Chrome writes on its own. Neither do the CDP
+ * `set*DownloadBehavior` commands, which were measured and did not stop it.
+ *
+ * Merged rather than overwritten, and best-effort: this profile may be a real
+ * logged-in one whose other preferences must survive, and a preferences file
+ * this cannot parse must not stop a session from launching.
+ */
+function pinProfileDownloadDirectory(profileDir: string): void {
+  try {
+    const downloadDir = join(profileDir, 'downloads');
+    mkdirSync(downloadDir, { recursive: true });
+    const defaultDir = join(profileDir, 'Default');
+    mkdirSync(defaultDir, { recursive: true });
+    const prefsPath = join(defaultDir, 'Preferences');
+    const existing: Record<string, unknown> = existsSync(prefsPath)
+      ? (JSON.parse(readFileSync(prefsPath, 'utf8')) as Record<string, unknown>)
+      : {};
+    const download =
+      typeof existing.download === 'object' && existing.download !== null
+        ? (existing.download as Record<string, unknown>)
+        : {};
+    writeFileSync(
+      prefsPath,
+      JSON.stringify({
+        ...existing,
+        download: { ...download, default_directory: downloadDir, prompt_for_download: false },
+      }),
+    );
+  } catch {
+    // Best effort; see the note above.
+  }
+}
 
 /**
  * Read the loopback CDP HTTP endpoint Chrome opened for a profile launched
