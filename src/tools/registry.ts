@@ -47,6 +47,15 @@ export interface ToolCtx {
    * it, and the tool then fails closed rather than accepting a contract
    * nothing will read. */
   outputContracts?: OutputContractStore;
+  /** Cancellation for tools that own a long-running external resource (a
+   * spawned process group, a network connection) and can react to the run
+   * being cancelled before their own work naturally ends. This is the FIRST
+   * tool-level cancellation signal in the codebase — until now the only
+   * cancellation was the TUI wrapping `config.callModel`, which only ever
+   * lands at model-call boundaries and cannot reach into a tool already
+   * executing. Present in interactive environments that support cancelling
+   * an in-flight run; tools that do not own such a resource can ignore it. */
+  abortSignal?: AbortSignal;
 }
 
 /**
