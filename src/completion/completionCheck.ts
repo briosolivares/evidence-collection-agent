@@ -794,13 +794,21 @@ function parseCsv(
     records.push(record);
   }
 
-  const nonEmpty = records.filter((entry) => entry.some((cell) => cell !== ''));
-  const header = nonEmpty.shift();
+  // A trailing newline (or a genuinely blank final line) produces one last
+  // record that is a single empty field; drop only that one, at the end,
+  // rather than filtering out every row whose cells all happen to be empty
+  // strings — that would also silently discard a genuine data row whose
+  // values are legitimately all blank, undercounting the table.
+  const lastRecord = records[records.length - 1];
+  if (lastRecord !== undefined && lastRecord.length === 1 && lastRecord[0] === '') {
+    records.pop();
+  }
+  const header = records.shift();
   if (header === undefined) return undefined;
 
   return {
     header,
-    rows: nonEmpty.map((cells) => {
+    rows: records.map((cells) => {
       const row: Record<string, string> = {};
       header.forEach((name, position) => {
         row[name] = cells[position] ?? '';

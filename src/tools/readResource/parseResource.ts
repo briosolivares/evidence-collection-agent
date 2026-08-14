@@ -212,10 +212,7 @@ export function parseDelimitedText(
   };
   const endRecord = (): boolean => {
     endField();
-    // A trailing newline produces one empty field; that is not a row.
-    if (!(record.length === 1 && record[0] === '')) {
-      records.push(record);
-    }
+    records.push(record);
     record = [];
     if (records.length > MAX_PARSED_CSV_ROWS) {
       rowsTruncated = true;
@@ -264,6 +261,15 @@ export function parseDelimitedText(
   }
   if (!rowsTruncated && (field !== '' || record.length > 0)) {
     endRecord();
+  }
+  // A trailing newline (or a genuinely blank final line) produces one last
+  // record that is a single empty field; drop only THAT one, at the end,
+  // rather than filtering every single-empty-field record as it's produced
+  // — the earlier per-record filter also discarded a genuine blank data row
+  // occurring anywhere in the body's interior, not just this trailing one.
+  const lastRecord = records[records.length - 1];
+  if (lastRecord !== undefined && lastRecord.length === 1 && lastRecord[0] === '') {
+    records.pop();
   }
   if (records.length === 0 || !sawAnyContent) {
     return undefined;
