@@ -745,18 +745,69 @@ describe('Playwright browser controller', () => {
     );
 
     it(
-      'still returns undefined for a statement body ending in a bare expression',
+      'returns the completion value of a statement body ending in a bare expression',
       async () => {
-        // The documented limitation: completion-value semantics need a real
-        // parser, so this form yields undefined rather than being rewritten.
-        // Pinned as a test so it stays a known shape, not a surprise.
+        // Was pinned as a known limitation ("needs a real parser"), until a
+        // live run showed this is the FIRST shape a model writes for a real
+        // extraction — statements building a result, named on the last line.
+        // V8 is the parser: new Function compiles without executing.
         await controller.newTab();
         await controller.goto(fixtureServer.url('/'));
         const result = await controller.executeJavaScript!(
           toEarlyJavaScriptRequest('const n = document.querySelectorAll("a").length;\nn;', 5_000),
         );
 
-        expect(result.value).toBeUndefined();
+        expect(typeof result.value).toBe('number');
+        expect(result.value as number).toBeGreaterThan(0);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'returns the completion value of the exact snippet the live run failed on',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest(
+            '\nconst rows = Array.from(document.querySelectorAll("a")).slice(0, 3);\n' +
+              'const results = rows.map((row) => ({ text: row.textContent.trim() }));\n' +
+              'results;\n',
+            5_000,
+          ),
+        );
+
+        expect(Array.isArray(result.value)).toBe(true);
+        expect((result.value as unknown[]).length).toBeGreaterThan(0);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'never turns a loop body into an early return while chasing a completion value',
+      async () => {
+        // `for (const x of xs) f(x)` splits into a head that does not parse on
+        // its own, so the candidate is rejected. Were it accepted, the joined
+        // form would parse and mean "return on the first iteration" — the
+        // silent meaning change that kept this rewrite out of the code before.
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const result = await controller.executeJavaScript!(
+          toEarlyJavaScriptRequest(
+            'const seen = [];\nfor (const a of document.querySelectorAll("a")) seen.push(a.href)\n' +
+              'return seen.length;',
+            5_000,
+          ),
+        );
+
+        // Every anchor visited, not just the first.
+        expect(result.value).toBe(
+          (
+            await controller.executeJavaScript!(
+              toEarlyJavaScriptRequest('document.querySelectorAll("a").length', 5_000),
+            )
+          ).value,
+        );
       },
       BROWSER_TEST_TIMEOUT_MS,
     );

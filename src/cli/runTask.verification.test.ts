@@ -498,4 +498,39 @@ describe('runTask V2 verification protocol', () => {
     },
     TEST_TIMEOUT_MS,
   );
+
+  it(
+    'hands the verifier the row count code already settled',
+    async () => {
+      // A live verifier read a correct 6-line CSV as "6 data rows plus
+      // header", contradicted the contract's exact_row_count that the code
+      // checks had just passed, and sent the work back — twice, for two
+      // wasted cycles on a file that was right. The count now travels to the
+      // verifier as a settled fact.
+      const initializer = scriptModel([setContract()]);
+      const worker = scriptModel([captureEvidence(), upsertRow(), setCompleteness(), submit()]);
+      const verifier = scriptModel([reportVerified()]);
+
+      const result = await runTask('Publish the widget roster.', {
+        browser,
+        runsBaseDir,
+        callModel: worker.callModel,
+        maxTurns: 10,
+        maxContextTokens: 100_000,
+        harness: {
+          outputContract: true,
+          contractAuthor: 'initializer',
+          initializerCallModel: initializer.callModel,
+          verifierCallModel: verifier.callModel,
+        },
+      });
+
+      expect(result.status).toBe('verified');
+      const opening = JSON.stringify(verifier.requests[0]);
+      expect(opening).toContain('Already established by code');
+      expect(opening).toContain('contains exactly 1 data row');
+      expect(opening).toContain('exact_row_count = 1 is satisfied');
+    },
+    TEST_TIMEOUT_MS,
+  );
 });

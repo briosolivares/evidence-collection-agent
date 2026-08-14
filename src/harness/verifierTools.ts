@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
 
+import type { SettledFact } from '../completion/completionCheck.js';
 import { EVIDENCE_DIR } from '../evidence/evidenceStore.js';
 import type { ImageBlock, ToolResultBlock, ToolUseBlock } from '../loop/messages.js';
 import { ARTIFACTS_DIR, MANIFEST_FILENAME } from '../run/artifacts.js';
@@ -61,7 +62,14 @@ export function createVerifierRegistry(): ToolRegistry {
  * checking task ↔ contract is what stops a mis-stated contract from
  * validating its own mistake.
  *
+ * Code-settled facts are included when the caller has them (see
+ * {@link SettledFact}). They are stated as facts, not hints: the verifier
+ * must not re-derive a count that code already established from the same
+ * bytes, because doing so can only introduce error — measured live, it cost
+ * two correction cycles on a file that was correct.
+ *
  * @param contracts - the run's contract history, when the run has one
+ * @param settled - what the code checks positively established
  * @throws if no typed contract is supplied and INTENT.md or CONTRACT.md is
  *   missing — a run reaching the verifier with neither is a harness bug and
  *   must fail loudly
@@ -70,6 +78,7 @@ export function buildVerificationInput(
   runDir: string,
   taskText: string,
   contracts?: { current: unknown; history: readonly unknown[] },
+  settled: readonly SettledFact[] = [],
 ): string {
   const manifestRaw = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
   const artifactListing = listArtifactFiles(runDir);
@@ -109,6 +118,19 @@ export function buildVerificationInput(
     '',
     `# Artifacts (${ARTIFACTS_DIR}/)`,
     artifactsSection,
+    ...(settled.length === 0
+      ? []
+      : [
+          '',
+          '# Already established by code (do not re-derive or contradict)',
+          'These were computed from the published bytes by the same checks that',
+          'gate submission. They are settled. Spend your attention on what code',
+          'cannot decide.',
+          ...settled.map(
+            (fact) =>
+              `- ${fact.outputId === undefined ? '' : `${fact.outputId}: `}${fact.statement}`,
+          ),
+        ]),
   ].join('\n');
 }
 

@@ -40,7 +40,11 @@ import {
   runWorkerCycle,
   writeWorkerSessionMetrics,
 } from '../loop/workerSession.js';
-import { runCompletionCheck, type CompletionFailure } from '../completion/completionCheck.js';
+import {
+  runCompletionCheck,
+  type CompletionFailure,
+  type SettledFact,
+} from '../completion/completionCheck.js';
 import { finalizeIncompleteRun } from '../completion/finalizeIncompleteRun.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel } from '../loop/messages.js';
@@ -666,11 +670,15 @@ async function runVerificationHarness(
       // own result, so the worker keeps working in the same conversation
       // and only a submission that survives them reaches the verifier.
       const contract = contractStore?.currentContract();
+      // What code proved about this submission, handed to the verifier so it
+      // does not re-derive a count less reliably than the checks did.
+      let settled: readonly SettledFact[] = [];
       if (result.kind === 'submitted' && contract !== undefined) {
         // The table store renders the contract's table outputs as part of the
         // check — without it, a run with valid typed rows is told its own
         // deliverable is missing.
         const checks = runCompletionCheck(runDir, contract, loopDeps.outputTables);
+        settled = checks.settled;
         if (!checks.ok) {
           completionCheckFailures += 1;
           appendTranscriptEvent(runDir, {
@@ -724,6 +732,7 @@ async function runVerificationHarness(
         ...(contract === undefined
           ? {}
           : { contracts: { current: contract, history: contractStore!.contractHistory() } }),
+        ...(settled.length === 0 ? {} : { settled }),
       });
 
       // Fail closed: an unavailable verifier is never success. The

@@ -258,7 +258,10 @@ export function workerProtocolBrief(
       'rows, each row citing the evidence id it came from — and mark it with ' +
       'set_table_completeness when the rows are final. The runtime renders ' +
       'the file itself from those rows, so do not write a contract-bound ' +
-      'deliverable by hand.',
+      'deliverable by hand. That file does not exist until you submit — ' +
+      'reading its path before then returns a not-found error, and the row ' +
+      'state each upsert_output_rows call returns is how you check your work ' +
+      'instead.',
   );
   if (deps.submissionProtocol === true) {
     lines.push(

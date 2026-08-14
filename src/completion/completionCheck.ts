@@ -40,12 +40,42 @@ export interface CompletionFailure {
   message: string;
 }
 
+/**
+ * One thing code POSITIVELY established about a published deliverable.
+ *
+ * The mirror image of a `CompletionFailure`, and it exists because the
+ * verifier needs it. Measured live on 2026-08-13: the code checks parsed a
+ * CSV, counted exactly 5 data rows, and passed the contract's
+ * `exact_row_count: 5`; the verifier then read the same 6-line file, called
+ * it "6 data rows plus header" (contradicting itself in the same sentence by
+ * citing "lines 2-6"), and returned needs_correction — twice. Two cycles and
+ * ~26s spent overturning a count code had already settled, on a file that
+ * was correct.
+ *
+ * Counting is not a judgment call, so handing the verifier the count removes
+ * the temptation to re-derive it. What the verifier is uniquely for —
+ * task↔contract, completeness of a claimed population, facts↔evidence — is
+ * untouched by this.
+ */
+export interface SettledFact {
+  /** Which output the fact is about; absent for run-wide facts. */
+  outputId?: string;
+  /** Machine-stable code of the check that passed, e.g. "exact_row_count". */
+  code: string;
+  /** The fact, stated concretely enough that a contradiction is obvious. */
+  statement: string;
+}
+
 /** The result of one code-check pass. */
 export interface CompletionCheckResult {
   /** True iff nothing objective is wrong — the verifier may run. */
   ok: boolean;
   /** Every defect found, in contract order. */
   failures: CompletionFailure[];
+  /** What code established about the outputs it could read, in contract
+   * order. Populated whether or not the pass succeeded; only the facts of
+   * checks that actually passed appear. */
+  settled: SettledFact[];
 }
 
 /** Placeholder text a finished deliverable must not contain. Deliberately
@@ -80,8 +110,9 @@ const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
  * @param tables - the run's table store. Omitted only by callers that have no
  *   typed rows to render (and by tests that pre-write their fixtures); when
  *   absent, a declared table output is checked as a plain file
- * @returns ok with no failures, or every defect found. Never throws for a
- *   defect — an unreadable or absent file IS a finding, not an exception
+ * @returns ok with no failures, or every defect found, plus the facts code
+ *   settled along the way. Never throws for a defect — an unreadable or
+ *   absent file IS a finding, not an exception
  */
 export function runCompletionCheck(
   runDir: string,
@@ -95,10 +126,12 @@ export function runCompletionCheck(
       ? []
       : renderTableOutputs(runDir, onlyTablesWithRows(contract, tables), tables)),
     ...validateManifestIntegrity(runDir),
-    ...validateExpectedOutputs(runDir, contract),
-    ...validateDocumentOutputs(runDir, contract),
   ];
-  return { ok: failures.length === 0, failures };
+  // Failures and settled facts come from the SAME parse of the same bytes, so
+  // the two can never disagree about the file they describe.
+  const outputs = expectedOutputsOutcome(runDir, contract);
+  failures.push(...outputs.failures, ...validateDocumentOutputs(runDir, contract));
+  return { ok: failures.length === 0, failures, settled: outputs.settled };
 }
 
 /**
@@ -208,14 +241,30 @@ export function validateExpectedOutputs(
   runDir: string,
   contract: OutputContract,
 ): CompletionFailure[] {
+  return expectedOutputsOutcome(runDir, contract).failures;
+}
+
+/**
+ * The same pass, keeping the settled facts the failure-only view discards.
+ * One parse feeds both halves — see {@link SettledFact} for why the verifier
+ * is given the positive half at all.
+ */
+function expectedOutputsOutcome(
+  runDir: string,
+  contract: OutputContract,
+): { failures: CompletionFailure[]; settled: SettledFact[] } {
   const failures: CompletionFailure[] = [];
+  const settled: SettledFact[] = [];
   const published = publishedEntries(runDir);
 
   for (const output of contract.outputs) {
     switch (output.kind) {
-      case 'table':
-        failures.push(...checkTableOutput(runDir, output));
+      case 'table': {
+        const outcome = checkTableOutput(runDir, output);
+        failures.push(...outcome.failures);
+        settled.push(...outcome.settled);
         break;
+      }
       case 'document':
         failures.push(...checkDocumentOutput(runDir, output));
         break;
@@ -225,7 +274,7 @@ export function validateExpectedOutputs(
         break;
     }
   }
-  return failures;
+  return { failures, settled };
 }
 
 /** The manifest's published (artifacts/) entries, or [] when unreadable —
@@ -284,9 +333,9 @@ function readOutput(
 function checkTableOutput(
   runDir: string,
   output: Extract<OutputSpec, { kind: 'table' }>,
-): CompletionFailure[] {
+): { failures: CompletionFailure[]; settled: SettledFact[] } {
   const read = readOutput(runDir, output.id, output.filename);
-  if ('failure' in read) return [read.failure];
+  if ('failure' in read) return { failures: [read.failure], settled: [] };
 
   const failures: CompletionFailure[] = [];
   const expectedColumns = output.columns.map((column) => column.name);
@@ -295,13 +344,16 @@ function checkTableOutput(
   if (output.format === 'csv') {
     const parsed = parseCsv(read.text);
     if (parsed === undefined) {
-      return [
-        {
-          outputId: output.id,
-          code: 'unparseable_csv',
-          message: `${output.filename} could not be parsed as CSV.`,
-        },
-      ];
+      return {
+        failures: [
+          {
+            outputId: output.id,
+            code: 'unparseable_csv',
+            message: `${output.filename} could not be parsed as CSV.`,
+          },
+        ],
+        settled: [],
+      };
     }
     if (
       parsed.header.length !== expectedColumns.length ||
@@ -321,24 +373,30 @@ function checkTableOutput(
     try {
       value = JSON.parse(read.text);
     } catch (error) {
-      return [
-        {
-          outputId: output.id,
-          code: 'unparseable_json',
-          message: `${output.filename} is not valid JSON: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        },
-      ];
+      return {
+        failures: [
+          {
+            outputId: output.id,
+            code: 'unparseable_json',
+            message: `${output.filename} is not valid JSON: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          },
+        ],
+        settled: [],
+      };
     }
     if (!Array.isArray(value)) {
-      return [
-        {
-          outputId: output.id,
-          code: 'json_not_array',
-          message: `${output.filename} must be a JSON array of row objects.`,
-        },
-      ];
+      return {
+        failures: [
+          {
+            outputId: output.id,
+            code: 'json_not_array',
+            message: `${output.filename} must be a JSON array of row objects.`,
+          },
+        ],
+        settled: [],
+      };
     }
     rows = value.map((row) => normalizeJsonRow(row));
     for (const [index, row] of rows.entries()) {
@@ -361,13 +419,16 @@ function checkTableOutput(
     // Markdown: a pipe table whose header row must match the contract.
     const header = parseMarkdownHeader(read.text);
     if (header === undefined) {
-      return [
-        {
-          outputId: output.id,
-          code: 'missing_markdown_table',
-          message: `${output.filename} contains no Markdown table header row.`,
-        },
-      ];
+      return {
+        failures: [
+          {
+            outputId: output.id,
+            code: 'missing_markdown_table',
+            message: `${output.filename} contains no Markdown table header row.`,
+          },
+        ],
+        settled: [],
+      };
     }
     if (
       header.length !== expectedColumns.length ||
@@ -384,9 +445,85 @@ function checkTableOutput(
   }
 
   failures.push(...checkRequiredValues(output, rows));
-  failures.push(...validateTableRules(output, rows));
+  const ruleFailures = validateTableRules(output, rows);
+  failures.push(...ruleFailures);
   failures.push(...checkPlaceholders(output.id, output.filename, read.text));
-  return failures;
+  return { failures, settled: tableSettledFacts(output, rows, ruleFailures, failures) };
+}
+
+/**
+ * What code established about a table it managed to parse: the row count, and
+ * every declared rule that came out satisfied.
+ *
+ * Only facts from checks that PASSED are reported — a rule that failed is
+ * already a failure, and repeating it as a "fact" would be incoherent. The
+ * row count is withheld when the columns did not match, because a header
+ * mismatch means the parse may have carved rows differently than intended.
+ */
+function tableSettledFacts(
+  output: Extract<OutputSpec, { kind: 'table' }>,
+  rows: readonly Record<string, string>[],
+  ruleFailures: readonly CompletionFailure[],
+  allFailures: readonly CompletionFailure[],
+): SettledFact[] {
+  if (allFailures.some((failure) => failure.code === 'column_mismatch')) return [];
+
+  const facts: SettledFact[] = [
+    {
+      outputId: output.id,
+      code: 'row_count',
+      statement:
+        `${ARTIFACTS_DIR}/${output.filename} was parsed as ${output.format} and contains ` +
+        `exactly ${rows.length} data row${rows.length === 1 ? '' : 's'} (the header is not ` +
+        `a data row). Columns are [${output.columns
+          .map((column) => column.name)
+          .join(', ')}], matching the contract exactly.`,
+    },
+  ];
+  const failedCodes = new Set(ruleFailures.map((failure) => failure.code));
+  for (const rule of output.rules) {
+    switch (rule.type) {
+      case 'exact_row_count':
+        if (!failedCodes.has('row_count_mismatch')) {
+          facts.push({
+            outputId: output.id,
+            code: 'exact_row_count',
+            statement: `exact_row_count = ${rule.value} is satisfied: ${rows.length} rows.`,
+          });
+        }
+        break;
+      case 'minimum_row_count':
+        if (!failedCodes.has('row_count_below_minimum')) {
+          facts.push({
+            outputId: output.id,
+            code: 'minimum_row_count',
+            statement: `minimum_row_count = ${rule.value} is satisfied: ${rows.length} rows.`,
+          });
+        }
+        break;
+      case 'unique':
+        if (!failedCodes.has('duplicate_rows')) {
+          facts.push({
+            outputId: output.id,
+            code: 'unique',
+            statement: `[${rule.columns.join(', ')}] is unique across all ${rows.length} rows.`,
+          });
+        }
+        break;
+      case 'matches_expected_values':
+        if (!failedCodes.has('missing_expected_values')) {
+          facts.push({
+            outputId: output.id,
+            code: 'matches_expected_values',
+            statement:
+              `column "${rule.column}" contains every one of the ${rule.expected.length} ` +
+              `expected value(s) the contract lists.`,
+          });
+        }
+        break;
+    }
+  }
+  return facts;
 }
 
 /** Required columns must carry a value in every row. */

@@ -364,6 +364,38 @@ describe('runVerifier typed-contract input', () => {
     expect(opening).toContain('Exact roster size found.');
   });
 
+  it('states code-settled facts as settled, and says nothing when there are none', async () => {
+    const script = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
+    await runVerifier({
+      taskText: TASK,
+      runDir,
+      callModel: script.callModel,
+      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+      settled: [
+        {
+          outputId: 'roster',
+          code: 'row_count',
+          statement: 'artifacts/roster.csv contains exactly 5 data rows.',
+        },
+      ],
+    });
+
+    const opening = JSON.stringify(script.requests[0]);
+    expect(opening).toContain('Already established by code');
+    expect(opening).toContain('roster: artifacts/roster.csv contains exactly 5 data rows.');
+
+    // No facts, no section — an empty heading would read as "code found
+    // nothing", which is a different claim from "code was not consulted".
+    const bare = scriptModel([reportResponse({ status: 'verified', findings: [] })]);
+    await runVerifier({
+      taskText: TASK,
+      runDir,
+      callModel: bare.callModel,
+      contracts: { current: CONTRACT, history: [{ revision: 1, contract: CONTRACT }] },
+    });
+    expect(JSON.stringify(bare.requests[0])).not.toContain('Already established by code');
+  });
+
   it('needs no prose contract documents when a typed contract is supplied', async () => {
     rmSync(join(runDir, CONTRACT_FILENAME));
     rmSync(join(runDir, INTENT_FILENAME));

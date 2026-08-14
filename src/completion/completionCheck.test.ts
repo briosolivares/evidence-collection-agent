@@ -71,10 +71,59 @@ function publishDocument(outputId: string, filename: string, content: string): v
 }
 
 describe('runCompletionCheck — table outputs', () => {
-  it('passes a table matching its contract exactly', () => {
+  it('passes a table matching its contract exactly, and settles its row count', () => {
     publish('roster.csv', 'name,url\nAlpha,https://example.com/a\n');
     const result = runCompletionCheck(runDir, contract([tableSpec()]));
-    expect(result).toEqual({ ok: true, failures: [] });
+    expect(result.ok).toBe(true);
+    expect(result.failures).toEqual([]);
+    // The header is not a data row. A live verifier read a 6-line file as "6
+    // data rows plus header" and sent a correct deliverable back twice, so the
+    // count is now stated for it rather than left to be re-derived.
+    expect(result.settled).toEqual([
+      {
+        outputId: 'roster',
+        code: 'row_count',
+        statement:
+          'artifacts/roster.csv was parsed as csv and contains exactly 1 data row (the ' +
+          'header is not a data row). Columns are [name, url], matching the contract exactly.',
+      },
+    ]);
+  });
+
+  it('settles each declared rule that passed, and none that failed', () => {
+    publish('roster.csv', 'name,url\nAlpha,https://example.com/a\nBeta,https://example.com/b\n');
+    const spec = tableSpec({
+      rules: [
+        { type: 'exact_row_count', value: 2 },
+        { type: 'unique', columns: ['name'] },
+      ],
+    });
+    const passing = runCompletionCheck(runDir, contract([spec]));
+    expect(passing.ok).toBe(true);
+    expect(passing.settled.map((fact) => fact.code)).toEqual([
+      'row_count',
+      'exact_row_count',
+      'unique',
+    ]);
+    expect(passing.settled[1]?.statement).toContain('exact_row_count = 2 is satisfied: 2 rows');
+
+    // A failed rule is a failure, never also a "settled fact" — reporting it
+    // both ways would hand the verifier a contradiction.
+    const failing = runCompletionCheck(
+      runDir,
+      contract([tableSpec({ rules: [{ type: 'exact_row_count', value: 5 }] })]),
+    );
+    expect(codes(failing)).toEqual(['row_count_mismatch']);
+    expect(failing.settled.map((fact) => fact.code)).toEqual(['row_count']);
+  });
+
+  it('settles nothing about a table whose columns do not match', () => {
+    // A header mismatch means the parse may have carved rows differently than
+    // intended, so the count is not a fact worth asserting.
+    publish('roster.csv', 'name,link\nAlpha,https://example.com/a\n');
+    const result = runCompletionCheck(runDir, contract([tableSpec()]));
+    expect(codes(result)).toContain('column_mismatch');
+    expect(result.settled).toEqual([]);
   });
 
   it('reports a missing required output', () => {

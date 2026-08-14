@@ -1736,30 +1736,107 @@ function isSyntaxErrorLike(error: unknown): boolean {
 }
 
 /**
+ * Does `source` PARSE? `new Function` compiles the body and throws
+ * SyntaxError without executing a single statement of it, so this answers a
+ * pure syntax question and runs nothing. Node and the page are both V8,
+ * which is what makes an answer here trustworthy about there.
+ */
+function parses(source: string): boolean {
+  try {
+    new Function(`return ${source};`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** How many trailing statement boundaries to consider for the
+ * completion-value split. A handful covers real snippets, and the bound keeps
+ * a pathological body from turning into hundreds of compiles. */
+const MAX_COMPLETION_SPLIT_CANDIDATES = 12;
+
+/**
+ * Rewrite `STATEMENTS; EXPRESSION` into `STATEMENTS; return (EXPRESSION);` —
+ * the completion-value semantics a console gives you — or return undefined
+ * when the snippet is not that shape.
+ *
+ * A split is accepted only when BOTH halves parse independently: the head as
+ * a complete statement list, the tail as an expression. Parsing the joined
+ * candidate is NOT sufficient, and the counterexample is why this function
+ * can be trusted. `for (const r of rows) doThing(r)` splits into a head of
+ * `for (const r of rows)` and a tail of `doThing(r)`; the joined form
+ * `for (const r of rows) return (doThing(r));` parses happily while meaning
+ * something entirely different — returning on the first iteration instead of
+ * looping. The head alone does not parse, which is exactly how that candidate
+ * is rejected. Requiring each half to stand alone is what makes appending a
+ * `return` meaning-preserving rather than a guess.
+ */
+function completionValueSource(code: string): string | undefined {
+  const body = code.replace(/\s+$/, '').replace(/;+$/, '');
+  const boundaries: number[] = [];
+  // Scanned from the END, so the smallest trailing expression is tried
+  // first — `a; b + \n c` must split at the `;`, not at the newline.
+  for (
+    let index = body.length;
+    index > 0 && boundaries.length < MAX_COMPLETION_SPLIT_CANDIDATES;
+    index -= 1
+  ) {
+    const previous = body[index - 1]!;
+    if (previous === ';' || previous === '}' || previous === '\n') boundaries.push(index);
+  }
+
+  for (const index of boundaries) {
+    const tail = body.slice(index).trim();
+    if (tail === '') continue;
+    const head = body.slice(0, index);
+    if (!parses(`(async () => {\n${head}\n})()`)) continue;
+    if (!parses(`(async () => { return (\n${tail}\n); })()`)) continue;
+    return `(async () => {\n${head}\nreturn (\n${tail}\n);\n})()`;
+  }
+  return undefined;
+}
+
+/**
  * The wrappings to try for a model-supplied snippet, in order.
  *
  * 1. **Expression** — `return (CODE)`. Covers a bare expression
  *    (`document.title`) and a self-invoking function, the two forms a person
  *    writing a console one-liner reaches for first. A trailing semicolon is
  *    stripped because `return (x;)` will not parse.
- * 2. **Statement** — the raw body. Covers multi-statement code with an
- *    explicit top-level `return`, and is the only shape that can express
- *    early returns or declarations.
+ * 2. **Completion value** — `STATEMENTS; return (LAST_EXPRESSION);` when the
+ *    snippet is that shape (see completionValueSource). This is what a model
+ *    writes when it builds a result across several statements and names it on
+ *    the last line, and measured live on 2026-08-13 it was the FIRST thing
+ *    the worker tried on a real extraction.
+ * 3. **Statement** — the raw body. Covers multi-statement code with an
+ *    explicit top-level `return`, and is the only shape that can express an
+ *    early return.
  *
- * Both are wrapped in an ASYNC arrow so `await` works at the snippet's top
+ * All are wrapped in an ASYNC arrow so `await` works at the snippet's top
  * level; Playwright resolves the returned promise before serializing, so a
  * synchronous snippet is unaffected.
  *
- * Deliberately no attempt to make a *statement body ending in an expression*
- * (`const x = 1; x;`) yield that expression: getting completion-value
- * semantics right needs a real parser, and guessing by rewriting the last
- * line would silently change what the model's code means. That form returns
- * undefined, and the error text names the two forms that work.
+ * Order matters for correctness, not just speed: form 3 PARSES for a
+ * completion-value snippet and quietly evaluates to undefined, so it must
+ * never be tried before form 2. Forms that cannot parse at all are dropped
+ * here rather than attempted, and since the caller retries only on a
+ * SyntaxError — a parse failure proves nothing ran — no snippet's side
+ * effects can happen twice.
  */
 export function evaluationSources(code: string): string[] {
   const expression = code.trim().replace(/;+$/, '');
+  const asExpression = `(async () => { return (\n${expression}\n); })()`;
+  const asStatements = `(async () => {\n${code}\n})()`;
+  const asCompletionValue = completionValueSource(code);
+  const expressionParses = parses(asExpression);
   return [
-    `(async () => { return (\n${expression}\n); })()`,
-    `(async () => {\n${code}\n})()`,
+    ...(expressionParses ? [asExpression] : []),
+    ...(asCompletionValue === undefined ? [] : [asCompletionValue]),
+    asStatements,
+    // Nothing parsed, so the page must still be sent something in order to
+    // report the real SyntaxError rather than this code guessing at intent.
+    ...(expressionParses || asCompletionValue !== undefined || parses(asStatements)
+      ? []
+      : [asExpression]),
   ];
 }
