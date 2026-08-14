@@ -4,6 +4,7 @@ import {
   constants as fsConstants,
   existsSync,
   fstatSync,
+  lstatSync,
   openSync,
   readdirSync,
   readSync,
@@ -127,9 +128,27 @@ interface WalkedWorkspaceFile {
  * the directory listing itself (`d_type` where the platform provides it),
  * not from following the entry — so a symlinked subdirectory is seen as a
  * symlink and rejected before this ever recurses into it or whatever it
- * points to.
+ * points to. That guard only covers entries FOUND INSIDE the directory being
+ * read, though — `readdirSync(workspaceDir, ...)` itself follows a symlink
+ * at `workspaceDir`'s own final path component (a command that replaces the
+ * whole `workspace` directory with `ln -s /etc workspace`, say), so the root
+ * is `lstat`-checked explicitly before the walk ever calls `readdirSync` on
+ * it.
  */
 function walkWorkspace(workspaceDir: string): WalkedWorkspaceFile[] {
+  const rootStat = lstatSync(workspaceDir);
+  if (rootStat.isSymbolicLink()) {
+    throw new Error(
+      `scratch workspace entry is a symlink, which is never followed or manifested: ${WORKSPACE_SUBDIR}`,
+    );
+  }
+  if (!rootStat.isDirectory()) {
+    throw new Error(
+      `scratch workspace entry is not a regular file (socket, FIFO, or device are ` +
+        `rejected): ${WORKSPACE_SUBDIR}`,
+    );
+  }
+
   const out: WalkedWorkspaceFile[] = [];
 
   function visit(dir: string, relSegments: readonly string[]): void {
