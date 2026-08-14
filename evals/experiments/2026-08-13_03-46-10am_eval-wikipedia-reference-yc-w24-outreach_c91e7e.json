@@ -1,0 +1,440 @@
+{
+  "startedAt": "2026-08-13T10:23:50.181Z",
+  "finishedAt": "2026-08-13T10:46:10.479Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "wikipedia_reference",
+      "k": 3,
+      "accuracy": 0.6666666666666666,
+      "taskPassed": false,
+      "meanLatencyMs": 232525.30956933333,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-23-55am_find-the-275th-reference-in-the_9fb6c9",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "full normalized text of CITEREFBeevor2012 not found; reference text was \"Beevor 2012 , pp. 555–560.\""
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "20 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "28 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 239922.2905,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-23-55am_find-the-275th-reference-in-the_0fe0a4",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "full normalized text of CITEREFBeevor2012 not found; reference text was \"Beevor 2012 , pp. 555–560.\""
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "20 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "21 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 211300.739,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-23-55am_find-the-275th-reference-in-the_bca7f9",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "full normalized text of CITEREFBeevor2012 not found; reference text was \"Beevor 2012 , pp. 555–560.\""
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": false,
+              "detail": "234 answer token(s), 14 source token(s); truncation markers: ..., ..., ... (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "23 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 246352.899208,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "yc_w24_outreach",
+      "k": 3,
+      "accuracy": 0.875,
+      "taskPassed": false,
+      "meanLatencyMs": 279534.09645866667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-27-23am_from-yc-winter-2024-pick-5-ai-focused_bbbf6b",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "9 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "9 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "5 distinct companies; missing founder row(s): Quivr: Brian Laleye"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": true,
+              "detail": "9 personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "9 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 217998.835292,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-27-51am_from-yc-winter-2024-pick-5-ai-focused_dbd98b",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "10 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "10 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": true,
+              "detail": "5 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "row 7: https://linkedin.com/in/sacellarius"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "10 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "7 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 253813.17808399998,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-27-57am_from-yc-winter-2024-pick-5-ai-focused_04fb05",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "10 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "10 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "5 distinct companies; missing founder row(s): Quivr: Brian Laleye"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": true,
+              "detail": "10 personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "10 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "10 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 366790.276,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "hacker_news",
+      "k": 3,
+      "accuracy": 0.9444444444444445,
+      "taskPassed": false,
+      "meanLatencyMs": 87566.69218066667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-31-07am_create-a-csv-of-the-top-5-stories-on_162dc3",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": false,
+              "detail": "extra: rank (header: rank, title, url, points)"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 106327.17587500002,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-32-05am_create-a-csv-of-the-top-5-stories-on_e7ae0b",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, URL, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 56028.87329200003,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-32-47am_create-a-csv-of-the-top-5-stories-on_dff2a1",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "6 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 100344.02737499995,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "openclaw_merged_prs",
+      "k": 3,
+      "accuracy": 0.3333333333333333,
+      "taskPassed": false,
+      "meanLatencyMs": 558729.8721806667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-33-00am_collect-evidence-about-the-last-10_2377b0",
+          "assertions": [],
+          "latencyMs": 790260.825459,
+          "error": "GitHub API GET /repos/openclaw/openclaw/pulls?state=closed&sort=updated&direction=desc&per_page=100 failed with HTTP 403 (rate limit exhausted — set GITHUB_TOKEN in .env to raise it to 5,000/hr)",
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-34-05am_collect-evidence-about-the-last-10_596dbb",
+          "assertions": [],
+          "latencyMs": 460061.068875,
+          "error": "GitHub API GET /repos/openclaw/openclaw/pulls/123103 failed with HTTP 403 (rate limit exhausted — set GITHUB_TOKEN in .env to raise it to 5,000/hr)",
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_03-34-27am_collect-evidence-about-the-last-10_9a46fd",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/pull_requests.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "21 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 425867.7222079999,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

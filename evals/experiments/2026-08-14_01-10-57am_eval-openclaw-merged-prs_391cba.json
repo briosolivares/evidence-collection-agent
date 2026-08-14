@@ -1,0 +1,160 @@
+{
+  "startedAt": "2026-08-14T08:10:52.281Z",
+  "finishedAt": "2026-08-14T08:10:57.713Z",
+  "k": 3,
+  "concurrency": 1,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "openclaw_merged_prs",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 13.182249999999991,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-14_12-55-50am_collect-evidence-about-the-last-10_66b681",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "22 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 0.023000000000024556,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-14_12-55-50am_collect-evidence-about-the-last-10_3261ab",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "60 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 39.522749999999974,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-14_12-55-51am_collect-evidence-about-the-last-10_51bee0",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/pull_requests.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "24 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 0.0009999999999763531,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}
