@@ -1172,3 +1172,46 @@ partially durable execution feature.
   `readManifest` (`src/tui/bridge/tuiTracing.ts`, `src/tui/runScanner.ts`,
   `src/completion/finalizeIncompleteRun.ts`, and `validateManifestIntegrity`'s
   own inline parse) into one call site (Step 1).
+
+## 7. Post-plan follow-ups (landed 2026-08-14)
+
+Three gaps this plan left open — two named in Step 8b's own module comments as
+known limitations, the third found while closing them — are now closed as
+commit 13, `run: close resume and document-output gaps`:
+
+- **Per-tool-call checkpoints.** Step 8a built `ToolCallLifecycleHooks`; Step
+  8b then called `runWorkerTurn` without them, so `'executing_tools'` — a
+  status the schema already had — was never produced. The hooks are now
+  threaded through `WorkerSessionDeps.toolHooks` and drive a new
+  `saveExecutingTools`. What this buys is narrow and worth not overstating:
+  resume is still turn-granular, because a turn's tool results reach the
+  conversation only once the whole batch returns, so half a batch has no valid
+  conversation to be replayed into. What it adds is that a resumed run can
+  name the specific call that was in flight — the difference between "your
+  last turn was interrupted" and "your `bash` call may already have run."
+- **Store replay from disk.** `restoreEvidenceStore` and
+  `restoreOutputTableStore` rebuild the evidence ledger and the typed rows on
+  resume, so evidence ids keep resolving and rows minted since the last
+  submission survive. The table store had no persistence at all, so it gained
+  a whole-table snapshot under `scratch/tables/`, written after every
+  successful mutation; replay goes through the store's own public mutation
+  path, so a restored store cannot hold a row the live store would have
+  rejected. Contract rehydration moved inside `buildRunToolchain` because row
+  replay validates against the contract and so must happen after it.
+- **`write_document` was never constructed.** It sat in `V2_TOOL_ORDER` with
+  no builder, which made every typed `document` output unsatisfiable:
+  `validateDocumentOutputs` requires a `scratch/documents/<id>/source.md` that
+  only this tool writes. It is now built in `buildRunToolchain`, and
+  `BrowserController.pdfPageSource` supplies the isolated page a `pdf` render
+  needs.
+
+Found while closing those, and fixed with them: `ToolCtx.abortSignal` never
+reached any tool. `runTask` passed it through a conditional object SPREAD,
+which TypeScript exempts from excess-property checking, so it type-checked,
+arrived on `WorkerSessionDeps`, and was dropped when `runWorkerTurn` assembled
+the ctx without it. Every `bash` command on every worker path was
+uncancellable.
+
+Still deferred, unchanged: default-enabling `harness.outputContract`,
+`write_file`'s hole against contract-bound filenames, and live eval
+re-baselining as a basis for policy changes.

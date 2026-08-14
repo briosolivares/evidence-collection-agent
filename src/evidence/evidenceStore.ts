@@ -23,7 +23,12 @@
  * write_file / screenshot with explicit roles.
  */
 
-import { SCRATCH_DIR, writeArtifact } from '../run/artifacts.js';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { basename } from 'node:path';
+
+import { readManifest, SCRATCH_DIR, writeArtifact, type ManifestEntry } from '../run/artifacts.js';
+import { resolveRunPath } from '../run/runDir.js';
 
 /** Run-dir subdirectory holding one JSON file per evidence record. Private
  * working state: under scratch/, so these writes take no roles. */
@@ -126,11 +131,82 @@ export function createEvidenceStore(runDir: string): EvidenceStore {
   if (runDir === '') {
     throw new TypeError('evidence store requires a run directory');
   }
+  return buildEvidenceStore(runDir, 0, []);
+}
 
+/**
+ * Rebuild a run's evidence ledger from what is already durable on disk —
+ * for a run resumed from a checkpoint, where a fresh `createEvidenceStore`
+ * would otherwise start empty and orphan every id minted before the
+ * interruption.
+ *
+ * Enumeration goes through the manifest, never a directory scan: the
+ * manifest is the run's single source of truth about which files are real
+ * and what they hash to, so a stray file nothing ever recorded (e.g. left
+ * behind by a crashed write) cannot resurrect as evidence.
+ *
+ * @param runDir - absolute path to a run directory whose manifest has been
+ *   initialized; throws if the manifest is missing
+ * @returns a store seeded with every manifest-recorded record under
+ *   `scratch/evidence/`, indexed in ascending numeric id order so `list()`
+ *   reproduces the original recording order, with the next id issued one
+ *   past the highest numeric id found (or `E1` when none were recorded) —
+ *   matching exactly what a continuous, uninterrupted run would issue next
+ * @throws Error naming the offending file when a record's on-disk bytes no
+ *   longer match the hash the manifest recorded, its JSON does not parse, or
+ *   its `id` disagrees with the filename it was read from. Resuming past a
+ *   silently missing or silently wrong record is exactly the failure this
+ *   function exists to close, so a bad record aborts the whole restore
+ *   rather than being skipped.
+ */
+export function restoreEvidenceStore(runDir: string): EvidenceStore {
+  if (runDir === '') {
+    throw new TypeError('evidence store requires a run directory');
+  }
+
+  const manifest = readManifest(runDir);
+  const evidenceEntries = manifest.artifacts.filter(
+    (entry) => entry.filename === EVIDENCE_DIR || entry.filename.startsWith(`${EVIDENCE_DIR}/`),
+  );
+
+  const restored = evidenceEntries
+    .map((entry) => restoreOne(runDir, entry))
+    // Ascending numeric order, not manifest order: the manifest lists an
+    // entry's *most recent* write, which is recording order for evidence
+    // (never rewritten in place) but shouldn't be relied on incidentally.
+    .sort((a, b) => idSequenceNumber(a.id) - idSequenceNumber(b.id));
+
+  // Seed from the highest id found, never the record count: a gap (e.g.
+  // E1, E3 with E2 missing for any reason) must not let the counter reissue
+  // an id that is already on disk under a different record.
+  const highest = restored.reduce(
+    (max, evidence) => Math.max(max, idSequenceNumber(evidence.id)),
+    0,
+  );
+
+  return buildEvidenceStore(
+    runDir,
+    highest,
+    restored.map((evidence) => [evidence.id, evidence] as const),
+  );
+}
+
+/**
+ * The one implementation behind both `createEvidenceStore` (empty start)
+ * and `restoreEvidenceStore` (seeded from disk). Keeping `record`/`get`/
+ * `list` in a single place is what guarantees the two constructors behave
+ * identically from this point on: the next id a restored store issues is
+ * exactly the id a continuous, never-interrupted run would have issued.
+ */
+function buildEvidenceStore(
+  runDir: string,
+  startSequence: number,
+  initialEntries: ReadonlyArray<readonly [string, Evidence]>,
+): EvidenceStore {
   // Counter and index are separate from disk so a failed write leaves no
   // trace at all: no id consumed, no half-recorded entry to reason about.
-  let sequence = 0;
-  const byId = new Map<string, Evidence>();
+  let sequence = startSequence;
+  const byId = new Map<string, Evidence>(initialEntries);
 
   return {
     runDir,
@@ -240,4 +316,69 @@ function serializeRecord(record: EvidenceRecord): string {
         `${thrown instanceof Error ? thrown.message : String(thrown)}`,
     );
   }
+}
+
+/**
+ * Read, hash-verify, and parse one manifest-recorded evidence file for
+ * {@link restoreEvidenceStore}.
+ *
+ * The three checks run in this order deliberately: bytes are verified
+ * against the manifest's hash *before* they are trusted enough to parse, so
+ * a tampered file is reported as a hash mismatch (the more specific,
+ * actionable fault) rather than as a downstream JSON or shape error.
+ *
+ * @throws Error naming `entry.filename` when the on-disk bytes no longer
+ *   hash to what the manifest recorded, the bytes are not valid JSON, or the
+ *   parsed record's `id` disagrees with the id its filename encodes
+ */
+function restoreOne(runDir: string, entry: ManifestEntry): Evidence {
+  const bytes = readFileSync(resolveRunPath(runDir, entry.filename));
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  if (sha256 !== entry.sha256) {
+    throw new Error(
+      `evidence file ${entry.filename} does not match its manifest hash ` +
+        `(manifest: ${entry.sha256}, on disk: ${sha256}) — the record may have been ` +
+        'tampered with since it was recorded',
+    );
+  }
+
+  let record: EvidenceRecord;
+  try {
+    record = JSON.parse(bytes.toString('utf8')) as EvidenceRecord;
+  } catch (thrown) {
+    throw new Error(
+      `evidence file ${entry.filename} is not valid JSON: ` +
+        `${thrown instanceof Error ? thrown.message : String(thrown)}`,
+    );
+  }
+
+  // The filename, not just the parsed body, is the id's other witness: the
+  // two must agree, or a record could be cited under an id that names a
+  // different file than the one actually holding those bytes.
+  const idFromFilename = basename(entry.filename, '.json');
+  if (record.id !== idFromFilename) {
+    throw new Error(
+      `evidence file ${entry.filename} holds record id ${JSON.stringify(record.id)}, ` +
+        `which does not match the id ${JSON.stringify(idFromFilename)} its filename encodes`,
+    );
+  }
+
+  return {
+    ...record,
+    path: entry.filename,
+    sha256,
+  };
+}
+
+/** Numeric suffix of a store-issued evidence id (`E12` -> `12`), used to
+ * order restored records and to seed the id counter from the highest one
+ * found. Throws rather than defaulting to 0 for anything not shaped like an
+ * id this store issued — silently ignoring it could under-seed the counter
+ * and reissue an id already on disk. */
+function idSequenceNumber(id: string): number {
+  const match = new RegExp(`^${EVIDENCE_ID_PREFIX}(\\d+)$`).exec(id);
+  if (!match) {
+    throw new Error(`not a well-formed evidence id (expected ${EVIDENCE_ID_PREFIX}<number>): ${JSON.stringify(id)}`);
+  }
+  return Number(match[1]);
 }

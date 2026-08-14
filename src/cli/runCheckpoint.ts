@@ -27,23 +27,31 @@ import {
 //   saveInitializerAccepted -> 'initializing', `initializer` now recorded
 //                               and carried forward on every later save
 //   saveReadyForModel       -> 'ready_for_model'
+//   saveExecutingTools      -> 'executing_tools'
 //   saveVerifying           -> 'verifying'
 //   saveTerminal            -> 'terminal'
 //
-// One runStatus in the schema — 'executing_tools' — is never produced by
-// this writer at all. That is not an oversight: `scheduleToolCalls` (the
-// only place tool calls actually execute, inside `runWorkerSession.ts`'s
-// `runWorkerTurn`) accepts lifecycle hooks that COULD checkpoint around each
-// call, but `runWorkerTurn` is called without them and this task does not
-// touch loop/workerSession.ts to wire them up. The honest consequence: a
-// crash mid-turn — between one `ready_for_model` (or `verifying`) save and
-// the next — is recovered by treating the WHOLE in-flight turn as if it
-// never started, never at per-call granularity. See runTask.ts's own module
-// note on `runHarnessCycles` for exactly which turn that is on resume, and
-// resumeTask's module note for the fault windows this leaves open (a
-// partially-executed tool batch, and any output-table rows or evidence
-// records minted after the last save, which live only in this process's
-// memory and are never part of this checkpoint).
+// 'executing_tools' is driven from `scheduleToolCalls`'s per-call lifecycle
+// hooks, which `runTask` supplies to the WorkerSession via
+// `WorkerSessionDeps.toolHooks`. Read what it does and does not buy, because
+// the distinction is easy to overstate:
+//
+//   It DOES record which individual call was in flight, and whether that
+//   call had settled, at the moment the process died. That is what lets a
+//   resumed run warn about a specific half-applied side effect instead of
+//   about a whole anonymous turn.
+//
+//   It does NOT make resume finer-grained than one turn. A turn's tool
+//   results reach `session.state.messages` only after the ENTIRE batch
+//   returns, so an 'executing_tools' checkpoint holds an assistant turn whose
+//   tool calls have no results at all. Resuming drops that turn and re-runs
+//   it — by design, since replaying half a batch into a conversation that
+//   never saw the other half would hand the model a turn it did not take.
+//
+// Still outside every checkpoint: output-table rows and evidence records
+// minted since the last save live in this process's memory. `resumeTask`
+// rebuilds both from disk where the run persisted them (see
+// `restoreEvidenceStore` and `restoreOutputTableStore`).
 
 /** Everything needed to assemble a checkpoint besides the moment-specific
  * arguments each `save*` method takes: this run's static configuration
@@ -105,6 +113,33 @@ export interface RunCheckpointWriter {
    * after a rejected submission, or a correction round) — see runTask.ts's
    * `runHarnessCycles` for the single rule that covers all three. */
   saveReadyForModel(args: { session: WorkerSession; progress: RunProgress }): Promise<void>;
+  /**
+   * While a turn's tool calls are executing: `runStatus: 'executing_tools'`,
+   * with `pendingTurn` naming the batch and each call's own
+   * `executionStatus`. Driven by `scheduleToolCalls`'s lifecycle hooks, so it
+   * fires twice per state-changing call — once as it starts (`'running'`) and
+   * once as it settles (`'finished'`, carrying the result).
+   *
+   * This is the only save whose purpose is DIAGNOSIS rather than replay, and
+   * the only one taken MID-turn. Its conversation therefore ends with the
+   * assistant's `tool_use` blocks and no `tool_result` for them — the batch's
+   * results only reach `session.state.messages` once the whole batch returns.
+   * Resuming must drop that dangling turn (see `dropUnansweredAssistantTurn`)
+   * and re-run it; the Anthropic API rejects a request whose `tool_use` blocks
+   * are unanswered, so a resume that skipped that step would 400 rather than
+   * recover.
+   *
+   * What this save adds, then, is not finer replay but better diagnosis: it
+   * can name WHICH side-effecting call was in flight when the process died —
+   * the difference between telling the model "your last turn was interrupted,
+   * redo it" and "your `bash` call may already have run; check before
+   * repeating it."
+   */
+  saveExecutingTools(args: {
+    session: WorkerSession;
+    progress: RunProgress;
+    pendingTurn: NonNullable<RunCheckpointV1['pendingTurn']>;
+  }): Promise<void>;
   /** After a worker cycle produces a completion or submission that already
    * passed any automated checks, and BEFORE `runVerifier` runs. Re-running
    * the (read-only) verifier after a crash is acceptable and cheap;
@@ -245,6 +280,15 @@ export function createRunCheckpointWriter(
         ...baseFields('ready_for_model'),
         workerSession: assembleSession(session),
         runProgress: progress,
+      });
+    },
+
+    async saveExecutingTools({ session, progress, pendingTurn }): Promise<void> {
+      await store.save({
+        ...baseFields('executing_tools'),
+        workerSession: assembleSession(session),
+        runProgress: progress,
+        pendingTurn,
       });
     },
 

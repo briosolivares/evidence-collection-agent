@@ -28,7 +28,7 @@ import {
 import type { ToolCall, ToolCallResult } from '../tools/pipeline.js';
 import type { ToolCtx, ToolRegistry } from '../tools/registry.js';
 import { elideStaleInspectResults } from './contextView.js';
-import { scheduleToolCalls } from './scheduler.js';
+import { scheduleToolCalls, type ToolCallLifecycleHooks } from './scheduler.js';
 import type {
   AssistantContentBlock,
   CallModel,
@@ -81,6 +81,19 @@ export interface WorkerSessionDeps {
   credentials?: ToolCtx['credentials'];
   /** Resolver for interactive tool calls; omitted in headless runs. */
   requestPermission?: ToolCtx['requestPermission'];
+  /** Cancellation for tools that own a long-running external resource — a
+   * spawned process group, an open connection — so cancelling a run can
+   * reach INTO a tool already executing rather than only landing at the next
+   * model-call boundary.
+   *
+   * Declared here because this interface is the only thing that builds the
+   * `ToolCtx` a worker's tools receive. Its previous absence failed silently
+   * rather than loudly: `runTask` already passed `abortSignal` through a
+   * conditional SPREAD, and TypeScript exempts spread properties from
+   * excess-property checking, so the field type-checked, arrived on this
+   * object, and was then dropped when the ctx was assembled without it.
+   * Every `bash` command on every worker path was uncancellable. */
+  abortSignal?: ToolCtx['abortSignal'];
   /** The run's output-contract store. Present enables the contract-first
    * gate: until a valid contract exists, only `set_output_contract` may
    * run. Absent (the judge-less path, fixture tests) leaves the gate off. */
@@ -94,6 +107,14 @@ export interface WorkerSessionDeps {
    * legacy judge-less path leaves it unset and keeps implicit
    * no-tool completion. */
   submissionProtocol?: boolean;
+  /** Optional per-tool-call lifecycle seam (see scheduler.ToolCallLifecycleHooks),
+   * threaded straight through to every scheduleToolCalls call site. This is
+   * what lets the runtime observe "about to run this state-changing call"
+   * and "this call produced a result" — the granularity a resumed run needs
+   * to tell whether a call actually happened, rather than only knowing
+   * which TURN it was mid-way through. Absent, scheduleToolCalls runs with
+   * no hooks and behavior is exactly what it was before this field existed. */
+  toolHooks?: ToolCallLifecycleHooks;
 }
 
 /** The session's guards: the shared whole-run budget plus the per-request
@@ -422,6 +443,40 @@ export function appendWorkerFeedback(session: WorkerSession, feedback: string): 
   session.state.messages.push({ role: 'user', content: [{ type: 'text', text: feedback }] });
 }
 
+/**
+ * Drop a trailing assistant turn whose tool calls were never answered.
+ *
+ * Exists for one caller: resuming a checkpoint saved WHILE a tool batch was
+ * executing. `runWorkerTurn` pushes the assistant message before it schedules
+ * anything, so such a checkpoint's conversation ends with `tool_use` blocks
+ * that no `tool_result` follows — and the Anthropic API rejects a request
+ * whose `tool_use` blocks are unanswered. Left in place, a resume would send
+ * that conversation and fail with a 400, so the run would crash again instead
+ * of recovering.
+ *
+ * Dropping rather than answering with synthetic results: those results would
+ * be fabrications about what the tools did, and the model would plan its next
+ * move on them. Re-running the turn re-derives real ones, which is what
+ * "resume is turn-granular" already means everywhere else.
+ *
+ * `turnCount` is deliberately NOT rolled back. The interrupted model call
+ * really happened and was really billed; a metric that hid it would be the
+ * inaccurate one.
+ *
+ * @param session - the session to repair, mutated in place
+ * @returns true when a turn was dropped, false when the conversation did not
+ *   end in an unanswered assistant turn (every other resume path)
+ */
+export function dropUnansweredAssistantTurn(session: WorkerSession): boolean {
+  const last = session.state.messages.at(-1);
+  if (last === undefined || last.role !== 'assistant') return false;
+  // Being LAST is what makes these calls unanswered: a `tool_result` for them
+  // could only live in a later message, and there is none.
+  if (!last.content.some((block) => block.type === 'tool_use')) return false;
+  session.state.messages.pop();
+  return true;
+}
+
 /** Map a tripped tracker ceiling onto the outcome's reason vocabulary. */
 function budgetReasonForLimit(limit: RunBudgetLimit): WorkerBudgetReason {
   switch (limit) {
@@ -611,6 +666,7 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
     credentials: deps.credentials,
     requestPermission: deps.requestPermission,
     outputContracts: deps.outputContracts,
+    abortSignal: deps.abortSignal,
   };
 
   // Contract-first gate (T4.3): until a valid contract exists, the only
@@ -756,19 +812,22 @@ async function runGatedCalls(
   establishingContract: boolean,
 ): Promise<ToolCallResult[]> {
   if (!establishingContract || calls[0]?.name !== SET_OUTPUT_CONTRACT) {
-    return scheduleToolCalls(calls, deps.registry, toolCtx);
+    return scheduleToolCalls(calls, deps.registry, toolCtx, deps.toolHooks);
   }
 
   const [contractCall, ...rest] = calls;
   const contractResult = (
-    await scheduleToolCalls([contractCall!], deps.registry, toolCtx)
+    await scheduleToolCalls([contractCall!], deps.registry, toolCtx, deps.toolHooks)
   )[0]!;
   if (rest.length === 0) return [contractResult];
 
   // Accepted: the remaining calls are now running under a validated
   // contract, so they proceed normally.
   if (deps.outputContracts?.hasContract() === true) {
-    return [contractResult, ...(await scheduleToolCalls(rest, deps.registry, toolCtx))];
+    return [
+      contractResult,
+      ...(await scheduleToolCalls(rest, deps.registry, toolCtx, deps.toolHooks)),
+    ];
   }
 
   return [

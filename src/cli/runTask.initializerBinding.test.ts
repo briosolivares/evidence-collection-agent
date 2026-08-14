@@ -11,8 +11,11 @@ import type { ModelStreamEvent } from '../model/streamAssembly.js';
 import {
   createBashTool,
   createProductionRegistry,
+  createV2Registry,
   V2_TOOL_ORDER,
 } from '../tools/index.js';
+import type { ToolDef } from '../tools/registry.js';
+import { createWriteDocumentTool } from '../tools/writeDocument/writeDocument.js';
 import { defaultInitializerCallModel } from './runTask.js';
 
 /**
@@ -201,5 +204,63 @@ describe('worker-only tool isolation', () => {
     }
     expect(V2_TOOL_ORDER).toContain('bash');
     expect(V2_TOOL_ORDER).toContain('edit_file');
+  });
+});
+
+/**
+ * `write_document` is a V2-only tool: it was in `V2_TOOL_ORDER` but was
+ * never CONSTRUCTED anywhere the runtime actually builds a registry, so a
+ * typed `document` output was impossible to satisfy no matter what the
+ * model did — the tool simply was not there to call. Mirrors the
+ * `createV2Registry` call `buildRunToolchain` makes (the same static tools,
+ * the same frozen order), so this exercises the actual mechanism production
+ * relies on, not a restatement of it.
+ *
+ * Same isolation shape as the block above: worker has it, the two roles
+ * that judge the work do not.
+ */
+describe('write_document isolation', () => {
+  function v2RegistryWithWriteDocument() {
+    return createV2Registry(
+      new Map<string, ToolDef>([
+        ['write_document', createWriteDocumentTool({ documentSpecs: () => [] }) as ToolDef],
+        ['bash', createBashTool({ secretEnvDenylist: [] }) as ToolDef],
+      ]),
+    );
+  }
+
+  it("is in the worker's V2 registry, at its frozen V2_TOOL_ORDER position", () => {
+    const names = [...v2RegistryWithWriteDocument().keys()];
+    expect(names).toContain('write_document');
+
+    // Not just "present somewhere" — in the exact relative order
+    // V2_TOOL_ORDER declares, filtered to what this registry actually holds
+    // (upsert_output_rows/delete_output_rows/set_table_completeness are not
+    // supplied here and are not static, so they are absent — exactly as
+    // createV2Registry's own "skip what's missing" contract promises).
+    const present = new Set(names);
+    expect(names).toEqual(V2_TOOL_ORDER.filter((name) => present.has(name)));
+
+    // Anchored to its two frozen neighbors directly, so a reorder of
+    // V2_TOOL_ORDER around it would fail here even if the filter above
+    // passed vacuously.
+    expect(names.indexOf('write_document')).toBe(names.indexOf('set_output_contract') + 1);
+    expect(names.indexOf('observe')).toBe(names.indexOf('write_document') + 1);
+  });
+
+  it('is NOT offered to the contract initializer', async () => {
+    const stream = recordingStream();
+    const request = await firstRequest(
+      makeContractInitializerModelDriver({ createStream: stream.createStream }),
+      stream.calls,
+    );
+
+    const names = request.tools?.map((tool) => (tool as { name: string }).name) ?? [];
+    expect(names).not.toContain('write_document');
+  });
+
+  it('is NOT offered to the verifier', () => {
+    const names = [...createVerifierRegistry().keys()];
+    expect(names).not.toContain('write_document');
   });
 });

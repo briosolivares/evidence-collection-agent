@@ -41,6 +41,7 @@ import {
   appendSubmissionResult,
   appendWorkerFeedback,
   createWorkerSession,
+  dropUnansweredAssistantTurn,
   recordWorkerSessionCrash,
   restoreWorkerSession,
   runWorkerTurn,
@@ -106,11 +107,21 @@ import {
   type ToolDef,
   type ToolRegistry,
 } from '../tools/registry.js';
+import type { ToolCall } from '../tools/pipeline.js';
+import type { ToolCallLifecycleHooks } from '../loop/scheduler.js';
 import { createV2Registry } from '../tools/index.js';
 import { createOutputRowTools } from '../tools/outputRows/outputRows.js';
 import { createInspectDocumentTool } from '../tools/inspectDocument/inspectDocument.js';
-import { createOutputTableStore, type OutputTableStore } from '../outputs/outputTable.js';
-import { createEvidenceStore, type EvidenceStore } from '../evidence/evidenceStore.js';
+import {
+  createOutputTableStore,
+  restoreOutputTableStore,
+  type OutputTableStore,
+} from '../outputs/outputTable.js';
+import {
+  createEvidenceStore,
+  restoreEvidenceStore,
+  type EvidenceStore,
+} from '../evidence/evidenceStore.js';
 import {
   createContentReaderRegistry,
 } from '../content/contentReader.js';
@@ -123,6 +134,9 @@ import {
 } from '../browser/browserJavaScript.js';
 import { createExecuteJavascriptTool } from '../tools/executeJavascript/executeJavascript.js';
 import { createCaptureTextTool } from '../tools/captureText/captureText.js';
+import { createWriteDocumentTool } from '../tools/writeDocument/writeDocument.js';
+import { createPlaywrightPdfPageOpener } from '../outputs/renderDocument.js';
+import type { DocumentOutputSpec } from '../outputs/documentSource.js';
 import { requireBrowser } from '../tools/shared/browser.js';
 import type { OutputSpec } from '../contracts/outputContract.js';
 import { submitForVerificationTool } from '../tools/submitForVerification/submitForVerification.js';
@@ -448,6 +462,12 @@ interface RunToolchainInputs {
   javascriptPolicy: BrowserJavaScriptPolicy | undefined;
   authenticated: boolean | undefined;
   bashTool: ToolDef;
+  /** True when this toolchain is being built for a RESUMED run, which makes
+   * every run-scoped store rebuild itself from what the interrupted process
+   * already wrote instead of starting empty. Contract, evidence, and typed
+   * rows are all durable; starting empty would silently discard them and then
+   * fail the run for citing evidence ids "that do not exist". */
+  restore?: boolean;
 }
 
 interface RunToolchain {
@@ -464,8 +484,21 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
   // Run-scoped V2 state. Built here, before the registry, because several
   // tools close over it — a tool cannot be constructed without the store it
   // mutates.
+  const restore = inputs.restore === true;
   const outputContracts = v2Protocol ? createOutputContractStore(runDir) : undefined;
-  const evidenceStore = v2Protocol ? createEvidenceStore(runDir) : undefined;
+  // Rehydrated HERE, before the table store exists, not by the caller
+  // afterwards: restoring typed rows replays them through their contract's
+  // validation, so the contract has to be back in place first. A caller that
+  // rehydrated later would validate every restored row against an empty
+  // contract and reject all of them.
+  if (restore && outputContracts !== undefined) {
+    rehydrateContractStore(runDir, outputContracts);
+  }
+  const evidenceStore = v2Protocol
+    ? restore
+      ? restoreEvidenceStore(runDir)
+      : createEvidenceStore(runDir)
+    : undefined;
   const contentReaders = v2Protocol
     ? createContentReaderRegistry([
         createPdfContentReader(),
@@ -474,7 +507,13 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
       ])
     : undefined;
   const outputTables = v2Protocol
-    ? createOutputTableStore({
+    ? (restore ? restoreOutputTableStore : createOutputTableStore)({
+        // `runDir` is what makes the store persist each table after every
+        // successful mutation — and therefore what makes the restore above
+        // have anything to find. Passing it on the FRESH path is not
+        // optional bookkeeping: without it a run writes no snapshots, and a
+        // resume of that run silently starts with zero rows.
+        runDir,
         tableSpec: (outputId) => {
           const current = outputContracts!.currentContract();
           const found = current?.outputs.find(
@@ -557,6 +596,32 @@ function buildRunToolchain(inputs: RunToolchainInputs): RunToolchain {
                 ],
               ] as Array<[string, ToolDef]>)
             : []),
+          // Publishing a prose deliverable. Both resolvers close over this
+          // run's stores and are read PER CALL, never cached: a contract
+          // revision must apply to the very next write, or the tool would
+          // publish yesterday's filename.
+          //
+          // `openPdfPage` is offered only when the session can hand out a
+          // throwaway page. Without it a `pdf` output fails explicitly before
+          // anything is written, which is the failure worth having — the
+          // alternative is a text file published under a .pdf name that the
+          // verifier accepts and a human cannot open.
+          [
+            'write_document',
+            createWriteDocumentTool({
+              documentSpecs: () =>
+                (outputContracts!.currentContract()?.outputs ?? []).filter(
+                  (output): output is DocumentOutputSpec => output.kind === 'document',
+                ),
+              evidence: () => (id) => evidenceStore!.get(id),
+              ...(inputs.browser.pdfPageSource === undefined
+                ? {}
+                : {
+                    openPdfPage: () =>
+                      createPlaywrightPdfPageOpener(inputs.browser.pdfPageSource!())(),
+                  }),
+            }) as ToolDef,
+          ],
           // Local code execution, at its frozen position in V2_TOOL_ORDER.
           // Run-scoped for the same reason the stores above are: it carries
           // this run's secret-env denylist.
@@ -806,6 +871,12 @@ export async function runTask(
         await config.browser.goto(config.startUrl);
       }
 
+      // Created before the session because it is one of the session's deps,
+      // and bound after, once the session exists — see
+      // createToolCallCheckpointHooks. Inert until then, and inert forever on
+      // the judge-less path, which has no checkpoint store to write to.
+      const toolCheckpoint = createToolCallCheckpointHooks();
+
       const loopDeps: LoopDeps = {
         callModel,
         registry: tracedRegistry,
@@ -813,6 +884,7 @@ export async function runTask(
         browser: config.browser,
         credentials,
         requestPermission: config.requestPermission,
+        toolHooks: toolCheckpoint.hooks,
         // Reaches an in-flight command, unlike the model-call boundary the
         // TUI's cancellation already covers.
         ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
@@ -837,6 +909,7 @@ export async function runTask(
         loopDeps,
         { budget: budget!, maxContextTokens },
         checkpointWriter!,
+        toolCheckpoint,
       );
     });
     return { runDir, ...result };
@@ -1109,6 +1182,168 @@ function reconstructPendingResult(
   };
 }
 
+/**
+ * One tool call as a checkpoint records it, keyed by the model's own call id.
+ */
+type CheckpointedToolCall = NonNullable<RunCheckpointV1['pendingTurn']>['toolCalls'][number];
+
+/**
+ * Per-tool-call checkpointing, as a `ToolCallLifecycleHooks` the WorkerSession
+ * can be built with.
+ *
+ * Two-phase construction is forced by an ordering the code cannot avoid: the
+ * hooks must exist before the `WorkerSession` (they are one of its deps), but
+ * they need that same session to read the turn number and the assistant
+ * message a batch belongs to. So the hooks are created inert and `bind` is
+ * called once the session exists. Before binding — and on the judge-less path,
+ * which has no checkpoint store at all — every hook is a no-op, which is why
+ * an unbound instance is safe to install rather than something to guard
+ * against at each call site.
+ */
+interface ToolCallCheckpointHooks {
+  hooks: ToolCallLifecycleHooks;
+  /** Supply the session and the save this run should use. Called once, right
+   * after the session is constructed. */
+  bind(target: {
+    session: WorkerSession;
+    save: (pendingTurn: NonNullable<RunCheckpointV1['pendingTurn']>) => Promise<void>;
+  }): void;
+}
+
+function createToolCallCheckpointHooks(): ToolCallCheckpointHooks {
+  let target:
+    | {
+        session: WorkerSession;
+        save: (pendingTurn: NonNullable<RunCheckpointV1['pendingTurn']>) => Promise<void>;
+      }
+    | undefined;
+
+  // The batch currently being observed. Reset whenever the session's turn
+  // count moves, which is how a new turn's first hook is distinguished from a
+  // later call in the same turn: `runWorkerTurn` increments `turnCount` before
+  // it schedules anything, so the count is a reliable batch identity without
+  // the session having to announce batch boundaries.
+  let openTurn: number | undefined;
+  let observed: CheckpointedToolCall[] = [];
+
+  /** The batch as it currently stands, ready to persist. Records only the
+   * calls observed SO FAR, not the model's full batch: the hooks learn about
+   * a call when it starts (state-changing) or settles (any), and never receive
+   * the batch as a whole. A checkpoint that listed calls it had not seen would
+   * be inventing detail. */
+  const pendingTurn = (
+    session: WorkerSession,
+  ): NonNullable<RunCheckpointV1['pendingTurn']> => ({
+    turnNumber: session.state.turnCount,
+    assistantMessage: session.state.messages.at(-1),
+    toolCalls: [...observed],
+  });
+
+  /** Record a call's current phase. Returns false when the call is not one
+   * this batch is tracking, which is how a read-only call is filtered out of
+   * the settle path — see `afterCallResult`. */
+  const track = (
+    session: WorkerSession,
+    call: ToolCall,
+    executionStatus: CheckpointedToolCall['executionStatus'],
+    result?: unknown,
+  ): boolean => {
+    if (openTurn !== session.state.turnCount) {
+      openTurn = session.state.turnCount;
+      observed = [];
+    }
+    const existing = observed.findIndex((seen) => seen.request.id === call.id);
+    if (existing === -1 && executionStatus !== 'running') return false;
+    const entry: CheckpointedToolCall = {
+      request: { id: call.id, name: call.name, input: call.input },
+      executionStatus,
+      ...(result === undefined ? {} : { result }),
+    };
+    if (existing === -1) {
+      observed.push(entry);
+    } else {
+      observed[existing] = entry;
+    }
+    return true;
+  };
+
+  return {
+    hooks: {
+      // Propagates a save failure on purpose, which fails this one call
+      // without running it (see scheduleToolCalls). If the runtime cannot
+      // record that a state-changing call is about to happen, running it
+      // anyway would leave a resume unable to tell whether it did.
+      async beforeStateChangingCall(call): Promise<void> {
+        if (target === undefined) return;
+        track(target.session, call, 'running');
+        await target.save(pendingTurn(target.session));
+      },
+
+      // Fires for EVERY call, read-only ones included, so it saves only for
+      // calls the batch is already tracking — i.e. the state-changing ones
+      // the hook above recorded as 'running'. A read has no side effect to
+      // warn a resumed model about, and every checkpoint write serializes the
+      // whole conversation, so saving after each read would multiply this
+      // run's checkpoint I/O to record nothing anyone can act on.
+      //
+      // Best-effort, deliberately unlike the hook above: this one runs after
+      // the tool already did its work, and `scheduleToolCalls` turns a throw
+      // here into an error result that REPLACES that work's real result. A
+      // failed checkpoint write must not destroy a successful tool call — the
+      // run continues with a slightly staler checkpoint instead.
+      async afterCallResult(call, result): Promise<void> {
+        if (target === undefined) return;
+        if (!track(target.session, call, 'finished', result)) return;
+        try {
+          await target.save(pendingTurn(target.session));
+        } catch {
+          // Intentionally swallowed; see above.
+        }
+      },
+    },
+
+    bind(next): void {
+      target = next;
+    },
+  };
+}
+
+/** Describe an interrupted tool batch for the resumed model, or undefined
+ * when the checkpoint records no calls worth warning about.
+ *
+ * A call left `'running'` is the one that matters: its side effects may or may
+ * not have landed, and only the model can check. Calls already `'finished'`
+ * are named too, because their results died with the process — the resumed
+ * conversation has no record of them, so the model would otherwise have no
+ * way to know it already did that work. */
+function describeInterruptedBatch(
+  checkpoint: RunCheckpointV1,
+): string | undefined {
+  if (checkpoint.runStatus !== 'executing_tools') return undefined;
+  const calls = checkpoint.pendingTurn?.toolCalls ?? [];
+  const running = calls.filter((call) => call.executionStatus === 'running');
+  const finished = calls.filter((call) => call.executionStatus === 'finished');
+  if (running.length === 0 && finished.length === 0) return undefined;
+
+  const names = (subset: typeof calls): string =>
+    subset.map((call) => call.request.name).join(', ');
+  const parts: string[] = [];
+  if (running.length > 0) {
+    parts.push(
+      `${running.length === 1 ? 'a call' : 'calls'} to ${names(running)} that had started ` +
+        'but never reported a result — their effects may or may not have been applied, so ' +
+        'check the current state before repeating them',
+    );
+  }
+  if (finished.length > 0) {
+    parts.push(
+      `${finished.length === 1 ? 'a completed call' : 'completed calls'} to ` +
+        `${names(finished)} whose results were lost with the interrupted turn`,
+    );
+  }
+  return `The interrupted turn included ${parts.join(', and ')}.`;
+}
+
 /** Text appended to the resumed conversation exactly once (see
  * `runHarnessCycles`'s `pendingNotice` handling for the one case — resuming
  * a `'verifying'` checkpoint on the typed protocol — where it cannot be
@@ -1140,18 +1375,20 @@ const RECOVERY_NOTICE =
  * recovery notice; and continue the harness loop from exactly where the
  * checkpoint left off.
  *
- * Fault windows this does NOT close (see also runCheckpoint.ts's module
- * comment): a crash mid-tool-batch is recovered by discarding the whole
- * in-flight worker turn, never at per-call granularity; any output-table
- * rows or evidence records minted since the run's last submission live only
- * in that crashed process's memory and are not restored (the typed output
- * CONTRACT is rehydrated from its own durable revision files — see
- * `rehydrateContractStore` — but rows upserted after the last successful
- * `submit_for_verification` are not, because `OutputTableStore` and
- * `EvidenceStore` are both pure in-memory indexes over files they already
- * wrote, with no "replay my own directory" constructor); and a resumed
- * run's tracing is a new segment, never a continuation of the original
- * run's trace.
+ * Every run-scoped store is rebuilt from disk, not started empty: the output
+ * CONTRACT from its durable revision files, the EVIDENCE ledger from
+ * `scratch/evidence/`, and the typed ROWS from `scratch/tables/` (see
+ * `RunToolchainInputs.restore`). Evidence ids therefore keep resolving after
+ * a resume, and rows minted since the last submission survive it.
+ *
+ * Fault windows this still does NOT close (see also runCheckpoint.ts's module
+ * comment): a crash mid-tool-batch re-runs the whole in-flight worker turn.
+ * Per-call checkpoints make that turn's interruption DESCRIBABLE — the
+ * resumed model is told which call was in flight and which had already
+ * finished — but not replayable, because a turn's results reach the
+ * conversation only when the entire batch returns, so half a batch has no
+ * valid conversation to be replayed into. A resumed run's tracing is also a
+ * new segment, never a continuation of the original run's trace.
  */
 export async function resumeTask(
   runDir: string,
@@ -1174,7 +1411,13 @@ export async function resumeTask(
     // turns) have all already returned — the sole thing that runs between a
     // 'verifying' save and the next is runVerifier's read-only, tool-free
     // model call.
-    const mayHaveCommandInFlight = checkpoint.runStatus === 'ready_for_model';
+    //
+    // 'executing_tools' is the same window seen from the inside: it is saved
+    // only while a batch is actually running, so it is the ONE status that
+    // says a command was in flight rather than merely might have been.
+    const mayHaveCommandInFlight =
+      checkpoint.runStatus === 'ready_for_model' ||
+      checkpoint.runStatus === 'executing_tools';
     if (mayHaveCommandInFlight) {
       if (config.confirmPreviousCommandStopped !== true) {
         throw new Error(
@@ -1255,11 +1498,12 @@ export async function resumeTask(
       javascriptPolicy: config.javascriptPolicy,
       authenticated: config.authenticated,
       bashTool,
+      // Rebuilds the contract, evidence, and typed-row stores from disk (see
+      // RunToolchainInputs.restore) — including the contract rehydration this
+      // function used to perform itself, which had to move inside so it
+      // happens before the row replay that depends on it.
+      restore: true,
     });
-
-    if (v2Protocol && toolchain.outputContracts !== undefined) {
-      rehydrateContractStore(runDir, toolchain.outputContracts);
-    }
 
     const credentials =
       config.credentials ??
@@ -1302,6 +1546,8 @@ export async function resumeTask(
       budget,
     });
 
+    const toolCheckpoint = createToolCallCheckpointHooks();
+
     const sessionDeps: WorkerSessionDeps = {
       callModel,
       registry: tracedRegistry,
@@ -1309,6 +1555,8 @@ export async function resumeTask(
       browser: config.browser,
       credentials,
       requestPermission: config.requestPermission,
+      toolHooks: toolCheckpoint.hooks,
+      ...(config.signal === undefined ? {} : { abortSignal: config.signal }),
       ...(toolchain.outputContracts === undefined ? {} : { outputContracts: toolchain.outputContracts }),
       ...(toolchain.outputTables === undefined ? {} : { outputTables: toolchain.outputTables }),
       ...(v2Protocol ? { submissionProtocol: true } : {}),
@@ -1347,9 +1595,27 @@ export async function resumeTask(
       // before that call is answered would make the next request invalid.
       // That one case defers the notice into runHarnessCycles's pendingNotice
       // instead (folded into the first feedback this run produces).
+      //
+      // 'executing_tools' has the same hazard from the other direction, and it
+      // is not solved by deferring: that status is saved mid-turn, so its
+      // conversation ENDS with tool_use blocks nothing answered. Those have to
+      // go before anything is appended after them — see
+      // dropUnansweredAssistantTurn for why sending them would fail the resume
+      // outright rather than recover it.
+      if (checkpoint.runStatus === 'executing_tools') {
+        dropUnansweredAssistantTurn(session);
+      }
+
+      // The same checkpoint knows WHICH call was in flight, so the notice can
+      // say so specifically instead of leaving the model to guess whether its
+      // last action landed.
+      const interrupted = describeInterruptedBatch(checkpoint);
+      const recoveryNotice =
+        interrupted === undefined ? RECOVERY_NOTICE : `${RECOVERY_NOTICE} ${interrupted}`;
+
       const deferNotice = checkpoint.runStatus === 'verifying' && v2Protocol;
       if (!deferNotice) {
-        appendWorkerFeedback(session, RECOVERY_NOTICE);
+        appendWorkerFeedback(session, recoveryNotice);
       }
 
       const verifierCallModel = withBudgetAccounting(
@@ -1369,7 +1635,7 @@ export async function resumeTask(
               ...(checkpoint.runStatus === 'verifying'
                 ? { precomputedResult: reconstructPendingResult(session, v2Protocol) }
                 : {}),
-              ...(deferNotice ? { pendingNotice: RECOVERY_NOTICE } : {}),
+              ...(deferNotice ? { pendingNotice: recoveryNotice } : {}),
             };
 
       const result = await runHarnessCycles({
@@ -1380,6 +1646,7 @@ export async function resumeTask(
         session,
         verifierCallModel,
         checkpointWriter,
+        toolCheckpoint,
         start,
       });
       return { runDir, ...result };
@@ -1464,6 +1731,9 @@ async function runHarnessCycles(args: {
   session: WorkerSession;
   verifierCallModel: CallModel;
   checkpointWriter: RunCheckpointWriter;
+  /** Bound here rather than at construction: this is the first point where
+   * the session, the writer, and the live progress snapshot all exist. */
+  toolCheckpoint: ToolCallCheckpointHooks;
   start: {
     cycle: number;
     completionCheckFailures: number;
@@ -1488,6 +1758,20 @@ async function runHarnessCycles(args: {
     currentCycle: cycle,
     completionCheckFailures,
     cycleRecords: [...cycleRecords],
+  });
+
+  // From here on, every state-changing tool call checkpoints itself. Bound
+  // once, before the first turn: the session's tools already hold the hook
+  // object (it is one of its deps), so binding is what switches the hooks
+  // from inert to live rather than what installs them.
+  args.toolCheckpoint.bind({
+    session,
+    save: (pendingTurn) =>
+      checkpointWriter.saveExecutingTools({
+        session,
+        progress: progressSnapshot(),
+        pendingTurn,
+      }),
   });
 
   /** Fold in the one-time recovery notice, if one is still pending. */
@@ -1743,6 +2027,7 @@ async function runVerificationHarness(
   loopDeps: LoopDeps,
   sessionConfig: { budget: RunBudgetTracker; maxContextTokens: number },
   checkpointWriter: RunCheckpointWriter,
+  toolCheckpoint: ToolCallCheckpointHooks,
 ): Promise<RunOutcome> {
   const verifierCallModel = withBudgetAccounting(
     harnessConfig.verifierCallModel ?? makeVerifierModelDriver(),
@@ -1761,6 +2046,7 @@ async function runVerificationHarness(
     session,
     verifierCallModel,
     checkpointWriter,
+    toolCheckpoint,
     start: { cycle: 1, completionCheckFailures: 0, cycleRecords: [] },
   });
 }

@@ -1,3 +1,10 @@
+// Type-only, and the only Playwright reference in this otherwise
+// backend-agnostic contract: `pdfPageSource` hands a real Playwright page
+// factory to the PDF renderer, which drives an actual `Page`. Erased at
+// runtime, so it adds no import edge; see `pdfPageSource` for why restating
+// the shape by hand would be worse.
+import type { Browser } from 'playwright';
+
 // Type-only import: `browserActions.ts` imports BrowserRefNotFoundError
 // (a runtime value) from this module, so the dependency between the two
 // must stay one-directional at runtime. Keep this `import type`.
@@ -422,6 +429,32 @@ export interface BrowserController {
    *   stays unavailable for the rest of this run.
    */
   refreshAfterBrowserScript?(): Promise<void>;
+
+  /**
+   * Hand out a source of fresh, throwaway pages for rendering a document
+   * output to PDF.
+   *
+   * OPTIONAL: a session that cannot make pages omits it, and a `pdf` document
+   * output then fails with an explicit "this run cannot render PDFs" error
+   * BEFORE anything is written — which is the point. The alternative failure,
+   * publishing rendered text under a `.pdf` filename, produces a file the
+   * verifier accepts and a human cannot open.
+   *
+   * The returned source must never hand back the worker's selected page.
+   * Rendering into it would navigate the agent's own session away mid-run,
+   * invalidating every ref and observation the model is holding, and the PDF
+   * would inherit that page's cookies and network policy instead of the
+   * renderer's isolated one. Returning a page FACTORY rather than a page is
+   * what makes that guarantee structural: the renderer opens its own page,
+   * disables its network, and closes it, so there is no shared page to leak.
+   *
+   * @returns something that can open a new page; a Playwright `Browser` or
+   *   `BrowserContext` satisfies it structurally. Typed against Playwright
+   *   because the renderer drives a real `Page` (routing, print media,
+   *   `page.pdf`) — a hand-rolled structural stand-in would have to restate
+   *   Playwright's own types and could drift from them silently.
+   */
+  pdfPageSource?(): Pick<Browser, 'newPage'>;
 
   close(): Promise<void>;
 }

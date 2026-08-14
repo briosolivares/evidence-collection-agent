@@ -13,6 +13,7 @@ import { createRunBudgetTracker, type RunBudgetConfig } from '../run/runBudget.j
 import { setOutputContractTool } from '../tools/setOutputContract/setOutputContract.js';
 import { createRegistry, type ToolDef, type ToolRegistry } from '../tools/registry.js';
 import type { Message, ModelResponse, Usage } from './messages.js';
+import type { ToolCallLifecycleHooks } from './scheduler.js';
 import {
   appendWorkerFeedback,
   captureWorkerSessionSnapshot,
@@ -428,6 +429,226 @@ describe('WorkerSession contract-first gate', () => {
 
     await runWorkerTurn(session);
     expect(touched).toEqual(['ungated']);
+  });
+});
+
+// T-next threads scheduler.ToolCallLifecycleHooks (already built and already
+// accepted by scheduleToolCalls) through WorkerSessionDeps down to every
+// scheduleToolCalls call site inside runGatedCalls. These tests are about
+// reachability, not about what a real checkpointing hook does with the
+// calls it observes — recording call ids in firing order is enough to prove
+// every call site wires the hooks through, and in the right order.
+describe('WorkerSession toolHooks', () => {
+  /** A single state-changing, ungated tool (no contract store involved),
+   * isolating the plain (non-gated) scheduleToolCalls call site. */
+  function writingRegistry(): ToolRegistry {
+    const write: ToolDef<{ what: string }> = {
+      name: 'write',
+      description: 'Write something.',
+      inputSchema: z.object({ what: z.string() }),
+      readOnly: false,
+      execute: async (input) => `wrote ${input.what}`,
+    };
+    return createRegistry([write as ToolDef]);
+  }
+
+  /** Records each hook firing as `before:<id>` / `after:<id>:<ok|error>`, in
+   * the order it actually happened — enough to assert both "did it fire"
+   * and "in what order" without any real checkpointing logic. */
+  function recordingHooks(): { hooks: ToolCallLifecycleHooks; events: string[] } {
+    const events: string[] = [];
+    const hooks: ToolCallLifecycleHooks = {
+      beforeStateChangingCall: async (call) => {
+        events.push(`before:${call.id}`);
+      },
+      afterCallResult: async (call, result) => {
+        events.push(`after:${call.id}:${result.isError === true ? 'error' : 'ok'}`);
+      },
+    };
+    return { hooks, events };
+  }
+
+  function multiCallResponse(
+    calls: Array<{ id: string; name: string; input: unknown }>,
+  ): ModelResponse {
+    return {
+      content: calls.map((c) => ({ type: 'tool_use' as const, ...c })),
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+  }
+
+  it('fires beforeStateChangingCall and afterCallResult for each state-changing call, in order', async () => {
+    const { hooks, events } = recordingHooks();
+    const { callModel } = scriptModel([
+      multiCallResponse([
+        { id: 'w1', name: 'write', input: { what: 'a' } },
+        { id: 'w2', name: 'write', input: { what: 'b' } },
+      ]),
+    ]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: writingRegistry(), runDir, toolHooks: hooks },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session);
+
+    // `write` declares no getAccess and readOnly: false, so both calls get
+    // EXCLUSIVE_ACCESS — which conflicts with everything, including itself —
+    // so the scheduler runs them as two serial groups, not overlapped.
+    // Interleaved hook firing (both befores before either after) would mean
+    // a resume could not trust "before" seen without a matching "after" to
+    // mean "this call's effect is unconfirmed".
+    expect(events).toEqual(['before:w1', 'after:w1:ok', 'before:w2', 'after:w2:ok']);
+  });
+
+  it('fires hooks for both the contract-establishing call and the calls that run after it is accepted', async () => {
+    const { hooks, events } = recordingHooks();
+    const touched: string[] = [];
+    const touch: ToolDef<{ what: string }> = {
+      name: 'touch',
+      description: 'Record a side effect.',
+      inputSchema: z.object({ what: z.string() }),
+      readOnly: false,
+      execute: async (input) => {
+        touched.push(input.what);
+        return `touched ${input.what}`;
+      },
+    };
+    const store = createOutputContractStore(runDir);
+    const validContract = {
+      contract: {
+        outputs: [
+          {
+            id: 'roster',
+            kind: 'table',
+            filename: 'roster.csv',
+            format: 'csv',
+            columns: [{ name: 'name', required: true, type: 'string' }],
+            rules: [],
+          },
+        ],
+      },
+    };
+    const { callModel } = scriptModel([
+      multiCallResponse([
+        { id: 'c1', name: 'set_output_contract', input: validContract },
+        { id: 't1', name: 'touch', input: { what: 'page' } },
+      ]),
+    ]);
+    const session = createWorkerSession(
+      TASK,
+      {
+        callModel,
+        registry: createRegistry([setOutputContractTool as ToolDef, touch as ToolDef]),
+        runDir,
+        outputContracts: store,
+        toolHooks: hooks,
+      },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session);
+
+    expect(store.hasContract()).toBe(true);
+    expect(touched).toEqual(['page']);
+    // runGatedCalls's contract-establishing branch calls scheduleToolCalls
+    // TWICE — once for the lone contract call, once for the accepted rest —
+    // so a naive one-line fix threading hooks into only one of those calls
+    // (or only into the ungated branch) would silently miss half of this
+    // response: c1 would fire without t1, or the reverse.
+    expect(events).toEqual(['before:c1', 'after:c1:ok', 'before:t1', 'after:t1:ok']);
+  });
+
+  it('a session with no toolHooks still executes tool calls normally (regression guard)', async () => {
+    const { callModel } = scriptModel([
+      multiCallResponse([{ id: 'w1', name: 'write', input: { what: 'a' } }]),
+      textResponse('Done.'),
+    ]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry: writingRegistry(), runDir },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    const first = await runWorkerTurn(session);
+    expect(first).toEqual({ kind: 'working' });
+    const resultBlock = session.state.messages.at(-1)!.content[0] as { content: string };
+    expect(resultBlock.content).toBe('wrote a');
+
+    const second = await runWorkerTurn(session);
+    expect(second).toEqual({ kind: 'completed', finalText: 'Done.' });
+  });
+});
+
+// T-next threads WorkerSessionDeps.abortSignal down to the ToolCtx every
+// tool call receives. The bug this closes: runTask passed abortSignal
+// through a conditional SPREAD, which TypeScript exempts from
+// excess-property checking, so the field type-checked its way onto deps and
+// was then silently dropped when runWorkerTurn assembled ToolCtx by hand —
+// every `bash` command on every worker path was uncancellable despite the
+// signal looking present in the deps object.
+describe('WorkerSession abortSignal', () => {
+  /** A tool that records exactly the ctx.abortSignal it was handed, so the
+   * assertion can check object identity — not merely "is defined" — which a
+   * bug that substituted some OTHER signal would still pass. */
+  function abortSignalProbeRegistry(): {
+    registry: ToolRegistry;
+    captured: (AbortSignal | undefined)[];
+  } {
+    const captured: (AbortSignal | undefined)[] = [];
+    const probe: ToolDef<{ ok: boolean }> = {
+      name: 'probe',
+      description: 'Record the abort signal ctx received.',
+      inputSchema: z.object({ ok: z.boolean() }),
+      readOnly: false,
+      execute: async (_input, ctx) => {
+        captured.push(ctx.abortSignal);
+        return 'probed';
+      },
+    };
+    return { registry: createRegistry([probe as ToolDef]), captured };
+  }
+
+  function probeResponse(id: string): ModelResponse {
+    return {
+      content: [{ type: 'tool_use', id, name: 'probe', input: { ok: true } }],
+      stop_reason: 'tool_use',
+      usage: { ...DEFAULT_USAGE },
+    };
+  }
+
+  it('passes the exact same AbortSignal instance from deps through to the tool\'s ToolCtx', async () => {
+    const { registry, captured } = abortSignalProbeRegistry();
+    const controller = new AbortController();
+    const { callModel } = scriptModel([probeResponse('p1')]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry, runDir, abortSignal: controller.signal },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session);
+
+    expect(captured).toHaveLength(1);
+    // Identity, not equality: a fresh AbortSignal never fires, so a session
+    // that wired up an unrelated signal would still look "not undefined".
+    expect(captured[0]).toBe(controller.signal);
+  });
+
+  it('leaves ctx.abortSignal undefined when the session has none (regression guard)', async () => {
+    const { registry, captured } = abortSignalProbeRegistry();
+    const { callModel } = scriptModel([probeResponse('p1')]);
+    const session = createWorkerSession(
+      TASK,
+      { callModel, registry, runDir },
+      { budget: createRunBudgetTracker(UNBOUNDED), maxContextTokens: 1_000_000 },
+    );
+
+    await runWorkerTurn(session);
+
+    expect(captured).toEqual([undefined]);
   });
 });
 

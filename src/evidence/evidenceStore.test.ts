@@ -1,15 +1,21 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
+import {
+  initManifest,
+  MANIFEST_FILENAME,
+  removeScratchArtifactEntry,
+  type Manifest,
+} from '../run/artifacts.js';
 import {
   createEvidenceStore,
   EVIDENCE_DIR,
   recordEvidence,
+  restoreEvidenceStore,
   type EvidenceRecord,
   type EvidenceStore,
 } from './evidenceStore.js';
@@ -221,5 +227,131 @@ describe('createEvidenceStore', () => {
 
   it('keeps records under scratch/, never artifacts/', () => {
     expect(EVIDENCE_DIR.startsWith('scratch/')).toBe(true);
+  });
+});
+
+describe('restoreEvidenceStore', () => {
+  it('rehydrates get/list with the same records, order, paths, and hashes as before the restore', () => {
+    const first = recordEvidence(store, {
+      kind: 'javascript_extraction',
+      summary: 'first extraction',
+      sourceUrl: 'https://example.test/a',
+      detail: { value: 1 },
+    });
+    const second = recordEvidence(store, {
+      kind: 'javascript_extraction',
+      summary: 'second extraction',
+      detail: { value: 2 },
+    });
+    const third = recordEvidence(store, {
+      kind: 'javascript_extraction',
+      summary: 'third extraction',
+      sourceUrl: 'https://example.test/c',
+      detail: { value: [3, 'three'] },
+    });
+
+    const restored = restoreEvidenceStore(runDir);
+
+    expect(restored.runDir).toBe(runDir);
+    expect(restored.list()).toEqual([first, second, third]);
+    expect(restored.get('E1')).toEqual(first);
+    expect(restored.get('E2')).toEqual(second);
+    expect(restored.get('E3')).toEqual(third);
+  });
+
+  it('issues E{N+1} as the next id after restoring N contiguously recorded records', () => {
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'one', detail: { value: 1 } });
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'two', detail: { value: 2 } });
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'three', detail: { value: 3 } });
+
+    const restored = restoreEvidenceStore(runDir);
+    const next = recordEvidence(restored, {
+      kind: 'javascript_extraction',
+      summary: 'four',
+      detail: { value: 4 },
+    });
+
+    expect(next.id).toBe('E4');
+  });
+
+  it('issues max+1 as the next id when restored ids are non-contiguous', () => {
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'one', detail: { value: 1 } });
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'two', detail: { value: 2 } });
+    recordEvidence(store, { kind: 'javascript_extraction', summary: 'three', detail: { value: 3 } });
+
+    // Construct a gap: drop E2's manifest entry so the manifest lists only
+    // E1 and E3. The file itself is left on disk untouched — restore must
+    // still ignore it, because enumeration goes through the manifest.
+    removeScratchArtifactEntry(runDir, `${EVIDENCE_DIR}/E2.json`);
+
+    const restored = restoreEvidenceStore(runDir);
+    expect(restored.list().map((e) => e.id)).toEqual(['E1', 'E3']);
+
+    const next = recordEvidence(restored, {
+      kind: 'javascript_extraction',
+      summary: 'four',
+      detail: { value: 4 },
+    });
+    expect(next.id).toBe('E4');
+  });
+
+  it('throws naming the file when a recorded evidence file has been tampered with', () => {
+    const evidence = recordEvidence(store, {
+      kind: 'javascript_extraction',
+      summary: 'will be tampered with',
+      detail: { value: 'original' },
+    });
+    const absPath = join(runDir, evidence.path);
+
+    // Edit the bytes directly, bypassing writeArtifact, so the manifest's
+    // recorded hash no longer matches what is on disk.
+    writeFileSync(absPath, JSON.stringify({ ...readRecordFile(evidence.path), detail: { value: 'tampered' } }));
+
+    expect(() => restoreEvidenceStore(runDir)).toThrow(evidence.path);
+  });
+
+  it('restores an empty store that issues E1 when no evidence was recorded', () => {
+    const restored = restoreEvidenceStore(runDir);
+
+    expect(restored.list()).toEqual([]);
+    expect(recordEvidence(restored, { kind: 'javascript_extraction', summary: 'first', detail: {} }).id).toBe(
+      'E1',
+    );
+  });
+
+  it('ignores files under scratch/evidence/ that the manifest does not record', () => {
+    const tracked = recordEvidence(store, {
+      kind: 'javascript_extraction',
+      summary: 'tracked',
+      detail: { value: 'tracked' },
+    });
+
+    // Planted directly on disk, never through writeArtifact — the manifest
+    // has no entry for it, so a directory scan would see it but the
+    // manifest-driven restore must not.
+    const strayPath = join(runDir, EVIDENCE_DIR, 'E99.json');
+    mkdirSync(dirname(strayPath), { recursive: true });
+    writeFileSync(
+      strayPath,
+      JSON.stringify({
+        id: 'E99',
+        kind: 'javascript_extraction',
+        summary: 'never recorded in the manifest',
+        recordedAt: new Date().toISOString(),
+        detail: {},
+      }),
+    );
+
+    const restored = restoreEvidenceStore(runDir);
+
+    expect(restored.list()).toEqual([tracked]);
+    expect(restored.get('E99')).toBeUndefined();
+    expect(
+      recordEvidence(restored, { kind: 'javascript_extraction', summary: 'next', detail: {} }).id,
+    ).toBe('E2');
+  });
+
+  it('refuses an empty run directory', () => {
+    expect(() => restoreEvidenceStore('')).toThrow(TypeError);
   });
 });

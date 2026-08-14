@@ -677,6 +677,69 @@ describe('Playwright browser controller', () => {
     },
     BROWSER_TEST_TIMEOUT_MS,
   );
+
+  describe('PlaywrightBrowserController.pdfPageSource', () => {
+    it(
+      'hands out a page factory whose pages can never navigate the selected page away',
+      async () => {
+        await controller.newTab();
+        await controller.goto(fixtureServer.url('/'));
+        const selectedUrlBefore = controller.currentUrl();
+        const pagesBefore = (await controller.pages()).map((page) => page.pageId);
+
+        const pageSource = playwright.pdfPageSource();
+        const renderPage = await pageSource.newPage();
+        try {
+          // The render page is a real, working page — it can navigate and
+          // load content on its own, independent of the worker's tab.
+          await renderPage.goto(fixtureServer.url('/second.html'));
+          expect(renderPage.url()).toBe(fixtureServer.url('/second.html'));
+          expect(await renderPage.title()).toBe('Second Fixture Page');
+
+          // The whole point: opening and driving the render page must never
+          // move the worker's own selected tab.
+          expect(controller.currentUrl()).toBe(selectedUrlBefore);
+        } finally {
+          await renderPage.close();
+        }
+
+        // Deliberately not tracked: a render page must never become
+        // selectable, so the registry's page list is untouched by its
+        // whole lifecycle (open, navigate, close).
+        expect((await controller.pages()).map((page) => page.pageId)).toEqual(pagesBefore);
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'throws once the browser session is closed',
+      async () => {
+        const standaloneProfileDir = await mkdtemp(
+          join(tmpdir(), 'evidence-agent-chrome-pdf-page-source-'),
+        );
+        const standaloneProvider = new LocalChromeBrowserSessionProvider({
+          profileDir: standaloneProfileDir,
+          headless: true,
+        });
+        const standalone = (await standaloneProvider.createSession()) as PlaywrightBrowserController;
+        try {
+          await standalone.newTab();
+          // Sanity: works normally before close, so the throw below is
+          // actually about closing, not about some other precondition.
+          expect(() => standalone.pdfPageSource()).not.toThrow();
+
+          await standalone.close();
+
+          expect(() => standalone.pdfPageSource()).toThrow(/closed/);
+        } finally {
+          await standalone.close().catch(() => undefined);
+          await rm(standaloneProfileDir, { recursive: true, force: true }).catch(() => undefined);
+        }
+      },
+      BROWSER_TEST_TIMEOUT_MS,
+    );
+  });
+
   describe('PlaywrightBrowserController.executeJavaScript', () => {
     it(
       'bulk-extracts a repeated list in one call, with the document URL and a token',

@@ -276,6 +276,109 @@ describe('createRunCheckpointWriter', () => {
     expect(runCheckpointV1Schema.safeParse(checkpoint).success).toBe(false);
   });
 
+  it('saveExecutingTools writes a schema-valid executing_tools checkpoint carrying the given pendingTurn and the worker session', async () => {
+    const { store, saved } = fakeStore();
+    const budget = createRunBudgetTracker({
+      maxWorkerTurns: 10,
+      maxToolCalls: 10,
+      maxModelTokens: 10_000,
+      maxToolResultBytes: 10_000,
+      maxWallTimeMs: 60_000,
+      maxVerifierCorrections: 2,
+    });
+    const writer = createRunCheckpointWriter(store, { runConfiguration: RUN_CONFIGURATION, budget });
+    const session = createWorkerSession('do the task', FAKE_DEPS, { budget, maxContextTokens: 10_000 });
+    session.state.turnCount = 1;
+
+    const pendingTurn: NonNullable<RunCheckpointV1['pendingTurn']> = {
+      turnNumber: 1,
+      assistantMessage: {
+        role: 'assistant',
+        content: [{ type: 'tool_use', id: 'call-1', name: 'bash', input: { command: 'echo hi' } }],
+      },
+      toolCalls: [
+        { request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } }, executionStatus: 'running' },
+      ],
+    };
+
+    await writer.saveExecutingTools({ session, progress: { ...NO_PROGRESS, currentCycle: 1 }, pendingTurn });
+
+    const checkpoint = saved.at(-1)!;
+    expect(checkpoint.runStatus).toBe('executing_tools');
+    // Carries the exact pendingTurn given, not a reshaped or partial copy.
+    expect(checkpoint.pendingTurn).toEqual(pendingTurn);
+    // And the worker session, like every save from saveReadyForModel onward.
+    expect(checkpoint.workerSession).toBeDefined();
+    expect(checkpoint.workerSession?.turnCount).toBe(1);
+    expect(() => runCheckpointV1Schema.parse(checkpoint)).not.toThrow();
+  });
+
+  it('assigns saveExecutingTools a checkpointRevision strictly greater than the preceding save', async () => {
+    const { store, saved } = fakeStore();
+    const budget = createRunBudgetTracker({
+      maxWorkerTurns: 10,
+      maxToolCalls: 10,
+      maxModelTokens: 10_000,
+      maxToolResultBytes: 10_000,
+      maxWallTimeMs: 60_000,
+      maxVerifierCorrections: 2,
+    });
+    const writer = createRunCheckpointWriter(store, { runConfiguration: RUN_CONFIGURATION, budget });
+    const session = createWorkerSession('do the task', FAKE_DEPS, { budget, maxContextTokens: 10_000 });
+
+    await writer.saveReadyForModel({ session, progress: { ...NO_PROGRESS, currentCycle: 1 } });
+    const before = saved.at(-1)!.checkpointRevision;
+
+    await writer.saveExecutingTools({
+      session,
+      progress: { ...NO_PROGRESS, currentCycle: 1 },
+      pendingTurn: {
+        turnNumber: 1,
+        assistantMessage: session.state.messages.at(-1),
+        toolCalls: [
+          { request: { id: 'call-1', name: 'write_file', input: {} }, executionStatus: 'running' },
+        ],
+      },
+    });
+    const after = saved.at(-1)!.checkpointRevision;
+
+    // Strictly greater, not merely different — the exact invariant
+    // RunCheckpointStore.save enforces on the other side of this seam, and
+    // exactly what a new writer method is best placed to accidentally break
+    // (e.g. by forgetting to route through baseFields()).
+    expect(after).toBeGreaterThan(before);
+  });
+
+  it('carries the accepted initializer forward onto a saveExecutingTools checkpoint', async () => {
+    const { store, saved } = fakeStore();
+    const budget = createRunBudgetTracker({
+      maxWorkerTurns: 10,
+      maxToolCalls: 10,
+      maxModelTokens: 10_000,
+      maxToolResultBytes: 10_000,
+      maxWallTimeMs: 60_000,
+      maxVerifierCorrections: 2,
+    });
+    const writer = createRunCheckpointWriter(store, { runConfiguration: RUN_CONFIGURATION, budget });
+    const session = createWorkerSession('do the task', FAKE_DEPS, { budget, maxContextTokens: 10_000 });
+
+    await writer.saveInitializerAccepted({ mode: 'contract', contractRevision: 1 });
+
+    await writer.saveExecutingTools({
+      session,
+      progress: { ...NO_PROGRESS, currentCycle: 1 },
+      pendingTurn: {
+        turnNumber: 1,
+        assistantMessage: session.state.messages.at(-1),
+        toolCalls: [
+          { request: { id: 'call-1', name: 'write_file', input: {} }, executionStatus: 'running' },
+        ],
+      },
+    });
+
+    expect(saved.at(-1)?.initializer).toEqual({ mode: 'contract', contractRevision: 1 });
+  });
+
   it('close() delegates to the underlying store', async () => {
     const { store } = fakeStore();
     let closed = false;

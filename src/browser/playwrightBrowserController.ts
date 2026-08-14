@@ -1071,6 +1071,23 @@ export class PlaywrightBrowserController implements BrowserController {
     }
   }
 
+  pdfPageSource(): Pick<BrowserContext, 'newPage'> {
+    if (this.closed) {
+      throw new Error(
+        'The browser session is closed, so no page can be opened to render a PDF.',
+      );
+    }
+    // The persistent context, handed over as a page FACTORY rather than as a
+    // page. The renderer therefore opens, isolates, and closes a page it owns
+    // outright — it can never reach `activePage`, so a render cannot navigate
+    // the worker's own tab out from under the refs it is holding.
+    //
+    // Deliberately NOT wrapped in `registerPage`: a render page is an internal
+    // throwaway, and tracking it would make it visible to `pages()` and
+    // eligible for selection, which is exactly the confusion this avoids.
+    return this.context;
+  }
+
   async close(): Promise<void> {
     if (this.closePromise !== undefined) {
       return this.closePromise;

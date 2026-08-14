@@ -7,10 +7,11 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
-import { CONTRACT_FILENAME, INTENT_FILENAME } from '../harness/initializer.js';
+import { CONTRACT_FILENAME, INTENT_FILENAME, writeInitializerFiles } from '../harness/initializer.js';
 import type { CallModel, Message, ModelResponse, Usage } from '../loop/messages.js';
+import { createWorkerSession, type WorkerSessionDeps } from '../loop/workerSession.js';
 import { createRunBudgetTracker } from '../run/runBudget.js';
-import { openRunCheckpointStore } from '../run/runCheckpointStore.js';
+import { openRunCheckpointStore, type RunCheckpointV1 } from '../run/runCheckpointStore.js';
 import { createRunDir } from '../run/runDir.js';
 import { generateRunId } from '../run/runId.js';
 import { initManifest, MANIFEST_FILENAME, type Manifest } from '../run/artifacts.js';
@@ -168,6 +169,104 @@ describe('runTask checkpointing and resumeTask', () => {
       },
     });
     return { result, runDir: result.runDir };
+  }
+
+  /**
+   * Hand-build a run directory whose only checkpoint is `'executing_tools'`,
+   * carrying exactly the given pendingTurn tool calls — the shape a real
+   * `runTask` would have left behind had the process died mid-batch (see
+   * runCheckpoint.ts's `saveExecutingTools`). Built directly rather than via
+   * a genuine crash, the same technique
+   * "resume of an interrupted prose initializer" above uses: there is no
+   * awaited call between a state-changing tool call starting and its result
+   * landing that this suite could interrupt from the outside.
+   *
+   * Uses the prose (non-typed) harness path so no contract or initializer
+   * call is needed to reach a valid checkpoint — this run never actually
+   * executes past `'initializing'`, so nothing here depends on
+   * INTENT.md/CONTRACT.md having been written.
+   */
+  async function buildExecutingToolsRunDir(
+    taskText: string,
+    toolCalls: NonNullable<RunCheckpointV1['pendingTurn']>['toolCalls'],
+  ): Promise<string> {
+    const runDir = createRunDir(runsBaseDir, generateRunId(taskText));
+    initManifest(runDir, taskText);
+
+    const budget = createRunBudgetTracker({
+      maxWorkerTurns: Infinity,
+      maxToolCalls: Infinity,
+      maxModelTokens: Infinity,
+      maxToolResultBytes: Infinity,
+      maxWallTimeMs: Infinity,
+      maxVerifierCorrections: 2,
+    });
+    const store = await openRunCheckpointStore(runDir);
+    const writer = createRunCheckpointWriter(store, {
+      runConfiguration: {
+        model: 'claude-sonnet-5',
+        toolProfile: 'atomic',
+        maxOutputTokens: 8192,
+        maxTurns: 'unbounded',
+        maxContextTokens: 100_000,
+        harness: {
+          maxWorkerCycles: 2,
+          maxCompletionCheckFailures: 5,
+          outputContract: false,
+          contractAuthor: 'initializer',
+        },
+      },
+      budget,
+    });
+    // The prose path's verifier reads INTENT.md/CONTRACT.md straight off
+    // disk (see harness/verifierTools.ts's buildVerificationInput) — a real
+    // run would have written these before ever reaching 'ready_for_model',
+    // so a hand-built checkpoint must too, or the resumed verifier call
+    // fails on a missing-file error unrelated to what this test checks.
+    writeInitializerFiles(runDir, { intent: 'Goal.', contract: 'Criteria.' });
+    await writer.saveInitializerAccepted({
+      mode: 'prose',
+      proseAccepted: { intent: 'Goal.', contract: 'Criteria.' },
+      filesWritten: true,
+    });
+
+    // Never actually called: this session exists only to be snapshotted into
+    // the checkpoint below, not to run.
+    const fakeDeps: WorkerSessionDeps = {
+      callModel: async () => {
+        throw new Error('not used: this session is checkpointed, never run');
+      },
+      registry: new Map(),
+      runDir,
+    };
+    const session = createWorkerSession(taskText, fakeDeps, { budget, maxContextTokens: 100_000 });
+    session.state.turnCount = 1;
+    // The unanswered assistant turn that started this (never-finished)
+    // batch — exactly what session.state.messages.at(-1) is by the time
+    // scheduleToolCalls's hooks fire (runWorkerTurn pushes the assistant
+    // message before tool execution begins, so it is already the last
+    // message when a call is still 'running' or freshly 'finished').
+    session.state.messages.push({
+      role: 'assistant',
+      content: toolCalls.map((call) => ({
+        type: 'tool_use' as const,
+        id: call.request.id,
+        name: call.request.name,
+        input: call.request.input,
+      })),
+    });
+
+    await writer.saveExecutingTools({
+      session,
+      progress: { currentCycle: 1, completionCheckFailures: 0, cycleRecords: [] },
+      pendingTurn: {
+        turnNumber: 1,
+        assistantMessage: session.state.messages.at(-1),
+        toolCalls,
+      },
+    });
+    await writer.close();
+    return runDir;
   }
 
   it(
@@ -365,6 +464,180 @@ describe('runTask checkpointing and resumeTask', () => {
       await finalStore.close();
       expect(finalCheckpoint?.runStatus).toBe('terminal');
       expect(finalCheckpoint?.finalOutcome).toMatchObject({ status: 'verified' });
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "resume from a 'ready_for_model' checkpoint appends only the plain recovery notice — no interrupted-batch sentence",
+    async () => {
+      const taskText = 'Ready-for-model crash produces the plain notice only, never the executing_tools one.';
+      const before = new Set(await readdir(runsBaseDir));
+
+      const initializer = scriptModel([initializerResponse('Goal.', 'Criteria.')]);
+      // Cycle 1 finishes with a plain no-tool completion: the checkpoint this
+      // crash leaves is 'ready_for_model', never 'executing_tools', so the
+      // resumed notice must never mention any tool call at all — that
+      // sentence is specific to describeInterruptedBatch, which only fires
+      // for 'executing_tools'.
+      const worker = scriptModel([textResponse('First attempt.')]);
+      const verifier = scriptModel([verifierNeedsCorrection('Needs a second pass.')]);
+
+      await expect(
+        runTask(taskText, {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 8,
+          maxContextTokens: 100_000,
+          harness: {
+            maxWorkerCycles: 2,
+            initializerCallModel: initializer.callModel,
+            verifierCallModel: verifier.callModel,
+          },
+        }),
+      ).rejects.toThrow(/only 1 responses were scripted/);
+
+      const runDir = await newRunDir(runsBaseDir, before);
+      const crashedStore = await openRunCheckpointStore(runDir);
+      const crashedCheckpoint = crashedStore.load();
+      await crashedStore.close();
+      expect(crashedCheckpoint?.runStatus).toBe('ready_for_model');
+
+      const continuation = scriptModel([textResponse('Second attempt, corrected.')]);
+      const continuationVerifier = scriptModel([verifierVerified()]);
+
+      const result = await resumeTask(runDir, {
+        browser,
+        confirmPreviousCommandStopped: true,
+        callModel: continuation.callModel,
+        harness: { verifierCallModel: continuationVerifier.callModel },
+      });
+
+      expect(result).toMatchObject({ runDir, status: 'verified' });
+
+      expect(continuation.requests).toHaveLength(1);
+      const restored = continuation.requests[0]!;
+      expect(restored).toHaveLength(4);
+      const noticeText = (restored[3]?.content[0] as { text: string }).text;
+      expect(noticeText).toContain('recovered after an interruption');
+      expect(noticeText).toContain('browser session was recreated');
+      // The regression this guards: describeInterruptedBatch's text must
+      // never leak onto a checkpoint it was not built for.
+      expect(noticeText).not.toContain('The interrupted turn included');
+      expect(noticeText).not.toContain('had started but never reported a result');
+      expect(noticeText).not.toContain('whose results were lost with the interrupted turn');
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "resume of an 'executing_tools' checkpoint requires confirmPreviousCommandStopped, and the error names the status",
+    async () => {
+      const runDir = await buildExecutingToolsRunDir(
+        "Executing-tools crash requires confirmation before resume.",
+        [{ request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } }, executionStatus: 'running' }],
+      );
+
+      await expect(
+        resumeTask(runDir, {
+          browser,
+          callModel: throwingCallModel('the worker model'),
+          harness: { verifierCallModel: throwingCallModel('the verifier model') },
+        }),
+      ).rejects.toThrow(/status 'executing_tools'/);
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "resume of an 'executing_tools' checkpoint names a still-running call in the recovery notice the resumed model actually receives",
+    async () => {
+      const taskText = 'Executing-tools crash: a running bash call is named in the notice.';
+      const runDir = await buildExecutingToolsRunDir(taskText, [
+        { request: { id: 'call-1', name: 'bash', input: { command: 'echo hi' } }, executionStatus: 'running' },
+      ]);
+
+      const continuation = scriptModel([textResponse('Finishing up.')]);
+      const continuationVerifier = scriptModel([verifierVerified()]);
+
+      const result = await resumeTask(runDir, {
+        browser,
+        confirmPreviousCommandStopped: true,
+        callModel: continuation.callModel,
+        harness: { verifierCallModel: continuationVerifier.callModel },
+      });
+
+      expect(result).toMatchObject({ runDir, status: 'verified' });
+
+      // Assert against the exact restored conversation the resumed model
+      // was actually asked with — not merely that "some notice" exists.
+      expect(continuation.requests).toHaveLength(1);
+      const restored = continuation.requests[0]!;
+
+      // The interrupted assistant turn is GONE, not carried forward. It held
+      // `tool_use` blocks that nothing ever answered, and the Anthropic API
+      // rejects a request whose tool_use blocks are unanswered — so leaving it
+      // in would make this resume fail with a 400 against the real API instead
+      // of recovering, which the scripted model here cannot tell you.
+      expect(
+        restored.flatMap((message) =>
+          message.content.filter((block) => block.type === 'tool_use'),
+        ),
+      ).toEqual([]);
+
+      expect(restored).toHaveLength(2);
+      expect(restored[0]).toEqual({ role: 'user', content: [{ type: 'text', text: taskText }] });
+      const noticeText = (restored[1]!.content[0] as { text: string }).text;
+      expect(noticeText).toContain('recovered after an interruption');
+      // The dropped turn is still DESCRIBED — that is the whole point of the
+      // per-call checkpoint, and it survives the message being removed.
+      expect(noticeText).toContain(
+        'a call to bash that had started but never reported a result',
+      );
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "resume of an 'executing_tools' checkpoint whose pendingTurn recorded a finished call notes its result was lost",
+    async () => {
+      const taskText = 'Executing-tools crash: a finished write_file call is named as lost.';
+      const runDir = await buildExecutingToolsRunDir(taskText, [
+        {
+          request: {
+            id: 'call-1',
+            name: 'write_file',
+            input: { file_path: 'artifacts/note.txt', content: 'hi\n' },
+          },
+          executionStatus: 'finished',
+          result: { isError: false, content: 'wrote artifacts/note.txt' },
+        },
+      ]);
+
+      const continuation = scriptModel([textResponse('Finishing up.')]);
+      const continuationVerifier = scriptModel([verifierVerified()]);
+
+      const result = await resumeTask(runDir, {
+        browser,
+        confirmPreviousCommandStopped: true,
+        callModel: continuation.callModel,
+        harness: { verifierCallModel: continuationVerifier.callModel },
+      });
+
+      expect(result).toMatchObject({ runDir, status: 'verified' });
+
+      const restored = continuation.requests[0]!;
+      expect(
+        restored.flatMap((message) =>
+          message.content.filter((block) => block.type === 'tool_use'),
+        ),
+      ).toEqual([]);
+      const noticeText = (restored[1]!.content[0] as { text: string }).text;
+      expect(noticeText).toContain('recovered after an interruption');
+      expect(noticeText).toContain(
+        'a completed call to write_file whose results were lost with the interrupted turn',
+      );
     },
     TEST_TIMEOUT_MS,
   );
