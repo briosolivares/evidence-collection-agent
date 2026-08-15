@@ -335,19 +335,27 @@ The tool is exclusive in the v3 sequential loop by construction. Its result:
 
 ```json
 {
-  "status": "exited | timed_out | cancelled | output_limit_exceeded",
+  "status": "exited | failed | protocol_error | timed_out | cancelled | output_limit_exceeded",
   "duration_ms": 123,
   "value": {},
   "stdout": "",
   "stderr": "",
+  "error": { "name": "Error", "message": "bounded message" },
   "changed_files": [],
-  "pages": []
+  "pages": [],
+  "pending_dialogs": []
 }
 ```
 
 `value` must be JSON-serializable. Tool stdout, stderr, return data, individual
 IPC replies, and aggregate tool output each have byte ceilings. Oversize
-model-visible results use the existing run-local offload pattern.
+model-visible results use the existing run-local offload pattern. `failed`
+means the child ran and the program threw; `protocol_error` means its private
+IPC contract failed. Both are ordinary structured tool results so the same
+worker conversation can inspect and correct them. `error` is present only
+when a bounded structured error exists. `pending_dialogs` is controller-owned
+state collected after reconciliation, so a timed-out call that opened a
+native dialog gives the next call an explicit page, type, message, and id.
 
 ### 8.2 Execution boundary
 
@@ -376,6 +384,13 @@ Like `bash`, model code can exercise the OS user's authority. The child boundary
 prevents an accidental `process.exit()` or global mutation from killing or
 corrupting Sherlock's main process; it does not make hostile code safe.
 
+The initial v3 local-execution support contract is POSIX (macOS and Linux),
+matching the existing `/bin/bash` worker tool. `browser_execute` fails before
+spawning on Windows because killing only the direct child would falsely claim
+the descendant-cleanup invariant. Windows support requires an owned Job Object
+or equivalently tested process-tree mechanism; it is not emulated with a
+best-effort direct-child kill.
+
 ### 8.3 Core browser API
 
 The child preloads a small helper object. Every helper is implemented in terms
@@ -402,6 +417,7 @@ interface BrowserProgramApi {
   scroll(x: number, y: number, deltaY: number, deltaX?: number): Promise<void>;
   waitForLoad(options?: WaitOptions): Promise<boolean>;
   waitFor(expression: string, options?: WaitOptions): Promise<boolean>;
+  handleDialog(action: "accept" | "dismiss", promptText?: string): Promise<unknown>;
   pages(): Promise<BrowserPageInfo[]>;
   open(url?: string): Promise<BrowserPageInfo>;
   activate(targetId: string): Promise<void>;
@@ -419,9 +435,20 @@ Interaction guidance in the static prompt:
 6. Wait for the specific load/DOM/network condition an action creates.
 7. Keep large raw captures in workspace files; return only bounded summaries.
 
-Native dialogs freeze page JavaScript. The API must surface a pending dialog
-as explicit state and provide a bounded accept/dismiss CDP helper; it must not
-silently answer on the user's behalf.
+Native dialogs freeze page JavaScript. The result surfaces every pending
+dialog as explicit controller state, and `handleDialog` issues one bounded
+`Page.handleJavaScriptDialog` decision against the pinned page. `promptText`
+is accepted only with `accept`. Sherlock never answers silently on the user's
+behalf.
+
+If a timed-out CDP evaluation is the command that opened the dialog, detaching
+that secondary session can itself hang or make Chrome dismiss the dialog.
+Closing the caller-facing command session therefore transfers its bounded
+detacher to the controller while that page has a pending dialog. The next
+explicit `handleDialog` decision is routed through the controller's cached
+Playwright `Dialog`; after the decision unblocks the original command, every
+transferred session is detached. Page/run cleanup drains the same detachers.
+This is controller-owned transport state, never a model-visible capability.
 
 ## 9. Editable helper lifecycle
 

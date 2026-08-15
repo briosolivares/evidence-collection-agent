@@ -141,9 +141,7 @@ when its code, tests, documentation, and named gate are all complete.
   specification.
 - [x] Create this durable implementation/progress file.
 - [x] Record a requirement-to-evidence matrix for every preserved subsystem.
-- [ ] Run and record the current typecheck/full-test/application baseline —
-  static/full-suite baseline is recorded; fixture-backed application smoke is
-  still pending.
+- [x] Run and record the current typecheck/full-test/application baseline.
 - [x] Commit the documentation and baseline record as one scoped change.
 
 **Gate:** the design names every model-visible tool schema, lifecycle state,
@@ -152,19 +150,19 @@ baseline is reproducible.
 
 ### Step 1 — v3 browser execution substrate
 
-- [ ] Add a target-pinned CDP-session capability to `BrowserController` that
+- [x] Add a target-pinned CDP-session capability to `BrowserController` that
   never exposes a connection URL.
-- [ ] Implement it in `PlaywrightBrowserController` for both local and remote
+- [x] Implement it in `PlaywrightBrowserController` for both local and remote
   sessions.
-- [ ] Add the bounded child-process runner and private request/response IPC.
-- [ ] Add core helpers (`cdp`, `js`, page info, AX-tree filtering, navigation,
+- [x] Add the bounded child-process runner and private request/response IPC.
+- [x] Add core helpers (`cdp`, `js`, page info, AX-tree filtering, navigation,
   coordinate click, typing, waits, tab listing/selection) on top of raw CDP.
-- [ ] Implement `browser_execute` with code, page target, timeout, stdout,
+- [x] Implement `browser_execute` with code, page target, timeout, stdout,
   stderr, return value, changed files, and post-run browser reconciliation.
-- [ ] Ensure cancellation kills the child; output/IPC payloads are bounded;
+- [x] Ensure cancellation kills the child; output/IPC payloads are bounded;
   secrets and CDP URLs never enter child env, logs, results, or artifacts.
-- [ ] Track and close all run-owned pages while preserving pre-existing pages.
-- [ ] Test local fixture behavior, stale target failure, dialog/error paths,
+- [x] Track and close all run-owned pages while preserving pre-existing pages.
+- [x] Test local fixture behavior, stale target failure, dialog/error paths,
   timeout/cancellation, workspace changes, secret sweeps, and provider-neutral
   construction.
 
@@ -289,17 +287,17 @@ proved, even if supporting code already exists.
 | Expanded v3 design | Design document reviewed against code | Complete |
 | Durable step plan/progress | This file | Complete; maintained continuously |
 | Browser-harness reference used | Pinned commit plus design adaptation table | Complete |
-| Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Pending |
+| Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete for Step 1 |
 | Editable run helpers and reviewed promotion | Run artifact/patch tests + docs | Pending |
 | Compact v3 tool surface | Registry/schema snapshot | Pending |
 | Sherlock TUI preserved | TUI integration suite + fixture smoke | Pending |
 | Streaming main loop preserved | Model/loop tests + transcript | Pending |
 | Evals/graders preserved | Eval runner/grader suite + boundary inspection | Pending |
 | Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | Pending |
-| Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Pending |
+| Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Provider-neutral command seam complete; cutover/live smoke pending |
 | Accuracy checks preserved | Completion/verifier correction tests | Pending |
-| Owned tabs always cleaned | Browser lifecycle tests on all terminal paths | Pending |
-| Secrets/CDP capability never leak | Secret sweep + child-env tests | Pending |
+| Owned tabs always cleaned | Browser lifecycle tests on all terminal paths | Controller and verified/failed run paths complete; cancellation cutover pending |
+| Secrets/CDP capability never leak | Secret sweep + child-env tests | Browser substrate complete; final whole-product sweep pending |
 | No task-specific logic | Source/prompt/helper audit | Pending |
 | Full implementation complete | Steps 0–7 and final audit | Pending |
 
@@ -330,8 +328,55 @@ proved, even if supporting code already exists.
   contracts, and fake eval CLI composition.
 - Coordinator verification then ran `npm run typecheck` successfully and a
   complete `npm test`: 140 files and all 1,833 cases passed in 68.87 seconds.
+  That suite includes the fixture-backed composition smoke in
+  `src/cli/runTask.test.ts` (real local browser and production tool pipeline
+  through a verified CSV artifact), so Step 0's application baseline is also
+  complete; this is not a paid or live eval re-baseline.
   Baseline size under the audit's convention is 33,557 production `src` lines
   in 132 files and 36,458 test lines in 140 files.
+
+### 2026-08-15 — Step 1 browser execution substrate complete
+
+- Chose clean new v3 modules under `src/v3/browser/` for the program runner
+  and protected helpers, while extending the existing provider-neutral
+  controller seam only where browser ownership requires it.
+- Added a URL-free, exact-target `BrowserCommandSession` to the provider seam;
+  both managed local and Browserbase-backed Playwright controllers expose it.
+  Stale ids fail closed and driver errors redact transport capabilities.
+- Added a fresh-process v3 runner and protected CDP helpers under
+  `src/v3/browser/`, plus the strict `browser_execute` tool under
+  `src/v3/tools/`. Source/result/IPC/stdout/stderr/CDP-call budgets,
+  cancellation, descendant cleanup, environment sanitization, page identity,
+  workspace reconciliation, and browser refresh are covered.
+- Native-dialog handling required one extra lifecycle rule discovered by the
+  real browser gate: a timed-out renderer command transfers its CDP detacher
+  to the controller until an explicit accept/dismiss decision. This prevents
+  detach from silently dismissing the dialog and prevents cleanup from
+  hanging behind it.
+- Task ownership now includes the task page, owned-opener popups, and exact
+  `Target.createTarget` receipts. `closeTaskPages()` drains page-event races,
+  closes in reverse ownership order on run success/failure, and preserves all
+  pre-existing and concurrently user-created pages. The existing `runTask`
+  and resume cleanup now use this stronger operation.
+- Added the attached-local provider foundation with a loopback-only explicit
+  endpoint, all-pre-existing-page snapshot, endpoint-free diagnostics, and
+  disconnect-only session close. Discovery and production provider selection
+  remain intentionally deferred to the cutover step.
+- The runner guarantees descendant-process cleanup on POSIX. The binding
+  design now explicitly matches the existing `/bin/bash` support envelope:
+  Windows fails before spawn until an owned Job Object (or equivalently tested
+  process-tree mechanism) exists, rather than claiming an unsafe direct-child
+  cleanup guarantee.
+- Coordinator gates passed: `npm run typecheck`; focused runner/tool tests
+  (26 cases); command-session tests (8); owned-page test (1); real
+  `browser_execute` journeys (2, including timeout/dialog recovery); provider,
+  tracing, and TUI regressions (87); and the real `runTask` popup-failure
+  cleanup test. Final `npm test` passed 146 files / 1,884 tests in 54.78s.
+- The first full run exposed the previously recorded stale browser-death
+  wording assertion. Production now says "browser session has been
+  disconnected," which remains recognized by the relaunch classifier; the
+  targeted regression and final full suite are green.
+- No live Browserbase smoke or eval re-baseline was run.
 
 ## Rules for coordinators and subagents
 

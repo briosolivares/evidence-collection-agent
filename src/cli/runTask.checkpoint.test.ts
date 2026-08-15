@@ -130,10 +130,9 @@ describe('runTask checkpointing and resumeTask', () => {
   }, TEST_TIMEOUT_MS);
 
   afterEach(async () => {
-    // Belt-and-suspenders: a test that already closed its own tab makes this
-    // a no-op (closeTab is documented as such); one that crashed mid-test
-    // leaves the session ready for the next test regardless.
-    await browser.closeTab().catch(() => undefined);
+    // Belt-and-suspenders: a completed run already closed all pages it owned;
+    // one that crashed mid-test leaves the session ready for the next test.
+    await browser.closeTaskPages().catch(() => undefined);
   });
 
   afterAll(async () => {

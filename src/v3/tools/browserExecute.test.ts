@@ -1,0 +1,353 @@
+import {
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type {
+  BrowserCommandSession,
+  BrowserController,
+} from '../../browser/controller.js';
+import type { BrowserPage } from '../../browser/browserState.js';
+import { initManifest } from '../../run/artifacts.js';
+import { executeToolCall } from '../../tools/pipeline.js';
+import { createRegistry, type ToolCtx } from '../../tools/registry.js';
+import type {
+  BrowserProgramOptions,
+  BrowserProgramResult,
+} from '../browser/runner.js';
+import {
+  BROWSER_EXECUTE_MAX_OUTPUT_BYTES,
+  DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS,
+  MAX_BROWSER_EXECUTE_TIMEOUT_MS,
+  createBrowserExecuteTool,
+  type BrowserExecuteResult,
+  type BrowserExecuteToolDeps,
+} from './browserExecute.js';
+
+let runDir: string;
+
+beforeEach(() => {
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-browser-execute-'));
+  initManifest(runDir, 'exercise the v3 browser tool');
+});
+
+afterEach(() => {
+  rmSync(runDir, { recursive: true, force: true });
+  vi.restoreAllMocks();
+});
+
+const PAGE: BrowserPage = {
+  pageId: 'page-task',
+  documentId: 'document-1',
+  observationId: 0,
+  url: 'https://example.test/report',
+  title: 'Report',
+  active: true,
+  frames: [],
+};
+
+interface FakeBrowserOptions {
+  closeError?: Error;
+  refreshError?: Error;
+  pagesError?: Error;
+  dialogsError?: Error;
+}
+
+function fakeBrowser(options: FakeBrowserOptions = {}) {
+  const events: string[] = [];
+  const send = vi.fn(async () => ({ result: { value: 42 } }));
+  const close = vi.fn(async () => {
+    events.push('close');
+    if (options.closeError) throw options.closeError;
+  });
+  const session: BrowserCommandSession = {
+    pageId: 'page-task',
+    targetId: 'target-task',
+    send,
+    close,
+  };
+  const openCommandSession = vi.fn(async () => {
+    events.push('open');
+    return session;
+  });
+  const refreshAfterExternalCommands = vi.fn(async () => {
+    events.push('refresh');
+    if (options.refreshError) throw options.refreshError;
+  });
+  const pages = vi.fn(async () => {
+    events.push('pages');
+    if (options.pagesError) throw options.pagesError;
+    return [PAGE];
+  });
+  const listPendingDialogs = vi.fn(() => {
+    events.push('dialogs');
+    if (options.dialogsError) throw options.dialogsError;
+    return [];
+  });
+  const browser = {
+    openCommandSession,
+    refreshAfterExternalCommands,
+    pages,
+    listPendingDialogs,
+  } as unknown as BrowserController;
+  return {
+    browser,
+    session,
+    send,
+    close,
+    openCommandSession,
+    refreshAfterExternalCommands,
+    pages,
+    listPendingDialogs,
+    events,
+  };
+}
+
+function callTool(
+  deps: BrowserExecuteToolDeps,
+  browser: BrowserController | undefined,
+  input: unknown,
+  overrides: Partial<ToolCtx> = {},
+) {
+  const tool = createBrowserExecuteTool(deps);
+  return executeToolCall(
+    createRegistry([tool]),
+    { id: 'browser-program-1', name: 'browser_execute', input },
+    { runDir, browser, ...overrides },
+  );
+}
+
+function parseSuccess(content: string): BrowserExecuteResult {
+  return JSON.parse(content) as BrowserExecuteResult;
+}
+
+function exited(
+  overrides: Partial<BrowserProgramResult> = {},
+): BrowserProgramResult {
+  return {
+    status: 'exited',
+    durationMs: 25,
+    value: null,
+    stdout: '',
+    stderr: '',
+    ...overrides,
+  };
+}
+
+describe('browser_execute tool', () => {
+  it('pins the requested page, routes CDP, sanitizes env, syncs files, and refreshes', async () => {
+    const fake = fakeBrowser();
+    let received: BrowserProgramOptions | undefined;
+    const runProgram = vi.fn(async (options: BrowserProgramOptions) => {
+      fake.events.push('run');
+      received = options;
+      const cdpValue = await options.sendCdp('Runtime.evaluate', {
+        expression: '21 * 2',
+      });
+      writeFileSync(join(options.cwd, 'notes.txt'), 'durable scratch bytes');
+      return exited({
+        value: { cdpValue },
+        stdout: 'program output\n',
+        stderr: 'program warning\n',
+      });
+    });
+
+    const result = await callTool(
+      {
+        secretEnvDenylist: ['INTERNAL_CAPABILITY_'],
+        environment: () => ({
+          SAFE_SETTING: 'visible',
+          INTERNAL_CAPABILITY_VALUE: 'configured-secret',
+          LANGFUSE_SECRET_KEY: 'tracing-secret',
+          SHERLOCK_CDP_URL: 'wss://secret.example/devtools/browser/control',
+          NODE_OPTIONS: '--inspect=127.0.0.1:9229',
+        }),
+        runProgram,
+      },
+      fake.browser,
+      { code: 'return browser.pageInfo();', page_id: 'page-task' },
+    );
+
+    expect(result.isError).toBe(false);
+    const parsed = parseSuccess(result.content);
+    expect(parsed).toMatchObject({
+      status: 'exited',
+      duration_ms: 25,
+      stdout: 'program output\n',
+      stderr: 'program warning\n',
+      pages: [PAGE],
+      pending_dialogs: [],
+      changed_files: [
+        { path: 'scratch/workspace/notes.txt', change: 'created' },
+      ],
+    });
+    expect(received).toMatchObject({
+      cwd: join(runDir, 'scratch/workspace'),
+      env: { SAFE_SETTING: 'visible' },
+      timeoutMs: DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS,
+      maxOutputBytes: BROWSER_EXECUTE_MAX_OUTPUT_BYTES,
+      page: { pageId: 'page-task', targetId: 'target-task' },
+    });
+    expect(fake.openCommandSession).toHaveBeenCalledExactlyOnceWith('page-task');
+    expect(fake.send).toHaveBeenCalledExactlyOnceWith('Runtime.evaluate', {
+      expression: '21 * 2',
+    });
+    expect(fake.events).toEqual([
+      'open',
+      'run',
+      'close',
+      'refresh',
+      'pages',
+      'dialogs',
+    ]);
+    expect(JSON.stringify(result)).not.toContain('configured-secret');
+    expect(JSON.stringify(result)).not.toContain('tracing-secret');
+    expect(JSON.stringify(result)).not.toContain('secret.example');
+  });
+
+  it('uses the active page when page_id is omitted and preserves program failure as data', async () => {
+    const fake = fakeBrowser();
+    const runProgram = vi.fn(async () =>
+      exited({
+        status: 'failed',
+        value: undefined,
+        error: { name: 'TypeError', message: 'page program failed' },
+      }),
+    );
+
+    const result = await callTool(
+      { secretEnvDenylist: [], runProgram },
+      fake.browser,
+      { code: "throw new TypeError('page program failed')" },
+    );
+
+    expect(result.isError).toBe(false);
+    expect(parseSuccess(result.content)).toMatchObject({
+      status: 'failed',
+      error: { name: 'TypeError', message: 'page program failed' },
+      pages: [PAGE],
+      pending_dialogs: [],
+    });
+    expect(fake.openCommandSession).toHaveBeenCalledExactlyOnceWith(undefined);
+    expect(fake.close).toHaveBeenCalledOnce();
+    expect(fake.refreshAfterExternalCommands).toHaveBeenCalledOnce();
+  });
+
+  it('attempts every cleanup step, keeps the primary error, and redacts capabilities', async () => {
+    const fake = fakeBrowser({
+      closeError: new Error(
+        'detach failed at wss://connect.browserbase.com/session?token=close-secret',
+      ),
+      refreshError: new Error(
+        'refresh failed at http://127.0.0.1:9222/devtools/browser/refresh-secret',
+      ),
+      pagesError: new Error(
+        'list failed at https://api.browserbase.com/v1/sessions/page-secret',
+      ),
+      dialogsError: new Error(
+        'dialogs failed at wss://private.example/devtools/page/dialog-secret',
+      ),
+    });
+    const runProgram = vi.fn(async () => {
+      fake.events.push('run');
+      throw new Error(
+        'spawn failed at wss://private.example/devtools/browser/primary-secret',
+      );
+    });
+
+    const result = await callTool(
+      { secretEnvDenylist: [], runProgram },
+      fake.browser,
+      { code: 'return 1;' },
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content).toContain('browser program failed to run');
+    expect(result.content).toContain('cleanup also failed');
+    expect(result.content).toContain('[REDACTED_WEBSOCKET_URL]');
+    expect(result.content).toContain('[REDACTED_CDP_URL]');
+    expect(result.content).not.toContain('primary-secret');
+    expect(result.content).not.toContain('close-secret');
+    expect(result.content).not.toContain('refresh-secret');
+    expect(result.content).not.toContain('page-secret');
+    expect(result.content).not.toContain('dialog-secret');
+    expect(fake.events).toEqual([
+      'open',
+      'run',
+      'close',
+      'refresh',
+      'pages',
+      'dialogs',
+    ]);
+  });
+
+  it('does not create a workspace, open a session, or spawn when already cancelled', async () => {
+    const fake = fakeBrowser();
+    const runProgram = vi.fn(async () => exited());
+    const abortController = new AbortController();
+    abortController.abort();
+
+    const result = await callTool(
+      { secretEnvDenylist: [], runProgram },
+      fake.browser,
+      { code: 'return 1;' },
+      { abortSignal: abortController.signal },
+    );
+
+    expect(result.isError).toBe(false);
+    expect(parseSuccess(result.content)).toEqual({
+      status: 'cancelled',
+      duration_ms: 0,
+      stdout: '',
+      stderr: '',
+      changed_files: [],
+      pages: [],
+      pending_dialogs: [],
+    });
+    expect(existsSync(join(runDir, 'scratch/workspace'))).toBe(false);
+    expect(fake.openCommandSession).not.toHaveBeenCalled();
+    expect(runProgram).not.toHaveBeenCalled();
+    expect(fake.refreshAfterExternalCommands).not.toHaveBeenCalled();
+  });
+
+  it('rejects unknown keys, blank code, and an over-limit timeout before touching the browser', async () => {
+    const fake = fakeBrowser();
+    const runProgram = vi.fn(async () => exited());
+    const deps = { secretEnvDenylist: [], runProgram };
+
+    const [unknown, blank, timeout] = await Promise.all([
+      callTool(deps, fake.browser, { code: 'return 1;', pageId: 'wrong-shape' }),
+      callTool(deps, fake.browser, { code: '   ' }),
+      callTool(deps, fake.browser, {
+        code: 'return 1;',
+        timeout_ms: MAX_BROWSER_EXECUTE_TIMEOUT_MS + 1,
+      }),
+    ]);
+
+    expect(unknown).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+    expect(blank).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+    expect(timeout).toMatchObject({ isError: true, errorKind: 'invalid_input' });
+    expect(fake.openCommandSession).not.toHaveBeenCalled();
+    expect(runProgram).not.toHaveBeenCalled();
+  });
+
+  it('fails clearly without a browser and does not create the workspace', async () => {
+    const runProgram = vi.fn(async () => exited());
+    const result = await callTool(
+      { secretEnvDenylist: [], runProgram },
+      undefined,
+      { code: 'return 1;' },
+    );
+
+    expect(result).toMatchObject({ isError: true, errorKind: 'execution_error' });
+    expect(result.content).toContain('requires an active browser session');
+    expect(existsSync(join(runDir, 'scratch/workspace'))).toBe(false);
+    expect(runProgram).not.toHaveBeenCalled();
+  });
+});

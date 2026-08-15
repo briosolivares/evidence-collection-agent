@@ -64,13 +64,18 @@ export async function prepareBrowserScriptTarget(
  * never reaches into controller-private state directly. */
 export interface BrowserScriptReconcileParams {
   context: BrowserContext;
-  /** The one pre-existing page permanently excluded from the page registry;
-   * see the controller constructor's `preexistingSessionPage` doc. */
-  preexistingSessionPage: Page | undefined;
+  /** Pages that predate this controller and remain permanently excluded from
+   * its registry. Managed sessions normally have one; attached Chrome can
+   * have many user-owned tabs. */
+  preexistingSessionPages: ReadonlySet<Page>;
   trackedPages: Map<Page, PageRecord>;
   createDocumentId: () => string;
   forgetPage: (pageId: string) => void;
   registerPage: (page: Page) => PageRecord;
+  /** Optional ownership filter used by the URL-free v3 command path. The
+   * legacy secondary-client script path omits it and adopts every non-
+   * pre-existing page for backward compatibility. */
+  shouldRegisterPage?: (page: Page) => Promise<boolean>;
   getActivePage: () => Page | undefined;
   setActivePage: (page: Page) => void;
 }
@@ -124,11 +129,12 @@ export async function reconcileAfterBrowserScript(
 ): Promise<void> {
   const {
     context,
-    preexistingSessionPage,
+    preexistingSessionPages,
     trackedPages,
     createDocumentId,
     forgetPage,
     registerPage,
+    shouldRegisterPage,
     getActivePage,
     setActivePage,
   } = params;
@@ -152,13 +158,16 @@ export async function reconcileAfterBrowserScript(
     );
   }
 
-  // Step 1. The pre-existing session page is excluded exactly as it always
-  // has been (see the controller constructor's preexistingSessionPage doc) —
+  // Step 1. Pre-existing session pages are excluded exactly as they always
+  // have been (see the controller's preexistingSessionPages option) —
   // this is the first code path that ever calls context.pages() directly,
   // and without the exclusion it would silently adopt that page into the
   // registry the moment any browser script ran.
   for (const page of livePages) {
-    if (page === preexistingSessionPage) {
+    if (preexistingSessionPages.has(page)) {
+      continue;
+    }
+    if (shouldRegisterPage !== undefined && !(await shouldRegisterPage(page))) {
       continue;
     }
     registerPage(page);

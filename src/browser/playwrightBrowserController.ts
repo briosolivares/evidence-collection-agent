@@ -44,6 +44,7 @@ import {
 import {
   BrowserRefNotFoundError,
   type BrowserCapturedText,
+  type BrowserCommandSession,
   type BrowserController,
   type BrowserDownloadResult,
   type BrowserDownloadTarget,
@@ -75,6 +76,7 @@ import {
 } from './pageElementRefs.js';
 import { evaluateJavaScript } from './pageJavaScript.js';
 import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
+import { openPlaywrightCommandSession } from './browserCommandSession.js';
 import {
   assertLoopbackCdpUrl,
   CDP_LOOPBACK_HOST,
@@ -356,15 +358,18 @@ export interface PlaywrightBrowserControllerOptions {
    * `docs/browserbase-provider-plan.md` §6 for the relay design that would
    * be required to restore browser scripts on a remote provider. */
   cdpUrl?: string;
-  /** The one pre-existing page {@link prepareSessionPage} leaves open (the
-   * profile's original tab, or a fresh replacement) — permanently excluded
-   * from the page registry, exactly as before this class ever inspected
-   * `context.pages()` directly. Without this, a `refreshAfterBrowserScript`
-   * rescan of `context.pages()` would adopt it as a "tracked page" the first
-   * time a browser script ran, silently changing what
+  /** One pre-existing page {@link prepareSessionPage} leaves open (the
+   * profile's original tab, or a fresh replacement). Retained for callers
+   * that can have only one; merged with `preexistingSessionPages`. */
+  preexistingSessionPage?: Page;
+  /** Pages that existed before this controller began owning task work —
+   * permanently excluded from the page registry. Attached Chrome may have
+   * many user-owned tabs, while managed providers normally pass only the
+   * singular option above. Without this set, an external-command refresh
+   * would silently adopt unrelated user pages and expose them through
    * {@link PlaywrightBrowserController.pages} and popup/task-tab fallbacks
    * report. */
-  preexistingSessionPage?: Page;
+  preexistingSessionPages?: readonly Page[];
   /**
    * Release the underlying browser session. Defaults to closing the
    * `context`, which is right for a locally launched persistent context: the
@@ -400,6 +405,18 @@ export class PlaywrightBrowserController implements BrowserController {
   /** Every page the runtime owns identity for, in tracking order. The
    * pre-existing session page and download capture pages never enter. */
   private readonly trackedPages = new Map<Page, PageRecord>();
+  /** Pages for which this controller has positive run-ownership evidence.
+   * This is deliberately narrower than `context.pages()`: attached Chrome
+   * can gain unrelated user tabs while a task is running. Insertion order is
+   * creation/claim order and is reversed by closeTaskPages(). */
+  private readonly ownedPages = new Set<Page>();
+  /** Target ids returned by this run's raw Target.createTarget calls but not
+   * yet paired with Playwright's asynchronously surfaced Page object. */
+  private readonly pendingOwnedTargetIds = new Set<string>();
+  /** Asynchronous opener/target ownership checks started by context page
+   * events. Cleanup drains this set before taking its reverse-order snapshot
+   * so a just-opened popup cannot race past the run's finally block. */
+  private readonly pendingPageClaims = new Set<Promise<void>>();
   /** Pages we are about to create for internal plumbing (download capture).
    * The context's 'page' event fires for them like any other page; this
    * counter lets the listener count them out instead of registering them.
@@ -414,6 +431,14 @@ export class PlaywrightBrowserController implements BrowserController {
    * script until {@link handleDialog} is called — which is why an action
    * sequence stops at a dialog and reports it. */
   private readonly pendingDialogs = new Map<string, PendingDialogRecord>();
+  /** Command-session detachers transferred to the controller because their
+   * in-flight renderer command opened a dialog. Detaching that session first
+   * makes Chrome silently dismiss the dialog; retaining it until the explicit
+   * decision preserves the no-automatic-answer contract. */
+  private readonly deferredCommandSessionDetachers = new Map<
+    string,
+    Set<() => Promise<void>>
+  >();
   /** Sequence-scoped watchers subscribed to page activity (navigations,
    * new pages, dialogs, downloads). */
   private readonly activityListeners = new Set<() => void>();
@@ -440,7 +465,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   private readonly context: BrowserContext;
   private readonly cdpUrl: string | undefined;
-  private readonly preexistingSessionPage: Page | undefined;
+  private readonly preexistingSessionPages: ReadonlySet<Page>;
   private readonly closeSession: () => Promise<void>;
   private readonly downloadReader: BrowserDownloadReader;
   private readonly uploadEncoder: BrowserUploadEncoder;
@@ -449,7 +474,10 @@ export class PlaywrightBrowserController implements BrowserController {
   constructor(options: PlaywrightBrowserControllerOptions) {
     this.context = options.context;
     this.cdpUrl = options.cdpUrl;
-    this.preexistingSessionPage = options.preexistingSessionPage;
+    this.preexistingSessionPages = new Set([
+      ...(options.preexistingSessionPages ?? []),
+      ...(options.preexistingSessionPage !== undefined ? [options.preexistingSessionPage] : []),
+    ]);
     this.closeSession = options.closeSession ?? (() => this.context.close());
     this.downloadReader = options.downloadReader ?? localDownloadReader;
     this.uploadEncoder = options.uploadEncoder ?? localUploadEncoder;
@@ -464,17 +492,18 @@ export class PlaywrightBrowserController implements BrowserController {
       this.prepareForBrowserScript = (pageId?: string) => this.doPrepareForBrowserScript(pageId);
       this.refreshAfterBrowserScript = () => this.doRefreshAfterBrowserScript();
     }
-    // Track every page the browser creates. Task tabs register themselves in
-    // newTab() (registerPage dedupes), so the pages that reach registerPage
-    // *only* through this listener are popups — including `noopener` popups,
-    // whose `page.opener()` is null and which a per-page 'popup' listener
-    // could miss.
+    // A context page event alone is not ownership evidence in attached mode:
+    // it may be a user opening a tab concurrently. Task tabs claim themselves
+    // in newTab(); this listener claims only popups of an owned page or exact
+    // target ids returned by this run's Target.createTarget commands.
     this.context.on('page', (page) => {
       if (this.pendingInternalPages > 0) {
         this.pendingInternalPages -= 1;
         return;
       }
-      this.registerPage(page);
+      const claim = this.claimPageFromCreationEvent(page).catch(() => undefined);
+      this.pendingPageClaims.add(claim);
+      void claim.finally(() => this.pendingPageClaims.delete(claim));
     });
   }
 
@@ -490,9 +519,7 @@ export class PlaywrightBrowserController implements BrowserController {
       }
 
       const page = await this.context.newPage();
-      // The context listener normally registered it already; this is the
-      // dedupe-safe guarantee that a task tab is tracked.
-      this.registerPage(page);
+      this.registerOwnedPage(page);
       this.activePage = page;
     });
   }
@@ -609,7 +636,16 @@ export class PlaywrightBrowserController implements BrowserController {
     const liveRecords = [...this.trackedPages.values()].filter(
       (record) => !record.page.isClosed(),
     );
-    return Promise.all(liveRecords.map((record) => this.describePage(record)));
+    const blockedPageIds = new Set(
+      [...this.pendingDialogs.values()].map((pending) => pending.info.pageId),
+    );
+    return Promise.all(
+      liveRecords.map((record) =>
+        blockedPageIds.has(record.pageId)
+          ? this.describePageIdentity(record)
+          : this.describePage(record),
+      ),
+    );
   }
 
   async observe(request: BrowserObserveRequest = {}): Promise<BrowserObservation> {
@@ -764,6 +800,29 @@ export class PlaywrightBrowserController implements BrowserController {
     };
   }
 
+  async openCommandSession(pageId?: string): Promise<BrowserCommandSession> {
+    this.requireOpenContext();
+    // Resolve controller identity exactly once before attachment. newTab()
+    // already registers the selected page; registerPage is idempotent so this
+    // remains safe for any later lifecycle path that restores selection.
+    const record =
+      pageId === undefined
+        ? this.registerPage(this.requirePage())
+        : this.requireTrackedPage(pageId);
+    return openPlaywrightCommandSession(
+      this.context,
+      record.page,
+      record.pageId,
+      {
+        onTargetCreated: (targetId) => this.claimRawCreatedTarget(targetId),
+        handleDialogCommand: (params) =>
+          this.handleRawDialogCommand(record.pageId, params),
+        release: (detach) =>
+          this.releaseCommandSession(record.pageId, detach),
+      },
+    );
+  }
+
   /**
    * Execute a receipted action sequence against one page and document.
    *
@@ -801,10 +860,18 @@ export class PlaywrightBrowserController implements BrowserController {
     // the unknown-id error rather than rejecting inside Playwright.
     this.pendingDialogs.delete(request.dialogId);
 
-    if (request.action === 'accept') {
-      await pending.dialog.accept(request.promptText);
-    } else {
-      await pending.dialog.dismiss();
+    try {
+      if (request.action === 'accept') {
+        await pending.dialog.accept(request.promptText);
+      } else {
+        await pending.dialog.dismiss();
+      }
+    } finally {
+      // A timed-out browser program may have transferred its blocked CDP
+      // session to the controller. The explicit decision unblocks that
+      // original command; only now is it safe to detach without silently
+      // choosing a dialog outcome.
+      await this.detachDeferredCommandSessions(pending.info.pageId);
     }
     this.signalActivity();
 
@@ -929,7 +996,9 @@ export class PlaywrightBrowserController implements BrowserController {
         await doomed.close({ runBeforeUnload: false }).catch(() => undefined);
       }
       this.requireOpenContext();
-      this.activePage = await this.context.newPage();
+      const replacement = await this.context.newPage();
+      this.registerOwnedPage(replacement);
+      this.activePage = replacement;
     });
   }
 
@@ -962,20 +1031,53 @@ export class PlaywrightBrowserController implements BrowserController {
    * only enforces the controller's own open/closed contract before handing
    * off its private collaborators as explicit closures.
    */
-  private async doRefreshAfterBrowserScript(): Promise<void> {
+  async refreshAfterExternalCommands(): Promise<void> {
     this.requireOpenContext();
+    await this.reconcileExternalPages(true);
+    // A returned target that is still absent after a complete context rescan
+    // was closed before Playwright exposed it. Do not retain stale ids across
+    // later, unrelated user page creations.
+    this.pendingOwnedTargetIds.clear();
+  }
+
+  listPendingDialogs(): readonly BrowserDialog[] {
+    return [...this.pendingDialogs.values()].map((pending) => ({ ...pending.info }));
+  }
+
+  closeTaskPages(): Promise<void> {
+    return this.serializeTabLifecycle(async () => {
+      const errors = await this.closeOwnedPages();
+      if (errors.length > 0) {
+        throw new Error(`Could not close every task page: ${errors.join('; ')}`);
+      }
+    });
+  }
+
+  private async reconcileExternalPages(ownedOnly: boolean): Promise<void> {
     await reconcileAfterBrowserScript({
       context: this.context,
-      preexistingSessionPage: this.preexistingSessionPage,
+      preexistingSessionPages: this.preexistingSessionPages,
       trackedPages: this.trackedPages,
       createDocumentId: () => this.state.createDocumentId(),
       forgetPage: (pageId) => this.state.forgetPage(pageId),
-      registerPage: (page) => this.registerPage(page),
+      registerPage: (page) => this.registerOwnedPage(page),
+      ...(ownedOnly
+        ? { shouldRegisterPage: (page: Page) => this.hasOwnershipEvidence(page) }
+        : {}),
       getActivePage: () => this.activePage,
       setActivePage: (page) => {
         this.activePage = page;
       },
     });
+  }
+
+  private async doRefreshAfterBrowserScript(): Promise<void> {
+    this.requireOpenContext();
+    // Compatibility for the soon-to-be-retired external Playwright script
+    // path: it had no command-session hook through which to report exact raw
+    // target creation, so it retains its historical "adopt every new page"
+    // behavior until Step 6 removes it.
+    await this.reconcileExternalPages(false);
   }
 
   pdfPageSource(): Pick<BrowserContext, 'newPage'> {
@@ -1002,10 +1104,25 @@ export class PlaywrightBrowserController implements BrowserController {
 
     this.closed = true;
     this.closePromise = this.serializeTabLifecycle(async () => {
-      this.activePage = undefined;
+      const pageErrors = await this.closeOwnedPages();
+      let sessionError = false;
       // Whatever the provider injected: close the local persistent context,
       // or disconnect and explicitly release a billable remote session.
-      await this.closeSession();
+      try {
+        await this.closeSession();
+      } catch {
+        sessionError = true;
+      }
+      if (pageErrors.length > 0 || sessionError) {
+        throw new Error(
+          [
+            ...(pageErrors.length > 0
+              ? [`task-page cleanup failed: ${pageErrors.join('; ')}`]
+              : []),
+            ...(sessionError ? ['browser-session cleanup failed'] : []),
+          ].join('; '),
+        );
+      }
     });
     return this.closePromise;
   }
@@ -1032,9 +1149,195 @@ export class PlaywrightBrowserController implements BrowserController {
     // so this is inert for local Chrome, which has no equivalent failure.
     if (this.context.browser()?.isConnected() === false) {
       throw new Error(
-        'The browser has been disconnected; the remote session has ended and cannot be reused.',
+        'The browser session has been disconnected; the remote session has ended and cannot be reused.',
       );
     }
+  }
+
+  /** Claim a page surfaced by Playwright only when its opener or an exact
+   * raw-CDP target result proves that this task created it. Event callbacks
+   * cannot propagate errors to their emitter, so a later explicit refresh is
+   * still the authoritative, failing reconciliation boundary. */
+  private async claimPageFromCreationEvent(page: Page): Promise<void> {
+    if (this.closed || page.isClosed()) return;
+    if (await this.hasOwnershipEvidence(page)) {
+      this.registerOwnedPage(page);
+    }
+  }
+
+  /** Record one exact target returned by this run's Target.createTarget and
+   * pair it with the corresponding Playwright page when available. */
+  private async claimRawCreatedTarget(targetId: string): Promise<void> {
+    this.pendingOwnedTargetIds.add(targetId);
+    for (const page of this.context.pages()) {
+      if (
+        page.isClosed() ||
+        this.preexistingSessionPages.has(page) ||
+        this.ownedPages.has(page)
+      ) {
+        continue;
+      }
+      if ((await this.targetIdForPage(page)) === targetId) {
+        this.pendingOwnedTargetIds.delete(targetId);
+        this.registerOwnedPage(page);
+        return;
+      }
+    }
+  }
+
+  /** Whether a live, non-pre-existing page belongs to this task. */
+  private async hasOwnershipEvidence(page: Page): Promise<boolean> {
+    if (this.ownedPages.has(page)) return true;
+    if (this.preexistingSessionPages.has(page) || page.isClosed()) return false;
+
+    try {
+      const opener = await page.opener();
+      if (opener !== null && this.ownedPages.has(opener)) return true;
+    } catch {
+      if (page.isClosed()) return false;
+    }
+
+    if (this.pendingOwnedTargetIds.size === 0) return false;
+    const targetId = await this.targetIdForPage(page);
+    if (targetId === undefined || !this.pendingOwnedTargetIds.has(targetId)) {
+      return false;
+    }
+    this.pendingOwnedTargetIds.delete(targetId);
+    return true;
+  }
+
+  /** Resolve a page's target through a short-lived attached session. Failure
+   * is treated as no ownership evidence here; the real command/refresh path
+   * still performs its own loud liveness checks. */
+  private async targetIdForPage(page: Page): Promise<string | undefined> {
+    let session: Awaited<ReturnType<BrowserContext['newCDPSession']>> | undefined;
+    try {
+      session = await this.context.newCDPSession(page);
+      const result = await session.send('Target.getTargetInfo');
+      const targetId = result.targetInfo?.targetId;
+      return typeof targetId === 'string' && targetId.length > 0
+        ? targetId
+        : undefined;
+    } catch {
+      return undefined;
+    } finally {
+      await session?.detach().catch(() => undefined);
+    }
+  }
+
+  private registerOwnedPage(page: Page): PageRecord {
+    if (this.preexistingSessionPages.has(page)) {
+      throw new Error('A pre-existing user page cannot be claimed as a task page.');
+    }
+    this.ownedPages.add(page);
+    return this.registerPage(page);
+  }
+
+  private async handleRawDialogCommand(
+    pageId: string,
+    params: Record<string, unknown>,
+  ): Promise<unknown> {
+    if (typeof params.accept !== 'boolean') {
+      throw new TypeError('Page.handleJavaScriptDialog requires a boolean accept parameter.');
+    }
+    if (params.promptText !== undefined && typeof params.promptText !== 'string') {
+      throw new TypeError('Page.handleJavaScriptDialog promptText must be a string.');
+    }
+    if (params.accept === false && params.promptText !== undefined) {
+      throw new TypeError('promptText is allowed only when accepting a dialog.');
+    }
+    const pending = [...this.pendingDialogs.values()].find(
+      (candidate) => candidate.info.pageId === pageId,
+    );
+    if (pending === undefined) {
+      throw new Error(`No browser dialog is pending for pageId ${pageId}.`);
+    }
+    await this.handleDialog({
+      dialogId: pending.info.dialogId,
+      action: params.accept ? 'accept' : 'dismiss',
+      ...(typeof params.promptText === 'string'
+        ? { promptText: params.promptText }
+        : {}),
+    });
+    return {};
+  }
+
+  private async releaseCommandSession(
+    pageId: string,
+    detach: () => Promise<void>,
+  ): Promise<void> {
+    // Let Playwright deliver a dialog event queued by the just-completed CDP
+    // message before deciding whether detaching would answer it implicitly.
+    await Promise.resolve();
+    const blocked = [...this.pendingDialogs.values()].some(
+      (pending) => pending.info.pageId === pageId,
+    );
+    if (!blocked) {
+      await detach();
+      return;
+    }
+    let detachers = this.deferredCommandSessionDetachers.get(pageId);
+    if (detachers === undefined) {
+      detachers = new Set();
+      this.deferredCommandSessionDetachers.set(pageId, detachers);
+    }
+    detachers.add(detach);
+  }
+
+  private async detachDeferredCommandSessions(pageId: string): Promise<void> {
+    const detachers = this.deferredCommandSessionDetachers.get(pageId);
+    if (detachers === undefined) return;
+    this.deferredCommandSessionDetachers.delete(pageId);
+    await Promise.all([...detachers].map((detach) => detach()));
+  }
+
+  /** Close in reverse claim order and collect every failure so one wedged
+   * page never prevents cleanup attempts for the rest. */
+  private async closeOwnedPages(): Promise<string[]> {
+    const errors: string[] = [];
+    await Promise.all([...this.pendingPageClaims]);
+    try {
+      // A page event may be queued just behind the command that returned to
+      // the worker. One explicit ownership-only scan closes that race without
+      // adopting unrelated user tabs or creating a replacement page.
+      if (
+        this.ownedPages.size > 0 ||
+        this.pendingOwnedTargetIds.size > 0 ||
+        this.pendingPageClaims.size > 0
+      ) {
+        for (const page of this.context.pages()) {
+          if (await this.hasOwnershipEvidence(page)) {
+            this.registerOwnedPage(page);
+          }
+        }
+      }
+      await Promise.all([...this.pendingPageClaims]);
+    } catch {
+      errors.push('live task pages could not be enumerated before cleanup');
+    }
+    this.activePage = undefined;
+    this.pendingOwnedTargetIds.clear();
+    for (const page of [...this.ownedPages].reverse()) {
+      const pageId = this.trackedPages.get(page)?.pageId ?? '(unregistered)';
+      if (page.isClosed()) {
+        this.ownedPages.delete(page);
+        continue;
+      }
+      try {
+        await page.close({ runBeforeUnload: false });
+      } catch {
+        // Deliberately omit the driver error: remote Playwright errors may
+        // retain a provider connection URL. Identity plus the failed action
+        // is enough for an actionable aggregate cleanup error.
+        errors.push(`pageId ${pageId} did not close`);
+      }
+      if (page.isClosed()) this.ownedPages.delete(page);
+      await this.detachDeferredCommandSessions(pageId);
+    }
+    for (const pageId of [...this.deferredCommandSessionDetachers.keys()]) {
+      await this.detachDeferredCommandSessions(pageId);
+    }
+    return errors;
   }
 
   /** Track a page's identity: assign a stable pageId, record every current
@@ -1128,6 +1431,7 @@ export class PlaywrightBrowserController implements BrowserController {
     });
     page.on('close', () => {
       this.trackedPages.delete(page);
+      this.ownedPages.delete(page);
       this.state.forgetPage(record.pageId);
       // A closed page's dialogs can never be answered; dropping them keeps
       // handle_dialog's "unknown dialog" error honest instead of handing
@@ -1140,6 +1444,7 @@ export class PlaywrightBrowserController implements BrowserController {
       if (this.activePage === page) {
         this.activePage = undefined;
       }
+      void this.detachDeferredCommandSessions(record.pageId);
       this.signalActivity();
     });
 

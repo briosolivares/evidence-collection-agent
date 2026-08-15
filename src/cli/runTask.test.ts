@@ -135,7 +135,7 @@ describe('runTask', () => {
   }, TEST_TIMEOUT_MS);
 
   afterEach(async () => {
-    await browser.closeTab();
+    await browser.closeTaskPages();
   });
 
   afterAll(async () => {
@@ -287,6 +287,52 @@ describe('runTask', () => {
       await expect(
         readJson<RunMetrics>(join(result.runDir, METRICS_FILENAME)),
       ).resolves.toMatchObject({ status: 'verified', turns: 24 });
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'closes an owned popup when a run fails before submission',
+    async () => {
+      const contract = {
+        contract: {
+          outputs: [
+            {
+              id: 'note',
+              kind: 'download',
+              count: { exact: 1 },
+              filenamePattern: 'note.txt',
+            },
+          ],
+        },
+      };
+      const popupUrl = fixtureServer.url('/second.html');
+      // The missing third response deliberately crashes the model call after
+      // the popup exists. runTask's finally block must still close the whole
+      // owned page graph, not only the selected task tab.
+      const worker = scriptModel([
+        toolResponse('c-popup', 'set_output_contract', contract),
+        toolResponse('open-popup', 'execute_javascript', {
+          code: `window.open(${JSON.stringify(popupUrl)}, '_blank'); return true;`,
+        }),
+      ]);
+
+      await expect(
+        runTask('Open a popup, then fail before publishing.', {
+          browser,
+          runsBaseDir,
+          callModel: worker.callModel,
+          maxTurns: 5,
+          maxContextTokens: 10_000,
+          harness: { contractAuthor: 'worker' },
+        }),
+      ).rejects.toThrow(/only 2 responses were scripted/);
+
+      expect(await browser.pages()).toEqual([]);
+      await browser.newTab();
+      await browser.goto(fixtureServer.url('/second.html'));
+      expect(await browser.title()).toBe('Second Fixture Page');
+      await browser.closeTaskPages();
     },
     TEST_TIMEOUT_MS,
   );

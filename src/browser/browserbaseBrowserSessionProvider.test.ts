@@ -265,6 +265,8 @@ describe('BrowserbaseBrowserSessionProvider browser-script support', () => {
 
     expect(controller.prepareForBrowserScript).toBeUndefined();
     expect(controller.refreshAfterBrowserScript).toBeUndefined();
+    expect(typeof controller.openCommandSession).toBe('function');
+    expect(typeof controller.refreshAfterExternalCommands).toBe('function');
     expect(() => assertBrowserScriptSupportIsPaired(controller)).not.toThrow();
   });
 });

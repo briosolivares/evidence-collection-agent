@@ -122,6 +122,22 @@ class FakeBrowser implements BrowserController {
     throw new Error('Unexpected browser dialog decision.');
   }
 
+  async openCommandSession(): Promise<never> {
+    throw new Error('Unexpected browser command session.');
+  }
+
+  async refreshAfterExternalCommands(): Promise<void> {
+    throw new Error('Unexpected external browser command refresh.');
+  }
+
+  listPendingDialogs(): readonly [] {
+    return [];
+  }
+
+  async closeTaskPages(): Promise<void> {
+    this.activeTab = false;
+  }
+
   async close(): Promise<void> {
     this.activeTab = false;
     this.sessionClosed = true;

@@ -546,13 +546,13 @@ export async function runTask(
   } finally {
     try {
       if (tabOpened) {
-        await config.browser.closeTab();
+        await config.browser.closeTaskPages();
       }
     } finally {
       try {
         // Closed before finalizeManifest, without masking an in-flight
         // error: an ordinary awaited call in its own finally layer, exactly
-        // like closeTab/tracing.close beside it — a failure here propagates
+        // like closeTaskPages/tracing.close beside it — a failure here propagates
         // normally rather than being swallowed.
         await checkpointWriter.close();
       } finally {
@@ -938,7 +938,7 @@ export async function resumeTask(
     } finally {
       try {
         if (tabOpened) {
-          await config.browser.closeTab();
+          await config.browser.closeTaskPages();
         }
       } finally {
         try {

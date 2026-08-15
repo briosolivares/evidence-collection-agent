@@ -92,6 +92,15 @@ export function stubBrowser(): BrowserController {
       page: stubPage(),
       pendingDialogs: [],
     })),
+    openCommandSession: vi.fn(async (pageId = 'page-stub') => ({
+      pageId,
+      targetId: 'target-stub',
+      send: vi.fn(async () => ({})),
+      close: vi.fn(async () => {}),
+    })),
+    refreshAfterExternalCommands: vi.fn(async () => {}),
+    listPendingDialogs: vi.fn(() => []),
+    closeTaskPages: vi.fn(async () => {}),
     close: vi.fn(async () => {}),
   };
 }

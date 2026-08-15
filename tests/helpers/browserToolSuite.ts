@@ -54,7 +54,7 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
   });
 
   afterEach(async () => {
-    await controller.closeTab();
+    await controller.closeTaskPages();
     rmSync(runDir, { recursive: true, force: true });
   });
 

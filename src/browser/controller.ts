@@ -141,6 +141,25 @@ export interface BrowserScriptSetup {
   selectedPageTargetId: string;
 }
 
+/**
+ * One provider-neutral command channel pinned to one exact live browser page.
+ *
+ * The controller owns the underlying transport. Callers receive neither a
+ * Playwright object nor the provider's CDP connection URL: only stable page
+ * identity, Chrome target identity, and the ability to issue commands against
+ * that already-attached target.
+ */
+export interface BrowserCommandSession {
+  /** Stable controller identity of the page resolved when the session opened. */
+  readonly pageId: string;
+  /** Chrome target identity obtained from the same attached CDP session. */
+  readonly targetId: string;
+  /** Send one arbitrary Chrome DevTools Protocol command to this target. */
+  send(method: string, params?: Record<string, unknown>): Promise<unknown>;
+  /** Detach the underlying CDP session. Repeated calls are safe. */
+  close(): Promise<void>;
+}
+
 /** Error raised when a ref from an outline no longer identifies an element. */
 export class BrowserRefNotFoundError extends Error {
   /** Ref that could not be resolved. */
@@ -375,6 +394,43 @@ export interface BrowserController {
    *   retained observation of that page, or its document has been replaced
    */
   captureText?(request?: BrowserTextCaptureRequest): Promise<BrowserCapturedText>;
+
+  /**
+   * Open a CDP command channel pinned to one exact tracked page.
+   *
+   * Unlike {@link prepareForBrowserScript}, this never hands a connection URL
+   * to its caller. The controller resolves `pageId` once, creates one attached
+   * CDP session for that page, reads the target id through that same session,
+   * and retains it until the returned session is closed. A missing or stale
+   * page rejects rather than falling back to another open tab.
+   *
+   * @param pageId - page to bind; omitted means the selected task page
+   * @returns a target-pinned command session containing no transport details
+   */
+  openCommandSession(pageId?: string): Promise<BrowserCommandSession>;
+
+  /**
+   * Reconcile controller state after commands may have changed pages outside
+   * the controller's ordinary action methods.
+   *
+   * This capability is provider-neutral and unconditional: both local Chrome
+   * and a Browserbase-backed Playwright context can be rescanned without
+   * exposing their connection details. It invalidates observations that may
+   * have become stale, adopts newly visible pages, and fails loudly when the
+   * underlying browser is no longer usable.
+   */
+  refreshAfterExternalCommands(): Promise<void>;
+
+  /** Return every JavaScript dialog currently blocking an owned page. */
+  listPendingDialogs(): readonly BrowserDialog[];
+
+  /**
+   * Close every page created for the current task, including owned popups and
+   * raw-CDP targets, while leaving pre-existing or concurrently user-created
+   * pages alone. Every owned page is attempted even if an earlier close
+   * fails; repeated calls are safe.
+   */
+  closeTaskPages(): Promise<void>;
 
   /**
    * Prepare this session to be driven by an external browser script: a
