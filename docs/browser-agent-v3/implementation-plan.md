@@ -43,7 +43,10 @@ updating the design and this plan in the same commit.
 1. **One persistent worker conversation.** The worker keeps its full useful
    history across verifier corrections.
 2. **Sequential tools.** Tool calls execute in response order. There is no
-   access-key scheduler or abandoned-resource ledger in the v3 loop.
+   access-key scheduler in the v3 loop. The generic pipeline's session-owned
+   busy-resource registry remains only as a fail-closed timeout guard: if a
+   timed-out promise may still be mutating a resource, a later conflicting
+   call must not race it merely because v3 itself dispatches sequentially.
 3. **Eight worker-visible capabilities.** `browser_execute`,
    `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
    `ask_user`, and `finish`. Internals may use more modules; the model-facing
@@ -187,18 +190,18 @@ published with correct manifest roles and verified hashes.
 
 ### Step 3 — v3 sequential worker session
 
-- [ ] Create a new v3 system prompt whose static prefix and tool order are
+- [x] Create a new v3 system prompt whose static prefix and tool order are
   deterministic.
-- [ ] Implement the single-conversation sequential loop over the existing
+- [x] Implement the single-conversation sequential loop over the existing
   strict streaming model driver.
-- [ ] Execute multiple tool calls in response order and return results in the
+- [x] Execute multiple tool calls in response order and return results in the
   same order.
-- [ ] Preserve result offloading, stale browser-result collapse, protocol
+- [x] Preserve result offloading, stale browser-result collapse, protocol
   correction limits, context/turn/wall/token budgets, transcript events, and
   metrics using smaller v3-owned state.
-- [ ] Treat zero-tool responses as working and accept completion only through
+- [x] Treat zero-tool responses as working and accept completion only through
   the exclusive `finish` call.
-- [ ] Add snapshot/restore of v3 conversation state.
+- [x] Add snapshot/restore of v3 conversation state.
 
 **Gate:** scripted model tests prove ordering, malformed-call recovery,
 offloading, budget termination, explicit finish, cancellation, and byte-stable
@@ -289,9 +292,9 @@ proved, even if supporting code already exists.
 | Browser-harness reference used | Pinned commit plus design adaptation table | Complete |
 | Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete for Step 1 |
 | Editable run helpers and reviewed promotion | Run artifact/patch tests + docs | Pending |
-| Compact v3 tool surface | Registry/schema snapshot | Pending |
+| Compact v3 tool surface | Registry/schema snapshot | Complete for Step 3 |
 | Sherlock TUI preserved | TUI integration suite + fixture smoke | Pending |
-| Streaming main loop preserved | Model/loop tests + transcript | Pending |
+| Streaming main loop preserved | Model/loop tests + transcript | V3 session complete; production cutover pending |
 | Evals/graders preserved | Eval runner/grader suite + boundary inspection | Pending |
 | Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | Pending |
 | Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Provider-neutral command seam complete; cutover/live smoke pending |
@@ -408,6 +411,60 @@ proved, even if supporting code already exists.
 - The TUI question dialog carries but does not yet render `ask_user.context`;
   that presentation update remains part of the production cutover. No live
   Browserbase smoke or eval re-baseline was run.
+
+### 2026-08-15 — Step 3 sequential worker session complete
+
+- The implementation is split into a static prompt/tool-prefix slice and a
+  clean v3 session slice, with an independent preservation review of the
+  current model driver, budget, transcript, result-offload, checkpoint-hook,
+  and context-view contracts. No production composition cutover belongs in
+  this step.
+- The loop contract is fixed: accepted content blocks, never `stop_reason`,
+  determine calls; ordinary calls execute strictly one at a time in response
+  order; every call receives one ordered result; no-tool responses receive a
+  short continuation prompt; and `finish` is accepted only as the sole call in
+  a response. Deterministic checks and verifier authority remain Step 4.
+- Only the two newest non-pipeline-error `browser_execute` results stay full in the
+  model request view. Older results become deterministic identity/status/page
+  stubs without mutating full conversation or transcript history.
+- A preservation review corrected one over-broad simplification assumption:
+  v3 removes the access-key scheduler, but retains the generic pipeline's
+  session-owned timeout-abandonment registry. Sequential dispatch cannot make
+  a timed-out promise stop running, so racing a later conflicting call would
+  be unsafe even without intentional parallelism.
+- Added one static `V3_SYSTEM_PROMPT`, a strict intercepted `finish` schema,
+  the exact eight-tool `V3_TOOL_ORDER`, a run-scoped execution registry, and a
+  deeply frozen process-wide `V3_API_TOOL_DEFS`. Independent constructions
+  serialize byte-for-byte identically and contain no retired protocol names.
+- Added a clean v3 worker session over `ModelDriver.generate`. It stores one
+  full conversation, executes ordinary calls sequentially, answers every
+  attempted call in order (including mixed-`finish` refusals), treats prose as
+  continuation, and exposes exclusive validated `finish` requests to the
+  Step 4 coordinator. Per-call lifecycle hooks persist `not_started`, a
+  conservative pre-effect `uncertain` boundary, and bounded results; a
+  post-effect persistence failure stops instead of inviting unsafe retry.
+- Model accounting now separates aggregate known billable usage from the
+  accepted request's context size. A complete `max_tokens` attempt plus its
+  enlarged replacement is charged as one logical worker turn with both usage
+  records, while peak context uses only the accepted response. If the
+  replacement fails before reporting usage, a typed fatal error preserves the
+  underlying cause and carries the first attempt's known usage for both v3
+  and legacy role accounting. Attempts with no complete provider usage remain
+  inherently unmeasurable.
+- Added the pure v3 request view: only two newest non-pipeline-error
+  `browser_execute` results remain expanded, older results become stable
+  identity/status/page stubs, and full history is untouched. The shared model
+  request builder now recognizes both legacy and v3 stubs as cache frontiers.
+- Added a vertical scripted acceptance gate using the real v3 registry: it
+  writes a private CSV, publishes exact bytes with requested-output/evidence
+  roles and source provenance, verifies manifest hashes, restores the same
+  conversation from a snapshot, continues after a prose-only turn, and ends
+  only at an exclusive `finish` request.
+- Coordinator gates passed: 106/106 focused prompt/registry/model/session/
+  accounting tests; 140/140 focused v3 plus legacy loop regressions;
+  `npm run typecheck`; `git diff --check`; and the complete hermetic suite,
+  157 files / 1,976 tests in 43.64 seconds. No live Browserbase smoke or eval
+  re-baseline was run.
 
 ## Rules for coordinators and subagents
 

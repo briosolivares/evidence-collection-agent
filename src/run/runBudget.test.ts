@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Message, ModelResponse } from '../loop/messages.js';
-import { ModelResponseRejectedError } from '../model/modelDriver.js';
+import {
+  ModelGenerationFailedError,
+  ModelResponseRejectedError,
+} from '../model/modelDriver.js';
 import {
   captureRunBudgetSnapshot,
   createRunBudgetTracker,
@@ -309,5 +312,27 @@ describe('withBudgetAccounting', () => {
 
     await expect(wrapped(messages)).rejects.toBe(rejection);
     expect(tracker.roleUsage().initializer).toMatchObject({ turns: 1, outputTokens: 50 });
+  });
+
+  it('charges known complete-attempt usage before a fatal retry failure propagates', async () => {
+    const tracker = createRunBudgetTracker(UNBOUNDED);
+    const failure = new ModelGenerationFailedError(
+      new Error('replacement transport failed'),
+      USAGE,
+    );
+    const wrapped = withBudgetAccounting(
+      async () => {
+        throw failure;
+      },
+      tracker,
+      'verifier',
+    );
+
+    await expect(wrapped(messages)).rejects.toBe(failure);
+    expect(tracker.roleUsage().verifier).toMatchObject({
+      turns: 1,
+      inputTokens: 100,
+      outputTokens: 50,
+    });
   });
 });

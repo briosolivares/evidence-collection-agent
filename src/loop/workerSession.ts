@@ -13,6 +13,7 @@ import { contractRevisionPath } from '../contracts/outputContractStore.js';
 import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
+  knownModelUsageFromError,
 } from '../model/modelDriver.js';
 import type { EvidenceStore } from '../evidence/evidenceStore.js';
 import type { OutputTableStore } from '../outputs/outputTable.js';
@@ -556,6 +557,10 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
   try {
     response = await deps.callModel(requestMessages);
   } catch (error) {
+    const knownUsage = knownModelUsageFromError(error);
+    if (knownUsage !== undefined) {
+      budget.recordModelUsage('worker', knownUsage, Date.now() - turnStartedMs);
+    }
     // A strict-driver rejection: the whole response was discarded before
     // history or execution (T1). Record it, charge its usage, and either
     // end truthfully or hand the same conversation a short protocol
@@ -567,9 +572,6 @@ export async function runWorkerTurn(session: WorkerSession): Promise<WorkerTurnO
       reason: error.reason,
       message: error.message,
     });
-    if (error.usage !== undefined) {
-      budget.recordModelUsage('worker', error.usage, Date.now() - turnStartedMs);
-    }
     if (error.reason === 'context_exhausted') {
       return { kind: 'budget_exceeded', reason: 'context_budget' };
     }

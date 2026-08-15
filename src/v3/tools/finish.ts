@@ -1,0 +1,88 @@
+import { z } from 'zod';
+
+import type { ToolDef } from '../../tools/registry.js';
+
+export const FINISH_TOOL_NAME = 'finish' as const;
+
+const nonBlankString = (maximum: number, description: string) =>
+  z
+    .string()
+    .max(maximum)
+    .refine((value) => value.trim().length > 0, {
+      message: 'must contain at least one non-whitespace character',
+    })
+    .describe(description);
+
+const uniqueNonBlankStrings = (
+  maximumItems: number,
+  itemMaximum: number,
+  description: string,
+) =>
+  z
+    .array(nonBlankString(itemMaximum, description))
+    .max(maximumItems)
+    .superRefine((values, ctx) => {
+      const seen = new Set<string>();
+      for (const [index, value] of values.entries()) {
+        if (seen.has(value)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [index],
+            message: 'must not contain duplicate values',
+          });
+        }
+        seen.add(value);
+      }
+    });
+
+/**
+ * Completion request produced by the worker. The loop validates this strict
+ * object and intercepts it before ordinary tool dispatch; deterministic
+ * output checks and verification own the actual completion decision.
+ */
+export const finishInputSchema = z.strictObject({
+  summary: nonBlankString(
+    8_000,
+    'User-facing summary of the completed work and what each output contains',
+  ),
+  artifacts: uniqueNonBlankStrings(
+    100,
+    1_024,
+    'Run-relative artifacts/ path for one completed requested output',
+  ).describe(
+    'Every published requested output the worker believes is complete; use an empty list only when none can be claimed',
+  ),
+  limitations: uniqueNonBlankStrings(
+    100,
+    2_000,
+    'One unresolved source, access, or freshness limitation',
+  ).describe(
+    'Explicit unresolved limitations; use an empty list when there are none',
+  ),
+});
+
+export type FinishInput = z.infer<typeof finishInputSchema>;
+
+/**
+ * Model-facing definition for the exclusive completion control call.
+ *
+ * `execute` is intentionally unusable. The v3 worker loop must recognize an
+ * exclusive finish response and hand its validated input to completion checks
+ * rather than allowing generic tool execution to imply success.
+ */
+export const finishTool: ToolDef<FinishInput> = {
+  name: FINISH_TOOL_NAME,
+  description:
+    'Request deterministic checks and independent verification after every requested output ' +
+    'has been published and inspected. Provide a user-facing summary, list every completed ' +
+    'requested-output path under artifacts/, and explicitly list unresolved limitations (use ' +
+    'an empty array when there are none). finish must be the only tool call in its assistant ' +
+    'response; it requests review and cannot declare success by itself.',
+  inputSchema: finishInputSchema,
+  getAccess: () => ({ reads: [], writes: [], exclusive: true }),
+  execute() {
+    throw new Error(
+      'finish is a control call that must be intercepted by the v3 worker loop; it cannot execute as an ordinary tool.',
+    );
+  },
+};

@@ -1,5 +1,5 @@
 import type { CallModel, Usage } from '../loop/messages.js';
-import { isModelResponseRejectedError } from '../model/modelDriver.js';
+import { knownModelUsageFromError } from '../model/modelDriver.js';
 
 // One finite budget for the entire run, shared by every model role. The old
 // shape — each worker cycle getting a fresh runAgentLoop with fresh guards —
@@ -312,11 +312,11 @@ export function createRunBudgetTracker(
 }
 
 /**
- * Wrap a CallModel so every call — accepted or rejected — charges the
- * shared budget under the given role. This is how initializer and verifier
- * calls join the run's accounting without their runners knowing about the
- * tracker: a rejected response's usage (carried on
- * ModelResponseRejectedError) is recorded before the rejection propagates.
+ * Wrap a CallModel so every call with reported usage — accepted, rejected,
+ * or fatally failed after a complete discarded attempt — charges the shared
+ * budget under the given role. This is how initializer and verifier calls
+ * join the run's accounting without their runners knowing about the tracker:
+ * known usage carried on the error is recorded before it propagates.
  */
 export function withBudgetAccounting(
   callModel: CallModel,
@@ -330,8 +330,9 @@ export function withBudgetAccounting(
       tracker.recordModelUsage(role, response.usage, Date.now() - startedMs);
       return response;
     } catch (error) {
-      if (isModelResponseRejectedError(error) && error.usage !== undefined) {
-        tracker.recordModelUsage(role, error.usage, Date.now() - startedMs);
+      const knownUsage = knownModelUsageFromError(error);
+      if (knownUsage !== undefined) {
+        tracker.recordModelUsage(role, knownUsage, Date.now() - startedMs);
       }
       throw error;
     }

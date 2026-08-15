@@ -5,6 +5,10 @@ import { COLLAPSED_MARKER } from '../loop/contextView.js';
 import type { Message } from '../loop/messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import {
+  V3_COLLAPSED_BROWSER_RESULT_MARKER,
+  buildV3ContextView,
+} from '../v3/loop/contextView.js';
+import {
   buildRequestParams,
   DEFAULT_MODEL,
   makeAnthropicClient,
@@ -56,6 +60,32 @@ function frozen(messages: Message[]): readonly Message[] {
     Object.freeze(message);
   }
   return Object.freeze(messages);
+}
+
+function v3BrowserExchange(id: string, value: number): Message[] {
+  return [
+    {
+      role: 'assistant',
+      content: [
+        {
+          type: 'tool_use',
+          id,
+          name: 'browser_execute',
+          input: { code: `return ${value}` },
+        },
+      ],
+    },
+    {
+      role: 'user',
+      content: [
+        {
+          type: 'tool_result',
+          tool_use_id: id,
+          content: JSON.stringify({ status: 'exited', pages: [] }),
+        },
+      ],
+    },
+  ];
 }
 
 const turnOneHistory = frozen([
@@ -177,6 +207,30 @@ describe('buildRequestParams', () => {
     );
     expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
     expect(contents.flat().filter((block) => block.cache_control !== undefined)).toHaveLength(1);
+  });
+
+  it('marks the v3 browser-result collapse frontier without mutating full history', () => {
+    const history = frozen([
+      { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] },
+      ...v3BrowserExchange('b1', 1),
+      ...v3BrowserExchange('b2', 2),
+      ...v3BrowserExchange('b3', 3),
+    ]);
+
+    const view = buildV3ContextView(history);
+    const params = buildRequestParams(makeConfig(), view);
+    const contents = params.messages.map(
+      (message) => message.content as Array<{ content?: string; cache_control?: unknown }>,
+    );
+
+    expect(contents[2]?.[0]?.content).toContain(V3_COLLAPSED_BROWSER_RESULT_MARKER);
+    expect(contents[2]?.[0]?.cache_control).toEqual({ type: 'ephemeral' });
+    expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
+    expect(
+      contents.flat().filter((block) => block.cache_control !== undefined),
+    ).toHaveLength(2);
+    expect(JSON.stringify(history)).not.toContain(V3_COLLAPSED_BROWSER_RESULT_MARKER);
+    expect(JSON.stringify(history)).not.toContain('cache_control');
   });
 
   it('carries the config into the request: model default and override, max_tokens, thinking off', () => {

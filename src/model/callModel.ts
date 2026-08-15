@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { isCollapsedStub } from '../loop/contextView.js';
 import type { CallModel, Message, Usage } from '../loop/messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
+import { isV3CollapsedBrowserResult } from '../v3/loop/contextView.js';
 import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
@@ -19,7 +20,7 @@ import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDrive
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
 //    turn. A second marker rides the collapse frontier — the newest
-//    observe stub in the API message view (see loop/contextView.ts).
+//    heavyweight-result stub in either API message view.
 //    It exists because the server matches cached prefixes only up to ~20
 //    content blocks back from a marker: when a new observation stubs the
 //    third-most-recent one, the request diverges at that stub — usually
@@ -104,7 +105,7 @@ export interface CallModelConfig {
  *   prefix (the API renders tools before system, so it caches both). A
  *   second, moving `cache_control` breakpoint rides the last content block
  *   of the last message, and a third rides the collapse frontier — the
- *   newest collapsed observe stub — when the view contains one (marked
+ *   newest collapsed heavyweight-result stub — when the view contains one (marked
  *   messages are clones; `messages` and its blocks are never mutated), so
  *   each turn's request resumes from a previous turn's cache entry even
  *   when collapsing edited a message mid-conversation — see the file header.
@@ -158,7 +159,7 @@ interface BlockPosition {
  * The conversation as API message params, with the moving cache
  * breakpoints in place: one on the last content block of the last message
  * (the tip), and one on the collapse frontier when the view contains
- * collapsed observe stubs (see the file header for why). Marked messages and
+ * collapsed heavyweight-result stubs (see the file header for why). Marked messages and
  * blocks are clones — the input array (owned by the loop, logged live to
  * the transcript) is never mutated, and all other messages pass through
  * as-is. An empty conversation or an empty final message (neither of which
@@ -200,7 +201,7 @@ function tipPosition(messages: readonly Message[]): BlockPosition | undefined {
   return blockIndex < 0 ? undefined : { messageIndex, blockIndex };
 }
 
-/** The collapse frontier: the newest collapsed observe stub in the view — the
+/** The collapse frontier: the newest recognized collapsed result in the view — the
  * block where a displacement turn's request diverges from the previous
  * turn's, and therefore where its cache entry must end. */
 function frontierPosition(messages: readonly Message[]): BlockPosition | undefined {
@@ -208,7 +209,10 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     const message = messages[messageIndex]!;
     if (message.role !== 'user') continue;
     for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
-      if (isCollapsedStub(message.content[blockIndex]!)) return { messageIndex, blockIndex };
+      const block = message.content[blockIndex]!;
+      if (isCollapsedStub(block) || isV3CollapsedBrowserResult(block)) {
+        return { messageIndex, blockIndex };
+      }
     }
   }
   return undefined;

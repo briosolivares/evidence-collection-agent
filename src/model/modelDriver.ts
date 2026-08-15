@@ -95,6 +95,40 @@ export function isModelResponseRejectedError(error: unknown): error is ModelResp
   return error instanceof Error && error.name === 'ModelResponseRejectedError';
 }
 
+/** A fatal model failure that happened after an earlier complete response in
+ * the same logical generate call had already reported billable usage. The
+ * original failure remains available as `cause`; no partial response content
+ * is exposed or accepted. */
+export class ModelGenerationFailedError extends Error {
+  override readonly name = 'ModelGenerationFailedError';
+  readonly usage: Usage;
+
+  constructor(cause: unknown, usage: Usage) {
+    super(
+      `model generation failed after an earlier billable attempt: ${
+        cause instanceof Error ? cause.message : String(cause)
+      }`,
+      { cause },
+    );
+    this.usage = usage;
+  }
+}
+
+export function isModelGenerationFailedError(
+  error: unknown,
+): error is ModelGenerationFailedError {
+  return error instanceof Error && error.name === 'ModelGenerationFailedError';
+}
+
+/** Usage known for a failed logical model call, when the provider reported
+ * any. Callers use this one seam so rejected responses and fatal retry
+ * failures cannot drift into different accounting rules. */
+export function knownModelUsageFromError(error: unknown): Usage | undefined {
+  if (isModelResponseRejectedError(error)) return error.usage;
+  if (isModelGenerationFailedError(error)) return error.usage;
+  return undefined;
+}
+
 /** A response the driver accepted: safe to append to history and execute. */
 export interface AcceptedModelResponse {
   /** The complete assembled response. */
@@ -104,6 +138,13 @@ export interface AcceptedModelResponse {
   /** Stream attempts this generate() consumed, counting transport retries
    * and the max_tokens re-ask. */
   attempts: number;
+  /** Known billable usage across every structurally complete response in
+   * this logical generate call. Usually identical to `response.usage`; when
+   * a max_tokens response was discarded and re-asked, it includes both the
+   * discarded attempt and the accepted replacement so one worker turn does
+   * not hide the first attempt's spend. Truncated transport attempts still
+   * cannot contribute usage because no complete usage record exists. */
+  usage: Usage;
 }
 
 /** Execution-validation limits; validated finite at driver construction. */
@@ -123,7 +164,7 @@ export interface ModelExecutionLimits {
 export function validateModelResponseForExecution(
   response: ModelResponse,
   limits: ModelExecutionLimits,
-): Omit<AcceptedModelResponse, 'attempts'> {
+): Omit<AcceptedModelResponse, 'attempts' | 'usage'> {
   assertValidToolCallLimit(limits.maxToolCallsPerTurn);
   const reject = (
     reason: ModelRejectionReason,
@@ -339,6 +380,7 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
     async generate(options: ModelGenerateOptions): Promise<AcceptedModelResponse> {
       const emit = options.onEvent ?? (() => {});
       let attempts = 0;
+      const knownUsages: Usage[] = [];
 
       const streamOnce = (maxTokens: number): Promise<ModelResponse> =>
         callWithRetry(
@@ -373,10 +415,11 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
 
       const accept = (response: ModelResponse): AcceptedModelResponse => {
         const attemptId = attempts;
+        knownUsages.push(response.usage);
         try {
           const validated = validateModelResponseForExecution(response, { maxToolCallsPerTurn });
           emit({ type: 'attempt_accepted', attemptId, usage: response.usage });
-          return { ...validated, attempts };
+          return { ...validated, attempts, usage: aggregateUsage(knownUsages) };
         } catch (error) {
           if (isModelResponseRejectedError(error)) {
             emit({
@@ -406,8 +449,63 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
           throw error;
         }
       }
-      const second = await streamOnce(retryOutputTokens);
-      return accept(second);
+      let second: ModelResponse;
+      try {
+        second = await streamOnce(retryOutputTokens);
+      } catch (error) {
+        // Cancellation must retain its conventional error shape. All other
+        // failures preserve the transport/assembly error as `cause` while
+        // carrying the first complete attempt's already-reported usage.
+        if (error instanceof Error && error.name === 'AbortError') throw error;
+        options.signal?.throwIfAborted();
+        throw new ModelGenerationFailedError(
+          error,
+          aggregateUsage(knownUsages),
+        );
+      }
+      try {
+        return accept(second);
+      } catch (error) {
+        if (isModelResponseRejectedError(error)) {
+          throw new ModelResponseRejectedError(
+            error.reason,
+            error.message,
+            error.protocolFeedback,
+            aggregateUsage(knownUsages),
+          );
+        }
+        throw error;
+      }
     },
+  };
+}
+
+/** Sum usage the provider reported for complete responses in one logical
+ * generate call. Optional cache counters remain absent only when every
+ * constituent usage omitted them; null contributes no tokens. */
+function aggregateUsage(usages: readonly Usage[]): Usage {
+  const optionalSum = (
+    field: 'cache_read_input_tokens' | 'cache_creation_input_tokens',
+  ): number | undefined => {
+    let seen = false;
+    let total = 0;
+    for (const usage of usages) {
+      const value = usage[field];
+      if (value === undefined || value === null) continue;
+      seen = true;
+      total += value;
+    }
+    return seen ? total : undefined;
+  };
+
+  const cacheRead = optionalSum('cache_read_input_tokens');
+  const cacheCreation = optionalSum('cache_creation_input_tokens');
+  return {
+    input_tokens: usages.reduce((sum, usage) => sum + usage.input_tokens, 0),
+    output_tokens: usages.reduce((sum, usage) => sum + usage.output_tokens, 0),
+    ...(cacheRead === undefined ? {} : { cache_read_input_tokens: cacheRead }),
+    ...(cacheCreation === undefined
+      ? {}
+      : { cache_creation_input_tokens: cacheCreation }),
   };
 }

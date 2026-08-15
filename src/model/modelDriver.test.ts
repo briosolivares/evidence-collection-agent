@@ -215,6 +215,11 @@ describe('createAnthropicModelDriver.generate', () => {
 
     expect(accepted.stopReason).toBe('end_turn');
     expect(accepted.attempts).toBe(1);
+    expect(accepted.usage).toEqual({
+      input_tokens: 100,
+      output_tokens: 20,
+      cache_read_input_tokens: 0,
+    });
     expect(accepted.response.content).toEqual([{ type: 'text', text: 'Answer.' }]);
     expect(events).toEqual([
       { type: 'attempt_start', attemptId: 1 },
@@ -251,6 +256,11 @@ describe('createAnthropicModelDriver.generate', () => {
     // The overflowing attempt is rejected and never surfaces as content.
     expect(accepted.attempts).toBe(2);
     expect(accepted.response.content).toEqual([{ type: 'text', text: 'Full answer.' }]);
+    expect(accepted.usage).toEqual({
+      input_tokens: 200,
+      output_tokens: 40,
+      cache_read_input_tokens: 0,
+    });
     expect(events.filter((event) => event.type === 'attempt_rejected')).toEqual([
       {
         type: 'attempt_rejected',
@@ -272,8 +282,44 @@ describe('createAnthropicModelDriver.generate', () => {
 
     await expect(
       driver.generate({ messages: [{ role: 'user', content: [{ type: 'text', text: 'q' }] }] }),
-    ).rejects.toMatchObject({ name: 'ModelResponseRejectedError', reason: 'max_tokens' });
+    ).rejects.toMatchObject({
+      name: 'ModelResponseRejectedError',
+      reason: 'max_tokens',
+      usage: {
+        input_tokens: 200,
+        output_tokens: 40,
+        cache_read_input_tokens: 0,
+      },
+    });
     expect(factory.calls).toHaveLength(2);
+  });
+
+  it('preserves known usage when the enlarged re-ask fails before reporting usage', async () => {
+    const boom = new Error('second transport failed');
+    let streams = 0;
+    const driver = createAnthropicModelDriver({
+      ...DRIVER_BASE,
+      createStream: () => {
+        streams += 1;
+        if (streams === 1) return replay(scriptedStream('cut', 'max_tokens'));
+        throw boom;
+      },
+    });
+
+    await expect(
+      driver.generate({
+        messages: [{ role: 'user', content: [{ type: 'text', text: 'q' }] }],
+      }),
+    ).rejects.toMatchObject({
+      name: 'ModelGenerationFailedError',
+      cause: boom,
+      usage: {
+        input_tokens: 100,
+        output_tokens: 20,
+        cache_read_input_tokens: 0,
+      },
+    });
+    expect(streams).toBe(2);
   });
 
   it('rejects a refusal immediately without a re-ask', async () => {
