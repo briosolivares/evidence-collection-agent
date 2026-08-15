@@ -11,7 +11,9 @@ const CSV_FILENAME = 'sorority_members.csv';
 const ANSWER_FILENAME = 'answer.md';
 const REQUIRED_COLUMNS = ['name', 'class', 'major', 'affiliation', 'interests', 'other'] as const;
 const COLUMN_ASSERTION_NAME = exactColumnsAssertionName(REQUIRED_COLUMNS);
-const SHEET_ASSERTION_NAME = 'answer.md contains a plausible Google Sheets URL';
+/** Exported so the CSV-only variant can drop exactly this assertion by
+ * name instead of restating a string that would silently stop matching. */
+export const SHEET_ASSERTION_NAME = 'answer.md contains a plausible Google Sheets URL';
 const COHORT_ASSERTION_NAME = 'CSV has plausible rows and every sorority/class cohort is represented';
 const IDENTITY_ASSERTION_NAME = 'member names are plausible and unique within each affiliation';
 const DETAIL_ASSERTION_NAME = 'major and interests/other fields meet minimum information coverage';
