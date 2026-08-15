@@ -32,7 +32,14 @@ export interface TuiEvalRuntime {
   close(): Promise<void>;
 }
 
-/** Browser-policy adapter used only by /evals. */
+/**
+ * Browser-policy adapter used only by /evals.
+ *
+ * Provider-neutral by construction: headed trials reuse Sherlock's own session
+ * runtime, which main.tsx already built from the selected provider, and the
+ * isolated lane delegates to `createEvalBrowserRuntime`, which selects the
+ * provider itself. Nothing here needs to know whether the browsers are local.
+ */
 export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
   const browserRuntime =
@@ -66,10 +73,11 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
       let cancelled = false;
       const done = browserRuntime
         .withBrowser(false, async (browser) => {
-          // Deliberately no requestPermission: headless trials run in an
-          // invisible isolated browser (nothing for a human to act in) and
-          // are the lane whose scores stay comparable to CLI batches —
-          // interactive tools fail closed here, same as the CLI runner.
+          // Deliberately no requestPermission: isolated trials run in a
+          // browser with nothing for a human to act in — headless locally, and
+          // in someone else's datacenter remotely — and are the lane whose
+          // scores stay comparable to CLI batches, so interactive tools fail
+          // closed here, same as the CLI runner.
           inner = startRunFn(task, {
             browser,
             onEvent,

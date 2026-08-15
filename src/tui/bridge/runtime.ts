@@ -50,11 +50,27 @@ export interface TuiRuntime {
   shutdown(): Promise<void>;
 }
 
-/** Recognize failures that mean the session browser itself is gone (the
+/**
+ * Recognize failures that mean the session browser itself is gone (the
  * controller's operations reject once the context closes), as opposed to an
- * ordinary in-run error. */
+ * ordinary in-run error.
+ *
+ * A remote session dies in ways a local Chrome never does — Browserbase ends it
+ * on its own timeout or CDP-inactivity limit — and Playwright reports those as a
+ * DISCONNECT rather than a closed context, which is why the disconnect phrases
+ * are here too. Classifying them as browser death routes them into the existing
+ * relaunch path, which for a remote provider means a NEW session opened from the
+ * persisted Context; without them a timed-out remote session would make every
+ * later run in the session fail identically.
+ *
+ * Deliberately NOT included: bare transport errors like `socket hang up` and
+ * `ECONNRESET`. Those arrive from a page's own network, or the model API, far
+ * more often than from the browser connection, and treating one as browser death
+ * would throw away a live session and relaunch on every flaky request. Only
+ * phrases Playwright uses for the CONTROL channel qualify.
+ */
 export function isBrowserDeathMessage(message: string): boolean {
-  return /browser has been closed|context or browser has been closed|browser session is closed|browserContext\.|Target closed|browser process crashed/i.test(
+  return /browser has been closed|context or browser has been closed|browser session is closed|browserContext\.|Target closed|browser process crashed|has been disconnected|Browser closed|Connection closed/i.test(
     message,
   );
 }
@@ -67,7 +83,9 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   let started = false;
   let browserDead = false;
 
-  const ensureBrowser = async (): Promise<BrowserController> => {
+  const ensureBrowser = async (
+    onEvent: (event: UiEvent) => void,
+  ): Promise<BrowserController> => {
     if (!started) {
       throw new Error('runtime not started — no browser session');
     }
@@ -85,6 +103,23 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
     }
     browser = await deps.browserSessionProvider.createSession();
     browserDead = false;
+    // A relaunch is a brand-new remote session with its own Live View URL,
+    // not a resumption of the old one — so this fires on every successful
+    // createSession(), not just the first. Local Chrome's controller carries
+    // no diagnostics, so this stays silent for the common case; the reducer
+    // would also drop a 'local' event on the floor, but there is no reason
+    // to emit noise it just has to discard.
+    if (browser.sessionDiagnostics !== undefined) {
+      const diagnostics = browser.sessionDiagnostics;
+      onEvent({
+        type: 'browser_session',
+        provider: diagnostics.provider,
+        ...(diagnostics.sessionId === undefined ? {} : { sessionId: diagnostics.sessionId }),
+        ...(diagnostics.liveViewUrl === undefined
+          ? {}
+          : { liveViewUrl: diagnostics.liveViewUrl }),
+      });
+    }
     return browser;
   };
 
@@ -106,7 +141,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
       const done: Promise<RunOutcome> = (async () => {
         let session: BrowserController;
         try {
-          session = await ensureBrowser();
+          session = await ensureBrowser(onEvent);
         } catch (error) {
           const message = `browser relaunch failed: ${
             error instanceof Error ? error.message : String(error)

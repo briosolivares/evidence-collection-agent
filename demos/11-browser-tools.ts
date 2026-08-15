@@ -3,14 +3,15 @@
 // server. Consolidates the old separate observe/act/evidence demos now that
 // the V1 tool set (navigate, inspect_page, click, type, scroll) has been
 // replaced by two tools: `observe` (look at a page) and `browser_action`
-// (act on one, with ops navigate/click/fill/scroll/...).
+// (act on one, with ops navigate/click/fill/scroll/...). The browser session
+// comes from the configured browser provider, local Chrome by default.
 // Run with: npx tsx demos/11-browser-tools.ts
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import type { BrowserObservation, ElementRef } from '../src/browser/browserState.js';
-import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
+import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
 import { finalizeManifest, initManifest, MANIFEST_FILENAME } from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
@@ -25,8 +26,10 @@ const runDir = createRunDir('runs', generateRunId('demo browser-tools'));
 initManifest(runDir, 'demo: observe, act, and capture evidence on local fixtures');
 
 const fixtureServer = await startFixtureServer();
-const browserSessionProvider = new LocalChromeBrowserSessionProvider({
-  profileDir: resolve('chrome-profile'),
+const PROFILE_DIR = resolve('chrome-profile');
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+const browserSessionProvider = createBrowserSessionProvider({
+  profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();
 // No contract in this demo, so captures are recorded as plain evidence.

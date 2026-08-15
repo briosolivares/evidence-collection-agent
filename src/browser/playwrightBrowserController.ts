@@ -59,7 +59,12 @@ import {
   type BrowserJavaScriptResult,
   type EarlyJavaScriptRequest,
 } from './browserJavaScript.js';
-import type { BrowserSessionProvider } from './sessionProvider.js';
+import type {
+  BrowserSessionDiagnostics,
+  BrowserSessionProvider,
+} from './sessionProvider.js';
+import { localDownloadReader, type BrowserDownloadReader } from './downloadReader.js';
+import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 import { accessKey, type BusyResourceRegistry } from '../tools/registry.js';
 import {
   actionTargetHandle,
@@ -317,12 +322,72 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
       // args above are always present, so a missing file means Chrome's CDP
       // port genuinely never came up.
       const cdpUrl = await readDevToolsActivePortUrl(this.options.profileDir);
-      return new PlaywrightBrowserController(context, undefined, cdpUrl, preexistingSessionPage);
+      return new PlaywrightBrowserController({ context, cdpUrl, preexistingSessionPage });
     } catch (error) {
       await context.close();
       throw error;
     }
   }
+}
+
+/**
+ * Everything one {@link PlaywrightBrowserController} needs that differs
+ * between the runtimes hosting it.
+ *
+ * An options object rather than positional parameters because the list is now
+ * long enough that a call site reads as a row of anonymous arguments —
+ * `new PlaywrightBrowserController(ctx, undefined, url, page)` — and the two
+ * newest entries (`closeSession`, `downloadReader`) are exactly the ones a
+ * reader must not mix up.
+ */
+export interface PlaywrightBrowserControllerOptions {
+  /** The Playwright context every browser operation acts on. */
+  context: BrowserContext;
+  stateStore?: BrowserStateStore;
+  /** Loopback CDP HTTP endpoint for this session's Chrome, when launched
+   * with the debugging port {@link launchPersistentChrome} opens. Absent for
+   * any provider that has none to offer (a remote session, a test double) —
+   * in which case the controller offers neither
+   * {@link BrowserController.prepareForBrowserScript} nor
+   * {@link BrowserController.refreshAfterBrowserScript}.
+   *
+   * MUST be loopback. A remote service's connection URL is a full
+   * session-control capability and is never accepted here — see
+   * `docs/browserbase-provider-plan.md` §6 for the relay design that would
+   * be required to restore browser scripts on a remote provider. */
+  cdpUrl?: string;
+  /** The one pre-existing page {@link prepareSessionPage} leaves open (the
+   * profile's original tab, or a fresh replacement) — permanently excluded
+   * from the page registry, exactly as before this class ever inspected
+   * `context.pages()` directly. Without this, a `refreshAfterBrowserScript`
+   * rescan of `context.pages()` would adopt it as a "tracked page" the first
+   * time a browser script ran, silently changing what
+   * {@link PlaywrightBrowserController.pages} and popup/task-tab fallbacks
+   * report. */
+  preexistingSessionPage?: Page;
+  /**
+   * Release the underlying browser session. Defaults to closing the
+   * `context`, which is right for a locally launched persistent context: the
+   * context IS the browser.
+   *
+   * A remote provider needs something else — disconnect the Playwright
+   * `Browser` it connected over CDP, stop its keep-alive heartbeat, and
+   * explicitly release the billable remote session — and `context.close()`
+   * alone would do none of it. Injected rather than subclassed so
+   * {@link PlaywrightBrowserController.close}'s idempotence and its
+   * serialization against in-flight tab lifecycle work stay in ONE place.
+   */
+  closeSession?: () => Promise<void>;
+  /** How a download EVENT becomes bytes; defaults to the local-file reader.
+   * See downloadReader.ts. */
+  downloadReader?: BrowserDownloadReader;
+  /** How a confined upload path reaches the browser; defaults to handing the
+   * path through, which only works when the browser shares this filesystem.
+   * See uploadEncoder.ts. */
+  uploadEncoder?: BrowserUploadEncoder;
+  /** User-facing facts about where this session is hosted; see
+   * {@link BrowserSessionDiagnostics}. Never carries a connection URL. */
+  sessionDiagnostics?: BrowserSessionDiagnostics;
 }
 
 /** Playwright implementation of the engine-neutral browser controller. */
@@ -361,7 +426,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   /**
    * Present iff this controller was constructed with a CDP endpoint (see
-   * the constructor's `cdpUrl` parameter). Assigned conditionally in the
+   * {@link PlaywrightBrowserControllerOptions.cdpUrl}). Assigned conditionally in the
    * constructor, rather than declared as an always-present method that
    * throws, so `typeof controller.prepareForBrowserScript === 'function'`
    * — the feature-detection {@link assertBrowserScriptSupportIsPaired} and
@@ -373,26 +438,29 @@ export class PlaywrightBrowserController implements BrowserController {
   /** Paired with {@link prepareForBrowserScript}; see there. */
   readonly refreshAfterBrowserScript?: () => Promise<void>;
 
-  constructor(
-    private readonly context: BrowserContext,
-    stateStore: BrowserStateStore = createBrowserStateStore(),
-    /** Loopback CDP HTTP endpoint for this session's Chrome, when launched
-     * with the debugging port {@link launchPersistentChrome} opens. Absent
-     * for any provider that has none to offer (a remote session, a test
-     * double) — in which case this controller offers neither
-     * {@link prepareForBrowserScript} nor {@link refreshAfterBrowserScript}. */
-    private readonly cdpUrl?: string,
-    /** The one pre-existing page {@link prepareSessionPage} leaves open
-     * (the profile's original tab, or a fresh replacement) — permanently
-     * excluded from the page registry, exactly as before this class ever
-     * inspected `context.pages()` directly. Without this, a
-     * `refreshAfterBrowserScript` rescan of `context.pages()` would adopt
-     * it as a "tracked page" the first time a browser script ran, silently
-     * changing what {@link pages} and popup/task-tab fallbacks report. */
-    private readonly preexistingSessionPage?: Page,
-  ) {
-    this.state = stateStore;
+  private readonly context: BrowserContext;
+  private readonly cdpUrl: string | undefined;
+  private readonly preexistingSessionPage: Page | undefined;
+  private readonly closeSession: () => Promise<void>;
+  private readonly downloadReader: BrowserDownloadReader;
+  private readonly uploadEncoder: BrowserUploadEncoder;
+  readonly sessionDiagnostics: BrowserSessionDiagnostics | undefined;
+
+  constructor(options: PlaywrightBrowserControllerOptions) {
+    this.context = options.context;
+    this.cdpUrl = options.cdpUrl;
+    this.preexistingSessionPage = options.preexistingSessionPage;
+    this.closeSession = options.closeSession ?? (() => this.context.close());
+    this.downloadReader = options.downloadReader ?? localDownloadReader;
+    this.uploadEncoder = options.uploadEncoder ?? localUploadEncoder;
+    this.sessionDiagnostics = options.sessionDiagnostics;
+    this.state = options.stateStore ?? createBrowserStateStore();
     if (this.cdpUrl !== undefined) {
+      // Re-asserted here, not only where the URL is produced: this is the
+      // boundary a remote provider would have to cross to hand a remote
+      // connection URL to browser scripts, and `prepareForBrowserScript`
+      // hands whatever it is given to model-generated shell code.
+      assertLoopbackCdpUrl(this.cdpUrl);
       this.prepareForBrowserScript = (pageId?: string) => this.doPrepareForBrowserScript(pageId);
       this.refreshAfterBrowserScript = () => this.doRefreshAfterBrowserScript();
     }
@@ -504,7 +572,7 @@ export class PlaywrightBrowserController implements BrowserController {
       return this.captureUrlThroughChrome(href, page);
     }
 
-    return captureClickDownload(locator, target.ref, page);
+    return captureClickDownload(locator, target.ref, page, this.downloadReader);
   }
 
   /** Capture a download reached by navigating a throwaway page straight to
@@ -523,6 +591,7 @@ export class PlaywrightBrowserController implements BrowserController {
       () => {
         this.pendingInternalPages = Math.max(0, this.pendingInternalPages - 1);
       },
+      this.downloadReader,
     );
   }
 
@@ -934,7 +1003,9 @@ export class PlaywrightBrowserController implements BrowserController {
     this.closed = true;
     this.closePromise = this.serializeTabLifecycle(async () => {
       this.activePage = undefined;
-      await this.context.close();
+      // Whatever the provider injected: close the local persistent context,
+      // or disconnect and explicitly release a billable remote session.
+      await this.closeSession();
     });
     return this.closePromise;
   }
@@ -1165,7 +1236,7 @@ export class PlaywrightBrowserController implements BrowserController {
       latestObservationId: (pageId) => this.state.latestObservationId(pageId),
       watchPage: (pageId) => this.createPageWatch(this.requireTrackedPage(pageId)),
       resolveTarget: async (target) =>
-        actionTargetHandle(await this.resolveElementRef(target)),
+        actionTargetHandle(await this.resolveElementRef(target), this.uploadEncoder),
       navigate: async (pageId, url) => {
         assertHttpUrl(url);
         await this.requireTrackedPage(pageId).page.goto(url, {
@@ -1607,8 +1678,13 @@ function normalizeDialogType(type: string): BrowserDialog['type'] {
  *   keep excluding it too, instead of accidentally adopting it as a
  *   "tracked page" the first time anything inspects `context.pages()`
  *   directly.
+ *
+ * Exported so a remote provider prepares its default context's blank page
+ * through the SAME code as a local launch. A second implementation of "which
+ * page is the session page" is exactly how a provider ends up with a tracked
+ * page the local one excludes.
  */
-async function prepareSessionPage(context: BrowserContext): Promise<Page> {
+export async function prepareSessionPage(context: BrowserContext): Promise<Page> {
   const pages = context.pages();
   const sessionPage = pages[0] ?? (await context.newPage());
 

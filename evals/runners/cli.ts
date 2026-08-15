@@ -10,6 +10,10 @@
 import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import {
+  describeBrowserProvider,
+  resolveBrowserProviderKind,
+} from '../../src/browser/provider.js';
 import { checkProfileLogins } from '../../src/cli/loginCheck.js';
 import { allLoggedIn, formatLoginState, loginServicesForIds } from '../../src/cli/loginProbe.js';
 import { chromeExecutablePath } from '../../src/config/paths.js';
@@ -40,13 +44,21 @@ async function main(): Promise<void> {
     );
   }
 
-  // Before any tokens are spent: does the profile hold the sessions this
-  // batch's tasks cannot run without? See loginPreflight.ts.
+  // Which browser runtime this batch will use, resolved once and reported
+  // before anything launches — a batch whose runtime you have to infer from
+  // its failures is a batch you will misread.
+  const browserProvider = resolveBrowserProviderKind();
+
+  // Before any tokens are spent: does the authenticated lane hold the sessions
+  // this batch's tasks cannot run without? See loginPreflight.ts. The probe
+  // goes through the same provider selection the trials will use, so it checks
+  // the local profile or the exact Browserbase Context the authenticated lane
+  // is about to open — never a different one.
   const requirements = requiredLogins(tasks);
   if (requirements.length > 0 && !args.skipLoginCheck) {
     console.log(
       `login preflight: ${requirements.map((req) => req.id).join(', ')} ` +
-        `(profile ${PROFILE_DIR})`,
+        `(${describeBrowserProvider({ profileDir: PROFILE_DIR })})`,
     );
     const statuses = await checkProfileLogins({
       profileDir: PROFILE_DIR,
@@ -58,7 +70,7 @@ async function main(): Promise<void> {
       },
     });
     if (!allLoggedIn(statuses)) {
-      console.error(formatLoginPreflightFailure(statuses, requirements));
+      console.error(formatLoginPreflightFailure(statuses, requirements, browserProvider));
       process.exitCode = 1;
       return;
     }
@@ -70,8 +82,12 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `eval browsers: default=headless isolated (concurrency ${args.concurrency}); ` +
-      'headed tasks=headed persistent logged-in (serial)',
+    browserProvider === 'browserbase'
+      ? `eval browsers: default=Browserbase isolated session per trial ` +
+          `(concurrency ${args.concurrency}); headed tasks=one Browserbase session on the ` +
+          'configured context (serial)'
+      : `eval browsers: default=headless isolated (concurrency ${args.concurrency}); ` +
+          'headed tasks=headed persistent logged-in (serial)',
   );
   // Announced before the first trial, not just recorded in the results file:
   // the protocol decides what the batch even measures, and a run whose path

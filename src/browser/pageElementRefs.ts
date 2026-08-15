@@ -15,6 +15,7 @@ import { ACTION_TIMEOUT_MS, type PageRecord } from './playwrightBrowserControlle
 import type { ActionTargetHandle } from './browserActions.js';
 import type { ElementRef } from './browserState.js';
 import { BrowserRefNotFoundError } from './controller.js';
+import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 
 /** Matches a bare Playwright aria-ref, e.g. `e12` or `f1e8` once the page has
  * navigated more than once. */
@@ -264,8 +265,16 @@ export async function countRefMatches(locator: Locator): Promise<number> {
 }
 
 /** Wrap a revalidated locator as an action handle. Every op carries the
- * finite {@link ACTION_TIMEOUT_MS} instead of Playwright's 30s default. */
-export function actionTargetHandle(locator: Locator): ActionTargetHandle {
+ * finite {@link ACTION_TIMEOUT_MS} instead of Playwright's 30s default.
+ *
+ * @param uploadEncoder - how an upload path becomes something the browser can
+ *   actually read; defaults to handing the path straight through, which is
+ *   correct only when the browser shares this filesystem. See
+ *   `uploadEncoder.ts` for why a remote browser needs bytes instead. */
+export function actionTargetHandle(
+  locator: Locator,
+  uploadEncoder: BrowserUploadEncoder = localUploadEncoder,
+): ActionTargetHandle {
   const options = { timeout: ACTION_TIMEOUT_MS };
   return {
     click: () => locator.click(options),
@@ -274,6 +283,8 @@ export function actionTargetHandle(locator: Locator): ActionTargetHandle {
     selectOptions: (values) => locator.selectOption([...values], options).then(() => undefined),
     setChecked: (checked) => locator.setChecked(checked, options),
     hover: () => locator.hover(options),
-    setFiles: (absolutePaths) => locator.setInputFiles([...absolutePaths], options),
+    setFiles: async (absolutePaths) => {
+      await locator.setInputFiles(await uploadEncoder.encode(absolutePaths), options);
+    },
   };
 }

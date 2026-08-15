@@ -40,6 +40,10 @@ export const BASH_SECRET_ENV_DENYLIST: readonly string[] = [
   'LANGFUSE_',
   // A token present in developer shells that no generated script needs.
   'GITHUB_TOKEN',
+  // A full remote-browser session-control credential. A generated script never
+  // needs it: the browser is reached through the controller, not from the
+  // workspace.
+  'BROWSERBASE_API_KEY',
 ];
 
 /** The shell `bash` invokes. Fixed rather than configurable until a concrete

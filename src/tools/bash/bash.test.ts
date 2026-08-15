@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../browser/controller.js';
+import { BASH_SECRET_ENV_DENYLIST } from '../../cli/localExecution.js';
 import { initManifest, readManifest } from '../../run/artifacts.js';
 import { executeToolCall } from '../pipeline.js';
 import { createRegistry } from '../registry.js';
@@ -188,6 +189,38 @@ describe('bash tool', () => {
         expect(body.stdout).toBe('__unset__');
       } finally {
         delete process.env.MY_SECRET_TOKEN;
+      }
+    });
+
+    it('strips every real credential named in BASH_SECRET_ENV_DENYLIST, including BROWSERBASE_API_KEY', async () => {
+      const realSecretRegistry = createRegistry([
+        createBashTool({ secretEnvDenylist: BASH_SECRET_ENV_DENYLIST }),
+      ]);
+      const probes = {
+        ANTHROPIC_API_KEY: 'sk-ant-test',
+        GITHUB_TOKEN: 'ghp_test',
+        BROWSERBASE_API_KEY: 'bb_test',
+      };
+      for (const [name, value] of Object.entries(probes)) {
+        process.env[name] = value;
+      }
+      try {
+        const result = await executeToolCall(
+          realSecretRegistry,
+          {
+            id: 'call-real-denylist',
+            name: 'bash',
+            input: {
+              command:
+                'printf "%s\\n%s\\n%s" "${ANTHROPIC_API_KEY:-__unset__}" "${GITHUB_TOKEN:-__unset__}" "${BROWSERBASE_API_KEY:-__unset__}"',
+            },
+          },
+          { runDir },
+        );
+        const body = bodyOf(result.content);
+        expect(body.stdout.split('\n')).toEqual(['__unset__', '__unset__', '__unset__']);
+      } finally {
+        for (const name of Object.keys(probes)) delete process.env[name];
       }
     });
 

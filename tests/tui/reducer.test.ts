@@ -1111,3 +1111,37 @@ describe('reduce (tab_pressed routing)', () => {
     expect(reduce(running, { type: 'tab_pressed' })).toEqual(running);
   });
 });
+
+describe('reduce (browser session diagnostics)', () => {
+  it('appends a Browserbase notice with the Live View URL', () => {
+    const state = fold([
+      ...started,
+      {
+        type: 'browser_session',
+        provider: 'browserbase',
+        sessionId: 'bb_1',
+        liveViewUrl: 'https://live.example/1',
+      },
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'notice',
+      text: 'Browserbase session bb_1 — watch or take over: https://live.example/1',
+    });
+  });
+
+  it('appends a Browserbase notice without a Live View URL, falling back on session id', () => {
+    const state = fold([...started, { type: 'browser_session', provider: 'browserbase' }]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'notice',
+      text: 'Browserbase session (unknown) (no Live View URL available)',
+    });
+  });
+
+  it('ignores a local session — the browser window is already on screen', () => {
+    const state = fold([
+      ...started,
+      { type: 'browser_session', provider: 'local', sessionId: 'ignored' },
+    ]);
+    expect(state).toEqual(fold(started));
+  });
+});

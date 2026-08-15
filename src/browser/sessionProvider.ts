@@ -10,3 +10,34 @@ import type { BrowserController } from './controller.js';
 export interface BrowserSessionProvider {
   createSession(): Promise<BrowserController>;
 }
+
+/** Which runtime hosts a browser session. Provider selection is always
+ * explicit (see `resolveBrowserProviderKind`) so merely holding a
+ * Browserbase API key cannot silently start billable remote sessions. */
+export type BrowserProviderKind = 'local' | 'browserbase';
+
+/**
+ * Provider-neutral, user-facing facts about one live browser session.
+ *
+ * Everything here may be printed to a local terminal, recorded in runtime
+ * diagnostics, or offered to a human for takeover. What is deliberately
+ * ABSENT is the remote CDP connection URL: that is a full session-control
+ * capability, and the invariant this codebase keeps is that it never reaches
+ * a log, a transcript, a model-visible tool result, a run artifact, or a
+ * child process environment. Diagnostics exist so observability does not
+ * need it.
+ *
+ * The vendor session id is a correlation field only — the run directory and
+ * its manifest remain the run's identity and provenance boundary.
+ */
+export interface BrowserSessionDiagnostics {
+  /** Which runtime hosts this session. */
+  provider: BrowserProviderKind;
+  /** Vendor session id, when the provider has one (Browserbase). */
+  sessionId?: string;
+  /** Live View URL a human can open to watch or take over the session.
+   * Local-user-interface only — never a tool result or artifact. */
+  liveViewUrl?: string;
+  /** Session inspector/recording URL, for after-the-fact review. */
+  recordingUrl?: string;
+}

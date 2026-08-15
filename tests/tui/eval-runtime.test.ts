@@ -23,6 +23,7 @@ describe('createTuiEvalRuntime', () => {
     const browser = stubBrowser();
     const policies: boolean[] = [];
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (headed, operation) => {
         policies.push(headed);
         return operation(browser);
@@ -62,6 +63,7 @@ describe('createTuiEvalRuntime', () => {
   it('forwards the dialog resolver to headed trials only — headless trials stay unassisted', async () => {
     const browser = stubBrowser();
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (_headed, operation) => operation(browser),
       close: vi.fn(async () => undefined),
     };
@@ -107,6 +109,7 @@ describe('createTuiEvalRuntime', () => {
     });
     const innerCancel = vi.fn();
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (_headed, operation) => operation(await browserPromise),
       close: vi.fn(async () => undefined),
     };

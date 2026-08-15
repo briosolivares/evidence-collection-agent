@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { LocalChromeBrowserSessionOptions } from '../../src/browser/playwrightBrowserController.js';
-import { createEvalBrowserRuntime } from './browserRuntime.js';
+import { createBrowserbaseEvalBrowserAdapter, createEvalBrowserRuntime } from './browserRuntime.js';
 
 /**
  * Keeps a test out of the orphaned-profile reaper. Without it the runtime
@@ -39,7 +39,11 @@ describe('createEvalBrowserRuntime', () => {
     const events: string[] = [];
     const providerOptions: LocalChromeBrowserSessionOptions[] = [];
     let profile = 0;
+    // An empty env pins the local provider so a developer with
+    // SHERLOCK_BROWSER_PROVIDER=browserbase exported in their shell cannot make
+    // this hermetic suite reach the network.
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       listTempProfiles: noReaping,
       executablePath: '/opt/custom-chrome',
@@ -88,6 +92,7 @@ describe('createEvalBrowserRuntime', () => {
     const firstCanFinish = deferred();
     const firstStarted = deferred();
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       listTempProfiles: noReaping,
       executablePath: '/opt/custom-chrome',
@@ -133,6 +138,7 @@ describe('createEvalBrowserRuntime', () => {
   it('preserves the trial error while warning about cleanup failures', async () => {
     const warnings: string[] = [];
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       listTempProfiles: noReaping,
       createTempProfile: async () => '/tmp/failing-profile',
@@ -165,6 +171,7 @@ describe('createEvalBrowserRuntime', () => {
   it('never launches the headed session when a batch has no authenticated jobs', async () => {
     const options: LocalChromeBrowserSessionOptions[] = [];
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       listTempProfiles: noReaping,
       createTempProfile: async () => '/tmp/normal-only',
@@ -184,6 +191,7 @@ describe('createEvalBrowserRuntime', () => {
 
   it('explains the persistent-profile singleton lock', async () => {
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       listTempProfiles: noReaping,
       createProvider: () => ({
@@ -242,6 +250,7 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
     await writeFile(join(root, 'evidence-agent-eval-chrome-notadir'), 'x');
 
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       tempProfileRoot: root,
       onWarning: (message) => warnings.push(message),
@@ -262,6 +271,7 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
     await profileDir('evidence-agent-eval-chrome-borderline', FOUR_HOURS_MS - 60_000);
 
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       tempProfileRoot: root,
     });
@@ -273,6 +283,7 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
   it('warns instead of failing the batch when the temp directory cannot be read', async () => {
     const warnings: string[] = [];
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       tempProfileRoot: join(root, 'does-not-exist'),
       onWarning: (message) => warnings.push(message),
@@ -289,6 +300,7 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
     const second = await profileDir('evidence-agent-eval-chrome-bbb', FOUR_HOURS_MS + 60_000);
 
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       tempProfileRoot: root,
       removeTempProfile: async (dir) => {
@@ -310,6 +322,7 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
     await profileDir('evidence-agent-eval-chrome-slow', FOUR_HOURS_MS + 60_000);
 
     const runtime = createEvalBrowserRuntime({
+      env: {},
       authenticatedProfileDir: '/persistent/auth-profile',
       tempProfileRoot: root,
       removeTempProfile: async () => {
@@ -320,5 +333,192 @@ describe('createEvalBrowserRuntime orphaned-profile reaping', () => {
     await runtime.close();
 
     expect(removalFinished).toBe(true);
+  });
+});
+
+// The Browserbase adapter, exercised through its own `createProvider` test
+// seam so no test here ever reaches the real Browserbase API or a real
+// browser. `env: {}` on `createEvalBrowserRuntime` pins provider
+// auto-selection off (see the top-of-file comment on `noReaping`'s sibling
+// tests above); `createBrowserbaseEvalBrowserAdapter`'s OWN `env` is what
+// carries `BROWSERBASE_API_KEY`/`BROWSERBASE_CONTEXT_ID`, since the adapter
+// validates those itself, independently of runtime provider selection.
+describe('createEvalBrowserRuntime on Browserbase', () => {
+  const UNUSED_LOCAL_PROFILE_DIR = '/local-profile-unused-by-the-browserbase-adapter';
+
+  function fakeBrowserbaseBrowser(sessionId: string, events: string[]): BrowserController {
+    return {
+      close: vi.fn(async () => {
+        events.push(`close:${sessionId}`);
+      }),
+      sessionDiagnostics: { provider: 'browserbase', sessionId },
+    } as unknown as BrowserController;
+  }
+
+  it('gives every isolated trial its own context-free, non-live-view session', async () => {
+    const events: string[] = [];
+    const configs: Array<{ contextId?: string; liveView: boolean; lane: string }> = [];
+    let sessionCount = 0;
+    const adapter = createBrowserbaseEvalBrowserAdapter({
+      env: { BROWSERBASE_API_KEY: 'key' },
+      createProvider: (config) => {
+        configs.push(config);
+        const sessionId = `session-${++sessionCount}`;
+        return {
+          createSession: async () => {
+            events.push(`create:${sessionId}`);
+            return fakeBrowserbaseBrowser(sessionId, events);
+          },
+        };
+      },
+    });
+    const runtime = createEvalBrowserRuntime({
+      env: {},
+      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
+      adapter,
+    });
+
+    await Promise.all([
+      runtime.withBrowser(false, async () => 'one'),
+      runtime.withBrowser(false, async () => 'two'),
+    ]);
+    await runtime.close();
+
+    // Two isolated trials, two distinct sessions — a shared Context (or a
+    // shared session) would let one trial's state reach the next, which is
+    // exactly what isolation exists to prevent.
+    expect(configs).toHaveLength(2);
+    for (const config of configs) {
+      expect(config.contextId).toBeUndefined();
+      expect(config.liveView).toBe(false);
+      expect(config.lane).toBe('isolated');
+    }
+    expect(events).toEqual(
+      expect.arrayContaining([
+        'create:session-1',
+        'create:session-2',
+        'close:session-1',
+        'close:session-2',
+      ]),
+    );
+  });
+
+  it("closes an isolated trial's session when the trial throws, and the trial's own error propagates rather than the close failure", async () => {
+    const warnings: string[] = [];
+    const adapter = createBrowserbaseEvalBrowserAdapter({
+      env: { BROWSERBASE_API_KEY: 'key' },
+      createProvider: () => ({
+        createSession: async () =>
+          ({
+            close: async () => {
+              throw new Error('close failed');
+            },
+            sessionDiagnostics: { provider: 'browserbase', sessionId: 'sess-1' },
+          }) as unknown as BrowserController,
+      }),
+    });
+    // The "could not close" warning is emitted by the lane policy in
+    // `createEvalBrowserRuntime` (it wraps `lease.release()`), not by the
+    // adapter itself — so it is `onWarning` here, on the runtime, that
+    // receives it, not the adapter factory's own `onWarning`.
+    const runtime = createEvalBrowserRuntime({
+      env: {},
+      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
+      adapter,
+      onWarning: (message) => warnings.push(message),
+    });
+
+    await expect(
+      runtime.withBrowser(false, async () => {
+        throw new Error('trial failed');
+      }),
+    ).rejects.toThrow('trial failed');
+
+    expect(warnings).toEqual([expect.stringContaining('sess-1: close failed')]);
+    await runtime.close();
+  });
+
+  it('reuses one authenticated session, serializes its operations, opens it against the configured context, and closes it idempotently', async () => {
+    const events: string[] = [];
+    const configs: Array<{ contextId?: string; liveView: boolean; lane: string }> = [];
+    const firstCanFinish = deferred();
+    const firstStarted = deferred();
+    const adapter = createBrowserbaseEvalBrowserAdapter({
+      env: { BROWSERBASE_API_KEY: 'key', BROWSERBASE_CONTEXT_ID: 'ctx-auth' },
+      createProvider: (config) => {
+        configs.push(config);
+        return { createSession: async () => fakeBrowserbaseBrowser('auth-session', events) };
+      },
+    });
+    const runtime = createEvalBrowserRuntime({
+      env: {},
+      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
+      adapter,
+    });
+
+    const first = runtime.withBrowser(true, async () => {
+      events.push('first:start');
+      firstStarted.resolve();
+      await firstCanFinish.promise;
+      events.push('first:end');
+    });
+    const second = runtime.withBrowser(true, async () => {
+      events.push('second:start');
+    });
+    await firstStarted.promise;
+    // The second operation must not begin until the first has finished —
+    // simultaneous sessions against the same Context would race over the
+    // same stored cookies.
+    expect(events).toEqual(['first:start']);
+
+    firstCanFinish.resolve();
+    await Promise.all([first, second]);
+    await runtime.close();
+    await runtime.close();
+
+    // Exactly one session created, exactly one close — the second close()
+    // must be a no-op rather than a second attempt on an already-closed
+    // session.
+    expect(events).toEqual(['first:start', 'first:end', 'second:start', 'close:auth-session']);
+    expect(configs).toHaveLength(1);
+    // `persistContext: false` is the property that makes this lane a pure READ
+    // of the operator's logins: a trial that gets signed out mid-batch must
+    // degrade that trial, not write the signed-out state back over the Context
+    // every later batch depends on.
+    expect(configs[0]).toEqual({
+      contextId: 'ctx-auth',
+      persistContext: false,
+      liveView: true,
+      lane: 'authenticated',
+    });
+  });
+
+  it("reports 'browserbase' as its provider", async () => {
+    const adapter = createBrowserbaseEvalBrowserAdapter({ env: { BROWSERBASE_API_KEY: 'key' } });
+    const runtime = createEvalBrowserRuntime({
+      env: {},
+      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
+      adapter,
+    });
+
+    expect(runtime.provider).toBe('browserbase');
+    await runtime.close();
+  });
+
+  it('fails an authenticated lane with no BROWSERBASE_CONTEXT_ID, naming `npm run login`', async () => {
+    // No createProvider override needed: `requireBrowserbaseContextId` must
+    // throw before the adapter ever calls it, or this test would reach for a
+    // provider double it never configured.
+    const adapter = createBrowserbaseEvalBrowserAdapter({ env: { BROWSERBASE_API_KEY: 'key' } });
+    const runtime = createEvalBrowserRuntime({
+      env: {},
+      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
+      adapter,
+    });
+
+    await expect(runtime.withBrowser(true, async () => undefined)).rejects.toThrow(
+      /npm run login/,
+    );
+    await runtime.close();
   });
 });

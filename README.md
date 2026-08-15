@@ -57,8 +57,8 @@ The manifest makes evidence tamper-evident — re-hash any artifact to prove it 
 
 ## Requirements
 
-- Node 22+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium).
-- An Anthropic API key. Optionally Langfuse keys for tracing.
+- Node 22+ and Google Chrome installed locally (the agent drives system Chrome, not bundled Chromium). Local Chrome is still required for the test suite even when production runs on Browserbase — see [Browser runtime](#browser-runtime).
+- An Anthropic API key. Optionally Langfuse keys for tracing, and a Browserbase API key to run the browser remotely.
 
 ## Setup
 
@@ -74,7 +74,39 @@ LANGFUSE_PUBLIC_KEY=...    # optional — tracing is a no-op without these
 LANGFUSE_SECRET_KEY=...
 LANGFUSE_BASE_URL=...      # optional
 GITHUB_TOKEN=...           # optional — authenticated GitHub eval oracles
+SHERLOCK_BROWSER_PROVIDER=browserbase   # optional — see Browser runtime
+BROWSERBASE_API_KEY=...    # required when the provider is browserbase
+BROWSERBASE_CONTEXT_ID=... # written by `npm run login`
 ```
+
+## Browser runtime
+
+Every entry point — the TUI, the REPL, CLI evals, TUI evals, the login command, the browser-backed demos — gets its browser from one place (`src/browser/provider.ts`), so a session can be local or remote without anything above the `BrowserController` boundary changing.
+
+| `SHERLOCK_BROWSER_PROVIDER` | Browser |
+| --- | --- |
+| unset or `local` | System Google Chrome on this machine, persistent profile in `chrome-profile/` |
+| `browserbase` | Browserbase-hosted Chrome, reached over CDP; logins live in a Browserbase Context |
+
+Selection is **explicit on purpose**: possessing a `BROWSERBASE_API_KEY` never starts a billable remote session on its own. `local` stays the fallback, and `npm test` is hermetic and network-free under either setting.
+
+With `browserbase` selected:
+
+```bash
+npm run login              # creates a Context, saves its id to .env, hands you a Live View to sign in through
+npm run login -- --check   # verify only; this is also the pre-batch eval gate
+npm run smoke:browserbase  # live end-to-end check of the remote provider (real minutes, not part of npm test)
+```
+
+`npm run login` verifies by **closing the session and opening a second one on the same Context** — closing is what commits it, and a sign-in that looks fine in Live View proves nothing about whether it persisted. That second session is the same boundary an authenticated eval trial crosses.
+
+What differs on Browserbase, and why:
+
+- **Downloads** land inside the remote container, so they are fetched back through Browserbase's Downloads API and **SHA-256-verified** before anything is written. The local run directory stays the evidence system of record; Browserbase is transport.
+- **Uploads** travel as bytes rather than as a path. Playwright would otherwise hand a remote Chrome a path from *this* filesystem, which it cannot read.
+- **Live View / recording links** are surfaced to the terminal and the TUI transcript so a human can watch or take over. The CDP *connection* URL never appears in a log, transcript, tool result, artifact, or child-process environment — `BROWSERBASE_API_KEY` is also on the `bash` tool's secret denylist.
+- **Browser-attached `bash` scripts are unavailable** remotely and fail explicitly. Ordinary `bash` in `scratch/workspace/` is unaffected. Attaching would mean handing model-generated shell code a remote session-control URL; the gated loopback-relay design that would restore it is §6 of [docs/browserbase-provider-plan.md](docs/browserbase-provider-plan.md).
+- **Google and X may still refuse a cloud browser** regardless of Context persistence. That is a measurement, not a bug — see the same document.
 
 ## Usage
 
@@ -92,7 +124,9 @@ npm run evals -- --tasks hacker_news,edgar,openclaw_pr --k 3 --concurrency 3
 
 Set `GITHUB_TOKEN` before running any GitHub-graded task. Without it the oracles fall back to GitHub's unauthenticated 60 requests/hour, which a k=3 batch exhausts partway through — and because grading happens *after* a run completes, the batch reports correct runs as failures. The first unauthenticated request warns; `evals/runners/regrade.ts` re-grades finished run directories once the token is in place.
 
-Normal eval trials run in parallel in separate headless Chrome processes, each with a temporary profile that is removed afterward. `--concurrency` limits this pool and defaults to 3. A task with `"headed": true` in `task.json` instead runs serially in a visible Chrome window backed by the persistent `chrome-profile/` — for tasks that need a real login or that bot-block headless browsers; currently `mit_sororities`, `edgar`, and `elon_tweets` use that policy. The headed lane may overlap the normal pool.
+Normal eval trials run in parallel in isolated browsers — separate headless Chrome processes with a temporary profile that is removed afterward, or one fresh context-free Browserbase session per trial. `--concurrency` limits this pool and defaults to 3. A task with `"headed": true` in `task.json` instead runs serially against the single logged-in browser: the persistent `chrome-profile/` locally, or one session on the configured Browserbase Context remotely (read-only, so a trial cannot overwrite your logins). That lane is for tasks that need a real login or that bot-block headless browsers; currently `mit_sororities`, `edgar`, and `elon_tweets` use that policy. It may overlap the normal pool.
+
+Tasks that declare `"requiresLogin"` are gated before the first trial: the preflight probes the same profile or Context the trials will use, and refuses the batch with the one command that fixes it. `--skip-login-check` runs anyway.
 
 Results print to stdout and persist to `evals/experiments/`. Task packages are the directories under `evals/datasets/`.
 

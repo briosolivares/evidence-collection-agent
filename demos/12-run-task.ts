@@ -1,5 +1,6 @@
 // Demo for T14: run the complete evidence-collection agent against a live
-// website with a visible, persistent Chrome profile. Run with:
+// website with a visible, persistent Chrome profile, via the configured
+// browser provider (local Chrome by default). Run with:
 //
 //   npx tsx demos/12-run-task.ts "Create a CSV of the top 5 Hacker News stories with title, URL, and points"
 //
@@ -10,7 +11,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
+import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
 import { runTask } from '../src/cli/runTask.js';
 import { METRICS_FILENAME, type RunMetrics } from '../src/loop/workerSession.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
@@ -31,9 +32,9 @@ if (!process.env.ANTHROPIC_API_KEY) {
 
 console.log(`task:        ${task}`);
 console.log(`start URL:   ${START_URL}`);
-console.log(`Chrome data: ${PROFILE_DIR}`);
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
 
-const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+const browserSessionProvider = createBrowserSessionProvider({
   profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();

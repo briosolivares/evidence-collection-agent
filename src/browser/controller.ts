@@ -25,6 +25,10 @@ import type {
 // Type-only, erased at runtime — registry.ts already imports `type
 // BrowserController` from this module, so this stays one-directional.
 import type { BusyResourceRegistry } from '../tools/registry.js';
+// Type-only: the diagnostics shape lives beside the provider seam that
+// produces it, so a provider and the runtimes that read it agree on one
+// definition. Erased at runtime — sessionProvider.ts imports this module.
+import type { BrowserSessionDiagnostics } from './sessionProvider.js';
 
 /** Options controlling a browser screenshot. */
 export interface BrowserScreenshotOptions {
@@ -452,6 +456,18 @@ export interface BrowserController {
    * protection from abandoned-read races — exactly today's behavior.
    */
   setBusyRegistry?(registry: BusyResourceRegistry): void;
+
+  /**
+   * Provider-neutral, user-facing facts about where this session is hosted:
+   * vendor session id, Live View URL, recording URL.
+   *
+   * OPTIONAL: a local Chrome session has nothing to say here and omits it.
+   * Read by application runtimes (the TUI, the REPL) to show a human where
+   * to watch or take over a remote session. Deliberately NOT a method and
+   * deliberately carrying no connection URL — see
+   * {@link BrowserSessionDiagnostics}.
+   */
+  readonly sessionDiagnostics?: BrowserSessionDiagnostics;
 
   close(): Promise<void>;
 }

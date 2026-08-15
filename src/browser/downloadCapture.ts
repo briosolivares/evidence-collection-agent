@@ -11,6 +11,7 @@
 import type { BrowserContext, Download, Locator, Page, Response } from 'playwright';
 
 import type { BrowserDownloadResult } from './controller.js';
+import type { BrowserDownloadReader } from './downloadReader.js';
 import { normalizeRefActionError } from './pageElementRefs.js';
 import { delay, isHttpUrl } from './playwrightBrowserController.js';
 
@@ -37,6 +38,11 @@ const DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS = 1_000;
  *   itself failed before (or, vanishingly rarely, after) its `page` event —
  *   rebalances the counter without going negative, so a later popup cannot
  *   be misclassified as internal
+ * @param downloadReader - how to turn a download EVENT into bytes; local
+ *   Chrome reads the file it already wrote, a remote browser has to fetch it
+ *   back (see downloadReader.ts). Direct-navigation responses never reach it:
+ *   those already carry their bytes in-process, which is why that path is
+ *   deliberately left untouched by provider choice.
  */
 export async function captureUrlThroughChrome(
   context: BrowserContext,
@@ -44,6 +50,7 @@ export async function captureUrlThroughChrome(
   referringPage: Page,
   trackPendingInternalPage: () => void,
   untrackPendingInternalPage: () => void,
+  downloadReader: BrowserDownloadReader,
 ): Promise<BrowserDownloadResult> {
   const referringUrl = referringPage.url();
   // A throwaway plumbing page: counted out of the page registry (see the
@@ -77,7 +84,7 @@ export async function captureUrlThroughChrome(
 
     const outcome = await Promise.race([downloadOutcome, navigationOutcome]);
     if (outcome.kind === 'download') {
-      return await readBrowserDownload(outcome.download);
+      return await readBrowserDownload(outcome.download, downloadReader);
     }
 
     if (outcome.kind === 'response') {
@@ -92,7 +99,7 @@ export async function captureUrlThroughChrome(
       delay(DOWNLOAD_AFTER_NAVIGATION_ERROR_GRACE_MS).then(() => undefined),
     ]);
     if (lateDownload !== undefined) {
-      return await readBrowserDownload(lateDownload.download);
+      return await readBrowserDownload(lateDownload.download, downloadReader);
     }
     throw outcome.error;
   } finally {
@@ -104,6 +111,7 @@ export async function captureClickDownload(
   locator: Locator,
   ref: string,
   page: Page,
+  downloadReader: BrowserDownloadReader,
 ): Promise<BrowserDownloadResult> {
   const downloadPromise = page.waitForEvent('download', {
     timeout: DOWNLOAD_EVENT_TIMEOUT_MS,
@@ -114,7 +122,7 @@ export async function captureClickDownload(
   try {
     await locator.click();
     clickCompleted = true;
-    return await readBrowserDownload(await downloadPromise);
+    return await readBrowserDownload(await downloadPromise, downloadReader);
   } catch (error) {
     if (!clickCompleted) {
       throw await normalizeRefActionError(locator, ref, error);
@@ -141,30 +149,19 @@ async function readNavigationResponse(
   };
 }
 
+/** Reject a failed download before its reader is asked for bytes it cannot
+ * have — the failure check is engine-level and identical for every provider,
+ * so it stays here rather than being restated in each reader. */
 async function readBrowserDownload(
   download: Download,
+  reader: BrowserDownloadReader,
 ): Promise<BrowserDownloadResult> {
   const failure = await download.failure();
   if (failure !== null) {
     throw new Error(`Browser download failed: ${failure}`);
   }
 
-  const stream = await download.createReadStream();
-  if (stream === null) {
-    throw new Error('Browser download completed without a readable byte stream.');
-  }
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-
-  return {
-    finalUrl: download.url(),
-    headers: {},
-    bytes: new Uint8Array(Buffer.concat(chunks)),
-    suggestedFilename: download.suggestedFilename(),
-  };
+  return reader.read(download);
 }
 
 function suggestedFilenameFromHeaders(

@@ -27,6 +27,7 @@
     "evals": "tsx --env-file-if-exists=.env evals/runners/cli.ts",
     "agent": "tsx src/cli/repl.ts",
     "login": "tsx src/cli/login.ts",
+    "smoke:browserbase": "tsx --env-file-if-exists=.env scripts/browserbaseSmoke.ts",
     "sherlock": "node bin/sherlock.mjs",
     "build:quicklook": "native/quicklook/build.sh"
   },
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",
+    "@browserbasehq/sdk": "2.18.0",
     "@date-fns/tz": "1.2.0",
     "@langfuse/otel": "5.10.0",
     "@langfuse/tracing": "5.10.0",

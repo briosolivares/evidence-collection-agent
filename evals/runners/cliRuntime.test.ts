@@ -11,6 +11,7 @@ describe('createBrowserBackedRunTask', () => {
     const policies: boolean[] = [];
     const configs: RunTaskConfig[] = [];
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (headed, operation) => {
         policies.push(headed);
         return operation(browser);
@@ -59,6 +60,7 @@ describe('createBrowserBackedRunTask', () => {
     const browser = { close: vi.fn() } as unknown as BrowserController;
     const configs: RunTaskConfig[] = [];
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (_headed, operation) => operation(browser),
       close: vi.fn(),
     };
@@ -91,6 +93,7 @@ describe('unanswerable questions in an unattended batch', () => {
   const runOnce = async () => {
     const browser = { close: vi.fn() } as unknown as BrowserController;
     const browserRuntime: EvalBrowserRuntime = {
+      provider: 'local',
       withBrowser: async (_headed, operation) => operation(browser),
       close: vi.fn(),
     };

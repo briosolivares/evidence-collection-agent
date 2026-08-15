@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { BrowserController } from '../../src/browser/controller.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
 import type { RunHandle, RunSessionDeps } from '../../src/tui/bridge/runSession.js';
+import type { UiEvent } from '../../src/tui/store/state.js';
 import { stubBrowser } from './stubBrowser.js';
 
 function makeHandle(): RunHandle {
@@ -58,6 +59,46 @@ describe('TUI browser lifecycle', () => {
     await runtime.start();
     await runtime.shutdown();
     expect(createSession).not.toHaveBeenCalled();
+  });
+
+  it('emits browser_session once for a controller carrying diagnostics, and never for one without', async () => {
+    const remoteController: BrowserController = {
+      ...stubBrowser(),
+      sessionDiagnostics: {
+        provider: 'browserbase',
+        sessionId: 'bb_1',
+        liveViewUrl: 'https://live.example/1',
+      },
+    };
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession: async () => remoteController },
+      startRunFn: () => makeHandle(),
+    });
+    const events: UiEvent[] = [];
+    await runtime.start();
+    await runtime.startRun('first', (event) => events.push(event)).done;
+
+    const sessionEvents = events.filter((event) => event.type === 'browser_session');
+    expect(sessionEvents).toEqual([
+      {
+        type: 'browser_session',
+        provider: 'browserbase',
+        sessionId: 'bb_1',
+        liveViewUrl: 'https://live.example/1',
+      },
+    ]);
+
+    // A local controller carries no diagnostics, so nothing is emitted.
+    const localController = stubBrowser();
+    expect(localController.sessionDiagnostics).toBeUndefined();
+    const localRuntime = createTuiRuntime({
+      browserSessionProvider: { createSession: async () => localController },
+      startRunFn: () => makeHandle(),
+    });
+    const localEvents: UiEvent[] = [];
+    await localRuntime.start();
+    await localRuntime.startRun('first', (event) => localEvents.push(event)).done;
+    expect(localEvents.filter((event) => event.type === 'browser_session')).toHaveLength(0);
   });
 
   it('refuses to run before the browser session exists', async () => {

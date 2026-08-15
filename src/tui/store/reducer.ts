@@ -512,6 +512,19 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       if (state.live === undefined) return state;
       return { ...state, live: { ...state.live, runDir: action.runDir } };
 
+    case 'browser_session': {
+      // Local Chrome is already a window on the user's own screen — a
+      // transcript line announcing it would just be noise about something
+      // they can already see.
+      if (action.provider === 'local') return state;
+      const id = action.sessionId ?? '(unknown)';
+      const text =
+        action.liveViewUrl === undefined
+          ? `Browserbase session ${id} (no Live View URL available)`
+          : `Browserbase session ${id} — watch or take over: ${action.liveViewUrl}`;
+      return append(state, { kind: 'notice', text });
+    }
+
     case 'turn_start': {
       if (state.live === undefined) return state;
       const next = settleDanglingPending(finalizeStreamingText(state));

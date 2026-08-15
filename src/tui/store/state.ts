@@ -4,6 +4,7 @@
 // finalized, and the single UiEvent stream the reducer consumes.
 
 import type { ArtifactRole, ManifestEntry } from '../../run/artifacts.js';
+import type { BrowserProviderKind } from '../../browser/sessionProvider.js';
 
 /** Interaction modes; overlays are modes so exactly one surface owns input. */
 export type SessionMode =
@@ -253,6 +254,18 @@ export interface LiveRunState {
 export type UiEvent =
   | { type: 'run_started'; task: string; at: number }
   | { type: 'run_dir'; runDir: string }
+  | {
+      /** A browser session now backs the run — emitted once, right after
+       * ensureBrowser() creates it (fresh launch or post-death relaunch).
+       * Local Chrome carries no diagnostics and never reaches here; only a
+       * remote provider (Browserbase) has anything worth telling a human
+       * about. Never carries the CDP connection URL — see
+       * BrowserSessionDiagnostics for why that invariant matters. */
+      type: 'browser_session';
+      provider: BrowserProviderKind;
+      sessionId?: string;
+      liveViewUrl?: string;
+    }
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; text: string }
   | { type: 'tool_pending'; name: string }

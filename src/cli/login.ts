@@ -1,25 +1,31 @@
-// Login helper for the persistent headed-lane Chrome profile.
+// Login helper for the authenticated lane, on whichever browser runtime is
+// selected (see src/browser/provider.ts).
 //
-//   npm run login             interactive: open the profile under
-//                             Playwright, log in by hand, press Enter to
-//                             verify; loops until every service verifies
-//   npm run login -- --manual launch a plain, un-automated Chrome on the
-//                             same profile so Google's sign-in flow will
-//                             accept it; quit Chrome and it verifies
-//   npm run login -- --check  verify only (headless, no interaction);
-//                             exit 0 iff every service is logged in —
-//                             this is the pre-batch preflight
+//   npm run login             interactive: sign in by hand and verify;
+//                             loops until every service verifies (local),
+//                             or signs in through Browserbase Live View
+//                             and verifies across a session boundary
+//   npm run login -- --manual LOCAL ONLY: launch a plain, un-automated
+//                             Chrome on the same profile so Google's
+//                             sign-in flow will accept it; quit Chrome
+//                             and it verifies
+//   npm run login -- --check  verify only, no interaction; exit 0 iff
+//                             every service is logged in — this is the
+//                             pre-batch preflight
 //
-// Why this exists: headed eval trials launch whatever sessions live in
-// ONE specific profile directory (repo-anchored in a dev checkout, so
-// every worktree has its own), and pre-batch logins kept silently
-// landing somewhere else. This helper resolves the profile and the
-// Chrome binary through the exact same code path the trials use, then
-// verifies behaviorally — a page that loads signed-in cannot lie.
+// Why this exists: authenticated eval trials use whatever sessions live in
+// ONE specific place — a profile directory locally (repo-anchored in a dev
+// checkout, so every worktree has its own), or one Browserbase Context
+// remotely — and pre-batch logins kept silently landing somewhere else.
+// This helper resolves that place through the exact same code path the
+// trials use, then verifies behaviorally — a page that loads signed-in
+// cannot lie.
 //
 // Why --manual exists: see manualLogin.ts. Google will not let you sign
-// in inside an automated browser at all, so the default mode works for X
-// but cannot work for Google.
+// in inside an automated LOCAL browser at all, so the default local mode
+// works for X but cannot work for Google. It has no remote analogue: a
+// Browserbase browser is only reachable through Live View, which is what
+// the Browserbase flow uses.
 
 import { spawn } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
@@ -33,10 +39,16 @@ import {
   pinProfileDownloadDirectory,
 } from '../browser/playwrightBrowserController.js';
 import {
+  describeBrowserProvider,
+  resolveBrowserProviderKind,
+} from '../browser/provider.js';
+import {
   chromeExecutablePath,
   findDevRoot,
+  loadFirstEnvFile,
   resolveSherlockPaths,
 } from '../config/paths.js';
+import { runBrowserbaseLogin } from './browserbaseLogin.js';
 import { checkProfileLogins, probeServices } from './loginCheck.js';
 import { HEADED_LANE_SERVICES, allLoggedIn, formatLoginState } from './loginProbe.js';
 import {
@@ -57,11 +69,35 @@ const MIN_MANUAL_SESSION_MS = 10_000;
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const paths = resolveSherlockPaths({ devRoot: findDevRoot(PACKAGE_ROOT) });
+// The same .env resolution the application runtimes use. Without it this
+// command could not see SHERLOCK_BROWSER_PROVIDER or BROWSERBASE_API_KEY, and
+// would silently log into local Chrome for a project configured to run
+// remotely — the exact class of "logged into the wrong place" failure this
+// helper exists to end.
+const loadedEnvFile = loadFirstEnvFile(paths.envFileCandidates);
+/** Where a newly created Browserbase Context id is saved: the file that
+ * loaded, or the last candidate (the repo `.env` in a checkout,
+ * `~/.sherlock/.env` installed) when none existed yet. */
+const envFilePath =
+  loadedEnvFile ?? paths.envFileCandidates[paths.envFileCandidates.length - 1]!;
+/** Resolve the provider, reporting a misconfiguration as a message rather than
+ * a stack trace: the whole failure here is a wrong value in a `.env` line, and
+ * a stack trace buries the one sentence that says which. */
+function selectedProvider(): 'local' | 'browserbase' {
+  try {
+    return resolveBrowserProviderKind();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
+}
+
+const provider = selectedProvider();
 const checkOnly = process.argv.includes('--check');
 const manual = process.argv.includes('--manual');
 
-console.log(`Chrome profile: ${paths.profileDir}`);
-console.log('(the exact directory headed eval trials launch — logins anywhere else do not count)');
+console.log(describeBrowserProvider({ profileDir: paths.profileDir }));
+console.log('(the exact place authenticated eval trials use — logins anywhere else do not count)');
 
 /** Probe every headed-lane service against an open context, printing one
  * status line each. */
@@ -157,7 +193,65 @@ async function runManual(): Promise<void> {
   process.exitCode = ready ? 0 : 1;
 }
 
-if (manual) {
+/** The Browserbase branch: Context provisioning, Live View sign-in, and
+ * verification across a close/reopen boundary. See browserbaseLogin.ts. */
+async function runBrowserbase(): Promise<void> {
+  if (manual) {
+    console.error(
+      '\n--manual launches a local Chrome on a local profile, which does nothing for a ' +
+        'Browserbase session. Run `npm run login` — it hands you a Live View to sign in ' +
+        'through, which is the only way into a remote browser.',
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  if (checkOnly) {
+    console.log('Verifying login state on the configured Browserbase context…');
+    const statuses = await checkProfileLogins({
+      profileDir: paths.profileDir,
+      services: HEADED_LANE_SERVICES,
+      headless: true,
+      onStatus: (status) => {
+        console.log(`  ${status.service.name}: ${formatLoginState(status.state)}`);
+      },
+    });
+    const ready = allLoggedIn(statuses);
+    console.log(
+      ready
+        ? '\nLOGIN OK — the Browserbase context is ready for authenticated batches.'
+        : '\nNOT READY — run `npm run login` to sign in through Live View.',
+    );
+    process.exitCode = ready ? 0 : 1;
+    return;
+  }
+
+  const ready = await runBrowserbaseLogin({
+    services: HEADED_LANE_SERVICES,
+    envFilePath,
+  });
+  console.log(
+    ready
+      ? '\nLOGIN OK — the logins survived closing and reopening the context, which is what ' +
+          'an authenticated trial will do.'
+      : '\nNOT READY — the logins did not survive the session boundary. Re-run ' +
+          '`npm run login`. If a sign-in page refuses the cloud browser outright, that is ' +
+          'the POC answer: this account cannot be used from Browserbase without proxy or ' +
+          'region configuration.',
+  );
+  process.exitCode = ready ? 0 : 1;
+}
+
+if (provider === 'browserbase') {
+  // Caught here rather than left to crash: every failure this branch can hit
+  // is a configuration one — no API key, no Context, a plan with no free
+  // concurrent session — and each already carries the sentence that fixes it.
+  // A stack trace on top only hides that sentence.
+  await runBrowserbase().catch((error: unknown) => {
+    console.error(`\n${error instanceof Error ? error.message : String(error)}`);
+    process.exitCode = 1;
+  });
+} else if (manual) {
   await runManual();
 } else {
   const context = await launchPersistentChrome({

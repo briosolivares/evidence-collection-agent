@@ -52,7 +52,7 @@ describe('formatLoginPreflightFailure', () => {
       { service: GOOGLE_SHEETS, state: 'logged-out' },
       { service: X_HOME, state: 'logged-in' },
     ];
-    const message = formatLoginPreflightFailure(statuses, requirements);
+    const message = formatLoginPreflightFailure(statuses, requirements, 'local');
 
     expect(message).toContain('LOGIN REQUIRED');
     expect(message).toContain('Google (Sheets): NOT LOGGED IN');
@@ -66,7 +66,7 @@ describe('formatLoginPreflightFailure', () => {
       { service: GOOGLE_SHEETS, state: 'logged-out' },
       { service: X_HOME, state: 'logged-in' },
     ];
-    expect(formatLoginPreflightFailure(statuses, requirements)).not.toContain('elon_tweets');
+    expect(formatLoginPreflightFailure(statuses, requirements, 'local')).not.toContain('elon_tweets');
   });
 
   // An unverified session is the case that silently burned two batches:
@@ -74,8 +74,37 @@ describe('formatLoginPreflightFailure', () => {
   // to stop making.
   it('reports an unverified probe as a blocker, not a pass', () => {
     const statuses: ServiceLoginStatus[] = [{ service: X_HOME, state: 'pending' }];
-    const message = formatLoginPreflightFailure(statuses, requirements);
+    const message = formatLoginPreflightFailure(statuses, requirements, 'local');
     expect(message).toContain('X: UNVERIFIED');
     expect(message).toContain('blocks elon_tweets');
+  });
+
+  // A Browserbase batch is fixed by a human clicking through Live View, not
+  // by anything that runs on the operator's own machine — so the fix line
+  // has to name that command and say nothing about local Chrome.
+  it('points a browserbase failure at Live View, not local Chrome', () => {
+    const statuses: ServiceLoginStatus[] = [
+      { service: GOOGLE_SHEETS, state: 'logged-out' },
+      { service: X_HOME, state: 'logged-in' },
+    ];
+    const message = formatLoginPreflightFailure(statuses, requirements, 'browserbase');
+
+    expect(message).toContain('LOGIN REQUIRED');
+    expect(message).toContain('Google (Sheets): NOT LOGGED IN');
+    expect(message).toContain('blocks mit_sororities');
+    expect(message).toContain('npm run login');
+    expect(message).toContain('Browserbase Live View');
+    expect(message).toContain('--skip-login-check');
+  });
+
+  // `--manual` launches a local Chrome on a local profile; a Browserbase
+  // batch has neither, so the flag would do nothing but pop an unrelated
+  // window on the operator's machine. Google being the failing service is
+  // exactly the case that triggers `--manual` advice on the local branch —
+  // proving it stays absent here is the point of this test.
+  it('never suggests --manual for browserbase, even when Google is failing', () => {
+    const statuses: ServiceLoginStatus[] = [{ service: GOOGLE_SHEETS, state: 'logged-out' }];
+    const message = formatLoginPreflightFailure(statuses, requirements, 'browserbase');
+    expect(message).not.toContain('--manual');
   });
 });

@@ -1,15 +1,17 @@
-// Demo for T10: create a local Chrome session and drive it through the
-// engine-neutral browser controller. Run with: npx tsx demos/10-controller.ts
+// Demo for T10: create a session through the configured browser provider
+// (local Chrome by default) and drive it through the engine-neutral browser
+// controller. Run with: npx tsx demos/10-controller.ts
 
 import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { LocalChromeBrowserSessionProvider } from '../src/browser/playwrightBrowserController.js';
+import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
 
 const DEMO_WINDOW_MS = 5_000;
 const PROFILE_DIR = resolve('chrome-profile');
 
-const browserSessionProvider = new LocalChromeBrowserSessionProvider({
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+const browserSessionProvider = createBrowserSessionProvider({
   profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();

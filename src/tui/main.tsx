@@ -8,7 +8,12 @@ import { dirname, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
-import { LocalChromeBrowserSessionProvider } from '../browser/playwrightBrowserController.js';
+import {
+  createBrowserSessionProvider,
+  describeBrowserProvider,
+  formatBrowserStartupError,
+  resolveBrowserProviderKind,
+} from '../browser/provider.js';
 import {
   chromeExecutablePath,
   findDevRoot,
@@ -152,6 +157,10 @@ if (verbose) {
       ? `env: loaded ${loadedEnvFile}`
       : 'env: no .env file found; using the ambient environment only',
   );
+  // Which runtime a session will use, before anything launches. A remote
+  // session also announces itself in the transcript once it opens (with its
+  // Live View link); this is the pre-launch answer.
+  console.error(describeBrowserProvider({ profileDir: paths.profileDir }));
 }
 
 // Key preflight: catch the missing-credential case while the terminal
@@ -171,31 +180,41 @@ if (
   );
 }
 
-// The headed persistent browser launches lazily on the first interactive
-// or authenticated run. Normal evals use the separate headless runtime.
+// The session browser launches lazily on the first interactive or
+// authenticated run — a persistent local Chrome, or a Browserbase session,
+// whichever the environment selects. Normal evals use the separate isolated
+// runtime. Provider selection happens once, here, so /evals and interactive
+// runs can never disagree about which runtime a session came from.
 const browserExecutablePath = chromeExecutablePath();
-const runtime = demo
-  ? undefined
-  : createTuiRuntime({
-      browserSessionProvider: new LocalChromeBrowserSessionProvider({
-        profileDir: paths.profileDir,
-        executablePath: browserExecutablePath,
-      }),
-      runsBaseDir: config.runsBaseDir,
-    });
+let browserProvider: ReturnType<typeof resolveBrowserProviderKind> = 'local';
+let runtime: ReturnType<typeof createTuiRuntime> | undefined;
 try {
+  // Inside the try because provider selection itself can fail on a
+  // misconfiguration (an unknown SHERLOCK_BROWSER_PROVIDER value, a missing
+  // API key) — which deserves the same actionable message a failed launch
+  // gets, not a raw stack trace before the terminal has even been claimed.
+  browserProvider = resolveBrowserProviderKind();
+  runtime = demo
+    ? undefined
+    : createTuiRuntime({
+        browserSessionProvider: createBrowserSessionProvider({
+          profileDir: paths.profileDir,
+          ...(browserExecutablePath === undefined
+            ? {}
+            : { executablePath: browserExecutablePath }),
+          // Interactive sessions are the authenticated ones: the user's logins
+          // live in the persistent profile locally and in the configured
+          // Context remotely, and this is the surface where a human can finish
+          // a re-auth prompt themselves. `optional` rather than `required` so
+          // a user who has not run `npm run login` yet can still browse.
+          context: 'optional',
+        }),
+        runsBaseDir: config.runsBaseDir,
+      });
   await runtime?.start();
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
-  console.error('sherlock could not launch Chrome.');
-  if (/not found|install|doesn'?t exist|does not exist/i.test(message)) {
-    console.error(
-      'Google Chrome does not appear to be installed. Install it from ' +
-        'https://www.google.com/chrome/ (or run `npx playwright install chrome`), ' +
-        'or point SHERLOCK_CHROME_PATH at a Chrome/Chromium binary.',
-    );
-  }
-  console.error(`\n${message}`);
+  console.error(formatBrowserStartupError(browserProvider, message));
   process.exit(1);
 }
 const evalRuntime =
