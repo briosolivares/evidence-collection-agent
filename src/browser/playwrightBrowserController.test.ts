@@ -745,6 +745,33 @@ describe('Playwright browser controller', () => {
     BROWSER_TEST_TIMEOUT_MS,
   );
 
+  it(
+    'tells a caller who passed an element id rather than an outline ref exactly that',
+    async () => {
+      await controller.newTab();
+      await controller.goto(fixtureServer.url('/'));
+      const observation = await controller.observe({ need: ['interactive'] });
+      const [element] = observation.elements;
+      if (element === undefined) {
+        throw new Error('the fixture page produced no interactive elements');
+      }
+
+      // `elements[].id` is browserAction's handle; download takes the
+      // `[ref=…]` outline stamp. The two are easy to confuse because one
+      // observation hands back both, so the error has to name the difference:
+      // observing again returns this very same id, which makes the default
+      // "inspect the page again" advice a loop rather than a fix.
+      const failure: unknown = await controller
+        .download({ ref: element.id })
+        .catch((error: unknown) => error);
+
+      expect(failure).toBeInstanceOf(BrowserRefNotFoundError);
+      expect((failure as Error).message).toContain('not an outline ref');
+      expect((failure as Error).message).not.toContain('inspect the page again');
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
   describe('PlaywrightBrowserController.pdfPageSource', () => {
     it(
       'hands out a page factory whose pages can never navigate the selected page away',

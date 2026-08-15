@@ -233,7 +233,16 @@ export async function resolveRefInRecord(record: PageRecord, ref: ElementRef): P
  * `ref` field) to a locator, requiring it to match exactly one element. */
 export async function locatorForRef(page: Page, ref: string): Promise<Locator> {
   if (!ARIA_REF_PATTERN.test(ref)) {
-    throw new BrowserRefNotFoundError(ref);
+    // A wrong-kind ref, not a stale one — most likely an `ElementRef.id` from
+    // an observation's `elements` list, which is the handle `browserAction`
+    // takes. Say so: the default advice is to observe again, and observing
+    // again returns that same id.
+    throw new BrowserRefNotFoundError(
+      ref,
+      'that is not an outline ref; this field takes the [ref=…] stamp from an ' +
+        'observe outline line, like e9 or f10e45, not an element object or an ' +
+        'id from the observe elements list',
+    );
   }
 
   const locator = page.locator(`aria-ref=${ref}`);

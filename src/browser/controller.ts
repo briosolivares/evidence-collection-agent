@@ -146,8 +146,20 @@ export class BrowserRefNotFoundError extends Error {
   /** Ref that could not be resolved. */
   readonly ref: string;
 
-  constructor(ref: string) {
-    super(`Browser ref ${ref} is unavailable; inspect the page again before acting.`);
+  /**
+   * @param ref - the ref that could not be resolved
+   * @param detail - why, for the cases where the default "inspect the page
+   *   again" advice would be actively wrong. A ref that was never the right
+   *   KIND of ref is not a stale one: re-observing hands back the same value,
+   *   so the default guidance invites a loop. Written as a clause, without
+   *   trailing punctuation.
+   */
+  constructor(ref: string, detail?: string) {
+    super(
+      detail === undefined
+        ? `Browser ref ${ref} is unavailable; inspect the page again before acting.`
+        : `Browser ref ${ref} is unusable: ${detail}.`,
+    );
     this.name = 'BrowserRefNotFoundError';
     this.ref = ref;
   }
