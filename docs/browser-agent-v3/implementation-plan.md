@@ -171,16 +171,16 @@ popup, and clean up using only `browser_execute`; the secret sweep passes.
 
 ### Step 2 — generic artifact and file surface
 
-- [ ] Implement `publish_artifact` modes for a workspace file, inline text,
+- [x] Implement `publish_artifact` modes for a workspace file, inline text,
   browser screenshot, and browser download.
-- [ ] Preserve exact bytes, manifest hashes, `requested_output`/`evidence`
+- [x] Preserve exact bytes, manifest hashes, `requested_output`/`evidence`
   roles, source URL, and path confinement.
-- [ ] Keep `read_file`, `write_file`, and `edit_file`, simplified to the v3
+- [x] Keep `read_file`, `write_file`, and `edit_file`, simplified to the v3
   partition and without contract-owner special cases.
-- [ ] Keep bounded worker-only `bash`; reuse scratch reconciliation and browser
+- [x] Keep bounded worker-only `bash`; reuse scratch reconciliation and browser
   access only through `browser_execute` (no CDP capability in child env).
-- [ ] Add `ask_user` over the existing permission/question bridge.
-- [ ] Add focused schema, partition, binary, overwrite, and cancellation tests.
+- [x] Add `ask_user` over the existing permission/question bridge.
+- [x] Add focused schema, partition, binary, overwrite, and cancellation tests.
 
 **Gate:** CSV, Markdown/text, screenshot, and download artifacts can each be
 published with correct manifest roles and verified hashes.
@@ -377,6 +377,37 @@ proved, even if supporting code already exists.
   disconnected," which remains recognized by the relaunch classifier; the
   targeted regression and final full suite are green.
 - No live Browserbase smoke or eval re-baseline was run.
+
+### 2026-08-15 — Step 2 generic artifact and file surface complete
+
+- Split the new-file implementation into three non-overlapping slices:
+  `publish_artifact`; simplified `read_file`/`write_file`/`edit_file`; and
+  browser-free `bash` plus `ask_user`. The coordinator owns the shared-contract
+  audit, combined acceptance gate, documentation, and commit.
+- Integration invariants are fixed before merge: publication is the only route
+  into `artifacts/`; editing tools write only under `scratch/`; file publication
+  reads exact regular-file bytes only from `scratch/workspace/`; overwrite role
+  equality is order-insensitive; browser capture checks cancellation before
+  committing bytes; and no child environment receives browser/CDP helper
+  capabilities.
+- Added strict conditional publication schemas, exact-byte file/text/browser
+  modes, role-set-stable overwrites, provider-derived browser provenance, and
+  cancellation-before-commit. Source reads use no-follow descriptors; the
+  coordinator applied the same descriptor-level hardening to private file-tool
+  reads after review exposed a check/read gap.
+- The private file tools now read only `artifacts/` or `scratch/`, mutate only
+  `scratch/`, reject symlink components and non-regular/binary edit targets,
+  preserve exact UTF-8 edit semantics, and route writes through the manifest.
+  V3 `bash` reuses the proven process-group runner but has no browser schema or
+  environment capability; `ask_user` keeps the existing fail-closed permission
+  bridge with optional context and two to four unique choices.
+- Coordinator gates passed: 51/51 new tests across five files, including the
+  vertical CSV/Markdown/screenshot/download manifest re-hash; 136/136 focused
+  legacy regressions; `npm run typecheck`; `git diff --check`; and the full
+  hermetic suite, 151 files / 1,935 tests in 45.82 seconds.
+- The TUI question dialog carries but does not yet render `ask_user.context`;
+  that presentation update remains part of the production cutover. No live
+  Browserbase smoke or eval re-baseline was run.
 
 ## Rules for coordinators and subagents
 
