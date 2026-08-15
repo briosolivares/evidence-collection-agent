@@ -61,6 +61,23 @@ import { remoteUploadEncoder } from './uploadEncoder.js';
  */
 const HEARTBEAT_INTERVAL_MS = 120_000;
 
+/**
+ * How long a session may live before Browserbase ends it, when a caller has
+ * not asked for something specific.
+ *
+ * Explicit because the alternative is not "no limit" — it is the project's
+ * `defaultTimeout`, a dashboard setting nobody here chose. A new project ships
+ * 300s, which is shorter than an agent turn on a hard task, shorter than a
+ * human signing in through Live View, and long enough to look like the browser
+ * died rather than expired. Both failures were observed before this existed.
+ *
+ * Bounded rather than maximal because the heartbeat keeps a live session alive
+ * indefinitely, so this value is really the backstop for a session whose owner
+ * crashed without reaching REQUEST_RELEASE: the longest a leak can bill.
+ * Browserbase permits 60s–21600s.
+ */
+const DEFAULT_SESSION_TIMEOUT_SECONDS = 1_800;
+
 /** Where a human watches or reviews a session. Live View comes from the API;
  * this is the durable inspector page for after the fact. */
 const SESSION_INSPECTOR_BASE_URL = 'https://browserbase.com/sessions';
@@ -100,8 +117,9 @@ export interface BrowserbaseBrowserSessionOptions {
    * explicit release.
    */
   keepAlive?: boolean;
-  /** Seconds before Browserbase ends the session on its own; omitted means the
-   * project's configured default. */
+  /** Seconds before Browserbase ends the session on its own; omitted means
+   * {@link DEFAULT_SESSION_TIMEOUT_SECONDS}, NOT the project's dashboard
+   * default — see that constant for why deferring to the project is a trap. */
   timeoutSeconds?: number;
   /** Region to run in; omitted means the project's default. */
   region?: 'us-west-2' | 'us-east-1' | 'eu-central-1' | 'ap-southeast-1';
@@ -263,9 +281,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
           },
           ...(this.options.keepAlive === undefined ? {} : { keepAlive: this.options.keepAlive }),
           ...(this.options.region === undefined ? {} : { region: this.options.region }),
-          ...(this.options.timeoutSeconds === undefined
-            ? {}
-            : { api_timeout: this.options.timeoutSeconds }),
+          api_timeout: this.options.timeoutSeconds ?? DEFAULT_SESSION_TIMEOUT_SECONDS,
           ...(this.options.proxies === undefined ? {} : { proxies: this.options.proxies }),
           ...(this.options.userMetadata === undefined
             ? {}

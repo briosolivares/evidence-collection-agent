@@ -29,12 +29,6 @@ import type { BrowserContext } from 'playwright';
 
 const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
 
-/** How long a remote sign-in session may live. Generous because the clock is
- * running on a person reading a Live View, finding a password, and answering
- * a 2FA challenge; bounded because a forgotten session is billable. Well
- * inside Browserbase's documented 60s–21600s range. */
-const INTERACTIVE_LOGIN_TIMEOUT_SECONDS = 1_800;
-
 /**
  * Navigate a fresh tab to `service.probeUrl` and classify where it landed.
  *
@@ -170,13 +164,8 @@ export async function openLoginProbeSession(
     contextId: requireBrowserbaseContextId(env),
     persistContext: options.persistContext ?? false,
     liveView: true,
-    // A sign-in session waits on a HUMAN typing credentials into Live View,
-    // possibly across two services and a 2FA prompt. The project default is
-    // whatever Browserbase set (300s on a new project), and a session that
-    // expires mid-sign-in takes the half-finished login with it — measured,
-    // not hypothetical. The automated verification session opposite needs no
-    // such grace and keeps the default.
-    ...(interactive ? { timeoutSeconds: INTERACTIVE_LOGIN_TIMEOUT_SECONDS } : {}),
+    // No timeoutSeconds: the provider's default already outlasts a human
+    // signing in through Live View, which is what a sign-in session waits on.
     userMetadata: { purpose: interactive ? 'login' : 'login-check' },
     ...(options.onWarning === undefined ? {} : { onWarning: options.onWarning }),
   });

@@ -311,6 +311,35 @@ describe('BrowserbaseBrowserSessionProvider contextId / persistContext', () => {
     const params = create.mock.calls[0]?.[0];
     expect(params.browserSettings).not.toHaveProperty('context');
   });
+
+  it('always sends an explicit api_timeout rather than inheriting the project default', async () => {
+    const { client, create } = fakeClient();
+    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
+    const provider = buildProvider({ client, connectOverCDP: async () => browser });
+
+    await provider.createSession();
+
+    // Deferring to the project's dashboard `defaultTimeout` is how a session
+    // ended up dying at 300s mid-run — shorter than an agent turn on a hard
+    // task, and shorter than a human signing in through Live View.
+    const params = create.mock.calls[0]?.[0];
+    expect(params.api_timeout).toBe(1_800);
+  });
+
+  it('lets a caller override the default session timeout', async () => {
+    const { client, create } = fakeClient();
+    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
+    const provider = buildProvider({
+      client,
+      connectOverCDP: async () => browser,
+      timeoutSeconds: 90,
+    });
+
+    await provider.createSession();
+
+    const params = create.mock.calls[0]?.[0];
+    expect(params.api_timeout).toBe(90);
+  });
 });
 
 describe('BrowserbaseBrowserSessionProvider Live View', () => {
