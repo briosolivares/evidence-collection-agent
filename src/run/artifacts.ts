@@ -10,6 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
+import type { BrowserProviderKind } from '../browser/sessionProvider.js';
 import { resolveRunPath } from './runDir.js';
 
 /** Name of the manifest file inside every run directory. */
@@ -63,6 +64,22 @@ export interface Manifest {
   startedAt: string;
   /** ISO 8601 timestamp of when the run ended; absent until finalized. */
   finishedAt?: string;
+  /**
+   * Which browser runtime produced this run. Absent for runs with no browser
+   * (and for runs recorded before this field existed).
+   *
+   * Recorded because the runtime changes both what a run CAN do and how long
+   * it takes — a Google-authenticated step is reachable on Browserbase and
+   * impossible on local Chrome, and remote turns measured roughly twice the
+   * wall time — yet nothing in a finished run said which one it was. That had
+   * to be inferred from timestamps against a commit date, which is not
+   * provenance.
+   *
+   * Only the provider NAME. The rest of BrowserSessionDiagnostics stays out:
+   * liveViewUrl and recordingUrl are local-user-interface only, and this file
+   * is readable by the verifier.
+   */
+  browserProvider?: BrowserProviderKind;
   /** One entry per distinct artifact path, most recent write wins. */
   artifacts: ManifestEntry[];
 }
@@ -87,15 +104,22 @@ export interface ArtifactMeta {
  *   yet contain a manifest; throws if one already exists (double-init is a
  *   bug, and overwriting would erase recorded provenance)
  * @param taskText - the task the run was started with, recorded verbatim
+ * @param browserProvider - the runtime hosting this run's browser; omit for a
+ *   run that has none
  * @returns nothing; <runDir>/manifest.json now holds valid JSON with the
  *   task text, a start timestamp, and an empty artifact list, and the
  *   artifacts/ and scratch/ subdirectories exist — the workspace layout is
  *   in place before the loop's first turn, like the manifest itself
  */
-export function initManifest(runDir: string, taskText: string): void {
+export function initManifest(
+  runDir: string,
+  taskText: string,
+  browserProvider?: BrowserProviderKind,
+): void {
   const manifest: Manifest = {
     task: taskText,
     startedAt: new Date().toISOString(),
+    ...(browserProvider === undefined ? {} : { browserProvider }),
     artifacts: [],
   };
   // 'wx' fails if the file exists — the guard against double-init.

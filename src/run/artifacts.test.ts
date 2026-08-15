@@ -169,6 +169,31 @@ describe('writeArtifact', () => {
   });
 });
 
+describe('manifest browserProvider', () => {
+  it('records which runtime produced the run', () => {
+    // A finished run used to say nothing about its browser, so which runtime
+    // produced it had to be inferred from timestamps against a commit date.
+    // The runtime decides both feasibility (a Google-authenticated step is
+    // impossible on local Chrome) and latency, so it belongs in provenance.
+    initManifest(runDir, 'collect the evidence', 'browserbase');
+
+    expect(readManifestFile().browserProvider).toBe('browserbase');
+  });
+
+  it('omits the field for a run with no browser', () => {
+    initManifest(runDir, 'collect the evidence');
+
+    expect(readManifestFile()).not.toHaveProperty('browserProvider');
+  });
+
+  it('survives finalize', () => {
+    initManifest(runDir, 'collect the evidence', 'local');
+    finalizeManifest(runDir);
+
+    expect(readManifestFile().browserProvider).toBe('local');
+  });
+});
+
 describe('manifest lifecycle', () => {
   it('stays valid JSON with all required fields through init, writes, and finalize', () => {
     initManifest(runDir, 'collect the evidence');

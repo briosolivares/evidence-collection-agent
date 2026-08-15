@@ -370,7 +370,9 @@ export async function runTask(
     generateRunId(taskText),
   );
   const runDir = runDirForRun;
-  initManifest(runDir, taskText);
+  // Only the Browserbase provider attaches diagnostics, so their absence is
+  // local Chrome — the same inference the startup banner makes.
+  initManifest(runDir, taskText, config.browser.sessionDiagnostics?.provider ?? 'local');
 
   // One budget tracker for the whole run — initializer, every worker cycle,
   // and every judge call charge the same instance, and starting a
