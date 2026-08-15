@@ -46,9 +46,16 @@ export const GOOGLE_SHEETS: LoginService = {
   },
 };
 
-/** X home: signed out client-redirects to the login flow (late — the
- * settle loop's confirmation re-check exists for exactly this); signed
- * in it stays on /home. */
+/** X home: signed out client-redirects (late — the settle loop's
+ * confirmation re-check exists for exactly this); signed in it stays on
+ * /home.
+ *
+ * The signed-out destination is NOT only the login flow: x.com/home very
+ * often lands on the marketing page at `/` instead. That was measured, not
+ * assumed — a Browserbase context with no X cookies at all probed as
+ * `https://x.com/`, classified `pending`, and the settle loop then handed
+ * back its stale optimistic `logged-in`. The gate said LOGGED IN for an
+ * account that had never signed in. */
 export const X_HOME: LoginService = {
   id: 'x',
   name: 'X',
@@ -61,6 +68,9 @@ export const X_HOME: LoginService = {
     if (parsed.pathname.startsWith('/i/flow/login') || parsed.pathname === '/login') {
       return 'logged-out';
     }
+    // Bounced off /home back to the root landing page: signed in, that
+    // never happens — the probe navigates to /home and stays there.
+    if (parsed.pathname === '/' || parsed.pathname === '') return 'logged-out';
     return parsed.pathname === '/home' ? 'logged-in' : 'pending';
   },
 };
@@ -150,7 +160,17 @@ export async function settleProbe(
 
   await sleep(confirmMs);
   const confirmed = service.classify(currentUrl());
-  return confirmed === 'pending' ? state : confirmed;
+  if (confirmed === state) return state;
+  if (confirmed !== 'pending') return confirmed;
+
+  // The confirmation was inconclusive. Resolving that in favour of the
+  // earlier reading is safe for `logged-out` and NOT safe for `logged-in`:
+  // this re-check exists because a signed-out page can sit on the signed-in
+  // destination for a moment before redirecting, so an optimistic first
+  // verdict is the one most likely to be wrong. Downgrade to `pending`,
+  // which `allLoggedIn` already treats as not ready — an unverified session
+  // must never pass a gate.
+  return state === 'logged-in' ? 'pending' : state;
 }
 
 function safeUrl(url: string): URL | undefined {

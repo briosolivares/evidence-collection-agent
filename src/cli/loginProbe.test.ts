@@ -42,8 +42,12 @@ describe('X_HOME.classify', () => {
     expect(X_HOME.classify('https://www.x.com/home')).toBe('logged-in');
   });
 
-  it('reports the landing page and foreign hosts as pending', () => {
-    expect(X_HOME.classify('https://x.com/')).toBe('pending');
+  it('reads the root landing page as logged out — /home bounces there when signed out', () => {
+    expect(X_HOME.classify('https://x.com/')).toBe('logged-out');
+    expect(X_HOME.classify('https://www.x.com')).toBe('logged-out');
+  });
+
+  it('reports foreign hosts and unrecognizable destinations as pending', () => {
     expect(X_HOME.classify('https://example.com/home')).toBe('pending');
     expect(X_HOME.classify('about:blank')).toBe('pending');
   });
@@ -73,6 +77,26 @@ describe('settleProbe', () => {
     let reads = 0;
     const state = await settleProbe(GOOGLE_SHEETS, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
     expect(state).toBe('logged-out');
+  });
+
+  it('catches a late bounce to the root landing page — the measured false positive', async () => {
+    // Exactly what a Browserbase context with no X cookies did: /home first,
+    // then the signed-out marketing page. This reported LOGGED IN before the
+    // classifier learned that `/` means signed out.
+    const urls = ['https://x.com/home', 'https://x.com/'];
+    let reads = 0;
+    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    expect(state).toBe('logged-out');
+  });
+
+  it('downgrades an unconfirmed logged-in verdict to pending instead of trusting it', async () => {
+    // A first read of logged-in is the one most likely to be wrong, because a
+    // signed-out page sits on the signed-in destination until its JS runs. If
+    // the confirmation cannot label where it went, the gate must not pass.
+    const urls = ['https://x.com/home', 'https://x.com/i/some-interstitial'];
+    let reads = 0;
+    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    expect(state).toBe('pending');
   });
 
   it('returns pending when the page never reaches a recognizable destination', async () => {
