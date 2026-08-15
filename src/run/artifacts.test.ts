@@ -1,5 +1,15 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  closeSync,
+  existsSync,
+  mkdtempSync,
+  openSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -31,6 +41,12 @@ afterEach(() => {
 
 function readManifestFile(): Manifest {
   return JSON.parse(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')) as Manifest;
+}
+
+function manifestTempFiles(): string[] {
+  return readdirSync(runDir).filter(
+    (name) => name.startsWith(`.${MANIFEST_FILENAME}.`) && name.endsWith('.tmp'),
+  );
 }
 
 describe('writeArtifact', () => {
@@ -224,7 +240,48 @@ describe('manifest lifecycle', () => {
 
   it('initManifest refuses to overwrite an existing manifest', () => {
     initManifest(runDir, 'first');
+    const before = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
+
     expect(() => initManifest(runDir, 'second')).toThrow();
+    expect(readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8')).toBe(before);
+    expect(manifestTempFiles()).toEqual([]);
+  });
+
+  it('replaces complete manifest snapshots and leaves no staging files', () => {
+    initManifest(runDir, 'atomic lifecycle');
+    const beforeWriteFd = openSync(join(runDir, MANIFEST_FILENAME), 'r');
+
+    try {
+      const entry = writeArtifact(runDir, 'artifacts/result.csv', Buffer.from('value\n1\n'), {
+        sourceUrl: 'https://example.com/source',
+        roles: ['requested_output', 'evidence'],
+      });
+      const initialSnapshot = JSON.parse(readFileSync(beforeWriteFd, 'utf8')) as Manifest;
+      expect(initialSnapshot.artifacts).toEqual([]);
+
+      const beforeFinalizeFd = openSync(join(runDir, MANIFEST_FILENAME), 'r');
+      try {
+        finalizeManifest(runDir);
+        const preFinalizeSnapshot = JSON.parse(
+          readFileSync(beforeFinalizeFd, 'utf8'),
+        ) as Manifest;
+        expect(preFinalizeSnapshot).not.toHaveProperty('finishedAt');
+      } finally {
+        closeSync(beforeFinalizeFd);
+      }
+
+      const final = readManifestFile();
+      expect(final.artifacts).toEqual([entry]);
+      expect(final.artifacts[0]).toMatchObject({
+        filename: 'artifacts/result.csv',
+        roles: ['requested_output', 'evidence'],
+        sha256: createHash('sha256').update('value\n1\n').digest('hex'),
+      });
+      expect(Number.isNaN(Date.parse(final.finishedAt!))).toBe(false);
+      expect(manifestTempFiles()).toEqual([]);
+    } finally {
+      closeSync(beforeWriteFd);
+    }
   });
 
   it('initManifest creates the artifacts/ and scratch/ workspace directories', () => {

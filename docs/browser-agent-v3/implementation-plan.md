@@ -220,7 +220,7 @@ prompt/tool definitions.
   append check/verifier feedback to the same worker conversation.
 - [ ] Write a compact v3 checkpoint at turn/tool/verifying/terminal boundaries
   under `harness/checkpoint.json`, atomically and with a run lock.
-- [ ] Make manifest replacement atomic and durable (temporary file, fsync,
+- [x] Make manifest replacement atomic and durable (temporary file, fsync,
   rename, parent-directory fsync) so a killed writer cannot leave truncated
   provenance.
 - [ ] Implement resume, including explicit uncertain-effect recovery instead
@@ -465,6 +465,26 @@ proved, even if supporting code already exists.
   `npm run typecheck`; `git diff --check`; and the complete hermetic suite,
   157 files / 1,976 tests in 43.64 seconds. No live Browserbase smoke or eval
   re-baseline was run.
+
+### 2026-08-15 — Step 4 durable coordinator in progress
+
+- Step 4 is split into three bounded foundations before composition: atomic
+  manifest replacement; generic deterministic `finish` checks over the
+  immutable output contract and manifest; and a compact version-3 checkpoint
+  schema/store for turn, tool, checking, verifying, terminal, and uncertain
+  effect state. The coordinator, verifier continuation, real process-kill
+  resume gate, and all terminal cleanup remain coordinator-owned integration
+  work after those foundations settle.
+- No production entry point is cut over during these foundations. Existing
+  v2 checkpoints/runs remain readable, and no live eval or Browserbase action
+  is authorized by this step.
+- Manifest creation, mutation, and finalization now use one durable atomic-file
+  primitive. Replacement stages and fsyncs a same-directory inode before
+  rename; first creation uses an exclusive hard-link publication so concurrent
+  initializers retain the prior `wx` no-clobber contract. The helper also
+  supports an exact `0600` mode for v3 checkpoints. Focused artifact/durability
+  tests passed 54/54, broader manifest consumers passed 195/195, and typecheck
+  plus whitespace checks passed.
 
 ## Rules for coordinators and subagents
 

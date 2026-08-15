@@ -11,6 +11,7 @@ import {
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import type { BrowserProviderKind } from '../browser/sessionProvider.js';
+import { writeFileDurablyAtomic } from './atomicFile.js';
 import { resolveRunPath } from './runDir.js';
 
 /** Name of the manifest file inside every run directory. */
@@ -122,8 +123,11 @@ export function initManifest(
     ...(browserProvider === undefined ? {} : { browserProvider }),
     artifacts: [],
   };
-  // 'wx' fails if the file exists — the guard against double-init.
-  writeFileSync(manifestPath(runDir), serializeManifest(manifest), { flag: 'wx' });
+  // Exclusive durable creation keeps the double-init guard while ensuring a
+  // crash can expose only the complete manifest or no manifest at all.
+  writeFileDurablyAtomic(manifestPath(runDir), serializeManifest(manifest), {
+    mode: 'create',
+  });
   mkdirSync(join(runDir, ARTIFACTS_DIR), { recursive: true });
   mkdirSync(join(runDir, SCRATCH_DIR), { recursive: true });
 }
@@ -203,7 +207,7 @@ export function writeArtifact(
   } else {
     manifest.artifacts.push(entry);
   }
-  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  writeManifestDurably(runDir, manifest);
   return entry;
 }
 
@@ -218,7 +222,7 @@ export function writeArtifact(
 export function finalizeManifest(runDir: string): void {
   const manifest = loadManifest(runDir);
   manifest.finishedAt = new Date().toISOString();
-  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  writeManifestDurably(runDir, manifest);
 }
 
 /**
@@ -255,6 +259,10 @@ function assertWorkspacePartition(
 
 function manifestPath(runDir: string): string {
   return join(runDir, MANIFEST_FILENAME);
+}
+
+function writeManifestDurably(runDir: string, manifest: Manifest): void {
+  writeFileDurablyAtomic(manifestPath(runDir), serializeManifest(manifest));
 }
 
 function loadManifest(runDir: string): Manifest {
@@ -305,7 +313,7 @@ export function setArtifactCompletionStatus(
   }
   const updated: ManifestEntry = { ...manifest.artifacts[index]!, completionStatus: status };
   manifest.artifacts[index] = updated;
-  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  writeManifestDurably(runDir, manifest);
   return updated;
 }
 
@@ -344,7 +352,7 @@ export function removeScratchArtifactEntry(runDir: string, relPath: string): voi
   const remaining = manifest.artifacts.filter((entry) => entry.filename !== filename);
   if (remaining.length === manifest.artifacts.length) return; // already absent: no-op
   manifest.artifacts = remaining;
-  writeFileSync(manifestPath(runDir), serializeManifest(manifest));
+  writeManifestDurably(runDir, manifest);
 }
 
 /**
