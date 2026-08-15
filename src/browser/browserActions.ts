@@ -332,6 +332,13 @@ export interface ActionCapableSession {
   /** Start recording page activity for one sequence. */
   watchPage(pageId: string): PageWatch;
   /**
+   * Let the engine settle page-identity work caused by the action that just
+   * completed. In particular, a popup is not safe to expose until ownership
+   * validation finishes; the sequencer must not start its next action while
+   * that validation is still pending.
+   */
+  settleActionActivity(): Promise<void>;
+  /**
    * Revalidate an element ref and return an actionable handle.
    *
    * @param target - the ref as observed
@@ -696,6 +703,7 @@ export async function performBrowserActions(
         action,
         preflight.uploadPaths.get(index),
       );
+      await session.settleActionActivity();
       receipts.push(attempt.receipt);
       if (attempt.receipt.effectsCommitted) committedAny = true;
 

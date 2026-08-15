@@ -32,6 +32,10 @@ import { chromium, type Browser, type BrowserContext, type Page } from 'playwrig
 
 import type { BrowserController } from './controller.js';
 import {
+  createChromiumTargetControl,
+  type ChromiumTargetControl,
+} from './chromiumTargetControl.js';
+import {
   createBrowserbaseDownloadReader,
   type BrowserbaseDownloadReaderHandle,
 } from './browserbaseDownloads.js';
@@ -368,6 +372,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
   async createSession(): Promise<BrowserController> {
     const raw = await this.createRawSession();
     let downloadReader: BrowserbaseDownloadReaderHandle;
+    let targetControl: ChromiumTargetControl | undefined;
     try {
       downloadReader = createBrowserbaseDownloadReader({
         apiKey: this.options.apiKey,
@@ -375,10 +380,15 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
         ...(this.options.fetchImpl === undefined ? {} : { fetchImpl: this.options.fetchImpl }),
         onWarning: this.warn,
       });
+      targetControl = await createChromiumTargetControl({
+        context: raw.context,
+        anchorPage: raw.sessionPage,
+      });
       return new PlaywrightBrowserController({
         context: raw.context,
         // No cdpUrl on purpose — see this module's header.
         preexistingSessionPage: raw.sessionPage,
+        targetControl,
         closeSession: () => raw.close(),
         downloadReader,
         // The remote browser cannot read this filesystem, so an upload has to
@@ -388,6 +398,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
         sessionDiagnostics: raw.diagnostics,
       });
     } catch (error) {
+      await targetControl?.close();
       await raw.close();
       throw error;
     }

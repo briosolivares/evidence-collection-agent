@@ -15,6 +15,10 @@ import { chromium, type Browser } from 'playwright';
 
 import type { BrowserController } from './controller.js';
 import { assertLoopbackCdpUrl } from './browserScriptSetup.js';
+import {
+  createChromiumTargetControl,
+  type ChromiumTargetControl,
+} from './chromiumTargetControl.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import type {
   BrowserSessionDiagnostics,
@@ -31,6 +35,9 @@ export interface AttachedChromeBrowserSessionOptions {
   cdpEndpoint: string;
   /** Test seam; production uses Playwright Chromium directly. */
   connectOverCDP?: (cdpEndpoint: string) => Promise<Browser>;
+  /** Test-only crash seam, awaited after an exact target commit receipt and
+   * before any Playwright page claim/marker work. */
+  afterTargetCreated?: () => Promise<void> | void;
 }
 
 /** An error whose text is safe to expose without revealing the endpoint. */
@@ -100,12 +107,14 @@ function safeSetupError(error: unknown, cleanupFailed: boolean): Error {
 export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvider {
   private readonly cdpEndpoint: string;
   private readonly connect: (cdpEndpoint: string) => Promise<Browser>;
+  private readonly afterTargetCreated: (() => Promise<void> | void) | undefined;
 
   constructor(options: AttachedChromeBrowserSessionOptions) {
     this.cdpEndpoint = requireLoopbackHttpEndpoint(options.cdpEndpoint);
     this.connect =
       options.connectOverCDP ??
       ((cdpEndpoint: string) => chromium.connectOverCDP(cdpEndpoint));
+    this.afterTargetCreated = options.afterTargetCreated;
   }
 
   async createSession(): Promise<BrowserController> {
@@ -121,6 +130,7 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
     }
 
     const disconnect = createClientDisconnect(browser);
+    let targetControl: ChromiumTargetControl | undefined;
 
     try {
       const contexts = browser.contexts();
@@ -140,10 +150,22 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
       // owned-page discovery and opens a fresh task page only when newTab()
       // is called by the run lifecycle.
       const preexistingSessionPages = [...context.pages()];
+      // Browser-scoped CDP needs no provider-internal page. Recovery may close
+      // every stale run page in this snapshot without detaching its own target
+      // inventory capability, and SIGKILL during setup cannot leak an
+      // unclassified blank anchor.
+      targetControl = await createChromiumTargetControl({
+        context,
+        browser,
+        ...(this.afterTargetCreated === undefined
+          ? {}
+          : { afterTargetCreated: this.afterTargetCreated }),
+      });
 
       return new PlaywrightBrowserController({
         context,
         preexistingSessionPages,
+        targetControl,
         closeSession: disconnect,
         sessionDiagnostics: ATTACHED_SESSION_DIAGNOSTICS,
         // No cdpUrl: V3 opens target-pinned sessions through the already
@@ -153,6 +175,11 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
       });
     } catch (error) {
       let cleanupFailed = false;
+      try {
+        await targetControl?.close();
+      } catch {
+        cleanupFailed = true;
+      }
       try {
         await disconnect();
       } catch {

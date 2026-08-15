@@ -42,11 +42,13 @@ import {
   createV3WorkerSession,
   dropV3UnansweredAssistantTurn,
   readV3WorkerMetrics,
+  resumeV3PendingToolTurn,
   restoreV3WorkerSession,
   runV3WorkerTurn,
   writeV3WorkerMetrics,
   type V3WorkerSession,
   type V3WorkerSessionDeps,
+  type V3PendingToolTurn,
 } from './workerSession.js';
 
 let runDir: string;
@@ -371,6 +373,89 @@ describe('v3 finish protocol', () => {
       ),
     });
   });
+
+  it.each([
+    {
+      name: 'model-token',
+      budget: { maxModelTokens: 1 },
+      maxContextTokens: Infinity,
+      usage: { input_tokens: 1, output_tokens: 1 },
+      reason: 'model_tokens',
+    },
+    {
+      name: 'context',
+      budget: {},
+      maxContextTokens: 1,
+      usage: { input_tokens: 1, output_tokens: 1 },
+      reason: 'context_budget',
+    },
+  ])('refuses valid finish after crossing the $name ceiling', async (entry) => {
+    const finishRequested = vi.fn();
+    const worker = session(
+      scriptedDriver([
+        accepted(
+          [
+            {
+              type: 'tool_use',
+              id: 'finish-over-budget',
+              name: 'finish',
+              input: VALID_FINISH,
+            },
+          ],
+          { usage: entry.usage },
+        ),
+      ]),
+      [finishTool],
+      {
+        budget: entry.budget,
+        maxContextTokens: entry.maxContextTokens,
+        deps: { lifecycle: { finishRequested } },
+      },
+    );
+
+    await expect(runV3WorkerTurn(worker)).resolves.toEqual({
+      kind: 'incomplete',
+      reason: entry.reason,
+    });
+    expect(finishRequested).not.toHaveBeenCalled();
+    expect(
+      transcript().filter((event) => event.type === 'finish_requested'),
+    ).toHaveLength(0);
+    expect(lastResults(worker)).toEqual([
+      expect.objectContaining({
+        tool_use_id: 'finish-over-budget',
+        is_error: true,
+        content: expect.stringContaining(entry.reason),
+      }),
+    ]);
+  });
+
+  it('allows finish on the final configured worker turn', async () => {
+    const finishRequested = vi.fn(async () => undefined);
+    const worker = session(
+      scriptedDriver([
+        accepted([
+          {
+            type: 'tool_use',
+            id: 'finish-on-final-turn',
+            name: 'finish',
+            input: VALID_FINISH,
+          },
+        ]),
+      ]),
+      [finishTool],
+      {
+        budget: { maxWorkerTurns: 1 },
+        deps: { lifecycle: { finishRequested } },
+      },
+    );
+
+    await expect(runV3WorkerTurn(worker)).resolves.toMatchObject({
+      kind: 'finish_requested',
+      request: { call: { id: 'finish-on-final-turn' } },
+    });
+    expect(finishRequested).toHaveBeenCalledOnce();
+  });
 });
 
 describe('v3 rejection and guards', () => {
@@ -521,6 +606,116 @@ describe('v3 rejection and guards', () => {
 });
 
 describe('v3 result bounds, cancellation, and lifecycle', () => {
+  it('charges and checkpoints an accepted response before cancellation wins', async () => {
+    const controller = new AbortController();
+    const accounting = vi.fn(async () => {});
+    const worker = session(
+      scriptedDriver([
+        () => {
+          controller.abort();
+          return accepted([{ type: 'text', text: 'must not be accepted' }]);
+        },
+      ]),
+      [],
+      {
+        deps: {
+          signal: controller.signal,
+          lifecycle: { afterModelAccounting: accounting },
+        },
+      },
+    );
+
+    await expect(runV3WorkerTurn(worker)).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+    expect(worker.config.budget.totalModelTokens()).toBe(18);
+    expect(accounting).toHaveBeenCalledWith(
+      expect.objectContaining({
+        turn: 1,
+        usage: USAGE,
+        outcome: 'accepted',
+      }),
+    );
+    expect(worker.state.messages).toHaveLength(1);
+  });
+
+  it('charges and checkpoints error-carried usage before cancellation wins', async () => {
+    const controller = new AbortController();
+    const accounting = vi.fn(async () => {});
+    const failure = new ModelGenerationFailedError(
+      new Error('replacement transport failed'),
+      { input_tokens: 7, output_tokens: 3 },
+    );
+    const worker = session(
+      scriptedDriver([
+        () => {
+          controller.abort();
+          throw failure;
+        },
+      ]),
+      [],
+      {
+        deps: {
+          signal: controller.signal,
+          lifecycle: { afterModelAccounting: accounting },
+        },
+      },
+    );
+
+    await expect(runV3WorkerTurn(worker)).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+    expect(worker.config.budget.totalModelTokens()).toBe(10);
+    expect(accounting).toHaveBeenCalledWith(
+      expect.objectContaining({
+        turn: 1,
+        usage: { input_tokens: 7, output_tokens: 3 },
+        outcome: 'failed',
+      }),
+    );
+    expect(worker.state.messages).toHaveLength(1);
+  });
+
+  it('awaits the durable accounting hook and propagates its failure before accepting content', async () => {
+    let rejectAccounting!: (error: Error) => void;
+    let accountingStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      accountingStarted = resolve;
+    });
+    const accounting = new Promise<void>((_resolve, reject) => {
+      rejectAccounting = reject;
+    });
+    const worker = session(
+      scriptedDriver([
+        accepted([{ type: 'text', text: 'must remain unaccepted' }]),
+      ]),
+      [],
+      {
+        deps: {
+          lifecycle: {
+            afterModelAccounting: async (event) => {
+              expect(event.session.turnCount).toBe(1);
+              expect(worker.config.budget.totalModelTokens()).toBe(18);
+              accountingStarted();
+              await accounting;
+            },
+          },
+        },
+      },
+    );
+
+    const running = runV3WorkerTurn(worker);
+    await started;
+    expect(worker.state.messages).toHaveLength(1);
+
+    rejectAccounting(new Error('checkpoint write failed'));
+    await expect(running).rejects.toThrow('checkpoint write failed');
+    expect(worker.state.messages).toHaveLength(1);
+    expect(
+      transcript().filter((event) => event.type === 'model_response'),
+    ).toHaveLength(0);
+  });
+
   it('freezes both per-result and combined offloads in stored history', async () => {
     const smallCap = tool('small_cap', () => 's'.repeat(2_000), 100);
     const large = tool('large', () => 'x'.repeat(45_000));
@@ -674,6 +869,102 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
     await expect(runV3WorkerTurn(worker)).rejects.toThrow('checkpoint write failed');
     expect(execute).toHaveBeenCalledOnce();
     expect(worker.state.messages.at(-1)?.role).toBe('assistant');
+  });
+
+  it('resumes a not_started batch at the exact next call without replaying completed calls', async () => {
+    const executed: string[] = [];
+    let savedPending: V3PendingToolTurn | undefined;
+    let savedSnapshot;
+    let worker!: V3WorkerSession;
+    worker = session(
+      scriptedDriver([
+        accepted([
+          { type: 'tool_use', id: 'one', name: 'work', input: { label: 'one' } },
+          { type: 'tool_use', id: 'two', name: 'work', input: { label: 'two' } },
+        ]),
+      ]),
+      [
+        tool('work', (input) => {
+          executed.push(input.label!);
+          return `done:${input.label}`;
+        }),
+      ],
+      {
+        deps: {
+          lifecycle: {
+            beforeCall: async (pending) => {
+              if (pending.nextCallIndex !== 1) return;
+              savedPending = structuredClone(pending);
+              savedSnapshot = captureV3WorkerSessionSnapshot(worker);
+              throw new Error('simulated stop before second dispatch');
+            },
+          },
+        },
+      },
+    );
+
+    await runV3WorkerTurn(worker);
+    expect(executed).toEqual(['one']);
+    const restored = restoreV3WorkerSession(
+      savedSnapshot!,
+      { ...worker.deps, lifecycle: {} },
+      worker.config,
+    );
+
+    await expect(
+      resumeV3PendingToolTurn(restored, savedPending!),
+    ).resolves.toEqual({ kind: 'working' });
+    expect(executed).toEqual(['one', 'two']);
+    expect(lastResults(restored).map((result) => result.content)).toEqual([
+      'done:one',
+      'done:two',
+    ]);
+  });
+
+  it('never replays an uncertain call and skips every remaining call in that response', async () => {
+    const execute = vi.fn(() => 'must not run');
+    let savedPending: V3PendingToolTurn | undefined;
+    let savedSnapshot;
+    let worker!: V3WorkerSession;
+    worker = session(
+      scriptedDriver([
+        accepted([
+          { type: 'tool_use', id: 'one', name: 'work', input: { label: 'one' } },
+          { type: 'tool_use', id: 'two', name: 'work', input: { label: 'two' } },
+        ]),
+      ]),
+      [tool('work', execute)],
+      {
+        deps: {
+          lifecycle: {
+            afterDispatch: async (pending) => {
+              if (savedPending === undefined) {
+                savedPending = structuredClone(pending);
+                savedSnapshot = captureV3WorkerSessionSnapshot(worker);
+              }
+              throw new Error('simulated crash after uncertain checkpoint');
+            },
+          },
+        },
+      },
+    );
+
+    await runV3WorkerTurn(worker);
+    expect(execute).not.toHaveBeenCalled();
+    const restored = restoreV3WorkerSession(
+      savedSnapshot!,
+      { ...worker.deps, lifecycle: {} },
+      worker.config,
+    );
+
+    await expect(
+      resumeV3PendingToolTurn(restored, savedPending!),
+    ).resolves.toEqual({ kind: 'working' });
+    expect(execute).not.toHaveBeenCalled();
+    const results = lastResults(restored);
+    expect(results.map((result) => result.tool_use_id)).toEqual(['one', 'two']);
+    expect(results[0]?.content).toMatch(/effect is uncertain/i);
+    expect(results[1]?.content).toMatch(/not executed during recovery/i);
   });
 });
 

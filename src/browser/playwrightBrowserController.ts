@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join } from 'node:path';
@@ -6,6 +7,7 @@ import {
   chromium,
   type BrowserContext,
   type Dialog,
+  type Disposable,
   type Frame,
   type Locator,
   type Page,
@@ -49,8 +51,10 @@ import {
   type BrowserDownloadResult,
   type BrowserDownloadTarget,
   type BrowserFetchResult,
+  type BrowserOperationOptions,
   type BrowserScreenshotOptions,
   type BrowserScriptSetup,
+  type BrowserTaskPagePreparation,
   type BrowserTextCaptureRequest,
   type HandleDialogRequest,
   type HandleDialogResult,
@@ -66,7 +70,11 @@ import type {
 } from './sessionProvider.js';
 import { localDownloadReader, type BrowserDownloadReader } from './downloadReader.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
-import { accessKey, type BusyResourceRegistry } from '../tools/registry.js';
+import {
+  accessKey,
+  EXCLUSIVE_ACCESS,
+  type BusyResourceRegistry,
+} from '../tools/registry.js';
 import {
   actionTargetHandle,
   locatorForRef,
@@ -78,6 +86,12 @@ import { evaluateJavaScript } from './pageJavaScript.js';
 import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
 import { openPlaywrightCommandSession } from './browserCommandSession.js';
 import {
+  ChromiumTargetControlError,
+  createChromiumTargetControl,
+  type ChromiumPageTargetRef,
+  type ChromiumTargetControl,
+} from './chromiumTargetControl.js';
+import {
   assertLoopbackCdpUrl,
   CDP_LOOPBACK_HOST,
   prepareBrowserScriptTarget,
@@ -85,6 +99,22 @@ import {
 } from './browserScriptSetup.js';
 
 const SCROLL_SETTLE_MS = 50;
+
+/** The browser-visible property/value namespace is deliberately generic and
+ * versioned. The caller's durable run id is hashed before it crosses into a
+ * page, so neither page content nor a driver error can disclose a local run
+ * path/id. Exact descriptor/value equality is the only ownership test. */
+const RUN_PAGE_OWNERSHIP_PROPERTY = '__sherlock_run_page_owner_v1__';
+const RUN_PAGE_OWNERSHIP_MARKER_PREFIX = '__sherlock_run_page_owner_v1__:';
+const RUN_PAGE_TARGET_SENTINEL_PREFIX = '__sherlock_run_target_v1__:';
+const MAX_RUN_PAGE_OWNERSHIP_ID_BYTES = 4_096;
+const MAX_RAW_TARGET_URL_BYTES = 16_384;
+const RUN_PAGE_OWNERSHIP_EVALUATION_TIMEOUT_MS = 5_000;
+const MAX_RUN_PAGE_OWNERSHIP_RECOVERY_PASSES = 10;
+const MAX_RUN_PAGE_OWNERSHIP_CLEANUP_PASSES = 10;
+const RUN_PAGE_OWNERSHIP_CLEAN_PASSES = 2;
+const TARGET_CREATION_NAVIGATION_TIMEOUT_MS = 5_000;
+const BROWSER_PREPARATION_CONTAINMENT_TIMEOUT_MS = 5_000;
 
 // --- Browser-script CDP endpoint (see launchPersistentChrome, prepareForBrowserScript). ---
 /** Chrome writes this file into the user-data-dir asynchronously after
@@ -162,6 +192,11 @@ export interface PageRecord {
 interface PendingDialogRecord {
   dialog: Dialog;
   info: BrowserDialog;
+}
+
+interface RunPageOwnershipEpoch {
+  generation: number;
+  marker: string | undefined;
 }
 
 /** Identity of one tracked frame; `documentId` rotates on navigation. */
@@ -314,6 +349,7 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
 
   async createSession(): Promise<BrowserController> {
     const context = await launchPersistentChrome(this.options);
+    let targetControl: ChromiumTargetControl | undefined;
 
     try {
       const preexistingSessionPage = await prepareSessionPage(context);
@@ -324,8 +360,18 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
       // args above are always present, so a missing file means Chrome's CDP
       // port genuinely never came up.
       const cdpUrl = await readDevToolsActivePortUrl(this.options.profileDir);
-      return new PlaywrightBrowserController({ context, cdpUrl, preexistingSessionPage });
+      targetControl = await createChromiumTargetControl({
+        context,
+        anchorPage: preexistingSessionPage,
+      });
+      return new PlaywrightBrowserController({
+        context,
+        cdpUrl,
+        preexistingSessionPage,
+        targetControl,
+      });
     } catch (error) {
+      await targetControl?.close();
       await context.close();
       throw error;
     }
@@ -370,6 +416,10 @@ export interface PlaywrightBrowserControllerOptions {
    * {@link PlaywrightBrowserController.pages} and popup/task-tab fallbacks
    * report. */
   preexistingSessionPages?: readonly Page[];
+  /** Context-scoped Chromium target capability used for crash-recoverable V3
+   * task-page creation. Providers construct and own this capability; callers
+   * never receive its raw CDP session or target ids. */
+  targetControl?: ChromiumTargetControl;
   /**
    * Release the underlying browser session. Defaults to closing the
    * `context`, which is right for a locally launched persistent context: the
@@ -412,7 +462,7 @@ export class PlaywrightBrowserController implements BrowserController {
   private readonly ownedPages = new Set<Page>();
   /** Target ids returned by this run's raw Target.createTarget calls but not
    * yet paired with Playwright's asynchronously surfaced Page object. */
-  private readonly pendingOwnedTargetIds = new Set<string>();
+  private readonly pendingOwnedTargetIds = new Map<string, number>();
   /** Asynchronous opener/target ownership checks started by context page
    * events. Cleanup drains this set before taking its reverse-order snapshot
    * so a just-opened popup cannot race past the run's finally block. */
@@ -443,6 +493,22 @@ export class PlaywrightBrowserController implements BrowserController {
    * new pages, dialogs, downloads). */
   private readonly activityListeners = new Set<() => void>();
   private dialogSequence = 0;
+  /** Stable, collision-resistant marker for the one durable run bound to this
+   * controller. It is intentionally absent from every model-facing page and
+   * diagnostics shape. */
+  private runPageOwnershipMarker: string | undefined;
+  /** Exact removable context-script handle for the current durable epoch. */
+  private runPageOwnershipInitScript: Disposable | undefined;
+  /** Rotates at bind and successful disarm. Async claims carry a snapshot so
+   * a late callback from run A can never consult or mutate run B's state. */
+  private runPageOwnershipGeneration = 0;
+  /** A failed cleanup remains bound and refuses task work/rebinding. A later
+   * closeTaskPages retry may finish cleanup; otherwise replace the controller. */
+  private runPageOwnershipPoisoned = false;
+  /** A context page event cannot reject back through EventEmitter. If durable
+   * marking of a positively-owned popup fails, close it immediately and retain
+   * this generic fault for the next explicit controller boundary. */
+  private runPageOwnershipFailure = false;
   /** Set via {@link setBusyRegistry}; undefined until the run's toolchain
    * wires it up (see runTask.ts's buildRunToolchain), or in a test that
    * constructs this controller directly. See {@link withRendererDeadline}
@@ -466,6 +532,7 @@ export class PlaywrightBrowserController implements BrowserController {
   private readonly context: BrowserContext;
   private readonly cdpUrl: string | undefined;
   private readonly preexistingSessionPages: ReadonlySet<Page>;
+  private readonly targetControl: ChromiumTargetControl | undefined;
   private readonly closeSession: () => Promise<void>;
   private readonly downloadReader: BrowserDownloadReader;
   private readonly uploadEncoder: BrowserUploadEncoder;
@@ -478,6 +545,7 @@ export class PlaywrightBrowserController implements BrowserController {
       ...(options.preexistingSessionPages ?? []),
       ...(options.preexistingSessionPage !== undefined ? [options.preexistingSessionPage] : []),
     ]);
+    this.targetControl = options.targetControl;
     this.closeSession = options.closeSession ?? (() => this.context.close());
     this.downloadReader = options.downloadReader ?? localDownloadReader;
     this.uploadEncoder = options.uploadEncoder ?? localUploadEncoder;
@@ -501,7 +569,12 @@ export class PlaywrightBrowserController implements BrowserController {
         this.pendingInternalPages -= 1;
         return;
       }
-      const claim = this.claimPageFromCreationEvent(page).catch(() => undefined);
+      const epoch = this.captureRunPageOwnershipEpoch();
+      const claim = this.claimPageFromCreationEvent(page, epoch).catch(() => {
+        if (this.isCurrentRunPageOwnershipEpoch(epoch)) {
+          this.runPageOwnershipFailure = true;
+        }
+      });
       this.pendingPageClaims.add(claim);
       void claim.finally(() => this.pendingPageClaims.delete(claim));
     });
@@ -511,16 +584,43 @@ export class PlaywrightBrowserController implements BrowserController {
     this.busyRegistry = registry;
   }
 
-  newTab(): Promise<void> {
-    return this.serializeTabLifecycle(async () => {
+  newTab(options: BrowserOperationOptions = {}): Promise<void> {
+    this.requirePreparationBusyRegistry(options.signal);
+    return this.runTabLifecycleWithContainment(async (holdForContainment) => {
       this.requireOpenContext();
-      if (this.activePage !== undefined && !this.activePage.isClosed()) {
-        throw new Error('A browser task tab is already active; close it first.');
-      }
+      this.requireHealthyRunPageOwnership();
+      options.signal?.throwIfAborted();
+      this.requireNoActiveTaskPage();
 
-      const page = await this.context.newPage();
-      this.registerOwnedPage(page);
-      this.activePage = page;
+      const pagePromise = this.context.newPage();
+      const page = await raceBrowserPreparationStep(
+        pagePromise,
+        options.signal,
+        () => {
+          holdForContainment(
+            pagePromise
+              .then(
+                (createdPage) => this.containAbortedTaskPage(createdPage),
+                () => undefined,
+              )
+              .then(() => this.drainPendingPageClaims()),
+          );
+        },
+      );
+      const claim = this.claimDurablyOwnedPage(page);
+      const record = await raceBrowserPreparationStep(
+        claim,
+        options.signal,
+        () => {
+          holdForContainment(
+            Promise.allSettled([
+              claim,
+              this.containAbortedTaskPage(page),
+            ]).then(() => this.drainPendingPageClaims()),
+          );
+        },
+      );
+      this.activePage = record.page;
     });
   }
 
@@ -536,9 +636,19 @@ export class PlaywrightBrowserController implements BrowserController {
     });
   }
 
-  async goto(url: string): Promise<void> {
+  async goto(
+    url: string,
+    options: BrowserOperationOptions = {},
+  ): Promise<void> {
+    this.requirePreparationBusyRegistry(options.signal);
     assertHttpUrl(url);
-    await this.requirePage().goto(url, { waitUntil: 'load' });
+    options.signal?.throwIfAborted();
+    const page = this.requirePage();
+    await raceBrowserPreparationStep(
+      page.goto(url, { waitUntil: 'load' }),
+      options.signal,
+      () => this.containAbortedTaskPage(page),
+    );
   }
 
   async outline(): Promise<string> {
@@ -633,6 +743,9 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async pages(): Promise<BrowserPage[]> {
     this.requireOpenContext();
+    await this.drainPendingPageClaims();
+    this.requireHealthyRunPageOwnership();
+
     const liveRecords = [...this.trackedPages.values()].filter(
       (record) => !record.page.isClosed(),
     );
@@ -802,6 +915,7 @@ export class PlaywrightBrowserController implements BrowserController {
 
   async openCommandSession(pageId?: string): Promise<BrowserCommandSession> {
     this.requireOpenContext();
+    this.requireHealthyRunPageOwnership();
     // Resolve controller identity exactly once before attachment. newTab()
     // already registers the selected page; registerPage is idempotent so this
     // remains safe for any later lifecycle path that restores selection.
@@ -809,18 +923,66 @@ export class PlaywrightBrowserController implements BrowserController {
       pageId === undefined
         ? this.registerPage(this.requirePage())
         : this.requireTrackedPage(pageId);
+    const epoch = this.captureRunPageOwnershipEpoch();
     return openPlaywrightCommandSession(
       this.context,
       record.page,
       record.pageId,
       {
-        onTargetCreated: (targetId) => this.claimRawCreatedTarget(targetId),
+        ...(epoch.marker === undefined
+          ? {
+              onTargetCreated: (targetId: string) =>
+                this.claimRawCreatedTarget(targetId, epoch),
+            }
+          : {
+              createTargetCommand: (params: Record<string, unknown>) =>
+                this.createRawRunTarget(params, epoch),
+            }),
         handleDialogCommand: (params) =>
           this.handleRawDialogCommand(record.pageId, params),
         release: (detach) =>
           this.releaseCommandSession(record.pageId, detach),
       },
     );
+  }
+
+  private createRawRunTarget(
+    params: Record<string, unknown>,
+    epoch: RunPageOwnershipEpoch,
+  ): Promise<unknown> {
+    const requestedUrl = rawTargetCreationUrl(params);
+    const targetControl = this.requireTargetControl();
+    return this.runTabLifecycleWithContainment(async (holdForContainment) => {
+      this.requireOpenContext();
+      this.requireHealthyRunPageOwnership();
+      if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+        throw new Error(
+          'The browser command session belongs to an ended task-page ownership epoch.',
+        );
+      }
+      const record = await this.createDurablyOwnedTargetPage(
+        targetControl,
+        epoch,
+        undefined,
+        holdForContainment,
+      );
+      try {
+        await record.page.goto(requestedUrl, {
+          waitUntil: 'commit',
+          timeout: TARGET_CREATION_NAVIGATION_TIMEOUT_MS,
+        });
+        const targetId = await withRunPageOwnershipEvaluationDeadline(
+          this.targetIdForPage(record.page),
+        );
+        if (targetId === undefined) {
+          throw new Error('Could not resolve the created browser target identity.');
+        }
+        return { targetId };
+      } catch {
+        await this.containAbortedTaskPage(record.page);
+        throw new Error('Could not finish creating the requested browser target.');
+      }
+    });
   }
 
   /**
@@ -987,18 +1149,30 @@ export class PlaywrightBrowserController implements BrowserController {
    * thing that is untrustworthy.
    */
   async replaceUnresponsivePage(): Promise<void> {
-    await this.serializeTabLifecycle(async () => {
+    await this.runTabLifecycleWithContainment(async (holdForContainment) => {
       const doomed = this.activePage;
       this.activePage = undefined;
       if (doomed !== undefined) {
-        // Best effort: a wedged page may refuse to close, and the run still
-        // needs a usable page more than it needs a clean shutdown.
-        await doomed.close({ runBeforeUnload: false }).catch(() => undefined);
+        await this.containAbortedTaskPage(doomed);
+        if (!doomed.isClosed()) {
+          throw new Error(
+            'The unresponsive browser page could not be contained before replacement.',
+          );
+        }
       }
       this.requireOpenContext();
-      const replacement = await this.context.newPage();
-      this.registerOwnedPage(replacement);
-      this.activePage = replacement;
+      this.requireHealthyRunPageOwnership();
+      const epoch = this.captureRunPageOwnershipEpoch();
+      const record =
+        epoch.marker === undefined
+          ? await this.claimDurablyOwnedPage(await this.context.newPage(), epoch)
+          : await this.createDurablyOwnedTargetPage(
+              this.requireTargetControl(),
+              epoch,
+              undefined,
+              holdForContainment,
+            );
+      this.activePage = record.page;
     });
   }
 
@@ -1033,42 +1207,509 @@ export class PlaywrightBrowserController implements BrowserController {
    */
   async refreshAfterExternalCommands(): Promise<void> {
     this.requireOpenContext();
+    await this.drainPendingPageClaims();
+    this.requireHealthyRunPageOwnership();
     await this.reconcileExternalPages(true);
-    // A returned target that is still absent after a complete context rescan
-    // was closed before Playwright exposed it. Do not retain stale ids across
-    // later, unrelated user page creations.
-    this.pendingOwnedTargetIds.clear();
+    const epoch = this.captureRunPageOwnershipEpoch();
+    if (this.pendingTargetCount(epoch) > 0) {
+      throw new Error(
+        'One or more exact task targets were not present in the complete browser page inventory.',
+      );
+    }
   }
 
   listPendingDialogs(): readonly BrowserDialog[] {
     return [...this.pendingDialogs.values()].map((pending) => ({ ...pending.info }));
   }
 
-  closeTaskPages(): Promise<void> {
-    return this.serializeTabLifecycle(async () => {
-      const errors = await this.closeOwnedPages();
-      if (errors.length > 0) {
-        throw new Error(`Could not close every task page: ${errors.join('; ')}`);
+  initializeRunPageOwnership(
+    ownershipId: string,
+    options: BrowserOperationOptions = {},
+  ): Promise<void> {
+    if (options.signal !== undefined && this.busyRegistry === undefined) {
+      return Promise.reject(
+        new Error(
+          'Cancellation-safe durable run ownership requires a shared busy-resource registry.',
+        ),
+      );
+    }
+    // The caller may stop waiting at the run deadline, but the lifecycle
+    // queue remains chained to the real provider effect. closeTaskPages()
+    // therefore cannot overlap a late stale-page close, context script
+    // install, or marker mutation. The shared exclusive fence additionally
+    // keeps coordinator terminalization outside this queue until the effect
+    // has settled.
+    const initialization = this.tabLifecycle.then(() => {
+      options.signal?.throwIfAborted();
+      return this.initializeRunPageOwnershipUnserialized(ownershipId);
+    });
+    this.tabLifecycle = initialization.then(
+      () => undefined,
+      () => undefined,
+    );
+    return raceBrowserPreparationStep(
+      initialization,
+      options.signal,
+      () => {
+        this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, initialization);
+      },
+    );
+  }
+
+  private async initializeRunPageOwnershipUnserialized(
+    ownershipId: string,
+  ): Promise<void> {
+    this.requireOpenContext();
+    const marker = runPageOwnershipMarker(ownershipId);
+    if (this.runPageOwnershipMarker !== undefined) {
+      if (this.runPageOwnershipMarker !== marker) {
+        throw new Error(
+          'This browser controller is already bound to a different durable run.',
+        );
       }
+      if (this.runPageOwnershipPoisoned) {
+        throw new Error(
+          'This browser controller remains bound after failed task-page cleanup; ' +
+            'retry cleanup or replace the controller.',
+        );
+      }
+      return;
+    }
+    if (
+      this.runPageOwnershipInitScript !== undefined ||
+      this.ownedPages.size > 0 ||
+      this.activePage !== undefined ||
+      this.pendingOwnedTargetIds.size > 0 ||
+      this.pendingPageClaims.size > 0
+    ) {
+      throw new Error(
+        'Durable run page ownership must be initialized before opening a task page.',
+      );
+    }
+
+    await this.drainPendingPageClaims();
+    this.requireHealthyRunPageOwnership();
+
+    if (this.targetControl !== undefined) {
+      await this.recoverRunTargetSentinels(marker);
+    }
+
+    // A stale opener can create a popup just after the first snapshot. Close
+    // exact matches, then rescan until one complete pass observes none. The
+    // opener disappears in the first matching pass, so this converges for a
+    // finite page graph; the cap turns a hostile/non-converging browser into
+    // a loud failure rather than an infinite startup loop.
+    for (let pass = 0; ; pass += 1) {
+      let pages: Page[];
+      try {
+        pages = this.context.pages();
+      } catch {
+        throw new Error(
+          'Could not enumerate browser pages while recovering durable run ownership; ' +
+            'ownership was not armed.',
+        );
+      }
+
+      // Inspect this complete snapshot before closing anything from it. An
+      // unreadable page is uncertain, never evidence: aborting the pass is
+      // the only way to guarantee an unrelated user tab is not acted on.
+      const stalePages: Page[] = [];
+      try {
+        for (const page of pages) {
+          if (!page.isClosed() && (await pageHasRunOwnershipMarker(page, marker))) {
+            stalePages.push(page);
+          }
+        }
+      } catch {
+        throw new Error(
+          'Could not inspect every browser page while recovering durable run ownership; ' +
+            'no page from the uncertain snapshot was intentionally closed.',
+        );
+      }
+      if (stalePages.length === 0) break;
+
+      let closeFailures = 0;
+      for (const page of stalePages.reverse()) {
+        if (page.isClosed()) continue;
+        try {
+          await page.close({ runBeforeUnload: false });
+          if (!page.isClosed()) closeFailures += 1;
+        } catch {
+          closeFailures += 1;
+        }
+      }
+      if (closeFailures > 0) {
+        throw new Error(
+          `Could not close ${closeFailures} stale task page(s) while recovering durable ` +
+            'run ownership.',
+        );
+      }
+      if (pass + 1 >= MAX_RUN_PAGE_OWNERSHIP_RECOVERY_PASSES) {
+        throw new Error(
+          'Durable run page ownership recovery did not converge after its bounded scans.',
+        );
+      }
+    }
+
+    let initScript: Disposable;
+    try {
+      // Runs before site JavaScript in every new document. A popup inherits
+      // ownership only from an exact marked opener; unrelated new tabs stay
+      // untouched. Per-page scripts installed by claimDurablyOwnedPage are
+      // the unconditional navigation-persistence layer after positive claim.
+      initScript = await this.context.addInitScript(
+        ({ property, marker }: { property: string; marker: string }) => {
+          const own = Object.getOwnPropertyDescriptor(window, property);
+          if (
+            own?.value === marker &&
+            own.enumerable === false &&
+            own.configurable === false &&
+            own.writable === false
+          ) {
+            return;
+          }
+          try {
+            const opener = window.opener as (Window & Record<string, unknown>) | null;
+            if (opener?.[property] !== marker) return;
+            Object.defineProperty(window, property, {
+              value: marker,
+              enumerable: false,
+              configurable: false,
+              writable: false,
+            });
+          } catch {
+            // A cross-origin or explicitly severed opener is not evidence.
+          }
+        },
+        { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker },
+      );
+    } catch {
+      throw new Error(
+        'Could not arm durable page ownership for this browser session.',
+      );
+    }
+
+    this.runPageOwnershipGeneration += 1;
+    this.runPageOwnershipMarker = marker;
+    this.runPageOwnershipInitScript = initScript;
+    this.runPageOwnershipPoisoned = false;
+  }
+
+  private async recoverRunTargetSentinels(marker: string): Promise<void> {
+    const targetControl = this.requireTargetControl();
+    const sentinelUrl = runPageTargetSentinel(marker);
+    let cleanPasses = 0;
+
+    for (
+      let pass = 0;
+      pass < MAX_RUN_PAGE_OWNERSHIP_RECOVERY_PASSES;
+      pass += 1
+    ) {
+      let targets: Awaited<ReturnType<ChromiumTargetControl['listPageTargets']>>;
+      try {
+        // listPageTargets validates the complete context-scoped inventory
+        // before returning any refs. No close begins from a partial snapshot.
+        targets = await targetControl.listPageTargets();
+      } catch {
+        throw new Error(
+          'Could not inventory browser targets while recovering durable run ownership; ' +
+            'no uncertain target was intentionally closed.',
+        );
+      }
+      const staleTargets = targets.filter((target) => target.url === sentinelUrl);
+      if (staleTargets.length === 0) {
+        cleanPasses += 1;
+        if (cleanPasses >= RUN_PAGE_OWNERSHIP_CLEAN_PASSES) return;
+        await browserOwnershipEventTurn();
+        continue;
+      }
+
+      cleanPasses = 0;
+      let closeFailures = 0;
+      for (const target of [...staleTargets].reverse()) {
+        try {
+          await targetControl.closeTarget(target.ref);
+        } catch {
+          closeFailures += 1;
+        }
+      }
+      if (closeFailures > 0) {
+        throw new Error(
+          `Could not close ${closeFailures} stale task target(s) while recovering ` +
+            'durable run ownership.',
+        );
+      }
+      await targetControl.drainContainment();
+      await browserOwnershipEventTurn();
+    }
+
+    throw new Error(
+      'Durable run target recovery did not converge after its bounded scans.',
+    );
+  }
+
+  async prepareTaskPage(request: BrowserTaskPagePreparation): Promise<void> {
+    request.signal?.throwIfAborted();
+    if (this.targetControl === undefined) {
+      throw new Error(
+        'Crash-recoverable task-page preparation requires provider target control.',
+      );
+    }
+    await this.initializeRunPageOwnership(request.ownershipId, {
+      signal: request.signal,
+    });
+    request.signal?.throwIfAborted();
+    await this.openDurableTaskTarget({ signal: request.signal });
+    if (request.startUrl !== undefined) {
+      await this.goto(request.startUrl, { signal: request.signal });
+    }
+  }
+
+  /** Open the V3 task page through an exact hashed sentinel target. A process
+   * killed before the page marker is installed leaves that sentinel behind;
+   * same-run recovery can therefore identify it without guessing from page
+   * order or exposing the raw durable run id. */
+  private openDurableTaskTarget(
+    options: BrowserOperationOptions,
+  ): Promise<void> {
+    this.requirePreparationBusyRegistry(options.signal);
+    const targetControl = this.requireTargetControl();
+    return this.runTabLifecycleWithContainment(async (holdForContainment) => {
+      this.requireOpenContext();
+      this.requireHealthyRunPageOwnership();
+      options.signal?.throwIfAborted();
+      this.requireNoActiveTaskPage();
+      const epoch = this.captureRunPageOwnershipEpoch();
+      const record = await this.createDurablyOwnedTargetPage(
+        targetControl,
+        epoch,
+        options.signal,
+        holdForContainment,
+      );
+      this.activePage = record.page;
     });
   }
 
+  private async createDurablyOwnedTargetPage(
+    targetControl: ChromiumTargetControl,
+    epoch: RunPageOwnershipEpoch,
+    signal: AbortSignal | undefined,
+    holdForContainment: (effect: Promise<unknown>) => void,
+  ): Promise<PageRecord> {
+    if (
+      epoch.marker === undefined ||
+      !this.isCurrentRunPageOwnershipEpoch(epoch)
+    ) {
+      throw new Error('Durable task-page ownership is not initialized.');
+    }
+    const sentinelUrl = runPageTargetSentinel(epoch.marker);
+    let target: ChromiumPageTargetRef | undefined;
+    let page: Page | undefined;
+    let claimPromise: Promise<unknown> | undefined;
+    let containmentStarted = false;
+    const pagePromise = (async () => {
+      target = await targetControl.createPageTarget(sentinelUrl, { signal });
+      page = await targetControl.awaitPage(target, { signal });
+      return page;
+    })();
+    const containOnce = (): void => {
+      if (containmentStarted) return;
+      containmentStarted = true;
+      holdForContainment(
+        this.containTargetPageCreation(
+          targetControl,
+          pagePromise,
+          () => target,
+          () => page,
+          () => claimPromise,
+        ),
+      );
+    };
+
+    try {
+      page = await raceBrowserPreparationStep(pagePromise, signal, containOnce);
+    } catch (error) {
+      containOnce();
+      throw error;
+    }
+
+    const claim = (async () => {
+      const record = await this.claimDurablyOwnedPage(page!, epoch);
+      await this.stripRunTargetSentinel(page!, sentinelUrl);
+      return record;
+    })();
+    claimPromise = claim;
+    try {
+      return await raceBrowserPreparationStep(claim, signal, containOnce);
+    } catch (error) {
+      containOnce();
+      throw error;
+    }
+  }
+
+  private async containTargetPageCreation(
+    targetControl: ChromiumTargetControl,
+    pagePromise: Promise<Page>,
+    target: () => ChromiumPageTargetRef | undefined,
+    page: () => Page | undefined,
+    pendingClaim: () => Promise<unknown> | undefined,
+  ): Promise<void> {
+    // Wait for the bounded wrapper to register any late raw-create effect
+    // before snapshotting drainContainment(). The underlying create itself may
+    // remain pending forever, in which case that drain is intentionally the
+    // exclusive busy fence that prevents terminalization/rebinding.
+    await Promise.allSettled([pagePromise]);
+    const effects: Promise<unknown>[] = [];
+    const claim = pendingClaim();
+    if (claim !== undefined) effects.push(claim);
+    const createdPage = page();
+    if (createdPage !== undefined) {
+      effects.push(this.containAbortedTaskPage(createdPage));
+    }
+    const createdTarget = target();
+    if (createdTarget !== undefined) {
+      effects.push(targetControl.closeTarget(createdTarget).catch(() => undefined));
+    }
+    await Promise.allSettled(effects);
+    await targetControl.drainContainment();
+    await this.drainPendingPageClaims();
+  }
+
+  private async stripRunTargetSentinel(
+    page: Page,
+    sentinelUrl: string,
+  ): Promise<void> {
+    const stripped = await withRunPageOwnershipEvaluationDeadline(
+      page.evaluate((expectedSentinel) => {
+        if (location.href !== expectedSentinel) return false;
+        history.replaceState(history.state, '', 'about:blank');
+        return location.href === 'about:blank';
+      }, sentinelUrl),
+    );
+    if (stripped !== true || page.url() !== 'about:blank') {
+      throw new Error('Could not disarm the durable task-target sentinel.');
+    }
+  }
+
+  closeTaskPages(): Promise<void> {
+    return this.serializeTabLifecycle(() => this.closeTaskPagesUnserialized());
+  }
+
+  private async closeTaskPagesUnserialized(): Promise<void> {
+    const epoch = this.captureRunPageOwnershipEpoch();
+    try {
+      let errors = await this.closeOwnedPagesToFixedPoint(epoch);
+      if (errors.length > 0) {
+        throw new Error(`Could not close every task page: ${errors.join('; ')}`);
+      }
+
+      const initScript = this.runPageOwnershipInitScript;
+      if (initScript !== undefined) {
+        try {
+          await initScript.dispose();
+          this.runPageOwnershipInitScript = undefined;
+        } catch {
+          throw new Error(
+            'Could not remove durable task-page ownership from the browser context.',
+          );
+        }
+      }
+
+      // Disabling propagation is not enough by itself: a popup/target event
+      // may already be queued. Prove a second fixed point with the same epoch
+      // before rotating it and allowing another run to bind.
+      errors = await this.closeOwnedPagesToFixedPoint(epoch);
+      if (errors.length > 0) {
+        throw new Error(`Could not close every task page: ${errors.join('; ')}`);
+      }
+
+      this.runPageOwnershipGeneration += 1;
+      this.runPageOwnershipMarker = undefined;
+      this.runPageOwnershipFailure = false;
+      this.runPageOwnershipPoisoned = false;
+    } catch (error) {
+      if (
+        epoch.marker !== undefined ||
+        this.ownedPages.size > 0 ||
+        this.pendingOwnedTargetIds.size > 0 ||
+        this.pendingPageClaims.size > 0
+      ) {
+        this.runPageOwnershipPoisoned = true;
+      }
+      throw error;
+    }
+  }
+
   private async reconcileExternalPages(ownedOnly: boolean): Promise<void> {
+    const epoch = this.captureRunPageOwnershipEpoch();
     await reconcileAfterBrowserScript({
       context: this.context,
       preexistingSessionPages: this.preexistingSessionPages,
       trackedPages: this.trackedPages,
       createDocumentId: () => this.state.createDocumentId(),
       forgetPage: (pageId) => this.state.forgetPage(pageId),
-      registerPage: (page) => this.registerOwnedPage(page),
+      registerPage: (page) => this.claimDurablyOwnedPage(page, epoch),
       ...(ownedOnly
-        ? { shouldRegisterPage: (page: Page) => this.hasOwnershipEvidence(page) }
+        ? {
+            shouldRegisterPage: (page: Page) =>
+              this.hasOwnershipEvidence(page, epoch),
+          }
         : {}),
       getActivePage: () => this.activePage,
       setActivePage: (page) => {
         this.activePage = page;
       },
     });
+  }
+
+  /** Establish containment synchronously, then close without awaiting a
+   * potentially wedged Playwright promise. closeTaskPages() will retry every
+   * positively owned page before terminal state is persisted. */
+  private async containAbortedTaskPage(page: Page): Promise<void> {
+    if (this.activePage === page) this.activePage = undefined;
+    if (!this.preexistingSessionPages.has(page)) this.ownedPages.add(page);
+    if (page.isClosed()) return;
+    let closing: Promise<void>;
+    try {
+      closing = page.close({ runBeforeUnload: false });
+    } catch {
+      return;
+    }
+    let settled = false;
+    let timer: NodeJS.Timeout | undefined;
+    try {
+      settled = await Promise.race([
+        closing.then(
+          () => true,
+          () => true,
+        ),
+        new Promise<false>((resolve) => {
+          timer = setTimeout(
+            () => resolve(false),
+            BROWSER_PREPARATION_CONTAINMENT_TIMEOUT_MS,
+          );
+        }),
+      ]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+    }
+    if (!settled && !page.isClosed()) {
+      // The outer coordinator checks this exact exclusive fence before any
+      // terminal cleanup or checkpoint. A close that never acknowledges
+      // therefore leaves the active checkpoint resumable instead of racing a
+      // terminal projection.
+      this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, closing);
+    }
+  }
+
+  private requirePreparationBusyRegistry(
+    signal: AbortSignal | undefined,
+  ): void {
+    if (signal !== undefined && this.busyRegistry === undefined) {
+      throw new Error(
+        'Cancellation-safe browser preparation requires a shared busy-resource registry.',
+      );
+    }
   }
 
   private async doRefreshAfterBrowserScript(): Promise<void> {
@@ -1104,7 +1745,18 @@ export class PlaywrightBrowserController implements BrowserController {
 
     this.closed = true;
     this.closePromise = this.serializeTabLifecycle(async () => {
-      const pageErrors = await this.closeOwnedPages();
+      let ownershipError = false;
+      try {
+        await this.closeTaskPagesUnserialized();
+      } catch {
+        ownershipError = true;
+      }
+      let targetControlError = false;
+      try {
+        await this.targetControl?.close();
+      } catch {
+        targetControlError = true;
+      }
       let sessionError = false;
       // Whatever the provider injected: close the local persistent context,
       // or disconnect and explicitly release a billable remote session.
@@ -1113,12 +1765,11 @@ export class PlaywrightBrowserController implements BrowserController {
       } catch {
         sessionError = true;
       }
-      if (pageErrors.length > 0 || sessionError) {
+      if (ownershipError || targetControlError || sessionError) {
         throw new Error(
           [
-            ...(pageErrors.length > 0
-              ? [`task-page cleanup failed: ${pageErrors.join('; ')}`]
-              : []),
+            ...(ownershipError ? ['task-page cleanup failed'] : []),
+            ...(targetControlError ? ['browser target-control cleanup failed'] : []),
             ...(sessionError ? ['browser-session cleanup failed'] : []),
           ].join('; '),
         );
@@ -1158,17 +1809,32 @@ export class PlaywrightBrowserController implements BrowserController {
    * raw-CDP target result proves that this task created it. Event callbacks
    * cannot propagate errors to their emitter, so a later explicit refresh is
    * still the authoritative, failing reconciliation boundary. */
-  private async claimPageFromCreationEvent(page: Page): Promise<void> {
+  private async claimPageFromCreationEvent(
+    page: Page,
+    epoch: RunPageOwnershipEpoch,
+  ): Promise<void> {
     if (this.closed || page.isClosed()) return;
-    if (await this.hasOwnershipEvidence(page)) {
-      this.registerOwnedPage(page);
+    if (await this.hasOwnershipEvidence(page, epoch)) {
+      if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+        await page.close({ runBeforeUnload: false }).catch(() => undefined);
+        return;
+      }
+      await this.claimDurablyOwnedPage(page, epoch);
     }
   }
 
   /** Record one exact target returned by this run's Target.createTarget and
    * pair it with the corresponding Playwright page when available. */
-  private async claimRawCreatedTarget(targetId: string): Promise<void> {
-    this.pendingOwnedTargetIds.add(targetId);
+  private async claimRawCreatedTarget(
+    targetId: string,
+    epoch: RunPageOwnershipEpoch,
+  ): Promise<void> {
+    if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+      throw new Error(
+        'A raw browser target completed after its task-page ownership epoch ended.',
+      );
+    }
+    this.pendingOwnedTargetIds.set(targetId, epoch.generation);
     for (const page of this.context.pages()) {
       if (
         page.isClosed() ||
@@ -1179,31 +1845,57 @@ export class PlaywrightBrowserController implements BrowserController {
       }
       if ((await this.targetIdForPage(page)) === targetId) {
         this.pendingOwnedTargetIds.delete(targetId);
-        this.registerOwnedPage(page);
+        await this.claimDurablyOwnedPage(page, epoch);
         return;
       }
     }
   }
 
   /** Whether a live, non-pre-existing page belongs to this task. */
-  private async hasOwnershipEvidence(page: Page): Promise<boolean> {
+  private async hasOwnershipEvidence(
+    page: Page,
+    epoch: RunPageOwnershipEpoch = this.captureRunPageOwnershipEpoch(),
+    strict = false,
+  ): Promise<boolean> {
     if (this.ownedPages.has(page)) return true;
     if (this.preexistingSessionPages.has(page) || page.isClosed()) return false;
 
     try {
       const opener = await page.opener();
       if (opener !== null && this.ownedPages.has(opener)) return true;
-    } catch {
+    } catch (error) {
       if (page.isClosed()) return false;
+      if (strict) throw error;
     }
 
-    if (this.pendingOwnedTargetIds.size === 0) return false;
-    const targetId = await this.targetIdForPage(page);
-    if (targetId === undefined || !this.pendingOwnedTargetIds.has(targetId)) {
+    if (
+      [...this.pendingOwnedTargetIds.values()].some(
+        (generation) => generation === epoch.generation,
+      )
+    ) {
+      const targetId = await this.targetIdForPage(page);
+      if (
+        targetId !== undefined &&
+        this.pendingOwnedTargetIds.get(targetId) === epoch.generation
+      ) {
+        this.pendingOwnedTargetIds.delete(targetId);
+        return true;
+      }
+      if (targetId === undefined && strict && !page.isClosed()) {
+        throw new Error('Could not resolve a browser target during task-page cleanup.');
+      }
+    }
+
+    // The context init script propagates the exact marker before site code.
+    // This is the durable fallback for popups whose DOM opener was severed.
+    const marker = epoch.marker;
+    if (marker === undefined) return false;
+    try {
+      return await pageHasRunOwnershipMarker(page, marker);
+    } catch (error) {
+      if (strict && !page.isClosed()) throw error;
       return false;
     }
-    this.pendingOwnedTargetIds.delete(targetId);
-    return true;
   }
 
   /** Resolve a page's target through a short-lived attached session. Failure
@@ -1231,6 +1923,106 @@ export class PlaywrightBrowserController implements BrowserController {
     }
     this.ownedPages.add(page);
     return this.registerPage(page);
+  }
+
+  /** Mark one positively-owned page before registering or exposing it. A
+   * failed mark closes the uncertain page immediately, so a process crash can
+   * never leave a known-but-unmarked task page behind intentionally. */
+  private async claimDurablyOwnedPage(
+    page: Page,
+    epoch: RunPageOwnershipEpoch = this.captureRunPageOwnershipEpoch(),
+  ): Promise<PageRecord> {
+    if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+      await page.close({ runBeforeUnload: false }).catch(() => undefined);
+      throw new Error('Task-page ownership changed before the page could be claimed.');
+    }
+    try {
+      await this.markDurablyOwnedPage(page, epoch.marker);
+    } catch {
+      await page.close({ runBeforeUnload: false }).catch(() => undefined);
+      throw new Error(
+        'Could not durably mark a newly owned task page; the page was closed when possible.',
+      );
+    }
+    if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+      await page.close({ runBeforeUnload: false }).catch(() => undefined);
+      throw new Error('Task-page ownership changed while the page was being claimed.');
+    }
+    return this.registerOwnedPage(page);
+  }
+
+  /** Install an unconditional per-page new-document script, then mark and
+   * verify the current document. `Page.addInitScript` follows this browsing
+   * context across same- and cross-origin navigation. */
+  private async markDurablyOwnedPage(
+    page: Page,
+    marker: string | undefined,
+  ): Promise<void> {
+    if (marker === undefined) return;
+    const payload = { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker };
+    await page.addInitScript(
+      ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
+        Object.defineProperty(window, property, {
+          value: expectedMarker,
+          enumerable: false,
+          configurable: false,
+          writable: false,
+        });
+      },
+      payload,
+    );
+    const marked = await withRunPageOwnershipEvaluationDeadline(
+      page.evaluate(
+        ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
+          const existing = Object.getOwnPropertyDescriptor(window, property);
+          if (existing === undefined) {
+            Object.defineProperty(window, property, {
+              value: expectedMarker,
+              enumerable: false,
+              configurable: false,
+              writable: false,
+            });
+          }
+          const installed = Object.getOwnPropertyDescriptor(window, property);
+          return (
+            installed?.value === expectedMarker &&
+            installed.enumerable === false &&
+            installed.configurable === false &&
+            installed.writable === false
+          );
+        },
+        payload,
+      ),
+    );
+    if (marked !== true) {
+      throw new Error('The browser did not retain its durable task-page marker.');
+    }
+  }
+
+  private async drainPendingPageClaims(): Promise<void> {
+    await Promise.all([...this.pendingPageClaims]);
+  }
+
+  private requireHealthyRunPageOwnership(): void {
+    if (this.runPageOwnershipPoisoned) {
+      throw new Error(
+        'Task-page ownership cleanup previously failed; retry cleanup or replace the controller.',
+      );
+    }
+    if (this.runPageOwnershipFailure) {
+      throw new Error(
+        'A positively-owned browser page could not be durably marked and was closed.',
+      );
+    }
+  }
+
+  private requireTargetControl(): ChromiumTargetControl {
+    if (this.targetControl === undefined) {
+      throw new Error(
+        'Crash-recoverable browser target control is unavailable for this session.',
+      );
+    }
+    return this.targetControl;
   }
 
   private async handleRawDialogCommand(
@@ -1291,53 +2083,162 @@ export class PlaywrightBrowserController implements BrowserController {
     await Promise.all([...detachers].map((detach) => detach()));
   }
 
-  /** Close in reverse claim order and collect every failure so one wedged
-   * page never prevents cleanup attempts for the rest. */
-  private async closeOwnedPages(): Promise<string[]> {
-    const errors: string[] = [];
-    await Promise.all([...this.pendingPageClaims]);
-    try {
-      // A page event may be queued just behind the command that returned to
-      // the worker. One explicit ownership-only scan closes that race without
-      // adopting unrelated user tabs or creating a replacement page.
-      if (
+  /** Reach a bounded two-pass fixed point before an ownership epoch may end.
+   * Each pass drains already-dispatched page events, inventories every live
+   * non-user page with strict ownership checks, closes exact owned pages in
+   * reverse order, and yields one event-loop turn. Two consecutive no-work
+   * passes prove that closing an opener did not leave a queued popup claim. */
+  private async closeOwnedPagesToFixedPoint(
+    epoch: RunPageOwnershipEpoch,
+  ): Promise<string[]> {
+    let cleanPasses = 0;
+    let lastErrors: string[] = [];
+
+    for (let pass = 0; pass < MAX_RUN_PAGE_OWNERSHIP_CLEANUP_PASSES; pass += 1) {
+      const errors: string[] = [];
+      let didWork =
         this.ownedPages.size > 0 ||
-        this.pendingOwnedTargetIds.size > 0 ||
-        this.pendingPageClaims.size > 0
-      ) {
-        for (const page of this.context.pages()) {
-          if (await this.hasOwnershipEvidence(page)) {
-            this.registerOwnedPage(page);
+        this.pendingPageClaims.size > 0 ||
+        this.pendingTargetCount(epoch) > 0;
+
+      if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+        return ['task-page ownership changed during cleanup'];
+      }
+
+      try {
+        await this.drainPendingPageClaims();
+      } catch {
+        errors.push('a pending task-page claim did not settle cleanly');
+      }
+      if (this.runPageOwnershipFailure) {
+        errors.push('a positively-owned page could not be durably marked');
+      }
+
+      if (this.targetControl !== undefined && epoch.marker !== undefined) {
+        try {
+          // The target-control inventory is all-or-nothing: malformed or
+          // incomplete target metadata rejects before any exact sentinel is
+          // returned for mutation.
+          const targets = await this.targetControl.listPageTargets();
+          const sentinelUrl = runPageTargetSentinel(epoch.marker);
+          const staleTargets = targets.filter(
+            (target) => target.url === sentinelUrl,
+          );
+          if (staleTargets.length > 0) didWork = true;
+          let closeFailures = 0;
+          for (const target of [...staleTargets].reverse()) {
+            try {
+              await this.targetControl.closeTarget(target.ref);
+            } catch {
+              closeFailures += 1;
+            }
           }
+          if (closeFailures > 0) {
+            errors.push(
+              `${closeFailures} exact task target(s) could not be closed`,
+            );
+          }
+        } catch (error) {
+          errors.push(
+            error instanceof ChromiumTargetControlError
+              ? `task target inventory was incomplete during cleanup: ${error.message}`
+              : 'task target inventory was incomplete during cleanup',
+          );
         }
       }
-      await Promise.all([...this.pendingPageClaims]);
-    } catch {
-      errors.push('live task pages could not be enumerated before cleanup');
-    }
-    this.activePage = undefined;
-    this.pendingOwnedTargetIds.clear();
-    for (const page of [...this.ownedPages].reverse()) {
-      const pageId = this.trackedPages.get(page)?.pageId ?? '(unregistered)';
-      if (page.isClosed()) {
-        this.ownedPages.delete(page);
-        continue;
-      }
+
       try {
-        await page.close({ runBeforeUnload: false });
+        for (const page of this.context.pages()) {
+          if (
+            !page.isClosed() &&
+            !this.preexistingSessionPages.has(page) &&
+            (await this.hasOwnershipEvidence(page, epoch, true))
+          ) {
+            didWork = true;
+            if (!this.ownedPages.has(page)) {
+              await this.claimDurablyOwnedPage(page, epoch);
+            }
+          }
+        }
+        await this.drainPendingPageClaims();
       } catch {
-        // Deliberately omit the driver error: remote Playwright errors may
-        // retain a provider connection URL. Identity plus the failed action
-        // is enough for an actionable aggregate cleanup error.
-        errors.push(`pageId ${pageId} did not close`);
+        errors.push('live task pages could not be fully inventoried before cleanup');
       }
-      if (page.isClosed()) this.ownedPages.delete(page);
-      await this.detachDeferredCommandSessions(pageId);
+
+      this.activePage = undefined;
+      for (const page of [...this.ownedPages].reverse()) {
+        const pageId = this.trackedPages.get(page)?.pageId ?? '(unregistered)';
+        if (!page.isClosed()) {
+          didWork = true;
+          try {
+            await page.close({ runBeforeUnload: false });
+          } catch {
+            // Deliberately omit the driver error: remote Playwright errors may
+            // retain a provider connection URL.
+          }
+        }
+        if (page.isClosed()) this.ownedPages.delete(page);
+        await this.detachDeferredCommandSessions(pageId);
+      }
+      for (const pageId of [...this.deferredCommandSessionDetachers.keys()]) {
+        await this.detachDeferredCommandSessions(pageId);
+      }
+
+      await browserOwnershipEventTurn();
+
+      if (this.ownedPages.size > 0) {
+        errors.push(
+          `${this.ownedPages.size} task page(s) remained live after cleanup`,
+        );
+      }
+      const pendingTargets = this.pendingTargetCount(epoch);
+      if (pendingTargets > 0) {
+        errors.push(
+          `${pendingTargets} exact task target(s) remained unresolved after cleanup`,
+        );
+      }
+      if (this.pendingPageClaims.size > 0) {
+        errors.push(
+          `${this.pendingPageClaims.size} task page claim(s) remained pending after cleanup`,
+        );
+      }
+
+      lastErrors = errors;
+      if (!didWork && errors.length === 0) {
+        cleanPasses += 1;
+        if (cleanPasses >= RUN_PAGE_OWNERSHIP_CLEAN_PASSES) return [];
+      } else {
+        cleanPasses = 0;
+      }
     }
-    for (const pageId of [...this.deferredCommandSessionDetachers.keys()]) {
-      await this.detachDeferredCommandSessions(pageId);
+
+    return lastErrors.length > 0
+      ? lastErrors
+      : ['task-page cleanup did not reach a bounded quiescent fixed point'];
+  }
+
+  private captureRunPageOwnershipEpoch(): RunPageOwnershipEpoch {
+    return {
+      generation: this.runPageOwnershipGeneration,
+      marker: this.runPageOwnershipMarker,
+    };
+  }
+
+  private isCurrentRunPageOwnershipEpoch(
+    epoch: RunPageOwnershipEpoch,
+  ): boolean {
+    return (
+      epoch.generation === this.runPageOwnershipGeneration &&
+      epoch.marker === this.runPageOwnershipMarker
+    );
+  }
+
+  private pendingTargetCount(epoch: RunPageOwnershipEpoch): number {
+    let count = 0;
+    for (const generation of this.pendingOwnedTargetIds.values()) {
+      if (generation === epoch.generation) count += 1;
     }
-    return errors;
+    return count;
   }
 
   /** Track a page's identity: assign a stable pageId, record every current
@@ -1561,6 +2462,15 @@ export class PlaywrightBrowserController implements BrowserController {
         this.describePageIdentity(this.requireTrackedPage(pageId)),
       latestObservationId: (pageId) => this.state.latestObservationId(pageId),
       watchPage: (pageId) => this.createPageWatch(this.requireTrackedPage(pageId)),
+      settleActionActivity: async () => {
+        // Playwright can resolve a click while the corresponding context-page
+        // event is still queued. Yield once so that event can establish a
+        // claim, then await every claim that is already in flight. This keeps
+        // an owned popup invisible until its opener/marker evidence is valid,
+        // without making the generic navigation-detection window longer.
+        await browserOwnershipEventTurn();
+        await this.drainPendingPageClaims();
+      },
       resolveTarget: async (target) =>
         actionTargetHandle(await this.resolveElementRef(target), this.uploadEncoder),
       navigate: async (pageId, url) => {
@@ -1694,6 +2604,57 @@ export class PlaywrightBrowserController implements BrowserController {
     }
 
     return page;
+  }
+
+  private requireNoActiveTaskPage(): void {
+    if (this.activePage !== undefined && !this.activePage.isClosed()) {
+      throw new Error('A browser task tab is already active; close it first.');
+    }
+  }
+
+  /** Serialize tab mutation while allowing a cancelled/timed-out caller to
+   * return before a non-cooperative provider effect. The lifecycle queue and
+   * shared exclusive ledger remain tied to the real containment promise, so
+   * cleanup/rebinding cannot overtake it. */
+  private runTabLifecycleWithContainment<T>(
+    operation: (holdForContainment: (effect: Promise<unknown>) => void) => Promise<T>,
+  ): Promise<T> {
+    const priorLifecycle = this.tabLifecycle;
+    let releaseLifecycle!: () => void;
+    const lifecycleFence = new Promise<void>((resolve) => {
+      releaseLifecycle = resolve;
+    });
+    let lifecycleHolds = 0;
+    let lifecycleReleased = false;
+    const release = (): void => {
+      if (lifecycleReleased) return;
+      lifecycleReleased = true;
+      releaseLifecycle();
+    };
+    const holdForContainment = (effect: Promise<unknown>): void => {
+      lifecycleHolds += 1;
+      this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, effect);
+      void effect.then(
+        () => {
+          lifecycleHolds -= 1;
+          if (lifecycleHolds === 0) release();
+        },
+        () => {
+          lifecycleHolds -= 1;
+          if (lifecycleHolds === 0) release();
+        },
+      );
+    };
+
+    const result = priorLifecycle.then(async () => {
+      try {
+        return await operation(holdForContainment);
+      } finally {
+        if (lifecycleHolds === 0) release();
+      }
+    });
+    this.tabLifecycle = lifecycleFence;
+    return result;
   }
 
   private serializeTabLifecycle<T>(operation: () => Promise<T>): Promise<T> {
@@ -1993,6 +2954,152 @@ function normalizeDialogType(type: string): BrowserDialog['type'] {
   return type === 'confirm' || type === 'prompt' || type === 'beforeunload'
     ? type
     : 'alert';
+}
+
+/** Derive a stable browser marker without placing the caller's local run id
+ * into page state. Including the versioned namespace in the digest separates
+ * this use from any other hash of the same opaque id. */
+function runPageOwnershipMarker(ownershipId: string): string {
+  if (typeof ownershipId !== 'string' || ownershipId.length === 0) {
+    throw new TypeError('Durable run page ownership requires a non-empty string id.');
+  }
+  if (Buffer.byteLength(ownershipId, 'utf8') > MAX_RUN_PAGE_OWNERSHIP_ID_BYTES) {
+    throw new RangeError(
+      `Durable run page ownership ids may not exceed ` +
+        `${MAX_RUN_PAGE_OWNERSHIP_ID_BYTES} UTF-8 bytes.`,
+    );
+  }
+  const digest = createHash('sha256')
+    .update(RUN_PAGE_OWNERSHIP_MARKER_PREFIX, 'utf8')
+    .update('\0', 'utf8')
+    .update(ownershipId, 'utf8')
+    .digest('base64url');
+  return `${RUN_PAGE_OWNERSHIP_MARKER_PREFIX}${digest}`;
+}
+
+/** Exact browser-only URL used between Chromium target commit and durable
+ * page-marker installation. It contains only a namespace-separated digest of
+ * the already-hashed marker; neither the durable run id nor a filesystem path
+ * crosses into target metadata. */
+function runPageTargetSentinel(marker: string): string {
+  const digest = createHash('sha256')
+    .update(RUN_PAGE_TARGET_SENTINEL_PREFIX, 'utf8')
+    .update('\0', 'utf8')
+    .update(marker, 'utf8')
+    .digest('base64url');
+  return `about:blank#${RUN_PAGE_TARGET_SENTINEL_PREFIX}${digest}`;
+}
+
+function rawTargetCreationUrl(params: Record<string, unknown>): string {
+  if (
+    Object.keys(params).length !== 1 ||
+    typeof params.url !== 'string' ||
+    params.url.length === 0 ||
+    Buffer.byteLength(params.url, 'utf8') > MAX_RAW_TARGET_URL_BYTES ||
+    /[\u0000-\u001f\u007f]/u.test(params.url)
+  ) {
+    throw new TypeError(
+      'Run-owned Target.createTarget accepts exactly one bounded URL parameter.',
+    );
+  }
+  try {
+    new URL(params.url);
+  } catch {
+    throw new TypeError(
+      'Run-owned Target.createTarget requires an absolute URL.',
+    );
+  }
+  return params.url;
+}
+
+/** Read only an equality bit out of the page. The marker itself never comes
+ * back through Playwright, so it cannot accidentally enter an error,
+ * diagnostic, page listing, or tool result. */
+async function pageHasRunOwnershipMarker(page: Page, marker: string): Promise<boolean> {
+  return withRunPageOwnershipEvaluationDeadline(
+    page.evaluate(
+      ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
+        const descriptor = Object.getOwnPropertyDescriptor(window, property);
+        return (
+          descriptor?.value === expectedMarker &&
+          descriptor.enumerable === false &&
+          descriptor.configurable === false &&
+          descriptor.writable === false
+        );
+      },
+      { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker },
+    ),
+  );
+}
+
+/** Browser startup cannot trust a provider promise to observe cancellation.
+ * Install the operation handlers first, then establish caller-supplied
+ * containment before rejecting on abort. Once the signal fires, containment
+ * wins over a provider promise settling at the same boundary. */
+function raceBrowserPreparationStep<T>(
+  operation: Promise<T>,
+  signal: AbortSignal | undefined,
+  containOnAbort: () => void | Promise<void>,
+): Promise<T> {
+  if (signal === undefined) return operation;
+
+  return new Promise<T>((resolve, reject) => {
+    let settled = false;
+    let aborting = false;
+    const finish = (complete: () => void): void => {
+      if (settled) return;
+      settled = true;
+      signal.removeEventListener('abort', onAbort);
+      complete();
+    };
+    const onAbort = (): void => {
+      if (aborting || settled) return;
+      aborting = true;
+      void Promise.resolve()
+        .then(containOnAbort)
+        .then(
+          () => finish(() => reject(signal.reason)),
+          (error) => finish(() => reject(error)),
+        );
+    };
+
+    operation.then(
+      (value) => {
+        if (!aborting) finish(() => resolve(value));
+      },
+      (error) => {
+        if (!aborting) finish(() => reject(error));
+      },
+    );
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) onAbort();
+  });
+}
+
+function browserOwnershipEventTurn(): Promise<void> {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
+/** Renderer inspection cannot inherit Playwright's global 30s+ waits: this
+ * gate runs before a resumed coordinator may safely do anything else. The
+ * losing evaluation is read-only (or an idempotent exact marker install) and
+ * is observed so a later driver rejection cannot become unhandled. */
+async function withRunPageOwnershipEvaluationDeadline<T>(
+  evaluation: Promise<T>,
+): Promise<T> {
+  let timer: NodeJS.Timeout | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(new Error('Durable page ownership inspection timed out.')),
+      RUN_PAGE_OWNERSHIP_EVALUATION_TIMEOUT_MS,
+    );
+  });
+  try {
+    return await Promise.race([evaluation, deadline]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+    void evaluation.catch(() => undefined);
+  }
 }
 
 /**

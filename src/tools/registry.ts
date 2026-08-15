@@ -237,7 +237,18 @@ export interface BusyResourceRegistry {
    * or `false` once `timeoutMs` elapses first. A conflicting entry added
    * AFTER this call starts waiting is not included — see the module note
    * on why that snapshot is intentional, not a race. */
-  waitUntilFree(access: ToolAccess, timeoutMs: number): Promise<boolean>;
+  waitUntilFree(
+    access: ToolAccess,
+    timeoutMs: number,
+    signal?: AbortSignal,
+  ): Promise<boolean>;
+  /** Wait without releasing the caller until every conflicting abandoned
+   * effect has actually settled. Unlike `waitUntilFree`, this is a fixed-
+   * point drain: entries added while an earlier snapshot is settling are
+   * included before it returns. Terminalization uses this only after its
+   * finite safety gate expires, so a live effect can never outlive the run
+   * lock and race a fresh coordinator. */
+  drainUntilFree(access: ToolAccess): Promise<void>;
 }
 
 /** Build an empty `BusyResourceRegistry`. One instance per run, shared by
@@ -261,6 +272,9 @@ export interface BusyResourceRegistry {
 export function createBusyResourceRegistry(): BusyResourceRegistry {
   const abandoned = new Set<{ access: ToolAccess; cleared: Promise<void> }>();
 
+  const conflictingEntries = (access: ToolAccess) =>
+    [...abandoned].filter((entry) => accessesConflict(entry.access, access));
+
   return {
     markAbandoned(access, settles) {
       const entry = {
@@ -275,13 +289,37 @@ export function createBusyResourceRegistry(): BusyResourceRegistry {
         abandoned.delete(entry);
       });
     },
-    async waitUntilFree(access, timeoutMs) {
-      const conflicting = [...abandoned].filter((entry) => accessesConflict(entry.access, access));
+    async waitUntilFree(access, timeoutMs, signal) {
+      const conflicting = conflictingEntries(access);
       if (conflicting.length === 0) return true;
-      return Promise.race([
-        Promise.all(conflicting.map((entry) => entry.cleared)).then(() => true),
-        new Promise<false>((resolve) => setTimeout(() => resolve(false), timeoutMs)),
-      ]);
+      signal?.throwIfAborted();
+      let timer: NodeJS.Timeout | undefined;
+      let abort: (() => void) | undefined;
+      const aborted = new Promise<never>((_resolve, reject) => {
+        if (signal === undefined) return;
+        abort = () => reject(signal.reason);
+        signal.addEventListener('abort', abort, { once: true });
+        if (signal.aborted) abort();
+      });
+      try {
+        return await Promise.race([
+          Promise.all(conflicting.map((entry) => entry.cleared)).then(() => true),
+          new Promise<false>((resolve) => {
+            timer = setTimeout(() => resolve(false), timeoutMs);
+          }),
+          aborted,
+        ]);
+      } finally {
+        if (timer !== undefined) clearTimeout(timer);
+        if (abort !== undefined) signal?.removeEventListener('abort', abort);
+      }
+    },
+    async drainUntilFree(access) {
+      for (;;) {
+        const conflicting = conflictingEntries(access);
+        if (conflicting.length === 0) return;
+        await Promise.all(conflicting.map((entry) => entry.cleared));
+      }
     },
   };
 }

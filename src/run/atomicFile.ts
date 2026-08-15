@@ -32,6 +32,12 @@ export interface DurableFileWriteOptions {
    * has been flushed, but the destination path has not changed yet.
    */
   afterTempFileSync?: (tempPath: string) => void;
+  /**
+   * Stable identifier for the same-directory staging file. Runtime journals
+   * use this to name (and, after a crash, remove) exactly their own staging
+   * inode. Omit for the usual process-id + random UUID name.
+   */
+  tempFileId?: string;
 }
 
 /**
@@ -54,9 +60,13 @@ export function writeFileDurablyAtomic(
 ): void {
   const mode = options.mode ?? 'replace';
   const parentDir = dirname(filePath);
+  const tempFileId = options.tempFileId ?? `${process.pid}.${randomUUID()}`;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,191}$/.test(tempFileId)) {
+    throw new Error(`invalid durable-write temporary file id: ${JSON.stringify(tempFileId)}`);
+  }
   const tempPath = join(
     parentDir,
-    `.${basename(filePath)}.${process.pid}.${randomUUID()}.tmp`,
+    `.${basename(filePath)}.${tempFileId}.tmp`,
   );
   const bytes = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
 

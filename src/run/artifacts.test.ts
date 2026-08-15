@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   closeSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   openSync,
   readFileSync,
@@ -108,6 +109,22 @@ describe('writeArtifact', () => {
 
     expect(entry.filename).toBe('artifacts/sub/dir/file.bin');
     expect(existsSync(join(runDir, 'artifacts', 'sub', 'dir', 'file.bin'))).toBe(true);
+  });
+
+  it('never follows a symlink in an artifact parent path', () => {
+    const outside = join(runDir, 'outside-real');
+    mkdirSync(outside);
+    symlinkSync(outside, join(runDir, 'artifacts', 'linked'));
+
+    expect(() =>
+      writeArtifact(
+        runDir,
+        'artifacts/linked/escape.txt',
+        Buffer.from('must stay confined'),
+        { roles: ['requested_output'] },
+      ),
+    ).toThrow(/symlink|real directory/);
+    expect(existsSync(join(outside, 'escape.txt'))).toBe(false);
   });
 
   it('records sourceUrl when provided and omits the key otherwise', () => {

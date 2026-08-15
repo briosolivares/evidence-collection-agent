@@ -50,6 +50,7 @@ import {
   finishInputSchema,
   type FinishInput,
 } from '../tools/finish.js';
+import { raceWithV3RunSignal } from '../run/runDeadline.js';
 import { buildV3ContextView } from './contextView.js';
 
 export const V3_METRICS_FILENAME = 'metrics.json';
@@ -134,17 +135,28 @@ export interface V3FinishRequest {
   assistantText: string;
 }
 
+export interface V3ModelAccountingEvent {
+  turn: number;
+  /** Aggregate known billable usage for this logical model call. */
+  usage: Usage;
+  outcome: 'accepted' | 'failed';
+  session: V3WorkerSessionSnapshot;
+}
+
 /**
  * Durable-state boundaries. Hooks receive defensive snapshots and cannot
  * mutate the live session. `afterDispatch` is conservatively awaited at the
  * dispatch boundary before the executor is invoked: once it succeeds, a
  * checkpoint may truthfully call the effect uncertain. A failure from either
  * pre-effect hook prevents execution and becomes that call's own error.
+ * `afterModelAccounting` is awaited immediately after known model usage is
+ * charged and before cancellation or accepted content can advance the turn.
  * `afterResult` and finish-hook failures are post-effect persistence failures
  * and propagate terminally; they are never disguised as retryable tool errors.
  */
 export interface V3WorkerLifecycleHooks {
   beforeModelRequest?(event: V3BeforeModelRequestEvent): Promise<void>;
+  afterModelAccounting?(event: V3ModelAccountingEvent): Promise<void>;
   beforeCall?(pending: V3PendingToolTurn): Promise<void>;
   afterDispatch?(pending: V3PendingToolTurn): Promise<void>;
   afterResult?(pending: V3PendingToolTurn): Promise<void>;
@@ -327,25 +339,31 @@ export async function runV3WorkerTurn(
   const startedMs = now(session);
   let accepted;
   try {
-    accepted = await session.deps.model.generate({
-      messages: requestMessages,
-      ...(session.deps.signal === undefined
-        ? {}
-        : { signal: session.deps.signal }),
-      ...(session.deps.onModelEvent === undefined
-        ? {}
-        : { onEvent: session.deps.onModelEvent }),
-    });
+    accepted = await raceWithV3RunSignal(
+      () =>
+        session.deps.model.generate({
+          messages: requestMessages,
+          ...(session.deps.signal === undefined
+            ? {}
+            : { signal: session.deps.signal }),
+          ...(session.deps.onModelEvent === undefined
+            ? {}
+            : { onEvent: session.deps.onModelEvent }),
+        }),
+      session.deps.signal,
+    );
   } catch (error) {
-    throwIfAborted(session.deps.signal);
     const knownUsage = knownModelUsageFromError(error);
     if (knownUsage !== undefined) {
-      session.config.budget.recordModelUsage(
-        'worker',
+      await recordWorkerModelAccounting(
+        session,
+        turn,
         knownUsage,
         now(session) - startedMs,
+        'failed',
       );
     }
+    throwIfAborted(session.deps.signal);
     if (!isModelResponseRejectedError(error)) throw error;
 
     appendTranscriptEvent(session.deps.runDir, {
@@ -386,13 +404,15 @@ export async function runV3WorkerTurn(
     };
   }
 
-  throwIfAborted(session.deps.signal);
   const response = accepted.response;
-  session.config.budget.recordModelUsage(
-    'worker',
+  await recordWorkerModelAccounting(
+    session,
+    turn,
     accepted.usage,
     now(session) - startedMs,
+    'accepted',
   );
+  throwIfAborted(session.deps.signal);
   recordAcceptedResponse(session, turn, response);
 
   const contextTokens = requestContextTokens(response.usage);
@@ -478,6 +498,27 @@ export async function runV3WorkerTurn(
       input: parsed.data,
       assistantText,
     };
+    // Completion is allowed on the final configured worker turn. Every
+    // other hard ceiling (including model tokens, wall time, and context)
+    // still applies before verification begins.
+    const finishGuard = guardReason(session, contextTokens, ['worker_turns']);
+    if (finishGuard !== undefined) {
+      appendToolResults(session, turn, calls, [
+        generatedErrorResult(
+          session.deps.runDir,
+          call,
+          JSON.stringify({
+            status: 'rejected',
+            source: 'run_guard',
+            reason: finishGuard,
+            message:
+              'Finish was not submitted because this accepted response crossed a hard run guard.',
+          }),
+        ),
+      ]);
+      return { kind: 'incomplete', reason: finishGuard };
+    }
+
     appendTranscriptEvent(session.deps.runDir, {
       type: 'finish_requested',
       turn,
@@ -508,6 +549,65 @@ export async function runV3WorkerSession(
     const outcome = await runV3WorkerTurn(session);
     if (outcome.kind !== 'working') return outcome;
   }
+}
+
+/** Complete a tool batch restored from an executing_tool checkpoint.
+ * `not_started` resumes at the named call exactly once. `uncertain` never
+ * replays the effect boundary: the current and remaining calls receive
+ * ordered model-readable errors so the next turn can inspect real state. */
+export async function resumeV3PendingToolTurn(
+  session: V3WorkerSession,
+  pending: V3PendingToolTurn,
+): Promise<V3WorkerTurnOutcome> {
+  assertRestorablePendingTurn(session, pending);
+  throwIfAborted(session.deps.signal);
+
+  let completed = pending.completedResults.map(fromResultBlock);
+  if (pending.effect === 'uncertain') {
+    const uncertainCall = pending.calls[pending.nextCallIndex]!;
+    completed.push(
+      generatedErrorResult(
+        session.deps.runDir,
+        uncertainCall,
+        `Recovery did not replay "${uncertainCall.name}" because the prior process ` +
+          'crossed its effect boundary without durably recording a result. Its effect is ' +
+          'uncertain. Inspect the browser, files, and manifest before deciding what to do.',
+      ),
+    );
+    for (const call of pending.calls.slice(pending.nextCallIndex + 1)) {
+      completed.push(
+        generatedErrorResult(
+          session.deps.runDir,
+          call,
+          `Not executed during recovery because earlier call "${uncertainCall.name}" ` +
+            'has an uncertain effect. Inspect current state in a new turn.',
+        ),
+      );
+    }
+    completed = capCombinedResults(session.deps.runDir, pending.calls, completed);
+    await session.deps.lifecycle?.afterResult?.(
+      pendingToolTurn(
+        pending.turn,
+        pending.assistant,
+        pending.calls,
+        completed,
+        pending.calls.length,
+        'not_started',
+      ),
+    );
+  } else if (pending.nextCallIndex < pending.calls.length) {
+    completed = await continueSequentialCalls(
+      session,
+      pending.turn,
+      pending.assistant,
+      pending.calls,
+      completed,
+      pending.nextCallIndex,
+    );
+  }
+
+  appendToolResults(session, pending.turn, pending.calls, completed);
+  return afterTurnGuard(session, session.peakContextTokens);
 }
 
 /**
@@ -614,9 +714,20 @@ async function executeSequentialCalls(
   assistant: AssistantMessage,
   calls: readonly ToolCall[],
 ): Promise<ToolCallResult[]> {
-  let completed: ToolCallResult[] = [];
+  return continueSequentialCalls(session, turn, assistant, calls, [], 0);
+}
 
-  for (let index = 0; index < calls.length; index += 1) {
+async function continueSequentialCalls(
+  session: V3WorkerSession,
+  turn: number,
+  assistant: AssistantMessage,
+  calls: readonly ToolCall[],
+  initialCompleted: readonly ToolCallResult[],
+  startIndex: number,
+): Promise<ToolCallResult[]> {
+  let completed: ToolCallResult[] = [...initialCompleted];
+
+  for (let index = startIndex; index < calls.length; index += 1) {
     throwIfAborted(session.deps.signal);
     const call = calls[index]!;
 
@@ -860,6 +971,22 @@ function recordAcceptedResponse(
   });
 }
 
+async function recordWorkerModelAccounting(
+  session: V3WorkerSession,
+  turn: number,
+  usage: Usage,
+  wallClockMs: number,
+  outcome: V3ModelAccountingEvent['outcome'],
+): Promise<void> {
+  session.config.budget.recordModelUsage('worker', usage, wallClockMs);
+  await session.deps.lifecycle?.afterModelAccounting?.({
+    turn,
+    usage: structuredClone(usage),
+    outcome,
+    session: captureV3WorkerSessionSnapshot(session),
+  });
+}
+
 function afterTurnGuard(
   session: V3WorkerSession,
   contextTokens: number,
@@ -873,8 +1000,9 @@ function afterTurnGuard(
 function guardReason(
   session: V3WorkerSession,
   contextTokens?: number,
+  ignoredLimits: readonly RunBudgetLimit[] = [],
 ): V3WorkerGuardReason | undefined {
-  const limit = session.config.budget.exceededLimit();
+  const limit = session.config.budget.exceededLimit(ignoredLimits);
   if (limit !== undefined) return budgetReason(limit);
   if (
     contextTokens !== undefined &&
@@ -922,6 +1050,21 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
     content: result.content,
     ...(result.isError ? { is_error: true } : {}),
   };
+}
+
+function fromResultBlock(block: ToolResultBlock): ToolCallResult {
+  const content =
+    typeof block.content === 'string'
+      ? block.content
+      : JSON.stringify(block.content);
+  return block.is_error === true
+    ? {
+        toolCallId: block.tool_use_id,
+        isError: true,
+        errorKind: 'execution_error',
+        content,
+      }
+    : { toolCallId: block.tool_use_id, isError: false, content };
 }
 
 function extractText(content: readonly AssistantContentBlock[]): string {
@@ -983,6 +1126,42 @@ function assertPendingFinishCall(
     throw new Error(
       `finish call ${JSON.stringify(request.call.id)} is not the conversation's unanswered trailing call`,
     );
+  }
+}
+
+function assertRestorablePendingTurn(
+  session: V3WorkerSession,
+  pending: V3PendingToolTurn,
+): void {
+  if (pending.turn !== session.state.turnCount) {
+    throw new Error(
+      `pending tool turn ${pending.turn} does not match session turn ${session.state.turnCount}`,
+    );
+  }
+  const last = session.state.messages.at(-1);
+  if (
+    last?.role !== 'assistant' ||
+    JSON.stringify(last) !== JSON.stringify(pending.assistant)
+  ) {
+    throw new Error('pending tool turn assistant does not match session history');
+  }
+  if (
+    pending.nextCallIndex < 0 ||
+    pending.nextCallIndex > pending.calls.length ||
+    pending.completedResults.length !== pending.nextCallIndex
+  ) {
+    throw new Error('pending tool turn result/index invariant is invalid');
+  }
+  pending.completedResults.forEach((result, index) => {
+    if (result.tool_use_id !== pending.calls[index]?.id) {
+      throw new Error('pending tool turn results are not in call order');
+    }
+  });
+  if (
+    pending.effect === 'uncertain' &&
+    pending.nextCallIndex >= pending.calls.length
+  ) {
+    throw new Error('pending tool turn cannot be uncertain after its final call');
   }
 }
 

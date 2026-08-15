@@ -1547,7 +1547,7 @@ describe('Playwright browser controller', () => {
               },
               { timeout: 10_000 },
             )
-            .toMatch(/browser (session|script)/i);
+            .toMatch(/browser (has been disconnected|session|script)/i);
         } finally {
           await standalone.close().catch(() => undefined);
           await rm(standaloneProfileDir, { recursive: true, force: true }).catch(() => undefined);

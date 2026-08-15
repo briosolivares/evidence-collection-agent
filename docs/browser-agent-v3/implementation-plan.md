@@ -209,23 +209,23 @@ prompt/tool definitions.
 
 ### Step 4 — finish checks, verifier loop, and durable coordinator
 
-- [ ] Run the contract initializer once; store one immutable typed contract in
+- [x] Run the contract initializer once; store one immutable typed contract in
   harness-private state and show it to the worker as per-run guidance.
-- [ ] Implement `finish` input (`summary`, published paths, unresolved limits)
+- [x] Implement `finish` input (`summary`, published paths, unresolved limits)
   and interception in the v3 loop.
-- [ ] Adapt deterministic completion checks to generic published artifacts:
+- [x] Adapt deterministic completion checks to generic published artifacts:
   exact filenames, exact CSV columns, row/count rules, non-placeholder
   content, requested screenshots/downloads, hashes, and roles.
-- [ ] Invoke the existing fresh-context verifier only after code checks pass;
+- [x] Invoke the existing fresh-context verifier only after code checks pass;
   append check/verifier feedback to the same worker conversation.
-- [ ] Write a compact v3 checkpoint at turn/tool/verifying/terminal boundaries
+- [x] Write a compact v3 checkpoint at turn/tool/verifying/terminal boundaries
   under `harness/checkpoint.json`, atomically and with a run lock.
 - [x] Make manifest replacement atomic and durable (temporary file, fsync,
   rename, parent-directory fsync) so a killed writer cannot leave truncated
   provenance.
-- [ ] Implement resume, including explicit uncertain-effect recovery instead
+- [x] Implement resume, including explicit uncertain-effect recovery instead
   of blind tool replay.
-- [ ] Finalize transcript, metrics, manifest, tracing, and owned browser pages
+- [x] Finalize transcript, metrics, manifest, tracing, and owned browser pages
   on success, incomplete exit, cancellation, and crash.
 
 **Gate:** scripted end-to-end tests cover verified, deterministic rejection and
@@ -296,10 +296,10 @@ proved, even if supporting code already exists.
 | Sherlock TUI preserved | TUI integration suite + fixture smoke | Pending |
 | Streaming main loop preserved | Model/loop tests + transcript | V3 session complete; production cutover pending |
 | Evals/graders preserved | Eval runner/grader suite + boundary inspection | Pending |
-| Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | Pending |
+| Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | V3 coordinator complete; production cutover pending |
 | Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Provider-neutral command seam complete; cutover/live smoke pending |
-| Accuracy checks preserved | Completion/verifier correction tests | Pending |
-| Owned tabs always cleaned | Browser lifecycle tests on all terminal paths | Controller and verified/failed run paths complete; cancellation cutover pending |
+| Accuracy checks preserved | Completion/verifier correction tests | V3 checks/verifier complete; production cutover pending |
+| Owned tabs always cleaned | Browser lifecycle tests on all terminal paths | V3 controller/coordinator and crash recovery complete; production cutover pending |
 | Secrets/CDP capability never leak | Secret sweep + child-env tests | Browser substrate complete; final whole-product sweep pending |
 | No task-specific logic | Source/prompt/helper audit | Pending |
 | Full implementation complete | Steps 0–7 and final audit | Pending |
@@ -485,6 +485,182 @@ proved, even if supporting code already exists.
   supports an exact `0600` mode for v3 checkpoints. Focused artifact/durability
   tests passed 54/54, broader manifest consumers passed 195/195, and typecheck
   plus whitespace checks passed.
+- The remaining Step 4 foundations are implemented in the uncommitted v3
+  path: one immutable two-attempt initializer and private
+  `harness/output-contract.json`; generic no-write finish inspection over
+  manifest bytes and contract shapes; a published-only, bounded, no-offload
+  verifier registry; aggregate role-budget accounting; and a strict 0600
+  phase-discriminated checkpoint store. Verifier recovery now records the
+  honest `{ recovery: "restart_read_only" }` rule instead of synthetic private
+  conversation state.
+- The v3 coordinator now composes initializer → persistent worker →
+  deterministic checks → fresh verifier, owns a fresh task tab lazily, and
+  closes all task pages on terminal paths. It checkpoints accepted contracts
+  before publishing their immutable file; links pending tool/finish cargo to
+  the exact trailing assistant turn; reconciles `scratch/workspace/` before
+  uncertain-tool recovery; verifies strong manifest shape/path/hash metadata
+  even on terminal resume; reruns deterministic checks for recorded verified
+  outcomes; and repairs a terminal transcript/manifest finalization window
+  idempotently. Terminal finish failures are answered without ever publishing
+  a transient `ready_for_model` checkpoint.
+- Adversarial review found and the coordinator fixed an async-finally race:
+  cancellation/failure branches must `await terminalize()` or the outer
+  `finally` closes the checkpoint store before the terminal save. Current
+  scripted gates pass 57/57 across coordinator happy path, deterministic and
+  verifier repair loops, budgets, cancellation, browser cleanup, checkpoint
+  integrity, and restored wall-clock downtime accounting; typecheck was green
+  on that merged slice. A real two-process kill/resume suite and final
+  transition/process-cleanup audit are still running, so Step 4 remains open.
+- The real two-process gate is now active and green. It forks a new coordinator
+  process, kills it with `SIGKILL`, then resumes under a different PID at the
+  accepted-contract, uncertain-effect, and private-verifier boundaries. The
+  uncertain effect is never replayed; verifier model/tool spend is checkpointed
+  per accepted response and rebilled on its read-only retry; the terminal
+  checkpoint retains exact `finish` claims; one terminal transcript event and
+  no run lock survive. The current crash/accounting subset passes 33/33.
+- Artifact publication is now a recoverable bytes-plus-manifest transaction.
+  A 0600 intent under `harness/artifact-write-journal/` precedes atomic target
+  replacement; recovery under the run lock commits the exact intended entry
+  only when no-follow length/hash checks match, otherwise preserves prior
+  manifest truth and removes only transaction-owned staging state. The
+  coordinator runs this recovery before any resume inspection. Real kill and
+  merged artifact/coordinator gates currently pass 69/69.
+- Completion now shares the worker's abandoned-resource ledger with the browser.
+  `finish` checks wait for exclusive quiescence, terminalization refuses to
+  finalize while a timed-out effect remains live, and delayed-writer tests prove
+  both verification and incomplete finalization see settled bytes. Browser page
+  cleanup has its own finite deadline, so a wedged controller produces a failed
+  outcome without suppressing durable terminal state.
+- Initializer, worker, and verifier activity consume one monotone budget.
+  Initializer control calls and verifier inspection/verdict calls are counted;
+  every model-visible verifier result is charged; initializer budget exhaustion
+  can terminalize without inventing a contract/worker; and verifier accounting
+  is checkpointed after each model/tool mutation. Metrics, transcript, and
+  manifest are independent terminal projections: resume reconstructs missing
+  metrics, repairs only an unterminated JSONL tail, and attempts all finalizers
+  even when one remains corrupt. The current focused coordinator/checkpoint/
+  verifier set passes 103/103 and typecheck is green.
+- Step 4 remains open on two external-liveness gates: a detached Bash/browser
+  child must be killed when its harness parent is `SIGKILL`ed, and an attached
+  Chrome reconnect must reclaim/close stale pages from the same durable run
+  while preserving unrelated user tabs. Both have isolated implementations
+  and real-process tests in progress; no production cutover or live eval has
+  started.
+- Durable attached-browser ownership is now implemented and wired before the
+  coordinator opens any task tab. A namespace-separated hash, never the raw
+  run path, is installed as a non-enumerable/non-writable/non-configurable
+  page property before site JavaScript. Real Chrome process-kill/reconnect
+  tests reclaim a same-run main tab and `noopener` popup across origins while
+  preserving wrong-run and user tabs; the merged ownership/lifecycle subset
+  currently passes 14/14.
+- Worker model accounting now has its own awaited checkpoint boundary before
+  cancellation or response content can win, and a valid `finish` passes the
+  same turn/token/context guard as every other accepted response. A new real
+  process-kill test proves one accepted worker response remains billed after
+  restart and its retry is billed again; the merged worker/crash/checkpoint
+  subset passes 79/79.
+- Stale run-lock takeover now uses a separate exclusive recovery guard and
+  re-reads the exact prior owner before unlinking. A simultaneous contender
+  fails closed instead of deleting the winner's live lock, interrupted
+  takeover guards are never guessed away, and lock-release failures surface;
+  the checkpoint suite currently passes 47/47.
+- The last Step 4 audit is addressing three bounded gaps before the full gate:
+  parent-death supervision must hard-kill without a resume overlap window;
+  manifest inspection needs canonical timestamps and aggregate memory/count
+  bounds; and finite whole-run wall time must interrupt even non-cooperative
+  model/provider calls. These remain uncommitted and keep Step 4 open.
+- The finite whole-run deadline slice is now implemented and focused-gated.
+  One restored absolute wall deadline is composed with operator cancellation
+  and races initializer, worker, verifier, checking-phase resource waits, and
+  controller-owned task-page preparation while still passing the signal into
+  cooperative providers. Known model usage crosses its awaited accounting
+  checkpoint before cancellation wins; wall expiry durably classifies as
+  `incomplete/budget_exceeded:wall_time`, while only the composed run signal
+  can classify operator cancellation. Interrupted verifier finishes receive
+  exactly one terminal error result. Playwright keeps exact late page creation,
+  durable claims, ownership initialization, and navigation behind both its tab
+  lifecycle and the shared exclusive abandoned-effect fence; terminalization
+  either observes containment or refuses to finalize after its separate finite
+  safety gate. Busy waits now cancel and clear losing timers. The merged
+  registry/budget/model/worker/verifier/checkpoint/coordinator/browser gate
+  passes 201/201 across 13 files, real Chrome semantics included; typecheck and
+  `git diff --check` are green. Step 4 remains open for the other audit slices
+  and the final full gate.
+- The follow-up resume/terminal audit is now implemented. Artifact recovery
+  bounds manifest/journal reads before allocation and polls a trusted guard
+  during directory and 64 KiB hash chunks; active resume uses the restored run
+  deadline, terminal resume has an independent 30-second integrity bound, and
+  workspace reconciliation polls the same guard while walking and reading.
+  The v3 verifier supplies a filesystem-free opening from the task, immutable
+  contract, finish claims, clarifications, and settled facts, so hostile
+  unmanifested trees cannot run ahead of its bounded no-follow tools. A
+  verified verdict is rechecked for cancellation/hard limits after resource
+  drain and browser cleanup. If the finite abandoned-effect gate expires,
+  terminalization retains the run lock and performs a fixed-point drain rather
+  than exposing an overlapping resume window. New regressions cover an
+  unmanifested symlink cycle, cleanup-time cancellation/wall expiry, terminal
+  inspection expiry, chunk-level guard propagation, and a competing
+  coordinator while an effect remains live. The focused regressions are
+  98/98, and the broader affected v3/run/verifier/tool set is 352/352; full
+  typecheck and `git diff --check` are green. Step 4 remains open only for the
+  in-progress target-sentinel/browser crash gate and then the merged full
+  suite.
+- Browser ownership now rotates explicit epochs only after `closeTaskPages()`
+  disposes the exact context init-script handle and reaches two clean bounded
+  inventory passes; cleanup failure remains bound/poisoned, and real A→B reuse
+  preserves user tabs. Providers inject a context-scoped opaque Chromium
+  target control; V3 task preparation creates an exact hashed sentinel target,
+  claims/marks its exact Playwright page before stripping the sentinel, and
+  routes run-owned raw target creation and unresponsive-page replacement
+  through the same path. Attached Chrome uses a dedicated excluded anchor so
+  reclaiming a stale task page cannot detach target inventory mid-cleanup.
+  The focused controller/provider/real-Chrome gate passes 82/82 across seven
+  files with one worker, and typecheck plus `git diff --check` are green. The
+  dedicated SIGKILL-at-post-create/pre-marker sentinel regression remains to
+  be added. A narrower provider-internal residual also remains: `context.newPage`
+  can commit the attached target-control anchor before the provider can retain
+  or tag it, so SIGKILL in that setup window may leave one unclassified blank
+  internal page; the real crash test distinguishes that page from run-owned
+  pages rather than guessing it is safe to close.
+- The browser crash follow-up closes both residuals above. Attached Chrome now
+  binds its context-scoped target inventory through Playwright's browser-level
+  CDP session, so provider setup creates no internal page and has no blank-page
+  SIGKILL window. A deterministic real-process fixture stops immediately after
+  `Target.createTarget` returns the exact hashed sentinel target and before any
+  Playwright page claim or ownership marker; after SIGKILL, a wrong run leaves
+  that target and both user tabs untouched, while a same-run resume reclaims
+  only the sentinel. The serial focused controller/provider/real-Chrome gate
+  passes 84/84 across seven files; full typecheck and `git diff --check` are
+  green.
+- The final bounded-inspection pass caps one table at 16 MiB, 100,000 data
+  rows, 1,000,000 header/data cells, and 100 deterministic defects. The run
+  guard is polled during parsing, normalization, and rule/cell validation, and
+  exact cancellation/deadline values propagate unchanged. The focused finish
+  and coordinator tests pass 64/64; the merged completion/coordinator gate
+  passes 85/85.
+- Bash and browser-program children are now armed behind an independent
+  parent-death supervisor before model-authored code can execute. Parent IPC
+  loss hard-kills the complete POSIX process group; watchdog failure inside a
+  live harness also hard-kills synchronously and overrides any softer outcome.
+  Real SIGKILL fixtures prove a target and descendant cannot outlive the run
+  lock or overwrite a replacement effect. The containment gate passes 42/42.
+- The final integration review fixed one action-ordering race: after a browser
+  action, the controller now yields once and drains page-ownership claims
+  before the sequencer decides whether a popup interrupted the remaining
+  actions. This preserves the short generic navigation window without letting
+  a slow durable popup claim expose the next action to the wrong page state.
+- Step 4's merged affected gate passes 418/418 tests across 25 files. The
+  serial target-control/provider/real-Chrome ownership gate passes 84/84, and
+  the real coordinator kill/restart gate passes 7/7. `npm run typecheck` and
+  `git diff --check` pass. The complete default-parallel hermetic suite passes
+  174 files / 2,226 tests in 93.24 seconds. No live Browserbase smoke or eval
+  re-baseline was run.
+- To recover enough disk for the complete gate, the coordinator removed only
+  explicitly inspected stale test directories: four `/private/tmp/sherlock-*`
+  directories dated August 12–13 and Chrome test profiles older than four
+  hours under the exact process temp directory. Those temporary files are not
+  recoverable; no run directory, persistent Chrome profile, source file, or
+  user-owned whiteboard was removed.
 
 ## Rules for coordinators and subagents
 

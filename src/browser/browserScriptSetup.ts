@@ -71,7 +71,7 @@ export interface BrowserScriptReconcileParams {
   trackedPages: Map<Page, PageRecord>;
   createDocumentId: () => string;
   forgetPage: (pageId: string) => void;
-  registerPage: (page: Page) => PageRecord;
+  registerPage: (page: Page) => PageRecord | Promise<PageRecord>;
   /** Optional ownership filter used by the URL-free v3 command path. The
    * legacy secondary-client script path omits it and adopts every non-
    * pre-existing page for backward compatibility. */
@@ -170,7 +170,7 @@ export async function reconcileAfterBrowserScript(
     if (shouldRegisterPage !== undefined && !(await shouldRegisterPage(page))) {
       continue;
     }
-    registerPage(page);
+    await registerPage(page);
   }
 
   // Step 2.
@@ -192,7 +192,7 @@ export async function reconcileAfterBrowserScript(
     } else {
       try {
         const page = await context.newPage();
-        registerPage(page);
+        await registerPage(page);
         setActivePage(page);
       } catch (error) {
         throw new Error(

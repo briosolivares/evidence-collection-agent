@@ -113,8 +113,9 @@ describe('createRunBudgetTracker', () => {
       { now: () => nowMs },
     );
     expect(wall.exceededLimit()).toBeUndefined();
-    nowMs = 1501;
+    nowMs = 1500;
     expect(wall.exceededLimit()).toBe('wall_time');
+    expect(wall.remainingWallTimeMs()).toBe(0);
 
     const corrections = createRunBudgetTracker({ ...UNBOUNDED, maxVerifierCorrections: 1 });
     corrections.recordCorrection();
@@ -198,11 +199,81 @@ describe('RunBudgetTracker snapshot/restore', () => {
     // even though this process's clock started somewhere else entirely.
     expect(restored.elapsedWallTimeMs()).toBe(9_900);
     expect(restored.exceededLimit()).toBeUndefined();
+    expect(restored.remainingWallTimeMs()).toBe(100);
 
-    restoredNowMs += 101; // only 101ms of real new time...
-    // ...but 9900 + 101 > 10000: the ceiling trips almost immediately,
+    restoredNowMs += 100; // only 100ms of real new time...
+    // ...but 9900 + 100 reaches 10000: the deadline trips exactly,
     // rather than getting a fresh 10s window.
     expect(restored.exceededLimit()).toBe('wall_time');
+  });
+
+  it('charges downtime from the durable snapshot time across repeated restores', () => {
+    const config = { ...UNBOUNDED, maxWallTimeMs: 10_000 };
+    let firstNowMs = 1_000_000;
+    const first = createRunBudgetTracker(config, { now: () => firstNowMs });
+
+    firstNowMs = 1_002_000;
+    const firstSnapshotAtMs = firstNowMs;
+    const firstSnapshot = captureRunBudgetSnapshot(first);
+    expect(firstSnapshot.elapsedWallTimeMs).toBe(2_000);
+
+    // The process was absent for 3 seconds. A durable restore counts those
+    // seconds instead of resuming at the snapshot's old 2-second duration.
+    let secondNowMs = 1_005_000;
+    const second = createRunBudgetTracker(config, {
+      now: () => secondNowMs,
+      restore: firstSnapshot,
+      restoreSnapshotAtMs: firstSnapshotAtMs,
+    });
+    expect(second.elapsedWallTimeMs()).toBe(5_000);
+
+    secondNowMs = 1_006_000;
+    const secondSnapshotAtMs = secondNowMs;
+    const secondSnapshot = captureRunBudgetSnapshot(second);
+    expect(secondSnapshot.elapsedWallTimeMs).toBe(6_000);
+
+    // A second restart still reconstructs the original t=1,000,000 baseline;
+    // repeated recovery neither resets nor double-counts elapsed time.
+    let thirdNowMs = 1_011_000;
+    const third = createRunBudgetTracker(config, {
+      now: () => thirdNowMs,
+      restore: secondSnapshot,
+      restoreSnapshotAtMs: secondSnapshotAtMs,
+    });
+    expect(third.elapsedWallTimeMs()).toBe(11_000);
+    expect(third.exceededLimit()).toBe('wall_time');
+  });
+
+  it('fails closed for unusable absolute restore timestamps', () => {
+    let nowMs = 10_000;
+    const snapshot = captureRunBudgetSnapshot(
+      createRunBudgetTracker(UNBOUNDED, { now: () => nowMs }),
+    );
+
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, {
+        now: () => nowMs,
+        restoreSnapshotAtMs: nowMs,
+      }),
+    ).toThrow(/requires a RunBudgetSnapshot/);
+
+    for (const invalid of [-1, Number.NaN, Infinity]) {
+      expect(() =>
+        createRunBudgetTracker(UNBOUNDED, {
+          now: () => nowMs,
+          restore: snapshot,
+          restoreSnapshotAtMs: invalid,
+        }),
+      ).toThrow(/restoreSnapshotAtMs must be a finite number >= 0/);
+    }
+
+    expect(() =>
+      createRunBudgetTracker(UNBOUNDED, {
+        now: () => nowMs,
+        restore: snapshot,
+        restoreSnapshotAtMs: nowMs + 1,
+      }),
+    ).toThrow(/must not be later than the current clock/);
   });
 
   it('a restored tracker keeps enforcing maxWorkerTurns from the restored count, so a restart cannot refill headroom', () => {

@@ -6,7 +6,7 @@ import {
   fstatSync,
   lstatSync,
   openSync,
-  readdirSync,
+  opendirSync,
   readSync,
 } from 'node:fs';
 import { join } from 'node:path';
@@ -46,6 +46,12 @@ export interface ScratchWorkspaceChangedFile {
   change: ScratchWorkspaceChange;
 }
 
+export interface ScratchWorkspaceSyncOptions {
+  /** Synchronous cancellation/deadline guard invoked between directory and
+   * file chunks. A thrown value propagates unchanged and stops reconciliation. */
+  checkActive?: () => void;
+}
+
 /**
  * Reconcile the manifest with whatever `scratch/workspace` actually contains
  * right now, after a command has run.
@@ -68,7 +74,11 @@ export interface ScratchWorkspaceChangedFile {
  *   followed or manifested — or if a file's size exceeds
  *   {@link SCRATCH_WORKSPACE_MAX_FILE_BYTES}
  */
-export function syncScratchWorkspace(runDir: string): ScratchWorkspaceChangedFile[] {
+export function syncScratchWorkspace(
+  runDir: string,
+  options: ScratchWorkspaceSyncOptions = {},
+): ScratchWorkspaceChangedFile[] {
+  options.checkActive?.();
   const workspaceDir = join(runDir, SCRATCH_DIR, WORKSPACE_SUBDIR);
   const manifest = readManifest(runDir);
 
@@ -86,9 +96,17 @@ export function syncScratchWorkspace(runDir: string): ScratchWorkspaceChangedFil
   const seen = new Set<string>();
 
   if (existsSync(workspaceDir)) {
-    for (const { absPath, relPath } of walkWorkspace(workspaceDir)) {
+    for (const { absPath, relPath } of walkWorkspace(
+      workspaceDir,
+      options.checkActive,
+    )) {
+      options.checkActive?.();
       seen.add(relPath);
-      const bytes = readRegularFileNoFollow(absPath, relPath);
+      const bytes = readRegularFileNoFollow(
+        absPath,
+        relPath,
+        options.checkActive,
+      );
       const hash = createHash('sha256').update(bytes).digest('hex');
       const priorHash = priorHashes.get(relPath);
       if (priorHash === hash) continue; // unchanged: leave the existing entry alone
@@ -96,12 +114,15 @@ export function syncScratchWorkspace(runDir: string): ScratchWorkspaceChangedFil
       // writeArtifact recomputes this same hash and (re)writes the manifest
       // entry — it is the single write path every artifact goes through, and
       // a reconciliation pass gets no exception from that rule.
+      options.checkActive?.();
       writeArtifact(runDir, relPath, bytes);
+      options.checkActive?.();
       changes.push({ path: relPath, change: priorHash === undefined ? 'created' : 'modified' });
     }
   }
 
   for (const relPath of priorHashes.keys()) {
+    options.checkActive?.();
     if (seen.has(relPath)) continue;
     removeScratchArtifactEntry(runDir, relPath);
     changes.push({ path: relPath, change: 'deleted' });
@@ -124,18 +145,22 @@ interface WalkedWorkspaceFile {
 /**
  * Walk scratch/workspace/ once, never following a symlink.
  *
- * `readdirSync(..., { withFileTypes: true })` reports each entry's type from
- * the directory listing itself (`d_type` where the platform provides it),
+ * `opendirSync(...).readSync()` reports each entry's type from the directory
+ * listing itself (`d_type` where the platform provides it),
  * not from following the entry — so a symlinked subdirectory is seen as a
  * symlink and rejected before this ever recurses into it or whatever it
  * points to. That guard only covers entries FOUND INSIDE the directory being
- * read, though — `readdirSync(workspaceDir, ...)` itself follows a symlink
+ * read, though — opening `workspaceDir` itself follows a symlink
  * at `workspaceDir`'s own final path component (a command that replaces the
  * whole `workspace` directory with `ln -s /etc workspace`, say), so the root
- * is `lstat`-checked explicitly before the walk ever calls `readdirSync` on
+ * is `lstat`-checked explicitly before the walk ever opens
  * it.
  */
-function walkWorkspace(workspaceDir: string): WalkedWorkspaceFile[] {
+function walkWorkspace(
+  workspaceDir: string,
+  checkActive?: () => void,
+): WalkedWorkspaceFile[] {
+  checkActive?.();
   const rootStat = lstatSync(workspaceDir);
   if (rootStat.isSymbolicLink()) {
     throw new Error(
@@ -152,27 +177,36 @@ function walkWorkspace(workspaceDir: string): WalkedWorkspaceFile[] {
   const out: WalkedWorkspaceFile[] = [];
 
   function visit(dir: string, relSegments: readonly string[]): void {
-    for (const dirent of readdirSync(dir, { withFileTypes: true })) {
-      const absPath = join(dir, dirent.name);
-      const relSegmentsHere = [...relSegments, dirent.name];
-      const relDisplay = relSegmentsHere.join('/');
+    checkActive?.();
+    const handle = opendirSync(dir);
+    try {
+      for (;;) {
+        checkActive?.();
+        const dirent = handle.readSync();
+        if (dirent === null) break;
+        const absPath = join(dir, dirent.name);
+        const relSegmentsHere = [...relSegments, dirent.name];
+        const relDisplay = relSegmentsHere.join('/');
 
-      if (dirent.isSymbolicLink()) {
-        throw new Error(
-          `scratch workspace entry is a symlink, which is never followed or manifested: ${relDisplay}`,
-        );
+        if (dirent.isSymbolicLink()) {
+          throw new Error(
+            `scratch workspace entry is a symlink, which is never followed or manifested: ${relDisplay}`,
+          );
+        }
+        if (dirent.isDirectory()) {
+          visit(absPath, relSegmentsHere);
+          continue;
+        }
+        if (!dirent.isFile()) {
+          throw new Error(
+            `scratch workspace entry is not a regular file (socket, FIFO, or device are ` +
+              `rejected): ${relDisplay}`,
+          );
+        }
+        out.push({ absPath, relPath: `${WORKSPACE_PREFIX}${relDisplay}` });
       }
-      if (dirent.isDirectory()) {
-        visit(absPath, relSegmentsHere);
-        continue;
-      }
-      if (!dirent.isFile()) {
-        throw new Error(
-          `scratch workspace entry is not a regular file (socket, FIFO, or device are ` +
-            `rejected): ${relDisplay}`,
-        );
-      }
-      out.push({ absPath, relPath: `${WORKSPACE_PREFIX}${relDisplay}` });
+    } finally {
+      handle.closeSync();
     }
   }
 
@@ -192,7 +226,11 @@ function walkWorkspace(workspaceDir: string): WalkedWorkspaceFile[] {
  * is the second, TOCTOU-safe check on the same handle the bytes are read
  * from, mirroring `verifyManifestFiles` in ./artifacts.ts.
  */
-function readRegularFileNoFollow(absPath: string, relPath: string): Buffer {
+function readRegularFileNoFollow(
+  absPath: string,
+  relPath: string,
+  checkActive?: () => void,
+): Buffer {
   // See verifyManifestFiles for why these two flags: O_NOFOLLOW refuses to
   // open a symlink at all, and O_NONBLOCK keeps a FIFO from hanging this
   // call forever waiting for a writer — regular files are unaffected by
@@ -238,6 +276,7 @@ function readRegularFileNoFollow(absPath: string, relPath: string): Buffer {
     const chunks: Buffer[] = [];
     let total = 0;
     for (;;) {
+      checkActive?.();
       const bytesRead = readSync(fd, chunk, 0, chunkSize, null);
       if (bytesRead === 0) break;
       total += bytesRead;

@@ -39,7 +39,7 @@ export interface RunBudgetConfig {
   /** Total model tokens (input + output + cache read + cache creation)
    * summed over every role; integer >= 1. */
   maxModelTokens: number;
-  /** Cumulative tool-result bytes returned to the worker; integer >= 0. */
+  /** Cumulative tool-result bytes made visible to any model role; integer >= 0. */
   maxToolResultBytes: number;
   /** Wall time from tracker creation; integer >= 1 (milliseconds). */
   maxWallTimeMs: number;
@@ -64,7 +64,7 @@ export interface RunBudgetTracker {
   recordModelUsage(role: ModelRole, usage: Usage, wallClockMs?: number): void;
   /** Charge attempted tool calls (integer >= 0). */
   recordToolCalls(count: number): void;
-  /** Charge tool-result bytes returned to the worker (integer >= 0). */
+  /** Charge tool-result bytes made visible to a model role (integer >= 0). */
   recordToolResultBytes(bytes: number): void;
   /** Charge one verifier correction round. */
   recordCorrection(): void;
@@ -74,14 +74,22 @@ export interface RunBudgetTracker {
   workerTurnsUsed(): number;
   /** Total model tokens charged so far, all roles. */
   totalModelTokens(): number;
-  /** Wall-clock milliseconds elapsed since the run started — for a tracker
-   * created with `opts.restore`, that means since the ORIGINAL run started,
-   * not since this process did (see `createRunBudgetTracker`). */
+  /** Wall-clock milliseconds elapsed since the run started. A restored
+   * tracker includes downtime when its caller supplies the absolute time at
+   * which the restored snapshot was captured (see
+   * `createRunBudgetTracker`). */
   elapsedWallTimeMs(): number;
+  /** Milliseconds left before the whole-run wall deadline. Infinity stays
+   * explicit; a finite result is clamped at zero and is safe to pass to a
+   * deadline scheduler. */
+  remainingWallTimeMs(): number;
   /** The first exhausted ceiling, or undefined while all headroom remains.
    * Deterministic order: worker_turns, tool_calls, model_tokens,
    * tool_result_bytes, wall_time, verifier_corrections. */
-  exceededLimit(): RunBudgetLimit | undefined;
+  /** The first exhausted ceiling, optionally ignoring limits that the caller
+   * has already consumed lawfully at a phase boundary (for example a worker
+   * finishing on its final allowed turn before the verifier runs). */
+  exceededLimit(ignore?: readonly RunBudgetLimit[]): RunBudgetLimit | undefined;
   /** Per-role usage snapshot (copies — mutating them changes nothing). */
   roleUsage(): Partial<Record<ModelRole, RunRoleUsage>>;
 }
@@ -180,9 +188,10 @@ export function captureRunBudgetSnapshot(tracker: RunBudgetTracker): RunBudgetSn
 }
 
 /**
- * Create the run's single budget tracker. Wall time counts from this call —
- * unless `opts.restore` is given, in which case wall time counts from
- * whenever the ORIGINAL run started (see the `startedAt` computation below).
+ * Create the run's single budget tracker. Wall time counts from this call.
+ * A restore always preserves the elapsed duration stored in its snapshot; if
+ * `opts.restoreSnapshotAtMs` is also supplied, it additionally charges the
+ * real downtime between that absolute checkpoint time and this construction.
  *
  * @param config - validated ceilings (see RunBudgetConfig; throws on any
  *   invalid field before anything else starts)
@@ -191,23 +200,68 @@ export function captureRunBudgetSnapshot(tracker: RunBudgetTracker): RunBudgetSn
  *   a prior (crashed or checkpointed) instance of this same run's tracker.
  *   Validated before anything else starts; a malformed snapshot throws
  *   rather than silently under-counting.
+ * @param opts.restoreSnapshotAtMs - absolute `now()` time at which `restore`
+ *   was captured. Supplying it makes a resumed tracker's elapsed wall time
+ *   continue from the original run baseline, including process downtime. It
+ *   must use the same clock as `opts.now`; an invalid or future value throws
+ *   rather than granting ambiguous headroom. Omit only for legacy snapshots
+ *   that did not durably record an absolute checkpoint time.
  */
 export function createRunBudgetTracker(
   config: RunBudgetConfig,
-  opts: { now?: () => number; restore?: RunBudgetSnapshot } = {},
+  opts: {
+    now?: () => number;
+    restore?: RunBudgetSnapshot;
+    restoreSnapshotAtMs?: number;
+  } = {},
 ): RunBudgetTracker {
   validateRunBudgetConfig(config);
   const restore = opts.restore;
   if (restore !== undefined) assertValidRunBudgetSnapshot(restore);
   const now = opts.now ?? Date.now;
-  // The single most important restore rule: a restart must NOT reset the
-  // wall clock. Backdating startedAt by the snapshot's already-elapsed time
-  // means `now() - startedAt` (what exceededLimit checks against
-  // maxWallTimeMs, and what elapsedWallTimeMs reports) picks up exactly
-  // where the prior instance left off, in a brand-new process with a
-  // brand-new `now()` origin. Using `now()` unadjusted here would silently
-  // hand a resumed run a fresh maxWallTimeMs window it never budgeted for.
-  const startedAt = restore !== undefined ? now() - restore.elapsedWallTimeMs : now();
+  const createdAtMs = now();
+  const restoreSnapshotAtMs = opts.restoreSnapshotAtMs;
+  if (restoreSnapshotAtMs !== undefined) {
+    if (restore === undefined) {
+      throw new Error(
+        'restoreSnapshotAtMs requires a RunBudgetSnapshot in opts.restore',
+      );
+    }
+    if (!Number.isFinite(restoreSnapshotAtMs) || restoreSnapshotAtMs < 0) {
+      throw new Error(
+        `restoreSnapshotAtMs must be a finite number >= 0, got ${restoreSnapshotAtMs}`,
+      );
+    }
+    if (restoreSnapshotAtMs > createdAtMs) {
+      throw new Error(
+        `restoreSnapshotAtMs (${restoreSnapshotAtMs}) must not be later than ` +
+          `the current clock (${createdAtMs})`,
+      );
+    }
+  }
+
+  // A duration-only legacy restore starts from the saved elapsed value. A
+  // durable restore also adds the time the process was down, reconstructing
+  // the original wall-clock baseline exactly:
+  //
+  //   createdAt - (savedElapsed + createdAt - snapshotAt)
+  //   === snapshotAt - savedElapsed === original startedAt
+  //
+  // Future timestamps fail above instead of being clamped: an unexplained
+  // clock reversal cannot safely prove how much budget remains.
+  const restoredElapsedMs =
+    restore === undefined
+      ? 0
+      : restore.elapsedWallTimeMs +
+        (restoreSnapshotAtMs === undefined
+          ? 0
+          : createdAtMs - restoreSnapshotAtMs);
+  if (!Number.isFinite(restoredElapsedMs)) {
+    throw new Error(
+      `restored wall time must remain finite, got ${restoredElapsedMs}`,
+    );
+  }
+  const startedAt = createdAtMs - restoredElapsedMs;
 
   const roles = new Map<ModelRole, RunRoleUsage>();
   if (restore !== undefined) {
@@ -282,14 +336,40 @@ export function createRunBudgetTracker(
     workerTurnsUsed: () => roles.get('worker')?.turns ?? 0,
     totalModelTokens: totalTokens,
     elapsedWallTimeMs: () => now() - startedAt,
+    remainingWallTimeMs: () => {
+      if (config.maxWallTimeMs === Infinity) return Infinity;
+      return Math.max(0, config.maxWallTimeMs - (now() - startedAt));
+    },
 
-    exceededLimit(): RunBudgetLimit | undefined {
-      if ((roles.get('worker')?.turns ?? 0) >= config.maxWorkerTurns) return 'worker_turns';
-      if (toolCalls > config.maxToolCalls) return 'tool_calls';
-      if (totalTokens() > config.maxModelTokens) return 'model_tokens';
-      if (toolResultBytes > config.maxToolResultBytes) return 'tool_result_bytes';
-      if (now() - startedAt > config.maxWallTimeMs) return 'wall_time';
-      if (corrections > config.maxVerifierCorrections) return 'verifier_corrections';
+    exceededLimit(ignore = []): RunBudgetLimit | undefined {
+      const ignored = new Set(ignore);
+      if (
+        !ignored.has('worker_turns') &&
+        (roles.get('worker')?.turns ?? 0) >= config.maxWorkerTurns
+      ) {
+        return 'worker_turns';
+      }
+      if (!ignored.has('tool_calls') && toolCalls > config.maxToolCalls) {
+        return 'tool_calls';
+      }
+      if (!ignored.has('model_tokens') && totalTokens() > config.maxModelTokens) {
+        return 'model_tokens';
+      }
+      if (
+        !ignored.has('tool_result_bytes') &&
+        toolResultBytes > config.maxToolResultBytes
+      ) {
+        return 'tool_result_bytes';
+      }
+      if (!ignored.has('wall_time') && now() - startedAt >= config.maxWallTimeMs) {
+        return 'wall_time';
+      }
+      if (
+        !ignored.has('verifier_corrections') &&
+        corrections > config.maxVerifierCorrections
+      ) {
+        return 'verifier_corrections';
+      }
       return undefined;
     },
 

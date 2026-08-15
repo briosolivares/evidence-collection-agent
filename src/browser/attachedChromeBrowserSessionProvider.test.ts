@@ -48,6 +48,17 @@ function fakeContext(preexistingPages: Page[] = []): {
   const pageListeners: Array<(page: Page) => void> = [];
   const allPages = [...preexistingPages];
   const taskPages: Page[] = [];
+  const targetIds = new WeakMap<Page, string>();
+  let targetSequence = 0;
+  const targetIdFor = (page: Page): string => {
+    let targetId = targetIds.get(page);
+    if (targetId === undefined) {
+      targetSequence += 1;
+      targetId = `fake-target-${targetSequence}`;
+      targetIds.set(page, targetId);
+    }
+    return targetId;
+  };
   const close = vi.fn(async () => undefined);
   const newPage = vi.fn(async () => {
     const taskPage = fakePage(`about:blank#task-${taskPages.length + 1}`).page;
@@ -62,6 +73,22 @@ function fakeContext(preexistingPages: Page[] = []): {
     }),
     pages: vi.fn(() => [...allPages]),
     newPage,
+    newCDPSession: vi.fn(async (page: Page) => ({
+      send: vi.fn(async (method: string) => {
+        if (method !== 'Target.getTargetInfo') return {};
+        return {
+          targetInfo: {
+            targetId: targetIdFor(page),
+            type: 'page',
+            title: '',
+            url: page.url(),
+            attached: true,
+            browserContextId: 'fake-attached-context',
+          },
+        };
+      }),
+      detach: vi.fn(async () => undefined),
+    })),
     close,
     isClosed: () => false,
     browser: () => ({ isConnected: () => true }),
@@ -76,6 +103,14 @@ function fakeBrowser(contexts: BrowserContext[]): {
   const close = vi.fn(async () => undefined);
   const browser = {
     contexts: vi.fn(() => contexts),
+    newBrowserCDPSession: vi.fn(async () => ({
+      send: vi.fn(async (method: string) =>
+        method === 'Target.getBrowserContexts'
+          ? { browserContextIds: [] }
+          : {},
+      ),
+      detach: vi.fn(async () => undefined),
+    })),
     close,
     isConnected: () => true,
   } as unknown as Browser;
@@ -168,7 +203,7 @@ describe('AttachedChromeBrowserSessionProvider page ownership', () => {
     await controller.newTab();
     await controller.refreshAfterExternalCommands();
 
-    expect(newPage).toHaveBeenCalledTimes(1);
+    expect(newPage).toHaveBeenCalledOnce();
     expect(taskPages).toHaveLength(1);
     const visiblePages = await controller.pages();
     expect(visiblePages).toHaveLength(1);
@@ -180,7 +215,10 @@ describe('AttachedChromeBrowserSessionProvider page ownership', () => {
   it('disconnects once without closing the existing context or any user page', async () => {
     const first = fakePage('https://mail.example.test/');
     const second = fakePage('https://calendar.example.test/');
-    const { context, close: closeContext } = fakeContext([first.page, second.page]);
+    const { context, close: closeContext } = fakeContext([
+      first.page,
+      second.page,
+    ]);
     const { browser, close: disconnectClient } = fakeBrowser([context]);
     const controller = await provider(browser).createSession();
 

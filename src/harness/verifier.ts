@@ -8,7 +8,12 @@ import type {
 } from '../loop/messages.js';
 import type { SettledFact } from '../completion/completionCheck.js';
 import { makeCallModel, type CallModelConfig, type ProgressEvent } from '../model/callModel.js';
-import { toApiToolDefs, type ApiToolDef, type ToolCtx } from '../tools/registry.js';
+import {
+  toApiToolDefs,
+  type ApiToolDef,
+  type ToolCtx,
+  type ToolRegistry,
+} from '../tools/registry.js';
 import {
   buildVerificationInput,
   createVerifierRegistry,
@@ -235,16 +240,54 @@ export async function runVerifier(args: {
   /** What the submission's code checks positively established, so the
    * verifier neither re-derives nor contradicts a mechanical fact. */
   settled?: readonly SettledFact[];
+  /** Run-specific worker claims that the verifier must assess rather than
+   * trust as code-settled facts. */
+  additionalContext?: string;
+  /** Optional already-bounded opening message. Callers with a stricter I/O
+   * boundary can supply this to avoid the legacy manifest/directory scan. */
+  openingInput?: string;
+  /** Errors matching this predicate are coordinator control flow and must
+   * escape instead of being downgraded to verifier_unavailable. */
+  propagateError?: (error: unknown) => boolean;
+  /** Optional verifier-specific read-only inspection implementation. */
+  inspection?: {
+    registry: ToolRegistry;
+    executeToolUses: (
+      registry: ToolRegistry,
+      toolUses: readonly ToolUseBlock[],
+      ctx: ToolCtx,
+    ) => Promise<ToolResultBlock[]>;
+    signal?: AbortSignal;
+    /** Optional accounting hook for callers that share whole-run result
+     * budgets with the verifier. Invoked before results become model input. */
+    onToolResults?: (
+      results: readonly ToolResultBlock[],
+    ) => void | Promise<void>;
+  };
 }): Promise<VerifierOutcome> {
   const { taskText, runDir, callModel } = args;
 
-  const opening = buildVerificationInput(runDir, taskText, args.contracts, args.settled);
+  args.inspection?.signal?.throwIfAborted();
+  const opening =
+    args.openingInput ??
+    buildVerificationInput(
+      runDir,
+      taskText,
+      args.contracts,
+      args.settled,
+      args.additionalContext,
+    );
 
-  const registry = createVerifierRegistry();
+  const registry = args.inspection?.registry ?? createVerifierRegistry();
   const messages: Message[] = [
     { role: 'user', content: [{ type: 'text', text: opening }] },
   ];
-  const toolCtx: ToolCtx = { runDir };
+  const toolCtx: ToolCtx = {
+    runDir,
+    ...(args.inspection?.signal === undefined
+      ? {}
+      : { abortSignal: args.inspection.signal }),
+  };
 
   const unavailable = (reason: string): VerifierOutcome => ({
     status: 'verifier_unavailable',
@@ -260,7 +303,12 @@ export async function runVerifier(args: {
     try {
       response = await callModel(messages);
     } catch (thrown) {
-      if (thrown instanceof Error && thrown.name === 'AbortError') throw thrown;
+      if (
+        (thrown instanceof Error && thrown.name === 'AbortError') ||
+        args.propagateError?.(thrown) === true
+      ) {
+        throw thrown;
+      }
       return unavailable(
         `verifier model call failed: ${thrown instanceof Error ? thrown.message : String(thrown)}`,
       );
@@ -287,10 +335,15 @@ export async function runVerifier(args: {
           return unavailable(`invalid report_verification input: ${parsed.error.message}`);
         }
         repairUsed = true;
+        const resultBlocks = closeToolUses(
+          toolUses,
+          'Not executed: the report was structurally invalid.',
+        );
+        await args.inspection?.onToolResults?.(resultBlocks);
         messages.push({
           role: 'user',
           content: [
-            ...closeToolUses(toolUses, 'Not executed: the report was structurally invalid.'),
+            ...resultBlocks,
             {
               type: 'text',
               text: `Your report_verification input failed validation: ${parsed.error.message}. ${REPAIR_SUFFIX}`,
@@ -301,10 +354,15 @@ export async function runVerifier(args: {
       }
       if (repairUsed || forced) return unavailable(problem);
       repairUsed = true;
+      const resultBlocks = closeToolUses(
+        toolUses,
+        'Not executed: the report response was invalid.',
+      );
+      await args.inspection?.onToolResults?.(resultBlocks);
       messages.push({
         role: 'user',
         content: [
-          ...closeToolUses(toolUses, 'Not executed: the report response was invalid.'),
+          ...resultBlocks,
           { type: 'text', text: `Invalid report: ${problem}. ${REPAIR_SUFFIX}` },
         ],
       });
@@ -350,20 +408,25 @@ export async function runVerifier(args: {
     if (contextTokens > VERIFIER_MAX_CONTEXT_TOKENS) {
       danglingToolUses = toolUses;
       forced = true;
+      const resultBlocks = closeToolUses(
+        danglingToolUses,
+        "Not executed: the verifier's inspection budget is exhausted.",
+      );
+      await args.inspection?.onToolResults?.(resultBlocks);
       messages.push({
         role: 'user',
         content: [
-          ...closeToolUses(
-            danglingToolUses,
-            "Not executed: the verifier's inspection budget is exhausted.",
-          ),
+          ...resultBlocks,
           { type: 'text', text: FORCED_REPORT_PROMPT },
         ],
       });
       continue;
     }
 
-    const resultBlocks = await executeVerifierToolUses(registry, toolUses, toolCtx);
+    const resultBlocks = await (
+      args.inspection?.executeToolUses ?? executeVerifierToolUses
+    )(registry, toolUses, toolCtx);
+    await args.inspection?.onToolResults?.(resultBlocks);
     messages.push({ role: 'user', content: resultBlocks });
   }
 }

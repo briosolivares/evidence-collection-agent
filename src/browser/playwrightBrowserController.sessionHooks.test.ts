@@ -9,8 +9,8 @@ import type { BrowserSessionDiagnostics } from './sessionProvider.js';
  * Pins the injected-seam contract of {@link PlaywrightBrowserController}
  * WITHOUT a real browser: no Chrome launch, no CDP connection, no network.
  * The controller only touches `context.on('page', ...)` in its constructor
- * and `context.close()`/the injected `closeSession` in `close()`, so a plain
- * object satisfies everything these tests exercise.
+ * and inventories `context.pages()` before `context.close()`/the injected
+ * `closeSession` in `close()`, so a small contract-faithful fake is enough.
  */
 
 function fakeContext(options: { connected?: boolean } = {}): {
@@ -24,6 +24,7 @@ function fakeContext(options: { connected?: boolean } = {}): {
     on: vi.fn((event: string, listener: (...args: unknown[]) => void) => {
       listeners.set(event, listener);
     }),
+    pages: vi.fn(() => []),
     close,
     // A locally launched persistent context returns null here; a
     // CDP-connected remote one returns the Browser. Both shapes matter.

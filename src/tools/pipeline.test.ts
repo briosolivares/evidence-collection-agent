@@ -458,6 +458,7 @@ describe('executeToolCall busy-resource gate', () => {
     const stubRegistry: BusyResourceRegistry = {
       markAbandoned: () => undefined,
       waitUntilFree: async () => false,
+      drainUntilFree: async () => undefined,
     };
     const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry: stubRegistry };
 

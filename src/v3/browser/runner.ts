@@ -2,6 +2,11 @@ import { fork, type ChildProcess } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
+import {
+  ParentDeathWatchdogError,
+  startParentDeathWatchdog,
+} from '../../process/parentDeathWatchdog.js';
+
 export const BROWSER_PROGRAM_LIMITS = Object.freeze({
   maxSourceBytes: 256_000,
   maxIpcMessageBytes: 1_048_576,
@@ -158,6 +163,15 @@ function protocolError(message: string): BrowserProgramError {
   return { name: 'ProtocolError', message: truncateUtf8(message, MAX_ERROR_MESSAGE_BYTES) };
 }
 
+function watchdogError(error: unknown, fallback: string): BrowserProgramError {
+  const message =
+    error instanceof ParentDeathWatchdogError ? error.message : fallback;
+  return {
+    name: 'ParentDeathWatchdogError',
+    message: truncateUtf8(redactCapabilities(message), MAX_ERROR_MESSAGE_BYTES),
+  };
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -263,6 +277,10 @@ function immediateResult(
   };
 }
 
+function isAborted(signal: AbortSignal | undefined): boolean {
+  return signal?.aborted === true;
+}
+
 /**
  * Run one model-authored browser program in a fresh, bounded Node child.
  *
@@ -278,7 +296,7 @@ export async function runBrowserProgram(
   validateOptions(options);
   const startedAt = performance.now();
 
-  if (options.abortSignal?.aborted === true) {
+  if (isAborted(options.abortSignal)) {
     return immediateResult(startedAt, { status: 'cancelled' });
   }
 
@@ -303,6 +321,31 @@ export async function runBrowserProgram(
     });
   }
 
+  let abortedDuringWatchdogStart = false;
+  const onWatchdogStartAbort = (): void => {
+    abortedDuringWatchdogStart = true;
+  };
+  options.abortSignal?.addEventListener('abort', onWatchdogStartAbort, {
+    once: true,
+  });
+
+  let watchdog;
+  try {
+    watchdog = await startParentDeathWatchdog();
+  } catch (error) {
+    return immediateResult(startedAt, {
+      status: 'failed',
+      error: watchdogError(error, 'parent-death watchdog failed to start'),
+    });
+  } finally {
+    options.abortSignal?.removeEventListener('abort', onWatchdogStartAbort);
+  }
+
+  if (abortedDuringWatchdogStart || isAborted(options.abortSignal)) {
+    await watchdog.disarm();
+    return immediateResult(startedAt, { status: 'cancelled' });
+  }
+
   return new Promise<BrowserProgramResult>((resolve) => {
     let child: ChildProcess;
     try {
@@ -315,25 +358,31 @@ export async function runBrowserProgram(
         serialization: 'json',
       });
     } catch (error) {
-      resolve(immediateResult(startedAt, { status: 'failed', error: structuredError(error) }));
+      void watchdog.disarm().then(() => {
+        resolve(immediateResult(startedAt, { status: 'failed', error: structuredError(error) }));
+      });
       return;
     }
 
     if (!child.stdout || !child.stderr) {
       child.kill('SIGKILL');
-      resolve(
-        immediateResult(startedAt, {
-          status: 'failed',
-          error: protocolError('browser-program child was created without output pipes'),
-        }),
-      );
+      void watchdog.disarm().then(() => {
+        resolve(
+          immediateResult(startedAt, {
+            status: 'failed',
+            error: protocolError('browser-program child was created without output pipes'),
+          }),
+        );
+      });
       return;
     }
 
     let settled = false;
     let ready = false;
+    let watchdogArmed = false;
     let startSent = false;
     let outcome: TerminalOutcome | undefined;
+    let watchdogFailure: BrowserProgramError | undefined;
     let terminationStarted = false;
     let exitObserved = false;
     let stdoutEnded = false;
@@ -378,23 +427,25 @@ export async function runBrowserProgram(
     const detachAbort = (): void => {
       options.abortSignal?.removeEventListener('abort', onAbort);
     };
+    let detachWatchdogFailure = (): void => undefined;
 
     const finish = (): void => {
       if (settled) return;
       settled = true;
       clearTimers();
       detachAbort();
+      detachWatchdogFailure();
       killGroup('SIGKILL');
       child.stdout?.removeAllListeners();
       child.stderr?.removeAllListeners();
       child.removeAllListeners();
-      const finalOutcome =
-        outcome ??
-        ({
-          status: 'failed',
-          error: protocolError('browser-program child ended without a result'),
-        } satisfies TerminalOutcome);
-      resolve({
+      const finalOutcome: TerminalOutcome = watchdogFailure
+        ? { status: 'failed', error: watchdogFailure }
+        : outcome ?? {
+            status: 'failed',
+            error: protocolError('browser-program child ended without a result'),
+          };
+      const result: BrowserProgramResult = {
         status: finalOutcome.status,
         durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
         ...(Object.prototype.hasOwnProperty.call(finalOutcome, 'value')
@@ -403,7 +454,11 @@ export async function runBrowserProgram(
         stdout: decodeRetainedBytes(stdoutChunks),
         stderr: decodeRetainedBytes(stderrChunks),
         ...(finalOutcome.error ? { error: finalOutcome.error } : {}),
-      });
+      };
+      void watchdog.disarm().then(
+        () => resolve(result),
+        () => resolve(result),
+      );
     };
 
     const maybeFinishAfterExit = (): void => {
@@ -448,6 +503,42 @@ export async function runBrowserProgram(
     function onAbort(): void {
       beginTermination({ status: 'cancelled' });
     }
+
+    detachWatchdogFailure = watchdog.onFailure((error) => {
+      if (settled) return;
+      watchdogFailure = watchdogError(
+        error,
+        'parent-death watchdog stopped while the browser program was active',
+      );
+      const failure: TerminalOutcome = {
+        status: 'failed',
+        error: watchdogFailure,
+      };
+
+      // Force the infrastructure failure even if cancellation, timeout, or a
+      // program result already began ordinary termination. With the watcher
+      // gone there can be no grace period during which a harness SIGKILL could
+      // abandon this group.
+      outcome = failure;
+      beginTermination(failure);
+      if (graceKillTimer) {
+        clearTimeout(graceKillTimer);
+        graceKillTimer = undefined;
+      }
+      killGroup('SIGKILL');
+    });
+
+    const maybeStartProgram = (): void => {
+      if (!ready || !watchdogArmed || startSent || settled || terminationStarted) return;
+      startSent = sendToChild({
+        version: PROTOCOL_VERSION,
+        kind: 'start',
+        code: options.code,
+        page: options.page,
+        maxIpcMessageBytes: BROWSER_PROGRAM_LIMITS.maxIpcMessageBytes,
+        maxResultBytes: BROWSER_PROGRAM_LIMITS.maxResultBytes,
+      });
+    };
 
     const appendOutput = (target: Buffer[], chunk: Buffer | string): void => {
       if (settled) return;
@@ -742,14 +833,7 @@ export async function runBrowserProgram(
           return;
         }
         ready = true;
-        startSent = sendToChild({
-          version: PROTOCOL_VERSION,
-          kind: 'start',
-          code: options.code,
-          page: options.page,
-          maxIpcMessageBytes: BROWSER_PROGRAM_LIMITS.maxIpcMessageBytes,
-          maxResultBytes: BROWSER_PROGRAM_LIMITS.maxResultBytes,
-        });
+        maybeStartProgram();
         return;
       }
       if (!ready || !startSent) {
@@ -820,5 +904,21 @@ export async function runBrowserProgram(
       options.abortSignal.addEventListener('abort', onAbort, { once: true });
       if (options.abortSignal.aborted) onAbort();
     }
+
+    void watchdog.arm(child.pid ?? -1).then(
+      () => {
+        watchdogArmed = true;
+        maybeStartProgram();
+      },
+      (error: unknown) => {
+        beginTermination({
+          status: 'failed',
+          error: watchdogError(
+            error,
+            'parent-death watchdog failed while arming the browser program',
+          ),
+        });
+      },
+    );
   });
 }

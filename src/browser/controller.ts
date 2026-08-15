@@ -99,6 +99,21 @@ export interface BrowserTextCaptureRequest {
   elementId?: string;
 }
 
+/** Cancellation for task-page creation/navigation. Implementations must
+ * contain any late browser effect before rejecting for an aborted signal: a
+ * page created after rejection is closed automatically, and an interrupted
+ * navigation cannot remain usable or race terminal cleanup. */
+export interface BrowserOperationOptions {
+  signal?: AbortSignal;
+}
+
+/** One v3-safe task-page startup transaction. `ownershipId` is harness-private
+ * and `startUrl` is omitted for a blank task page. */
+export interface BrowserTaskPagePreparation extends BrowserOperationOptions {
+  ownershipId: string;
+  startUrl?: string;
+}
+
 /**
  * Exactly what was read, and what it was read from. Every field is part of
  * the evidence record the capture produces: without page and document
@@ -206,7 +221,7 @@ export interface BrowserController {
    * @returns nothing; a new active tab whose URL is `about:blank` is ready
    *   for browser operations. Rejects if a task tab is already active.
    */
-  newTab(): Promise<void>;
+  newTab(options?: BrowserOperationOptions): Promise<void>;
 
   /**
    * Close the active task tab while keeping the browser session alive.
@@ -223,7 +238,7 @@ export interface BrowserController {
    * @returns nothing; the active tab has reached its load event, including
    *   any redirects, before the promise resolves
    */
-  goto(url: string): Promise<void>;
+  goto(url: string, options?: BrowserOperationOptions): Promise<void>;
 
   /**
    * Capture an AI-oriented semantic outline of the active page.
@@ -423,6 +438,34 @@ export interface BrowserController {
 
   /** Return every JavaScript dialog currently blocking an owned page. */
   listPendingDialogs(): readonly BrowserDialog[];
+
+  /**
+   * Recover page ownership for one durable run before opening its task tab.
+   *
+   * Implementations that host multiple clients in one persistent browser may
+   * use `ownershipId` to find and close pages left by an earlier process for
+   * this exact run. Unrelated pages must remain untouched. The same call also
+   * arms durable ownership marking for pages the controller subsequently
+   * creates or claims, including popups and pages that navigate cross-origin.
+   *
+   * OPTIONAL because a provider whose browser lifetime is already bounded by
+   * the harness process has no stale attached-session pages to reclaim. When
+   * present, the coordinator calls it with the stable run id after acquiring
+   * the session and before `newTab()` or any navigation. Repeating the same id
+   * is safe. A different id rejects until `closeTaskPages()` removes the exact
+   * context init script and reaches a proven quiescent fixed point; failed
+   * cleanup leaves the controller bound.
+   */
+  initializeRunPageOwnership?(
+    ownershipId: string,
+    options?: BrowserOperationOptions,
+  ): Promise<void>;
+
+  /** Atomically prepare a run-owned task page under cancellation. Unlike
+   * composing the legacy methods at a caller, this boundary owns containment
+   * of a late `newTab` or `goto` effect. V3 requires this capability whenever
+   * it receives a browser controller. */
+  prepareTaskPage?(request: BrowserTaskPagePreparation): Promise<void>;
 
   /**
    * Close every page created for the current task, including owned popups and

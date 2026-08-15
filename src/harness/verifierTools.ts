@@ -72,6 +72,7 @@ export function buildVerificationInput(
   taskText: string,
   contracts: { current: unknown; history: readonly unknown[] },
   settled: readonly SettledFact[] = [],
+  additionalContext?: string,
 ): string {
   const manifestRaw = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
   const artifactListing = listArtifactFiles(runDir);
@@ -94,6 +95,9 @@ export function buildVerificationInput(
   return [
     '# Task',
     taskText,
+    ...(additionalContext === undefined
+      ? []
+      : ['', '# Run-specific completion claim (not code-settled)', additionalContext]),
     '',
     ...contractSections,
     '',
@@ -216,6 +220,17 @@ function readImageToolResult(
       is_error: true,
     };
   }
+  return verifierImageResultFromBytes(toolUseId, relPath, mediaType, bytes);
+}
+
+/** Build the verifier's image result from bytes already read through a
+ * caller-owned confinement/no-follow boundary. */
+export function verifierImageResultFromBytes(
+  toolUseId: string,
+  relPath: string,
+  mediaType: ImageBlock['source']['media_type'],
+  bytes: Buffer,
+): ToolResultBlock {
   if (bytes.byteLength > VERIFIER_MAX_IMAGE_BYTES) {
     return {
       type: 'tool_result',

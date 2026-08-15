@@ -13,6 +13,10 @@ type ArbitraryCdpSend = (
 ) => Promise<unknown>;
 
 export interface PlaywrightCommandSessionHooks {
+  /** Replace raw Target.createTarget with a controller-owned crash-recoverable
+   * creation path. The hook returns the ordinary CDP result shape, but the
+   * target is durably claimed before that result reaches the caller. */
+  createTargetCommand?: (params: Record<string, unknown>) => Promise<unknown>;
   /** Called after Chrome confirms a raw Target.createTarget command. The
    * controller uses the returned target id to claim only that page for task
    * cleanup; a concurrent user-created page is never inferred as owned. */
@@ -122,7 +126,10 @@ export async function openPlaywrightCommandSession(
           method === 'Page.handleJavaScriptDialog' &&
           hooks.handleDialogCommand !== undefined
             ? await hooks.handleDialogCommand(params ?? {})
-            : await send(method, params);
+            : method === 'Target.createTarget' &&
+                hooks.createTargetCommand !== undefined
+              ? await hooks.createTargetCommand(params ?? {})
+              : await send(method, params);
         if (method === 'Target.createTarget' && hooks.onTargetCreated !== undefined) {
           const createdTargetId = (result as { targetId?: unknown })?.targetId;
           if (typeof createdTargetId !== 'string' || createdTargetId.length === 0) {

@@ -65,6 +65,22 @@ describe('syncScratchWorkspace', () => {
     expect(syncScratchWorkspace(runDir)).toEqual([]);
   });
 
+  it('propagates the exact active guard failure while streaming a file', () => {
+    writeWorkspaceFile('large.bin', Buffer.alloc(2 * 1024 * 1024, 1));
+    const stopped = new Error('resume inspection deadline');
+    let checks = 0;
+
+    expect(() =>
+      syncScratchWorkspace(runDir, {
+        checkActive: () => {
+          checks += 1;
+          if (checks >= 5) throw stopped;
+        },
+      }),
+    ).toThrow(stopped);
+    expect(checks).toBeGreaterThanOrEqual(5);
+  });
+
   it('classifies a same-size rewrite as modified — comparing hashes, not size', () => {
     writeWorkspaceFile('a.txt', 'hello');
     syncScratchWorkspace(runDir);

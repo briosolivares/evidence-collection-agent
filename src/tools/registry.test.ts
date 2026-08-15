@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import {
@@ -235,6 +235,57 @@ describe('createBusyResourceRegistry', () => {
     await expect(waiting).resolves.toBe(true);
   });
 
+  it('clears its losing timeout when abandoned work settles first', async () => {
+    vi.useFakeTimers();
+    try {
+      const registry = createBusyResourceRegistry();
+      let resolveAbandoned!: () => void;
+      const abandoned = new Promise<void>((resolve) => {
+        resolveAbandoned = resolve;
+      });
+      registry.markAbandoned(
+        { reads: [], writes: [accessKey.page('p1')] },
+        abandoned,
+      );
+
+      const waiting = registry.waitUntilFree(
+        { reads: [], writes: [accessKey.page('p1')] },
+        120_000,
+      );
+      expect(vi.getTimerCount()).toBe(1);
+      resolveAbandoned();
+      await expect(waiting).resolves.toBe(true);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('cancels a busy wait and clears its timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      const registry = createBusyResourceRegistry();
+      registry.markAbandoned(
+        { reads: [], writes: [accessKey.page('p1')] },
+        new Promise(() => undefined),
+      );
+      const abort = new AbortController();
+      const reason = new Error('run deadline');
+      const waiting = registry.waitUntilFree(
+        { reads: [], writes: [accessKey.page('p1')] },
+        120_000,
+        abort.signal,
+      );
+
+      abort.abort(reason);
+
+      await expect(waiting).rejects.toBe(reason);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('times out and reports not-free when the abandoned call never settles in time', async () => {
     const registry = createBusyResourceRegistry();
     registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, new Promise(() => undefined));
@@ -258,5 +309,32 @@ describe('createBusyResourceRegistry', () => {
     await expect(
       registry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 50),
     ).resolves.toBe(true);
+  });
+
+  it('drains to a fixed point when another conflicting effect appears mid-wait', async () => {
+    const registry = createBusyResourceRegistry();
+    let releaseFirst!: () => void;
+    let releaseSecond!: () => void;
+    const first = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    const second = new Promise<void>((resolve) => {
+      releaseSecond = resolve;
+    });
+    const access = { reads: [], writes: [accessKey.page('p1')] };
+    registry.markAbandoned(access, first);
+
+    let drained = false;
+    const draining = registry.drainUntilFree(access).then(() => {
+      drained = true;
+    });
+    registry.markAbandoned(access, second);
+    releaseFirst();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(drained).toBe(false);
+
+    releaseSecond();
+    await draining;
+    expect(drained).toBe(true);
   });
 });

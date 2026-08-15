@@ -29,7 +29,10 @@ const FAKE_CONNECT_URL = 'wss://connect.browserbase.com/v1/definitely-secret-con
 const FAKE_LIVE_VIEW_URL = 'https://debug.browserbase.com/fullscreen/session-abc123';
 
 function fakeCdpSession(sendImpl?: (method: string, params?: unknown) => Promise<unknown>) {
-  return { send: vi.fn(sendImpl ?? (async () => ({}))) };
+  return {
+    send: vi.fn(sendImpl ?? (async () => ({}))),
+    detach: vi.fn(async () => undefined),
+  };
 }
 
 function fakeContext(options: {
@@ -37,13 +40,33 @@ function fakeContext(options: {
 } = {}): { context: BrowserContext; cdp: ReturnType<typeof fakeCdpSession>; page: Page } {
   // Already 'about:blank' so prepareSessionPage's extra goto never fires; a
   // fake page with no `goto` method would surface that as a loud failure.
-  const page = { url: () => 'about:blank' } as unknown as Page;
+  const page = {
+    url: () => 'about:blank',
+    isClosed: () => false,
+  } as unknown as Page;
   const cdp = options.cdp ?? fakeCdpSession();
+  const targetCdp = fakeCdpSession(async (method) => {
+    if (method !== 'Target.getTargetInfo') return {};
+    return {
+      targetInfo: {
+        targetId: 'fake-session-page-target',
+        type: 'page',
+        title: '',
+        url: 'about:blank',
+        attached: true,
+        browserContextId: 'fake-browserbase-context',
+      },
+    };
+  });
+  let attachmentCount = 0;
   const context = {
     on: vi.fn(),
     pages: vi.fn(() => [page]),
     newPage: vi.fn(async () => page),
-    newCDPSession: vi.fn(async () => cdp),
+    newCDPSession: vi.fn(async () => {
+      attachmentCount += 1;
+      return attachmentCount === 1 ? cdp : targetCdp;
+    }),
     close: vi.fn(async () => undefined),
   };
   return { context: context as unknown as BrowserContext, cdp, page };
@@ -185,7 +208,7 @@ describe('BrowserbaseBrowserSessionProvider.createSession happy path', () => {
     expect(connectOverCDP).toHaveBeenCalledWith(FAKE_CONNECT_URL);
   });
 
-  it("prepares the default context's blank page and opens one CDP session on it", async () => {
+  it("prepares the default context's blank page and anchors both CDP capabilities on it", async () => {
     const { context, page } = fakeContext();
     const { client } = fakeClient();
     const { browser } = fakeBrowser({ contexts: [context] });
@@ -196,6 +219,7 @@ describe('BrowserbaseBrowserSessionProvider.createSession happy path', () => {
     // The existing default page is reused, not replaced.
     expect(context.newPage).not.toHaveBeenCalled();
     expect(context.newCDPSession).toHaveBeenCalledWith(page);
+    expect(context.newCDPSession).toHaveBeenCalledTimes(2);
   });
 
   it('sends Browser.setDownloadBehavior with exactly the expected params', async () => {

@@ -3,12 +3,70 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as parentDeathWatchdogModule from '../../process/parentDeathWatchdog.js';
 import { runForegroundCommand } from './runForegroundCommand.js';
 
 const SHELL = '/bin/bash';
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!existsSync(path)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`timed out waiting for ${path}`);
+    }
+    await wait(10);
+  }
+}
+
+function createControlledWatchdog(
+  options: { armNeverSettles?: boolean } = {},
+): {
+  watchdog: parentDeathWatchdogModule.ParentDeathWatchdog;
+  fail(): void;
+  processGroupId(): number;
+} {
+  let failureListener:
+    | ((error: parentDeathWatchdogModule.ParentDeathWatchdogError) => void)
+    | undefined;
+  let armedProcessGroupId: number | undefined;
+
+  return {
+    watchdog: {
+      arm: (processGroupId) => {
+        armedProcessGroupId = processGroupId;
+        return options.armNeverSettles === true
+          ? new Promise<void>(() => undefined)
+          : Promise.resolve();
+      },
+      disarm: async () => undefined,
+      onFailure: (listener) => {
+        failureListener = listener;
+        return () => {
+          if (failureListener === listener) failureListener = undefined;
+        };
+      },
+    },
+    fail: () => {
+      if (failureListener === undefined) {
+        throw new Error('watchdog failure listener was not installed');
+      }
+      failureListener(
+        new parentDeathWatchdogModule.ParentDeathWatchdogError(
+          'parent-death watchdog stopped while its target was active',
+        ),
+      );
+    },
+    processGroupId: () => {
+      if (armedProcessGroupId === undefined) {
+        throw new Error('watchdog was not armed');
+      }
+      return armedProcessGroupId;
+    },
+  };
 }
 
 // A generous default: real child processes are fast, but CI machines are
@@ -23,6 +81,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   rmSync(workDir, { recursive: true, force: true });
 });
 
@@ -189,6 +248,48 @@ describe('runForegroundCommand', () => {
   );
 
   it(
+    'times out the gated child lifecycle even when watchdog arming stalls',
+    async () => {
+      const marker = join(workDir, 'must-remain-gated.txt');
+      const controlledWatchdog = createControlledWatchdog({
+        armNeverSettles: true,
+      });
+      vi.spyOn(
+        parentDeathWatchdogModule,
+        'startParentDeathWatchdog',
+      ).mockResolvedValue(controlledWatchdog.watchdog);
+      const promise = runForegroundCommand({
+        shellPath: SHELL,
+        command: `printf started > ${JSON.stringify(marker)}`,
+        cwd: workDir,
+        env: process.env,
+        timeoutMs: 50,
+        maxOutputBytes: DEFAULT_MAX_OUTPUT_BYTES,
+      });
+
+      try {
+        const result = await Promise.race([
+          promise,
+          wait(1_000).then(() => {
+            throw new Error('gated child outlived timeoutMs while arm was stalled');
+          }),
+        ]);
+
+        expect(result.status).toBe('timed_out');
+        expect(existsSync(marker)).toBe(false);
+      } finally {
+        try {
+          process.kill(-controlledWatchdog.processGroupId(), 'SIGKILL');
+        } catch {
+          // Production should already have removed the complete group.
+        }
+        await promise;
+      }
+    },
+    10_000,
+  );
+
+  it(
     'terminates the process group and yields "cancelled" on a mid-run abort',
     async () => {
       const controller = new AbortController();
@@ -208,6 +309,58 @@ describe('runForegroundCommand', () => {
 
       expect(result.status).toBe('cancelled');
       expect(result.durationMs).toBeLessThan(4000);
+    },
+    10_000,
+  );
+
+  it(
+    'hard-kills immediately and rejects if the watchdog fails during cancellation',
+    async () => {
+      const readyPath = join(workDir, 'watchdog-failure-ready.txt');
+      const controller = new AbortController();
+      const controlledWatchdog = createControlledWatchdog();
+      vi.spyOn(
+        parentDeathWatchdogModule,
+        'startParentDeathWatchdog',
+      ).mockResolvedValue(controlledWatchdog.watchdog);
+      const killSpy = vi.spyOn(process, 'kill');
+      const promise = runForegroundCommand({
+        shellPath: SHELL,
+        command:
+          `trap '' TERM\n` +
+          `printf ready > "$READY_PATH"\n` +
+          'while :; do :; done',
+        cwd: workDir,
+        env: { ...process.env, READY_PATH: readyPath },
+        timeoutMs: DEFAULT_TIMEOUT_MS,
+        maxOutputBytes: DEFAULT_MAX_OUTPUT_BYTES,
+        abortSignal: controller.signal,
+      });
+
+      try {
+        await waitForPath(readyPath);
+        controller.abort();
+        const callsBeforeFailure = killSpy.mock.calls.length;
+
+        controlledWatchdog.fail();
+
+        expect(killSpy.mock.calls.slice(callsBeforeFailure)).toContainEqual([
+          -controlledWatchdog.processGroupId(),
+          'SIGKILL',
+        ]);
+        await expect(promise).rejects.toMatchObject({
+          name: 'ParentDeathWatchdogError',
+          message: 'parent-death watchdog stopped while its target was active',
+        });
+      } finally {
+        controller.abort();
+        try {
+          process.kill(-controlledWatchdog.processGroupId(), 'SIGKILL');
+        } catch {
+          // Production should already have removed the complete group.
+        }
+        await promise.catch(() => undefined);
+      }
     },
     10_000,
   );

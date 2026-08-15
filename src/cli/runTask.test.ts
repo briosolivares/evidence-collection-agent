@@ -136,7 +136,7 @@ describe('runTask', () => {
 
   afterEach(async () => {
     await browser.closeTaskPages();
-  });
+  }, TEST_TIMEOUT_MS);
 
   afterAll(async () => {
     await browser?.close();
@@ -144,7 +144,7 @@ describe('runTask', () => {
     if (tempRoot !== undefined) {
       await rm(tempRoot, { recursive: true, force: true });
     }
-  });
+  }, TEST_TIMEOUT_MS);
 
   it(
     'runs the real browser and tool pipeline to a verified CSV artifact',

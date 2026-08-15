@@ -6,13 +6,19 @@ import {
   mkdirSync,
   openSync,
   readFileSync,
-  writeFileSync,
 } from 'node:fs';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { join, relative, resolve, sep } from 'node:path';
 
 import type { BrowserProviderKind } from '../browser/sessionProvider.js';
+import { commitArtifactWriteTransaction } from './artifactWriteTransaction.js';
 import { writeFileDurablyAtomic } from './atomicFile.js';
 import { resolveRunPath } from './runDir.js';
+
+export {
+  ARTIFACT_WRITE_JOURNAL_PATH,
+  recoverPendingArtifactWrites,
+  type ArtifactWriteRecoveryResult,
+} from './artifactWriteTransaction.js';
 
 /** Name of the manifest file inside every run directory. */
 export const MANIFEST_FILENAME = 'manifest.json';
@@ -153,7 +159,9 @@ export function readManifest(runDir: string): Manifest {
 /**
  * Write an artifact file into the run directory and record its provenance
  * in the manifest. This is the single write path every file-producing tool
- * routes through, so provenance can never be forgotten.
+ * routes through, so provenance can never be forgotten. A durable private
+ * intent is recorded before an atomic file replacement; recovery can finish
+ * the manifest upsert after a crash without accepting different bytes.
  *
  * @param runDir - absolute path to a run directory whose manifest has been
  *   initialized; throws (writing nothing) if the manifest is missing
@@ -183,12 +191,6 @@ export function writeArtifact(
   // manifest entry.
   const filename = relative(resolve(runDir), absPath);
   assertWorkspacePartition(filename, relPath, meta);
-  // Load (and thereby require) the manifest before writing the file, so a
-  // missing manifest aborts the write instead of leaving untracked files.
-  const manifest = loadManifest(runDir);
-
-  mkdirSync(dirname(absPath), { recursive: true });
-  writeFileSync(absPath, bytes);
 
   const entry: ManifestEntry = {
     filename,
@@ -200,14 +202,7 @@ export function writeArtifact(
       ? { completionStatus: meta.completionStatus }
       : {}),
   };
-
-  const existing = manifest.artifacts.findIndex((a) => a.filename === entry.filename);
-  if (existing >= 0) {
-    manifest.artifacts[existing] = entry;
-  } else {
-    manifest.artifacts.push(entry);
-  }
-  writeManifestDurably(runDir, manifest);
+  commitArtifactWriteTransaction(runDir, entry, bytes);
   return entry;
 }
 
