@@ -43,8 +43,11 @@ import { generateRunId } from '../src/run/runId.js';
 const FIXTURE_PAGE_URL = 'https://example.com/';
 /** A public, tiny, stable text file for the direct-navigation download path —
  * the one that returns bytes WITHOUT a browser download event, and so must keep
- * working untouched by any of the remote download plumbing. */
-const DIRECT_DOWNLOAD_URL = 'https://www.w3.org/TR/PNG/iso_8859-1.txt';
+ * working untouched by any of the remote download plumbing. An RFC is used
+ * because rfc-editor.org URLs are permanent by policy; the previous W3C fixture
+ * had already rotted into a redirect to a 404, which this script reported as a
+ * download failure. */
+const DIRECT_DOWNLOAD_URL = 'https://www.rfc-editor.org/rfc/rfc2119.txt';
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const paths = resolveSherlockPaths({ devRoot: findDevRoot(PACKAGE_ROOT) });
@@ -98,20 +101,36 @@ async function evaluate(browser: BrowserController, code: string): Promise<unkno
 }
 
 /**
- * Resolve a full {@link ElementRef} the way the model does: read the outline,
- * find the line describing the element, take its `[ref=…]` stamp, and match it
- * against the observation's element identities. A hand-built `{ ref: 'e1' }` is
- * not what the action API takes, and faking one here would test a shape the
- * agent never produces.
+ * Resolve a full {@link ElementRef} the way the model does: from the
+ * observation's `elements` array, by the ARIA role and accessible name each
+ * one carries. A hand-built `{ ref: 'e1' }` is not what the action API takes,
+ * and faking one here would test a shape the agent never produces.
+ *
+ * Deliberately NOT by parsing `[ref=…]` out of the outline: those stamps are
+ * Playwright's internal aria-refs, while an `ElementRef.id` is the
+ * store-scoped `el-N` issued by `stampOutlineElements`. The two never match,
+ * so an outline-parsing lookup silently resolves nothing.
  */
 function findElement(
-  outline: string,
   elements: readonly ElementRef[],
-  needle: string,
+  role: string,
+  name?: string,
 ): ElementRef | undefined {
+  return elements.find(
+    (element) => element.role === role && (name === undefined || element.name === name),
+  );
+}
+
+/**
+ * The OTHER handle an observation yields: the bare Playwright aria-ref stamped
+ * in the outline. `download` takes this one (`locatorForRef` rejects anything
+ * that is not `e12`/`f1e8`), while `browserAction` takes the {@link ElementRef}
+ * above — so a script that feeds one where the other is expected fails without
+ * ever touching the page.
+ */
+function findAriaRef(outline: string, needle: string): string | undefined {
   const line = outline.split('\n').find((candidate) => candidate.includes(needle));
-  const id = line?.match(/\[ref=([^\]]+)\]/)?.[1];
-  return id === undefined ? undefined : elements.find((element) => element.id === id);
+  return line?.match(/\[ref=([^\]]+)\]/)?.[1];
 }
 
 async function main(): Promise<void> {
@@ -168,14 +187,14 @@ async function main(): Promise<void> {
     check('fixture built in-page', (await evaluate(browser, BUILD_FIXTURE_JS)) === 'built');
     const fixture = await browser.observe({ need: ['interactive'] });
     const fixtureOutline = fixture.views[0]?.content ?? '';
-    const textElement = findElement(fixtureOutline, fixture.elements, 'textbox');
-    // Chrome renders a file input as a button, so that is what the outline
-    // describes it as.
-    const fileElement = findElement(fixtureOutline, fixture.elements, 'button');
-    const downloadElement = findElement(fixtureOutline, fixture.elements, 'download me');
+    const textElement = findElement(fixture.elements, 'textbox');
+    // Chrome exposes a file input as a button, so that is the role it carries.
+    const fileElement = findElement(fixture.elements, 'button');
+    const downloadElement = findElement(fixture.elements, 'link', 'download me');
+    const downloadAriaRef = findAriaRef(fixtureOutline, 'download me');
     check(
       'fixture refs were observed',
-      textElement !== undefined && downloadElement !== undefined,
+      textElement !== undefined && fileElement !== undefined && downloadElement !== undefined,
       fixtureOutline.slice(0, 200),
     );
 
@@ -270,21 +289,34 @@ async function main(): Promise<void> {
       direct.bytes.length > 0 && direct.status === 200,
       `${direct.bytes.length} bytes, status ${String(direct.status)}`,
     );
-    if (downloadElement !== undefined) {
+    if (downloadAriaRef === undefined) {
+      check('download link aria-ref was observed', false, fixtureOutline.slice(0, 200));
+    } else {
       // A blob href is not HTTP(S), so this takes the CLICK path: a real
       // browser download event, which on Browserbase means the file lands in
       // the remote container and has to be fetched back and checksum-verified.
-      const clicked = await browser.download({ ref: downloadElement.id });
-      check(
-        'browser-event download returned the exact bytes',
-        Buffer.from(clicked.bytes).toString('utf8') === EXPECTED_DOWNLOAD_BYTES,
-        `got ${JSON.stringify(Buffer.from(clicked.bytes).toString('utf8').slice(0, 60))}`,
-      );
-      check(
-        'browser-event download kept the suggested filename',
-        clicked.suggestedFilename === 'smoke-download.txt',
-        clicked.suggestedFilename,
-      );
+      // This is the single most Browserbase-specific behavior in the script,
+      // so a throw here is recorded and stepped over rather than allowed to
+      // abort the run before the context-persistence section.
+      try {
+        const clicked = await browser.download({ ref: downloadAriaRef });
+        check(
+          'browser-event download returned the exact bytes',
+          Buffer.from(clicked.bytes).toString('utf8') === EXPECTED_DOWNLOAD_BYTES,
+          `got ${JSON.stringify(Buffer.from(clicked.bytes).toString('utf8').slice(0, 60))}`,
+        );
+        check(
+          'browser-event download kept the suggested filename',
+          clicked.suggestedFilename === 'smoke-download.txt',
+          clicked.suggestedFilename,
+        );
+      } catch (error) {
+        check(
+          'browser-event download returned the exact bytes',
+          false,
+          error instanceof Error ? error.message : String(error),
+        );
+      }
     }
 
     await browser.closeTab();
