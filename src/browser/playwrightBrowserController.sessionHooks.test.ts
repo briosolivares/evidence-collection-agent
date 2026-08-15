@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BrowserContext } from 'playwright';
 
+import { isBrowserDeathMessage } from '../tui/bridge/runtime.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics } from './sessionProvider.js';
 
@@ -12,7 +13,11 @@ import type { BrowserSessionDiagnostics } from './sessionProvider.js';
  * object satisfies everything these tests exercise.
  */
 
-function fakeContext(): { context: BrowserContext; listeners: Map<string, (...args: unknown[]) => void>; close: ReturnType<typeof vi.fn> } {
+function fakeContext(options: { connected?: boolean } = {}): {
+  context: BrowserContext;
+  listeners: Map<string, (...args: unknown[]) => void>;
+  close: ReturnType<typeof vi.fn>;
+} {
   const listeners = new Map<string, (...args: unknown[]) => void>();
   const close = vi.fn(async () => undefined);
   const context = {
@@ -20,6 +25,10 @@ function fakeContext(): { context: BrowserContext; listeners: Map<string, (...ar
       listeners.set(event, listener);
     }),
     close,
+    // A locally launched persistent context returns null here; a
+    // CDP-connected remote one returns the Browser. Both shapes matter.
+    browser: () =>
+      options.connected === undefined ? null : { isConnected: () => options.connected },
   };
   return { context: context as unknown as BrowserContext, listeners, close };
 }
@@ -56,6 +65,47 @@ describe('PlaywrightBrowserController close() session hooks', () => {
     await controller.close();
 
     expect(closeSession).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('PlaywrightBrowserController reporting of a session that ended on its own', () => {
+  /** Drive any operation that goes through the open-context guard. */
+  const attempt = async (context: BrowserContext): Promise<string> => {
+    const controller = new PlaywrightBrowserController({ context });
+    try {
+      await controller.fetch('https://example.com/');
+      return '(no error)';
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  };
+
+  it('says the browser is disconnected, in words isBrowserDeathMessage recognizes', async () => {
+    // The failure this prevents: a Browserbase session hits its own timeout,
+    // and every later operation reports "No browser task tab is active; call
+    // newTab() first." That reads as recoverable, so an agent retries against
+    // a browser that is gone — observed for ~20 turns, and unbounded, since
+    // DEFAULT_MAX_TURNS is Infinity. The classifier link is the point of this
+    // test: the wording alone is worthless if it does not route to relaunch.
+    const message = await attempt(fakeContext({ connected: false }).context);
+
+    expect(message).toMatch(/disconnected/i);
+    expect(message).not.toMatch(/newTab/);
+    expect(isBrowserDeathMessage(message)).toBe(true);
+  });
+
+  it('leaves a live remote session alone', async () => {
+    const message = await attempt(fakeContext({ connected: true }).context);
+
+    expect(isBrowserDeathMessage(message)).toBe(false);
+  });
+
+  it('is inert for a local persistent context, which exposes no browser', async () => {
+    // context.browser() is null there, so the guard must not fire — a local
+    // Chrome has no equivalent expire-underneath-you failure.
+    const message = await attempt(fakeContext().context);
+
+    expect(message).not.toMatch(/disconnected/i);
   });
 });
 

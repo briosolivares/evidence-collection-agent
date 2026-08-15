@@ -75,8 +75,12 @@ const HEARTBEAT_INTERVAL_MS = 120_000;
  * indefinitely, so this value is really the backstop for a session whose owner
  * crashed without reaching REQUEST_RELEASE: the longest a leak can bill.
  * Browserbase permits 60s–21600s.
+ *
+ * An hour, because 1800s was measured to be too short: a `mit_sororities`
+ * trial was still driving the browser at 30 minutes when its session expired
+ * underneath it. Raise this from evidence, not from nerves.
  */
-const DEFAULT_SESSION_TIMEOUT_SECONDS = 1_800;
+const DEFAULT_SESSION_TIMEOUT_SECONDS = 3_600;
 
 /** Where a human watches or reviews a session. Live View comes from the API;
  * this is the durable inspector page for after the fact. */

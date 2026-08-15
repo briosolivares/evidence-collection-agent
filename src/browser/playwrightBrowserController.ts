@@ -1014,6 +1014,27 @@ export class PlaywrightBrowserController implements BrowserController {
     if (this.closed) {
       throw new Error('Browser session is closed.');
     }
+
+    // `closed` records only that WE closed it. A REMOTE session also ends on
+    // its own — Browserbase's session timeout — and nothing local observes
+    // that. Without this check the next operation falls through to
+    // requirePage(), whose "No browser task tab is active; call newTab()
+    // first." reads as a recoverable state and invites a retry against a
+    // browser that no longer exists. Measured: after a session timed out
+    // mid-run, an agent alternated navigate/sleep for ~20 turns and would
+    // have continued indefinitely (DEFAULT_MAX_TURNS is Infinity).
+    //
+    // Phrased so isBrowserDeathMessage() recognizes it, which routes the TUI
+    // and REPL into their existing relaunch path — for a remote provider, a
+    // fresh session on the persisted Context.
+    //
+    // `context.browser()` is null for a locally launched persistent context,
+    // so this is inert for local Chrome, which has no equivalent failure.
+    if (this.context.browser()?.isConnected() === false) {
+      throw new Error(
+        'The browser has been disconnected; the remote session has ended and cannot be reused.',
+      );
+    }
   }
 
   /** Track a page's identity: assign a stable pageId, record every current

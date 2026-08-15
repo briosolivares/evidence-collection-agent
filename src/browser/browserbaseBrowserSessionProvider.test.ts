@@ -321,9 +321,11 @@ describe('BrowserbaseBrowserSessionProvider contextId / persistContext', () => {
 
     // Deferring to the project's dashboard `defaultTimeout` is how a session
     // ended up dying at 300s mid-run — shorter than an agent turn on a hard
-    // task, and shorter than a human signing in through Live View.
+    // task, and shorter than a human signing in through Live View. 1800s was
+    // then measured to be too short as well: a mit_sororities trial was still
+    // driving the browser at 30 minutes.
     const params = create.mock.calls[0]?.[0];
-    expect(params.api_timeout).toBe(1_800);
+    expect(params.api_timeout).toBe(3_600);
   });
 
   it('lets a caller override the default session timeout', async () => {
