@@ -685,62 +685,6 @@ export interface V3CheckpointStore {
 }
 
 /**
- * Read only the durable checkpoint format discriminator for resume routing.
- * This intentionally does not validate format-specific cargo: after routing,
- * the selected v1 or v3 loader must validate the complete checkpoint under
- * its own rules. The shared reader still enforces the private directory/file
- * contract, byte ceiling, no-follow behavior, and valid JSON before a version
- * is returned.
- */
-export function readRunCheckpointVersion(
-  runDir: string,
-): 1 | typeof V3_CHECKPOINT_VERSION {
-  assertRealRunDirectory(runDir);
-  const harnessDir = existingHarnessDirectory(runDir);
-  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
-  const raw = readCheckpointText(checkpointPath);
-  if (raw === undefined) {
-    throw new Error(`checkpoint does not exist at ${checkpointPath}`);
-  }
-  const value = parseJson(raw, `checkpoint at ${checkpointPath}`);
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error(
-      `checkpoint at ${checkpointPath} has no supported version discriminator`,
-    );
-  }
-
-  const envelope = value as Record<string, unknown>;
-  const hasLegacyVersion = Object.hasOwn(envelope, 'schemaVersion');
-  const hasV3Version = Object.hasOwn(envelope, 'version');
-  if (hasLegacyVersion && hasV3Version) {
-    throw new Error(
-      `checkpoint at ${checkpointPath} has ambiguous version discriminators`,
-    );
-  }
-  if (hasLegacyVersion) {
-    if (envelope.schemaVersion !== 1) {
-      throw new Error(
-        `checkpoint at ${checkpointPath} has unsupported schemaVersion ` +
-          JSON.stringify(envelope.schemaVersion),
-      );
-    }
-    return 1;
-  }
-  if (hasV3Version) {
-    if (envelope.version !== V3_CHECKPOINT_VERSION) {
-      throw new Error(
-        `checkpoint at ${checkpointPath} has unsupported version ` +
-          JSON.stringify(envelope.version),
-      );
-    }
-    return V3_CHECKPOINT_VERSION;
-  }
-  throw new Error(
-    `checkpoint at ${checkpointPath} has no supported version discriminator`,
-  );
-}
-
-/**
  * Observe the immutable configuration of an existing v3 run without taking
  * its lock or changing any run-directory state. This is deliberately only a
  * composition-time hint: resume must still open the checkpoint store and

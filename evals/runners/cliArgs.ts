@@ -1,5 +1,4 @@
 import { DEFAULT_EVAL_CONCURRENCY, DEFAULT_K } from '../config.js';
-import type { ContractAuthor } from '../../src/harness/initializer.js';
 
 /** The eval CLI's parsed parameters: which tasks, how many trials. */
 export interface EvalCliArgs {
@@ -9,8 +8,6 @@ export interface EvalCliArgs {
   k: number;
   /** Maximum simultaneous normal/headless trials. */
   concurrency: number;
-  /** Who states the typed output contract every batch runs. */
-  contractAuthor: ContractAuthor;
   /** Skip the pre-batch login gate and run even if a required session is
    * missing — the escape hatch for deliberately measuring what the agent
    * does at a login wall. */
@@ -31,7 +28,6 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
   let tasksRaw: string | undefined;
   let kRaw: string | undefined;
   let concurrencyRaw: string | undefined;
-  let contractAuthorRaw: string | undefined;
   let skipLoginCheck = false;
 
   for (let i = 0; i < argv.length; i++) {
@@ -50,12 +46,11 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     if (flag === '--tasks') tasksRaw = takeValue();
     else if (flag === '--k') kRaw = takeValue();
     else if (flag === '--concurrency') concurrencyRaw = takeValue();
-    else if (flag === '--contract-author') contractAuthorRaw = takeValue();
     else if (flag === '--skip-login-check') skipLoginCheck = true;
     else throw new Error(
       `unknown argument ${JSON.stringify(arg)} ` +
         '(usage: --tasks <a,b,c> [--k <n>] [--concurrency <n>] ' +
-          '[--contract-author initializer|worker] [--skip-login-check])',
+          '[--skip-login-check])',
     );
   }
 
@@ -87,13 +82,5 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     }
   }
 
-  const contractAuthor = contractAuthorRaw ?? 'initializer';
-  if (contractAuthor !== 'initializer' && contractAuthor !== 'worker') {
-    throw new Error(
-      `--contract-author must be "initializer" or "worker", got ` +
-        `${JSON.stringify(contractAuthorRaw)}`,
-    );
-  }
-
-  return { tasks, k, concurrency, contractAuthor, skipLoginCheck };
+  return { tasks, k, concurrency, skipLoginCheck };
 }

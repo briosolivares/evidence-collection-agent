@@ -14,15 +14,6 @@ export interface BrowserBackedRunTaskOptions {
   browserRuntime: EvalBrowserRuntime;
   model: string;
   runsBaseDir: string;
-  /**
-   * Protocol settings layered over the eval harness defaults — the switches
-   * the CLI exposes as flags.
-   *
-   * Spread over `{}` rather than replacing it, so leaving a field unset keeps
-   * the harness's own default instead of forcing every caller to restate all
-   * of them.
-   */
-  harness?: Pick<NonNullable<RunTaskConfig['harness']>, 'contractAuthor'>;
   onProgress?: (taskName: string, trialNumber: number, k: number, event: ProgressEvent) => void;
   /** Announce that a trial asked its human a question nobody is there to
    * answer. Defaults to a console warning. */
@@ -88,11 +79,6 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
               notify,
             ),
           ),
-        // Eval batches and interactive surfaces share the same production
-        // initializer→worker→verifier runtime. The temporary contract-author
-        // flag remains only as the migration selector until Step 6 removes
-        // the worker-authored legacy path.
-        harness: { ...options.harness },
         // The headed lane is the persistent/login-capable browser. State the
         // authority and JavaScript grant explicitly; isolated trials are
         // anonymous but use the same static v3 tool prefix.

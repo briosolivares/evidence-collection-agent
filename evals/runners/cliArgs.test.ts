@@ -8,26 +8,20 @@ describe('parseEvalArgs', () => {
       tasks: ['stub'],
       k: 2,
       concurrency: 3,
-      contractAuthor: 'initializer',
       skipLoginCheck: false,
     });
     expect(parseEvalArgs(['--tasks', 'hacker_news,edgar', '--k=3'])).toEqual({
       tasks: ['hacker_news', 'edgar'],
       k: 3,
       concurrency: 3,
-      contractAuthor: 'initializer',
       skipLoginCheck: false,
     });
   });
 
-  it('accepts both contract authors and defaults to initializer', () => {
-    expect(
-      parseEvalArgs(['--tasks', 'stub', '--contract-author', 'worker']).contractAuthor,
-    ).toBe('worker');
-    expect(parseEvalArgs(['--tasks', 'stub']).contractAuthor).toBe('initializer');
+  it('rejects the retired worker-contract selector', () => {
     expect(() =>
-      parseEvalArgs(['--tasks', 'stub', '--contract-author', 'nobody']),
-    ).toThrow(/initializer.*worker/);
+      parseEvalArgs(['--tasks', 'stub', '--contract-author', 'worker']),
+    ).toThrow(/unknown argument/);
   });
 
   it('defaults k to 1 when --k is absent', () => {

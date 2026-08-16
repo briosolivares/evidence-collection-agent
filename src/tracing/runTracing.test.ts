@@ -24,15 +24,12 @@ import type {
   BrowserDownloadTarget,
   BrowserFetchResult,
   BrowserScreenshotOptions,
+  BrowserTaskPagePreparation,
   HandleDialogRequest,
   HandleDialogResult,
 } from '../browser/controller.js';
 import { runTask } from '../cli/runTask.js';
 import {
-  METRICS_FILENAME,
-  type RunMetrics,
-} from '../loop/workerSession.js';
-import type {
   CallModel,
   ModelResponse,
   Usage,
@@ -42,6 +39,10 @@ import {
   type Manifest,
 } from '../run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
+import {
+  V3_METRICS_FILENAME,
+  type V3WorkerMetrics,
+} from '../v3/loop/workerSession.js';
 import { createRunTracing } from './runTracing.js';
 
 const FIRST_USAGE: Usage = {
@@ -64,6 +65,12 @@ class FakeBrowser implements BrowserController {
       throw new Error('Cannot open a task tab.');
     }
     this.activeTab = true;
+  }
+
+  async prepareTaskPage(
+    _request: BrowserTaskPagePreparation,
+  ): Promise<void> {
+    await this.newTab();
   }
 
   async closeTab(): Promise<void> {
@@ -156,21 +163,23 @@ function scriptModel(responses: readonly ModelResponse[]): CallModel {
   };
 }
 
-// A one-column, no-rules table body: valid CSV against contractResponse's
-// contract below (a rules-ruled table would additionally need a completeness
-// claim — see completionCheck.ts's validateTableCompleteness — which these
-// tracing tests have no reason to exercise), so `write_file`-ing it directly
-// clears the automated completion checks without extra worker turns.
+// A one-column, no-rules table body that clears v3's deterministic finish
+// checks without adding unrelated worker turns to the tracing fixtures.
 const TRACED_CSV = 'body\ntraced output\n';
 
-function toolResponse(usage: Usage): ModelResponse {
+function publishResponse(usage: Usage): ModelResponse {
   return {
     content: [
       {
         type: 'tool_use',
-        id: 'write-1',
-        name: 'write_file',
-        input: { file_path: 'artifacts/trace.txt', content: TRACED_CSV },
+        id: 'publish-1',
+        name: 'publish_artifact',
+        input: {
+          kind: 'text',
+          artifact_path: 'artifacts/trace.txt',
+          roles: ['requested_output'],
+          content: TRACED_CSV,
+        },
       },
     ],
     stop_reason: 'tool_use',
@@ -178,14 +187,18 @@ function toolResponse(usage: Usage): ModelResponse {
   };
 }
 
-function submitResponse(usage: Usage): ModelResponse {
+function finishResponse(usage: Usage): ModelResponse {
   return {
     content: [
       {
         type: 'tool_use',
-        id: 'submit-1',
-        name: 'submit_for_verification',
-        input: { summary: 'Done.' },
+        id: 'finish-1',
+        name: 'finish',
+        input: {
+          summary: 'Published the requested traced output.',
+          artifacts: ['artifacts/trace.txt'],
+          limitations: [],
+        },
       },
     ],
     stop_reason: 'tool_use',
@@ -265,33 +278,31 @@ describe('createRunTracing with runTask', () => {
   });
 
   it('is a clean no-op without Langfuse credentials', async () => {
-    // Every run goes through initializer -> worker -> verifier, and
-    // `submit_for_verification` is the only way a worker cycle ends (see
-    // runTask.ts's HarnessConfig module comment) — the single-turn
-    // no-tool-response 'completed' path this test used to exercise no longer
-    // exists. The no-op-tracing claim itself is unchanged: only its shape
-    // (contract, one write, one submission, one verified verdict) had to
-    // catch up.
     vi.stubEnv('LANGFUSE_PUBLIC_KEY', '');
     vi.stubEnv('LANGFUSE_SECRET_KEY', '');
     vi.stubEnv('LANGFUSE_BASE_URL', '');
     const browser = new FakeBrowser();
-    const taskText = 'Complete without tracing configuration.';
-    const writeUsage: Usage = { input_tokens: 7, output_tokens: 2, cache_read_input_tokens: 1 };
-    // Non-zero cache_read_input_tokens from turn 2 on: otherwise the worker's
-    // own cache-miss tripwire (workerSession.ts, "from turn 2 the stable
-    // prompt prefix alone guarantees cache reads") fires a
-    // `cache_miss_warning` transcript event this fixture has no reason to
-    // produce.
-    const submitUsage: Usage = { input_tokens: 5, output_tokens: 1, cache_read_input_tokens: 1 };
+    const taskText =
+      'Complete without tracing configuration. Do not take screenshots.';
+    const publishUsage: Usage = {
+      input_tokens: 7,
+      output_tokens: 2,
+      cache_read_input_tokens: 1,
+    };
+    const finishUsage: Usage = {
+      input_tokens: 5,
+      output_tokens: 1,
+      cache_read_input_tokens: 1,
+    };
     const initializerUsage: Usage = { input_tokens: 3, output_tokens: 1 };
     const result = await runTask(taskText, {
       browser,
-      runtimeProtocol: 'legacy',
       runsBaseDir,
-      callModel: scriptModel([toolResponse(writeUsage), submitResponse(submitUsage)]),
+      callModel: scriptModel([
+        publishResponse(publishUsage),
+        finishResponse(finishUsage),
+      ]),
       harness: {
-        contractAuthor: 'initializer',
         initializerCallModel: scriptModel([contractResponse('trace.txt', initializerUsage)]),
         verifierCallModel: scriptModel([verifiedResponse()]),
       },
@@ -302,34 +313,38 @@ describe('createRunTracing with runTask', () => {
     expect(browser.sessionClosed).toBe(false);
 
     const transcript = await readTranscript(result.runDir);
-    // Every stage the harness goes through for one write + one
-    // submission: the cycle marker, the write turn (request/response/tool
-    // call/tool result), the submission turn (request/response), and the
-    // submission call's own answer once the verifier reports `verified`.
     expect(transcript.map(({ type, turn }) => [type, turn])).toEqual([
-      ['cycle_start', undefined],
       ['model_request', 1],
       ['model_response', 1],
       ['tool_call', 1],
       ['tool_result', 1],
       ['model_request', 2],
       ['model_response', 2],
-      ['submission', 2],
-      ['tool_result', 2],
+      ['tool_call', 2],
+      ['finish_requested', 2],
+      ['v3_run_terminal', undefined],
     ]);
 
-    const metrics = await readJson<RunMetrics>(
-      join(result.runDir, METRICS_FILENAME),
+    const metrics = await readJson<V3WorkerMetrics>(
+      join(result.runDir, V3_METRICS_FILENAME),
     );
-    // Aggregated over every role sharing the run's budget (worker, verifier,
-    // initializer) — see writeWorkerSessionMetrics's own doc comment.
     expect(metrics).toMatchObject({
       status: 'verified',
       turns: 2,
-      inputTokens: writeUsage.input_tokens + submitUsage.input_tokens + initializerUsage.input_tokens + VERIFIED_USAGE.input_tokens,
-      outputTokens: writeUsage.output_tokens + submitUsage.output_tokens + initializerUsage.output_tokens + VERIFIED_USAGE.output_tokens,
+      protocolCorrections: 0,
+      inputTokens:
+        publishUsage.input_tokens
+        + finishUsage.input_tokens
+        + initializerUsage.input_tokens
+        + VERIFIED_USAGE.input_tokens,
+      outputTokens:
+        publishUsage.output_tokens
+        + finishUsage.output_tokens
+        + initializerUsage.output_tokens
+        + VERIFIED_USAGE.output_tokens,
       cacheReadInputTokens:
-        (writeUsage.cache_read_input_tokens ?? 0) + (submitUsage.cache_read_input_tokens ?? 0),
+        (publishUsage.cache_read_input_tokens ?? 0)
+        + (finishUsage.cache_read_input_tokens ?? 0),
     });
     expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
 
@@ -337,13 +352,11 @@ describe('createRunTracing with runTask', () => {
       join(result.runDir, MANIFEST_FILENAME),
     );
     expect(manifest.task).toBe(taskText);
-    // Two tracked files, not one: the accepted output-contract revision the
-    // initializer wrote (scratch/output-contract/revision-1.json) plus the
-    // requested deliverable itself — the manifest now tracks every
-    // durable file the run produced, not only artifacts/.
-    expect(manifest.artifacts.map((a) => a.filename).sort()).toEqual([
-      'artifacts/trace.txt',
-      'scratch/output-contract/revision-1.json',
+    expect(manifest.artifacts).toEqual([
+      expect.objectContaining({
+        filename: 'artifacts/trace.txt',
+        roles: ['requested_output'],
+      }),
     ]);
     expect(manifest.finishedAt).toBeDefined();
   });
@@ -355,21 +368,25 @@ describe('createRunTracing with runTask', () => {
       spanProcessor: new SimpleSpanProcessor(exporter),
     });
     const browser = new FakeBrowser();
-    const result = await runTask('Write a traced deliverable.', {
-      browser,
-      runtimeProtocol: 'legacy',
-      runsBaseDir,
-      model: 'test-model',
-      callModel: scriptModel([toolResponse(FIRST_USAGE), submitResponse(SECOND_USAGE)]),
-      tracing,
-      harness: {
-        contractAuthor: 'initializer',
-        initializerCallModel: scriptModel([
-          contractResponse('trace.txt', { input_tokens: 3, output_tokens: 1 }),
+    const result = await runTask(
+      'Write a traced deliverable. Do not take screenshots.',
+      {
+        browser,
+        runsBaseDir,
+        model: 'test-model',
+        callModel: scriptModel([
+          publishResponse(FIRST_USAGE),
+          finishResponse(SECOND_USAGE),
         ]),
-        verifierCallModel: scriptModel([verifiedResponse()]),
+        tracing,
+        harness: {
+          initializerCallModel: scriptModel([
+            contractResponse('trace.txt', { input_tokens: 3, output_tokens: 1 }),
+          ]),
+          verifierCallModel: scriptModel([verifiedResponse()]),
+        },
       },
-    });
+    );
 
     expect(result.status).toBe('verified');
     expect(await readFile(join(result.runDir, 'artifacts/trace.txt'), 'utf8')).toBe(
@@ -379,7 +396,9 @@ describe('createRunTracing with runTask', () => {
     const manifest = await readJson<Manifest>(
       join(result.runDir, MANIFEST_FILENAME),
     );
-    const artifact = manifest.artifacts[0];
+    const artifact = manifest.artifacts.find(
+      (entry) => entry.filename === 'artifacts/trace.txt',
+    );
     expect(artifact).toBeDefined();
     if (artifact === undefined) {
       throw new Error('Expected trace.txt in the finalized manifest.');
@@ -443,12 +462,16 @@ describe('createRunTracing with runTask', () => {
     }
     const toolOutput =
       toolSpan.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT];
-    expect(toolOutput).toBe('File created successfully at: artifacts/trace.txt');
+    expect(JSON.parse(String(toolOutput))).toMatchObject({
+      filename: 'artifacts/trace.txt',
+      sha256: artifact.sha256,
+      roles: ['requested_output'],
+    });
     expect(
       toolSpan.attributes[
         `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.resultBytes`
       ],
-    ).toBe(String(Buffer.byteLength(String(toolOutput), 'utf8')));
+    ).toBe(String(Buffer.byteLength(JSON.stringify(artifact), 'utf8')));
 
     expect(
       root.attributes[
@@ -463,7 +486,7 @@ describe('createRunTracing with runTask', () => {
           ],
         ),
       ),
-    ).toEqual(['write_file']);
+    ).toEqual(['publish_artifact']);
     const latencyMs = Number(
       root.attributes[
         `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.latencyMs`

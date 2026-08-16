@@ -92,8 +92,8 @@ async function main(): Promise<void> {
   // Announced before the first trial, not just recorded in the results file:
   // the protocol decides what the batch even measures, and a run whose path
   // you have to reconstruct afterwards is a run you will misread.
-  console.log(`eval protocol: typed output contract, authored by the ${args.contractAuthor}`);
-  const protocol: EvalProtocol = { completion: 'output-contract', contractAuthor: args.contractAuthor };
+  console.log('eval protocol: Sherlock v3 immutable initializer contract');
+  const protocol: EvalProtocol = { completion: 'output-contract' };
   const browserRuntime = createEvalBrowserRuntime({
     authenticatedProfileDir: PROFILE_DIR,
     executablePath: chromeExecutablePath(),
@@ -103,9 +103,6 @@ async function main(): Promise<void> {
       browserRuntime,
       model: MODEL,
       runsBaseDir: RUNS_DIR,
-      // Every batch runs the typed output-contract protocol; the only harness
-      // choice left is who authors the contract.
-      harness: { contractAuthor: args.contractAuthor },
       onProgress: (taskName, trialNumber, k, event) => {
         const text = formatEvalProgress(taskName, trialNumber, k, event);
         if (text !== undefined) process.stdout.write(text);

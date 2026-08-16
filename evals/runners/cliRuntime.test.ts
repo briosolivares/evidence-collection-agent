@@ -50,8 +50,6 @@ describe('createBrowserBackedRunTask', () => {
       runsBaseDir: '/runs',
       startUrl: 'https://example.com/',
       signal,
-      // Eval batches always enable the judge harness with defaults.
-      harness: {},
     });
     expect(progress).toEqual([
       ['headed-task', 1, 2, { type: 'turn_start', turn: 1 }],
@@ -103,7 +101,7 @@ describe('unanswerable questions in an unattended batch', () => {
     let decision: unknown;
     const runTaskFn = vi.fn(async (_taskText: string, config: RunTaskConfig) => {
       decision = await config.requestPermission?.({
-        toolName: 'ask_user_question',
+        toolName: 'ask_user',
         input: { question: 'Please sign in to Google, then tell me when done.' },
       });
       return { runDir: '/runs/one' };

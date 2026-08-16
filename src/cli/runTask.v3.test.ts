@@ -1,10 +1,7 @@
 import {
-  chmodSync,
-  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
-  writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -20,22 +17,19 @@ import type {
 } from '../loop/messages.js';
 import type { ProgressEvent } from '../model/callModel.js';
 import {
-  initManifest,
   readManifest,
 } from '../run/artifacts.js';
-import type { RunCheckpointV1 } from '../run/runCheckpointStore.js';
-import { createRunDir } from '../run/runDir.js';
 import type { RunTracing } from '../tracing/runTracing.js';
 import type { ResumeTaskConfig } from './runTask.js';
 import {
-  V3_HARNESS_DIR,
-  V3_RUN_CHECKPOINT_FILENAME,
-  readRunCheckpointVersion,
   readV3CheckpointConfiguration,
 } from '../v3/run/checkpoint.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../v3/tools/browserExecute.js';
-import { resumeTask, runTask } from './runTask.js';
-import { V3_PRODUCTION_DEFAULTS } from './runTaskV3.js';
+import {
+  V3_PRODUCTION_DEFAULTS,
+  resumeTask,
+  runTask,
+} from './runTask.js';
 
 const TASK =
   'Publish report.csv with exactly one name column and one data row. Do not take screenshots.';
@@ -82,22 +76,6 @@ afterEach(() => {
 });
 
 describe('public runTask v3 adapter', () => {
-  it('rejects v3-only budget fields on the temporary legacy route', async () => {
-    const browser = fakeBrowser();
-
-    await expect(
-      runTask('Legacy comparison.', {
-        browser: browser.controller,
-        runtimeProtocol: 'legacy',
-        maxToolCalls: 10,
-        tracing: noopTracing(),
-      }),
-    ).rejects.toThrow(
-      /legacy runtimeProtocol does not support v3 budget fields: maxToolCalls/,
-    );
-    for (const effect of browser.effects) expect(effect).not.toHaveBeenCalled();
-  });
-
   it('uses v3 by default, persists finite defaults, and orders worker progress', async () => {
     const browser = fakeBrowser();
     const progress: ProgressEvent[] = [];
@@ -116,8 +94,6 @@ describe('public runTask v3 adapter', () => {
     expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
       REPORT,
     );
-    expect(readRunCheckpointVersion(run.result.runDir)).toBe(3);
-
     const configuration = readV3CheckpointConfiguration(run.result.runDir);
     expect(configuration).toMatchObject({
       maxOutputTokens: V3_PRODUCTION_DEFAULTS.maxOutputTokens,
@@ -234,7 +210,9 @@ describe('public runTask v3 adapter', () => {
       detail: expect.stringContaining('initializer transport unavailable'),
       finalText: '',
     });
-    expect(readRunCheckpointVersion(result.runDir)).toBe(3);
+    expect(readV3CheckpointConfiguration(result.runDir).taskText).toBe(
+      'A task whose initializer is unavailable.',
+    );
     expect(readManifest(result.runDir).finishedAt).toBeDefined();
     expect(readJson(join(result.runDir, 'metrics.json'))).toMatchObject({
       status: 'incomplete',
@@ -248,7 +226,7 @@ describe('public runTask v3 adapter', () => {
   });
 });
 
-describe('public resumeTask discriminator routing', () => {
+describe('public v3 resumeTask', () => {
   it('returns a terminal v3 checkpoint without model or browser effects', async () => {
     const initial = await runVerifiedV3({ browser: fakeBrowser() });
     const browser = fakeBrowser();
@@ -290,34 +268,6 @@ describe('public resumeTask discriminator routing', () => {
     await expect(resumeTask(initial.result.runDir, unsafeConfig)).rejects.toThrow(
       /explicitly state authenticated=true or false/,
     );
-  });
-
-  it('keeps schemaVersion=1 terminal checkpoints on the legacy resume path', async () => {
-    const runDir = createRunDir(runsBaseDir, 'legacy-terminal-route');
-    initManifest(runDir, 'Legacy terminal run.', 'local');
-    writeLegacyTerminalCheckpoint(runDir);
-    const browser = fakeBrowser();
-    const worker = unexpectedCallModel('legacy worker must not resume');
-    const verifier = unexpectedCallModel('legacy verifier must not resume');
-
-    expect(readRunCheckpointVersion(runDir)).toBe(1);
-    const resumed = await resumeTask(runDir, {
-      browser: browser.controller,
-      authenticated: false,
-      callModel: worker,
-      tracing: noopTracing(),
-      harness: { verifierCallModel: verifier },
-    });
-
-    expect(resumed).toEqual({
-      runDir,
-      status: 'verified',
-      finalText: 'Legacy run already verified.',
-    });
-    expect(readManifest(runDir).finishedAt).toBeDefined();
-    expect(worker).not.toHaveBeenCalled();
-    expect(verifier).not.toHaveBeenCalled();
-    for (const effect of browser.effects) expect(effect).not.toHaveBeenCalled();
   });
 });
 
@@ -551,64 +501,4 @@ function readTranscript(runDir: string): Array<Record<string, unknown>> {
 
 function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
-}
-
-function writeLegacyTerminalCheckpoint(runDir: string): void {
-  const checkpoint: RunCheckpointV1 = {
-    schemaVersion: 1,
-    checkpointRevision: 1,
-    runStatus: 'terminal',
-    updatedAt: new Date().toISOString(),
-    runConfiguration: {
-      model: 'legacy-test-model',
-      maxOutputTokens: 1_024,
-      maxTurns: 4,
-      maxContextTokens: 10_000,
-      harness: {
-        maxWorkerCycles: 2,
-        maxCompletionCheckFailures: 2,
-        contractAuthor: 'worker',
-      },
-    },
-    budget: {
-      config: {
-        maxWorkerTurns: 4,
-        maxToolCalls: 10,
-        maxModelTokens: 10_000,
-        maxToolResultBytes: 100_000,
-        maxWallTimeMs: 60_000,
-        maxVerifierCorrections: 1,
-      },
-      elapsedWallTimeMs: 50,
-      roles: {},
-      toolCalls: 0,
-      toolResultBytes: 0,
-      corrections: 0,
-    },
-    initializer: { mode: 'contract' },
-    workerSession: {
-      messages: [],
-      turnCount: 0,
-      peakContextTokens: 0,
-      protocolCorrections: 0,
-      startedMs: Date.now(),
-    },
-    runProgress: {
-      currentCycle: 1,
-      completionCheckFailures: 0,
-      cycleRecords: [],
-    },
-    finalOutcome: {
-      status: 'verified',
-      finalText: 'Legacy run already verified.',
-    },
-  };
-  const harnessDir = join(runDir, V3_HARNESS_DIR);
-  mkdirSync(harnessDir, { recursive: true, mode: 0o700 });
-  chmodSync(harnessDir, 0o700);
-  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
-  writeFileSync(checkpointPath, `${JSON.stringify(checkpoint, null, 2)}\n`, {
-    mode: 0o600,
-  });
-  chmodSync(checkpointPath, 0o600);
 }

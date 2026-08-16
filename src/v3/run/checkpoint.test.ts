@@ -24,7 +24,6 @@ import {
   V3_RUN_CHECKPOINT_FILENAME,
   V3_RUN_LOCK_FILENAME,
   V3_RUN_LOCK_RECOVERY_FILENAME,
-  readRunCheckpointVersion,
   readV3CheckpointConfiguration,
   readV3CheckpointResumeInfo,
   v3CeilingFromCheckpoint,
@@ -769,63 +768,6 @@ describe('read-only checkpoint observation', () => {
     chmodSync(path, 0o600);
     return path;
   }
-
-  it('probes legacy v1 and v3 discriminators without touching checkpoint or lock state', () => {
-    const checkpointPath = writeCheckpoint({ schemaVersion: 1 });
-    const lockPath = pathInHarness(V3_RUN_LOCK_FILENAME);
-    writeFileSync(lockPath, 'leave this corrupt lock untouched', { mode: 0o600 });
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
-
-    for (const [checkpoint, expected] of [
-      [{ schemaVersion: 1 }, 1],
-      [ready(), 3],
-    ] as const) {
-      writeFileSync(checkpointPath, `${JSON.stringify(checkpoint)}\n`, {
-        mode: 0o600,
-      });
-      const namesBefore = readdirSync(harnessDir).sort();
-      const checkpointBefore = readFileSync(checkpointPath);
-      const lockBefore = readFileSync(lockPath);
-
-      expect(readRunCheckpointVersion(runDir)).toBe(expected);
-
-      expect(readdirSync(harnessDir).sort()).toEqual(namesBefore);
-      expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
-      expect(readFileSync(lockPath)).toEqual(lockBefore);
-    }
-  });
-
-  it('fails closed when the checkpoint or its harness directory is missing', () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
-    expect(() => readRunCheckpointVersion(runDir)).toThrow(
-      /harness directory does not exist/,
-    );
-    expect(existsSync(harnessDir)).toBe(false);
-
-    mkdirSync(harnessDir, { mode: 0o700 });
-    chmodSync(harnessDir, 0o700);
-    expect(() => readRunCheckpointVersion(runDir)).toThrow(
-      /checkpoint does not exist/,
-    );
-    expect(readdirSync(harnessDir)).toEqual([]);
-  });
-
-  it('rejects corrupt, versionless, ambiguous, and unsupported envelopes', () => {
-    const checkpointPath = writeCheckpoint({ version: 3 });
-
-    writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
-    expect(() => readRunCheckpointVersion(runDir)).toThrow(/not valid JSON/);
-
-    for (const [checkpoint, problem] of [
-      [{ phase: 'ready_for_model' }, /no supported version discriminator/],
-      [{ schemaVersion: 1, version: 3 }, /ambiguous version discriminators/],
-      [{ schemaVersion: 2 }, /unsupported schemaVersion 2/],
-      [{ version: 4 }, /unsupported version 4/],
-    ] as const) {
-      writeFileSync(checkpointPath, JSON.stringify(checkpoint), { mode: 0o600 });
-      expect(() => readRunCheckpointVersion(runDir)).toThrow(problem);
-    }
-  });
 
   it('returns a detached frozen configuration without touching lock or directory state', () => {
     const checkpointPath = writeCheckpoint(ready());
