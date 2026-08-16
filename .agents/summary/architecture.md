@@ -93,7 +93,7 @@ The controller owns run pages explicitly through `prepareTaskPage`/`closeTaskPag
 | --- | ---: | --- |
 | Worker model | `claude-sonnet-5` | `src/model/callModel.ts` |
 | Worker output tokens/request | 8,192 | `V3_PRODUCTION_DEFAULTS` |
-| Worker turns, whole run | 24 | `V3_PRODUCTION_DEFAULTS` |
+| Worker turns, whole run | unbounded | `V3_PRODUCTION_DEFAULTS` |
 | Request context ceiling | 900,000 tokens | `V3_PRODUCTION_DEFAULTS` |
 | Tool calls, whole run | 100 | `V3_PRODUCTION_DEFAULTS` |
 | Model tokens, all roles | unbounded | `V3_PRODUCTION_DEFAULTS` |

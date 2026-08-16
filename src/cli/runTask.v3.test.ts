@@ -101,7 +101,7 @@ describe('public runTask v3 adapter', () => {
       maxCompletionCheckFailures:
         V3_PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
       budgetLimits: {
-        maxWorkerTurns: V3_PRODUCTION_DEFAULTS.maxWorkerTurns,
+        maxWorkerTurns: V3_UNBOUNDED_CEILING,
         maxToolCalls: V3_PRODUCTION_DEFAULTS.maxToolCalls,
         maxModelTokens: V3_UNBOUNDED_CEILING,
         maxToolResultBytes: V3_PRODUCTION_DEFAULTS.maxToolResultBytes,
@@ -113,7 +113,7 @@ describe('public runTask v3 adapter', () => {
     expect(
       Object.entries(V3_PRODUCTION_DEFAULTS).every(
         ([name, value]) =>
-          name === 'maxModelTokens'
+          name === 'maxModelTokens' || name === 'maxWorkerTurns'
             ? value === Infinity
             : Number.isFinite(value) && value > 0,
       ),

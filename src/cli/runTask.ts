@@ -57,7 +57,7 @@ const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
  * aggregate model tokens are intentionally unbounded. */
 export const V3_PRODUCTION_DEFAULTS = Object.freeze({
   maxOutputTokens: 8_192,
-  maxWorkerTurns: 24,
+  maxWorkerTurns: Infinity,
   maxContextTokens: 900_000,
   maxToolCalls: 100,
   maxModelTokens: Infinity,

@@ -1202,6 +1202,14 @@ proved, even if supporting code already exists.
   then stopped at the unchanged `maxWorkerTurns` limit before publishing or
   finishing. It graded 1/8 (manifest integrity only) in 173.2 seconds; report:
   `evals/experiments/2026-08-16_03-11-17am_eval-yc-w24-outreach_0fa1cc.json`.
+- [x] At the user's direction, lift only the default worker-turn ceiling after
+  that retry exposed it as the next stopping condition.
+- [x] Rerun `yc_w24_outreach` at k=1 without aggregate token or worker-turn
+  ceilings. It verified and graded 8/8 after 67 worker turns, 91 tool calls,
+  roughly 2.05M aggregate model tokens, and 467.2 seconds. One deterministic
+  completion-check failure was repaired before a single successful verifier
+  cycle. Report:
+  `evals/experiments/2026-08-16_03-20-44am_eval-yc-w24-outreach_9f8c73.json`.
 
 ## Rules for coordinators and subagents
 
