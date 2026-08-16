@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { access, mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -74,6 +74,26 @@ async function readTranscript(runDir: string): Promise<TranscriptEvent[]> {
     .map((line) => JSON.parse(line) as TranscriptEvent);
 }
 
+async function filesContaining(
+  root: string,
+  needle: string,
+  relativeDir = '',
+): Promise<string[]> {
+  const hits: string[] = [];
+  for (const entry of await readdir(join(root, relativeDir), {
+    withFileTypes: true,
+  })) {
+    const relativePath = join(relativeDir, entry.name);
+    if (entry.isDirectory()) {
+      hits.push(...(await filesContaining(root, needle, relativePath)));
+    } else if (entry.isFile()) {
+      const bytes = await readFile(join(root, relativePath));
+      if (bytes.includes(needle)) hits.push(relativePath);
+    }
+  }
+  return hits;
+}
+
 describe('runTask browser acceptance', () => {
   let browser: BrowserController;
   let fixtureServer: FixtureServer;
@@ -109,6 +129,7 @@ describe('runTask browser acceptance', () => {
         'Inspect the local evidence fixture and publish its title and URL as stories.csv. Do not take screenshots.';
       const fixtureUrl = fixtureServer.url('/');
       const csv = `title,url\nBrowser Controller Fixture,${fixtureUrl}\n`;
+      const secretSentinel = 'sherlock-run-secret-sentinel-8f06d05f';
       const initializer = scriptModel([
         toolResponse('contract-v3', 'set_output_contract', {
           contract: {
@@ -133,7 +154,8 @@ describe('runTask browser acceptance', () => {
           code:
             `await browser.goto(${JSON.stringify(fixtureUrl)}); ` +
             'await browser.waitForLoad(); ' +
-            "return await browser.js('({title: document.title, url: location.href})');",
+            "const page = await browser.js('({title: document.title, url: location.href})'); " +
+            'return { page, leakedSecret: process.env.BROWSERBASE_API_KEY ?? null };',
         }),
         toolResponse('publish-v3', 'publish_artifact', {
           kind: 'text',
@@ -154,19 +176,30 @@ describe('runTask browser acceptance', () => {
         }),
       ]);
 
-      const result = await runTask(taskText, {
-        browser,
-        runsBaseDir,
-        authenticated: false,
-        javascriptPolicy: 'allow',
-        callModel: worker.callModel,
-        maxTurns: 4,
-        maxContextTokens: 10_000,
-        harness: {
-          initializerCallModel: initializer.callModel,
-          verifierCallModel: verifier.callModel,
-        },
-      });
+      const previousBrowserbaseKey = process.env.BROWSERBASE_API_KEY;
+      process.env.BROWSERBASE_API_KEY = secretSentinel;
+      let result: Awaited<ReturnType<typeof runTask>>;
+      try {
+        result = await runTask(taskText, {
+          browser,
+          runsBaseDir,
+          authenticated: false,
+          javascriptPolicy: 'allow',
+          callModel: worker.callModel,
+          maxTurns: 4,
+          maxContextTokens: 10_000,
+          harness: {
+            initializerCallModel: initializer.callModel,
+            verifierCallModel: verifier.callModel,
+          },
+        });
+      } finally {
+        if (previousBrowserbaseKey === undefined) {
+          delete process.env.BROWSERBASE_API_KEY;
+        } else {
+          process.env.BROWSERBASE_API_KEY = previousBrowserbaseKey;
+        }
+      }
 
       expect(result).toEqual({
         runDir: result.runDir,
@@ -176,6 +209,9 @@ describe('runTask browser acceptance', () => {
       expect(await readFile(join(result.runDir, 'artifacts/stories.csv'), 'utf8')).toBe(csv);
       expect(JSON.stringify(worker.requests[1])).toContain('Browser Controller Fixture');
       expect(JSON.stringify(worker.requests[1])).toContain(fixtureUrl);
+      expect(JSON.stringify(worker.requests[1])).toContain(
+        '\\"leakedSecret\\":null',
+      );
 
       const manifest = await readJson<Manifest>(
         join(result.runDir, MANIFEST_FILENAME),
@@ -196,6 +232,24 @@ describe('runTask browser acceptance', () => {
           join(result.runDir, 'metrics.json'),
         ),
       ).resolves.toMatchObject({ status: 'verified', turns: 3 });
+      await expect(
+        readJson(join(result.runDir, 'harness/checkpoint.json')),
+      ).resolves.toMatchObject({
+        version: 3,
+        phase: 'terminal',
+        outcome: { status: 'verified' },
+      });
+      await expect(
+        readJson(join(result.runDir, 'harness/output-contract.json')),
+      ).resolves.toMatchObject({
+        outputs: [{ id: 'stories', filename: 'stories.csv' }],
+      });
+      await expect(
+        readdir(join(result.runDir, 'harness/artifact-write-journal')),
+      ).resolves.toEqual([]);
+      await expect(
+        access(join(result.runDir, 'harness/run.lock')),
+      ).rejects.toMatchObject({ code: 'ENOENT' });
 
       const events = await readTranscript(result.runDir);
       expect(
@@ -203,6 +257,7 @@ describe('runTask browser acceptance', () => {
           .filter((event) => event.type === 'tool_call')
           .map((event) => (event.call as { name: string }).name),
       ).toEqual(['browser_execute', 'publish_artifact', 'finish']);
+      expect(await filesContaining(result.runDir, secretSentinel)).toEqual([]);
       expect(() => browser.currentUrl()).toThrow(/No browser task page/);
     },
     TEST_TIMEOUT_MS,
