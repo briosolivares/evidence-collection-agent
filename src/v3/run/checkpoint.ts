@@ -1,9 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import {
   chmodSync,
+  closeSync,
+  constants as fsConstants,
+  fstatSync,
   lstatSync,
   mkdirSync,
+  openSync,
   readFileSync,
+  readSync,
   unlinkSync,
 } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
@@ -33,6 +38,8 @@ export const V3_UNBOUNDED_CEILING = 'unbounded' as const;
 export const V3_HARNESS_DIR = 'harness';
 export const V3_RUN_LOCK_FILENAME = 'run.lock';
 export const V3_RUN_CHECKPOINT_FILENAME = 'checkpoint.json';
+/** Finite pre-parse allocation ceiling for durable v3 checkpoint state. */
+export const V3_CHECKPOINT_MAX_BYTES = 64 * 1024 * 1024;
 
 /**
  * Short-lived compare/delete guard used only while replacing a stale run
@@ -45,6 +52,7 @@ export const V3_RUN_LOCK_RECOVERY_FILENAME = 'run.lock.recovery';
 
 const HARNESS_DIR_MODE = 0o700;
 const HARNESS_FILE_MODE = 0o600;
+const CHECKPOINT_READ_CHUNK_BYTES = 64 * 1024;
 const MAX_SAFE_DIAGNOSTIC_LENGTH = 16_000;
 const MAX_TASK_LENGTH = 1_000_000;
 
@@ -188,6 +196,25 @@ export const v3DurableRunConfigurationSchema = z.strictObject({
 export type V3DurableRunConfiguration = z.infer<
   typeof v3DurableRunConfigurationSchema
 >;
+
+type DeepReadonly<T> = T extends readonly (infer Child)[]
+  ? readonly DeepReadonly<Child>[]
+  : T extends object
+    ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+    : T;
+
+/** Detached, recursively frozen configuration observed before resume opens
+ * the mutating checkpoint store. The coordinator still re-reads and
+ * revalidates the complete checkpoint after acquiring the run lock. */
+export type V3ReadonlyDurableRunConfiguration =
+  DeepReadonly<V3DurableRunConfiguration>;
+
+/** Minimal, immutable composition-time view used to route a v3 resume
+ * without exposing or mutating the checkpoint's actionable cargo. */
+export interface V3CheckpointResumeInfo {
+  readonly phase: V3CheckpointPhase;
+  readonly configuration: V3ReadonlyDurableRunConfiguration;
+}
 
 /** Initializer-only conversation state, absent before its first request. */
 export const v3InitializerProgressSchema = z.strictObject({
@@ -658,6 +685,98 @@ export interface V3CheckpointStore {
 }
 
 /**
+ * Read only the durable checkpoint format discriminator for resume routing.
+ * This intentionally does not validate format-specific cargo: after routing,
+ * the selected v1 or v3 loader must validate the complete checkpoint under
+ * its own rules. The shared reader still enforces the private directory/file
+ * contract, byte ceiling, no-follow behavior, and valid JSON before a version
+ * is returned.
+ */
+export function readRunCheckpointVersion(
+  runDir: string,
+): 1 | typeof V3_CHECKPOINT_VERSION {
+  assertRealRunDirectory(runDir);
+  const harnessDir = existingHarnessDirectory(runDir);
+  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
+  const raw = readCheckpointText(checkpointPath);
+  if (raw === undefined) {
+    throw new Error(`checkpoint does not exist at ${checkpointPath}`);
+  }
+  const value = parseJson(raw, `checkpoint at ${checkpointPath}`);
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(
+      `checkpoint at ${checkpointPath} has no supported version discriminator`,
+    );
+  }
+
+  const envelope = value as Record<string, unknown>;
+  const hasLegacyVersion = Object.hasOwn(envelope, 'schemaVersion');
+  const hasV3Version = Object.hasOwn(envelope, 'version');
+  if (hasLegacyVersion && hasV3Version) {
+    throw new Error(
+      `checkpoint at ${checkpointPath} has ambiguous version discriminators`,
+    );
+  }
+  if (hasLegacyVersion) {
+    if (envelope.schemaVersion !== 1) {
+      throw new Error(
+        `checkpoint at ${checkpointPath} has unsupported schemaVersion ` +
+          JSON.stringify(envelope.schemaVersion),
+      );
+    }
+    return 1;
+  }
+  if (hasV3Version) {
+    if (envelope.version !== V3_CHECKPOINT_VERSION) {
+      throw new Error(
+        `checkpoint at ${checkpointPath} has unsupported version ` +
+          JSON.stringify(envelope.version),
+      );
+    }
+    return V3_CHECKPOINT_VERSION;
+  }
+  throw new Error(
+    `checkpoint at ${checkpointPath} has no supported version discriminator`,
+  );
+}
+
+/**
+ * Observe the immutable configuration of an existing v3 run without taking
+ * its lock or changing any run-directory state. This is deliberately only a
+ * composition-time hint: resume must still open the checkpoint store and
+ * revalidate the checkpoint under its exclusive lock before doing work.
+ *
+ * The complete checkpoint is read through the same schema as the store, with
+ * a finite byte ceiling and no-follow regular-file checks. The returned value
+ * is detached from the parsed checkpoint and recursively frozen.
+ */
+export function readV3CheckpointConfiguration(
+  runDir: string,
+): V3ReadonlyDurableRunConfiguration {
+  return readV3CheckpointResumeInfo(runDir).configuration;
+}
+
+/** Observe the checkpoint phase together with its immutable configuration.
+ * Terminal resumes use this hint to avoid constructing a new external trace;
+ * the coordinator still re-reads and validates the full checkpoint under its
+ * exclusive run lock before trusting either value. */
+export function readV3CheckpointResumeInfo(
+  runDir: string,
+): Readonly<V3CheckpointResumeInfo> {
+  assertRealRunDirectory(runDir);
+  const harnessDir = existingHarnessDirectory(runDir);
+  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
+  const checkpoint = readCheckpointFile(checkpointPath);
+  if (checkpoint === undefined) {
+    throw new Error(`v3 checkpoint does not exist at ${checkpointPath}`);
+  }
+  return Object.freeze({
+    phase: checkpoint.phase,
+    configuration: deepFreeze(checkpoint.configuration),
+  });
+}
+
+/**
  * Open one exclusively locked v3 checkpoint store. Saves are schema-checked,
  * serialized, monotonic, configuration/contract immutable, and published via
  * fsync + same-directory atomic rename + parent-directory fsync.
@@ -666,11 +785,7 @@ export async function openV3CheckpointStore(
   runDir: string,
   options: V3CheckpointStoreOptions = {},
 ): Promise<V3CheckpointStore> {
-  if (!isAbsolute(runDir)) throw new Error(`v3 checkpoint runDir must be absolute: ${runDir}`);
-  const runStats = lstatSync(runDir);
-  if (!runStats.isDirectory() || runStats.isSymbolicLink()) {
-    throw new Error(`v3 checkpoint runDir must be a real directory: ${runDir}`);
-  }
+  assertRealRunDirectory(runDir);
 
   const now = options.now ?? Date.now;
   const harnessDir = ensureHarnessDirectory(runDir);
@@ -790,6 +905,39 @@ export async function openV3CheckpointStore(
       return closePromise;
     },
   };
+}
+
+function assertRealRunDirectory(runDir: string): void {
+  if (!isAbsolute(runDir)) {
+    throw new Error(`v3 checkpoint runDir must be absolute: ${runDir}`);
+  }
+  const runStats = lstatSync(runDir);
+  if (!runStats.isDirectory() || runStats.isSymbolicLink()) {
+    throw new Error(`v3 checkpoint runDir must be a real directory: ${runDir}`);
+  }
+}
+
+function existingHarnessDirectory(runDir: string): string {
+  const harnessDir = join(runDir, V3_HARNESS_DIR);
+  let stats: ReturnType<typeof lstatSync>;
+  try {
+    stats = lstatSync(harnessDir);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(`v3 checkpoint harness directory does not exist: ${harnessDir}`);
+    }
+    throw error;
+  }
+  if (!stats.isDirectory() || stats.isSymbolicLink()) {
+    throw new Error(`${harnessDir} must be a real directory`);
+  }
+  const mode = stats.mode & 0o777;
+  if (mode !== HARNESS_DIR_MODE) {
+    throw new Error(
+      `${harnessDir} has mode 0${mode.toString(8)}, expected 0${HARNESS_DIR_MODE.toString(8)}`,
+    );
+  }
+  return harnessDir;
 }
 
 function ensureHarnessDirectory(runDir: string): string {
@@ -979,13 +1127,8 @@ function readRunLock(path: string): RunLockFile | undefined {
 }
 
 function readCheckpointFile(path: string): V3Checkpoint | undefined {
-  let raw: string;
-  try {
-    raw = readFileSync(path, 'utf8');
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
-    throw error;
-  }
+  const raw = readCheckpointText(path);
+  if (raw === undefined) return undefined;
   const parsedJson = parseJson(raw, `checkpoint at ${path}`);
   const parsed = v3CheckpointSchema.safeParse(parsedJson);
   if (!parsed.success) {
@@ -995,6 +1138,88 @@ function readCheckpointFile(path: string): V3Checkpoint | undefined {
     );
   }
   return parsed.data;
+}
+
+function readCheckpointText(path: string): string | undefined {
+  let before: ReturnType<typeof lstatSync>;
+  try {
+    before = lstatSync(path);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+    throw error;
+  }
+  if (!before.isFile() || before.isSymbolicLink()) {
+    throw new Error(
+      `checkpoint at ${path} must be a regular file; symlinks are not followed`,
+    );
+  }
+
+  const flags =
+    fsConstants.O_RDONLY |
+    (fsConstants.O_NOFOLLOW ?? 0) |
+    (fsConstants.O_NONBLOCK ?? 0);
+  let descriptor: number;
+  try {
+    descriptor = openSync(path, flags);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+    throw error;
+  }
+
+  try {
+    const opened = fstatSync(descriptor);
+    if (!opened.isFile()) {
+      throw new Error(`checkpoint at ${path} must be a regular file`);
+    }
+    const mode = opened.mode & 0o777;
+    if (mode !== HARNESS_FILE_MODE) {
+      throw new Error(
+        `checkpoint at ${path} has mode 0${mode.toString(8)}, ` +
+          `expected 0${HARNESS_FILE_MODE.toString(8)}`,
+      );
+    }
+    if (opened.size > V3_CHECKPOINT_MAX_BYTES) {
+      throw checkpointSizeLimitError(path, opened.size);
+    }
+
+    const bytes = Buffer.allocUnsafe(opened.size);
+    let total = 0;
+    while (total < bytes.byteLength) {
+      const count = readSync(
+        descriptor,
+        bytes,
+        total,
+        Math.min(CHECKPOINT_READ_CHUNK_BYTES, bytes.byteLength - total),
+        null,
+      );
+      if (count === 0) break;
+      total += count;
+    }
+
+    const overflowProbe = Buffer.allocUnsafe(1);
+    const overflow = readSync(descriptor, overflowProbe, 0, 1, null);
+    const after = fstatSync(descriptor);
+    if (after.size > V3_CHECKPOINT_MAX_BYTES) {
+      throw checkpointSizeLimitError(path, Math.max(after.size, total + overflow));
+    }
+    if (
+      overflow !== 0 ||
+      total !== opened.size ||
+      after.size !== opened.size
+    ) {
+      throw new Error(`checkpoint at ${path} changed while it was being read`);
+    }
+    return bytes.toString('utf8');
+  } finally {
+    closeSync(descriptor);
+  }
+}
+
+function checkpointSizeLimitError(path: string, observedBytes: number): Error {
+  return new Error(
+    `checkpoint at ${path} is ${observedBytes} bytes, exceeding the ` +
+      `${V3_CHECKPOINT_MAX_BYTES}-byte read limit`,
+  );
 }
 
 function parseJson(raw: string, label: string): unknown {
@@ -1035,6 +1260,14 @@ function canonicalJsonValue(value: unknown): unknown {
     );
   }
   return value;
+}
+
+function deepFreeze<T>(value: T): DeepReadonly<T> {
+  if (value !== null && typeof value === 'object') {
+    for (const child of Object.values(value)) deepFreeze(child);
+    Object.freeze(value);
+  }
+  return value as DeepReadonly<T>;
 }
 
 function openingTaskText(messages: readonly Message[]): string | undefined {

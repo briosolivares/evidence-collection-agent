@@ -115,6 +115,27 @@ describe('runV3Coordinator', () => {
     expect(checkpoint).toMatchObject({ phase: 'terminal', outcome });
     expect(readManifest(runDir).finishedAt).toBeDefined();
     expect(existsSync(join(runDir, V3_OUTPUT_CONTRACT_PATH))).toBe(true);
+    expect(
+      JSON.stringify(
+        vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages,
+      ),
+    ).toContain('JavaScript policy is allow for this run');
+  });
+
+  it('puts a deny decision in per-run guidance without changing the static prefix', async () => {
+    publishValidRunArtifacts();
+    const models = happyModels();
+
+    const outcome = await run(models, {
+      configuration: { ...CONFIGURATION, javascriptPolicy: 'deny' },
+    });
+
+    expect(outcome.status).toBe('verified');
+    const opening = JSON.stringify(
+      vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages,
+    );
+    expect(opening).toContain('browser_execute is disabled in its entirety');
+    expect(opening).toContain('Do not call or retry browser_execute');
   });
 
   it('ends incomplete when the initializer model is unavailable', async () => {

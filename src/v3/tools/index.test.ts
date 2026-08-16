@@ -23,14 +23,23 @@ describe('v3 tool registry', () => {
     expect(V3_TOOL_ORDER).toEqual(exactOrder);
     expect(new Set(V3_TOOL_ORDER).size).toBe(V3_TOOL_ORDER.length);
 
-    const registry = createV3ToolRegistry({ secretEnvDenylist: ['TOKEN_'] });
+    const registry = createV3ToolRegistry({
+      javascriptPolicy: 'allow',
+      secretEnvDenylist: ['TOKEN_'],
+    });
     expect([...registry.keys()]).toEqual(exactOrder);
     expect([...registry.values()].map((tool) => tool.name)).toEqual(exactOrder);
   });
 
   it('rebuilds only the run-scoped code-execution definitions per run', () => {
-    const first = createV3ToolRegistry({ secretEnvDenylist: ['FIRST_SECRET'] });
-    const second = createV3ToolRegistry({ secretEnvDenylist: ['SECOND_SECRET'] });
+    const first = createV3ToolRegistry({
+      javascriptPolicy: 'allow',
+      secretEnvDenylist: ['FIRST_SECRET'],
+    });
+    const second = createV3ToolRegistry({
+      javascriptPolicy: 'deny',
+      secretEnvDenylist: ['SECOND_SECRET'],
+    });
 
     expect(first.get('browser_execute')).not.toBe(second.get('browser_execute'));
     expect(first.get('bash')).not.toBe(second.get('bash'));
@@ -60,13 +69,19 @@ describe('v3 tool registry', () => {
     }
   });
 
-  it('produces byte-identical API definitions across runs and denylists', () => {
+  it('produces byte-identical API definitions across policies, runs, and denylists', () => {
     const first = JSON.stringify(
-      toApiToolDefs(createV3ToolRegistry({ secretEnvDenylist: [] })),
+      toApiToolDefs(
+        createV3ToolRegistry({
+          javascriptPolicy: 'allow',
+          secretEnvDenylist: [],
+        }),
+      ),
     );
     const second = JSON.stringify(
       toApiToolDefs(
         createV3ToolRegistry({
+          javascriptPolicy: 'deny',
           secretEnvDenylist: ['ANTHROPIC_', 'BROWSERBASE_API_KEY'],
         }),
       ),
@@ -74,6 +89,17 @@ describe('v3 tool registry', () => {
 
     expect(second).toBe(first);
     expect(JSON.stringify(V3_API_TOOL_DEFS)).toBe(first);
+  });
+
+  it('requires an explicit valid policy at registry construction', () => {
+    expect(() =>
+      // @ts-expect-error javascriptPolicy is intentionally required.
+      createV3ToolRegistry({
+        secretEnvDenylist: [],
+      }),
+    ).toThrow(
+      'browser_execute requires an explicit javascriptPolicy of "allow" or "deny".',
+    );
   });
 
   it('deep-freezes the shared process-wide API definitions', () => {

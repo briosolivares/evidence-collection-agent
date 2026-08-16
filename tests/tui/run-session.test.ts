@@ -6,14 +6,19 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CallModel, ModelResponse } from '../../src/loop/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
+import {
+  createInitialState,
+  reduce,
+  type StoreAction,
+} from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
 // These tests drive the REAL runTask (run directories, manifest, loop,
 // tool pipeline) against a stub browser and fully scripted SDK streams —
-// no live API, no Chrome. Every run goes through the initializer → worker
-// → verifier harness now, so every test forces `contractAuthor: 'worker'`
+// no live API, no Chrome. The first vertical test uses default v3; remaining
+// legacy compatibility cases temporarily force `contractAuthor: 'worker'`
 // (the worker states its own contract, or none — see the minimal
 // `{ outputs: [] }` contract below — skipping a live initializer network
 // call) and, whenever a run is expected to reach verification, scripts
@@ -83,6 +88,117 @@ const submitResponse = (summary = 'Done.') =>
   );
 
 describe('startRun (RunSession bridge)', () => {
+  it('drives the default v3 publish/finish path through ordered TUI events', async () => {
+    const { events, onEvent } = collect();
+    const initializer: CallModel = async () => ({
+      content: [
+        {
+          type: 'tool_use',
+          id: 'contract-v3',
+          name: 'set_output_contract',
+          input: {
+            contract: {
+              outputs: [
+                {
+                  id: 'report',
+                  kind: 'table',
+                  filename: 'report.csv',
+                  format: 'csv',
+                  columns: [{ name: 'name', required: true, type: 'string' }],
+                  rules: [{ type: 'exact_row_count', value: 1 }],
+                },
+              ],
+            },
+          },
+        },
+      ],
+      stop_reason: 'tool_use',
+      usage: { input_tokens: 100, output_tokens: 20 },
+    });
+    const factory = scriptedStreamFactory([
+      scriptedResponse(
+        [
+          {
+            type: 'tool_use',
+            id: 'publish-v3',
+            name: 'publish_artifact',
+            input: {
+              kind: 'text',
+              artifact_path: 'artifacts/report.csv',
+              roles: ['requested_output'],
+              content: 'name\nAlice\n',
+            },
+          },
+        ],
+        { input: 1000, output: 200 },
+        'tool_use',
+      ),
+      scriptedResponse(
+        [
+          {
+            type: 'tool_use',
+            id: 'finish-v3',
+            name: 'finish',
+            input: {
+              summary: 'Published report.csv.',
+              artifacts: ['artifacts/report.csv'],
+              limitations: [],
+            },
+          },
+        ],
+        { input: 1200, output: 100 },
+        'tool_use',
+      ),
+    ]);
+
+    const outcome = await startRun(
+      'Publish a one-row report.csv. Do not take screenshots.',
+      {
+        browser: stubBrowser(),
+        onEvent,
+        runsBaseDir,
+        harness: {
+          initializerCallModel: initializer,
+          verifierCallModel,
+        },
+        createStream: factory.createStream,
+      },
+    ).done;
+
+    expect(outcome).toMatchObject({
+      status: 'verified',
+      finalText: 'Published report.csv.',
+    });
+    if (outcome.status !== 'verified') throw new Error('unreachable');
+    expect(readFileSync(join(outcome.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
+      'name\nAlice\n',
+    );
+    expect(
+      events.filter((event) => event.type === 'tool_pending').map((event) => event.name),
+    ).toEqual(['publish_artifact', 'finish']);
+    expect(
+      events.filter((event) => event.type === 'tool_exec_start').map((event) => event.name),
+    ).toEqual(['publish_artifact']);
+    expect(events.some((event) => event.type === 'artifact_published')).toBe(true);
+    expect(events.at(-1)).toMatchObject({ type: 'run_finished', outcome: 'verified' });
+
+    const state = events.reduce(
+      (current, event) => reduce(current, event as StoreAction),
+      createInitialState(),
+    );
+    expect(
+      state.transcript.filter(
+        (item) => item.kind === 'activity' && item.status === 'retried',
+      ),
+    ).toEqual([]);
+    expect(state.transcript.at(-2)).toMatchObject({
+      kind: 'activity',
+      line: 'Submitting for verification',
+      status: 'ok',
+    });
+    expect(state.transcript.at(-1)).toMatchObject({ kind: 'completion' });
+  });
+
   it('re-emits all four progress events in order for a text-only run', async () => {
     const { events, onEvent } = collect();
     const factory = scriptedStreamFactory([

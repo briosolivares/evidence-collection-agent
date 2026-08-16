@@ -122,7 +122,7 @@ Do not claim a baseline until the commands are run on the current checkout.
 - [x] record production/test raw line counts using the same convention as
   `docs/reports/2026-08-14-simplification-audit.md` — 33,557 production
   `src` lines in 132 files; 36,458 test lines in 140 files
-- [ ] fixture-backed current application smoke path
+- [x] fixture-backed current application smoke path
 
 A parallel audit observed one failure once in
 `src/browser/playwrightBrowserController.test.ts`'s “fails
@@ -234,16 +234,16 @@ boundary, and cleanup on every terminal path.
 
 ### Step 5 — TUI and eval cutover
 
-- [ ] Preserve `runTask`'s public configuration/result seam or provide a thin
+- [x] Preserve `runTask`'s public configuration/result seam or provide a thin
   compatibility adapter.
-- [ ] Make v3 the default for `sherlock`, `npm run agent`, demos that represent
+- [x] Make v3 the default for `sherlock`, `npm run agent`, demos that represent
   production, CLI evals, and TUI evals.
-- [ ] Preserve ordered progress, tool pending/result, question dialog,
+- [x] Preserve ordered progress, tool pending/result, question dialog,
   artifact-published, cancellation, browser death/relaunch, and terminal
   events.
-- [ ] Preserve headless parallel and headed serial eval lanes, login preflight,
+- [x] Preserve headless parallel and headed serial eval lanes, login preflight,
   provider selection, grader inputs, report schema, and regrade behavior.
-- [ ] Add/adjust bridge and runner tests without pinning v3 private internals.
+- [x] Add/adjust bridge and runner tests without pinning v3 private internals.
 
 **Gate:** TUI and eval integration suites pass unchanged at their public
 boundaries, and a fixture-backed `sherlock` run renders/publishes artifacts.
@@ -661,6 +661,60 @@ proved, even if supporting code already exists.
   hours under the exact process temp directory. Those temporary files are not
   recoverable; no run directory, persistent Chrome profile, source file, or
   user-owned whiteboard was removed.
+
+### 2026-08-15 — Step 5 production cutover complete
+
+- Public outcome decision: preserve every truthful durable v3 `incomplete`
+  reason (`initializer_unavailable`, `worker_incomplete`, deterministic-check
+  exhaustion, verifier exhaustion, and budget exhaustion) through `runTask`
+  and the TUI. Do not collapse initializer/worker unavailability into a
+  generic thrown `run_failed`; callers receive the terminal state recorded in
+  checkpoint, metrics, transcript, and manifest.
+
+- The read-only resume router now identifies checkpoint v1 versus v3 without
+  taking or changing a run lock. V3 configuration loading shares the bounded,
+  no-follow checkpoint reader, validates the complete snapshot, and returns a
+  recursively frozen durable configuration. The checkpoint/coordinator gate
+  passes 92/92.
+- V3 JavaScript policy is now a required run-scoped registry dependency. A
+  deny decision blocks the complete `browser_execute` authority before any
+  browser, CDP, child, workspace, or environment access while leaving the
+  static eight-tool prompt prefix byte-identical. Per-run worker guidance
+  states the resolved provider, authentication state, and policy outside that
+  cached prefix. The focused policy gate passes 14/14.
+- A new `runTaskV3` composition adapter now builds finite durable defaults,
+  the immutable initializer, byte-stable v3 worker driver/tool registry, fresh
+  verifier, tracing/progress bridges, and the durable coordinator. Public
+  `runTask` defaults to v3; a temporary explicit legacy selector preserves
+  tests and the worker-authored contract option until Step 6 deletes both.
+  `resumeTask` routes only from the durable checkpoint discriminator. TUI,
+  REPL, demo 12, and CLI eval composition now state authenticated JavaScript
+  authority explicitly and forward cancellation through eval trials.
+- TUI compatibility updates recognize all v3 tool names, retain manifest-
+  derived publication events, classify finalized runs from manifest plus
+  terminal metrics, preserve incomplete diagnostics, and recycle controllers
+  poisoned by page-cleanup failures. Cancellation cannot mask a poisoned-page
+  cleanup error, and intercepted `finish` calls settle as successful/error
+  control flow rather than false retried warnings.
+- The public v3 adapter has direct tests for finite defaults, publication and
+  verification, JavaScript denial, truthful initializer incompletion,
+  authenticated resume authority, terminal no-effect/no-trace resume, v1
+  routing, and rejection of v3-only budgets on the rollback route. A real
+  local-Chrome fixture journey drives `browser_execute` →
+  `publish_artifact` → `finish` → fresh verification, and a TUI vertical test
+  proves ordered run-directory, pending/execution, manifest-derived artifact,
+  finish, and completion events through the reducer.
+- Final gates: the Step 5 affected suite passed 730/730 before the last two
+  focused TUI fixes; their merged focused gate passed 99/99, the real-browser
+  `runTask` suite passed 13/13 serially, `npm run typecheck` and
+  `git diff --check` passed, and the complete hermetic suite passed 175 files
+  / 2,265 tests in 94.39 seconds. Three independent final read-only audits
+  found no surviving P0/P1 issue in adapter/security, resume/checkpoint, or
+  TUI/eval compatibility. No live Browserbase smoke or eval re-baseline ran.
+- Full-suite concurrency exposed a test-only PID-file readiness race in the
+  parent-death watchdog gate (directory-entry visibility preceded contents).
+  The poll now waits for complete parseable PIDs; its focused serial gate and
+  both subsequent complete suites pass.
 
 ## Rules for coordinators and subagents
 

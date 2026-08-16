@@ -4,8 +4,11 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   statSync,
+  symlinkSync,
+  truncateSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -16,10 +19,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { OutputContract } from '../../contracts/outputContract.js';
 import type { V3FinishFacts } from '../completion/finishChecks.js';
 import {
+  V3_CHECKPOINT_MAX_BYTES,
   V3_HARNESS_DIR,
   V3_RUN_CHECKPOINT_FILENAME,
   V3_RUN_LOCK_FILENAME,
   V3_RUN_LOCK_RECOVERY_FILENAME,
+  readRunCheckpointVersion,
+  readV3CheckpointConfiguration,
+  readV3CheckpointResumeInfo,
   v3CeilingFromCheckpoint,
   v3CeilingToCheckpoint,
   openV3CheckpointStore,
@@ -749,6 +756,165 @@ describe('v3 checkpoint schema', () => {
         },
       }).success,
     ).toBe(false);
+  });
+});
+
+describe('read-only checkpoint observation', () => {
+  function writeCheckpoint(value: unknown): string {
+    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    mkdirSync(harnessDir, { mode: 0o700 });
+    chmodSync(harnessDir, 0o700);
+    const path = pathInHarness(V3_RUN_CHECKPOINT_FILENAME);
+    writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
+    chmodSync(path, 0o600);
+    return path;
+  }
+
+  it('probes legacy v1 and v3 discriminators without touching checkpoint or lock state', () => {
+    const checkpointPath = writeCheckpoint({ schemaVersion: 1 });
+    const lockPath = pathInHarness(V3_RUN_LOCK_FILENAME);
+    writeFileSync(lockPath, 'leave this corrupt lock untouched', { mode: 0o600 });
+    const harnessDir = join(runDir, V3_HARNESS_DIR);
+
+    for (const [checkpoint, expected] of [
+      [{ schemaVersion: 1 }, 1],
+      [ready(), 3],
+    ] as const) {
+      writeFileSync(checkpointPath, `${JSON.stringify(checkpoint)}\n`, {
+        mode: 0o600,
+      });
+      const namesBefore = readdirSync(harnessDir).sort();
+      const checkpointBefore = readFileSync(checkpointPath);
+      const lockBefore = readFileSync(lockPath);
+
+      expect(readRunCheckpointVersion(runDir)).toBe(expected);
+
+      expect(readdirSync(harnessDir).sort()).toEqual(namesBefore);
+      expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
+      expect(readFileSync(lockPath)).toEqual(lockBefore);
+    }
+  });
+
+  it('fails closed when the checkpoint or its harness directory is missing', () => {
+    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    expect(() => readRunCheckpointVersion(runDir)).toThrow(
+      /harness directory does not exist/,
+    );
+    expect(existsSync(harnessDir)).toBe(false);
+
+    mkdirSync(harnessDir, { mode: 0o700 });
+    chmodSync(harnessDir, 0o700);
+    expect(() => readRunCheckpointVersion(runDir)).toThrow(
+      /checkpoint does not exist/,
+    );
+    expect(readdirSync(harnessDir)).toEqual([]);
+  });
+
+  it('rejects corrupt, versionless, ambiguous, and unsupported envelopes', () => {
+    const checkpointPath = writeCheckpoint({ version: 3 });
+
+    writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
+    expect(() => readRunCheckpointVersion(runDir)).toThrow(/not valid JSON/);
+
+    for (const [checkpoint, problem] of [
+      [{ phase: 'ready_for_model' }, /no supported version discriminator/],
+      [{ schemaVersion: 1, version: 3 }, /ambiguous version discriminators/],
+      [{ schemaVersion: 2 }, /unsupported schemaVersion 2/],
+      [{ version: 4 }, /unsupported version 4/],
+    ] as const) {
+      writeFileSync(checkpointPath, JSON.stringify(checkpoint), { mode: 0o600 });
+      expect(() => readRunCheckpointVersion(runDir)).toThrow(problem);
+    }
+  });
+
+  it('returns a detached frozen configuration without touching lock or directory state', () => {
+    const checkpointPath = writeCheckpoint(ready());
+    const lockPath = pathInHarness(V3_RUN_LOCK_FILENAME);
+    writeFileSync(lockPath, 'leave this corrupt lock untouched', { mode: 0o600 });
+    const namesBefore = readdirSync(join(runDir, V3_HARNESS_DIR)).sort();
+    const checkpointBefore = readFileSync(checkpointPath);
+    const lockBefore = readFileSync(lockPath);
+
+    const observed = readV3CheckpointConfiguration(runDir);
+    const resumeInfo = readV3CheckpointResumeInfo(runDir);
+
+    expect(observed).toEqual(configuration);
+    expect(Object.isFrozen(observed)).toBe(true);
+    expect(Object.isFrozen(observed.budgetLimits)).toBe(true);
+    expect(Reflect.set(observed, 'model', 'mutated')).toBe(false);
+    expect(observed.model).toBe(configuration.model);
+    expect(resumeInfo).toEqual({
+      phase: 'ready_for_model',
+      configuration,
+    });
+    expect(Object.isFrozen(resumeInfo)).toBe(true);
+    expect(resumeInfo.configuration).not.toBe(observed);
+    expect(readdirSync(join(runDir, V3_HARNESS_DIR)).sort()).toEqual(namesBefore);
+    expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
+    expect(readFileSync(lockPath)).toEqual(lockBefore);
+  });
+
+  it('does not create a missing harness directory or checkpoint', () => {
+    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+      /harness directory does not exist/,
+    );
+    expect(existsSync(harnessDir)).toBe(false);
+
+    mkdirSync(harnessDir, { mode: 0o700 });
+    chmodSync(harnessDir, 0o700);
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+      /checkpoint does not exist/,
+    );
+    expect(readdirSync(harnessDir)).toEqual([]);
+  });
+
+  it('rejects malformed JSON, the wrong version, and invalid durable configuration', () => {
+    const checkpointPath = writeCheckpoint(ready());
+
+    writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(/not valid JSON/);
+
+    writeFileSync(checkpointPath, JSON.stringify({ ...ready(), version: 2 }), {
+      mode: 0o600,
+    });
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(/version/);
+
+    writeFileSync(
+      checkpointPath,
+      JSON.stringify({
+        ...ready(),
+        configuration: { ...configuration, model: '   ' },
+      }),
+      { mode: 0o600 },
+    );
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+      /configuration\.model/,
+    );
+  });
+
+  it('refuses an oversized checkpoint before parsing it', () => {
+    const checkpointPath = writeCheckpoint(ready());
+    truncateSync(checkpointPath, V3_CHECKPOINT_MAX_BYTES + 1);
+
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+      new RegExp(`${V3_CHECKPOINT_MAX_BYTES}-byte read limit`),
+    );
+  });
+
+  it('does not follow a checkpoint symlink', () => {
+    const target = join(runDir, 'outside-checkpoint.json');
+    const targetBytes = `${JSON.stringify(ready())}\n`;
+    writeFileSync(target, targetBytes, { mode: 0o600 });
+    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    mkdirSync(harnessDir, { mode: 0o700 });
+    chmodSync(harnessDir, 0o700);
+    symlinkSync(target, pathInHarness(V3_RUN_CHECKPOINT_FILENAME));
+
+    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+      /symlinks are not followed/,
+    );
+    expect(readFileSync(target, 'utf8')).toBe(targetBytes);
   });
 });
 

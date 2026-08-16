@@ -269,7 +269,11 @@ describe('createAnthropicModelDriver.generate', () => {
         message: expect.stringContaining('output-token limit'),
       },
     ]);
-    expect(events.at(-1)).toMatchObject({ type: 'attempt_accepted', attemptId: 2 });
+    expect(events.at(-1)).toEqual({
+      type: 'attempt_accepted',
+      attemptId: 2,
+      usage: accepted.usage,
+    });
   });
 
   it('rejects after a second max_tokens overflow — the re-ask happens at most once', async () => {

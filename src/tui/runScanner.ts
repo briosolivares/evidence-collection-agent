@@ -1,11 +1,10 @@
 // Past-run discovery for /runs: read the runs directory and classify each
 // run from its artifacts alone. The status semantics follow the core's
-// write contract: metrics.json exists only when the loop returned
-// normally, and manifest.finishedAt is stamped by runTask's `finally` —
-// so "finished without metrics" means stopped (cancelled/failed), NEVER
-// "crashed" (design ruling).
+// write contract. A run is complete only when its manifest is finalized and
+// its metrics report a successful terminal status. V3 projects metrics before
+// finalizing the manifest, so metrics existence alone cannot prove completion.
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest } from '../run/artifacts.js';
@@ -22,9 +21,31 @@ export interface RunListEntry {
   task: string;
   /** ISO start time from the manifest. */
   startedAt: string;
-  /** ✓ complete (metrics present) · ◐ unfinished (no finishedAt) ·
-   * ✗ stopped (finished without metrics). */
+  /** ✓ complete (finalized + successful metrics) · ◐ unfinished
+   * (no finishedAt) · ✗ stopped (finalized without successful metrics). */
   status: 'complete' | 'unfinished' | 'stopped';
+}
+
+function readMetricsStatus(runDir: string): string | undefined {
+  try {
+    const metrics = JSON.parse(
+      readFileSync(join(runDir, 'metrics.json'), 'utf8'),
+    ) as { status?: unknown };
+    return typeof metrics.status === 'string' ? metrics.status : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function classifyRun(
+  runDir: string,
+  manifest: Manifest,
+): RunListEntry['status'] {
+  if (manifest.finishedAt === undefined) return 'unfinished';
+  const metricsStatus = readMetricsStatus(runDir);
+  return metricsStatus === 'completed' || metricsStatus === 'verified'
+    ? 'complete'
+    : 'stopped';
 }
 
 function readManifest(runDir: string): Manifest | undefined {
@@ -59,11 +80,7 @@ export function scanRuns(runsBaseDir: string): RunListEntry[] {
     const manifest = readManifest(runDir);
     if (manifest === undefined) continue;
 
-    const status: RunListEntry['status'] = existsSync(join(runDir, 'metrics.json'))
-      ? 'complete'
-      : manifest.finishedAt === undefined
-        ? 'unfinished'
-        : 'stopped';
+    const status = classifyRun(runDir, manifest);
 
     entries.push({
       runDir,

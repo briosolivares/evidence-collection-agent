@@ -31,6 +31,10 @@ export interface CreateRunTracingOptions {
 
 /** Tracing decorators and lifecycle controls scoped to one agent run. */
 export interface RunTracing {
+  /** Announce the durable run directory as soon as composition creates or
+   * resumes it. Optional so non-UI tracing implementations remain source
+   * compatible; the TUI uses it to cover tool-free terminal paths. */
+  announceRunDir?(runDir: string): void;
   /** Return a CallModel with one generation observation per invocation. */
   wrapCallModel(callModel: CallModel, model?: string): CallModel;
   /** Return a registry with one tool observation per executor invocation. */

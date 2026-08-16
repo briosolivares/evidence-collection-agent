@@ -100,6 +100,7 @@ export function stubBrowser(): BrowserController {
     })),
     refreshAfterExternalCommands: vi.fn(async () => {}),
     listPendingDialogs: vi.fn(() => []),
+    prepareTaskPage: vi.fn(async () => {}),
     closeTaskPages: vi.fn(async () => {}),
     close: vi.fn(async () => {}),
   };

@@ -146,6 +146,94 @@ describe('deriveSemanticLine — the live tool table', () => {
   });
 });
 
+describe('deriveSemanticLine — v3 tool surface', () => {
+  const table: Array<{
+    name: string;
+    input: unknown;
+    line: string;
+    isEvidence: boolean;
+  }> = [
+    {
+      name: 'browser_execute',
+      input: { code: 'return await browser.pageInfo()' },
+      line: 'Running a browser program',
+      isEvidence: false,
+    },
+    {
+      name: 'publish_artifact',
+      input: {
+        kind: 'screenshot',
+        artifact_path: 'artifacts/source-page.png',
+        roles: ['evidence'],
+      },
+      line: 'Publishing a screenshot → artifacts/source-page.png',
+      isEvidence: true,
+    },
+    {
+      name: 'read_file',
+      input: { file_path: 'scratch/workspace/notes.md' },
+      line: 'Re-reading scratch/workspace/notes.md',
+      isEvidence: false,
+    },
+    {
+      name: 'write_file',
+      input: { file_path: 'scratch/workspace/report.md', content: '…' },
+      line: 'Writing scratch/workspace/report.md',
+      isEvidence: false,
+    },
+    {
+      name: 'edit_file',
+      input: { file_path: 'scratch/workspace/report.md' },
+      line: 'Editing scratch/workspace/report.md',
+      isEvidence: false,
+    },
+    {
+      name: 'bash',
+      input: { command: 'rg evidence notes.md' },
+      line: 'Running `rg evidence notes.md`',
+      isEvidence: false,
+    },
+    {
+      name: 'ask_user',
+      input: { question: 'Which account should I use?' },
+      line: 'Asking you a question',
+      isEvidence: false,
+    },
+    {
+      name: 'finish',
+      input: { summary: 'Done', artifacts: [], limitations: [] },
+      line: 'Submitting for verification',
+      isEvidence: false,
+    },
+  ];
+
+  for (const row of table) {
+    it(`maps ${row.name} to "${row.line}"`, () => {
+      expect(deriveSemanticLine(row.name, row.input)).toEqual({
+        line: row.line,
+        isEvidence: row.isEvidence,
+      });
+    });
+  }
+
+  it('describes every publish mode without exposing inline content', () => {
+    for (const [kind, expected] of [
+      ['file', 'Publishing an artifact'],
+      ['text', 'Publishing an artifact'],
+      ['screenshot', 'Publishing a screenshot'],
+      ['download', 'Publishing a download'],
+    ] as const) {
+      const line = deriveSemanticLine('publish_artifact', {
+        kind,
+        artifact_path: `artifacts/${kind}`,
+        content: 'private inline content',
+      }).line;
+      expect(line).toBe(`${expected} → artifacts/${kind}`);
+      expect(line).not.toContain('private inline content');
+    }
+  });
+});
+
 describe('deriveSemanticLine — action sequences, truncation, and malformed input', () => {
   it('names a sequence by its first op and counts the rest', () => {
     expect(

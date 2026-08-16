@@ -24,6 +24,7 @@ describe('createBrowserBackedRunTask', () => {
       return { runDir: '/runs/one' };
     });
     const progress: unknown[][] = [];
+    const signal = new AbortController().signal;
     const run = createBrowserBackedRunTask({
       browserRuntime,
       model: 'test-model',
@@ -39,7 +40,7 @@ describe('createBrowserBackedRunTask', () => {
       k: 2,
       startUrl: 'https://example.com/',
       headed: true,
-      signal: new AbortController().signal,
+      signal,
     });
 
     expect(policies).toEqual([true]);
@@ -48,6 +49,7 @@ describe('createBrowserBackedRunTask', () => {
       model: 'test-model',
       runsBaseDir: '/runs',
       startUrl: 'https://example.com/',
+      signal,
       // Eval batches always enable the judge harness with defaults.
       harness: {},
     });

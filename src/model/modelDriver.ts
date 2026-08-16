@@ -418,8 +418,9 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
         knownUsages.push(response.usage);
         try {
           const validated = validateModelResponseForExecution(response, { maxToolCallsPerTurn });
-          emit({ type: 'attempt_accepted', attemptId, usage: response.usage });
-          return { ...validated, attempts, usage: aggregateUsage(knownUsages) };
+          const usage = aggregateUsage(knownUsages);
+          emit({ type: 'attempt_accepted', attemptId, usage });
+          return { ...validated, attempts, usage };
         } catch (error) {
           if (isModelResponseRejectedError(error)) {
             emit({

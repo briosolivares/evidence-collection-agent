@@ -27,14 +27,16 @@
 // rejects the in-flight model call; the error propagates out of the loop
 // (no interior catch) through runTask's `finally` (tab closed, manifest
 // finalized) and rejects the runTask promise — this module's outer `catch`
-// then maps ANY rejection observed after `controller.abort()` to
-// `run_cancelled`, regardless of the error's shape, so it does not depend
-// on a particular AbortError normalization happening inside the model
-// client. Deltas from an attempt the driver later rejects are ephemeral
-// live output only — rejected attempts never reach the transcript or the
-// conversation.
+// then maps a rejection observed after `controller.abort()` to
+// `run_cancelled` without depending on one AbortError normalization. The one
+// exception is a browser-death/task-page-cleanup failure: even during
+// cancellation it stays `run_failed` so the session runtime replaces the
+// poisoned controller before another task. Deltas from an attempt the driver
+// later rejects are ephemeral live output only — rejected attempts never
+// reach the transcript or the conversation.
 
 import type { BrowserController } from '../../browser/controller.js';
+import type { BrowserJavaScriptPolicy } from '../../browser/browserJavaScript.js';
 import {
   runTask,
   type HarnessConfig,
@@ -45,6 +47,7 @@ import type { ProgressEvent } from '../../model/callModel.js';
 import type { ModelDriverConfig } from '../../model/modelDriver.js';
 import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
+import { isBrowserDeathMessage } from './browserDeath.js';
 import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
 
@@ -55,7 +58,7 @@ import type { UiEvent } from '../store/state.js';
  * `failed` (a runtime crash outside the harness's own accounting). */
 export type RunOutcome =
   | { status: 'verified'; finalText: string; runDir: string }
-  | { status: 'incomplete'; reason: string; runDir: string }
+  | { status: 'incomplete'; reason: string; detail?: string; runDir: string }
   | { status: 'cancelled' }
   | { status: 'failed'; message: string };
 
@@ -78,6 +81,10 @@ export interface RunSessionDeps {
   model?: string;
   maxTurns?: number;
   maxContextTokens?: number;
+  /** Whether the browser carries logged-in authority. */
+  authenticated?: boolean;
+  /** Explicit capability decision for authenticated browser sessions. */
+  javascriptPolicy?: BrowserJavaScriptPolicy;
   startUrl?: string;
   /** Tuning for the initializer → worker → verifier harness every run now
    * goes through; forwarded to `runTask` verbatim. Omitted — the
@@ -220,6 +227,12 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         ...(deps.maxContextTokens === undefined
           ? {}
           : { maxContextTokens: deps.maxContextTokens }),
+        ...(deps.authenticated === undefined
+          ? {}
+          : { authenticated: deps.authenticated }),
+        ...(deps.javascriptPolicy === undefined
+          ? {}
+          : { javascriptPolicy: deps.javascriptPolicy }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
         ...(requestPermission === undefined ? {} : { requestPermission }),
         ...(deps.createStream === undefined ? {} : { createStream: deps.createStream }),
@@ -251,22 +264,24 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
             type: 'run_finished',
             outcome: 'incomplete',
             reason: result.reason,
+            detail: result.detail,
             runDir: result.runDir,
             at: now(),
           });
           return {
             status: 'incomplete',
             reason: result.reason,
+            detail: result.detail,
             runDir: result.runDir,
           } as const;
         }
       }
     } catch (error) {
-      if (signal.aborted) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (signal.aborted && !isBrowserDeathMessage(message)) {
         emit({ type: 'run_cancelled', at: now() });
         return { status: 'cancelled' } as const;
       }
-      const message = error instanceof Error ? error.message : String(error);
       emit({ type: 'run_failed', message, at: now() });
       return { status: 'failed', message } as const;
     }

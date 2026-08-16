@@ -88,12 +88,17 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
               notify,
             ),
           ),
-        // Eval batches always run the initializer→worker→verifier harness
-        // (judge-design.md step 5): defaults apply (2 worker cycles,
-        // production initializer/verifier models). Interactive surfaces
-        // (REPL/TUI) stay verifier-less until validated. The protocol
-        // switches come from the CLI so a batch records which path it ran.
+        // Eval batches and interactive surfaces share the same production
+        // initializer→worker→verifier runtime. The temporary contract-author
+        // flag remains only as the migration selector until Step 6 removes
+        // the worker-authored legacy path.
         harness: { ...options.harness },
+        // The headed lane is the persistent/login-capable browser. State the
+        // authority and JavaScript grant explicitly; isolated trials are
+        // anonymous but use the same static v3 tool prefix.
+        authenticated: evalOptions.headed,
+        javascriptPolicy: 'allow',
+        signal: evalOptions.signal,
         ...(startUrl === undefined ? {} : { startUrl }),
         ...(options.onProgress === undefined
           ? {}

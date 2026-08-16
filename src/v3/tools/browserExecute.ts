@@ -6,6 +6,7 @@ import type {
   BrowserCommandSession,
   BrowserController,
 } from '../../browser/controller.js';
+import type { BrowserJavaScriptPolicy } from '../../browser/browserJavaScript.js';
 import type { BrowserPage } from '../../browser/browserState.js';
 import type { BrowserDialog } from '../../browser/browserActions.js';
 import { SCRATCH_DIR } from '../../run/artifacts.js';
@@ -30,6 +31,11 @@ export const MAX_BROWSER_EXECUTE_TIMEOUT_MS =
   BROWSER_PROGRAM_LIMITS.maxProgramTimeoutMs;
 export const BROWSER_EXECUTE_MAX_OUTPUT_BYTES =
   BROWSER_PROGRAM_LIMITS.maxCaptureOutputBytes;
+
+export const BROWSER_EXECUTE_POLICY_DENIED_MESSAGE =
+  'browser_execute is disabled for this run (javascriptPolicy=deny). ' +
+  'Do not retry browser_execute; complete only work that does not require browser execution ' +
+  'and report the access limitation honestly.';
 
 /**
  * The tool deadline must outlive the runner's own maximum program deadline,
@@ -88,6 +94,9 @@ export interface BrowserExecuteResult {
 }
 
 export interface BrowserExecuteToolDeps {
+  /** Durable run policy for all model-authored browser execution, including
+   * protected helpers and raw CDP methods. There is deliberately no default. */
+  javascriptPolicy: BrowserJavaScriptPolicy;
   /** Run-configured names or prefixes stripped in addition to the runner's
    * generic secret/capability policy. */
   secretEnvDenylist: readonly string[];
@@ -100,6 +109,7 @@ export interface BrowserExecuteToolDeps {
 export function createBrowserExecuteTool(
   deps: BrowserExecuteToolDeps,
 ): ToolDef<BrowserExecuteInput> {
+  const javascriptPolicy = requireJavaScriptPolicy(deps.javascriptPolicy);
   const executeProgram = deps.runProgram ?? runBrowserProgram;
   const environment = deps.environment ?? (() => process.env);
 
@@ -114,15 +124,40 @@ export function createBrowserExecuteTool(
       'receives no CDP URL or provider/model/tracing secret. This is powerful local code, not ' +
       'a security sandbox, and the call always runs alone.',
     inputSchema: browserExecuteInputSchema,
-    getAccess: () => ({ reads: [], writes: [], exclusive: true }),
+    // A denied call touches no resource. Declaring that truthfully keeps the
+    // generic abandoned-effect gate from replacing the policy refusal with a
+    // resource_busy result before execute gets a chance to reject it.
+    getAccess: () =>
+      javascriptPolicy === 'deny'
+        ? { reads: [], writes: [] }
+        : { reads: [], writes: [], exclusive: true },
     timeoutMs: BROWSER_EXECUTE_TOOL_TIMEOUT_MS,
-    execute: (input, ctx) =>
-      executeBrowserProgram(input, ctx, {
+    execute: (input, ctx) => {
+      // This is the complete browser-program authority boundary. Refuse
+      // before even checking cancellation so deny has one deterministic
+      // result and cannot reach a controller, workspace, child, helper, or
+      // raw CDP method through any input shape.
+      if (javascriptPolicy === 'deny') {
+        throw new Error(BROWSER_EXECUTE_POLICY_DENIED_MESSAGE);
+      }
+      return executeBrowserProgram(input, ctx, {
         executeProgram,
         environment,
         secretEnvDenylist: deps.secretEnvDenylist,
-      }),
+      });
+    },
   };
+}
+
+function requireJavaScriptPolicy(
+  policy: BrowserJavaScriptPolicy,
+): BrowserJavaScriptPolicy {
+  if (policy !== 'allow' && policy !== 'deny') {
+    throw new Error(
+      'browser_execute requires an explicit javascriptPolicy of "allow" or "deny".',
+    );
+  }
+  return policy;
 }
 
 interface ExecutionDeps {

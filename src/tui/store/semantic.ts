@@ -112,6 +112,25 @@ function describeTableUpdate(input: unknown): string {
  */
 export function deriveSemanticLine(name: string, input?: unknown): SemanticLine {
   switch (name) {
+    case 'browser_execute':
+      return { line: 'Running a browser program', isEvidence: false };
+    case 'publish_artifact': {
+      const path = field(input, 'artifact_path');
+      const kind = field(input, 'kind');
+      const activity =
+        kind === 'screenshot'
+          ? 'Publishing a screenshot'
+          : kind === 'download'
+            ? 'Publishing a download'
+            : 'Publishing an artifact';
+      return {
+        line:
+          path === undefined
+            ? activity
+            : `${activity} → ${truncate(path, TEXT_MAX)}`,
+        isEvidence: true,
+      };
+    }
     case 'set_output_contract':
       return { line: 'Stating the output contract', isEvidence: false };
     case 'update_table':
@@ -212,8 +231,10 @@ export function deriveSemanticLine(name: string, input?: unknown): SemanticLine 
       };
     }
     case 'ask_user_question':
+    case 'ask_user':
       return { line: 'Asking you a question', isEvidence: false };
     case 'submit_for_verification':
+    case 'finish':
       return { line: 'Submitting for verification', isEvidence: false };
     default:
       return { line: name, isEvidence: false };

@@ -120,7 +120,10 @@ describe('v3 session vertical acceptance', () => {
     });
     const deps = {
       model,
-      registry: createV3ToolRegistry({ secretEnvDenylist: ['TEST_SECRET'] }),
+      registry: createV3ToolRegistry({
+        javascriptPolicy: 'allow',
+        secretEnvDenylist: ['TEST_SECRET'],
+      }),
       runDir,
     };
     const config = { budget, maxContextTokens: Infinity };

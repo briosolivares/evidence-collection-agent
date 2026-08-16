@@ -23,6 +23,7 @@ afterEach(() => {
 function makeDelegate() {
   const executedThroughDelegate: string[] = [];
   const delegate: RunTracing = {
+    announceRunDir: vi.fn(),
     wrapCallModel: vi.fn((callModel) => callModel),
     wrapRegistry: vi.fn((registry) => {
       // Wrap each tool so delegate-level execution is observable.
@@ -74,6 +75,19 @@ function makeRegistry() {
 }
 
 describe('createTuiTracing', () => {
+  it('announces runDir eagerly exactly once without requiring a tool call', () => {
+    const events: UiEvent[] = [];
+    const { delegate } = makeDelegate();
+    const tracing = createTuiTracing({ onEvent: (event) => events.push(event), delegate });
+
+    tracing.announceRunDir?.(runDir);
+    tracing.announceRunDir?.(runDir);
+
+    expect(events).toEqual([{ type: 'run_dir', runDir }]);
+    expect(delegate.announceRunDir).toHaveBeenCalledOnce();
+    expect(delegate.announceRunDir).toHaveBeenCalledWith(runDir);
+  });
+
   it('emits validated input and success results, capturing runDir once', async () => {
     const events: UiEvent[] = [];
     const { delegate, executedThroughDelegate } = makeDelegate();

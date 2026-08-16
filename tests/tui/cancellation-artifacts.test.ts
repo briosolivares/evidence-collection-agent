@@ -8,11 +8,9 @@ import { startRun } from '../../src/tui/bridge/runSession.js';
 import { scriptedResponse } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
-// The design's cancellation artifact contract: the core's `finally` still
-// finalizes the manifest on the abort path, while metrics.json is written
-// only on the loop's normal return — so a cancelled run has
-// manifest.finishedAt but NO metrics.json (that is "stopped", not
-// "crashed", for the /runs browser).
+// The v3 cancellation artifact contract: cancellation is a durable terminal
+// outcome, so both the finalized manifest and a `cancelled` metrics projection
+// survive even though the public run promise maps it back to cancellation.
 
 let runsBaseDir: string;
 
@@ -25,7 +23,7 @@ afterEach(() => {
 });
 
 describe('cancellation artifacts', () => {
-  it('a cancelled run keeps a finalized manifest and omits metrics.json', async () => {
+  it('a cancelled run keeps a finalized manifest and cancelled metrics', async () => {
     let sawDelta: () => void = () => {};
     const firstDelta = new Promise<void>((resolve) => {
       sawDelta = resolve;
@@ -69,6 +67,9 @@ describe('cancellation artifacts', () => {
     };
     expect(manifest.task).toBe('a run to interrupt');
     expect(manifest.finishedAt).toBeDefined();
-    expect(existsSync(join(runDir, 'metrics.json'))).toBe(false);
+    expect(existsSync(join(runDir, 'metrics.json'))).toBe(true);
+    expect(
+      JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')),
+    ).toMatchObject({ status: 'cancelled' });
   });
 });

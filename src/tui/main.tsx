@@ -210,6 +210,13 @@ try {
           context: 'optional',
         }),
         runsBaseDir: config.runsBaseDir,
+        // The persistent interactive profile may carry cookies, stored
+        // credentials, and live logins. V3 requires that authority and its
+        // JavaScript capability be stated rather than inferred.
+        runConfig: {
+          authenticated: true,
+          javascriptPolicy: 'allow',
+        },
       });
   await runtime?.start();
 } catch (error) {

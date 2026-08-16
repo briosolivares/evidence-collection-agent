@@ -313,6 +313,34 @@ describe('reduce (run lifecycle events)', () => {
     });
   });
 
+  it('settles an intercepted v3 finish as successful instead of retried', () => {
+    const state = fold([
+      ...started,
+      { type: 'turn_start', turn: 1 },
+      { type: 'tool_pending', name: 'finish' },
+      { type: 'turn_end', usage: { input: 100, output: 20 } },
+      {
+        type: 'run_finished',
+        outcome: 'verified',
+        finalText: 'done',
+        runDir: '/runs/v3',
+        at: 2_000,
+      },
+    ]);
+
+    expect(
+      state.transcript.filter(
+        (item) => item.kind === 'activity' && item.status === 'retried',
+      ),
+    ).toEqual([]);
+    expect(state.transcript.at(-2)).toMatchObject({
+      kind: 'activity',
+      line: 'Submitting for verification',
+      status: 'ok',
+    });
+    expect(state.transcript.at(-1)).toMatchObject({ kind: 'completion' });
+  });
+
   it('run_finished uses the configured completion verb', () => {
     const state = fold(
       [

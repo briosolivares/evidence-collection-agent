@@ -70,7 +70,13 @@ async function assertCrashContainment(scenario: Scenario): Promise<void> {
   const markerPath = join(workDir, 'delayed-marker.txt');
 
   try {
-    await waitFor(() => existsSync(targetPidPath) && existsSync(descendantPidPath));
+    // Creation and contents are not one filesystem event: under full-suite
+    // load the polling process can observe an empty file between open(2) and
+    // the fixture's write. Wait for complete, parseable PIDs instead of only
+    // directory-entry visibility.
+    await waitFor(
+      () => pidFileIsReady(targetPidPath) && pidFileIsReady(descendantPidPath),
+    );
     const targetPid = readPid(targetPidPath);
     const descendantPid = readPid(descendantPidPath);
     containedProcesses.processGroupId = targetPid;
@@ -130,6 +136,18 @@ function readPid(path: string): number {
     throw new Error(`fixture wrote an invalid process id to ${path}`);
   }
   return pid;
+}
+
+function pidFileIsReady(path: string): boolean {
+  if (!existsSync(path)) return false;
+  try {
+    const text = readFileSync(path, 'utf8');
+    if (!/^\d+$/.test(text)) return false;
+    const pid = Number.parseInt(text, 10);
+    return Number.isSafeInteger(pid) && pid > 1;
+  } catch {
+    return false;
+  }
 }
 
 function isProcessAlive(pid: number): boolean {

@@ -64,7 +64,7 @@ afterEach(() => {
 });
 
 describe('mid-stream failure', () => {
-  it('appends an error item and returns the session to idle', async () => {
+  it('preserves the v3 incomplete diagnostic and returns the session to idle', async () => {
     const events: UiEvent[] = [];
 
     // A stream that emits some prose, then dies with a non-abort error.
@@ -88,7 +88,11 @@ describe('mid-stream failure', () => {
       createStream: () => dyingStream(),
     });
     const outcome = await handle.done;
-    expect(outcome).toEqual({ status: 'failed', message: 'socket hang up' });
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'worker_incomplete',
+      detail: 'socket hang up',
+    });
 
     // Fold the emitted events through the reducer: the failure lands as a
     // persistent error item and the composer comes back (idle).
@@ -101,7 +105,7 @@ describe('mid-stream failure', () => {
     expect(state.live).toBeUndefined();
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'error',
-      message: 'socket hang up',
+      message: expect.stringContaining('socket hang up'),
     });
   });
 });
@@ -116,6 +120,16 @@ describe('browser-death classification', () => {
       isBrowserDeathMessage('browserContext.newPage: Browser closed'),
     ).toBe(true);
     expect(isBrowserDeathMessage('Target closed')).toBe(true);
+    expect(
+      isBrowserDeathMessage(
+        'Task-page ownership cleanup previously failed; retry cleanup or replace the controller.',
+      ),
+    ).toBe(true);
+    expect(
+      isBrowserDeathMessage(
+        'run reached verified, but terminal cleanup failed: browser pages: close failed',
+      ),
+    ).toBe(true);
   });
 
   it('leaves ordinary run errors unclassified', () => {
@@ -126,7 +140,69 @@ describe('browser-death classification', () => {
 });
 
 describe('browser relaunch on next submit', () => {
-  it('relaunches a fresh browser after a browser-death failure', async () => {
+  it('preserves a cancelled cleanup failure and relaunches before the next run', async () => {
+    const controllers: BrowserController[] = [];
+    const createSession = vi.fn(async () => {
+      const controller = stubBrowser();
+      controllers.push(controller);
+      return controller;
+    });
+    let calls = 0;
+    let markFirstStarted!: () => void;
+    const firstStarted = new Promise<void>((resolve) => {
+      markFirstStarted = resolve;
+    });
+    const startRunFn = (task: string, deps: RunSessionDeps): RunHandle =>
+      startRun(task, {
+        ...deps,
+        runTaskFn: async (_task, config) => {
+          calls += 1;
+          if (calls === 1) {
+            markFirstStarted();
+            const signal = config.signal;
+            if (signal === undefined) throw new Error('test expected a run signal');
+            await new Promise<void>((resolve) => {
+              if (signal.aborted) resolve();
+              else signal.addEventListener('abort', () => resolve(), { once: true });
+            });
+            throw new Error(
+              'run reached cancelled, but terminal cleanup failed: browser pages: close failed',
+            );
+          }
+          return { status: 'verified', finalText: 'ok', runDir: '/runs/recovered' };
+        },
+      });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn,
+    });
+    await runtime.start();
+
+    const first = runtime.startRun('cancel during cleanup', () => {});
+    await firstStarted;
+    first.cancel();
+    await expect(first.done).resolves.toMatchObject({
+      status: 'failed',
+      message: expect.stringContaining('terminal cleanup failed'),
+    });
+
+    await expect(runtime.startRun('next task', () => {}).done).resolves.toMatchObject({
+      status: 'verified',
+    });
+    expect(createSession).toHaveBeenCalledTimes(2);
+    expect(controllers[0]?.close).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    [
+      'browser disconnect',
+      'browserContext.newPage: Target page, context or browser has been closed',
+    ],
+    [
+      'poisoned task-page cleanup',
+      'Task-page ownership cleanup previously failed; retry cleanup or replace the controller.',
+    ],
+  ])('relaunches a fresh browser after %s', async (_label, failureMessage) => {
     const controllers: BrowserController[] = [];
     const createSession = vi.fn(async () => {
       const controller = stubBrowser();
@@ -143,7 +219,7 @@ describe('browser relaunch on next submit', () => {
         call === 1
           ? ({
               status: 'failed',
-              message: 'browserContext.newPage: Target page, context or browser has been closed',
+              message: failureMessage,
             } as const)
           : ({ status: 'verified', finalText: 'ok', runDir: '/runs/x' } as const);
       return { cancel: vi.fn(), done: Promise.resolve(outcome) };

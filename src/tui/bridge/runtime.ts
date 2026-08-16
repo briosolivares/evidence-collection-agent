@@ -14,6 +14,9 @@ import {
   type RunOutcome,
   type RunSessionDeps,
 } from './runSession.js';
+import { isBrowserDeathMessage } from './browserDeath.js';
+
+export { isBrowserDeathMessage } from './browserDeath.js';
 
 /** What the runtime needs; launch is injectable for tests. */
 export interface TuiRuntimeDeps {
@@ -25,7 +28,13 @@ export interface TuiRuntimeDeps {
   /** Extra per-run configuration forwarded to the bridge. */
   runConfig?: Pick<
     RunSessionDeps,
-    'model' | 'harness' | 'maxTurns' | 'maxContextTokens' | 'tracingDelegate'
+    | 'model'
+    | 'harness'
+    | 'maxTurns'
+    | 'maxContextTokens'
+    | 'authenticated'
+    | 'javascriptPolicy'
+    | 'tracingDelegate'
   >;
   /** Test seam: clock for event stamps. */
   now?: () => number;
@@ -48,31 +57,6 @@ export interface TuiRuntime {
   ): RunHandle;
   /** Close the persistent browser; safe to call once at teardown. */
   shutdown(): Promise<void>;
-}
-
-/**
- * Recognize failures that mean the session browser itself is gone (the
- * controller's operations reject once the context closes), as opposed to an
- * ordinary in-run error.
- *
- * A remote session dies in ways a local Chrome never does — Browserbase ends it
- * on its own timeout or CDP-inactivity limit — and Playwright reports those as a
- * DISCONNECT rather than a closed context, which is why the disconnect phrases
- * are here too. Classifying them as browser death routes them into the existing
- * relaunch path, which for a remote provider means a NEW session opened from the
- * persisted Context; without them a timed-out remote session would make every
- * later run in the session fail identically.
- *
- * Deliberately NOT included: bare transport errors like `socket hang up` and
- * `ECONNRESET`. Those arrive from a page's own network, or the model API, far
- * more often than from the browser connection, and treating one as browser death
- * would throw away a live session and relaunch on every flaky request. Only
- * phrases Playwright uses for the CONTROL channel qualify.
- */
-export function isBrowserDeathMessage(message: string): boolean {
-  return /browser has been closed|context or browser has been closed|browser session is closed|browserContext\.|Target closed|browser process crashed|has been disconnected|Browser closed|Connection closed/i.test(
-    message,
-  );
 }
 
 /** Create the session runtime. */

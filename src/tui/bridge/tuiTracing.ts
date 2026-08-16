@@ -28,7 +28,8 @@ export interface TuiTracingDeps {
  * Create the TUI's RunTracing: emits UiEvents from every tool execution
  * and forwards all tracing responsibilities to the delegate.
  *
- * Emission contract: `run_dir` once, from the first execution's ctx;
+ * Emission contract: `run_dir` once, eagerly when runTask announces it (or
+ * from the first execution's ctx as a legacy fallback);
  * `tool_exec_start` with the validated input; one `artifact_published`
  * per new-or-changed published manifest entry, before that execution's
  * `tool_exec_end`; `tool_exec_end` with ok/result or ok:false/error
@@ -39,6 +40,13 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
   const emit = deps.onEvent;
   let nextExecId = 1;
   let runDirSeen = false;
+
+  const announceRunDir = (runDir: string): void => {
+    if (runDirSeen) return;
+    runDirSeen = true;
+    emit({ type: 'run_dir', runDir });
+    delegate.announceRunDir?.(runDir);
+  };
 
   /** filename → sha256 of every published entry already announced. */
   const announced = new Map<string, string>();
@@ -82,8 +90,7 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
         ...tool,
         execute: async (input: unknown, ctx: ToolCtx) => {
           if (!runDirSeen) {
-            runDirSeen = true;
-            emit({ type: 'run_dir', runDir: ctx.runDir });
+            announceRunDir(ctx.runDir);
           }
           const id = nextExecId;
           nextExecId += 1;
@@ -112,6 +119,7 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
   };
 
   return {
+    announceRunDir,
     wrapCallModel: (callModel, model) => delegate.wrapCallModel(callModel, model),
     wrapRegistry,
     traceRun: (taskText, operation) => delegate.traceRun(taskText, operation),

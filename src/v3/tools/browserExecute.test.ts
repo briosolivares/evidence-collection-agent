@@ -23,6 +23,7 @@ import type {
 } from '../browser/runner.js';
 import {
   BROWSER_EXECUTE_MAX_OUTPUT_BYTES,
+  BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
   DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS,
   MAX_BROWSER_EXECUTE_TIMEOUT_MS,
   createBrowserExecuteTool,
@@ -160,6 +161,7 @@ describe('browser_execute tool', () => {
 
     const result = await callTool(
       {
+        javascriptPolicy: 'allow',
         secretEnvDenylist: ['INTERNAL_CAPABILITY_'],
         environment: () => ({
           SAFE_SETTING: 'visible',
@@ -211,6 +213,62 @@ describe('browser_execute tool', () => {
     expect(JSON.stringify(result)).not.toContain('secret.example');
   });
 
+  it('refuses deny before controller, session, child, helper, environment, or workspace access', async () => {
+    const fake = fakeBrowser();
+    const environment = vi.fn(() => ({ SAFE_SETTING: 'unreachable' }));
+    const runProgram = vi.fn(async (options: BrowserProgramOptions) => {
+      await options.sendCdp('Runtime.evaluate', {
+        expression: 'document.cookie',
+      });
+      return exited();
+    });
+    const abortController = new AbortController();
+    abortController.abort();
+    const busyRegistry = {
+      markAbandoned: vi.fn(),
+      waitUntilFree: vi.fn(async () => true),
+      drainUntilFree: vi.fn(async () => undefined),
+    };
+
+    const result = await callTool(
+      {
+        javascriptPolicy: 'deny',
+        secretEnvDenylist: [],
+        environment,
+        runProgram,
+      },
+      fake.browser,
+      {
+        code:
+          `return browser.cdp('Runtime.evaluate', ` +
+          `{ expression: 'document.cookie' });`,
+      },
+      { abortSignal: abortController.signal, busyRegistry },
+    );
+
+    expect(result).toEqual({
+      toolCallId: 'browser-program-1',
+      isError: true,
+      errorKind: 'execution_error',
+      content:
+        `Tool "browser_execute" failed: ` +
+        BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
+    });
+    expect(existsSync(join(runDir, 'scratch/workspace'))).toBe(false);
+    expect(busyRegistry.waitUntilFree).toHaveBeenCalledWith(
+      { reads: [], writes: [] },
+      expect.any(Number),
+    );
+    expect(fake.openCommandSession).not.toHaveBeenCalled();
+    expect(fake.send).not.toHaveBeenCalled();
+    expect(fake.close).not.toHaveBeenCalled();
+    expect(runProgram).not.toHaveBeenCalled();
+    expect(environment).not.toHaveBeenCalled();
+    expect(fake.refreshAfterExternalCommands).not.toHaveBeenCalled();
+    expect(fake.pages).not.toHaveBeenCalled();
+    expect(fake.listPendingDialogs).not.toHaveBeenCalled();
+  });
+
   it('uses the active page when page_id is omitted and preserves program failure as data', async () => {
     const fake = fakeBrowser();
     const runProgram = vi.fn(async () =>
@@ -222,7 +280,7 @@ describe('browser_execute tool', () => {
     );
 
     const result = await callTool(
-      { secretEnvDenylist: [], runProgram },
+      { javascriptPolicy: 'allow', secretEnvDenylist: [], runProgram },
       fake.browser,
       { code: "throw new TypeError('page program failed')" },
     );
@@ -262,7 +320,7 @@ describe('browser_execute tool', () => {
     });
 
     const result = await callTool(
-      { secretEnvDenylist: [], runProgram },
+      { javascriptPolicy: 'allow', secretEnvDenylist: [], runProgram },
       fake.browser,
       { code: 'return 1;' },
     );
@@ -294,7 +352,7 @@ describe('browser_execute tool', () => {
     abortController.abort();
 
     const result = await callTool(
-      { secretEnvDenylist: [], runProgram },
+      { javascriptPolicy: 'allow', secretEnvDenylist: [], runProgram },
       fake.browser,
       { code: 'return 1;' },
       { abortSignal: abortController.signal },
@@ -319,7 +377,11 @@ describe('browser_execute tool', () => {
   it('rejects unknown keys, blank code, and an over-limit timeout before touching the browser', async () => {
     const fake = fakeBrowser();
     const runProgram = vi.fn(async () => exited());
-    const deps = { secretEnvDenylist: [], runProgram };
+    const deps = {
+      javascriptPolicy: 'allow' as const,
+      secretEnvDenylist: [],
+      runProgram,
+    };
 
     const [unknown, blank, timeout] = await Promise.all([
       callTool(deps, fake.browser, { code: 'return 1;', pageId: 'wrong-shape' }),
@@ -340,7 +402,7 @@ describe('browser_execute tool', () => {
   it('fails clearly without a browser and does not create the workspace', async () => {
     const runProgram = vi.fn(async () => exited());
     const result = await callTool(
-      { secretEnvDenylist: [], runProgram },
+      { javascriptPolicy: 'allow', secretEnvDenylist: [], runProgram },
       undefined,
       { code: 'return 1;' },
     );

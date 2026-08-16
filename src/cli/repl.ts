@@ -170,6 +170,8 @@ try {
       const result = await runTask(taskText, {
         browser,
         runsBaseDir: RUNS_BASE_DIR,
+        authenticated: true,
+        javascriptPolicy: 'allow',
         onProgress: (event) => process.stdout.write(formatProgressEvent(event)),
       });
       process.stdout.write(formatRunSummary(result));

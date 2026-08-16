@@ -307,6 +307,8 @@ export type UiEvent =
       /** Which guard tripped (budget_exceeded) or why the run is
        * incomplete (incomplete). */
       reason?: string;
+      /** Bounded core diagnostic for an incomplete run. */
+      detail?: string;
       at: number;
     }
   | { type: 'run_cancelled'; at: number }

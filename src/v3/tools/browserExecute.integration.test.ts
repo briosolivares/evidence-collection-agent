@@ -74,7 +74,10 @@ describe('browser_execute real-browser journey', () => {
         const popup = await browser.open(${JSON.stringify(popupUrl)});
         return { info: await browser.pageInfo(), extracted, popup, axNodes: tree.nodes.length };
       `;
-      const tool = createBrowserExecuteTool({ secretEnvDenylist: [] });
+      const tool = createBrowserExecuteTool({
+        javascriptPolicy: 'allow',
+        secretEnvDenylist: [],
+      });
       const result = await executeToolCall(
         createRegistry([tool]),
         { id: 'real-browser-program', name: 'browser_execute', input: { code } },
@@ -108,7 +111,10 @@ describe('browser_execute real-browser journey', () => {
   it(
     'surfaces a blocking native dialog and handles it explicitly on the next call',
     async () => {
-      const tool = createBrowserExecuteTool({ secretEnvDenylist: [] });
+      const tool = createBrowserExecuteTool({
+        javascriptPolicy: 'allow',
+        secretEnvDenylist: [],
+      });
       const registry = createRegistry([tool]);
       const context = {
         runDir: suite.runDir(),

@@ -27,8 +27,9 @@ describe('scanRuns', () => {
     });
     writeFixtureRun(baseDir, {
       id: '2026-08-11T09-00-00-000Z-bbb',
-      task: 'still in flight (or crashed) — no finishedAt',
+      task: 'v3 terminal projection interrupted before manifest finalization',
       startedAt: '2026-08-11T09:00:00.000Z',
+      metrics: { status: 'verified', turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 60_000 },
     });
     writeFixtureRun(baseDir, {
       id: '2026-08-11T10-00-00-000Z-ccc',
@@ -60,6 +61,25 @@ describe('scanRuns', () => {
     const [entry] = scanRuns(baseDir);
     expect(entry?.status).toBe('stopped');
     expect(JSON.stringify(entry)).not.toContain('crash');
+  });
+
+  it.each([
+    ['completed', 'complete'],
+    ['verified', 'complete'],
+    ['incomplete', 'stopped'],
+    ['cancelled', 'stopped'],
+    ['failed', 'stopped'],
+    ['budget_exceeded', 'stopped'],
+  ] as const)('classifies finalized metrics status %s as %s', (metricsStatus, expected) => {
+    writeFixtureRun(baseDir, {
+      id: `2026-08-11T10-00-00-000Z-${metricsStatus}`,
+      task: `${metricsStatus} run`,
+      startedAt: '2026-08-11T10:00:00.000Z',
+      finishedAt: '2026-08-11T10:00:18.000Z',
+      metrics: { status: metricsStatus, turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 18_000 },
+    });
+
+    expect(scanRuns(baseDir)[0]?.status).toBe(expected);
   });
 
   it('skips non-run directories and junk files', () => {

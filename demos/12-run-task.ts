@@ -13,8 +13,11 @@ import { join, resolve } from 'node:path';
 
 import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
 import { runTask } from '../src/cli/runTask.js';
-import { METRICS_FILENAME, type RunMetrics } from '../src/loop/workerSession.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
+import {
+  V3_METRICS_FILENAME,
+  type V3WorkerMetrics,
+} from '../src/v3/loop/workerSession.js';
 
 const DEFAULT_TASK =
   'Create a CSV of the top 5 Hacker News stories with title, URL, and points';
@@ -43,17 +46,19 @@ try {
   const result = await runTask(task, {
     browser,
     startUrl: START_URL,
+    authenticated: true,
+    javascriptPolicy: 'allow',
     onProgress: printProgress,
   });
 
   console.log(`\nfinal result: ${JSON.stringify(result)}`);
   console.log(`run dir:      ${result.runDir}`);
 
-  const metricsRaw = readFileSync(join(result.runDir, METRICS_FILENAME), 'utf8');
+  const metricsRaw = readFileSync(join(result.runDir, V3_METRICS_FILENAME), 'utf8');
   console.log('\n--- metrics.json ---');
   console.log(metricsRaw);
 
-  const metrics = JSON.parse(metricsRaw) as RunMetrics;
+  const metrics = JSON.parse(metricsRaw) as V3WorkerMetrics;
   if (metrics.turns >= 2) {
     console.log(
       metrics.cacheReadInputTokens > 0

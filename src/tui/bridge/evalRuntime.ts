@@ -20,7 +20,13 @@ export interface TuiEvalRuntimeDeps {
   runsBaseDir?: string;
   runConfig?: Pick<
     RunSessionDeps,
-    'model' | 'harness' | 'maxTurns' | 'maxContextTokens' | 'tracingDelegate'
+    | 'model'
+    | 'harness'
+    | 'maxTurns'
+    | 'maxContextTokens'
+    | 'authenticated'
+    | 'javascriptPolicy'
+    | 'tracingDelegate'
   >;
   /** Test seams. */
   browserRuntime?: EvalBrowserRuntime;

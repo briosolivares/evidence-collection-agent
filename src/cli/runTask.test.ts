@@ -147,7 +147,108 @@ describe('runTask', () => {
   }, TEST_TIMEOUT_MS);
 
   it(
-    'runs the real browser and tool pipeline to a verified CSV artifact',
+    'runs the default v3 browser and publication pipeline to a verified CSV artifact',
+    async () => {
+      const taskText =
+        'Inspect the local evidence fixture and publish its title and URL as stories.csv. Do not take screenshots.';
+      const fixtureUrl = fixtureServer.url('/');
+      const csv = `title,url\nBrowser Controller Fixture,${fixtureUrl}\n`;
+      const initializer = scriptModel([
+        toolResponse('contract-v3', 'set_output_contract', {
+          contract: {
+            outputs: [
+              {
+                id: 'stories',
+                kind: 'table',
+                filename: 'stories.csv',
+                format: 'csv',
+                columns: [
+                  { name: 'title', required: true, type: 'string' },
+                  { name: 'url', required: true, type: 'string' },
+                ],
+                rules: [{ type: 'exact_row_count', value: 1 }],
+              },
+            ],
+          },
+        }),
+      ]);
+      const worker = scriptModel([
+        toolResponse('browse-v3', 'browser_execute', {
+          code:
+            `await browser.goto(${JSON.stringify(fixtureUrl)}); ` +
+            `await browser.waitForLoad(); ` +
+            `return await browser.js('({title: document.title, url: location.href})');`,
+        }),
+        toolResponse('publish-v3', 'publish_artifact', {
+          kind: 'text',
+          artifact_path: 'artifacts/stories.csv',
+          roles: ['requested_output'],
+          content: csv,
+        }),
+        toolResponse('finish-v3', 'finish', {
+          summary: 'Published the requested fixture report.',
+          artifacts: ['artifacts/stories.csv'],
+          limitations: [],
+        }),
+      ]);
+      const verifier = scriptModel([verifierVerified()]);
+
+      const result = await runTask(taskText, {
+        browser,
+        runsBaseDir,
+        authenticated: false,
+        javascriptPolicy: 'allow',
+        callModel: worker.callModel,
+        maxTurns: 4,
+        maxContextTokens: 10_000,
+        harness: {
+          initializerCallModel: initializer.callModel,
+          verifierCallModel: verifier.callModel,
+        },
+      });
+
+      expect(result).toEqual({
+        runDir: result.runDir,
+        status: 'verified',
+        finalText: 'Published the requested fixture report.',
+      });
+      expect(await readFile(join(result.runDir, 'artifacts/stories.csv'), 'utf8')).toBe(csv);
+      expect(JSON.stringify(worker.requests[1])).toContain('Browser Controller Fixture');
+      expect(JSON.stringify(worker.requests[1])).toContain(fixtureUrl);
+
+      const manifest = await readJson<Manifest>(
+        join(result.runDir, MANIFEST_FILENAME),
+      );
+      expect(manifest.finishedAt).toBeDefined();
+      expect(manifest.artifacts).toEqual([
+        expect.objectContaining({
+          filename: 'artifacts/stories.csv',
+          roles: ['requested_output'],
+        }),
+      ]);
+      const artifactBytes = await readFile(join(result.runDir, 'artifacts/stories.csv'));
+      expect(manifest.artifacts[0]?.sha256).toBe(
+        createHash('sha256').update(artifactBytes).digest('hex'),
+      );
+      await expect(
+        readJson<{ status: string; turns: number }>(
+          join(result.runDir, METRICS_FILENAME),
+        ),
+      ).resolves.toMatchObject({ status: 'verified', turns: 3 });
+
+      const events = await readTranscript(result.runDir);
+      expect(
+        events
+          .filter((event) => event.type === 'tool_call')
+          .map((event) => (event.call as { name: string }).name),
+      ).toEqual(['browser_execute', 'publish_artifact', 'finish']);
+      expect(() => browser.currentUrl()).toThrow(/No browser task tab/);
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'runs the temporary legacy browser and tool pipeline to a verified CSV artifact',
     async () => {
       const taskText =
         'Inspect the local evidence fixture and write its title and URL to stories.csv.';
@@ -403,6 +504,7 @@ describe('runTask', () => {
 
         const result = await runTask('Collect widgets and publish a report.', {
           browser,
+          runtimeProtocol: 'legacy',
           runsBaseDir,
           callModel: worker.callModel,
           maxTurns: 4,
@@ -747,6 +849,7 @@ describe('runTask', () => {
         await expect(
           runTask('Initializer fails on both attempts.', {
             browser,
+            runtimeProtocol: 'legacy',
             runsBaseDir,
             callModel: worker.callModel,
             maxTurns: 4,

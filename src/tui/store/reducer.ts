@@ -269,6 +269,37 @@ function settleDanglingPending(state: SessionState): SessionState {
   return { ...next, live: { ...live, pendingTools: [] } };
 }
 
+/** Finish/submission calls are coordinator control flow, not registry tools,
+ * so the tracing seam has no tool_exec_end with which to settle them. Resolve
+ * the terminal control line from the run outcome before generic dangling
+ * calls become retried warnings. */
+function settleTerminalControlPending(
+  state: SessionState,
+  status: 'ok' | 'error',
+): SessionState {
+  const live = state.live;
+  if (live === undefined) return state;
+  const controls = live.pendingTools.filter(
+    (pending) => pending.name === 'finish' || pending.name === 'submit_for_verification',
+  );
+  if (controls.length === 0) return state;
+  let next = state;
+  for (const pending of controls) {
+    const line =
+      pending.line === pending.name
+        ? deriveSemanticLine(pending.name).line
+        : pending.line;
+    next = append(next, { kind: 'activity', line, status });
+  }
+  return {
+    ...next,
+    live: {
+      ...live,
+      pendingTools: live.pendingTools.filter((pending) => !controls.includes(pending)),
+    },
+  };
+}
+
 /** Tokens the run has visibly consumed right now (estimate ≥ settled). */
 function displayTokens(live: LiveRunState): number {
   return Math.round(Math.max(live.tokens.settled, live.tokens.estimate));
@@ -697,10 +728,15 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'run_finished': {
       const live = state.live;
       if (live === undefined) return state;
-      let next = settleDanglingPending(finalizeStreamingText(state));
+      const successful = action.outcome === 'completed' || action.outcome === 'verified';
+      let next = settleTerminalControlPending(
+        finalizeStreamingText(state),
+        successful ? 'ok' : 'error',
+      );
+      next = settleDanglingPending(next);
       const elapsedMs = action.at - live.startedAt;
       const tokens = displayTokens(next.live!);
-      if (action.outcome === 'completed' || action.outcome === 'verified') {
+      if (successful) {
         next = append(next, {
           kind: 'completion',
           verb: state.completionVerb,
@@ -737,7 +773,9 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           kind: 'error',
           message:
             `Stopped early after ${formatDuration(elapsedMs)} · ` +
-            `${formatTokens(tokens)} — ${reason}\n  ${action.runDir}`,
+            `${formatTokens(tokens)} — ${reason}` +
+            (action.detail === undefined ? '' : `\n  ${action.detail}`) +
+            `\n  ${action.runDir}`,
         });
       }
       return endRun(next);

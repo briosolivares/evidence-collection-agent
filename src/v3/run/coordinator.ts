@@ -858,7 +858,12 @@ class CoordinatorState {
       this.configuration.taskText,
       this.workerDeps(),
       this.workerConfig(),
-      { guidance: [formatV3ContractGuidance(this.requireContract())] },
+      {
+        guidance: [
+          formatV3ContractGuidance(this.requireContract()),
+          formatV3RunCapabilityGuidance(this.configuration),
+        ],
+      },
     );
   }
 
@@ -1404,6 +1409,26 @@ function budgetConfig(
       limits.maxVerifierCorrections,
     ),
   };
+}
+
+function formatV3RunCapabilityGuidance(
+  configuration: V3DurableRunConfiguration,
+): string {
+  const authority = configuration.authenticated
+    ? 'authenticated browser state'
+    : 'an anonymous browser session';
+  if (configuration.javascriptPolicy === 'deny') {
+    return (
+      `Run capabilities: provider=${configuration.browserProvider}; ${authority}. ` +
+      'JavaScript policy is deny: browser_execute is disabled in its entirety because its ' +
+      'general CDP authority can evaluate page code. Do not call or retry browser_execute; ' +
+      'work only from non-browser inputs already available to the run.'
+    );
+  }
+  return (
+    `Run capabilities: provider=${configuration.browserProvider}; ${authority}. ` +
+    'JavaScript policy is allow for this run.'
+  );
 }
 
 function workerIncomplete(

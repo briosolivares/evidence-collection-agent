@@ -427,6 +427,7 @@ describe('runTask verification protocol', () => {
 
       const result = await runTask('Publish the widget roster.', {
         browser,
+        runtimeProtocol: 'legacy',
         runsBaseDir,
         callModel: worker.callModel,
         maxTurns: 8,
@@ -464,6 +465,7 @@ describe('runTask verification protocol', () => {
 
       const result = await runTask('Publish the widget roster.', {
         browser,
+        runtimeProtocol: 'legacy',
         runsBaseDir,
         callModel: worker.callModel,
         maxTurns: 10,
@@ -503,6 +505,7 @@ describe('runTask verification protocol', () => {
 
       const result = await runTask('Publish the widget roster.', {
         browser,
+        runtimeProtocol: 'legacy',
         runsBaseDir,
         callModel: worker.callModel,
         maxTurns: 10,
@@ -550,6 +553,7 @@ describe('runTask verification protocol', () => {
 
       const result = await runTask('Publish the widget roster.', {
         browser,
+        runtimeProtocol: 'legacy',
         runsBaseDir,
         callModel: worker.callModel,
         maxTurns: 10,

@@ -287,6 +287,7 @@ describe('createRunTracing with runTask', () => {
     const initializerUsage: Usage = { input_tokens: 3, output_tokens: 1 };
     const result = await runTask(taskText, {
       browser,
+      runtimeProtocol: 'legacy',
       runsBaseDir,
       callModel: scriptModel([toolResponse(writeUsage), submitResponse(submitUsage)]),
       harness: {
@@ -356,6 +357,7 @@ describe('createRunTracing with runTask', () => {
     const browser = new FakeBrowser();
     const result = await runTask('Write a traced deliverable.', {
       browser,
+      runtimeProtocol: 'legacy',
       runsBaseDir,
       model: 'test-model',
       callModel: scriptModel([toolResponse(FIRST_USAGE), submitResponse(SECOND_USAGE)]),
