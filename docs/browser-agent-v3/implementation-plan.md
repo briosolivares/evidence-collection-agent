@@ -716,6 +716,40 @@ proved, even if supporting code already exists.
   The poll now waits for complete parseable PIDs; its focused serial gate and
   both subsequent complete suites pass.
 
+### 2026-08-15 — Step 6 retirement preflight
+
+- Step 5 is committed at `071a9ec`. The rollback point is green: 175 test
+  files / 2,265 tests, `npm run typecheck`, and `git diff --check` all pass.
+  The execution board is 43/55 checked items (78%) before Step 6 removals.
+- Use the raw physical-line convention from
+  `docs/reports/2026-08-14-simplification-audit.md`; do not count generated or
+  vendor code and do not claim comment/format churn as structural savings.
+  The post-cutover coexistence baseline is 579 tracked files, 51,209
+  production `src` lines across 167 files, 51,885 test lines across 175 test
+  files, and 12,877 `evals` lines. The pre-v3 production baseline was 33,557
+  lines across 132 files, so the temporary duplicate runtime is visible and
+  intentional rather than hidden in a net number.
+- A TypeScript-aware `madge` import graph was generated from the actual
+  production roots and cross-checked with `rg`; `tsc` with unused-symbol
+  diagnostics was also run as a secondary signal. Replacing the legacy
+  dispatcher with the v3-only public composition and retiring legacy-only
+  demos exposes at least 26 direct production deletion candidates totaling
+  about 6,489 raw lines. Dynamic child/helper modules and the attached-local
+  provider are explicit false positives and must be retained.
+- The first coherent retirement slices are: migrate the TUI's remaining type
+  imports to v3, make `runTask` a v3-only public seam, remove the worker-authored
+  contract/legacy-checkpoint rollback route, then delete only modules and
+  demos that the semantic graph proves unreachable. Reusable parsers,
+  provider/controller seams, run provenance, eval boundaries, and the TUI are
+  product floor, not reduction targets.
+- One behavior gap was found before deletion: the attached-local provider has
+  crash/ownership coverage but was never selected by the production
+  interactive local path. Close that design requirement in a separate
+  behavior commit (interactive local defaults attached; evals/tests remain
+  explicitly managed; Browserbase is unchanged) before structural removal.
+  This keeps behavior changes reviewable independently from the legacy SLOC
+  reduction.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.
