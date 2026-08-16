@@ -225,9 +225,25 @@ describe('runBrowserProgram', () => {
     });
   });
 
-  it('rejects traversal and symbolic-link workspace module paths', async () => {
+  it('starts run-local modules with fresh process state for every program', async () => {
+    writeFileSync(
+      join(cwd, 'fresh-helper.mjs'),
+      `globalThis.__sherlockFreshLoads = (globalThis.__sherlockFreshLoads ?? 0) + 1;\n` +
+        `export const loads = globalThis.__sherlockFreshLoads;\n`,
+    );
+
+    const code = `return (await browser.importModule('./fresh-helper.mjs')).loads;`;
+    const first = await runBrowserProgram(options(code));
+    const second = await runBrowserProgram(options(code));
+
+    expect(first).toMatchObject({ status: 'exited', value: 1 });
+    expect(second).toMatchObject({ status: 'exited', value: 1 });
+  });
+
+  it('rejects traversal, symbolic links, and oversized workspace modules', async () => {
     writeFileSync(join(cwd, 'real-helper.mjs'), 'export const value = 1;\n');
     symlinkSync('real-helper.mjs', join(cwd, 'linked-helper.mjs'));
+    writeFileSync(join(cwd, 'oversized-helper.mjs'), ' '.repeat(1_048_577));
 
     const traversal = await runBrowserProgram(
       options(`return browser.importModule('../outside.mjs');`),
@@ -235,11 +251,16 @@ describe('runBrowserProgram', () => {
     const symlink = await runBrowserProgram(
       options(`return browser.importModule('./linked-helper.mjs');`),
     );
+    const oversized = await runBrowserProgram(
+      options(`return browser.importModule('./oversized-helper.mjs');`),
+    );
 
     expect(traversal).toMatchObject({ status: 'failed' });
     expect(traversal.error?.message).toContain('must stay within scratch/workspace');
     expect(symlink).toMatchObject({ status: 'failed' });
     expect(symlink.error?.message).toContain('must not contain symbolic links');
+    expect(oversized).toMatchObject({ status: 'failed' });
+    expect(oversized.error?.message).toContain('workspace module exceeds 1048576 bytes');
   });
 
   it('composes the protected helpers entirely from CDP requests', async () => {
