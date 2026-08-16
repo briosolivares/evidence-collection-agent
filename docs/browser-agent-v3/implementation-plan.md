@@ -293,9 +293,9 @@ proved, even if supporting code already exists.
 | Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete for Step 1 |
 | Editable run helpers and reviewed promotion | Run artifact/patch tests + docs | Pending |
 | Compact v3 tool surface | Registry/schema snapshot | Complete for Step 3 |
-| Sherlock TUI preserved | TUI integration suite + fixture smoke | Pending |
-| Streaming main loop preserved | Model/loop tests + transcript | V3 session complete; production cutover pending |
-| Evals/graders preserved | Eval runner/grader suite + boundary inspection | Pending |
+| Sherlock TUI preserved | TUI integration suite + fixture smoke | Complete; 28 files / 324 tests |
+| Streaming main loop preserved | Model/loop tests + transcript | Complete; v3 is the sole production composition |
+| Evals/graders preserved | Eval runner/grader suite + boundary inspection | Complete locally; no paid re-baseline run |
 | Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | V3 coordinator complete; production cutover pending |
 | Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Provider-neutral command seam complete; cutover/live smoke pending |
 | Accuracy checks preserved | Completion/verifier correction tests | V3 checks/verifier complete; production cutover pending |
@@ -830,6 +830,19 @@ proved, even if supporting code already exists.
   generic registry/pipeline, browser providers, public composition, tracing,
   and TUI all pass (349/349 tests). Active documentation consolidation and
   the complete acceptance suite remain before Step 6/7 can close.
+
+### 2026-08-15 — TUI semantics reduced to the v3 surface
+
+- The semantic activity mapper, demo transcript, terminal-control handling,
+  and their fixtures now name only the eight frozen v3 worker tools. Removed
+  mappings and assertions for the retired scheduler-era tool set rather than
+  carrying a compatibility table no live or historical run scanner consumes.
+- This focused slice removes 159 production lines and 254 test lines net from
+  the TUI semantic boundary while retaining manifest-derived publication as
+  the authoritative artifact signal.
+- The complete TUI gate passes 28 files / 324 tests. `npm run typecheck` and
+  `git diff --check` also pass; no live browser, model, eval, or remote service
+  was invoked.
 
 ## Rules for coordinators and subagents
 

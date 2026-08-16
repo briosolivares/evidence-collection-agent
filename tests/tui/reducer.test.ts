@@ -480,32 +480,32 @@ describe('reduce (semantic activity + evidence)', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
-      { type: 'tool_pending', name: 'browser_action' },
+      { type: 'tool_pending', name: 'browser_execute' },
       {
         type: 'tool_exec_start',
         id: 1,
-        name: 'browser_action',
-        input: { actions: [{ op: 'navigate', url: 'https://www.sec.gov/cgi-bin/browse-edgar' }] },
+        name: 'browser_execute',
+        input: { code: 'return await browser.pageInfo()' },
       },
     ]);
     expect(state.live?.pendingTools).toHaveLength(1);
     expect(state.live?.pendingTools[0]).toMatchObject({
       execId: 1,
-      line: 'Opening sec.gov/cgi-bin/browse-edgar',
+      line: 'Running a browser program',
       isEvidence: false,
     });
   });
 
-  it('finalizes a publishing write_file as an evidence item', () => {
+  it('finalizes publish_artifact as an evidence item', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
-      { type: 'tool_pending', name: 'write_file' },
+      { type: 'tool_pending', name: 'publish_artifact' },
       {
         type: 'tool_exec_start',
         id: 1,
-        name: 'write_file',
-        input: { file_path: 'artifacts/top5.csv', content: 'a,b' },
+        name: 'publish_artifact',
+        input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'a,b' },
       },
       published(1, publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }), 3),
       { type: 'tool_exec_end', id: 1, ok: true, result: 'Created top5.csv' },
@@ -513,9 +513,9 @@ describe('reduce (semantic activity + evidence)', () => {
     const item = state.transcript.at(-1);
     expect(item).toMatchObject({
       kind: 'evidence',
-      line: 'Evidence saved → artifacts/top5.csv',
+      line: 'Publishing an artifact → artifacts/top5.csv',
     });
-    // write_file records no sourceUrl, so the evidence line omits it.
+    // This published text has no sourceUrl, so the evidence line omits it.
     expect((item as { sourceUrl?: string }).sourceUrl).toBeUndefined();
   });
 
@@ -526,15 +526,15 @@ describe('reduce (semantic activity + evidence)', () => {
       {
         type: 'tool_exec_start',
         id: 1,
-        name: 'screenshot',
-        input: { filename: 'page.png' },
+        name: 'publish_artifact',
+        input: { kind: 'screenshot', artifact_path: 'artifacts/page.png' },
       },
       { type: 'tool_exec_end', id: 1, ok: false, error: 'no browser' },
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'activity',
       status: 'error',
-      line: 'Captured page.png',
+      line: 'Publishing a screenshot → artifacts/page.png',
     });
   });
 
@@ -542,13 +542,18 @@ describe('reduce (semantic activity + evidence)', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
-      { type: 'tool_exec_start', id: 1, name: 'grep', input: { pattern: 'Q3' } },
+      {
+        type: 'tool_exec_start',
+        id: 1,
+        name: 'read_file',
+        input: { file_path: 'scratch/workspace/notes.md' },
+      },
       { type: 'tool_exec_end', id: 1, ok: true, result: 'notes.md:4: Q3 revenue' },
     ]);
     const item = state.transcript.at(-1);
     expect(item).toMatchObject({ kind: 'activity', status: 'ok' });
     expect((item as { verbose?: { input: string; result: string } }).verbose).toEqual({
-      input: '{"pattern":"Q3"}',
+      input: '{"file_path":"scratch/workspace/notes.md"}',
       result: 'notes.md:4: Q3 revenue',
     });
   });
@@ -565,8 +570,8 @@ describe('reduce (published artifacts)', () => {
     {
       type: 'tool_exec_start',
       id: 1,
-      name: 'screenshot',
-      input: { filename: 'artifacts/page.png' },
+      name: 'publish_artifact',
+      input: { kind: 'screenshot', artifact_path: 'artifacts/page.png' },
     },
     published(
       1,
@@ -582,16 +587,16 @@ describe('reduce (published artifacts)', () => {
       {
         type: 'tool_exec_start',
         id: 2,
-        name: 'write_file',
-        input: { file_path: 'artifacts/top5.csv', content: 'v1' },
+        name: 'publish_artifact',
+        input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'v1' },
       },
       published(2, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '1'.repeat(64), roles: ['requested_output'] }), 2),
       { type: 'tool_exec_end', id: 2, ok: true },
       {
         type: 'tool_exec_start',
         id: 3,
-        name: 'write_file',
-        input: { file_path: 'artifacts/top5.csv', content: 'v2!' },
+        name: 'publish_artifact',
+        input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'v2!' },
       },
       published(3, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '2'.repeat(64), roles: ['requested_output'] }), 3),
       { type: 'tool_exec_end', id: 3, ok: true },
@@ -627,7 +632,7 @@ describe('reduce (published artifacts)', () => {
     const state = fold(captured);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'evidence',
-      line: 'Captured artifacts/page.png',
+      line: 'Publishing a screenshot → artifacts/page.png',
       sourceUrl: 'https://sec.gov/filings',
     });
   });
@@ -652,15 +657,15 @@ describe('reduce (published artifacts)', () => {
     expect(state.artifacts).toEqual([]);
   });
 
-  it('a publishing browser_batch finalizes as evidence, first entry with a sourceUrl winning', () => {
+  it('a publishing call uses the first artifact source URL', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
       {
         type: 'tool_exec_start',
         id: 4,
-        name: 'browser_action',
-        input: { actions: [{ op: 'click', target: { ref: 'e1' } }] },
+        name: 'publish_artifact',
+        input: { kind: 'text', artifact_path: 'artifacts/notes.csv' },
       },
       published(4, publishedEntry({ filename: 'artifacts/notes.csv', roles: ['requested_output'] })),
       published(4, publishedEntry({ filename: 'artifacts/shot.png', sourceUrl: 'https://x.test/b' })),
@@ -668,7 +673,7 @@ describe('reduce (published artifacts)', () => {
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'evidence',
-      line: 'Clicking',
+      line: 'Publishing an artifact → artifacts/notes.csv',
       sourceUrl: 'https://x.test/b',
     });
     expect(state.artifacts).toHaveLength(2);
@@ -697,8 +702,8 @@ describe('reduce (published artifacts)', () => {
       {
         type: 'tool_exec_start',
         id: 5,
-        name: 'browser_action',
-        input: { actions: [{ op: 'click', target: { ref: 'e1' } }, { op: 'click', target: { ref: 'e2' } }] },
+        name: 'publish_artifact',
+        input: { kind: 'screenshot', artifact_path: 'artifacts/partial.png' },
       },
       published(5, publishedEntry({ filename: 'artifacts/partial.png', sourceUrl: 'https://x.test/a' })),
       { type: 'tool_exec_end', id: 5, ok: false, error: 'step 2 failed' },

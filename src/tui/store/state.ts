@@ -296,7 +296,7 @@ export type UiEvent =
       /** A real run emits only 'verified' (the one harness success) or
        * 'incomplete' (judge crash, correction exhaustion, budget
        * exhaustion — never a runtime failure, which stays run_failed):
-       * since the V2-only cutover every run goes through the harness, so
+       * since the v3-only cutover every run goes through the harness, so
        * the bridge switches over a status union of just those two.
        * 'completed'/'budget_exceeded' outlive the judge-less path they came
        * from because the synthetic `--demo` stream still emits them and the

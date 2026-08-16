@@ -52,8 +52,10 @@ describe('smoke: full scripted-run rendering contract', () => {
     // The transcript story is all present…
     expect(frame).toContain("▸ Find Acme Corp's Series B investors");
     expect(frame).toContain("I'll start with recent funding coverage");
-    expect(frame).toContain('● Opening techcrunch.com/2026/05/14/acme-series-b');
-    expect(frame).toContain('◆ Evidence saved → investors.csv');
+    expect(frame).toContain('● Running a browser program');
+    expect(frame).toContain(
+      '◆ Publishing an artifact → artifacts/investors.csv',
+    );
     expect(frame).toContain('✓ Brewed in 42s · 18.7k tokens');
     // …and the passive completion panel sits above the composer.
     expect(frame).toContain('tab to browse artifacts');
@@ -68,7 +70,8 @@ describe('smoke: full scripted-run rendering contract', () => {
     await tick();
     const frame = lastFrame();
     expect(frame).toContain('✓ Brewed in 42s · 18.7k tokens');
-    expect(frame).toContain('◆ Evidence saved → investors.csv');
+    expect(frame).toContain('◆ Publishing an artifact →');
+    expect(frame).toContain('artifacts/investors.csv');
     expect(frame).toContain('tab to browse artifacts');
     expect(frame).toMatchSnapshot();
     unmount();

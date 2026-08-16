@@ -263,7 +263,7 @@ describe('startEvalBatch', () => {
       const done = (async (): Promise<RunOutcome> => {
         // The trial asks the user a question (e.g. a login blocker) through
         // the resolver the batch threaded in.
-        expect(await opts.requestPermission?.({ toolName: 'ask_user_question', input: {} })).toEqual(decision);
+        expect(await opts.requestPermission?.({ toolName: 'ask_user', input: {} })).toEqual(decision);
         return { status: 'verified', finalText: '', runDir };
       })();
       return { cancel: vi.fn(), done };

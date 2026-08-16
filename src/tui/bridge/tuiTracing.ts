@@ -28,8 +28,8 @@ export interface TuiTracingDeps {
  * Create the TUI's RunTracing: emits UiEvents from every tool execution
  * and forwards all tracing responsibilities to the delegate.
  *
- * Emission contract: `run_dir` once, eagerly when runTask announces it (or
- * from the first execution's ctx as a legacy fallback);
+ * Emission contract: `run_dir` once, eagerly when runTask announces it (with
+ * the first execution's context as a defensive fallback);
  * `tool_exec_start` with the validated input; one `artifact_published`
  * per new-or-changed published manifest entry, before that execution's
  * `tool_exec_end`; `tool_exec_end` with ok/result or ok:false/error
@@ -55,7 +55,7 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
    * published marker — scratch entries carry none) against what has been
    * announced, emitting artifact_published for each new or changed one.
    * The manifest is the metadata channel: reading it catches writes the
-   * tool boundary hides (browser_batch's inner registry) and is exactly
+   * tool boundary may hide (for example a helper performing several writes) and is exactly
    * what graders do. Tracing must never break a run — failures emit
    * nothing. */
   const emitPublishedDiff = (runDir: string, toolExecId: number): void => {

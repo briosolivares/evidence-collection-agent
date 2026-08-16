@@ -5,19 +5,10 @@
 // This module drives every run through runTask's OWN production model
 // client: it forwards `onProgress` (mapped to UiEvent below), `signal`, and
 // `createStream` into RunTaskConfig and lets runTask build and own the
-// client, rather than injecting a second hand-rolled one. That used to be
-// impossible — runTask built its own `makeCallModel` client whenever
-// `config.callModel` was omitted, but did not forward `config.signal` into
-// it, so an aborted signal reached only tool execution
-// (`ToolCtx.abortSignal`), never an in-flight model request. Fixed on the
-// `RunTaskConfig`/`ResumeTaskConfig` side (see runTask.ts): both now accept
-// `signal` and `createStream` and thread them into every model role they
-// build. With that gap closed, this module no longer needs its own
-// `callModel`, which also means the run drives through runTask's REAL tool
-// surface (`update_table`, `write_document`, `execute_javascript`,
-// `capture_text`, `inspect_document`, and the run-scoped stores they need)
-// instead of the best-effort approximation a locally-built registry could
-// offer.
+// client rather than constructing a second model or tool registry. `runTask`
+// threads `signal` and `createStream` through initializer, worker, and
+// verifier roles, so cancellation reaches the in-flight role and the bridge
+// always observes the exact production v3 tool surface.
 //
 // Progress mapping is a straight passthrough of `ProgressEvent` (see
 // model/callModel.ts) onto this module's `UiEvent`s: turn_start →
@@ -89,10 +80,8 @@ export interface RunSessionDeps {
   /** Tuning for the initializer → worker → verifier harness every run now
    * goes through; forwarded to `runTask` verbatim. Omitted — the
    * production default — gets every default (a live initializer call,
-   * three worker cycles, a live verifier). Tests use this to inject
-   * `contractAuthor: 'worker'` plus a scripted `verifierCallModel`, so a
-   * bridge test never makes a second, unscripted model role's network
-   * call. */
+   * three worker cycles, a live verifier). Tests inject scripted initializer
+   * and verifier calls so no model role can reach the network. */
   harness?: HarnessConfig;
   /** Tracing the TUI's adapter delegates to; defaults to the core's
    * createRunTracing() so Langfuse observability is preserved. */

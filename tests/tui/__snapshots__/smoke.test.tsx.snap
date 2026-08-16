@@ -28,16 +28,16 @@ exports[`smoke: full scripted-run rendering contract > locks the frame at narrow
   then confirm the names against the primary
    filing.
 
- ● Opening
- techcrunch.com/2026/05/14/acme-series-b  ✓
+ ● Running a browser program  ✓
 
   The coverage is up. Reading the page for
   investor names and capturing the article
   as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured series-b-coverage.png
+ ◆ Publishing a screenshot →
+ artifacts/series-b-coverage.png
    └ source: https://techcrunch.com/2026/05/
  14/acme-series-b
 
@@ -46,29 +46,31 @@ exports[`smoke: full scripted-run rendering contract > locks the frame at narrow
   Northgate Capital. The filing should
   confirm the amounts.
 
- ● Opening
- sec.gov/cgi-bin/browse-edgar?company=acme
- ✓
+ ● Running a browser program  ✓
 
- ● Clicking e42  ✗
+ ● Running a browser program  ✗
 
   The link moved after the page settled —
   re-inspecting, then capturing the filing
   and saving the confirmed list as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured form-d-filing.png
+ ◆ Publishing a screenshot →
+ artifacts/form-d-filing.png
    └ source: https://www.sec.gov/Archives/ed
  gar/data/1874523/primary_doc.xml
 
- ◆ Evidence saved → investors.csv
+ ◆ Publishing an artifact →
+ artifacts/investors.csv
 
   Acme's Series B was led by Meridian Growth
    with participation from Halcyon Partners
   and Northgate Capital; the three names and
    their filing references are saved in
   investors.csv.
+
+ ● Submitting for verification  ✓
 
  ✓ Brewed in 42s · 18.7k tokens
    ◆ artifacts/investors.csv · 182 B ·
@@ -124,36 +126,38 @@ exports[`smoke: full scripted-run rendering contract > locks the frame at normal
   I'll start with recent funding coverage, then confirm the names against the
   primary filing.
 
- ● Opening techcrunch.com/2026/05/14/acme-series-b  ✓
+ ● Running a browser program  ✓
 
   The coverage is up. Reading the page for investor names and capturing the
   article as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured series-b-coverage.png
+ ◆ Publishing a screenshot → artifacts/series-b-coverage.png
    └ source: https://techcrunch.com/2026/05/14/acme-series-b
 
   The article names three investors — Meridian Growth, Halcyon Partners, and
   Northgate Capital. The filing should confirm the amounts.
 
- ● Opening sec.gov/cgi-bin/browse-edgar?company=acme  ✓
+ ● Running a browser program  ✓
 
- ● Clicking e42  ✗
+ ● Running a browser program  ✗
 
   The link moved after the page settled — re-inspecting, then capturing the
   filing and saving the confirmed list as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured form-d-filing.png
+ ◆ Publishing a screenshot → artifacts/form-d-filing.png
    └ source: https://www.sec.gov/Archives/edgar/data/1874523/primary_doc.xml
 
- ◆ Evidence saved → investors.csv
+ ◆ Publishing an artifact → artifacts/investors.csv
 
   Acme's Series B was led by Meridian Growth with participation from Halcyon
   Partners and Northgate Capital; the three names and their filing references
   are saved in investors.csv.
+
+ ● Submitting for verification  ✓
 
  ✓ Brewed in 42s · 18.7k tokens
    ◆ artifacts/investors.csv · 182 B · requested output
@@ -201,36 +205,38 @@ exports[`smoke: full scripted-run rendering contract > locks the waiting compose
   I'll start with recent funding coverage, then confirm the names against the
   primary filing.
 
- ● Opening techcrunch.com/2026/05/14/acme-series-b  ✓
+ ● Running a browser program  ✓
 
   The coverage is up. Reading the page for investor names and capturing the
   article as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured series-b-coverage.png
+ ◆ Publishing a screenshot → artifacts/series-b-coverage.png
    └ source: https://techcrunch.com/2026/05/14/acme-series-b
 
   The article names three investors — Meridian Growth, Halcyon Partners, and
   Northgate Capital. The filing should confirm the amounts.
 
- ● Opening sec.gov/cgi-bin/browse-edgar?company=acme  ✓
+ ● Running a browser program  ✓
 
- ● Clicking e42  ✗
+ ● Running a browser program  ✗
 
   The link moved after the page settled — re-inspecting, then capturing the
   filing and saving the confirmed list as evidence.
 
- ● Reading the page  ✓
+ ● Running a browser program  ✓
 
- ◆ Captured form-d-filing.png
+ ◆ Publishing a screenshot → artifacts/form-d-filing.png
    └ source: https://www.sec.gov/Archives/edgar/data/1874523/primary_doc.xml
 
- ◆ Evidence saved → investors.csv
+ ◆ Publishing an artifact → artifacts/investors.csv
 
   Acme's Series B was led by Meridian Growth with participation from Halcyon
   Partners and Northgate Capital; the three names and their filing references
   are saved in investors.csv.
+
+ ● Submitting for verification  ✓
 
  ✓ Brewed in 42s · 18.7k tokens
    ◆ artifacts/investors.csv · 182 B · requested output

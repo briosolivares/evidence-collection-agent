@@ -269,7 +269,7 @@ function settleDanglingPending(state: SessionState): SessionState {
   return { ...next, live: { ...live, pendingTools: [] } };
 }
 
-/** Finish/submission calls are coordinator control flow, not registry tools,
+/** Finish calls are coordinator control flow, not registry tools,
  * so the tracing seam has no tool_exec_end with which to settle them. Resolve
  * the terminal control line from the run outcome before generic dangling
  * calls become retried warnings. */
@@ -280,7 +280,7 @@ function settleTerminalControlPending(
   const live = state.live;
   if (live === undefined) return state;
   const controls = live.pendingTools.filter(
-    (pending) => pending.name === 'finish' || pending.name === 'submit_for_verification',
+    (pending) => pending.name === 'finish',
   );
   if (controls.length === 0) return state;
   let next = state;
@@ -659,8 +659,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
             };
       // Publish-driven classification: an execution reads as evidence iff
       // it actually published (a scratch write publishes nothing however
-      // evidence-flavored its name; a browser_batch capture publishes
-      // whatever its name suggests). Failures stay error activity.
+      // evidence-flavored its name). Failures stay error activity.
       const published = finished.published ?? [];
       const sourceUrl = published.find((entry) => entry.sourceUrl !== undefined)?.sourceUrl;
       const withItem = action.ok && published.length > 0

@@ -43,16 +43,16 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       500,
       "I'll start with recent funding coverage, then confirm the names against the primary filing.",
     ),
-    { delayMs: 400, action: { type: 'tool_pending', name: 'browser_action' } },
+    { delayMs: 400, action: { type: 'tool_pending', name: 'browser_execute' } },
     { delayMs: 300, action: { type: 'turn_end', usage: { input: 1200, output: 180 } } },
     {
       delayMs: 200,
       action: {
         type: 'tool_exec_start',
         id: 1,
-        name: 'browser_action',
+        name: 'browser_execute',
         input: {
-          actions: [{ op: 'navigate', url: 'https://techcrunch.com/2026/05/14/acme-series-b' }],
+          code: "await browser.goto('https://techcrunch.com/2026/05/14/acme-series-b'); return await browser.pageInfo();",
         },
       },
     },
@@ -64,12 +64,17 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The coverage is up. Reading the page for investor names and capturing the article as evidence.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'observe' } },
-    { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'browser_execute' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'publish_artifact' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 3400, output: 240 } } },
     {
       delayMs: 200,
-      action: { type: 'tool_exec_start', id: 2, name: 'observe', input: {} },
+      action: {
+        type: 'tool_exec_start',
+        id: 2,
+        name: 'browser_execute',
+        input: { code: "return await browser.accessibility({ filter: 'investor' });" },
+      },
     },
     { delayMs: 1200, action: { type: 'tool_exec_end', id: 2, ok: true, result: 'outline: article — "Acme Corp raises $85M Series B led by Meridian Growth"' } },
     {
@@ -77,8 +82,12 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       action: {
         type: 'tool_exec_start',
         id: 3,
-        name: 'screenshot',
-        input: { filename: 'series-b-coverage.png' },
+        name: 'publish_artifact',
+        input: {
+          kind: 'screenshot',
+          artifact_path: 'artifacts/series-b-coverage.png',
+          roles: ['evidence'],
+        },
       },
     },
     // Publishes precede their execution's tool_exec_end (the tracing-seam
@@ -106,19 +115,17 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The article names three investors — Meridian Growth, Halcyon Partners, and Northgate Capital. The filing should confirm the amounts.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'browser_action' } },
-    { delayMs: 100, action: { type: 'tool_pending', name: 'browser_action' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'browser_execute' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'browser_execute' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 4200, output: 260 } } },
     {
       delayMs: 200,
       action: {
         type: 'tool_exec_start',
         id: 4,
-        name: 'browser_action',
+        name: 'browser_execute',
         input: {
-          actions: [
-            { op: 'navigate', url: 'https://www.sec.gov/cgi-bin/browse-edgar?company=acme' },
-          ],
+          code: "await browser.goto('https://www.sec.gov/cgi-bin/browse-edgar?company=acme'); return await browser.pageInfo();",
         },
       },
     },
@@ -128,8 +135,8 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       action: {
         type: 'tool_exec_start',
         id: 5,
-        name: 'browser_action',
-        input: { actions: [{ op: 'click', target: 'e42' }] },
+        name: 'browser_execute',
+        input: { code: "await browser.click('e42'); return await browser.pageInfo();" },
       },
     },
     {
@@ -148,13 +155,18 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       400,
       'The link moved after the page settled — re-inspecting, then capturing the filing and saving the confirmed list as evidence.',
     ),
-    { delayMs: 350, action: { type: 'tool_pending', name: 'observe' } },
-    { delayMs: 100, action: { type: 'tool_pending', name: 'screenshot' } },
-    { delayMs: 100, action: { type: 'tool_pending', name: 'write_file' } },
+    { delayMs: 350, action: { type: 'tool_pending', name: 'browser_execute' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'publish_artifact' } },
+    { delayMs: 100, action: { type: 'tool_pending', name: 'publish_artifact' } },
     { delayMs: 250, action: { type: 'turn_end', usage: { input: 4300, output: 420 } } },
     {
       delayMs: 200,
-      action: { type: 'tool_exec_start', id: 6, name: 'observe', input: {} },
+      action: {
+        type: 'tool_exec_start',
+        id: 6,
+        name: 'browser_execute',
+        input: { code: "return await browser.accessibility({ filter: 'offering' });" },
+      },
     },
     { delayMs: 1000, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'outline: Form D — Acme Corp, total offering $85,000,000' } },
     {
@@ -162,8 +174,12 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       action: {
         type: 'tool_exec_start',
         id: 7,
-        name: 'screenshot',
-        input: { filename: 'form-d-filing.png' },
+        name: 'publish_artifact',
+        input: {
+          kind: 'screenshot',
+          artifact_path: 'artifacts/form-d-filing.png',
+          roles: ['evidence'],
+        },
       },
     },
     {
@@ -187,12 +203,16 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       action: {
         type: 'tool_exec_start',
         id: 8,
-        name: 'write_file',
-        input: { file_path: 'investors.csv' },
+        name: 'publish_artifact',
+        input: {
+          kind: 'text',
+          artifact_path: 'artifacts/investors.csv',
+          roles: ['requested_output'],
+        },
       },
     },
-    // The publish is what makes the write render as evidence (the reducer
-    // classifies by artifact_published, not by tool name).
+    // The manifest-derived publish is authoritative; the reducer does not
+    // infer an artifact merely from the tool name.
     {
       delayMs: 550,
       action: {
@@ -215,6 +235,7 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       500,
       "Acme's Series B was led by Meridian Growth with participation from Halcyon Partners and Northgate Capital; the three names and their filing references are saved in investors.csv.",
     ),
+    { delayMs: 100, action: { type: 'tool_pending', name: 'finish' } },
     { delayMs: 300, action: { type: 'turn_end', usage: { input: 4100, output: 400 } } },
     {
       delayMs: 500,

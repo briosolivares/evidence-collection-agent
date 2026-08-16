@@ -64,13 +64,6 @@ function makeRegistry() {
         throw new Error('kaboom');
       },
     },
-    {
-      name: 'write_file',
-      description: 'fake evidence writer',
-      inputSchema: z.object({ file_path: z.string() }),
-      getAccess: () => ({ reads: [], writes: [] }),
-      execute: async (input: { file_path: string }) => ({ path: input.file_path, size: 3 }),
-    },
   ]);
 }
 
@@ -133,9 +126,8 @@ describe('createTuiTracing', () => {
   });
 
   describe('artifact_published (manifest diff)', () => {
-    // Tools that publish through the real writeArtifact pipeline, the way
-    // screenshot/download/write_file (and browser_batch's inner registry)
-    // do — the diff keys on the manifest, never on tool names.
+    // Fakes that publish through the real writeArtifact pipeline. The tracing
+    // diff keys on the manifest, never on tool names.
     function makePublishingRegistry() {
       const publishInput = z.object({
         file_path: z.string(),
@@ -167,7 +159,7 @@ describe('createTuiTracing', () => {
         },
         {
           name: 'batch',
-          description: 'browser_batch shape: several inner writes, one exec',
+          description: 'several inner writes in one execution',
           inputSchema: z.object({ items: z.array(publishInput) }),
           getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: { items: PublishInput[] }, ctx: ToolCtx) => {
@@ -216,8 +208,7 @@ describe('createTuiTracing', () => {
       const { events, wrapped } = setup();
       const ctx: ToolCtx = { runDir };
       const publish = wrapped.get('publish')!;
-      // The three real publishers' shapes: screenshot and download are
-      // evidence with a sourceUrl; write_file is a requested output.
+      // Exercise evidence-with-source and requested-output manifest roles.
       await publish.execute(
         { file_path: 'artifacts/page.png', content: 'png-bytes', source_url: 'https://sec.gov/filings', roles: ['evidence'] },
         ctx,
@@ -260,7 +251,7 @@ describe('createTuiTracing', () => {
       for (const end of ends) expect(end).not.toHaveProperty('sourceUrl');
     });
 
-    it('announces inner writes of a single execution (browser_batch shape)', async () => {
+    it('announces every inner write of a single execution', async () => {
       const { events, wrapped } = setup();
       await wrapped.get('batch')!.execute(
         {

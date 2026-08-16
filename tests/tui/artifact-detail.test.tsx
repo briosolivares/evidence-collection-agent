@@ -55,7 +55,7 @@ describe('ArtifactDetail', () => {
     unmount();
   });
 
-  it('omits the source line when the entry has no sourceUrl (write_file)', async () => {
+  it('omits the source line when a published entry has no sourceUrl', async () => {
     const { lastFrame, unmount } = render(
       <ArtifactDetail
         artifact={artifact({
