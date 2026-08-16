@@ -1016,6 +1016,38 @@ describe('runV3FinishChecks — documents and captures', () => {
       expect.arrayContaining(['unexpected_requested_output', 'helper_proposal_wrong_role']),
     );
   });
+
+  it('accepts a review-only helper patch and metadata record as evidence', () => {
+    publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
+    publish(
+      'artifacts/helper-proposals/table-reader.patch',
+      'diff --git a/src/table.ts b/src/table.ts\n',
+      { roles: ['evidence'] },
+    );
+    publish(
+      'artifacts/helper-proposals/table-reader.json',
+      JSON.stringify({
+        capability: 'Read a generic table from an accessibility tree.',
+        sourceRun: 'current run',
+        mechanics: ['accessibility backend-node traversal'],
+        verification: ['fixture table parsed with exact columns'],
+        limitations: [],
+      }),
+      { roles: ['evidence'] },
+    );
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(tableSpec()),
+      finish: finish(['artifacts/roster.csv']),
+    });
+
+    expect(result.status).toBe('passed');
+    expect(result.facts.manifest?.evidencePaths).toEqual([
+      'artifacts/helper-proposals/table-reader.patch',
+      'artifacts/helper-proposals/table-reader.json',
+    ]);
+  });
 });
 
 describe('runV3FinishChecks — browser evidence and limitations', () => {

@@ -21,6 +21,11 @@ describe('V3_SYSTEM_PROMPT', () => {
       'Only the two newest successful browser_execute results remain fully expanded',
     );
     expect(V3_SYSTEM_PROMPT).toContain('record durable facts in workspace files');
+    expect(V3_SYSTEM_PROMPT).toContain('artifacts/helper-proposals/');
+    expect(V3_SYSTEM_PROMPT).toContain('a unified .patch plus a small .json record');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'Never apply, commit, or automatically promote a proposal',
+    );
   });
 
   it('teaches exact generic publication and the private workspace boundary', () => {
