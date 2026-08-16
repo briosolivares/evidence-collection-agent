@@ -73,6 +73,16 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!existsSync(path)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`Timed out waiting for ${path}`);
+    }
+    await wait(10);
+  }
+}
+
 describe('v3 bash tool', () => {
   it('has a strict browser-free schema and an exclusive bounded contract', () => {
     const tool = createBashTool({ secretEnvDenylist: [] });
@@ -318,7 +328,7 @@ describe('v3 bash tool', () => {
         { abortSignal: controller.signal },
       );
 
-      await wait(100);
+      await waitForPath(join(workspace, 'before-cancel.txt'));
       controller.abort();
       const result = await pending;
 
