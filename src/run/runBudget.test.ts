@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Message, ModelResponse } from '../loop/messages.js';
-import {
-  ModelGenerationFailedError,
-  ModelResponseRejectedError,
-} from '../model/modelDriver.js';
 import {
   captureRunBudgetSnapshot,
   createRunBudgetTracker,
   validateRunBudgetConfig,
-  withBudgetAccounting,
   type RunBudgetConfig,
   type RunBudgetSnapshot,
 } from './runBudget.js';
@@ -346,64 +340,5 @@ describe('RunBudgetTracker snapshot/restore', () => {
 
     expect(snapshot.roles.worker?.turns).toBe(1);
     expect(tracker.roleUsage().worker?.turns).toBe(2);
-  });
-});
-
-describe('withBudgetAccounting', () => {
-  const messages: Message[] = [{ role: 'user', content: [{ type: 'text', text: 'q' }] }];
-
-  it('charges accepted responses to the given role', async () => {
-    const tracker = createRunBudgetTracker(UNBOUNDED);
-    const response: ModelResponse = {
-      content: [{ type: 'text', text: 'ok' }],
-      stop_reason: 'end_turn',
-      usage: USAGE,
-    };
-    const wrapped = withBudgetAccounting(async () => response, tracker, 'verifier');
-
-    await expect(wrapped(messages)).resolves.toBe(response);
-    expect(tracker.roleUsage().verifier).toMatchObject({ turns: 1, inputTokens: 100 });
-  });
-
-  it('still charges a rejected response before the rejection propagates', async () => {
-    const tracker = createRunBudgetTracker(UNBOUNDED);
-    const rejection = new ModelResponseRejectedError(
-      'refusal',
-      'scripted refusal',
-      'feedback',
-      USAGE,
-    );
-    const wrapped = withBudgetAccounting(
-      async () => {
-        throw rejection;
-      },
-      tracker,
-      'initializer',
-    );
-
-    await expect(wrapped(messages)).rejects.toBe(rejection);
-    expect(tracker.roleUsage().initializer).toMatchObject({ turns: 1, outputTokens: 50 });
-  });
-
-  it('charges known complete-attempt usage before a fatal retry failure propagates', async () => {
-    const tracker = createRunBudgetTracker(UNBOUNDED);
-    const failure = new ModelGenerationFailedError(
-      new Error('replacement transport failed'),
-      USAGE,
-    );
-    const wrapped = withBudgetAccounting(
-      async () => {
-        throw failure;
-      },
-      tracker,
-      'verifier',
-    );
-
-    await expect(wrapped(messages)).rejects.toBe(failure);
-    expect(tracker.roleUsage().verifier).toMatchObject({
-      turns: 1,
-      inputTokens: 100,
-      outputTokens: 50,
-    });
   });
 });

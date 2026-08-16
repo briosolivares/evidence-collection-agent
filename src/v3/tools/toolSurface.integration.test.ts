@@ -17,7 +17,7 @@ import {
 } from '../../run/artifacts.js';
 import { executeToolCall } from '../../tools/pipeline.js';
 import { createRegistry } from '../../tools/registry.js';
-import { V3_FILE_TOOLS } from './fileTools.js';
+import { editFileTool, readFileTool, writeFileTool } from './fileTools.js';
 import { publishArtifactTool } from './publishArtifact.js';
 
 let runDir: string;
@@ -31,7 +31,12 @@ afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
 
-const registry = createRegistry([publishArtifactTool, ...V3_FILE_TOOLS]);
+const registry = createRegistry([
+  publishArtifactTool,
+  readFileTool,
+  writeFileTool,
+  editFileTool,
+]);
 
 async function call(
   name: 'publish_artifact' | 'read_file' | 'write_file' | 'edit_file',

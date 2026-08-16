@@ -30,7 +30,6 @@ import { generateRunId } from '../run/runId.js';
 import type { RunOutcome } from '../run/runOutcome.js';
 import { createRunTracing, type RunTracing } from '../tracing/runTracing.js';
 import type { ToolCtx } from '../tools/registry.js';
-import { BASH_SECRET_ENV_DENYLIST } from './localExecution.js';
 import { createV3ContractInitializerModelDriver } from '../v3/harness/initializer.js';
 import { createV3VerifierModelDriver } from '../v3/harness/verifier.js';
 import {
@@ -47,6 +46,7 @@ import {
   V3_API_TOOL_DEFS,
   createV3ToolRegistry,
 } from '../v3/tools/index.js';
+import { BASH_SECRET_ENV_DENYLIST } from '../v3/tools/secretEnvironment.js';
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({

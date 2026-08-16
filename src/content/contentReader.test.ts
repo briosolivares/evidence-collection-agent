@@ -1,14 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  assertContentRange,
-  createContentReaderRegistry,
-  detectContentFormat,
-  throwIfAborted,
-  UnsupportedContentError,
-  type ContentObservation,
-  type ContentReader,
-} from './contentReader.js';
+import { detectContentFormat } from './contentReader.js';
 
 const bytes = (text: string): Uint8Array => new Uint8Array(Buffer.from(text, 'latin1'));
 const raw = (...values: number[]): Uint8Array => new Uint8Array(values);
@@ -82,75 +74,5 @@ describe('detectContentFormat — bytes beat extensions', () => {
   it('does not crash on empty or tiny input', () => {
     expect(detectContentFormat({ bytes: new Uint8Array() })).toBe('text');
     expect(detectContentFormat({ bytes: raw(0x25) })).toBe('text');
-  });
-});
-
-describe('assertContentRange', () => {
-  it('accepts a valid 1-based inclusive range', () => {
-    expect(() => assertContentRange({ from: 1, to: 1 })).not.toThrow();
-    expect(() => assertContentRange({ from: 2, to: 10 })).not.toThrow();
-  });
-
-  it.each([
-    ['zero from', { from: 0, to: 5 }],
-    ['negative from', { from: -1, to: 5 }],
-    ['fractional to', { from: 1, to: 2.5 }],
-    ['NaN', { from: Number.NaN, to: 5 }],
-    ['Infinity', { from: 1, to: Infinity }],
-    ['reversed', { from: 5, to: 2 }],
-  ])('rejects %s', (_label, range) => {
-    expect(() => assertContentRange(range)).toThrow();
-  });
-});
-
-describe('createContentReaderRegistry', () => {
-  const stub = (name: string, formats: ContentReader['formats']): ContentReader => ({
-    name,
-    formats,
-    read: async (request): Promise<ContentObservation> => ({
-      format: formats[0]!,
-      text: `${name} read ${request.bytes.length} bytes`,
-      locator: 'stub',
-    }),
-  });
-
-  it('routes to the adapter for the detected format', async () => {
-    const registry = createContentReaderRegistry([stub('pdf-stub', ['pdf'])]);
-    const observation = await registry.read({ bytes: bytes('%PDF-1.7 body') });
-    expect(observation.text).toContain('pdf-stub read');
-  });
-
-  it('throws UnsupportedContentError when nothing handles the format', async () => {
-    const registry = createContentReaderRegistry([stub('pdf-stub', ['pdf'])]);
-    await expect(registry.read({ bytes: bytes('{"a":1}') })).rejects.toBeInstanceOf(
-      UnsupportedContentError,
-    );
-  });
-
-  it('validates the range before dispatching', async () => {
-    const registry = createContentReaderRegistry([stub('pdf-stub', ['pdf'])]);
-    await expect(
-      registry.read({ bytes: bytes('%PDF-1.7'), range: { from: 0, to: 3 } }),
-    ).rejects.toThrow(/range\.from/);
-  });
-
-  it('lets a later adapter override an earlier one for the same format', () => {
-    const registry = createContentReaderRegistry([stub('first', ['pdf']), stub('second', ['pdf'])]);
-    expect(registry.readerFor('pdf')?.name).toBe('second');
-  });
-});
-
-describe('throwIfAborted', () => {
-  it('does nothing without a signal or before abort', () => {
-    expect(() => throwIfAborted()).not.toThrow();
-    expect(() => throwIfAborted(new AbortController().signal)).not.toThrow();
-  });
-
-  it('throws an AbortError once aborted, so a long parse can stop between chunks', () => {
-    const controller = new AbortController();
-    controller.abort();
-    expect(() => throwIfAborted(controller.signal)).toThrow(
-      expect.objectContaining({ name: 'AbortError' }),
-    );
   });
 });

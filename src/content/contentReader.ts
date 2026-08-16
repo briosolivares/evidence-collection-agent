@@ -1,106 +1,20 @@
-// Non-HTML evidence, made observable through the same bounded
-// representation as everything else. A PDF, a spreadsheet, and a scanned
-// image are all things a run legitimately has to read, and none of them is
-// served usefully by "download it and hope".
-//
-// Two boundaries shape this registry:
-//
-//  1. Format is detected from TRUSTED BYTES plus the media type, never from a
-//     filename extension alone. An extension is attacker- and
-//     mistake-controlled; a magic number is what the file actually is. A
-//     `.csv` that is really a PDF must be read as a PDF, and a `.pdf` that is
-//     really HTML must not be handed to a PDF parser.
-//  2. Every read is BOUNDED and resumable. An adapter returns a chunk plus an
-//     explicit continuation range, so the model asks for the next range
-//     rather than receiving a whole 400-page document it cannot use.
+// Lightweight byte sniffing shared by the worker and verifier file readers.
+// Extensions and transport media types are only hints: recognizable bytes
+// always win so a mislabeled download is not described as the wrong format.
 
-/** Content this registry can route. */
-export type ContentFormat = 'pdf' | 'spreadsheet' | 'image' | 'html' | 'json' | 'csv' | 'text';
+type ContentFormat =
+  | 'pdf'
+  | 'spreadsheet'
+  | 'image'
+  | 'html'
+  | 'json'
+  | 'csv'
+  | 'text';
 
-/** One bounded slice of a document, with enough provenance to cite it. */
-export interface ContentObservation {
-  format: ContentFormat;
-  /** The slice's text, already bounded by the request. */
-  text: string;
-  /** Where this slice came from, precisely enough to re-read or cite:
-   * `page 3`, `Sheet1!A1:D20`, `image 2`. */
-  locator: string;
-  /** The range that would continue this read, when more remains. Absent
-   * means the document was fully covered. */
-  continuation?: ContentRange;
-  /** Total extent, when the adapter can determine it cheaply (page count,
-   * sheet row count). */
-  total?: number;
-  /** Adapter-specific provenance the caller must not lose: OCR engine and
-   * confidence, a spreadsheet's underlying vs displayed values, a PDF's
-   * bounding boxes. */
-  metadata?: Record<string, unknown>;
-}
-
-/** A bounded, 1-based, inclusive range. */
-export interface ContentRange {
-  from: number;
-  to: number;
-}
-
-/** One read request. */
-export interface ContentReadRequest {
-  /** The bytes to read. */
+interface ContentDetectionRequest {
   bytes: Uint8Array;
-  /** Media type from the transport, when known — combined with the bytes to
-   * decide the format, never trusted alone. */
   mediaType?: string;
-  /** Filename, used only as a last-resort hint and never over the bytes. */
   filename?: string;
-  /** Which slice to read; the adapter's own default when omitted. */
-  range?: ContentRange;
-  /** Cancellation for CPU-heavy parsing and OCR. */
-  signal?: AbortSignal;
-}
-
-/** One format's reader. */
-export interface ContentReader {
-  /** Stable name, for diagnostics. */
-  readonly name: string;
-  /** The formats this reader handles. */
-  readonly formats: readonly ContentFormat[];
-  read(request: ContentReadRequest): Promise<ContentObservation>;
-}
-
-/** Routes a read to the adapter for its detected format. */
-export interface ContentReaderRegistry {
-  /** The format these bytes actually are. */
-  detect(request: Pick<ContentReadRequest, 'bytes' | 'mediaType' | 'filename'>): ContentFormat;
-  /** Read through the adapter for the detected format. */
-  read(request: ContentReadRequest): Promise<ContentObservation>;
-  /** The adapter registered for a format, if any. */
-  readerFor(format: ContentFormat): ContentReader | undefined;
-}
-
-/** Thrown when no adapter handles a detected format. */
-export class UnsupportedContentError extends Error {
-  override readonly name = 'UnsupportedContentError';
-  readonly format: ContentFormat;
-
-  constructor(format: ContentFormat) {
-    super(`no content reader registered for ${format}`);
-    this.format = format;
-  }
-}
-
-/** Validate a range: 1-based, inclusive, ordered, finite. */
-export function assertContentRange(range: ContentRange): void {
-  for (const [label, value] of [
-    ['from', range.from],
-    ['to', range.to],
-  ] as const) {
-    if (!Number.isInteger(value) || value < 1) {
-      throw new Error(`range.${label} must be an integer >= 1, got ${value}`);
-    }
-  }
-  if (range.to < range.from) {
-    throw new Error(`range.to (${range.to}) must be >= range.from (${range.from})`);
-  }
 }
 
 /**
@@ -116,7 +30,7 @@ export function assertContentRange(range: ContentRange): void {
  * cheap structural inspection.
  */
 export function detectContentFormat(
-  request: Pick<ContentReadRequest, 'bytes' | 'mediaType' | 'filename'>,
+  request: ContentDetectionRequest,
 ): ContentFormat {
   const bytes = request.bytes;
 
@@ -145,37 +59,6 @@ export function detectContentFormat(
   if (looksTabular(head)) return 'csv';
   if ((request.filename ?? '').toLowerCase().endsWith('.csv')) return 'csv';
   return 'text';
-}
-
-/** Build a registry over the given adapters. Later adapters override earlier
- * ones for the same format, so a caller can substitute one deliberately. */
-export function createContentReaderRegistry(
-  readers: readonly ContentReader[],
-): ContentReaderRegistry {
-  const byFormat = new Map<ContentFormat, ContentReader>();
-  for (const reader of readers) {
-    for (const format of reader.formats) byFormat.set(format, reader);
-  }
-
-  return {
-    detect: (request) => detectContentFormat(request),
-    readerFor: (format) => byFormat.get(format),
-    async read(request) {
-      if (request.range !== undefined) assertContentRange(request.range);
-      const format = detectContentFormat(request);
-      const reader = byFormat.get(format);
-      if (reader === undefined) throw new UnsupportedContentError(format);
-      return reader.read(request);
-    },
-  };
-}
-
-/** Whether a signal has already been aborted; adapters call this between
- * chunks so cancellation is observed without waiting for a whole parse. */
-export function throwIfAborted(signal?: AbortSignal): void {
-  if (signal?.aborted === true) {
-    throw Object.assign(new Error('content read aborted'), { name: 'AbortError' });
-  }
 }
 
 function startsWithAscii(bytes: Uint8Array, prefix: string): boolean {

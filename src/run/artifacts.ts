@@ -273,42 +273,6 @@ function serializeManifest(manifest: Manifest): string {
 }
 
 /**
- * Mark one already-written artifact `complete` or `partial` without
- * rewriting its bytes (see ManifestEntry.completionStatus).
- *
- * Used by incomplete-run finalization: the run is ending unverified, and the
- * outputs whose contract requirement is unmet must say so, while the ones
- * already satisfied keep standing. Rewriting the file to record this would
- * change its hash and destroy the provenance the manifest exists to keep, so
- * only the entry is touched.
- *
- * @param runDir - absolute path to a run directory with an initialized manifest
- * @param relPath - run-dir-relative path of an artifact already on record
- * @param status - the status to record
- * @returns the updated entry
- * @throws if the manifest has no entry for that path — marking a file the
- *   run never wrote would be a bookkeeping lie, not a recoverable slip
- */
-export function setArtifactCompletionStatus(
-  runDir: string,
-  relPath: string,
-  status: 'complete' | 'partial',
-): ManifestEntry {
-  const filename = relative(resolve(runDir), resolveRunPath(runDir, relPath));
-  const manifest = loadManifest(runDir);
-  const index = manifest.artifacts.findIndex((a) => a.filename === filename);
-  if (index < 0) {
-    throw new Error(
-      `cannot set completion status: ${filename} has no manifest entry in ${runDir}`,
-    );
-  }
-  const updated: ManifestEntry = { ...manifest.artifacts[index]!, completionStatus: status };
-  manifest.artifacts[index] = updated;
-  writeManifestDurably(runDir, manifest);
-  return updated;
-}
-
-/**
  * Drop one scratch file's manifest entry after the caller has already
  * observed the file itself is gone from disk.
  *

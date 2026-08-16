@@ -293,14 +293,10 @@ export const outputContractSchema = z.strictObject({
     .describe('Only the choices that materially affect the result'),
 });
 
-/** A date/datetime column's rendering contract. */
-export type DateOutputFormat = z.infer<typeof dateOutputFormatSchema>;
 /** One column of a table output. */
 export type OutputColumn = z.infer<typeof outputColumnSchema>;
 /** One table-wide checkable rule. */
 export type TableRule = z.infer<typeof tableRuleSchema>;
-/** How many captures or files an output requires. */
-export type OutputCount = z.infer<typeof outputCountSchema>;
 /** One required deliverable. */
 export type OutputSpec = z.infer<typeof outputSpecSchema>;
 /** The validated contract. Note that `outputs` and table `columns` are plain

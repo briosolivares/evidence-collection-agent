@@ -26,8 +26,10 @@ import {
   type ToolCtx,
 } from '../../tools/registry.js';
 import {
-  V3_FILE_TOOLS,
   V3_FILE_TOOL_MAX_BYTES,
+  editFileTool,
+  readFileTool,
+  writeFileTool,
   type EditFileResult,
 } from './fileTools.js';
 
@@ -42,7 +44,7 @@ afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
 
-const registry = createRegistry(V3_FILE_TOOLS);
+const registry = createRegistry([readFileTool, writeFileTool, editFileTool]);
 
 function call(
   name: 'read_file' | 'write_file' | 'edit_file',

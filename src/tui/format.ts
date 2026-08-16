@@ -67,23 +67,3 @@ export function formatRelativeTime(thenMs: number, nowMs: number): string {
   if (hours < 24) return `${hours}h ago`;
   return `${Math.floor(hours / 24)}d ago`;
 }
-
-/**
- * Shorten a URL for a semantic activity line: protocol and a leading
- * `www.` are dropped, the host is kept, and the path/query is trimmed to
- * fit maxLength (`sec.gov/cgi-bin/browse-edgar…`). A string that does not
- * parse as a URL is simply truncated.
- */
-export function shortenUrl(url: string, maxLength = 40): string {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return truncate(url, maxLength);
-  }
-  const host = parsed.host.replace(/^www\./, '');
-  const rest = parsed.pathname === '/' && parsed.search === ''
-    ? ''
-    : `${parsed.pathname}${parsed.search}`;
-  return truncate(`${host}${rest}`, maxLength);
-}

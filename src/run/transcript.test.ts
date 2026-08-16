@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   appendTranscriptEvent,
   TRANSCRIPT_FILENAME,
-  type CycleStartEvent,
   type TranscriptEvent,
 } from './transcript.js';
 
@@ -56,14 +55,5 @@ describe('appendTranscriptEvent', () => {
 
     // Everything previously on disk is still there, byte-for-byte, as a prefix.
     expect(readTranscript().startsWith(before)).toBe(true);
-  });
-
-  it('accepts a CycleStartEvent (harness-mode cycle boundary) and round-trips it deep-equal', () => {
-    const event: CycleStartEvent = { type: 'cycle_start', cycle: 2 };
-    appendTranscriptEvent(runDir, event);
-
-    const lines = readTranscript().trimEnd().split('\n');
-    expect(lines).toHaveLength(1);
-    expect(JSON.parse(lines[0]!)).toEqual(event);
   });
 });

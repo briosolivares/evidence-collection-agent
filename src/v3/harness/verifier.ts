@@ -61,9 +61,6 @@ export const v3VerificationResultSchema = z.discriminatedUnion('status', [
     }),
 ]);
 
-export type V3VerificationFinding = z.infer<
-  typeof v3VerificationFindingSchema
->;
 export type V3VerificationResult = z.infer<typeof v3VerificationResultSchema>;
 export type V3VerifierOutcome =
   | V3VerificationResult

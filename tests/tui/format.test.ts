@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   formatDuration,
   formatTokens,
-  shortenUrl,
   truncate,
 } from '../../src/tui/format.js';
 
@@ -47,37 +46,5 @@ describe('truncate', () => {
     expect(truncate('abcdefghij', 10)).toBe('abcdefghij');
     expect(truncate('abcdefghijk', 10)).toBe('abcdefghi…');
     expect(truncate('abcdefghijk', 10)).toHaveLength(10);
-  });
-});
-
-describe('shortenUrl', () => {
-  it('drops protocol and www, keeping host and path', () => {
-    expect(shortenUrl('https://www.sec.gov/cgi-bin/browse-edgar')).toBe(
-      'sec.gov/cgi-bin/browse-edgar',
-    );
-  });
-
-  it('renders a bare origin as just the host', () => {
-    expect(shortenUrl('https://news.ycombinator.com/')).toBe('news.ycombinator.com');
-    expect(shortenUrl('https://news.ycombinator.com')).toBe('news.ycombinator.com');
-  });
-
-  it('keeps the query string when present', () => {
-    expect(shortenUrl('https://example.com/search?q=acme', 60)).toBe(
-      'example.com/search?q=acme',
-    );
-  });
-
-  it('truncates to the maximum length with an ellipsis', () => {
-    const long = `https://www.sec.gov/${'x'.repeat(100)}`;
-    const shortened = shortenUrl(long, 40);
-    expect(shortened).toHaveLength(40);
-    expect(shortened.endsWith('…')).toBe(true);
-    expect(shortened.startsWith('sec.gov/')).toBe(true);
-  });
-
-  it('truncates non-URL text instead of throwing', () => {
-    expect(shortenUrl('not a url', 40)).toBe('not a url');
-    expect(shortenUrl('x'.repeat(50), 40)).toHaveLength(40);
   });
 });

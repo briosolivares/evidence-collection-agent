@@ -257,13 +257,6 @@ export const editFileTool: ToolDef<EditFileInput> = {
   },
 };
 
-/** Deterministic v3 file-tool order, ready for the eventual v3 registry. */
-export const V3_FILE_TOOLS = Object.freeze([
-  readFileTool,
-  writeFileTool,
-  editFileTool,
-] as const);
-
 interface ResolvedWorkerFile {
   absolutePath: string;
   relativePath: string;
