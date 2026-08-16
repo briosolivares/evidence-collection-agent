@@ -91,8 +91,9 @@ that make evidence trustworthy.
   errors, artifacts, or the transcript.
 - Streaming hidden model reasoning.
 - A live eval re-baseline as an implicit implementation step.
-- Keeping legacy modules merely because they already exist. V3 is built beside
-  the old path and cuts over after parity gates.
+- Keeping legacy modules merely because they already exist. V3 was built
+  beside the old path, cut over after parity gates, and then removed the
+  retired production wiring.
 
 ## 4. Requirements
 
@@ -157,6 +158,14 @@ The upstream project contains no model SDK, production agent loop, artifact
 manifest, output contract, verifier, or eval harness. Those Sherlock systems
 are not candidates for replacement by upstream code.
 
+The comparison is grounded in the pinned upstream
+[`run.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/src/browser_harness/run.py),
+[`daemon.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/src/browser_harness/daemon.py),
+[`helpers.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/src/browser_harness/helpers.py),
+[`agent_helpers.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/agent-workspace/agent_helpers.py),
+[`_ipc.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/src/browser_harness/_ipc.py), and
+[`telemetry.py`](https://github.com/browser-use/browser-harness/blob/6a80dbbce51e8c1776af061282546627f007be4e/src/browser_harness/telemetry.py).
+
 ## 6. Target architecture
 
 ```mermaid
@@ -191,36 +200,52 @@ The dependency direction is deliberate:
 
 ### 6.1 Modules
 
-New code lives under a cohesive `src/v3/` tree during construction:
+The completed runtime lives under a cohesive `src/v3/` tree:
 
     src/v3/
       browser/
-        executeTool.ts
         runner.ts
         child.mjs
         coreHelpers.mjs
       tools/
-        registry.ts
+        index.ts
+        browserExecute.ts
         publishArtifact.ts
+        fileTools.ts
+        bash.ts
+        askUser.ts
         finish.ts
-      agent/
-        prompt.ts
-        session.ts
-        context.ts
+        secretEnvironment.ts
+      loop/
+        workerSession.ts
+        contextView.ts
+      harness/
+        initializer.ts
+        verifier.ts
+        verifierTools.ts
+      completion/
+        finishChecks.ts
+        artifactInspection.ts
+        tableInspection.ts
+        types.ts
       run/
         coordinator.ts
         checkpoint.ts
-        completion.ts
+        outputContractFile.ts
+        runDeadline.ts
+      model/
+        budgetedCall.ts
+        budgetError.ts
+      systemPrompt.ts
 
 This is a responsibility map, not a requirement for one tiny file per type.
 Deep cohesive modules are preferred to either god objects or policy fragments.
-Stable v2 seams may remain in their existing directories and be imported:
+Stable shared seams remain in their existing directories and are imported:
 
 - the strict streaming model driver and message types;
 - browser providers and controller primitives;
 - run-directory/path/artifact/transcript primitives;
-- contract parsing and deterministic file checks where they remain useful;
-- the verifier;
+- output-contract parsing plus the generic tool pipeline and access ledger;
 - TUI tracing and eval/grader boundaries.
 
 ## 7. Browser runtime
@@ -266,12 +291,27 @@ interface BrowserCommandSession {
   readonly pageId: string;
   readonly targetId: string;
   send(method: string, params?: Record<string, unknown>): Promise<unknown>;
+  upload(backendDOMNodeId: number, absolutePath: string): Promise<void>;
   close(): Promise<void>;
 }
 
 interface BrowserController {
+  screenshot(options?: BrowserScreenshotOptions): Promise<Uint8Array>;
+  download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult>;
+  currentUrl(pageId?: string): string;
+  pages(): Promise<BrowserPage[]>;
   openCommandSession(pageId?: string): Promise<BrowserCommandSession>;
   refreshAfterExternalCommands(): Promise<void>;
+  listPendingDialogs(): readonly BrowserDialog[];
+  initializeRunPageOwnership?(
+    ownershipId: string,
+    options?: BrowserOperationOptions,
+  ): Promise<void>;
+  prepareTaskPage?(request: {
+    ownershipId: string;
+    startUrl?: string;
+    signal?: AbortSignal;
+  }): Promise<void>;
   closeTaskPages(): Promise<void>;
 }
 ```
@@ -283,16 +323,28 @@ semantics:
 - The returned CDP session is attached to exactly that target.
 - A stale or missing target fails; it never falls back to the first page.
 - The raw provider/CDP URL never leaves the controller.
+- Upload resolves a model-supplied workspace path in the parent, then uses the
+  provider's local-path or remote-byte encoder against the exact backend node;
+  the upload RPC never receives provider credentials and the parent accepts a
+  file only from the current run workspace. The child itself is not a sandbox
+  and retains the application OS user's authority as stated below.
 - `close()` is idempotent and always attempted in `finally`.
-- Browser-level `Target.*` commands may be routed without an attached session,
-  but their results are still associated with this run for page ownership.
+- Browser-level target commands are an owned-target API, not ambient browser
+  authority: inventory is filtered to positively run-owned targets; info,
+  activation, and close reject any other target; creation goes through the
+  durable controller path; every other `Target.*` command fails closed.
+- Model-authored `Browser.*` commands fail closed because they act on the
+  entire managed or attached browser rather than the pinned task page.
 - After the child exits, the controller rescans pages, rotates document state,
   invalidates stale observations, and reports an unusable browser loudly.
 
-Separate budgets govern connection setup, each CDP command, and the whole
-program. A single target-pinned retry is permitted only when a command is known
-not to have committed effects. State-changing calls never replay merely because
-the response was lost.
+Connection setup is bounded by the run deadline. The private protocol applies
+per-message byte ceilings, total and concurrently pending request counts, and
+one whole-program deadline; every CDP command consumes that remaining program
+time. Commands are never replayed automatically. If timeout or cancellation
+leaves a raw command in flight, the command session reports the abandoned
+request and the controller retires that exact owned page before another
+program can use it.
 
 ### 7.3 Run-owned pages
 
@@ -305,6 +357,16 @@ propagates only through evidence that the run caused creation:
 
 A concurrently opened user page with no owned opener is not owned. Internal
 download/PDF pages remain invisible and clean themselves up separately.
+
+Ownership survives a coordinator crash. The controller derives a versioned,
+opaque marker from the durable run identity and installs it before site code
+on every owned document. Attached recovery scans pre-existing targets, closes
+only exact same-run markers, and preserves unrelated user tabs. A separate
+browser-scoped target-control sentinel covers the narrow crash window after
+`Target.createTarget` commits but before the page marker can be installed.
+`prepareTaskPage` performs reclaim, creation, durable claim, and optional
+navigation as one bounded lifecycle operation so late effects remain visible
+to the shared exclusive busy ledger.
 
 `closeTaskPages()` closes the owned page graph in reverse creation order,
 best-effort but exhaustively, then clears active selection. It is invoked in a
@@ -368,8 +430,10 @@ Each call starts a fresh Node child process in `scratch/workspace/`:
 3. Parent sends the source code over IPC, not a command-line argument or env
    variable.
 4. Child evaluates it inside its own process and exposes `browser` as an RPC
-   client. The child may import run-local helper modules with normal relative
-   imports.
+   client. Run-local helper entry modules are loaded explicitly with
+   `browser.importModule(workspacePath)`, which confines and bounds the entry
+   under `scratch/workspace/`. Ordinary relative `import()` resolves beside
+   Sherlock's protected child module and is not the workspace-loading API.
 5. Each `browser.cdp` call carries a request id. Parent validates payload size,
    sends it through the pinned controller session, and replies with a bounded
    result or error.
@@ -383,6 +447,10 @@ This is process isolation for application liveness, not a security sandbox.
 Like `bash`, model code can exercise the OS user's authority. The child boundary
 prevents an accidental `process.exit()` or global mutation from killing or
 corrupting Sherlock's main process; it does not make hostile code safe.
+The parent treats even direct writes to Node's inherited IPC channel as
+untrusted and fails closed on malformed or application-oversized messages.
+That byte check occurs after Node delivers/deserializes a message; it is a
+protocol bound, not a hostile-process memory boundary.
 
 The initial v3 local-execution support contract is POSIX (macOS and Linux),
 matching the existing `/bin/bash` worker tool. `browser_execute` fails before
@@ -422,8 +490,18 @@ interface BrowserProgramApi {
   open(url?: string): Promise<BrowserPageInfo>;
   activate(targetId: string): Promise<void>;
   close(targetId?: string): Promise<void>;
+  importModule(workspacePath: string): Promise<Record<string, unknown>>;
+  upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
 }
 ```
+
+`importModule` validates a no-follow, regular entry file under the run
+workspace and enforces its entry-size bound before import. Nested imports use
+normal Node resolution and are not recursively confined; this is a documented
+same-user, non-sandbox limitation. `upload` sends only a bounded backend node
+id and workspace-relative path over host IPC. The parent revalidates and
+confines the path, applies the provider-specific encoder, and fences any
+late-running upload before command-session detach or run finalization.
 
 Interaction guidance in the static prompt:
 
@@ -878,8 +956,9 @@ the grader contract.
 
 ## 17. Migration and cutover
 
-V3 is developed as a parallel runtime with a temporary internal protocol
-selector. Public callers continue through `runTask` or a compatible adapter.
+V3 was developed as a parallel runtime with a temporary internal protocol
+selector. Public callers stayed on `runTask`; the selector and retired runtime
+were removed after the acceptance cutover.
 
 1. Pin the current baseline and characterize existing failures.
 2. Build/test the browser execution substrate without changing production

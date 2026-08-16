@@ -75,11 +75,13 @@ from manifest entries carrying `requested_output`.
 - **`bash` is bounded but not sandboxed.** It is worker-only, foreground-only,
   package-install-free, and has no browser capability. It runs with the
   application's OS-user authority; do not describe it as a security boundary.
-- **`browser_execute` never exposes CDP authority.** The child talks to a
-  protected parent helper; connection URLs and provider credentials must not
-  enter model output, logs, artifacts, errors, or child environments. A
-  durable `javascriptPolicy: deny` disables the whole tool without changing
-  the static tool prefix.
+- **`browser_execute` never exposes a CDP connection capability.** The child
+  talks to a protected parent helper; connection URLs and provider credentials
+  must not enter model output, logs, artifacts, errors, or child environments.
+  Raw target inventory/mutation is confined to run-owned pages, and the
+  browser-global `Browser.*` domain is denied. A durable
+  `javascriptPolicy: deny` disables the whole tool without changing the static
+  tool prefix.
 - **Crash safety is product behavior.** Checkpoint effect state before and
   after every call, preserve artifact-write journals, use parent-death
   watchdogs for child processes, and reclaim only pages marked for the same
@@ -133,11 +135,13 @@ from manifest entries carrying `requested_output`.
 
 The v3 runtime, attached-local cutover, public composition, TUI/eval adapters,
 legacy-runtime retirement, active documentation, and local final acceptance are
-complete. Production `src` is 31,680 raw lines across 111 files; the complete
-hermetic suite passes 131 files / 1,465 tests, and typecheck is green. The live
-Browserbase smoke, first-use attachment to the user's daily Chrome, and an eval
-re-baseline were not run because they require explicit external authority or
-consume live resources; their status is recorded in the v3 implementation plan.
+complete. The original TypeScript/TSX production convention is now 31,843
+lines across 111 files; the three shipping browser-child/helper `.mjs` files
+add 982 lines. The complete hermetic suite passes 136 files / 1,477 tests, and
+typecheck is green. The live Browserbase smoke, first-use attachment to the
+user's daily Chrome, and an eval re-baseline were not run because they require
+explicit external authority or consume live resources; their status is
+recorded in the v3 implementation plan.
 
 ## Custom Instructions
 

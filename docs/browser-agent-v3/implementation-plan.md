@@ -1,6 +1,7 @@
 # Sherlock v3 implementation plan and progress log
 
-**Status:** complete (local/hermetic acceptance; live external checks explicitly deferred)
+**Status:** complete for local/hermetic acceptance; live external checks are
+explicitly deferred pending user authorization
 
 **Last updated:** 2026-08-15
 
@@ -29,11 +30,11 @@ preserving these product contracts:
 - cancellation, human questions, Langfuse tracing, and provider-secret
   handling.
 
-The implementation strategy is a parallel v3 path, not an in-place rewrite of
-the legacy harness. New v3 modules may reuse stable seams, but they must not
-inherit initializer/contract/table/evidence/scheduler complexity merely to
-avoid writing a smaller coherent replacement. Cutover happens only after the
-new path passes its gates; legacy production wiring is removed afterward.
+The implementation used a parallel v3 path rather than an in-place rewrite of
+the legacy harness. New v3 modules reused stable seams without inheriting
+initializer/contract/table/evidence/scheduler complexity merely to avoid
+writing a smaller coherent replacement. After the new path passed its gates,
+the public cutover and legacy-production removal were completed.
 
 ## Binding decisions
 
@@ -267,16 +268,19 @@ or prompts name removed tools/protocols; focused and full tests pass.
 
 - [x] Run `npm run typecheck`.
 - [x] Run the complete hermetic `npm test` suite.
-- [x] Run fixture-backed acceptance journeys for table, screenshot/download,
-  multi-page synthesis, human handoff, cancellation, and crash/resume.
+- [x] Run direct fixture-backed acceptance journeys for table,
+  screenshot/download, multi-page synthesis, human handoff, cancellation, and
+  every named crash/resume boundary.
 - [x] Evaluate the Browserbase smoke gate. It was not run because it is
   live/billable and the user did not authorize it; remote behavior remains
   explicitly unverified rather than inferred from fakes.
 - [x] Run a secret sweep over representative run directories.
 - [x] Inspect final diff, production import graph, tool order/schema snapshot,
   manifest outputs, transcript, metrics, checkpoints, and owned tabs.
-- [x] Complete the requirement-to-evidence matrix in this file.
-- [x] Record final line/file/test deltas and residual risks.
+- [x] Complete the requirement-to-evidence matrix with direct rather than
+  inferred evidence.
+- [x] Refresh final line/file/test deltas and residual risks after the added
+  acceptance evidence.
 
 **Gate:** every explicit objective and design requirement has direct current
 evidence. Passing narrow tests alone is not completion.
@@ -288,9 +292,9 @@ proved, even if supporting code already exists.
 
 | Requirement | Authoritative evidence | Status |
 | --- | --- | --- |
-| Expanded v3 design | Design document reviewed against code | Complete |
+| Expanded v3 design | Design document reviewed against code | Complete; final API/module/authority drift closed |
 | Durable step plan/progress | This file | Complete; maintained continuously |
-| Browser-harness reference used | Pinned commit plus design adaptation table | Complete |
+| Browser-harness reference used | Pinned commit plus design adaptation table | Complete; official `6a80dbb` sources reverified |
 | Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete |
 | Editable run helpers and reviewed promotion | Confined import/upload journey; static prompt; evidence-only patch/metadata finish test; verified TUI grouping | Complete |
 | Compact v3 tool surface | Registry/schema snapshot | Complete for Step 3 |
@@ -303,7 +307,7 @@ proved, even if supporting code already exists.
 | Owned tabs always cleaned | Terminal lifecycle + real SIGKILL attached-ownership tests | Complete |
 | Secrets/CDP capability never leak | Child-env/redaction gate + recursive representative run-directory sentinel sweep | Complete locally |
 | No task-specific logic | Production source/prompt/helper audit | Complete; no task-name/text dispatch branch |
-| Full implementation complete | Steps 0–7 and final audit | Complete locally; external live measurements listed below |
+| Full implementation complete | Steps 0–7 and final audit | Complete locally; external live measurements remain separately deferred |
 
 ## Progress log / handoff notes
 
@@ -1074,6 +1078,76 @@ proved, even if supporting code already exists.
   run-local module loader retains the documented narrow same-user TOCTOU and
   normal nested-import resolution; `bash` and model-authored browser programs
   remain explicitly non-sandboxed OS-user capabilities.
+
+### 2026-08-15 — Step 7 direct-evidence re-audit closed
+
+- Re-read the design against the completed tree and reverified the official
+  `browser-use/browser-harness` commit
+  `6a80dbbce51e8c1776af061282546627f007be4e`. The design now links its exact
+  `run.py`, daemon, helper, IPC, and telemetry sources and distinguishes the
+  borrowed programmable-CDP idea from Sherlock's bounded child lifecycle,
+  provider-secret boundary, durable ownership, artifacts, verifier, TUI, and
+  eval systems.
+- Replaced the remaining inferred acceptance claims with these direct current
+  journeys:
+
+  | Journey | Direct evidence |
+  | --- | --- |
+  | Exact public CSV | `src/cli/runTask.test.ts` — public initializer/worker/verifier run, exact columns/row count, hashes, secret sweep, terminal projections, and owned-page cleanup |
+  | Screenshot/download and TUI-to-grader | `tests/tui/tui-to-grader.test.ts` — ordered UI events, exact capture bytes/provenance/roles, manifest selection, and a grader that still succeeds after transcript deletion |
+  | Multi-page synthesis | `src/v3/tools/multiPageSynthesis.integration.test.ts` — run-local helper, two owned pages, one published document, filtered target inventory, and preserved ambient page |
+  | Human handoff | `tests/tui/run-session.test.ts` — announced/answered `ask_user`, cancellation while paused, and headless fail-closed continuation |
+  | Cancellation containment | `tests/tui/cancellation-acceptance.test.ts` — real browser/Bash child groups and descendants die, partial workspace is reconciled, locks/pages close, and the next task succeeds in the same browser session |
+  | Crash/resume boundaries | `src/v3/run/coordinator.crash.test.ts` — real second-process kills at model, pre-tool, uncertain-tool, post-tool, checking/correction, and verifier-accounting boundaries |
+  | Provider parity | `src/browser/providerContract.integration.test.ts` — managed local, attached local, and Browserbase fake share command/upload/download/redaction/cleanup/idempotence behavior |
+  | Ambient target authority | `src/browser/browserTargetAuthority.integration.test.ts` — attached Chrome exposes only owned targets; known ambient IDs cannot be inspected, activated, attached, or closed; all `Browser.*` commands fail closed |
+  | Static prefix | `src/v3/systemPrompt.test.ts` and `src/v3/tools/index.test.ts` — the exact frozen eight-tool prefix is invariant across tasks, providers, policy, and secret denylists |
+
+- The re-audit found and fixed one genuine authority defect rather than
+  declaring completion around it: a page-attached CDP session could enumerate
+  or mutate pre-existing attached-browser targets. The private command-session
+  policy now filters `Target.getTargets`, authorizes info/activate/close only
+  for current run-owned targets, routes creation through durable ownership,
+  rejects every other `Target.*`, and rejects the browser-global `Browser.*`
+  domain. A merged real-browser/provider gate passes 8 files / 82 tests.
+- Closed two smaller helper-boundary gaps: workspace module entry size and
+  fresh child/module state now have direct regressions, and deliberate direct
+  writes to Node IPC are proved to fail closed when malformed or oversized.
+  The IPC ceiling is honestly documented as application-level after Node
+  delivery, not as hostile-process memory isolation.
+- Final gates: `npm run typecheck -- --pretty false` passes;
+  `git diff --check` passes; and the complete hermetic suite passes 136/136
+  files and 1,477/1,477 tests in 82.67 seconds. The first complete pass exposed
+  one test-only Bash cancellation race: a fixed sleep could abort before the
+  asserted readiness file existed under suite load. The test now waits for
+  that exact condition; its focused 13/13 gate and the subsequent full suite
+  pass.
+- The prompt/tool-prefix SHA-256 remains
+  `f8f94520d78221dcf36c184681faeb80c56414aa5d591088c384ea171e235e88`.
+  The model-facing order remains exactly `browser_execute`,
+  `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
+  `ask_user`, `finish`. The target-authority fix changes neither prompt nor
+  schema.
+- Final raw-line accounting is intentionally two-view. Under the original
+  TypeScript/TSX audit convention, production `src` is 31,843 lines across 111
+  files and every tracked test is 37,103 lines across 136 files. The three
+  shipping `.mjs` browser-child/helper files add 982 lines, so total shipping
+  source is 32,825 lines across 114 files. The tree has 483 tracked files.
+  Against the temporary coexistence peak, like-for-like TypeScript production
+  is down 19,366 lines/56 files (37.8%), tests are down 14,782 lines/39 files
+  (28.5%), and combined counted code is down 34,148 lines (33.1%). Against the
+  pre-v3 baseline, TypeScript production is 1,714 lines smaller while tests are
+  645 lines larger; including the new `.mjs` runtime, total production plus
+  tests is essentially flat (87 lines smaller) while direct acceptance grows
+  materially. That is the honest trade: the simplification is structural —
+  one runtime and deleted legacy mechanisms — not formatting/comment gaming,
+  and the final safety audit deliberately added code and tests.
+- The branch from `bbe94ac` is 38 commits / 303 files /
+  +44,018/-42,930 textual lines. That rewrite-heavy diff is not presented as
+  SLOC reduction. No live/billable Browserbase smoke, daily-browser first-use
+  attachment, or live-site eval re-baseline ran without user authorization;
+  those remain external measurements rather than local implementation
+  blockers.
 
 ## Rules for coordinators and subagents
 
