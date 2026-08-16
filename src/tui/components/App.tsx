@@ -13,7 +13,7 @@ import type {
   PermissionDecision,
   PermissionRequest,
 } from '../../tools/registry.js';
-import type { AskUserAnswers } from '../../tools/index.js';
+import type { AskUserAnswers } from '../../v3/tools/askUser.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
 import { scanRuns, type RunListEntry } from '../runScanner.js';

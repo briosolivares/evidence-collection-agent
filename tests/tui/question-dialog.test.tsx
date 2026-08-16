@@ -18,7 +18,6 @@ vi.setConfig({ testTimeout: 30_000 });
 
 const config = createConfig();
 const DOWN = '[B';
-const TAB = '\t';
 
 /** A fake runner that stays live forever and exposes the App-provided
  * requestPermission callback, so tests can pose questions on demand. */
@@ -46,7 +45,7 @@ function interactiveRunner() {
       if (requestPermission === undefined) {
         throw new Error('runner was not called with requestPermission');
       }
-      return requestPermission({ toolName: 'ask_user_question', input });
+      return requestPermission({ toolName: 'ask_user', input });
     },
   };
 }
@@ -70,16 +69,16 @@ async function startRunWithQuestion(input: unknown) {
 }
 
 describe('QuestionDialog in the App', () => {
-  it('renders the question, header chip, and options above the composer', async () => {
+  it('renders the v3 question, context, and options above the composer', async () => {
     const { lastFrame, decision, stdin, unmount } = await startRunWithQuestion({
       question: 'Complete the login in the browser window, then tell me.',
-      header: 'Login',
+      context: 'Use the already-open account; do not create a new one.',
       options: [{ label: 'Done', description: 'I logged in' }, { label: 'Skip it' }],
     });
 
     const frame = lastFrame() ?? '';
-    expect(frame).toContain('Login');
     expect(frame).toContain('Complete the login in the browser window');
+    expect(frame).toContain('Use the already-open account');
     expect(frame).toContain('Done');
     expect(frame).toContain('I logged in');
     expect(frame).toContain('Skip it');
@@ -132,30 +131,6 @@ describe('QuestionDialog in the App', () => {
     unmount();
   });
 
-  it('toggles options with Tab under multi_select and submits the set', async () => {
-    const { decision, stdin, unmount } = await startRunWithQuestion({
-      question: 'Which pages should I check?',
-      options: [{ label: 'Profile' }, { label: 'Replies' }, { label: 'Media' }],
-      multi_select: true,
-    });
-
-    stdin.write(TAB); // toggle Profile
-    await tick();
-    stdin.write(DOWN);
-    await tick();
-    stdin.write(TAB); // toggle Replies
-    await tick();
-    stdin.write(ENTER);
-
-    const resolved = await decision;
-    expect(resolved.behavior).toBe('allow');
-    if (resolved.behavior !== 'allow') throw new Error('unreachable');
-    expect(
-      (resolved.updatedInput as { answers: { chosen: string[] } }).answers.chosen,
-    ).toEqual(['Profile', 'Replies']);
-    unmount();
-  });
-
   it('Esc denies with the fixed dismissal feedback and the run continues', async () => {
     const { decision, stdin, lastFrame, unmount } = await startRunWithQuestion({
       question: 'Proceed?',
@@ -183,7 +158,7 @@ describe('permission_request in the reducer', () => {
     state = reduce(state, { type: 'text_delta', text: 'One question first.' });
     state = reduce(state, {
       type: 'permission_request',
-      toolName: 'ask_user_question',
+      toolName: 'ask_user',
       input: { question: 'Hm?' },
     });
 
