@@ -5,7 +5,10 @@ import { join } from 'node:path';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BrowserContext, CDPSession, Page } from 'playwright';
 
-import { openPlaywrightCommandSession } from './browserCommandSession.js';
+import {
+  openPlaywrightCommandSession,
+  type BrowserTargetCommandPolicy,
+} from './browserCommandSession.js';
 import type { BrowserController } from './controller.js';
 import { LocalChromeBrowserSessionProvider } from './playwrightBrowserController.js';
 import type { BrowserUploadEncoder, UploadPayload } from './uploadEncoder.js';
@@ -32,6 +35,19 @@ async function waitForPages(
     }
     await new Promise((resolve) => setTimeout(resolve, 20));
   }
+}
+
+function allowOwnedTargets(...initialTargetIds: string[]): BrowserTargetCommandPolicy {
+  const targetIds = new Set(initialTargetIds);
+  return {
+    ownedTargetIds: async () => new Set(targetIds),
+    createTarget: async (params, rawCreate) => {
+      const result = await rawCreate(params);
+      const targetId = (result as { targetId?: unknown })?.targetId;
+      if (typeof targetId === 'string') targetIds.add(targetId);
+      return result;
+    },
+  };
 }
 
 describe('PlaywrightBrowserController command sessions', () => {
@@ -240,7 +256,9 @@ describe('command-session transport boundary', () => {
 
   it('detaches exactly once, rejects later sends, and retains only safe identity', async () => {
     const { context, page, send, detach } = fakeTarget();
-    const session = await openPlaywrightCommandSession(context, page, 'page-exact');
+    const session = await openPlaywrightCommandSession(context, page, 'page-exact', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+    });
 
     expect(session.pageId).toBe('page-exact');
     expect(session.targetId).toBe('target-exact');
@@ -253,11 +271,113 @@ describe('command-session transport boundary', () => {
     await expect(session.send('Runtime.evaluate')).rejects.toThrow(/closed/i);
   });
 
+  it('filters target inventory and refuses ambient or non-whitelisted target commands', async () => {
+    const targetInfos = [
+      {
+        targetId: 'target-exact',
+        type: 'page',
+        title: 'Owned main',
+        url: 'about:blank#owned-main',
+      },
+      {
+        targetId: 'target-owned-popup',
+        type: 'page',
+        title: 'Owned popup',
+        url: 'about:blank#owned-popup',
+      },
+      {
+        targetId: 'target-ambient-secret',
+        type: 'page',
+        title: 'Ambient secret title',
+        url: 'https://ambient.example.test/private',
+      },
+    ];
+    const send = vi.fn(
+      async (method: string, params: Record<string, unknown> = {}) => {
+        if (method === 'Target.getTargets') return { targetInfos };
+        if (method === 'Target.getTargetInfo') {
+          const requested =
+            typeof params.targetId === 'string' ? params.targetId : 'target-exact';
+          return {
+            targetInfo: targetInfos.find((target) => target.targetId === requested),
+          };
+        }
+        if (method === 'Target.activateTarget') return {};
+        if (method === 'Target.closeTarget') return { success: true };
+        throw new Error(`unexpected raw command ${method}`);
+      },
+    );
+    const detach = vi.fn(async () => undefined);
+    const page = { isClosed: () => false } as unknown as Page;
+    const context = {
+      newCDPSession: vi.fn(async () => ({ send, detach })),
+    } as unknown as BrowserContext;
+    const session = await openPlaywrightCommandSession(
+      context,
+      page,
+      'page-exact',
+      {
+        targetPolicy: allowOwnedTargets(
+          'target-exact',
+          'target-owned-popup',
+        ),
+      },
+    );
+
+    expect(await session.send('Target.getTargets')).toEqual({
+      targetInfos: targetInfos.slice(0, 2),
+    });
+    expect(await session.send('Target.getTargetInfo')).toEqual({
+      targetInfo: targetInfos[0],
+    });
+    expect(
+      await session.send('Target.getTargetInfo', {
+        targetId: 'target-owned-popup',
+      }),
+    ).toEqual({ targetInfo: targetInfos[1] });
+    await expect(
+      session.send('Target.activateTarget', {
+        targetId: 'target-owned-popup',
+      }),
+    ).resolves.toEqual({});
+    await expect(
+      session.send('Target.closeTarget', {
+        targetId: 'target-owned-popup',
+      }),
+    ).resolves.toEqual({ success: true });
+
+    for (const [method, params] of [
+      ['Target.getTargetInfo', { targetId: 'target-ambient-secret' }],
+      ['Target.activateTarget', { targetId: 'target-ambient-secret' }],
+      ['Target.closeTarget', { targetId: 'target-ambient-secret' }],
+      ['Target.attachToTarget', { targetId: 'target-ambient-secret', flatten: true }],
+      ['Target.setDiscoverTargets', { discover: true }],
+      ['Browser.close', {}],
+      ['Browser.crash', {}],
+      ['Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: '/tmp' }],
+    ] as const) {
+      const callsBefore = send.mock.calls.length;
+      let message = '';
+      try {
+        await session.send(method, params);
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error);
+      }
+      expect(message).toMatch(/not allowed|outside this run/i);
+      expect(message).not.toContain('target-ambient-secret');
+      expect(send).toHaveBeenCalledTimes(callsBefore);
+    }
+
+    await session.close();
+  });
+
   it('redacts a provider connection URL from command errors', async () => {
     const { context, page } = fakeTarget({
       commandError: new Error(`transport failed at ${PRIVATE_CONNECT_URL}`),
     });
-    const session = await openPlaywrightCommandSession(context, page, 'page-safe');
+    const session = await openPlaywrightCommandSession(context, page, 'page-safe', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+    });
 
     let message = '';
     try {
@@ -307,7 +427,10 @@ describe('command-session transport boundary', () => {
       context,
       page,
       'page-exact',
-      { uploadEncoder },
+      {
+        targetPolicy: allowOwnedTargets('target-exact'),
+        uploadEncoder,
+      },
     );
 
     await session.upload(73, '/confined/workspace/evidence.csv');
@@ -377,6 +500,7 @@ describe('command-session transport boundary', () => {
       page,
       'page-late',
       {
+        targetPolicy: allowOwnedTargets('target-late'),
         uploadEncoder,
         trackUploadEffect: (effect) =>
           busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect),
@@ -428,12 +552,13 @@ describe('command-session transport boundary', () => {
 
   it('reports only an exact successful Target.createTarget result to the ownership hook', async () => {
     const { context, page, send } = fakeTarget();
-    const onTargetCreated = vi.fn(async () => undefined);
+    const targetPolicy = allowOwnedTargets('target-exact');
+    const createTarget = vi.spyOn(targetPolicy, 'createTarget');
     const session = await openPlaywrightCommandSession(
       context,
       page,
       'page-safe',
-      { onTargetCreated },
+      { targetPolicy },
     );
     send.mockResolvedValueOnce({ targetId: 'target-created-by-run' });
 
@@ -442,9 +567,8 @@ describe('command-session transport boundary', () => {
     ).toEqual({ targetId: 'target-created-by-run' });
     await session.send('Runtime.evaluate', { expression: '1' });
 
-    expect(onTargetCreated).toHaveBeenCalledExactlyOnceWith(
-      'target-created-by-run',
-    );
+    expect(createTarget).toHaveBeenCalledOnce();
+    expect(await targetPolicy.ownedTargetIds()).toContain('target-created-by-run');
     await session.close();
   });
 
@@ -455,7 +579,10 @@ describe('command-session transport boundary', () => {
       context,
       page,
       'page-safe',
-      { handleDialogCommand },
+      {
+        targetPolicy: allowOwnedTargets('target-exact'),
+        handleDialogCommand,
+      },
     );
 
     await session.send('Runtime.evaluate', { expression: '1' });
@@ -480,7 +607,10 @@ describe('command-session transport boundary', () => {
       context,
       page,
       'page-safe',
-      { release },
+      {
+        targetPolicy: allowOwnedTargets('target-exact'),
+        release,
+      },
     );
 
     await session.close();
@@ -514,7 +644,10 @@ describe('command-session transport boundary', () => {
       context,
       page,
       'page-busy',
-      { release },
+      {
+        targetPolicy: allowOwnedTargets('target-exact'),
+        release,
+      },
     );
 
     void session.send('Runtime.evaluate', {

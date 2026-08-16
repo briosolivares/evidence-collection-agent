@@ -71,6 +71,11 @@ describe('Sherlock v3 multi-page synthesis acceptance', () => {
             '<title>User workspace</title><h1 id="user-marker">Leave me open</h1>',
           )}`,
         );
+        const userCommandSession = await context.newCDPSession(userPage);
+        const ambientTargetId = (
+          await userCommandSession.send('Target.getTargetInfo')
+        ).targetInfo.targetId;
+        await userCommandSession.detach();
         const preexistingPages = [...context.pages()];
         const targetControl = await createChromiumTargetControl({
           context,
@@ -117,7 +122,14 @@ describe('Sherlock v3 multi-page synthesis acceptance', () => {
                 }
                 const fact = await helper.capturePage(browser, 'Main page');
                 const secondPage = await browser.open('about:blank');
-                return { fact, secondPage };
+                let ambientCloseError;
+                try {
+                  await browser.close(${JSON.stringify(ambientTargetId)});
+                } catch (error) {
+                  ambientCloseError = error instanceof Error ? error.message : String(error);
+                }
+                const inventory = await browser.pages();
+                return { fact, secondPage, inventory, ambientCloseError };
               `,
             },
           },
@@ -136,8 +148,18 @@ describe('Sherlock v3 multi-page synthesis acceptance', () => {
               heading: 'Browser controller fixture',
               url: mainUrl,
             },
+            inventory: expect.arrayContaining([
+              expect.objectContaining({ url: mainUrl }),
+              expect.objectContaining({ url: 'about:blank' }),
+            ]),
+            ambientCloseError: expect.stringMatching(/outside this run/i),
           },
         });
+        expect(
+          (mainResult.value as { inventory: unknown[] }).inventory,
+        ).toHaveLength(2);
+        expect(JSON.stringify(mainResult.value)).not.toContain('User workspace');
+        expect(JSON.stringify(mainResult.value)).not.toContain('user-marker');
         expect(mainResult.pages).toHaveLength(2);
         const secondPage = mainResult.pages.find((page) => !page.active);
         expect(secondPage).toBeDefined();

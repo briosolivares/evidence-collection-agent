@@ -18,15 +18,24 @@ type ArbitraryCdpSend = (
   params?: Record<string, unknown>,
 ) => Promise<unknown>;
 
+/**
+ * Controller-owned authority policy for browser-scoped Target commands.
+ *
+ * Kept on this private Playwright composition seam rather than the public
+ * BrowserController contract: model-authored code receives only the filtered
+ * BrowserCommandSession, never this policy or its raw target identities.
+ */
+export interface BrowserTargetCommandPolicy {
+  ownedTargetIds(): Promise<ReadonlySet<string>>;
+  createTarget(
+    params: Record<string, unknown>,
+    rawCreate: (params: Record<string, unknown>) => Promise<unknown>,
+  ): Promise<unknown>;
+}
+
 export interface PlaywrightCommandSessionHooks {
-  /** Replace raw Target.createTarget with a controller-owned crash-recoverable
-   * creation path. The hook returns the ordinary CDP result shape, but the
-   * target is durably claimed before that result reaches the caller. */
-  createTargetCommand?: (params: Record<string, unknown>) => Promise<unknown>;
-  /** Called after Chrome confirms a raw Target.createTarget command. The
-   * controller uses the returned target id to claim only that page for task
-   * cleanup; a concurrent user-created page is never inferred as owned. */
-  onTargetCreated?: (targetId: string) => Promise<void>;
+  /** Required authority boundary for every browser-scoped Target command. */
+  targetPolicy: BrowserTargetCommandPolicy;
   /** Route dialog decisions through the controller's cached Playwright
    * Dialog. A prior timed-out evaluation may still own the original CDP
    * command, so a second raw session cannot reliably address it directly. */
@@ -101,6 +110,114 @@ async function detachWithoutHanging(session: CDPSession): Promise<void> {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function responseTargetId(value: unknown, operation: string): string {
+  if (!isRecord(value) || !isRecord(value.targetInfo)) {
+    throw new Error(`${operation} returned an invalid response.`);
+  }
+  const targetId = value.targetInfo.targetId;
+  if (typeof targetId !== 'string' || targetId.length === 0) {
+    throw new Error(`${operation} returned an invalid target identity.`);
+  }
+  return targetId;
+}
+
+function requiredTargetId(
+  params: Record<string, unknown>,
+  operation: string,
+): string {
+  const targetId = params.targetId;
+  if (typeof targetId !== 'string' || targetId.length === 0) {
+    throw new TypeError(`${operation} requires a non-empty targetId.`);
+  }
+  return targetId;
+}
+
+async function requireOwnedTarget(
+  targetId: string,
+  policy: BrowserTargetCommandPolicy,
+): Promise<void> {
+  if (!(await policy.ownedTargetIds()).has(targetId)) {
+    throw new Error('Target command refused because the target is outside this run.');
+  }
+}
+
+function filteredTargetInventory(
+  response: unknown,
+  ownedTargetIds: ReadonlySet<string>,
+): Record<string, unknown> {
+  if (!isRecord(response) || !Array.isArray(response.targetInfos)) {
+    throw new Error('Target.getTargets returned an invalid response.');
+  }
+  const targetInfos = response.targetInfos.map((value) => {
+    if (!isRecord(value) || typeof value.targetId !== 'string' || value.targetId.length === 0) {
+      throw new Error('Target.getTargets returned an invalid target record.');
+    }
+    return value;
+  });
+  return {
+    ...response,
+    targetInfos: targetInfos.filter((target) =>
+      ownedTargetIds.has(target.targetId as string),
+    ),
+  };
+}
+
+async function sendTargetCommand(
+  method: string,
+  params: Record<string, unknown>,
+  pinnedTargetId: string,
+  send: ArbitraryCdpSend,
+  policy: BrowserTargetCommandPolicy,
+): Promise<unknown> {
+  switch (method) {
+    case 'Target.createTarget': {
+      const response = await policy.createTarget(
+        params,
+        (rawParams) => send('Target.createTarget', rawParams),
+      );
+      if (!isRecord(response) || typeof response.targetId !== 'string' || response.targetId.length === 0) {
+        throw new Error('Target.createTarget returned an invalid response.');
+      }
+      await requireOwnedTarget(response.targetId, policy);
+      return response;
+    }
+    case 'Target.getTargets': {
+      const ownedTargetIds = await policy.ownedTargetIds();
+      return filteredTargetInventory(
+        await send('Target.getTargets', params),
+        ownedTargetIds,
+      );
+    }
+    case 'Target.getTargetInfo': {
+      if (!Object.hasOwn(params, 'targetId')) {
+        const response = await send('Target.getTargetInfo', params);
+        if (responseTargetId(response, 'Target.getTargetInfo') !== pinnedTargetId) {
+          throw new Error('Target.getTargetInfo did not return the pinned target.');
+        }
+        return response;
+      }
+      const targetId = requiredTargetId(params, 'Target.getTargetInfo');
+      await requireOwnedTarget(targetId, policy);
+      const response = await send('Target.getTargetInfo', params);
+      if (responseTargetId(response, 'Target.getTargetInfo') !== targetId) {
+        throw new Error('Target.getTargetInfo returned a different target.');
+      }
+      return response;
+    }
+    case 'Target.activateTarget':
+    case 'Target.closeTarget': {
+      await requireOwnedTarget(requiredTargetId(params, method), policy);
+      return send(method, params);
+    }
+    default:
+      throw new Error(`CDP command ${method} is not allowed for browser programs.`);
+  }
+}
+
 /**
  * Attach one Playwright CDP session to an already-resolved page.
  *
@@ -113,7 +230,7 @@ export async function openPlaywrightCommandSession(
   context: BrowserContext,
   page: Page,
   pageId: string,
-  hooks: PlaywrightCommandSessionHooks = {},
+  hooks: PlaywrightCommandSessionHooks,
 ): Promise<BrowserCommandSession> {
   if (page.isClosed()) {
     throw new Error(`Cannot open a browser command session: pageId ${pageId} is closed.`);
@@ -164,22 +281,22 @@ export async function openPlaywrightCommandSession(
       }
       const operation = (async (): Promise<unknown> => {
         try {
-          const result =
-            method === 'Page.handleJavaScriptDialog' &&
-            hooks.handleDialogCommand !== undefined
-              ? await hooks.handleDialogCommand(params ?? {})
-              : method === 'Target.createTarget' &&
-                  hooks.createTargetCommand !== undefined
-                ? await hooks.createTargetCommand(params ?? {})
-                : await send(method, params);
-          if (method === 'Target.createTarget' && hooks.onTargetCreated !== undefined) {
-            const createdTargetId = (result as { targetId?: unknown })?.targetId;
-            if (typeof createdTargetId !== 'string' || createdTargetId.length === 0) {
-              throw new Error('Target.createTarget returned no target id');
-            }
-            await hooks.onTargetCreated(createdTargetId);
+          if (method.startsWith('Browser.')) {
+            throw new Error(`CDP command ${method} is not allowed for browser programs.`);
           }
-          return result;
+          if (method.startsWith('Target.')) {
+            return await sendTargetCommand(
+              method,
+              params ?? {},
+              targetId,
+              send,
+              hooks.targetPolicy,
+            );
+          }
+          return method === 'Page.handleJavaScriptDialog' &&
+            hooks.handleDialogCommand !== undefined
+            ? await hooks.handleDialogCommand(params ?? {})
+            : await send(method, params);
         } catch (error) {
           throw commandError(
             `CDP command ${JSON.stringify(method)} failed for pageId ${pageId}`,

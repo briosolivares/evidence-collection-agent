@@ -33,7 +33,10 @@ import {
 } from '../tools/registry.js';
 import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
-import { openPlaywrightCommandSession } from './browserCommandSession.js';
+import {
+  openPlaywrightCommandSession,
+  type BrowserTargetCommandPolicy,
+} from './browserCommandSession.js';
 import {
   ChromiumTargetControlError,
   createChromiumTargetControl,
@@ -473,20 +476,27 @@ export class PlaywrightBrowserController implements BrowserController {
         ? this.registerPage(this.requirePage())
         : this.requireTrackedPage(pageId);
     const epoch = this.captureRunPageOwnershipEpoch();
+    const targetPolicy: BrowserTargetCommandPolicy = {
+      ownedTargetIds: () => this.ownedTargetIdsForCommand(epoch),
+      createTarget: async (params, rawCreate) => {
+        if (epoch.marker !== undefined) {
+          return this.createRawRunTarget(params, epoch);
+        }
+        const result = await rawCreate(params);
+        const targetId = (result as { targetId?: unknown })?.targetId;
+        if (typeof targetId !== 'string' || targetId.length === 0) {
+          throw new Error('Target.createTarget returned no target id');
+        }
+        await this.claimRawCreatedTarget(targetId, epoch);
+        return result;
+      },
+    };
     return openPlaywrightCommandSession(
       this.context,
       record.page,
       record.pageId,
       {
-        ...(epoch.marker === undefined
-          ? {
-              onTargetCreated: (targetId: string) =>
-                this.claimRawCreatedTarget(targetId, epoch),
-            }
-          : {
-              createTargetCommand: (params: Record<string, unknown>) =>
-                this.createRawRunTarget(params, epoch),
-            }),
+        targetPolicy,
         handleDialogCommand: (params) =>
           this.handleRawDialogCommand(record.pageId, params),
         uploadEncoder: this.uploadEncoder,
@@ -500,6 +510,42 @@ export class PlaywrightBrowserController implements BrowserController {
           ),
       },
     );
+  }
+
+  /**
+   * Resolve the complete target authority for one command-session epoch.
+   * Pending opener/creation claims are drained and external pages reconciled
+   * before taking the snapshot; unrelated context pages remain excluded.
+   */
+  private async ownedTargetIdsForCommand(
+    epoch: RunPageOwnershipEpoch,
+  ): Promise<ReadonlySet<string>> {
+    this.requireOpenContext();
+    this.requireHealthyRunPageOwnership();
+    if (!this.isCurrentRunPageOwnershipEpoch(epoch)) {
+      throw new Error(
+        'The browser command session belongs to an ended task-page ownership epoch.',
+      );
+    }
+
+    await this.drainPendingPageClaims();
+    await this.reconcileExternalPages();
+    await this.drainPendingPageClaims();
+    this.requireHealthyRunPageOwnership();
+
+    const targetIds = new Set<string>();
+    for (const page of this.ownedPages) {
+      if (page.isClosed()) continue;
+      const targetId = await this.targetIdForPage(page);
+      if (targetId === undefined) {
+        throw new Error('Could not resolve the complete owned browser target inventory.');
+      }
+      targetIds.add(targetId);
+    }
+    for (const [targetId, generation] of this.pendingOwnedTargetIds) {
+      if (generation === epoch.generation) targetIds.add(targetId);
+    }
+    return targetIds;
   }
 
   private createRawRunTarget(
