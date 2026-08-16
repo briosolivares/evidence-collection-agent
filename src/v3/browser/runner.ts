@@ -15,6 +15,10 @@ export const BROWSER_PROGRAM_LIMITS = Object.freeze({
   maxProgramTimeoutMs: 120_000,
   maxCdpCalls: 1_000,
   maxPendingCdpCalls: 32,
+  maxHostCalls: 32,
+  maxPendingHostCalls: 8,
+  maxWorkspacePathBytes: 4_096,
+  maxUploadFileBytes: 64 * 1024 * 1024,
 });
 
 const PROTOCOL_VERSION = 1;
@@ -67,6 +71,9 @@ export interface BrowserProgramOptions {
   abortSignal?: AbortSignal;
   /** Parent-owned, target-pinned CDP sender. It must not expose a CDP URL. */
   sendCdp(method: string, params: Record<string, unknown>): Promise<unknown>;
+  /** Parent-owned upload effect. The implementation must confine workspacePath
+   * before invoking the exact target-pinned command session. */
+  upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
 }
 
 export interface BrowserProgramResult {
@@ -243,6 +250,7 @@ function validateOptions(options: BrowserProgramOptions): void {
     );
   }
   if (typeof options.sendCdp !== 'function') throw new TypeError('sendCdp must be a function');
+  if (typeof options.upload !== 'function') throw new TypeError('upload must be a function');
   if (
     !Number.isInteger(options.timeoutMs) ||
     options.timeoutMs <= 0 ||
@@ -389,7 +397,9 @@ export async function runBrowserProgram(
     let stderrEnded = false;
     let outputBytes = 0;
     let cdpCallCount = 0;
+    let hostCallCount = 0;
     const pendingCdp = new Set<number>();
+    const pendingHost = new Set<number>();
     const stdoutChunks: Buffer[] = [];
     const stderrChunks: Buffer[] = [];
 
@@ -649,6 +659,27 @@ export async function runBrowserProgram(
       });
     };
 
+    const replyToHost = (id: number, error?: unknown): void => {
+      if (settled || outcome) return;
+      sendToChild(
+        error === undefined
+          ? {
+              version: PROTOCOL_VERSION,
+              kind: 'host_response',
+              id,
+              ok: true,
+              value: null,
+            }
+          : {
+              version: PROTOCOL_VERSION,
+              kind: 'host_response',
+              id,
+              ok: false,
+              error: structuredError(error),
+            },
+      );
+    };
+
     const handleCdpRequest = (message: Record<string, unknown>): void => {
       const id = message.id;
       const method = message.method;
@@ -668,7 +699,7 @@ export async function runBrowserProgram(
         return;
       }
       const requestId = id as number;
-      if (pendingCdp.has(requestId)) {
+      if (pendingCdp.has(requestId) || pendingHost.has(requestId)) {
         beginTermination({
           status: 'protocol_error',
           error: protocolError(`child reused pending CDP request id ${requestId}`),
@@ -694,6 +725,74 @@ export async function runBrowserProgram(
           (error: unknown) => replyToCdp(requestId, false, error),
         )
         .finally(() => pendingCdp.delete(requestId));
+    };
+
+    const handleHostRequest = (message: Record<string, unknown>): void => {
+      const id = message.id;
+      const operation = message.operation;
+      const params = message.params;
+      if (
+        !Number.isSafeInteger(id) ||
+        (id as number) <= 0 ||
+        operation !== 'upload' ||
+        !isRecord(params) ||
+        !Number.isInteger(params.backendDOMNodeId) ||
+        (params.backendDOMNodeId as number) <= 0 ||
+        (params.backendDOMNodeId as number) > 2_147_483_647 ||
+        typeof params.workspacePath !== 'string' ||
+        params.workspacePath.length === 0 ||
+        Buffer.byteLength(params.workspacePath, 'utf8') >
+          BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes ||
+        Object.keys(message).some(
+          (key) =>
+            key !== 'version' &&
+            key !== 'kind' &&
+            key !== 'id' &&
+            key !== 'operation' &&
+            key !== 'params',
+        ) ||
+        Object.keys(params).some(
+          (key) => key !== 'backendDOMNodeId' && key !== 'workspacePath',
+        )
+      ) {
+        beginTermination({
+          status: 'protocol_error',
+          error: protocolError('child sent a malformed browser host request'),
+        });
+        return;
+      }
+      const requestId = id as number;
+      if (pendingHost.has(requestId) || pendingCdp.has(requestId)) {
+        beginTermination({
+          status: 'protocol_error',
+          error: protocolError(`child reused pending request id ${requestId}`),
+        });
+        return;
+      }
+      hostCallCount += 1;
+      if (
+        hostCallCount > BROWSER_PROGRAM_LIMITS.maxHostCalls ||
+        pendingHost.size >= BROWSER_PROGRAM_LIMITS.maxPendingHostCalls
+      ) {
+        beginTermination({
+          status: 'protocol_error',
+          error: protocolError('browser program exceeded its host request budget'),
+        });
+        return;
+      }
+      pendingHost.add(requestId);
+      Promise.resolve()
+        .then(() =>
+          options.upload(
+            params.backendDOMNodeId as number,
+            params.workspacePath as string,
+          ),
+        )
+        .then(
+          () => replyToHost(requestId),
+          (error: unknown) => replyToHost(requestId, error),
+        )
+        .finally(() => pendingHost.delete(requestId));
     };
 
     const handleProgramResult = (message: Record<string, unknown>): void => {
@@ -845,6 +944,8 @@ export async function runBrowserProgram(
       }
       if (rawMessage.kind === 'cdp_request') {
         handleCdpRequest(rawMessage);
+      } else if (rawMessage.kind === 'host_request') {
+        handleHostRequest(rawMessage);
       } else if (rawMessage.kind === 'program_result') {
         handleProgramResult(rawMessage);
       } else {

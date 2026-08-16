@@ -1,4 +1,12 @@
-import { mkdirSync } from 'node:fs';
+import {
+  closeSync,
+  constants as fsConstants,
+  fstatSync,
+  lstatSync,
+  mkdirSync,
+  openSync,
+} from 'node:fs';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
@@ -31,6 +39,8 @@ export const MAX_BROWSER_EXECUTE_TIMEOUT_MS =
   BROWSER_PROGRAM_LIMITS.maxProgramTimeoutMs;
 export const BROWSER_EXECUTE_MAX_OUTPUT_BYTES =
   BROWSER_PROGRAM_LIMITS.maxCaptureOutputBytes;
+export const BROWSER_UPLOAD_MAX_FILE_BYTES =
+  BROWSER_PROGRAM_LIMITS.maxUploadFileBytes;
 
 export const BROWSER_EXECUTE_POLICY_DENIED_MESSAGE =
   'browser_execute is disabled for this run (javascriptPolicy=deny). ' +
@@ -118,9 +128,11 @@ export function createBrowserExecuteTool(
     description:
       'Run one bounded async JavaScript program against an exact browser page. The program ' +
       'receives `browser`, which provides raw CDP plus protected inspection, interaction, ' +
-      'navigation, wait, tab, and dialog helpers. Use page_id to target a page returned by a ' +
-      'prior result; omit it for the active task page. Intermediate files belong in the ' +
-      'current scratch/workspace directory and are reconciled into changed_files. The child ' +
+      'navigation, wait, tab, dialog, confined importModule, and upload helpers. ' +
+      'browser.upload targets a backend DOM node and a path relative to scratch/workspace. ' +
+      'Use page_id to target a page returned by a prior result; omit it for the active task ' +
+      'page. Intermediate files belong in the current scratch/workspace directory and are ' +
+      'reconciled into changed_files. The child ' +
       'receives no CDP URL or provider/model/tracing secret. This is powerful local code, not ' +
       'a security sandbox, and the call always runs alone.',
     inputSchema: browserExecuteInputSchema,
@@ -202,6 +214,13 @@ async function executeBrowserProgram(
         targetId: commandSession.targetId,
       },
       sendCdp: (method, params) => commandSession!.send(method, params),
+      upload: async (backendDOMNodeId, workspacePath) => {
+        const absolutePath = resolveWorkspaceUploadPath(
+          workspaceDir,
+          workspacePath,
+        );
+        await commandSession!.upload(backendDOMNodeId, absolutePath);
+      },
     });
   } catch (error) {
     executionError = error;
@@ -245,6 +264,104 @@ function requireBrowser(
     throw new Error('browser_execute requires an active browser session.');
   }
   return browser;
+}
+
+function resolveWorkspaceUploadPath(
+  workspaceDir: string,
+  workspacePath: string,
+): string {
+  const workspaceStats = lstatSync(workspaceDir);
+  if (workspaceStats.isSymbolicLink()) {
+    throw new Error('browser.upload scratch/workspace root must not be a symbolic link');
+  }
+  if (!workspaceStats.isDirectory()) {
+    throw new Error('browser.upload scratch/workspace root must be a directory');
+  }
+  if (
+    typeof workspacePath !== 'string' ||
+    workspacePath.length === 0 ||
+    Buffer.byteLength(workspacePath, 'utf8') >
+      BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes
+  ) {
+    throw new Error(
+      `browser.upload workspace path must contain 1 through ` +
+        `${BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes} UTF-8 bytes`,
+    );
+  }
+  if (workspacePath.includes('\0')) {
+    throw new Error('browser.upload workspace path must not contain a NUL byte');
+  }
+  if (isAbsolute(workspacePath)) {
+    throw new Error('browser.upload workspace path must be relative');
+  }
+  if (workspacePath.split(/[\\/]+/u).includes('..')) {
+    throw new Error('browser.upload path must stay within scratch/workspace');
+  }
+
+  const absolutePath = resolve(workspaceDir, workspacePath);
+  const confined = relative(workspaceDir, absolutePath);
+  if (
+    confined === '' ||
+    confined === '..' ||
+    confined.startsWith(`..${sep}`) ||
+    isAbsolute(confined)
+  ) {
+    throw new Error('browser.upload path must name a file within scratch/workspace');
+  }
+
+  const components = confined.split(sep);
+  let current = workspaceDir;
+  for (const [index, component] of components.entries()) {
+    current = resolve(current, component);
+    let stats;
+    try {
+      stats = lstatSync(current);
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      throw new Error(
+        `browser.upload file ${JSON.stringify(workspacePath)} is unavailable` +
+          (code === undefined ? '' : ` (${code})`),
+      );
+    }
+    if (stats.isSymbolicLink()) {
+      throw new Error('browser.upload path must not contain symbolic links');
+    }
+    const isEntry = index === components.length - 1;
+    if (!isEntry && !stats.isDirectory()) {
+      throw new Error('browser.upload parent must be a directory');
+    }
+    if (isEntry && !stats.isFile()) {
+      throw new Error('browser.upload path must name a regular file');
+    }
+  }
+
+  const flags =
+    fsConstants.O_RDONLY |
+    (fsConstants.O_NOFOLLOW ?? 0) |
+    (fsConstants.O_NONBLOCK ?? 0);
+  let fd: number;
+  try {
+    fd = openSync(absolutePath, flags);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
+      throw new Error('browser.upload path must not contain symbolic links');
+    }
+    throw error;
+  }
+  try {
+    const stats = fstatSync(fd);
+    if (!stats.isFile()) {
+      throw new Error('browser.upload path must name a regular file');
+    }
+    if (stats.size > BROWSER_UPLOAD_MAX_FILE_BYTES) {
+      throw new Error(
+        `browser.upload file exceeds ${BROWSER_UPLOAD_MAX_FILE_BYTES} bytes`,
+      );
+    }
+  } finally {
+    closeSync(fd);
+  }
+  return absolutePath;
 }
 
 function emptyResult(status: BrowserProgramStatus): BrowserExecuteResult {

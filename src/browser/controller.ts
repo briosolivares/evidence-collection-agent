@@ -154,6 +154,10 @@ export interface BrowserCommandSession {
   readonly targetId: string;
   /** Send one arbitrary Chrome DevTools Protocol command to this target. */
   send(method: string, params?: Record<string, unknown>): Promise<unknown>;
+  /** Attach one already-confined local file to a file input identified by a
+   * backend DOM node id from this exact target. The controller's provider
+   * encoder decides whether Playwright receives a local path or file bytes. */
+  upload(backendDOMNodeId: number, absolutePath: string): Promise<void>;
   /** Detach the underlying CDP session. Repeated calls are safe. */
   close(): Promise<void>;
 }

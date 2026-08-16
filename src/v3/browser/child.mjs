@@ -90,7 +90,7 @@ function requestCdp(method, params) {
     params,
   };
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve, reject });
+    pending.set(id, { resolve, reject, responseKind: 'cdp_response' });
     const sent = sendBounded(message, (error) => {
       if (!error) return;
       const entry = pending.get(id);
@@ -101,6 +101,32 @@ function requestCdp(method, params) {
     if (!sent && pending.has(id)) {
       pending.delete(id);
       reject(new Error('failed to send browser CDP request'));
+    }
+  });
+}
+
+function requestHost(operation, params) {
+  if (finished) return Promise.reject(new Error('browser program already finished'));
+  const id = nextRequestId++;
+  const message = {
+    version: PROTOCOL_VERSION,
+    kind: 'host_request',
+    id,
+    operation,
+    params,
+  };
+  return new Promise((resolve, reject) => {
+    pending.set(id, { resolve, reject, responseKind: 'host_response' });
+    const sent = sendBounded(message, (error) => {
+      if (!error) return;
+      const entry = pending.get(id);
+      if (!entry) return;
+      pending.delete(id);
+      entry.reject(error);
+    });
+    if (!sent && pending.has(id)) {
+      pending.delete(id);
+      reject(new Error('failed to send browser host request'));
     }
   });
 }
@@ -134,7 +160,7 @@ function normalizedResult(value) {
 
 async function execute(code, page) {
   try {
-    const browser = createBrowserApi(requestCdp, page);
+    const browser = createBrowserApi(requestCdp, requestHost, page);
     const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
     const program = new AsyncFunction(
       'browser',
@@ -209,14 +235,20 @@ process.on('message', (message) => {
     return;
   }
 
-  if (message.kind === 'cdp_response') {
+  if (message.kind === 'cdp_response' || message.kind === 'host_response') {
     if (!started || !Number.isSafeInteger(message.id) || message.id <= 0 || typeof message.ok !== 'boolean') {
-      failProtocol('browser program received a malformed CDP response');
+      failProtocol('browser program received a malformed request response');
       return;
     }
     const entry = pending.get(message.id);
     if (!entry) {
-      failProtocol(`browser program received a response for unknown CDP request ${message.id}`);
+      failProtocol(`browser program received a response for unknown request ${message.id}`);
+      return;
+    }
+    if (entry.responseKind !== message.kind) {
+      failProtocol(
+        `browser program received ${message.kind} for a pending ${entry.responseKind}`,
+      );
       return;
     }
     pending.delete(message.id);
@@ -224,11 +256,20 @@ process.on('message', (message) => {
       entry.resolve(message.value);
     } else {
       const error = isRecord(message.error) ? message.error : {};
-      const cdpError = new Error(
-        typeof error.message === 'string' ? error.message : 'CDP command failed',
+      const requestError = new Error(
+        typeof error.message === 'string'
+          ? error.message
+          : message.kind === 'cdp_response'
+            ? 'CDP command failed'
+            : 'browser host request failed',
       );
-      cdpError.name = typeof error.name === 'string' ? error.name : 'CdpError';
-      entry.reject(cdpError);
+      requestError.name =
+        typeof error.name === 'string'
+          ? error.name
+          : message.kind === 'cdp_response'
+            ? 'CdpError'
+            : 'HostError';
+      entry.reject(requestError);
     }
     return;
   }

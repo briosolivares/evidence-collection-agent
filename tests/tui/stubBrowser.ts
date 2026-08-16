@@ -96,6 +96,7 @@ export function stubBrowser(): BrowserController {
       pageId,
       targetId: 'target-stub',
       send: vi.fn(async () => ({})),
+      upload: vi.fn(async () => {}),
       close: vi.fn(async () => {}),
     })),
     refreshAfterExternalCommands: vi.fn(async () => {}),

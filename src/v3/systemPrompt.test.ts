@@ -13,6 +13,10 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain('backend DOM node and box model');
     expect(V3_SYSTEM_PROMPT).toContain('verify the specific postcondition');
     expect(V3_SYSTEM_PROMPT).toContain('raw cdp as an escape hatch');
+    expect(V3_SYSTEM_PROMPT).toContain('browser.importModule(workspacePath)');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'browser.upload(backendDOMNodeId, workspacePath)',
+    );
     expect(V3_SYSTEM_PROMPT).toContain(
       'Only the two newest successful browser_execute results remain fully expanded',
     );

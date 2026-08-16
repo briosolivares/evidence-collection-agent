@@ -2,6 +2,9 @@ import {
   existsSync,
   mkdtempSync,
   rmSync,
+  symlinkSync,
+  truncateSync,
+  unlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,6 +27,7 @@ import type {
 import {
   BROWSER_EXECUTE_MAX_OUTPUT_BYTES,
   BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
+  BROWSER_UPLOAD_MAX_FILE_BYTES,
   DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS,
   MAX_BROWSER_EXECUTE_TIMEOUT_MS,
   createBrowserExecuteTool,
@@ -67,10 +71,12 @@ function fakeBrowser(options: FakeBrowserOptions = {}) {
     events.push('close');
     if (options.closeError) throw options.closeError;
   });
+  const upload = vi.fn(async () => undefined);
   const session: BrowserCommandSession = {
     pageId: 'page-task',
     targetId: 'target-task',
     send,
+    upload,
     close,
   };
   const openCommandSession = vi.fn(async () => {
@@ -101,6 +107,7 @@ function fakeBrowser(options: FakeBrowserOptions = {}) {
     browser,
     session,
     send,
+    upload,
     close,
     openCommandSession,
     refreshAfterExternalCommands,
@@ -152,6 +159,7 @@ describe('browser_execute tool', () => {
         expression: '21 * 2',
       });
       writeFileSync(join(options.cwd, 'notes.txt'), 'durable scratch bytes');
+      await options.upload(73, 'notes.txt');
       return exited({
         value: { cdpValue },
         stdout: 'program output\n',
@@ -200,6 +208,10 @@ describe('browser_execute tool', () => {
     expect(fake.send).toHaveBeenCalledExactlyOnceWith('Runtime.evaluate', {
       expression: '21 * 2',
     });
+    expect(fake.upload).toHaveBeenCalledExactlyOnceWith(
+      73,
+      join(runDir, 'scratch/workspace/notes.txt'),
+    );
     expect(fake.events).toEqual([
       'open',
       'run',
@@ -211,6 +223,44 @@ describe('browser_execute tool', () => {
     expect(JSON.stringify(result)).not.toContain('configured-secret');
     expect(JSON.stringify(result)).not.toContain('tracing-secret');
     expect(JSON.stringify(result)).not.toContain('secret.example');
+  });
+
+  it('rejects traversal, symlink, and oversized upload paths before a browser effect', async () => {
+    const fake = fakeBrowser();
+    const runProgram = vi.fn(async (options: BrowserProgramOptions) => {
+      writeFileSync(join(options.cwd, 'real.csv'), 'name\nAda\n');
+      symlinkSync('real.csv', join(options.cwd, 'linked.csv'));
+      writeFileSync(join(options.cwd, 'oversized.bin'), '');
+      truncateSync(
+        join(options.cwd, 'oversized.bin'),
+        BROWSER_UPLOAD_MAX_FILE_BYTES + 1,
+      );
+      const failures: string[] = [];
+      for (const path of ['../outside.csv', 'linked.csv', 'oversized.bin']) {
+        try {
+          await options.upload(73, path);
+        } catch (error) {
+          failures.push(error instanceof Error ? error.message : String(error));
+        }
+      }
+      unlinkSync(join(options.cwd, 'linked.csv'));
+      unlinkSync(join(options.cwd, 'oversized.bin'));
+      return exited({ value: failures });
+    });
+
+    const result = await callTool(
+      { javascriptPolicy: 'allow', secretEnvDenylist: [], runProgram },
+      fake.browser,
+      { code: `return 'test seam';` },
+    );
+
+    expect(result.isError, result.content).toBe(false);
+    expect(parseSuccess(result.content).value).toEqual([
+      expect.stringContaining('must stay within scratch/workspace'),
+      expect.stringContaining('must not contain symbolic links'),
+      expect.stringContaining(`exceeds ${BROWSER_UPLOAD_MAX_FILE_BYTES} bytes`),
+    ]);
+    expect(fake.upload).not.toHaveBeenCalled();
   });
 
   it('refuses deny before controller, session, child, helper, environment, or workspace access', async () => {

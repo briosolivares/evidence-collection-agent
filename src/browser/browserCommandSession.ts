@@ -1,11 +1,19 @@
+import { randomUUID } from 'node:crypto';
+
 import type { BrowserContext, CDPSession, Page } from 'playwright';
 
 import type { BrowserCommandSession } from './controller.js';
+import {
+  localUploadEncoder,
+  type BrowserUploadEncoder,
+} from './uploadEncoder.js';
 
 /** Transport URLs are session-control capabilities. Even if a driver error
  * happens to echo one, it must stop at this controller-owned boundary. */
 const TRANSPORT_URL = /\b(?:https?|wss?):\/\/[^\s"'<>]+/giu;
 const DETACH_DEADLINE_MS = 1_000;
+const UPLOAD_TIMEOUT_MS = 5_000;
+const UPLOAD_MARKER_ATTRIBUTE = 'data-sherlock-upload-target';
 
 type ArbitraryCdpSend = (
   method: string,
@@ -25,9 +33,101 @@ export interface PlaywrightCommandSessionHooks {
    * Dialog. A prior timed-out evaluation may still own the original CDP
    * command, so a second raw session cannot reliably address it directly. */
   handleDialogCommand?: (params: Record<string, unknown>) => Promise<unknown>;
+  /** Provider-specific file preparation. Local Chrome receives the confined
+   * path; a remote browser receives a Playwright FilePayload with bytes. */
+  uploadEncoder?: BrowserUploadEncoder;
+  /** Register the complete upload effect in the controller's shared busy
+   * ledger. A timed-out child may stop awaiting it, but cleanup and later
+   * exclusive calls must still see it until the real effect settles. */
+  trackUploadEffect?: (effect: Promise<void>) => void;
   /** Release the caller's session. The controller may take ownership of the
    * bounded detacher until a blocking dialog is answered. */
   release?: (detach: () => Promise<void>) => Promise<void>;
+}
+
+function runtimeException(response: unknown): string | undefined {
+  const details = (response as { exceptionDetails?: unknown })?.exceptionDetails;
+  if (details === undefined) return undefined;
+  const record = details as {
+    text?: unknown;
+    exception?: { description?: unknown; value?: unknown };
+  };
+  if (typeof record.exception?.description === 'string') {
+    return record.exception.description;
+  }
+  if (record.exception?.value !== undefined) return String(record.exception.value);
+  return typeof record.text === 'string' ? record.text : 'browser upload marker failed';
+}
+
+async function uploadToBackendNode(
+  page: Page,
+  send: ArbitraryCdpSend,
+  uploadEncoder: BrowserUploadEncoder,
+  backendDOMNodeId: number,
+  absolutePath: string,
+): Promise<void> {
+  // Encode/read before touching the page. A missing or unreadable file must
+  // fail before even the temporary marker becomes observable in the document.
+  const encoded = await uploadEncoder.encode([absolutePath]);
+  const resolved = (await send('DOM.resolveNode', { backendNodeId: backendDOMNodeId })) as {
+    object?: { objectId?: unknown };
+  };
+  const objectId = resolved.object?.objectId;
+  if (typeof objectId !== 'string' || objectId.length === 0) {
+    throw new Error(`DOM.resolveNode returned no object for backend node ${backendDOMNodeId}`);
+  }
+
+  const marker = randomUUID();
+  try {
+    const marked = await send('Runtime.callFunctionOn', {
+      objectId,
+      functionDeclaration: `function(attribute, marker) {
+        if (!(this instanceof HTMLInputElement) || this.type !== 'file') {
+          throw new TypeError('browser.upload target must be an input[type=file]');
+        }
+        this.setAttribute(attribute, marker);
+      }`,
+      arguments: [
+        { value: UPLOAD_MARKER_ATTRIBUTE },
+        { value: marker },
+      ],
+      returnByValue: true,
+    });
+    const markerError = runtimeException(marked);
+    if (markerError !== undefined) throw new Error(markerError);
+
+    const selector = `[${UPLOAD_MARKER_ATTRIBUTE}="${marker}"]`;
+    let target: ReturnType<Page['locator']> | undefined;
+    for (const frame of page.frames()) {
+      const candidate = frame.locator(selector);
+      const count = await candidate.count();
+      if (count === 0) continue;
+      if (count !== 1 || target !== undefined) {
+        throw new Error('browser.upload temporary target marker was not unique');
+      }
+      target = candidate;
+    }
+    if (target === undefined) {
+      throw new Error('browser.upload target disappeared before the file could be attached');
+    }
+    await target.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
+  } finally {
+    // Marker/object cleanup is best-effort because navigation can destroy the
+    // execution context after a successful input event. Both cleanup actions
+    // are still attempted on every path and never replace the primary result.
+    await send('Runtime.callFunctionOn', {
+      objectId,
+      functionDeclaration: `function(attribute, marker) {
+        if (this.getAttribute?.(attribute) === marker) this.removeAttribute(attribute);
+      }`,
+      arguments: [
+        { value: UPLOAD_MARKER_ATTRIBUTE },
+        { value: marker },
+      ],
+      returnByValue: true,
+    }).catch(() => undefined);
+    await send('Runtime.releaseObject', { objectId }).catch(() => undefined);
+  }
 }
 
 function errorText(error: unknown): string {
@@ -92,6 +192,7 @@ export async function openPlaywrightCommandSession(
   }
 
   const send = arbitrarySend(session);
+  const uploadEncoder = hooks.uploadEncoder ?? localUploadEncoder;
   let targetId: string;
   try {
     const response = await send('Target.getTargetInfo');
@@ -114,6 +215,7 @@ export async function openPlaywrightCommandSession(
 
   let closed = false;
   let closePromise: Promise<void> | undefined;
+  const inFlightUploads = new Set<Promise<void>>();
   const commandSession: BrowserCommandSession = {
     pageId,
     targetId,
@@ -145,15 +247,49 @@ export async function openPlaywrightCommandSession(
         );
       }
     },
+    upload(backendDOMNodeId, absolutePath) {
+      if (closed) {
+        return Promise.reject(
+          new Error(`Browser command session for pageId ${pageId} is closed.`),
+        );
+      }
+      const effect = uploadToBackendNode(
+        page,
+        send,
+        uploadEncoder,
+        backendDOMNodeId,
+        absolutePath,
+      ).catch((error: unknown) => {
+        throw commandError(
+          `Browser upload failed for pageId ${pageId}`,
+          error,
+        );
+      });
+      const settled = effect.then(
+        () => undefined,
+        () => undefined,
+      );
+      inFlightUploads.add(settled);
+      void settled.then(() => inFlightUploads.delete(settled));
+      hooks.trackUploadEffect?.(effect);
+      return effect;
+    },
     close() {
       if (closePromise !== undefined) {
         return closePromise;
       }
       closed = true;
-      // Detach is cleanup: it is attempted exactly once and cannot mask the
-      // command/program outcome merely because the target disappeared first.
-      const detach = () => detachWithoutHanging(session);
-      closePromise = hooks.release?.(detach) ?? detach();
+      closePromise = (async () => {
+        // A child timeout can abandon its awaited host reply while the
+        // provider is still reading bytes or setting the input. Keep this
+        // exact session attached, and block the caller's refresh, until every
+        // effect that began before close has really stopped touching it.
+        await Promise.all([...inFlightUploads]);
+        // Detach is cleanup: it is attempted exactly once and cannot mask the
+        // command/program outcome merely because the target disappeared first.
+        const detach = () => detachWithoutHanging(session);
+        await (hooks.release?.(detach) ?? detach());
+      })();
       return closePromise;
     },
   };

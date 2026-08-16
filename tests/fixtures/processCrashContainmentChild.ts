@@ -72,5 +72,6 @@ async function main(): Promise<void> {
     timeoutMs: 120_000,
     maxOutputBytes: 1_000_000,
     sendCdp: async () => ({}),
+    upload: async () => undefined,
   });
 }

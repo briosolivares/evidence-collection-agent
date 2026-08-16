@@ -8,6 +8,12 @@ import type { BrowserContext, CDPSession, Page } from 'playwright';
 import { openPlaywrightCommandSession } from './browserCommandSession.js';
 import type { BrowserController } from './controller.js';
 import { LocalChromeBrowserSessionProvider } from './playwrightBrowserController.js';
+import type { BrowserUploadEncoder, UploadPayload } from './uploadEncoder.js';
+import {
+  createBusyResourceRegistry,
+  EXCLUSIVE_ACCESS,
+} from '../tools/registry.js';
+import { runBrowserProgram } from '../v3/browser/runner.js';
 
 const TEST_TIMEOUT_MS = 15_000;
 const PRIVATE_CONNECT_URL =
@@ -130,7 +136,13 @@ describe('PlaywrightBrowserController command sessions', () => {
     async () => {
       const session = await controller.openCommandSession();
 
-      expect(Object.keys(session).sort()).toEqual(['close', 'pageId', 'send', 'targetId']);
+      expect(Object.keys(session).sort()).toEqual([
+        'close',
+        'pageId',
+        'send',
+        'targetId',
+        'upload',
+      ]);
       expect(JSON.stringify(session)).not.toMatch(/(?:wss?|https?):\/\//i);
       expect(JSON.stringify(session)).not.toContain(PRIVATE_CONNECT_URL);
       await session.close();
@@ -253,6 +265,159 @@ describe('command-session transport boundary', () => {
     }
     expect(message).toContain('[redacted URL]');
     expect(message).not.toContain(PRIVATE_CONNECT_URL);
+  });
+
+  it('encodes a remote upload as bytes, targets the exact backend node, and cleans its marker', async () => {
+    const setInputFiles = vi.fn(async () => undefined);
+    const locator = {
+      count: vi.fn(async () => 1),
+      setInputFiles,
+    };
+    const page = {
+      isClosed: () => false,
+      frames: () => [{ locator: vi.fn(() => locator) }],
+    } as unknown as Page;
+    const send = vi.fn(async (method: string) => {
+      if (method === 'Target.getTargetInfo') {
+        return { targetInfo: { targetId: 'target-exact' } };
+      }
+      if (method === 'DOM.resolveNode') {
+        return { object: { objectId: 'upload-object' } };
+      }
+      return {};
+    });
+    const detach = vi.fn(async () => undefined);
+    const context = {
+      newCDPSession: vi.fn(async () => ({ send, detach })),
+    } as unknown as BrowserContext;
+    const payload: UploadPayload = {
+      name: 'evidence.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from('name\nAda\n'),
+    };
+    const uploadEncoder: BrowserUploadEncoder = {
+      encode: vi.fn(async () => [payload]),
+    };
+    const session = await openPlaywrightCommandSession(
+      context,
+      page,
+      'page-exact',
+      { uploadEncoder },
+    );
+
+    await session.upload(73, '/confined/workspace/evidence.csv');
+
+    expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith([
+      '/confined/workspace/evidence.csv',
+    ]);
+    expect(send).toHaveBeenCalledWith('DOM.resolveNode', { backendNodeId: 73 });
+    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith(
+      [payload],
+      { timeout: 5_000 },
+    );
+    expect(
+      send.mock.calls.filter(([method]) => method === 'Runtime.callFunctionOn'),
+    ).toHaveLength(2);
+    expect(send).toHaveBeenCalledWith('Runtime.releaseObject', {
+      objectId: 'upload-object',
+    });
+    await session.close();
+  });
+
+  it('fences and drains an upload that outlives the browser-program timeout', async () => {
+    let releaseEncoding!: () => void;
+    const encodingGate = new Promise<void>((resolve) => {
+      releaseEncoding = resolve;
+    });
+    const payload: UploadPayload = {
+      name: 'late.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from('name\nLate\n'),
+    };
+    const uploadEncoder: BrowserUploadEncoder = {
+      encode: vi.fn(async () => {
+        await encodingGate;
+        return [payload];
+      }),
+    };
+    const setInputFiles = vi.fn(async () => undefined);
+    const page = {
+      isClosed: () => false,
+      frames: () => [
+        {
+          locator: vi.fn(() => ({
+            count: vi.fn(async () => 1),
+            setInputFiles,
+          })),
+        },
+      ],
+    } as unknown as Page;
+    const send = vi.fn(async (method: string) => {
+      if (method === 'Target.getTargetInfo') {
+        return { targetInfo: { targetId: 'target-late' } };
+      }
+      if (method === 'DOM.resolveNode') {
+        return { object: { objectId: 'late-upload-object' } };
+      }
+      return {};
+    });
+    const detach = vi.fn(async () => undefined);
+    const context = {
+      newCDPSession: vi.fn(async () => ({ send, detach })),
+    } as unknown as BrowserContext;
+    const busyRegistry = createBusyResourceRegistry();
+    const session = await openPlaywrightCommandSession(
+      context,
+      page,
+      'page-late',
+      {
+        uploadEncoder,
+        trackUploadEffect: (effect) =>
+          busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect),
+      },
+    );
+
+    const program = runBrowserProgram({
+      code: `await browser.upload(91, 'late.csv');`,
+      cwd: process.cwd(),
+      env: { PATH: process.env.PATH },
+      page: { pageId: session.pageId, targetId: session.targetId },
+      timeoutMs: 1_000,
+      maxOutputBytes: 1_000_000,
+      sendCdp: (method, params) => session.send(method, params),
+      upload: (backendDOMNodeId, workspacePath) =>
+        session.upload(backendDOMNodeId, `/confined/${workspacePath}`),
+    });
+    await vi.waitFor(() => expect(uploadEncoder.encode).toHaveBeenCalledOnce());
+    const result = await program;
+
+    expect(result.status).toBe('timed_out');
+    expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith([
+      '/confined/late.csv',
+    ]);
+    await expect(
+      busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10),
+    ).resolves.toBe(false);
+
+    let closeSettled = false;
+    const close = session.close().then(() => {
+      closeSettled = true;
+    });
+    await Promise.resolve();
+    expect(closeSettled).toBe(false);
+    expect(detach).not.toHaveBeenCalled();
+
+    releaseEncoding();
+    await close;
+
+    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith(
+      [payload],
+      { timeout: 5_000 },
+    );
+    expect(detach).toHaveBeenCalledOnce();
+    await expect(
+      busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 100),
+    ).resolves.toBe(true);
   });
 
   it('reports only an exact successful Target.createTarget result to the ownership hook', async () => {

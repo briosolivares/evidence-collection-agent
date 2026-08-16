@@ -1,10 +1,14 @@
+import { constants as fsConstants } from 'node:fs';
+import { lstat, open, realpath } from 'node:fs/promises';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
 /**
  * Protected browser-program helpers.
  *
- * This module deliberately knows nothing about a browser connection. Every
- * operation is composed from the one `requestCdp` capability supplied by the
- * child runner, so a CDP URL or provider credential can never enter this
- * layer.
+ * This module deliberately knows nothing about a browser connection. Browser
+ * operations use `requestCdp`; the one host file effect uses `requestHost`.
+ * Neither closure reveals a CDP URL or provider credential to this layer.
  */
 
 const MAX_STRING_ARGUMENT_BYTES = 256_000;
@@ -12,6 +16,8 @@ const MAX_AX_NODES = 1_000;
 const MAX_AX_DEPTH = 50;
 const MAX_WAIT_MS = 120_000;
 const MAX_DIALOG_PROMPT_BYTES = 16_384;
+const MAX_WORKSPACE_PATH_BYTES = 4_096;
+const MAX_WORKSPACE_MODULE_BYTES = 1_048_576;
 
 const KEY_DEFINITIONS = Object.freeze({
   Enter: [13, 'Enter', '\r'],
@@ -226,6 +232,84 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function workspaceModulePath(workspacePath) {
+  boundedString(workspacePath, 'workspace module path', {
+    maxBytes: MAX_WORKSPACE_PATH_BYTES,
+  });
+  if (workspacePath.includes('\0')) {
+    throw new TypeError('workspace module path must not contain a NUL byte');
+  }
+  if (isAbsolute(workspacePath)) {
+    throw new Error('workspace module path must be relative');
+  }
+  if (workspacePath.split(/[\\/]+/u).includes('..')) {
+    throw new Error('workspace module path must stay within scratch/workspace');
+  }
+
+  const workspaceRoot = await realpath(process.cwd());
+  const candidate = resolve(workspaceRoot, workspacePath);
+  const confined = relative(workspaceRoot, candidate);
+  if (
+    confined === '' ||
+    confined === '..' ||
+    confined.startsWith(`..${sep}`) ||
+    isAbsolute(confined)
+  ) {
+    throw new Error('workspace module path must name a file within scratch/workspace');
+  }
+
+  const components = confined.split(sep);
+  let current = workspaceRoot;
+  for (const [index, component] of components.entries()) {
+    current = resolve(current, component);
+    let stats;
+    try {
+      stats = await lstat(current);
+    } catch (error) {
+      const code = typeof error?.code === 'string' ? ` (${error.code})` : '';
+      throw new Error(`workspace module ${JSON.stringify(workspacePath)} is unavailable${code}`);
+    }
+    if (stats.isSymbolicLink()) {
+      throw new Error('workspace module path must not contain symbolic links');
+    }
+    const isEntry = index === components.length - 1;
+    if (!isEntry && !stats.isDirectory()) {
+      throw new Error('workspace module parent must be a directory');
+    }
+    if (isEntry && !stats.isFile()) {
+      throw new Error('workspace module must be a regular file');
+    }
+  }
+
+  const flags =
+    fsConstants.O_RDONLY |
+    (fsConstants.O_NOFOLLOW ?? 0) |
+    (fsConstants.O_NONBLOCK ?? 0);
+  let handle;
+  try {
+    handle = await open(current, flags);
+  } catch (error) {
+    if (error?.code === 'ELOOP') {
+      throw new Error('workspace module path must not contain symbolic links');
+    }
+    throw error;
+  }
+  try {
+    const stats = await handle.stat();
+    if (!stats.isFile()) {
+      throw new Error('workspace module must be a regular file');
+    }
+    if (stats.size > MAX_WORKSPACE_MODULE_BYTES) {
+      throw new RangeError(
+        `workspace module exceeds ${MAX_WORKSPACE_MODULE_BYTES} bytes`,
+      );
+    }
+  } finally {
+    await handle.close();
+  }
+  return current;
+}
+
 function pageFromTargetInfo(targetInfo, pageId) {
   const targetId = boundedString(targetInfo?.targetId, 'target targetId');
   return {
@@ -247,10 +331,11 @@ function normalizedInitialPage(value) {
 
 /**
  * Build the frozen browser API made visible to one browser program.
- * `requestCdp` is an RPC closure owned by child.mjs.
+ * Both RPC closures are owned by child.mjs and expose no transport authority.
  */
-export function createBrowserApi(requestCdp, initialPageIdentity) {
+export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
   if (typeof requestCdp !== 'function') throw new TypeError('requestCdp must be a function');
+  if (typeof requestHost !== 'function') throw new TypeError('requestHost must be a function');
   const initialPage = normalizedInitialPage(initialPageIdentity);
 
   const cdp = async (method, params = {}) => {
@@ -481,6 +566,24 @@ export function createBrowserApi(requestCdp, initialPageIdentity) {
     });
   };
 
+  const importModule = async (workspacePath) => {
+    const modulePath = await workspaceModulePath(workspacePath);
+    return import(pathToFileURL(modulePath).href);
+  };
+
+  const upload = async (backendDOMNodeId, workspacePath) => {
+    boundedInteger(
+      backendDOMNodeId,
+      'upload backendDOMNodeId',
+      1,
+      2_147_483_647,
+    );
+    boundedString(workspacePath, 'upload workspace path', {
+      maxBytes: MAX_WORKSPACE_PATH_BYTES,
+    });
+    await requestHost('upload', { backendDOMNodeId, workspacePath });
+  };
+
   return Object.freeze({
     cdp,
     js,
@@ -498,5 +601,7 @@ export function createBrowserApi(requestCdp, initialPageIdentity) {
     open,
     activate,
     close,
+    importModule,
+    upload,
   });
 }

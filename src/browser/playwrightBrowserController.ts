@@ -821,6 +821,9 @@ export class PlaywrightBrowserController implements BrowserController {
             }),
         handleDialogCommand: (params) =>
           this.handleRawDialogCommand(record.pageId, params),
+        uploadEncoder: this.uploadEncoder,
+        trackUploadEffect: (effect) =>
+          this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, effect),
         release: (detach) =>
           this.releaseCommandSession(record.pageId, detach),
       },

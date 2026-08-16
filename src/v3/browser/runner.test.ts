@@ -1,4 +1,10 @@
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -92,6 +98,7 @@ function options(
     timeoutMs: DEFAULT_TIMEOUT_MS,
     maxOutputBytes: DEFAULT_OUTPUT_BYTES,
     sendCdp: async () => ({}),
+    upload: async () => undefined,
     ...overrides,
   };
 }
@@ -116,6 +123,123 @@ describe('runBrowserProgram', () => {
     expect(result.error).toBeUndefined();
     expect(sendCdp).toHaveBeenCalledOnce();
     expect(sendCdp).toHaveBeenCalledWith('Example.echo', { answer: 42 });
+  });
+
+  it('routes a bounded upload request over host IPC without exposing browser authority', async () => {
+    const upload = vi.fn(async () => undefined);
+
+    const result = await runBrowserProgram(
+      options(
+        `await browser.upload(73, 'evidence.csv'); return 'attached';`,
+        { upload },
+      ),
+    );
+
+    expect(result).toMatchObject({ status: 'exited', value: 'attached' });
+    expect(upload).toHaveBeenCalledExactlyOnceWith(73, 'evidence.csv');
+  });
+
+  it('bounds upload paths and host request count before forwarding effects', async () => {
+    const oversizedUpload = vi.fn(async () => undefined);
+    const oversized = await runBrowserProgram(
+      options(
+        `return browser.upload(1, 'x'.repeat(${BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes + 1}));`,
+        { upload: oversizedUpload },
+      ),
+    );
+    expect(oversized).toMatchObject({ status: 'failed' });
+    expect(oversized.error?.message).toContain('upload workspace path exceeds');
+    expect(oversizedUpload).not.toHaveBeenCalled();
+
+    const upload = vi.fn(async () => undefined);
+    const budget = await runBrowserProgram(
+      options(
+        `for (let index = 0; index <= ${BROWSER_PROGRAM_LIMITS.maxHostCalls}; index += 1) {
+          await browser.upload(1, 'evidence.csv');
+        }`,
+        { upload },
+      ),
+    );
+    expect(budget).toMatchObject({ status: 'protocol_error' });
+    expect(budget.error?.message).toContain('host request budget');
+    expect(upload).toHaveBeenCalledTimes(BROWSER_PROGRAM_LIMITS.maxHostCalls);
+  });
+
+  it('rejects malformed host IPC and redacts upload-effect errors', async () => {
+    const malformedUpload = vi.fn(async () => undefined);
+    const malformed = await runBrowserProgram(
+      options(
+        `process.send({
+          version: 1,
+          kind: 'host_request',
+          id: 1,
+          operation: 'upload',
+          params: { backendDOMNodeId: 1, workspacePath: 'x.csv', extra: true }
+        });
+        await new Promise(() => {});`,
+        { upload: malformedUpload },
+      ),
+    );
+    expect(malformed).toMatchObject({ status: 'protocol_error' });
+    expect(malformed.error?.message).toContain('malformed browser host request');
+    expect(malformedUpload).not.toHaveBeenCalled();
+
+    const redacted = await runBrowserProgram(
+      options(`return browser.upload(1, 'evidence.csv');`, {
+        upload: async () => {
+          throw new Error(
+            'upload failed at wss://private.example/devtools/browser/session-control',
+          );
+        },
+      }),
+    );
+    expect(redacted).toMatchObject({ status: 'failed' });
+    expect(redacted.error?.message).toContain('[REDACTED_WEBSOCKET_URL]');
+    expect(JSON.stringify(redacted)).not.toContain('session-control');
+  });
+
+  it('imports a confined run-local module relative to cwd and reuses its module instance', async () => {
+    writeFileSync(
+      join(cwd, 'helper.mjs'),
+      `globalThis.__sherlockHelperLoads = (globalThis.__sherlockHelperLoads ?? 0) + 1;\n` +
+        `export const loads = globalThis.__sherlockHelperLoads;\n` +
+        `export const answer = () => 42;\n`,
+    );
+
+    const result = await runBrowserProgram(
+      options(`
+        const first = await browser.importModule('./helper.mjs');
+        const second = await browser.importModule('helper.mjs');
+        return {
+          same: first === second,
+          firstLoads: first.loads,
+          secondLoads: second.loads,
+          answer: second.answer()
+        };
+      `),
+    );
+
+    expect(result).toMatchObject({
+      status: 'exited',
+      value: { same: true, firstLoads: 1, secondLoads: 1, answer: 42 },
+    });
+  });
+
+  it('rejects traversal and symbolic-link workspace module paths', async () => {
+    writeFileSync(join(cwd, 'real-helper.mjs'), 'export const value = 1;\n');
+    symlinkSync('real-helper.mjs', join(cwd, 'linked-helper.mjs'));
+
+    const traversal = await runBrowserProgram(
+      options(`return browser.importModule('../outside.mjs');`),
+    );
+    const symlink = await runBrowserProgram(
+      options(`return browser.importModule('./linked-helper.mjs');`),
+    );
+
+    expect(traversal).toMatchObject({ status: 'failed' });
+    expect(traversal.error?.message).toContain('must stay within scratch/workspace');
+    expect(symlink).toMatchObject({ status: 'failed' });
+    expect(symlink.error?.message).toContain('must not contain symbolic links');
   });
 
   it('composes the protected helpers entirely from CDP requests', async () => {

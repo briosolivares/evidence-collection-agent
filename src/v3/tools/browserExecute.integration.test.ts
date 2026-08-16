@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import { executeToolCall } from '../../tools/pipeline.js';
@@ -166,6 +169,75 @@ describe('browser_execute real-browser journey', () => {
       expect(handledResult).toMatchObject({
         value: 'complete',
         pending_dialogs: [],
+      });
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'uploads a confined workspace file to an accessibility backend node and removes its marker',
+    async () => {
+      const workspace = join(suite.runDir(), 'scratch/workspace');
+      mkdirSync(workspace, { recursive: true });
+      writeFileSync(join(workspace, 'evidence.csv'), 'name\nAda Lovelace\n');
+      writeFileSync(
+        join(workspace, 'upload-helper.mjs'),
+        `export const uploadPath = 'evidence.csv';\n`,
+      );
+      const actionsUrl = suite.server().url('/actions.html');
+      const code = `
+        const helper = await browser.importModule('./upload-helper.mjs');
+        await browser.goto(${JSON.stringify(actionsUrl)});
+        if (!(await browser.waitForLoad({ timeoutMs: 5000, pollIntervalMs: 25 }))) {
+          throw new Error('upload fixture did not finish loading');
+        }
+        const tree = await browser.accessibility({
+          name: 'Attachment file',
+          maxDepth: 30,
+          maxNodes: 20
+        });
+        const input = tree.nodes.find((node) =>
+          node.name === 'Attachment file' && node.backendDOMNodeId
+        );
+        if (!input?.backendDOMNodeId) {
+          throw new Error('file input backend node was absent');
+        }
+        await browser.upload(input.backendDOMNodeId, helper.uploadPath);
+        return browser.js(\`(async () => {
+          const element = document.querySelector('#attachment-input');
+          const file = element?.files?.[0];
+          return {
+            name: file?.name ?? null,
+            text: file ? await file.text() : null,
+            visible: document.querySelector('#attachment')?.textContent ?? null,
+            markerCount: document.querySelectorAll('[data-sherlock-upload-target]').length
+          };
+        })()\`);
+      `;
+      const tool = createBrowserExecuteTool({
+        javascriptPolicy: 'allow',
+        secretEnvDenylist: [],
+      });
+      const result = await executeToolCall(
+        createRegistry([tool]),
+        { id: 'real-browser-upload', name: 'browser_execute', input: { code } },
+        { runDir: suite.runDir(), browser: suite.controller() },
+      );
+
+      expect(result.isError, result.content).toBe(false);
+      const parsed = JSON.parse(result.content) as BrowserExecuteResult;
+      expect(parsed).toMatchObject({
+        status: 'exited',
+        value: {
+          name: 'evidence.csv',
+          text: 'name\nAda Lovelace\n',
+          visible: 'Attachment: evidence.csv',
+          markerCount: 0,
+        },
+        changed_files: [
+          { path: 'scratch/workspace/evidence.csv', change: 'created' },
+          { path: 'scratch/workspace/upload-helper.mjs', change: 'created' },
+        ],
       });
     },
     BROWSER_TEST_TIMEOUT_MS,
