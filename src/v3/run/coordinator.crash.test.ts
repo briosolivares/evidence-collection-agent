@@ -16,7 +16,10 @@ import { initManifest, readManifest, writeArtifact } from '../../run/artifacts.j
 
 type Scenario =
   | 'contract'
+  | 'model_in_flight'
+  | 'pre_tool'
   | 'uncertain_tool'
+  | 'post_tool'
   | 'cancelled_workspace_recovery'
   | 'verifying'
   | 'worker_accounting'
@@ -131,6 +134,54 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
     });
   }, 20_000);
 
+  it('retries an interrupted model request from the last durable conversation', async () => {
+    const first = startHarness('model_in_flight', 'initial');
+    await expectBoundary(first, 'model_in_flight');
+    await killHarness(first);
+
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'ready_for_model',
+      worker: { turnCount: 0 },
+    });
+    expect(modelEvents(readEvents(), 'worker')).toHaveLength(1);
+
+    const resumed = startHarness('model_in_flight', 'resume');
+    expect(resumed.child.pid).not.toBe(first.child.pid);
+    const outcome = await expectOutcome(resumed);
+    expect(outcome.status).toBe('verified');
+
+    expect(modelEvents(readEvents(), 'worker')).toHaveLength(2);
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'terminal',
+      budget: { roles: { worker: { turns: 1 } } },
+      outcome,
+    });
+  }, 20_000);
+
+  it('executes exactly once after a crash at the durable pre-tool boundary', async () => {
+    const first = startHarness('pre_tool', 'initial');
+    await expectBoundary(first, 'pre_tool');
+    await killHarness(first);
+
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'executing_tool',
+      pendingTurn: {
+        effect: 'not_started',
+        nextCallIndex: 0,
+        calls: [{ id: 'effect-once', name: 'record_effect' }],
+      },
+    });
+    expect(readEvents().filter((event) => event.type === 'tool_effect')).toHaveLength(0);
+
+    const resumed = startHarness('pre_tool', 'resume');
+    expect(resumed.child.pid).not.toBe(first.child.pid);
+    const outcome = await expectOutcome(resumed);
+    expect(outcome.status).toBe('verified');
+
+    expect(readEvents().filter((event) => event.type === 'tool_effect')).toHaveLength(1);
+    expect(readCheckpoint()).toMatchObject({ phase: 'terminal', outcome });
+  }, 20_000);
+
   it('never replays an effect killed after the durable uncertain checkpoint', async () => {
     const first = startHarness('uncertain_tool', 'initial');
     await expectBoundary(first, 'uncertain_tool');
@@ -172,6 +223,27 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
       finish: { artifacts: ['artifacts/report.csv'] },
       outcome,
     });
+  }, 20_000);
+
+  it('does not replay a tool whose result was durable before the crash', async () => {
+    const first = startHarness('post_tool', 'initial');
+    await expectBoundary(first, 'post_tool');
+    await killHarness(first);
+
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'ready_for_model',
+      worker: { turnCount: 1 },
+    });
+    expect(JSON.stringify(readCheckpoint())).toContain('effect-once');
+    expect(readEvents().filter((event) => event.type === 'tool_effect')).toHaveLength(1);
+
+    const resumed = startHarness('post_tool', 'resume');
+    expect(resumed.child.pid).not.toBe(first.child.pid);
+    const outcome = await expectOutcome(resumed);
+    expect(outcome.status).toBe('verified');
+
+    expect(readEvents().filter((event) => event.type === 'tool_effect')).toHaveLength(1);
+    expect(readCheckpoint()).toMatchObject({ phase: 'terminal', outcome });
   }, 20_000);
 
   it('reconciles a killed tool workspace before terminalizing an already-cancelled resume', async () => {

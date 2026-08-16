@@ -22,7 +22,10 @@ import { runV3Coordinator } from '../../src/v3/run/coordinator.js';
 
 type Scenario =
   | 'contract'
+  | 'model_in_flight'
+  | 'pre_tool'
   | 'uncertain_tool'
+  | 'post_tool'
   | 'cancelled_workspace_recovery'
   | 'verifying'
   | 'worker_accounting'
@@ -88,6 +91,7 @@ const CONFIGURATION: V3DurableRunConfiguration = {
 
 const args = parseArguments(process.argv.slice(2));
 let verifierCalls = 0;
+let effectCalls = 0;
 
 const effectTool: ToolDef<Record<string, never>> = {
   name: 'record_effect',
@@ -95,6 +99,7 @@ const effectTool: ToolDef<Record<string, never>> = {
   inputSchema: z.strictObject({}),
   getAccess: () => ({ reads: [], writes: ['fixture:effect'] }),
   async execute(_input, ctx) {
+    effectCalls += 1;
     if (args.scenario === 'cancelled_workspace_recovery') {
       const workspaceFile = join(
         ctx.runDir,
@@ -198,6 +203,20 @@ async function afterCheckpoint(checkpoint: V3Checkpoint): Promise<void> {
   }
 
   if (
+    args.scenario === 'pre_tool' &&
+    checkpoint.phase === 'executing_tool' &&
+    checkpoint.pendingTurn.effect === 'not_started' &&
+    checkpoint.pendingTurn.nextCallIndex === 0
+  ) {
+    await sendToParent({
+      type: 'boundary',
+      boundary: 'pre_tool',
+      revision: checkpoint.revision,
+    });
+    await hangUntilKilled();
+  }
+
+  if (
     (args.scenario === 'uncertain_tool' ||
       args.scenario === 'cancelled_workspace_recovery') &&
     checkpoint.phase === 'executing_tool' &&
@@ -243,6 +262,20 @@ async function afterCheckpoint(checkpoint: V3Checkpoint): Promise<void> {
     checkpoint.phase === 'initializing' || checkpoint.worker === undefined
       ? ''
       : JSON.stringify(checkpoint.worker.messages);
+  if (
+    args.scenario === 'post_tool' &&
+    checkpoint.phase === 'ready_for_model' &&
+    effectCalls === 1 &&
+    workerMessages.includes('effect-once') &&
+    workerMessages.includes('tool_result')
+  ) {
+    await sendToParent({
+      type: 'boundary',
+      boundary: 'post_tool',
+      revision: checkpoint.revision,
+    });
+    await hangUntilKilled();
+  }
   if (
     args.scenario === 'deterministic_feedback' &&
     checkpoint.phase === 'ready_for_model' &&
@@ -301,7 +334,9 @@ function workerModel(): ModelDriver {
       );
       const responseKind = (() => {
         if (
-          (args.scenario === 'uncertain_tool' ||
+          (args.scenario === 'pre_tool' ||
+            args.scenario === 'uncertain_tool' ||
+            args.scenario === 'post_tool' ||
             args.scenario === 'cancelled_workspace_recovery') &&
           args.invocation === 'initial'
         ) {
@@ -324,6 +359,13 @@ function workerModel(): ModelDriver {
         sawDeterministicFeedback,
         sawVerifierCorrection,
       });
+      if (
+        args.scenario === 'model_in_flight' &&
+        args.invocation === 'initial'
+      ) {
+        await sendToParent({ type: 'boundary', boundary: 'model_in_flight' });
+        await hangUntilKilled();
+      }
       if (responseKind === 'effect') {
         return accepted([
           {
@@ -456,7 +498,10 @@ function parseArguments(values: readonly string[]): FixtureArguments {
   const [scenario, invocation, runDir, eventsPath] = values;
   if (
     scenario !== 'contract' &&
+    scenario !== 'model_in_flight' &&
+    scenario !== 'pre_tool' &&
     scenario !== 'uncertain_tool' &&
+    scenario !== 'post_tool' &&
     scenario !== 'cancelled_workspace_recovery' &&
     scenario !== 'verifying' &&
     scenario !== 'worker_accounting' &&
