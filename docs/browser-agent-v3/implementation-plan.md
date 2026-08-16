@@ -1189,6 +1189,20 @@ proved, even if supporting code already exists.
   revision has SHA-256
   `a8db70417eccf525ef471a5c3f20b67004ee9fe8a45f792f24ddf24d484e4b17`.
 
+### 2026-08-16 — YC eval token-cap retry
+
+- A user-authorized k=1 YC W24 outreach run reached turn 16 while still
+  researching founders and stopped at the 250,000 aggregate model-token
+  ceiling before publishing or finishing.
+- [x] Lift only the default aggregate model-token ceiling; retain the worker
+  turn, tool-call, result-byte, request-context, correction, and wall-time
+  limits unchanged.
+- [x] Rerun `yc_w24_outreach` at k=1. The retry passed the former token
+  boundary, consumed 24 worker turns and roughly 433k aggregate model tokens,
+  then stopped at the unchanged `maxWorkerTurns` limit before publishing or
+  finishing. It graded 1/8 (manifest integrity only) in 173.2 seconds; report:
+  `evals/experiments/2026-08-16_03-11-17am_eval-yc-w24-outreach_0fa1cc.json`.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

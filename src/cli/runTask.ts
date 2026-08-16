@@ -53,14 +53,14 @@ const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
   devRoot: findDevRoot(PACKAGE_ROOT),
 }).runsBaseDir;
 
-/** Finite production limits. Callers may override them explicitly, but a
- * default v3 run never has an unbounded effect, spend, or wall-clock axis. */
+/** Production defaults. Effect, tool, and wall-clock axes remain bounded;
+ * aggregate model tokens are intentionally unbounded. */
 export const V3_PRODUCTION_DEFAULTS = Object.freeze({
   maxOutputTokens: 8_192,
   maxWorkerTurns: 24,
   maxContextTokens: 900_000,
   maxToolCalls: 100,
-  maxModelTokens: 250_000,
+  maxModelTokens: Infinity,
   maxToolResultBytes: 5_000_000,
   maxWallTimeMs: 3_600_000,
   maxCompletionCheckFailures: 5,

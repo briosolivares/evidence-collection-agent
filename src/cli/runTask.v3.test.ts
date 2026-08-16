@@ -23,6 +23,7 @@ import type { RunTracing } from '../tracing/runTracing.js';
 import type { ResumeTaskConfig } from './runTask.js';
 import {
   readV3CheckpointConfiguration,
+  V3_UNBOUNDED_CEILING,
 } from '../v3/run/checkpoint.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../v3/tools/browserExecute.js';
 import {
@@ -102,7 +103,7 @@ describe('public runTask v3 adapter', () => {
       budgetLimits: {
         maxWorkerTurns: V3_PRODUCTION_DEFAULTS.maxWorkerTurns,
         maxToolCalls: V3_PRODUCTION_DEFAULTS.maxToolCalls,
-        maxModelTokens: V3_PRODUCTION_DEFAULTS.maxModelTokens,
+        maxModelTokens: V3_UNBOUNDED_CEILING,
         maxToolResultBytes: V3_PRODUCTION_DEFAULTS.maxToolResultBytes,
         maxWallTimeMs: V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
         maxVerifierCorrections:
@@ -110,8 +111,11 @@ describe('public runTask v3 adapter', () => {
       },
     });
     expect(
-      Object.values(V3_PRODUCTION_DEFAULTS).every(
-        (value) => Number.isFinite(value) && value > 0,
+      Object.entries(V3_PRODUCTION_DEFAULTS).every(
+        ([name, value]) =>
+          name === 'maxModelTokens'
+            ? value === Infinity
+            : Number.isFinite(value) && value > 0,
       ),
     ).toBe(true);
 

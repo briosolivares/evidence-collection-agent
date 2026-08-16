@@ -96,7 +96,7 @@ The controller owns run pages explicitly through `prepareTaskPage`/`closeTaskPag
 | Worker turns, whole run | 24 | `V3_PRODUCTION_DEFAULTS` |
 | Request context ceiling | 900,000 tokens | `V3_PRODUCTION_DEFAULTS` |
 | Tool calls, whole run | 100 | `V3_PRODUCTION_DEFAULTS` |
-| Model tokens, all roles | 250,000 | `V3_PRODUCTION_DEFAULTS` |
+| Model tokens, all roles | unbounded | `V3_PRODUCTION_DEFAULTS` |
 | Model-visible tool-result bytes | 5,000,000 | `V3_PRODUCTION_DEFAULTS` |
 | Whole-run wall time | 3,600,000 ms | `V3_PRODUCTION_DEFAULTS` |
 | Deterministic-check failures | 5 | `V3_PRODUCTION_DEFAULTS` |
