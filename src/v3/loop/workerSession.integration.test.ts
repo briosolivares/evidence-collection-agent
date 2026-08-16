@@ -96,7 +96,6 @@ describe('v3 session vertical acceptance', () => {
           name: 'finish',
           input: {
             summary: 'Published the requested two-column CSV report.',
-            artifacts: ['artifacts/report.csv'],
             limitations: [],
           },
         },
@@ -151,7 +150,10 @@ describe('v3 session vertical acceptance', () => {
       request: {
         turn: 3,
         call: { id: 'finish-report', name: 'finish' },
-        input: { artifacts: ['artifacts/report.csv'], limitations: [] },
+        input: {
+          summary: 'Published the requested two-column CSV report.',
+          limitations: [],
+        },
       },
     });
     expect(restored.state.messages[0]).toEqual(worker.state.messages[0]);

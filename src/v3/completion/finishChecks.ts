@@ -1,4 +1,4 @@
-import { basename, relative, resolve, sep } from 'node:path';
+import { basename } from 'node:path';
 
 import {
   matchesFilenamePattern,
@@ -6,7 +6,6 @@ import {
   type OutputSpec,
 } from '../../contracts/outputContract.js';
 import { ARTIFACTS_DIR, type ManifestEntry } from '../../run/artifacts.js';
-import { resolveRunPath } from '../../run/runDir.js';
 import type { FinishInput } from '../tools/finish.js';
 import {
   artifactBasename,
@@ -73,7 +72,6 @@ export function runV3FinishChecks({
   const facts: V3FinishFacts = {
     finish: {
       summary: finish.summary,
-      artifactPaths: [...finish.artifacts],
       limitations: [...finish.limitations],
     },
     outputs: [],
@@ -131,13 +129,7 @@ export function runV3FinishChecks({
     }
   }
 
-  validateFinishArtifactClaims(
-    runDir,
-    finish,
-    entriesByPath,
-    requestedEntries,
-    defects,
-  );
+  validateManifestDerivedFinishClaim(finish, requestedEntries, defects);
 
   const claimedContractPaths = new Set<string>();
   const captureOwners = new Map<string, string[]>();
@@ -405,103 +397,34 @@ function validateFinishText(finish: FinishInput, defects: V3FinishDefect[]): voi
       });
     }
   }
-  if (finish.artifacts.length === 0 && finish.limitations.length === 0) {
+}
+
+function validateManifestDerivedFinishClaim(
+  finish: FinishInput,
+  requestedEntries: readonly InspectedEntry[],
+  defects: V3FinishDefect[],
+): void {
+  if (requestedEntries.length === 0 && finish.limitations.length === 0) {
     defects.push({
       code: 'empty_finish_claim',
       message:
-        'finish names no completed artifact and no limitation. Publish the required outputs, or state the concrete source/access/freshness constraint blocking them.',
+        'The manifest contains no requested output and finish reports no limitation. ' +
+        'Publish the required outputs, or state the concrete source/access/freshness ' +
+        'constraint blocking them.',
     });
-  }
-}
-
-function validateFinishArtifactClaims(
-  runDir: string,
-  finish: FinishInput,
-  entriesByPath: ReadonlyMap<string, InspectedEntry>,
-  requestedEntries: readonly InspectedEntry[],
-  defects: V3FinishDefect[],
-): Set<string> {
-  const finishPaths = new Set<string>();
-  for (const supplied of finish.artifacts) {
-    const canonical = canonicalFinishPath(runDir, supplied);
-    if ('defect' in canonical) {
-      defects.push(canonical.defect);
-      continue;
-    }
-    const artifactPath = canonical.path;
-    if (finishPaths.has(artifactPath)) {
-      defects.push({
-        code: 'duplicate_finish_artifact',
-        artifactPath,
-        message: `finish.artifacts lists ${artifactPath} more than once. List each requested output exactly once.`,
-      });
-      continue;
-    }
-    finishPaths.add(artifactPath);
-    const entry = entriesByPath.get(artifactPath);
-    if (entry === undefined) {
-      defects.push({
-        code: 'finish_artifact_not_manifested',
-        artifactPath,
-        message: `${artifactPath} is listed in finish but has no manifest entry. Publish it through publish_artifact before finishing.`,
-      });
-      continue;
-    }
-    if (!hasRole(entry, 'requested_output')) {
-      defects.push({
-        code: 'finish_artifact_not_requested_output',
-        artifactPath,
-        message: `${artifactPath} is listed in finish but does not carry the requested_output role. Re-publish it with the correct role or remove it from finish.`,
-      });
-    }
-    if (entry.entry.completionStatus === 'partial') {
-      defects.push({
-        code: 'partial_finish_artifact',
-        artifactPath,
-        message: `${artifactPath} is marked partial and cannot be claimed complete in finish.`,
-      });
-    }
   }
 
   for (const entry of requestedEntries) {
-    if (!finishPaths.has(entry.canonicalPath)) {
+    if (entry.entry.completionStatus === 'partial') {
       defects.push({
-        code: 'finish_omits_requested_output',
+        code: 'partial_requested_output',
         artifactPath: entry.canonicalPath,
-        message: `finish.artifacts omits manifested requested output ${entry.canonicalPath}. List every completed requested output exactly as recorded.`,
+        message:
+          `${entry.canonicalPath} is marked partial and cannot satisfy finish. ` +
+          'Publish the completed output before requesting verification.',
       });
     }
   }
-  return finishPaths;
-}
-
-function canonicalFinishPath(
-  runDir: string,
-  supplied: string,
-): { path: string } | { defect: V3FinishDefect } {
-  let absolute: string;
-  try {
-    absolute = resolveRunPath(runDir, supplied);
-  } catch {
-    return {
-      defect: {
-        code: 'unsafe_finish_artifact_path',
-        artifactPath: supplied,
-        message: `finish artifact ${JSON.stringify(supplied)} escapes the run directory. Use its canonical artifacts/ path.`,
-      },
-    };
-  }
-  const normalized = relative(resolve(runDir), absolute).split(sep).join('/');
-  if (normalized !== supplied.split(sep).join('/') || !normalized.startsWith(`${ARTIFACTS_DIR}/`)) {
-    return {
-      defect: {
-        code: 'noncanonical_finish_artifact_path',
-        artifactPath: supplied,
-        message: `finish artifact ${JSON.stringify(supplied)} must be a canonical run-relative path under artifacts/ (for example ${JSON.stringify(normalized)}).`,
-      },
-    };
-  }
-  return { path: normalized };
 }
 
 function requireRequestedOutput(

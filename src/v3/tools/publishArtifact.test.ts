@@ -220,6 +220,10 @@ describe('publish_artifact file and text modes', () => {
 
     writeFileSync(join(runDir, 'scratch/outside.bin'), bytes);
     for (const sourcePath of [
+      'raw.bin',
+      'workspace/raw.bin',
+      './scratch/workspace/raw.bin',
+      'scratch/workspace/./raw.bin',
       'scratch/outside.bin',
       'scratch/workspace/../../scratch/outside.bin',
       '../outside.bin',
@@ -231,6 +235,10 @@ describe('publish_artifact file and text modes', () => {
         source_path: sourcePath,
       });
       expect(result.isError).toBe(true);
+      if (result.isError) {
+        expect(result.errorKind).toBe('invalid_input');
+        expect(result.content).toContain('scratch/workspace/report.csv');
+      }
       expect(existsSync(join(runDir, 'artifacts/refused.bin'))).toBe(false);
     }
   });

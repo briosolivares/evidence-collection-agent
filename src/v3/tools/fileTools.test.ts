@@ -179,6 +179,12 @@ describe('v3 write_file', () => {
     const bytes = Buffer.from('alpha\r\nbeta\n', 'utf8');
     expect(created).toMatchObject({ isError: false });
     expect(appended).toMatchObject({ isError: false });
+    expect(created.content).toBe(
+      JSON.stringify({ path: 'scratch/notes.txt', bytes: 7 }),
+    );
+    expect(appended.content).toBe(
+      JSON.stringify({ path: 'scratch/notes.txt', bytes: bytes.length }),
+    );
     expect(readFileSync(join(runDir, 'scratch/notes.txt'))).toEqual(bytes);
 
     const entries = readManifest(runDir).artifacts.filter(
@@ -203,6 +209,9 @@ describe('v3 write_file', () => {
 
     const expected = Buffer.concat([original, Buffer.from('λ', 'utf8')]);
     expect(result).toMatchObject({ isError: false });
+    expect(result.content).toBe(
+      JSON.stringify({ path: 'scratch/blob.bin', bytes: expected.length }),
+    );
     expect(readFileSync(join(runDir, 'scratch/blob.bin'))).toEqual(expected);
     expect(
       readManifest(runDir).artifacts.find(

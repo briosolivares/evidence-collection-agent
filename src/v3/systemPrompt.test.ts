@@ -38,6 +38,12 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain('Do not add supposedly helpful fields');
     expect(V3_SYSTEM_PROMPT).toContain('Only files under artifacts/ are published');
     expect(V3_SYSTEM_PROMPT).toContain('Use publish_artifact for every publication.');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'prefer text mode and publish it directly without an intermediate write_file call',
+    );
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'exact canonical run-relative path beginning with scratch/workspace/',
+    );
     expect(V3_SYSTEM_PROMPT).toContain('requested_output');
     expect(V3_SYSTEM_PROMPT).toContain('evidence');
     expect(V3_SYSTEM_PROMPT).toContain('normally publish at least one useful evidence screenshot');
@@ -60,8 +66,10 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain(
       'finish is an exclusive control call and must be the only tool call',
     );
-    expect(V3_SYSTEM_PROMPT).toContain('the complete artifacts list');
     expect(V3_SYSTEM_PROMPT).toContain('an explicit limitations list');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'derives requested outputs and evidence from the authoritative manifest',
+    );
     expect(V3_SYSTEM_PROMPT).toContain(
       'A prose-only response or a response with no tool call does not finish the run.',
     );

@@ -67,7 +67,7 @@ flowchart TD
     M --> A
 ```
 
-No-tool prose is not completion. `finish` must be the only call in its response and claims `{ summary, artifacts, limitations }`. Deterministic failures never reach the verifier; verifier corrections resume the same worker conversation. Only verifier acceptance yields public success.
+No-tool prose is not completion. `finish` must be the only call in its response and carries `{ summary, limitations }`; deterministic checks derive requested outputs and evidence from the manifest. Deterministic failures never reach the verifier; verifier corrections resume the same worker conversation. Only verifier acceptance yields public success.
 
 Whole-run ceilings cover worker turns, request context, tool calls, all-role model tokens, model-visible tool-result bytes, wall time, deterministic failures, and verifier corrections. Accounting is monotone and checkpointed.
 

@@ -81,7 +81,6 @@ const USAGE: Usage = {
 
 const VALID_FINISH: FinishInput = {
   summary: 'The requested report and evidence were published.',
-  artifacts: ['artifacts/report.csv'],
   limitations: [],
 };
 
@@ -307,7 +306,7 @@ describe('v3 finish protocol', () => {
             type: 'tool_use',
             id: 'bad-finish',
             name: 'finish',
-            input: { summary: '', artifacts: [], limitations: [] },
+            input: { summary: '', limitations: [] },
           },
         ]),
       ]),

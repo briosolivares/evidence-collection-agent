@@ -66,6 +66,12 @@ export const writeFileInputSchema = z.strictObject({
 
 export type WriteFileInput = z.infer<typeof writeFileInputSchema>;
 
+/** Canonical private path and exact resulting byte length. */
+export interface WriteFileResult {
+  path: string;
+  bytes: number;
+}
+
 export const editFileInputSchema = z.strictObject({
   file_path: z
     .string()
@@ -144,13 +150,15 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
   description:
     'Write a private working file under scratch/, overwriting by default. Set append to build ' +
     'a file in pieces. This tool cannot publish artifacts; use publish_artifact for final ' +
-    'outputs or evidence. Every surviving write is hashed into the run manifest.',
+    'outputs or evidence. Every surviving write is hashed into the run manifest. Returns the ' +
+    'canonical run-relative path and exact byte count as JSON; pass that path unchanged to ' +
+    'publish_artifact kind=file when publishing a workspace file.',
   inputSchema: writeFileInputSchema,
   getAccess: (input) => ({
     reads: [],
     writes: [accessKey.file(input.file_path), accessKey.manifest()],
   }),
-  execute(input, ctx) {
+  execute(input, ctx): WriteFileResult {
     assertNotAborted(ctx.abortSignal, 'write_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'write');
     const existing = statOptionalRegularFile(
@@ -183,12 +191,7 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
     }
 
     const entry = writeArtifact(ctx.runDir, target.relativePath, bytes);
-    if (input.append === true && existing !== undefined) {
-      return `Appended to ${entry.filename} (now ${bytes.length} bytes).`;
-    }
-    return existing === undefined
-      ? `File created successfully at: ${entry.filename}`
-      : `The file ${entry.filename} has been updated successfully.`;
+    return { path: entry.filename, bytes: bytes.length };
   },
 };
 

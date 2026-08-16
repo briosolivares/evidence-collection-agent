@@ -60,10 +60,9 @@ function contract(...outputs: OutputSpec[]): OutputContract {
   return { outputs } as OutputContract;
 }
 
-function finish(paths: string[], limitations: string[] = []): FinishInput {
+function finish(limitations: string[] = []): FinishInput {
   return {
     summary: 'Created and checked every requested output.',
-    artifacts: paths,
     limitations,
   };
 }
@@ -91,14 +90,14 @@ function codes(result: ReturnType<typeof runV3FinishChecks>): string[] {
   return result.status === 'passed' ? [] : result.defects.map((defect) => defect.code);
 }
 
-describe('runV3FinishChecks — manifest and finish claims', () => {
+describe('runV3FinishChecks — manifest-derived finish facts', () => {
   it('passes an exact CSV publication and returns structured verifier facts', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,https://example.test/a\n');
 
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
 
     expect(result.status).toBe('passed');
@@ -138,7 +137,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
   it('does not mutate the immutable contract or finish input', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const expected = contract(tableSpec());
-    const submitted = finish(['artifacts/roster.csv'], ['Source freshness is one day.']);
+    const submitted = finish(['Source freshness is one day.']);
     const before = JSON.stringify({ expected, submitted });
 
     runV3FinishChecks({ runDir, contract: expected, finish: submitted });
@@ -146,37 +145,23 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     expect(JSON.stringify({ expected, submitted })).toBe(before);
   });
 
-  it('rejects noncanonical, unmanifested, and evidence-only finish paths', () => {
+  it('derives requested outputs from the manifest without treating evidence as output', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     publish('artifacts/support.txt', 'support', { roles: ['evidence'] });
 
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish([
-        './artifacts/roster.csv',
-        'artifacts/missing.csv',
-        'artifacts/support.txt',
-      ]),
+      finish: finish(),
     });
 
-    expect(codes(result)).toEqual(
-      expect.arrayContaining([
-        'noncanonical_finish_artifact_path',
-        'finish_artifact_not_manifested',
-        'finish_artifact_not_requested_output',
-        'finish_omits_requested_output',
-      ]),
-    );
-  });
-
-  it('rejects a finish path escaping the run directory', () => {
-    const result = runV3FinishChecks({
-      runDir,
-      contract: contract(tableSpec()),
-      finish: finish(['../outside.csv']),
-    });
-    expect(codes(result)).toContain('unsafe_finish_artifact_path');
+    expect(result.status).toBe('passed');
+    expect(result.facts.manifest?.requestedOutputPaths).toEqual([
+      'artifacts/roster.csv',
+    ]);
+    expect(result.facts.manifest?.evidencePaths).toEqual([
+      'artifacts/support.txt',
+    ]);
   });
 
   it('reports hash drift and a recorded file that disappeared', () => {
@@ -185,7 +170,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     let result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('hash_mismatch');
 
@@ -193,7 +178,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('missing_recorded_file');
   });
@@ -208,7 +193,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('artifact_symlink');
   });
@@ -220,7 +205,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
         runV3FinishChecks({
           runDir,
           contract: contract(tableSpec()),
-          finish: finish([], ['The run manifest is unavailable.']),
+          finish: finish(['The run manifest is unavailable.']),
         }),
       ),
     ).toEqual(['missing_manifest']);
@@ -231,7 +216,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
         runV3FinishChecks({
           runDir,
           contract: contract(tableSpec()),
-          finish: finish([], ['The run manifest is unavailable.']),
+          finish: finish(['The run manifest is unavailable.']),
         }),
       ),
     ).toEqual(['unparseable_manifest']);
@@ -253,7 +238,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
       codes(runV3FinishChecks({
         runDir,
         contract: contract(tableSpec()),
-        finish: finish(['artifacts/roster.csv']),
+        finish: finish(),
       })),
     ).toContain('invalid_manifest_shape');
 
@@ -267,7 +252,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
       codes(runV3FinishChecks({
         runDir,
         contract: contract(tableSpec()),
-        finish: finish(['artifacts/roster.csv']),
+        finish: finish(),
       })),
     ).toContain('invalid_manifest_entry');
 
@@ -281,7 +266,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
       codes(runV3FinishChecks({
         runDir,
         contract: contract(tableSpec()),
-        finish: finish(['artifacts/roster.csv']),
+        finish: finish(),
       })),
     ).toContain('invalid_manifest_timestamp_order');
   });
@@ -295,7 +280,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish([], ['The provenance index exceeds the supported bound.']),
+      finish: finish(['The provenance index exceeds the supported bound.']),
     });
     expect(codes(result)).toEqual(['manifest_bytes_limit_exceeded']);
   });
@@ -315,7 +300,7 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(['manifest_entry_limit_exceeded']);
   });
@@ -337,13 +322,13 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
       runV3FinishChecks({
         runDir,
         contract: contract(tableSpec()),
-        finish: finish(['artifacts/roster.csv']),
+        finish: finish(),
       }),
     ).not.toThrow();
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('invalid_manifest_entry');
   });
@@ -362,20 +347,19 @@ describe('runV3FinishChecks — manifest and finish claims', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('invalid_source_url');
   });
 
-  it('requires finish to list every manifested requested output', () => {
-    publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
+  it('rejects an empty manifest claim only when no limitation is reported', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish([]),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(
-      expect.arrayContaining(['empty_finish_claim', 'finish_omits_requested_output']),
+      expect.arrayContaining(['empty_finish_claim', 'missing_required_output']),
     );
   });
 });
@@ -639,7 +623,7 @@ describe('runV3FinishChecks — generic tables', () => {
             columns: [{ name: 'name', required: true, type: 'string' }],
           }),
         ),
-        finish: finish(['artifacts/roster.csv']),
+        finish: finish(),
         checkActive: () => {
           checks += 1;
           if (checks === 40) throw interrupted;
@@ -658,7 +642,7 @@ describe('runV3FinishChecks — generic tables', () => {
     let result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('column_mismatch');
 
@@ -666,7 +650,7 @@ describe('runV3FinishChecks — generic tables', () => {
     result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('row_shape_mismatch');
   });
@@ -692,7 +676,7 @@ describe('runV3FinishChecks — generic tables', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.outputs[0]).toMatchObject({
@@ -726,7 +710,7 @@ describe('runV3FinishChecks — generic tables', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result).filter((code) => code === 'invalid_column_value')).toHaveLength(6);
     expect(codes(result)).toContain('missing_required_value');
@@ -745,7 +729,7 @@ describe('runV3FinishChecks — generic tables', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/roster.json']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('row_shape_mismatch');
   });
@@ -763,7 +747,7 @@ describe('runV3FinishChecks — generic tables', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/roster.md']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.outputs[0]).toMatchObject({ rowCount: 2 });
@@ -785,7 +769,7 @@ describe('runV3FinishChecks — generic tables', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['placeholder_text', 'missing_expected_values', 'unexpected_values']),
@@ -811,7 +795,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(documentSpec({ requiredSections: ['Summary', 'Findings'] })),
-      finish: finish(['artifacts/report.md']),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['placeholder_text', 'missing_required_section']),
@@ -823,7 +807,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(documentSpec({ filename: 'report.pdf', format: 'pdf' })),
-      finish: finish(['artifacts/report.pdf']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('document_format_mismatch');
   });
@@ -842,7 +826,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/shot-1.png']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.outputs[0]).toMatchObject({
@@ -863,7 +847,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/shot-1.png']),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining([
@@ -888,7 +872,9 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish([], ['The screenshot is not yet published as requested output.']),
+      finish: finish([
+        'The screenshot is not yet published as requested output.',
+      ]),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['capture_wrong_role', 'capture_count_below_minimum']),
@@ -910,7 +896,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const passing = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/report.pdf']),
+      finish: finish(),
     });
     expect(passing.status).toBe('passed');
 
@@ -920,7 +906,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const failing = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish(['artifacts/report.pdf']),
+      finish: finish(),
     });
     expect(codes(failing)).toEqual(
       expect.arrayContaining([
@@ -955,7 +941,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(screenshots, download),
-      finish: finish(['artifacts/source.png', 'artifacts/report.pdf']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.outputs.map((output) => [output.outputId, output.kind])).toEqual([
@@ -985,7 +971,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(first, second),
-      finish: finish(['artifacts/source.png']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('ambiguous_capture_assignment');
   });
@@ -995,7 +981,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(documentSpec({ evidenceRequirement: 'at_least_one' })),
-      finish: finish(['artifacts/report.md']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('missing_document_evidence');
   });
@@ -1007,10 +993,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish([
-        'artifacts/roster.csv',
-        'artifacts/helper-proposals/helper.patch',
-      ]),
+      finish: finish(),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['unexpected_requested_output', 'helper_proposal_wrong_role']),
@@ -1039,7 +1022,7 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
 
     expect(result.status).toBe('passed');
@@ -1062,7 +1045,7 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(codes(result)).toContain('missing_browser_evidence_screenshot');
   });
@@ -1076,7 +1059,7 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.evidenceScreenshotPaths).toEqual(['artifacts/source.png']);
@@ -1091,7 +1074,7 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv']),
+      finish: finish(),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.evidenceScreenshotPaths).toEqual(['artifacts/source.png']);
@@ -1103,7 +1086,7 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv'], [limitation]),
+      finish: finish([limitation]),
     });
     expect(result.status).toBe('passed');
     expect(result.facts.finish.limitations).toEqual([limitation]);
@@ -1114,7 +1097,7 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['artifacts/roster.csv'], ['TBD access limitation']),
+      finish: finish(['TBD access limitation']),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['placeholder_limitation', 'missing_browser_evidence_screenshot']),

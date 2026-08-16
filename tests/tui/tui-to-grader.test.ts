@@ -151,7 +151,6 @@ function finishResponse() {
         name: 'finish',
         input: {
           summary: 'Published the answer, source screenshot, and exact export.',
-          artifacts: ['artifacts/answer.md', 'artifacts/export.bin'],
           limitations: [],
         },
       },

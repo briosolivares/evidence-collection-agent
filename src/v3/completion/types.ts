@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { finishInputSchema } from '../tools/finish.js';
+
 /** One objective defect the worker can repair before a verifier is called. */
 export interface V3FinishDefect {
   /** Stable programmatic identifier. */
@@ -57,11 +59,7 @@ const v3CaptureFactSchema = z.strictObject({
 
 /** Strict checkpoint validator for the code-settled verifier payload. */
 export const v3FinishFactsSchema = z.strictObject({
-  finish: z.strictObject({
-    summary: z.string(),
-    artifactPaths: z.array(z.string()),
-    limitations: z.array(z.string()),
-  }),
+  finish: finishInputSchema,
   manifest: z
     .strictObject({
       task: z.string(),

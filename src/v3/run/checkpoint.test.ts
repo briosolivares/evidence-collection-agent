@@ -119,13 +119,11 @@ const finish = {
     name: 'finish' as const,
     input: {
       summary: 'Published the requested roster.',
-      artifacts: ['artifacts/roster.csv'],
       limitations: [],
     },
   },
   input: {
     summary: 'Published the requested roster.',
-    artifacts: ['artifacts/roster.csv'],
     limitations: [],
   },
   assistantText: 'The roster is ready.',
@@ -150,6 +148,36 @@ const finishWorker = {
   ],
   turnCount: finish.turn,
 };
+
+function legacyFinishInput(artifacts = ['artifacts/roster.csv']) {
+  return {
+    summary: finish.input.summary,
+    artifacts,
+    limitations: finish.input.limitations,
+  };
+}
+
+function legacyFinishWorker(artifacts = ['artifacts/roster.csv']) {
+  const input = legacyFinishInput(artifacts);
+  return {
+    ...finishWorker,
+    messages: [
+      ...worker.messages,
+      {
+        role: 'assistant' as const,
+        content: [
+          { type: 'text' as const, text: finish.assistantText },
+          {
+            type: 'tool_use' as const,
+            id: finish.call.id,
+            name: finish.call.name,
+            input,
+          },
+        ],
+      },
+    ],
+  };
+}
 
 const toolAssistant = {
   role: 'assistant' as const,
@@ -181,7 +209,6 @@ const pendingToolTurn = {
 const facts: V3FinishFacts = {
   finish: {
     summary: finish.input.summary,
-    artifactPaths: [...finish.input.artifacts],
     limitations: [],
   },
   manifest: {
@@ -584,7 +611,6 @@ describe('v3 checkpoint schema', () => {
                     name: finish.call.name,
                     input: {
                       limitations: finish.input.limitations,
-                      artifacts: finish.input.artifacts,
                       summary: finish.input.summary,
                     },
                   },
@@ -607,7 +633,7 @@ describe('v3 checkpoint schema', () => {
 
       const changedInput = {
         ...finish.input,
-        artifacts: ['artifacts/different.csv'],
+        limitations: ['Different durable limitation.'],
       };
       expect(
         v3CheckpointSchema.safeParse({
@@ -737,7 +763,10 @@ describe('v3 checkpoint schema', () => {
     expect(
       v3CheckpointSchema.safeParse({
         ...terminal(),
-        finish: { ...finish.input, artifacts: [] },
+        finish: {
+          ...finish.input,
+          limitations: ['Different durable limitation.'],
+        },
       }).success,
     ).toBe(false);
 
@@ -794,6 +823,60 @@ describe('read-only checkpoint observation', () => {
     expect(readdirSync(join(runDir, V3_HARNESS_DIR)).sort()).toEqual(namesBefore);
     expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
     expect(readFileSync(lockPath)).toEqual(lockBefore);
+  });
+
+  it('migrates a legacy active finish list without rewriting checkpoint bytes', async () => {
+    const legacyInput = legacyFinishInput();
+    const legacy = {
+      ...checking(),
+      worker: legacyFinishWorker(),
+      pendingFinish: {
+        ...finish,
+        call: { ...finish.call, input: legacyInput },
+        input: legacyInput,
+      },
+    };
+    const checkpointPath = writeCheckpoint(legacy);
+    const before = readFileSync(checkpointPath);
+
+    const store = await openV3CheckpointStore(runDir);
+    expect(store.load()).toEqual(checking());
+    await store.close();
+    expect(readFileSync(checkpointPath)).toEqual(before);
+  });
+
+  it('migrates a legacy verified terminal finish list', async () => {
+    const legacy = {
+      ...terminal(),
+      worker: legacyFinishWorker(),
+      finish: legacyFinishInput(),
+    };
+    writeCheckpoint(legacy);
+
+    const store = await openV3CheckpointStore(runDir);
+    expect(store.load()).toEqual(terminal());
+    await store.close();
+  });
+
+  it('does not hide mismatched current finish claims while normalizing legacy paths', async () => {
+    const legacy = {
+      ...checking(),
+      worker: legacyFinishWorker(),
+      pendingFinish: {
+        ...finish,
+        call: { ...finish.call, input: legacyFinishInput() },
+        input: {
+          ...legacyFinishInput(),
+          summary: 'A different durable finish summary.',
+        },
+      },
+    };
+    writeCheckpoint(legacy);
+
+    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(
+      /schema validation|must equal the validated finish input/,
+    );
+    expect(existsSync(pathInHarness(V3_RUN_LOCK_FILENAME))).toBe(false);
   });
 
   it('does not create a missing harness directory or checkpoint', () => {

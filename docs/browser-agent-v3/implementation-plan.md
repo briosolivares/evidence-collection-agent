@@ -212,7 +212,8 @@ prompt/tool definitions.
 
 - [x] Run the contract initializer once; store one immutable typed contract in
   harness-private state and show it to the worker as per-run guidance.
-- [x] Implement `finish` input (`summary`, published paths, unresolved limits)
+- [x] Implement `finish` input (`summary`, unresolved limits) with published
+  requested outputs derived from the authoritative manifest
   and interception in the v3 loop.
 - [x] Adapt deterministic completion checks to generic published artifacts:
   exact filenames, exact CSV columns, row/count rules, non-placeholder
@@ -1148,6 +1149,45 @@ proved, even if supporting code already exists.
   attachment, or live-site eval re-baseline ran without user authorization;
   those remain external measurements rather than local implementation
   blockers.
+
+### 2026-08-16 — post-eval publication and finish ergonomics complete
+
+- A user-authorized live Hacker News trial passed all 6/6 grader assertions
+  and matched 5/5 fresh titles, but took 14 worker turns. The browser extraction
+  itself took 174 ms; most avoidable work came from four incorrect
+  `publish_artifact.source_path` spellings, a broad Bash search for the file,
+  and a rejected `finish` that repeated an evidence-only path as a requested
+  output.
+- [x] Make workspace publication paths use one explicit run-relative spelling
+  beginning with `scratch/workspace/`, return that canonical path as structured
+  `write_file` data, and make invalid-path feedback directly actionable.
+- [x] Clarify that inline `kind: text` is the direct path for small final
+  CSV/JSON/Markdown/text outputs; retain `kind: file` for an existing workspace
+  file without adding another worker-visible tool.
+- [x] Remove the redundant requested-output path list from `finish`. Keep the
+  explicit exclusive control call, but derive its artifact facts from the
+  authoritative manifest during deterministic checks and persist those facts
+  for verification/recovery.
+- [x] Update the binding design, static tool-schema snapshots, checkpoint and
+  coordinator fixtures, and focused integration coverage. Prove the compact
+  scripted journey `browser_execute -> publish_artifact -> finish`, then run
+  typecheck, affected tests, full hermetic tests, and diff checks.
+- Focused verification after the path/result slice: `npm test -- --run
+  src/v3/tools/fileTools.test.ts src/v3/tools/publishArtifact.test.ts
+  src/v3/tools/toolSurface.integration.test.ts` passes 3 files / 29 tests;
+  `npm run typecheck -- --pretty false` passes.
+- The public fixture-backed run in `src/cli/runTask.test.ts` now pins the compact
+  browser journey at exactly three worker turns. Requested-output paths live
+  only in manifest facts; verifier context labels them as code-derived rather
+  than worker claims. Checkpoint v3 retains read compatibility by normalizing
+  the retired field at its schema boundary, with active/terminal compatibility
+  and malformed-current-claim regressions.
+- Final gates: the affected contract/public-run group passes 7 files / 148
+  tests; the complete hermetic suite passes 136 files / 1,479 tests in 88.41s;
+  `npm run typecheck -- --pretty false` and `git diff --check` pass. The static
+  eight-tool order is unchanged. The one intentional static prompt/schema
+  revision has SHA-256
+  `a8db70417eccf525ef471a5c3f20b67004ee9fe8a45f792f24ddf24d484e4b17`.
 
 ## Rules for coordinators and subagents
 

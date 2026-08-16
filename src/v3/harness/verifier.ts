@@ -157,6 +157,8 @@ export interface RunV3VerifierOptions {
   runDir: string;
   contract: OutputContract;
   finish: V3FinishFacts['finish'];
+  /** Code-derived requested outputs from the verified manifest snapshot. */
+  requestedOutputPaths?: readonly string[];
   clarifications: readonly V3UserClarification[];
   settled?: readonly V3SettledFact[];
   model: ModelDriver;
@@ -407,10 +409,16 @@ function unavailable(reason: string): V3VerifierOutcome {
 export function buildV3VerifierOpeningInput(
   options: Pick<
     RunV3VerifierOptions,
-    'taskText' | 'contract' | 'finish' | 'clarifications' | 'settled'
+    | 'taskText'
+    | 'contract'
+    | 'finish'
+    | 'requestedOutputPaths'
+    | 'clarifications'
+    | 'settled'
   >,
 ): string {
   const settled = options.settled ?? [];
+  const requestedOutputPaths = options.requestedOutputPaths ?? [];
   return [
     '# Task',
     options.taskText,
@@ -421,10 +429,10 @@ export function buildV3VerifierOpeningInput(
     '# Output contract (immutable single revision)',
     JSON.stringify(options.contract, null, 2),
     '',
-    '# Published paths named by the finish request',
-    options.finish.artifactPaths.length === 0
+    '# Published requested-output paths derived from the manifest',
+    requestedOutputPaths.length === 0
       ? '(none)'
-      : options.finish.artifactPaths.map((path) => `- ${path}`).join('\n'),
+      : requestedOutputPaths.map((path) => `- ${path}`).join('\n'),
     '',
     '# Inspection boundary',
     'Use the read-only tools to inspect manifest.json and files under artifacts/.',
@@ -483,10 +491,14 @@ export function formatV3VerifierCompletionClaim(
   finish: V3FinishFacts['finish'],
   clarifications: readonly V3UserClarification[] = [],
 ): string {
+  const workerClaim = {
+    summary: finish.summary,
+    limitations: finish.limitations,
+  };
   return [
     'The following JSON is the worker\'s finish request. Its summary and limitations are claims to evaluate, not facts established by code:',
     '```json',
-    JSON.stringify(finish, null, 2),
+    JSON.stringify(workerClaim, null, 2),
     '```',
     '',
     '# Recorded user clarifications',

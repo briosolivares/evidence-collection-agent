@@ -24,7 +24,11 @@ import {
   v3FinishFactsSchema,
   type V3FinishFacts,
 } from '../completion/types.js';
-import { finishInputSchema } from '../tools/finish.js';
+import {
+  finishInputSchema,
+  legacyFinishInputSchema,
+  type FinishInput,
+} from '../tools/finish.js';
 import type {
   V3FinishRequest,
   V3PendingToolTurn,
@@ -73,6 +77,16 @@ const jsonValueSchema: z.ZodType<V3CheckpointJson> = z.lazy(() =>
   ]),
 );
 
+/** Read old v3 finish cargo, but expose and rewrite only the current shape. */
+const v3CheckpointFinishInputSchema = z
+  .union([finishInputSchema, legacyFinishInputSchema])
+  .transform(
+    (finish): FinishInput => ({
+      summary: finish.summary,
+      limitations: [...finish.limitations],
+    }),
+  );
+
 const isoTimestampSchema = z
   .string()
   .refine((value) => {
@@ -117,12 +131,18 @@ const imageBlockSchema = z.strictObject({
   }),
 });
 
-const toolUseBlockSchema = z.strictObject({
-  type: z.literal('tool_use'),
-  id: z.string().min(1),
-  name: z.string().min(1),
-  input: jsonValueSchema,
-});
+const toolUseBlockSchema = z
+  .strictObject({
+    type: z.literal('tool_use'),
+    id: z.string().min(1),
+    name: z.string().min(1),
+    input: jsonValueSchema,
+  })
+  .transform((block) => {
+    if (block.name !== 'finish') return block;
+    const parsed = v3CheckpointFinishInputSchema.safeParse(block.input);
+    return parsed.success ? { ...block, input: parsed.data } : block;
+  });
 
 const toolResultBlockSchema = z.strictObject({
   type: z.literal('tool_result'),
@@ -307,9 +327,9 @@ export const v3PendingFinishSchema: z.ZodType<V3FinishRequest> = z
     call: z.strictObject({
       id: z.string().min(1),
       name: z.literal('finish'),
-      input: finishInputSchema,
+      input: v3CheckpointFinishInputSchema,
     }),
-    input: finishInputSchema,
+    input: v3CheckpointFinishInputSchema,
     assistantText: z.string(),
   })
   .superRefine((pending, ctx) => {
@@ -483,7 +503,7 @@ const terminalCheckpointSchema = z
     worker: v3WorkerSessionSnapshotSchema.optional(),
     /** Exact accepted finish claims, required for verified terminal recovery
      * so deterministic checks can be rerun against the current manifest. */
-    finish: finishInputSchema.optional(),
+    finish: v3CheckpointFinishInputSchema.optional(),
     outcome: v3DurableTerminalOutcomeSchema,
   })
   .superRefine((checkpoint, ctx) => {

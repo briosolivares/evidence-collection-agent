@@ -127,7 +127,6 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
       phase: 'terminal',
       finish: {
         summary: 'Published the requested one-row report.',
-        artifacts: ['artifacts/report.csv'],
         limitations: [],
       },
       outcome,
@@ -220,7 +219,10 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
     ]);
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
-      finish: { artifacts: ['artifacts/report.csv'] },
+      finish: {
+        summary: 'Published the requested one-row report.',
+        limitations: [],
+      },
       outcome,
     });
   }, 20_000);
@@ -317,7 +319,10 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
     ).toEqual(['initial', 'resume']);
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
-      finish: { artifacts: ['artifacts/report.csv'] },
+      finish: {
+        summary: 'Published the requested one-row report.',
+        limitations: [],
+      },
       budget: {
         toolCalls: 4,
         roles: { verifier: { turns: 2 } },

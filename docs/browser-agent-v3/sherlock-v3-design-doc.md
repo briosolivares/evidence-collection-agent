@@ -590,9 +590,11 @@ Common fields:
 
 Mode fields:
 
-- `file`: `source_path` must resolve under `scratch/workspace/`; exact bytes
-  are copied through `writeArtifact`.
+- `file`: `source_path` is the exact canonical run-relative path beginning
+  with `scratch/workspace/`; exact bytes are copied through `writeArtifact`.
 - `text`: `content` is encoded UTF-8 and written through `writeArtifact`.
+  Small final CSV, JSON, Markdown, and text outputs should use this direct
+  path instead of creating and then copying an unnecessary private file.
 - `screenshot`: optional `page_id` and `full_page`; bytes and current URL come
   from `BrowserController`.
 - `download`: exactly one of `url` or an accessibility
@@ -608,6 +610,8 @@ for an explicit correction.
 - `write_file` and `edit_file` write only private files under `scratch/`, with
   `scratch/workspace/` the normal location. Publication always goes through
   `publish_artifact`, making intent visible and role assignment unavoidable.
+- `write_file` returns structured `{ path, bytes }` data. `path` is the exact
+  canonical run-relative path accepted by `publish_artifact` file mode.
 - `read_file` may read published or scratch files but never harness-private
   state, manifest internals, transcript internals, metrics, or paths outside
   the run.
@@ -650,15 +654,15 @@ the next guard.
 ```json
 {
   "summary": "What was done and what each output contains.",
-  "artifacts": ["artifacts/top-stories.csv"],
   "limitations": []
 }
 ```
 
 - `summary` is required and user-facing.
-- `artifacts` lists every requested output the worker believes complete.
 - `limitations` names unresolved source/access/freshness constraints; an empty
   list is explicit.
+- Requested outputs and evidence are derived from the authoritative manifest,
+  rather than repeated as worker-authored finish input.
 - `finish` must be the only tool call in its assistant response.
 - It is a control call intercepted by the loop, not an ordinary tool that can
   declare success itself.
@@ -693,10 +697,11 @@ ends incomplete with its run directory preserved.
 
 ### 11.2 Deterministic finish checks
 
-On `finish`, code validates before spending a verifier attempt:
+On `finish`, code derives published outputs from the manifest and validates
+before spending a verifier attempt:
 
-- every listed path is confined, exists, is in the manifest, has a matching
-  hash, and carries `requested_output`;
+- every published requested output is confined, exists, has a matching hash,
+  carries `requested_output`, and is not marked partial;
 - every contract-required output exists with the right kind and filename;
 - CSV/JSON/Markdown tables have exactly the declared columns and valid row
   shapes—extra columns fail;

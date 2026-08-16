@@ -529,6 +529,8 @@ class CoordinatorState {
             runDir: this.options.runDir,
             contract: this.requireContract(),
             finish: facts.finish,
+            requestedOutputPaths:
+              facts.manifest?.requestedOutputPaths ?? [],
             clarifications: collectV3UserClarifications(
               this.requireSession().state.messages,
             ),

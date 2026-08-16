@@ -54,7 +54,6 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested report.',
-  artifactPaths: ['artifacts/report.csv'],
   limitations: ['The source exposed only the current reporting period.'],
 };
 
@@ -148,6 +147,7 @@ function verifyWith(model: ModelDriver) {
     runDir,
     contract: CONTRACT,
     finish: FINISH,
+    requestedOutputPaths: ['artifacts/report.csv'],
     clarifications: [],
     model,
     budget: budget(),
@@ -571,6 +571,7 @@ describe('runV3Verifier', () => {
       runDir,
       contract: CONTRACT,
       finish: FINISH,
+      requestedOutputPaths: ['artifacts/report.csv'],
       clarifications: [
         {
           question: 'Which period should the report cover?',
@@ -592,6 +593,10 @@ describe('runV3Verifier', () => {
       vi.mocked(model.generate).mock.calls[0]![0].messages,
     );
     expect(opening).toContain('Run-specific completion claim (not code-settled)');
+    expect(opening).toContain(
+      'Published requested-output paths derived from the manifest',
+    );
+    expect(opening).toContain('artifacts/report.csv');
     expect(opening).toContain(FINISH.limitations[0]);
     expect(opening).toContain('Which period should the report cover?');
     expect(opening).toContain('Use only the current reporting period.');

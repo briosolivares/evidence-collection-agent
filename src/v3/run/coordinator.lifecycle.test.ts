@@ -57,7 +57,6 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested one-row report.',
-  artifacts: ['artifacts/report.csv'],
   limitations: [],
 };
 

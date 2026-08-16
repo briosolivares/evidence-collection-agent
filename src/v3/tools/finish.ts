@@ -45,13 +45,6 @@ export const finishInputSchema = z.strictObject({
     8_000,
     'User-facing summary of the completed work and what each output contains',
   ),
-  artifacts: uniqueNonBlankStrings(
-    100,
-    1_024,
-    'Run-relative artifacts/ path for one completed requested output',
-  ).describe(
-    'Every published requested output the worker believes is complete; use an empty list only when none can be claimed',
-  ),
   limitations: uniqueNonBlankStrings(
     100,
     2_000,
@@ -64,6 +57,20 @@ export const finishInputSchema = z.strictObject({
 export type FinishInput = z.infer<typeof finishInputSchema>;
 
 /**
+ * Read compatibility for checkpoints written before requested outputs became
+ * manifest-derived. This schema is never exposed to the model-facing API.
+ */
+export const legacyFinishInputSchema = z.strictObject({
+  summary: finishInputSchema.shape.summary,
+  artifacts: uniqueNonBlankStrings(
+    100,
+    1_024,
+    'Legacy run-relative requested-output path',
+  ),
+  limitations: finishInputSchema.shape.limitations,
+});
+
+/**
  * Model-facing definition for the exclusive completion control call.
  *
  * `execute` is intentionally unusable. The v3 worker loop must recognize an
@@ -74,10 +81,10 @@ export const finishTool: ToolDef<FinishInput> = {
   name: FINISH_TOOL_NAME,
   description:
     'Request deterministic checks and independent verification after every requested output ' +
-    'has been published and inspected. Provide a user-facing summary, list every completed ' +
-    'requested-output path under artifacts/, and explicitly list unresolved limitations (use ' +
-    'an empty array when there are none). finish must be the only tool call in its assistant ' +
-    'response; it requests review and cannot declare success by itself.',
+    'has been published and inspected. Provide a user-facing summary and explicitly list ' +
+    'unresolved limitations (use an empty array when there are none). Requested outputs and ' +
+    'evidence are derived from the authoritative manifest. finish must be the only tool call ' +
+    'in its assistant response; it requests review and cannot declare success by itself.',
   inputSchema: finishInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {

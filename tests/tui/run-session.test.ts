@@ -119,7 +119,6 @@ function finishResponse(summary = 'Published report.csv.'): ModelStreamEvent[] {
         name: 'finish',
         input: {
           summary,
-          artifacts: ['artifacts/report.csv'],
           limitations: [],
         },
       },

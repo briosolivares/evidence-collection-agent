@@ -6,7 +6,7 @@ import {
   openSync,
   readSync,
 } from 'node:fs';
-import { join, relative, resolve, sep } from 'node:path';
+import { join, posix, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
@@ -27,6 +27,16 @@ import { SCRATCH_WORKSPACE_MAX_FILE_BYTES } from '../../run/syncScratchWorkspace
 import type { ToolCtx, ToolDef } from '../../tools/registry.js';
 
 const WORKSPACE_PREFIX = `${SCRATCH_DIR}/workspace/`;
+
+const workspaceSourcePathSchema = z
+  .string()
+  .min(1)
+  .refine(isCanonicalWorkspaceSourcePath, {
+    message:
+      'must be a canonical run-relative path beginning with "scratch/workspace/" ' +
+      '(for example "scratch/workspace/report.csv"); copy the exact path returned ' +
+      'by write_file or browser_execute changed_files',
+  });
 
 /**
  * One publication is bounded to the same per-file ceiling as the private
@@ -86,11 +96,13 @@ export const publishArtifactInputSchema = z
       .describe(
         'Source URL for file or text publication. Screenshot and download provenance is browser-derived.',
       ),
-    source_path: z
-      .string()
-      .min(1)
+    source_path: workspaceSourcePathSchema
       .optional()
-      .describe('File-mode source under scratch/workspace/.'),
+      .describe(
+        'File-mode source as the exact canonical run-relative path returned by ' +
+          'write_file or browser_execute changed_files. It must begin with ' +
+          'scratch/workspace/ (for example scratch/workspace/report.csv).',
+      ),
     content: z
       .string()
       .optional()
@@ -191,10 +203,12 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
   name: 'publish_artifact',
   description:
     'Publish one artifact with explicit semantic roles. Choose kind=file to copy exact bytes ' +
-    'from scratch/workspace, kind=text for UTF-8 content, kind=screenshot for browser PNG ' +
-    'bytes, or kind=download for browser-captured resource bytes. artifact_path must be under ' +
-    'artifacts/. Screenshot and download source provenance is derived from the browser. ' +
-    'Overwriting is allowed only when the existing artifact has the same role set.',
+    'from an existing canonical run-relative scratch/workspace/ source_path. Choose kind=text ' +
+    'to publish small final CSV, JSON, Markdown, or other UTF-8 content directly without an ' +
+    'intermediate write_file call; choose kind=screenshot for browser PNG bytes or ' +
+    'kind=download for browser-captured resource bytes. artifact_path must be under artifacts/. ' +
+    'Screenshot and download source provenance is derived from the browser. Overwriting is ' +
+    'allowed only when the existing artifact has the same role set.',
   inputSchema: publishArtifactInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   async execute(input, ctx): Promise<ManifestEntry> {
@@ -385,10 +399,15 @@ function inspectDestinationPath(
  */
 function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
   const absolutePath = resolveRunPath(runDir, requestedPath);
-  const normalizedPath = relative(resolve(runDir), absolutePath);
-  if (!normalizedPath.startsWith(WORKSPACE_PREFIX.split('/').join(sep))) {
+  const normalizedPath = relative(resolve(runDir), absolutePath).split(sep).join('/');
+  if (
+    normalizedPath !== requestedPath ||
+    !isCanonicalWorkspaceSourcePath(normalizedPath)
+  ) {
     throw new Error(
-      `source_path must resolve under ${WORKSPACE_PREFIX}: ${JSON.stringify(requestedPath)}`,
+      'source_path must be the exact canonical run-relative path of a file under ' +
+        `${WORKSPACE_PREFIX} (for example "scratch/workspace/report.csv"): ` +
+        JSON.stringify(requestedPath),
     );
   }
 
@@ -445,11 +464,20 @@ function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
   }
 }
 
+function isCanonicalWorkspaceSourcePath(value: string): boolean {
+  return (
+    value.startsWith(WORKSPACE_PREFIX) &&
+    value.length > WORKSPACE_PREFIX.length &&
+    !value.includes('\\') &&
+    posix.normalize(value) === value
+  );
+}
+
 function assertSourceAncestorsAreDirectories(
   runDir: string,
   normalizedPath: string,
 ): void {
-  const segments = normalizedPath.split(sep);
+  const segments = normalizedPath.split('/');
   let current = resolve(runDir);
   for (let index = 0; index < segments.length; index += 1) {
     current = join(current, segments[index]!);

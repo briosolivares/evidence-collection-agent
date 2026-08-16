@@ -112,7 +112,7 @@ SDK-free conversation types in `src/loop/messages.ts` mirror the Messages API: `
 
 ## Finish and verification data
 
-`finish` input is `{ summary, artifacts, limitations }`. It is control flow, not a generic executor. `src/v3/completion/types.ts` defines strict serializable defects and positive facts produced by deterministic inspection. The fresh verifier returns either `verified`, `needs_correction`, or an unavailable outcome; it does not author facts that code can settle.
+`finish` input is `{ summary, limitations }`. It is control flow, not a generic executor. Requested outputs and evidence are selected from the authoritative manifest; the derived requested-output paths are persisted with deterministic facts for verifier and recovery use. `src/v3/completion/types.ts` defines strict serializable defects and positive facts produced by deterministic inspection. The fresh verifier returns either `verified`, `needs_correction`, or an unavailable outcome; it does not author facts that code can settle.
 
 ## Transcript and metrics
 
