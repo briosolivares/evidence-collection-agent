@@ -131,6 +131,7 @@ export function ArtifactsPanel({
               cursor={focused ? ui.cursor : 0}
               showCursor={focused}
               limit={limit}
+              showVerifiedHelperProposals={summary !== undefined}
             />
             <Text color={theme.muted}>
               {focused

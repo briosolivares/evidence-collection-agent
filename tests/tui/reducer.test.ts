@@ -4,6 +4,7 @@ import {
   createInitialState,
   deriveSuggestions,
   HELP_TEXT,
+  orderArtifactsForSummary,
   reduce,
   routeInput,
   unknownCommandNotice,
@@ -18,6 +19,35 @@ describe('createInitialState', () => {
     expect(state.mode).toBe('idle');
     expect(state.transcript).toHaveLength(1);
     expect(state.transcript[0]).toMatchObject({ kind: 'banner', apiKeyPresent: true });
+  });
+});
+
+describe('orderArtifactsForSummary', () => {
+  it('keeps verified helper proposals separate and last', () => {
+    const artifact = (
+      filename: string,
+      roles: ManifestEntry['roles'],
+    ): SessionState['artifacts'][number] => ({
+      entry: {
+        filename,
+        sha256: 'a'.repeat(64),
+        roles,
+        capturedAt: '2026-08-15T00:00:00.000Z',
+      },
+      sizeBytes: 1,
+    });
+    const proposal = artifact(
+      'artifacts/helper-proposals/helper.patch',
+      ['requested_output', 'evidence'],
+    );
+    const evidence = artifact('artifacts/source.png', ['evidence']);
+    const output = artifact('artifacts/result.csv', ['requested_output']);
+
+    expect(orderArtifactsForSummary([proposal, evidence, output])).toEqual([
+      output,
+      evidence,
+      proposal,
+    ]);
   });
 });
 

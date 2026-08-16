@@ -214,10 +214,20 @@ function clampCursor(cursor: number, length: number): number {
 }
 
 /**
+ * Shared helper proposals are review candidates rather than ordinary
+ * deliverables. Even when a task explicitly requests one, the verified-run
+ * UI keeps it in its own final group so it cannot be mistaken for a normal
+ * requested output.
+ */
+export function isHelperProposalArtifact(artifact: PublishedArtifact): boolean {
+  return artifact.entry.filename.startsWith('artifacts/helper-proposals/');
+}
+
+/**
  * Summary display order: requested outputs first, then evidence-only
- * artifacts, each group keeping its publish order. The live rail keeps
- * raw publish order (chronological log); the completion panel and the
- * transcript digest use this instead.
+ * artifacts, then verified helper proposals; each group keeps publish order.
+ * The live rail keeps raw publish order (chronological log); the completion
+ * panel and transcript digest use this instead.
  */
 export function orderArtifactsForSummary(
   artifacts: readonly PublishedArtifact[],
@@ -225,8 +235,13 @@ export function orderArtifactsForSummary(
   const isRequested = (artifact: PublishedArtifact) =>
     (artifact.entry.roles ?? []).includes('requested_output');
   return [
-    ...artifacts.filter(isRequested),
-    ...artifacts.filter((artifact) => !isRequested(artifact)),
+    ...artifacts.filter(
+      (artifact) => isRequested(artifact) && !isHelperProposalArtifact(artifact),
+    ),
+    ...artifacts.filter(
+      (artifact) => !isRequested(artifact) && !isHelperProposalArtifact(artifact),
+    ),
+    ...artifacts.filter(isHelperProposalArtifact),
   ];
 }
 

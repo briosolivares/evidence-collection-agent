@@ -16,7 +16,7 @@ import {
   revealPath,
   type OpenExternalResult,
 } from '../openExternal.js';
-import type { UiAction } from '../store/reducer.js';
+import { isHelperProposalArtifact, type UiAction } from '../store/reducer.js';
 import type { ArtifactUiState, PublishedArtifact } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 
@@ -109,6 +109,11 @@ interface ArtifactRowsProps {
   showCursor?: boolean;
   /** Visible window size for long lists. */
   limit?: number;
+  /** A completed, verified run may contain reviewable helper proposals.
+   * They stay ordinary evidence artifacts, but the design requires the TUI
+   * to distinguish them from requested outputs. Live/incomplete runs leave
+   * this false because a proposal is not review-ready until verification. */
+  showVerifiedHelperProposals?: boolean;
 }
 
 /** The windowed artifact rows (house list idiom: `› ` + emphasis on the
@@ -118,6 +123,7 @@ export function ArtifactRows({
   cursor,
   showCursor = true,
   limit = 8,
+  showVerifiedHelperProposals = false,
 }: ArtifactRowsProps) {
   const windowStart = Math.max(
     0,
@@ -130,19 +136,30 @@ export function ArtifactRows({
       {visible.map((artifact, index) => {
         const absolute = windowStart + index;
         const selected = showCursor && absolute === cursor;
+        const beginsVisibleProposalGroup =
+          showVerifiedHelperProposals &&
+          isHelperProposalArtifact(artifact) &&
+          (index === 0 || !isHelperProposalArtifact(visible[index - 1]!));
         return (
-          <Text key={artifact.entry.filename}>
-            <Text color={selected ? theme.emphasis : undefined}>
-              {selected ? '› ' : '  '}
+          <Box key={artifact.entry.filename} flexDirection="column">
+            {beginsVisibleProposalGroup && (
+              <Text color={theme.primary} bold>
+                Verified helper proposals
+              </Text>
+            )}
+            <Text>
+              <Text color={selected ? theme.emphasis : undefined}>
+                {selected ? '› ' : '  '}
+              </Text>
+              <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
+              <Text color={selected ? theme.emphasis : undefined}>
+                {artifact.entry.filename}
+              </Text>
+              <Text color={theme.muted}>
+                {`  ${artifact.sizeBytes === undefined ? '?' : formatBytes(artifact.sizeBytes)}`}
+              </Text>
             </Text>
-            <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
-            <Text color={selected ? theme.emphasis : undefined}>
-              {artifact.entry.filename}
-            </Text>
-            <Text color={theme.muted}>
-              {`  ${artifact.sizeBytes === undefined ? '?' : formatBytes(artifact.sizeBytes)}`}
-            </Text>
-          </Text>
+          </Box>
         );
       })}
       {artifacts.length > limit && (

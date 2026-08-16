@@ -72,12 +72,27 @@ function completedState(options: {
   finalText?: string;
   focused?: boolean;
   publishCount?: number;
+  helperProposal?: boolean;
 } = {}): SessionState {
+  const publishedActions = publishes().slice(0, options.publishCount ?? 3);
+  if (options.helperProposal === true) {
+    publishedActions.push({
+      type: 'artifact_published',
+      entry: {
+        filename: 'artifacts/helper-proposals/table-reader.patch',
+        sha256: SHA,
+        roles: ['evidence'],
+        capturedAt: '2026-08-12T10:03:00.000Z',
+      },
+      sizeBytes: 512,
+      toolExecId: 4,
+    });
+  }
   const actions: StoreAction[] = [
     { type: 'run_started', task: 'investigate', at: 0 },
     { type: 'run_dir', runDir: RUN_DIR },
     { type: 'turn_start', turn: 1 },
-    ...publishes().slice(0, options.publishCount ?? 3),
+    ...publishedActions,
     { type: 'turn_end', usage: { input: 17_000, output: 1_700 } },
     {
       type: 'run_finished',
@@ -170,6 +185,22 @@ describe('ArtifactsPanel (passive)', () => {
     ].map((name) => frame.indexOf(name));
     expect(positions.every((index) => index >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    unmount();
+  });
+
+  it('separates verified helper proposals from requested outputs', async () => {
+    const { lastFrame, unmount } = render(
+      <Harness initial={completedState({ helperProposal: true })} />,
+    );
+    await tick();
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('Verified helper proposals');
+    expect(frame.indexOf('artifacts/top5.csv')).toBeLessThan(
+      frame.indexOf('Verified helper proposals'),
+    );
+    expect(frame.indexOf('Verified helper proposals')).toBeLessThan(
+      frame.indexOf('artifacts/helper-proposals/table-reader.patch'),
+    );
     unmount();
   });
 
@@ -351,6 +382,34 @@ describe('ArtifactsPanel (artifacts-only, no summary)', () => {
     expect(frame).toContain('› ◆ artifacts/top5.csv');
     expect(frame).not.toContain('✓');
     expect(frame).not.toContain('Task completed');
+    unmount();
+  });
+
+  it('does not call a retained proposal verified after cancellation', async () => {
+    const actions: StoreAction[] = [
+      { type: 'run_started', task: 'investigate', at: 0 },
+      { type: 'run_dir', runDir: RUN_DIR },
+      { type: 'turn_start', turn: 1 },
+      {
+        type: 'artifact_published',
+        entry: {
+          filename: 'artifacts/helper-proposals/candidate.patch',
+          sha256: SHA,
+          roles: ['evidence'],
+          capturedAt: '2026-08-12T10:03:00.000Z',
+        },
+        sizeBytes: 128,
+        toolExecId: 1,
+      },
+      { type: 'run_cancelled', at: 9_000 },
+      { type: 'artifacts_focus' },
+    ];
+    const { lastFrame, unmount } = render(
+      <Harness initial={actions.reduce(reduce, createInitialState())} />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('artifacts/helper-proposals/candidate.patch');
+    expect(lastFrame()).not.toContain('Verified helper proposals');
     unmount();
   });
 
