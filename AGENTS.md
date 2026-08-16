@@ -132,10 +132,12 @@ from manifest entries carrying `requested_output`.
 ## Current state (2026-08-15)
 
 The v3 runtime, attached-local cutover, public composition, TUI/eval adapters,
-and legacy-runtime retirement are implemented. Active documentation and final
-acceptance are the remaining steps. The last pre-retirement full suite passed
-175 files / 2,265 tests; focused retirement gates and typecheck are green.
-No live Browserbase smoke or eval re-baseline has run during this work.
+legacy-runtime retirement, active documentation, and local final acceptance are
+complete. Production `src` is 31,680 raw lines across 111 files; the complete
+hermetic suite passes 131 files / 1,465 tests, and typecheck is green. The live
+Browserbase smoke, first-use attachment to the user's daily Chrome, and an eval
+re-baseline were not run because they require explicit external authority or
+consume live resources; their status is recorded in the v3 implementation plan.
 
 ## Custom Instructions
 

@@ -1,6 +1,6 @@
 # Sherlock v3 implementation plan and progress log
 
-**Status:** active
+**Status:** complete (local/hermetic acceptance; live external checks explicitly deferred)
 
 **Last updated:** 2026-08-15
 
@@ -265,17 +265,18 @@ or prompts name removed tools/protocols; focused and full tests pass.
 
 ### Step 7 — final acceptance and completion audit
 
-- [ ] Run `npm run typecheck`.
-- [ ] Run the complete hermetic `npm test` suite.
-- [ ] Run fixture-backed acceptance journeys for table, screenshot/download,
+- [x] Run `npm run typecheck`.
+- [x] Run the complete hermetic `npm test` suite.
+- [x] Run fixture-backed acceptance journeys for table, screenshot/download,
   multi-page synthesis, human handoff, cancellation, and crash/resume.
-- [ ] Run the Browserbase smoke only if credentials/approval are available and
-  it is still necessary; record any unverified remote behavior explicitly.
-- [ ] Run a secret sweep over representative run directories.
-- [ ] Inspect final diff, production import graph, tool order/schema snapshot,
+- [x] Evaluate the Browserbase smoke gate. It was not run because it is
+  live/billable and the user did not authorize it; remote behavior remains
+  explicitly unverified rather than inferred from fakes.
+- [x] Run a secret sweep over representative run directories.
+- [x] Inspect final diff, production import graph, tool order/schema snapshot,
   manifest outputs, transcript, metrics, checkpoints, and owned tabs.
-- [ ] Complete the requirement-to-evidence matrix in this file.
-- [ ] Record final line/file/test deltas and residual risks.
+- [x] Complete the requirement-to-evidence matrix in this file.
+- [x] Record final line/file/test deltas and residual risks.
 
 **Gate:** every explicit objective and design requirement has direct current
 evidence. Passing narrow tests alone is not completion.
@@ -290,19 +291,19 @@ proved, even if supporting code already exists.
 | Expanded v3 design | Design document reviewed against code | Complete |
 | Durable step plan/progress | This file | Complete; maintained continuously |
 | Browser-harness reference used | Pinned commit plus design adaptation table | Complete |
-| Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete for Step 1 |
-| Editable run helpers and reviewed promotion | Run artifact/patch tests + docs | Pending |
+| Programmable `browser_execute` | Tool tests + fixture acceptance transcript | Complete |
+| Editable run helpers and reviewed promotion | Confined import/upload journey; static prompt; evidence-only patch/metadata finish test; verified TUI grouping | Complete |
 | Compact v3 tool surface | Registry/schema snapshot | Complete for Step 3 |
-| Sherlock TUI preserved | TUI integration suite + fixture smoke | Complete; 28 files / 324 tests |
+| Sherlock TUI preserved | TUI integration suite + fixture smoke | Complete |
 | Streaming main loop preserved | Model/loop tests + transcript | Complete; v3 is the sole production composition |
 | Evals/graders preserved | Eval runner/grader suite + boundary inspection | Complete locally; no paid re-baseline run |
-| Durable run directory preserved | Manifest/checkpoint/resume tests + run inspection | V3 coordinator complete; production cutover pending |
-| Local + Browserbase seam preserved | Provider tests; live smoke if authorized | Provider-neutral command seam complete; cutover/live smoke pending |
-| Accuracy checks preserved | Completion/verifier correction tests | V3 checks/verifier complete; production cutover pending |
-| Owned tabs always cleaned | Browser lifecycle tests on all terminal paths | V3 controller/coordinator and crash recovery complete; production cutover pending |
-| Secrets/CDP capability never leak | Secret sweep + child-env tests | Browser substrate complete; final whole-product sweep pending |
-| No task-specific logic | Source/prompt/helper audit | Pending |
-| Full implementation complete | Steps 0–7 and final audit | Pending |
+| Durable run directory preserved | Manifest/checkpoint/resume tests + representative terminal run inspection | Complete |
+| Local + Browserbase seam preserved | Provider/command/upload/download contract tests | Complete hermetically; live Browserbase smoke remains unrun by explicit policy |
+| Accuracy checks preserved | Deterministic rejection/repair and fresh-verifier correction tests | Complete |
+| Owned tabs always cleaned | Terminal lifecycle + real SIGKILL attached-ownership tests | Complete |
+| Secrets/CDP capability never leak | Child-env/redaction gate + recursive representative run-directory sentinel sweep | Complete locally |
+| No task-specific logic | Production source/prompt/helper audit | Complete; no task-name/text dispatch branch |
+| Full implementation complete | Steps 0–7 and final audit | Complete locally; external live measurements listed below |
 
 ## Progress log / handoff notes
 
@@ -1008,9 +1009,12 @@ proved, even if supporting code already exists.
   succeeds.
 - Structural code delta for this slice is +530/-5,959 raw lines (net -5,429):
   production +248/-4,463 (net -4,215), tests +282/-1,496 (net -1,214). The
-  live tree is 31,680 production lines across 111 files and 30,391 test lines
-  across 95 files. Relative to the Step 6 coexistence baseline, production is
-  down 19,529 lines/56 files and tests are down 21,494 lines/80 files.
+  live tree is 31,680 production lines across 111 files; the slice handoff's
+  30,391-line/95-file test subtotal covered `src/` plus `tests/` but omitted
+  `evals/`. The final Step 7 record below restores the binding all-test-files
+  convention rather than comparing that subtotal with the full baseline.
+  Relative to the Step 6 coexistence baseline, production is down 19,529
+  lines/56 files.
 - `npm run typecheck`, the retired-symbol scan, and `git diff --check` pass.
   The serial local-Chrome/browser impact gate passes 15 files / 139 tests.
   No live Browserbase session or eval re-baseline ran.
@@ -1030,6 +1034,46 @@ proved, even if supporting code already exists.
   from the package graph. The active-doc removed-symbol scan is empty, and all
   relative Markdown link targets resolve. Typecheck and the complete hermetic
   test suite remain the Step 7 gate.
+
+### 2026-08-15 — Step 7 final acceptance complete
+
+- Final clean-tree gates pass: `npm run typecheck -- --pretty false`, then the
+  complete hermetic suite at 131/131 files and 1,465/1,465 tests in 53.63s.
+  The explicit serial acceptance group passes 8 files / 46 tests and covers a
+  real table run, multi-page browser synthesis, screenshot and generated/blob
+  download publication, human handoff, cancellation, deterministic/verifier
+  repairs, process crash/resume, and attached-page reclamation after SIGKILL.
+- A representative public run now recursively sweeps every regular file for
+  an ambient Browserbase-key sentinel and finds none. The same run verifies
+  exact artifact bytes/hash/roles, a finalized manifest, ordered transcript,
+  terminal metrics and v3 checkpoint, immutable contract projection, an empty
+  artifact journal, a released run lock, and no remaining owned task page.
+  The broader child-env/provider/redaction gate passes 8 files / 127 tests.
+- The static tool/schema gate passes 3 files / 13 tests. Tool registry order
+  and API-definition order are both exactly `browser_execute`,
+  `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
+  `ask_user`, `finish`; the deeply frozen prompt/API prefix SHA-256 is
+  `f8f94520d78221dcf36c184681faeb80c56414aa5d591088c384ea171e235e88`.
+  A relative-import closure from `src/cli/runTask.ts` reaches 54 production
+  modules (25 under `src/v3/`) and no retired scheduler/store/browser-action
+  module. A source audit found no task-name or task-text dispatch branch.
+- Final physical-line counts use the original audit convention: production
+  `src` is 31,680 lines across 111 files; every tracked test is 34,760 lines
+  across 131 files. Against the temporary Step 6 coexistence peak, production
+  is down 19,529 lines/56 files (38.1%), tests are down 17,125 lines/44 files
+  (33.0%), and combined code is down 36,654 lines (35.6%). Against the pre-v3
+  baseline, the completed system is 1,877 production lines and 1,698 test
+  lines smaller (3,575 combined, 5.1%) despite retaining the new v3 features.
+  Tracked files fell from 579 at coexistence to 477. The branch-wide textual
+  diff is 29 commits / 297 files / +41,221/-42,932 lines; that rewrite-heavy
+  number is reported separately and is not presented as structural SLOC.
+- No local blocker remains. Deliberately unrun external measurements are the
+  live/billable Browserbase smoke (including real Context, upload/download,
+  target-site IP/fingerprint behavior), first-use attachment to the user's
+  daily Chrome, and an eval re-baseline against changing live sites. The
+  run-local module loader retains the documented narrow same-user TOCTOU and
+  normal nested-import resolution; `bash` and model-authored browser programs
+  remain explicitly non-sandboxed OS-user capabilities.
 
 ## Rules for coordinators and subagents
 
