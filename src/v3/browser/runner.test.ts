@@ -739,15 +739,27 @@ describe('runBrowserProgram', () => {
     expect(sendCdp).not.toHaveBeenCalled();
   });
 
-  it('kills a child that writes malformed messages directly to the private channel', async () => {
-    const result = await runBrowserProgram(
+  it('fails closed on direct malformed or oversized private-channel writes', async () => {
+    const malformed = await runBrowserProgram(
       options(
         `process.send({ version: 1, kind: 'not-a-real-message' }); await new Promise(() => {});`,
       ),
     );
+    const oversized = await runBrowserProgram(
+      options(
+        `process.send({
+          version: 1,
+          kind: 'not-a-real-message',
+          data: 'x'.repeat(${BROWSER_PROGRAM_LIMITS.maxIpcMessageBytes})
+        });
+        await new Promise(() => {});`,
+      ),
+    );
 
-    expect(result.status).toBe('protocol_error');
-    expect(result.error?.message).toContain('unknown IPC message kind');
+    expect(malformed.status).toBe('protocol_error');
+    expect(malformed.error?.message).toContain('unknown IPC message kind');
+    expect(oversized.status).toBe('protocol_error');
+    expect(oversized.error?.message).toContain('child IPC message exceeds');
   });
 
   it('uses only the sanitized caller environment and never ambient process.env', async () => {
