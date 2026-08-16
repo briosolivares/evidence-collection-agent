@@ -1,126 +1,180 @@
 # Workflows
 
-The key processes end-to-end.
+Current end-to-end behavior of the v3-only runtime.
 
-## 1. A task run (`runTask`)
+## 1. Fresh task run
 
 ```mermaid
 sequenceDiagram
-    participant Caller as REPL / eval CLI
-    participant RT as runTask
-    participant TR as RunTracing
-    participant B as BrowserController
-    participant L as runAgentLoop
-    Caller->>RT: runTask(taskText, { browser, ... })
-    RT->>RT: createRunDir + initManifest
-    RT->>TR: createRunTracing(); wrapCallModel + wrapRegistry
-    RT->>TR: traceRun(taskText, ...)
-    TR->>B: newTab()
-    opt startUrl provided
-        B->>B: goto(startUrl)
+    participant U as TUI / REPL / eval
+    participant R as runTask
+    participant C as v3 coordinator
+    participant I as initializer
+    participant W as worker
+    participant D as deterministic checks
+    participant V as fresh verifier
+    U->>R: task + live browser + explicit policy
+    R->>R: durable configuration, run dir, manifest
+    R->>C: runV3Coordinator(...)
+    C->>C: acquire run lock; write initializing checkpoint
+    C->>I: task, contract-only tools
+    I-->>C: one immutable OutputContract
+    C->>W: task + contract guidance
+    loop until a trusted terminal result
+        W-->>C: ordered work, or exclusive finish
+        C->>D: inspect claim + manifest + bytes
+        alt defects
+            D-->>W: finish tool result with repairs
+        else checks pass
+            C->>V: fresh context + facts + published run
+            alt correction
+                V-->>W: finish tool result with repairs
+            else verified
+                V-->>C: verified
+            end
+        end
     end
-    TR->>L: runAgentLoop(taskText, deps, config)
-    L-->>TR: LoopResult (metrics.json written)
-    Note over RT: finally, nested:<br/>closeTab → finalizeManifest → tracing.close
-    RT-->>Caller: { runDir } & LoopResult
+    C->>C: terminal checkpoint, projections, cleanup
+    C-->>R: durable outcome
+    R-->>U: runDir + verified/incomplete result
 ```
 
-The browser **session** is never closed by `runTask` — only the tab. Its caller owns the session: interactive/authenticated callers reuse persistent Chrome, while normal eval callers close their isolated headless session and remove its temporary profile after the trial.
+`runTask` creates the run directory and manifest before any tool can write. The coordinator owns the run lock, browser task pages, all three role budgets, checkpoint boundaries, and terminalization. The caller owns the browser session; only run-owned pages are closed.
 
-## 2. One turn of the agent loop (`src/loop/agentLoop.ts`)
+The initializer gets one initial attempt and one repair. It cannot browse or write. The accepted contract becomes immutable before the worker starts.
+
+## 2. Worker turn and completion cycle
 
 ```mermaid
 flowchart TD
-    A["turnCount += 1"] --> B["append model_request to transcript"]
-    B --> C["callModel(state.messages) — streaming"]
-    C --> D["append model_response; accumulate usage;\npush assistant message"]
-    D --> E{"tool_use blocks\nin content?"}
-    E -->|"no"| F["finish: completed\n(finalText = joined text blocks;\nmetrics.json written)"]
-    E -->|"yes"| G["append all tool_call events\nin request order"]
-    G --> H["scheduleToolCalls:\nread-only batches parallel (≤5),\nstate-changing serialized as barriers"]
-    H --> I["append all tool_result events;\npush one user message of tool_result blocks"]
-    I --> J{"turn ≥ maxTurns?"}
-    J -->|"yes"| K["finish: budget_exceeded / max_turns"]
-    J -->|"no"| L{"input+output+cache_read\n> maxTokens?"}
-    L -->|"yes"| M["finish: budget_exceeded / token_budget"]
-    L -->|"no"| A
+    A["checkpoint ready_for_model"] --> B["build pure context view"]
+    B --> C["strict streaming ModelDriver call"]
+    C --> D{"complete response accepted?"}
+    D -->|no| E["charge known usage; bounded correction or incomplete"]
+    D -->|yes| F["persist assistant response"]
+    F --> G{"tool calls?"}
+    G -->|none| H["append continuation; keep working"]
+    G -->|ordinary calls| I["execute sequentially in response order"]
+    I --> J["append ordered results; checkpoint"]
+    G -->|finish only| K["deterministic read-only checks"]
+    G -->|finish mixed with another call| L["execute nothing; protocol correction"]
+    K -->|defects| M["append finish result; same conversation"]
+    K -->|pass| N["fresh read-only verifier"]
+    N -->|needs correction| M
+    N -->|verified| O["terminal verified checkpoint"]
+    H --> A
+    J --> A
+    M --> A
 ```
 
-Notes: completion is checked **before** the budget guards, so a final no-tool response completes even if the budget is exhausted; the token guard is strictly-greater-than, so the budget is spendable in full; `stop_reason` is never consulted.
+No-tool prose is not completion. `finish` must be the only call in its response and claims `{ summary, artifacts, limitations }`. Deterministic failures never reach the verifier; verifier corrections resume the same worker conversation. Only verifier acceptance yields public success.
 
-## 3. Tool execution pipeline (`src/tools/pipeline.ts`)
+Whole-run ceilings cover worker turns, request context, tool calls, all-role model tokens, model-visible tool-result bytes, wall time, deterministic failures, and verifier corrections. Accounting is monotone and checkpointed.
 
-Every call, six stages, never throws:
+## 3. Tool execution
+
+The generic pipeline in `src/tools/pipeline.ts` performs:
 
 ```mermaid
 flowchart LR
-    A["1. exists?\n(unknown → error listing\navailable tools)"] --> B["2. zod validate\n(issues rendered per path)"]
-    B --> C["3. execute(input, ctx)"]
-    C --> D["4. normalize\n(string pass-through,\nundefined → '', else JSON)"]
-    D --> E["5. cap\n(> 50 KB → offload to\nscratch/tool-output/, preview + path)"]
-    E --> F["6. ToolCallResult"]
-    C -.->|"throw"| X["execution_error\n(structured, model-readable)"]
+    A["registry lookup"] --> B["Zod validation"]
+    B --> C["permission gate"]
+    C --> D["busy-resource gate"]
+    D --> E["bounded execute"]
+    E --> F["normalize"]
+    F --> G["cap / durable offload"]
+    G --> H["ToolCallResult"]
 ```
 
-Offloaded output is written through `writeArtifact`, so it is hashed into the manifest like any deliverable.
+Failures become structured model-readable results. A timeout abandons waiting, not necessarily the underlying effect: its access set stays busy until the executor settles. Later conflicting work waits only for a finite gate, and terminalization drains the registry to a fixed point before releasing ownership.
 
-## 4. Browser observation and action
+The worker's eight tools are static and ordered: `browser_execute`, `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`, `finish`.
 
-The working cycle the system prompt teaches the model:
+- `browser_execute` runs one finite program against one exact run-owned page. Its run-scoped JavaScript policy is durable and explicit.
+- `publish_artifact` is the sole worker publication surface for text, workspace bytes, screenshots, and downloads.
+- File editing and `bash` operate in private `scratch/workspace/`; `bash` is foreground-only, bounded, and reconciles surviving files before returning.
+- `ask_user` passes through the interactive permission seam. Headless or unavailable environments fail closed instead of hanging.
+- `finish` is intercepted control flow and never reaches a generic executor.
 
-1. `navigate` (or start from `startUrl`) → returns the **landed** URL + title.
-2. `inspect_page` → `URL / Title` header + the ARIA outline with refs (built from the whole DOM, so no scrolling needed just to read a loaded page).
-3. `click <ref>` / `type <ref>` — the tool re-reads the outline first to attach a human description to the transcript and catch stale refs before acting; stale refs return "run inspect_page again and use a current ref."
-4. For lazy-loading pages (infinite scroll): `scroll` → `inspect_page` again (fresh refs, newly loaded content), or `scroll` → `screenshot` to frame a viewport capture.
-5. `screenshot { filename, fullPage? }` and `download { ref, filename? }` write evidence with `sourceUrl` provenance; `download` fetches through the browser session (cookies apply) and rejects non-2xx. JS-triggered downloads (no href) are a known gap — the error message says so.
+## 4. Durable writes and recovery
 
-## 5. Run persistence
+Normal artifact writes use `writeArtifact`: validate the confined path and partition, persist a write-ahead journal entry, atomically replace bytes, update the manifest hash, and clear the journal. Crash recovery completes or rejects an interrupted transaction before trusted inspection.
 
-Ordering guarantees: `initManifest` happens before the loop starts (so `writeArtifact` can never write untracked files); `metrics.json` is written by the loop's single `finish()` funnel on every exit path; `finalizeManifest` stamps `finishedAt` in `runTask`'s `finally` even when the loop throws. The transcript is synchronous append-only JSONL — serialize-before-write so a bad event can't corrupt the file.
+The checkpoint store reads regular files without following symlinks, enforces a 64 MiB ceiling and strict schema, writes monotonically through same-directory atomic replacement, and retains exclusive ownership through terminal cleanup. `harness/` permissions are private and its paths are never accepted from the model.
 
-## 6. Running evals
+`bash` is the deliberate write-chokepoint exception. It writes directly inside `scratch/workspace/`; `syncScratchWorkspace` then scans without following symlinks, hashes every surviving regular file, removes deleted tracked entries, and fails on unsafe or oversized nodes.
+
+## 5. Resume
 
 ```mermaid
 sequenceDiagram
-    participant CLI as evals/runners/cli.ts
-    participant R as runEvals
-    participant A as runTask (real agent)
-    participant O as Oracle (live API)
-    participant G as Grader
-    CLI->>CLI: parse --tasks/--k/--concurrency; load tasks
-    CLI->>R: runEvals(tasks, k, { concurrency, runTask })
-    par normal jobs (bounded pool, default 3)
-        R->>A: isolated headless Chrome + temp profile + runTask
-    and authenticated jobs (serial lane)
-        R->>A: shared headed chrome-profile + runTask
-    end
-    loop completed trials (one-slot grading queue)
-        A-->>R: { runDir } (+ latency timed)
-        R->>O: fetchOracle() — at grading time
-        O-->>R: oracleData
-        R->>G: grade(runDir, oracleData)
-        G-->>R: AssertionResult[] (≥1 or the harness throws)
-    end
-    R-->>CLI: EvalReport
-    CLI->>CLI: print formatReport; writeResults → evals/experiments/<id>.json
-    CLI->>CLI: close sessions; remove temporary profiles
+    participant U as caller
+    participant R as resumeTask
+    participant P as read-only checkpoint probe
+    participant C as coordinator
+    participant S as locked checkpoint store
+    U->>R: runDir + fresh browser + explicit authenticated
+    R->>P: bounded/no-follow observation
+    P-->>R: frozen phase + durable configuration
+    R->>R: compare caller assertions
+    R->>C: compose from durable values
+    C->>S: acquire lock; re-read and validate full checkpoint
+    S-->>C: authoritative phase state
+    C->>C: recover conservatively and continue/repair projections
 ```
 
-Modes by parameters: `--tasks hacker_news --k 1` (debugging inner loop), `--k 3 --concurrency 3` (parallel consistency run), or lower concurrency for resource-constrained machines. `requiresAuth` metadata, never task-specific runtime logic, selects the headed serial lane. The development done-bar remains every task passing all 3 trials.
+The pre-lock observation performs no write, cleanup, or lock acquisition. It is only enough to select composition. The coordinator revalidates under lock. An `uncertain` tool effect is not replayed blindly; verifier work is safe to restart because its view is bounded and read-only. A terminal resume invokes no model or browser work and creates no external trace root; it only validates integrity and repairs local projections when needed.
 
-**Fixing a failing eval:** the binding rule is general mechanisms only — improve the outline, tool results, or prompt; never task-specific branches. Log failures and candidate mechanisms in `.agents/planning/.../implementation/baseline-failure-log.md` (see `docs/reports/2026-08-11-baseline.md` for the worked example).
+## 6. Browser ownership modes
 
-## 7. Tracing
+- **Installed TUI, local:** attach to the user's existing Chrome over an approved loopback DevTools endpoint. Sherlock closes only its own run pages and client connection.
+- **REPL, local:** managed headed Chrome with the persistent project profile.
+- **Normal local eval:** managed headless Chrome with a unique temporary profile per trial; bounded parallel pool.
+- **Headed local eval:** managed persistent profile in a separate serial lane. It never borrows the TUI's attached browser.
+- **Browserbase:** isolated context-free sessions for normal work; configured Context for authenticated/headed work. Live View supports human takeover.
 
-Per run (when `LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY` are set): a root `run-evidence-agent` agent span (input = task text; metadata = turnCount, toolsUsed, latencyMs) with children `call-model` generation spans (token `usageDetails`, including `cache_read_input_tokens` — the explicit prompt-caching verification signal) and `execute-<tool>` tool spans (`resultBytes`). Without credentials everything is an identity no-op; tracing failures can never change a run's outcome. The JSONL transcript + `metrics.json` remain the durable local record regardless.
+Provider selection is explicit. Remote downloads return through Browserbase's API and are hash-verified; uploads travel as bytes. Session-control URLs and API keys never enter transcripts, artifacts, model results, logs, or child environments.
 
-## 8. Developer loops
+## 7. Evaluation
 
-| Loop | Command |
+```mermaid
+sequenceDiagram
+    participant CLI as eval CLI
+    participant RUN as eval runner
+    participant A as runTask bridge
+    participant O as fresh oracle
+    participant G as grader
+    CLI->>CLI: load task packages; login preflight
+    CLI->>RUN: tasks, k, concurrency, cancellation
+    par normal managed lane
+        RUN->>A: isolated trial(s)
+    and headed managed lane
+        RUN->>A: serial trial
+    end
+    RUN->>O: fetch after run
+    O-->>RUN: ground truth
+    RUN->>G: runDir + oracle only
+    G-->>RUN: assertions
+    RUN-->>CLI: ordered EvalReport
+    CLI->>CLI: print and persist JSON
+```
+
+Browser/model work may overlap, but oracle fetch and grading are serialized independently. `headed` selects the serial lane; `requiresLogin` drives the pre-batch probe. A trial error is recorded and the rest of the batch continues; caller cancellation stops the batch. Never fix evals with task-name or task-text branches.
+
+## 8. Interactive progress and cancellation
+
+`src/tui/bridge/runSession.ts` forwards attempt-scoped streaming progress in order, derives publication events from manifest diffs, translates `ask_user` into a local dialog, and forwards abort signals through model calls and cancellable tools. Cancelling a model stream or in-flight effect first durably terminalizes the run; no effect is allowed to outlive lock release.
+
+## 9. Developer loops
+
+| Purpose | Command |
 | --- | --- |
-| Unit/integration tests (no network beyond loopback; needs local Chrome) | `npm test` |
-| Typecheck (covers `src`, `demos`, `evals`, `tests`) | `npm run typecheck` |
-| Interactive agent session | `npx tsx --env-file=.env src/cli/repl.ts` (or `npm run agent` with ambient env) |
-| One eval task, once | `npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news --k 1` |
-| Subsystem walkthrough | `npx tsx demos/<nn>-<name>.ts` (09/14 need the API key; 10–14 need Chrome) |
-| Inspect a run | read `runs/<id>/transcript.jsonl`, `manifest.json`, `metrics.json`; or the Langfuse trace |
+| Hermetic test suite (local Chrome required for browser suites) | `npm test` |
+| Typecheck all TypeScript | `npm run typecheck` |
+| Installed TUI | `npm run sherlock` |
+| Minimal agent REPL | `npm run agent` |
+| Eval batch | `npm run evals -- --tasks <names> [--k <n>] [--concurrency <n>]` |
+| Login/preflight | `npm run login` / `npm run login -- --check` |
+| Live Browserbase smoke (billable/networked) | `npm run smoke:browserbase` |
+
+Do not run a new baseline without explicit user direction. Dated measurements remain in `docs/reports/`; current design rationale lives under `docs/browser-agent-v3/`.

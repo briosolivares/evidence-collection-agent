@@ -1,5 +1,5 @@
 // Renders the real App in a real terminal with a scripted runner that
-// pauses on ask_user_question mid-run — the PTY verification harness for
+// pauses on ask_user mid-run — the PTY verification harness for
 // the pause/ask/answer/resume path, needing no model and no browser.
 //
 // Drive it per the repo's PTY playbook, e.g.:
@@ -47,11 +47,11 @@ const runner = (
     await sleep(300);
 
     const decision = await opts!.requestPermission!({
-      toolName: 'ask_user_question',
+      toolName: 'ask_user',
       input: {
         question:
           'Please complete the login in the browser window, then tell me.',
-        header: 'Login',
+        context: 'Sherlock is paused until the existing browser session is ready.',
         options: [
           { label: 'Done', description: 'I completed the login' },
           { label: 'Skip', description: 'Continue without logging in' },

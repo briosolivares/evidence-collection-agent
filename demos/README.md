@@ -1,25 +1,24 @@
 # Demos
 
-Twelve numbered scripts that walk each subsystem **in build order** — run one to watch that layer work in isolation and read its output. They are manual demonstration scripts, **not tests**: nothing asserts, several hit live websites or spend real API tokens, and the automated suite never invokes them.
-
-The automated end-to-end coverage lives elsewhere: `npm test` runs the hermetic vitest suites (per-tool suites in `src/tools/*/`, plus `src/cli/runTask.test.ts` for the full stack) against local Chrome and the loopback fixture server in `tests/fixtures/` — no network, no tokens.
+Seven retained scripts show stable public or reusable layers. They are manual
+walkthroughs, not tests; the automated suite never invokes them.
 
 ```bash
-npx tsx demos/07-loop-fake-model.ts        # full worker session, scripted model, zero tokens
-npx tsx --env-file=.env demos/12-run-task.ts "your task here"   # the real thing
+npx tsx demos/03-manifest.ts
+npx tsx --env-file=.env demos/12-run-task.ts "your task here"
 ```
 
 | Demo | Shows | Needs |
 | --- | --- | --- |
 | `01-run-id` | Run-id generation | — |
-| `02-run-dir` | Run directory + transcript | — |
-| `03-manifest` | Artifact manifest + hashing | — |
-| `04-registry` | Tool registry + validation pipeline | — |
-| `05-offload` | Oversize tool-result offloading | — |
-| `06-file-tools` | read_file / write_file / edit_file / grep | — |
-| `07-loop-fake-model` | Full worker session with a scripted model | — |
-| `08-scheduling` | Concrete-access-key tool scheduling | — |
-| `09-real-agent` | Worker session against the live model (file tools only) | API key, **spends tokens** |
-| `10-controller` | Browser controller over local Chrome | Chrome |
-| `11-browser-tools` | observe -> browser_action -> screenshot/download | Chrome |
-| `12-run-task` | The complete production stack on a live site | Chrome, API key, **spends tokens** |
+| `02-run-dir` | Run directory, confined paths, transcript | — |
+| `03-manifest` | Atomic artifact manifest and hashing | — |
+| `04-registry` | Generic tool validation/execution pipeline | — |
+| `05-offload` | Bounded model-visible tool results | — |
+| `10-controller` | Browser controller over explicit managed local Chrome or Browserbase | Chrome/provider config |
+| `12-run-task` | Complete initializer → worker → checks → verifier v3 stack | Chrome/provider config, API key, **spends tokens** |
+
+Use `npm test` for hermetic behavior coverage. It exercises the v3 tools,
+coordinator, crash/resume boundaries, public composition, TUI bridge, and local
+Chrome against the loopback fixture server without model tokens or oracle
+network calls.

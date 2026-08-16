@@ -1,146 +1,144 @@
 # Data Models
 
-The data structures that flow through the system, and where each is defined.
+The durable and in-memory structures that define the v3 runtime.
 
-## The run directory — the product's output contract
+## Run directory: the product boundary
 
-Every task run produces one directory. Graders, auditors, and debugging all read this — the run directory is the boundary between the agent and everything downstream.
-
-```
+```text
 runs/<run-id>/
-  manifest.json                 # provenance index (initManifest → writeArtifact upserts → finalizeManifest)
-  transcript.jsonl              # append-only event log, one JSON object per line
-  metrics.json                  # written once, on every exit path
-  artifacts/                    # everything the agent publishes — answer.md, *.csv, *.png, downloads
-  scratch/                      # private agent working state; never graded or shown, still hashed
-    tool-output/<tool>-<n>.txt  # offloaded oversize tool results
+  manifest.json
+  transcript.jsonl
+  metrics.json
+  artifacts/                         # published outputs/evidence
+  scratch/                           # private, still provenance-tracked
+    workspace/                       # bounded bash working directory
+    tool-output/                     # oversize model-result offloads
+  harness/                           # never a model-supplied path
+    checkpoint.json
+    output-contract.json             # recoverable contract projection
+    run.lock                         # while the coordinator owns the run
+    run.lock.recovery                # transient stale-lock guard
+    artifact-write-journal/          # durable write transactions
 ```
 
-**Workspace partition** (enforced by `writeArtifact`, both dirs created by `initManifest`): every write lands under `artifacts/` or `scratch/`. Published (`artifacts/`) entries must carry non-empty `roles` — `requested_output` (the task asked for this file) and/or `evidence` (supporting/audit capture); one artifact may hold both (an explicitly requested screenshot that is also audit evidence). Scratch entries carry no roles — the field's presence is itself the published/private marker. Graders select deliverables exclusively through `requestedOutputs()` and the finders in `evals/grading/manifestVerification.ts`, so scratch files and evidence-only captures can never shadow a deliverable; `verifyManifestHashes` still covers the whole run (tamper evidence is total). External users need not know the directory names — the roles field is the product-facing model.
+`src/run/runId.ts` creates `<date>_<time>_<task-slug>_<suffix>` names in local time. `manifest.startedAt` retains the exact UTC instant.
 
-**Run ID** (`src/run/runId.ts`): `<date>_<time>_<label-slug>_<6-hex>` in **local 12-hour time** — e.g. `2026-08-10_09-48-32pm_top-5-hacker-news_1adfa7` (slug omitted when no label is given; `runTask` passes the task text; the manifest's `startedAt` keeps the exact UTC instant). Ids sort lexically by date; within a day the 12-hour clock means alphabetical order is not strictly clock order. Collisions throw at `mkdir` rather than reusing a directory.
+### Manifest (`src/run/artifacts.ts`)
 
-## Provenance types (`src/run/artifacts.ts`)
+```ts
+interface Manifest {
+  task: string;
+  startedAt: string;
+  finishedAt?: string;
+  browserProvider?: 'local' | 'browserbase';
+  artifacts: ManifestEntry[];
+}
+
+interface ManifestEntry {
+  filename: string;
+  sha256: string;
+  sourceUrl?: string;
+  roles?: ('requested_output' | 'evidence')[];
+  capturedAt: string;
+  completionStatus?: 'complete' | 'partial';
+}
+```
+
+Published files live under `artifacts/` and require one or both roles. Private files live under `scratch/` and must not carry roles. A path rewrite upserts its entry and hashes the exact new bytes. `completionStatus` is retained as optional compatibility metadata: `partial` is never accepted as a satisfied requested output, while absence makes no completion claim. The active v3 publisher normally omits it and relies on finish checks plus the terminal checkpoint.
+
+Graders select deliverables through manifest roles. The transcript, filename guesses, scratch content, and evidence-only entries cannot substitute for a requested output.
+
+## Immutable output contract (`src/contracts/outputContract.ts`)
+
+The initializer produces one immutable `OutputContract` before browser work. It records typed outputs (`table`, `document`, `screenshots`, or `download`), exact filenames, kind-specific schema/rules, content expectations, and assumptions. The checkpoint is authoritative; `harness/output-contract.json` is a readable projection that can be reconstructed but cannot drift.
+
+The worker and verifier consume the contract but cannot mutate it. Finish claims list artifact paths; deterministic code compares those claims and the manifest/files against the contract.
+
+## Checkpoint (`src/v3/run/checkpoint.ts`)
+
+Every v3 checkpoint has strict common fields:
+
+```ts
+{
+  version: 3;
+  revision: number;
+  updatedAt: string;
+  configuration: V3DurableRunConfiguration;
+  budget: V3RunBudgetSnapshot;
+  progress: V3CheckpointProgress;
+  phase: V3CheckpointPhase;
+  // phase-specific cargo
+}
+```
+
+`V3DurableRunConfiguration` binds task text, model/output/context settings, browser provider, explicit authentication, JavaScript policy, optional start URL, initializer/check ceilings, and whole-run budget limits. Numeric infinity is serialized as the explicit `"unbounded"` sentinel. Configuration and accepted contract are immutable across revisions.
 
 ```mermaid
-classDiagram
-    class Manifest {
-        +task: string
-        +startedAt: string
-        +finishedAt?: string
-        +artifacts: ManifestEntry[]
-    }
-    class ManifestEntry {
-        +filename: string
-        +sha256: string
-        +sourceUrl?: string
-        +roles?: ArtifactRole[]
-        +capturedAt: string
-    }
-    class TranscriptEvent {
-        +type: string
-        +...open-ended
-    }
-    class RunMetrics {
-        +status: string
-        +turns: number
-        +inputTokens: number
-        +outputTokens: number
-        +cacheReadInputTokens: number
-        +wallClockMs: number
-    }
-    Manifest "1" *-- "many" ManifestEntry
+stateDiagram-v2
+    [*] --> initializing
+    initializing --> ready_for_model: contract accepted
+    ready_for_model --> executing_tool: effect turn
+    executing_tool --> ready_for_model: results durable
+    ready_for_model --> checking: finish requested
+    checking --> ready_for_model: defects returned
+    checking --> verifying: deterministic pass
+    verifying --> ready_for_model: correction returned
+    verifying --> terminal: verifier accepts
+    initializing --> terminal
+    ready_for_model --> terminal
+    executing_tool --> terminal
+    checking --> terminal
+    verifying --> terminal
 ```
 
-- `ManifestEntry.sha256` is computed from the exact bytes at capture time — the tamper-evidence mechanism. `filename` is normalized run-dir-relative (so `artifacts/data.csv` and `./artifacts/data.csv` collapse); rewriting a path **upserts** the entry. `roles` (`ArtifactRole = 'requested_output' | 'evidence'`) is present exactly on published (`artifacts/`) entries.
-- `TranscriptEvent` (`src/run/transcript.ts`) is open-ended (`{ type: string, ...}`); the loop writes exactly four shapes: `model_request {turn, messages}`, `model_response {turn, response}`, `tool_call {turn, call}`, `tool_result {turn, result}`. Tool events are bracketed — all `tool_call`s appended in request order before execution, all `tool_result`s after every call settles — so parallel completion order is never observable in the transcript.
-- `RunMetrics` (`src/loop/agentLoop.ts`) — `status` is `completed` or `budget_exceeded`.
+Phase-specific cargo prevents ambiguous resume:
 
-## Conversation types (`src/loop/messages.ts`)
+- `initializing`: optional initializer messages/attempts until a contract is accepted.
+- `ready_for_model`: immutable contract plus full worker snapshot.
+- `executing_tool`: worker snapshot plus assistant call batch, completed results, next index, and effect state `not_started` or `uncertain`.
+- `checking`: the exclusive pending finish and deterministic-check attempt.
+- `verifying`: pending finish, passed structured facts, and verifier restart marker.
+- `terminal`: durable `verified`, `incomplete`, `failed`, or `cancelled` outcome. Terminal state is absorbing.
 
-Structural mirrors of the Anthropic Messages API, snake_case preserved, no SDK import:
+The public `RunOutcome` deliberately exposes only `verified` and explicit `incomplete`; operational failure and cancellation propagate through the public call after durable terminalization.
 
-| Type | Shape |
-| --- | --- |
-| `TextBlock` | `{ type: 'text', text }` |
-| `ToolUseBlock` | `{ type: 'tool_use', id, name, input: unknown }` |
-| `ToolResultBlock` | `{ type: 'tool_result', tool_use_id, content: string, is_error? }` |
-| `Message` | `UserMessage \| AssistantMessage` (user content: text/tool_result; assistant content: text/tool_use) |
-| `Usage` | `{ input_tokens, output_tokens, cache_read_input_tokens? }` |
-| `ModelResponse` | `{ content: AssistantContentBlock[], stop_reason: string \| null, usage }` — `stop_reason` recorded but never consulted |
+## Worker conversation and effects
 
-## Tool-layer types (`src/tools/`)
+SDK-free conversation types in `src/loop/messages.ts` mirror the Messages API: `TextBlock`, `ToolUseBlock`, `ToolResultBlock`, `Message`, `Usage`, and `ModelResponse`. `stop_reason` is validated by `ModelDriver`; completion itself depends on an exclusive `finish` call, not prose or a no-tool response.
 
-| Type | Defined in | Shape / meaning |
-| --- | --- | --- |
-| `ToolCall` | `pipeline.ts` | `{ id, name, input: unknown }` — converted from `ToolUseBlock` in the loop |
-| `ToolCallResult` | `pipeline.ts` | Discriminated on `isError`; error variant carries `errorKind: 'unknown_tool' \| 'invalid_input' \| 'execution_error'` — converted to `ToolResultBlock` in the loop |
-| `OffloadedResult` | `capResult.ts` | `{ preview, offloadedTo, note }` — what the model sees when a result exceeds the cap |
-| `EvidenceResult` | `src/tools/shared/evidence.ts` | `{ path, size }` — screenshot/download return value; bytes never enter the transcript |
-| `ToolCtx` | `registry.ts` | `{ runDir, browser? }` — capabilities handed to every tool |
+`V3WorkerSessionSnapshot` stores the full never-collapsed message history, logical turn count, peak context, protocol-correction count, and start time. `src/v3/loop/contextView.ts` may replace old bulky browser results only in the pure request view; checkpoint history remains complete.
 
-The two conversion points where API-shaped and internal types meet are both in `agentLoop.ts`: `ToolUseBlock → ToolCall` before scheduling, `ToolCallResult → ToolResultBlock` after.
+`ToolCall` and `ToolCallResult` in `src/tools/pipeline.ts` form the execution boundary. Errors are classified as unknown tool, invalid input, permission denied, execution failure, timeout, or busy resource. A timed-out effect remains in the busy ledger until its underlying promise settles.
 
-## Loop and task types
+## Finish and verification data
 
-| Type | Defined in | Shape |
-| --- | --- | --- |
-| `State` | `loop/agentLoop.ts` | `{ messages: Message[], turnCount }` — the loop's only memory |
-| `LoopResult` | `loop/agentLoop.ts` | `{ status:'completed', finalText } \| { status:'budget_exceeded', reason: 'max_turns' \| 'token_budget' }` |
-| `RunTaskResult` | `cli/runTask.ts` | `{ runDir } & LoopResult` |
-| `ProgressEvent` | `model/callModel.ts` | `turn_start \| text_delta \| tool_use_start \| turn_end`, each tagged with the turn |
+`finish` input is `{ summary, artifacts, limitations }`. It is control flow, not a generic executor. `src/v3/completion/types.ts` defines strict serializable defects and positive facts produced by deterministic inspection. The fresh verifier returns either `verified`, `needs_correction`, or an unavailable outcome; it does not author facts that code can settle.
 
-## Eval harness types (`evals/`)
+## Transcript and metrics
 
-```mermaid
-classDiagram
-    class EvalReport {
-        +startedAt: string
-        +finishedAt: string
-        +k: number
-        +model: string
-        +tasks: TaskReport[]
-    }
-    class TaskReport {
-        +task: string
-        +k: number
-        +accuracy: number
-        +taskPassed: boolean
-        +meanLatencyMs: number
-        +trials: TrialReport[]
-    }
-    class TrialReport {
-        +runDir: string
-        +assertions: AssertionResult[]
-        +latencyMs: number
-        +completed: boolean
-    }
-    class AssertionResult {
-        +name: string
-        +passed: boolean
-        +detail: string
-    }
-    EvalReport "1" *-- "many" TaskReport
-    TaskReport "1" *-- "many" TrialReport
-    TrialReport "1" *-- "many" AssertionResult
-```
+`transcript.jsonl` is append-only. V3 events include model request/accepted response/rejection, cache warnings, continuation messages, ordered tool calls/results, finish requests, deterministic-check failures, terminal outcome, and run errors. Events record what happened; they are not trusted product state.
 
-Metric definitions (`evals/metrics/metrics.ts`): `accuracy` = mean over trials of fraction-of-assertions-passed; `completed` = all assertions passed in that trial; `taskPassed` = **every** trial completed (all-of-k — deliberately strict, measuring consistency). Zero assertions or zero trials throw.
+`V3WorkerMetrics` in `src/v3/loop/workerSession.ts` records terminal status (`verified`, `incomplete`, `failed`, or `cancelled`), turns, protocol corrections, input/output/cache tokens, tool calls/result bytes, peak context, wall time, and per-role usage. Metrics and transcript are terminal projections repaired from checkpoint state when necessary.
 
-The persisted eval result (`evals/experiments/<run-id>.json`) is the `EvalReport` serialized with 2-space indent.
+## Eval report
 
-## Data flow between subsystems
+An `EvalReport` records timestamps, `k`, normal-lane concurrency, model, optional assisted-dialog count, and ordered task reports. Each task report contains accuracy, all-of-k pass, mean run latency, and ordered trial reports. A trial is complete only when every grader assertion passes; an errored run or grader scores zero and remains distinguishable from failed assertions.
+
+Accuracy is the mean per-trial fraction of passed assertions. Task pass is deliberately strict: every one of the `k` trials must be complete.
+
+## End-to-end data flow
 
 ```mermaid
 flowchart LR
-    TU["ToolUseBlock\n(model response)"] -->|"agentLoop"| TC["ToolCall"]
-    TC -->|"scheduler + pipeline"| TR["ToolCallResult"]
-    TR -->|"agentLoop"| TRB["ToolResultBlock\n(next user message)"]
-    TR -->|"oversize"| OFF["OffloadedResult\n+ scratch/tool-output/ file"]
-    TOOL["write_file / screenshot / download / offload"] -->|"writeArtifact"| ME["ManifestEntry\n(sha256 + sourceUrl + roles)"]
-    ME --> MAN["manifest.json"]
-    MAN -->|"readManifest +\nrequestedOutputs"| GR["Graders"]
-    OR["Oracle data (unknown)"] --> GR
-    GR --> AR["AssertionResult[]"]
-    AR -->|"metrics.ts"| REP["TaskReport / EvalReport"]
+    MR["accepted ModelResponse"] --> CALL["ordered ToolCall(s)"]
+    CALL --> PIPE["tool pipeline"]
+    PIPE --> RES["ToolCallResult(s)"]
+    RES --> MSG["next worker Message"]
+    PIPE --> FILE["workspace / published bytes"]
+    FILE --> MAN["ManifestEntry + SHA-256"]
+    MAN --> CHECK["deterministic finish facts"]
+    CHECK --> VER["fresh verifier"]
+    VER --> TERM["terminal checkpoint"]
+    MAN --> GRADER["grader"]
+    ORACLE["fresh oracle"] --> GRADER
 ```

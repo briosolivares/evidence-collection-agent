@@ -37,17 +37,13 @@ export interface EvalRunnerDeps {
   onTrialGraded?: (job: EvalTrialJob, grade: TrialGrade) => void | Promise<void>;
 }
 
-/**
- * Which completion protocol a batch ran.
- *
- * Every batch runs the typed output contract now; this records who authored
- * it (initializer or worker), since the contract-author experiment compares
- * those two live sub-paths.
- */
+/** Completion metadata. New batches have one initializer-authored protocol;
+ * `contractAuthor` remains optional only so historical report JSON still
+ * renders with its original experiment label. */
 export interface EvalProtocol {
-  /** The completion path under test. Only 'output-contract' exists now. */
+  /** The sole production completion path. */
   completion: 'output-contract';
-  /** Who authored the contract. */
+  /** Historical A/B label; current runners never produce it. */
   contractAuthor?: 'initializer' | 'worker';
 }
 

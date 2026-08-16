@@ -65,8 +65,8 @@ export interface ToolCtx {
  * "read-only" call that reads the page a concurrent write mutates no longer
  * slips through).
  *
- * Deriving this from input is the whole point: `browser_action` on page p1 and
- * `browser_action` on page p2 are the same TOOL with different access.
+ * Deriving this from input is the whole point: two calls to one file tool can
+ * name different paths and therefore have different access.
  */
 export interface ToolAccess {
   /** Keys this call reads and must see unchanged while it runs. */

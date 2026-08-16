@@ -1,6 +1,8 @@
 # Browser Agent Local Code Execution — Detailed Specification
 
-**Status:** Proposed
+**Status:** Historical — implemented for v2, then superseded by the
+[Sherlock v3 design](./browser-agent-v3/sherlock-v3-design-doc.md). The v3
+worker retains bounded `bash`/file editing through a different runtime.
 
 **Date:** 2026-08-13
 

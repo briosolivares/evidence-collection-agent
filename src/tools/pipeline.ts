@@ -42,15 +42,15 @@ export type ToolErrorKind =
  * guard — `wall_time` included — is checked AFTER a tool call completes, so
  * an execution that hangs forever hangs the entire run: no result, no
  * transcript entry, no outcome, indefinitely. Measured live on 2026-08-13, a
- * `browser_action` fill on a heavy React page stopped returning and the run
- * sat dead for ten minutes with no guard able to fire. Tools bounding their
+ * browser interaction on a heavy React page stopped returning and the run sat
+ * dead for ten minutes with no guard able to fire. Tools bounding their
  * own work is necessary but not sufficient — the next unbounded call
  * reintroduces the identical failure — so this is the one ceiling no tool
  * can forget to apply.
  *
- * Two minutes is deliberately generous, well past any legitimate call
- * (`browser_action`'s own worst case is 8 actions x 5s plus settle), so that
- * tripping it means something is genuinely wrong rather than merely slow.
+ * Two minutes is deliberately generous beside every tool's own normal
+ * deadline, so tripping it means something is genuinely wrong rather than
+ * merely slow.
  */
 export const DEFAULT_TOOL_TIMEOUT_MS = 120_000;
 
@@ -280,7 +280,7 @@ export class ToolTimeoutError extends Error {
  * process down long after the call it belonged to was reported.
  *
  * A non-finite `timeoutMs` opts out entirely, for a tool whose waiting is
- * legitimately unbounded. Note that the human wait in `ask_user_question`
+ * legitimately unbounded. Note that the human wait in `ask_user`
  * needs no such opt-out: it happens in the permission gate, before execute,
  * which this never wraps.
  */

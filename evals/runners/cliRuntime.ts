@@ -23,7 +23,7 @@ export interface BrowserBackedRunTaskOptions {
 }
 
 /**
- * Turn one unanswerable `ask_user_question` into a loud operator warning and
+ * Turn one unanswerable `ask_user` into a loud operator warning and
  * a denial the agent can act on sensibly.
  *
  * The eval CLI has no dialog, so before this the pipeline's generic

@@ -1,6 +1,8 @@
 # Browser Agent V2 — Revised Architecture Proposal
 
-**Status:** Proposed
+**Status:** Historical — superseded by the
+[Sherlock v3 design](./browser-agent-v3/sherlock-v3-design-doc.md). Paths and
+tool names below describe the retired v2 architecture.
 
 **Date:** 2026-08-13
 

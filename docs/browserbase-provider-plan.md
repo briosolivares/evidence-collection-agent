@@ -1,7 +1,9 @@
 # Browserbase Browser Runtime and Provider Plan
 
 **Date:** 2026-08-14  
-**Status:** Implemented on `feat/judge-harness`, except §6 (deferred by design). Hermetic tests and typecheck pass; the live smoke test and the Google/X acceptance run have not been executed. See [Implementation status](#implementation-status) at the end for what was built, what changed against this plan, and what remains unverified.  
+**Status:** Provider implemented. The old §6 secondary-client design was
+superseded by v3's protected command bridge; the live smoke test and Google/X
+acceptance run have not been executed. See [Implementation status](#implementation-status).
 **Scope:** Sherlock TUI, interactive REPL, CLI evals, TUI evals, login/preflight commands, and browser-backed demos
 
 ## Goal
@@ -17,7 +19,8 @@ Add Browserbase as the production browser runtime so normal application and eval
 - Persist Google Sheets and X authentication in that Context.
 - Enable Browserbase session recording.
 - Preserve ordinary `bash` workspace execution.
-- Do not pass Browserbase's remote connection URL directly to model-generated shell code. Restore browser-attached script support through a bounded loopback relay only after multiple-CDP-client behavior has been verified.
+- Do not pass Browserbase's remote connection URL to model-generated code.
+  Browser programs use a parent-owned, target-pinned command session instead.
 - Do not run an eval re-baseline without separate user direction.
 
 ## Architectural fit
@@ -139,23 +142,19 @@ Browserbase stores browser downloads remotely, so the local `Download.createRead
 - Track retrieved remote download IDs and delete them during successful session cleanup after the local artifact has been written.
 - Preserve current direct-navigation response capture where it already returns bytes without a browser download.
 
-### 6. Browser-attached `bash` scripts
+### 6. Protected browser-program bridge (v3 resolution)
 
-Ordinary `bash` commands in `scratch/workspace/` remain available from the first Browserbase release. The only deferred behavior is a `bash` call that asks to attach to a selected browser page.
+Ordinary `bash` remains browser-free and runs only in
+`scratch/workspace/`. The retired design would have given a second Playwright
+client a loopback relay; v3 instead gives the bounded `browser_execute` child a
+parent-owned helper. The controller opens one target-pinned CDP command session
+and sends/receives bounded messages over protected IPC. The Browserbase
+connection URL and API key never enter the child environment, tool result,
+transcript, artifact, or error.
 
-The current helper deliberately accepts only loopback CDP endpoints. A Browserbase connection URL is a remote session-control capability; passing it directly into model-generated shell code would expose it in the child environment and weaken that invariant. Remote sessions can also terminate on disconnect unless their lifecycle is configured correctly.
-
-Restore the feature in a gated follow-up within this project:
-
-1. Verify Browserbase permits a second concurrent Playwright CDP client without destabilizing the controller's primary client.
-2. Verify closing the secondary client leaves the primary controller and session usable.
-3. Determine whether the user's Browserbase plan supports the required `keepAlive` behavior.
-4. If reliable, add a short-lived, parent-owned loopback WebSocket relay that forwards to the Browserbase CDP endpoint.
-5. Give the child only the loopback relay URL and selected target ID; never give it the Browserbase URL or API key.
-6. Bound relay lifetime to the one `bash` invocation, close it on every success/error/timeout path, then run the existing controller reconciliation.
-7. Explicitly release keep-alive sessions so abandoned scripts cannot create billing leaks.
-
-If Browserbase cannot support the secondary connection safely, retain the explicit unsupported result for browser-attached scripts and consider a separately designed parent-side browser-script RPC. Do not relax the loopback assertion as a shortcut.
+This is the same provider-neutral boundary used by local Chrome. Closing the
+command session detaches only that target session; the provider owner still
+controls and explicitly releases the Browserbase session.
 
 ### 7. Secret handling and observability
 
@@ -181,7 +180,7 @@ Keep `npm test` hermetic and network-free. Add:
 - login verification tests across the close/persist/reopen boundary;
 - download polling, correlation, checksum, timeout, and cleanup tests;
 - secret-redaction tests proving the API key and CDP URL never reach the worker shell or model-visible results;
-- browser-script relay tests if that phase is enabled.
+- target-pinned command-session and child-environment redaction tests.
 
 Add a separately invoked live smoke test using `.env`, never part of `npm test`, covering:
 
@@ -210,12 +209,17 @@ Run the regular test suite and typecheck after each implementation slice. Do not
 - Downloaded bytes are copied into the local provenance boundary and checksum-verified.
 - Every session is closed or explicitly released on success, failure, cancellation, and partial initialization.
 - `BROWSERBASE_API_KEY` and CDP connection URLs never appear in worker environments, transcripts, model-visible results, or artifacts.
-- Ordinary `bash` workspace commands remain functional. Browser-attached scripts either use the verified loopback relay or fail explicitly without receiving remote credentials.
+- Ordinary `bash` workspace commands remain functional and browser-free;
+  `browser_execute` uses the protected parent command bridge without receiving
+  remote credentials.
 - Local Chrome remains available through explicit provider configuration, and the normal test suite remains hermetic.
 
 ## Remaining operational input
 
-Confirm the user's Browserbase plan before implementing concurrency and browser-script relay defaults. The plan tier affects concurrent-session limits and whether `keepAlive` is available. This does not block the base provider, recording, Context creation, Live View login, or ordinary Browserbase sessions.
+Confirm the user's Browserbase plan before changing concurrency or `keepAlive`
+defaults. The plan tier affects concurrent-session limits and session lifetime;
+it does not block the provider, recording, Context creation, Live View login,
+or ordinary Browserbase sessions.
 
 ---
 
@@ -232,7 +236,7 @@ Written after the fact. This section is the honest record of what the code does,
 | §3 provider-neutral eval runtime | `evals/runners/browserRuntime.ts`, split into a provider-independent lane policy plus `createLocalEvalBrowserAdapter` / `createBrowserbaseEvalBrowserAdapter` behind an `EvalBrowserAdapter` seam |
 | §4 Context and login workflow | `src/cli/browserbaseLogin.ts`, `src/cli/envFile.ts`, provider-aware `src/cli/login.ts`, provider-neutral `src/cli/loginCheck.ts`, provider-aware `evals/runners/loginPreflight.ts` |
 | §5 download adapter | `src/browser/downloadReader.ts`, `src/browser/browserbaseDownloads.ts` |
-| §6 browser-attached `bash` | **Deferred, as planned.** The Browserbase controller is constructed with no `cdpUrl`, so it offers neither `prepareForBrowserScript` nor `refreshAfterBrowserScript` and the run omits the tool. Ordinary `bash` is untouched. |
+| §6 browser-program execution | Superseded by v3: `browser_execute` uses target-pinned controller command sessions and protected IPC; `bash` remains browser-free. |
 | §7 secrets and observability | `BROWSERBASE_API_KEY` added to `BASH_SECRET_ENV_DENYLIST`; `BrowserSessionDiagnostics` carries session id / Live View / recording URL and structurally cannot carry a connection URL |
 | §8 tests | ~160 new hermetic tests across the provider, retry, downloads, composition, controller hooks, env-file, login, and both eval lanes; plus `npm run smoke:browserbase` (`scripts/browserbaseSmoke.ts`), which is never part of `npm test` |
 

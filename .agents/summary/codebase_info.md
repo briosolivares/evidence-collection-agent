@@ -1,81 +1,95 @@
 # Codebase Information
 
-Basic facts about the evidence-collection-agent repository. See [index.md](index.md) for how this fits into the full documentation set.
+Current repository orientation for Sherlock's v3-only runtime. See [index.md](index.md) for the rest of the summary set.
 
 ## What this project is
 
-A general browser agent for audit evidence collection. It takes a natural-language task (e.g. "Create a CSV of the top 5 stories on Hacker News"), drives a real local Chrome browser via Playwright to carry it out, and produces evidence artifacts — CSVs, screenshots, downloaded files, and/or a written answer — with tamper-evident provenance (SHA-256 hashes in a per-run manifest).
+Sherlock is a general browser agent for collecting auditable evidence and publishing requested artifacts. A run starts from natural-language task text, derives one immutable typed output contract, uses a real Chrome session plus bounded local tools, checks the finished bytes deterministically, and asks a fresh verifier to accept or reject them.
 
-The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of zod-validated browser and file tools. Browser operations use an engine-agnostic controller, and session creation is isolated behind a provider.
+The run directory—not assistant prose—is the product. Its manifest hashes published deliverables, supporting evidence, and private scratch state; eval graders receive that directory and independent oracle data only.
 
 ## Technology stack
 
 | Layer | Technology |
 | --- | --- |
-| Language | TypeScript (strict, ES2022, NodeNext modules, `noEmit` — run via `tsx`) |
-| Model API | `@anthropic-ai/sdk` (Claude, streaming, prompt caching; default model `claude-sonnet-5`) |
-| Browser automation | `playwright` driving local, visible Chrome with a persistent profile (`chrome-profile/`) |
-| Schema validation | `zod` (tool input schemas; one definition validates at runtime and converts to JSON Schema for the API) |
-| Tracing | Langfuse via OpenTelemetry (`@langfuse/tracing`, `@langfuse/otel`, `@opentelemetry/*`) |
-| Tests | Vitest |
-
-There are no other runtime languages; the only non-TypeScript sources are HTML test fixtures under `tests/`.
+| Runtime | Node.js 22+, TypeScript/ESM, `tsx` (`tsconfig` is `noEmit`) |
+| Models | Anthropic Messages API, always streaming, strict response validation, prompt caching |
+| Browsers | Playwright over attached or managed local Chrome; Browserbase over CDP |
+| Validation | Zod schemas for contracts, tools, checkpoints, and model-result protocols |
+| TUI | Ink 7 + React 19 |
+| Content checks | Byte-based format detection plus `date-fns` table validation |
+| Tracing | Langfuse through OpenTelemetry |
+| Tests | Vitest; real local Chrome for browser suites |
 
 ## Repository layout
 
-```mermaid
-graph TB
-    subgraph Source
-        SRC["src/ — agent implementation"]
-        SRC --> LOOP["src/loop — agent loop, scheduler, message types"]
-        SRC --> MODEL["src/model — Claude API calls, stream assembly"]
-        SRC --> TOOLS["src/tools — registry + pipeline, one directory per tool"]
-        SRC --> BROWSER["src/browser — controller + session-provider interfaces and Playwright implementation"]
-        SRC --> RUN["src/run — run IDs, run directories, artifacts, transcript"]
-        SRC --> CLI["src/cli — REPL, runTask composition root, system prompt"]
-        SRC --> TRACE["src/tracing — Langfuse/OTel wiring"]
-    end
-    subgraph Evaluation
-        EVALS["evals/ — eval harness (config.ts at root)"]
-        EVALS --> TASKS["evals/datasets/&lt;task&gt;/ — task.json + oracle/ + grader/ per task"]
-        EVALS --> RUNNER["evals/runners/ — cli, runner, loadTask, report; evals/metrics/ — metric definitions"]
-        EVALS --> EXPER["evals/experiments/ — results JSON from past runs (gitignored)"]
-    end
-    subgraph Supporting
-        DEMOS["demos/ — 14 numbered demo scripts (build-order walkthrough)"]
-        TESTS["tests/ — fixture HTML pages + server, shared test helpers"]
-        DOCS["docs/ — baseline reports + browser-layer research"]
-        PLAN[".agents/planning/ — design doc, plan, handoff state"]
-    end
-    subgraph "Runtime artifacts (gitignored)"
-        RUNS["runs/ — per-run output directories"]
-        PROFILE["chrome-profile/ — persistent Chrome profile"]
-    end
+```text
+bin/                       installed `sherlock` launcher
+src/
+  cli/                     runTask/resumeTask, REPL, login, env/config edges
+  tui/                     Ink application and run/eval bridges
+  v3/
+    run/                   checkpoint, coordinator, output-contract projection
+    loop/                  sequential worker and collapsed model request view
+    harness/               immutable initializer and fresh verifier
+    completion/            deterministic artifact/table checks
+    tools/                 eight model-visible tools
+    model/                 shared-budget model wrapper
+    browser/               bounded browser-program child runtime
+  browser/                 controller/provider implementations and downloads/uploads
+  model/                   streaming client, retries, strict ModelDriver
+  tools/                   registry, access/resource pipeline, result capping
+  run/                     run dirs, manifest, atomic writes, budget, transcript
+  tracing/                 optional Langfuse/OTel side channel
+  contracts/               immutable output-contract schema
+  loop/messages.ts         SDK-free message types (not a second runtime loop)
+evals/
+  datasets/                task.json + oracle + grader packages
+  runners/                 CLI, browser policies, scheduling/reporting
+  grading/                 run-directory verification helpers
+  metrics/                 trial/task aggregation
+tests/                     browser fixtures, helpers, TUI suites, crash children
+demos/                     retained focused build-order demos
+docs/                      v3/provider designs and dated reports
+.agents/summary/            this current architecture snapshot
 ```
 
-## Directory notes
+## Entry points
 
-- `src/` — the agent itself; each subdirectory is one subsystem with co-located `*.test.ts` files.
-- `evals/` — the eval harness, split by concern: `runners/` (cli, runner, loadTask, report), `metrics/` (metric definitions), `grading/` (run-dir verification toolkit for graders), `datasets/` (one directory per task — `hacker_news`, `edgar`, `openclaw_pr`, `stub` — each holding `task.json`, an `oracle/` for independent ground truth, and a `grader/` asserting against the run directory), `experiments/` (results JSON, gitignored), plus `config.ts` (paths + defaults) and `types.ts` (harness contracts) at the root.
-- `demos/` — numbered standalone scripts (`01-run-id.ts` … `14-run-task.ts`) that exercise each subsystem in build order; run with `npx tsx demos/<file>`. Manual walkthroughs, not tests — see `demos/README.md`.
-- `tests/fixtures/` — local HTML pages plus `server.ts`, used by browser-tool tests to avoid depending on the live web. `tests/helpers/` — shared test scaffolding (browser-suite lifecycle, outline ref lookup).
-- `docs/reports/` — dated baseline/eval reports. `docs/research/browser-layer/` — the research behind the Playwright-on-local-Chrome decision.
-- `.agents/planning/` — the checkpoint-1 planning set: `design/detailed-design.md` (authoritative design), `implementation/plan.md` (task checklist), `implementation/handoff-state.md` (session handoff), `implementation/baseline-failure-log.md` (failure→mechanism queue).
-- `runs/` (gitignored) — one directory per agent run, named `<date>_<time>_<task-slug>_<suffix>` in local time (e.g. `2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b`): deliverables, `transcript.jsonl`, `manifest.json`, `metrics.json`. Eval result JSON lands in `evals/experiments/`.
-- `chrome-profile/` (gitignored) — the persistent Chrome profile (cookies/logins survive across runs).
-- `.env` (gitignored) — `ANTHROPIC_API_KEY` plus `LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY`/`LANGFUSE_BASE_URL`.
+| Command | Entry | Browser behavior |
+| --- | --- | --- |
+| `sherlock` / `npm run sherlock` | `bin/sherlock.mjs` → `src/tui/main.tsx` | Local attaches to the user's current Chrome; Browserbase is lazy |
+| `npm run agent` | `src/cli/repl.ts` | Managed persistent local profile or Browserbase session |
+| `npm run evals -- --tasks …` | `evals/runners/cli.ts` | Managed isolated normal lane plus serial headed lane |
+| `npm run login` | `src/cli/login.ts` | Provider-aware login/provisioning flow |
+| `npm run smoke:browserbase` | `scripts/browserbaseSmoke.ts` | Explicit live remote smoke; costs real minutes |
+| programmatic | `runTask()` / `resumeTask()` in `src/cli/runTask.ts` | Caller supplies a `BrowserController` and explicit authority |
 
-## Entry points and scripts
+Other common commands:
 
-| Command | What it runs |
+| Command | Purpose |
 | --- | --- |
-| `npm run agent` | `src/cli/repl.ts` — interactive terminal agent (type a task, watch the loop stream) |
-| `npm run evals -- --tasks <ids> --k <n>` | `evals/runners/cli.ts` — parameterized eval runner |
-| `npm test` | Vitest suite |
-| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Hermetic Vitest suite (loopback-only network, local Chrome required) |
+| `npm run typecheck` | `tsc --noEmit` over source, tests, demos, and evals |
+| `npm run build:quicklook` | Build the native macOS run-directory preview extension |
 
-Scripts that call the Claude API or Langfuse need env vars: `npx tsx --env-file=.env <script>`.
+## Runtime locations
 
-## Languages and analysis coverage
+`src/config/paths.ts` resolves checkout-relative paths during development and per-user `~/.sherlock` paths when installed.
 
-TypeScript is fully analyzable and covered by this documentation. The `chrome-profile/` and `runs/` trees are runtime data, not source, and are intentionally undocumented beyond their role.
+- `runs/` — run directories and eval trials.
+- `chrome-profile/` — managed persistent local profile used by login/headed eval/REPL paths, not by attached TUI browsing.
+- `evals/experiments/` or configured eval-results directory — batch reports.
+- `.env` candidates — API/provider/tracing configuration; values must never be printed.
+
+A run id is generated by `src/run/runId.ts` from local date/time, a task slug, and a random suffix. `manifest.startedAt` remains the canonical UTC instant.
+
+## Eval datasets
+
+Current dataset packages live under `evals/datasets/`: `stub`, `hacker_news`, `edgar`, `openclaw_pr`, `company_freshness`, `yc_w24_outreach`, `openclaw_merged_prs`, `elon_tweets`, `openclaw_contributors`, `wikipedia_reference`, `airbnb_lake_tahoe`, `mit_sororities`, and `mit_sororities_csv`.
+
+Each package owns its input metadata, independent oracle, and grader. Network-backed oracle parsing is tested with canned payloads; ordinary tests never call live oracle services.
+
+## Historical material
+
+The checkpoint-1 design and older reports explain how the project reached this shape, but their pre-v3 module and protocol names are historical. Use [the v3 design](../../docs/browser-agent-v3/sherlock-v3-design-doc.md) for current rationale and [`docs/reports/`](../../docs/reports/) for dated measurements.

@@ -1,68 +1,141 @@
 # AGENTS.md
 
-Navigation and ground rules for AI agents working in this repository. Deep documentation lives in `.agents/summary/` (start with [index.md](.agents/summary/index.md)); design rationale in `.agents/planning/evidence-collection-agent-checkpoint-1/design/detailed-design.md`; current project state in `.agents/planning/evidence-collection-agent-checkpoint-1/implementation/handoff-state.md`.
+Navigation and binding rules for agents working in this repository. Start with
+[the current v3 implementation plan](docs/browser-agent-v3/implementation-plan.md)
+for live progress and [the v3 design](docs/browser-agent-v3/sherlock-v3-design-doc.md)
+for rationale. `.agents/summary/` is the concise architecture reference;
+historical checkpoint-1 planning and reports remain useful only as history.
 
 ## What this is
 
-<!-- metadata: overview, subsystems, navigation -->
+Sherlock is a general browser agent for audit evidence collection. The single
+production composition root is `src/cli/runTask.ts`. It runs a bounded contract
+initializer, one persistent sequential worker session, deterministic finish
+checks, and a fresh read-only verifier under the durable coordinator in
+`src/v3/run/coordinator.ts`.
 
-A browser agent for audit evidence collection: a minimal Claude Code–style worker session (`src/loop/workerSession.ts`, `createWorkerSession` + `runWorkerCycle`) over eighteen zod-validated tools (one directory per tool under `src/tools/`, assembled in one frozen order — `TOOL_ORDER` in `src/tools/index.ts` — by `createToolRegistry`), driving browser sessions through an engine-neutral `BrowserController` and acquiring them through `BrowserSessionProvider` (`src/browser/`). Two providers implement that seam: local Playwright Chrome (headed persistent or headless isolated, as the caller selects) and Browserbase-hosted remote Chrome reached over CDP. `SHERLOCK_BROWSER_PROVIDER` picks one, resolved in exactly one place (`src/browser/provider.ts`); nothing above the controller boundary changes with it. Every run writes a self-contained directory under `runs/`, named `<date>_<time>_<task-slug>_<suffix>` in local time — `artifacts/` (published outputs and evidence, each manifest entry carrying `roles: requested_output|evidence`, both allowed on one file), `scratch/` (private agent working state, never graded or shown, still hashed — including `scratch/workspace/`, the `bash` working directory), `harness/` (harness-private durable state: `run.lock`, `checkpoint.json`; never a valid model-supplied path), plus `manifest.json` (SHA-256 provenance, exact UTC `startedAt`), `transcript.jsonl`, `metrics.json` — which is the product's output boundary; eval graders read only the run directory and select deliverables exclusively from `requested_output` entries.
+The worker sees exactly eight tools in the frozen order declared by
+`V3_TOOL_ORDER`: `browser_execute`, `publish_artifact`, `read_file`,
+`write_file`, `edit_file`, `bash`, `ask_user`, and `finish`. Browser work goes
+through the engine-neutral `BrowserController`; `BrowserSessionProvider`
+selects local Chrome or Browserbase in `src/browser/provider.ts`.
+
+Each run is a self-contained directory under `runs/`:
+
+- `artifacts/`: published requested outputs and evidence;
+- `scratch/`: private, hashed work, including `scratch/workspace/`;
+- `harness/`: private checkpoint, lock, immutable contract, and recovery data;
+- `manifest.json`: artifact roles, hashes, provenance, and lifecycle times;
+- `transcript.jsonl` and `metrics.json`: durable execution projections.
+
+Graders receive only `(runDir, oracleData)` and select deliverables exclusively
+from manifest entries carrying `requested_output`.
 
 | Subsystem | Entry point | Notes |
 | --- | --- | --- |
-| Composition root | `src/cli/runTask.ts` | The only place loop + model + tools + tracing are wired; both REPL and evals drive it |
-| Interactive agent | `src/cli/repl.ts` (`npm run agent`) | One persistent browser per session (local Chrome or a Browserbase session); fresh tab per task; relaunches after a browser death |
-| Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n>] [--contract-author <initializer\|worker>]`) | Normal trials: parallel isolated browsers (default 3) — headless Chrome + temp profile, or one context-free Browserbase session each; `headed` trials (`task.json`'s `headed` flag): serial against the single logged-in browser (`chrome-profile/`, or the configured Browserbase Context read-only); results JSON in `evals/experiments/` |
-| Model client | `src/model/` | Streaming always; thinking disabled; prompt caching via one `cache_control` breakpoint |
-| Provenance | `src/run/` | `writeArtifact` and `resolveRunPath` are the only write/path chokepoints — with one explicit exception, `scratch/workspace/` (see the workspace-partition rule) |
-| Demos | `demos/01…12` | Build-order walkthrough; 09/12 spend real tokens; 10–12 need a browser (provider-selected) |
-| Browser login | `src/cli/login.ts` (`npm run login`) | Provider-aware: local profile sign-in, or Browserbase Context provisioning + Live View sign-in verified across a close/reopen boundary. `--check` is the pre-batch eval gate; `--manual` is local-only |
-| Live remote smoke test | `scripts/browserbaseSmoke.ts` (`npm run smoke:browserbase`) | Real Browserbase minutes and real network; deliberately NOT part of `npm test` |
+| Composition | `src/cli/runTask.ts` | Only production model/tool/coordinator wiring |
+| Interactive TUI | `src/tui/main.tsx` (`npm run sherlock`) | Attaches to the user's local Chrome or uses Browserbase |
+| REPL | `src/cli/repl.ts` (`npm run agent`) | Explicit managed browser session |
+| Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b> [--k N] [--concurrency N]`) | Parallel isolated normal lane plus serial headed lane |
+| V3 runtime | `src/v3/` | Initializer, worker, tools, finish checks, verifier, checkpoint/coordinator |
+| Provenance | `src/run/` | Atomic manifest/artifact transactions, reconciliation, budget, transcript |
+| Browser login | `src/cli/login.ts` (`npm run login`) | Managed local profile or Browserbase Context |
+| Remote smoke | `scripts/browserbaseSmoke.ts` | Live/billable; never part of `npm test` |
 
 ## Binding project rules
 
-<!-- metadata: rules, constraints, conventions -->
+- **No task-specific logic.** Fix eval failures with general mechanisms, never
+  task-name branches. Hidden evals make per-task tuning worthless.
+- **The run directory is the product boundary.** Never grade a transcript or
+  treat conversation text/scratch files as a deliverable.
+- **Keep the cached prefix byte-stable.** `V3_SYSTEM_PROMPT` and
+  `V3_API_TOOL_DEFS` are process-wide and deterministic. Task/config/run data
+  belongs in conversation messages, not the static prefix.
+- **Exact requested shapes are exact.** Named CSV columns mean precisely those
+  columns in that order; extra columns fail.
+- **One immutable contract.** The initializer alone calls
+  `set_output_contract`, at most twice. The worker cannot revise it.
+- **One completion protocol.** `finish` must be the only tool call in its
+  response. It requests deterministic checks and fresh verification; it does
+  not declare success. Prose or a zero-tool response never completes a run.
+  Only verifier acceptance yields `verified`; every bounded failure is a
+  truthful `incomplete` reason.
+- **Worker tools execute sequentially.** Do not reintroduce the retired
+  scheduler. Every `ToolDef` still requires `getAccess(input)` because the
+  access declaration gates timed-out effects, finish quiescence, and recovery.
+- **Publication is explicit.** `write_file` and `edit_file` write only private
+  scratch files. `publish_artifact` is the sole worker publication boundary
+  and requires nonempty `requested_output` and/or `evidence` roles.
+- **Constrain every model path.** Use `resolveRunPath`; never permit a
+  model-supplied path under `harness/` or to metadata files.
+- **Workspace writes are the deliberate exception.** `bash` and
+  `browser_execute` may create files directly under `scratch/workspace/`.
+  Their lifecycle must run `syncScratchWorkspace()` so surviving regular
+  files are hashed and deletions reconciled. Symlinks/special files fail.
+- **`bash` is bounded but not sandboxed.** It is worker-only, foreground-only,
+  package-install-free, and has no browser capability. It runs with the
+  application's OS-user authority; do not describe it as a security boundary.
+- **`browser_execute` never exposes CDP authority.** The child talks to a
+  protected parent helper; connection URLs and provider credentials must not
+  enter model output, logs, artifacts, errors, or child environments. A
+  durable `javascriptPolicy: deny` disables the whole tool without changing
+  the static tool prefix.
+- **Crash safety is product behavior.** Checkpoint effect state before and
+  after every call, preserve artifact-write journals, use parent-death
+  watchdogs for child processes, and reclaim only pages marked for the same
+  run. Never weaken no-follow, atomic-write, or resume-integrity checks.
 
-- **No task-specific logic, ever.** Eval failures are fixed with general mechanisms (outline, tool results, prompt) — never `if (task === ...)`. There is a hidden eval set; per-task tuning is worthless.
-- **Graders read only the run directory** (path + oracle data). Never point one at a transcript.
-- **The prompt prefix must stay byte-stable**: `SYSTEM_PROMPT` is static and `toApiToolDefs` is deterministic; changes that vary the prefix per run break prompt caching (tests assert this).
-- **Exact output schema ruling**: a task naming CSV columns means exactly those columns — graders enforce; extra columns fail.
-- **`bash` is worker-only, local, and finite.** The absolute prohibition is lifted (it read: "No `bash` tool in the agent, by security design"). The worker may run bounded foreground commands in `scratch/workspace/`; the initializer and the verifier never receive `bash` or `edit_file`, so a contract author and a verdict author still cannot mutate anything. This is **not** a security boundary: commands run as the same OS user as the application, so the original prompt-injection concern (untrusted web content + shell) is mitigated only by exposure scoping, output/time bounds, and manifest provenance — never by isolation. Do not add a remote sandbox, background commands, or package installation without a fresh decision.
-- Every tool write goes through `writeArtifact` (hashing into the manifest); every model-supplied path through `resolveRunPath`. Tools must not write `manifest.json`, `transcript.jsonl`, `metrics.json`, `harness.json`, or anything under `harness/`.
-- **The one write-chokepoint exception is `scratch/workspace/`.** A `bash` command creates files directly, so bytes land there without passing through `writeArtifact` first. `syncScratchWorkspace()` closes the gap: before the `bash` tool returns, every surviving regular file in that directory is hashed into the manifest and every deleted tracked file is removed from it. Symlinks and special files fail reconciliation loudly rather than being followed. Because the run is not sandboxed, provenance is guaranteed only for surviving files *inside* that directory.
-- **A contract-bound deliverable may be written only by the tool that owns it.** `edit_file` refuses any path matching a `filename` declared by the current output contract, directing the worker to `update_table` or `write_document`. (`write_file` still permits it — a known, separately-tracked hole.)
-- **Workspace partition** (enforced by `writeArtifact`): every write lands under `artifacts/` (published — non-empty `roles` required) or `scratch/` (private — roles forbidden). `write_file` may target either (roles default `["requested_output"]`); `screenshot`/`download` publish only (roles default `["evidence"]`, plus `requested_output` when the capture was explicitly asked for). Graders select deliverables via `requestedOutputs()` / the finders in `evals/grading/manifestVerification.ts` — never from raw `manifest.artifacts`.
-- **Every production run states a typed output contract, and every run is a harness run.** There is one completion protocol: it requires an explicit, exclusive `submit_for_verification` call (validated by `validateWorkerResponse`) — a response with zero `tool_use` blocks is an INVALID working response, not completion, and the loop still never consults `stop_reason`. Before a contract exists, every tool but `set_output_contract` is refused (the contract-first gate); `--contract-author <initializer|worker>` picks who states it (default `initializer`), feeding the same store, code checks, and verifier either way. The prose `INTENT.md`/`CONTRACT.md` authoring mode is gone, along with the judge-less path it served: `runTask` always runs initializer → worker cycles → verifier and always checkpoints, so `RunTaskResult.status` is only `verified` or `incomplete`. `SYSTEM_PROMPT` now describes the typed contract directly, and the per-run `workerProtocolBrief` states only what the prompt cannot (which revision is set, which outputs it requires) rather than correcting it.
-- Declare `getAccess(input)` on every tool — it is mandatory on `ToolDef`, not optional. It drives the scheduler, deriving `{reads, writes, exclusive}` from validated input (parallel calls ≤5; conflicting writes serialize; read/read never conflicts). There is no `readOnly` field anymore. A tool with no `getAccess` is a type error at authoring time; one whose declaration throws at runtime is treated as exclusive — degrading to serial execution, never to unsafe parallelism.
+## Browser and eval mechanics
 
-## Repo-specific mechanics agents otherwise miss
+- Provider selection is explicit: only
+  `SHERLOCK_BROWSER_PROVIDER=browserbase` starts a billable remote session.
+  Merely holding a Browserbase key never selects it.
+- Interactive local `sherlock` uses **attached** Chrome. It preserves existing
+  user tabs, owns/marks only task pages, and disconnects without closing the
+  daily browser. Local evals, login, REPL, demos, and tests choose **managed**
+  Chrome explicitly so they never touch ambient state.
+- Attached setup accepts an explicit loopback
+  `SHERLOCK_CHROME_CDP_ENDPOINT` or bounded Chrome discovery; the endpoint is a
+  capability and must always be redacted.
+- Normal eval trials run in parallel isolated headless browsers. A task with
+  `headed: true` runs in the serial authenticated lane. `requiresLogin` enables
+  the pre-batch login gate; never infer either policy from task text/name.
+- Remote downloads return through Browserbase's API and are SHA-256 verified;
+  uploads travel as bytes. Remote Chrome cannot reach local loopback fixtures.
+- Do not run `npm run smoke:browserbase` or an eval re-baseline without user
+  direction. GitHub-graded evals need `GITHUB_TOKEN` or the grader can 403 only
+  after a correct agent run has finished.
 
-<!-- metadata: gotchas, environment, workflow -->
+## Repository mechanics agents otherwise miss
 
-- **No dotenv loader.** `.env` (gitignored) holds `ANTHROPIC_API_KEY`, `LANGFUSE_*`, `GITHUB_TOKEN`, and the browser-provider trio (`SHERLOCK_BROWSER_PROVIDER`, `BROWSERBASE_API_KEY`, `BROWSERBASE_CONTEXT_ID`); run key-needing scripts as `npx tsx --env-file=.env <script>`. Never read or print the values. Four entry points are exempt because they load it themselves: `sherlock` (its own loader, `src/tui/main.tsx`), `npm run evals` (`--env-file-if-exists=.env` in the script), and `npm run login` / `npm run agent` (which must see the provider variables or they would silently run local Chrome for a remotely configured project). **`evals/runners/regrade.ts` is not** — it still needs the flag by hand.
-- **An eval that grades GitHub needs `GITHUB_TOKEN`.** Unauthenticated oracles get 60 requests/hour, which a k=3 batch exhausts mid-run. The failure is disguised: the agent run *succeeds* and the grader then dies on HTTP 403, so the report shows low accuracy and looks like an agent regression. Read the log ordering — a trial that prints `run finished` and *then* `errored` failed in the grader, not the agent. Recover with `npx tsx --env-file=.env evals/runners/regrade.ts "<task>:<dir1>,<dir2>,<dir3>"`, promptly, since regrading refetches live ground truth.
-- **No build step** — `tsx` runs TypeScript directly; `tsconfig` is `noEmit`. Typecheck covers `src`, `demos`, `evals`, `tests`.
-- `npm test` is hermetic (loopback fixture server in `tests/fixtures/server.ts`) but **requires a local Chrome install**; oracle network functions are never called in tests. Browser tool suites register their Chrome/fixture/run-dir lifecycle through `tests/helpers/browserToolSuite.ts`.
-- Interactive and authenticated LOCAL runs launch headed (`channel: 'chrome'`) with the persistent `chrome-profile/` (gitignored). Normal local eval trials each launch headless with their own temporary profile. Profile paths must be absolute; only one process may own the persistent profile.
-- **Provider selection is explicit, never inferred.** Holding a `BROWSERBASE_API_KEY` must not start a billable remote session; only `SHERLOCK_BROWSER_PROVIDER=browserbase` does. `local` stays the fallback and the runtime for the hermetic suite — pass `env: {}` when constructing `createEvalBrowserRuntime` in a test so a developer's exported shell variable cannot make it reach the network.
-- **The Browserbase CDP connection URL is a session-control capability.** It must never reach a log, transcript, model-visible tool result, run artifact, thrown error, or child-process environment. `BrowserSessionDiagnostics` (session id, Live View URL, recording URL) exists so observability never needs it, and `PlaywrightBrowserController` asserts any `cdpUrl` it is handed is loopback. `BROWSERBASE_API_KEY` is on `BASH_SECRET_ENV_DENYLIST`. Browser-attached `bash` scripts are therefore unavailable on Browserbase and fail explicitly — see §6 of `docs/browserbase-provider-plan.md` before trying to restore them.
-- **Remote browsers do not share this filesystem.** Downloads land in the container and come back through Browserbase's Downloads API, SHA-256-verified (`src/browser/browserbaseDownloads.ts`); uploads must travel as bytes, not paths, because Playwright would otherwise send a local path over CDP (`src/browser/uploadEncoder.ts`). Both are per-provider strategies injected into the controller, and the local run directory remains the evidence system of record either way. A remote browser also cannot reach the loopback fixture server, which is why the live smoke test builds its fixtures in-page.
-- Per-trial profile cleanup only runs on a normal exit, so `createEvalBrowserRuntime` also sweeps `$TMPDIR` for `evidence-agent-eval-chrome-*` directories untouched for 4+ hours (a killed batch used to leak them forever — ~260 MB across two days once filled the disk). mtime, not age alone, is what protects a concurrently running batch: live Chrome writes to its profile constantly. The sweep only ever warns.
-- Tool results over 50 KB are offloaded to `runs/<id>/scratch/tool-output/` with a preview — that's the designed behavior, not a bug.
-- The TUI's `artifact_published` event is **derived, not authoritative**: the tracing seam (`src/tui/bridge/tuiTracing.ts`) diffs `manifest.json` after each tool execution and emits one event per new-or-changed published entry. The manifest remains the single source of truth; nothing model-visible changed — the prompt prefix stays byte-stable and tool-result shapes are untouched — so evals are unaffected.
-- SEC-related code: their edge 403s any non-plain User-Agent and most non-browser HTTP clients; the oracle's `Name email` UA in `evals/datasets/edgar/oracle/edgarClient.ts` is load-bearing.
-- Defaults that matter when debugging runs: model `claude-sonnet-5`, `maxTurns` 24, token budget 250k (all in `src/cli/runTask.ts` / `src/model/callModel.ts`, overridable per run via `RunTaskConfig`).
-- Planning docs are part of the workflow: failure analysis goes in `.agents/planning/.../implementation/baseline-failure-log.md`; commit scoped `git add` after each verified step, planning dir included.
+- There is no build step; `tsx` runs TypeScript and `tsconfig` is `noEmit`.
+  `npm run typecheck` covers `src`, `demos`, `evals`, `scripts`, and `tests`.
+- `npm test` is hermetic/network-free but requires local Chrome. Tests must
+  pass `env: {}` to eval browser composition so a developer's exported
+  provider variable cannot trigger Browserbase.
+- `.env` is gitignored. Never read or print secret values. `sherlock`, evals,
+  login, and agent load their supported env files; direct scripts usually need
+  `npx tsx --env-file=.env ...`.
+- The Browserbase CDP URL is more sensitive than diagnostics. Use
+  `BrowserSessionDiagnostics`; keep `BROWSERBASE_API_KEY` in the execution
+  denylist.
+- The TUI's `artifact_published` event is derived by diffing the manifest after
+  tool execution. The manifest remains authoritative.
+- Defaults in `src/cli/runTask.ts`: model `claude-sonnet-5`, 24 worker turns,
+  100 tool calls, 250k aggregate model tokens, 5 MB model-visible tool-result
+  bytes, 900k per-request context ceiling, and one hour wall time.
+- Planning docs are part of the workflow. Track v3 work in
+  `docs/browser-agent-v3/implementation-plan.md`; use scoped commits and include
+  the tracker after every verified step. Never edit
+  `docs/architecture-whiteboard.html` unless explicitly asked.
 
-## Current state (2026-08-12)
+## Current state (2026-08-15)
 
-<!-- metadata: status, work-queue -->
-
-Checkpoint 1 complete; the post-F1–F4 easy re-baseline passes 3/3 tasks at k=3 (details in `docs/reports/2026-08-11-rebaseline.md`). All eleven design-doc eval tasks now have loadable dataset packages; the six added on 2026-08-12 have not been baseline-run. The initializer/worker typed output-contract idea, once deferred, has since landed and is now the run's unconditional protocol (see the "Binding project rules" contract bullet above). **Do not re-baseline without the user's direction.**
-
-Eval execution supports parallel normal trials in isolated browsers and a separate serial authenticated lane. `task.json` controls the policy through optional boolean `headed` (renamed from `requiresAuth`; the loader throws if it sees the old name) and `requiresLogin` (the pre-batch login gate); never infer either from task names or task text.
-
-The Browserbase provider landed on `feat/judge-harness` (all of `docs/browserbase-provider-plan.md` except §6, which is deferred by design). Hermetic tests and typecheck pass. **Nothing about the remote provider has been exercised against real Browserbase yet** — `npm run smoke:browserbase` has not been run, and whether Google and X accept a cloud browser's IP and fingerprint is still the POC's open question. Read that document's "Implementation status" section before extending this work; it records the deviations and what remains unverified.
+The v3 runtime, attached-local cutover, public composition, TUI/eval adapters,
+and legacy-runtime retirement are implemented. Active documentation and final
+acceptance are the remaining steps. The last pre-retirement full suite passed
+175 files / 2,265 tests; focused retirement gates and typecheck are green.
+No live Browserbase smoke or eval re-baseline has run during this work.
 
 ## Custom Instructions
 

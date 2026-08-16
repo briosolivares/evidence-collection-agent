@@ -2,7 +2,12 @@
 
 A general browser agent for audit evidence collection: it takes a natural-language task, drives a browser to gather the evidence, and produces CSVs, screenshots, and/or written summaries suitable for audit documentation.
 
-The core is a minimal Claude Code–style agent loop (context → model → tool calls → repeat) over a small registry of validated browser and file tools. An engine-agnostic `BrowserController` drives each session, while a `BrowserSessionProvider` decides whether that session comes from local Chrome or a hosted service.
+The core is a crash-durable v3 run: a bounded initializer derives one immutable
+output contract, a sequential worker uses eight validated tools, deterministic
+checks inspect the published bytes, and a fresh read-only verifier alone can
+accept the result. An engine-agnostic `BrowserController` drives each session;
+`BrowserSessionProvider` selects attached local Chrome, managed Chrome, or
+Browserbase without changing the agent above that boundary.
 
 ## Install
 
@@ -15,7 +20,7 @@ Requires Node ≥ 22 and Google Chrome. On first launch Sherlock prompts for an 
 
 ```
 ~/.sherlock/
-  chrome-profile/   # persistent Chrome profile — logins survive across runs
+  chrome-profile/   # managed login/eval profile; interactive Sherlock attaches to daily Chrome
   runs/             # one directory per investigation (evidence + provenance)
   .env              # ANTHROPIC_API_KEY and friends (written by the first-run prompt)
 ```
@@ -32,7 +37,7 @@ npm run sherlock -- --demo    # scripted demo investigation, no API cost
 npm run sherlock -- --verbose # show raw tool input/result detail
 ```
 
-Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/artifacts` browses the last run's artifacts, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, local Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`).
+Inside the TUI: `/help` lists commands, `/runs` browses past run directories, `/artifacts` browses the last run's artifacts, `/evals` runs eval tasks (multi-select + trial and concurrency settings), `/exit` quits. Esc cancels the in-flight run or every active eval trial without leaving the session; Ctrl+C quits. Requires Node ≥ 22, a TTY, Chrome, and an Anthropic API key (prompted for on first run, or loaded from `.env`). Local interactive runs attach to the user's current Chrome and preserve pre-existing tabs; first use may ask you to enable Chrome's remote-debugging control.
 
 During a run, published artifacts appear as selectable rows the moment they land: ↑↓ select · Enter details (source URL, capture time, sha256, size) · Space preview · o open · r reveal — and with a detail card open, Esc closes it before it ever means cancel. On completion a summary panel (the concise answer plus the artifacts, requested outputs first) appears above the composer without taking focus, so the next task types immediately; Tab focuses the rows (Tab or Esc hands focus back), and `/artifacts` brings the panel back later. Space is macOS Quick Look — the same preview as Finder's spacebar, chrome-free via the bundled `sherlock-ql` helper (a universal binary committed at `bin/sherlock-ql`; `npm run build:quicklook` rebuilds it if you edit the Swift, and `qlmanage`'s debug-titled panel fills in if it's ever missing); on Linux it falls back to `xdg-open`, and reveal is macOS-only.
 
@@ -40,15 +45,21 @@ During a run, published artifacts appear as selectable rows the moment they land
 
 Give it a task ("Create a CSV of the top 5 stories on Hacker News, with columns for title, URL, and points") and it:
 
-1. Opens a fresh tab in a real, visible Chrome window (persistent profile, so logins survive between runs).
-2. Loops: the model observes pages through a compact accessibility-tree outline, acts by element ref (`click`, `type`, `scroll`, `navigate`), and writes evidence (`write_file`, `screenshot`, `download`) — until it responds with no tool calls.
-3. Leaves behind a self-contained run directory:
+1. Initializes one immutable, typed contract for the requested end state.
+2. Opens a run-owned task page. The worker browses through bounded
+   `browser_execute` programs, keeps private work under `scratch/`, and
+   publishes exact bytes with `publish_artifact`.
+3. Calls `finish` alone. Code checks the manifest and artifact contents, then
+   a fresh verifier inspects only published evidence. If either finds a defect,
+   the same worker repairs it; only verifier acceptance is success.
+4. Leaves behind a self-contained, resumable run directory:
 
 ```
 runs/2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b/   # date_time_task-slug_suffix (local time)
   artifacts/          # published outputs — the CSVs, screenshots, downloads, answer.md the task asked for
   scratch/            # the agent's private working files (never graded, still hashed)
-  manifest.json       # provenance: SHA-256 hash, source URL, roles, capture time per artifact
+  harness/            # private checkpoint, lock, immutable contract, recovery journals
+  manifest.json       # provenance: SHA-256, roles, capture time, and source URL when applicable
   transcript.jsonl    # append-only record of every model call and tool call
   metrics.json        # tokens, turns, wall-clock time
 ```
@@ -77,15 +88,18 @@ GITHUB_TOKEN=...           # optional — authenticated GitHub eval oracles
 SHERLOCK_BROWSER_PROVIDER=browserbase   # optional — see Browser runtime
 BROWSERBASE_API_KEY=...    # required when the provider is browserbase
 BROWSERBASE_CONTEXT_ID=... # written by `npm run login`
+SHERLOCK_CHROME_CDP_ENDPOINT=http://127.0.0.1:9222 # optional attached-local override
 ```
 
 ## Browser runtime
 
-Every entry point — the TUI, the REPL, CLI evals, TUI evals, the login command, the browser-backed demos — gets its browser from one place (`src/browser/provider.ts`), so a session can be local or remote without anything above the `BrowserController` boundary changing.
+Every entry point gets its browser from `src/browser/provider.ts`, but each
+caller must also state whether local Chrome is attached or managed. This keeps
+interactive convenience from leaking into isolated evals/tests.
 
 | `SHERLOCK_BROWSER_PROVIDER` | Browser |
 | --- | --- |
-| unset or `local` | System Google Chrome on this machine, persistent profile in `chrome-profile/` |
+| unset or `local` | System Chrome. Interactive `sherlock` attaches to the current user session; evals/login/REPL/demos use explicit managed profiles |
 | `browserbase` | Browserbase-hosted Chrome, reached over CDP; logins live in a Browserbase Context |
 
 Selection is **explicit on purpose**: possessing a `BROWSERBASE_API_KEY` never starts a billable remote session on its own. `local` stays the fallback, and `npm test` is hermetic and network-free under either setting.
@@ -105,7 +119,9 @@ What differs on Browserbase, and why:
 - **Downloads** land inside the remote container, so they are fetched back through Browserbase's Downloads API and **SHA-256-verified** before anything is written. The local run directory stays the evidence system of record; Browserbase is transport.
 - **Uploads** travel as bytes rather than as a path. Playwright would otherwise hand a remote Chrome a path from *this* filesystem, which it cannot read.
 - **Live View / recording links** are surfaced to the terminal and the TUI transcript so a human can watch or take over. The CDP *connection* URL never appears in a log, transcript, tool result, artifact, or child-process environment — `BROWSERBASE_API_KEY` is also on the `bash` tool's secret denylist.
-- **Browser-attached `bash` scripts are unavailable** remotely and fail explicitly. Ordinary `bash` in `scratch/workspace/` is unaffected. Attaching would mean handing model-generated shell code a remote session-control URL; the gated loopback-relay design that would restore it is §6 of [docs/browserbase-provider-plan.md](docs/browserbase-provider-plan.md).
+- **`bash` is never browser-attached.** `browser_execute` reaches either
+  provider only through the controller's protected command bridge, so neither
+  shell code nor the model receives a CDP connection URL.
 - **Google and X may still refuse a cloud browser** regardless of Context persistence. That is a measurement, not a bug — see the same document.
 
 ## Usage
@@ -137,26 +153,40 @@ npm test
 npm run typecheck
 ```
 
-**Demos** — fourteen numbered scripts under `demos/` walk each subsystem in build order (`npx tsx demos/07-loop-fake-model.ts` runs the full loop with a scripted model and zero tokens; 09 and 14 call the real API). They are manual walkthroughs, not tests — see [demos/README.md](demos/README.md).
+**Demos** — seven retained scripts under `demos/` cover run IDs/directories,
+manifest provenance, the generic tool pipeline, bounded offloading, the browser
+controller, and the complete v3 stack. Only demo 12 calls the real model. They
+are manual walkthroughs, not tests — see [demos/README.md](demos/README.md).
 
 ## Project layout
 
 | Path | Contents |
 | --- | --- |
-| `src/` | The agent: loop, model client, tools (one directory per tool under `src/tools/`), browser controller/session providers, run/provenance layer, CLI |
+| `src/` | Composition, v3 runtime/tools, model client, browser controller/providers, provenance, TUI, and CLI |
 | `evals/` | Eval harness: `runners/` (run-triggering scripts), `metrics/` (metric definitions), `datasets/` (per-task `task.json` + oracle + grader), `experiments/` (past-run results JSON), `config.ts` |
 | `demos/` | Build-order walkthrough scripts (manual, not tests — see its README) |
 | `tests/` | Fixture pages + loopback server (`fixtures/`) and shared test helpers (`helpers/`) |
-| `docs/` | Baseline reports and browser-layer research |
+| `docs/` | Current v3 design/plan, provider research, and historical reports |
 | `.agents/summary/` | Generated codebase knowledge base (start at `index.md`) |
-| `.agents/planning/` | Design doc, implementation plan, baseline failure log |
+| `.agents/planning/` | Historical checkpoint planning and failure-analysis records |
 
 ## Design highlights
 
-- **Provenance first**: every file-producing tool routes through one `writeArtifact` chokepoint that hashes bytes into the manifest at capture time.
-- **Bounded context**: tool results over 50 KB are offloaded to disk; the model gets a preview plus the path and reads selectively.
+- **Provenance first**: published bytes route through the artifact transaction
+  boundary; direct workspace effects from `bash`/`browser_execute` are
+  reconciled and hashed before their calls settle.
+- **Durable by construction**: atomic checkpoints, artifact-write journals,
+  child-process watchdogs, and run-owned page markers support safe resume after
+  process death.
+- **Bounded context and effects**: model turns, tokens, tool calls, result bytes,
+  wall time, browser programs, shell commands, and verifier reads are finite.
 - **Prompt caching by construction**: a byte-stable system-prompt + tool-definition prefix, verified by tests and by `cache_read_input_tokens` in traces.
-- **No shell access**: the agent has no `bash` tool, so a prompt-injecting web page cannot execute code on the host.
+- **Explicit authority**: `bash` is local, foreground, finite, browser-free, and
+  not a sandbox; consequential browser/user decisions require `ask_user`.
+- **Fail-closed completion**: `finish` requests checks and independent
+  verification; missing evidence, unavailable verification, and exhausted
+  budgets never become success.
 - **General mechanisms only**: eval failures are never fixed with task-specific logic — the eval suite is treated as a test set for general capability.
 
-Full documentation: [.agents/summary/index.md](.agents/summary/index.md). Design rationale: `.agents/planning/evidence-collection-agent-checkpoint-1/design/detailed-design.md`.
+Full documentation: [.agents/summary/index.md](.agents/summary/index.md). Current
+design and progress: [docs/browser-agent-v3/](docs/browser-agent-v3/).

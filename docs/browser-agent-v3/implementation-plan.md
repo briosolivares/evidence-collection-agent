@@ -255,7 +255,7 @@ boundaries, and a fixture-backed `sherlock` run renders/publishes artifacts.
   replay path.
 - [x] Remove unreachable production modules, demos, and tests that exist only
   for the retired path; keep reusable parsers/checks and historical reports.
-- [ ] Consolidate current documentation and update `AGENTS.md`, README, and the
+- [x] Consolidate current documentation and update `AGENTS.md`, README, and the
   architecture summary so they describe v3 rather than the retired protocol.
 - [x] Keep removals separate from v3 behavior changes and report structural
   versus cosmetic line reduction honestly.
@@ -1014,6 +1014,22 @@ proved, even if supporting code already exists.
 - `npm run typecheck`, the retired-symbol scan, and `git diff --check` pass.
   The serial local-Chrome/browser impact gate passes 15 files / 139 tests.
   No live Browserbase session or eval re-baseline ran.
+
+### 2026-08-15 — active documentation consolidated
+
+- Rewrote `AGENTS.md`, README, the retained demo guide, and all nine active
+  `.agents/summary/` documents around the sole v3 production path, static
+  eight-tool surface, immutable contract, durable coordinator, attached versus
+  managed browser ownership, and current provider/eval boundaries.
+- Marked the superseded v2 proposal/implementation documents as historical
+  without rewriting their dated delivery record. Updated the Browserbase plan
+  to describe the protected target-pinned command bridge that replaced its
+  deferred secondary-client proposal.
+- Removed stale references to retired controller actions, old completion and
+  contract protocols, deleted stores/readers, and dependencies already removed
+  from the package graph. The active-doc removed-symbol scan is empty, and all
+  relative Markdown link targets resolve. Typecheck and the complete hermetic
+  test suite remain the Step 7 gate.
 
 ## Rules for coordinators and subagents
 

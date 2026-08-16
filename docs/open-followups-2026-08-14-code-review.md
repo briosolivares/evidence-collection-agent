@@ -1,5 +1,9 @@
 # Follow-ups from the 2026-08-14 code-review pass on `feat/judge-harness`
 
+> **Historical v2 review record.** Every finding in this document was resolved
+> before the v2 runtime was retired. Current architecture and work live in
+> [the Sherlock v3 plan](./browser-agent-v3/implementation-plan.md).
+
 A code-review pass over this branch's uncommitted diff fixed a batch of bugs
 and flagged two findings as architecture-level rather than safe surgical
 patches. Both were investigated properly rather than taken on faith, and

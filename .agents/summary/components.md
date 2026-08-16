@@ -1,113 +1,133 @@
 # Components
 
-Major components and their responsibilities. File references are the primary implementation files; nearly all have a co-located `*.test.ts` (barrels like `src/tools/index.ts` and the `src/tools/shared/` helpers are covered through the tool suites that use them).
+Responsibilities of the active v3 production modules. Co-located tests pin most boundaries; crash-window tests additionally use child processes under `tests/fixtures/`.
 
-## src/loop — the agent loop
+## Public composition and user surfaces
+
+| File/area | Responsibility |
+| --- | --- |
+| `src/cli/runTask.ts` | The public v3-only composition root. Exposes `runTask` and `resumeTask`, creates durable configuration and model drivers, builds the eight-tool registry, wires tracing/progress, and delegates lifecycle to the coordinator. |
+| `src/tui/main.tsx` | Installed `sherlock` TUI edge: env/key setup, attached-local or Browserbase provider selection, interactive runtime, eval runtime, and Ink rendering. |
+| `src/tui/bridge/runSession.ts` | Converts `runTask` progress/outcomes, permission questions, tracing, cancellation, and published-manifest changes into UI events. |
+| `src/tui/bridge/runtime.ts` | Owns the session-long interactive browser, one run at a time, and browser-death replacement. Local TUI startup receives an already attached controller. |
+| `src/tui/bridge/evalRuntime.ts` | Keeps `/evals` on managed browser lanes. Local evals never borrow the attached daily browser. |
+| `src/cli/repl.ts` | Minimal line-oriented alternative using a managed persistent session. |
+| `src/cli/login.ts` and login helpers | Provider-aware login creation/checking. Browserbase provisions a Context and exposes Live View; local uses the managed profile. |
+
+## `src/v3/run` — durable lifecycle
 
 | File | Responsibility |
 | --- | --- |
-| `agentLoop.ts` | `runAgentLoop(taskText, deps, config)` — the turn loop. Owns `State { messages, turnCount }`, transcript writing, usage accounting, budget guards, and `metrics.json` (written on every exit path via a single `finish()` funnel). All I/O goes through the injected `LoopDeps` (`callModel`, `registry`, `runDir`, optional `browser`), which is what makes the loop testable with a scripted fake model. |
-| `scheduler.ts` | `scheduleToolCalls(calls, registry, ctx)` — partitions a turn's tool calls into consecutive same-kind batches: read-only batches run concurrently under a 5-slot FIFO semaphore; state-changing calls run one at a time and act as barriers. Results return in request order, never completion order. Never throws. |
-| `messages.ts` | SDK-free structural mirrors of the Anthropic Messages API (`Message`, `TextBlock`, `ToolUseBlock`, `ToolResultBlock`, `Usage`, `ModelResponse`) plus the `CallModel` function type — the seam between loop and model client. |
+| `coordinator.ts` | Runs or resumes initializer → worker → checks → verifier. Owns phase transitions, shared budgets/deadline, page ownership, checkpoint hooks, correction cycles, terminal cleanup, and projection repair. |
+| `checkpoint.ts` | Strict v3 checkpoint schemas plus the exclusive store. Bounded/no-follow reads; monotonic atomic saves; immutable configuration/contract; stale-lock recovery; lock-free immutable resume observation. |
+| `outputContractFile.ts` | Ensures `harness/output-contract.json` matches the checkpointed immutable contract; reconstructs a missing projection and rejects drift. |
+| `runDeadline.ts` | One whole-run abort/deadline signal shared across roles and effects. |
 
-Loop semantics worth knowing: completion is decided from response *content* (zero `tool_use` blocks), never `stop_reason`; guard order is completion → `maxTurns` → token budget (strictly greater than, so the budget is spendable in full); cumulative usage counts input + output + cache-read tokens.
+Checkpoint phases are `initializing`, `ready_for_model`, `executing_tool`, `checking`, `verifying`, and absorbing `terminal`.
 
-## src/model — the production Claude client
-
-| File | Responsibility |
-| --- | --- |
-| `callModel.ts` | `makeCallModel(config)` builds the production `CallModel`: always-streaming `client.messages.stream(...)`, thinking disabled, `system` as a single text block with `cache_control: { type: 'ephemeral' }` (caches tools + system together). `buildRequestParams` is exported separately so prompt-caching properties are directly testable. Emits `ProgressEvent`s decorated with the turn number. |
-| `streamAssembly.ts` | `assembleModelResponse(events, onProgress?)` — pure function assembling a `ModelResponse` from any `AsyncIterable` of raw stream events. Fails fast (throws) on unsupported block types (e.g. thinking), truncated streams, or unparseable tool JSON rather than silently degrading. |
-
-## src/browser — the browser layer
+## `src/v3/harness` — initializer and verifier
 
 | File | Responsibility |
 | --- | --- |
-| `controller.ts` | Pure types: the engine-neutral `BrowserController` interface (tab lifecycle, `goto`, `outline`, `click`/`type` by ref, `scroll`, `screenshot`, `resolveHref`, `fetch`, `currentUrl`, `title`, `close`), `BrowserFetchResult`, and `BrowserRefNotFoundError` (a first-class part of the contract). A controller owns at most one task tab at a time. |
-| `sessionProvider.ts` | `BrowserSessionProvider` — the hosting-neutral session-acquisition seam. `createSession()` returns a live `BrowserController` with no active task tab; callers own and close it. |
-| `playwrightBrowserController.ts` | The only file importing `playwright`. `LocalChromeBrowserSessionProvider` launches `chromium.launchPersistentContext(profileDir, { channel: 'chrome', headless: false })` and returns a `PlaywrightBrowserController`. The controller's `outline()` is `page.ariaSnapshot({ mode: 'ai' })`; refs are validated against `/^(?:f\d+)?e\d+$/` and resolved via `aria-ref=` locators requiring exactly one match. `fetch()` uses `context.request.get` (shares cookies). Tab lifecycle operations are serialized on a promise queue; `close()` is idempotent. |
+| `initializer.ts` | Contract-only model role. Forces one `set_output_contract` call, validates the immutable contract, permits one repair, and returns one `OutputContract`. The tool is initializer-private and never executes. |
+| `verifier.ts` | Fresh-context semantic review. Owns the report schema/loop, fail-closed repair behavior, role accounting, settled facts, and verified/needs-correction/unavailable result. |
+| `verifierTools.ts` | Bounded literal `grep` and windowed `read_file` over published artifacts plus `manifest.json`; rejects scratch, traversal, symlinks, special files, oversized trees/files/images, and performs no offload writes. |
 
-## src/tools — registry, pipeline, and the ten tools
+The verifier has no browser and cannot mutate the run. It receives one immutable contract, worker finish claims, user clarifications, and facts already settled by code.
 
-Each tool lives in its own directory (`src/tools/<toolName>/`) holding the tool's source and its test. Framework files sit at the `src/tools/` root; helpers used by more than one tool live in `src/tools/shared/`; `src/tools/index.ts` exports the registration-order groupings (`fileTools`, `observationTools`, `actionTools`, `evidenceTools`) that `runTask` registers — reordering them would change the cached prompt prefix.
-
-| File | Responsibility |
-| --- | --- |
-| `registry.ts` | `ToolDef` (name, description, zod `inputSchema`, `readOnly`, optional `maxBytes`, `execute`), `createRegistry` (rejects duplicates; iteration order = registration order), `toApiToolDefs` (zod → JSON Schema, deterministic/byte-stable because it is part of the cached prefix), and `ToolCtx { runDir, browser? }`. |
-| `pipeline.ts` | `executeToolCall` — the six-stage checklist every call flows through: exists-check → zod validation → execute → normalize → cap → return. Never throws; errors come back as structured `ToolCallResult`s with `errorKind` (`unknown_tool` / `invalid_input` / `execution_error`) and model-readable detail (zod issues rendered per path; unknown tools list available names). |
-| `capResult.ts` | The offloading mechanism (see [architecture.md](architecture.md)). Offload filenames are claimed with exclusive create + retry so parallel reads can offload concurrently; previews never slice a UTF-8 character. |
-| `index.ts` | The tool groupings in stable registration order, plus re-exports of every tool — the one import consumers need. |
-| `shared/browser.ts` | `requireBrowser`, `formatPageHeader`, and the stale-ref machinery (`actByRef`, `requireRefDescription`) shared by the browser tools. |
-| `shared/lines.ts` | `splitLines` — newline handling shared by `read_file` and `grep` (no phantom final line). |
-| `shared/evidence.ts` | `assertEvidencePath` (reserved-metadata guard) and the `EvidenceResult` shape shared by `screenshot` and `download`. |
-| `readFile/`, `writeFile/`, `grep/` | `read_file`, `write_file`, `grep` — Claude Code–shaped contracts (`file_path`/`offset`/`limit`, `cat -n`-style output, `path:line: match` grep output) because the model has seen those exact shapes in training. `read_file`/`grep` are read-only; `write_file` routes through `writeArtifact`. Empty file / offset-past-end are warnings, not errors; `grep` walks files in sorted order for determinism. |
-| `navigate/`, `inspectPage/` | `navigate` (state-changing; http/https only; returns the *landed* URL + title) and `inspect_page` (read-only; header + full ARIA outline). |
-| `click/`, `type/`, `scroll/` | `click`, `type`, `scroll` (all state-changing). `click`/`type` first re-read the outline to resolve a human description for the ref — so the transcript reads `Clicked ref=e12 (button "Submit").` and stale refs are caught before acting. Stale refs surface to the model as "run inspect_page again and use a current ref." |
-| `screenshot/`, `download/` | `screenshot` (viewport or `fullPage`) and `download` (resolves an href from a ref, fetches through the browser session so cookies apply, rejects non-2xx). Both record `sourceUrl` in the manifest; the model receives only `{ path, size }` — image bytes never enter the transcript. Refuses to write reserved metadata filenames. |
-
-## src/run — run identity, confinement, provenance
+## `src/v3/loop` — sequential worker
 
 | File | Responsibility |
 | --- | --- |
-| `runId.ts` | `generateRunId(label?)` — `<date>_<time>_<label-slug>_<6-hex>` in local 12-hour time, e.g. `2026-08-10_08-00-53pm_top-5-hacker-news_9f3a2b`; filesystem-safe, human-readable, sorts by date (12-hour times don't sort within a day). `runTask` passes the task text as the label. |
-| `runDir.ts` | `createRunDir` (non-recursive final mkdir, so id collisions throw) and `resolveRunPath` — the single path-confinement chokepoint. |
-| `artifacts.ts` | `initManifest` / `writeArtifact` / `finalizeManifest` and the `Manifest`/`ManifestEntry` types. `writeArtifact` is the single write path: loads the manifest before writing (a missing manifest aborts, leaving no untracked file), hashes exact bytes, upserts by normalized path. Pretty-printed because auditors read it. |
-| `transcript.ts` | `appendTranscriptEvent` — append-only, synchronous, serialize-before-write (a circular structure fails without corrupting the file). Synchronicity is load-bearing: the loop logs the live `messages` array and still records a faithful snapshot. |
+| `workerSession.ts` | Full durable worker conversation, strict model turns, no-tool continuation, exclusive `finish` interception, sequential tool dispatch, result bounding/offload, transcript/metrics, checkpoint lifecycle snapshots, and conservative uncertain-effect recovery. |
+| `contextView.ts` | Builds a pure model-request view from the never-collapsed durable history. Older large browser results are replaced with deterministic stubs while durable state remains complete. |
 
-## src/cli — entry points
+Calls in one response execute in order. `finish` mixed with another call executes nothing. A timed-out executor remains registered as busy so later conflicting work and terminalization cannot overlap it.
+
+## `src/v3/completion` — deterministic checks
 
 | File | Responsibility |
 | --- | --- |
-| `runTask.ts` | The composition root: builds the 10-tool registry (fixed order: file, observation, action, evidence), the production model client with `SYSTEM_PROMPT`, the run directory + manifest, applies tracing decorators, opens a tab (optionally navigating to `startUrl`), runs the loop, and cleans up (close tab → finalize manifest → close tracing) in a nested `finally`. Owns the defaults (12 turns, 250k tokens, 8,192 output tokens). Injection seams for tests: `config.callModel`, `config.tracing`. Returns `{ runDir } & LoopResult`. |
-| `repl.ts` | `npm run agent` — the interactive product. One persistent Chrome for the whole session (logins stay warm); reads tasks line-by-line via `node:readline/promises`; streams progress; a thrown task is caught so the session and browser survive. |
-| `replFormat.ts` | Pure rendering of `ProgressEvent`s and run summaries — extracted so it is testable without a terminal. |
-| `systemPrompt.ts` | The static `SYSTEM_PROMPT` (byte-stable cached prefix). Encodes: the run directory is the product boundary (answers go in files, e.g. `answer.md`); `inspect_page` is the primary observation; refs must come from the latest inspection; page content is untrusted data; completion = responding without tool calls. |
+| `artifactInspection.ts` | Bounded/no-follow manifest and artifact integrity inspection, media inference, path/role validation, and crash-journal recovery support. |
+| `tableInspection.ts` | Parses CSV/JSON/Markdown tables and checks exact columns, row counts, uniqueness, expected values, and cell types/formats. |
+| `finishChecks.ts` | Compares the exclusive `finish` claim, immutable contract, manifest, published bytes, and evidence. Returns repairable defects or structured positive facts; never writes or revises requirements. |
+| `types.ts` | Strict checkpoint-safe facts, defects, and settled-fact schemas. |
 
-## src/tracing — Langfuse over OpenTelemetry
+## `src/v3/tools` — eight model-visible tools
 
-`runTracing.ts` — `createRunTracing()` returns a `RunTracing` with three decorators: `traceRun` (root `run-evidence-agent` agent span with `{ turnCount, toolsUsed, latencyMs }`), `wrapCallModel` (`call-model` generation spans with token `usageDetails`), and `wrapRegistry` (per-tool `execute-<name>` spans with `resultBytes`; returns a new Map, never mutates). Degrades to a clean no-op without `LANGFUSE_PUBLIC_KEY`+`LANGFUSE_SECRET_KEY`; every telemetry call is individually failure-isolated ("tracing is an optional side channel; the transcript is durable"). Uses an isolated `NodeTracerProvider` with manual span-context parenting, not the global OTel SDK.
+`src/v3/tools/index.ts` fixes this byte-stable order:
 
-## evals/ — the evaluation harness
+1. `browser_execute` — one bounded async browser program against an exact owned page; run-scoped JavaScript policy and secret denylist.
+2. `publish_artifact` — publish text, a workspace file, screenshot, or browser download with explicit manifest roles/provenance.
+3. `read_file` — bounded content-aware reads from the run workspace.
+4. `write_file` — write private workspace bytes.
+5. `edit_file` — exact-match edits to private workspace text.
+6. `bash` — bounded foreground local commands in `scratch/workspace/`, followed by manifest reconciliation.
+7. `ask_user` — permission-mediated interactive question; unavailable/headless paths fail closed.
+8. `finish` — exclusive completion control request, intercepted before generic dispatch.
 
-Five subdirectories separate the harness's concerns — `runners/` (the scripts that trigger and shape a run), `metrics/` (metric definitions), `grading/` (the run-dir verification toolkit graders build on), `datasets/` (one directory per task: input + expected-output oracle + grader), `experiments/` (results JSON from past runs; gitignored) — with `config.ts` (paths + defaults) and `types.ts` (the harness contracts) at the root.
+There is no active legacy tool barrel or one-directory-per-browser-action surface. Browser observation/action is consolidated behind `browser_execute`; publication is consolidated behind `publish_artifact`.
 
-| File(s) | Responsibility |
+## Shared tool framework (`src/tools`)
+
+| File | Responsibility |
 | --- | --- |
-| `config.ts` | Central config: dataset/run/result/profile paths, `DEFAULT_K`, `DEFAULT_EVAL_CONCURRENCY` (3), and `MODEL`. |
-| `runners/cli.ts` + `runners/cliArgs.ts` | `npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n>]`. Normal trials use isolated headless Chrome/temp profiles; authenticated trials use the serial headed persistent lane. |
-| `runners/browserRuntime.ts` | Owns eval browser lifecycle: one fresh headless Chrome/temp profile per normal trial, plus one lazy shared headed `chrome-profile/` session for authenticated trials. |
-| `runners/runner.ts` | `runEvals(tasks, k, deps)` — bounded normal pool plus serial auth lane, deterministic report slots, cancellation, and a separate one-slot fresh-oracle/grading queue. The grader still receives exactly run dir + oracle data. |
-| `metrics/metrics.ts` | Accuracy = mean fraction of assertions passed across trials; completion = all assertions pass in a trial; task pass = **all** k trials complete. Zero assertions or zero trials throw (harness bug, not a score). |
-| `runners/report.ts` | Human-readable report text + `writeResults` to `evals/experiments/<fresh-run-id>.json` (never overwrites). |
-| `runners/loadTask.ts` | Loads `task.json` (including normalized boolean `requiresAuth`) plus oracle/grader modules. Task names are validated (`/^[A-Za-z0-9_-]+$/`) before any path join. |
-| `grading/manifestVerification.ts` | Shared grader helpers: `readManifest`, `verifyManifestHashes` (the standing provenance assertion every grader runs), `findArtifactByExtension` (deterministic tie-break), `findArtifactBySha256`. |
-| `grading/csv.ts`, `grading/hash.ts` | Dependency-free RFC 4180-shaped CSV parser; `sha256Hex` matching `writeArtifact`'s encoding. |
-| `runners/fakeAgent.ts` | `makeFakeRunTask` — builds a realistic run dir in milliseconds with no browser/model. Its transcript deliberately *claims success* so the suite can prove graders never read transcripts. Test-only. |
-| `types.ts` | `AssertionResult`, `Grader`, `RunTaskFn`, `EvalTask` — the harness contracts, including the grader-isolation standing rule. |
+| `registry.ts` | `ToolDef`, deterministic registries/API definitions, mandatory `getAccess`, permission types, access keys, and the run-owned busy-resource ledger. |
+| `pipeline.ts` | Existence/schema/permission/resource gates, bounded execution timeout, normalization, result capping, and structured errors. It never lets a timed-out effect silently disappear from resource accounting. |
+| `capResult.ts` | Per-result and combined-result byte limits. Oversize output is durably offloaded under `scratch/tool-output/` with a bounded UTF-8 preview. |
+| `shared/lines.ts` | Stable line splitting used by bounded readers. |
+| `bash/runForegroundCommand.ts` | Process-group-aware finite foreground command runner used by the v3 `bash` tool. |
 
-### Eval task datasets (checkpoint 1)
+## Model layer (`src/model`, `src/v3/model`)
 
-| Dataset dir | Oracle (tier) | Grader assertions |
-| --- | --- | --- |
-| `datasets/stub/` | Static (plumbing exerciser) | `answer.md` exists; manifest hash verifies |
-| `datasets/hacker_news/` | HN Firebase API, top 5 (Tier A) | CSV exists (by extension); columns exactly `title,url,points`; 5 rows; ≥4/5 oracle titles present (churn tolerance); URLs well-formed; manifest hashes verify |
-| `datasets/edgar/` | SEC submissions API + archive document bytes (Tier A) | An artifact hash-matches the oracle document's SHA-256; a `.png` with real PNG magic bytes exists; manifest hashes verify (screenshot *content* is Tier C / human) |
-| `datasets/openclaw_pr/` | GitHub REST, last 10 PRs, churn window as a step function of run start/end (Tier A) | `answer.md` exists; mentions number **and** title of a most-recent-in-window PR; manifest hashes verify |
-| `datasets/company_freshness/` | Official Notion pages, Figma JSON Feed, and Eight Sleep blog (Tier A + C) | At least six real PNGs; official homepage provenance for each company; content provenance matches each live three-item freshness window; distinct pairs; hashes verify. Pixel contents remain human-reviewed |
-| `datasets/yc_w24_outreach/` | Official YC public Startup + Founder directory Algolia indexes (Tier A/B) | Exact CSV columns; distinct complete founder rows; all founders belong to W24 AI companies; exactly five companies with every public founder included; personal LinkedIn URL shape/name agreement; founder/company/detail-specific 15-minute asks; hashes verify |
-| `datasets/openclaw_merged_prs/` | GitHub REST recently-merged window + PR/review details (Tier A) | Exact CSV columns and 10 distinct PRs; recent-window membership; author/merger/reviewer agreement where independently checkable; one provenance-matched real PNG per PR; hashes verify |
-| `datasets/elon_tweets/` | Run-time structural contract (Tier B) | Exact CSV columns; plausible non-empty distinct rows; parseable non-negative like counts; same-day/relative time values; hashes verify. Authorship and completeness remain human-reviewed |
-| `datasets/openclaw_contributors/` | GitHub REST top-100 contributor window + profiles (Tier A/B) | Exact CSV columns and 30 distinct handles; ≥25 oracle-window matches; public-name agreement where comparable; LinkedIn URL shape; hashes verify |
-| `datasets/wikipedia_reference/` | Official MediaWiki parse API, displayed-reference traversal (Tier A) | `answer.md` exists; contains the full Sources entry reached from displayed reference 275; no truncation; hashes verify |
-| `datasets/airbnb_lake_tahoe/` | Run-time structural/date contract (Tier B) | `answer.md`; exactly numbered 1–30; 30 distinct Airbnb room URLs; substantive per-listing summaries; seven-night next-week date pair; Lake Tahoe overall summary; hashes verify. Ranking/availability remain human-reviewed |
-| `datasets/mit_sororities/` | Static affiliation/cohort contract (Tier B) | Local CSV + Google Sheet URL receipt; exact columns; plausible row bounds; all 12 affiliation/class cohorts; plausible unique names; minimum detail coverage; hashes verify. Private Sheet/site fidelity remains human-reviewed |
+| File | Responsibility |
+| --- | --- |
+| `callModel.ts` | Anthropic request construction, static/collapsed-frontier prompt-cache breakpoints, streaming adapter, default model, and compatibility `CallModel` seam. |
+| `streamAssembly.ts` | Requires a complete stream and rejects malformed/truncated block assembly. |
+| `callWithRetry.ts` | Cancellable bounded retry for transient transport/truncation failures. |
+| `modelDriver.ts` | Strict `ModelDriver`: complete response validation, accepted stop reasons, tool-call shape/count checks, one enlarged max-token retry, attempt-scoped progress, and known billable usage on failures. |
+| `src/v3/model/budgetedCall.ts` | Charges every role's accepted/rejected model usage into the one durable whole-run budget and persists accounting hooks. |
 
-Oracle clients split parsing from fetching: parse logic is unit-tested against canned payloads; no test ever calls the network. Live smoke checks are separate, explicit developer actions.
+## Browser layer (`src/browser`, `src/v3/browser`)
 
-## demos/ — build-order walkthrough
+| File/area | Responsibility |
+| --- | --- |
+| `controller.ts` | Minimal engine-neutral `BrowserController`: run-page ownership/preparation/cleanup, safe page summaries, target-pinned command sessions (including protected upload), dialogs, screenshots/downloads, and diagnostics. |
+| `sessionProvider.ts` | `BrowserSessionProvider` and provider-safe diagnostics (`local` or `browserbase`). |
+| `provider.ts` | The only environment-to-provider composition point; explicit local/Browserbase choice and explicit local `attached`/`managed` authority. |
+| `attachedChromeSetup.ts`, `attachedChromeBrowserSessionProvider.ts` | Bounded loopback discovery/approval and non-owning connection to the user's current Chrome. Endpoint values never enter user-visible errors. |
+| `playwrightBrowserController.ts` | Shared controller for attached, managed, and remote sessions; owns only tagged run pages, contains late effects, and retires an exact page after an abandoned raw renderer command. |
+| `browserbaseBrowserSessionProvider.ts` and download/upload helpers | Remote session lifecycle, Live View/recording diagnostics, Context policy, checksum-verified downloads, and byte-based uploads. |
+| `src/v3/browser/runner.ts` + child modules | Executes a bounded browser program in a child process against the exact page/session capability supplied by the controller. |
 
-Fourteen standalone `tsx` scripts mirroring the implementation order (T1→T14): run ids → run dirs → manifest → registry → offloading → file tools → loop with a fake model (zero tokens) → scheduling → first real agent (needs `ANTHROPIC_API_KEY`) → browser controller → observe → act (incl. the scroll→inspect lazy-load pattern) → evidence (screenshot + authenticated download) → full `runTask` against a live site. Demos 10–14 need local Chrome; 11–13 start their own loopback fixture server; 09 and 14 spend real tokens.
+## Run/provenance layer (`src/run`)
 
-## tests/ — fixtures and shared helpers
+| File | Responsibility |
+| --- | --- |
+| `runDir.ts`, `runId.ts` | Run creation and the model-path confinement chokepoint. `harness/` is never a model-visible path. |
+| `artifacts.ts` | Manifest initialization/read/finalization and `writeArtifact`, the normal provenance write chokepoint. |
+| `artifactWriteTransaction.ts`, `atomicFile.ts` | Durable write-ahead journal, fsync, atomic replace, and crash recovery. |
+| `syncScratchWorkspace.ts` | No-follow reconciliation of direct `bash` workspace changes into the manifest; rejects symlinks/special/oversized files. |
+| `runBudget.ts` | Monotone shared usage, tool, result-byte, wall-time, and verifier-correction accounting with checkpoint snapshots. |
+| `transcript.ts` | Append-only JSONL events. |
+| `runOutcome.ts` | Public `verified` or explicit `incomplete` result shapes. |
 
-`tests/fixtures/server.ts` serves the fixture pages on an ephemeral loopback port: `index.html` (buttons, textbox, below-fold content; sets the `fixture-session=ready` cookie), `second.html` (navigation target), `downloads.html` (tall page + cookie-gated `/authenticated.bin`), `lazy-load.html` (IntersectionObserver-driven infinite scroll), `oversized.html` (120 links to exercise outline capping). `tests/helpers/` holds shared test scaffolding: `browserToolSuite.ts` (`setupBrowserToolSuite` — the one-Chrome-per-suite, fresh-run-dir-per-test lifecycle every browser tool suite registers) and `outline.ts` (`refFor` — resolve a role/name to its outline ref). All tests are co-located in `src/` and `evals/`; `tests/` holds only fixtures and helpers. `npm test` needs no network beyond loopback plus a local Chrome install.
+## Tracing
+
+`src/tracing/runTracing.ts` provides optional Langfuse/OTel model/tool/root spans and run-directory announcements. It is an isolated side channel: trace failure never changes run behavior, and terminal resume does not create a new external root trace.
+
+## Evaluation
+
+| Area | Responsibility |
+| --- | --- |
+| `evals/runners/loadTask.ts` | Validates `task.json` (`task`, optional `startUrl`, `headed`, `requiresLogin`), rejects deprecated metadata keys, and loads oracle/grader functions. |
+| `evals/runners/browserRuntime.ts` | Fresh isolated normal browsers plus one serial authenticated/headed managed browser, for local or Browserbase. |
+| `evals/runners/runner.ts` | Bounded normal pool, independent serial headed lane, cancellation, deterministic slots, and serialized fresh-oracle grading. |
+| `evals/grading/` | Manifest/hash/output helpers used by task graders. |
+| `evals/metrics/` and `report.ts` | Trial accuracy/completion, all-of-k task pass, human output, and JSON persistence. |
+
+## Tests and demos
+
+- Source tests are mostly co-located. `tests/tui/` covers public UI bridges and behavior; `tests/fixtures/` contains loopback pages and crash children; `tests/helpers/` owns shared Chrome fixtures.
+- The surviving demos are `01`–`05`, `10`, and `12`. They are examples, not a second runtime.
+- `npm test` is hermetic except for loopback and requires an installed local Chrome. Live Browserbase behavior is exercised only by the explicit smoke command.

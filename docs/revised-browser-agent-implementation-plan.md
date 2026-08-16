@@ -1,6 +1,8 @@
 # Browser Agent V2 — Step-by-Step Implementation Plan
 
-**Status:** Proposed
+**Status:** Historical — superseded by the
+[Sherlock v3 implementation plan](./browser-agent-v3/implementation-plan.md).
+Commands and paths below are retained only as the v2 delivery record.
 
 **Date:** 2026-08-13
 
