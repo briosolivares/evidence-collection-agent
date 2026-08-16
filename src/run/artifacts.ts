@@ -141,12 +141,8 @@ export function initManifest(
 /**
  * Read the run's manifest as it stands on disk, without mutating it.
  *
- * At least three ad hoc manifest readers already exist elsewhere in the
- * codebase (`src/completion/completionCheck.ts` and
- * `src/completion/finalizeIncompleteRun.ts`), each re-implementing "read
- * manifest.json, JSON.parse it, throw if that fails" inline. Consolidating
- * them onto this function is deliberately out of scope here — this only
- * keeps the count from growing for callers written from now on.
+ * Runtime callers that need stronger shape, confinement, or hash guarantees
+ * layer those checks on top of this raw provenance read.
  *
  * @param runDir - absolute path to a run directory whose manifest has been
  *   initialized; throws if the manifest file is missing or is not valid JSON
@@ -355,20 +351,9 @@ export function removeScratchArtifactEntry(runDir: string, relPath: string): voi
  * the run directory, exist as a regular, non-symlink file, and match its
  * recorded SHA-256.
  *
- * Hash verification of manifest entries already exists as
- * `validateManifestIntegrity` in `src/completion/completionCheck.ts`, and
- * this function deliberately does not become a third implementation of that
- * comparison — but it cannot delegate to it either. That module imports
- * `ARTIFACTS_DIR`, `writeArtifact`, and other names from this one, so an
- * import the other way would be a cycle. More importantly, delegating would
- * silently drop the guarantee this function exists to add:
- * `validateManifestIntegrity` reads entries with `existsSync`/`readFileSync`,
- * which both follow symlinks, so a symlink planted where a manifest entry
- * expects a plain file would be "verified" against bytes that live somewhere
- * else on disk entirely. That gap is tolerable on the ordinary
- * submission-time path it serves, but recovery runs over a run directory a
- * crashed or untrusted worker left behind, where a planted symlink is
- * exactly the kind of thing recovery needs to catch rather than trust.
+ * This recovery boundary deliberately uses no-follow regular-file reads. A
+ * symlink planted where a manifest entry expects a file must never verify
+ * against bytes elsewhere on disk, especially after a crashed child process.
  *
  * @param runDir - absolute path to the run directory being recovered
  * @throws one Error listing every failing entry — a path that escapes the

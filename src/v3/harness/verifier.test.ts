@@ -17,11 +17,14 @@ import {
   type RunBudgetConfig,
 } from '../../run/runBudget.js';
 import {
+  V3_REPORT_VERIFICATION_TOOL,
   V3_VERIFIER_API_TOOL_DEFS,
+  V3_VERIFIER_MAX_CONTEXT_TOKENS,
   V3_VERIFIER_SYSTEM_PROMPT,
   collectV3UserClarifications,
   createV3VerifierModelDriver,
   runV3Verifier,
+  v3VerificationResultSchema,
 } from './verifier.js';
 
 let runDir: string;
@@ -93,11 +96,15 @@ function accepted(
 
 function acceptedContent(
   content: AcceptedModelResponse['response']['content'],
+  responseUsage: AcceptedModelResponse['response']['usage'] = {
+    input_tokens: 10,
+    output_tokens: 4,
+  },
 ): AcceptedModelResponse {
   const response = {
     content,
     stop_reason: 'tool_use' as const,
-    usage: { input_tokens: 10, output_tokens: 4 },
+    usage: responseUsage,
   };
   return {
     response,
@@ -105,6 +112,46 @@ function acceptedContent(
     attempts: 1,
     usage: { input_tokens: 20, output_tokens: 8 },
   };
+}
+
+function scriptedModel(steps: readonly AcceptedModelResponse[]): ModelDriver {
+  const remaining = [...steps];
+  return {
+    generate: vi.fn(async () => {
+      const next = remaining.shift();
+      if (next === undefined) throw new Error('verifier script exhausted');
+      return next;
+    }),
+  };
+}
+
+function report(input: unknown, id = 'verdict'): AcceptedModelResponse {
+  return acceptedContent([
+    { type: 'tool_use', id, name: 'report_verification', input },
+  ]);
+}
+
+function inspect(id = 'inspect'): AcceptedModelResponse {
+  return acceptedContent([
+    {
+      type: 'tool_use',
+      id,
+      name: 'read_file',
+      input: { file_path: 'artifacts/report.csv' },
+    },
+  ]);
+}
+
+function verifyWith(model: ModelDriver) {
+  return runV3Verifier({
+    taskText: 'Create report.csv.',
+    runDir,
+    contract: CONTRACT,
+    finish: FINISH,
+    clarifications: [],
+    model,
+    budget: budget(),
+  });
 }
 
 describe('v3 verifier binding', () => {
@@ -124,6 +171,30 @@ describe('v3 verifier binding', () => {
     expect(() => createV3VerifierModelDriver({ maxOutputTokens: 0 })).toThrow(
       /maxOutputTokens/,
     );
+  });
+
+  it('pins the fail-closed verdict schema', () => {
+    expect(V3_REPORT_VERIFICATION_TOOL.name).toBe('report_verification');
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'verified',
+        findings: [],
+      }).success,
+    ).toBe(true);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'verified',
+        findings: [
+          { area: 'output', code: 'contradiction', message: 'not empty' },
+        ],
+      }).success,
+    ).toBe(false);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [],
+      }).success,
+    ).toBe(false);
   });
 });
 
@@ -204,6 +275,147 @@ describe('runV3Verifier', () => {
       expect(captureRunBudgetSnapshot(tracker).toolCalls).toBe(1);
     },
   );
+
+  it('treats prose as no verdict and allows exactly one repair', async () => {
+    const prose = acceptedContent([{ type: 'text', text: 'DONE' }]);
+    await expect(verifyWith(scriptedModel([prose, prose]))).resolves.toEqual({
+      status: 'verifier_unavailable',
+      reason: 'verifier ended without a valid report_verification call',
+    });
+
+    const repaired = scriptedModel([
+      prose,
+      report({ status: 'verified', findings: [] }),
+    ]);
+    await expect(verifyWith(repaired)).resolves.toEqual({
+      status: 'verified',
+      findings: [],
+    });
+    expect(
+      JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages),
+    ).toContain('Prose is never a verdict');
+  });
+
+  it('repairs one malformed report, then fails closed on a second', async () => {
+    const invalid = report({
+      status: 'verified',
+      findings: [
+        { area: 'output', code: 'contradiction', message: 'not empty' },
+      ],
+    });
+    const repaired = scriptedModel([
+      invalid,
+      report({
+        status: 'needs_correction',
+        findings: [
+          { area: 'output', code: 'missing_row', message: 'One row is absent.' },
+        ],
+      }),
+    ]);
+    await expect(verifyWith(repaired)).resolves.toMatchObject({
+      status: 'needs_correction',
+    });
+    expect(
+      JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages),
+    ).toContain('failed validation');
+
+    await expect(
+      verifyWith(scriptedModel([invalid, invalid])),
+    ).resolves.toMatchObject({
+      status: 'verifier_unavailable',
+      reason: expect.stringContaining('invalid report_verification input'),
+    });
+  });
+
+  it.each([
+    {
+      name: 'a report mixed with inspection',
+      calls: [
+        {
+          type: 'tool_use' as const,
+          id: 'verdict',
+          name: 'report_verification',
+          input: { status: 'verified', findings: [] },
+        },
+        {
+          type: 'tool_use' as const,
+          id: 'inspect',
+          name: 'read_file',
+          input: { file_path: 'artifacts/report.csv' },
+        },
+      ],
+      reason: 'only tool call',
+    },
+    {
+      name: 'multiple reports',
+      calls: [
+        {
+          type: 'tool_use' as const,
+          id: 'one',
+          name: 'report_verification',
+          input: { status: 'verified', findings: [] },
+        },
+        {
+          type: 'tool_use' as const,
+          id: 'two',
+          name: 'report_verification',
+          input: { status: 'verified', findings: [] },
+        },
+      ],
+      reason: 'more than one',
+    },
+  ])('rejects $name after one repair', async ({ calls, reason }) => {
+    const invalid = acceptedContent(calls);
+    await expect(
+      verifyWith(scriptedModel([invalid, invalid])),
+    ).resolves.toMatchObject({
+      status: 'verifier_unavailable',
+      reason: expect.stringContaining(reason),
+    });
+  });
+
+  it('forces a final report after the context ceiling and refuses more inspection', async () => {
+    const overCeiling = acceptedContent(
+      [
+        {
+          type: 'tool_use',
+          id: 'inspect',
+          name: 'read_file',
+          input: { file_path: 'artifacts/report.csv' },
+        },
+      ],
+      {
+        input_tokens: V3_VERIFIER_MAX_CONTEXT_TOKENS + 1,
+        output_tokens: 1,
+      },
+    );
+    const corrected = scriptedModel([
+      overCeiling,
+      report({
+        status: 'needs_correction',
+        findings: [
+          {
+            area: 'completeness',
+            code: 'unverified',
+            message: 'Inspection budget exhausted.',
+          },
+        ],
+      }),
+    ]);
+    await expect(verifyWith(corrected)).resolves.toMatchObject({
+      status: 'needs_correction',
+    });
+    expect(
+      JSON.stringify(vi.mocked(corrected.generate).mock.calls[1]![0].messages),
+    ).toContain('inspection budget is exhausted');
+
+    await expect(
+      verifyWith(scriptedModel([overCeiling, inspect('inspect-again')])),
+    ).resolves.toMatchObject({
+      status: 'verifier_unavailable',
+      reason: expect.stringContaining('kept requesting tools'),
+    });
+  });
 
   it('stops before accepting a verdict that exceeds the whole-run tool-call budget', async () => {
     const tracker = budget({ maxToolCalls: 0 });

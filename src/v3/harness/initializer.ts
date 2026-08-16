@@ -6,7 +6,6 @@ import {
   validateContractRevision,
   type OutputContract,
 } from '../../contracts/outputContract.js';
-import { SET_OUTPUT_CONTRACT } from '../../contracts/contractFirstGate.js';
 import type { CallModel, Message, ToolUseBlock } from '../../loop/messages.js';
 import {
   createAnthropicModelDriver,
@@ -24,6 +23,7 @@ import {
 
 export const V3_INITIALIZER_MODEL = 'claude-sonnet-5';
 export const V3_INITIALIZER_MAX_ATTEMPTS = 2;
+const SET_OUTPUT_CONTRACT = 'set_output_contract';
 
 /** Static contract-only instructions. Task and checkpoint facts stay in the
  * conversation so this prefix remains byte-stable across runs. */

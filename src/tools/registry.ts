@@ -3,7 +3,6 @@ import { normalize, sep } from 'node:path';
 import { z } from 'zod';
 
 import type { BrowserController } from '../browser/controller.js';
-import type { OutputContractStore } from '../contracts/outputContractStore.js';
 
 /** A tool call awaiting the user's decision. */
 export interface PermissionRequest {
@@ -38,12 +37,6 @@ export interface ToolCtx {
    * TUI dialog). Headless environments omit it; tools that require user
    * interaction then fail closed. */
   requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
-  /** The run's append-only output-contract history, owned by the runtime.
-   * Present whenever the registry includes `set_output_contract`; registries
-   * built for contract-less runs (the judge-less path, fixture tests) omit
-   * it, and the tool then fails closed rather than accepting a contract
-   * nothing will read. */
-  outputContracts?: OutputContractStore;
   /** Cancellation for tools that own a long-running external resource (a
    * spawned process group, a network connection) and can react to the run
    * being cancelled before their own work naturally ends. This is the FIRST

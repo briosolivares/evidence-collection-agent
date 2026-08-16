@@ -33,7 +33,6 @@ import {
 import type { ElementRef } from '../src/browser/browserState.js';
 import type { BrowserController } from '../src/browser/controller.js';
 import { findDevRoot, loadFirstEnvFile, resolveSherlockPaths } from '../src/config/paths.js';
-import { createPlaywrightPdfPageOpener } from '../src/outputs/renderDocument.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { generateRunId } from '../src/run/runId.js';
 
@@ -266,11 +265,21 @@ async function main(): Promise<void> {
     const pageSource = browser.pdfPageSource?.();
     check('pdfPageSource is available', pageSource !== undefined);
     if (pageSource !== undefined) {
-      const renderPage = await createPlaywrightPdfPageOpener(pageSource)();
+      const renderPage = await pageSource.newPage();
       try {
-        await renderPage.disableNetwork();
-        await renderPage.setHtml('<html><body><h1>browserbase smoke</h1></body></html>');
-        const pdf = await renderPage.toPdf();
+        await renderPage.route('**/*', (route) => {
+          void route.abort('blockedbyclient');
+        });
+        await renderPage.setContent(
+          '<html><body><h1>browserbase smoke</h1></body></html>',
+          { waitUntil: 'load' },
+        );
+        await renderPage.emulateMedia({ media: 'print' });
+        const pdf = await renderPage.pdf({
+          format: 'Letter',
+          printBackground: true,
+          displayHeaderFooter: false,
+        });
         check(
           'rendered real PDF bytes',
           pdf.length > 500 && Buffer.from(pdf.slice(0, 5)).toString() === '%PDF-',

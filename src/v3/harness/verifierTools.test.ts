@@ -9,13 +9,15 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { ToolUseBlock } from '../../loop/messages.js';
+import type { ToolResultBlock, ToolUseBlock } from '../../loop/messages.js';
 import {
   MANIFEST_FILENAME,
   initManifest,
   writeArtifact,
 } from '../../run/artifacts.js';
 import {
+  V3_VERIFIER_MAX_IMAGE_BYTES,
+  V3_VERIFIER_MAX_IMAGE_DIMENSION_PX,
   createV3VerifierRegistry,
   executeV3VerifierToolUses,
 } from './verifierTools.js';
@@ -33,6 +35,32 @@ afterEach(() => {
 
 function use(name: string, input: unknown, id = 'call-1'): ToolUseBlock {
   return { type: 'tool_use', id, name, input };
+}
+
+async function readPublishedImage(
+  filename: string,
+  bytes: Buffer,
+): Promise<ToolResultBlock | undefined> {
+  writeArtifact(runDir, `artifacts/${filename}`, bytes, {
+    roles: ['evidence'],
+  });
+  const [result] = await executeV3VerifierToolUses(
+    createV3VerifierRegistry(),
+    [use('read_file', { file_path: `artifacts/${filename}` })],
+    { runDir },
+  );
+  return result;
+}
+
+function jpegHeader(width: number, height: number): Buffer {
+  const bytes = Buffer.from([
+    0xff, 0xd8,
+    0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x00, 0x00, 0x00,
+    0x01, 0x01, 0x11, 0x00,
+  ]);
+  bytes.writeUInt16BE(height, 7);
+  bytes.writeUInt16BE(width, 9);
+  return bytes;
 }
 
 describe('v3 verifier inspection', () => {
@@ -129,5 +157,44 @@ describe('v3 verifier inspection', () => {
         expect.objectContaining({ type: 'image' }),
       ]),
     );
+  });
+
+  it('rejects an image one byte above the encoded-request safety cap', async () => {
+    const bytes = Buffer.alloc(V3_VERIFIER_MAX_IMAGE_BYTES + 1);
+
+    const result = await readPublishedImage('oversized.png', bytes);
+
+    expect(result).toMatchObject({ is_error: true });
+    expect(result?.content).toContain(
+      `is ${V3_VERIFIER_MAX_IMAGE_BYTES + 1} bytes`,
+    );
+    expect(result?.content).toContain(`limit ${V3_VERIFIER_MAX_IMAGE_BYTES}`);
+  });
+
+  it('rejects a JPEG whose header declares an over-limit dimension', async () => {
+    const width = V3_VERIFIER_MAX_IMAGE_DIMENSION_PX + 1;
+
+    const result = await readPublishedImage(
+      'too-wide.jpg',
+      jpegHeader(width, 1),
+    );
+
+    expect(result).toMatchObject({ is_error: true });
+    expect(result?.content).toContain(`${width}x1 pixels`);
+    expect(result?.content).toContain(
+      `limit ${V3_VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension`,
+    );
+  });
+
+  it('rejects malformed image headers before creating an image block', async () => {
+    const result = await readPublishedImage(
+      'malformed.png',
+      Buffer.from('not a PNG', 'utf8'),
+    );
+
+    expect(result).toMatchObject({
+      content: expect.stringContaining('Not a readable image/png image'),
+      is_error: true,
+    });
   });
 });

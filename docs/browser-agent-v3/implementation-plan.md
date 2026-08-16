@@ -250,14 +250,14 @@ boundaries, and a fixture-backed `sherlock` run renders/publishes artifacts.
 
 ### Step 6 — retire legacy production mechanisms
 
-- [ ] Prove no production import reaches the legacy scheduler, mutable contract
+- [x] Prove no production import reaches the legacy scheduler, mutable contract
   tool, typed row/evidence stores, document renderer tools, or old checkpoint
   replay path.
-- [ ] Remove unreachable production modules, demos, and tests that exist only
+- [x] Remove unreachable production modules, demos, and tests that exist only
   for the retired path; keep reusable parsers/checks and historical reports.
 - [ ] Consolidate current documentation and update `AGENTS.md`, README, and the
   architecture summary so they describe v3 rather than the retired protocol.
-- [ ] Keep removals separate from v3 behavior changes and report structural
+- [x] Keep removals separate from v3 behavior changes and report structural
   versus cosmetic line reduction honestly.
 
 **Gate:** semantic import search shows one production run path; no active docs
@@ -806,6 +806,30 @@ proved, even if supporting code already exists.
   carries the typed output-contract store. Those dependencies must be folded
   into cohesive v3/shared seams before deleting the typed row/evidence stores
   and document renderer; none of that code was deleted speculatively.
+
+### 2026-08-15 — Step 6 verifier and typed-store closure removed
+
+- V3 now owns its complete verifier boundary: verdict schema, exclusive report
+  tool, fail-closed repair/context loop, bounded read-only inspection, and
+  PNG/JPEG validation. Compact v3 tests retain the old safety locks for prose,
+  malformed/mixed reports, forced reporting, cancellation, aggregate billing,
+  no-follow reads, image limits, and durable accounting.
+- With those imports removed, the mutable contract store/gate, typed table and
+  evidence stores, completion renderer, document source/renderer, and the old
+  verifier/read/grep stack were semantically closed and deleted. The live
+  Browserbase smoke still exercises real PDF generation, now directly through
+  its existing fresh Playwright page seam rather than importing a retired
+  document renderer.
+- This slice adds 719 lines of cohesive v3 tests/implementation and deletes
+  8,503 lines, net -7,784. The live production `src` tree is now 36,994 raw
+  lines across 117 files; tests are 32,482 lines across 99 files. Relative to
+  the post-cutover coexistence baseline, production is down 14,215 lines and
+  50 files; tests are down 19,403 lines and 76 files.
+- `npm run typecheck -- --pretty false`, `git diff --check`, and a 17-file
+  impact gate spanning verifier/initializer/completion, worker/coordinator,
+  generic registry/pipeline, browser providers, public composition, tracing,
+  and TUI all pass (349/349 tests). Active documentation consolidation and
+  the complete acceptance suite remain before Step 6/7 can close.
 
 ## Rules for coordinators and subagents
 

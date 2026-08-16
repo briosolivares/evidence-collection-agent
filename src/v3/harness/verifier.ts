@@ -1,13 +1,14 @@
 import { Buffer } from 'node:buffer';
 
+import { z } from 'zod';
+
 import type { OutputContract } from '../../contracts/outputContract.js';
-import type { SettledFact } from '../../completion/completionCheck.js';
-import type { Message, ToolResultBlock } from '../../loop/messages.js';
-import {
-  REPORT_VERIFICATION_TOOL,
-  runVerifier,
-  type VerifierOutcome,
-} from '../../harness/verifier.js';
+import type {
+  CallModel,
+  Message,
+  ToolResultBlock,
+  ToolUseBlock,
+} from '../../loop/messages.js';
 import {
   createAnthropicModelDriver,
   type ModelAttemptEvent,
@@ -15,8 +16,15 @@ import {
   type ModelDriverConfig,
 } from '../../model/modelDriver.js';
 import type { RunBudgetTracker } from '../../run/runBudget.js';
-import { toApiToolDefs, type ApiToolDef } from '../../tools/registry.js';
-import type { V3FinishFacts } from '../completion/finishChecks.js';
+import {
+  toApiToolDefs,
+  type ApiToolDef,
+  type ToolCtx,
+} from '../../tools/registry.js';
+import type {
+  V3FinishFacts,
+  V3SettledFact,
+} from '../completion/finishChecks.js';
 import { askUserInputSchema } from '../tools/askUser.js';
 import {
   V3RoleBudgetExceededError,
@@ -29,6 +37,79 @@ import {
 } from './verifierTools.js';
 
 export const V3_VERIFIER_MODEL = 'claude-haiku-4-5-20251001';
+export const V3_VERIFIER_MAX_CONTEXT_TOKENS = 150_000;
+
+export const v3VerificationFindingSchema = z
+  .strictObject({
+    area: z.enum(['contract', 'output', 'evidence', 'completeness']),
+    code: z.string().min(1),
+    message: z.string().min(1),
+    outputId: z.string().optional(),
+    evidenceIds: z.array(z.string()).optional(),
+  });
+
+export const v3VerificationResultSchema = z.discriminatedUnion('status', [
+  z
+    .strictObject({
+      status: z.literal('verified'),
+      findings: z.array(v3VerificationFindingSchema).max(0),
+    }),
+  z
+    .strictObject({
+      status: z.literal('needs_correction'),
+      findings: z.array(v3VerificationFindingSchema).min(1),
+    }),
+]);
+
+export type V3VerificationFinding = z.infer<
+  typeof v3VerificationFindingSchema
+>;
+export type V3VerificationResult = z.infer<typeof v3VerificationResultSchema>;
+export type V3VerifierOutcome =
+  | V3VerificationResult
+  | { status: 'verifier_unavailable'; reason: string };
+
+export const V3_REPORT_VERIFICATION_TOOL: ApiToolDef = {
+  name: 'report_verification',
+  description:
+    'Report the final decision. Call this exactly once and by itself: status ' +
+    '"verified" with findings: [] only when every requirement is satisfied and ' +
+    'evidenced, otherwise status "needs_correction" with specific findings.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      status: { type: 'string', enum: ['verified', 'needs_correction'] },
+      findings: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            area: {
+              type: 'string',
+              enum: ['contract', 'output', 'evidence', 'completeness'],
+            },
+            code: { type: 'string' },
+            message: { type: 'string' },
+            outputId: { type: 'string' },
+            evidenceIds: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['area', 'code', 'message'],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ['status', 'findings'],
+    additionalProperties: false,
+  },
+};
+
+const FORCED_REPORT_PROMPT =
+  'Your inspection budget is exhausted. No further inspection calls will be ' +
+  'executed. Based only on what you already verified, respond now with one ' +
+  'report_verification call. Treat every unverified criterion as unproven.';
+
+const REPAIR_SUFFIX =
+  'Respond again with one valid report_verification call and no other tool calls.';
 
 export const V3_VERIFIER_SYSTEM_PROMPT = `You are a fresh-context verifier for one evidence-collection run. You did not do the work. Everything you may trust comes from the opening message and the published run directory: the original task, one immutable typed output contract, code-settled facts, manifest provenance, and files under artifacts/.
 
@@ -47,7 +128,7 @@ Conclude only with one report_verification call by itself. Use status "verified"
 
 export const V3_VERIFIER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze([
   ...toApiToolDefs(createV3VerifierRegistry()),
-  structuredClone(REPORT_VERIFICATION_TOOL),
+  structuredClone(V3_REPORT_VERIFICATION_TOOL),
 ]);
 
 export interface V3VerifierModelConfig {
@@ -80,7 +161,7 @@ export interface RunV3VerifierOptions {
   contract: OutputContract;
   finish: V3FinishFacts['finish'];
   clarifications: readonly V3UserClarification[];
-  settled?: readonly SettledFact[];
+  settled?: readonly V3SettledFact[];
   model: ModelDriver;
   budget: RunBudgetTracker;
   signal?: AbortSignal;
@@ -104,7 +185,7 @@ export function isV3VerifierAccountingPersistenceError(
  * and one immutable contract revision. */
 export function runV3Verifier(
   options: RunV3VerifierOptions,
-): Promise<VerifierOutcome> {
+): Promise<V3VerifierOutcome> {
   options.signal?.throwIfAborted();
   const callModel = createV3BudgetedCallModel({
     model: options.model,
@@ -124,36 +205,201 @@ export function runV3Verifier(
         }),
     ...(options.now === undefined ? {} : { now: options.now }),
   });
-  const inspectionRegistry = createV3VerifierRegistry();
-  return runVerifier({
-    taskText: options.taskText,
+  return runV3VerifierLoop(options, callModel);
+}
+
+async function runV3VerifierLoop(
+  options: RunV3VerifierOptions,
+  callModel: CallModel,
+): Promise<V3VerifierOutcome> {
+  const messages: Message[] = [
+    {
+      role: 'user',
+      content: [{ type: 'text', text: buildV3VerifierOpeningInput(options) }],
+    },
+  ];
+  const registry = createV3VerifierRegistry();
+  const toolCtx: ToolCtx = {
     runDir: options.runDir,
-    callModel,
-    contracts: {
-      current: options.contract,
-      history: [{ revision: 1, contract: options.contract }],
-    },
-    additionalContext: formatV3VerifierCompletionClaim(
-      options.finish,
-      options.clarifications,
-    ),
-    openingInput: buildV3VerifierOpeningInput(options),
-    propagateError: (error) =>
-      options.signal?.aborted === true ||
-      isV3RoleBudgetExceededError(error) ||
-      isV3VerifierAccountingPersistenceError(error),
-    inspection: {
-      registry: inspectionRegistry,
-      executeToolUses: executeV3VerifierToolUses,
-      onToolResults: async (results) => {
-        options.budget.recordToolResultBytes(verifierResultBytes(results));
-        await persistV3VerifierAccounting(options);
-        throwIfVerifierBudgetExceeded(options.budget);
-      },
-      ...(options.signal === undefined ? {} : { signal: options.signal }),
-    },
-    ...(options.settled === undefined ? {} : { settled: options.settled }),
+    ...(options.signal === undefined
+      ? {}
+      : { abortSignal: options.signal }),
+  };
+  let repairUsed = false;
+  let forced = false;
+
+  for (;;) {
+    let response;
+    try {
+      response = await callModel(messages);
+    } catch (error) {
+      if (
+        isAbortError(error) ||
+        options.signal?.aborted === true ||
+        isV3RoleBudgetExceededError(error) ||
+        isV3VerifierAccountingPersistenceError(error)
+      ) {
+        throw error;
+      }
+      return unavailable(
+        `verifier model call failed: ${errorMessage(error)}`,
+      );
+    }
+
+    options.signal?.throwIfAborted();
+    messages.push({ role: 'assistant', content: response.content });
+    const toolUses = response.content.filter(
+      (block): block is ToolUseBlock => block.type === 'tool_use',
+    );
+    const reports = toolUses.filter(
+      (block) => block.name === V3_REPORT_VERIFICATION_TOOL.name,
+    );
+
+    if (reports.length > 0) {
+      const structuralProblem =
+        reports.length > 1
+          ? 'more than one report_verification call in one response'
+          : toolUses.length > 1
+            ? 'report_verification must be the only tool call in its response'
+            : undefined;
+      if (structuralProblem !== undefined) {
+        if (repairUsed || forced) return unavailable(structuralProblem);
+        repairUsed = true;
+        await appendRepair(
+          options,
+          messages,
+          toolUses,
+          'Not executed: the report response was invalid.',
+          `Invalid report: ${structuralProblem}. ${REPAIR_SUFFIX}`,
+        );
+        continue;
+      }
+
+      const parsed = v3VerificationResultSchema.safeParse(reports[0]!.input);
+      if (parsed.success) return parsed.data;
+      if (repairUsed || forced) {
+        return unavailable(
+          `invalid report_verification input: ${parsed.error.message}`,
+        );
+      }
+      repairUsed = true;
+      await appendRepair(
+        options,
+        messages,
+        toolUses,
+        'Not executed: the report was structurally invalid.',
+        `Your report_verification input failed validation: ${parsed.error.message}. ${REPAIR_SUFFIX}`,
+      );
+      continue;
+    }
+
+    if (toolUses.length === 0) {
+      if (repairUsed || forced) {
+        return unavailable(
+          'verifier ended without a valid report_verification call',
+        );
+      }
+      repairUsed = true;
+      messages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text:
+              'Your response contained no report_verification call. Prose is ' +
+              `never a verdict. ${REPAIR_SUFFIX} If inspection is still needed, ` +
+              'make only those tool calls first.',
+          },
+        ],
+      });
+      continue;
+    }
+
+    if (forced) {
+      return unavailable(
+        'verifier kept requesting tools after its inspection budget was exhausted',
+      );
+    }
+
+    if (responseContextTokens(response.usage) > V3_VERIFIER_MAX_CONTEXT_TOKENS) {
+      forced = true;
+      const results = closeToolUses(
+        toolUses,
+        "Not executed: the verifier's inspection budget is exhausted.",
+      );
+      await accountV3VerifierResults(options, results);
+      messages.push({
+        role: 'user',
+        content: [
+          ...results,
+          { type: 'text', text: FORCED_REPORT_PROMPT },
+        ],
+      });
+      continue;
+    }
+
+    const results = await executeV3VerifierToolUses(
+      registry,
+      toolUses,
+      toolCtx,
+    );
+    await accountV3VerifierResults(options, results);
+    messages.push({ role: 'user', content: results });
+  }
+}
+
+async function appendRepair(
+  options: RunV3VerifierOptions,
+  messages: Message[],
+  toolUses: readonly ToolUseBlock[],
+  closedMessage: string,
+  correction: string,
+): Promise<void> {
+  const results = closeToolUses(toolUses, closedMessage);
+  await accountV3VerifierResults(options, results);
+  messages.push({
+    role: 'user',
+    content: [...results, { type: 'text', text: correction }],
   });
+}
+
+async function accountV3VerifierResults(
+  options: RunV3VerifierOptions,
+  results: readonly ToolResultBlock[],
+): Promise<void> {
+  options.budget.recordToolResultBytes(verifierResultBytes(results));
+  await persistV3VerifierAccounting(options);
+  throwIfVerifierBudgetExceeded(options.budget);
+}
+
+function closeToolUses(
+  toolUses: readonly ToolUseBlock[],
+  message: string,
+): ToolResultBlock[] {
+  return toolUses.map((block) => ({
+    type: 'tool_result',
+    tool_use_id: block.id,
+    content: message,
+    is_error: true,
+  }));
+}
+
+function responseContextTokens(usage: {
+  input_tokens: number;
+  output_tokens: number;
+  cache_creation_input_tokens?: number | null;
+  cache_read_input_tokens?: number | null;
+}): number {
+  return (
+    usage.input_tokens +
+    usage.output_tokens +
+    (usage.cache_creation_input_tokens ?? 0) +
+    (usage.cache_read_input_tokens ?? 0)
+  );
+}
+
+function unavailable(reason: string): V3VerifierOutcome {
+  return { status: 'verifier_unavailable', reason };
 }
 
 /** Build the v3 verifier's complete opening context without touching the
@@ -230,6 +476,10 @@ function verifierResultBytes(results: readonly ToolResultBlock[]): number {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError';
 }
 
 export function formatV3VerifierCompletionClaim(

@@ -12,10 +12,6 @@ import { extname, join, relative, resolve, sep } from 'node:path';
 import { z } from 'zod';
 
 import { detectContentFormat } from '../../content/contentReader.js';
-import {
-  VERIFIER_MAX_IMAGE_BYTES,
-  verifierImageResultFromBytes,
-} from '../../harness/verifierTools.js';
 import type {
   ImageBlock,
   ToolResultBlock,
@@ -37,6 +33,10 @@ export const V3_VERIFIER_MAX_FILE_BYTES = 16 * 1024 * 1024;
 export const V3_VERIFIER_MAX_GREP_BYTES = 64 * 1024 * 1024;
 export const V3_VERIFIER_MAX_RESULT_BYTES = 48 * 1024;
 export const V3_VERIFIER_MAX_FILES = 512;
+/** 3.75MB of raw bytes stays within the API's ~5MB encoded-image limit. */
+export const V3_VERIFIER_MAX_IMAGE_BYTES = 3_750_000;
+/** The API rejects an image with either dimension above 8,000 pixels. */
+export const V3_VERIFIER_MAX_IMAGE_DIMENSION_PX = 8_000;
 
 const LINE_NUMBER_PAD = 6;
 const READ_DEFAULT_LINES = 400;
@@ -235,10 +235,10 @@ async function readImageResult(
     const bytes = await readRegularFileNoFollow(
       target.absolutePath,
       givenPath,
-      VERIFIER_MAX_IMAGE_BYTES + 1,
+      V3_VERIFIER_MAX_IMAGE_BYTES + 1,
       signal,
     );
-    return verifierImageResultFromBytes(
+    return v3VerifierImageResultFromBytes(
       toolUseId,
       target.relativePath,
       mediaType,
@@ -253,6 +253,128 @@ async function readImageResult(
       is_error: true,
     };
   }
+}
+
+/** Build an API-safe image result from bytes already read through v3's
+ * confinement and no-follow boundary. */
+function v3VerifierImageResultFromBytes(
+  toolUseId: string,
+  relativePath: string,
+  mediaType: ImageBlock['source']['media_type'],
+  bytes: Buffer,
+): ToolResultBlock {
+  if (bytes.byteLength > V3_VERIFIER_MAX_IMAGE_BYTES) {
+    return {
+      type: 'tool_result',
+      tool_use_id: toolUseId,
+      content:
+        `Image too large to view: ${relativePath} is ${bytes.byteLength} bytes ` +
+        `(limit ${V3_VERIFIER_MAX_IMAGE_BYTES}). Treat whatever it would have proven as ` +
+        'unverified unless another published artifact proves it.',
+      is_error: true,
+    };
+  }
+
+  const dimensions = v3ImageDimensions(bytes, mediaType);
+  if (dimensions === undefined) {
+    return {
+      type: 'tool_result',
+      tool_use_id: toolUseId,
+      content:
+        `Not a readable ${mediaType} image: ${relativePath}. Treat whatever it would ` +
+        'have proven as unverified unless another published artifact proves it.',
+      is_error: true,
+    };
+  }
+  if (
+    dimensions.width > V3_VERIFIER_MAX_IMAGE_DIMENSION_PX ||
+    dimensions.height > V3_VERIFIER_MAX_IMAGE_DIMENSION_PX
+  ) {
+    return {
+      type: 'tool_result',
+      tool_use_id: toolUseId,
+      content:
+        `Image too large to view: ${relativePath} is ${dimensions.width}x${dimensions.height} ` +
+        `pixels (limit ${V3_VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension). Treat whatever it ` +
+        'would have proven as unverified unless another published artifact proves it.',
+      is_error: true,
+    };
+  }
+
+  return {
+    type: 'tool_result',
+    tool_use_id: toolUseId,
+    content: [
+      {
+        type: 'text',
+        text: `${relativePath} (${mediaType}, ${bytes.byteLength} bytes):`,
+      },
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: mediaType,
+          data: bytes.toString('base64'),
+        },
+      },
+    ],
+  };
+}
+
+const V3_PNG_SIGNATURE = Buffer.from('89504e470d0a1a0a', 'hex');
+
+/** Read bounded PNG/JPEG dimensions without an image-processing dependency. */
+function v3ImageDimensions(
+  bytes: Buffer,
+  mediaType: ImageBlock['source']['media_type'],
+): { width: number; height: number } | undefined {
+  return mediaType === 'image/png'
+    ? v3PngDimensions(bytes)
+    : v3JpegDimensions(bytes);
+}
+
+function v3PngDimensions(
+  bytes: Buffer,
+): { width: number; height: number } | undefined {
+  if (
+    bytes.length < 24 ||
+    !bytes.subarray(0, V3_PNG_SIGNATURE.length).equals(V3_PNG_SIGNATURE) ||
+    bytes.toString('latin1', 12, 16) !== 'IHDR'
+  ) {
+    return undefined;
+  }
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+}
+
+function v3JpegDimensions(
+  bytes: Buffer,
+): { width: number; height: number } | undefined {
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
+    return undefined;
+  }
+  let offset = 2;
+  while (offset + 9 <= bytes.length) {
+    if (bytes[offset] !== 0xff) return undefined;
+    const marker = bytes[offset + 1]!;
+    if (marker >= 0xd0 && marker <= 0xd8) {
+      offset += 2;
+      continue;
+    }
+    if (
+      marker >= 0xc0 &&
+      marker <= 0xcf &&
+      marker !== 0xc4 &&
+      marker !== 0xc8 &&
+      marker !== 0xcc
+    ) {
+      return {
+        height: bytes.readUInt16BE(offset + 5),
+        width: bytes.readUInt16BE(offset + 7),
+      };
+    }
+    offset += 2 + bytes.readUInt16BE(offset + 2);
+  }
+  return undefined;
 }
 
 interface PublishedPath {
