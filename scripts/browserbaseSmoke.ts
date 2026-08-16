@@ -30,11 +30,14 @@ import {
   createBrowserbaseClient,
   requireBrowserbaseApiKey,
 } from '../src/browser/browserbaseBrowserSessionProvider.js';
-import type { ElementRef } from '../src/browser/browserState.js';
-import type { BrowserController } from '../src/browser/controller.js';
+import type {
+  BrowserCommandSession,
+  BrowserController,
+} from '../src/browser/controller.js';
 import { findDevRoot, loadFirstEnvFile, resolveSherlockPaths } from '../src/config/paths.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { generateRunId } from '../src/run/runId.js';
+import { createBusyResourceRegistry } from '../src/tools/registry.js';
 
 /** A public, tiny, extremely stable page to build fixtures on. A real origin
  * rather than `about:blank`, because a blob download inherits the page's origin
@@ -78,10 +81,12 @@ const BUILD_FIXTURE_JS = `
   document.body.innerHTML = '';
   const text = document.createElement('input');
   text.id = 'smoke-text';
+  text.setAttribute('aria-label', 'Smoke text');
   document.body.appendChild(text);
   const file = document.createElement('input');
   file.type = 'file';
   file.id = 'smoke-file';
+  file.setAttribute('aria-label', 'Smoke file');
   document.body.appendChild(file);
   const link = document.createElement('a');
   link.id = 'smoke-download';
@@ -94,42 +99,103 @@ const BUILD_FIXTURE_JS = `
 
 const EXPECTED_DOWNLOAD_BYTES = 'browserbase smoke payload';
 
-async function evaluate(browser: BrowserController, code: string): Promise<unknown> {
-  const result = await browser.executeJavaScript?.({ code, timeoutMs: 10_000 });
-  return result?.value;
+interface AccessibilityNode {
+  role?: { value?: unknown };
+  name?: { value?: unknown };
+  backendDOMNodeId?: unknown;
 }
 
-/**
- * Resolve a full {@link ElementRef} the way the model does: from the
- * observation's `elements` array, by the ARIA role and accessible name each
- * one carries. A hand-built `{ ref: 'e1' }` is not what the action API takes,
- * and faking one here would test a shape the agent never produces.
- *
- * Deliberately NOT by parsing `[ref=…]` out of the outline: those stamps are
- * Playwright's internal aria-refs, while an `ElementRef.id` is the
- * store-scoped `el-N` issued by `stampOutlineElements`. The two never match,
- * so an outline-parsing lookup silently resolves nothing.
- */
-function findElement(
-  elements: readonly ElementRef[],
+async function prepareTaskPage(
+  browser: BrowserController,
+  ownershipId: string,
+  startUrl: string,
+): Promise<void> {
+  if (browser.prepareTaskPage === undefined) {
+    throw new Error('Browserbase smoke requires v3 task-page preparation');
+  }
+  browser.setBusyRegistry?.(createBusyResourceRegistry());
+  await browser.prepareTaskPage({ ownershipId, startUrl });
+}
+
+async function evaluate(
+  session: BrowserCommandSession,
+  expression: string,
+): Promise<unknown> {
+  const response = (await session.send('Runtime.evaluate', {
+    expression,
+    awaitPromise: true,
+    returnByValue: true,
+  })) as {
+    result?: { value?: unknown };
+    exceptionDetails?: {
+      text?: unknown;
+      exception?: { description?: unknown };
+    };
+  };
+  if (response.exceptionDetails !== undefined) {
+    const description = response.exceptionDetails.exception?.description;
+    throw new Error(
+      typeof description === 'string'
+        ? description
+        : String(response.exceptionDetails.text ?? 'browser evaluation failed'),
+    );
+  }
+  return response.result?.value;
+}
+
+async function accessibilityNodes(
+  session: BrowserCommandSession,
+): Promise<readonly AccessibilityNode[]> {
+  const response = (await session.send('Accessibility.getFullAXTree')) as {
+    nodes?: unknown;
+  };
+  return Array.isArray(response.nodes)
+    ? (response.nodes as AccessibilityNode[])
+    : [];
+}
+
+function findBackendNodeId(
+  nodes: readonly AccessibilityNode[],
   role: string,
-  name?: string,
-): ElementRef | undefined {
-  return elements.find(
-    (element) => element.role === role && (name === undefined || element.name === name),
-  );
+  name: string,
+): number | undefined {
+  const backendDOMNodeId = nodes.find(
+    (node) => node.role?.value === role && node.name?.value === name,
+  )?.backendDOMNodeId;
+  return Number.isInteger(backendDOMNodeId) && (backendDOMNodeId as number) > 0
+    ? (backendDOMNodeId as number)
+    : undefined;
 }
 
-/**
- * The OTHER handle an observation yields: the bare Playwright aria-ref stamped
- * in the outline. `download` takes this one (`locatorForRef` rejects anything
- * that is not `e12`/`f1e8`), while `browserAction` takes the {@link ElementRef}
- * above — so a script that feeds one where the other is expected fails without
- * ever touching the page.
- */
-function findAriaRef(outline: string, needle: string): string | undefined {
-  const line = outline.split('\n').find((candidate) => candidate.includes(needle));
-  return line?.match(/\[ref=([^\]]+)\]/)?.[1];
+async function fillBackendNode(
+  session: BrowserCommandSession,
+  backendDOMNodeId: number,
+  value: string,
+): Promise<void> {
+  const resolved = (await session.send('DOM.resolveNode', {
+    backendNodeId: backendDOMNodeId,
+  })) as { object?: { objectId?: unknown } };
+  const objectId = resolved.object?.objectId;
+  if (typeof objectId !== 'string' || objectId.length === 0) {
+    throw new Error('Smoke text input could not be resolved');
+  }
+  try {
+    const response = (await session.send('Runtime.callFunctionOn', {
+      objectId,
+      functionDeclaration: `function(value) {
+        this.value = value;
+        this.dispatchEvent(new Event('input', { bubbles: true }));
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+      }`,
+      arguments: [{ value }],
+      returnByValue: true,
+    })) as { exceptionDetails?: unknown };
+    if (response.exceptionDetails !== undefined) {
+      throw new Error('Smoke text input could not be filled');
+    }
+  } finally {
+    await session.send('Runtime.releaseObject', { objectId }).catch(() => undefined);
+  }
 }
 
 async function main(): Promise<void> {
@@ -169,47 +235,44 @@ async function main(): Promise<void> {
     console.log(`  live view: ${diagnostics.liveViewUrl}`);
   }
 
+  let commandSession: BrowserCommandSession | undefined;
   try {
-    // --- 2. Tab lifecycle, navigation, observation, actions. ---
-    section('2. navigation, observation, actions');
-    await browser.newTab();
-    await browser.goto(FIXTURE_PAGE_URL);
+    // --- 2. V3 task-page lifecycle, raw commands, and accessibility. ---
+    section('2. v3 task page, commands, accessibility');
+    await prepareTaskPage(browser, `${runDir}:primary`, FIXTURE_PAGE_URL);
+    commandSession = await browser.openCommandSession();
     check('landed on the fixture page', browser.currentUrl().startsWith('https://example.com'));
-    check('read a document title', (await browser.title()).length > 0);
-    const outline = await browser.outline();
-    check('outline is non-empty', outline.length > 0);
-    const observation = await browser.observe({ need: ['interactive', 'text'] });
-    check('observation has views', observation.views.length === 2);
+    check(
+      'read a document title through the pinned command session',
+      String(await evaluate(commandSession, 'document.title')).length > 0,
+    );
     check('one page is tracked', (await browser.pages()).length === 1);
 
-    check('page JavaScript is available', browser.executeJavaScript !== undefined);
-    check('fixture built in-page', (await evaluate(browser, BUILD_FIXTURE_JS)) === 'built');
-    const fixture = await browser.observe({ need: ['interactive'] });
-    const fixtureOutline = fixture.views[0]?.content ?? '';
-    const textElement = findElement(fixture.elements, 'textbox');
-    // Chrome exposes a file input as a button, so that is the role it carries.
-    const fileElement = findElement(fixture.elements, 'button');
-    const downloadElement = findElement(fixture.elements, 'link', 'download me');
-    const downloadAriaRef = findAriaRef(fixtureOutline, 'download me');
     check(
-      'fixture refs were observed',
-      textElement !== undefined && fileElement !== undefined && downloadElement !== undefined,
-      fixtureOutline.slice(0, 200),
+      'fixture built in-page',
+      (await evaluate(commandSession, BUILD_FIXTURE_JS)) === 'built',
+    );
+    const nodes = await accessibilityNodes(commandSession);
+    const textBackendNodeId = findBackendNodeId(nodes, 'textbox', 'Smoke text');
+    // Chrome exposes a file input as a button.
+    const fileBackendNodeId = findBackendNodeId(nodes, 'button', 'Smoke file');
+    const downloadBackendNodeId = findBackendNodeId(nodes, 'link', 'download me');
+    check(
+      'fixture backend nodes were exposed by accessibility',
+      textBackendNodeId !== undefined &&
+        fileBackendNodeId !== undefined &&
+        downloadBackendNodeId !== undefined,
+      JSON.stringify(nodes.slice(0, 12)),
     );
 
-    if (textElement !== undefined) {
-      const filled = await browser.browserAction({
-        actions: [{ op: 'fill', target: textElement, text: 'smoke' }],
-        runDir,
-      });
+    if (textBackendNodeId !== undefined) {
+      await fillBackendNode(commandSession, textBackendNodeId, 'smoke');
       check(
-        'fill action committed',
-        filled.actionReceipts[0]?.status === 'completed',
-        JSON.stringify(filled.actionReceipts[0]),
-      );
-      check(
-        'the page really holds the filled value',
-        (await evaluate(browser, "document.getElementById('smoke-text').value")) === 'smoke',
+        'backend-node fill committed',
+        (await evaluate(
+          commandSession,
+          "document.getElementById('smoke-text').value",
+        )) === 'smoke',
       );
     }
 
@@ -233,62 +296,49 @@ async function main(): Promise<void> {
     mkdirSync(workspace, { recursive: true });
     const uploadPayload = 'id,value\n1,smoke\n';
     writeFileSync(join(workspace, 'smoke-upload.csv'), uploadPayload);
-    if (fileElement !== undefined) {
-      const uploaded = await browser.browserAction({
-        actions: [
-          { op: 'upload', target: fileElement, runPath: 'scratch/workspace/smoke-upload.csv' },
-        ],
-        runDir,
-      });
-      check(
-        'upload action committed',
-        uploaded.actionReceipts[0]?.status === 'completed',
-        JSON.stringify(uploaded.actionReceipts[0]),
+    if (fileBackendNodeId !== undefined) {
+      await commandSession.upload(
+        fileBackendNodeId,
+        join(workspace, 'smoke-upload.csv'),
       );
       check(
         'the remote page received the file name',
-        (await evaluate(browser, "document.getElementById('smoke-file').files[0]?.name")) ===
+        (await evaluate(
+          commandSession,
+          "document.getElementById('smoke-file').files[0]?.name",
+        )) ===
           'smoke-upload.csv',
       );
       check(
         'the remote page received the file BYTES',
-        (await evaluate(browser, "document.getElementById('smoke-file').files[0]?.size")) ===
+        (await evaluate(
+          commandSession,
+          "document.getElementById('smoke-file').files[0]?.size",
+        )) ===
           Buffer.byteLength(uploadPayload),
         'a path-based upload to a remote browser attaches nothing',
       );
     } else {
-      check('file input ref was observed', false, 'could not resolve the file input');
+      check('file input backend node was observed', false);
     }
 
-    // --- 5. PDF rendering. ---
+    // --- 5. PDF rendering through the same protected CDP boundary. ---
     section('5. PDF rendering');
-    const pageSource = browser.pdfPageSource?.();
-    check('pdfPageSource is available', pageSource !== undefined);
-    if (pageSource !== undefined) {
-      const renderPage = await pageSource.newPage();
-      try {
-        await renderPage.route('**/*', (route) => {
-          void route.abort('blockedbyclient');
-        });
-        await renderPage.setContent(
-          '<html><body><h1>browserbase smoke</h1></body></html>',
-          { waitUntil: 'load' },
-        );
-        await renderPage.emulateMedia({ media: 'print' });
-        const pdf = await renderPage.pdf({
-          format: 'Letter',
-          printBackground: true,
-          displayHeaderFooter: false,
-        });
-        check(
-          'rendered real PDF bytes',
-          pdf.length > 500 && Buffer.from(pdf.slice(0, 5)).toString() === '%PDF-',
-          `${pdf.length} bytes`,
-        );
-      } finally {
-        await renderPage.close();
-      }
-    }
+    const printed = (await commandSession.send('Page.printToPDF', {
+      printBackground: true,
+      displayHeaderFooter: false,
+      paperWidth: 8.5,
+      paperHeight: 11,
+    })) as { data?: unknown };
+    const pdf = Buffer.from(
+      typeof printed.data === 'string' ? printed.data : '',
+      'base64',
+    );
+    check(
+      'rendered real PDF bytes',
+      pdf.length > 500 && pdf.subarray(0, 5).toString() === '%PDF-',
+      `${pdf.length} bytes`,
+    );
 
     // --- 6. Downloads, both paths. ---
     section('6. downloads');
@@ -298,8 +348,8 @@ async function main(): Promise<void> {
       direct.bytes.length > 0 && direct.status === 200,
       `${direct.bytes.length} bytes, status ${String(direct.status)}`,
     );
-    if (downloadAriaRef === undefined) {
-      check('download link aria-ref was observed', false, fixtureOutline.slice(0, 200));
+    if (downloadBackendNodeId === undefined) {
+      check('download link backend node was observed', false);
     } else {
       // A blob href is not HTTP(S), so this takes the CLICK path: a real
       // browser download event, which on Browserbase means the file lands in
@@ -308,7 +358,9 @@ async function main(): Promise<void> {
       // so a throw here is recorded and stepped over rather than allowed to
       // abort the run before the context-persistence section.
       try {
-        const clicked = await browser.download({ ref: downloadAriaRef });
+        const clicked = await browser.download({
+          backendNodeId: downloadBackendNodeId,
+        });
         check(
           'browser-event download returned the exact bytes',
           Buffer.from(clicked.bytes).toString('utf8') === EXPECTED_DOWNLOAD_BYTES,
@@ -328,10 +380,14 @@ async function main(): Promise<void> {
       }
     }
 
-    await browser.closeTab();
+    await commandSession.close();
+    commandSession = undefined;
+    await browser.closeTaskPages();
   } finally {
     // --- 7. Clean shutdown, with nothing left running. ---
     section('7. clean shutdown');
+    await commandSession?.close().catch(() => undefined);
+    await browser.closeTaskPages().catch(() => undefined);
     await browser.close();
     await browser.close(); // idempotent
     if (sessionId !== undefined) {
@@ -360,19 +416,26 @@ async function main(): Promise<void> {
     liveView: false,
   });
   const writing = await writer.createSession();
+  let writingSession: BrowserCommandSession | undefined;
   try {
-    await writing.newTab();
-    await writing.goto(FIXTURE_PAGE_URL);
-    await evaluate(
+    await prepareTaskPage(
       writing,
+      `${runDir}:context-writer`,
+      FIXTURE_PAGE_URL,
+    );
+    writingSession = await writing.openCommandSession();
+    await evaluate(
+      writingSession,
       `document.cookie = 'smoke=${cookieValue}; path=/; max-age=3600'; document.cookie`,
     );
     check(
       'cookie set in the first session',
-      String(await evaluate(writing, 'document.cookie')).includes(cookieValue),
+      String(await evaluate(writingSession, 'document.cookie')).includes(cookieValue),
     );
   } finally {
     // Closing is what commits the Context — exactly as `npm run login` relies on.
+    await writingSession?.close().catch(() => undefined);
+    await writing.closeTaskPages().catch(() => undefined);
     await writing.close();
   }
 
@@ -387,15 +450,22 @@ async function main(): Promise<void> {
     liveView: false,
   });
   const reading = await reader.createSession();
+  let readingSession: BrowserCommandSession | undefined;
   try {
-    await reading.newTab();
-    await reading.goto(FIXTURE_PAGE_URL);
+    await prepareTaskPage(
+      reading,
+      `${runDir}:context-reader`,
+      FIXTURE_PAGE_URL,
+    );
+    readingSession = await reading.openCommandSession();
     check(
       'cookie survived into a SECOND session on the same context',
-      String(await evaluate(reading, 'document.cookie')).includes(cookieValue),
+      String(await evaluate(readingSession, 'document.cookie')).includes(cookieValue),
       'this is the mechanism a persisted Google/X login depends on',
     );
   } finally {
+    await readingSession?.close().catch(() => undefined);
+    await reading.closeTaskPages().catch(() => undefined);
     await reading.close();
     await client.contexts.delete?.(context.id).catch(() => undefined);
   }

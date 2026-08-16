@@ -969,6 +969,21 @@ proved, even if supporting code already exists.
   gate passes 4/4, typecheck and diff check pass. Live Browserbase remains
   intentionally unrun.
 
+### 2026-08-15 — Browserbase smoke and controller demo migrated to v3
+
+- Rewrote the live Browserbase smoke driver around durable task-page
+  preparation and target-pinned command sessions. Fixture discovery now uses
+  the accessibility tree's backend node ids; fill uses raw CDP; upload uses
+  the protected byte/path encoder; generated downloads use the same backend
+  node accepted by `publish_artifact`; PDF evidence uses `Page.printToPDF`.
+- Context-persistence writer and reader sessions now use the same v3 page
+  lifecycle and explicitly drain command sessions/task pages before closing.
+  The local controller demo likewise exercises the v3 preparation and command
+  seam rather than the retired observation/action methods.
+- `npm run typecheck`, the stale-call scan, and scoped diff check pass. The
+  live smoke was not run because it consumes Browserbase minutes and remains
+  gated on explicit user direction.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.
