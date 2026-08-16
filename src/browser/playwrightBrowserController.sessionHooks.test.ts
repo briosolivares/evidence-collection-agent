@@ -110,42 +110,6 @@ describe('PlaywrightBrowserController reporting of a session that ended on its o
   });
 });
 
-describe('PlaywrightBrowserController browser-script support pairing', () => {
-  it('offers both prepareForBrowserScript and refreshAfterBrowserScript when cdpUrl is a loopback URL', () => {
-    const { context } = fakeContext();
-    const controller = new PlaywrightBrowserController({
-      context,
-      cdpUrl: 'http://127.0.0.1:54213',
-    });
-
-    expect(typeof controller.prepareForBrowserScript).toBe('function');
-    expect(typeof controller.refreshAfterBrowserScript).toBe('function');
-  });
-
-  it('offers neither when cdpUrl is absent', () => {
-    const { context } = fakeContext();
-    const controller = new PlaywrightBrowserController({ context });
-
-    expect(controller.prepareForBrowserScript).toBeUndefined();
-    expect(controller.refreshAfterBrowserScript).toBeUndefined();
-  });
-
-  it('throws in the constructor for a non-loopback cdpUrl', () => {
-    // This is the invariant that stops a remote session-control URL (a full
-    // takeover capability) from ever reaching model-generated shell code via
-    // prepareForBrowserScript.
-    const { context } = fakeContext();
-
-    expect(
-      () =>
-        new PlaywrightBrowserController({
-          context,
-          cdpUrl: 'wss://connect.browserbase.com/session-abc123',
-        }),
-    ).toThrow();
-  });
-});
-
 describe('PlaywrightBrowserController sessionDiagnostics', () => {
   it('is exactly what was injected', () => {
     const { context } = fakeContext();

@@ -128,11 +128,11 @@ describe('PlaywrightBrowserController command sessions', () => {
   it(
     'returns no connection URL and rejects sends after an idempotent close',
     async () => {
-      const legacySetup = await controller.prepareForBrowserScript!();
       const session = await controller.openCommandSession();
 
       expect(Object.keys(session).sort()).toEqual(['close', 'pageId', 'send', 'targetId']);
-      expect(JSON.stringify(session)).not.toContain(legacySetup.cdpUrl);
+      expect(JSON.stringify(session)).not.toMatch(/(?:wss?|https?):\/\//i);
+      expect(JSON.stringify(session)).not.toContain(PRIVATE_CONNECT_URL);
       await session.close();
       await session.close();
 
@@ -143,7 +143,52 @@ describe('PlaywrightBrowserController command sessions', () => {
         message = error instanceof Error ? error.message : String(error);
       }
       expect(message).toMatch(/command session.*closed/i);
-      expect(message).not.toContain(legacySetup.cdpUrl);
+      expect(message).not.toContain(PRIVATE_CONNECT_URL);
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'invalidates observations after external commands mutate the document',
+    async () => {
+      const seed = await controller.openCommandSession();
+      await seed.send('Runtime.evaluate', {
+        expression: "document.body.innerHTML = '<button>Before</button>'",
+      });
+      await seed.close();
+      await controller.refreshAfterExternalCommands();
+      const before = await controller.observe();
+
+      const mutate = await controller.openCommandSession();
+      await mutate.send('Runtime.evaluate', {
+        expression: "document.body.innerHTML = '<button>After</button>'",
+      });
+      await mutate.close();
+      await controller.refreshAfterExternalCommands();
+
+      const after = await controller.observe({
+        basedOnObservationId: before.page.observationId,
+      });
+      expect(after.page.documentId).not.toBe(before.page.documentId);
+      expect(after.changes.basis).toBe('full_snapshot');
+      expect(after.views[0]?.content).toContain('After');
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'restores a usable owned page when commands close the selected page',
+    async () => {
+      const session = await controller.openCommandSession();
+      await session.send('Page.close');
+      await session.close();
+
+      await controller.refreshAfterExternalCommands();
+
+      expect(await controller.pages()).toEqual([
+        expect.objectContaining({ active: true, url: 'about:blank' }),
+      ]);
+      expect(controller.currentUrl()).toBe('about:blank');
     },
     TEST_TIMEOUT_MS,
   );

@@ -140,23 +140,6 @@ export interface BrowserCapturedText {
 }
 
 /**
- * What a browser-script run needs to attach a SECOND, independent Playwright
- * client to the SAME running Chrome and the SAME selected tab a session's
- * ordinary browser tools are already using.
- */
-export interface BrowserScriptSetup {
-  /** Loopback CDP HTTP endpoint (e.g. `http://127.0.0.1:54213`) the
-   * secondary client connects to via `chromium.connectOverCDP`. */
-  cdpUrl: string;
-  /** CDP target id of the resolved page — the page named by
-   * {@link BrowserController.prepareForBrowserScript}'s `pageId`, or the
-   * selected page when it was omitted — so the secondary client can find
-   * that exact tab among possibly several open ones — and must never fall
-   * back to guessing (e.g. "the first page"). */
-  selectedPageTargetId: string;
-}
-
-/**
  * One provider-neutral command channel pinned to one exact live browser page.
  *
  * The controller owns the underlying transport. Callers receive neither a
@@ -210,9 +193,10 @@ export class BrowserRefNotFoundError extends Error {
  * this interface moves the selected pointer away from the page {@link newTab}
  * opened, so every other page (a popup, a second tab) must be addressed
  * explicitly by `pageId` rather than selected first. An implementation may
- * still re-point the pointer when {@link refreshAfterBrowserScript} finds the
- * selected page closed out from under it — that is a liveness guard so the
- * session stays usable after external interference, not a selection feature.
+ * still re-point the pointer when {@link refreshAfterExternalCommands} finds
+ * the selected page closed out from under it — that is a liveness guard so
+ * the session stays usable after external interference, not a selection
+ * feature.
  */
 export interface BrowserController {
   /**
@@ -413,11 +397,11 @@ export interface BrowserController {
   /**
    * Open a CDP command channel pinned to one exact tracked page.
    *
-   * Unlike {@link prepareForBrowserScript}, this never hands a connection URL
-   * to its caller. The controller resolves `pageId` once, creates one attached
-   * CDP session for that page, reads the target id through that same session,
-   * and retains it until the returned session is closed. A missing or stale
-   * page rejects rather than falling back to another open tab.
+   * The controller resolves `pageId` once, creates one attached CDP session
+   * for that page, reads the target id through that same session, and retains
+   * it until the returned session is closed. A missing or stale page rejects
+   * rather than falling back to another open tab. No provider connection URL
+   * crosses this boundary.
    *
    * @param pageId - page to bind; omitted means the selected task page
    * @returns a target-pinned command session containing no transport details
@@ -461,10 +445,9 @@ export interface BrowserController {
     options?: BrowserOperationOptions,
   ): Promise<void>;
 
-  /** Atomically prepare a run-owned task page under cancellation. Unlike
-   * composing the legacy methods at a caller, this boundary owns containment
-   * of a late `newTab` or `goto` effect. V3 requires this capability whenever
-   * it receives a browser controller. */
+  /** Atomically prepare a run-owned task page under cancellation. This
+   * boundary owns containment of a late page-creation or navigation effect.
+   * V3 requires this capability whenever it receives a browser controller. */
   prepareTaskPage?(request: BrowserTaskPagePreparation): Promise<void>;
 
   /**
@@ -474,61 +457,6 @@ export interface BrowserController {
    * fails; repeated calls are safe.
    */
   closeTaskPages(): Promise<void>;
-
-  /**
-   * Prepare this session to be driven by an external browser script: a
-   * short-lived process that opens its OWN Playwright connection to the SAME
-   * running Chrome over CDP, so it can act on one exact tab of this
-   * controller's — the named page, or the selected page when `pageId` is
-   * omitted — without this controller ever selecting that page itself.
-   *
-   * OPTIONAL, and a PAIRED capability with {@link refreshAfterBrowserScript}:
-   * a controller implements both or neither. {@link
-   * assertBrowserScriptSupportIsPaired} enforces that once, at session
-   * startup, so a provider that wired only one half fails loudly as a
-   * configuration error instead of surprising a caller mid-run when the
-   * missing half is finally needed. A controller with no CDP endpoint at all
-   * (a remote provider, a stub in a test) simply omits both, and a run wires
-   * the browser-script tool only when both are present — the same pattern
-   * {@link executeJavaScript} and {@link replaceUnresponsivePage} use.
-   *
-   * This is an idempotent READ, not a stateful lease: it hands back facts
-   * the secondary client needs (where the browser is, which tab to use) and
-   * records no reservation anywhere. There is deliberately no lease object,
-   * capability token, or "owns the browser now" handshake to release later —
-   * the scheduler's own exclusivity already guarantees no other browser tool
-   * runs concurrently with a script, so nothing here needs to enforce that a
-   * second time. Calling it again before {@link refreshAfterBrowserScript}
-   * runs is safe and returns the current facts.
-   *
-   * @param pageId - page to hand to the script; omitted means the selected
-   *   page
-   * @returns the CDP endpoint and the resolved page's CDP target id
-   * @throws Error when the resolved page does not exist (no task tab active,
-   *   for an omitted `pageId`; an unknown or closed page, for a named one),
-   *   or this controller has no CDP endpoint configured
-   */
-  prepareForBrowserScript?(pageId?: string): Promise<BrowserScriptSetup>;
-
-  /**
-   * Reconcile this controller's state after an external browser script has
-   * run and exited. Nothing about a script's actions is rolled back — this
-   * only makes sure nothing here still trusts state the script may have
-   * invalidated (a mutated DOM, a closed tab, a popup it opened).
-   *
-   * OPTIONAL, and PAIRED with {@link prepareForBrowserScript} — see there for
-   * why half-implemented support is rejected rather than tolerated.
-   *
-   * Like {@link prepareForBrowserScript}, this is an idempotent REFRESH, not
-   * the release side of a lease: there was never a lease to release, only
-   * facts that may now be stale. Calling it again when nothing changed is a
-   * no-op beyond another conservative invalidation pass.
-   *
-   * @throws Error when the script closed the entire browser/context.
-   *   Recreating a session mid-run is out of scope: every later browser tool
-   *   stays unavailable for the rest of this run.
-   */
-  refreshAfterBrowserScript?(): Promise<void>;
 
   /**
    * Hand out a source of fresh, throwaway pages for rendering a document
@@ -581,31 +509,4 @@ export interface BrowserController {
   readonly sessionDiagnostics?: BrowserSessionDiagnostics;
 
   close(): Promise<void>;
-}
-
-/**
- * Verify a controller implements both {@link BrowserController.prepareForBrowserScript}
- * and {@link BrowserController.refreshAfterBrowserScript}, or neither.
- *
- * Meant to be called once, at session startup, by whatever owns the
- * controller and decides which tools a run gets. Half-implemented support —
- * a provider that wired one method but not its pair — is a configuration
- * error the owner should learn about immediately, not a runtime surprise the
- * first time a browser script tries to refresh state that was never
- * prepared (or vice versa).
- *
- * @param controller - the controller to check
- * @throws Error when exactly one of the two methods is present
- */
-export function assertBrowserScriptSupportIsPaired(controller: BrowserController): void {
-  const hasPrepare = typeof controller.prepareForBrowserScript === 'function';
-  const hasRefresh = typeof controller.refreshAfterBrowserScript === 'function';
-  if (hasPrepare === hasRefresh) {
-    return;
-  }
-  throw new Error(
-    'Browser script support is half-implemented on this controller: ' +
-      `${hasPrepare ? 'prepareForBrowserScript is present but refreshAfterBrowserScript is not' : 'refreshAfterBrowserScript is present but prepareForBrowserScript is not'}. ` +
-      'A controller must implement both methods or neither.',
-  );
 }

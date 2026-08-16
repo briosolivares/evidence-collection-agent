@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Browser, BrowserContext, Page } from 'playwright';
 
-import { assertBrowserScriptSupportIsPaired } from './controller.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import {
   BrowserbaseBrowserSessionProvider,
@@ -279,19 +278,16 @@ describe('BrowserbaseBrowserSessionProvider diagnostics', () => {
   });
 });
 
-describe('BrowserbaseBrowserSessionProvider browser-script support', () => {
-  it('is entirely absent, and the pairing check accepts that', async () => {
+describe('BrowserbaseBrowserSessionProvider command-session support', () => {
+  it('uses the provider-neutral command and reconciliation surface', async () => {
     const { client } = fakeClient();
     const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
     const provider = buildProvider({ client, connectOverCDP: async () => browser });
 
     const controller = await provider.createSession();
 
-    expect(controller.prepareForBrowserScript).toBeUndefined();
-    expect(controller.refreshAfterBrowserScript).toBeUndefined();
     expect(typeof controller.openCommandSession).toBe('function');
     expect(typeof controller.refreshAfterExternalCommands).toBe('function');
-    expect(() => assertBrowserScriptSupportIsPaired(controller)).not.toThrow();
   });
 });
 

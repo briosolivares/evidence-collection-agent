@@ -844,6 +844,22 @@ proved, even if supporting code already exists.
   `git diff --check` also pass; no live browser, model, eval, or remote service
   was invoked.
 
+### 2026-08-15 — legacy browser-script transport removed
+
+- Removed the second-Playwright-client browser-script helper/setup, its CDP
+  endpoint export and pairing lifecycle, and the managed-provider endpoint
+  polling that existed only for that retired path. V3 keeps the protected,
+  target-pinned `openCommandSession` and `refreshAfterExternalCommands`
+  boundary used by `browser_execute` on every provider.
+- Loopback endpoint validation is now a small provider-facing helper. External
+  command reconciliation remains ownership-aware, invalidates stale
+  observations, and restores a usable owned page without adopting ambient user
+  tabs.
+- The slice removes 1,253 net lines across 14 files. The complete serial
+  browser gate passes 15 files / 234 tests; `npm run typecheck` and
+  `git diff --check` pass. Browserbase smoke was updated structurally but the
+  live/billable command was not run.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

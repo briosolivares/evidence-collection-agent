@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
 import { isAbsolute, join } from 'node:path';
 
 import {
@@ -53,7 +52,6 @@ import {
   type BrowserFetchResult,
   type BrowserOperationOptions,
   type BrowserScreenshotOptions,
-  type BrowserScriptSetup,
   type BrowserTaskPagePreparation,
   type BrowserTextCaptureRequest,
   type HandleDialogRequest,
@@ -91,12 +89,6 @@ import {
   type ChromiumPageTargetRef,
   type ChromiumTargetControl,
 } from './chromiumTargetControl.js';
-import {
-  assertLoopbackCdpUrl,
-  CDP_LOOPBACK_HOST,
-  prepareBrowserScriptTarget,
-  reconcileAfterBrowserScript,
-} from './browserScriptSetup.js';
 
 const SCROLL_SETTLE_MS = 50;
 
@@ -115,20 +107,6 @@ const MAX_RUN_PAGE_OWNERSHIP_CLEANUP_PASSES = 10;
 const RUN_PAGE_OWNERSHIP_CLEAN_PASSES = 2;
 const TARGET_CREATION_NAVIGATION_TIMEOUT_MS = 5_000;
 const BROWSER_PREPARATION_CONTAINMENT_TIMEOUT_MS = 5_000;
-
-// --- Browser-script CDP endpoint (see launchPersistentChrome, prepareForBrowserScript). ---
-/** Chrome writes this file into the user-data-dir asynchronously after
- * launch, once `--remote-debugging-port=0` gave it an ephemeral port to
- * bind. First line: the port. Second line: the browser's CDP websocket
- * path (unused here — the HTTP origin alone is a valid endpoint for
- * `chromium.connectOverCDP`). */
-const DEVTOOLS_ACTIVE_PORT_FILENAME = 'DevToolsActivePort';
-/** How often to re-check for the file while it has not appeared yet. */
-const DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS = 25;
-/** Bounded wait for the file to appear. Chrome writes it well under this in
- * practice; a launch that never produces it must fail loudly rather than
- * hang a session indefinitely on a CDP endpoint that will never exist. */
-const DEVTOOLS_ACTIVE_PORT_DEADLINE_MS = 5_000;
 
 // --- T9 observation bounds (all finite literals). ---
 /** Per-view content bound so an evicted-baseline "full snapshot" stays
@@ -233,14 +211,10 @@ export async function launchPersistentChrome(
       ? { executablePath: options.executablePath }
       : { channel: 'chrome' }),
     headless: options.headless ?? false,
-    // Opens a SECOND, loopback-only CDP TCP endpoint alongside Playwright's
-    // own pipe-based control channel, so a browser script can attach an
-    // independent Playwright client to this exact browser via
-    // `chromium.connectOverCDP` without disturbing this controller's own
-    // connection. Port 0 asks Chrome for an ephemeral port; the port Chrome
-    // actually chose is read back from DevToolsActivePort in the SAME
-    // profile directory (see readDevToolsActivePortUrl). This is the first
-    // `args` entry this codebase has ever passed to Chrome.
+    // Keep an ephemeral loopback endpoint available for exact process-crash
+    // and reattachment coverage. Managed production composition never reads
+    // or exports the endpoint; command execution stays on the controller's
+    // provider-neutral attached CDP sessions.
     args: ['--remote-debugging-port=0'],
   });
 }
@@ -295,54 +269,6 @@ export function pinProfileDownloadDirectory(profileDir: string): void {
   }
 }
 
-/**
- * Read the loopback CDP HTTP endpoint Chrome opened for a profile launched
- * by {@link launchPersistentChrome}.
- *
- * Chrome writes `DevToolsActivePort` asynchronously after launch, so this
- * polls with a bounded deadline instead of reading once.
- *
- * @param profileDir - the EXACT directory passed to `launchPersistentChrome`
- *   as `profileDir` (Chrome's user-data-dir); the file is written there and
- *   nowhere else
- * @returns a loopback (`127.0.0.1`) HTTP CDP URL, e.g. `http://127.0.0.1:54213`
- * @throws Error when the file never appears within the deadline, does not
- *   contain a valid port, or (defensively) would resolve to a non-loopback
- *   host
- */
-async function readDevToolsActivePortUrl(profileDir: string): Promise<string> {
-  const path = join(profileDir, DEVTOOLS_ACTIVE_PORT_FILENAME);
-  const deadline = Date.now() + DEVTOOLS_ACTIVE_PORT_DEADLINE_MS;
-  let lastError: unknown;
-  for (;;) {
-    try {
-      const contents = await readFile(path, 'utf8');
-      const portLine = contents.split('\n')[0]?.trim();
-      const port = Number(portLine);
-      if (portLine === undefined || portLine === '' || !Number.isInteger(port) || port <= 0) {
-        throw new Error(
-          `${DEVTOOLS_ACTIVE_PORT_FILENAME} at ${path} did not contain a valid port on its ` +
-            `first line: ${JSON.stringify(portLine)}`,
-        );
-      }
-      const cdpUrl = `http://${CDP_LOOPBACK_HOST}:${port}`;
-      assertLoopbackCdpUrl(cdpUrl);
-      return cdpUrl;
-    } catch (error) {
-      lastError = error;
-      if (Date.now() >= deadline) {
-        throw new Error(
-          `Chrome never wrote a usable ${DEVTOOLS_ACTIVE_PORT_FILENAME} into ${profileDir} ` +
-            `within ${DEVTOOLS_ACTIVE_PORT_DEADLINE_MS}ms; its CDP debugging port never became ` +
-            'available. Browser scripts will be unavailable for this session. Last error: ' +
-            `${lastError instanceof Error ? lastError.message : String(lastError)}`,
-        );
-      }
-      await delay(DEVTOOLS_ACTIVE_PORT_POLL_INTERVAL_MS);
-    }
-  }
-}
-
 /** Creates persistent local Chrome sessions controlled through Playwright. */
 export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider {
   constructor(private readonly options: LocalChromeBrowserSessionOptions) {}
@@ -353,20 +279,12 @@ export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider
 
     try {
       const preexistingSessionPage = await prepareSessionPage(context);
-      // Read from the SAME profileDir passed to launchPersistentChrome — the
-      // only directory Chrome could have written DevToolsActivePort into.
-      // A read failure fails the whole session loudly rather than silently
-      // shipping a controller with no browser-script support: the launch
-      // args above are always present, so a missing file means Chrome's CDP
-      // port genuinely never came up.
-      const cdpUrl = await readDevToolsActivePortUrl(this.options.profileDir);
       targetControl = await createChromiumTargetControl({
         context,
         anchorPage: preexistingSessionPage,
       });
       return new PlaywrightBrowserController({
         context,
-        cdpUrl,
         preexistingSessionPage,
         targetControl,
       });
@@ -392,18 +310,6 @@ export interface PlaywrightBrowserControllerOptions {
   /** The Playwright context every browser operation acts on. */
   context: BrowserContext;
   stateStore?: BrowserStateStore;
-  /** Loopback CDP HTTP endpoint for this session's Chrome, when launched
-   * with the debugging port {@link launchPersistentChrome} opens. Absent for
-   * any provider that has none to offer (a remote session, a test double) —
-   * in which case the controller offers neither
-   * {@link BrowserController.prepareForBrowserScript} nor
-   * {@link BrowserController.refreshAfterBrowserScript}.
-   *
-   * MUST be loopback. A remote service's connection URL is a full
-   * session-control capability and is never accepted here — see
-   * `docs/browserbase-provider-plan.md` §6 for the relay design that would
-   * be required to restore browser scripts on a remote provider. */
-  cdpUrl?: string;
   /** One pre-existing page {@link prepareSessionPage} leaves open (the
    * profile's original tab, or a fresh replacement). Retained for callers
    * that can have only one; merged with `preexistingSessionPages`. */
@@ -515,22 +421,7 @@ export class PlaywrightBrowserController implements BrowserController {
    * for what it protects. */
   private busyRegistry: BusyResourceRegistry | undefined;
 
-  /**
-   * Present iff this controller was constructed with a CDP endpoint (see
-   * {@link PlaywrightBrowserControllerOptions.cdpUrl}). Assigned conditionally in the
-   * constructor, rather than declared as an always-present method that
-   * throws, so `typeof controller.prepareForBrowserScript === 'function'`
-   * — the feature-detection {@link assertBrowserScriptSupportIsPaired} and
-   * a run's tool-wiring rely on — genuinely reflects whether THIS instance
-   * supports browser scripts, exactly as an omitted method would on a
-   * provider that never implements this pair at all.
-   */
-  readonly prepareForBrowserScript?: (pageId?: string) => Promise<BrowserScriptSetup>;
-  /** Paired with {@link prepareForBrowserScript}; see there. */
-  readonly refreshAfterBrowserScript?: () => Promise<void>;
-
   private readonly context: BrowserContext;
-  private readonly cdpUrl: string | undefined;
   private readonly preexistingSessionPages: ReadonlySet<Page>;
   private readonly targetControl: ChromiumTargetControl | undefined;
   private readonly closeSession: () => Promise<void>;
@@ -540,7 +431,6 @@ export class PlaywrightBrowserController implements BrowserController {
 
   constructor(options: PlaywrightBrowserControllerOptions) {
     this.context = options.context;
-    this.cdpUrl = options.cdpUrl;
     this.preexistingSessionPages = new Set([
       ...(options.preexistingSessionPages ?? []),
       ...(options.preexistingSessionPage !== undefined ? [options.preexistingSessionPage] : []),
@@ -551,15 +441,6 @@ export class PlaywrightBrowserController implements BrowserController {
     this.uploadEncoder = options.uploadEncoder ?? localUploadEncoder;
     this.sessionDiagnostics = options.sessionDiagnostics;
     this.state = options.stateStore ?? createBrowserStateStore();
-    if (this.cdpUrl !== undefined) {
-      // Re-asserted here, not only where the URL is produced: this is the
-      // boundary a remote provider would have to cross to hand a remote
-      // connection URL to browser scripts, and `prepareForBrowserScript`
-      // hands whatever it is given to model-generated shell code.
-      assertLoopbackCdpUrl(this.cdpUrl);
-      this.prepareForBrowserScript = (pageId?: string) => this.doPrepareForBrowserScript(pageId);
-      this.refreshAfterBrowserScript = () => this.doRefreshAfterBrowserScript();
-    }
     // A context page event alone is not ownership evidence in attached mode:
     // it may be a user opening a tab concurrently. Task tabs claim themselves
     // in newTab(); this listener claims only popups of an owned page or exact
@@ -1176,40 +1057,11 @@ export class PlaywrightBrowserController implements BrowserController {
     });
   }
 
-  /**
-   * Implementation behind the conditionally-assigned `prepareForBrowserScript`
-   * field (see the constructor) — reachable only when this controller was
-   * given a CDP endpoint. Resolves the target page and guards on the CDP
-   * endpoint's presence; the CDP mechanics themselves live in
-   * {@link prepareBrowserScriptTarget} (browserScriptSetup.ts).
-   */
-  private async doPrepareForBrowserScript(pageId?: string): Promise<BrowserScriptSetup> {
-    this.requireOpenContext();
-    if (this.cdpUrl === undefined) {
-      // Unreachable through the public field — it is only assigned when
-      // cdpUrl is defined — kept as a direct guard so this method can never
-      // silently return a BrowserScriptSetup with a missing cdpUrl if it is
-      // ever called another way (e.g. a future internal caller).
-      throw new Error('This browser session has no CDP endpoint configured.');
-    }
-    const page = this.pageFor(pageId);
-    return prepareBrowserScriptTarget(this.context, page, this.cdpUrl);
-  }
-
-  /**
-   * Implementation behind the conditionally-assigned `refreshAfterBrowserScript`
-   * field; see {@link doPrepareForBrowserScript} for why it is reachable only
-   * that way. The reconciliation mechanics (rescan, invalidate, reselect —
-   * four steps, all documented there) live in
-   * {@link reconcileAfterBrowserScript} (browserScriptSetup.ts); this method
-   * only enforces the controller's own open/closed contract before handing
-   * off its private collaborators as explicit closures.
-   */
   async refreshAfterExternalCommands(): Promise<void> {
     this.requireOpenContext();
     await this.drainPendingPageClaims();
     this.requireHealthyRunPageOwnership();
-    await this.reconcileExternalPages(true);
+    await this.reconcileExternalPages();
     const epoch = this.captureRunPageOwnershipEpoch();
     if (this.pendingTargetCount(epoch) > 0) {
       throw new Error(
@@ -1640,26 +1492,63 @@ export class PlaywrightBrowserController implements BrowserController {
     }
   }
 
-  private async reconcileExternalPages(ownedOnly: boolean): Promise<void> {
+  /** Rescan after raw commands, conservatively invalidate every observation,
+   * and restore a usable selected page without adopting ambient user tabs. */
+  private async reconcileExternalPages(): Promise<void> {
     const epoch = this.captureRunPageOwnershipEpoch();
-    await reconcileAfterBrowserScript({
-      context: this.context,
-      preexistingSessionPages: this.preexistingSessionPages,
-      trackedPages: this.trackedPages,
-      createDocumentId: () => this.state.createDocumentId(),
-      forgetPage: (pageId) => this.state.forgetPage(pageId),
-      registerPage: (page) => this.claimDurablyOwnedPage(page, epoch),
-      ...(ownedOnly
-        ? {
-            shouldRegisterPage: (page: Page) =>
-              this.hasOwnershipEvidence(page, epoch),
-          }
-        : {}),
-      getActivePage: () => this.activePage,
-      setActivePage: (page) => {
-        this.activePage = page;
-      },
-    });
+    if (this.context.isClosed()) {
+      throw new Error(
+        'External browser commands closed the browser session; replacing it mid-run is unsupported.',
+      );
+    }
+
+    let livePages: Page[];
+    try {
+      livePages = this.context.pages();
+    } catch {
+      throw new Error(
+        'External browser commands left the browser session unusable; replacing it mid-run is unsupported.',
+      );
+    }
+
+    for (const page of livePages) {
+      if (
+        this.preexistingSessionPages.has(page) ||
+        !(await this.hasOwnershipEvidence(page, epoch))
+      ) {
+        continue;
+      }
+      await this.claimDurablyOwnedPage(page, epoch);
+    }
+
+    for (const record of this.trackedPages.values()) {
+      for (const frameRecord of record.frames.values()) {
+        frameRecord.documentId = this.state.createDocumentId();
+      }
+      this.state.forgetPage(record.pageId);
+    }
+
+    if (this.activePage !== undefined && !this.activePage.isClosed()) return;
+
+    const liveTrackedPage = [...this.trackedPages.values()].find(
+      (record) => !record.page.isClosed(),
+    )?.page;
+    if (liveTrackedPage !== undefined) {
+      this.activePage = liveTrackedPage;
+      return;
+    }
+
+    try {
+      const record = await this.claimDurablyOwnedPage(
+        await this.context.newPage(),
+        epoch,
+      );
+      this.activePage = record.page;
+    } catch {
+      throw new Error(
+        'External browser commands left the browser session unusable; replacing it mid-run is unsupported.',
+      );
+    }
   }
 
   /** Establish containment synchronously, then close without awaiting a
@@ -1710,15 +1599,6 @@ export class PlaywrightBrowserController implements BrowserController {
         'Cancellation-safe browser preparation requires a shared busy-resource registry.',
       );
     }
-  }
-
-  private async doRefreshAfterBrowserScript(): Promise<void> {
-    this.requireOpenContext();
-    // Compatibility for the soon-to-be-retired external Playwright script
-    // path: it had no command-session hook through which to report exact raw
-    // target creation, so it retains its historical "adopt every new page"
-    // behavior until Step 6 removes it.
-    await this.reconcileExternalPages(false);
   }
 
   pdfPageSource(): Pick<BrowserContext, 'newPage'> {
@@ -2709,8 +2589,8 @@ export class PlaywrightBrowserController implements BrowserController {
 
   /**
    * Resolve the page an implicit-page-or-explicit-`pageId` method
-   * (screenshot, download, currentUrl, title, executeJavaScript,
-   * prepareForBrowserScript) should act on.
+   * (screenshot, download, currentUrl, title, executeJavaScript) should act
+   * on.
    *
    * @param pageId - explicit page, or undefined for the selected page
    * @returns the selected task tab when `pageId` is omitted, or exactly the

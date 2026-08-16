@@ -161,9 +161,9 @@ async function main(): Promise<void> {
     JSON.stringify(diagnostics ?? {}),
   );
   check(
-    'browser scripts are explicitly unsupported',
-    browser.prepareForBrowserScript === undefined &&
-      browser.refreshAfterBrowserScript === undefined,
+    'provider-neutral browser command sessions are available',
+    typeof browser.openCommandSession === 'function' &&
+      typeof browser.refreshAfterExternalCommands === 'function',
   );
   if (diagnostics?.liveViewUrl !== undefined) {
     console.log(`  live view: ${diagnostics.liveViewUrl}`);

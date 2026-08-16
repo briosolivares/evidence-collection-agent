@@ -15,7 +15,7 @@
 import { chromium, type Browser } from 'playwright';
 
 import type { BrowserController } from './controller.js';
-import { assertLoopbackCdpUrl } from './browserScriptSetup.js';
+import { assertLoopbackCdpUrl } from './cdpEndpoint.js';
 import {
   createChromiumTargetControl,
   type ChromiumTargetControl,
@@ -189,10 +189,6 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
         targetControl,
         closeSession: disconnect,
         sessionDiagnostics: ATTACHED_SESSION_DIAGNOSTICS,
-        // No cdpUrl: V3 opens target-pinned sessions through the already
-        // attached BrowserContext. Re-exporting the endpoint would revive the
-        // legacy child-process capability leak this provider is designed to
-        // avoid.
       });
     } catch (error) {
       let cleanupFailed = false;

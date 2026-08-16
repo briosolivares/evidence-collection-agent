@@ -41,7 +41,7 @@ export interface BrowserPage {
   title: string;
   /** True iff this is the selected page — the one `goto`/`outline`, and
    * every other implicit-page method (screenshot, download, currentUrl,
-   * title, executeJavaScript, prepareForBrowserScript, ...) when its
+   * title, executeJavaScript, openCommandSession, ...) when its
    * `pageId` is omitted, currently operate on. */
   active: boolean;
   /** Every live frame, main frame first, so an {@link ElementRef.frameId}

@@ -19,13 +19,9 @@
  *   View URL, and recording URL travel as {@link BrowserSessionDiagnostics},
  *   while `connectUrl` never leaves this module.
  *
- * Browser scripts are deliberately unsupported on this provider: no `cdpUrl`
- * is passed to the controller, so `prepareForBrowserScript` /
- * `refreshAfterBrowserScript` are both absent and the run omits that tool
- * rather than offering one that would need a remote session-control URL in a
- * model-generated shell. See `docs/browserbase-provider-plan.md` §6 for the
- * loopback-relay design that would restore it. Ordinary `bash` in
- * `scratch/workspace/` is unaffected.
+ * Raw browser commands use controller-owned, target-pinned CDP sessions.
+ * The Browserbase `connectUrl` remains provider-private and never enters the
+ * controller, a model-visible result, diagnostics, or a child environment.
  */
 import Browserbase from '@browserbasehq/sdk';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
@@ -386,7 +382,6 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
       });
       return new PlaywrightBrowserController({
         context: raw.context,
-        // No cdpUrl on purpose — see this module's header.
         preexistingSessionPage: raw.sessionPage,
         targetControl,
         closeSession: () => raw.close(),

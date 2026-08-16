@@ -260,7 +260,6 @@ describe('AttachedChromeBrowserSessionProvider page ownership', () => {
     expect(controller.sessionDiagnostics).toEqual({ provider: 'local' });
     expect(JSON.stringify(controller.sessionDiagnostics)).not.toContain(secretEndpoint);
     expect(JSON.stringify(controller.sessionDiagnostics)).not.toContain('diagnostic-secret');
-    expect(controller.prepareForBrowserScript).toBeUndefined();
   });
 });
 
