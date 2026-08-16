@@ -101,6 +101,8 @@ const RUN_PAGE_OWNERSHIP_MARKER_PREFIX = '__sherlock_run_page_owner_v1__:';
 const RUN_PAGE_TARGET_SENTINEL_PREFIX = '__sherlock_run_target_v1__:';
 const MAX_RUN_PAGE_OWNERSHIP_ID_BYTES = 4_096;
 const MAX_RAW_TARGET_URL_BYTES = 16_384;
+const RAW_TARGET_PAGE_APPEAR_TIMEOUT_MS = 2_000;
+const RAW_TARGET_PAGE_POLL_MS = 10;
 const RUN_PAGE_OWNERSHIP_EVALUATION_TIMEOUT_MS = 5_000;
 const MAX_RUN_PAGE_OWNERSHIP_RECOVERY_PASSES = 10;
 const MAX_RUN_PAGE_OWNERSHIP_CLEANUP_PASSES = 10;
@@ -1718,19 +1720,28 @@ export class PlaywrightBrowserController implements BrowserController {
       );
     }
     this.pendingOwnedTargetIds.set(targetId, epoch.generation);
-    for (const page of this.context.pages()) {
-      if (
-        page.isClosed() ||
-        this.preexistingSessionPages.has(page) ||
-        this.ownedPages.has(page)
-      ) {
-        continue;
+    const deadline = Date.now() + RAW_TARGET_PAGE_APPEAR_TIMEOUT_MS;
+    for (;;) {
+      for (const page of this.context.pages()) {
+        if (
+          page.isClosed() ||
+          this.preexistingSessionPages.has(page) ||
+          this.ownedPages.has(page)
+        ) {
+          continue;
+        }
+        if ((await this.targetIdForPage(page)) === targetId) {
+          this.pendingOwnedTargetIds.delete(targetId);
+          await this.claimDurablyOwnedPage(page, epoch);
+          return;
+        }
       }
-      if ((await this.targetIdForPage(page)) === targetId) {
-        this.pendingOwnedTargetIds.delete(targetId);
-        await this.claimDurablyOwnedPage(page, epoch);
-        return;
-      }
+      if (Date.now() >= deadline) return;
+      // Target.createTarget answers before Playwright is guaranteed to have
+      // emitted/registered the matching Page. Give that independent protocol
+      // event a short bounded window instead of turning ordinary delivery
+      // skew into a false unresolved-target failure at refresh.
+      await delay(RAW_TARGET_PAGE_POLL_MS);
     }
   }
 
