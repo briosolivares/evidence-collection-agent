@@ -860,6 +860,20 @@ proved, even if supporting code already exists.
   `git diff --check` pass. Browserbase smoke was updated structurally but the
   live/billable command was not run.
 
+### 2026-08-15 — immutable contract schema simplified
+
+- Replaced the retired revision/basis validator and canonical revision
+  serializer with `validateOutputContract`, which parses the one initializer-
+  authored immutable contract and applies the same cross-field checks and
+  defaults directly.
+- The initializer's strict `{contract}` call shape remains its own static API;
+  invalid shape or cross-field requirements receive one bounded repair. No
+  mutable contract history or worker revision concept remains.
+- The change removes 232 net lines across four files. A seven-file contract,
+  initializer, output-contract-file, checkpoint, coordinator, lifecycle, and
+  real crash/resume gate passes 132 tests; `npm run typecheck` and
+  `git diff --check` pass.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

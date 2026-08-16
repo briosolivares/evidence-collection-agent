@@ -22,7 +22,7 @@ import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 //     instead of after minutes of collection. Judgment-shaped requirements go
 //     in `contentExpectations`, which code deliberately does not check.
 //
-// Cross-field checks live in `validateContractRevision()` rather than in the
+// Cross-field checks live in `validateOutputContract()` rather than in the
 // Zod schema on purpose: Zod refinements are dropped by `z.toJSONSchema()`
 // (so the model would never see them anyway), and hand-written messages name
 // the offending id, column, or filename — which is what makes one rejected
@@ -293,36 +293,6 @@ export const outputContractSchema = z.strictObject({
     .describe('Only the choices that materially affect the result'),
 });
 
-/** Why a contract changed. Browsing legitimately reveals an exact
- * population, a field rule, or a mistaken assumption; a revision without one
- * of these three reasons is drift, and the verifier is given the basis so it
- * can tell the two apart. */
-export const contractRevisionBasisSchema = z.discriminatedUnion('kind', [
-  z.strictObject({
-    kind: z.literal('evidence_discovery'),
-    summary: nonBlankString.describe('What the evidence showed that the previous revision missed'),
-    evidenceIds: z.array(nonBlankString).min(1).describe('Evidence records supporting the change'),
-  }),
-  z.strictObject({
-    kind: z.literal('assumption_correction'),
-    summary: nonBlankString.describe('Which earlier assumption was wrong, and what replaces it'),
-  }),
-  z.strictObject({
-    kind: z.literal('user_clarification'),
-    summary: nonBlankString.describe('What the user clarified or relaxed'),
-  }),
-]);
-
-/** Input accepted by the `set_output_contract` tool, in either authoring
- * mode (worker-authored or initializer-authored). One schema, one validator,
- * one stored form — the architecture must not depend on which author ran. */
-export const setOutputContractInputSchema = z.strictObject({
-  contract: outputContractSchema,
-  revisionBasis: contractRevisionBasisSchema
-    .optional()
-    .describe('Required on every revision after the first; omitted on the first'),
-});
-
 /** A date/datetime column's rendering contract. */
 export type DateOutputFormat = z.infer<typeof dateOutputFormatSchema>;
 /** One column of a table output. */
@@ -336,42 +306,19 @@ export type OutputSpec = z.infer<typeof outputSpecSchema>;
 /** The validated contract. Note that `outputs` and table `columns` are plain
  * arrays in the type but carry a runtime minimum of one element. */
 export type OutputContract = z.infer<typeof outputContractSchema>;
-/** Why a contract changed. */
-export type ContractRevisionBasis = z.infer<typeof contractRevisionBasisSchema>;
-/** Validated `set_output_contract` input. */
-export type SetOutputContractInput = z.infer<typeof setOutputContractInputSchema>;
 
-/**
- * One accepted, numbered contract state. History is append-only: a revision
- * is never edited or replaced, so the verifier can always see how the
- * requirements moved between revision 1 and now.
- */
-export interface OutputContractRevision {
-  /** 1-based position in the run's contract history. */
-  revision: number;
-  /** Why this revision exists. Absent exactly on revision 1. */
-  basis?: ContractRevisionBasis;
-  /** The full contract as of this revision — never a diff. */
-  contract: OutputContract;
-}
-
-/** The outcome of validating one proposed revision: either the revision the
- * store may persist, or every reason it was rejected. Errors are plural on
- * purpose — one rejected tool call should be enough to fix everything. */
-export type ContractRevisionValidation =
-  | { ok: true; revision: OutputContractRevision }
+/** The outcome of validating the run's one immutable output contract. Errors
+ * are plural so one rejected initializer call can fix every problem. */
+export type OutputContractValidation =
+  | { ok: true; contract: OutputContract }
   | { ok: false; errors: [string, ...string[]] };
 
 /**
- * Validate a proposed contract revision: shape, then every cross-field rule,
- * then the revision-basis requirement.
+ * Validate the run's immutable initial contract: shape, then every cross-field
+ * rule.
  *
- * @param input - raw `set_output_contract` input, exactly as the model sent
- *   it; never trusted
- * @param revisionNumber - the 1-based number this revision would take (the
- *   store passes `history.length + 1`). Must itself be a positive integer;
- *   a non-integer is a caller bug and throws
- * @returns `ok: true` with the revision to persist — Zod defaults applied
+ * @param input - raw contract value; never trusted
+ * @returns `ok: true` with the contract — Zod defaults applied
  *   (a document's evidence requirement and presentation are always explicit
  *   in the stored form) — or `ok: false` with one message per problem found.
  *   Every message names the offending output id, column, filename, or rule
@@ -386,19 +333,10 @@ export type ContractRevisionValidation =
  * expected values naming an undeclared column, more expected values than
  * rows); a download constrained by nothing; a document requiring
  * per-section evidence with no sections, or visible footnotes with no
- * evidence at all; a basis on revision 1; and a missing basis after it.
+ * evidence at all.
  */
-export function validateContractRevision(
-  input: unknown,
-  revisionNumber: number,
-): ContractRevisionValidation {
-  if (!Number.isInteger(revisionNumber) || revisionNumber < 1) {
-    throw new Error(
-      `revisionNumber must be a positive integer, got ${JSON.stringify(revisionNumber)}`,
-    );
-  }
-
-  const parsed = setOutputContractInputSchema.safeParse(input);
+export function validateOutputContract(input: unknown): OutputContractValidation {
+  const parsed = outputContractSchema.safeParse(input);
   if (!parsed.success) {
     // Shape errors short-circuit: cross-field checks assume a well-formed
     // contract, and a model reading both lists at once cannot tell which
@@ -411,39 +349,10 @@ export function validateContractRevision(
     );
   }
 
-  const errors = [
-    ...checkOutputs(parsed.data.contract.outputs),
-    ...checkBasis(parsed.data.revisionBasis, revisionNumber),
-  ];
+  const errors = checkOutputs(parsed.data.outputs);
   if (errors.length > 0) return failure(errors);
 
-  return {
-    ok: true,
-    revision: {
-      revision: revisionNumber,
-      ...(parsed.data.revisionBasis !== undefined ? { basis: parsed.data.revisionBasis } : {}),
-      contract: parsed.data.contract,
-    },
-  };
-}
-
-/**
- * Serialize a revision to the exact bytes stored on disk.
- *
- * @param revision - an accepted revision (as returned by
- *   `validateContractRevision`)
- * @returns canonical JSON — object keys sorted recursively, array order
- *   preserved (column order is semantic), two-space indent, trailing
- *   newline. Canonical rather than "whatever `JSON.stringify` does" so that
- *   the same tool input always produces byte-identical storage no matter
- *   which authoring mode built it or what key order the model happened to
- *   emit; the plan requires the two modes to be byte-for-byte comparable
- * @throws if the revision contains a non-finite number or a value JSON
- *   cannot represent — impossible after validation, and a silent `null` in
- *   a stored requirement would be worse than a crash
- */
-export function serializeContractRevision(revision: OutputContractRevision): string {
-  return `${JSON.stringify(canonicalizeJson(revision, 'revision'), null, 2)}\n`;
+  return { ok: true, contract: parsed.data };
 }
 
 /** Every cross-field check over the contract's outputs. */
@@ -762,30 +671,6 @@ function checkDownload(output: Extract<OutputSpec, { kind: 'download' }>): strin
   return errors;
 }
 
-/** The revision-basis rule. Revision 1 has nothing to explain; every later
- * revision must say what evidence, corrected assumption, or user
- * clarification moved the requirements — an unexplained change is exactly
- * the drift the verifier needs to see. */
-function checkBasis(
-  basis: ContractRevisionBasis | undefined,
-  revisionNumber: number,
-): string[] {
-  if (revisionNumber === 1) {
-    return basis === undefined
-      ? []
-      : [
-          `the first contract revision has no revisionBasis: there is no earlier ` +
-            `contract for it to explain`,
-        ];
-  }
-  return basis === undefined
-    ? [
-        `revision ${revisionNumber} needs a revisionBasis explaining the change ` +
-          `(evidence_discovery, assumption_correction, or user_clarification)`,
-      ]
-    : [];
-}
-
 /** Values appearing more than once, each reported once, in first-seen
  * order. */
 function duplicatesOf(values: readonly string[]): string[] {
@@ -824,37 +709,4 @@ function isValidLocale(locale: string): boolean {
 function failure(errors: string[]): { ok: false; errors: [string, ...string[]] } {
   const [first, ...rest] = errors;
   return { ok: false, errors: [first, ...rest] };
-}
-
-/**
- * Recursively sort object keys so serialization depends only on the data.
- * Arrays keep their order — a table's column order is part of the
- * requirement, not an incidental detail.
- */
-function canonicalizeJson(value: unknown, path: string): unknown {
-  if (value === null || typeof value === 'boolean' || typeof value === 'string') return value;
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) {
-      throw new Error(`cannot serialize non-finite number at ${path}: ${String(value)}`);
-    }
-    return value;
-  }
-  if (Array.isArray(value)) {
-    return value.map((item, index) => canonicalizeJson(item, `${path}[${index}]`));
-  }
-  if (typeof value === 'object') {
-    const source = value as Record<string, unknown>;
-    const canonical: Record<string, unknown> = {};
-    // Default sort order is by UTF-16 code unit: locale-independent, so two
-    // machines produce the same bytes.
-    for (const key of Object.keys(source).sort()) {
-      const child = source[key];
-      // JSON.stringify drops undefined-valued keys; dropping them here keeps
-      // the canonical form and the emitted JSON in agreement.
-      if (child === undefined) continue;
-      canonical[key] = canonicalizeJson(child, `${path}.${key}`);
-    }
-    return canonical;
-  }
-  throw new Error(`cannot serialize ${typeof value} at ${path}`);
 }

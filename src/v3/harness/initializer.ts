@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import {
   outputContractSchema,
-  validateContractRevision,
+  validateOutputContract,
   type OutputContract,
 } from '../../contracts/outputContract.js';
 import type { CallModel, Message, ToolUseBlock } from '../../loop/messages.js';
@@ -37,7 +37,7 @@ Rules:
 - State a row count only when the task itself fixes one. When the population is unknown until research, do not invent an exact count.
 - When the task names the complete entities to cover, add an exhaustive matches_expected_values rule listing them. Leave exhaustive off for examples or a population the run must discover.
 - Put judgment requirements in contentExpectations and only material choices in assumptions.
-- Do not invent outputs the task did not ask for, and do not include revisionBasis: v3 accepts one immutable initial contract.
+- Do not invent outputs the task did not ask for. V3 accepts one immutable initial contract.
 
 Respond with the set_output_contract call and nothing else.`;
 
@@ -45,8 +45,7 @@ const v3SetOutputContractInputSchema = z.strictObject({
   contract: outputContractSchema,
 });
 
-/** Initializer-only definition: unlike the retired worker tool, this schema
- * cannot advertise or accept revisionBasis or later mutation. */
+/** Initializer-only definition for the run's one immutable contract. */
 const v3SetOutputContractTool: ToolDef<{ contract: OutputContract }> = {
   name: SET_OUTPUT_CONTRACT,
   description:
@@ -157,8 +156,8 @@ export function restoreV3ContractInitializerState(
 }
 
 /** Run or resume the bounded contract initializer. Accepted contract bytes
- * live only in the returned value/checkpoint; no worker-visible revision
- * files or mutable contract store are created. */
+ * live only in the returned value/checkpoint; no worker-visible mutable
+ * contract store is created. */
 export async function runV3ContractInitializer(
   state: V3ContractInitializerState,
   callModel: CallModel,
@@ -225,9 +224,9 @@ export async function runV3ContractInitializer(
       problem =
         `Respond with exactly one ${SET_OUTPUT_CONTRACT} call and no other tool calls.`;
     } else {
-      const validation = validateContractRevision(contractCalls[0]!.input, 1);
+      const validation = validateInitialContractCall(contractCalls[0]!.input);
       if (validation.ok) {
-        const contract = validation.revision.contract;
+        const contract = validation.contract;
         delete state.lastProblem;
         await hooks.afterAttempt?.({
           state: captureV3ContractInitializerState(state),
@@ -308,4 +307,17 @@ function deepFreeze<T>(value: T): T {
     Object.freeze(value);
   }
   return value;
+}
+
+function validateInitialContractCall(
+  input: unknown,
+): ReturnType<typeof validateOutputContract> {
+  const parsed = v3SetOutputContractInputSchema.safeParse(input);
+  if (parsed.success) return validateOutputContract(parsed.data.contract);
+
+  const errors = parsed.error.issues.map((issue) => {
+    const path = issue.path.length > 0 ? issue.path.map(String).join('.') : '(input)';
+    return `at ${path}: ${issue.message}`;
+  });
+  return { ok: false, errors: [errors[0]!, ...errors.slice(1)] };
 }

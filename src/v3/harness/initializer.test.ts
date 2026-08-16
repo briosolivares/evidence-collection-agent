@@ -77,9 +77,6 @@ describe('v3 contract initializer static prefix', () => {
       properties?: Record<string, unknown>;
     };
     expect(Object.keys(schema.properties ?? {})).toEqual(['contract']);
-    expect(V3_CONTRACT_INITIALIZER_API_TOOL_DEFS[0]!.description).not.toMatch(
-      /revise|revisionBasis/i,
-    );
     expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).not.toContain('report.csv');
     expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
       'one immutable output contract',
@@ -94,7 +91,7 @@ describe('v3 contract initializer static prefix', () => {
 });
 
 describe('runV3ContractInitializer', () => {
-  it('accepts exactly one valid contract without writing revision files', async () => {
+  it('accepts exactly one valid immutable contract', async () => {
     const state = createV3ContractInitializerState('Create report.csv.');
     const afterAttempt = vi.fn(async () => undefined);
 
@@ -110,6 +107,28 @@ describe('runV3ContractInitializer', () => {
     expect(afterAttempt).toHaveBeenCalledWith(
       expect.objectContaining({ outcome: 'accepted', contract: CONTRACT }),
     );
+  });
+
+  it('feeds contract validation errors back for one bounded repair', async () => {
+    const invalid = contractCall('invalid-contract');
+    invalid.input = {
+      contract: {
+        ...CONTRACT,
+        outputs: [{ ...CONTRACT.outputs[0]!, filename: 'nested/report.csv' }],
+      },
+    };
+    const state = createV3ContractInitializerState('Create report.csv.');
+    const callModel = vi.fn<CallModel>(async (messages) => {
+      if (messages.length === 1) return response([invalid]);
+      expect(JSON.stringify(messages.at(-1))).toContain('bare filename');
+      return response([contractCall('repaired-contract')]);
+    });
+
+    await expect(runV3ContractInitializer(state, callModel)).resolves.toEqual({
+      ok: true,
+      contract: CONTRACT,
+    });
+    expect(callModel).toHaveBeenCalledTimes(2);
   });
 
   it('answers every invalid call, then accepts one bounded repair', async () => {
