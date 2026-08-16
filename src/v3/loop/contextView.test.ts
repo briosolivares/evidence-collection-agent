@@ -56,12 +56,8 @@ describe('buildV3ContextView', () => {
       pages: [
         {
           pageId: 'page-1',
-          documentId: 'document-1',
-          observationId: 4,
           url: 'https://one.example/report',
-          title: 'One',
           active: false,
-          frames: [],
         },
       ],
     };
@@ -89,7 +85,7 @@ describe('buildV3ContextView', () => {
     );
     expect(stale.content).toContain('Status: "exited"');
     expect(stale.content).toContain(
-      'Pages: [{"pageId":"page-1","url":"https://one.example/report","title":"One","active":false}]',
+      'Pages: [{"pageId":"page-1","url":"https://one.example/report","active":false}]',
     );
     expect(isV3CollapsedBrowserResult(stale)).toBe(true);
 
@@ -107,7 +103,6 @@ describe('buildV3ContextView', () => {
         {
           pageId: 'page-a',
           url: 'https://example.test/a',
-          title: 'A ] page',
           active: true,
         },
       ],
@@ -130,7 +125,7 @@ describe('buildV3ContextView', () => {
 
     expect(stub.content).toContain('Status: "timed_out"');
     expect(stub.content).toContain(
-      'Pages: [{"pageId":"page-a","url":"https://example.test/a","title":"A ] page","active":true}]',
+      'Pages: [{"pageId":"page-a","url":"https://example.test/a","active":true}]',
     );
     expect(resultAt(second, 2).content).toBe(stub.content);
   });

@@ -382,7 +382,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
       });
       return new PlaywrightBrowserController({
         context: raw.context,
-        preexistingSessionPage: raw.sessionPage,
+        preexistingSessionPages: [raw.sessionPage],
         targetControl,
         closeSession: () => raw.close(),
         downloadReader,

@@ -984,6 +984,37 @@ proved, even if supporting code already exists.
   live smoke was not run because it consumes Browserbase minutes and remains
   gated on explicit user direction.
 
+### 2026-08-15 — legacy browser action stack removed
+
+- Removed the unreachable observation/action/ref/evaluate implementation:
+  `browserActions`, `browserState`, `pageElementRefs`, `pageJavaScript`, and
+  their legacy controller tests. `BrowserController` is now the v3 runtime
+  contract only: durable task-page preparation/cleanup, target-pinned command
+  sessions, safe page summaries, dialogs, screenshots, downloads, and
+  provider diagnostics. JavaScript policy remains a separate 20-line durable
+  authority check.
+- Replaced old controller-facing test setup with production-faithful durable
+  preparation. Existing ownership/provider/command suites retain popup,
+  target, dialog, upload, cancellation, attached-Chrome, and SIGKILL coverage;
+  real publication journeys now pin exact generated-download bytes and a
+  full-page PNG with browser-derived provenance.
+- The real browser gate exposed and fixed one ownership race: refresh was
+  reinstalling a durable marker on an already-owned page, so an outstanding
+  native dialog could block that unnecessary renderer evaluation and close
+  the page. Refresh now claims only newly discovered pages. Command sessions
+  also report raw commands abandoned at child timeout; the controller retires
+  that exact owned page and creates a durable replacement. A real infinite
+  `Runtime.evaluate` regression proves the following `browser_execute`
+  succeeds.
+- Structural code delta for this slice is +530/-5,959 raw lines (net -5,429):
+  production +248/-4,463 (net -4,215), tests +282/-1,496 (net -1,214). The
+  live tree is 31,680 production lines across 111 files and 30,391 test lines
+  across 95 files. Relative to the Step 6 coexistence baseline, production is
+  down 19,529 lines/56 files and tests are down 21,494 lines/80 files.
+- `npm run typecheck`, the retired-symbol scan, and `git diff --check` pass.
+  The serial local-Chrome/browser impact gate passes 15 files / 139 tests.
+  No live Browserbase session or eval re-baseline ran.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

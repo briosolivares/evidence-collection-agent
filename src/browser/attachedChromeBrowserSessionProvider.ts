@@ -168,8 +168,8 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
 
       const context = contexts[0]!;
       // Snapshot, do not mutate. The controller excludes this whole set from
-      // owned-page discovery and opens a fresh task page only when newTab()
-      // is called by the run lifecycle.
+      // owned-page discovery. The run lifecycle later opens its own durable
+      // task page through prepareTaskPage().
       const preexistingSessionPages = [...context.pages()];
       // Browser-scoped CDP needs no provider-internal page. Recovery may close
       // every stale run page in this snapshot without detaching its own target

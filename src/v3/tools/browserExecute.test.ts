@@ -15,8 +15,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   BrowserCommandSession,
   BrowserController,
+  BrowserPage,
 } from '../../browser/controller.js';
-import type { BrowserPage } from '../../browser/browserState.js';
 import { initManifest } from '../../run/artifacts.js';
 import { executeToolCall } from '../../tools/pipeline.js';
 import { createRegistry, type ToolCtx } from '../../tools/registry.js';
@@ -49,12 +49,8 @@ afterEach(() => {
 
 const PAGE: BrowserPage = {
   pageId: 'page-task',
-  documentId: 'document-1',
-  observationId: 0,
   url: 'https://example.test/report',
-  title: 'Report',
   active: true,
-  frames: [],
 };
 
 interface FakeBrowserOptions {

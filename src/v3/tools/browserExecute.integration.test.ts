@@ -175,6 +175,64 @@ describe('browser_execute real-browser journey', () => {
   );
 
   it(
+    'retires a renderer wedged by a timed-out command and runs the next program',
+    async () => {
+      const tool = createBrowserExecuteTool({
+        javascriptPolicy: 'allow',
+        secretEnvDenylist: [],
+      });
+      const registry = createRegistry([tool]);
+      const context = {
+        runDir: suite.runDir(),
+        browser: suite.controller(),
+      };
+      const originalPageId = (await suite.controller().pages())[0]?.pageId;
+      expect(originalPageId).toBeDefined();
+
+      const timedOut = await executeToolCall(
+        registry,
+        {
+          id: 'wedge-renderer',
+          name: 'browser_execute',
+          input: {
+            code:
+              `return browser.cdp('Runtime.evaluate', { ` +
+              `expression: 'while (true) {}', returnByValue: true });`,
+            timeout_ms: 250,
+          },
+        },
+        context,
+      );
+
+      expect(timedOut.isError, timedOut.content).toBe(false);
+      const timedOutResult = JSON.parse(timedOut.content) as BrowserExecuteResult;
+      expect(timedOutResult.status).toBe('timed_out');
+      expect(timedOutResult.pages).toEqual([
+        expect.objectContaining({ active: true, url: 'about:blank' }),
+      ]);
+      expect(timedOutResult.pages[0]?.pageId).not.toBe(originalPageId);
+
+      const recovered = await executeToolCall(
+        registry,
+        {
+          id: 'use-replacement',
+          name: 'browser_execute',
+          input: { code: `return browser.js('40 + 2');` },
+        },
+        context,
+      );
+
+      expect(recovered.isError, recovered.content).toBe(false);
+      expect(JSON.parse(recovered.content)).toMatchObject({
+        status: 'exited',
+        value: 42,
+        pending_dialogs: [],
+      });
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
     'uploads a confined workspace file to an accessibility backend node and removes its marker',
     async () => {
       const workspace = join(suite.runDir(), 'scratch/workspace');

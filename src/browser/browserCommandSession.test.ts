@@ -37,6 +37,7 @@ async function waitForPages(
 describe('PlaywrightBrowserController command sessions', () => {
   let controller: BrowserController;
   let profileDir: string;
+  let testSequence = 0;
 
   beforeAll(async () => {
     profileDir = await mkdtemp(join(tmpdir(), 'browser-command-session-chrome-'));
@@ -44,25 +45,21 @@ describe('PlaywrightBrowserController command sessions', () => {
       profileDir,
       headless: true,
     }).createSession();
+    controller.setBusyRegistry?.(createBusyResourceRegistry());
   }, 30_000);
 
   beforeEach(async () => {
-    await controller.newTab();
+    testSequence += 1;
+    if (controller.prepareTaskPage === undefined) {
+      throw new Error('Local controller omitted v3 task-page preparation.');
+    }
+    await controller.prepareTaskPage({
+      ownershipId: `browser-command-session-test-${testSequence}`,
+    });
   });
 
   afterEach(async () => {
-    // A test may create a non-selected target. Close every such page through
-    // the command-session seam itself so later tests start from one task tab.
-    for (const page of await controller.pages()) {
-      if (page.active) continue;
-      const session = await controller.openCommandSession(page.pageId);
-      try {
-        await session.send('Page.close').catch(() => undefined);
-      } finally {
-        await session.close();
-      }
-    }
-    await controller.closeTab();
+    await controller.closeTaskPages();
   });
 
   afterAll(async () => {
@@ -102,8 +99,16 @@ describe('PlaywrightBrowserController command sessions', () => {
           returnByValue: true,
         })) as { result?: { value?: unknown } };
         expect(namedEvaluation.result?.value).toBe('named command target');
-        expect(await controller.title(selected.pageId)).toBe('selected command target');
-        expect(await controller.title(named.pageId)).toBe('named command target');
+        const selectedTitle = (await selected.send('Runtime.evaluate', {
+          expression: 'document.title',
+          returnByValue: true,
+        })) as { result?: { value?: unknown } };
+        const namedTitle = (await named.send('Runtime.evaluate', {
+          expression: 'document.title',
+          returnByValue: true,
+        })) as { result?: { value?: unknown } };
+        expect(selectedTitle.result?.value).toBe('selected command target');
+        expect(namedTitle.result?.value).toBe('named command target');
       } finally {
         await named.close();
         await selected.close();
@@ -125,7 +130,7 @@ describe('PlaywrightBrowserController command sessions', () => {
         `Unknown or closed browser pageId: ${stalePageId}`,
       );
       await expect(controller.openCommandSession()).rejects.toThrow(
-        /No browser task tab is active/,
+        /No browser task page is active/,
       );
     },
     TEST_TIMEOUT_MS,
@@ -161,29 +166,28 @@ describe('PlaywrightBrowserController command sessions', () => {
   );
 
   it(
-    'invalidates observations after external commands mutate the document',
+    'refreshes safe page inventory after external commands mutate the document',
     async () => {
-      const seed = await controller.openCommandSession();
-      await seed.send('Runtime.evaluate', {
-        expression: "document.body.innerHTML = '<button>Before</button>'",
-      });
-      await seed.close();
-      await controller.refreshAfterExternalCommands();
-      const before = await controller.observe();
+      const before = (await controller.pages())[0];
+      expect(before).toBeDefined();
 
       const mutate = await controller.openCommandSession();
       await mutate.send('Runtime.evaluate', {
-        expression: "document.body.innerHTML = '<button>After</button>'",
+        expression:
+          "document.body.innerHTML = '<button>After</button>'; " +
+          "history.replaceState(null, '', 'about:blank#after'); location.href",
       });
       await mutate.close();
       await controller.refreshAfterExternalCommands();
 
-      const after = await controller.observe({
-        basedOnObservationId: before.page.observationId,
-      });
-      expect(after.page.documentId).not.toBe(before.page.documentId);
-      expect(after.changes.basis).toBe('full_snapshot');
-      expect(after.views[0]?.content).toContain('After');
+      expect(await controller.pages()).toEqual([
+        {
+          pageId: before!.pageId,
+          url: 'about:blank#after',
+          active: true,
+        },
+      ]);
+      expect(controller.currentUrl()).toBe('about:blank#after');
     },
     TEST_TIMEOUT_MS,
   );
@@ -482,9 +486,52 @@ describe('command-session transport boundary', () => {
     await session.close();
     await session.close();
     expect(release).toHaveBeenCalledOnce();
+    expect(release).toHaveBeenCalledWith(expect.any(Function), false);
     expect(detach).not.toHaveBeenCalled();
 
     await transferred?.();
+    expect(detach).toHaveBeenCalledOnce();
+  });
+
+  it('reports an abandoned raw command when closing without awaiting it', async () => {
+    const { context, page, send, detach } = fakeTarget();
+    send.mockImplementation(async (method: string) => {
+      if (method === 'Target.getTargetInfo') {
+        return { targetInfo: { targetId: 'target-exact' } };
+      }
+      await new Promise<never>(() => undefined);
+    });
+    const release = vi.fn(
+      async (
+        detachSession: () => Promise<void>,
+        hadPendingCommands: boolean,
+      ) => {
+        expect(hadPendingCommands).toBe(true);
+        await detachSession();
+      },
+    );
+    const session = await openPlaywrightCommandSession(
+      context,
+      page,
+      'page-busy',
+      { release },
+    );
+
+    void session.send('Runtime.evaluate', {
+      expression: 'while (true) {}',
+    }).catch(() => undefined);
+    await vi.waitFor(() =>
+      expect(send).toHaveBeenCalledWith('Runtime.evaluate', {
+        expression: 'while (true) {}',
+      }),
+    );
+
+    await session.close();
+
+    expect(release).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Function),
+      true,
+    );
     expect(detach).toHaveBeenCalledOnce();
   });
 });

@@ -40,7 +40,10 @@ export interface PlaywrightCommandSessionHooks {
   trackUploadEffect?: (effect: Promise<void>) => void;
   /** Release the caller's session. The controller may take ownership of the
    * bounded detacher until a blocking dialog is answered. */
-  release?: (detach: () => Promise<void>) => Promise<void>;
+  release?: (
+    detach: () => Promise<void>,
+    hadPendingCommands: boolean,
+  ) => Promise<void>;
 }
 
 async function uploadToBackendNode(
@@ -150,6 +153,7 @@ export async function openPlaywrightCommandSession(
 
   let closed = false;
   let closePromise: Promise<void> | undefined;
+  const inFlightCommands = new Set<Promise<void>>();
   const inFlightUploads = new Set<Promise<void>>();
   const commandSession: BrowserCommandSession = {
     pageId,
@@ -158,28 +162,40 @@ export async function openPlaywrightCommandSession(
       if (closed) {
         throw new Error(`Browser command session for pageId ${pageId} is closed.`);
       }
-      try {
-        const result =
-          method === 'Page.handleJavaScriptDialog' &&
-          hooks.handleDialogCommand !== undefined
-            ? await hooks.handleDialogCommand(params ?? {})
-            : method === 'Target.createTarget' &&
-                hooks.createTargetCommand !== undefined
-              ? await hooks.createTargetCommand(params ?? {})
-              : await send(method, params);
-        if (method === 'Target.createTarget' && hooks.onTargetCreated !== undefined) {
-          const createdTargetId = (result as { targetId?: unknown })?.targetId;
-          if (typeof createdTargetId !== 'string' || createdTargetId.length === 0) {
-            throw new Error('Target.createTarget returned no target id');
+      const operation = (async (): Promise<unknown> => {
+        try {
+          const result =
+            method === 'Page.handleJavaScriptDialog' &&
+            hooks.handleDialogCommand !== undefined
+              ? await hooks.handleDialogCommand(params ?? {})
+              : method === 'Target.createTarget' &&
+                  hooks.createTargetCommand !== undefined
+                ? await hooks.createTargetCommand(params ?? {})
+                : await send(method, params);
+          if (method === 'Target.createTarget' && hooks.onTargetCreated !== undefined) {
+            const createdTargetId = (result as { targetId?: unknown })?.targetId;
+            if (typeof createdTargetId !== 'string' || createdTargetId.length === 0) {
+              throw new Error('Target.createTarget returned no target id');
+            }
+            await hooks.onTargetCreated(createdTargetId);
           }
-          await hooks.onTargetCreated(createdTargetId);
+          return result;
+        } catch (error) {
+          throw commandError(
+            `CDP command ${JSON.stringify(method)} failed for pageId ${pageId}`,
+            error,
+          );
         }
-        return result;
-      } catch (error) {
-        throw commandError(
-          `CDP command ${JSON.stringify(method)} failed for pageId ${pageId}`,
-          error,
-        );
+      })();
+      const settled = operation.then(
+        () => undefined,
+        () => undefined,
+      );
+      inFlightCommands.add(settled);
+      try {
+        return await operation;
+      } finally {
+        inFlightCommands.delete(settled);
       }
     },
     upload(backendDOMNodeId, absolutePath) {
@@ -223,7 +239,7 @@ export async function openPlaywrightCommandSession(
         // Detach is cleanup: it is attempted exactly once and cannot mask the
         // command/program outcome merely because the target disappeared first.
         const detach = () => detachWithoutHanging(session);
-        await (hooks.release?.(detach) ?? detach());
+        await (hooks.release?.(detach, inFlightCommands.size > 0) ?? detach());
       })();
       return closePromise;
     },

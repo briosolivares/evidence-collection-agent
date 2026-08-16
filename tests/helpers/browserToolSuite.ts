@@ -8,6 +8,7 @@ import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import { initManifest } from '../../src/run/artifacts.js';
+import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 import { startFixtureServer, type FixtureServer } from '../fixtures/server.js';
 
 /** Timeout for individual tests that drive the real browser. */
@@ -45,12 +46,16 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
       headless: true,
     });
     controller = await browserSessionProvider.createSession();
+    controller.setBusyRegistry?.(createBusyResourceRegistry());
   }, 30_000);
 
   beforeEach(async () => {
     runDir = mkdtempSync(join(tmpdir(), `${name}-run-`));
     initManifest(runDir, `test ${name}`);
-    await controller.newTab();
+    if (controller.prepareTaskPage === undefined) {
+      throw new Error('Browser test controller lacks v3 task-page preparation');
+    }
+    await controller.prepareTaskPage({ ownershipId: runDir });
   });
 
   afterEach(async () => {

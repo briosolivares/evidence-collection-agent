@@ -11,22 +11,12 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
-  BrowserActionOutput,
-  BrowserActionRequest,
-} from '../browser/browserActions.js';
-import type {
-  BrowserObservation,
-  BrowserPage,
-} from '../browser/browserState.js';
-import type {
   BrowserController,
   BrowserDownloadResult,
   BrowserDownloadTarget,
-  BrowserFetchResult,
+  BrowserPage,
   BrowserScreenshotOptions,
   BrowserTaskPagePreparation,
-  HandleDialogRequest,
-  HandleDialogResult,
 } from '../browser/controller.js';
 import { runTask } from '../cli/runTask.js';
 import {
@@ -60,29 +50,13 @@ class FakeBrowser implements BrowserController {
   activeTab = false;
   sessionClosed = false;
 
-  async newTab(): Promise<void> {
+  async prepareTaskPage(
+    _request: BrowserTaskPagePreparation,
+  ): Promise<void> {
     if (this.sessionClosed || this.activeTab) {
       throw new Error('Cannot open a task tab.');
     }
     this.activeTab = true;
-  }
-
-  async prepareTaskPage(
-    _request: BrowserTaskPagePreparation,
-  ): Promise<void> {
-    await this.newTab();
-  }
-
-  async closeTab(): Promise<void> {
-    this.activeTab = false;
-  }
-
-  async goto(_url: string): Promise<void> {
-    throw new Error('Unexpected browser navigation.');
-  }
-
-  async outline(): Promise<string> {
-    throw new Error('Unexpected page inspection.');
   }
 
   async screenshot(
@@ -91,42 +65,19 @@ class FakeBrowser implements BrowserController {
     throw new Error('Unexpected browser screenshot.');
   }
 
-  async fetch(_url: string): Promise<BrowserFetchResult> {
-    throw new Error('Unexpected browser fetch.');
-  }
-
   async download(_target: BrowserDownloadTarget): Promise<BrowserDownloadResult> {
     throw new Error('Unexpected browser download.');
   }
 
   currentUrl(_pageId?: string): string {
     if (!this.activeTab) {
-      throw new Error('No browser task tab.');
+      throw new Error('No browser task page.');
     }
     return 'about:blank';
   }
 
-  async title(_pageId?: string): Promise<string> {
-    if (!this.activeTab) {
-      throw new Error('No browser task tab.');
-    }
-    return '';
-  }
-
   async pages(): Promise<BrowserPage[]> {
     throw new Error('Unexpected page listing.');
-  }
-
-  async observe(): Promise<BrowserObservation> {
-    throw new Error('Unexpected page observation.');
-  }
-
-  async browserAction(_request: BrowserActionRequest): Promise<BrowserActionOutput> {
-    throw new Error('Unexpected browser action sequence.');
-  }
-
-  async handleDialog(_request: HandleDialogRequest): Promise<HandleDialogResult> {
-    throw new Error('Unexpected browser dialog decision.');
   }
 
   async openCommandSession(): Promise<never> {

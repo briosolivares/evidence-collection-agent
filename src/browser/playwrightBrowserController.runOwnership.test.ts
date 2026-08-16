@@ -233,17 +233,16 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     const controller = new PlaywrightBrowserController({
       context,
       preexistingSessionPages: [user.page],
+      targetControl: fakeTargetControl(context),
     });
 
-    await controller.initializeRunPageOwnership('first-run');
-    await controller.newTab();
+    await controller.prepareTaskPage({ ownershipId: 'first-run' });
     await expect(
       controller.initializeRunPageOwnership('second-run'),
     ).rejects.toThrow(/different durable run/i);
 
     await controller.closeTaskPages();
-    await controller.initializeRunPageOwnership('second-run');
-    await controller.newTab();
+    await controller.prepareTaskPage({ ownershipId: 'second-run' });
     await controller.closeTaskPages();
 
     expect(firstTask.close).toHaveBeenCalledOnce();
@@ -264,8 +263,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       targetControl: fakeTargetControl(context),
     });
 
-    await controller.initializeRunPageOwnership('first-run');
-    await controller.newTab();
+    await controller.prepareTaskPage({ ownershipId: 'first-run' });
     await expect(controller.closeTaskPages()).rejects.toThrow(
       /could not close every task page/i,
     );
@@ -300,13 +298,12 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     const controller = new PlaywrightBrowserController({
       context,
       preexistingSessionPages: [user.page],
+      targetControl: fakeTargetControl(context),
     });
 
-    await controller.initializeRunPageOwnership('first-run');
-    await controller.newTab();
+    await controller.prepareTaskPage({ ownershipId: 'first-run' });
     await controller.closeTaskPages();
-    await controller.initializeRunPageOwnership('second-run');
-    await controller.newTab();
+    await controller.prepareTaskPage({ ownershipId: 'second-run' });
     await controller.closeTaskPages();
 
     expect(firstTask.close).toHaveBeenCalledOnce();
@@ -367,11 +364,9 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       context,
       targetControl: fakeTargetControl(context),
     });
-    await controller.initializeRunPageOwnership('stable-run-id');
-
     let error: unknown;
     try {
-      await controller.newTab();
+      await controller.prepareTaskPage({ ownershipId: 'stable-run-id' });
     } catch (caught) {
       error = caught;
     }
@@ -380,6 +375,23 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     expect((error as Error).message).toMatch(/could not durably mark/i);
     expect((error as Error).message).not.toContain('raw marker installation detail');
     expect(task.close).toHaveBeenCalledOnce();
+  });
+
+  it('does not reinstall ownership on an already-owned page during refresh', async () => {
+    const task = fakePage();
+    const { context } = fakeContext([], task.page);
+    const controller = new PlaywrightBrowserController({
+      context,
+      targetControl: fakeTargetControl(context),
+    });
+
+    await controller.prepareTaskPage({ ownershipId: 'stable-run-id' });
+    expect(task.page.addInitScript).toHaveBeenCalledOnce();
+
+    await controller.refreshAfterExternalCommands();
+
+    expect(task.page.addInitScript).toHaveBeenCalledOnce();
+    expect(task.close).not.toHaveBeenCalled();
   });
 
   it('settles cancellation even when page creation never settles', async () => {

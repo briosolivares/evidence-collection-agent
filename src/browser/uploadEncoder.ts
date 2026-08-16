@@ -15,10 +15,9 @@
  * a per-provider choice rather than a blanket one: reading every upload into
  * memory is pointless work for a local Chrome that can simply open the file.
  *
- * The confinement guarantee is untouched either way. `browserActions.ts` still
- * resolves every upload path through `resolveRunPath` against the run directory
- * BEFORE anything here is called, so an encoder only ever sees a path the run
- * was already allowed to read.
+ * The confinement guarantee is untouched either way. The v3 host validates a
+ * no-follow regular file under `scratch/workspace` before the command session
+ * calls an encoder, so this module sees only an already-confined absolute path.
  */
 import { readFile } from 'node:fs/promises';
 import { basename, extname } from 'node:path';
@@ -40,8 +39,8 @@ export interface BrowserUploadEncoder {
    * mixes paths and buffers, and encoding the whole set at once makes mixing
    * unrepresentable instead of merely avoided.
    *
-   * @param absolutePaths - paths `resolveRunPath` has already confined to the
-   *   run directory
+   * @param absolutePaths - paths the v3 host has already confined to the run
+   *   workspace
    * @returns the paths themselves, or the files' bytes when the browser cannot
    *   see this filesystem — never a mixture
    * @throws when a file cannot be read (remote encoder only)
@@ -76,7 +75,7 @@ export const remoteUploadEncoder: BrowserUploadEncoder = {
  *
  * Exported for its own test.
  */
-export function guessUploadMimeType(path: string): string {
+function guessUploadMimeType(path: string): string {
   const extension = extname(path).toLowerCase();
   switch (extension) {
     case '.csv':

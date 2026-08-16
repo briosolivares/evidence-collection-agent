@@ -1,4 +1,5 @@
 import { AttachedChromeBrowserSessionProvider } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
+import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 
 interface Arguments {
   endpoint: string;
@@ -32,6 +33,7 @@ async function main(): Promise<void> {
         }
       : {}),
   }).createSession();
+  controller.setBusyRegistry?.(createBusyResourceRegistry());
   if (mode === 'committed-sentinel') {
     if (controller.prepareTaskPage === undefined) {
       throw new Error('Attached controller omitted atomic task-page preparation.');
@@ -39,18 +41,20 @@ async function main(): Promise<void> {
     await controller.prepareTaskPage({ ownershipId });
     throw new Error('Sentinel crash fixture unexpectedly completed page preparation.');
   }
-  if (controller.initializeRunPageOwnership === undefined) {
-    throw new Error('Attached controller omitted durable run page ownership.');
+  if (controller.prepareTaskPage === undefined) {
+    throw new Error('Attached controller omitted v3 task-page preparation.');
   }
-  await controller.initializeRunPageOwnership(ownershipId);
-  await controller.newTab();
-  if (controller.executeJavaScript === undefined) {
-    throw new Error('Attached controller omitted page JavaScript.');
+  await controller.prepareTaskPage({ ownershipId });
+  const popupSession = await controller.openCommandSession();
+  try {
+    await popupSession.send('Runtime.evaluate', {
+      expression: "window.open('about:blank#crash-popup', '_blank'); true",
+      awaitPromise: true,
+      returnByValue: true,
+    });
+  } finally {
+    await popupSession.close();
   }
-  await controller.executeJavaScript({
-    code: "window.open('about:blank#crash-popup', '_blank'); return true;",
-    timeoutMs: 5_000,
-  });
 
   const pages = await waitForPages(controller, 2);
   await Promise.all(

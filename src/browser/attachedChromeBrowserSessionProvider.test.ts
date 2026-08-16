@@ -210,7 +210,7 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
 });
 
 describe('AttachedChromeBrowserSessionProvider page ownership', () => {
-  it('opens one fresh owned task page and excludes every pre-existing page after refresh', async () => {
+  it('does not adopt or mutate any pre-existing page during session setup', async () => {
     const first = fakePage('https://mail.example.test/');
     const second = fakePage('https://calendar.example.test/');
     const { context, newPage, taskPages } = fakeContext([first.page, second.page]);
@@ -219,15 +219,7 @@ describe('AttachedChromeBrowserSessionProvider page ownership', () => {
 
     expect(newPage).not.toHaveBeenCalled();
     expect(await controller.pages()).toEqual([]);
-
-    await controller.newTab();
-    await controller.refreshAfterExternalCommands();
-
-    expect(newPage).toHaveBeenCalledOnce();
-    expect(taskPages).toHaveLength(1);
-    const visiblePages = await controller.pages();
-    expect(visiblePages).toHaveLength(1);
-    expect(visiblePages[0]?.url).toBe('about:blank#task-1');
+    expect(taskPages).toEqual([]);
     expect(first.close).not.toHaveBeenCalled();
     expect(second.close).not.toHaveBeenCalled();
   });

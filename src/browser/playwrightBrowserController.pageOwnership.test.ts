@@ -5,7 +5,10 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { BrowserContext, Page } from 'playwright';
 
-import type { BrowserController } from './controller.js';
+import type {
+  BrowserController,
+  BrowserTaskPagePreparation,
+} from './controller.js';
 import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSessionProvider.js';
 import { createChromiumTargetControl } from './chromiumTargetControl.js';
 import {
@@ -30,6 +33,16 @@ async function waitForOwnedPages(
   }
 }
 
+async function prepareTaskPage(
+  controller: BrowserController,
+  request: BrowserTaskPagePreparation,
+): Promise<void> {
+  if (controller.prepareTaskPage === undefined) {
+    throw new Error('Browser controller omitted v3 task-page preparation.');
+  }
+  await controller.prepareTaskPage(request);
+}
+
 describe('PlaywrightBrowserController task-page ownership', () => {
   let context: BrowserContext;
   let controller: BrowserController;
@@ -51,6 +64,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
       preexistingSessionPages: preexistingPages,
       targetControl,
     });
+    controller.setBusyRegistry?.(createBusyResourceRegistry());
   }, 30_000);
 
   afterAll(async () => {
@@ -65,7 +79,9 @@ describe('PlaywrightBrowserController task-page ownership', () => {
     async () => {
       expect(await controller.pages()).toEqual([]);
 
-      await controller.newTab();
+      await prepareTaskPage(controller, {
+        ownershipId: 'page-ownership-cleanup-test',
+      });
       await waitForOwnedPages(controller, 1);
       const taskPage = context
         .pages()
@@ -134,8 +150,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
     async () => {
       const durableRunId = 'v3-run-2026-08-15-reconnect-test';
       const userPages = [...context.pages()];
-      await controller.initializeRunPageOwnership?.(durableRunId);
-      await controller.newTab();
+      await prepareTaskPage(controller, { ownershipId: durableRunId });
       const taskPage = context
         .pages()
         .find((page) => !userPages.includes(page));
@@ -209,6 +224,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
       const reconnected = await new AttachedChromeBrowserSessionProvider({
         cdpEndpoint: attachedEndpoint,
       }).createSession();
+      reconnected.setBusyRegistry?.(createBusyResourceRegistry());
       await reconnected.initializeRunPageOwnership?.(durableRunId);
       await reconnected.initializeRunPageOwnership?.(durableRunId);
 
@@ -218,7 +234,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
         expect(page.isClosed()).toBe(false);
       }
 
-      await reconnected.newTab();
+      await prepareTaskPage(reconnected, { ownershipId: durableRunId });
       const listed = await reconnected.pages();
       expect(listed).toHaveLength(1);
       expect(JSON.stringify(listed)).not.toContain(durableRunId);
@@ -262,12 +278,11 @@ describe('PlaywrightBrowserController task-page ownership', () => {
       controller.setBusyRegistry?.(createBusyResourceRegistry());
 
       try {
-        const preparation = controller.prepareTaskPage?.({
+        const preparation = prepareTaskPage(controller, {
           ownershipId: durableRunId,
           startUrl: 'https://deadline-preparation.test/slow',
           signal: abort.signal,
         });
-        expect(preparation).toBeDefined();
         await started;
 
         abort.abort(reason);
@@ -290,7 +305,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
     'rebinds one real controller from run A to run B only after quiescent cleanup',
     async () => {
       const originalUserPages = [...context.pages()];
-      await controller.prepareTaskPage?.({
+      await prepareTaskPage(controller, {
         ownershipId: 'sequential-real-run-a',
       });
       const runAMain = context
@@ -315,7 +330,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
         'data:text/html,<title>between-runs-user</title><h1>user</h1>',
       );
 
-      await controller.prepareTaskPage?.({
+      await prepareTaskPage(controller, {
         ownershipId: 'sequential-real-run-b',
       });
       expect(await controller.pages()).toHaveLength(1);

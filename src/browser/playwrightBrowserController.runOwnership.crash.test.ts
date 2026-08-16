@@ -9,6 +9,7 @@ import type { BrowserContext } from 'playwright';
 
 import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSessionProvider.js';
 import { launchPersistentChrome } from './playwrightBrowserController.js';
+import { createBusyResourceRegistry } from '../tools/registry.js';
 
 interface RunningFixture {
   child: ChildProcess;
@@ -78,12 +79,16 @@ processDescribe('durable browser page ownership after process death', () => {
       const resumed = await new AttachedChromeBrowserSessionProvider({
         cdpEndpoint: endpoint,
       }).createSession();
+      resumed.setBusyRegistry?.(createBusyResourceRegistry());
       await resumed.initializeRunPageOwnership?.(ownershipId);
       await resumed.initializeRunPageOwnership?.(ownershipId);
       for (const page of stalePages) expect(page.isClosed()).toBe(true);
       for (const page of userPages) expect(page.isClosed()).toBe(false);
 
-      await resumed.newTab();
+      if (resumed.prepareTaskPage === undefined) {
+        throw new Error('Attached controller omitted v3 task-page preparation.');
+      }
+      await resumed.prepareTaskPage({ ownershipId });
       expect(await resumed.pages()).toHaveLength(1);
       await resumed.closeTaskPages();
       await resumed.closeTaskPages();

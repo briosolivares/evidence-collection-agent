@@ -28,7 +28,6 @@ interface BrowserResultSummary {
   pages?: Array<{
     pageId: string;
     url?: string;
-    title?: string;
     active?: boolean;
   }>;
 }
@@ -196,7 +195,6 @@ function normalizePages(value: unknown): BrowserResultSummary['pages'] | undefin
     pages.push({
       pageId: page.pageId,
       ...(typeof page.url === 'string' ? { url: page.url } : {}),
-      ...(typeof page.title === 'string' ? { title: page.title } : {}),
       ...(typeof page.active === 'boolean' ? { active: page.active } : {}),
     });
   }

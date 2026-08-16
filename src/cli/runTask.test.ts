@@ -203,7 +203,7 @@ describe('runTask browser acceptance', () => {
           .filter((event) => event.type === 'tool_call')
           .map((event) => (event.call as { name: string }).name),
       ).toEqual(['browser_execute', 'publish_artifact', 'finish']);
-      expect(() => browser.currentUrl()).toThrow(/No browser task tab/);
+      expect(() => browser.currentUrl()).toThrow(/No browser task page/);
     },
     TEST_TIMEOUT_MS,
   );

@@ -17,7 +17,7 @@ import {
 } from './browserExecute.js';
 import { publishArtifactTool } from './publishArtifact.js';
 
-describe('publish_artifact real-browser download journey', () => {
+describe('publish_artifact real-browser journeys', () => {
   const suite = setupBrowserToolSuite('v3-publish-artifact');
   const browserExecuteTool = createBrowserExecuteTool({
     javascriptPolicy: 'allow',
@@ -111,6 +111,60 @@ describe('publish_artifact real-browser download journey', () => {
       );
       expect(checked.isError, checked.content).toBe(false);
       expect((JSON.parse(checked.content) as BrowserExecuteResult).value).toBe(0);
+    },
+    BROWSER_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'publishes a real full-page PNG with browser-derived provenance',
+    async () => {
+      const pageUrl = suite.server().url('/index.html');
+      const context = {
+        runDir: suite.runDir(),
+        browser: suite.controller(),
+      };
+      const navigated = await executeToolCall(
+        registry,
+        {
+          id: 'navigate-screenshot',
+          name: 'browser_execute',
+          input: { code: `await browser.goto(${JSON.stringify(pageUrl)});` },
+        },
+        context,
+      );
+      expect(navigated.isError, navigated.content).toBe(false);
+
+      const published = await executeToolCall(
+        registry,
+        {
+          id: 'publish-screenshot',
+          name: 'publish_artifact',
+          input: {
+            kind: 'screenshot',
+            artifact_path: 'artifacts/page-evidence.png',
+            roles: ['evidence'],
+            full_page: true,
+          },
+        },
+        context,
+      );
+      expect(published.isError, published.content).toBe(false);
+
+      const bytes = readFileSync(
+        join(suite.runDir(), 'artifacts/page-evidence.png'),
+      );
+      expect(bytes.subarray(0, 8)).toEqual(
+        Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+      );
+      expect(bytes.byteLength).toBeGreaterThan(1_000);
+      expect(readManifest(suite.runDir()).artifacts).toEqual([
+        expect.objectContaining({
+          filename: 'artifacts/page-evidence.png',
+          sha256: createHash('sha256').update(bytes).digest('hex'),
+          sourceUrl: pageUrl,
+          roles: ['evidence'],
+        }),
+      ]);
     },
     BROWSER_TEST_TIMEOUT_MS,
   );

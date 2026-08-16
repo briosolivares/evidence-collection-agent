@@ -74,7 +74,7 @@ describe('PlaywrightBrowserController reporting of a session that ended on its o
   const attempt = async (context: BrowserContext): Promise<string> => {
     const controller = new PlaywrightBrowserController({ context });
     try {
-      await controller.fetch('https://example.com/');
+      controller.currentUrl();
       return '(no error)';
     } catch (error) {
       return error instanceof Error ? error.message : String(error);
@@ -83,10 +83,9 @@ describe('PlaywrightBrowserController reporting of a session that ended on its o
 
   it('says the browser is disconnected, in words isBrowserDeathMessage recognizes', async () => {
     // The failure this prevents: a Browserbase session hits its own timeout,
-    // and every later operation reports "No browser task tab is active; call
-    // newTab() first." That reads as recoverable, so an agent retries against
-    // a browser that is gone — observed for ~20 turns, and unbounded, since
-    // DEFAULT_MAX_TURNS is Infinity. The classifier link is the point of this
+    // and every later operation reports "No browser task page is active;
+    // prepare the task page first." That reads as recoverable, so an agent
+    // retries against a browser that is gone. The classifier link is the point of this
     // test: the wording alone is worthless if it does not route to relaunch.
     const message = await attempt(fakeContext({ connected: false }).context);
 

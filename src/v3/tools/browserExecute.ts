@@ -11,12 +11,12 @@ import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { z } from 'zod';
 
 import type {
+  BrowserDialog,
   BrowserCommandSession,
   BrowserController,
+  BrowserPage,
 } from '../../browser/controller.js';
 import type { BrowserJavaScriptPolicy } from '../../browser/browserJavaScript.js';
-import type { BrowserPage } from '../../browser/browserState.js';
-import type { BrowserDialog } from '../../browser/browserActions.js';
 import { SCRATCH_DIR } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import {
