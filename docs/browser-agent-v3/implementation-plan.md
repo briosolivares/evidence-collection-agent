@@ -782,6 +782,31 @@ proved, even if supporting code already exists.
   nonstandard profile uses the explicit loopback endpoint escape hatch. No
   live Browserbase smoke or eval re-baseline ran.
 
+### 2026-08-15 — Step 6 immediate legacy closure removed
+
+- After the v3-only `runTask` seam landed, the semantic import graph proved the
+  old scheduler/session, mutable contract authoring path, v1 checkpoint replay,
+  legacy composition root, and their wrapper tools unreachable. This slice
+  removes 67 files and 17,953 raw lines while retaining the generic tool
+  registry/pipeline, bounded foreground-command runner, browser/controller
+  seams, provenance layer, and every v3 implementation.
+- Measured against the Step 6 coexistence baseline, the live production
+  `src` tree is now 41,298 raw lines across 130 files (down 9,911 lines and 37
+  files); the test tree is 35,971 raw lines across 111 files (down 15,914 lines
+  and 64 files). Those category deltas overlap neither generated nor vendor
+  code; the total patch also includes retired demos and two small model-frontier
+  cleanups. No comment-only or formatting reduction is counted as structural.
+- The retained-result cache frontier now recognizes the sole v3 collapsed
+  browser-result marker; the deleted legacy marker and its redundant tests are
+  gone. `npm run typecheck -- --pretty false`, `git diff --check`, and a focused
+  15-file gate covering model calls, generic tool infrastructure, v3 tools,
+  worker/coordinator, tracing, and TUI all pass (242/242 tests).
+- The remaining retirement boundary is deliberate: the v3 verifier still
+  imports the old generic verifier loop/image inspection, and `ToolCtx` still
+  carries the typed output-contract store. Those dependencies must be folded
+  into cohesive v3/shared seams before deleting the typed row/evidence stores
+  and document renderer; none of that code was deleted speculatively.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { COLLAPSED_MARKER } from '../loop/contextView.js';
 import type { Message } from '../loop/messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import {
@@ -155,58 +154,6 @@ describe('buildRequestParams', () => {
         .filter((block) => block.cache_control !== undefined);
       expect(markers).toHaveLength(1);
     }
-  });
-
-  it('marks the collapse frontier — the newest stub — alongside the tip when the view has stubs', () => {
-    const stub = (n: number): string =>
-      `${COLLAPSED_MARKER}\nURL: https://site.test/page-${n}\nTitle: Page ${n}\nRun inspect_page again.`;
-    const history = frozen([
-      { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] },
-      { role: 'assistant', content: [{ type: 'tool_use', id: 'i1', name: 'inspect_page', input: {} }] },
-      { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'i1', content: stub(1) }] },
-      { role: 'assistant', content: [{ type: 'tool_use', id: 'i2', name: 'inspect_page', input: {} }] },
-      { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'i2', content: stub(2) }] },
-      { role: 'assistant', content: [{ type: 'tool_use', id: 'i3', name: 'inspect_page', input: {} }] },
-      {
-        role: 'user',
-        content: [{ type: 'tool_result', tool_use_id: 'i3', content: 'URL: x\nTitle: y\n\nfull outline' }],
-      },
-    ]);
-    const params = buildRequestParams(makeConfig(), history);
-    const contents = params.messages.map(
-      (message) => message.content as Array<{ cache_control?: unknown }>,
-    );
-
-    // The newest stub (message 4) carries the frontier marker — the block
-    // where a displacement turn's request diverges from the previous
-    // turn's — so that turn resumes from the prior frontier's cache entry
-    // instead of missing the whole conversation (the server only matches
-    // ~20 blocks back from a marker). The older stub is unmarked.
-    expect(contents[4]?.[0]?.cache_control).toEqual({ type: 'ephemeral' });
-    expect(contents[2]?.[0]?.cache_control).toBeUndefined();
-    // The tip marker still rides the final block: 2 message-level markers,
-    // 3 breakpoints total with the system block (API max 4).
-    expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
-    expect(contents.flat().filter((block) => block.cache_control !== undefined)).toHaveLength(2);
-    // The frozen input never saw a marker — marked messages are clones.
-    expect(JSON.stringify(history)).not.toContain('cache_control');
-  });
-
-  it('a frontier sitting on the tip block gets one marker, not two', () => {
-    const history = frozen([
-      { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] },
-      { role: 'assistant', content: [{ type: 'tool_use', id: 'i1', name: 'inspect_page', input: {} }] },
-      {
-        role: 'user',
-        content: [{ type: 'tool_result', tool_use_id: 'i1', content: `${COLLAPSED_MARKER}\nRun inspect_page again.` }],
-      },
-    ]);
-    const params = buildRequestParams(makeConfig(), history);
-    const contents = params.messages.map(
-      (message) => message.content as Array<{ cache_control?: unknown }>,
-    );
-    expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
-    expect(contents.flat().filter((block) => block.cache_control !== undefined)).toHaveLength(1);
   });
 
   it('marks the v3 browser-result collapse frontier without mutating full history', () => {
