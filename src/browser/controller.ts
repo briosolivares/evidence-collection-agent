@@ -62,12 +62,14 @@ export interface BrowserDownloadResult {
   suggestedFilename?: string;
 }
 
-/** A browser-native download source: an observed page ref or verified URL.
- * `pageId` names which page to act on — the page the ref was observed on,
- * or the page whose context frames a direct URL fetch (a temporary page
- * still performs the actual capture regardless); omitted means the
- * selected page. */
-export type BrowserDownloadTarget = { pageId?: string } & ({ ref: string } | { url: string });
+/** A browser-native download source: a verified URL, a v3 accessibility
+ * backend node, or a temporary legacy observation ref. `pageId` names which
+ * page to act on; omitted means the selected task page. */
+export type BrowserDownloadTarget = { pageId?: string } & (
+  | { backendNodeId: number }
+  | { ref: string }
+  | { url: string }
+);
 
 /** How to answer one pending JavaScript dialog. */
 export interface HandleDialogRequest {
@@ -259,13 +261,13 @@ export interface BrowserController {
   /**
    * Capture a resource through Chrome's page network stack.
    *
-   * HTTP(S) refs and URLs are opened in a temporary page so the acted-on page
-   * remains unchanged; the main navigation response or resulting browser
-   * download is captured exactly. Refs without an HTTP(S) href are clicked on
-   * the target page and must trigger a browser download event.
+   * HTTP(S) element hrefs and URLs are opened in a temporary page so the
+   * acted-on page remains unchanged; the main navigation response or browser
+   * download is captured exactly. Elements without an HTTP(S) href are
+   * clicked on the target page and must trigger a browser download event.
    *
-   * @param target - an inspected page ref or an absolute HTTP(S) URL, plus an
-   *   optional `pageId`; omitted means the selected page
+   * @param target - an accessibility backend node or absolute HTTP(S) URL,
+   *   plus an optional `pageId`; omitted means the selected page
    * @returns exact bytes plus the final URL and available response metadata
    */
   download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult>;

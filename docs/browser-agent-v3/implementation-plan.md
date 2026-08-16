@@ -874,6 +874,101 @@ proved, even if supporting code already exists.
   real crash/resume gate passes 132 tests; `npm run typecheck` and
   `git diff --check` pass.
 
+### 2026-08-15 — final parity audit (open before acceptance)
+
+- The semantic deletion pass found two browser capabilities that are still
+  implemented below the controller but are not reachable through the v3
+  worker surface: remote-safe file upload, and click/blob download capture.
+  `browser_execute` currently exposes neither upload nor a parent helper;
+  `publish_artifact`'s `ref` mode expects a retired observation ref that the
+  v3 worker cannot produce. These are acceptance blockers, not documentation
+  exceptions.
+- A direct runner probe also confirmed that `await import('./helper.mjs')`
+  resolves relative to the static child module, not `scratch/workspace/`; the
+  promised run-local helper import needs an explicit confined loader and test.
+  The audit is still checking whether verified helper proposals are
+  distinguishable in the TUI. Do not delete retained upload/download provider
+  strategies until the v3 replacement seams and fixture tests land.
+
+### 2026-08-15 — verified helper proposals separated in the TUI
+
+- The completed-run artifact summary now keeps
+  `artifacts/helper-proposals/**` in a distinct final group and labels it
+  `Verified helper proposals`, even if a task explicitly requested the patch.
+  Requested outputs and ordinary evidence retain their relative publish order.
+- Live and incomplete/cancelled artifact surfaces deliberately do not use the
+  verified label: the files remain visible evidence candidates, but only a
+  verified run makes them review-ready proposals.
+- Focused reducer and Ink gates pass: 2 files / 97 tests. Run-local import and
+  the browser upload/download parity work remain open before the full editable
+  helper lifecycle is complete.
+
+### 2026-08-15 — orphan content-reader and adapter island removed
+
+- Deleted the unreachable OCR, PDF, and spreadsheet reader registries and
+  retained only the byte-based `detectContentFormat` helper used by the v3
+  worker/verifier. Removed `exceljs`, `pdfjs-dist`, and `tesseract.js`, dropping
+  111 installed transitive packages.
+- Removed additional proven-dead adapters and aliases: the old local-execution
+  preflight shell, artifact completion-status mutator, legacy budget wrapper,
+  cycle-start transcript type, URL formatter, file-tool bundle alias, and
+  unused contract/verifier type aliases. The secret environment denylist moved
+  intact beside the v3 tools that consume it.
+- Structural delta: 47 additions / 1,691 deletions in production+test code
+  (net -1,644), plus 1,342 package/lock lines removed (overall net -2,986).
+  Focused gate: 10 files / 134 tests; typecheck, dependency tree, npm audit,
+  stale-symbol/import scan, and diff check all pass. Commit `41222a6`.
+- A follow-up import audit removed four more zero-caller dependencies:
+  `@date-fns/tz`, `csv-stringify`, `ink-select-input`, and
+  `@opentelemetry/sdk-node`. That dropped another 58 installed packages and
+  730 net package/lock lines; `npm ls --depth=0`, typecheck, npm audit, and
+  diff check pass. Commit `f801205`.
+
+### 2026-08-15 — protected run-local helpers and upload parity complete
+
+- Added `browser.importModule(workspacePath)` for bounded, entry-confined
+  run-local modules and `browser.upload(backendDOMNodeId, workspacePath)` over
+  strict host IPC. Upload paths are confined to `scratch/workspace`, validated
+  as no-follow regular files with a 64 MiB ceiling, then encoded through the
+  provider strategy so Browserbase receives bytes rather than local paths.
+- Upload targets the exact page/backend node through the pinned command
+  session, cleans its temporary marker/object, and exposes no CDP URL or
+  provider authority. IPC is bounded to 32 calls / 8 pending / 4 KiB paths.
+  A timed-out child cannot orphan an upload: the session drains in-flight
+  uploads before detach/refresh and the shared exclusive busy ledger fences
+  later work until the real effect settles.
+- Gates: helper/tool/prompt 40/40, command session 12/12, local review gate
+  52/52, real Chrome import+upload journey, typecheck, and diff check pass.
+  Live Browserbase remains intentionally unrun; its byte encoder is covered by
+  a fake. Commit `d83f2cd`.
+- The real-browser gate exposed a pre-existing raw-target delivery race:
+  `Target.createTarget` could answer just before Playwright published its Page.
+  Registration now waits within a bounded 2-second poll window. The complete
+  three-test browser_execute journey passed three consecutive serial reruns;
+  typecheck and diff check pass. Commit `83e7e39`.
+- Residual documented limits: entry validation closes its descriptor before
+  Node import/Playwright consumption, leaving a narrow same-user TOCTOU window;
+  nested imports use normal Node resolution and are not recursively confined.
+  This runtime is explicitly not an OS security boundary.
+
+### 2026-08-15 — backend-node download parity complete
+
+- Replaced `publish_artifact`'s unreachable legacy observation-ref input with
+  `backend_node_id`, the exact integer identity returned by the v3
+  accessibility helper. Direct HTTP(S) URL capture remains available.
+- Upload and download now share one exact backend-node-to-locator primitive.
+  It resolves through the target-pinned CDP session, installs a unique
+  temporary marker across frames, releases the remote object, and removes the
+  marker on every exit path. Generated/blob controls are clicked with the
+  provider-injected download reader, so local file reads and Browserbase byte
+  retrieval retain the same controller boundary.
+- The real Chrome vertical journey navigates through an authenticated fixture,
+  obtains the button's backend node via `browser_execute`, publishes its exact
+  generated bytes with both manifest roles and browser-derived provenance, and
+  proves marker cleanup. Unit/session gates pass 32/32, the serial real-browser
+  gate passes 4/4, typecheck and diff check pass. Live Browserbase remains
+  intentionally unrun.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

@@ -60,7 +60,7 @@ const MODE_FIELDS = [
   'page_id',
   'full_page',
   'url',
-  'ref',
+  'backend_node_id',
 ] as const;
 
 type ModeField = (typeof MODE_FIELDS)[number];
@@ -107,18 +107,22 @@ export const publishArtifactInputSchema = z
     url: httpUrlSchema
       .optional()
       .describe('Download mode: direct HTTP(S) resource URL.'),
-    ref: z
-      .string()
+    backend_node_id: z
+      .number()
+      .int()
       .min(1)
+      .max(2_147_483_647)
       .optional()
-      .describe('Download mode: observed browser download ref.'),
+      .describe(
+        'Download mode: accessibility backend DOM node id for a link or control.',
+      ),
   })
   .superRefine((input, ctx) => {
     const allowedByMode: Record<typeof input.kind, readonly ModeField[]> = {
       file: ['source_path'],
       text: ['content'],
       screenshot: ['page_id', 'full_page'],
-      download: ['page_id', 'url', 'ref'],
+      download: ['page_id', 'url', 'backend_node_id'],
     };
 
     for (const field of MODE_FIELDS) {
@@ -150,12 +154,13 @@ export const publishArtifactInputSchema = z
     }
     if (
       input.kind === 'download' &&
-      (input.url === undefined) === (input.ref === undefined)
+      (input.url === undefined) === (input.backend_node_id === undefined)
     ) {
       ctx.addIssue({
         code: 'custom',
         path: ['url'],
-        message: 'download mode requires exactly one of url or ref',
+        message:
+          'download mode requires exactly one of url or backend_node_id',
       });
     }
     if (
@@ -233,7 +238,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
         const initiatingPageUrl = browser.currentUrl(input.page_id);
         const response = await abortable(
           browser.download(
-            input.ref === undefined
+            input.backend_node_id === undefined
               ? {
                   url: input.url!,
                   ...(input.page_id === undefined
@@ -241,7 +246,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
                     : { pageId: input.page_id }),
                 }
               : {
-                  ref: input.ref,
+                  backendNodeId: input.backend_node_id,
                   ...(input.page_id === undefined
                     ? {}
                     : { pageId: input.page_id }),

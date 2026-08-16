@@ -1,8 +1,7 @@
-import { randomUUID } from 'node:crypto';
-
 import type { BrowserContext, CDPSession, Page } from 'playwright';
 
 import type { BrowserCommandSession } from './controller.js';
+import { withBackendNodeLocator } from './backendNodeTarget.js';
 import {
   localUploadEncoder,
   type BrowserUploadEncoder,
@@ -13,7 +12,6 @@ import {
 const TRANSPORT_URL = /\b(?:https?|wss?):\/\/[^\s"'<>]+/giu;
 const DETACH_DEADLINE_MS = 1_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
-const UPLOAD_MARKER_ATTRIBUTE = 'data-sherlock-upload-target';
 
 type ArbitraryCdpSend = (
   method: string,
@@ -45,20 +43,6 @@ export interface PlaywrightCommandSessionHooks {
   release?: (detach: () => Promise<void>) => Promise<void>;
 }
 
-function runtimeException(response: unknown): string | undefined {
-  const details = (response as { exceptionDetails?: unknown })?.exceptionDetails;
-  if (details === undefined) return undefined;
-  const record = details as {
-    text?: unknown;
-    exception?: { description?: unknown; value?: unknown };
-  };
-  if (typeof record.exception?.description === 'string') {
-    return record.exception.description;
-  }
-  if (record.exception?.value !== undefined) return String(record.exception.value);
-  return typeof record.text === 'string' ? record.text : 'browser upload marker failed';
-}
-
 async function uploadToBackendNode(
   page: Page,
   send: ArbitraryCdpSend,
@@ -69,65 +53,16 @@ async function uploadToBackendNode(
   // Encode/read before touching the page. A missing or unreadable file must
   // fail before even the temporary marker becomes observable in the document.
   const encoded = await uploadEncoder.encode([absolutePath]);
-  const resolved = (await send('DOM.resolveNode', { backendNodeId: backendDOMNodeId })) as {
-    object?: { objectId?: unknown };
-  };
-  const objectId = resolved.object?.objectId;
-  if (typeof objectId !== 'string' || objectId.length === 0) {
-    throw new Error(`DOM.resolveNode returned no object for backend node ${backendDOMNodeId}`);
-  }
-
-  const marker = randomUUID();
-  try {
-    const marked = await send('Runtime.callFunctionOn', {
-      objectId,
-      functionDeclaration: `function(attribute, marker) {
-        if (!(this instanceof HTMLInputElement) || this.type !== 'file') {
-          throw new TypeError('browser.upload target must be an input[type=file]');
-        }
-        this.setAttribute(attribute, marker);
-      }`,
-      arguments: [
-        { value: UPLOAD_MARKER_ATTRIBUTE },
-        { value: marker },
-      ],
-      returnByValue: true,
-    });
-    const markerError = runtimeException(marked);
-    if (markerError !== undefined) throw new Error(markerError);
-
-    const selector = `[${UPLOAD_MARKER_ATTRIBUTE}="${marker}"]`;
-    let target: ReturnType<Page['locator']> | undefined;
-    for (const frame of page.frames()) {
-      const candidate = frame.locator(selector);
-      const count = await candidate.count();
-      if (count === 0) continue;
-      if (count !== 1 || target !== undefined) {
-        throw new Error('browser.upload temporary target marker was not unique');
-      }
-      target = candidate;
-    }
-    if (target === undefined) {
-      throw new Error('browser.upload target disappeared before the file could be attached');
+  await withBackendNodeLocator(page, send, backendDOMNodeId, async (target) => {
+    const isFileInput = await target.evaluate(
+      (element) =>
+        element instanceof HTMLInputElement && element.type === 'file',
+    );
+    if (!isFileInput) {
+      throw new TypeError('browser.upload target must be an input[type=file]');
     }
     await target.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
-  } finally {
-    // Marker/object cleanup is best-effort because navigation can destroy the
-    // execution context after a successful input event. Both cleanup actions
-    // are still attempted on every path and never replace the primary result.
-    await send('Runtime.callFunctionOn', {
-      objectId,
-      functionDeclaration: `function(attribute, marker) {
-        if (this.getAttribute?.(attribute) === marker) this.removeAttribute(attribute);
-      }`,
-      arguments: [
-        { value: UPLOAD_MARKER_ATTRIBUTE },
-        { value: marker },
-      ],
-      returnByValue: true,
-    }).catch(() => undefined);
-    await send('Runtime.releaseObject', { objectId }).catch(() => undefined);
-  }
+  });
 }
 
 function errorText(error: unknown): string {

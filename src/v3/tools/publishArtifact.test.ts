@@ -137,7 +137,19 @@ describe('publish_artifact schema', () => {
         artifact_path: 'artifacts/a.bin',
         roles: ['evidence'],
         url: 'https://example.test/a',
-        ref: 'ref-1',
+        backend_node_id: 73,
+      },
+      {
+        kind: 'download',
+        artifact_path: 'artifacts/a.bin',
+        roles: ['evidence'],
+        backend_node_id: 0,
+      },
+      {
+        kind: 'download',
+        artifact_path: 'artifacts/a.bin',
+        roles: ['evidence'],
+        backend_node_id: 1.5,
       },
       {
         kind: 'text',
@@ -350,7 +362,7 @@ describe('publish_artifact browser modes', () => {
     });
   });
 
-  it('downloads exact bytes by URL or ref and records final/initiating provenance', async () => {
+  it('downloads exact bytes by URL or backend node and records final/initiating provenance', async () => {
     const directBytes = Buffer.from([0, 255, 7, 8]);
     const direct = fakeBrowser({ downloadBytes: directBytes });
     const directEntry = await successfulCall(
@@ -378,11 +390,11 @@ describe('publish_artifact browser modes', () => {
         kind: 'download',
         artifact_path: 'artifacts/generated.bin',
         roles: ['evidence'],
-        ref: 'ref-download',
+        backend_node_id: 73,
       },
       { browser: generated.browser },
     );
-    expect(generated.download).toHaveBeenCalledWith({ ref: 'ref-download' });
+    expect(generated.download).toHaveBeenCalledWith({ backendNodeId: 73 });
     expect(generatedEntry.sourceUrl).toBe(
       'https://source.example.test/report',
     );

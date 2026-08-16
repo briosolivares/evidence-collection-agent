@@ -12,7 +12,6 @@ import type { BrowserContext, Download, Locator, Page, Response } from 'playwrig
 
 import type { BrowserDownloadResult } from './controller.js';
 import type { BrowserDownloadReader } from './downloadReader.js';
-import { normalizeRefActionError } from './pageElementRefs.js';
 import { delay, isHttpUrl } from './playwrightBrowserController.js';
 
 const DOWNLOAD_EVENT_TIMEOUT_MS = 5_000;
@@ -109,7 +108,7 @@ export async function captureUrlThroughChrome(
 
 export async function captureClickDownload(
   locator: Locator,
-  ref: string,
+  targetDescription: string,
   page: Page,
   downloadReader: BrowserDownloadReader,
 ): Promise<BrowserDownloadResult> {
@@ -125,11 +124,15 @@ export async function captureClickDownload(
     return await readBrowserDownload(await downloadPromise, downloadReader);
   } catch (error) {
     if (!clickCompleted) {
-      throw await normalizeRefActionError(locator, ref, error);
+      // Deliberately do not retain Playwright's error: a remote-driver error
+      // may include its session-control URL. The caller already resolved one
+      // exact node; a failed click is reported without unsafe metadata.
+      void error;
+      throw new Error(`${targetDescription} could not be clicked for download.`);
     }
     throw new Error(
-      `Browser ref ${ref} has no HTTP(S) href and did not start a browser download. ` +
-        'Observe the page again and choose a download link or control, or pass a verified direct URL.',
+      `${targetDescription} has no HTTP(S) href and did not start a browser download. ` +
+        'Inspect the page again and choose a download link or control, or pass a verified direct URL.',
     );
   }
 }

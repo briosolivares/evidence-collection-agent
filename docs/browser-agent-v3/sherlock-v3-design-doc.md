@@ -517,9 +517,9 @@ Mode fields:
 - `text`: `content` is encoded UTF-8 and written through `writeArtifact`.
 - `screenshot`: optional `page_id` and `full_page`; bytes and current URL come
   from `BrowserController`.
-- `download`: exactly one of `url` or an observed browser `ref`, plus optional
-  `page_id`; the provider-specific download strategy returns bytes and source
-  metadata.
+- `download`: exactly one of `url` or an accessibility
+  `backend_node_id`, plus optional `page_id`; the provider-specific download
+  strategy returns bytes and source metadata.
 
 The result returns the manifest entry. Overwriting an artifact is allowed only
 when the path already has the same semantic role set; otherwise the call fails

@@ -210,7 +210,7 @@ describe('browser_execute real-browser journey', () => {
             name: file?.name ?? null,
             text: file ? await file.text() : null,
             visible: document.querySelector('#attachment')?.textContent ?? null,
-            markerCount: document.querySelectorAll('[data-sherlock-upload-target]').length
+            markerCount: document.querySelectorAll('[data-sherlock-backend-target]').length
           };
         })()\`);
       `;

@@ -271,6 +271,7 @@ describe('command-session transport boundary', () => {
     const setInputFiles = vi.fn(async () => undefined);
     const locator = {
       count: vi.fn(async () => 1),
+      evaluate: vi.fn(async () => true),
       setInputFiles,
     };
     const page = {
@@ -347,6 +348,7 @@ describe('command-session transport boundary', () => {
         {
           locator: vi.fn(() => ({
             count: vi.fn(async () => 1),
+            evaluate: vi.fn(async () => true),
             setInputFiles,
           })),
         },

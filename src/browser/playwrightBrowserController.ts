@@ -82,6 +82,7 @@ import {
 } from './pageElementRefs.js';
 import { evaluateJavaScript } from './pageJavaScript.js';
 import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
+import { withBackendNodeLocator } from './backendNodeTarget.js';
 import { openPlaywrightCommandSession } from './browserCommandSession.js';
 import {
   ChromiumTargetControlError,
@@ -577,6 +578,44 @@ export class PlaywrightBrowserController implements BrowserController {
       return this.captureUrlThroughChrome(target.url, page);
     }
 
+    if ('backendNodeId' in target) {
+      const commandSession = await this.openCommandSession(target.pageId);
+      try {
+        return await withBackendNodeLocator(
+          page,
+          (method, params) => commandSession.send(method, params),
+          target.backendNodeId,
+          async (locator) => {
+            let href: string | null;
+            try {
+              href = await locator.evaluate((element) => {
+                const value = element.getAttribute('href');
+                return value === null
+                  ? null
+                  : new URL(value, element.ownerDocument.baseURI).href;
+              });
+            } catch {
+              throw new Error(
+                `Browser backend node ${target.backendNodeId} could not be inspected for download.`,
+              );
+            }
+
+            if (href !== null && isHttpUrl(href)) {
+              return this.captureUrlThroughChrome(href, page);
+            }
+            return captureClickDownload(
+              locator,
+              `Browser backend node ${target.backendNodeId}`,
+              page,
+              this.downloadReader,
+            );
+          },
+        );
+      } finally {
+        await commandSession.close();
+      }
+    }
+
     const locator = await locatorForRef(page, target.ref);
     let href: string | null;
     try {
@@ -592,7 +631,12 @@ export class PlaywrightBrowserController implements BrowserController {
       return this.captureUrlThroughChrome(href, page);
     }
 
-    return captureClickDownload(locator, target.ref, page, this.downloadReader);
+    return captureClickDownload(
+      locator,
+      `Browser ref ${target.ref}`,
+      page,
+      this.downloadReader,
+    );
   }
 
   /** Capture a download reached by navigating a throwaway page straight to
