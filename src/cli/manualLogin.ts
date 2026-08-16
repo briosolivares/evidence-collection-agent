@@ -15,48 +15,7 @@
 // This module resolves the binary and builds the argv; `login.ts` spawns
 // it and owns the terminal.
 
-import { existsSync } from 'node:fs';
-
-/** Where a real Chrome lives, per platform, when nothing overrides it.
- * Ordered most- to least-preferred; the first that exists wins. */
-const DEFAULT_CHROME_PATHS: Readonly<Record<string, readonly string[]>> = {
-  darwin: [
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-  ],
-  linux: [
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-  ],
-  win32: [
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-  ],
-};
-
-/**
- * Locate a Chrome binary to launch by hand.
- *
- * Deliberately NOT Playwright's bundled browser: this launch exists to be
- * indistinguishable from a human's own Chrome, and a downloaded Chromium
- * build is one of the things Google's sign-in checks notice.
- *
- * @param override - an explicit path (SHERLOCK_CHROME_PATH), used as-is
- * @param platform - process.platform
- * @param exists - existence probe, injected for tests
- * @returns the binary path, or undefined when none of the known
- *   locations holds one
- */
-export function resolveRealChromePath(
-  override: string | undefined,
-  platform: string = process.platform,
-  exists: (path: string) => boolean = existsSync,
-): string | undefined {
-  if (override !== undefined && override !== '') return override;
-  return (DEFAULT_CHROME_PATHS[platform] ?? []).find((candidate) => exists(candidate));
-}
+export { resolveRealChromePath } from '../browser/localChromeExecutable.js';
 
 /**
  * Argv for the manual sign-in launch.

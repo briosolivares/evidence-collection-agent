@@ -61,6 +61,22 @@ describe('TUI browser lifecycle', () => {
     expect(createSession).not.toHaveBeenCalled();
   });
 
+  it('owns and closes a pre-attached controller even when no run starts', async () => {
+    const initialBrowser = stubBrowser();
+    const createSession = vi.fn(async () => stubBrowser());
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      initialBrowser,
+      startRunFn: () => makeHandle(),
+    });
+
+    await runtime.start();
+    await runtime.shutdown();
+
+    expect(createSession).not.toHaveBeenCalled();
+    expect(initialBrowser.close).toHaveBeenCalledOnce();
+  });
+
   it('emits browser_session once for a controller carrying diagnostics, and never for one without', async () => {
     const remoteController: BrowserController = {
       ...stubBrowser(),

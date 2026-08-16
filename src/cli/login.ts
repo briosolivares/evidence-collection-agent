@@ -96,7 +96,12 @@ const provider = selectedProvider();
 const checkOnly = process.argv.includes('--check');
 const manual = process.argv.includes('--manual');
 
-console.log(describeBrowserProvider({ profileDir: paths.profileDir }));
+console.log(
+  describeBrowserProvider({
+    profileDir: paths.profileDir,
+    localMode: 'managed',
+  }),
+);
 console.log('(the exact place authenticated eval trials use — logins anywhere else do not count)');
 
 /** Probe every headed-lane service against an open context, printing one

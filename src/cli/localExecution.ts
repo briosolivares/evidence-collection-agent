@@ -13,6 +13,7 @@
 import { accessSync, constants as fsConstants, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from '../browser/browserEnvironment.js';
 import { SCRATCH_DIR } from '../run/artifacts.js';
 
 /**
@@ -44,6 +45,9 @@ export const BASH_SECRET_ENV_DENYLIST: readonly string[] = [
   // needs it: the browser is reached through the controller, not from the
   // workspace.
   'BROWSERBASE_API_KEY',
+  // The optional attached-local endpoint is equally a browser-control
+  // capability. Only provider composition may consume it.
+  ATTACHED_CHROME_ENDPOINT_ENV_VAR,
 ];
 
 /** The shell `bash` invokes. Fixed rather than configurable until a concrete

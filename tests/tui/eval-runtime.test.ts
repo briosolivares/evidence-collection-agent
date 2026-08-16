@@ -19,7 +19,7 @@ function evalOptions(headed: boolean) {
 }
 
 describe('createTuiEvalRuntime', () => {
-  it('uses isolated browsers for normal trials and delegates headed trials', async () => {
+  it('uses explicit managed eval browsers for both normal and headed local trials', async () => {
     const browser = stubBrowser();
     const policies: boolean[] = [];
     const browserRuntime: EvalBrowserRuntime = {
@@ -54,10 +54,38 @@ describe('createTuiEvalRuntime', () => {
     await runtime.startRun('auth task', () => {}, evalOptions(true)).done;
     await runtime.close();
 
-    expect(policies).toEqual([false]);
+    expect(policies).toEqual([false, true]);
     expect(seenDeps[0]).toMatchObject({ browser, runsBaseDir: '/runs' });
-    expect(authenticatedRunner).toHaveBeenCalledTimes(1);
+    expect(seenDeps[1]).toMatchObject({
+      browser,
+      runsBaseDir: '/runs',
+      authenticated: true,
+      javascriptPolicy: 'allow',
+    });
+    expect(authenticatedRunner).not.toHaveBeenCalled();
     expect(browserRuntime.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps Browserbase headed trials on the existing remote interactive session', async () => {
+    const browserRuntime: EvalBrowserRuntime = {
+      provider: 'browserbase',
+      withBrowser: vi.fn(async (_headed, operation) => operation(stubBrowser())),
+      close: vi.fn(async () => undefined),
+    };
+    const authenticatedRunner = vi.fn(() => ({
+      cancel: vi.fn(),
+      done: Promise.resolve({ status: 'verified', finalText: '', runDir: '/runs/auth' } as const),
+    }));
+    const runtime = createTuiEvalRuntime({
+      authenticatedRunner,
+      authenticatedProfileDir: '/persistent/profile',
+      browserRuntime,
+    });
+
+    await runtime.startRun('auth task', () => {}, evalOptions(true)).done;
+
+    expect(authenticatedRunner).toHaveBeenCalledOnce();
+    expect(browserRuntime.withBrowser).not.toHaveBeenCalled();
   });
 
   it('forwards the dialog resolver to headed trials only — headless trials stay unassisted', async () => {
@@ -91,15 +119,14 @@ describe('createTuiEvalRuntime', () => {
     await runtime.startRun('normal task', () => {}, { ...evalOptions(false), requestPermission })
       .done;
 
-    // Headed: the resolver rides through to the persistent-session runner.
-    expect(authenticatedRunner).toHaveBeenCalledWith(
-      'auth task',
-      expect.any(Function),
-      expect.objectContaining({ requestPermission }),
-    );
+    // Headed: the resolver reaches the managed persistent-profile run.
+    expect(seenDeps[0]).toHaveProperty('requestPermission', requestPermission);
+    expect(seenDeps[0]).toMatchObject({ authenticated: true, javascriptPolicy: 'allow' });
+    expect(authenticatedRunner).not.toHaveBeenCalled();
     // Headless: deliberately withheld — interactive tools fail closed,
     // keeping this lane's scores comparable to CLI batches.
-    expect(seenDeps[0]).not.toHaveProperty('requestPermission');
+    expect(seenDeps[1]).not.toHaveProperty('requestPermission');
+    expect(seenDeps[1]).toMatchObject({ authenticated: false, javascriptPolicy: 'allow' });
   });
 
   it('cancels a normal run whose browser is still being acquired', async () => {

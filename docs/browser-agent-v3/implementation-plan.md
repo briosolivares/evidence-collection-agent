@@ -750,6 +750,38 @@ proved, even if supporting code already exists.
   This keeps behavior changes reviewable independently from the legacy SLOC
   reduction.
 
+### 2026-08-15 — binding §7.1 attached-local cutover ready
+
+- `SHERLOCK_BROWSER_PROVIDER` remains the sole local-versus-Browserbase
+  switch. Provider composition now requires an explicit local mode:
+  interactive `sherlock` chooses `attached`; the REPL, demos, login, and all
+  local eval/test adapters choose or directly construct `managed` Chrome.
+  Local TUI evals lease the managed eval runtime even though interactive runs
+  use attached Chrome; Browserbase headed-session reuse is unchanged.
+- Attached setup probes the optional loopback-only
+  `SHERLOCK_CHROME_CDP_ENDPOINT`, then Chrome stable's bounded
+  `DevToolsActivePort` discovery. A missing or stale endpoint opens
+  `chrome://inspect/#remote-debugging`, names the exact control to enable, and
+  waits for the human under finite setup, port-probe, and connection budgets.
+  Sherlock never clicks the permission prompt.
+- Local attachment completes before Ink renders and the TUI runtime owns that
+  controller even when no task starts. The attached provider uses Playwright's
+  `noDefaults` mode, snapshots all existing pages, creates no setup page, and
+  disconnects without closing user Chrome. Endpoint values are redacted from
+  setup/errors/diagnostics and stripped from both legacy and v3 child-process
+  environments.
+- Focused gate: 151/151 tests passed across attached setup/provider,
+  composition, manual-Chrome resolution, legacy/v3 environment redaction,
+  eval-browser policy, and TUI browser lifecycle. `git diff --check` passed.
+  The last global `npm run typecheck` before the coordinator's concurrent
+  Step 6 legacy deletions was green; current global diagnostics are confined
+  to that in-progress `contractAuthor` removal, not this slice.
+- Deliberately unexercised external UX: no test attached to or opened the
+  developer's real daily Chrome. Automatic discovery currently targets the
+  stable default Chrome profile supported by Chrome 144+; another channel or
+  nonstandard profile uses the explicit loopback endpoint escape hatch. No
+  live Browserbase smoke or eval re-baseline ran.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

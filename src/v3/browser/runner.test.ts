@@ -615,6 +615,7 @@ describe('runBrowserProgram', () => {
             ambient: process.env.V3_AMBIENT_ONLY ?? null,
             openai: process.env.OPENAI_API_KEY ?? null,
             browserbase: process.env.BROWSERBASE_API_KEY ?? null,
+            attached: process.env.SHERLOCK_CHROME_CDP_ENDPOINT ?? null,
             nodeOptions: process.env.NODE_OPTIONS ?? null,
             cdp: process.env.CDP_URL ?? null
           };`,
@@ -623,6 +624,8 @@ describe('runBrowserProgram', () => {
               SAFE_SETTING: 'visible',
               OPENAI_API_KEY: 'openai-secret',
               BROWSERBASE_API_KEY: 'browserbase-secret',
+              SHERLOCK_CHROME_CDP_ENDPOINT:
+                'ws://127.0.0.1:61545/devtools/browser/attached-capability',
               NODE_OPTIONS: '--inspect=127.0.0.1:9333',
               CDP_URL: 'wss://secret.example/devtools/browser/capability',
             },
@@ -637,6 +640,7 @@ describe('runBrowserProgram', () => {
           ambient: null,
           openai: null,
           browserbase: null,
+          attached: null,
           nodeOptions: null,
           cdp: null,
         },

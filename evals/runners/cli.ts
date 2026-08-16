@@ -58,7 +58,7 @@ async function main(): Promise<void> {
   if (requirements.length > 0 && !args.skipLoginCheck) {
     console.log(
       `login preflight: ${requirements.map((req) => req.id).join(', ')} ` +
-        `(${describeBrowserProvider({ profileDir: PROFILE_DIR })})`,
+        `(${describeBrowserProvider({ profileDir: PROFILE_DIR, localMode: 'managed' })})`,
     );
     const statuses = await checkProfileLogins({
       profileDir: PROFILE_DIR,

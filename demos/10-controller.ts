@@ -10,8 +10,9 @@ import { createBrowserSessionProvider, describeBrowserProvider } from '../src/br
 const DEMO_WINDOW_MS = 5_000;
 const PROFILE_DIR = resolve('chrome-profile');
 
-console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR, localMode: 'managed' }));
 const browserSessionProvider = createBrowserSessionProvider({
+  localMode: 'managed',
   profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();

@@ -1,6 +1,6 @@
-// Session-long wiring: one persistent browser launched lazily on the first
-// interactive/authenticated run, handed to later persistent-profile runs,
-// and closed at TUI teardown. If the
+// Session-long wiring: one browser, either supplied after a visible pre-render
+// attached-Chrome setup or launched lazily on the first interactive run,
+// handed to later runs and closed at TUI teardown. If the
 // browser dies mid-session (window closed, process killed), the failure
 // is classified and the next submit relaunches a fresh browser instead of
 // failing every subsequent run.
@@ -22,6 +22,9 @@ export { isBrowserDeathMessage } from './browserDeath.js';
 export interface TuiRuntimeDeps {
   /** Creates session browsers (production: local persistent Chrome). */
   browserSessionProvider: BrowserSessionProvider;
+  /** An already attached controller whose first-use setup completed before
+   * Ink claimed the terminal. The runtime immediately owns its teardown. */
+  initialBrowser?: BrowserController;
   runsBaseDir?: string;
   /** Test seam: replaces the run-session bridge. */
   startRunFn?: (task: string, deps: RunSessionDeps) => RunHandle;
@@ -63,7 +66,7 @@ export interface TuiRuntime {
 export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
   const now = deps.now ?? Date.now;
-  let browser: BrowserController | undefined;
+  let browser: BrowserController | undefined = deps.initialBrowser;
   let started = false;
   let browserDead = false;
 

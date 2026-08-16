@@ -35,9 +35,10 @@ if (!process.env.ANTHROPIC_API_KEY) {
 
 console.log(`task:        ${task}`);
 console.log(`start URL:   ${START_URL}`);
-console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR, localMode: 'managed' }));
 
 const browserSessionProvider = createBrowserSessionProvider({
+  localMode: 'managed',
   profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();

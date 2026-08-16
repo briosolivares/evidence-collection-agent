@@ -9,7 +9,9 @@ import type { EvalRunner } from './evalSession.js';
 import { startRun, type RunHandle, type RunSessionDeps } from './runSession.js';
 
 export interface TuiEvalRuntimeDeps {
-  /** Reuses Sherlock's lazy persistent headed controller for headed trials. */
+  /** Browserbase keeps reusing Sherlock's remote interactive session for
+   * headed trials. Local trials never use this callback: they lease the
+   * explicitly managed eval profile instead of touching attached Chrome. */
   authenticatedRunner: (
     task: string,
     onEvent: (event: UiEvent) => void,
@@ -41,10 +43,10 @@ export interface TuiEvalRuntime {
 /**
  * Browser-policy adapter used only by /evals.
  *
- * Provider-neutral by construction: headed trials reuse Sherlock's own session
- * runtime, which main.tsx already built from the selected provider, and the
- * isolated lane delegates to `createEvalBrowserRuntime`, which selects the
- * provider itself. Nothing here needs to know whether the browsers are local.
+ * Normal trials always use the eval runtime's isolated lane. Headed local
+ * trials use that runtime's managed persistent profile as well — never the
+ * TUI's attached daily browser. Browserbase keeps its existing remote-session
+ * reuse because there is no local ambient browser to protect there.
  */
 export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
@@ -59,7 +61,7 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
 
   return {
     startRun(task, onEvent, opts) {
-      if (opts.headed) {
+      if (opts.headed && browserRuntime.provider === 'browserbase') {
         // Headed trials run in the user's visible persistent browser, so
         // the question dialog is live here (user ruling 2026-08-13:
         // always-on for headed TUI evals) — the user can answer questions
@@ -78,18 +80,22 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
       let inner: RunHandle | undefined;
       let cancelled = false;
       const done = browserRuntime
-        .withBrowser(false, async (browser) => {
-          // Deliberately no requestPermission: isolated trials run in a
-          // browser with nothing for a human to act in — headless locally, and
-          // in someone else's datacenter remotely — and are the lane whose
-          // scores stay comparable to CLI batches, so interactive tools fail
-          // closed here, same as the CLI runner.
+        .withBrowser(opts.headed, async (browser) => {
+          // Local headed trials remain visible and may ask the TUI's human,
+          // but they run against the managed authenticated eval profile.
+          // Normal trials deliberately receive no resolver and stay
+          // comparable to unattended CLI batches.
           inner = startRunFn(task, {
             browser,
             onEvent,
             ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
             ...(opts.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
+            ...(opts.headed && opts.requestPermission !== undefined
+              ? { requestPermission: opts.requestPermission }
+              : {}),
             ...deps.runConfig,
+            authenticated: opts.headed,
+            javascriptPolicy: deps.runConfig?.javascriptPolicy ?? 'allow',
           });
           if (cancelled) inner.cancel();
           return inner.done;

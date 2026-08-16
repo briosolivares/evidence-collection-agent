@@ -27,8 +27,9 @@ initManifest(runDir, 'demo: observe, act, and capture evidence on local fixtures
 
 const fixtureServer = await startFixtureServer();
 const PROFILE_DIR = resolve('chrome-profile');
-console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+console.log(describeBrowserProvider({ profileDir: PROFILE_DIR, localMode: 'managed' }));
 const browserSessionProvider = createBrowserSessionProvider({
+  localMode: 'managed',
   profileDir: PROFILE_DIR,
 });
 const browser = await browserSessionProvider.createSession();

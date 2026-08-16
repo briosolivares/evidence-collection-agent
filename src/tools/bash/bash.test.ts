@@ -200,6 +200,7 @@ describe('bash tool', () => {
         ANTHROPIC_API_KEY: 'sk-ant-test',
         GITHUB_TOKEN: 'ghp_test',
         BROWSERBASE_API_KEY: 'bb_test',
+        SHERLOCK_CHROME_CDP_ENDPOINT: 'http://127.0.0.1:9222/private',
       };
       for (const [name, value] of Object.entries(probes)) {
         process.env[name] = value;
@@ -212,13 +213,18 @@ describe('bash tool', () => {
             name: 'bash',
             input: {
               command:
-                'printf "%s\\n%s\\n%s" "${ANTHROPIC_API_KEY:-__unset__}" "${GITHUB_TOKEN:-__unset__}" "${BROWSERBASE_API_KEY:-__unset__}"',
+                'printf "%s\\n%s\\n%s\\n%s" "${ANTHROPIC_API_KEY:-__unset__}" "${GITHUB_TOKEN:-__unset__}" "${BROWSERBASE_API_KEY:-__unset__}" "${SHERLOCK_CHROME_CDP_ENDPOINT:-__unset__}"',
             },
           },
           { runDir },
         );
         const body = bodyOf(result.content);
-        expect(body.stdout.split('\n')).toEqual(['__unset__', '__unset__', '__unset__']);
+        expect(body.stdout.split('\n')).toEqual([
+          '__unset__',
+          '__unset__',
+          '__unset__',
+          '__unset__',
+        ]);
       } finally {
         for (const name of Object.keys(probes)) delete process.env[name];
       }

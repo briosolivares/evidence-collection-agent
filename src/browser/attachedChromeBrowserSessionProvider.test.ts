@@ -132,7 +132,7 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
   it.each([
     'not a URL',
     'https://127.0.0.1:9222',
-    'ws://127.0.0.1:9222/devtools/browser/secret',
+    'wss://127.0.0.1:9222/devtools/browser/secret',
     'http://example.com:9222',
   ])('rejects %s before attempting a connection and redacts it', (cdpEndpoint) => {
     const connectOverCDP = vi.fn(async () => fakeBrowser([]).browser);
@@ -149,8 +149,12 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
     expect(connectOverCDP).not.toHaveBeenCalled();
   });
 
-  it.each(['http://127.0.0.1:9222', 'http://localhost:9333/'])(
-    'connects to an accepted loopback HTTP endpoint unchanged: %s',
+  it.each([
+    'http://127.0.0.1:9222',
+    'http://localhost:9333/',
+    'ws://127.0.0.1:9222/devtools/browser/discovery-token',
+  ])(
+    'connects to an accepted loopback endpoint unchanged: %s',
     async (cdpEndpoint) => {
       const { context } = fakeContext();
       const { browser } = fakeBrowser([context]);
@@ -163,6 +167,22 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
       await attached.createSession();
 
       expect(connectOverCDP).toHaveBeenCalledExactlyOnceWith(cdpEndpoint);
+    },
+  );
+
+  it.each([0, -1, 1.5, Number.POSITIVE_INFINITY])(
+    'rejects an invalid connection timeout before connecting: %s',
+    (connectionTimeoutMs) => {
+      const connectOverCDP = vi.fn(async () => fakeBrowser([]).browser);
+      expect(
+        () =>
+          new AttachedChromeBrowserSessionProvider({
+            cdpEndpoint: ENDPOINT,
+            connectionTimeoutMs,
+            connectOverCDP,
+          }),
+      ).toThrow(/connectionTimeoutMs/);
+      expect(connectOverCDP).not.toHaveBeenCalled();
     },
   );
 

@@ -17,6 +17,10 @@ import {
   BrowserbaseBrowserSessionProvider,
   requireBrowserbaseApiKey,
 } from './browserbaseBrowserSessionProvider.js';
+import {
+  attachedChromeEndpoint,
+  AttachedChromeSetupBrowserSessionProvider,
+} from './attachedChromeSetup.js';
 import { LocalChromeBrowserSessionProvider } from './playwrightBrowserController.js';
 import type { BrowserProviderKind, BrowserSessionProvider } from './sessionProvider.js';
 
@@ -24,6 +28,16 @@ import type { BrowserProviderKind, BrowserSessionProvider } from './sessionProvi
 export const BROWSER_PROVIDER_ENV_VAR = 'SHERLOCK_BROWSER_PROVIDER';
 /** The environment variable holding the persistent Browserbase Context. */
 export const BROWSERBASE_CONTEXT_ENV_VAR = 'BROWSERBASE_CONTEXT_ID';
+
+/** How a local provider obtains Chrome. This never selects Browserbase. */
+export type LocalBrowserMode = 'attached' | 'managed';
+
+function requireLocalBrowserMode(value: LocalBrowserMode): LocalBrowserMode {
+  if (value !== 'attached' && value !== 'managed') {
+    throw new TypeError('localMode must be "attached" or "managed".');
+  }
+  return value;
+}
 
 /**
  * Which runtime this environment asks for.
@@ -59,9 +73,15 @@ export function browserbaseContextId(
 export interface BrowserProviderCompositionOptions {
   /** Environment to read; defaults to `process.env`. */
   env?: Record<string, string | undefined>;
-  /** Local-only: the persistent Chrome profile directory. Required because the
-   * local provider cannot be built without it, and a caller that omits it
-   * would only discover that after flipping the provider back to local. */
+  /**
+   * Required local authority decision. Interactive Sherlock chooses
+   * `attached`; tests, evals, login, demos, and other managed-profile callers
+   * choose `managed` so ambient Chrome is never touched accidentally.
+   */
+  localMode: LocalBrowserMode;
+  /** Local managed-only: the persistent Chrome profile directory. Kept
+   * required so switching a caller from attached or Browserbase to managed
+   * cannot fail later with a missing path. */
   profileDir: string;
   /** Local-only: Chrome/Chromium binary override. */
   executablePath?: string;
@@ -95,6 +115,9 @@ export interface BrowserProviderCompositionOptions {
   userMetadata?: Record<string, unknown>;
   /** Receives operator-facing warnings. */
   onWarning?: (message: string) => void;
+  /** Local attached-only: visible first-use setup state. Required at runtime
+   * because enabling and approving debugging is deliberately a human action. */
+  onAttachedSetupState?: (message: string) => void;
 }
 
 /**
@@ -111,7 +134,23 @@ export function createBrowserSessionProvider(
   options: BrowserProviderCompositionOptions,
 ): BrowserSessionProvider {
   const env = options.env ?? process.env;
+  const localMode = requireLocalBrowserMode(options.localMode);
   if (resolveBrowserProviderKind(env) === 'local') {
+    if (localMode === 'attached') {
+      if (options.onAttachedSetupState === undefined) {
+        throw new TypeError(
+          'Attached local browser mode requires an onAttachedSetupState callback.',
+        );
+      }
+      const explicitEndpoint = attachedChromeEndpoint(env);
+      return new AttachedChromeSetupBrowserSessionProvider({
+        ...(explicitEndpoint === undefined ? {} : { explicitEndpoint }),
+        ...(options.executablePath === undefined
+          ? {}
+          : { executablePath: options.executablePath }),
+        onSetupState: options.onAttachedSetupState,
+      });
+    }
     return new LocalChromeBrowserSessionProvider({
       profileDir: options.profileDir,
       ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
@@ -164,11 +203,15 @@ export function requireBrowserbaseContextId(
  */
 export function describeBrowserProvider(options: {
   env?: Record<string, string | undefined>;
+  localMode: LocalBrowserMode;
   profileDir: string;
 }): string {
   const env = options.env ?? process.env;
+  const localMode = requireLocalBrowserMode(options.localMode);
   if (resolveBrowserProviderKind(env) === 'local') {
-    return `browser: local Chrome, profile ${options.profileDir}`;
+    return localMode === 'attached'
+      ? 'browser: local Chrome, attached to the current user session'
+      : `browser: local Chrome, managed profile ${options.profileDir}`;
   }
   const contextId = browserbaseContextId(env);
   return (
@@ -182,28 +225,36 @@ export function describeBrowserProvider(options: {
 /**
  * Turn a session-startup failure into something the operator can act on.
  *
- * The local branch keeps the Chrome-install guidance that has been the useful
- * answer for that failure; the remote branch points at the configuration and
- * plan limits that actually produce remote failures. Neither ever prints a key
- * or a connection URL — `message` comes from an error this codebase raised, and
- * the provider is careful not to put either in one.
+ * Managed local mode keeps the Chrome-install guidance that has been useful;
+ * attached mode names the exact permission page, and the remote branch points
+ * at its real configuration limits. Neither ever prints a key or connection
+ * URL — `message` comes from an error this codebase raised, and the providers
+ * are careful not to put either in one.
  */
 export function formatBrowserStartupError(
   kind: BrowserProviderKind,
   message: string,
+  localMode: LocalBrowserMode,
 ): string {
+  const checkedLocalMode = requireLocalBrowserMode(localMode);
   const lines =
     kind === 'local'
-      ? [
-          'sherlock could not launch a local Chrome.',
-          ...(/not found|install|doesn'?t exist|does not exist/i.test(message)
-            ? [
-                'Google Chrome does not appear to be installed. Install it from ' +
-                  'https://www.google.com/chrome/ (or run `npx playwright install chrome`), ' +
-                  'or point SHERLOCK_CHROME_PATH at a Chrome/Chromium binary.',
-              ]
-            : []),
-        ]
+      ? checkedLocalMode === 'attached'
+        ? [
+            'sherlock could not attach to the current local Chrome.',
+            'Open chrome://inspect/#remote-debugging in Chrome and enable ' +
+              '“Allow remote debugging for this browser instance”.',
+          ]
+        : [
+            'sherlock could not launch a local Chrome.',
+            ...(/not found|install|doesn'?t exist|does not exist/i.test(message)
+              ? [
+                  'Google Chrome does not appear to be installed. Install it from ' +
+                    'https://www.google.com/chrome/ (or run `npx playwright install chrome`), ' +
+                    'or point SHERLOCK_CHROME_PATH at a Chrome/Chromium binary.',
+                ]
+              : []),
+          ]
       : [
           'sherlock could not start a Browserbase browser session.',
           'Check BROWSERBASE_API_KEY, and that your plan has a free concurrent session. ' +

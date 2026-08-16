@@ -61,11 +61,17 @@ const executablePath = chromeExecutablePath();
 let browserSessionProvider: BrowserSessionProvider;
 let browser: BrowserController;
 try {
-  console.log(describeBrowserProvider({ profileDir: PROFILE_DIR }));
+  console.log(
+    describeBrowserProvider({
+      profileDir: PROFILE_DIR,
+      localMode: 'managed',
+    }),
+  );
   console.log(`runs directory: ${RUNS_BASE_DIR}`);
   console.log('Type a task and press enter. Ctrl-C or Ctrl-D ends the session.');
 
   browserSessionProvider = createBrowserSessionProvider({
+    localMode: 'managed',
     profileDir: PROFILE_DIR,
     ...(executablePath === undefined ? {} : { executablePath }),
     // The REPL is an interactive, logged-in surface, exactly like the TUI's
@@ -81,6 +87,7 @@ try {
     formatBrowserStartupError(
       resolveBrowserProviderKindOrLocal(),
       error instanceof Error ? error.message : String(error),
+      'managed',
     ),
   );
   process.exit(1);
