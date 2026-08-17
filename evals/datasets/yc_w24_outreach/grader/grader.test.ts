@@ -61,17 +61,16 @@ describe('yc_w24_outreach grader', () => {
     expect(byName(results, 'rows represent exactly five companies and include every oracle-listed founder for each').passed).toBe(false);
   });
 
-  it('accepts an initials-style handle prefixing the name but rejects an unrelated slug', async () => {
-    const linkedinAssertion = 'every LinkedIn URL is a distinct plausible personal profile for its founder';
-    // "alia" carries the ≥3-char prefix "ali" of "alice" — the binw-for-Bing-Wu shape.
-    const truncated = passingCsv()
-      .replace('https://www.linkedin.com/in/alice-archer', 'https://www.linkedin.com/in/alia');
-    writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(truncated), { roles: ['requested_output'] });
+  it('accepts opaque personal handles but rejects duplicate profile URLs', async () => {
+    const linkedinAssertion = 'every LinkedIn URL is a distinct personal profile URL';
+    const opaque = passingCsv()
+      .replace('https://www.linkedin.com/in/alice-archer', 'https://www.linkedin.com/in/xq7');
+    writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(opaque), { roles: ['requested_output'] });
     expect(byName(await grade(runDir, ORACLE), linkedinAssertion).passed).toBe(true);
 
-    const unrelated = passingCsv()
-      .replace('https://www.linkedin.com/in/alice-archer', 'https://www.linkedin.com/in/xq7');
-    writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(unrelated), { roles: ['requested_output'] });
+    const duplicate = passingCsv()
+      .replace('https://www.linkedin.com/in/alice-archer', 'https://www.linkedin.com/in/bob-able');
+    writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(duplicate), { roles: ['requested_output'] });
     expect(byName(await grade(runDir, ORACLE), linkedinAssertion).passed).toBe(false);
   });
 
@@ -81,7 +80,7 @@ describe('yc_w24_outreach grader', () => {
       .replace(/"Hi Alice,[^"]+"/, '"Hello there. This is a generic note with no specific request and not enough useful personalization for its intended recipient."');
     writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(bad), { roles: ['requested_output'] });
     const results = await grade(runDir, ORACLE);
-    expect(byName(results, 'every LinkedIn URL is a distinct plausible personal profile for its founder').passed).toBe(false);
+    expect(byName(results, 'every LinkedIn URL is a distinct personal profile URL').passed).toBe(false);
     expect(byName(results, 'every outreach email is founder/company personalized and asks for a 15-minute call').passed).toBe(false);
   });
 

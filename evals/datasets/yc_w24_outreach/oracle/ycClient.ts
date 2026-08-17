@@ -4,6 +4,7 @@ const COMPANY_DIRECTORY_URL = 'https://www.ycombinator.com/companies';
 const FOUNDER_DIRECTORY_URL = 'https://www.ycombinator.com/founders';
 const COMPANY_INDEX = 'YCCompany_production';
 const FOUNDER_INDEX = 'YCUsers_production';
+const PROFILE_FETCH_CONCURRENCY = 8;
 
 interface AlgoliaCredentials {
   app: string;
@@ -27,7 +28,9 @@ export interface YcClientDeps extends FetchRetryDeps {}
 
 /** Query the same public, search-only Algolia indexes the official YC
  * Startup and Founder directories use. Credentials are discovered fresh
- * from each directory page rather than committed or assumed stable.
+ * from each directory page rather than committed or assumed stable. The
+ * founder index retains historical company associations, so each eligible
+ * company's live YC profile supplies the final active-founder roster.
  *
  * The whole W24 batch is fetched and AI-classified locally (isAiFocused)
  * rather than tag-facet-filtered server-side: tag facets under-cover the
@@ -51,7 +54,16 @@ export async function fetchYcW24AiCompanies(deps: YcClientDeps = {}): Promise<Yc
     }, deps),
   ]);
   const combined = combineDirectoryResults(companyPayload, founderPayload);
-  const companies = combined.companies.filter(isAiFocused);
+  const aiCompanies = combined.companies.filter(isAiFocused);
+  const profiles = await mapConcurrent(
+    aiCompanies,
+    PROFILE_FETCH_CONCURRENCY,
+    async (company): Promise<YcAiCompany | undefined> => {
+      const founders = await fetchCurrentProfileFounders(company.slug, deps);
+      return founders.length === 0 ? undefined : { ...company, founders };
+    },
+  );
+  const companies = profiles.filter((company): company is YcAiCompany => company !== undefined);
   if (companies.length < 5) {
     throw new Error(`YC oracle found only ${companies.length} AI-focused W24 companies with public founders`);
   }
@@ -156,4 +168,38 @@ function asHits(payload: unknown, label: string): Array<Record<string, unknown>>
 function stringField(value: Record<string, unknown>, field: string): string | undefined {
   const raw = value[field];
   return typeof raw === 'string' && raw.trim() ? raw.trim() : undefined;
+}
+
+async function fetchCurrentProfileFounders(
+  slug: string,
+  deps: YcClientDeps,
+): Promise<string[]> {
+  const response = await fetchWithRetry(`${COMPANY_DIRECTORY_URL}/${encodeURIComponent(slug)}`, undefined, deps);
+  if (!response.ok) throw new Error(`YC company profile ${slug} failed: HTTP ${response.status}`);
+  return parseCurrentProfileFounders(await response.text());
+}
+
+function parseCurrentProfileFounders(html: string): string[] {
+  const names = Array.from(
+    html.matchAll(/&quot;is_active&quot;:true(?:(?!&quot;is_active&quot;:)[\s\S])*?&quot;full_name&quot;:&quot;([^&]+)&quot;/g),
+    (match) => match[1]!.replaceAll('&#x27;', "'").replaceAll('&amp;', '&').trim(),
+  );
+  return [...new Set(names)].sort((a, b) => a.localeCompare(b));
+}
+
+async function mapConcurrent<T, R>(
+  values: readonly T[],
+  concurrency: number,
+  operation: (value: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(values.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, values.length) }, async () => {
+    for (;;) {
+      const index = next++;
+      if (index >= values.length) return;
+      results[index] = await operation(values[index]!);
+    }
+  }));
+  return results;
 }

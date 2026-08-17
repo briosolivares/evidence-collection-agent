@@ -75,6 +75,21 @@ slice. No test files were added. The combined focused gate passes 6 files / 40
 tests, `npm run typecheck` passes, and the complete hermetic suite passes 136
 files / 1,479 tests.
 
+## YC W24 outreach grader correction complete (2026-08-17)
+
+- [x] Define each selected company's required founder roster from the active
+  founders on its current official YC company profile, rather than every
+  historical W24 founder-directory association.
+- [x] Remove the invalid assumption that a personal LinkedIn handle must
+  resemble its owner's name; require a distinct `linkedin.com/in/...` profile
+  URL and leave ownership to human review.
+
+No test files were added. The two existing YC oracle/grader suites pass 11
+tests, `npm run typecheck` passes, and the complete hermetic suite passes 136
+files / 1,479 tests. Regrading the August 17 YC run against the corrected live
+oracle changes it from 6/8 to 8/8 assertions and a task pass without rerunning
+the agent.
+
 ## Binding decisions
 
 These decisions are made for the current implementation. Change one only by

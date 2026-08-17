@@ -12,7 +12,7 @@ const COLUMN_ASSERTION_NAME = exactColumnsAssertionName(REQUIRED_COLUMNS);
 const ROW_ASSERTION_NAME = 'CSV has a plausible number of distinct, non-empty founder rows';
 const FOUNDER_ASSERTION_NAME = 'every founder belongs to an oracle-listed YC W24 AI company';
 const COMPANY_ASSERTION_NAME = 'rows represent exactly five companies and include every oracle-listed founder for each';
-const LINKEDIN_ASSERTION_NAME = 'every LinkedIn URL is a distinct plausible personal profile for its founder';
+const LINKEDIN_ASSERTION_NAME = 'every LinkedIn URL is a distinct personal profile URL';
 const EMAIL_ASSERTION_NAME = 'every outreach email is founder/company personalized and asks for a 15-minute call';
 
 interface OutreachRow {
@@ -137,13 +137,8 @@ function linkedinAssertion(rows: OutreachRow[]): AssertionResult {
       const url = new URL(row.linkedinUrl);
       const host = url.hostname.toLowerCase();
       const slug = /^\/in\/([^/?#]+)/i.exec(url.pathname)?.[1]?.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const nameTokens = normalize(row.founderName).split(' ').filter((token) => token.length >= 3);
-      // Real handles are often truncated or initials-style ("binw" for
-      // Bing Wu), so a ≥3-char prefix of a name token counts as a match;
-      // profile ownership stays human-reviewed.
       if ((url.protocol !== 'http:' && url.protocol !== 'https:') ||
-          (host !== 'linkedin.com' && !host.endsWith('.linkedin.com')) || !slug ||
-          !nameTokens.some((token) => slug.includes(token.slice(0, 3)))) {
+          (host !== 'linkedin.com' && !host.endsWith('.linkedin.com')) || !slug) {
         bad.push(`row ${row.rowNumber}: ${row.linkedinUrl}`);
       } else {
         urls.push(url.href.toLowerCase().replace(/\/$/, ''));
@@ -157,7 +152,7 @@ function linkedinAssertion(rows: OutreachRow[]): AssertionResult {
   return {
     name: LINKEDIN_ASSERTION_NAME,
     passed: rows.length > 0 && bad.length === 0,
-    detail: bad.length ? bad.join('; ') : `${urls.length} personal linkedin.com/in URLs (profile ownership is human-reviewed)`,
+    detail: bad.length ? bad.join('; ') : `${urls.length} distinct personal linkedin.com/in URLs (profile ownership is human-reviewed)`,
   };
 }
 

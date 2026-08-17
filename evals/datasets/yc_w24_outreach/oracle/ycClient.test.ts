@@ -12,6 +12,13 @@ const FOUNDER_HITS = COMPANY_HITS.flatMap((company, index) => [
   { first_name: `Bob${index}`, last_name: `Builder${index}`, company_slug: company.slug, batches: ['W24'] },
 ]);
 
+function profileHtml(slug: string, founders = FOUNDER_HITS): string {
+  return founders
+    .filter((founder) => founder.company_slug === slug)
+    .map((founder) => `&quot;is_active&quot;:true,&quot;full_name&quot;:&quot;${founder.first_name} ${founder.last_name}&quot;`)
+    .join('');
+}
+
 describe('YC W24 AI oracle', () => {
   it('parses fresh public Algolia credentials from official directory HTML', () => {
     expect(parseAlgoliaCredentials('<script>window.AlgoliaOpts = {"app":"APP123","key":"abcdefghijklmnopqrstuvwxyz"};</script>'))
@@ -40,6 +47,8 @@ describe('YC W24 AI oracle', () => {
       if (url.endsWith('/founders')) return new Response('<script>window.AlgoliaOpts = {"app":"APP123","key":"founderkeyfounderkeyfounderkey"};</script>');
       if (url.includes('YCCompany_production')) return new Response(JSON.stringify({ hits: COMPANY_HITS }));
       if (url.includes('YCUsers_production')) return new Response(JSON.stringify({ hits: FOUNDER_HITS }));
+      const slug = COMPANY_HITS.find((company) => url.endsWith(`/companies/${company.slug}`))?.slug;
+      if (slug) return new Response(profileHtml(slug));
       return new Response('not found', { status: 404 });
     };
     const result = await fetchYcW24AiCompanies({ fetchFn, sleep: async () => undefined, random: () => 0.5 });
@@ -65,6 +74,8 @@ describe('YC W24 AI oracle', () => {
       }
       if (url.includes('YCCompany_production')) return new Response(JSON.stringify({ hits }));
       if (url.includes('YCUsers_production')) return new Response(JSON.stringify({ hits: founders }));
+      const slug = hits.find((company) => url.endsWith(`/companies/${company.slug}`))?.slug;
+      if (slug) return new Response(profileHtml(slug, founders));
       return new Response('not found', { status: 404 });
     };
     const result = await fetchYcW24AiCompanies({ fetchFn, sleep: async () => undefined, random: () => 0.5 });
