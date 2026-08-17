@@ -103,15 +103,6 @@ export function inspectTable(
     return { defects: context.defects };
   }
 
-  const placeholder = findPlaceholder(text, context.checkActive);
-  if (placeholder !== undefined) {
-    recordDefect(
-      context,
-      'placeholder_text',
-      `${artifactPath} still contains unfinished placeholder text (${JSON.stringify(placeholder)}). Replace it with supported content or remove it.`,
-    );
-  }
-
   const parsed = parseDeclaredTable(text, context);
   if (parsed === undefined || context.halted) return { defects: context.defects };
 
@@ -781,28 +772,6 @@ function matchesUnicodeDatePattern(value: string, pattern: string): boolean {
   } catch {
     return false;
   }
-}
-
-const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
-  /\bTODO\b/,
-  /\bFIXME\b/,
-  /\bTBD\b/,
-  /\bXXX\b/,
-  /\bLorem ipsum\b/i,
-  /\bplaceholder\b/i,
-  /\bN\/A pending\b/i,
-];
-
-export function findPlaceholder(
-  text: string,
-  checkActive?: () => void,
-): string | undefined {
-  for (const pattern of PLACEHOLDER_PATTERNS) {
-    checkActive?.();
-    const match = pattern.exec(text);
-    if (match !== null) return match[0];
-  }
-  return undefined;
 }
 
 function sameOrderedStrings(

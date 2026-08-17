@@ -127,7 +127,6 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
       phase: 'terminal',
       finish: {
         summary: 'Published the requested one-row report.',
-        limitations: [],
       },
       outcome,
     });
@@ -221,7 +220,6 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
       phase: 'terminal',
       finish: {
         summary: 'Published the requested one-row report.',
-        limitations: [],
       },
       outcome,
     });
@@ -321,7 +319,6 @@ processDescribe('runV3Coordinator real process crash recovery', () => {
       phase: 'terminal',
       finish: {
         summary: 'Published the requested one-row report.',
-        limitations: [],
       },
       budget: {
         toolCalls: 4,

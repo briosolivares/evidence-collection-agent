@@ -65,7 +65,6 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested one-row report.',
-  limitations: [],
 };
 
 const CONFIGURATION: V3DurableRunConfiguration = {

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createRegistry, toApiToolDefs } from '../../tools/registry.js';
 import {
+  durableFinishInputSchema,
   FINISH_TOOL_NAME,
   finishInputSchema,
   finishTool,
@@ -10,7 +11,6 @@ import {
 
 const validInput: FinishInput = {
   summary: 'Collected the requested records and published the exact CSV.',
-  limitations: [],
 };
 
 describe('finish schema', () => {
@@ -21,36 +21,40 @@ describe('finish schema', () => {
     expect(definition?.input_schema).toMatchObject({
       type: 'object',
       additionalProperties: false,
-      required: ['summary', 'limitations'],
+      required: ['summary'],
     });
-    expect(Object.keys(finishInputSchema.shape)).toEqual([
-      'summary',
-      'limitations',
-    ]);
+    expect(Object.keys(finishInputSchema.shape)).toEqual(['summary']);
     expect(finishInputSchema.parse(validInput)).toEqual(validInput);
   });
 
-  it('requires explicit, nonblank, duplicate-free values and rejects extra fields', () => {
+  it('requires one nonblank summary and rejects extra fields', () => {
     for (const invalid of [
-      { summary: 'done' },
-      { summary: '  ', limitations: [] },
+      {},
+      { summary: '  ' },
       { summary: 'done', limitations: ['  '] },
-      {
-        summary: 'done',
-        limitations: ['blocked', 'blocked'],
-      },
       { ...validInput, artifacts: ['artifacts/a.csv'] },
       { ...validInput, success: true },
     ]) {
       expect(finishInputSchema.safeParse(invalid).success).toBe(false);
     }
 
+    expect(finishInputSchema.safeParse({ summary: 'done' }).success).toBe(true);
+  });
+
+  it('normalizes historical checkpoint inputs to the current shape', () => {
     expect(
-      finishInputSchema.safeParse({
-        summary: 'No output could be claimed because access remained blocked.',
+      durableFinishInputSchema.parse({
+        summary: 'Published the requested report.',
         limitations: ['The source required an unavailable account.'],
-      }).success,
-    ).toBe(true);
+      }),
+    ).toEqual({ summary: 'Published the requested report.' });
+    expect(
+      durableFinishInputSchema.parse({
+        summary: 'Published the requested report.',
+        artifacts: ['artifacts/report.csv'],
+        limitations: [],
+      }),
+    ).toEqual({ summary: 'Published the requested report.' });
   });
 });
 

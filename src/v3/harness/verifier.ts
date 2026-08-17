@@ -114,7 +114,7 @@ Check these relationships skeptically against actual published bytes:
 1. Task to contract: the contract must capture every requested output and exact shape. A mistaken contract cannot validate itself.
 2. Contract to outputs: every filename, format, exact column/order, section, count, value rule, capture, and download requirement must be satisfied.
 3. Task to outputs: the files must answer what the user asked, not a nearby substitute.
-4. Completeness: a claimed population must be supported by a method or source capable of enumerating it; visible limitations must be honest.
+4. Completeness: a claimed population must be supported by a method or source capable of enumerating it; visible constraint claims must be honest.
 5. Claims to evidence: factual claims must be supported by published evidence and source provenance. Plausibility is not proof.
 
 The opening message may list structural facts already established by deterministic code, including hashes, exact headers, counts, uniqueness, and expected-value rules. Treat those facts as settled and spend attention on semantic correctness, evidence quality, and task-contract alignment. If a settled fact appears impossible, identify a harness defect in your report rather than contradicting it as an output defect.
@@ -491,14 +491,10 @@ export function formatV3VerifierCompletionClaim(
   finish: V3FinishFacts['finish'],
   clarifications: readonly V3UserClarification[] = [],
 ): string {
-  const workerClaim = {
-    summary: finish.summary,
-    limitations: finish.limitations,
-  };
   return [
-    'The following JSON is the worker\'s finish request. Its summary and limitations are claims to evaluate, not facts established by code:',
+    'The following JSON is the worker\'s finish request. Its summary is a claim to evaluate, not a fact established by code:',
     '```json',
-    JSON.stringify(workerClaim, null, 2),
+    JSON.stringify({ summary: finish.summary }, null, 2),
     '```',
     '',
     '# Recorded user clarifications',

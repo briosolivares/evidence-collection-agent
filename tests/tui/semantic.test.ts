@@ -57,7 +57,7 @@ describe('deriveSemanticLine', () => {
     },
     {
       name: 'finish',
-      input: { summary: 'Done', artifactPaths: [], limitations: [] },
+      input: { summary: 'Done' },
       line: 'Submitting for verification',
       isEvidence: false,
     },

@@ -119,12 +119,10 @@ const finish = {
     name: 'finish' as const,
     input: {
       summary: 'Published the requested roster.',
-      limitations: [],
     },
   },
   input: {
     summary: 'Published the requested roster.',
-    limitations: [],
   },
   assistantText: 'The roster is ready.',
 };
@@ -153,7 +151,7 @@ function legacyFinishInput(artifacts = ['artifacts/roster.csv']) {
   return {
     summary: finish.input.summary,
     artifacts,
-    limitations: finish.input.limitations,
+    limitations: ['Historical source-access constraint.'],
   };
 }
 
@@ -209,7 +207,6 @@ const pendingToolTurn = {
 const facts: V3FinishFacts = {
   finish: {
     summary: finish.input.summary,
-    limitations: [],
   },
   manifest: {
     task: configuration.taskText,
@@ -592,35 +589,6 @@ describe('v3 checkpoint schema', () => {
       const checkpoint = makeCheckpoint();
       expect(v3CheckpointSchema.safeParse(checkpoint).success).toBe(true);
 
-      // JSON object member order has no semantic meaning. A provider may
-      // return the same strict input fields in a different insertion order.
-      expect(
-        v3CheckpointSchema.safeParse({
-          ...checkpoint,
-          worker: {
-            ...finishWorker,
-            messages: [
-              ...worker.messages,
-              {
-                role: 'assistant',
-                content: [
-                  { type: 'text', text: finish.assistantText },
-                  {
-                    type: 'tool_use',
-                    id: finish.call.id,
-                    name: finish.call.name,
-                    input: {
-                      limitations: finish.input.limitations,
-                      summary: finish.input.summary,
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        }).success,
-      ).toBe(true);
-
       expect(
         v3CheckpointSchema.safeParse({
           ...checkpoint,
@@ -633,7 +601,7 @@ describe('v3 checkpoint schema', () => {
 
       const changedInput = {
         ...finish.input,
-        limitations: ['Different durable limitation.'],
+        summary: 'A different durable finish summary.',
       };
       expect(
         v3CheckpointSchema.safeParse({
@@ -765,7 +733,7 @@ describe('v3 checkpoint schema', () => {
         ...terminal(),
         finish: {
           ...finish.input,
-          limitations: ['Different durable limitation.'],
+          summary: 'A different durable finish summary.',
         },
       }).success,
     ).toBe(false);

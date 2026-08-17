@@ -213,7 +213,6 @@ function recoveryResponses() {
           name: 'finish',
           input: {
             summary: 'The same TUI browser session completed a later task.',
-            limitations: [],
           },
         },
       ],

@@ -17,7 +17,7 @@ import {
   type InspectedEntry,
   V3_FINISH_SIGNATURE_BYTES,
 } from './artifactInspection.js';
-import { findPlaceholder, inspectTable } from './tableInspection.js';
+import { inspectTable } from './tableInspection.js';
 import type {
   V3CaptureFact,
   V3DocumentFact,
@@ -70,15 +70,11 @@ export function runV3FinishChecks({
   checkActive?.();
   const defects: V3FinishDefect[] = [];
   const facts: V3FinishFacts = {
-    finish: {
-      summary: finish.summary,
-      limitations: [...finish.limitations],
-    },
+    finish: { summary: finish.summary },
     outputs: [],
     evidenceScreenshotPaths: [],
   };
 
-  validateFinishText(finish, defects);
   const fixedPaths = new Set(
     contract.outputs.flatMap((output) =>
       output.kind === 'table' || output.kind === 'document'
@@ -129,7 +125,7 @@ export function runV3FinishChecks({
     }
   }
 
-  validateManifestDerivedFinishClaim(finish, requestedEntries, defects);
+  validateManifestDerivedFinishClaim(requestedEntries, defects);
 
   const claimedContractPaths = new Set<string>();
   const captureOwners = new Map<string, string[]>();
@@ -242,8 +238,7 @@ export function runV3FinishChecks({
   if (
     browserProvider !== undefined &&
     evidenceScreenshots.length === 0 &&
-    !taskExplicitlyForbidsScreenshots(inspection.manifest.task) &&
-    !finish.limitations.some(isExplicitScreenshotAccessLimitation)
+    !taskExplicitlyForbidsScreenshots(inspection.manifest.task)
   ) {
     defects.push({
       code: 'missing_browser_evidence_screenshot',
@@ -380,37 +375,16 @@ function inspectionBytes(entry: InspectedEntry): Uint8Array | undefined {
   return entry.bytes ?? entry.contentPrefix;
 }
 
-function validateFinishText(finish: FinishInput, defects: V3FinishDefect[]): void {
-  const summaryPlaceholder = findPlaceholder(finish.summary);
-  if (summaryPlaceholder !== undefined) {
-    defects.push({
-      code: 'placeholder_finish_summary',
-      message: `finish.summary contains unfinished placeholder text (${JSON.stringify(summaryPlaceholder)}). Replace it with the actual user-facing result.`,
-    });
-  }
-  for (const [index, limitation] of finish.limitations.entries()) {
-    const placeholder = findPlaceholder(limitation);
-    if (placeholder !== undefined) {
-      defects.push({
-        code: 'placeholder_limitation',
-        message: `finish.limitations[${index}] contains unfinished placeholder text (${JSON.stringify(placeholder)}). State the concrete unresolved constraint or remove it.`,
-      });
-    }
-  }
-}
-
 function validateManifestDerivedFinishClaim(
-  finish: FinishInput,
   requestedEntries: readonly InspectedEntry[],
   defects: V3FinishDefect[],
 ): void {
-  if (requestedEntries.length === 0 && finish.limitations.length === 0) {
+  if (requestedEntries.length === 0) {
     defects.push({
       code: 'empty_finish_claim',
       message:
-        'The manifest contains no requested output and finish reports no limitation. ' +
-        'Publish the required outputs, or state the concrete source/access/freshness ' +
-        'constraint blocking them.',
+        'The manifest contains no requested output. Publish every required output before ' +
+        'finishing.',
     });
   }
 
@@ -526,15 +500,6 @@ function inspectDocument(
       artifactPath,
       code: 'empty_output',
       message: `${artifactPath} contains only whitespace. Publish substantive document content.`,
-    });
-  }
-  const placeholder = findPlaceholder(text);
-  if (placeholder !== undefined) {
-    defects.push({
-      outputId: output.id,
-      artifactPath,
-      code: 'placeholder_text',
-      message: `${artifactPath} still contains unfinished placeholder text (${JSON.stringify(placeholder)}).`,
     });
   }
   const present: string[] = [];
@@ -690,19 +655,6 @@ function inspectCaptureOutput(
         );
         acceptable = false;
       }
-      const text = entry.bytes === undefined ? undefined : decodeUtf8(entry.bytes);
-      const placeholder = text === undefined ? undefined : findPlaceholder(text);
-      if (placeholder !== undefined) {
-        defects.push(
-          captureDefect(
-            output,
-            entry,
-            'placeholder_text',
-            `${entry.canonicalPath} still contains unfinished placeholder text (${JSON.stringify(placeholder)}).`,
-          ),
-        );
-        acceptable = false;
-      }
     }
     if (acceptable && sourceUrl !== undefined) valid.push({ entry, sourceUrl });
   }
@@ -771,15 +723,6 @@ function hasSource(entry: InspectedEntry): boolean {
 function taskExplicitlyForbidsScreenshots(task: string): boolean {
   return /(?:without|no|do not (?:take|include|capture|provide))\s+(?:any\s+)?screenshots?/i.test(
     task,
-  );
-}
-
-function isExplicitScreenshotAccessLimitation(limitation: string): boolean {
-  return (
-    /(?:access|blocked|unavailable|unable|denied|permission|login|authentication)/i.test(
-      limitation,
-    ) &&
-    /(?:screenshot|capture|image|visual|page|source)/i.test(limitation)
   );
 }
 

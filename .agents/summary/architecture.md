@@ -30,8 +30,8 @@ flowchart TD
 2. The worker receives the task, immutable contract guidance, and durable capability policy. Model responses are fully streamed and validated before content enters history or any tool runs.
 3. Ordinary tool calls execute strictly in response order. Each effect boundary is checkpointed conservatively so recovery never blindly replays an uncertain call.
 4. A response without tool calls receives a continuation message. It does not complete the run.
-5. Completion is requested only by an exclusive `finish` call containing a summary, the claimed requested-output paths, and explicit limitations.
-6. Read-only deterministic checks validate manifest integrity, exact output shape, counts/rules, placeholders, roles, and evidence requirements. Defects are returned as the intercepted `finish` call's result and the same worker conversation continues.
+5. Completion is requested only by an exclusive `finish` call containing a user-facing summary. Requested-output paths are derived from the manifest rather than claimed by the worker.
+6. Read-only deterministic checks validate manifest integrity, exact output shape, counts/rules, roles, media, and evidence requirements. Prose quality is left to the verifier. Defects are returned as the intercepted `finish` call's result and the same worker conversation continues.
 7. Passing facts go to a fresh-context verifier with bounded, no-follow access only to `manifest.json` and published `artifacts/`. A correction likewise returns to the worker. Only the verifier can produce `verified`.
 8. Every terminal path persists an absorbing checkpoint, closes run-owned pages, writes transcript/metrics projections, and finalizes the manifest. Non-success is explicit `incomplete`, `failed`, or `cancelled` durable state; the public API normalizes successful and incomplete outcomes.
 

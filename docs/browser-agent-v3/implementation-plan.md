@@ -3,7 +3,7 @@
 **Status:** complete for local/hermetic acceptance; live external checks are
 explicitly deferred pending user authorization
 
-**Last updated:** 2026-08-15
+**Last updated:** 2026-08-17
 
 **Working branch:** `simplify/sherlock-core`
 
@@ -35,6 +35,24 @@ the legacy harness. New v3 modules reused stable seams without inheriting
 initializer/contract/table/evidence/scheduler complexity merely to avoid
 writing a smaller coherent replacement. After the new path passed its gates,
 the public cutover and legacy-production removal were completed.
+
+## Post-v3 simplification complete (2026-08-17)
+
+- [x] Remove the self-reported `finish.limitations` field from the current
+  worker/verifier/checkpoint contract while retaining read compatibility for
+  already-written v3 checkpoints.
+- [x] Remove lexical placeholder rejection from finish metadata and published
+  prose; retain objective manifest, shape, media, integrity, and evidence
+  checks.
+- [x] Remove limitation-based completion exemptions: a missing required output
+  or required browser screenshot remains an objective defect.
+- [x] Update the prompt, design, tests, and durable schemas, then run focused
+  completion/checkpoint/coordinator coverage, typecheck, and the full suite.
+
+Verification: 158 focused finish/checkpoint/verifier/worker/prompt tests, 76
+coordinator/CLI/TUI boundary tests, 2 tracing tests, `npm run typecheck`, and
+the complete hermetic suite (136 files / 1,479 tests) all pass. The scoped
+code-and-documentation change removes 138 more lines than it adds.
 
 ## Binding decisions
 
@@ -212,12 +230,12 @@ prompt/tool definitions.
 
 - [x] Run the contract initializer once; store one immutable typed contract in
   harness-private state and show it to the worker as per-run guidance.
-- [x] Implement `finish` input (`summary`, unresolved limits) with published
+- [x] Implement `finish` input (`summary`) with published
   requested outputs derived from the authoritative manifest
   and interception in the v3 loop.
 - [x] Adapt deterministic completion checks to generic published artifacts:
-  exact filenames, exact CSV columns, row/count rules, non-placeholder
-  content, requested screenshots/downloads, hashes, and roles.
+  exact filenames, exact CSV columns, row/count rules, nonempty content,
+  requested screenshots/downloads, hashes, and roles.
 - [x] Invoke the existing fresh-context verifier only after code checks pass;
   append check/verifier feedback to the same worker conversation.
 - [x] Write a compact v3 checkpoint at turn/tool/verifying/terminal boundaries

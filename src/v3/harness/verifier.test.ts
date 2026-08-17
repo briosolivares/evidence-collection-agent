@@ -54,7 +54,6 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested report.',
-  limitations: ['The source exposed only the current reporting period.'],
 };
 
 function budget(overrides: Partial<RunBudgetConfig> = {}) {
@@ -561,7 +560,7 @@ describe('runV3Verifier', () => {
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
 
-  it('labels finish limitations as worker claims rather than settled facts', async () => {
+  it('labels the finish summary as a worker claim rather than a settled fact', async () => {
     const model: ModelDriver = {
       generate: vi.fn(async () => accepted('verified')),
     };
@@ -597,11 +596,11 @@ describe('runV3Verifier', () => {
       'Published requested-output paths derived from the manifest',
     );
     expect(opening).toContain('artifacts/report.csv');
-    expect(opening).toContain(FINISH.limitations[0]);
+    expect(opening).toContain(FINISH.summary);
     expect(opening).toContain('Which period should the report cover?');
     expect(opening).toContain('Use only the current reporting period.');
     expect(opening).toContain('Already established by code');
-    expect(opening.indexOf(FINISH.limitations[0])).toBeLessThan(
+    expect(opening.indexOf(FINISH.summary)).toBeLessThan(
       opening.indexOf('Already established by code'),
     );
   });

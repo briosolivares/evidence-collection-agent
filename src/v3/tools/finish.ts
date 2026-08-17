@@ -45,13 +45,6 @@ export const finishInputSchema = z.strictObject({
     8_000,
     'User-facing summary of the completed work and what each output contains',
   ),
-  limitations: uniqueNonBlankStrings(
-    100,
-    2_000,
-    'One unresolved source, access, or freshness limitation',
-  ).describe(
-    'Explicit unresolved limitations; use an empty list when there are none',
-  ),
 });
 
 export type FinishInput = z.infer<typeof finishInputSchema>;
@@ -66,9 +59,18 @@ export const legacyFinishInputSchema = z.strictObject({
     100,
     1_024,
     'Legacy run-relative requested-output path',
+  ).optional(),
+  limitations: uniqueNonBlankStrings(
+    100,
+    2_000,
+    'Legacy unresolved source, access, or freshness limitation',
   ),
-  limitations: finishInputSchema.shape.limitations,
 });
+
+/** Read old v3 checkpoint cargo, but expose and rewrite only the current shape. */
+export const durableFinishInputSchema = z
+  .union([finishInputSchema, legacyFinishInputSchema])
+  .transform((finish): FinishInput => ({ summary: finish.summary }));
 
 /**
  * Model-facing definition for the exclusive completion control call.
@@ -81,10 +83,10 @@ export const finishTool: ToolDef<FinishInput> = {
   name: FINISH_TOOL_NAME,
   description:
     'Request deterministic checks and independent verification after every requested output ' +
-    'has been published and inspected. Provide a user-facing summary and explicitly list ' +
-    'unresolved limitations (use an empty array when there are none). Requested outputs and ' +
-    'evidence are derived from the authoritative manifest. finish must be the only tool call ' +
-    'in its assistant response; it requests review and cannot declare success by itself.',
+    'has been published and inspected. Provide a user-facing summary of the completed work and ' +
+    'outputs. Requested outputs and evidence are derived from the authoritative manifest. ' +
+    'finish must be the only tool call in its assistant response; it requests review and cannot ' +
+    'declare success by itself.',
   inputSchema: finishInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {

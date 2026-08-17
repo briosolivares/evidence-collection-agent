@@ -66,7 +66,10 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain(
       'finish is an exclusive control call and must be the only tool call',
     );
-    expect(V3_SYSTEM_PROMPT).toContain('an explicit limitations list');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'Include any concrete unresolved constraint in that summary',
+    );
+    expect(V3_SYSTEM_PROMPT).not.toContain('explicit limitations list');
     expect(V3_SYSTEM_PROMPT).toContain(
       'derives requested outputs and evidence from the authoritative manifest',
     );

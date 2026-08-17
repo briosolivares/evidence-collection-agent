@@ -25,8 +25,7 @@ import {
   type V3FinishFacts,
 } from '../completion/types.js';
 import {
-  finishInputSchema,
-  legacyFinishInputSchema,
+  durableFinishInputSchema,
   type FinishInput,
 } from '../tools/finish.js';
 import type {
@@ -76,16 +75,6 @@ const jsonValueSchema: z.ZodType<V3CheckpointJson> = z.lazy(() =>
     z.record(z.string(), jsonValueSchema),
   ]),
 );
-
-/** Read old v3 finish cargo, but expose and rewrite only the current shape. */
-const v3CheckpointFinishInputSchema = z
-  .union([finishInputSchema, legacyFinishInputSchema])
-  .transform(
-    (finish): FinishInput => ({
-      summary: finish.summary,
-      limitations: [...finish.limitations],
-    }),
-  );
 
 const isoTimestampSchema = z
   .string()
@@ -140,7 +129,7 @@ const toolUseBlockSchema = z
   })
   .transform((block) => {
     if (block.name !== 'finish') return block;
-    const parsed = v3CheckpointFinishInputSchema.safeParse(block.input);
+    const parsed = durableFinishInputSchema.safeParse(block.input);
     return parsed.success ? { ...block, input: parsed.data } : block;
   });
 
@@ -327,9 +316,9 @@ export const v3PendingFinishSchema: z.ZodType<V3FinishRequest> = z
     call: z.strictObject({
       id: z.string().min(1),
       name: z.literal('finish'),
-      input: v3CheckpointFinishInputSchema,
+      input: durableFinishInputSchema,
     }),
-    input: v3CheckpointFinishInputSchema,
+    input: durableFinishInputSchema,
     assistantText: z.string(),
   })
   .superRefine((pending, ctx) => {
@@ -503,7 +492,7 @@ const terminalCheckpointSchema = z
     worker: v3WorkerSessionSnapshotSchema.optional(),
     /** Exact accepted finish claims, required for verified terminal recovery
      * so deterministic checks can be rerun against the current manifest. */
-    finish: v3CheckpointFinishInputSchema.optional(),
+    finish: durableFinishInputSchema.optional(),
     outcome: v3DurableTerminalOutcomeSchema,
   })
   .superRefine((checkpoint, ctx) => {

@@ -165,7 +165,6 @@ describe('runTask browser acceptance', () => {
         }),
         toolResponse('finish-v3', 'finish', {
           summary: 'Published the requested fixture report.',
-          limitations: [],
         }),
       ]);
       const verifier = scriptModel([

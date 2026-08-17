@@ -60,10 +60,11 @@ function contract(...outputs: OutputSpec[]): OutputContract {
   return { outputs } as OutputContract;
 }
 
-function finish(limitations: string[] = []): FinishInput {
+function finish(
+  summary = 'Created and checked every requested output.',
+): FinishInput {
   return {
-    summary: 'Created and checked every requested output.',
-    limitations,
+    summary,
   };
 }
 
@@ -137,7 +138,7 @@ describe('runV3FinishChecks — manifest-derived finish facts', () => {
   it('does not mutate the immutable contract or finish input', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const expected = contract(tableSpec());
-    const submitted = finish(['Source freshness is one day.']);
+    const submitted = finish('Created every output from source data refreshed yesterday.');
     const before = JSON.stringify({ expected, submitted });
 
     runV3FinishChecks({ runDir, contract: expected, finish: submitted });
@@ -205,7 +206,7 @@ describe('runV3FinishChecks — manifest-derived finish facts', () => {
         runV3FinishChecks({
           runDir,
           contract: contract(tableSpec()),
-          finish: finish(['The run manifest is unavailable.']),
+          finish: finish('The run manifest is unavailable.'),
         }),
       ),
     ).toEqual(['missing_manifest']);
@@ -216,7 +217,7 @@ describe('runV3FinishChecks — manifest-derived finish facts', () => {
         runV3FinishChecks({
           runDir,
           contract: contract(tableSpec()),
-          finish: finish(['The run manifest is unavailable.']),
+          finish: finish('The run manifest is unavailable.'),
         }),
       ),
     ).toEqual(['unparseable_manifest']);
@@ -280,7 +281,7 @@ describe('runV3FinishChecks — manifest-derived finish facts', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['The provenance index exceeds the supported bound.']),
+      finish: finish('The provenance index exceeds the supported bound.'),
     });
     expect(codes(result)).toEqual(['manifest_bytes_limit_exceeded']);
   });
@@ -753,7 +754,7 @@ describe('runV3FinishChecks — generic tables', () => {
     expect(result.facts.outputs[0]).toMatchObject({ rowCount: 2 });
   });
 
-  it('rejects placeholders and missing expected/exhaustive values together', () => {
+  it('allows placeholder words while enforcing expected/exhaustive values', () => {
     publish('artifacts/roster.csv', 'name,url\nTODO,\nUnexpected,\n');
     const spec = tableSpec({
       rules: [
@@ -771,9 +772,10 @@ describe('runV3FinishChecks — generic tables', () => {
       contract: contract(spec),
       finish: finish(),
     });
-    expect(codes(result)).toEqual(
-      expect.arrayContaining(['placeholder_text', 'missing_expected_values', 'unexpected_values']),
-    );
+    expect(codes(result).sort()).toEqual([
+      'missing_expected_values',
+      'unexpected_values',
+    ]);
   });
 });
 
@@ -790,16 +792,14 @@ describe('runV3FinishChecks — documents and captures', () => {
     } as OutputSpec;
   }
 
-  it('checks document encoding, required sections, and placeholders', () => {
+  it('checks document encoding and required sections without lexical rejection', () => {
     publish('artifacts/report.md', '# Summary\nTODO\n');
     const result = runV3FinishChecks({
       runDir,
       contract: contract(documentSpec({ requiredSections: ['Summary', 'Findings'] })),
       finish: finish(),
     });
-    expect(codes(result)).toEqual(
-      expect.arrayContaining(['placeholder_text', 'missing_required_section']),
-    );
+    expect(codes(result)).toEqual(['missing_required_section']);
   });
 
   it('requires actual PDF bytes for a PDF document', () => {
@@ -872,16 +872,14 @@ describe('runV3FinishChecks — documents and captures', () => {
     const result = runV3FinishChecks({
       runDir,
       contract: contract(spec),
-      finish: finish([
-        'The screenshot is not yet published as requested output.',
-      ]),
+      finish: finish('The screenshot is not yet published as requested output.'),
     });
     expect(codes(result)).toEqual(
       expect.arrayContaining(['capture_wrong_role', 'capture_count_below_minimum']),
     );
   });
 
-  it('validates download source patterns, inferred media types, and placeholder content', () => {
+  it('validates download source patterns and inferred media types', () => {
     publish('artifacts/report.pdf', Buffer.from('%PDF-body'), {
       sourceUrl: 'https://example.test/files/report.pdf',
     });
@@ -912,7 +910,6 @@ describe('runV3FinishChecks — documents and captures', () => {
       expect.arrayContaining([
         'download_source_mismatch',
         'download_media_type_mismatch',
-        'placeholder_text',
         'capture_count_mismatch',
       ]),
     );
@@ -1033,7 +1030,7 @@ describe('runV3FinishChecks — documents and captures', () => {
   });
 });
 
-describe('runV3FinishChecks — browser evidence and limitations', () => {
+describe('runV3FinishChecks — browser evidence', () => {
   beforeEach(() => {
     rmSync(runDir, { recursive: true, force: true });
     runDir = mkdtempSync(join(tmpdir(), 'v3-finish-checks-browser-'));
@@ -1080,27 +1077,15 @@ describe('runV3FinishChecks — browser evidence and limitations', () => {
     expect(result.facts.evidenceScreenshotPaths).toEqual(['artifacts/source.png']);
   });
 
-  it('allows an explicit screenshot access limitation without waiving required outputs', () => {
-    publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
-    const limitation = 'Login access was denied, so a source page screenshot could not be captured.';
-    const result = runV3FinishChecks({
-      runDir,
-      contract: contract(tableSpec()),
-      finish: finish([limitation]),
-    });
-    expect(result.status).toBe('passed');
-    expect(result.facts.finish.limitations).toEqual([limitation]);
-  });
-
-  it('rejects placeholder limitations', () => {
+  it('does not let a summary claim waive required browser evidence', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(['TBD access limitation']),
+      finish: finish(
+        'Published the table, but login access prevented a source screenshot.',
+      ),
     });
-    expect(codes(result)).toEqual(
-      expect.arrayContaining(['placeholder_limitation', 'missing_browser_evidence_screenshot']),
-    );
+    expect(codes(result)).toContain('missing_browser_evidence_screenshot');
   });
 });

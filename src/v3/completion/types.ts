@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { finishInputSchema } from '../tools/finish.js';
+import { durableFinishInputSchema } from '../tools/finish.js';
 
 /** One objective defect the worker can repair before a verifier is called. */
 export interface V3FinishDefect {
@@ -59,7 +59,7 @@ const v3CaptureFactSchema = z.strictObject({
 
 /** Strict checkpoint validator for the code-settled verifier payload. */
 export const v3FinishFactsSchema = z.strictObject({
-  finish: finishInputSchema,
+  finish: durableFinishInputSchema,
   manifest: z
     .strictObject({
       task: z.string(),

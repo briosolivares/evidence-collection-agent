@@ -111,7 +111,7 @@ Sherlock must:
 - ask the user when login, MFA, consent, account selection, ambiguity, or an
   irreversible decision requires human authority;
 - save private intermediate state separately from published output;
-- state an explicit final summary and unresolved limitations;
+- state an explicit final summary, including any concrete unresolved constraint;
 - validate and independently verify every production run;
 - resume a durable incomplete run without blindly repeating an uncertain
   state-changing call;
@@ -653,14 +653,13 @@ the next guard.
 
 ```json
 {
-  "summary": "What was done and what each output contains.",
-  "limitations": []
+  "summary": "What was done, what each output contains, and any unresolved constraint."
 }
 ```
 
 - `summary` is required and user-facing.
-- `limitations` names unresolved source/access/freshness constraints; an empty
-  list is explicit.
+- Concrete unresolved source, access, or freshness constraints belong in the
+  summary as claims for the verifier to evaluate.
 - Requested outputs and evidence are derived from the authoritative manifest,
   rather than repeated as worker-authored finish input.
 - `finish` must be the only tool call in its assistant response.
@@ -686,11 +685,11 @@ worker's first per-run message. It captures only user-observable requirements:
 - requested screenshots or downloads;
 - explicit required values and source constraints.
 
-The worker cannot restate or revise the contract. New facts about source
-availability are reported in `limitations`; user clarifications are recorded
-in the conversation and verifier context. The verifier always compares the
-actual user task as well as the initializer output, so a bad initializer cannot
-rewrite the task.
+The worker cannot restate or revise the contract. New claims about source
+availability may be reported in the final summary; user clarifications are
+recorded in the conversation and verifier context. The verifier always
+compares the actual user task as well as the initializer output, so a bad
+initializer cannot rewrite the task.
 
 Initializer unavailability does not produce a false-success fallback. The run
 ends incomplete with its run directory preserved.
@@ -706,10 +705,12 @@ before spending a verifier attempt:
 - CSV/JSON/Markdown tables have exactly the declared columns and valid row
   shapes—extra columns fail;
 - exact/min/max/available count rules and required values hold;
-- documents and captures are non-empty and contain no obvious placeholders;
+- documents and captures are non-empty and satisfy their declared structural
+  and media requirements; prose quality is judged by the verifier rather than
+  lexical placeholder matching;
 - requested screenshots/downloads carry appropriate roles and source data;
 - browser-backed runs include at least one evidence screenshot unless the task
-  itself or an explicitly reported access limitation makes that impossible;
+  itself explicitly forbids screenshots;
 - helper proposals are evidence-only unless the user requested them.
 
 Checks operate on generic artifact bytes and manifest metadata, not a hidden

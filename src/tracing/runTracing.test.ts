@@ -147,7 +147,6 @@ function finishResponse(usage: Usage): ModelResponse {
         name: 'finish',
         input: {
           summary: 'Published the requested traced output.',
-          limitations: [],
         },
       },
     ],

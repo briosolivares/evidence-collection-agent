@@ -37,7 +37,6 @@ const TASK =
 const REPORT = 'name\nAlice\n';
 const FINISH = {
   summary: 'Published the requested one-row report.',
-  limitations: [],
 };
 
 const CONTRACT: OutputContract = {
