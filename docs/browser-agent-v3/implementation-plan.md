@@ -126,6 +126,21 @@ gate passes 5 files / 57 tests; the provider contract passes all three provider
 variants; `npm run typecheck` passes; and the complete hermetic suite passes
 136 files / 1,478 tests. `git diff --check` is clean.
 
+## Program-oriented browser batching (2026-08-17)
+
+- [x] Present `browser_execute` as a small multi-line browser program rather
+  than a single browser action.
+- [x] Add one compact model-visible loop example with a bounded item slice and
+  per-item error handling.
+- [x] Recommend one bounded call for three or more known mechanical items,
+  normally in chunks of up to 20, while retaining the existing split rules.
+- [x] Keep runtime behavior and the eight-tool API unchanged; update only
+  existing assertions and run focused plus complete verification.
+
+The cached-prefix/tool gate passes 2 files / 12 tests; `npm run typecheck` and
+`git diff --check` pass; and the complete hermetic suite passes 136 files /
+1,478 tests. No test file, tool, runtime path, or dynamic schema was added.
+
 ## YC W24 outreach grader correction complete (2026-08-17)
 
 - [x] Define each selected company's required founder roster from the active

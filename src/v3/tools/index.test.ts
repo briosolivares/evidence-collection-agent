@@ -67,6 +67,13 @@ describe('v3 tool registry', () => {
       expect(definition.input_schema).not.toHaveProperty('anyOf');
       expect(definition.input_schema).not.toHaveProperty('oneOf');
     }
+
+    expect(V3_API_TOOL_DEFS[0]?.description).toContain(
+      'small multi-line browser program, not a single browser action',
+    );
+    expect(JSON.stringify(V3_API_TOOL_DEFS[0]?.input_schema)).toContain(
+      'items.slice(0, 20)',
+    );
   });
 
   it('produces byte-identical API definitions across policies, runs, and denylists', () => {

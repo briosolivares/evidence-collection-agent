@@ -70,7 +70,11 @@ export const browserExecuteInputSchema = z.strictObject({
       },
     )
     .describe(
-      'Body of an async JavaScript function receiving the protected `browser` helper object.',
+      'Body of an async JavaScript function receiving the protected `browser` helper object. ' +
+        'Example batch shape: `const items = [/* known { id, url } items */]; const results = []; ' +
+        'for (const item of items.slice(0, 20)) { try { const page = await browser.goto(item.url); ' +
+        "results.push({ id: item.id, url: page.url, title: await browser.js('document.title') }); " +
+        '} catch (error) { results.push({ id: item.id, error: String(error) }); } } return results;`',
     ),
   page_id: z
     .string()
@@ -129,6 +133,10 @@ export function createBrowserExecuteTool(
       'Run one bounded async JavaScript program against an exact browser page. The program ' +
       'receives `browser`, which provides raw CDP plus protected inspection, interaction, ' +
       'navigation, wait, tab, dialog, confined importModule, and upload helpers. ' +
+      'Treat this as a small multi-line browser program, not a single browser action. When ' +
+      'three or more known items require the same mechanical workflow, normally process a ' +
+      'bounded batch of up to 20 in one call. Split when the next step requires judgment, ' +
+      'visual inspection, human authority, or resolving an ambiguous target. ' +
       'browser.upload targets a backend DOM node and a path relative to scratch/workspace. ' +
       'Use page_id to target a page returned by a prior result; omit it for the active task ' +
       'page. Intermediate files belong in the current scratch/workspace directory and are ' +

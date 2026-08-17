@@ -22,6 +22,12 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain(
       'focuses an owned tab but never retargets the current program',
     );
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'small multi-line browser program, not a single browser action',
+    );
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'bounded batch of up to 20 in one call',
+    );
     expect(V3_SYSTEM_PROMPT).toContain('browser.importModule(workspacePath)');
     expect(V3_SYSTEM_PROMPT).toContain(
       'browser.upload(backendDOMNodeId, workspacePath)',
