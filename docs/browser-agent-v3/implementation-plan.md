@@ -54,6 +54,27 @@ coordinator/CLI/TUI boundary tests, 2 tracing tests, `npm run typecheck`, and
 the complete hermetic suite (136 files / 1,479 tests) all pass. The scoped
 code-and-documentation change removes 138 more lines than it adds.
 
+## Post-eval efficiency follow-ups complete (2026-08-17)
+
+- [x] Teach the worker to use fewer, larger `browser_execute` programs for
+  repeated list/detail extraction when one bounded program can safely perform
+  the whole mechanical sequence.
+- [x] Make the existing multi-call worker protocol explicit for independent
+  `publish_artifact` calls so several ready outputs can be published in one
+  model response without adding a batch tool.
+- [x] Extend Langfuse model observations to initializer and verifier calls so
+  whole-run latency, usage, and failures are attributable across all roles.
+- [x] Keep verification proportionate: update existing assertions where a
+  contract changes, but add no speculative or redundant regression suites.
+
+The tracing change preserves the stable `call-model` observation name and
+worker-only `turnCount`, adds filterable initializer/worker/verifier role
+metadata, and reports known aggregate usage on accepted and failed logical
+model calls. Verifier inspection tools remain outside this model-observation
+slice. No test files were added. The combined focused gate passes 6 files / 40
+tests, `npm run typecheck` passes, and the complete hermetic suite passes 136
+files / 1,479 tests.
+
 ## Binding decisions
 
 These decisions are made for the current implementation. Change one only by

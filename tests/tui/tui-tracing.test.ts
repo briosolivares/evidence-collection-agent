@@ -323,8 +323,12 @@ describe('createTuiTracing', () => {
     const tracing = createTuiTracing({ onEvent: () => {}, delegate });
 
     const callModel = async () => ({ content: [], stop_reason: null, usage: { input_tokens: 0, output_tokens: 0 } });
-    tracing.wrapCallModel(callModel, 'model-x');
-    expect(delegate.wrapCallModel).toHaveBeenCalledWith(callModel, 'model-x');
+    tracing.wrapCallModel(callModel, 'model-x', 'verifier');
+    expect(delegate.wrapCallModel).toHaveBeenCalledWith(
+      callModel,
+      'model-x',
+      'verifier',
+    );
 
     await tracing.traceRun('task', async () => 'result');
     expect(delegate.traceRun).toHaveBeenCalledTimes(1);

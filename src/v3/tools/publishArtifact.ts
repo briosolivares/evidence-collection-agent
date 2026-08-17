@@ -207,7 +207,9 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
     'to publish small final CSV, JSON, Markdown, or other UTF-8 content directly without an ' +
     'intermediate write_file call; choose kind=screenshot for browser PNG bytes or ' +
     'kind=download for browser-captured resource bytes. artifact_path must be under artifacts/. ' +
-    'Screenshot and download source provenance is derived from the browser. Overwriting is ' +
+    'Screenshot and download source provenance is derived from the browser. When several ' +
+    'independent outputs are already ready, you may issue multiple publish_artifact calls in ' +
+    'the same assistant response; they execute sequentially. Overwriting is ' +
     'allowed only when the existing artifact has the same role set.',
   inputSchema: publishArtifactInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),

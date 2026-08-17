@@ -33,6 +33,8 @@ import {
   V3_METRICS_FILENAME,
   type V3WorkerMetrics,
 } from '../v3/loop/workerSession.js';
+import { V3_INITIALIZER_MODEL } from '../v3/harness/initializer.js';
+import { V3_VERIFIER_MODEL } from '../v3/harness/verifier.js';
 import { createRunTracing } from './runTracing.js';
 
 const FIRST_USAGE: Usage = {
@@ -358,7 +360,7 @@ describe('createRunTracing with runTask', () => {
     );
 
     const spans = exporter.getFinishedSpans();
-    expect(spans).toHaveLength(4);
+    expect(spans).toHaveLength(6);
     const spansOfType = (type: string) =>
       spans.filter(
         (span) =>
@@ -368,7 +370,7 @@ describe('createRunTracing with runTask', () => {
     const generationSpans = spansOfType('generation');
     const toolSpans = spansOfType('tool');
     expect(agentSpans).toHaveLength(1);
-    expect(generationSpans).toHaveLength(2);
+    expect(generationSpans).toHaveLength(4);
     expect(toolSpans).toHaveLength(1);
 
     const root = agentSpans[0];
@@ -393,10 +395,23 @@ describe('createRunTracing with runTask', () => {
       )
       .sort((left, right) => left.input - right.input);
     expect(usageDetails).toEqual([
+      { input: 3, output: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+      { input: 4, output: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
       { input: 11, output: 3, cache_read_input_tokens: 2, cache_creation_input_tokens: 0 },
       { input: 13, output: 5, cache_read_input_tokens: 4, cache_creation_input_tokens: 0 },
     ]);
+    const rolesAndModels = generationSpans.map((span) => [
+      span.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.role`],
+      span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_MODEL],
+    ]).sort((left, right) => String(left[0]).localeCompare(String(right[0])));
+    expect(rolesAndModels).toEqual([
+      ['initializer', V3_INITIALIZER_MODEL],
+      ['verifier', V3_VERIFIER_MODEL],
+      ['worker', 'test-model'],
+      ['worker', 'test-model'],
+    ]);
     for (const generation of generationSpans) {
+      expect(generation.name).toBe('call-model');
       expect(
         generation.attributes[LangfuseOtelSpanAttributes.OBSERVATION_INPUT],
       ).toBeDefined();

@@ -131,7 +131,7 @@ describe('public runTask v3 adapter', () => {
     expect(browser.closeTaskPages).toHaveBeenCalledOnce();
     expect(tracing.traceRuns).toBe(1);
     expect(tracing.runDirs).toEqual([run.result.runDir]);
-    expect(tracing.modelCalls).toBe(2);
+    expect(tracing.modelCalls).toBe(4);
     expect(tracing.toolExecutions).toEqual(['publish_artifact']);
     expect(tracing.closeCalls).toBe(1);
 

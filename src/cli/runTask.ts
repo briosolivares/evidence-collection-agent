@@ -30,8 +30,14 @@ import { generateRunId } from '../run/runId.js';
 import type { RunOutcome } from '../run/runOutcome.js';
 import { createRunTracing, type RunTracing } from '../tracing/runTracing.js';
 import type { ToolCtx } from '../tools/registry.js';
-import { createV3ContractInitializerModelDriver } from '../v3/harness/initializer.js';
-import { createV3VerifierModelDriver } from '../v3/harness/verifier.js';
+import {
+  V3_INITIALIZER_MODEL,
+  createV3ContractInitializerModelDriver,
+} from '../v3/harness/initializer.js';
+import {
+  V3_VERIFIER_MODEL,
+  createV3VerifierModelDriver,
+} from '../v3/harness/verifier.js';
 import {
   readV3CheckpointResumeInfo,
   v3CeilingFromCheckpoint,
@@ -224,14 +230,19 @@ async function executeV3Run(
       }),
     );
 
-    const initializerModel = modelFromCallModel(
-      config.harness?.initializerCallModel,
-      () =>
-        createV3ContractInitializerModelDriver({
-          ...(config.createStream === undefined
-            ? {}
-            : { createStream: config.createStream }),
-        }),
+    const initializerModel = traceModelDriver(
+      modelFromCallModel(
+        config.harness?.initializerCallModel,
+        () =>
+          createV3ContractInitializerModelDriver({
+            ...(config.createStream === undefined
+              ? {}
+              : { createStream: config.createStream }),
+          }),
+      ),
+      tracing,
+      V3_INITIALIZER_MODEL,
+      'initializer',
     );
     const workerModel = traceModelDriver(
       modelFromCallModel(
@@ -249,15 +260,21 @@ async function executeV3Run(
       ),
       tracing,
       configuration.model,
+      'worker',
     );
-    const verifierModel = modelFromCallModel(
-      config.harness?.verifierCallModel,
-      () =>
-        createV3VerifierModelDriver({
-          ...(config.createStream === undefined
-            ? {}
-            : { createStream: config.createStream }),
-        }),
+    const verifierModel = traceModelDriver(
+      modelFromCallModel(
+        config.harness?.verifierCallModel,
+        () =>
+          createV3VerifierModelDriver({
+            ...(config.createStream === undefined
+              ? {}
+              : { createStream: config.createStream }),
+          }),
+      ),
+      tracing,
+      V3_VERIFIER_MODEL,
+      'verifier',
     );
 
     return await tracing.traceRun(configuration.taskText, async () => {
@@ -474,6 +491,7 @@ function traceModelDriver(
   driver: ModelDriver,
   tracing: RunTracing,
   model: string,
+  role: 'initializer' | 'worker' | 'verifier',
 ): ModelDriver {
   return {
     async generate(options): Promise<AcceptedModelResponse> {
@@ -486,7 +504,7 @@ function traceModelDriver(
           // request, including a discarded max_tokens re-ask.
           usage: accepted.usage,
         };
-      }, model);
+      }, model, role);
       await traced(options.messages);
       if (accepted === undefined) {
         throw new Error('traced v3 model call returned without an accepted response');

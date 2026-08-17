@@ -10,6 +10,8 @@ import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 import type { CallModel } from '../loop/messages.js';
+import { knownModelUsageFromError } from '../model/modelDriver.js';
+import type { ModelRole } from '../run/runBudget.js';
 import type {
   ToolCtx,
   ToolDef,
@@ -36,7 +38,11 @@ export interface RunTracing {
    * compatible; the TUI uses it to cover tool-free terminal paths. */
   announceRunDir?(runDir: string): void;
   /** Return a CallModel with one generation observation per invocation. */
-  wrapCallModel(callModel: CallModel, model?: string): CallModel;
+  wrapCallModel(
+    callModel: CallModel,
+    model?: string,
+    role?: ModelRole,
+  ): CallModel;
   /** Return a registry with one tool observation per executor invocation. */
   wrapRegistry(registry: ToolRegistry): ToolRegistry;
   /** Run an operation inside the run's root agent observation. */
@@ -111,16 +117,25 @@ function createEnabledRunTracing(
   let turnCount = 0;
   const toolsUsed = new Set<string>();
 
-  const wrapCallModel = (callModel: CallModel, model?: string): CallModel => {
+  const wrapCallModel = (
+    callModel: CallModel,
+    model?: string,
+    role?: ModelRole,
+  ): CallModel => {
     return async (messages) => {
       if (!enabled) return callModel(messages);
 
-      turnCount += 1;
+      // `turnCount` has historically meant worker turns. Callers predating
+      // role attribution still receive that behavior, while private
+      // initializer/verifier calls remain visible as generations without
+      // changing the root metric's meaning.
+      if (role === undefined || role === 'worker') turnCount += 1;
       const generation = safelyStartObservation(() => startObservation(
         MODEL_OBSERVATION_NAME,
         {
           input: messages,
           ...(model === undefined ? {} : { model }),
+          ...(role === undefined ? {} : { metadata: { role } }),
         },
         {
           asType: 'generation',
@@ -134,17 +149,16 @@ function createEnabledRunTracing(
         const response = await callModel(messages);
         safelyObserve(() => generation?.update({
           output: response,
-          usageDetails: {
-            input: response.usage.input_tokens,
-            output: response.usage.output_tokens,
-            cache_read_input_tokens:
-              response.usage.cache_read_input_tokens ?? 0,
-            cache_creation_input_tokens:
-              response.usage.cache_creation_input_tokens ?? 0,
-          },
+          usageDetails: usageDetails(response.usage),
         }));
         return response;
       } catch (error) {
+        const usage = knownModelUsageFromError(error);
+        if (usage !== undefined) {
+          safelyObserve(() => generation?.update({
+            usageDetails: usageDetails(usage),
+          }));
+        }
         safelyRecordError(generation, error);
         throw error;
       } finally {
@@ -278,6 +292,20 @@ function runMetadata(
     turnCount,
     toolsUsed: [...toolsUsed],
     latencyMs: Date.now() - startedMs,
+  };
+}
+
+function usageDetails(usage: {
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_input_tokens?: number | null;
+  cache_creation_input_tokens?: number | null;
+}): Record<string, number> {
+  return {
+    input: usage.input_tokens,
+    output: usage.output_tokens,
+    cache_read_input_tokens: usage.cache_read_input_tokens ?? 0,
+    cache_creation_input_tokens: usage.cache_creation_input_tokens ?? 0,
   };
 }
 
