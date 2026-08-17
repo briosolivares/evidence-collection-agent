@@ -30,6 +30,8 @@ const MAX_ERROR_NAME_BYTES = 256;
 const MAX_ERROR_MESSAGE_BYTES = 8_192;
 const MAX_ERROR_STACK_BYTES = 24_576;
 const MAX_CDP_METHOD_BYTES = 512;
+const MAX_NAVIGATION_URL_BYTES = 256_000;
+const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const CHILD_MODULE = fileURLToPath(new URL('./child.mjs', import.meta.url));
 
 export type BrowserProgramStatus =
@@ -53,6 +55,13 @@ export interface BrowserProgramPageIdentity {
   targetId: string;
 }
 
+export interface BrowserProgramNavigationResult {
+  pageId: string;
+  targetId: string;
+  url: string;
+  title: string;
+}
+
 export interface BrowserProgramOptions {
   /** Async-function body executed with one argument named `browser`. */
   code: string;
@@ -71,6 +80,11 @@ export interface BrowserProgramOptions {
   abortSignal?: AbortSignal;
   /** Parent-owned, target-pinned CDP sender. It must not expose a CDP URL. */
   sendCdp(method: string, params: Record<string, unknown>): Promise<unknown>;
+  /** Parent-owned navigation transaction on the same pinned page. */
+  navigate(
+    url: string,
+    options: { timeoutMs: number; waitUntil: 'domcontentloaded' | 'load' },
+  ): Promise<BrowserProgramNavigationResult>;
   /** Parent-owned upload effect. The implementation must confine workspacePath
    * before invoking the exact target-pinned command session. */
   upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
@@ -250,6 +264,7 @@ function validateOptions(options: BrowserProgramOptions): void {
     );
   }
   if (typeof options.sendCdp !== 'function') throw new TypeError('sendCdp must be a function');
+  if (typeof options.navigate !== 'function') throw new TypeError('navigate must be a function');
   if (typeof options.upload !== 'function') throw new TypeError('upload must be a function');
   if (
     !Number.isInteger(options.timeoutMs) ||
@@ -659,25 +674,41 @@ export async function runBrowserProgram(
       });
     };
 
-    const replyToHost = (id: number, error?: unknown): void => {
+    const replyToHost = (id: number, value: unknown, error?: unknown): void => {
       if (settled || outcome) return;
-      sendToChild(
-        error === undefined
-          ? {
-              version: PROTOCOL_VERSION,
-              kind: 'host_response',
-              id,
-              ok: true,
-              value: null,
-            }
-          : {
-              version: PROTOCOL_VERSION,
-              kind: 'host_response',
-              id,
-              ok: false,
-              error: structuredError(error),
-            },
-      );
+      if (error !== undefined) {
+        sendToChild({
+          version: PROTOCOL_VERSION,
+          kind: 'host_response',
+          id,
+          ok: false,
+          error: structuredError(error),
+        });
+        return;
+      }
+      try {
+        const response = {
+          version: PROTOCOL_VERSION,
+          kind: 'host_response',
+          id,
+          ok: true,
+          value: normalizedJsonValue(value),
+        };
+        if (serializedSize(response) > BROWSER_PROGRAM_LIMITS.maxIpcMessageBytes) {
+          throw new RangeError(
+            `host reply exceeds ${BROWSER_PROGRAM_LIMITS.maxIpcMessageBytes} bytes`,
+          );
+        }
+        sendToChild(response);
+      } catch (replyError) {
+        sendToChild({
+          version: PROTOCOL_VERSION,
+          kind: 'host_response',
+          id,
+          ok: false,
+          error: structuredError(replyError),
+        });
+      }
     };
 
     const handleCdpRequest = (message: Record<string, unknown>): void => {
@@ -731,29 +762,47 @@ export async function runBrowserProgram(
       const id = message.id;
       const operation = message.operation;
       const params = message.params;
-      if (
-        !Number.isSafeInteger(id) ||
-        (id as number) <= 0 ||
-        operation !== 'upload' ||
-        !isRecord(params) ||
-        !Number.isInteger(params.backendDOMNodeId) ||
-        (params.backendDOMNodeId as number) <= 0 ||
-        (params.backendDOMNodeId as number) > 2_147_483_647 ||
-        typeof params.workspacePath !== 'string' ||
-        params.workspacePath.length === 0 ||
-        Buffer.byteLength(params.workspacePath, 'utf8') >
-          BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes ||
-        Object.keys(message).some(
+      const validEnvelope =
+        Number.isSafeInteger(id) &&
+        (id as number) > 0 &&
+        isRecord(params) &&
+        !Object.keys(message).some(
           (key) =>
             key !== 'version' &&
             key !== 'kind' &&
             key !== 'id' &&
             key !== 'operation' &&
             key !== 'params',
-        ) ||
-        Object.keys(params).some(
+        );
+      const validUpload =
+        operation === 'upload' &&
+        isRecord(params) &&
+        Number.isInteger(params.backendDOMNodeId) &&
+        (params.backendDOMNodeId as number) > 0 &&
+        (params.backendDOMNodeId as number) <= 2_147_483_647 &&
+        typeof params.workspacePath === 'string' &&
+        params.workspacePath.length > 0 &&
+        Buffer.byteLength(params.workspacePath, 'utf8') <=
+          BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes &&
+        !Object.keys(params).some(
           (key) => key !== 'backendDOMNodeId' && key !== 'workspacePath',
-        )
+        );
+      const validNavigation =
+        operation === 'navigate' &&
+        isRecord(params) &&
+        typeof params.url === 'string' &&
+        params.url.length > 0 &&
+        Buffer.byteLength(params.url, 'utf8') <= MAX_NAVIGATION_URL_BYTES &&
+        Number.isInteger(params.timeoutMs) &&
+        (params.timeoutMs as number) >= 1 &&
+        (params.timeoutMs as number) <= MAX_NAVIGATION_TIMEOUT_MS &&
+        (params.waitUntil === 'domcontentloaded' || params.waitUntil === 'load') &&
+        !Object.keys(params).some(
+          (key) => key !== 'url' && key !== 'timeoutMs' && key !== 'waitUntil',
+        );
+      if (
+        !validEnvelope ||
+        (!validUpload && !validNavigation)
       ) {
         beginTermination({
           status: 'protocol_error',
@@ -781,16 +830,24 @@ export async function runBrowserProgram(
         return;
       }
       pendingHost.add(requestId);
+      const effect = validUpload
+        ? () =>
+            options
+              .upload(
+                params.backendDOMNodeId as number,
+                params.workspacePath as string,
+              )
+              .then(() => null)
+        : () =>
+            options.navigate(params.url as string, {
+              timeoutMs: params.timeoutMs as number,
+              waitUntil: params.waitUntil as 'domcontentloaded' | 'load',
+            });
       Promise.resolve()
-        .then(() =>
-          options.upload(
-            params.backendDOMNodeId as number,
-            params.workspacePath as string,
-          ),
-        )
+        .then(effect)
         .then(
-          () => replyToHost(requestId),
-          (error: unknown) => replyToHost(requestId, error),
+          (value) => replyToHost(requestId, value),
+          (error: unknown) => replyToHost(requestId, null, error),
         )
         .finally(() => pendingHost.delete(requestId));
     };

@@ -93,6 +93,16 @@ describe('PlaywrightBrowserController command sessions', () => {
 
       const selected = await controller.openCommandSession();
       expect(selected.pageId).toBe(selectedPage!.pageId);
+      const navigation = await selected.navigate(
+        'data:text/html,<title>Settled navigation</title><main>ready</main>',
+        { timeoutMs: 5_000, waitUntil: 'domcontentloaded' },
+      );
+      expect(navigation).toMatchObject({
+        pageId: selected.pageId,
+        targetId: selected.targetId,
+        title: 'Settled navigation',
+      });
+      expect(navigation.url).toContain('data:text/html');
       const selectedEvaluation = (await selected.send('Runtime.evaluate', {
         expression: "document.title = 'selected command target'; document.title",
         returnByValue: true,
@@ -159,6 +169,7 @@ describe('PlaywrightBrowserController command sessions', () => {
 
       expect(Object.keys(session).sort()).toEqual([
         'close',
+        'navigate',
         'pageId',
         'send',
         'targetId',
@@ -232,10 +243,17 @@ describe('command-session transport boundary', () => {
   } = {}): {
     context: BrowserContext;
     page: Page;
+    goto: ReturnType<typeof vi.fn>;
     send: ReturnType<typeof vi.fn>;
     detach: ReturnType<typeof vi.fn>;
   } {
-    const page = { isClosed: () => false } as unknown as Page;
+    const goto = vi.fn(async () => undefined);
+    const page = {
+      isClosed: () => false,
+      goto,
+      url: () => 'https://example.test/settled',
+      title: vi.fn(async () => 'Settled title'),
+    } as unknown as Page;
     const send = vi.fn(async (method: string) => {
       if (method === 'Target.getTargetInfo') {
         return { targetInfo: { targetId: 'target-exact' } };
@@ -251,11 +269,11 @@ describe('command-session transport boundary', () => {
         return cdp;
       }),
     } as unknown as BrowserContext;
-    return { context, page, send, detach };
+    return { context, page, goto, send, detach };
   }
 
   it('detaches exactly once, rejects later sends, and retains only safe identity', async () => {
-    const { context, page, send, detach } = fakeTarget();
+    const { context, page, goto, send, detach } = fakeTarget();
     const session = await openPlaywrightCommandSession(context, page, 'page-exact', {
       targetPolicy: allowOwnedTargets('target-exact'),
     });
@@ -264,6 +282,21 @@ describe('command-session transport boundary', () => {
     expect(session.targetId).toBe('target-exact');
     expect(await session.send('Experimental.command', { enabled: true })).toEqual({ ok: true });
     expect(send).toHaveBeenLastCalledWith('Experimental.command', { enabled: true });
+    await expect(
+      session.navigate('https://example.test/settled', {
+        timeoutMs: 2_500,
+        waitUntil: 'load',
+      }),
+    ).resolves.toEqual({
+      pageId: 'page-exact',
+      targetId: 'target-exact',
+      url: 'https://example.test/settled',
+      title: 'Settled title',
+    });
+    expect(goto).toHaveBeenCalledExactlyOnceWith(
+      'https://example.test/settled',
+      { timeout: 2_500, waitUntil: 'load' },
+    );
 
     await session.close();
     await session.close();
@@ -515,6 +548,7 @@ describe('command-session transport boundary', () => {
       timeoutMs: 1_000,
       maxOutputBytes: 1_000_000,
       sendCdp: (method, params) => session.send(method, params),
+      navigate: (url, options) => session.navigate(url, options),
       upload: (backendDOMNodeId, workspacePath) =>
         session.upload(backendDOMNodeId, `/confined/${workspacePath}`),
     });

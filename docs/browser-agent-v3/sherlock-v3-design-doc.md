@@ -461,9 +461,11 @@ best-effort direct-child kill.
 
 ### 8.3 Core browser API
 
-The child preloads a small helper object. Every helper is implemented in terms
-of raw CDP, so helpers remain inspectable and replaceable rather than becoming
-a second browser framework.
+The child preloads a small helper object. Most helpers are implemented in terms
+of raw CDP. Operations that require parent-owned containment, currently
+navigation and upload, cross the same bounded private IPC into the exact pinned
+command session. Helpers remain inspectable and replaceable rather than
+becoming a second browser framework.
 
 ```ts
 interface BrowserProgramApi {
@@ -478,7 +480,18 @@ interface BrowserProgramApi {
     page: { width: number; height: number };
   }>;
   accessibility(query?: AccessibilityQuery): Promise<unknown>;
-  goto(url: string): Promise<unknown>;
+  goto(
+    url: string,
+    options?: {
+      timeoutMs?: number;
+      waitUntil?: "domcontentloaded" | "load";
+    },
+  ): Promise<{
+    pageId: string;
+    targetId: string;
+    url: string;
+    title: string;
+  }>;
   click(x: number, y: number, options?: ClickOptions): Promise<void>;
   type(text: string): Promise<void>;
   press(key: string, options?: KeyOptions): Promise<void>;
@@ -494,6 +507,12 @@ interface BrowserProgramApi {
   upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
 }
 ```
+
+`goto` defaults to a 15-second `domcontentloaded` wait, rejects unknown option
+keys, contains timeout/failure through the parent-owned page operation, and
+returns only after the requested lifecycle state. Raw `Page.navigate` remains
+the deliberate non-waiting escape hatch. `activate` changes browser focus only;
+it never retargets the program's command session away from its initial page.
 
 `importModule` validates a no-follow, regular entry file under the run
 workspace and enforces its entry-size bound before import. Nested imports use

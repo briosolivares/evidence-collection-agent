@@ -33,6 +33,12 @@ export function stubBrowser(): BrowserController {
       pageId,
       targetId: 'target-stub',
       send: vi.fn(async () => ({})),
+      navigate: vi.fn(async (url: string) => ({
+        pageId,
+        targetId: 'target-stub',
+        url,
+        title: '',
+      })),
       upload: vi.fn(async () => {}),
       close: vi.fn(async () => {}),
     })),

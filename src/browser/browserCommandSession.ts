@@ -1,6 +1,10 @@
 import type { BrowserContext, CDPSession, Page } from 'playwright';
 
-import type { BrowserCommandSession } from './controller.js';
+import type {
+  BrowserCommandSession,
+  BrowserNavigationOptions,
+  BrowserNavigationResult,
+} from './controller.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
 import {
   localUploadEncoder,
@@ -11,6 +15,9 @@ import {
  * happens to echo one, it must stop at this controller-owned boundary. */
 const TRANSPORT_URL = /\b(?:https?|wss?):\/\/[^\s"'<>]+/giu;
 const DETACH_DEADLINE_MS = 1_000;
+const NAVIGATION_STOP_DEADLINE_MS = 1_000;
+const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
+const MAX_NAVIGATION_URL_BYTES = 256_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
 
 type ArbitraryCdpSend = (
@@ -103,6 +110,49 @@ async function detachWithoutHanging(session: CDPSession): Promise<void> {
       session.detach().catch(() => undefined),
       new Promise<void>((resolve) => {
         timer = setTimeout(resolve, DETACH_DEADLINE_MS);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+}
+
+function validateNavigation(
+  url: string,
+  options: BrowserNavigationOptions,
+): void {
+  if (
+    typeof url !== 'string' ||
+    url.length === 0 ||
+    Buffer.byteLength(url, 'utf8') > MAX_NAVIGATION_URL_BYTES
+  ) {
+    throw new TypeError(
+      `browser navigation URL must contain 1 through ${MAX_NAVIGATION_URL_BYTES} UTF-8 bytes`,
+    );
+  }
+  if (
+    !Number.isInteger(options?.timeoutMs) ||
+    options.timeoutMs < 1 ||
+    options.timeoutMs > MAX_NAVIGATION_TIMEOUT_MS
+  ) {
+    throw new RangeError(
+      `browser navigation timeoutMs must be an integer from 1 through ${MAX_NAVIGATION_TIMEOUT_MS}`,
+    );
+  }
+  if (options.waitUntil !== 'domcontentloaded' && options.waitUntil !== 'load') {
+    throw new TypeError(
+      'browser navigation waitUntil must be domcontentloaded or load',
+    );
+  }
+}
+
+async function stopNavigationWithoutHanging(send: ArbitraryCdpSend): Promise<void> {
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    await Promise.race([
+      send('Page.stopLoading').catch(() => undefined),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, NAVIGATION_STOP_DEADLINE_MS);
       }),
     ]);
   } finally {
@@ -272,6 +322,18 @@ export async function openPlaywrightCommandSession(
   let closePromise: Promise<void> | undefined;
   const inFlightCommands = new Set<Promise<void>>();
   const inFlightUploads = new Set<Promise<void>>();
+  const trackCommand = async <Result>(operation: Promise<Result>): Promise<Result> => {
+    const settled = operation.then(
+      () => undefined,
+      () => undefined,
+    );
+    inFlightCommands.add(settled);
+    try {
+      return await operation;
+    } finally {
+      inFlightCommands.delete(settled);
+    }
+  };
   const commandSession: BrowserCommandSession = {
     pageId,
     targetId,
@@ -304,16 +366,34 @@ export async function openPlaywrightCommandSession(
           );
         }
       })();
-      const settled = operation.then(
-        () => undefined,
-        () => undefined,
-      );
-      inFlightCommands.add(settled);
-      try {
-        return await operation;
-      } finally {
-        inFlightCommands.delete(settled);
+      return trackCommand(operation);
+    },
+    async navigate(url, options): Promise<BrowserNavigationResult> {
+      if (closed) {
+        throw new Error(`Browser command session for pageId ${pageId} is closed.`);
       }
+      validateNavigation(url, options);
+      const operation = (async () => {
+        try {
+          await page.goto(url, {
+            timeout: options.timeoutMs,
+            waitUntil: options.waitUntil,
+          });
+          return {
+            pageId,
+            targetId,
+            url: page.url(),
+            title: await page.title(),
+          };
+        } catch (error) {
+          await stopNavigationWithoutHanging(send);
+          throw commandError(
+            `Browser navigation failed for pageId ${pageId}`,
+            error,
+          );
+        }
+      })();
+      return trackCommand(operation);
     },
     upload(backendDOMNodeId, absolutePath) {
       if (closed) {

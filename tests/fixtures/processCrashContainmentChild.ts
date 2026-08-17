@@ -72,6 +72,12 @@ async function main(): Promise<void> {
     timeoutMs: 120_000,
     maxOutputBytes: 1_000_000,
     sendCdp: async () => ({}),
+    navigate: async (url) => ({
+      pageId: 'crash-fixture-page',
+      targetId: 'crash-fixture-target',
+      url,
+      title: '',
+    }),
     upload: async () => undefined,
   });
 }

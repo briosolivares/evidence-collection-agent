@@ -98,6 +98,12 @@ function options(
     timeoutMs: DEFAULT_TIMEOUT_MS,
     maxOutputBytes: DEFAULT_OUTPUT_BYTES,
     sendCdp: async () => ({}),
+    navigate: async (url) => ({
+      pageId: 'sherlock-page-1',
+      targetId: 'current-target',
+      url,
+      title: '',
+    }),
     upload: async () => undefined,
     ...overrides,
   };
@@ -263,8 +269,14 @@ describe('runBrowserProgram', () => {
     expect(oversized.error?.message).toContain('workspace module exceeds 1048576 bytes');
   });
 
-  it('composes the protected helpers entirely from CDP requests', async () => {
+  it('composes protected helpers from pinned CDP and host navigation requests', async () => {
     const calls: Array<{ method: string; params: Record<string, unknown> }> = [];
+    const navigate = vi.fn(async (url: string) => ({
+      pageId: 'sherlock-page-1',
+      targetId: 'current-target',
+      url,
+      title: 'Settled destination',
+    }));
     const sendCdp = async (method: string, params: Record<string, unknown>) => {
       calls.push({ method, params });
       if (method === 'Runtime.evaluate') {
@@ -342,7 +354,7 @@ describe('runBrowserProgram', () => {
         `
           const info = await browser.pageInfo();
           const ax = await browser.accessibility({ role: 'button', text: 'save', maxDepth: 8, maxNodes: 10 });
-          await browser.goto('https://example.test/destination');
+          const navigation = await browser.goto('https://example.test/destination', { timeoutMs: 1234, waitUntil: 'load' });
           await browser.click(100, 200, { button: 'left', clickCount: 2 });
           await browser.type('hello');
           await browser.press('Enter');
@@ -353,9 +365,9 @@ describe('runBrowserProgram', () => {
           const opened = await browser.open('https://example.test/new');
           await browser.activate('current-target');
           await browser.close('new-target');
-          return { info, ax, loaded, found, listed, opened };
+          return { info, ax, navigation, loaded, found, listed, opened };
         `,
-        { sendCdp },
+        { sendCdp, navigate },
       ),
     );
 
@@ -372,6 +384,12 @@ describe('runBrowserProgram', () => {
         totalNodes: 2,
         matchedNodes: 1,
         truncated: false,
+      },
+      navigation: {
+        pageId: 'sherlock-page-1',
+        targetId: 'current-target',
+        url: 'https://example.test/destination',
+        title: 'Settled destination',
       },
       loaded: true,
       found: true,
@@ -394,6 +412,23 @@ describe('runBrowserProgram', () => {
       method: 'Target.closeTarget',
       params: { targetId: 'new-target' },
     });
+    expect(navigate).toHaveBeenCalledExactlyOnceWith(
+      'https://example.test/destination',
+      { timeoutMs: 1234, waitUntil: 'load' },
+    );
+  });
+
+  it('rejects unsupported goto options instead of silently ignoring them', async () => {
+    const navigate = vi.fn(options('').navigate);
+    const result = await runBrowserProgram(
+      options(`return browser.goto('https://example.test', { timeout: 15_000 });`, {
+        navigate,
+      }),
+    );
+
+    expect(result.status).toBe('failed');
+    expect(result.error?.message).toContain('use timeoutMs instead of timeout');
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it('returns the controller page identity and fails if CDP reports a different target', async () => {

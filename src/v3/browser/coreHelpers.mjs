@@ -15,6 +15,7 @@ const MAX_STRING_ARGUMENT_BYTES = 256_000;
 const MAX_AX_NODES = 1_000;
 const MAX_AX_DEPTH = 50;
 const MAX_WAIT_MS = 120_000;
+const DEFAULT_NAVIGATION_TIMEOUT_MS = 15_000;
 const MAX_DIALOG_PROMPT_BYTES = 16_384;
 const MAX_WORKSPACE_PATH_BYTES = 4_096;
 const MAX_WORKSPACE_MODULE_BYTES = 1_048_576;
@@ -42,6 +43,16 @@ function plainObject(value, label) {
     throw new TypeError(`${label} must be an object`);
   }
   return value;
+}
+
+function rejectUnknownKeys(value, label, allowedKeys) {
+  const unknown = Object.keys(value).filter((key) => !allowedKeys.includes(key));
+  if (unknown.length === 0) return;
+  const hint = unknown.includes('timeout') ? '; use timeoutMs instead of timeout' : '';
+  throw new TypeError(
+    `${label} contains unsupported ${unknown.length === 1 ? 'key' : 'keys'} ` +
+      `${unknown.map((key) => JSON.stringify(key)).join(', ')}${hint}`,
+  );
 }
 
 function boundedString(
@@ -226,6 +237,34 @@ function waitOptions(input) {
   boundedInteger(timeoutMs, 'wait timeoutMs', 0, MAX_WAIT_MS);
   boundedInteger(pollIntervalMs, 'wait pollIntervalMs', 10, 5_000);
   return { timeoutMs, pollIntervalMs };
+}
+
+function navigationOptions(input) {
+  const options = plainObject(input, 'goto options');
+  rejectUnknownKeys(options, 'goto options', ['timeoutMs', 'waitUntil']);
+  const timeoutMs = options.timeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS;
+  const waitUntil = options.waitUntil ?? 'domcontentloaded';
+  boundedInteger(timeoutMs, 'goto timeoutMs', 1, MAX_WAIT_MS);
+  if (waitUntil !== 'domcontentloaded' && waitUntil !== 'load') {
+    throw new TypeError('goto waitUntil must be domcontentloaded or load');
+  }
+  return { timeoutMs, waitUntil };
+}
+
+function normalizedNavigationResult(value) {
+  const result = plainObject(value, 'goto result');
+  return {
+    pageId: boundedString(result.pageId, 'goto result pageId', { maxBytes: 4_096 }),
+    targetId: boundedString(result.targetId, 'goto result targetId', { maxBytes: 4_096 }),
+    url: boundedString(result.url, 'goto result URL', {
+      allowEmpty: true,
+      maxBytes: MAX_STRING_ARGUMENT_BYTES,
+    }),
+    title: boundedString(result.title, 'goto result title', {
+      allowEmpty: true,
+      maxBytes: MAX_STRING_ARGUMENT_BYTES,
+    }),
+  };
 }
 
 function delay(ms) {
@@ -430,7 +469,14 @@ export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
     };
   };
 
-  const goto = async (url) => cdp('Page.navigate', { url: boundedString(url, 'URL') });
+  const goto = async (url, input = {}) => {
+    const options = navigationOptions(input);
+    const result = await requestHost('navigate', {
+      url: boundedString(url, 'URL'),
+      ...options,
+    });
+    return normalizedNavigationResult(result);
+  };
 
   const click = async (x, y, input = {}) => {
     const options = plainObject(input, 'click options');

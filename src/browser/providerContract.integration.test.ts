@@ -151,6 +151,7 @@ describe('v3 provider-neutral browser contract', () => {
 
         expect(Object.keys(command).sort()).toEqual([
           'close',
+          'navigate',
           'pageId',
           'send',
           'targetId',

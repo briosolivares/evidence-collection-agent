@@ -72,6 +72,12 @@ function fakeBrowser(options: FakeBrowserOptions = {}) {
     pageId: 'page-task',
     targetId: 'target-task',
     send,
+    navigate: vi.fn(async (url: string) => ({
+      pageId: 'page-task',
+      targetId: 'target-task',
+      url,
+      title: '',
+    })),
     upload,
     close,
   };

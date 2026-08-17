@@ -106,6 +106,7 @@ describe('attached browser target authority', () => {
           timeoutMs: 20_000,
           maxOutputBytes: 100_000,
           sendCdp: (method, params) => command.send(method, params),
+          navigate: (url, options) => command.navigate(url, options),
           upload: (backendDOMNodeId, workspacePath) =>
             command.upload(backendDOMNodeId, workspacePath),
         });

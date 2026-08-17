@@ -214,6 +214,7 @@ async function executeBrowserProgram(
         targetId: commandSession.targetId,
       },
       sendCdp: (method, params) => commandSession!.send(method, params),
+      navigate: (url, options) => commandSession!.navigate(url, options),
       upload: async (backendDOMNodeId, workspacePath) => {
         const absolutePath = resolveWorkspaceUploadPath(
           workspaceDir,

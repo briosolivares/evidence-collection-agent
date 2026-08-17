@@ -108,6 +108,24 @@ The focused gate passes 8 files / 170 tests, `npm run typecheck` passes, and
 the complete hermetic suite passes 136 files / 1,477 tests. The whole-tree
 diff check is clean.
 
+## Truthful navigation helper semantics (2026-08-17)
+
+- [x] Replace fire-and-forget `browser.goto(url)` with a strict optional
+  `{ timeoutMs, waitUntil }` contract.
+- [x] Run navigation through the exact parent-owned Playwright page, detect
+  failures, and wait for the requested lifecycle state before returning.
+- [x] Return the settled page identity, URL, and title; retain raw CDP as the
+  explicit non-waiting escape hatch.
+- [x] Clarify that `activate(targetId)` focuses an owned tab but does not
+  retarget the browser program's pinned command session.
+- [x] Update the existing helper/prompt/design assertions and run focused real
+  Chrome navigation coverage, typecheck, and the complete hermetic suite.
+
+The combined helper, tool, prompt, exact-command-session, and target-authority
+gate passes 5 files / 57 tests; the provider contract passes all three provider
+variants; `npm run typecheck` passes; and the complete hermetic suite passes
+136 files / 1,478 tests. `git diff --check` is clean.
+
 ## YC W24 outreach grader correction complete (2026-08-17)
 
 - [x] Define each selected company's required founder roster from the active
