@@ -61,6 +61,8 @@ const configuration: V3DurableRunConfiguration = {
     maxWorkerTurns: 24,
     maxToolCalls: 100,
     maxModelTokens: 250_000,
+    // Retained here to exercise read compatibility with checkpoints written
+    // before the cumulative tool-result ceiling was retired.
     maxToolResultBytes: 5_000_000,
     maxWallTimeMs: 3_600_000,
     maxVerifierCorrections: 3,

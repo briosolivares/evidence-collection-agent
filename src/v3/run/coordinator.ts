@@ -1405,7 +1405,6 @@ function budgetConfig(
     maxWorkerTurns: v3CeilingFromCheckpoint(limits.maxWorkerTurns),
     maxToolCalls: v3CeilingFromCheckpoint(limits.maxToolCalls),
     maxModelTokens: v3CeilingFromCheckpoint(limits.maxModelTokens),
-    maxToolResultBytes: v3CeilingFromCheckpoint(limits.maxToolResultBytes),
     maxWallTimeMs: v3CeilingFromCheckpoint(limits.maxWallTimeMs),
     maxVerifierCorrections: v3CeilingFromCheckpoint(
       limits.maxVerifierCorrections,
@@ -1443,7 +1442,6 @@ function workerIncomplete(
     'context_budget',
     'tool_calls',
     'model_tokens',
-    'tool_result_bytes',
     'wall_time',
     'verifier_corrections',
   ];

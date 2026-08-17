@@ -11,7 +11,6 @@ function budget(maxWallTimeMs: number) {
     maxWorkerTurns: Infinity,
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
-    maxToolResultBytes: Infinity,
     maxWallTimeMs,
     maxVerifierCorrections: Infinity,
   });

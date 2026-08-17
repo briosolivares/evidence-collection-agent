@@ -75,6 +75,39 @@ slice. No test files were added. The combined focused gate passes 6 files / 40
 tests, `npm run typecheck` passes, and the complete hermetic suite passes 136
 files / 1,479 tests.
 
+## Evidence screenshot efficiency follow-up (2026-08-17)
+
+- [x] Change the worker guidance from an open-ended minimum of one evidence
+  screenshot to one representative screenshot by default.
+- [x] Permit additional screenshots only when explicitly required or needed
+  to support materially distinct visual claims.
+- [x] Decide the cumulative result-byte policy separately from screenshot
+  guidance; retain per-result/per-message bounds and defer the independent
+  tool-call ceiling decision.
+
+This is guidance rather than a hard screenshot cap because contracts may
+legitimately require multiple views. The existing prompt assertion was updated;
+no new regression suite was added. The focused prompt suite passes 6/6,
+`npm run typecheck` passes, and the scoped diff check is clean.
+
+## Whole-run tool-result ceiling retirement (2026-08-17)
+
+- [x] Remove the arbitrary cumulative 5 MB model-visible tool-result ceiling
+  from public run configuration and live budget enforcement.
+- [x] Retain cumulative tool-result byte accounting in checkpoints and metrics
+  for observability.
+- [x] Retain the Claude-Code-style 50 KB per-result and 200 KB per-message
+  bounds, which offload complete oversized text under
+  `scratch/tool-output/` and leave a bounded preview in model context.
+- [x] Accept the retired durable configuration field when reading existing v3
+  checkpoints, but omit and ignore it for new runs.
+- [x] Run focused budget/worker/verifier/checkpoint/coordinator/CLI coverage,
+  typecheck, and scoped diff verification.
+
+The focused gate passes 8 files / 170 tests, `npm run typecheck` passes, and
+the complete hermetic suite passes 136 files / 1,477 tests. The whole-tree
+diff check is clean.
+
 ## YC W24 outreach grader correction complete (2026-08-17)
 
 - [x] Define each selected company's required founder roster from the active

@@ -81,7 +81,6 @@ const CONFIGURATION: V3DurableRunConfiguration = {
     maxWorkerTurns: 10,
     maxToolCalls: 20,
     maxModelTokens: 100_000,
-    maxToolResultBytes: 1_000_000,
     maxWallTimeMs: 120_000,
     maxVerifierCorrections: 2,
   },

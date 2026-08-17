@@ -112,7 +112,6 @@ describe('v3 session vertical acceptance', () => {
       maxWorkerTurns: Infinity,
       maxToolCalls: Infinity,
       maxModelTokens: Infinity,
-      maxToolResultBytes: Infinity,
       maxWallTimeMs: Infinity,
       maxVerifierCorrections: Infinity,
     });

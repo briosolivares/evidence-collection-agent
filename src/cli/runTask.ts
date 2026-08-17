@@ -59,15 +59,15 @@ const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
   devRoot: findDevRoot(PACKAGE_ROOT),
 }).runsBaseDir;
 
-/** Production defaults. Effect, tool, and wall-clock axes remain bounded;
- * aggregate model tokens are intentionally unbounded. */
+/** Production defaults. Tool outputs are bounded per result/message and
+ * offloaded to disk; whole-run model/tool-result totals remain observable
+ * without acting as arbitrary completion ceilings. */
 export const V3_PRODUCTION_DEFAULTS = Object.freeze({
   maxOutputTokens: 8_192,
   maxWorkerTurns: Infinity,
   maxContextTokens: 900_000,
   maxToolCalls: 100,
   maxModelTokens: Infinity,
-  maxToolResultBytes: 5_000_000,
   maxWallTimeMs: 3_600_000,
   maxCompletionCheckFailures: 5,
   maxVerifierCorrections: 2,
@@ -96,7 +96,6 @@ export interface RunTaskConfig {
   maxContextTokens?: number;
   maxToolCalls?: number;
   maxModelTokens?: number;
-  maxToolResultBytes?: number;
   maxWallTimeMs?: number;
   onProgress?: (event: ProgressEvent) => void;
   callModel?: CallModel;
@@ -123,7 +122,6 @@ export interface ResumeTaskConfig {
   maxContextTokens?: number;
   maxToolCalls?: number;
   maxModelTokens?: number;
-  maxToolResultBytes?: number;
   maxWallTimeMs?: number;
   startUrl?: string;
   onProgress?: (event: ProgressEvent) => void;
@@ -347,10 +345,6 @@ function buildFreshConfiguration(
       maxModelTokens: v3CeilingToCheckpoint(
         config.maxModelTokens ?? V3_PRODUCTION_DEFAULTS.maxModelTokens,
       ),
-      maxToolResultBytes: v3CeilingToCheckpoint(
-        config.maxToolResultBytes ??
-          V3_PRODUCTION_DEFAULTS.maxToolResultBytes,
-      ),
       maxWallTimeMs: v3CeilingToCheckpoint(
         config.maxWallTimeMs ?? V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
       ),
@@ -407,11 +401,6 @@ function assertResumeConfigurationMatches(
     'maxModelTokens',
     config.maxModelTokens,
     v3CeilingFromCheckpoint(durable.budgetLimits.maxModelTokens),
-  );
-  check(
-    'maxToolResultBytes',
-    config.maxToolResultBytes,
-    v3CeilingFromCheckpoint(durable.budgetLimits.maxToolResultBytes),
   );
   check(
     'maxWallTimeMs',

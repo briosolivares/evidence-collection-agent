@@ -103,7 +103,6 @@ describe('public runTask v3 adapter', () => {
         maxWorkerTurns: V3_UNBOUNDED_CEILING,
         maxToolCalls: V3_PRODUCTION_DEFAULTS.maxToolCalls,
         maxModelTokens: V3_UNBOUNDED_CEILING,
-        maxToolResultBytes: V3_PRODUCTION_DEFAULTS.maxToolResultBytes,
         maxWallTimeMs: V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
         maxVerifierCorrections:
           V3_PRODUCTION_DEFAULTS.maxVerifierCorrections,

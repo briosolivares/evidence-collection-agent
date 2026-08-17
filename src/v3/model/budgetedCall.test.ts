@@ -21,7 +21,6 @@ function budget() {
     maxWorkerTurns: Infinity,
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
-    maxToolResultBytes: Infinity,
     maxWallTimeMs: Infinity,
     maxVerifierCorrections: Infinity,
   });

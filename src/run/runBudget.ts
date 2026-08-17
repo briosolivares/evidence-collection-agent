@@ -38,8 +38,6 @@ export interface RunBudgetConfig {
   /** Total model tokens (input + output + cache read + cache creation)
    * summed over every role; integer >= 1. */
   maxModelTokens: number;
-  /** Cumulative tool-result bytes made visible to any model role; integer >= 0. */
-  maxToolResultBytes: number;
   /** Wall time from tracker creation; integer >= 1 (milliseconds). */
   maxWallTimeMs: number;
   /** Verifier correction rounds the run may spend; integer >= 0. */
@@ -51,7 +49,6 @@ export type RunBudgetLimit =
   | 'worker_turns'
   | 'tool_calls'
   | 'model_tokens'
-  | 'tool_result_bytes'
   | 'wall_time'
   | 'verifier_corrections';
 
@@ -84,7 +81,7 @@ export interface RunBudgetTracker {
   remainingWallTimeMs(): number;
   /** The first exhausted ceiling, or undefined while all headroom remains.
    * Deterministic order: worker_turns, tool_calls, model_tokens,
-   * tool_result_bytes, wall_time, verifier_corrections. */
+   * wall_time, verifier_corrections. */
   /** The first exhausted ceiling, optionally ignoring limits that the caller
    * has already consumed lawfully at a phase boundary (for example a worker
    * finishing on its final allowed turn before the verifier runs). */
@@ -123,7 +120,6 @@ export function validateRunBudgetConfig(config: RunBudgetConfig): void {
   assertBudgetField('maxWorkerTurns', config.maxWorkerTurns, 1);
   assertBudgetField('maxToolCalls', config.maxToolCalls, 0);
   assertBudgetField('maxModelTokens', config.maxModelTokens, 1);
-  assertBudgetField('maxToolResultBytes', config.maxToolResultBytes, 0);
   assertBudgetField('maxWallTimeMs', config.maxWallTimeMs, 1);
   assertBudgetField('maxVerifierCorrections', config.maxVerifierCorrections, 0);
 }
@@ -353,12 +349,6 @@ export function createRunBudgetTracker(
       }
       if (!ignored.has('model_tokens') && totalTokens() > config.maxModelTokens) {
         return 'model_tokens';
-      }
-      if (
-        !ignored.has('tool_result_bytes') &&
-        toolResultBytes > config.maxToolResultBytes
-      ) {
-        return 'tool_result_bytes';
       }
       if (!ignored.has('wall_time') && now() - startedAt >= config.maxWallTimeMs) {
         return 'wall_time';

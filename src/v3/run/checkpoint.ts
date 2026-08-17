@@ -196,7 +196,9 @@ export const v3DurableRunConfigurationSchema = z.strictObject({
     maxWorkerTurns: serializedCeilingSchema(1),
     maxToolCalls: serializedCeilingSchema(0),
     maxModelTokens: serializedCeilingSchema(1),
-    maxToolResultBytes: serializedCeilingSchema(0),
+    /** Retired whole-run ceiling accepted only so existing v3 checkpoints
+     * remain resumable. New runs omit it and the runtime ignores it. */
+    maxToolResultBytes: serializedCeilingSchema(0).optional(),
     maxWallTimeMs: serializedCeilingSchema(1),
     maxVerifierCorrections: serializedCeilingSchema(0),
   }),

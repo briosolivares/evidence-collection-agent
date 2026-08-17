@@ -124,8 +124,11 @@ from manifest entries carrying `requested_output`.
 - The TUI's `artifact_published` event is derived by diffing the manifest after
   tool execution. The manifest remains authoritative.
 - Defaults in `src/cli/runTask.ts`: model `claude-sonnet-5`, unbounded worker
-  turns, 100 tool calls, unbounded aggregate model tokens, 5 MB model-visible
-  tool-result bytes, 900k per-request context ceiling, and one hour wall time.
+  turns, 100 tool calls, unbounded aggregate model tokens, 900k per-request
+  context ceiling, and one hour wall time. Model-visible tool output is
+  bounded per result and per message, with complete oversized text offloaded
+  under `scratch/tool-output/`; cumulative result bytes remain a metric, not a
+  whole-run completion ceiling.
 - Planning docs are part of the workflow. Track v3 work in
   `docs/browser-agent-v3/implementation-plan.md`; use scoped commits and include
   the tracker after every verified step. Never edit

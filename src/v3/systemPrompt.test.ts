@@ -46,7 +46,12 @@ describe('V3_SYSTEM_PROMPT', () => {
     );
     expect(V3_SYSTEM_PROMPT).toContain('requested_output');
     expect(V3_SYSTEM_PROMPT).toContain('evidence');
-    expect(V3_SYSTEM_PROMPT).toContain('normally publish at least one useful evidence screenshot');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'normally publish one representative evidence screenshot',
+    );
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'Publish additional evidence screenshots only when the task or output contract explicitly requires them',
+    );
     expect(V3_SYSTEM_PROMPT).toContain('scratch/workspace/');
     expect(V3_SYSTEM_PROMPT).toContain('bash has no browser capability');
     expect(V3_SYSTEM_PROMPT).toContain('Do not install packages or leave background work');

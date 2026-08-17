@@ -12,7 +12,6 @@ const UNBOUNDED: RunBudgetConfig = {
   maxWorkerTurns: Infinity,
   maxToolCalls: Infinity,
   maxModelTokens: Infinity,
-  maxToolResultBytes: Infinity,
   maxWallTimeMs: Infinity,
   maxVerifierCorrections: Infinity,
 };
@@ -32,7 +31,6 @@ describe('validateRunBudgetConfig', () => {
         maxWorkerTurns: 10,
         maxToolCalls: 0,
         maxModelTokens: 1_000_000,
-        maxToolResultBytes: 0,
         maxWallTimeMs: 60_000,
         maxVerifierCorrections: 0,
       }),
@@ -45,7 +43,6 @@ describe('validateRunBudgetConfig', () => {
     ['maxWorkerTurns fractional', { maxWorkerTurns: 2.5 }],
     ['maxToolCalls negative', { maxToolCalls: -1 }],
     ['maxModelTokens NaN', { maxModelTokens: Number.NaN }],
-    ['maxToolResultBytes fractional', { maxToolResultBytes: 10.5 }],
     ['maxWallTimeMs 0', { maxWallTimeMs: 0 }],
     ['maxVerifierCorrections negative', { maxVerifierCorrections: -2 }],
   ])('rejects %s naming the field', (_label, overrides) => {
@@ -96,10 +93,6 @@ describe('createRunBudgetTracker', () => {
     const tokens = createRunBudgetTracker({ ...UNBOUNDED, maxModelTokens: 150 });
     tokens.recordModelUsage('initializer', USAGE); // 165 > 150
     expect(tokens.exceededLimit()).toBe('model_tokens');
-
-    const bytes = createRunBudgetTracker({ ...UNBOUNDED, maxToolResultBytes: 10 });
-    bytes.recordToolResultBytes(11);
-    expect(bytes.exceededLimit()).toBe('tool_result_bytes');
 
     let nowMs = 1000;
     const wall = createRunBudgetTracker(
@@ -152,8 +145,8 @@ describe('RunBudgetTracker snapshot/restore', () => {
     expect(restored.totalModelTokens()).toBe(tracker.totalModelTokens());
   });
 
-  it('restored toolCalls and toolResultBytes keep enforcing their ceilings without refill', () => {
-    const config = { ...UNBOUNDED, maxToolCalls: 5, maxToolResultBytes: 100 };
+  it('restored tool calls keep enforcing their ceiling while result-byte metrics remain monotone', () => {
+    const config = { ...UNBOUNDED, maxToolCalls: 5 };
     const tracker = createRunBudgetTracker(config);
     tracker.recordToolCalls(5);
     tracker.recordToolResultBytes(100);
@@ -170,7 +163,8 @@ describe('RunBudgetTracker snapshot/restore', () => {
 
     const restoredBytes = createRunBudgetTracker(config, { restore: snapshot });
     restoredBytes.recordToolResultBytes(1);
-    expect(restoredBytes.exceededLimit()).toBe('tool_result_bytes');
+    expect(captureRunBudgetSnapshot(restoredBytes).toolResultBytes).toBe(101);
+    expect(restoredBytes.exceededLimit()).toBeUndefined();
   });
 
   it('restored elapsed wall time is preserved: a near-exhausted snapshot trips wall_time almost immediately', () => {

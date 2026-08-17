@@ -67,7 +67,6 @@ const UNBOUNDED: RunBudgetConfig = {
   maxWorkerTurns: Infinity,
   maxToolCalls: Infinity,
   maxModelTokens: Infinity,
-  maxToolResultBytes: Infinity,
   maxWallTimeMs: Infinity,
   maxVerifierCorrections: Infinity,
 };
@@ -543,21 +542,18 @@ describe('v3 rejection and guards', () => {
     });
   });
 
-  it.each([
-    { budget: { maxToolCalls: 0 }, reason: 'tool_calls' },
-    { budget: { maxToolResultBytes: 0 }, reason: 'tool_result_bytes' },
-  ])('returns every result before enforcing $reason', async ({ budget, reason }) => {
+  it('returns every result before enforcing the tool-call ceiling', async () => {
     const worker = session(
       scriptedDriver([
         accepted([{ type: 'tool_use', id: 'call', name: 'small', input: {} }]),
       ]),
       [tool('small', () => 'one result')],
-      { budget },
+      { budget: { maxToolCalls: 0 } },
     );
 
     await expect(runV3WorkerTurn(worker)).resolves.toEqual({
       kind: 'incomplete',
-      reason,
+      reason: 'tool_calls',
     });
     expect(lastResults(worker)).toHaveLength(1);
   });

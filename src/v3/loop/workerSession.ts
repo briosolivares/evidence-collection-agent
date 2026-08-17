@@ -176,7 +176,6 @@ export type V3WorkerGuardReason =
   | 'context_budget'
   | 'tool_calls'
   | 'model_tokens'
-  | 'tool_result_bytes'
   | 'wall_time'
   | 'verifier_corrections';
 
@@ -1021,8 +1020,6 @@ function budgetReason(limit: RunBudgetLimit): V3WorkerGuardReason {
       return 'tool_calls';
     case 'model_tokens':
       return 'model_tokens';
-    case 'tool_result_bytes':
-      return 'tool_result_bytes';
     case 'wall_time':
       return 'wall_time';
     case 'verifier_corrections':

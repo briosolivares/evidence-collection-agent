@@ -61,7 +61,6 @@ function budget(overrides: Partial<RunBudgetConfig> = {}) {
     maxWorkerTurns: Infinity,
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
-    maxToolResultBytes: Infinity,
     maxWallTimeMs: Infinity,
     maxVerifierCorrections: 2,
     ...overrides,
@@ -439,14 +438,14 @@ describe('runV3Verifier', () => {
     expect(captureRunBudgetSnapshot(tracker).toolCalls).toBe(1);
   });
 
-  it('charges verifier inspection calls and model-visible result bytes', async () => {
+  it('charges verifier inspection calls and records model-visible result bytes', async () => {
     writeArtifact(
       runDir,
       'artifacts/report.csv',
       Buffer.from('name\nAlice\n', 'utf8'),
       { roles: ['requested_output'] },
     );
-    const tracker = budget({ maxToolResultBytes: 1 });
+    const tracker = budget();
     const steps = [
       acceptedContent([
         {
@@ -466,24 +465,21 @@ describe('runV3Verifier', () => {
       }),
     };
 
-    await expect(
-      runV3Verifier({
-        taskText: 'Create report.csv.',
-        runDir,
-        contract: CONTRACT,
-        finish: FINISH,
-        clarifications: [],
-        model,
-        budget: tracker,
-      }),
-    ).rejects.toMatchObject({
-      name: 'V3RoleBudgetExceededError',
-      limit: 'tool_result_bytes',
+    await expect(runV3Verifier({
+      taskText: 'Create report.csv.',
+      runDir,
+      contract: CONTRACT,
+      finish: FINISH,
+      clarifications: [],
+      model,
+      budget: tracker,
+    })).resolves.toMatchObject({
+      status: 'verified',
     });
     const snapshot = captureRunBudgetSnapshot(tracker);
-    expect(snapshot.toolCalls).toBe(1);
+    expect(snapshot.toolCalls).toBe(2);
     expect(snapshot.toolResultBytes).toBeGreaterThan(1);
-    expect(model.generate).toHaveBeenCalledOnce();
+    expect(model.generate).toHaveBeenCalledTimes(2);
   });
 
   it('propagates a durable-accounting failure instead of downgrading it to verifier unavailable', async () => {
