@@ -58,6 +58,44 @@ describe('outputContractSchema shape', () => {
     ).toBe(false);
   });
 
+  it('normalizes empty optional constraint lists to absent instead of rejecting', () => {
+    // Initializer models legitimately write [] for "none"; a wikipedia_reference
+    // trial died in the initializer when requiredSections: [] was rejected.
+    const result = validate(
+      contract([
+        {
+          id: 'answer',
+          kind: 'document',
+          filename: 'answer.md',
+          format: 'markdown',
+          requiredSections: [],
+        } as unknown as OutputSpec,
+      ]),
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error('unreachable');
+    expect('requiredSections' in result.contract.outputs[0]!
+      ? (result.contract.outputs[0] as Extract<OutputSpec, { kind: 'document' }>).requiredSections
+      : undefined,
+    ).toBeUndefined();
+
+    const download = validate(
+      contract([
+        {
+          id: 'files',
+          kind: 'download',
+          count: { exact: 1 },
+          filenamePattern: '*.pdf',
+          allowedMediaTypes: [],
+        } as unknown as OutputSpec,
+      ]),
+    );
+    expect(download.ok).toBe(true);
+    if (!download.ok) throw new Error('unreachable');
+    const spec = download.contract.outputs[0] as Extract<OutputSpec, { kind: 'download' }>;
+    expect(spec.allowedMediaTypes).toBeUndefined();
+  });
+
   it('applies document evidence defaults so the stored form is always explicit', () => {
     const result = validate(
       contract([

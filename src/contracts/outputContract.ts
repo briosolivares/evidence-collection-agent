@@ -79,6 +79,16 @@ const nonBlankString = z
  * times" is a contract bug, never a requirement. */
 const positiveInt = z.number().int().positive();
 
+/** An optional constraint list where an empty array plainly means "none":
+ * models legitimately write `[]` instead of omitting the field, and rejecting
+ * that can kill a run's only contract attempt. Normalizing to absent keeps
+ * one canonical form, so consumers keep their `!== undefined` semantics and
+ * an empty `allowedMediaTypes` can never read as "allow nothing". */
+const optionalConstraintList = z
+  .array(nonBlankString)
+  .transform((value) => (value.length === 0 ? undefined : value))
+  .optional();
+
 /**
  * An output id: a short machine-usable token. Later tools reference outputs
  * by id (row upserts, completeness evidence, verifier findings), so ids must
@@ -218,11 +228,9 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
       'Bare filename (no directories) the runtime publishes under artifacts/',
     ),
     format: z.enum(['markdown', 'text', 'pdf']),
-    requiredSections: z
-      .array(nonBlankString)
-      .min(1)
-      .optional()
-      .describe('Section headings the document must contain, in no particular order'),
+    requiredSections: optionalConstraintList.describe(
+      'Section headings the document must contain, in no particular order',
+    ),
     evidenceRequirement: z
       .enum(['none', 'at_least_one', 'per_required_section'])
       .default(DEFAULT_EVIDENCE_REQUIREMENT)
@@ -245,14 +253,10 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
     filenamePattern: nonBlankString
       .optional()
       .describe('Bare filename pattern the captures must match, e.g. "profile-*.png"'),
-    mustShow: z
-      .array(nonBlankString)
-      .min(1)
-      .optional()
-      .describe(
-        'What must be visible in the images. Deliberately semantic: checked by an ' +
-          'image-capable verifier, never by code',
-      ),
+    mustShow: optionalConstraintList.describe(
+      'What must be visible in the images. Deliberately semantic: checked by an ' +
+        'image-capable verifier, never by code',
+    ),
   }),
   z.strictObject({
     id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
@@ -272,14 +276,10 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
           .describe(
             'How many PNG proof screenshots captured at the destination the run must publish',
           ),
-        mustShow: z
-          .array(nonBlankString)
-          .min(1)
-          .optional()
-          .describe(
-            'What must be visible in the proof captures. Deliberately semantic: checked ' +
-              'by the verifier, never by code',
-          ),
+        mustShow: optionalConstraintList.describe(
+          'What must be visible in the proof captures. Deliberately semantic: checked ' +
+            'by the verifier, never by code',
+        ),
       })
       .describe(
         'Auditable proof the action happened at its real destination. Source URLs of ' +
@@ -293,11 +293,9 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
     filenamePattern: nonBlankString
       .optional()
       .describe('Bare filename pattern the downloads must match, e.g. "*.pdf"'),
-    allowedMediaTypes: z
-      .array(nonBlankString)
-      .min(1)
-      .optional()
-      .describe('Accepted media types, e.g. ["application/pdf"]'),
+    allowedMediaTypes: optionalConstraintList.describe(
+      'Accepted media types, e.g. ["application/pdf"]',
+    ),
     sourceUrlPattern: nonBlankString
       .optional()
       .describe('Pattern the download source URL must match'),
