@@ -1,0 +1,68 @@
+{
+  "startedAt": "2026-08-16T10:08:23.532Z",
+  "finishedAt": "2026-08-16T10:11:17.230Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "yc_w24_outreach",
+      "k": 1,
+      "accuracy": 0.125,
+      "taskPassed": false,
+      "meanLatencyMs": 173167.684542,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-16_03-08-25am_from-yc-winter-2024-pick-5-ai-focused_27a007",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": false,
+              "detail": "no .csv artifact found in the manifest"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 173167.684542,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

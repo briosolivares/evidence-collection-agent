@@ -1,0 +1,114 @@
+{
+  "startedAt": "2026-08-16T10:03:29.875Z",
+  "finishedAt": "2026-08-16T10:05:10.400Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "hacker_news",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 34305.433916,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-16_03-03-31am_create-a-csv-of-the-top-5-stories-on_72abbf",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/top5_hn_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, URL, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 34305.433916,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "yc_w24_outreach",
+      "k": 1,
+      "accuracy": 0.125,
+      "taskPassed": false,
+      "meanLatencyMs": 100178.782292,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-16_03-03-31am_from-yc-winter-2024-pick-5-ai-focused_cf8813",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": false,
+              "detail": "no .csv artifact found in the manifest"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": false,
+              "detail": "no CSV artifact to check"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "1 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 100178.782292,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

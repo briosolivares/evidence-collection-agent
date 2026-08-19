@@ -53,7 +53,13 @@ export async function fetchOracle(): Promise<MitSororitiesOracle> {
     // One member per required cohort: 12 cohorts minus the optional ones.
     minRows: 10,
     maxRows: 400,
-    minMajorCoverage: 0.5,
+    /* 0.5 → 0.45 (2026-08-19): three of the six chapters publish no majors
+     * at all (names/photos-only rosters, verified live for Pi Beta Phi and
+     * in the current AXO/APhi captures), so the live web holds at most
+     * ~102/204 majors — 0.5 demanded a zero-miss capture of everything that
+     * exists. 0.45 still fails low-effort runs (the 2026-08-17 baseline
+     * scored 0.44) while passing a run that found 101 of ~102. */
+    minMajorCoverage: 0.45,
     minEnrichmentCoverage: 0.25,
   };
 }
