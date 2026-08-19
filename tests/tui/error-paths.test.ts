@@ -64,7 +64,7 @@ afterEach(() => {
 });
 
 describe('mid-stream failure', () => {
-  it('preserves the v3 incomplete diagnostic and returns the session to idle', async () => {
+  it('preserves the incomplete diagnostic and returns the session to idle', async () => {
     const events: UiEvent[] = [];
 
     // A stream that emits some prose, then dies with a non-abort error.

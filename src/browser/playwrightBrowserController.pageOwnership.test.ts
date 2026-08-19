@@ -38,7 +38,7 @@ async function prepareTaskPage(
   request: BrowserTaskPagePreparation,
 ): Promise<void> {
   if (controller.prepareTaskPage === undefined) {
-    throw new Error('Browser controller omitted v3 task-page preparation.');
+    throw new Error('Browser controller omitted task-page preparation.');
   }
   await controller.prepareTaskPage(request);
 }
@@ -148,7 +148,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
   it(
     'reclaims only same-run pages after an attached-client reconnect',
     async () => {
-      const durableRunId = 'v3-run-2026-08-15-reconnect-test';
+      const durableRunId = 'run-2026-08-15-reconnect-test';
       const userPages = [...context.pages()];
       await prepareTaskPage(controller, { ownershipId: durableRunId });
       const taskPage = context
@@ -253,7 +253,7 @@ describe('PlaywrightBrowserController task-page ownership', () => {
   it(
     'closes a real navigating task page on preparation cancellation while preserving user tabs',
     async () => {
-      const durableRunId = 'v3-run-2026-08-15-reconnect-test';
+      const durableRunId = 'run-2026-08-15-reconnect-test';
       const userPages = [...context.pages()];
       let releaseRoute!: () => void;
       let routeStarted!: () => void;

@@ -22,7 +22,7 @@ const DEFAULT_OUTPUT_BYTES = 1_000_000;
 let cwd: string;
 
 beforeEach(() => {
-  cwd = mkdtempSync(join(tmpdir(), 'sherlock-v3-browser-runner-'));
+  cwd = mkdtempSync(join(tmpdir(), 'sherlock-browser-runner-'));
 });
 
 afterEach(() => {
@@ -798,13 +798,13 @@ describe('runBrowserProgram', () => {
   });
 
   it('uses only the sanitized caller environment and never ambient process.env', async () => {
-    process.env.V3_AMBIENT_ONLY = 'must-not-leak';
+    process.env.AMBIENT_ONLY = 'must-not-leak';
     try {
       const result = await runBrowserProgram(
         options(
           `return {
             safe: process.env.SAFE_SETTING ?? null,
-            ambient: process.env.V3_AMBIENT_ONLY ?? null,
+            ambient: process.env.AMBIENT_ONLY ?? null,
             openai: process.env.OPENAI_API_KEY ?? null,
             browserbase: process.env.BROWSERBASE_API_KEY ?? null,
             attached: process.env.SHERLOCK_CHROME_CDP_ENDPOINT ?? null,
@@ -840,7 +840,7 @@ describe('runBrowserProgram', () => {
       expect(JSON.stringify(result)).not.toContain('openai-secret');
       expect(JSON.stringify(result)).not.toContain('capability');
     } finally {
-      delete process.env.V3_AMBIENT_ONLY;
+      delete process.env.AMBIENT_ONLY;
     }
   });
 

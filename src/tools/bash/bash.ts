@@ -30,7 +30,7 @@ export const BASH_TOOL_TIMEOUT_MS = 150_000;
 const SHELL_PATH = '/bin/bash';
 const SHELL_STARTUP_HOOK_ENV_KEYS = new Set(['BASH_ENV', 'ENV']);
 
-/** Legacy browser-script capabilities must never cross into the v3 shell. */
+/** Legacy browser-script capabilities must never cross into the shell. */
 const BROWSER_CAPABILITY_ENV_KEYS = new Set([
   'SHERLOCK_CDP_URL',
   'SHERLOCK_PLAYWRIGHT_HELPER_URL',

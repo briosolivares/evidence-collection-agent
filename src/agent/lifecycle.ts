@@ -40,75 +40,75 @@ import {
 } from '../tools/registry.js';
 import { inspectManifest } from './completion/artifactInspection.js';
 import {
-  runV3FinishChecks,
-  toV3SettledFacts,
-  type V3FinishDefect,
-  type V3FinishFacts,
+  runFinishChecks,
+  toSettledFacts,
+  type FinishDefect,
+  type FinishFacts,
 } from './completion/finishChecks.js';
 import {
-  V3_INITIALIZER_MAX_ATTEMPTS,
-  captureV3ContractInitializerState,
-  createV3ContractInitializerState,
-  formatV3ContractGuidance,
-  restoreV3ContractInitializerState,
-  runV3ContractInitializer,
-  type V3ContractInitializerState,
+  INITIALIZER_MAX_ATTEMPTS,
+  captureContractInitializerState,
+  createContractInitializerState,
+  formatContractGuidance,
+  restoreContractInitializerState,
+  runContractInitializer,
+  type ContractInitializerState,
 } from './initializer/initializer.js';
 import {
-  runV3Verifier,
-  V3_VERIFICATION_HISTORY_LIMIT,
-  type V3CorrectionFinding,
-  type V3SurfacedArtifact,
-  type V3VerificationHistoryEntry,
+  runVerifier,
+  VERIFICATION_HISTORY_LIMIT,
+  type CorrectionFinding,
+  type SurfacedArtifact,
+  type VerificationHistoryEntry,
 } from './verifier/verifier.js';
 import {
-  appendV3FinishResult,
-  captureV3WorkerSessionSnapshot,
-  createV3WorkerSession,
-  restoreV3WorkerSession,
-  resumeV3PendingToolTurn,
-  runV3WorkerSession,
-  type V3FinishRequest,
-  type V3PendingToolTurn,
-  type V3WorkerIncompleteReason,
-  type V3WorkerLifecycleHooks,
-  type V3WorkerMetrics,
-  type V3WorkerSession,
-  type V3WorkerSessionSnapshot,
+  appendFinishResult,
+  captureWorkerSnapshot,
+  createWorker,
+  restoreWorker,
+  resumePendingToolTurn,
+  runWorker,
+  type FinishRequest,
+  type PendingToolTurn,
+  type WorkerIncompleteReason,
+  type WorkerHooks,
+  type WorkerMetrics,
+  type Worker,
+  type WorkerSnapshot,
 } from './worker/worker.js';
 import {
-  V3RoleBudgetExceededError,
-  createV3BudgetedCallModel,
-  isV3RoleBudgetExceededError,
+  RoleBudgetExceededError,
+  createBudgetedCallModel,
+  isRoleBudgetExceededError,
 } from '../model/budgetedCall.js';
 import {
   durableFinishInputSchema,
   type FinishInput,
 } from '../tools/finish/finish.js';
 import {
-  V3_CHECKPOINT_VERSION,
-  openV3CheckpointStore,
-  v3CeilingFromCheckpoint,
-  v3DurableRunConfigurationSchema,
-  type V3Checkpoint,
-  type V3CheckpointPhase,
-  type V3CheckpointStoreOptions,
-  type V3DurableRunConfiguration,
-  type V3DurableTerminalOutcome,
+  CHECKPOINT_VERSION,
+  openCheckpointStore,
+  ceilingFromCheckpoint,
+  durableRunConfigurationSchema,
+  type Checkpoint,
+  type CheckpointPhase,
+  type CheckpointStoreOptions,
+  type DurableRunConfiguration,
+  type DurableTerminalOutcome,
 } from './checkpoint.js';
 import {
-  buildV3FindingsReportInputFromCheckpoint,
-  writeV3FindingsReport,
-  type V3FindingsReportCurrentFindings,
-  type V3FindingsReportInput,
+  buildFindingsReportInputFromCheckpoint,
+  writeFindingsReport,
+  type FindingsReportCurrentFindings,
+  type FindingsReportInput,
 } from './findingsReport.js';
-import { ensureV3OutputContractFile } from './initializer/contractFile.js';
+import { ensureOutputContractFile } from './initializer/contractFile.js';
 import {
-  createV3RunDeadline,
-  raceWithV3RunSignal,
+  createRunDeadline,
+  raceWithRunSignal,
 } from './runDeadline.js';
 
-type V3CheckpointCommonKey =
+type CheckpointCommonKey =
   | 'version'
   | 'revision'
   | 'updatedAt'
@@ -116,15 +116,15 @@ type V3CheckpointCommonKey =
   | 'budget'
   | 'progress';
 
-type V3CheckpointPhaseState = V3Checkpoint extends infer Checkpoint
-  ? Checkpoint extends V3Checkpoint
-    ? Omit<Checkpoint, V3CheckpointCommonKey>
+type CheckpointPhaseState = Checkpoint extends infer Checkpoint
+  ? Checkpoint extends Checkpoint
+    ? Omit<Checkpoint, CheckpointCommonKey>
     : never
   : never;
 
-export interface RunV3CoordinatorOptions {
+export interface RunAgentOptions {
   runDir: string;
-  configuration: V3DurableRunConfiguration;
+  configuration: DurableRunConfiguration;
   initializerModel: ModelDriver;
   workerModel: ModelDriver;
   verifierModel: ModelDriver;
@@ -142,9 +142,9 @@ export interface RunV3CoordinatorOptions {
     role: 'initializer' | 'worker' | 'verifier',
     event: ModelAttemptEvent,
   ) => void;
-  checkpointStoreOptions?: V3CheckpointStoreOptions;
+  checkpointStoreOptions?: CheckpointStoreOptions;
   /** Observability/test seam called only after a checkpoint is durable. */
-  afterCheckpoint?: (checkpoint: V3Checkpoint) => void | Promise<void>;
+  afterCheckpoint?: (checkpoint: Checkpoint) => void | Promise<void>;
   /** Bound for browser page cleanup only. Production uses the exported
    * default; focused tests may shorten it without changing tool deadlines. */
   terminalBrowserCleanupTimeoutMs?: number;
@@ -158,29 +158,29 @@ export interface RunV3CoordinatorOptions {
   now?: () => number;
 }
 
-export const V3_TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS = 10_000;
-export const V3_TERMINAL_RESUME_INSPECTION_TIMEOUT_MS = 30_000;
+export const TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS = 10_000;
+export const TERMINAL_RESUME_INSPECTION_TIMEOUT_MS = 30_000;
 
-/** Run or resume one v3 initializer → worker → checks → verifier lifecycle.
+/** Run or resume one initializer → worker → checks → verifier lifecycle.
  * The checkpoint is authoritative; a terminal checkpoint is returned without
  * invoking a model or touching the browser. */
-export async function runV3Coordinator(
-  options: RunV3CoordinatorOptions,
-): Promise<V3DurableTerminalOutcome> {
-  const configuration = v3DurableRunConfigurationSchema.parse(
+export async function runAgent(
+  options: RunAgentOptions,
+): Promise<DurableTerminalOutcome> {
+  const configuration = durableRunConfigurationSchema.parse(
     options.configuration,
   );
   terminalBrowserCleanupTimeout(options);
   terminalBusyResourceTimeout(options);
   terminalResumeInspectionTimeout(options);
-  if (configuration.maxInitializerAttempts !== V3_INITIALIZER_MAX_ATTEMPTS) {
+  if (configuration.maxInitializerAttempts !== INITIALIZER_MAX_ATTEMPTS) {
     throw new Error(
-      `v3 requires exactly ${V3_INITIALIZER_MAX_ATTEMPTS} initializer attempts ` +
+      `requires exactly ${INITIALIZER_MAX_ATTEMPTS} initializer attempts ` +
         `(one initial response plus one repair)`,
     );
   }
 
-  const store = await openV3CheckpointStore(
+  const store = await openCheckpointStore(
     options.runDir,
     options.checkpointStoreOptions,
   );
@@ -190,7 +190,7 @@ export async function runV3Coordinator(
       loaded !== undefined &&
       JSON.stringify(loaded.configuration) !== JSON.stringify(configuration)
     ) {
-      throw new Error('resume configuration does not match the durable v3 checkpoint');
+      throw new Error('resume configuration does not match the durable checkpoint');
     }
     const now = options.now ?? Date.now;
     if (loaded?.phase === 'terminal') {
@@ -202,11 +202,11 @@ export async function runV3Coordinator(
         checkActive,
       );
       if (loaded.contract !== undefined) {
-        ensureV3OutputContractFile(options.runDir, loaded.contract);
+        ensureOutputContractFile(options.runDir, loaded.contract);
       }
-      let verifiedChecks: ReturnType<typeof runV3FinishChecks> | undefined;
+      let verifiedChecks: ReturnType<typeof runFinishChecks> | undefined;
       if (loaded.outcome.status === 'verified') {
-        verifiedChecks = runV3FinishChecks({
+        verifiedChecks = runFinishChecks({
           runDir: options.runDir,
           contract: loaded.contract!,
           finish: loaded.finish!,
@@ -239,7 +239,7 @@ export async function runV3Coordinator(
           : { restoreSnapshotAtMs: Date.parse(loaded.updatedAt) }),
       },
     );
-    const deadline = createV3RunDeadline(budget, options.signal);
+    const deadline = createRunDeadline(budget, options.signal);
     try {
       const state = new CoordinatorState(
         options,
@@ -252,8 +252,8 @@ export async function runV3Coordinator(
       );
       if (loaded !== undefined) writeFindingsReportOnResume(options.runDir, loaded);
       const terminalizePreflightControl = async (
-        outcome: V3DurableTerminalOutcome,
-      ): Promise<V3DurableTerminalOutcome> => {
+        outcome: DurableTerminalOutcome,
+      ): Promise<DurableTerminalOutcome> => {
         // The run deadline/cancellation stops active inspection, but a
         // terminal checkpoint must not strand a half-recovered artifact
         // transaction or executing-tool workspace. Re-run the idempotent
@@ -273,14 +273,14 @@ export async function runV3Coordinator(
           cleanupCheck,
         );
         if (loaded?.contract !== undefined) {
-          ensureV3OutputContractFile(options.runDir, loaded.contract);
+          ensureOutputContractFile(options.runDir, loaded.contract);
         }
         return state.terminalize(outcome);
       };
       const checkActive = (): void => {
         deadline.signal.throwIfAborted();
         const limit = budget.exceededLimit(['worker_turns']);
-        if (limit !== undefined) throw new V3RoleBudgetExceededError(limit);
+        if (limit !== undefined) throw new RoleBudgetExceededError(limit);
       };
       try {
         recoverAndInspectRun(
@@ -290,7 +290,7 @@ export async function runV3Coordinator(
           checkActive,
         );
         if (loaded?.contract !== undefined) {
-          ensureV3OutputContractFile(options.runDir, loaded.contract);
+          ensureOutputContractFile(options.runDir, loaded.contract);
         }
       } catch (error) {
         const deadlineError = wallDeadlineError(error, deadline.signal);
@@ -304,7 +304,7 @@ export async function runV3Coordinator(
             ),
           );
         }
-        if (isV3RoleBudgetExceededError(error)) {
+        if (isRoleBudgetExceededError(error)) {
           return await terminalizePreflightControl(
             incompleteBudget(
               error.limit,
@@ -339,7 +339,7 @@ export async function runV3Coordinator(
             ),
           );
         }
-        if (isV3RoleBudgetExceededError(error)) {
+        if (isRoleBudgetExceededError(error)) {
           return await state.terminalize(
             incompleteBudget(
               error.limit,
@@ -394,16 +394,16 @@ export async function runV3Coordinator(
 }
 
 class CoordinatorState {
-  phase: Exclude<V3CheckpointPhase, 'terminal'>;
+  phase: Exclude<CheckpointPhase, 'terminal'>;
 
   private revision: number;
   private contract: OutputContract | undefined;
-  private session: V3WorkerSession | undefined;
-  private pendingTurn: V3PendingToolTurn | undefined;
-  private pendingFinish: V3FinishRequest | undefined;
-  private pendingFacts: V3FinishFacts | undefined;
-  private pendingStructuralFindings: V3FinishDefect[] = [];
-  private verificationHistory: V3VerificationHistoryEntry[];
+  private session: Worker | undefined;
+  private pendingTurn: PendingToolTurn | undefined;
+  private pendingFinish: FinishRequest | undefined;
+  private pendingFacts: FinishFacts | undefined;
+  private pendingStructuralFindings: FinishDefect[] = [];
+  private verificationHistory: VerificationHistoryEntry[];
   private verifierCycles: number;
   private completionCheckFailures: number;
   private terminalizing = false;
@@ -413,11 +413,11 @@ class CoordinatorState {
   private readonly busyRegistry: BusyResourceRegistry;
 
   constructor(
-    private readonly options: RunV3CoordinatorOptions,
-    private readonly configuration: V3DurableRunConfiguration,
-    private readonly store: Awaited<ReturnType<typeof openV3CheckpointStore>>,
+    private readonly options: RunAgentOptions,
+    private readonly configuration: DurableRunConfiguration,
+    private readonly store: Awaited<ReturnType<typeof openCheckpointStore>>,
     private readonly budget: RunBudgetTracker,
-    private readonly loaded: Exclude<V3Checkpoint, { phase: 'terminal' }> | undefined,
+    private readonly loaded: Exclude<Checkpoint, { phase: 'terminal' }> | undefined,
     private readonly now: () => number,
     private readonly runSignal: AbortSignal,
   ) {
@@ -443,7 +443,7 @@ class CoordinatorState {
     this.busyRegistry = options.busyRegistry ?? createBusyResourceRegistry();
   }
 
-  async run(): Promise<V3DurableTerminalOutcome> {
+  async run(): Promise<DurableTerminalOutcome> {
     // Browser-internal abandoned renderer work and tool-pipeline abandonment
     // must live in one ledger. Otherwise a later finish could see the tool
     // layer as idle while the controller is still mutating the same page.
@@ -457,7 +457,7 @@ class CoordinatorState {
 
       if (this.phase === 'executing_tool') {
         await this.prepareBrowser();
-        const outcome = await resumeV3PendingToolTurn(
+        const outcome = await resumePendingToolTurn(
           this.requireSession(),
           this.requirePendingTurn(),
         );
@@ -478,7 +478,7 @@ class CoordinatorState {
 
       if (this.phase === 'ready_for_model') {
         await this.prepareBrowser();
-        const outcome = await runV3WorkerSession(this.requireSession());
+        const outcome = await runWorker(this.requireSession());
         if (outcome.kind === 'incomplete') {
           return this.terminalize(
             workerIncomplete(
@@ -497,7 +497,7 @@ class CoordinatorState {
 
       if (this.phase === 'checking') {
         const request = this.requirePendingFinish();
-        const resourcesSettled = await raceWithV3RunSignal(
+        const resourcesSettled = await raceWithRunSignal(
           () =>
             this.busyRegistry.waitUntilFree(
               EXCLUSIVE_ACCESS,
@@ -508,7 +508,7 @@ class CoordinatorState {
         );
         this.runSignal.throwIfAborted();
         if (!resourcesSettled) {
-          await appendV3FinishResult(
+          await appendFinishResult(
             this.requireSession(),
             request,
             JSON.stringify({
@@ -524,7 +524,7 @@ class CoordinatorState {
           this.phase = 'ready_for_model';
           continue;
         }
-        const checks = runV3FinishChecks({
+        const checks = runFinishChecks({
           runDir: this.options.runDir,
           contract: this.requireContract(),
           finish: request.input,
@@ -567,7 +567,7 @@ class CoordinatorState {
               unresolved: request.input.unresolved,
             });
           }
-          await appendV3FinishResult(
+          await appendFinishResult(
             this.requireSession(),
             request,
             JSON.stringify({
@@ -595,15 +595,15 @@ class CoordinatorState {
         const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(
           surfacedArtifacts,
         );
-        let verification: Awaited<ReturnType<typeof runV3Verifier>>;
+        let verification: Awaited<ReturnType<typeof runVerifier>>;
         try {
-          verification = await runV3Verifier({
+          verification = await runVerifier({
             taskText: this.configuration.taskText,
             runDir: this.options.runDir,
             contract: this.requireContract(),
             finish: facts.finish,
             surfacedArtifacts,
-            settled: toV3SettledFacts(facts),
+            settled: toSettledFacts(facts),
             outputs: facts.outputs,
             structuralFindings: this.pendingStructuralFindings,
             verificationHistory: this.verificationHistory,
@@ -738,10 +738,10 @@ class CoordinatorState {
         // credible blocker). The latter becomes report_repair findings: the
         // harness never designs artifact contents, and this can only make
         // the worker's own summary/unresolved report more truthful.
-        const correctionFindings: V3CorrectionFinding[] =
+        const correctionFindings: CorrectionFinding[] =
           verification.status === 'incomplete'
             ? verification.findings.map(
-                (finding): V3CorrectionFinding => ({
+                (finding): CorrectionFinding => ({
                   kind: 'report_repair',
                   requirement: finding.requirement,
                   problem:
@@ -810,13 +810,13 @@ class CoordinatorState {
           surfacedEvidenceFingerprint,
           findings: structuredClone(correctionFindings),
         });
-        if (this.verificationHistory.length > V3_VERIFICATION_HISTORY_LIMIT) {
+        if (this.verificationHistory.length > VERIFICATION_HISTORY_LIMIT) {
           this.verificationHistory.splice(
             0,
-            this.verificationHistory.length - V3_VERIFICATION_HISTORY_LIMIT,
+            this.verificationHistory.length - VERIFICATION_HISTORY_LIMIT,
           );
         }
-        await appendV3FinishResult(
+        await appendFinishResult(
           this.requireSession(),
           request,
           JSON.stringify({
@@ -824,14 +824,14 @@ class CoordinatorState {
             findings: renderFindingsForWorker(correctionFindings),
           }),
         );
-        // The checkpoint save inside appendV3FinishResult's
+        // The checkpoint save inside appendFinishResult's
         // finishResultAppended hook just made this cycle's pushed
         // verification-history entry durable; render the audit projection
         // from that same now-durable state before clearing per-cycle cargo.
         writeFindingsReportSafely(this.options.runDir, {
           phase: this.phase,
           completionReport: request.input,
-          settledFacts: toV3SettledFacts(facts),
+          settledFacts: toSettledFacts(facts),
           structuralFindings: this.pendingStructuralFindings,
           surfacedArtifacts,
           currentFindings: { kind: 'correction', findings: correctionFindings },
@@ -846,15 +846,15 @@ class CoordinatorState {
   }
 
   async terminalize(
-    outcome: V3DurableTerminalOutcome,
+    outcome: DurableTerminalOutcome,
     // Typed findings the calling branch already has in hand (a credible
     // blocker's verifier findings, or the correction findings that just
     // converged/exhausted budget). Every other terminal path has no open
     // verifier findings to show; the terminal outcome's own `detail` string
     // already narrates those.
-    currentFindings: V3FindingsReportCurrentFindings = { kind: 'none' },
-  ): Promise<V3DurableTerminalOutcome> {
-    if (this.terminalizing) throw new Error('recursive v3 terminalization');
+    currentFindings: FindingsReportCurrentFindings = { kind: 'none' },
+  ): Promise<DurableTerminalOutcome> {
+    if (this.terminalizing) throw new Error('recursive terminalization');
     this.terminalizing = true;
     // Preflight cancellation/deadline failure can reach terminalization
     // before `run()` restored the durable worker. Later-phase terminal
@@ -949,7 +949,7 @@ class CoordinatorState {
           summary: finalOutcome.finalText,
           unresolved: finalOutcome.status === 'incomplete' ? finalOutcome.unresolved : [],
         },
-        settledFacts: this.pendingFacts === undefined ? [] : toV3SettledFacts(this.pendingFacts),
+        settledFacts: this.pendingFacts === undefined ? [] : toSettledFacts(this.pendingFacts),
         structuralFindings: this.pendingStructuralFindings,
         surfacedArtifacts: collectSurfacedArtifacts(this.options.runDir),
         currentFindings,
@@ -989,7 +989,7 @@ class CoordinatorState {
   private assertFinishInspectionActive(): void {
     this.runSignal.throwIfAborted();
     const limit = this.budget.exceededLimit(['worker_turns']);
-    if (limit !== undefined) throw new V3RoleBudgetExceededError(limit);
+    if (limit !== undefined) throw new RoleBudgetExceededError(limit);
   }
 
   isTerminalizing(): boolean {
@@ -998,7 +998,7 @@ class CoordinatorState {
 
   private async initialize(): Promise<void> {
     if (this.contract !== undefined) {
-      ensureV3OutputContractFile(this.options.runDir, this.contract);
+      ensureOutputContractFile(this.options.runDir, this.contract);
       this.createWorker();
       await this.saveReady();
       this.phase = 'ready_for_model';
@@ -1006,11 +1006,11 @@ class CoordinatorState {
     }
 
     const state = this.loaded?.phase === 'initializing' && this.loaded.initializer
-      ? restoreV3ContractInitializerState(this.loaded.initializer)
-      : createV3ContractInitializerState(this.configuration.taskText);
+      ? restoreContractInitializerState(this.loaded.initializer)
+      : createContractInitializerState(this.configuration.taskText);
     if (this.revision === 0) await this.saveInitializing({ initializer: state });
 
-    const budgetedCallModel = createV3BudgetedCallModel({
+    const budgetedCallModel = createBudgetedCallModel({
       model: this.options.initializerModel,
       budget: this.budget,
       role: 'initializer',
@@ -1037,7 +1037,7 @@ class CoordinatorState {
     );
     let result;
     try {
-      result = await runV3ContractInitializer(state, callModel, {
+      result = await runContractInitializer(state, callModel, {
         beforeRequest: async (snapshot) => {
           await this.saveInitializing({ initializer: snapshot });
         },
@@ -1052,7 +1052,7 @@ class CoordinatorState {
             // convenience copy after it means a crash can only leave a missing
             // file that resume reconstructs, never an orphan contract that was
             // not accepted durably.
-            ensureV3OutputContractFile(this.options.runDir, event.contract);
+            ensureOutputContractFile(this.options.runDir, event.contract);
             return;
           }
           await this.saveInitializing({ initializer: event.state });
@@ -1081,7 +1081,7 @@ class CoordinatorState {
       ? undefined
       : this.loaded?.worker;
     if (snapshot !== undefined) {
-      this.session = restoreV3WorkerSession(
+      this.session = restoreWorker(
         snapshot,
         this.workerDeps(),
         this.workerConfig(),
@@ -1092,14 +1092,14 @@ class CoordinatorState {
   }
 
   private createWorker(): void {
-    this.session = createV3WorkerSession(
+    this.session = createWorker(
       this.configuration.taskText,
       this.workerDeps(),
       this.workerConfig(),
       {
         guidance: [
-          formatV3ContractGuidance(this.requireContract()),
-          formatV3RunCapabilityGuidance(this.configuration),
+          formatContractGuidance(this.requireContract()),
+          formatRunCapabilityGuidance(this.configuration),
         ],
       },
     );
@@ -1135,14 +1135,14 @@ class CoordinatorState {
   private workerConfig() {
     return {
       budget: this.budget,
-      maxContextTokens: v3CeilingFromCheckpoint(
+      maxContextTokens: ceilingFromCheckpoint(
         this.configuration.maxContextTokens,
       ),
     };
   }
 
   private recordInitializerCorrectionResults(
-    state: V3ContractInitializerState,
+    state: ContractInitializerState,
   ): void {
     const trailing = state.messages.at(-1);
     if (trailing?.role !== 'user') return;
@@ -1160,10 +1160,10 @@ class CoordinatorState {
 
   private throwIfSharedBudgetExceeded(): void {
     const limit = this.budget.exceededLimit(['worker_turns']);
-    if (limit !== undefined) throw new V3RoleBudgetExceededError(limit);
+    if (limit !== undefined) throw new RoleBudgetExceededError(limit);
   }
 
-  private lifecycle(): V3WorkerLifecycleHooks {
+  private lifecycle(): WorkerHooks {
     return {
       beforeModelRequest: async (event) => {
         await this.saveReady(event.session);
@@ -1213,14 +1213,14 @@ class CoordinatorState {
     const browser = this.options.browser;
     if (browser === undefined) {
       if (this.configuration.startUrl !== undefined) {
-        throw new Error('v3 startUrl requires a BrowserController');
+        throw new Error('startUrl requires a BrowserController');
       }
       this.browserPrepared = true;
       return;
     }
     if (browser.prepareTaskPage === undefined) {
       throw new Error(
-        'v3 requires BrowserController.prepareTaskPage so task-page startup ' +
+        'requires BrowserController.prepareTaskPage so task-page startup ' +
           'can be cancelled without leaving a late browser effect',
       );
     }
@@ -1243,12 +1243,12 @@ class CoordinatorState {
    * transition; if the process dies first, recovery reruns checking/verifying
    * from its prior read-only checkpoint. */
   private async appendTerminalFinishFailure(
-    request: V3FinishRequest,
+    request: FinishRequest,
     content: string,
   ): Promise<void> {
     this.suppressFinishReadyCheckpoint = true;
     try {
-      await appendV3FinishResult(
+      await appendFinishResult(
         this.requireSession(),
         request,
         content,
@@ -1263,19 +1263,19 @@ class CoordinatorState {
 
   private async saveInitializing(
     state:
-      | { initializer: V3ContractInitializerState; contract?: never }
+      | { initializer: ContractInitializerState; contract?: never }
       | { contract: OutputContract; initializer?: never },
   ): Promise<void> {
     await this.save({
       phase: 'initializing',
       ...(state.contract === undefined
-        ? { initializer: captureV3ContractInitializerState(state.initializer) }
+        ? { initializer: captureContractInitializerState(state.initializer) }
         : { contract: state.contract }),
     });
   }
 
   private async saveReady(
-    snapshot: V3WorkerSessionSnapshot = captureV3WorkerSessionSnapshot(
+    snapshot: WorkerSnapshot = captureWorkerSnapshot(
       this.requireSession(),
     ),
   ): Promise<void> {
@@ -1287,19 +1287,19 @@ class CoordinatorState {
     });
   }
 
-  private async saveExecuting(pendingTurn: V3PendingToolTurn): Promise<void> {
+  private async saveExecuting(pendingTurn: PendingToolTurn): Promise<void> {
     await this.save({
       phase: 'executing_tool',
       contract: this.requireContract(),
-      worker: captureV3WorkerSessionSnapshot(this.requireSession()),
+      worker: captureWorkerSnapshot(this.requireSession()),
       verificationHistory: this.verificationHistory,
       pendingTurn,
     });
   }
 
   private async saveChecking(
-    worker: V3WorkerSessionSnapshot,
-    pendingFinish: V3FinishRequest,
+    worker: WorkerSnapshot,
+    pendingFinish: FinishRequest,
   ): Promise<void> {
     await this.save({
       phase: 'checking',
@@ -1315,14 +1315,14 @@ class CoordinatorState {
   }
 
   private async saveVerifying(
-    pendingFinish: V3FinishRequest,
-    facts: V3FinishFacts,
-    structuralFindings: readonly V3FinishDefect[],
+    pendingFinish: FinishRequest,
+    facts: FinishFacts,
+    structuralFindings: readonly FinishDefect[],
   ): Promise<void> {
     await this.save({
       phase: 'verifying',
       contract: this.requireContract(),
-      worker: captureV3WorkerSessionSnapshot(this.requireSession()),
+      worker: captureWorkerSnapshot(this.requireSession()),
       verificationHistory: this.verificationHistory,
       pendingFinish,
       pendingCheck: {
@@ -1339,14 +1339,14 @@ class CoordinatorState {
   }
 
   private async saveTerminal(
-    outcome: V3DurableTerminalOutcome,
+    outcome: DurableTerminalOutcome,
   ): Promise<void> {
     await this.save({
       phase: 'terminal',
       ...(this.contract === undefined ? {} : { contract: this.contract }),
       ...(this.session === undefined
         ? {}
-        : { worker: captureV3WorkerSessionSnapshot(this.session) }),
+        : { worker: captureWorkerSnapshot(this.session) }),
       ...(outcome.status === 'verified'
         ? { finish: this.requireVerifiedFinish() }
         : {}),
@@ -1355,10 +1355,10 @@ class CoordinatorState {
   }
 
   private async save(
-    phaseState: V3CheckpointPhaseState,
+    phaseState: CheckpointPhaseState,
   ): Promise<void> {
     const checkpoint = {
-      version: V3_CHECKPOINT_VERSION,
+      version: CHECKPOINT_VERSION,
       revision: this.revision + 1,
       updatedAt: new Date(this.now()).toISOString(),
       configuration: this.configuration,
@@ -1368,33 +1368,33 @@ class CoordinatorState {
         completionCheckFailures: this.completionCheckFailures,
       },
       ...phaseState,
-    } as V3Checkpoint;
+    } as Checkpoint;
     await this.store.save(checkpoint);
     this.revision = checkpoint.revision;
     await this.options.afterCheckpoint?.(structuredClone(checkpoint));
   }
 
-  private requireSession(): V3WorkerSession {
-    if (this.session === undefined) throw new Error('v3 worker session is unavailable');
+  private requireSession(): Worker {
+    if (this.session === undefined) throw new Error('worker session is unavailable');
     return this.session;
   }
 
   private requireContract(): OutputContract {
-    if (this.contract === undefined) throw new Error('v3 output contract is unavailable');
+    if (this.contract === undefined) throw new Error('output contract is unavailable');
     return this.contract;
   }
 
-  private requirePendingTurn(): V3PendingToolTurn {
+  private requirePendingTurn(): PendingToolTurn {
     if (this.pendingTurn === undefined) throw new Error('pending tool turn is unavailable');
     return this.pendingTurn;
   }
 
-  private requirePendingFinish(): V3FinishRequest {
+  private requirePendingFinish(): FinishRequest {
     if (this.pendingFinish === undefined) throw new Error('pending finish is unavailable');
     return this.pendingFinish;
   }
 
-  private requirePendingFacts(): V3FinishFacts {
+  private requirePendingFacts(): FinishFacts {
     if (this.pendingFacts === undefined) throw new Error('pending finish facts are unavailable');
     return this.pendingFacts;
   }
@@ -1425,7 +1425,7 @@ function initializerModelBoundary(
     } catch (error) {
       if (
         (isAbortError(error) && signal.aborted) ||
-        isV3RoleBudgetExceededError(error) ||
+        isRoleBudgetExceededError(error) ||
         isModelResponseRejectedError(error)
       ) {
         throw error;
@@ -1463,8 +1463,8 @@ function workerModelBoundary(
 
 function inspectRunForResume(
   runDir: string,
-  configuration: V3DurableRunConfiguration,
-  phase: V3CheckpointPhase | undefined,
+  configuration: DurableRunConfiguration,
+  phase: CheckpointPhase | undefined,
   checkActive: () => void,
 ): void {
   checkActive();
@@ -1498,8 +1498,8 @@ function inspectRunForResume(
 
 function recoverAndInspectRun(
   runDir: string,
-  configuration: V3DurableRunConfiguration,
-  phase: V3CheckpointPhase | undefined,
+  configuration: DurableRunConfiguration,
+  phase: CheckpointPhase | undefined,
   checkActive: () => void,
 ): void {
   // Artifact bytes and manifest metadata are one recoverable transaction.
@@ -1514,21 +1514,21 @@ function recoverAndInspectRun(
 
 function assertManifestMetadata(
   manifest: ReturnType<typeof inspectManifest>['manifest'],
-  configuration: V3DurableRunConfiguration,
-  phase: V3CheckpointPhase | undefined,
+  configuration: DurableRunConfiguration,
+  phase: CheckpointPhase | undefined,
 ): void {
   if (manifest === undefined) return;
   if (manifest.task !== configuration.taskText) {
-    throw new Error('manifest task does not match the durable v3 configuration');
+    throw new Error('manifest task does not match the durable configuration');
   }
   if (manifest.browserProvider !== configuration.browserProvider) {
     throw new Error(
-      'manifest browserProvider does not match the durable v3 configuration',
+      'manifest browserProvider does not match the durable configuration',
     );
   }
   if (phase !== 'terminal' && manifest.finishedAt !== undefined) {
     throw new Error(
-      'an active or fresh v3 run cannot reuse an already-finalized manifest',
+      'an active or fresh run cannot reuse an already-finalized manifest',
     );
   }
 }
@@ -1537,7 +1537,7 @@ function manifestIntegrityError(
   defects: readonly { code: string; message: string }[],
 ): Error {
   return new Error(
-    `v3 run manifest integrity check failed:\n${defects
+    `run manifest integrity check failed:\n${defects
       .map((defect) => `- ${defect.code}: ${defect.message}`)
       .join('\n')}`,
   );
@@ -1545,7 +1545,7 @@ function manifestIntegrityError(
 
 function ensureTerminalTranscriptEvent(
   runDir: string,
-  outcome: V3DurableTerminalOutcome,
+  outcome: DurableTerminalOutcome,
 ): void {
   let raw = '';
   try {
@@ -1602,7 +1602,7 @@ function ensureTerminalTranscriptEvent(
 
   if (matchingEvents > 1) {
     throw new Error(
-      `${TRANSCRIPT_FILENAME} contains ${matchingEvents} duplicate v3 terminal events`,
+      `${TRANSCRIPT_FILENAME} contains ${matchingEvents} duplicate terminal events`,
     );
   }
   if (matchingEvents === 0) {
@@ -1615,7 +1615,7 @@ function ensureTerminalTranscriptEvent(
 
 function repairTerminalProjections(
   runDir: string,
-  checkpoint: Extract<V3Checkpoint, { phase: 'terminal' }>,
+  checkpoint: Extract<Checkpoint, { phase: 'terminal' }>,
 ): void {
   const errors: string[] = [];
   const attempts: Array<[string, () => void]> = [
@@ -1635,7 +1635,7 @@ function repairTerminalProjections(
   }
   if (errors.length > 0) {
     throw new Error(
-      `v3 terminal projection repair failed after attempting every finalizer: ${errors.join('; ')}`,
+      `terminal projection repair failed after attempting every finalizer: ${errors.join('; ')}`,
     );
   }
 }
@@ -1645,10 +1645,10 @@ function repairTerminalProjections(
  * outcome or aborts the run. */
 function writeFindingsReportSafely(
   runDir: string,
-  input: V3FindingsReportInput,
+  input: FindingsReportInput,
 ): void {
   try {
-    writeV3FindingsReport(runDir, input);
+    writeFindingsReport(runDir, input);
   } catch (error) {
     try {
       appendTranscriptEvent(runDir, {
@@ -1669,10 +1669,10 @@ function writeFindingsReportSafely(
  * checkpoint (never freshly collected here); omit otherwise. */
 function writeFindingsReportOnResume(
   runDir: string,
-  checkpoint: V3Checkpoint,
-  verifiedFacts?: V3FinishFacts,
+  checkpoint: Checkpoint,
+  verifiedFacts?: FinishFacts,
 ): void {
-  const input = buildV3FindingsReportInputFromCheckpoint(
+  const input = buildFindingsReportInputFromCheckpoint(
     checkpoint,
     collectSurfacedArtifacts(runDir),
     verifiedFacts,
@@ -1681,14 +1681,14 @@ function writeFindingsReportOnResume(
 }
 
 function budgetConfig(
-  configuration: V3DurableRunConfiguration,
+  configuration: DurableRunConfiguration,
 ): RunBudgetConfig {
   const limits = configuration.budgetLimits;
   return {
-    maxWorkerTurns: v3CeilingFromCheckpoint(limits.maxWorkerTurns),
-    maxToolCalls: v3CeilingFromCheckpoint(limits.maxToolCalls),
-    maxModelTokens: v3CeilingFromCheckpoint(limits.maxModelTokens),
-    maxWallTimeMs: v3CeilingFromCheckpoint(limits.maxWallTimeMs),
+    maxWorkerTurns: ceilingFromCheckpoint(limits.maxWorkerTurns),
+    maxToolCalls: ceilingFromCheckpoint(limits.maxToolCalls),
+    maxModelTokens: ceilingFromCheckpoint(limits.maxModelTokens),
+    maxWallTimeMs: ceilingFromCheckpoint(limits.maxWallTimeMs),
     // Retained in durable configuration only for old-checkpoint read
     // compatibility. Correction dialogue is bounded by the ordinary whole-run
     // turn/token/tool/wall budgets, never by a correction-specific cap.
@@ -1696,8 +1696,8 @@ function budgetConfig(
   };
 }
 
-function formatV3RunCapabilityGuidance(
-  configuration: V3DurableRunConfiguration,
+function formatRunCapabilityGuidance(
+  configuration: DurableRunConfiguration,
 ): string {
   const authority = configuration.authenticated
     ? 'authenticated browser state'
@@ -1717,13 +1717,13 @@ function formatV3RunCapabilityGuidance(
 }
 
 function workerIncomplete(
-  reason: V3WorkerIncompleteReason,
-  during: Exclude<V3CheckpointPhase, 'terminal'>,
+  reason: WorkerIncompleteReason,
+  during: Exclude<CheckpointPhase, 'terminal'>,
   finalText: string,
   unresolved: FinishInput['unresolved'],
   detail?: string,
-): V3DurableTerminalOutcome {
-  const budgetReasons: readonly V3WorkerIncompleteReason[] = [
+): DurableTerminalOutcome {
+  const budgetReasons: readonly WorkerIncompleteReason[] = [
     'max_turns',
     'context_budget',
     'tool_calls',
@@ -1747,8 +1747,8 @@ function incompleteBudget(
   limit: string,
   finalText: string,
   unresolved: FinishInput['unresolved'],
-  during: Exclude<V3CheckpointPhase, 'terminal'>,
-): V3DurableTerminalOutcome {
+  during: Exclude<CheckpointPhase, 'terminal'>,
+): DurableTerminalOutcome {
   return {
     status: 'incomplete',
     during,
@@ -1761,7 +1761,7 @@ function incompleteBudget(
 
 function writeMetricsAtomically(
   runDir: string,
-  metrics: V3WorkerMetrics,
+  metrics: WorkerMetrics,
 ): void {
   writeFileDurablyAtomic(
     join(runDir, 'metrics.json'),
@@ -1771,7 +1771,7 @@ function writeMetricsAtomically(
 
 function writeTerminalMetrics(
   runDir: string,
-  checkpoint: Extract<V3Checkpoint, { phase: 'terminal' }>,
+  checkpoint: Extract<Checkpoint, { phase: 'terminal' }>,
 ): void {
   const roles = checkpoint.budget.roles;
   const totals = Object.values(roles).reduce(
@@ -1809,11 +1809,11 @@ function finalizeManifestIfNeeded(runDir: string): void {
 }
 
 function terminalBrowserCleanupTimeout(
-  options: RunV3CoordinatorOptions,
+  options: RunAgentOptions,
 ): number {
   const timeoutMs =
     options.terminalBrowserCleanupTimeoutMs ??
-    V3_TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS;
+    TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
     throw new Error(
       `terminalBrowserCleanupTimeoutMs must be finite and > 0, got ${timeoutMs}`,
@@ -1823,7 +1823,7 @@ function terminalBrowserCleanupTimeout(
 }
 
 function terminalBusyResourceTimeout(
-  options: RunV3CoordinatorOptions,
+  options: RunAgentOptions,
 ): number {
   const timeoutMs =
     options.terminalBusyResourceTimeoutMs ?? BUSY_RESOURCE_GATE_TIMEOUT_MS;
@@ -1836,11 +1836,11 @@ function terminalBusyResourceTimeout(
 }
 
 function terminalResumeInspectionTimeout(
-  options: RunV3CoordinatorOptions,
+  options: RunAgentOptions,
 ): number {
   const timeoutMs =
     options.terminalResumeInspectionTimeoutMs ??
-    V3_TERMINAL_RESUME_INSPECTION_TIMEOUT_MS;
+    TERMINAL_RESUME_INSPECTION_TIMEOUT_MS;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
     throw new Error(
       `terminalResumeInspectionTimeoutMs must be finite and > 0, got ${timeoutMs}`,
@@ -1850,7 +1850,7 @@ function terminalResumeInspectionTimeout(
 }
 
 function createTerminalResumeInspectionGuard(
-  options: RunV3CoordinatorOptions,
+  options: RunAgentOptions,
   now: () => number,
   honorCancellation = true,
 ): () => void {
@@ -1922,24 +1922,24 @@ function formatIncompleteFindings(
 /** Fixed harness-owned instruction attached to research findings only when
  * rendering the correction JSON for the worker. It is never model text and
  * never stored in the durable typed finding itself. */
-const V3_RESEARCH_FINDING_INSTRUCTION =
+const RESEARCH_FINDING_INSTRUCTION =
   'Continue evidence collection for this requirement using materially different applicable ' +
   'sources or navigation; do not fabricate, pad, or weaken artifacts. If it remains genuinely ' +
   'unobtainable after the applicable fallbacks, report it truthfully in unresolved.';
 
 function renderFindingsForWorker(
-  findings: readonly V3CorrectionFinding[],
+  findings: readonly CorrectionFinding[],
 ): unknown[] {
   return findings.map((finding) =>
     finding.kind === 'research'
-      ? { ...finding, instruction: V3_RESEARCH_FINDING_INSTRUCTION }
+      ? { ...finding, instruction: RESEARCH_FINDING_INSTRUCTION }
       : finding,
   );
 }
 
 function sameRequirementSet(
-  previous: readonly V3CorrectionFinding[],
-  current: readonly V3CorrectionFinding[],
+  previous: readonly CorrectionFinding[],
+  current: readonly CorrectionFinding[],
 ): boolean {
   const previousRequirements = new Set(
     previous.map((finding) => finding.requirement),
@@ -1969,7 +1969,7 @@ function hasNewDistinctAttempt(
   );
 }
 
-function collectSurfacedArtifacts(runDir: string): V3SurfacedArtifact[] {
+function collectSurfacedArtifacts(runDir: string): SurfacedArtifact[] {
   return readManifest(runDir).artifacts
     .filter(
       (entry) =>
@@ -1992,7 +1992,7 @@ function collectSurfacedArtifacts(runDir: string): V3SurfacedArtifact[] {
 }
 
 function fingerprintSurfacedArtifacts(
-  artifacts: readonly V3SurfacedArtifact[],
+  artifacts: readonly SurfacedArtifact[],
 ): string {
   const stableEvidence = artifacts.map(
     ({ filename, sha256, sourceUrl, roles, completionStatus }) => ({
@@ -2009,7 +2009,7 @@ function fingerprintSurfacedArtifacts(
 }
 
 function formatOutcomeForDiagnostic(
-  outcome: V3DurableTerminalOutcome,
+  outcome: DurableTerminalOutcome,
 ): string {
   if (outcome.status === 'verified') return 'verified';
   if (outcome.status === 'incomplete') {
@@ -2036,14 +2036,14 @@ function abortReason(error: unknown): string {
 function wallDeadlineError(
   error: unknown,
   signal: AbortSignal,
-): V3RoleBudgetExceededError | undefined {
+): RoleBudgetExceededError | undefined {
   if (
-    isV3RoleBudgetExceededError(error) &&
+    isRoleBudgetExceededError(error) &&
     error.limit === 'wall_time'
   ) {
     return error;
   }
-  return isV3RoleBudgetExceededError(signal.reason) &&
+  return isRoleBudgetExceededError(signal.reason) &&
     signal.reason.limit === 'wall_time'
     ? signal.reason
     : undefined;
@@ -2052,9 +2052,9 @@ function wallDeadlineError(
 function verifierBudgetError(
   error: unknown,
   signal: AbortSignal,
-): V3RoleBudgetExceededError | undefined {
-  if (isV3RoleBudgetExceededError(error)) return error;
-  return isV3RoleBudgetExceededError(signal.reason)
+): RoleBudgetExceededError | undefined {
+  if (isRoleBudgetExceededError(error)) return error;
+  return isRoleBudgetExceededError(signal.reason)
     ? signal.reason
     : undefined;
 }

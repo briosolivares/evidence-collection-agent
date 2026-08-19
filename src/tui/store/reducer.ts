@@ -779,7 +779,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           };
         }
       } else {
-        // Synthetic pre-v3 budget stops retain their historical diagnostic
+        // Synthetic legacy budget stops retain their historical diagnostic
         // rendering. Real incomplete runs take the human-facing branch above.
         const reason =
           action.reason === 'max_turns'

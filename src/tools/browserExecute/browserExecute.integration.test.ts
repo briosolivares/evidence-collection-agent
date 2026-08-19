@@ -15,7 +15,7 @@ import {
 } from './browserExecute.js';
 
 describe('browser_execute real-browser journey', () => {
-  const suite = setupBrowserToolSuite('v3-browser-execute');
+  const suite = setupBrowserToolSuite('browser-execute');
 
   it(
     'navigates, inspects AX, interacts, extracts, writes scratch, opens a page, and cleans up',

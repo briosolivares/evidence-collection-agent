@@ -18,7 +18,7 @@ import {
 import { publishArtifactTool } from './publishArtifact.js';
 
 describe('publish_artifact real-browser journeys', () => {
-  const suite = setupBrowserToolSuite('v3-publish-artifact');
+  const suite = setupBrowserToolSuite('publish-artifact');
   const browserExecuteTool = createBrowserExecuteTool({
     javascriptPolicy: 'allow',
     secretEnvDenylist: [],

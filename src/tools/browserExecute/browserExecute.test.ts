@@ -38,8 +38,8 @@ import {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-browser-execute-'));
-  initManifest(runDir, 'exercise the v3 browser tool');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-browser-execute-'));
+  initManifest(runDir, 'exercise the browser tool');
 });
 
 afterEach(() => {

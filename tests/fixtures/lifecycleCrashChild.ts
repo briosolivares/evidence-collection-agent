@@ -15,10 +15,10 @@ import {
 } from '../../src/tools/registry.js';
 import { writeArtifact } from '../../src/run/artifacts.js';
 import type {
-  V3Checkpoint,
-  V3DurableRunConfiguration,
+  Checkpoint,
+  DurableRunConfiguration,
 } from '../../src/agent/checkpoint.js';
-import { runV3Coordinator } from '../../src/agent/lifecycle.js';
+import { runAgent } from '../../src/agent/lifecycle.js';
 
 type Scenario =
   | 'contract'
@@ -68,7 +68,7 @@ const FINISH = {
   unresolved: [],
 };
 
-const CONFIGURATION: V3DurableRunConfiguration = {
+const CONFIGURATION: DurableRunConfiguration = {
   taskText: TASK,
   model: 'crash-fixture-worker',
   maxOutputTokens: 4_096,
@@ -157,7 +157,7 @@ async function main(): Promise<void> {
   ) {
     abort.abort(new DOMException('cancel before resume recovery', 'AbortError'));
   }
-  const outcome = await runV3Coordinator({
+  const outcome = await runAgent({
     runDir: args.runDir,
     configuration: CONFIGURATION,
     initializerModel: initializerModel(),
@@ -171,7 +171,7 @@ async function main(): Promise<void> {
   await sendToParent({ type: 'outcome', outcome });
 }
 
-async function afterCheckpoint(checkpoint: V3Checkpoint): Promise<void> {
+async function afterCheckpoint(checkpoint: Checkpoint): Promise<void> {
   appendEvent({
     type: 'checkpoint',
     phase: checkpoint.phase,

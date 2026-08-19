@@ -4,8 +4,8 @@ import { z } from 'zod';
 import type { Message } from './messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import {
-  V3_COLLAPSED_BROWSER_RESULT_MARKER,
-  buildV3ContextView,
+  COLLAPSED_BROWSER_RESULT_MARKER,
+  buildContextView,
 } from '../agent/worker/contextView.js';
 import {
   buildRequestParams,
@@ -61,7 +61,7 @@ function frozen(messages: Message[]): readonly Message[] {
   return Object.freeze(messages);
 }
 
-function v3BrowserExchange(id: string, value: number): Message[] {
+function browserExchange(id: string, value: number): Message[] {
   return [
     {
       role: 'assistant',
@@ -156,27 +156,27 @@ describe('buildRequestParams', () => {
     }
   });
 
-  it('marks the v3 browser-result collapse frontier without mutating full history', () => {
+  it('marks the browser-result collapse frontier without mutating full history', () => {
     const history = frozen([
       { role: 'user', content: [{ type: 'text', text: 'Collect the evidence.' }] },
-      ...v3BrowserExchange('b1', 1),
-      ...v3BrowserExchange('b2', 2),
-      ...v3BrowserExchange('b3', 3),
+      ...browserExchange('b1', 1),
+      ...browserExchange('b2', 2),
+      ...browserExchange('b3', 3),
     ]);
 
-    const view = buildV3ContextView(history);
+    const view = buildContextView(history);
     const params = buildRequestParams(makeConfig(), view);
     const contents = params.messages.map(
       (message) => message.content as Array<{ content?: string; cache_control?: unknown }>,
     );
 
-    expect(contents[2]?.[0]?.content).toContain(V3_COLLAPSED_BROWSER_RESULT_MARKER);
+    expect(contents[2]?.[0]?.content).toContain(COLLAPSED_BROWSER_RESULT_MARKER);
     expect(contents[2]?.[0]?.cache_control).toEqual({ type: 'ephemeral' });
     expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
     expect(
       contents.flat().filter((block) => block.cache_control !== undefined),
     ).toHaveLength(2);
-    expect(JSON.stringify(history)).not.toContain(V3_COLLAPSED_BROWSER_RESULT_MARKER);
+    expect(JSON.stringify(history)).not.toContain(COLLAPSED_BROWSER_RESULT_MARKER);
     expect(JSON.stringify(history)).not.toContain('cache_control');
   });
 

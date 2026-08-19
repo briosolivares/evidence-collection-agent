@@ -87,7 +87,7 @@ describe('finish control definition', () => {
       exclusive: true,
     });
     expect(() => finishTool.execute(validInput, { runDir: '/unused' })).toThrow(
-      /must be intercepted by the v3 worker loop/,
+      /must be intercepted by the worker loop/,
     );
   });
 });

@@ -17,37 +17,37 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { OutputContract } from './initializer/outputContract.js';
-import type { V3FinishFacts, V3TableFact } from './completion/finishChecks.js';
+import type { FinishFacts, TableFact } from './completion/finishChecks.js';
 import {
-  V3_CHECKPOINT_MAX_BYTES,
-  V3_HARNESS_DIR,
-  V3_RUN_CHECKPOINT_FILENAME,
-  V3_RUN_LOCK_FILENAME,
-  V3_RUN_LOCK_RECOVERY_FILENAME,
-  readV3CheckpointConfiguration,
-  readV3CheckpointResumeInfo,
-  v3CeilingFromCheckpoint,
-  v3CeilingToCheckpoint,
-  openV3CheckpointStore,
-  v3CheckpointSchema,
-  v3DurableTerminalOutcomeSchema,
-  v3InitializerProgressSchema,
-  v3PendingToolTurnSchema,
-  type V3Checkpoint,
-  type V3DurableRunConfiguration,
+  CHECKPOINT_MAX_BYTES,
+  HARNESS_DIR,
+  RUN_CHECKPOINT_FILENAME,
+  RUN_LOCK_FILENAME,
+  RUN_LOCK_RECOVERY_FILENAME,
+  readCheckpointConfiguration,
+  readCheckpointResumeInfo,
+  ceilingFromCheckpoint,
+  ceilingToCheckpoint,
+  openCheckpointStore,
+  checkpointSchema,
+  durableTerminalOutcomeSchema,
+  initializerProgressSchema,
+  pendingToolTurnSchema,
+  type Checkpoint,
+  type DurableRunConfiguration,
 } from './checkpoint.js';
 
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'v3-checkpoint-'));
+  runDir = mkdtempSync(join(tmpdir(), 'checkpoint-'));
 });
 
 afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
 
-const configuration: V3DurableRunConfiguration = {
+const configuration: DurableRunConfiguration = {
   taskText: 'Publish a one-column roster CSV.',
   model: 'claude-sonnet-5',
   maxOutputTokens: 8_192,
@@ -208,7 +208,7 @@ const pendingToolTurn = {
   effect: 'uncertain' as const,
 };
 
-const facts: V3FinishFacts = {
+const facts: FinishFacts = {
   finish: {
     summary: finish.input.summary,
     unresolved: [],
@@ -283,15 +283,15 @@ function common(revision = 1) {
   };
 }
 
-function initializing(revision = 1): V3Checkpoint {
+function initializing(revision = 1): Checkpoint {
   return { ...common(revision), phase: 'initializing' };
 }
 
-function ready(revision = 1): V3Checkpoint {
+function ready(revision = 1): Checkpoint {
   return { ...common(revision), phase: 'ready_for_model', contract, worker };
 }
 
-function executing(revision = 1): V3Checkpoint {
+function executing(revision = 1): Checkpoint {
   return {
     ...common(revision),
     phase: 'executing_tool',
@@ -305,7 +305,7 @@ function executing(revision = 1): V3Checkpoint {
   };
 }
 
-function checking(revision = 1): V3Checkpoint {
+function checking(revision = 1): Checkpoint {
   return {
     ...common(revision),
     phase: 'checking',
@@ -316,7 +316,7 @@ function checking(revision = 1): V3Checkpoint {
   };
 }
 
-function verifying(revision = 1): V3Checkpoint {
+function verifying(revision = 1): Checkpoint {
   return {
     ...common(revision),
     phase: 'verifying',
@@ -331,7 +331,7 @@ function verifying(revision = 1): V3Checkpoint {
   };
 }
 
-function terminal(revision = 1): V3Checkpoint {
+function terminal(revision = 1): Checkpoint {
   return {
     ...common(revision),
     phase: 'terminal',
@@ -342,7 +342,7 @@ function terminal(revision = 1): V3Checkpoint {
   };
 }
 
-function initializerTerminal(revision = 1): V3Checkpoint {
+function initializerTerminal(revision = 1): Checkpoint {
   return {
     ...common(revision),
     phase: 'terminal',
@@ -358,14 +358,14 @@ function initializerTerminal(revision = 1): V3Checkpoint {
 }
 
 function pathInHarness(name: string): string {
-  return join(runDir, V3_HARNESS_DIR, name);
+  return join(runDir, HARNESS_DIR, name);
 }
 
 function checkpointForTransition(
-  phase: V3Checkpoint['phase'],
+  phase: Checkpoint['phase'],
   revision: number,
-  priorPhase?: V3Checkpoint['phase'],
-): V3Checkpoint {
+  priorPhase?: Checkpoint['phase'],
+): Checkpoint {
   switch (phase) {
     case 'initializing':
       return initializing(revision);
@@ -384,17 +384,17 @@ function checkpointForTransition(
   }
 }
 
-describe('v3 checkpoint schema', () => {
+describe('checkpoint schema', () => {
   it('round-trips an unbounded ceiling without JSON coercion', () => {
-    expect(v3CeilingToCheckpoint(Infinity)).toBe('unbounded');
-    expect(v3CeilingFromCheckpoint('unbounded')).toBe(Infinity);
-    expect(v3CeilingToCheckpoint(42)).toBe(42);
-    expect(() => v3CeilingToCheckpoint(Number.NaN)).toThrow(/non-finite/);
+    expect(ceilingToCheckpoint(Infinity)).toBe('unbounded');
+    expect(ceilingFromCheckpoint('unbounded')).toBe(Infinity);
+    expect(ceilingToCheckpoint(42)).toBe(42);
+    expect(() => ceilingToCheckpoint(Number.NaN)).toThrow(/non-finite/);
   });
 
   it('round-trips the optional per-column nonblank count field, and still parses without it', () => {
-    const tableFactWithCounts: V3TableFact = {
-      ...(facts.outputs[0] as V3TableFact),
+    const tableFactWithCounts: TableFact = {
+      ...(facts.outputs[0] as TableFact),
       columnNonblankCounts: [{ column: 'name', nonblankCount: 1 }],
     };
     const withCounts = {
@@ -405,11 +405,11 @@ describe('v3 checkpoint schema', () => {
         facts: { ...facts, outputs: [tableFactWithCounts] },
       },
     };
-    expect(v3CheckpointSchema.parse(withCounts)).toEqual(withCounts);
+    expect(checkpointSchema.parse(withCounts)).toEqual(withCounts);
 
     // Checkpoints written before this field existed carry no
     // `columnNonblankCounts` at all; they must still parse unchanged.
-    expect(v3CheckpointSchema.parse(verifying())).toEqual(verifying());
+    expect(checkpointSchema.parse(verifying())).toEqual(verifying());
   });
 
   it('round-trips new typed verification-history findings and normalizes legacy nextAction findings', () => {
@@ -417,13 +417,13 @@ describe('v3 checkpoint schema', () => {
       ...verifying(),
       verificationHistory: typedVerificationHistory(),
     };
-    expect(v3CheckpointSchema.parse(withTypedHistory)).toEqual(withTypedHistory);
+    expect(checkpointSchema.parse(withTypedHistory)).toEqual(withTypedHistory);
 
     const withLegacyHistory = {
       ...verifying(),
       verificationHistory: legacyVerificationHistory(),
     };
-    const parsedLegacy = v3CheckpointSchema.parse(withLegacyHistory);
+    const parsedLegacy = checkpointSchema.parse(withLegacyHistory);
     if (parsedLegacy.phase !== 'verifying') {
       throw new Error('expected a verifying checkpoint');
     }
@@ -446,7 +446,7 @@ describe('v3 checkpoint schema', () => {
   });
 
   it('accepts every phase with only its required durable state', () => {
-    const values: V3Checkpoint[] = [
+    const values: Checkpoint[] = [
       initializing(),
       { ...initializing(), contract },
       ready(),
@@ -480,31 +480,31 @@ describe('v3 checkpoint schema', () => {
     ];
 
     for (const value of values) {
-      expect(v3CheckpointSchema.safeParse(value).success).toBe(true);
+      expect(checkpointSchema.safeParse(value).success).toBe(true);
     }
   });
 
   it('keeps strict phase boundaries and requires contract plus worker while active', () => {
     expect(
-      v3CheckpointSchema.safeParse({ ...initializing(), surprise: true }).success,
+      checkpointSchema.safeParse({ ...initializing(), surprise: true }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({ ...ready(), contract: undefined }).success,
+      checkpointSchema.safeParse({ ...ready(), contract: undefined }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({ ...ready(), worker: undefined }).success,
+      checkpointSchema.safeParse({ ...ready(), worker: undefined }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({ ...ready(), pendingFinish: finish }).success,
+      checkpointSchema.safeParse({ ...ready(), pendingFinish: finish }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({ ...checking(), pendingCheck: undefined }).success,
+      checkpointSchema.safeParse({ ...checking(), pendingCheck: undefined }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({ ...verifying(), pendingVerifier: undefined }).success,
+      checkpointSchema.safeParse({ ...verifying(), pendingVerifier: undefined }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...verifying(),
         pendingVerifier: {
           cycle: 1,
@@ -528,15 +528,15 @@ describe('v3 checkpoint schema', () => {
       attempts: 1,
       lastProblem: 'The first response had no contract call.',
     };
-    expect(v3InitializerProgressSchema.safeParse(initializer).success).toBe(true);
+    expect(initializerProgressSchema.safeParse(initializer).success).toBe(true);
     expect(
-      v3CheckpointSchema.safeParse({ ...initializing(), initializer }).success,
+      checkpointSchema.safeParse({ ...initializing(), initializer }).success,
     ).toBe(true);
     expect(
-      v3CheckpointSchema.safeParse({ ...initializing(), initializer, contract }).success,
+      checkpointSchema.safeParse({ ...initializing(), initializer, contract }).success,
     ).toBe(false);
     expect(
-      v3InitializerProgressSchema.safeParse({ ...initializer, attempts: 3 }).success,
+      initializerProgressSchema.safeParse({ ...initializer, attempts: 3 }).success,
     ).toBe(false);
   });
 
@@ -560,24 +560,24 @@ describe('v3 checkpoint schema', () => {
       nextCallIndex: 1,
       effect: 'not_started' as const,
     };
-    expect(v3PendingToolTurnSchema.safeParse(base).success).toBe(true);
+    expect(pendingToolTurnSchema.safeParse(base).success).toBe(true);
     expect(
-      v3PendingToolTurnSchema.safeParse({
+      pendingToolTurnSchema.safeParse({
         ...base,
         completedResults: [{ ...base.completedResults[0], tool_use_id: 'b' }],
       }).success,
     ).toBe(false);
     expect(
-      v3PendingToolTurnSchema.safeParse({ ...base, nextCallIndex: 2 }).success,
+      pendingToolTurnSchema.safeParse({ ...base, nextCallIndex: 2 }).success,
     ).toBe(false);
     expect(
-      v3PendingToolTurnSchema.safeParse({
+      pendingToolTurnSchema.safeParse({
         ...base,
         calls: [...base.calls].reverse(),
       }).success,
     ).toBe(false);
     expect(
-      v3PendingToolTurnSchema.safeParse({
+      pendingToolTurnSchema.safeParse({
         ...base,
         assistant: {
           role: 'assistant',
@@ -594,7 +594,7 @@ describe('v3 checkpoint schema', () => {
 
   it('cross-checks task and turn identity against the immutable snapshot', () => {
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...ready(),
         worker: {
           ...worker,
@@ -605,7 +605,7 @@ describe('v3 checkpoint schema', () => {
       }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...checking(),
         pendingFinish: { ...finish, turn: 99 },
       }).success,
@@ -649,7 +649,7 @@ describe('v3 checkpoint schema', () => {
       },
       pendingTurn,
     };
-    expect(v3CheckpointSchema.safeParse(checkpoint).success).toBe(true);
+    expect(checkpointSchema.safeParse(checkpoint).success).toBe(true);
 
     const wrongInput = structuredClone(assistant);
     wrongInput.content[0]!.input = { path: 'scratch/other.txt' };
@@ -661,7 +661,7 @@ describe('v3 checkpoint schema', () => {
     };
     for (const trailing of [wrongInput, wrongId, wrongOrder]) {
       expect(
-        v3CheckpointSchema.safeParse({
+        checkpointSchema.safeParse({
           ...checkpoint,
           worker: {
             ...checkpoint.worker,
@@ -671,7 +671,7 @@ describe('v3 checkpoint schema', () => {
       ).toBe(false);
     }
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...checkpoint,
         worker: { ...checkpoint.worker, messages: [...worker.messages] },
       }).success,
@@ -685,10 +685,10 @@ describe('v3 checkpoint schema', () => {
     'links %s pending finish state to one exact trailing finish call',
     (_phase, makeCheckpoint) => {
       const checkpoint = makeCheckpoint();
-      expect(v3CheckpointSchema.safeParse(checkpoint).success).toBe(true);
+      expect(checkpointSchema.safeParse(checkpoint).success).toBe(true);
 
       expect(
-        v3CheckpointSchema.safeParse({
+        checkpointSchema.safeParse({
           ...checkpoint,
           pendingFinish: {
             ...finish,
@@ -702,7 +702,7 @@ describe('v3 checkpoint schema', () => {
         summary: 'A different durable finish summary.',
       };
       expect(
-        v3CheckpointSchema.safeParse({
+        checkpointSchema.safeParse({
           ...checkpoint,
           pendingFinish: {
             ...finish,
@@ -713,7 +713,7 @@ describe('v3 checkpoint schema', () => {
       ).toBe(false);
 
       expect(
-        v3CheckpointSchema.safeParse({
+        checkpointSchema.safeParse({
           ...checkpoint,
           worker: {
             ...finishWorker,
@@ -737,7 +737,7 @@ describe('v3 checkpoint schema', () => {
       ).toBe(false);
 
       expect(
-        v3CheckpointSchema.safeParse({
+        checkpointSchema.safeParse({
           ...checkpoint,
           pendingFinish: { ...finish, assistantText: 'different assistant text' },
         }).success,
@@ -759,13 +759,13 @@ describe('v3 checkpoint schema', () => {
       { status: 'cancelled', during: 'executing_tool', reason: 'user cancelled' },
     ];
     for (const outcome of outcomes) {
-      expect(v3DurableTerminalOutcomeSchema.safeParse(outcome).success).toBe(true);
+      expect(durableTerminalOutcomeSchema.safeParse(outcome).success).toBe(true);
     }
     expect(
-      v3DurableTerminalOutcomeSchema.safeParse({ status: 'failed', message: 'x' }).success,
+      durableTerminalOutcomeSchema.safeParse({ status: 'failed', message: 'x' }).success,
     ).toBe(false);
     expect(
-      v3DurableTerminalOutcomeSchema.safeParse({
+      durableTerminalOutcomeSchema.safeParse({
         status: 'incomplete',
         reason: 'budget_exceeded',
         detail: 'model token budget',
@@ -774,7 +774,7 @@ describe('v3 checkpoint schema', () => {
     ).toBe(false);
 
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...common(),
         phase: 'terminal',
         outcome: {
@@ -788,14 +788,14 @@ describe('v3 checkpoint schema', () => {
     ).toBe(false);
 
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...common(),
         phase: 'terminal',
         outcome: { status: 'verified', finalText: 'done' },
       }).success,
     ).toBe(false);
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...common(),
         phase: 'terminal',
         contract,
@@ -805,7 +805,7 @@ describe('v3 checkpoint schema', () => {
       }).success,
     ).toBe(true);
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...common(),
         phase: 'terminal',
         contract,
@@ -816,7 +816,7 @@ describe('v3 checkpoint schema', () => {
     ).toBe(false);
 
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...common(),
         phase: 'terminal',
         contract,
@@ -827,7 +827,7 @@ describe('v3 checkpoint schema', () => {
     ).toBe(false);
 
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...terminal(),
         finish: {
           ...finish.input,
@@ -837,7 +837,7 @@ describe('v3 checkpoint schema', () => {
     ).toBe(false);
 
     expect(
-      v3CheckpointSchema.safeParse({
+      checkpointSchema.safeParse({
         ...ready(),
         phase: 'terminal',
         finish: finish.input,
@@ -855,10 +855,10 @@ describe('v3 checkpoint schema', () => {
 
 describe('read-only checkpoint observation', () => {
   function writeCheckpoint(value: unknown): string {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    const path = pathInHarness(V3_RUN_CHECKPOINT_FILENAME);
+    const path = pathInHarness(RUN_CHECKPOINT_FILENAME);
     writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
     chmodSync(path, 0o600);
     return path;
@@ -866,14 +866,14 @@ describe('read-only checkpoint observation', () => {
 
   it('returns a detached frozen configuration without touching lock or directory state', () => {
     const checkpointPath = writeCheckpoint(ready());
-    const lockPath = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const lockPath = pathInHarness(RUN_LOCK_FILENAME);
     writeFileSync(lockPath, 'leave this corrupt lock untouched', { mode: 0o600 });
-    const namesBefore = readdirSync(join(runDir, V3_HARNESS_DIR)).sort();
+    const namesBefore = readdirSync(join(runDir, HARNESS_DIR)).sort();
     const checkpointBefore = readFileSync(checkpointPath);
     const lockBefore = readFileSync(lockPath);
 
-    const observed = readV3CheckpointConfiguration(runDir);
-    const resumeInfo = readV3CheckpointResumeInfo(runDir);
+    const observed = readCheckpointConfiguration(runDir);
+    const resumeInfo = readCheckpointResumeInfo(runDir);
 
     expect(observed).toEqual(configuration);
     expect(Object.isFrozen(observed)).toBe(true);
@@ -886,7 +886,7 @@ describe('read-only checkpoint observation', () => {
     });
     expect(Object.isFrozen(resumeInfo)).toBe(true);
     expect(resumeInfo.configuration).not.toBe(observed);
-    expect(readdirSync(join(runDir, V3_HARNESS_DIR)).sort()).toEqual(namesBefore);
+    expect(readdirSync(join(runDir, HARNESS_DIR)).sort()).toEqual(namesBefore);
     expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
     expect(readFileSync(lockPath)).toEqual(lockBefore);
   });
@@ -905,7 +905,7 @@ describe('read-only checkpoint observation', () => {
     const checkpointPath = writeCheckpoint(legacy);
     const before = readFileSync(checkpointPath);
 
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     expect(store.load()).toEqual(checking());
     await store.close();
     expect(readFileSync(checkpointPath)).toEqual(before);
@@ -919,7 +919,7 @@ describe('read-only checkpoint observation', () => {
     const checkpointPath = writeCheckpoint(legacy);
     const before = readFileSync(checkpointPath);
 
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     expect(store.load()).toEqual({
       ...verifying(),
       verificationHistory: typedVerificationHistory(),
@@ -936,7 +936,7 @@ describe('read-only checkpoint observation', () => {
     };
     writeCheckpoint(legacy);
 
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     expect(store.load()).toEqual(terminal());
     await store.close();
   });
@@ -956,22 +956,22 @@ describe('read-only checkpoint observation', () => {
     };
     writeCheckpoint(legacy);
 
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(
       /schema validation|must equal the validated finish input/,
     );
-    expect(existsSync(pathInHarness(V3_RUN_LOCK_FILENAME))).toBe(false);
+    expect(existsSync(pathInHarness(RUN_LOCK_FILENAME))).toBe(false);
   });
 
   it('does not create a missing harness directory or checkpoint', () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+    const harnessDir = join(runDir, HARNESS_DIR);
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(
       /harness directory does not exist/,
     );
     expect(existsSync(harnessDir)).toBe(false);
 
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(
       /checkpoint does not exist/,
     );
     expect(readdirSync(harnessDir)).toEqual([]);
@@ -981,12 +981,12 @@ describe('read-only checkpoint observation', () => {
     const checkpointPath = writeCheckpoint(ready());
 
     writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(/not valid JSON/);
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/not valid JSON/);
 
     writeFileSync(checkpointPath, JSON.stringify({ ...ready(), version: 2 }), {
       mode: 0o600,
     });
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(/version/);
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/version/);
 
     writeFileSync(
       checkpointPath,
@@ -996,17 +996,17 @@ describe('read-only checkpoint observation', () => {
       }),
       { mode: 0o600 },
     );
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(
       /configuration\.model/,
     );
   });
 
   it('refuses an oversized checkpoint before parsing it', () => {
     const checkpointPath = writeCheckpoint(ready());
-    truncateSync(checkpointPath, V3_CHECKPOINT_MAX_BYTES + 1);
+    truncateSync(checkpointPath, CHECKPOINT_MAX_BYTES + 1);
 
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
-      new RegExp(`${V3_CHECKPOINT_MAX_BYTES}-byte read limit`),
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(
+      new RegExp(`${CHECKPOINT_MAX_BYTES}-byte read limit`),
     );
   });
 
@@ -1014,19 +1014,19 @@ describe('read-only checkpoint observation', () => {
     const target = join(runDir, 'outside-checkpoint.json');
     const targetBytes = `${JSON.stringify(ready())}\n`;
     writeFileSync(target, targetBytes, { mode: 0o600 });
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    symlinkSync(target, pathInHarness(V3_RUN_CHECKPOINT_FILENAME));
+    symlinkSync(target, pathInHarness(RUN_CHECKPOINT_FILENAME));
 
-    expect(() => readV3CheckpointConfiguration(runDir)).toThrow(
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(
       /symlinks are not followed/,
     );
     expect(readFileSync(target, 'utf8')).toBe(targetBytes);
   });
 });
 
-describe('openV3CheckpointStore', () => {
+describe('openCheckpointStore', () => {
   it.each([
     ['initializing', 'initializing'],
     ['initializing', 'ready_for_model'],
@@ -1045,7 +1045,7 @@ describe('openV3CheckpointStore', () => {
     ['verifying', 'ready_for_model'],
     ['verifying', 'terminal'],
   ] as const)('accepts the lawful %s -> %s phase transition', async (from, to) => {
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     await store.save(checkpointForTransition(from, 1));
     await store.save(checkpointForTransition(to, 2, from));
     expect(store.load()?.phase).toBe(to);
@@ -1061,7 +1061,7 @@ describe('openV3CheckpointStore', () => {
     ['verifying', 'executing_tool'],
     ['initializing', 'checking'],
   ] as const)('rejects the illegal %s -> %s phase transition', async (from, to) => {
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     await store.save(checkpointForTransition(from, 1));
     await expect(
       store.save(checkpointForTransition(to, 2, from)),
@@ -1071,11 +1071,11 @@ describe('openV3CheckpointStore', () => {
   });
 
   it('accepts a terminal checkpoint as an imported first snapshot but keeps it absorbing after reopen', async () => {
-    const first = await openV3CheckpointStore(runDir);
+    const first = await openCheckpointStore(runDir);
     await first.save(terminal(7));
     await first.close();
 
-    const reopened = await openV3CheckpointStore(runDir);
+    const reopened = await openCheckpointStore(runDir);
     await expect(reopened.save(ready(8))).rejects.toThrow(
       /phase transition terminal -> ready_for_model.*terminal is absorbing/i,
     );
@@ -1088,17 +1088,17 @@ describe('openV3CheckpointStore', () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    const store = await openV3CheckpointStore(runDir, { beforeWrite: () => gate });
+    const store = await openCheckpointStore(runDir, { beforeWrite: () => gate });
 
     await expect(
-      store.save({ ...initializing(), unexpected: true } as unknown as V3Checkpoint),
-    ).rejects.toThrow(/invalid v3 checkpoint/);
+      store.save({ ...initializing(), unexpected: true } as unknown as Checkpoint),
+    ).rejects.toThrow(/invalid checkpoint/);
     expect(store.load()).toBeUndefined();
 
     const candidate = {
       ...initializing(1),
       configuration: structuredClone(configuration),
-    } as V3Checkpoint;
+    } as Checkpoint;
     const saving = store.save(candidate);
     candidate.configuration.model = 'mutated-after-save';
     release?.();
@@ -1108,28 +1108,28 @@ describe('openV3CheckpointStore', () => {
   });
 
   it('round-trips every typed payload and writes private durable files', async () => {
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     const checkpoint = verifying();
     await store.save(checkpoint);
 
     expect(store.load()).toEqual(checkpoint);
     expect(
-      JSON.parse(readFileSync(pathInHarness(V3_RUN_CHECKPOINT_FILENAME), 'utf8')),
+      JSON.parse(readFileSync(pathInHarness(RUN_CHECKPOINT_FILENAME), 'utf8')),
     ).toEqual(checkpoint);
-    expect(statSync(join(runDir, V3_HARNESS_DIR)).mode & 0o777).toBe(0o700);
-    expect(statSync(pathInHarness(V3_RUN_LOCK_FILENAME)).mode & 0o777).toBe(0o600);
-    expect(statSync(pathInHarness(V3_RUN_CHECKPOINT_FILENAME)).mode & 0o777).toBe(0o600);
+    expect(statSync(join(runDir, HARNESS_DIR)).mode & 0o777).toBe(0o700);
+    expect(statSync(pathInHarness(RUN_LOCK_FILENAME)).mode & 0o777).toBe(0o600);
+    expect(statSync(pathInHarness(RUN_CHECKPOINT_FILENAME)).mode & 0o777).toBe(0o600);
 
     await store.close();
   });
 
   it('enforces strictly increasing revisions across reopen', async () => {
-    const first = await openV3CheckpointStore(runDir);
+    const first = await openCheckpointStore(runDir);
     await first.save(initializing(4));
     await expect(first.save(initializing(4))).rejects.toThrow(/strictly greater/);
     await first.close();
 
-    const second = await openV3CheckpointStore(runDir);
+    const second = await openCheckpointStore(runDir);
     await expect(second.save(initializing(3))).rejects.toThrow(/strictly greater/);
     await second.save(initializing(5));
     expect(second.load()?.revision).toBe(5);
@@ -1137,7 +1137,7 @@ describe('openV3CheckpointStore', () => {
   });
 
   it('locks configuration and accepted contract while allowing one acceptance transition', async () => {
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     await store.save(initializing(1));
     await store.save({ ...initializing(2), contract });
     await store.save(ready(3));
@@ -1165,7 +1165,7 @@ describe('openV3CheckpointStore', () => {
   it('keeps the previous checkpoint after a failure at the pre-rename boundary', async () => {
     let fail = false;
     let stagedPath: string | undefined;
-    const store = await openV3CheckpointStore(runDir, {
+    const store = await openCheckpointStore(runDir, {
       afterTempFileSync: (path) => {
         stagedPath = path;
         if (fail) throw new Error('injected crash window');
@@ -1191,7 +1191,7 @@ describe('openV3CheckpointStore', () => {
       release = resolve;
     });
     let writes = 0;
-    const store = await openV3CheckpointStore(runDir, {
+    const store = await openCheckpointStore(runDir, {
       beforeWrite: async () => {
         writes += 1;
         order.push(`start-${writes}`);
@@ -1206,22 +1206,22 @@ describe('openV3CheckpointStore', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(order).toEqual(['start-1']);
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(/already open/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/already open/);
 
     release?.();
     await Promise.all([first, second, closing]);
     expect(order).toEqual(['start-1', 'end-1', 'start-2', 'end-2']);
 
     await expect(store.save(initializing(3))).rejects.toThrow(/closed/);
-    const reopened = await openV3CheckpointStore(runDir);
+    const reopened = await openCheckpointStore(runDir);
     await reopened.close();
   });
 
   it('recovers a stale lock but refuses a live or corrupt lock', async () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    const lock = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const lock = pathInHarness(RUN_LOCK_FILENAME);
     writeFileSync(
       lock,
       JSON.stringify({
@@ -1231,7 +1231,7 @@ describe('openV3CheckpointStore', () => {
       }),
       { mode: 0o600 },
     );
-    const recovered = await openV3CheckpointStore(runDir);
+    const recovered = await openCheckpointStore(runDir);
     await recovered.close();
 
     writeFileSync(
@@ -1243,18 +1243,18 @@ describe('openV3CheckpointStore', () => {
       }),
       { mode: 0o600 },
     );
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(/already open/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/already open/);
     rmSync(lock);
     writeFileSync(lock, 'not json', { mode: 0o600 });
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(/not valid JSON/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/not valid JSON/);
     expect(readFileSync(lock, 'utf8')).toBe('not json');
   });
 
   it('serializes stale-lock recovery so a second contender cannot delete the winner', async () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    const lock = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const lock = pathInHarness(RUN_LOCK_FILENAME);
     writeFileSync(
       lock,
       JSON.stringify({
@@ -1266,9 +1266,9 @@ describe('openV3CheckpointStore', () => {
     );
 
     let contender: Promise<unknown> | undefined;
-    const winner = await openV3CheckpointStore(runDir, {
+    const winner = await openCheckpointStore(runDir, {
       beforeStaleLockUnlink: () => {
-        contender = openV3CheckpointStore(runDir);
+        contender = openCheckpointStore(runDir);
         // Attach a handler immediately so the deliberately rejected promise
         // is never observed as an unhandled rejection before the assertion.
         void contender.catch(() => undefined);
@@ -1280,15 +1280,15 @@ describe('openV3CheckpointStore', () => {
     expect(JSON.parse(readFileSync(lock, 'utf8'))).toMatchObject({
       processId: process.pid,
     });
-    expect(existsSync(pathInHarness(V3_RUN_LOCK_RECOVERY_FILENAME))).toBe(false);
+    expect(existsSync(pathInHarness(RUN_LOCK_RECOVERY_FILENAME))).toBe(false);
     await winner.close();
   });
 
   it('fails closed when a stale-lock recovery guard survived an interrupted takeover', async () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    const lock = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const lock = pathInHarness(RUN_LOCK_FILENAME);
     const stale = {
       harnessInstanceId: 'dead',
       processId: 999_999,
@@ -1296,21 +1296,21 @@ describe('openV3CheckpointStore', () => {
     };
     writeFileSync(lock, JSON.stringify(stale), { mode: 0o600 });
     writeFileSync(
-      pathInHarness(V3_RUN_LOCK_RECOVERY_FILENAME),
+      pathInHarness(RUN_LOCK_RECOVERY_FILENAME),
       JSON.stringify({ ...stale, harnessInstanceId: 'interrupted-recovery' }),
       { mode: 0o600 },
     );
 
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(
       /already recovering the stale run lock/i,
     );
     expect(JSON.parse(readFileSync(lock, 'utf8'))).toEqual(stale);
   });
 
   it('poisons mutation after lock ownership is lost', async () => {
-    const store = await openV3CheckpointStore(runDir);
+    const store = await openCheckpointStore(runDir);
     await store.save(initializing(1));
-    const lock = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const lock = pathInHarness(RUN_LOCK_FILENAME);
     const value = JSON.parse(readFileSync(lock, 'utf8')) as Record<string, unknown>;
     writeFileSync(
       lock,
@@ -1325,8 +1325,8 @@ describe('openV3CheckpointStore', () => {
   });
 
   it('reports a lock-release failure instead of silently claiming close succeeded', async () => {
-    const store = await openV3CheckpointStore(runDir);
-    const lock = pathInHarness(V3_RUN_LOCK_FILENAME);
+    const store = await openCheckpointStore(runDir);
+    const lock = pathInHarness(RUN_LOCK_FILENAME);
     rmSync(lock);
     mkdirSync(lock);
 
@@ -1334,25 +1334,25 @@ describe('openV3CheckpointStore', () => {
   });
 
   it('fails closed on a corrupt checkpoint and releases its newly acquired lock', async () => {
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    const checkpointPath = pathInHarness(V3_RUN_CHECKPOINT_FILENAME);
+    const checkpointPath = pathInHarness(RUN_CHECKPOINT_FILENAME);
     writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
 
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(/not valid JSON/);
-    expect(existsSync(pathInHarness(V3_RUN_LOCK_FILENAME))).toBe(false);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/not valid JSON/);
+    expect(existsSync(pathInHarness(RUN_LOCK_FILENAME))).toBe(false);
 
     writeFileSync(checkpointPath, JSON.stringify(initializing(1)), { mode: 0o600 });
-    const reopened = await openV3CheckpointStore(runDir);
+    const reopened = await openCheckpointStore(runDir);
     expect(reopened.load()?.revision).toBe(1);
     await reopened.close();
   });
 
   it('rejects relative run directories and unsafe harness directory modes', async () => {
-    await expect(openV3CheckpointStore('relative/run')).rejects.toThrow(/absolute/);
-    mkdirSync(join(runDir, V3_HARNESS_DIR), { mode: 0o755 });
-    chmodSync(join(runDir, V3_HARNESS_DIR), 0o755);
-    await expect(openV3CheckpointStore(runDir)).rejects.toThrow(/mode/);
+    await expect(openCheckpointStore('relative/run')).rejects.toThrow(/absolute/);
+    mkdirSync(join(runDir, HARNESS_DIR), { mode: 0o755 });
+    chmodSync(join(runDir, HARNESS_DIR), 0o755);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/mode/);
   });
 });

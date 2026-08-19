@@ -9,18 +9,18 @@ import type {
   RunBudgetLimit,
   RunBudgetTracker,
 } from '../run/runBudget.js';
-import { raceWithV3RunSignal } from '../agent/runDeadline.js';
+import { raceWithRunSignal } from '../agent/runDeadline.js';
 import {
-  V3RoleBudgetExceededError,
-  isV3RoleBudgetExceededError,
+  RoleBudgetExceededError,
+  isRoleBudgetExceededError,
 } from './budgetError.js';
 
 export {
-  V3RoleBudgetExceededError,
-  isV3RoleBudgetExceededError,
+  RoleBudgetExceededError,
+  isRoleBudgetExceededError,
 } from './budgetError.js';
 
-export interface V3BudgetedCallModelOptions {
+export interface BudgetedCallModelOptions {
   model: ModelDriver;
   budget: RunBudgetTracker;
   role: ModelRole;
@@ -39,15 +39,15 @@ export interface V3BudgetedCallModelOptions {
 }
 
 /**
- * Adapt the strict driver to a legacy CallModel consumer without losing v3's
- * aggregate accounting. The returned response carries only the accepted
+ * Adapt the strict driver to a legacy CallModel consumer without losing the
+ * runtime's aggregate accounting. The returned response carries only the accepted
  * attempt's usage, which is the correct per-request context measurement;
  * the shared budget receives aggregate known usage across discarded complete
  * attempts. Partial transport attempts remain uncountable unless the provider
  * reported a complete usage record.
  */
-export function createV3BudgetedCallModel(
-  options: V3BudgetedCallModelOptions,
+export function createBudgetedCallModel(
+  options: BudgetedCallModelOptions,
 ): CallModel {
   const now = options.now ?? Date.now;
   return async (messages) => {
@@ -56,7 +56,7 @@ export function createV3BudgetedCallModel(
     const startedMs = now();
     let accepted;
     try {
-      accepted = await raceWithV3RunSignal(
+      accepted = await raceWithRunSignal(
         () =>
           options.model.generate({
             messages,
@@ -66,7 +66,7 @@ export function createV3BudgetedCallModel(
         options.signal,
       );
     } catch (error) {
-      if (isV3RoleBudgetExceededError(error)) throw error;
+      if (isRoleBudgetExceededError(error)) throw error;
       const usage = knownModelUsageFromError(error);
       if (usage !== undefined) {
         options.budget.recordModelUsage(
@@ -83,7 +83,7 @@ export function createV3BudgetedCallModel(
       if (isAbortError(error)) throw error;
       const exceeded = roleBudgetLimit(options.budget);
       if (exceeded !== undefined) {
-        throw new V3RoleBudgetExceededError(exceeded, { cause: error });
+        throw new RoleBudgetExceededError(exceeded, { cause: error });
       }
       throw error;
     }
@@ -106,7 +106,7 @@ export function createV3BudgetedCallModel(
 
 function throwIfRoleBudgetExceeded(budget: RunBudgetTracker): void {
   const limit = roleBudgetLimit(budget);
-  if (limit !== undefined) throw new V3RoleBudgetExceededError(limit);
+  if (limit !== undefined) throw new RoleBudgetExceededError(limit);
 }
 
 /** A verifier may lawfully run after the worker used its final allowed turn;

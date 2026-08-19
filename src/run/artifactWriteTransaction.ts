@@ -29,7 +29,7 @@ const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const HASH_CHUNK_BYTES = 64 * 1024;
 
-/** Recovery refuses provenance larger than v3 finish inspection accepts. */
+/** Recovery refuses provenance larger than finish inspection accepts. */
 export const ARTIFACT_WRITE_MAX_MANIFEST_BYTES = 4 * 1024 * 1024;
 /** One intent contains only bounded path/provenance metadata, never payload bytes. */
 export const ARTIFACT_WRITE_MAX_JOURNAL_BYTES = 64 * 1024;

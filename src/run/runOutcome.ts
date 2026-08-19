@@ -10,7 +10,7 @@ export type IncompleteRunReason =
   /** The contract initializer could not produce one trustworthy immutable
    * contract within its bounded attempts. */
   | 'initializer_unavailable'
-  /** The v3 worker ended for a non-budget reason after preserving its run. */
+  /** The worker ended for a non-budget reason after preserving its run. */
   | 'worker_incomplete'
   /** Deterministic finish defects persisted through the configured repair
    * attempts, so the verifier was never allowed to accept the run. */

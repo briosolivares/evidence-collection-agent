@@ -50,16 +50,16 @@ import {
   finishInputSchema,
   type FinishInput,
 } from '../../tools/finish/finish.js';
-import { raceWithV3RunSignal } from '../runDeadline.js';
-import { buildV3ContextView } from './contextView.js';
+import { raceWithRunSignal } from '../runDeadline.js';
+import { buildContextView } from './contextView.js';
 
-export const V3_METRICS_FILENAME = 'metrics.json';
-export const V3_MAX_PROTOCOL_CORRECTIONS = 3;
+export const METRICS_FILENAME = 'metrics.json';
+export const MAX_PROTOCOL_CORRECTIONS = 3;
 
-export const V3_NO_TOOL_CONTINUATION =
+export const NO_TOOL_CONTINUATION =
   'Continue working with tools, or call finish alone when the requested work is ready.';
 
-export interface V3WorkerSessionDeps {
+export interface WorkerDeps {
   /** Strict, fully assembled streaming driver. Partial responses never enter history. */
   model: ModelDriver;
   registry: ToolRegistry;
@@ -70,41 +70,41 @@ export interface V3WorkerSessionDeps {
   busyRegistry?: BusyResourceRegistry;
   signal?: AbortSignal;
   onModelEvent?: (event: ModelAttemptEvent) => void;
-  lifecycle?: V3WorkerLifecycleHooks;
+  lifecycle?: WorkerHooks;
   /** Test/metrics seam. Budget wall time remains owned by RunBudgetTracker. */
   now?: () => number;
 }
 
-export interface V3WorkerSessionConfig {
+export interface WorkerConfig {
   /** One unresettable tracker shared with initializer/verifier roles. */
   budget: RunBudgetTracker;
   /** Maximum tokens in one accepted request/response context, or Infinity. */
   maxContextTokens: number;
 }
 
-export interface V3WorkerSessionOpeningOptions {
+export interface WorkerOpeningOptions {
   /** Per-run contract/resume facts; each remains a separate opening text block. */
   guidance?: readonly string[];
 }
 
-export interface V3WorkerSessionState {
+export interface WorkerState {
   /** Full, never-collapsed conversation. */
   messages: Message[];
   /** Logical worker model calls, including rejected responses. */
   turnCount: number;
 }
 
-export interface V3WorkerSession {
-  readonly deps: V3WorkerSessionDeps;
-  readonly config: V3WorkerSessionConfig;
-  readonly state: V3WorkerSessionState;
+export interface Worker {
+  readonly deps: WorkerDeps;
+  readonly config: WorkerConfig;
+  readonly state: WorkerState;
   readonly startedMs: number;
   readonly busyRegistry: BusyResourceRegistry;
   peakContextTokens: number;
   protocolCorrections: number;
 }
 
-export interface V3WorkerSessionSnapshot {
+export interface WorkerSnapshot {
   messages: Message[];
   turnCount: number;
   peakContextTokens: number;
@@ -112,7 +112,7 @@ export interface V3WorkerSessionSnapshot {
   startedMs: number;
 }
 
-export interface V3PendingToolTurn {
+export interface PendingToolTurn {
   turn: number;
   assistant: AssistantMessage;
   calls: ToolCall[];
@@ -121,26 +121,26 @@ export interface V3PendingToolTurn {
   effect: 'not_started' | 'uncertain';
 }
 
-export interface V3BeforeModelRequestEvent {
+export interface BeforeModelRequestEvent {
   turn: number;
-  session: V3WorkerSessionSnapshot;
+  session: WorkerSnapshot;
   /** Pure collapsed request view; never aliases changed blocks into state. */
   messages: readonly Message[];
 }
 
-export interface V3FinishRequest {
+export interface FinishRequest {
   turn: number;
   call: ToolCall;
   input: FinishInput;
   assistantText: string;
 }
 
-export interface V3ModelAccountingEvent {
+export interface ModelAccountingEvent {
   turn: number;
   /** Aggregate known billable usage for this logical model call. */
   usage: Usage;
   outcome: 'accepted' | 'failed';
-  session: V3WorkerSessionSnapshot;
+  session: WorkerSnapshot;
 }
 
 /**
@@ -154,24 +154,24 @@ export interface V3ModelAccountingEvent {
  * `afterResult` and finish-hook failures are post-effect persistence failures
  * and propagate terminally; they are never disguised as retryable tool errors.
  */
-export interface V3WorkerLifecycleHooks {
-  beforeModelRequest?(event: V3BeforeModelRequestEvent): Promise<void>;
-  afterModelAccounting?(event: V3ModelAccountingEvent): Promise<void>;
-  beforeCall?(pending: V3PendingToolTurn): Promise<void>;
-  afterDispatch?(pending: V3PendingToolTurn): Promise<void>;
-  afterResult?(pending: V3PendingToolTurn): Promise<void>;
+export interface WorkerHooks {
+  beforeModelRequest?(event: BeforeModelRequestEvent): Promise<void>;
+  afterModelAccounting?(event: ModelAccountingEvent): Promise<void>;
+  beforeCall?(pending: PendingToolTurn): Promise<void>;
+  afterDispatch?(pending: PendingToolTurn): Promise<void>;
+  afterResult?(pending: PendingToolTurn): Promise<void>;
   finishRequested?(event: {
-    session: V3WorkerSessionSnapshot;
-    request: V3FinishRequest;
+    session: WorkerSnapshot;
+    request: FinishRequest;
   }): Promise<void>;
   finishResultAppended?(event: {
-    session: V3WorkerSessionSnapshot;
-    request: V3FinishRequest;
+    session: WorkerSnapshot;
+    request: FinishRequest;
     result: ToolResultBlock;
   }): Promise<void>;
 }
 
-export type V3WorkerGuardReason =
+export type WorkerGuardReason =
   | 'max_turns'
   | 'context_budget'
   | 'tool_calls'
@@ -179,34 +179,34 @@ export type V3WorkerGuardReason =
   | 'wall_time'
   | 'verifier_corrections';
 
-export type V3WorkerIncompleteReason =
-  | V3WorkerGuardReason
+export type WorkerIncompleteReason =
+  | WorkerGuardReason
   | 'model_rejected'
   | 'model_rejection_limit';
 
-export type V3WorkerTurnOutcome =
+export type WorkerTurnOutcome =
   | { kind: 'working' }
-  | { kind: 'finish_requested'; request: V3FinishRequest }
+  | { kind: 'finish_requested'; request: FinishRequest }
   | {
       kind: 'incomplete';
-      reason: V3WorkerIncompleteReason;
+      reason: WorkerIncompleteReason;
       modelRejection?: ModelRejectionReason;
       detail?: string;
     };
 
-export type V3WorkerSessionOutcome = Exclude<
-  V3WorkerTurnOutcome,
+export type WorkerOutcome = Exclude<
+  WorkerTurnOutcome,
   { kind: 'working' }
 >;
 
-export type V3WorkerMetricsStatus =
+export type WorkerMetricsStatus =
   | 'verified'
   | 'incomplete'
   | 'failed'
   | 'cancelled';
 
-export interface V3WorkerMetrics {
-  status: V3WorkerMetricsStatus;
+export interface WorkerMetrics {
+  status: WorkerMetricsStatus;
   turns: number;
   protocolCorrections: number;
   inputTokens: number;
@@ -220,12 +220,12 @@ export interface V3WorkerMetrics {
   roles: Partial<Record<string, RunRoleUsage>>;
 }
 
-export function createV3WorkerSession(
+export function createWorker(
   taskText: string,
-  deps: V3WorkerSessionDeps,
-  config: V3WorkerSessionConfig,
-  options: V3WorkerSessionOpeningOptions = {},
-): V3WorkerSession {
+  deps: WorkerDeps,
+  config: WorkerConfig,
+  options: WorkerOpeningOptions = {},
+): Worker {
   assertContextCeiling(config.maxContextTokens);
   const now = deps.now ?? Date.now;
   return {
@@ -253,9 +253,9 @@ export function createV3WorkerSession(
   };
 }
 
-export function captureV3WorkerSessionSnapshot(
-  session: V3WorkerSession,
-): V3WorkerSessionSnapshot {
+export function captureWorkerSnapshot(
+  session: Worker,
+): WorkerSnapshot {
   return {
     messages: structuredClone(session.state.messages),
     turnCount: session.state.turnCount,
@@ -265,13 +265,13 @@ export function captureV3WorkerSessionSnapshot(
   };
 }
 
-export function restoreV3WorkerSession(
-  snapshot: V3WorkerSessionSnapshot,
-  deps: V3WorkerSessionDeps,
-  config: V3WorkerSessionConfig,
-): V3WorkerSession {
+export function restoreWorker(
+  snapshot: WorkerSnapshot,
+  deps: WorkerDeps,
+  config: WorkerConfig,
+): Worker {
   assertContextCeiling(config.maxContextTokens);
-  assertV3Snapshot(snapshot);
+  assertSnapshot(snapshot);
   return {
     deps,
     config,
@@ -286,8 +286,8 @@ export function restoreV3WorkerSession(
   };
 }
 
-export function appendV3WorkerFeedback(
-  session: V3WorkerSession,
+export function appendWorkerFeedback(
+  session: Worker,
   feedback: string,
 ): void {
   session.state.messages.push({
@@ -297,7 +297,7 @@ export function appendV3WorkerFeedback(
 }
 
 /** Remove only a trailing assistant turn whose tool uses have no answer. */
-export function dropV3UnansweredAssistantTurn(session: V3WorkerSession): boolean {
+export function dropUnansweredAssistantTurn(session: Worker): boolean {
   const last = session.state.messages.at(-1);
   if (
     last?.role !== 'assistant' ||
@@ -310,9 +310,9 @@ export function dropV3UnansweredAssistantTurn(session: V3WorkerSession): boolean
 }
 
 /** Advance one strict model turn and, for ordinary calls, one serial batch. */
-export async function runV3WorkerTurn(
-  session: V3WorkerSession,
-): Promise<V3WorkerTurnOutcome> {
+export async function runWorkerTurn(
+  session: Worker,
+): Promise<WorkerTurnOutcome> {
   throwIfAborted(session.deps.signal);
   const existingGuard = guardReason(session);
   if (existingGuard !== undefined) {
@@ -320,10 +320,10 @@ export async function runV3WorkerTurn(
   }
 
   const turn = session.state.turnCount + 1;
-  const requestMessages = buildV3ContextView(session.state.messages);
+  const requestMessages = buildContextView(session.state.messages);
   await session.deps.lifecycle?.beforeModelRequest?.({
     turn,
-    session: captureV3WorkerSessionSnapshot(session),
+    session: captureWorkerSnapshot(session),
     messages: structuredClone(requestMessages),
   });
   throwIfAborted(session.deps.signal);
@@ -338,7 +338,7 @@ export async function runV3WorkerTurn(
   const startedMs = now(session);
   let accepted;
   try {
-    accepted = await raceWithV3RunSignal(
+    accepted = await raceWithRunSignal(
       () =>
         session.deps.model.generate({
           messages: requestMessages,
@@ -380,7 +380,7 @@ export async function runV3WorkerTurn(
       };
     }
     if (isProtocolCorrectableRejection(error.reason)) {
-      if (session.protocolCorrections >= V3_MAX_PROTOCOL_CORRECTIONS) {
+      if (session.protocolCorrections >= MAX_PROTOCOL_CORRECTIONS) {
         return {
           kind: 'incomplete',
           reason: 'model_rejection_limit',
@@ -389,7 +389,7 @@ export async function runV3WorkerTurn(
         };
       }
       session.protocolCorrections += 1;
-      appendV3WorkerFeedback(session, error.protocolFeedback);
+      appendWorkerFeedback(session, error.protocolFeedback);
       const correctionGuard = guardReason(session);
       return correctionGuard === undefined
         ? { kind: 'working' }
@@ -438,7 +438,7 @@ export async function runV3WorkerTurn(
   const assistantText = extractText(response.content);
 
   if (calls.length === 0) {
-    appendV3WorkerFeedback(session, V3_NO_TOOL_CONTINUATION);
+    appendWorkerFeedback(session, NO_TOOL_CONTINUATION);
     appendTranscriptEvent(session.deps.runDir, {
       type: 'worker_continuation',
       turn,
@@ -491,7 +491,7 @@ export async function runV3WorkerTurn(
       return afterTurnGuard(session, contextTokens);
     }
 
-    const request: V3FinishRequest = {
+    const request: FinishRequest = {
       turn,
       call: structuredClone(call),
       input: parsed.data,
@@ -524,7 +524,7 @@ export async function runV3WorkerTurn(
       input: request.input,
     });
     await session.deps.lifecycle?.finishRequested?.({
-      session: captureV3WorkerSessionSnapshot(session),
+      session: captureWorkerSnapshot(session),
       request: structuredClone(request),
     });
     return { kind: 'finish_requested', request };
@@ -541,11 +541,11 @@ export async function runV3WorkerTurn(
 }
 
 /** Run until exclusive finish interception or a truthful incomplete outcome. */
-export async function runV3WorkerSession(
-  session: V3WorkerSession,
-): Promise<V3WorkerSessionOutcome> {
+export async function runWorker(
+  session: Worker,
+): Promise<WorkerOutcome> {
   for (;;) {
-    const outcome = await runV3WorkerTurn(session);
+    const outcome = await runWorkerTurn(session);
     if (outcome.kind !== 'working') return outcome;
   }
 }
@@ -554,10 +554,10 @@ export async function runV3WorkerSession(
  * `not_started` resumes at the named call exactly once. `uncertain` never
  * replays the effect boundary: the current and remaining calls receive
  * ordered model-readable errors so the next turn can inspect real state. */
-export async function resumeV3PendingToolTurn(
-  session: V3WorkerSession,
-  pending: V3PendingToolTurn,
-): Promise<V3WorkerTurnOutcome> {
+export async function resumePendingToolTurn(
+  session: Worker,
+  pending: PendingToolTurn,
+): Promise<WorkerTurnOutcome> {
   assertRestorablePendingTurn(session, pending);
   throwIfAborted(session.deps.signal);
 
@@ -614,9 +614,9 @@ export async function resumeV3PendingToolTurn(
  * call's own result, preserving one conversation. The model-visible bytes are
  * bounded, transcripted, and charged exactly once before the next turn.
  */
-export async function appendV3FinishResult(
-  session: V3WorkerSession,
-  request: V3FinishRequest,
+export async function appendFinishResult(
+  session: Worker,
+  request: FinishRequest,
   content: string,
   isError = true,
 ): Promise<void> {
@@ -656,16 +656,16 @@ export async function appendV3FinishResult(
     result: bounded,
   });
   await session.deps.lifecycle?.finishResultAppended?.({
-    session: captureV3WorkerSessionSnapshot(session),
+    session: captureWorkerSnapshot(session),
     request: structuredClone(request),
     result: structuredClone(block),
   });
 }
 
-export function readV3WorkerMetrics(
-  session: V3WorkerSession,
-  status: V3WorkerMetricsStatus,
-): V3WorkerMetrics {
+export function readWorkerMetrics(
+  session: Worker,
+  status: WorkerMetricsStatus,
+): WorkerMetrics {
   const roles = session.config.budget.roleUsage();
   const budget = captureRunBudgetSnapshot(session.config.budget);
   const totals = sumRoleUsage(roles);
@@ -682,20 +682,20 @@ export function readV3WorkerMetrics(
   };
 }
 
-export function writeV3WorkerMetrics(
-  session: V3WorkerSession,
-  status: V3WorkerMetricsStatus,
+export function writeWorkerMetrics(
+  session: Worker,
+  status: WorkerMetricsStatus,
 ): void {
-  const metrics = readV3WorkerMetrics(session, status);
+  const metrics = readWorkerMetrics(session, status);
   writeFileSync(
-    join(session.deps.runDir, V3_METRICS_FILENAME),
+    join(session.deps.runDir, METRICS_FILENAME),
     `${JSON.stringify(metrics, null, 2)}\n`,
     'utf8',
   );
 }
 
-export function recordV3WorkerCrash(
-  session: V3WorkerSession,
+export function recordWorkerCrash(
+  session: Worker,
   error: unknown,
 ): void {
   if (session.deps.signal?.aborted === true || isAbortError(error)) return;
@@ -704,11 +704,11 @@ export function recordV3WorkerCrash(
     turn: session.state.turnCount,
     message: errorMessage(error),
   });
-  writeV3WorkerMetrics(session, 'failed');
+  writeWorkerMetrics(session, 'failed');
 }
 
 async function executeSequentialCalls(
-  session: V3WorkerSession,
+  session: Worker,
   turn: number,
   assistant: AssistantMessage,
   calls: readonly ToolCall[],
@@ -717,7 +717,7 @@ async function executeSequentialCalls(
 }
 
 async function continueSequentialCalls(
-  session: V3WorkerSession,
+  session: Worker,
   turn: number,
   assistant: AssistantMessage,
   calls: readonly ToolCall[],
@@ -789,7 +789,7 @@ async function continueSequentialCalls(
 }
 
 async function executeOneCall(
-  session: V3WorkerSession,
+  session: Worker,
   call: ToolCall,
 ): Promise<ToolCallResult> {
   const ctx: ToolCtx = {
@@ -818,14 +818,14 @@ async function executeOneCall(
 }
 
 function appendToolResults(
-  session: V3WorkerSession,
+  session: Worker,
   turn: number,
   calls: readonly ToolCall[],
   results: readonly ToolCallResult[],
 ): void {
   if (calls.length !== results.length) {
     throw new Error(
-      `v3 result invariant failed: ${calls.length} calls produced ${results.length} results`,
+      `result invariant failed: ${calls.length} calls produced ${results.length} results`,
     );
   }
   const blocks = results.map(toResultBlock);
@@ -846,8 +846,8 @@ function pendingToolTurn(
   calls: readonly ToolCall[],
   completed: readonly ToolCallResult[],
   nextCallIndex: number,
-  effect: V3PendingToolTurn['effect'],
-): V3PendingToolTurn {
+  effect: PendingToolTurn['effect'],
+): PendingToolTurn {
   return structuredClone({
     turn,
     assistant,
@@ -897,7 +897,7 @@ function capCombinedResults(
     );
     const replacementBytes = Buffer.byteLength(replacement, 'utf8');
     if (replacementBytes >= sizes[largest]!) {
-      throw new Error('v3 offload replacement unexpectedly failed to shrink a result');
+      throw new Error('offload replacement unexpectedly failed to shrink a result');
     }
     bounded[largest] = { ...original, content: replacement };
     total += replacementBytes - sizes[largest]!;
@@ -907,7 +907,7 @@ function capCombinedResults(
 
   if (total > MAX_TOOL_RESULTS_PER_MESSAGE_BYTES) {
     throw new Error(
-      `v3 combined tool results could not be bounded below ${MAX_TOOL_RESULTS_PER_MESSAGE_BYTES} bytes`,
+      `combined tool results could not be bounded below ${MAX_TOOL_RESULTS_PER_MESSAGE_BYTES} bytes`,
     );
   }
   return bounded;
@@ -959,7 +959,7 @@ function formatInvalidInput(
 }
 
 function recordAcceptedResponse(
-  session: V3WorkerSession,
+  session: Worker,
   turn: number,
   response: ModelResponse,
 ): void {
@@ -971,25 +971,25 @@ function recordAcceptedResponse(
 }
 
 async function recordWorkerModelAccounting(
-  session: V3WorkerSession,
+  session: Worker,
   turn: number,
   usage: Usage,
   wallClockMs: number,
-  outcome: V3ModelAccountingEvent['outcome'],
+  outcome: ModelAccountingEvent['outcome'],
 ): Promise<void> {
   session.config.budget.recordModelUsage('worker', usage, wallClockMs);
   await session.deps.lifecycle?.afterModelAccounting?.({
     turn,
     usage: structuredClone(usage),
     outcome,
-    session: captureV3WorkerSessionSnapshot(session),
+    session: captureWorkerSnapshot(session),
   });
 }
 
 function afterTurnGuard(
-  session: V3WorkerSession,
+  session: Worker,
   contextTokens: number,
-): V3WorkerTurnOutcome {
+): WorkerTurnOutcome {
   const reason = guardReason(session, contextTokens);
   return reason === undefined
     ? { kind: 'working' }
@@ -997,10 +997,10 @@ function afterTurnGuard(
 }
 
 function guardReason(
-  session: V3WorkerSession,
+  session: Worker,
   contextTokens?: number,
   ignoredLimits: readonly RunBudgetLimit[] = [],
-): V3WorkerGuardReason | undefined {
+): WorkerGuardReason | undefined {
   const limit = session.config.budget.exceededLimit(ignoredLimits);
   if (limit !== undefined) return budgetReason(limit);
   if (
@@ -1012,7 +1012,7 @@ function guardReason(
   return undefined;
 }
 
-function budgetReason(limit: RunBudgetLimit): V3WorkerGuardReason {
+function budgetReason(limit: RunBudgetLimit): WorkerGuardReason {
   switch (limit) {
     case 'worker_turns':
       return 'max_turns';
@@ -1081,7 +1081,7 @@ function resultBytes(results: readonly ToolCallResult[]): number {
 function sumRoleUsage(
   roles: Partial<Record<string, RunRoleUsage>>,
 ): Pick<
-  V3WorkerMetrics,
+  WorkerMetrics,
   | 'inputTokens'
   | 'outputTokens'
   | 'cacheReadInputTokens'
@@ -1104,8 +1104,8 @@ function sumRoleUsage(
 }
 
 function assertPendingFinishCall(
-  session: V3WorkerSession,
-  request: V3FinishRequest,
+  session: Worker,
+  request: FinishRequest,
 ): void {
   if (request.call.name !== FINISH_TOOL_NAME) {
     throw new Error(`expected a ${FINISH_TOOL_NAME} call, got ${request.call.name}`);
@@ -1127,8 +1127,8 @@ function assertPendingFinishCall(
 }
 
 function assertRestorablePendingTurn(
-  session: V3WorkerSession,
-  pending: V3PendingToolTurn,
+  session: Worker,
+  pending: PendingToolTurn,
 ): void {
   if (pending.turn !== session.state.turnCount) {
     throw new Error(
@@ -1168,17 +1168,17 @@ function assertContextCeiling(value: number): void {
   }
 }
 
-function assertV3Snapshot(snapshot: V3WorkerSessionSnapshot): void {
+function assertSnapshot(snapshot: WorkerSnapshot): void {
   if (snapshot.messages.length === 0) {
-    throw new Error('V3WorkerSessionSnapshot.messages must not be empty');
+    throw new Error('WorkerSnapshot.messages must not be empty');
   }
   assertNonnegativeInteger('turnCount', snapshot.turnCount);
   assertNonnegativeNumber('peakContextTokens', snapshot.peakContextTokens);
   assertNonnegativeInteger('protocolCorrections', snapshot.protocolCorrections);
-  if (snapshot.protocolCorrections > V3_MAX_PROTOCOL_CORRECTIONS) {
+  if (snapshot.protocolCorrections > MAX_PROTOCOL_CORRECTIONS) {
     throw new Error(
-      'V3WorkerSessionSnapshot.protocolCorrections must be <= ' +
-        `${V3_MAX_PROTOCOL_CORRECTIONS}, got ${snapshot.protocolCorrections}`,
+      'WorkerSnapshot.protocolCorrections must be <= ' +
+        `${MAX_PROTOCOL_CORRECTIONS}, got ${snapshot.protocolCorrections}`,
     );
   }
   assertNonnegativeNumber('startedMs', snapshot.startedMs);
@@ -1186,13 +1186,13 @@ function assertV3Snapshot(snapshot: V3WorkerSessionSnapshot): void {
 
 function assertNonnegativeInteger(name: string, value: number): void {
   if (!Number.isInteger(value) || value < 0) {
-    throw new Error(`V3WorkerSessionSnapshot.${name} must be an integer >= 0, got ${value}`);
+    throw new Error(`WorkerSnapshot.${name} must be an integer >= 0, got ${value}`);
   }
 }
 
 function assertNonnegativeNumber(name: string, value: number): void {
   if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`V3WorkerSessionSnapshot.${name} must be finite and >= 0, got ${value}`);
+    throw new Error(`WorkerSnapshot.${name} must be finite and >= 0, got ${value}`);
   }
 }
 
@@ -1208,6 +1208,6 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function now(session: V3WorkerSession): number {
+function now(session: Worker): number {
   return (session.deps.now ?? Date.now)();
 }

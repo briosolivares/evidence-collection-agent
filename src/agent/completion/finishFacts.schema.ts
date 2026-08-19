@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { durableFinishInputSchema } from '../../tools/finish/finish.js';
 
 /** Durable structural finding produced by deterministic finish inspection. */
-export const v3FinishDefectSchema = z.strictObject({
+export const finishDefectSchema = z.strictObject({
   /** Stable programmatic identifier. */
   code: z.string(),
   /** Concrete structural observation and correction guidance. */
@@ -14,10 +14,10 @@ export const v3FinishDefectSchema = z.strictObject({
   artifactPath: z.string().optional(),
 });
 
-export type V3FinishDefect = z.infer<typeof v3FinishDefectSchema>;
+export type FinishDefect = z.infer<typeof finishDefectSchema>;
 
 /** Structural verifier fact; compatible with the preserved verifier seam. */
-export interface V3SettledFact {
+export interface SettledFact {
   outputId?: string;
   code: string;
   statement: string;
@@ -25,12 +25,12 @@ export interface V3SettledFact {
 
 /** Per-declared-column nonblank cell count, purely informational: it carries
  * no threshold and never becomes a deterministic defect on its own. */
-const v3ColumnNonblankCountSchema = z.strictObject({
+const columnNonblankCountSchema = z.strictObject({
   column: z.string(),
   nonblankCount: z.number().int().nonnegative(),
 });
 
-const v3TableFactSchema = z.strictObject({
+const tableFactSchema = z.strictObject({
   kind: z.literal('table'),
   outputId: z.string(),
   artifactPath: z.string(),
@@ -39,7 +39,7 @@ const v3TableFactSchema = z.strictObject({
   rowCount: z.number().int().nonnegative(),
   /** One entry per declared column, in contract order. Optional so
    * checkpoints written before this field existed still parse. */
-  columnNonblankCounts: z.array(v3ColumnNonblankCountSchema).optional(),
+  columnNonblankCounts: z.array(columnNonblankCountSchema).optional(),
   satisfiedRules: z.array(
     z.enum([
       'exact_row_count',
@@ -50,7 +50,7 @@ const v3TableFactSchema = z.strictObject({
   ),
 });
 
-const v3DocumentFactSchema = z.strictObject({
+const documentFactSchema = z.strictObject({
   kind: z.literal('document'),
   outputId: z.string(),
   artifactPath: z.string(),
@@ -59,7 +59,7 @@ const v3DocumentFactSchema = z.strictObject({
   requiredSectionsPresent: z.array(z.string()),
 });
 
-const v3CaptureFactSchema = z.strictObject({
+const captureFactSchema = z.strictObject({
   kind: z.enum(['screenshots', 'download']),
   outputId: z.string(),
   artifactPaths: z.array(z.string()),
@@ -69,7 +69,7 @@ const v3CaptureFactSchema = z.strictObject({
   sourceUrls: z.array(z.string()),
 });
 
-const v3ExternalActionFactSchema = z.strictObject({
+const externalActionFactSchema = z.strictObject({
   kind: z.literal('external_action'),
   outputId: z.string(),
   sourceUrlPattern: z.string(),
@@ -81,7 +81,7 @@ const v3ExternalActionFactSchema = z.strictObject({
 });
 
 /** Strict checkpoint validator for the code-settled verifier payload. */
-export const v3FinishFactsSchema = z.strictObject({
+export const finishFactsSchema = z.strictObject({
   finish: durableFinishInputSchema,
   manifest: z
     .strictObject({
@@ -95,37 +95,37 @@ export const v3FinishFactsSchema = z.strictObject({
     .optional(),
   outputs: z.array(
     z.discriminatedUnion('kind', [
-      v3TableFactSchema,
-      v3DocumentFactSchema,
-      v3CaptureFactSchema,
-      v3ExternalActionFactSchema,
+      tableFactSchema,
+      documentFactSchema,
+      captureFactSchema,
+      externalActionFactSchema,
     ]),
   ),
   evidenceScreenshotPaths: z.array(z.string()),
 });
 
-export type V3ColumnNonblankCount = z.infer<typeof v3ColumnNonblankCountSchema>;
-export type V3TableFact = z.infer<typeof v3TableFactSchema>;
-export type V3DocumentFact = z.infer<typeof v3DocumentFactSchema>;
-export type V3CaptureFact = z.infer<typeof v3CaptureFactSchema>;
-export type V3ExternalActionFact = z.infer<typeof v3ExternalActionFactSchema>;
-export type V3OutputFact =
-  | V3TableFact
-  | V3DocumentFact
-  | V3CaptureFact
-  | V3ExternalActionFact;
-export type V3FinishFacts = z.infer<typeof v3FinishFactsSchema>;
-export type V3ManifestFacts = NonNullable<V3FinishFacts['manifest']>;
+export type ColumnNonblankCount = z.infer<typeof columnNonblankCountSchema>;
+export type TableFact = z.infer<typeof tableFactSchema>;
+export type DocumentFact = z.infer<typeof documentFactSchema>;
+export type CaptureFact = z.infer<typeof captureFactSchema>;
+export type ExternalActionFact = z.infer<typeof externalActionFactSchema>;
+export type OutputFact =
+  | TableFact
+  | DocumentFact
+  | CaptureFact
+  | ExternalActionFact;
+export type FinishFacts = z.infer<typeof finishFactsSchema>;
+export type ManifestFacts = NonNullable<FinishFacts['manifest']>;
 
-export type V3FinishCheckResult =
+export type FinishCheckResult =
   | {
       status: 'passed';
       defects: [];
-      facts: V3FinishFacts;
+      facts: FinishFacts;
     }
   | {
       status: 'failed';
-      defects: [V3FinishDefect, ...V3FinishDefect[]];
+      defects: [FinishDefect, ...FinishDefect[]];
       /** Partial positive facts are retained so diagnostics remain auditable. */
-      facts: V3FinishFacts;
+      facts: FinishFacts;
     };

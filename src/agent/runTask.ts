@@ -1,4 +1,4 @@
-// Public composition root for the single Sherlock v3 runtime.
+// Public composition root for the single Sherlock runtime.
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,26 +34,26 @@ import {
 import { createRunTracing, type RunTracing } from '../tracing/runTracing.js';
 import type { ToolCtx } from '../tools/registry.js';
 import {
-  V3_INITIALIZER_MODEL,
-  createV3ContractInitializerModelDriver,
+  INITIALIZER_MODEL,
+  createContractInitializerModelDriver,
 } from './initializer/initializer.js';
 import {
-  V3_VERIFIER_MODEL,
-  createV3VerifierModelDriver,
+  VERIFIER_MODEL,
+  createVerifierModelDriver,
 } from './verifier/verifier.js';
 import {
-  readV3CheckpointResumeInfo,
-  v3CeilingFromCheckpoint,
-  v3CeilingToCheckpoint,
-  v3DurableRunConfigurationSchema,
-  type V3DurableRunConfiguration,
-  type V3DurableTerminalOutcome,
+  readCheckpointResumeInfo,
+  ceilingFromCheckpoint,
+  ceilingToCheckpoint,
+  durableRunConfigurationSchema,
+  type DurableRunConfiguration,
+  type DurableTerminalOutcome,
 } from './checkpoint.js';
-import { runV3Coordinator } from './lifecycle.js';
+import { runAgent } from './lifecycle.js';
 import { V3_SYSTEM_PROMPT } from './systemPrompt.js';
 import {
-  V3_API_TOOL_DEFS,
-  createV3ToolRegistry,
+  WORKER_API_TOOL_DEFS,
+  createWorkerToolRegistry,
 } from '../tools/index.js';
 import { BASH_SECRET_ENV_DENYLIST } from '../tools/bash/secretEnvironment.js';
 
@@ -66,7 +66,7 @@ const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
  * offloaded to disk; whole-run model, tool-call, and tool-result totals
  * remain observable without acting as arbitrary completion ceilings. Wall
  * time is the run's bound on research persistence. */
-export const V3_PRODUCTION_DEFAULTS = Object.freeze({
+export const PRODUCTION_DEFAULTS = Object.freeze({
   maxOutputTokens: 8_192,
   maxWorkerTurns: Infinity,
   maxContextTokens: 900_000,
@@ -116,7 +116,7 @@ export interface RunTaskConfig {
 export type RunTaskResult = { runDir: string } & RunOutcome;
 
 /** Live dependencies and optional durable-configuration assertions for
- * resuming a v3 run. A fresh browser's authentication authority must always
+ * resuming a run. A fresh browser's authentication authority must always
  * be stated explicitly. */
 export interface ResumeTaskConfig {
   browser: BrowserController;
@@ -139,7 +139,7 @@ export interface ResumeTaskConfig {
   signal?: AbortSignal;
 }
 
-/** Start a fresh run through the v3 initializer → worker → verifier
+/** Start a fresh run through the initializer → worker → verifier
  * coordinator while preserving runTask's public dependency seams. */
 export async function runTask(
   taskText: string,
@@ -152,24 +152,24 @@ export async function runTask(
   );
   initManifest(runDir, taskText, configuration.browserProvider);
 
-  return executeV3Run(runDir, configuration, config);
+  return executeRun(runDir, configuration, config);
 }
 
-/** Resume a v3 checkpoint. The read-only loader performs no locking or
+/** Resume a checkpoint. The read-only loader performs no locking or
  * mutation; the coordinator re-reads the full checkpoint after acquiring its
  * run lock and rejects any configuration drift. */
 export async function resumeTask(
   runDir: string,
   config: ResumeTaskConfig,
 ): Promise<RunTaskResult> {
-  const resumeInfo = readV3CheckpointResumeInfo(runDir);
+  const resumeInfo = readCheckpointResumeInfo(runDir);
   const durable = resumeInfo.configuration;
   assertResumeConfigurationMatches(durable, config);
-  const configuration = structuredClone(durable) as V3DurableRunConfiguration;
+  const configuration = structuredClone(durable) as DurableRunConfiguration;
   if (resumeInfo.phase === 'terminal') {
-    return executeTerminalV3Resume(runDir, configuration, config);
+    return executeTerminalResume(runDir, configuration, config);
   }
-  return executeV3Run(runDir, configuration, config);
+  return executeRun(runDir, configuration, config);
 }
 
 type LiveRunConfig = Pick<
@@ -186,21 +186,21 @@ type LiveRunConfig = Pick<
 
 const TERMINAL_RESUME_MODEL: ModelDriver = {
   generate: async () => {
-    throw new Error('terminal v3 resume unexpectedly invoked a model');
+    throw new Error('terminal resume unexpectedly invoked a model');
   },
 };
 
 /** Repair/read an already-terminal run without opening a new Langfuse root,
  * wrapping tools, or constructing live model clients. Explicit tracing still
  * receives the local run-directory announcement needed by the TUI. */
-async function executeTerminalV3Resume(
+async function executeTerminalResume(
   runDir: string,
-  configuration: V3DurableRunConfiguration,
+  configuration: DurableRunConfiguration,
   config: LiveRunConfig,
 ): Promise<RunTaskResult> {
   try {
     config.tracing?.announceRunDir?.(runDir);
-    const outcome = await runV3Coordinator({
+    const outcome = await runAgent({
       runDir,
       configuration,
       initializerModel: TERMINAL_RESUME_MODEL,
@@ -210,15 +210,15 @@ async function executeTerminalV3Resume(
       browser: config.browser,
       ...(config.signal === undefined ? {} : { signal: config.signal }),
     });
-    return normalizeV3Outcome(runDir, outcome);
+    return normalizeOutcome(runDir, outcome);
   } finally {
     await config.tracing?.close();
   }
 }
 
-async function executeV3Run(
+async function executeRun(
   runDir: string,
-  configuration: V3DurableRunConfiguration,
+  configuration: DurableRunConfiguration,
   config: LiveRunConfig,
 ): Promise<RunTaskResult> {
   const tracing = config.tracing ?? createRunTracing();
@@ -226,7 +226,7 @@ async function executeV3Run(
     tracing.announceRunDir?.(runDir);
     const progress = createWorkerProgressBridge(config.onProgress);
     const registry = tracing.wrapRegistry(
-      createV3ToolRegistry({
+      createWorkerToolRegistry({
         javascriptPolicy: configuration.javascriptPolicy,
         secretEnvDenylist: BASH_SECRET_ENV_DENYLIST,
       }),
@@ -236,14 +236,14 @@ async function executeV3Run(
       modelFromCallModel(
         config.harness?.initializerCallModel,
         () =>
-          createV3ContractInitializerModelDriver({
+          createContractInitializerModelDriver({
             ...(config.createStream === undefined
               ? {}
               : { createStream: config.createStream }),
           }),
       ),
       tracing,
-      V3_INITIALIZER_MODEL,
+      INITIALIZER_MODEL,
       'initializer',
     );
     const workerModel = traceModelDriver(
@@ -253,7 +253,7 @@ async function executeV3Run(
           createAnthropicModelDriver({
             model: configuration.model,
             system: V3_SYSTEM_PROMPT,
-            apiToolDefs: V3_API_TOOL_DEFS,
+            apiToolDefs: WORKER_API_TOOL_DEFS,
             maxOutputTokens: configuration.maxOutputTokens,
             ...(config.createStream === undefined
               ? {}
@@ -268,19 +268,19 @@ async function executeV3Run(
       modelFromCallModel(
         config.harness?.verifierCallModel,
         () =>
-          createV3VerifierModelDriver({
+          createVerifierModelDriver({
             ...(config.createStream === undefined
               ? {}
               : { createStream: config.createStream }),
           }),
       ),
       tracing,
-      V3_VERIFIER_MODEL,
+      VERIFIER_MODEL,
       'verifier',
     );
 
     return await tracing.traceRun(configuration.taskText, async () => {
-      const outcome = await runV3Coordinator({
+      const outcome = await runAgent({
         runDir,
         configuration,
         initializerModel,
@@ -300,7 +300,7 @@ async function executeV3Run(
               },
             }),
       });
-      return normalizeV3Outcome(runDir, outcome);
+      return normalizeOutcome(runDir, outcome);
     });
   } finally {
     await tracing.close();
@@ -310,20 +310,20 @@ async function executeV3Run(
 function buildFreshConfiguration(
   taskText: string,
   config: RunTaskConfig,
-): V3DurableRunConfiguration {
+): DurableRunConfiguration {
   const authenticated = config.authenticated ?? false;
   const javascriptPolicy = assertJavaScriptPolicy(
     config.javascriptPolicy,
     authenticated,
   );
   const startUrl = usableStartUrl(config.startUrl);
-  return v3DurableRunConfigurationSchema.parse({
+  return durableRunConfigurationSchema.parse({
     taskText,
     model: config.model ?? DEFAULT_MODEL,
     maxOutputTokens:
-      config.maxOutputTokens ?? V3_PRODUCTION_DEFAULTS.maxOutputTokens,
-    maxContextTokens: v3CeilingToCheckpoint(
-      config.maxContextTokens ?? V3_PRODUCTION_DEFAULTS.maxContextTokens,
+      config.maxOutputTokens ?? PRODUCTION_DEFAULTS.maxOutputTokens,
+    maxContextTokens: ceilingToCheckpoint(
+      config.maxContextTokens ?? PRODUCTION_DEFAULTS.maxContextTokens,
     ),
     browserProvider: browserProvider(config.browser),
     authenticated,
@@ -332,29 +332,29 @@ function buildFreshConfiguration(
     maxInitializerAttempts: 2,
     maxCompletionCheckFailures:
       config.harness?.maxCompletionCheckFailures ??
-      V3_PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
+      PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
     budgetLimits: {
-      maxWorkerTurns: v3CeilingToCheckpoint(
-        config.maxTurns ?? V3_PRODUCTION_DEFAULTS.maxWorkerTurns,
+      maxWorkerTurns: ceilingToCheckpoint(
+        config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns,
       ),
-      maxToolCalls: v3CeilingToCheckpoint(
-        config.maxToolCalls ?? V3_PRODUCTION_DEFAULTS.maxToolCalls,
+      maxToolCalls: ceilingToCheckpoint(
+        config.maxToolCalls ?? PRODUCTION_DEFAULTS.maxToolCalls,
       ),
-      maxModelTokens: v3CeilingToCheckpoint(
-        config.maxModelTokens ?? V3_PRODUCTION_DEFAULTS.maxModelTokens,
+      maxModelTokens: ceilingToCheckpoint(
+        config.maxModelTokens ?? PRODUCTION_DEFAULTS.maxModelTokens,
       ),
-      maxWallTimeMs: v3CeilingToCheckpoint(
-        config.maxWallTimeMs ?? V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
+      maxWallTimeMs: ceilingToCheckpoint(
+        config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs,
       ),
-      maxVerifierCorrections: v3CeilingToCheckpoint(
-        V3_PRODUCTION_DEFAULTS.maxVerifierCorrections,
+      maxVerifierCorrections: ceilingToCheckpoint(
+        PRODUCTION_DEFAULTS.maxVerifierCorrections,
       ),
     },
   });
 }
 
 function assertResumeConfigurationMatches(
-  durable: Readonly<V3DurableRunConfiguration>,
+  durable: Readonly<DurableRunConfiguration>,
   config: ResumeTaskConfig,
 ): void {
   const check = (name: string, supplied: unknown, stored: unknown): void => {
@@ -368,7 +368,7 @@ function assertResumeConfigurationMatches(
 
   if (typeof config.authenticated !== 'boolean') {
     throw new Error(
-      'v3 resume requires the caller to explicitly state authenticated=true or false',
+      'resume requires the caller to explicitly state authenticated=true or false',
     );
   }
 
@@ -385,27 +385,27 @@ function assertResumeConfigurationMatches(
   check(
     'maxTurns',
     config.maxTurns,
-    v3CeilingFromCheckpoint(durable.budgetLimits.maxWorkerTurns),
+    ceilingFromCheckpoint(durable.budgetLimits.maxWorkerTurns),
   );
   check(
     'maxContextTokens',
     config.maxContextTokens,
-    v3CeilingFromCheckpoint(durable.maxContextTokens),
+    ceilingFromCheckpoint(durable.maxContextTokens),
   );
   check(
     'maxToolCalls',
     config.maxToolCalls,
-    v3CeilingFromCheckpoint(durable.budgetLimits.maxToolCalls),
+    ceilingFromCheckpoint(durable.budgetLimits.maxToolCalls),
   );
   check(
     'maxModelTokens',
     config.maxModelTokens,
-    v3CeilingFromCheckpoint(durable.budgetLimits.maxModelTokens),
+    ceilingFromCheckpoint(durable.budgetLimits.maxModelTokens),
   );
   check(
     'maxWallTimeMs',
     config.maxWallTimeMs,
-    v3CeilingFromCheckpoint(durable.budgetLimits.maxWallTimeMs),
+    ceilingFromCheckpoint(durable.budgetLimits.maxWallTimeMs),
   );
   check(
     'startUrl',
@@ -429,7 +429,7 @@ function modelFromCallModel(
 }
 
 /** Preserve the long-standing CallModel injection seam while putting even a
- * test/alternate implementation behind v3's whole-response validation. */
+ * test/alternate implementation behind the runtime's whole-response validation. */
 function adaptCallModel(callModel: CallModel): ModelDriver {
   return {
     async generate(options): Promise<AcceptedModelResponse> {
@@ -489,7 +489,7 @@ function traceModelDriver(
       }, model, role);
       await traced(options.messages);
       if (accepted === undefined) {
-        throw new Error('traced v3 model call returned without an accepted response');
+        throw new Error('traced model call returned without an accepted response');
       }
       return accepted;
     },
@@ -540,9 +540,9 @@ function createWorkerProgressBridge(
   };
 }
 
-function normalizeV3Outcome(
+function normalizeOutcome(
   runDir: string,
-  outcome: V3DurableTerminalOutcome,
+  outcome: DurableTerminalOutcome,
 ): RunTaskResult {
   if (outcome.status === 'verified') return { runDir, ...outcome };
   if (outcome.status === 'incomplete') {
@@ -561,13 +561,13 @@ function normalizeV3Outcome(
     throw error;
   }
   throw new Error(
-    `v3 run failed during ${outcome.during}: ${outcome.message}`,
+    `run failed during ${outcome.during}: ${outcome.message}`,
   );
 }
 
 function browserProvider(
   browser: BrowserController,
-): V3DurableRunConfiguration['browserProvider'] {
+): DurableRunConfiguration['browserProvider'] {
   return browser.sessionDiagnostics?.provider ?? 'local';
 }
 

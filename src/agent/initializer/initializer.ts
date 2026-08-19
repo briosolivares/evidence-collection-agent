@@ -21,8 +21,8 @@ import {
   type ToolDef,
 } from '../../tools/registry.js';
 
-export const V3_INITIALIZER_MODEL = 'claude-sonnet-5';
-export const V3_INITIALIZER_MAX_ATTEMPTS = 2;
+export const INITIALIZER_MODEL = 'claude-sonnet-5';
+export const INITIALIZER_MAX_ATTEMPTS = 2;
 const SET_OUTPUT_CONTRACT = 'set_output_contract';
 
 /** Static contract-only instructions. Task and checkpoint facts stay in the
@@ -45,49 +45,49 @@ Rules:
 
 Respond with the set_output_contract call and nothing else.`;
 
-const v3InitializerOutputContractSchema = outputContractSchema.omit({
+const initializerOutputContractSchema = outputContractSchema.omit({
   assumptions: true,
 });
 
-const v3SetOutputContractInputSchema = z.strictObject({
-  contract: v3InitializerOutputContractSchema,
+const setOutputContractInputSchema = z.strictObject({
+  contract: initializerOutputContractSchema,
 });
 
 /** Initializer-only definition for the run's one immutable contract. */
-const v3SetOutputContractTool: ToolDef<{ contract: OutputContract }> = {
+const setOutputContractTool: ToolDef<{ contract: OutputContract }> = {
   name: SET_OUTPUT_CONTRACT,
   description:
     'Return the one immutable typed output contract for this run. Describe only the ' +
     'explicitly requested artifacts, exact shapes, counts, scope, and evidence needs. This ' +
     'contract is accepted once before work begins and is final after acceptance.',
-  inputSchema: v3SetOutputContractInputSchema,
+  inputSchema: setOutputContractInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {
-    throw new Error('the v3 initializer result is intercepted and never executed');
+    throw new Error('the initializer result is intercepted and never executed');
   },
 };
 
-export const V3_CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] =
+export const CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] =
   deepFreeze(
     toApiToolDefs(
-      createRegistry([v3SetOutputContractTool as ToolDef]),
+      createRegistry([setOutputContractTool as ToolDef]),
     ),
   );
 
-export interface V3ContractInitializerModelConfig {
+export interface ContractInitializerModelConfig {
   model?: string;
   maxOutputTokens?: number;
   maxTokensRetryOutputTokens?: number;
   createStream?: ModelDriverConfig['createStream'];
 }
 
-export function createV3ContractInitializerModelDriver(
-  config: V3ContractInitializerModelConfig = {},
+export function createContractInitializerModelDriver(
+  config: ContractInitializerModelConfig = {},
 ): ModelDriver {
   return createAnthropicModelDriver({
-    model: config.model ?? V3_INITIALIZER_MODEL,
+    model: config.model ?? INITIALIZER_MODEL,
     system: V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT,
-    apiToolDefs: V3_CONTRACT_INITIALIZER_API_TOOL_DEFS,
+    apiToolDefs: CONTRACT_INITIALIZER_API_TOOL_DEFS,
     maxOutputTokens: config.maxOutputTokens ?? 4_096,
     maxToolCallsPerTurn: 1,
     toolChoice: {
@@ -103,28 +103,28 @@ export function createV3ContractInitializerModelDriver(
   });
 }
 
-export interface V3ContractInitializerState {
+export interface ContractInitializerState {
   messages: Message[];
   attempts: number;
   lastProblem?: string;
 }
 
-export interface V3ContractInitializerHooks {
-  beforeRequest?(state: V3ContractInitializerState): Promise<void>;
+export interface ContractInitializerHooks {
+  beforeRequest?(state: ContractInitializerState): Promise<void>;
   afterAttempt?(event: {
-    state: V3ContractInitializerState;
+    state: ContractInitializerState;
     outcome: 'correction' | 'accepted' | 'failed';
     contract?: OutputContract;
   }): Promise<void>;
 }
 
-export type V3ContractInitializerOutcome =
+export type ContractInitializerOutcome =
   | { ok: true; contract: OutputContract }
   | { ok: false; reason: string };
 
-export function createV3ContractInitializerState(
+export function createContractInitializerState(
   taskText: string,
-): V3ContractInitializerState {
+): ContractInitializerState {
   return {
     messages: [
       { role: 'user', content: [{ type: 'text', text: taskText }] },
@@ -133,22 +133,22 @@ export function createV3ContractInitializerState(
   };
 }
 
-export function captureV3ContractInitializerState(
-  state: V3ContractInitializerState,
-): V3ContractInitializerState {
+export function captureContractInitializerState(
+  state: ContractInitializerState,
+): ContractInitializerState {
   return structuredClone(state);
 }
 
-export function restoreV3ContractInitializerState(
-  snapshot: V3ContractInitializerState,
-): V3ContractInitializerState {
+export function restoreContractInitializerState(
+  snapshot: ContractInitializerState,
+): ContractInitializerState {
   if (
     !Number.isInteger(snapshot.attempts) ||
     snapshot.attempts < 0 ||
-    snapshot.attempts > V3_INITIALIZER_MAX_ATTEMPTS
+    snapshot.attempts > INITIALIZER_MAX_ATTEMPTS
   ) {
     throw new Error(
-      `initializer attempts must be an integer from 0 to ${V3_INITIALIZER_MAX_ATTEMPTS}`,
+      `initializer attempts must be an integer from 0 to ${INITIALIZER_MAX_ATTEMPTS}`,
     );
   }
   if (snapshot.messages.length === 0) {
@@ -166,12 +166,12 @@ export function restoreV3ContractInitializerState(
 /** Run or resume the bounded contract initializer. Accepted contract bytes
  * live only in the returned value/checkpoint; no worker-visible mutable
  * contract store is created. */
-export async function runV3ContractInitializer(
-  state: V3ContractInitializerState,
+export async function runContractInitializer(
+  state: ContractInitializerState,
   callModel: CallModel,
-  hooks: V3ContractInitializerHooks = {},
-): Promise<V3ContractInitializerOutcome> {
-  if (state.attempts >= V3_INITIALIZER_MAX_ATTEMPTS) {
+  hooks: ContractInitializerHooks = {},
+): Promise<ContractInitializerOutcome> {
+  if (state.attempts >= INITIALIZER_MAX_ATTEMPTS) {
     return {
       ok: false,
       reason:
@@ -180,8 +180,8 @@ export async function runV3ContractInitializer(
     };
   }
 
-  while (state.attempts < V3_INITIALIZER_MAX_ATTEMPTS) {
-    await hooks.beforeRequest?.(captureV3ContractInitializerState(state));
+  while (state.attempts < INITIALIZER_MAX_ATTEMPTS) {
+    await hooks.beforeRequest?.(captureContractInitializerState(state));
 
     let response;
     try {
@@ -193,19 +193,19 @@ export async function runV3ContractInitializer(
       ) {
         state.attempts += 1;
         state.lastProblem = error.protocolFeedback;
-        if (state.attempts < V3_INITIALIZER_MAX_ATTEMPTS) {
+        if (state.attempts < INITIALIZER_MAX_ATTEMPTS) {
           state.messages.push({
             role: 'user',
             content: [{ type: 'text', text: error.protocolFeedback }],
           });
           await hooks.afterAttempt?.({
-            state: captureV3ContractInitializerState(state),
+            state: captureContractInitializerState(state),
             outcome: 'correction',
           });
           continue;
         }
         await hooks.afterAttempt?.({
-          state: captureV3ContractInitializerState(state),
+          state: captureContractInitializerState(state),
           outcome: 'failed',
         });
         return { ok: false, reason: error.protocolFeedback };
@@ -237,7 +237,7 @@ export async function runV3ContractInitializer(
         const contract = validation.contract;
         delete state.lastProblem;
         await hooks.afterAttempt?.({
-          state: captureV3ContractInitializerState(state),
+          state: captureContractInitializerState(state),
           outcome: 'accepted',
           contract: structuredClone(contract),
         });
@@ -249,9 +249,9 @@ export async function runV3ContractInitializer(
     }
 
     state.lastProblem = problem;
-    if (state.attempts >= V3_INITIALIZER_MAX_ATTEMPTS) {
+    if (state.attempts >= INITIALIZER_MAX_ATTEMPTS) {
       await hooks.afterAttempt?.({
-        state: captureV3ContractInitializerState(state),
+        state: captureContractInitializerState(state),
         outcome: 'failed',
       });
       return { ok: false, reason: problem };
@@ -259,7 +259,7 @@ export async function runV3ContractInitializer(
 
     state.messages.push(contractCorrectionMessage(problem, calls));
     await hooks.afterAttempt?.({
-      state: captureV3ContractInitializerState(state),
+      state: captureContractInitializerState(state),
       outcome: 'correction',
     });
   }
@@ -272,7 +272,7 @@ export async function runV3ContractInitializer(
 
 /** Per-run immutable guidance appended after the user's task in the worker's
  * opening message. */
-export function formatV3ContractGuidance(contract: OutputContract): string {
+export function formatContractGuidance(contract: OutputContract): string {
   const parsed = outputContractSchema.parse(contract);
   return [
     '# Immutable output contract',
@@ -321,7 +321,7 @@ function deepFreeze<T>(value: T): T {
 function validateInitialContractCall(
   input: unknown,
 ): ReturnType<typeof validateOutputContract> {
-  const parsed = v3SetOutputContractInputSchema.safeParse(input);
+  const parsed = setOutputContractInputSchema.safeParse(input);
   if (parsed.success) {
     const validation = validateOutputContract(parsed.data.contract);
     if (!validation.ok) return validation;

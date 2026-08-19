@@ -30,11 +30,11 @@ import {
 } from '../run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import {
-  V3_METRICS_FILENAME,
-  type V3WorkerMetrics,
+  METRICS_FILENAME,
+  type WorkerMetrics,
 } from '../agent/worker/worker.js';
-import { V3_INITIALIZER_MODEL } from '../agent/initializer/initializer.js';
-import { V3_VERIFIER_MODEL } from '../agent/verifier/verifier.js';
+import { INITIALIZER_MODEL } from '../agent/initializer/initializer.js';
+import { VERIFIER_MODEL } from '../agent/verifier/verifier.js';
 import { createRunTracing } from './runTracing.js';
 
 const FIRST_USAGE: Usage = {
@@ -116,7 +116,7 @@ function scriptModel(responses: readonly ModelResponse[]): CallModel {
   };
 }
 
-// A one-column, no-rules table body that clears v3's deterministic finish
+// A one-column, no-rules table body that clears the deterministic finish
 // checks without adding unrelated worker turns to the tracing fixtures.
 const TRACED_CSV = 'body\ntraced output\n';
 
@@ -277,8 +277,8 @@ describe('createRunTracing with runTask', () => {
       ['v3_run_terminal', undefined],
     ]);
 
-    const metrics = await readJson<V3WorkerMetrics>(
-      join(result.runDir, V3_METRICS_FILENAME),
+    const metrics = await readJson<WorkerMetrics>(
+      join(result.runDir, METRICS_FILENAME),
     );
     expect(metrics).toMatchObject({
       status: 'verified',
@@ -406,8 +406,8 @@ describe('createRunTracing with runTask', () => {
       span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_MODEL],
     ]).sort((left, right) => String(left[0]).localeCompare(String(right[0])));
     expect(rolesAndModels).toEqual([
-      ['initializer', V3_INITIALIZER_MODEL],
-      ['verifier', V3_VERIFIER_MODEL],
+      ['initializer', INITIALIZER_MODEL],
+      ['verifier', VERIFIER_MODEL],
       ['worker', 'test-model'],
       ['worker', 'test-model'],
     ]);

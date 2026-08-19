@@ -26,7 +26,7 @@ import {
   type ToolCtx,
 } from './registry.js';
 import {
-  V3_FILE_TOOL_MAX_BYTES,
+  FILE_TOOL_MAX_BYTES,
   editFileTool,
   readFileTool,
   writeFileTool,
@@ -36,8 +36,8 @@ import {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-file-tools-'));
-  initManifest(runDir, 'exercise the v3 private file tools');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-file-tools-'));
+  initManifest(runDir, 'exercise the private file tools');
 });
 
 afterEach(() => {
@@ -65,7 +65,7 @@ function writeRaw(relativePath: string, bytes: string | Buffer): string {
   return absolutePath;
 }
 
-describe('v3 read_file', () => {
+describe('read_file', () => {
   it('reads only artifacts/ and scratch/ with familiar line windows', async () => {
     writeArtifact(
       runDir,
@@ -141,7 +141,7 @@ describe('v3 read_file', () => {
 
   it('checks the source size before reading it into memory', async () => {
     const large = writeRaw('scratch/large.txt', '');
-    truncateSync(large, V3_FILE_TOOL_MAX_BYTES + 1);
+    truncateSync(large, FILE_TOOL_MAX_BYTES + 1);
 
     const result = await call('read_file', { file_path: 'scratch/large.txt' });
 
@@ -164,7 +164,7 @@ describe('v3 read_file', () => {
   });
 });
 
-describe('v3 write_file', () => {
+describe('write_file', () => {
   it('writes and appends only scratch files through manifest provenance', async () => {
     const created = await call('write_file', {
       file_path: 'scratch/workspace/../notes.txt',
@@ -271,7 +271,7 @@ describe('v3 write_file', () => {
 
   it('rejects an append whose resulting file would exceed the size bound', async () => {
     const large = writeRaw('scratch/large.txt', '');
-    truncateSync(large, V3_FILE_TOOL_MAX_BYTES);
+    truncateSync(large, FILE_TOOL_MAX_BYTES);
 
     const result = await call('write_file', {
       file_path: 'scratch/large.txt',
@@ -281,7 +281,7 @@ describe('v3 write_file', () => {
 
     expect(result).toMatchObject({ isError: true, errorKind: 'execution_error' });
     expect(result.content).toMatch(/64 MiB/);
-    expect(statSync(large).size).toBe(V3_FILE_TOOL_MAX_BYTES);
+    expect(statSync(large).size).toBe(FILE_TOOL_MAX_BYTES);
   });
 
   it('refuses an already-cancelled mutation without touching disk or manifest', async () => {
@@ -302,7 +302,7 @@ describe('v3 write_file', () => {
   });
 });
 
-describe('v3 edit_file', () => {
+describe('edit_file', () => {
   it('preserves BOM, CRLF, trailing bytes, and manifest provenance', async () => {
     const bom = Buffer.from([0xef, 0xbb, 0xbf]);
     const original = Buffer.concat([
@@ -408,7 +408,7 @@ describe('v3 edit_file', () => {
 
   it('checks size and cancellation before modifying a file', async () => {
     const large = writeRaw('scratch/large.txt', '');
-    truncateSync(large, V3_FILE_TOOL_MAX_BYTES + 1);
+    truncateSync(large, FILE_TOOL_MAX_BYTES + 1);
     const oversized = await call('edit_file', {
       file_path: 'scratch/large.txt',
       old_string: 'x',

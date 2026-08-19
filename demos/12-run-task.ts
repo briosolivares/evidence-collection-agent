@@ -15,8 +15,8 @@ import { createBrowserSessionProvider, describeBrowserProvider } from '../src/br
 import { runTask } from '../src/agent/runTask.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
 import {
-  V3_METRICS_FILENAME,
-  type V3WorkerMetrics,
+  METRICS_FILENAME,
+  type WorkerMetrics,
 } from '../src/agent/worker/worker.js';
 
 const DEFAULT_TASK =
@@ -55,11 +55,11 @@ try {
   console.log(`\nfinal result: ${JSON.stringify(result)}`);
   console.log(`run dir:      ${result.runDir}`);
 
-  const metricsRaw = readFileSync(join(result.runDir, V3_METRICS_FILENAME), 'utf8');
+  const metricsRaw = readFileSync(join(result.runDir, METRICS_FILENAME), 'utf8');
   console.log('\n--- metrics.json ---');
   console.log(metricsRaw);
 
-  const metrics = JSON.parse(metricsRaw) as V3WorkerMetrics;
+  const metrics = JSON.parse(metricsRaw) as WorkerMetrics;
   if (metrics.turns >= 2) {
     console.log(
       metrics.cacheReadInputTokens > 0

@@ -67,7 +67,7 @@ describe('PlaywrightBrowserController command sessions', () => {
   beforeEach(async () => {
     testSequence += 1;
     if (controller.prepareTaskPage === undefined) {
-      throw new Error('Local controller omitted v3 task-page preparation.');
+      throw new Error('Local controller omitted task-page preparation.');
     }
     await controller.prepareTaskPage({
       ownershipId: `browser-command-session-test-${testSequence}`,

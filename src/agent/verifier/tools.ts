@@ -28,19 +28,19 @@ import {
 } from '../../tools/registry.js';
 import { splitLines } from '../../tools/lines.js';
 
-export const V3_VERIFIER_MAX_FILE_BYTES = 16 * 1024 * 1024;
-export const V3_VERIFIER_MAX_GREP_BYTES = 64 * 1024 * 1024;
-export const V3_VERIFIER_MAX_RESULT_BYTES = 48 * 1024;
-export const V3_VERIFIER_MAX_FILES = 512;
+export const VERIFIER_MAX_FILE_BYTES = 16 * 1024 * 1024;
+export const VERIFIER_MAX_GREP_BYTES = 64 * 1024 * 1024;
+export const VERIFIER_MAX_RESULT_BYTES = 48 * 1024;
+export const VERIFIER_MAX_FILES = 512;
 /** 3.75MB of raw bytes stays within the API's ~5MB encoded-image limit. */
-export const V3_VERIFIER_MAX_IMAGE_BYTES = 3_750_000;
+export const VERIFIER_MAX_IMAGE_BYTES = 3_750_000;
 /** The API rejects an image with either dimension above 8,000 pixels. */
-export const V3_VERIFIER_MAX_IMAGE_DIMENSION_PX = 8_000;
+export const VERIFIER_MAX_IMAGE_DIMENSION_PX = 8_000;
 
 const LINE_NUMBER_PAD = 6;
 const READ_DEFAULT_LINES = 400;
 
-export const v3VerifierReadFileInputSchema = z.strictObject({
+export const verifierReadFileInputSchema = z.strictObject({
   file_path: z
     .string()
     .min(1)
@@ -52,7 +52,7 @@ export const v3VerifierReadFileInputSchema = z.strictObject({
   limit: z.number().int().min(1).max(1_000).optional(),
 });
 
-export const v3VerifierGrepInputSchema = z.strictObject({
+export const verifierGrepInputSchema = z.strictObject({
   pattern: z
     .string()
     .min(1)
@@ -69,16 +69,16 @@ export const v3VerifierGrepInputSchema = z.strictObject({
   max_results: z.number().int().min(1).max(200).optional(),
 });
 
-type ReadInput = z.infer<typeof v3VerifierReadFileInputSchema>;
-type GrepInput = z.infer<typeof v3VerifierGrepInputSchema>;
+type ReadInput = z.infer<typeof verifierReadFileInputSchema>;
+type GrepInput = z.infer<typeof verifierGrepInputSchema>;
 
-export interface V3VerifierPathPolicy {
+export interface VerifierPathPolicy {
   readonly allowedArtifactPaths: ReadonlySet<string>;
 }
 
-export function createV3VerifierPathPolicy(
+export function createVerifierPathPolicy(
   allowedArtifactPaths: readonly string[] = [],
-): V3VerifierPathPolicy {
+): VerifierPathPolicy {
   return {
     allowedArtifactPaths: new Set(
       allowedArtifactPaths.map(normalizeAllowedArtifactPath),
@@ -87,7 +87,7 @@ export function createV3VerifierPathPolicy(
 }
 
 function createReadFileTool(
-  policy: V3VerifierPathPolicy,
+  policy: VerifierPathPolicy,
 ): ToolDef<ReadInput> {
   return {
     name: 'read_file',
@@ -95,7 +95,7 @@ function createReadFileTool(
       'Read a bounded window from a surfaced UTF-8 artifact. PNG/JPEG ' +
       'artifacts are returned as images. Only requested-output/evidence files are visible; use ' +
       'offset/limit for large text files.',
-    inputSchema: v3VerifierReadFileInputSchema,
+    inputSchema: verifierReadFileInputSchema,
     getAccess: (input) => ({
       reads: [accessKey.file(input.file_path)],
       writes: [],
@@ -109,7 +109,7 @@ function createReadFileTool(
       const bytes = await readRegularFileNoFollow(
         target.absolutePath,
         input.file_path,
-        V3_VERIFIER_MAX_FILE_BYTES,
+        VERIFIER_MAX_FILE_BYTES,
         ctx.abortSignal,
       );
       const text = decodeText(bytes, input.file_path);
@@ -137,14 +137,14 @@ function createReadFileTool(
   };
 }
 
-function createGrepTool(policy: V3VerifierPathPolicy): ToolDef<GrepInput> {
+function createGrepTool(policy: VerifierPathPolicy): ToolDef<GrepInput> {
   return {
     name: 'grep',
     description:
       'Find bounded literal text matches in surfaced UTF-8 artifacts. ' +
       'Defaults to artifacts/. This is deliberately literal rather than regex so untrusted ' +
       'file content cannot trigger unbounded regular-expression work.',
-    inputSchema: v3VerifierGrepInputSchema,
+    inputSchema: verifierGrepInputSchema,
     getAccess: (input) => ({
       reads: [accessKey.file(input.path ?? ARTIFACTS_DIR)],
       writes: [],
@@ -157,7 +157,7 @@ function createGrepTool(policy: V3VerifierPathPolicy): ToolDef<GrepInput> {
         ctx.runDir,
         givenPath,
         policy,
-        V3_VERIFIER_MAX_FILES,
+        VERIFIER_MAX_FILES,
       );
       const needle = input.case_sensitive === false
         ? input.pattern.toLocaleLowerCase('en-US')
@@ -168,16 +168,16 @@ function createGrepTool(policy: V3VerifierPathPolicy): ToolDef<GrepInput> {
 
       for (const file of files) {
         throwIfAborted(ctx.abortSignal);
-        const remaining = V3_VERIFIER_MAX_GREP_BYTES - totalBytes;
+        const remaining = VERIFIER_MAX_GREP_BYTES - totalBytes;
         if (remaining <= 0) {
           throw new Error(
-            `grep inspection exceeds ${V3_VERIFIER_MAX_GREP_BYTES} total bytes; narrow path`,
+            `grep inspection exceeds ${VERIFIER_MAX_GREP_BYTES} total bytes; narrow path`,
           );
         }
         const bytes = await readRegularFileNoFollow(
           file.absolutePath,
           file.relativePath,
-          Math.min(V3_VERIFIER_MAX_FILE_BYTES, remaining),
+          Math.min(VERIFIER_MAX_FILE_BYTES, remaining),
           ctx.abortSignal,
         );
         totalBytes += bytes.length;
@@ -203,25 +203,25 @@ function createGrepTool(policy: V3VerifierPathPolicy): ToolDef<GrepInput> {
   };
 }
 
-export function createV3VerifierRegistry(
-  policy: V3VerifierPathPolicy = createV3VerifierPathPolicy(),
+export function createVerifierRegistry(
+  policy: VerifierPathPolicy = createVerifierPathPolicy(),
 ): ToolRegistry {
   return createRegistry([createReadFileTool(policy), createGrepTool(policy)]);
 }
 
-/** Execute v3 inspection calls sequentially and without any write/offload
+/** Execute inspection calls sequentially and without any write/offload
  * path. The same exact registry supplies both the API prefix and execution. */
-export async function executeV3VerifierToolUses(
+export async function executeVerifierToolUses(
   registry: ToolRegistry,
   toolUses: readonly ToolUseBlock[],
   ctx: ToolCtx,
-  policy: V3VerifierPathPolicy = createV3VerifierPathPolicy(),
+  policy: VerifierPathPolicy = createVerifierPathPolicy(),
 ): Promise<ToolResultBlock[]> {
   const results: ToolResultBlock[] = [];
   for (const block of toolUses) {
     throwIfAborted(ctx.abortSignal);
     if (block.name === 'read_file') {
-      const parsed = v3VerifierReadFileInputSchema.safeParse(block.input);
+      const parsed = verifierReadFileInputSchema.safeParse(block.input);
       if (parsed.success) {
         const mediaType = imageMediaType(parsed.data.file_path);
         if (mediaType !== undefined) {
@@ -254,7 +254,7 @@ async function readImageResult(
   runDir: string,
   givenPath: string,
   mediaType: ImageBlock['source']['media_type'],
-  policy: V3VerifierPathPolicy,
+  policy: VerifierPathPolicy,
   signal?: AbortSignal,
 ): Promise<ToolResultBlock> {
   try {
@@ -262,10 +262,10 @@ async function readImageResult(
     const bytes = await readRegularFileNoFollow(
       target.absolutePath,
       givenPath,
-      V3_VERIFIER_MAX_IMAGE_BYTES + 1,
+      VERIFIER_MAX_IMAGE_BYTES + 1,
       signal,
     );
-    return v3VerifierImageResultFromBytes(
+    return verifierImageResultFromBytes(
       toolUseId,
       target.relativePath,
       mediaType,
@@ -282,27 +282,27 @@ async function readImageResult(
   }
 }
 
-/** Build an API-safe image result from bytes already read through v3's
- * confinement and no-follow boundary. */
-function v3VerifierImageResultFromBytes(
+/** Build an API-safe image result from bytes already read through the
+ * verifier's confinement and no-follow boundary. */
+function verifierImageResultFromBytes(
   toolUseId: string,
   relativePath: string,
   mediaType: ImageBlock['source']['media_type'],
   bytes: Buffer,
 ): ToolResultBlock {
-  if (bytes.byteLength > V3_VERIFIER_MAX_IMAGE_BYTES) {
+  if (bytes.byteLength > VERIFIER_MAX_IMAGE_BYTES) {
     return {
       type: 'tool_result',
       tool_use_id: toolUseId,
       content:
         `Image too large to view: ${relativePath} is ${bytes.byteLength} bytes ` +
-        `(limit ${V3_VERIFIER_MAX_IMAGE_BYTES}). Treat whatever it would have proven as ` +
+        `(limit ${VERIFIER_MAX_IMAGE_BYTES}). Treat whatever it would have proven as ` +
         'unverified unless another published artifact proves it.',
       is_error: true,
     };
   }
 
-  const dimensions = v3ImageDimensions(bytes, mediaType);
+  const dimensions = imageDimensions(bytes, mediaType);
   if (dimensions === undefined) {
     return {
       type: 'tool_result',
@@ -314,15 +314,15 @@ function v3VerifierImageResultFromBytes(
     };
   }
   if (
-    dimensions.width > V3_VERIFIER_MAX_IMAGE_DIMENSION_PX ||
-    dimensions.height > V3_VERIFIER_MAX_IMAGE_DIMENSION_PX
+    dimensions.width > VERIFIER_MAX_IMAGE_DIMENSION_PX ||
+    dimensions.height > VERIFIER_MAX_IMAGE_DIMENSION_PX
   ) {
     return {
       type: 'tool_result',
       tool_use_id: toolUseId,
       content:
         `Image too large to view: ${relativePath} is ${dimensions.width}x${dimensions.height} ` +
-        `pixels (limit ${V3_VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension). Treat whatever it ` +
+        `pixels (limit ${VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension). Treat whatever it ` +
         'would have proven as unverified unless another published artifact proves it.',
       is_error: true,
     };
@@ -348,24 +348,24 @@ function v3VerifierImageResultFromBytes(
   };
 }
 
-const V3_PNG_SIGNATURE = Buffer.from('89504e470d0a1a0a', 'hex');
+const PNG_SIGNATURE = Buffer.from('89504e470d0a1a0a', 'hex');
 
 /** Read bounded PNG/JPEG dimensions without an image-processing dependency. */
-function v3ImageDimensions(
+function imageDimensions(
   bytes: Buffer,
   mediaType: ImageBlock['source']['media_type'],
 ): { width: number; height: number } | undefined {
   return mediaType === 'image/png'
-    ? v3PngDimensions(bytes)
-    : v3JpegDimensions(bytes);
+    ? pngDimensions(bytes)
+    : jpegDimensions(bytes);
 }
 
-function v3PngDimensions(
+function pngDimensions(
   bytes: Buffer,
 ): { width: number; height: number } | undefined {
   if (
     bytes.length < 24 ||
-    !bytes.subarray(0, V3_PNG_SIGNATURE.length).equals(V3_PNG_SIGNATURE) ||
+    !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE) ||
     bytes.toString('latin1', 12, 16) !== 'IHDR'
   ) {
     return undefined;
@@ -373,7 +373,7 @@ function v3PngDimensions(
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
-function v3JpegDimensions(
+function jpegDimensions(
   bytes: Buffer,
 ): { width: number; height: number } | undefined {
   if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
@@ -412,14 +412,14 @@ interface PublishedPath {
 function resolveSurfacedFile(
   runDir: string,
   givenPath: string,
-  policy: V3VerifierPathPolicy,
+  policy: VerifierPathPolicy,
 ): PublishedPath {
   const absolutePath = resolveRunPath(runDir, givenPath);
   const root = resolve(runDir);
   const relativePath = relative(root, absolutePath).split(sep).join('/');
   if (!policy.allowedArtifactPaths.has(relativePath)) {
     throw new Error(
-      `outside v3 verifier scope: ${JSON.stringify(givenPath)}; only surfaced requested-output and evidence files are readable`,
+      `outside verifier scope: ${JSON.stringify(givenPath)}; only surfaced requested-output and evidence files are readable`,
     );
   }
   assertNoSymlinkComponents(root, absolutePath, givenPath);
@@ -450,7 +450,7 @@ function assertNoSymlinkComponents(
 function collectSurfacedFiles(
   runDir: string,
   givenPath: string,
-  policy: V3VerifierPathPolicy,
+  policy: VerifierPathPolicy,
   maximum: number,
 ): PublishedPath[] {
   const root = resolve(runDir);
@@ -463,7 +463,7 @@ function collectSurfacedFiles(
     .sort();
   if (matching.length === 0) {
     throw new Error(
-      `outside v3 verifier scope: ${JSON.stringify(givenPath)}; no surfaced files are available at that path`,
+      `outside verifier scope: ${JSON.stringify(givenPath)}; no surfaced files are available at that path`,
     );
   }
   if (matching.length > maximum) {
@@ -549,12 +549,12 @@ function tryDecodeText(bytes: Buffer, filename: string): string | undefined {
 }
 
 function boundText(content: string, suffix = ''): string {
-  if (Buffer.byteLength(content + suffix, 'utf8') <= V3_VERIFIER_MAX_RESULT_BYTES) {
+  if (Buffer.byteLength(content + suffix, 'utf8') <= VERIFIER_MAX_RESULT_BYTES) {
     return content + suffix;
   }
   const marker =
     '\n[Result truncated in memory without writing run state; narrow path, pattern, offset, or limit.]';
-  const budget = V3_VERIFIER_MAX_RESULT_BYTES - Buffer.byteLength(marker, 'utf8');
+  const budget = VERIFIER_MAX_RESULT_BYTES - Buffer.byteLength(marker, 'utf8');
   let low = 0;
   let high = content.length;
   while (low < high) {

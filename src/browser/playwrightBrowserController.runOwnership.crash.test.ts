@@ -44,7 +44,7 @@ processDescribe('durable browser page ownership after process death', () => {
       ]);
       const userPages = [firstUserPage, secondUserPage];
       const endpoint = await attachedEndpoint(profileDir);
-      const ownershipId = 'v3-real-sigkill-page-owner';
+      const ownershipId = 'real-sigkill-page-owner';
 
       fixture = startFixture(endpoint, ownershipId);
       const ready = await waitForMessage(fixture, (message) => message.type === 'ready');
@@ -86,7 +86,7 @@ processDescribe('durable browser page ownership after process death', () => {
       for (const page of userPages) expect(page.isClosed()).toBe(false);
 
       if (resumed.prepareTaskPage === undefined) {
-        throw new Error('Attached controller omitted v3 task-page preparation.');
+        throw new Error('Attached controller omitted task-page preparation.');
       }
       await resumed.prepareTaskPage({ ownershipId });
       expect(await resumed.pages()).toHaveLength(1);
@@ -122,7 +122,7 @@ processDescribe('durable browser page ownership after process death', () => {
       ]);
       const userPages = [firstUserPage, secondUserPage];
       const endpoint = await attachedEndpoint(profileDir);
-      const ownershipId = 'v3-real-sigkill-target-sentinel';
+      const ownershipId = 'real-sigkill-target-sentinel';
 
       fixture = startFixture(endpoint, ownershipId, 'committed-sentinel');
       await waitForMessage(

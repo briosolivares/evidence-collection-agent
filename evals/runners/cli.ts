@@ -92,7 +92,7 @@ async function main(): Promise<void> {
   // Announced before the first trial, not just recorded in the results file:
   // the protocol decides what the batch even measures, and a run whose path
   // you have to reconstruct afterwards is a run you will misread.
-  console.log('eval protocol: Sherlock v3 immutable initializer contract');
+  console.log('eval protocol: Sherlock immutable initializer contract');
   const protocol: EvalProtocol = { completion: 'output-contract' };
   const browserRuntime = createEvalBrowserRuntime({
     authenticatedProfileDir: PROFILE_DIR,

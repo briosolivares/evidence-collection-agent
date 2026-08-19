@@ -224,7 +224,7 @@ try {
       ...(initialBrowser === undefined ? {} : { initialBrowser }),
       runsBaseDir: config.runsBaseDir,
       // The attached interactive browser may carry cookies, stored
-      // credentials, and live logins. V3 requires that authority and its
+      // credentials, and live logins. The runtime requires that authority and its
       // JavaScript capability be stated rather than inferred.
       runConfig: {
         authenticated: true,

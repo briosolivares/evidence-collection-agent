@@ -131,7 +131,7 @@ describe('runTask browser acceptance', () => {
       const csv = `title,url\nBrowser Controller Fixture,${fixtureUrl}\n`;
       const secretSentinel = 'sherlock-run-secret-sentinel-8f06d05f';
       const initializer = scriptModel([
-        toolResponse('contract-v3', 'set_output_contract', {
+        toolResponse('contract-1', 'set_output_contract', {
           contract: {
             outputs: [
               {
@@ -150,26 +150,26 @@ describe('runTask browser acceptance', () => {
         }),
       ]);
       const worker = scriptModel([
-        toolResponse('browse-v3', 'browser_execute', {
+        toolResponse('browse-1', 'browser_execute', {
           code:
             `await browser.goto(${JSON.stringify(fixtureUrl)}); ` +
             'await browser.waitForLoad(); ' +
             "const page = await browser.js('({title: document.title, url: location.href})'); " +
             'return { page, leakedSecret: process.env.BROWSERBASE_API_KEY ?? null };',
         }),
-        toolResponse('publish-v3', 'publish_artifact', {
+        toolResponse('publish-1', 'publish_artifact', {
           kind: 'text',
           artifact_path: 'artifacts/stories.csv',
           roles: ['requested_output'],
           content: csv,
         }),
-        toolResponse('finish-v3', 'finish', {
+        toolResponse('finish-1', 'finish', {
           summary: 'Published the requested fixture report.',
           unresolved: [],
         }),
       ]);
       const verifier = scriptModel([
-        toolResponse('verify-v3', 'report_verification', {
+        toolResponse('verify-1', 'report_verification', {
           status: 'verified',
           findings: [],
         }),

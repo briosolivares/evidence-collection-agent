@@ -10,26 +10,26 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { V3FinishDefect, V3SettledFact } from './completion/finishChecks.js';
+import type { FinishDefect, SettledFact } from './completion/finishChecks.js';
 import type {
-  V3CorrectionFinding,
-  V3IncompleteFinding,
-  V3SurfacedArtifact,
-  V3VerificationHistoryEntry,
+  CorrectionFinding,
+  IncompleteFinding,
+  SurfacedArtifact,
+  VerificationHistoryEntry,
 } from './verifier/verifier.js';
 import type { FinishInput } from '../tools/finish/finish.js';
-import { V3_HARNESS_DIR } from './checkpoint.js';
+import { HARNESS_DIR } from './checkpoint.js';
 import {
-  buildV3FindingsReportInputFromCheckpoint,
-  renderV3FindingsReport,
-  V3_FINDINGS_REPORT_FILENAME,
-  writeV3FindingsReport,
-  type V3FindingsReportInput,
+  buildFindingsReportInputFromCheckpoint,
+  renderFindingsReport,
+  FINDINGS_REPORT_FILENAME,
+  writeFindingsReport,
+  type FindingsReportInput,
 } from './findingsReport.js';
 
 function minimalInput(
-  overrides: Partial<V3FindingsReportInput> = {},
-): V3FindingsReportInput {
+  overrides: Partial<FindingsReportInput> = {},
+): FindingsReportInput {
   return {
     phase: 'ready_for_model',
     settledFacts: [],
@@ -52,20 +52,20 @@ const FINISH: FinishInput = {
   ],
 };
 
-const SETTLED_FACT: V3SettledFact = {
+const SETTLED_FACT: SettledFact = {
   outputId: 'report',
   code: 'table_shape',
   statement: 'report.csv parsed with exactly 1 data row.',
 };
 
-const STRUCTURAL_FINDING: V3FinishDefect = {
+const STRUCTURAL_FINDING: FinishDefect = {
   code: 'hash_mismatch',
   message: 'artifacts/report.csv bytes did not match the recorded manifest hash.',
   outputId: 'report',
   artifactPath: 'artifacts/report.csv',
 };
 
-const SURFACED_ARTIFACT: V3SurfacedArtifact = {
+const SURFACED_ARTIFACT: SurfacedArtifact = {
   filename: 'artifacts/report.csv',
   sha256: 'a'.repeat(64),
   roles: ['requested_output'],
@@ -73,25 +73,25 @@ const SURFACED_ARTIFACT: V3SurfacedArtifact = {
   sourceUrl: 'https://example.test/source',
 };
 
-const CORRECTION_FINDING: V3CorrectionFinding = {
+const CORRECTION_FINDING: CorrectionFinding = {
   kind: 'research',
   requirement: 'Include Bob in the roster.',
   problem: 'The report only contains Alice.',
 };
 
-const INCOMPLETE_FINDING: V3IncompleteFinding = {
+const INCOMPLETE_FINDING: IncompleteFinding = {
   requirement: 'Support the report with the requested source.',
   assessment: 'The source consistently returned access-denied; retries are unlikely to help.',
 };
 
-const HISTORY_ENTRY: V3VerificationHistoryEntry = {
+const HISTORY_ENTRY: VerificationHistoryEntry = {
   cycle: 1,
   completionReport: FINISH,
   surfacedEvidenceFingerprint: 'b'.repeat(64),
   findings: [CORRECTION_FINDING],
 };
 
-describe('renderV3FindingsReport', () => {
+describe('renderFindingsReport', () => {
   it('is deterministic for identical input', () => {
     const input = minimalInput({
       completionReport: FINISH,
@@ -101,17 +101,17 @@ describe('renderV3FindingsReport', () => {
       currentFindings: { kind: 'correction', findings: [CORRECTION_FINDING] },
       verificationHistory: [HISTORY_ENTRY],
     });
-    expect(renderV3FindingsReport(input)).toBe(renderV3FindingsReport(input));
+    expect(renderFindingsReport(input)).toBe(renderFindingsReport(input));
   });
 
   it('marks the projection as an audit-only, non-machine-read file', () => {
-    const rendered = renderV3FindingsReport(minimalInput());
+    const rendered = renderFindingsReport(minimalInput());
     expect(rendered).toContain('Audit projection only');
     expect(rendered).toContain('never machine-read for control flow');
   });
 
   it('renders an active, non-terminal status without an outcome section', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({ phase: 'verifying', verificationHistory: [HISTORY_ENTRY] }),
     );
     expect(rendered).toContain('- Phase: verifying');
@@ -120,7 +120,7 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('renders a verified terminal outcome', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({
         phase: 'terminal',
         outcome: { status: 'verified', finalText: FINISH.summary },
@@ -132,7 +132,7 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('renders an incomplete terminal outcome with its reason and detail', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({
         phase: 'terminal',
         outcome: {
@@ -152,7 +152,7 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('renders the completion report summary and every unresolved requirement with attempts', () => {
-    const rendered = renderV3FindingsReport(minimalInput({ completionReport: FINISH }));
+    const rendered = renderFindingsReport(minimalInput({ completionReport: FINISH }));
     expect(rendered).toContain(`- Summary: ${FINISH.summary}`);
     expect(rendered).toContain('### Unresolved requirements (1)');
     expect(rendered).toContain('Include Bob in the roster.');
@@ -160,12 +160,12 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('reports no completion report as an explicit placeholder rather than omitting the section', () => {
-    const rendered = renderV3FindingsReport(minimalInput());
+    const rendered = renderFindingsReport(minimalInput());
     expect(rendered).toContain('_No completion report available yet._');
   });
 
   it('renders deterministic settled facts and structural findings with their output/path context', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({
         settledFacts: [SETTLED_FACT],
         structuralFindings: [STRUCTURAL_FINDING],
@@ -179,7 +179,7 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('says none recorded for empty facts/findings sections', () => {
-    const rendered = renderV3FindingsReport(minimalInput());
+    const rendered = renderFindingsReport(minimalInput());
     const factsSection = rendered.split('## Deterministic settled facts')[1]!.split('##')[0]!;
     expect(factsSection).toContain('None recorded.');
     const structuralSection = rendered.split('## Structural findings')[1]!.split('##')[0]!;
@@ -187,7 +187,7 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('renders surfaced artifacts as a table with filename, hash, roles, and source', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({ surfacedArtifacts: [SURFACED_ARTIFACT] }),
     );
     expect(rendered).toContain('## Surfaced artifacts (1)');
@@ -198,44 +198,44 @@ describe('renderV3FindingsReport', () => {
   });
 
   it('escapes pipe characters and newlines in artifact table cells', () => {
-    const artifact: V3SurfacedArtifact = {
+    const artifact: SurfacedArtifact = {
       ...SURFACED_ARTIFACT,
       filename: 'artifacts/weird|name\nwith-newline.csv',
     };
-    const rendered = renderV3FindingsReport(minimalInput({ surfacedArtifacts: [artifact] }));
+    const rendered = renderFindingsReport(minimalInput({ surfacedArtifacts: [artifact] }));
     expect(rendered).toContain('artifacts/weird\\|name with-newline.csv');
     expect(rendered).not.toContain('weird|name\nwith');
   });
 
   it('renders none/correction/incomplete current findings by kind', () => {
-    expect(renderV3FindingsReport(minimalInput())).toContain('No open verifier findings.');
+    expect(renderFindingsReport(minimalInput())).toContain('No open verifier findings.');
 
-    const correction = renderV3FindingsReport(
+    const correction = renderFindingsReport(
       minimalInput({ currentFindings: { kind: 'correction', findings: [CORRECTION_FINDING] } }),
     );
     expect(correction).toContain('**research** — Include Bob in the roster.');
 
-    const incomplete = renderV3FindingsReport(
+    const incomplete = renderFindingsReport(
       minimalInput({ currentFindings: { kind: 'incomplete', findings: [INCOMPLETE_FINDING] } }),
     );
     expect(incomplete).toContain('Support the report with the requested source.');
   });
 
   it('includes an artifact_repair finding evidence path list', () => {
-    const finding: V3CorrectionFinding = {
+    const finding: CorrectionFinding = {
       kind: 'artifact_repair',
       requirement: 'Fix the row.',
       problem: 'The row uses a placeholder value.',
       evidencePaths: ['artifacts/evidence.png'],
     };
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({ currentFindings: { kind: 'correction', findings: [finding] } }),
     );
     expect(rendered).toContain('(evidence: artifacts/evidence.png)');
   });
 
   it('renders prior verification cycles with their fingerprint and findings', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({ verificationHistory: [HISTORY_ENTRY] }),
     );
     expect(rendered).toContain('## Prior verification cycles (1)');
@@ -249,7 +249,7 @@ describe('renderV3FindingsReport', () => {
       reason: 'Blocked.',
       attempts: [] as string[],
     }));
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({ completionReport: { summary: 'partial', unresolved } }),
     );
     expect(rendered).toContain('### Unresolved requirements (55)');
@@ -262,7 +262,7 @@ describe('renderV3FindingsReport', () => {
       ...SURFACED_ARTIFACT,
       filename: `artifacts/file-${index}.csv`,
     }));
-    const rendered = renderV3FindingsReport(minimalInput({ surfacedArtifacts: artifacts }));
+    const rendered = renderFindingsReport(minimalInput({ surfacedArtifacts: artifacts }));
     expect(rendered).toContain('## Surfaced artifacts (210)');
     expect(rendered).toContain('_(+10 more artifact(s), truncated)_');
     expect(rendered).not.toContain('file-209.csv');
@@ -273,14 +273,14 @@ describe('renderV3FindingsReport', () => {
       ...HISTORY_ENTRY,
       cycle: index + 1,
     }));
-    const rendered = renderV3FindingsReport(minimalInput({ verificationHistory: history }));
+    const rendered = renderFindingsReport(minimalInput({ verificationHistory: history }));
     expect(rendered).toContain('## Prior verification cycles (52)');
     expect(rendered).toContain('_(+2 more cycle(s), truncated)_');
     expect(rendered).not.toContain('### Cycle 52');
   });
 
   it('truncates one very long field with an explicit marker rather than growing unbounded', () => {
-    const rendered = renderV3FindingsReport(
+    const rendered = renderFindingsReport(
       minimalInput({
         completionReport: { summary: 'x'.repeat(20_000), unresolved: [] },
       }),
@@ -293,12 +293,12 @@ describe('renderV3FindingsReport', () => {
     // Each list section is already capped at 50 items, so exceeding the
     // whole-document bound requires volume across many verification-history
     // cycles (also capped at 50) rather than one oversized list.
-    const bigFinding: V3CorrectionFinding = {
+    const bigFinding: CorrectionFinding = {
       kind: 'research',
       requirement: 'r'.repeat(1_000),
       problem: 'p'.repeat(1_000),
     };
-    const verificationHistory: V3VerificationHistoryEntry[] = Array.from(
+    const verificationHistory: VerificationHistoryEntry[] = Array.from(
       { length: 50 },
       (_, cycle) => ({
         ...HISTORY_ENTRY,
@@ -306,13 +306,13 @@ describe('renderV3FindingsReport', () => {
         findings: Array.from({ length: 50 }, () => bigFinding),
       }),
     );
-    const rendered = renderV3FindingsReport(minimalInput({ verificationHistory }));
+    const rendered = renderFindingsReport(minimalInput({ verificationHistory }));
     expect(Buffer.byteLength(rendered, 'utf8')).toBeLessThanOrEqual(1_000_000);
     expect(rendered.endsWith('[truncated]')).toBe(true);
   });
 });
 
-describe('buildV3FindingsReportInputFromCheckpoint', () => {
+describe('buildFindingsReportInputFromCheckpoint', () => {
   const COMMON = {
     version: 3 as const,
     revision: 1,
@@ -324,7 +324,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
 
   it('has nothing to render while still initializing', () => {
     const checkpoint = { ...COMMON, phase: 'initializing' as const } as never;
-    expect(buildV3FindingsReportInputFromCheckpoint(checkpoint, [])).toBeUndefined();
+    expect(buildFindingsReportInputFromCheckpoint(checkpoint, [])).toBeUndefined();
   });
 
   it('has nothing to render for a failed or cancelled terminal outcome', () => {
@@ -333,7 +333,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
       phase: 'terminal' as const,
       outcome: { status: 'failed' as const, during: 'checking' as const, message: 'boom' },
     } as never;
-    expect(buildV3FindingsReportInputFromCheckpoint(failed, [])).toBeUndefined();
+    expect(buildFindingsReportInputFromCheckpoint(failed, [])).toBeUndefined();
 
     const cancelled = {
       ...COMMON,
@@ -344,7 +344,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
         reason: 'run cancelled',
       },
     } as never;
-    expect(buildV3FindingsReportInputFromCheckpoint(cancelled, [])).toBeUndefined();
+    expect(buildFindingsReportInputFromCheckpoint(cancelled, [])).toBeUndefined();
   });
 
   it('reconstructs a verified terminal checkpoint using the caller-supplied re-run facts', () => {
@@ -358,7 +358,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
       outputs: [],
       evidenceScreenshotPaths: [],
     } as never;
-    const input = buildV3FindingsReportInputFromCheckpoint(checkpoint, [SURFACED_ARTIFACT], facts);
+    const input = buildFindingsReportInputFromCheckpoint(checkpoint, [SURFACED_ARTIFACT], facts);
     expect(input).toMatchObject({
       phase: 'terminal',
       completionReport: { summary: FINISH.summary, unresolved: [] },
@@ -381,7 +381,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
         unresolved: FINISH.unresolved,
       },
     } as never;
-    const input = buildV3FindingsReportInputFromCheckpoint(checkpoint, []);
+    const input = buildFindingsReportInputFromCheckpoint(checkpoint, []);
     expect(input).toMatchObject({
       phase: 'terminal',
       completionReport: FINISH,
@@ -418,7 +418,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
       },
       pendingVerifier: { cycle: 1, recovery: 'restart_read_only' as const },
     } as never;
-    const input = buildV3FindingsReportInputFromCheckpoint(checkpoint, []);
+    const input = buildFindingsReportInputFromCheckpoint(checkpoint, []);
     expect(input).toMatchObject({
       phase: 'verifying',
       completionReport: FINISH,
@@ -437,7 +437,7 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
       worker: {} as never,
       verificationHistory: [HISTORY_ENTRY],
     } as never;
-    const input = buildV3FindingsReportInputFromCheckpoint(checkpoint, []);
+    const input = buildFindingsReportInputFromCheckpoint(checkpoint, []);
     expect(input).toMatchObject({
       phase: 'ready_for_model',
       completionReport: FINISH,
@@ -454,18 +454,18 @@ describe('buildV3FindingsReportInputFromCheckpoint', () => {
       contract: {} as never,
       worker: {} as never,
     } as never;
-    const input = buildV3FindingsReportInputFromCheckpoint(checkpoint, []);
+    const input = buildFindingsReportInputFromCheckpoint(checkpoint, []);
     expect(input?.completionReport).toBeUndefined();
     expect(input?.currentFindings).toEqual({ kind: 'none' });
   });
 });
 
-describe('writeV3FindingsReport', () => {
+describe('writeFindingsReport', () => {
   let runDir: string;
 
   beforeEach(() => {
-    runDir = mkdtempSync(join(tmpdir(), 'v3-findings-report-'));
-    mkdirSync(join(runDir, V3_HARNESS_DIR), { mode: 0o700 });
+    runDir = mkdtempSync(join(tmpdir(), 'findings-report-'));
+    mkdirSync(join(runDir, HARNESS_DIR), { mode: 0o700 });
   });
 
   afterEach(() => {
@@ -474,19 +474,19 @@ describe('writeV3FindingsReport', () => {
 
   it('writes the rendered markdown to harness/findings.md with private file permissions', () => {
     const input = minimalInput({ completionReport: FINISH });
-    writeV3FindingsReport(runDir, input);
-    const path = join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME);
-    expect(readFileSync(path, 'utf8')).toBe(renderV3FindingsReport(input));
+    writeFindingsReport(runDir, input);
+    const path = join(runDir, HARNESS_DIR, FINDINGS_REPORT_FILENAME);
+    expect(readFileSync(path, 'utf8')).toBe(renderFindingsReport(input));
     expect(statSync(path).mode & 0o777).toBe(0o600);
   });
 
   it('rebuilds the whole file atomically rather than appending on a second write', () => {
-    writeV3FindingsReport(runDir, minimalInput({ completionReport: FINISH }));
+    writeFindingsReport(runDir, minimalInput({ completionReport: FINISH }));
     const second = minimalInput({ phase: 'terminal', outcome: { status: 'verified', finalText: 'done' } });
-    writeV3FindingsReport(runDir, second);
-    const path = join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME);
+    writeFindingsReport(runDir, second);
+    const path = join(runDir, HARNESS_DIR, FINDINGS_REPORT_FILENAME);
     const content = readFileSync(path, 'utf8');
-    expect(content).toBe(renderV3FindingsReport(second));
+    expect(content).toBe(renderFindingsReport(second));
     expect(content).not.toContain(FINISH.summary);
   });
 });

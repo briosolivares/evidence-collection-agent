@@ -30,8 +30,8 @@ import {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-bash-'));
-  initManifest(runDir, 'exercise the v3 bash tool');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-bash-'));
+  initManifest(runDir, 'exercise the bash tool');
 });
 
 afterEach(() => {
@@ -83,7 +83,7 @@ async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
   }
 }
 
-describe('v3 bash tool', () => {
+describe('bash tool', () => {
   it('has a strict browser-free schema and an exclusive bounded contract', () => {
     const tool = createBashTool({ secretEnvDenylist: [] });
 
@@ -166,7 +166,7 @@ describe('v3 bash tool', () => {
       {},
       {
         get() {
-          throw new Error('v3 bash must not inspect the browser controller');
+          throw new Error('bash must not inspect the browser controller');
         },
       },
     ) as BrowserController;

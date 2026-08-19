@@ -34,8 +34,8 @@ import {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-publish-artifact-'));
-  initManifest(runDir, 'publish generic v3 artifacts');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-publish-artifact-'));
+  initManifest(runDir, 'publish generic artifacts');
   mkdirSync(join(runDir, 'scratch/workspace'), { recursive: true });
 });
 
@@ -245,7 +245,7 @@ describe('publish_artifact file and text modes', () => {
 
   it('rejects source symlinks, symlink ancestors, directories, and oversized files', async () => {
     const externalDir = mkdtempSync(
-      join(tmpdir(), 'sherlock-v3-publish-external-'),
+      join(tmpdir(), 'sherlock-publish-external-'),
     );
     try {
       writeFileSync(join(externalDir, 'secret.bin'), 'secret');
@@ -280,7 +280,7 @@ describe('publish_artifact file and text modes', () => {
   });
 
   it('confines destinations to artifacts and refuses symlinked or unmanifested targets', async () => {
-    const external = join(tmpdir(), `sherlock-v3-destination-${process.pid}.txt`);
+    const external = join(tmpdir(), `sherlock-destination-${process.pid}.txt`);
     writeFileSync(external, 'outside');
     try {
       symlinkSync(external, join(runDir, 'artifacts/link.txt'));

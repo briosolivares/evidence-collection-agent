@@ -22,7 +22,7 @@ function call(
     registry,
     { id: 'ask-user-1', name: 'ask_user', input },
     {
-      runDir: '/tmp/unused-v3-ask-user',
+      runDir: '/tmp/unused-ask-user',
       ...(requestPermission === undefined ? {} : { requestPermission }),
     },
   );
@@ -35,8 +35,8 @@ function allowWith(answers: AskUserAnswers) {
   });
 }
 
-describe('v3 ask_user tool', () => {
-  it('is an exclusive interactive tool with the v3 name', () => {
+describe('ask_user tool', () => {
+  it('is an exclusive interactive tool with the ask_user name', () => {
     expect(askUserTool.name).toBe('ask_user');
     expect(askUserTool.requiresUserInteraction).toBe(true);
     expect(askUserTool.getAccess({ question: 'Continue?' })).toEqual({

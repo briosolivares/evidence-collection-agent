@@ -55,7 +55,7 @@ interface RunningHarness {
 
 const TASK = 'Publish report.csv with exactly one name column and one row.';
 const CHILD_FIXTURE = fileURLToPath(
-  new URL('../../tests/fixtures/v3CoordinatorCrashChild.ts', import.meta.url),
+  new URL('../../tests/fixtures/lifecycleCrashChild.ts', import.meta.url),
 );
 const PROCESS_TIMEOUT_MS = 15_000;
 
@@ -65,7 +65,7 @@ let eventsPath: string;
 const activeChildren = new Set<RunningHarness>();
 
 beforeEach(() => {
-  tempRoot = mkdtempSync(join(tmpdir(), 'sherlock-v3-real-crash-'));
+  tempRoot = mkdtempSync(join(tmpdir(), 'sherlock-real-crash-'));
   runDir = join(tempRoot, 'run');
   eventsPath = join(tempRoot, 'events.jsonl');
   mkdirSync(runDir);
@@ -94,7 +94,7 @@ afterEach(async () => {
 
 const processDescribe = process.platform === 'win32' ? describe.skip : describe;
 
-processDescribe('runV3Coordinator real process crash recovery', () => {
+processDescribe('runAgent real process crash recovery', () => {
   it('resumes an accepted contract checkpoint without rerunning initialization', async () => {
     const first = startHarness('contract', 'initial');
     await expectBoundary(first, 'accepted_contract');

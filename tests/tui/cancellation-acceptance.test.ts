@@ -24,9 +24,9 @@ import {
 } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import {
-  V3_HARNESS_DIR,
-  V3_RUN_CHECKPOINT_FILENAME,
-  V3_RUN_LOCK_FILENAME,
+  HARNESS_DIR,
+  RUN_CHECKPOINT_FILENAME,
+  RUN_LOCK_FILENAME,
 } from '../../src/agent/checkpoint.js';
 import {
   scriptedResponse,
@@ -328,12 +328,12 @@ function expectWorkspaceFullyManifested(runDir: string): void {
 
 function expectCancelledRunFinalized(runDir: string): void {
   expect(
-    existsSync(join(runDir, V3_HARNESS_DIR, V3_RUN_LOCK_FILENAME)),
+    existsSync(join(runDir, HARNESS_DIR, RUN_LOCK_FILENAME)),
   ).toBe(false);
   expect(
     JSON.parse(
       readFileSync(
-        join(runDir, V3_HARNESS_DIR, V3_RUN_CHECKPOINT_FILENAME),
+        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
         'utf8',
       ),
     ),
@@ -347,15 +347,15 @@ function expectCancelledRunFinalized(runDir: string): void {
   expectWorkspaceFullyManifested(runDir);
 }
 
-describe('Sherlock v3 cancellation acceptance', () => {
+describe('Sherlock cancellation acceptance', () => {
   it.skipIf(process.platform === 'win32')(
     'contains real browser and Bash process trees, finalizes their runs, and reuses the TUI session',
     async () => {
       const runsBaseDir = mkdtempSync(
-        join(tmpdir(), 'sherlock-v3-cancellation-runs-'),
+        join(tmpdir(), 'sherlock-cancellation-runs-'),
       );
       const profileDir = mkdtempSync(
-        join(tmpdir(), 'sherlock-v3-cancellation-chrome-'),
+        join(tmpdir(), 'sherlock-cancellation-chrome-'),
       );
       const managedProvider = new LocalChromeBrowserSessionProvider({
         profileDir,
@@ -585,8 +585,8 @@ describe('Sherlock v3 cancellation acceptance', () => {
           existsSync(
             join(
               recoveryOutcome.runDir,
-              V3_HARNESS_DIR,
-              V3_RUN_LOCK_FILENAME,
+              HARNESS_DIR,
+              RUN_LOCK_FILENAME,
             ),
           ),
         ).toBe(false);

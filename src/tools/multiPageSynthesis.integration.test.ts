@@ -46,12 +46,12 @@ interface PageFact {
   url: string;
 }
 
-describe('Sherlock v3 multi-page synthesis acceptance', () => {
+describe('Sherlock multi-page synthesis acceptance', () => {
   it(
     'synthesizes two owned pages through a run-local helper and preserves a user page',
     async () => {
-      const profileDir = await mkdtemp(join(tmpdir(), 'v3-multi-page-chrome-'));
-      const runDir = await mkdtemp(join(tmpdir(), 'v3-multi-page-run-'));
+      const profileDir = await mkdtemp(join(tmpdir(), 'multi-page-chrome-'));
+      const runDir = await mkdtemp(join(tmpdir(), 'multi-page-run-'));
       let fixtureServer: FixtureServer | undefined;
       let context: BrowserContext | undefined;
       let controller: BrowserController | undefined;
@@ -90,12 +90,12 @@ describe('Sherlock v3 multi-page synthesis acceptance', () => {
         expect(await controller.pages()).toEqual([]);
 
         if (controller.prepareTaskPage === undefined) {
-          throw new Error('Browser controller omitted v3 task-page preparation.');
+          throw new Error('Browser controller omitted task-page preparation.');
         }
         const mainUrl = fixtureServer.url('/index.html');
         const popupUrl = fixtureServer.url('/popup.html');
         await controller.prepareTaskPage({
-          ownershipId: 'v3-multi-page-synthesis-acceptance',
+          ownershipId: 'multi-page-synthesis-acceptance',
           startUrl: mainUrl,
         });
 

@@ -1,16 +1,16 @@
 import type { Message, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
 
-/** The only heavyweight v3 result collapsed in the per-request view. */
-export const V3_BROWSER_EXECUTE_TOOL_NAME = 'browser_execute' as const;
+/** The only heavyweight result collapsed in the per-request view. */
+export const BROWSER_EXECUTE_TOOL_NAME = 'browser_execute' as const;
 
 /** The newest two successful browser results retain their complete content. */
-export const V3_KEPT_BROWSER_EXECUTE_RESULTS = 2;
+export const KEPT_BROWSER_EXECUTE_RESULTS = 2;
 
 /**
  * Stable prefix for a collapsed result. `callModel.ts` uses the exported
  * predicate to place the cache frontier at the newest displaced result.
  */
-export const V3_COLLAPSED_BROWSER_RESULT_MARKER =
+export const COLLAPSED_BROWSER_RESULT_MARKER =
   '[Older browser_execute result collapsed — only the two most recent ' +
   'successful browser_execute results stay expanded.]';
 
@@ -33,19 +33,19 @@ interface BrowserResultSummary {
 }
 
 /** Whether a content block is one of this module's deterministic stubs. */
-export function isV3CollapsedBrowserResult(block: {
+export function isCollapsedBrowserResult(block: {
   type: string;
   content?: unknown;
 }): boolean {
   return (
     block.type === 'tool_result' &&
     typeof block.content === 'string' &&
-    block.content.startsWith(V3_COLLAPSED_BROWSER_RESULT_MARKER)
+    block.content.startsWith(COLLAPSED_BROWSER_RESULT_MARKER)
   );
 }
 
 /**
- * Build the v3 model-request view without changing durable conversation
+ * Build the model-request view without changing durable conversation
  * history. Every successful `browser_execute` result except the newest two
  * becomes a short, deterministic identity/status/page stub. Failed pipeline
  * results remain full and do not consume either retained slot.
@@ -54,7 +54,7 @@ export function isV3CollapsedBrowserResult(block: {
  * on its original call and result, so it remains byte-identical on every later
  * request and is safe as a moving prompt-cache frontier.
  */
-export function buildV3ContextView(messages: readonly Message[]): readonly Message[] {
+export function buildContextView(messages: readonly Message[]): readonly Message[] {
   const browserCalls = collectBrowserCalls(messages);
   if (browserCalls.size === 0) return messages;
 
@@ -74,7 +74,7 @@ export function buildV3ContextView(messages: readonly Message[]): readonly Messa
 
   const stale = successfulResults.slice(
     0,
-    Math.max(0, successfulResults.length - V3_KEPT_BROWSER_EXECUTE_RESULTS),
+    Math.max(0, successfulResults.length - KEPT_BROWSER_EXECUTE_RESULTS),
   );
   if (stale.length === 0) return messages;
 
@@ -106,7 +106,7 @@ function collectBrowserCalls(
   for (const message of messages) {
     if (message.role !== 'assistant') continue;
     for (const block of message.content) {
-      if (block.type !== 'tool_use' || block.name !== V3_BROWSER_EXECUTE_TOOL_NAME) {
+      if (block.type !== 'tool_use' || block.name !== BROWSER_EXECUTE_TOOL_NAME) {
         continue;
       }
       calls.set(block.id, callIdentity(block));
@@ -135,7 +135,7 @@ function stubBrowserResult(
       ? recoverBrowserResultSummary(block.content)
       : {};
   const lines = [
-    V3_COLLAPSED_BROWSER_RESULT_MARKER,
+    COLLAPSED_BROWSER_RESULT_MARKER,
     `Identity: ${JSON.stringify({
       tool_use_id: identity.toolUseId,
       ...(identity.requestedPageId === undefined

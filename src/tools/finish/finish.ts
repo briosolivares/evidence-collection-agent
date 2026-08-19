@@ -72,7 +72,7 @@ export const legacyFinishInputSchema = z.strictObject({
     .optional(),
 });
 
-/** Read old v3 checkpoint cargo, but expose and rewrite only the current shape. */
+/** Read old checkpoint cargo, but expose and rewrite only the current shape. */
 export const durableFinishInputSchema = z
   .union([finishInputSchema, legacyFinishInputSchema])
   .transform(
@@ -85,7 +85,7 @@ export const durableFinishInputSchema = z
 /**
  * Model-facing definition for the exclusive completion control call.
  *
- * `execute` is intentionally unusable. The v3 worker loop must recognize an
+ * `execute` is intentionally unusable. The worker loop must recognize an
  * exclusive finish response and hand its validated input to completion checks
  * rather than allowing generic tool execution to imply success.
  */
@@ -102,7 +102,7 @@ export const finishTool: ToolDef<FinishInput> = {
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {
     throw new Error(
-      'finish is a control call that must be intercepted by the v3 worker loop; it cannot execute as an ordinary tool.',
+      'finish is a control call that must be intercepted by the worker loop; it cannot execute as an ordinary tool.',
     );
   },
 };

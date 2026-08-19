@@ -30,15 +30,15 @@ import {
 import { publishArtifactTool } from '../tools/publishArtifact/publishArtifact.js';
 import { finishTool, type FinishInput } from '../tools/finish/finish.js';
 import {
-  V3_HARNESS_DIR,
-  V3_RUN_CHECKPOINT_FILENAME,
-  v3CheckpointSchema,
-  type V3Checkpoint,
-  type V3DurableRunConfiguration,
+  HARNESS_DIR,
+  RUN_CHECKPOINT_FILENAME,
+  checkpointSchema,
+  type Checkpoint,
+  type DurableRunConfiguration,
 } from './checkpoint.js';
-import { runV3Coordinator } from './lifecycle.js';
-import { V3_FINDINGS_REPORT_FILENAME } from './findingsReport.js';
-import { raceWithV3RunSignal } from './runDeadline.js';
+import { runAgent } from './lifecycle.js';
+import { FINDINGS_REPORT_FILENAME } from './findingsReport.js';
+import { raceWithRunSignal } from './runDeadline.js';
 
 const TASK =
   'Publish report.csv with exactly one name column and one row. Do not take screenshots.';
@@ -62,7 +62,7 @@ const FINISH = {
   unresolved: [],
 };
 
-const CONFIGURATION: V3DurableRunConfiguration = {
+const CONFIGURATION: DurableRunConfiguration = {
   taskText: TASK,
   model: 'scripted-worker',
   maxOutputTokens: 4_096,
@@ -92,7 +92,7 @@ const DEFAULT_USAGE = {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-coordinator-lifecycle-'));
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-coordinator-lifecycle-'));
   initManifest(runDir, TASK, 'local');
 });
 
@@ -101,7 +101,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('v3 coordinator correction lifecycle', () => {
+describe('coordinator correction lifecycle', () => {
   it('returns a research finding with the harness instruction, accepts new evidence, and owns one browser page', async () => {
     const unresolvedFinish: FinishInput = {
       summary: 'Published the available report; Bob is still unresolved.',
@@ -188,7 +188,7 @@ describe('v3 coordinator correction lifecycle', () => {
     });
 
     expect(outcome.status).toBe('verified');
-    const findingsPath = join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME);
+    const findingsPath = join(runDir, HARNESS_DIR, FINDINGS_REPORT_FILENAME);
     const findings = readFileSync(findingsPath, 'utf8');
     expect(findings).toContain('Audit projection only');
     expect(findings).toContain('Include Bob in the requested report.');
@@ -199,8 +199,8 @@ describe('v3 coordinator correction lifecycle', () => {
     // Pre-create the harness directory with the exact convention the
     // checkpoint store expects, then pre-occupy the findings-report path
     // with a directory so the atomic rename onto it fails deterministically.
-    mkdirSync(join(runDir, V3_HARNESS_DIR), { mode: 0o700 });
-    mkdirSync(join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME));
+    mkdirSync(join(runDir, HARNESS_DIR), { mode: 0o700 });
+    mkdirSync(join(runDir, HARNESS_DIR, FINDINGS_REPORT_FILENAME));
 
     const outcome = await runCoordinator({
       initializer: scriptedDriver([initializerAccepted()]),
@@ -509,7 +509,7 @@ describe('v3 coordinator correction lifecycle', () => {
   });
 });
 
-describe('v3 coordinator terminal lifecycle', () => {
+describe('coordinator terminal lifecycle', () => {
   it.each([
     {
       label: 'initializer',
@@ -1101,7 +1101,7 @@ interface RunInputs {
   browser: BrowserController;
   registry?: ToolRegistry;
   busyRegistry?: BusyResourceRegistry;
-  configuration?: V3DurableRunConfiguration;
+  configuration?: DurableRunConfiguration;
   signal?: AbortSignal;
   terminalBrowserCleanupTimeoutMs?: number;
   terminalBusyResourceTimeoutMs?: number;
@@ -1109,7 +1109,7 @@ interface RunInputs {
 }
 
 function runCoordinator(inputs: RunInputs) {
-  return runV3Coordinator({
+  return runAgent({
     runDir,
     configuration: inputs.configuration ?? CONFIGURATION,
     initializerModel: inputs.initializer,
@@ -1329,9 +1329,9 @@ function fakeBrowser(
       signal?: AbortSignal;
     }) => {
       await initializeRunPageOwnership(request.ownershipId);
-      await raceWithV3RunSignal(() => newTab(), request.signal);
+      await raceWithRunSignal(() => newTab(), request.signal);
       if (request.startUrl !== undefined) {
-        await raceWithV3RunSignal(() => goto(request.startUrl!), request.signal);
+        await raceWithRunSignal(() => goto(request.startUrl!), request.signal);
       }
     },
   );
@@ -1366,7 +1366,7 @@ function fakeBrowser(
 
 function wallDeadlineConfiguration(
   maxWallTimeMs: number,
-): V3DurableRunConfiguration {
+): DurableRunConfiguration {
   return {
     ...CONFIGURATION,
     budgetLimits: {
@@ -1424,11 +1424,11 @@ function delayedPublishTool(
   };
 }
 
-function readCheckpoint(): V3Checkpoint {
-  return v3CheckpointSchema.parse(
+function readCheckpoint(): Checkpoint {
+  return checkpointSchema.parse(
     JSON.parse(
       readFileSync(
-        join(runDir, V3_HARNESS_DIR, V3_RUN_CHECKPOINT_FILENAME),
+        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
         'utf8',
       ),
     ),
@@ -1436,7 +1436,7 @@ function readCheckpoint(): V3Checkpoint {
 }
 
 function toolResultsFor(
-  checkpoint: V3Checkpoint,
+  checkpoint: Checkpoint,
   toolUseId: string,
 ): Array<{ tool_use_id: string; is_error?: boolean; content: unknown }> {
   if (checkpoint.phase === 'initializing' || checkpoint.worker === undefined) return [];

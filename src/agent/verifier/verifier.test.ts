@@ -17,20 +17,20 @@ import {
   type RunBudgetConfig,
 } from '../../run/runBudget.js';
 import {
-  V3_REPORT_VERIFICATION_TOOL,
-  V3_VERIFIER_API_TOOL_DEFS,
-  V3_VERIFIER_MAX_CONTEXT_TOKENS,
+  REPORT_VERIFICATION_TOOL,
+  VERIFIER_API_TOOL_DEFS,
+  VERIFIER_MAX_CONTEXT_TOKENS,
   V3_VERIFIER_SYSTEM_PROMPT,
-  createV3VerifierModelDriver,
-  runV3Verifier,
-  v3VerificationResultSchema,
-  type V3SurfacedArtifact,
+  createVerifierModelDriver,
+  runVerifier,
+  verificationResultSchema,
+  type SurfacedArtifact,
 } from './verifier.js';
 
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-verifier-'));
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-verifier-'));
   initManifest(runDir, 'Create report.csv.');
 });
 
@@ -57,7 +57,7 @@ const FINISH = {
   unresolved: [],
 };
 
-const SURFACED_ARTIFACTS: V3SurfacedArtifact[] = [
+const SURFACED_ARTIFACTS: SurfacedArtifact[] = [
   {
     filename: 'artifacts/report.csv',
     sha256: 'a'.repeat(64),
@@ -149,7 +149,7 @@ function inspect(id = 'inspect'): AcceptedModelResponse {
 }
 
 function verifyWith(model: ModelDriver) {
-  return runV3Verifier({
+  return runVerifier({
     taskText: 'Create report.csv.',
     runDir,
     contract: CONTRACT,
@@ -160,35 +160,35 @@ function verifyWith(model: ModelDriver) {
   });
 }
 
-describe('v3 verifier binding', () => {
+describe('verifier binding', () => {
   it('pins a frozen read-only inspection and verdict prefix', () => {
-    expect(V3_VERIFIER_API_TOOL_DEFS.map((tool) => tool.name)).toEqual([
+    expect(VERIFIER_API_TOOL_DEFS.map((tool) => tool.name)).toEqual([
       'read_file',
       'grep',
       'report_verification',
     ]);
-    expect(Object.isFrozen(V3_VERIFIER_API_TOOL_DEFS)).toBe(true);
+    expect(Object.isFrozen(VERIFIER_API_TOOL_DEFS)).toBe(true);
     expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('fresh, read-only evidence judge');
     expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('Prose is not a verdict');
     expect(V3_VERIFIER_SYSTEM_PROMPT).not.toContain('report.csv');
   });
 
   it('validates model-driver limits at construction', () => {
-    expect(() => createV3VerifierModelDriver({ maxOutputTokens: 0 })).toThrow(
+    expect(() => createVerifierModelDriver({ maxOutputTokens: 0 })).toThrow(
       /maxOutputTokens/,
     );
   });
 
   it('pins the fail-closed verdict schema', () => {
-    expect(V3_REPORT_VERIFICATION_TOOL.name).toBe('report_verification');
+    expect(REPORT_VERIFICATION_TOOL.name).toBe('report_verification');
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'verified',
         findings: [],
       }).success,
     ).toBe(true);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'verified',
         findings: [
           { area: 'output', code: 'contradiction', message: 'not empty' },
@@ -196,14 +196,14 @@ describe('v3 verifier binding', () => {
       }).success,
     ).toBe(false);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [],
       }).success,
     ).toBe(false);
     // The legacy free-form shape (nextAction, no kind) no longer parses.
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [
           {
@@ -215,7 +215,7 @@ describe('v3 verifier binding', () => {
       }).success,
     ).toBe(false);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [
           {
@@ -228,7 +228,7 @@ describe('v3 verifier binding', () => {
     ).toBe(true);
     // artifact_repair requires nonempty evidencePaths.
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [
           {
@@ -240,7 +240,7 @@ describe('v3 verifier binding', () => {
       }).success,
     ).toBe(false);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [
           {
@@ -253,7 +253,7 @@ describe('v3 verifier binding', () => {
       }).success,
     ).toBe(true);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'needs_correction',
         findings: [
           {
@@ -265,7 +265,7 @@ describe('v3 verifier binding', () => {
       }).success,
     ).toBe(true);
     expect(
-      v3VerificationResultSchema.safeParse({
+      verificationResultSchema.safeParse({
         status: 'incomplete',
         findings: [
           {
@@ -278,7 +278,7 @@ describe('v3 verifier binding', () => {
   });
 });
 
-describe('runV3Verifier', () => {
+describe('runVerifier', () => {
   it.each(['verified', 'needs_correction'] as const)(
     'returns a typed %s verdict and charges aggregate usage',
     async (status) => {
@@ -288,7 +288,7 @@ describe('runV3Verifier', () => {
       };
 
       await expect(
-        runV3Verifier({
+        runVerifier({
           taskText: 'Create report.csv.',
           runDir,
           contract: CONTRACT,
@@ -390,7 +390,7 @@ describe('runV3Verifier', () => {
       accepted('needs_correction'),
     ]);
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -426,7 +426,7 @@ describe('runV3Verifier', () => {
       }),
     ]);
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -512,7 +512,7 @@ describe('runV3Verifier', () => {
         },
       ],
       {
-        input_tokens: V3_VERIFIER_MAX_CONTEXT_TOKENS + 1,
+        input_tokens: VERIFIER_MAX_CONTEXT_TOKENS + 1,
         output_tokens: 1,
       },
     );
@@ -551,7 +551,7 @@ describe('runV3Verifier', () => {
     };
 
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -561,7 +561,7 @@ describe('runV3Verifier', () => {
         budget: tracker,
       }),
     ).rejects.toMatchObject({
-      name: 'V3RoleBudgetExceededError',
+      name: 'RoleBudgetExceededError',
       limit: 'tool_calls',
     });
     expect(captureRunBudgetSnapshot(tracker).toolCalls).toBe(1);
@@ -594,7 +594,7 @@ describe('runV3Verifier', () => {
       }),
     };
 
-    await expect(runV3Verifier({
+    await expect(runVerifier({
       taskText: 'Create report.csv.',
       runDir,
       contract: CONTRACT,
@@ -618,7 +618,7 @@ describe('runV3Verifier', () => {
     };
 
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -631,7 +631,7 @@ describe('runV3Verifier', () => {
         },
       }),
     ).rejects.toMatchObject({
-      name: 'V3VerifierAccountingPersistenceError',
+      name: 'VerifierAccountingPersistenceError',
       cause: persistenceFailure,
     });
   });
@@ -649,7 +649,7 @@ describe('runV3Verifier', () => {
     };
 
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -673,7 +673,7 @@ describe('runV3Verifier', () => {
     };
 
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,
@@ -690,7 +690,7 @@ describe('runV3Verifier', () => {
       generate: vi.fn(async () => accepted('verified')),
     };
 
-    await runV3Verifier({
+    await runVerifier({
       taskText: 'Create report.csv.',
       runDir,
       contract: CONTRACT,
@@ -726,7 +726,7 @@ describe('runV3Verifier', () => {
       generate: vi.fn(async () => accepted('verified')),
     };
 
-    await runV3Verifier({
+    await runVerifier({
       taskText: 'Create report.csv.',
       runDir,
       contract: CONTRACT,
@@ -759,7 +759,7 @@ describe('runV3Verifier', () => {
     const withoutCounts: ModelDriver = {
       generate: vi.fn(async () => accepted('verified')),
     };
-    await runV3Verifier({
+    await runVerifier({
       taskText: 'Create report.csv.',
       runDir,
       contract: CONTRACT,
@@ -794,7 +794,7 @@ describe('runV3Verifier', () => {
     };
 
     await expect(
-      runV3Verifier({
+      runVerifier({
         taskText: 'Create report.csv.',
         runDir,
         contract: CONTRACT,

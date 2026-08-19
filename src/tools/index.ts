@@ -14,7 +14,7 @@ import { finishTool } from './finish/finish.js';
 import { publishArtifactTool } from './publishArtifact/publishArtifact.js';
 
 /** Exact model-visible order. It is part of the byte-stable cached prefix. */
-export const V3_TOOL_ORDER = Object.freeze([
+export const WORKER_TOOL_ORDER = Object.freeze([
   'browser_execute',
   'publish_artifact',
   'read_file',
@@ -25,16 +25,16 @@ export const V3_TOOL_ORDER = Object.freeze([
   'finish',
 ] as const);
 
-export type V3ToolName = (typeof V3_TOOL_ORDER)[number];
+export type WorkerToolName = (typeof WORKER_TOOL_ORDER)[number];
 
-export interface V3ToolRegistryDeps {
+export interface WorkerToolRegistryDeps {
   /** Durable run policy for the entire browser_execute capability. */
   javascriptPolicy: BrowserJavaScriptPolicy;
   /** Exact environment names or prefixes denied to both code-execution tools. */
   secretEnvDenylist: readonly string[];
 }
 
-const STATIC_TOOLS: ReadonlyMap<V3ToolName, ToolDef> = new Map([
+const STATIC_TOOLS: ReadonlyMap<WorkerToolName, ToolDef> = new Map([
   ['publish_artifact', publishArtifactTool as ToolDef],
   ['read_file', readFileTool as ToolDef],
   ['write_file', writeFileTool as ToolDef],
@@ -49,11 +49,11 @@ const STATIC_TOOLS: ReadonlyMap<V3ToolName, ToolDef> = new Map([
  * `browser_execute` closes over the run's explicit JavaScript policy, and it
  * and `bash` close over a defensive copy of the secret-environment denylist.
  * Static tool definitions are then assembled with them strictly according to
- * `V3_TOOL_ORDER`; map/import order never decides the model-facing prefix.
+ * `WORKER_TOOL_ORDER`; map/import order never decides the model-facing prefix.
  */
-export function createV3ToolRegistry(deps: V3ToolRegistryDeps): ToolRegistry {
+export function createWorkerToolRegistry(deps: WorkerToolRegistryDeps): ToolRegistry {
   const secretEnvDenylist = Object.freeze([...deps.secretEnvDenylist]);
-  const runScopedTools: ReadonlyMap<V3ToolName, ToolDef> = new Map([
+  const runScopedTools: ReadonlyMap<WorkerToolName, ToolDef> = new Map([
     [
       'browser_execute',
       createBrowserExecuteTool({
@@ -65,11 +65,11 @@ export function createV3ToolRegistry(deps: V3ToolRegistryDeps): ToolRegistry {
   ]);
 
   return createRegistry(
-    V3_TOOL_ORDER.map((name) => {
+    WORKER_TOOL_ORDER.map((name) => {
       const tool = runScopedTools.get(name) ?? STATIC_TOOLS.get(name);
       if (tool === undefined || tool.name !== name) {
         throw new Error(
-          `v3 tool registry invariant failed for ${JSON.stringify(name)}`,
+          `tool registry invariant failed for ${JSON.stringify(name)}`,
         );
       }
       return tool;
@@ -85,9 +85,9 @@ export function createV3ToolRegistry(deps: V3ToolRegistryDeps): ToolRegistry {
  * affect tool closures, never names, descriptions, or schemas. Deep freezing
  * prevents a caller from corrupting the shared prefix for later runs.
  */
-export const V3_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
+export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
   toApiToolDefs(
-    createV3ToolRegistry({
+    createWorkerToolRegistry({
       javascriptPolicy: 'allow',
       secretEnvDenylist: [],
     }),

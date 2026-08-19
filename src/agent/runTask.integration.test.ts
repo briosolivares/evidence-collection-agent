@@ -22,12 +22,12 @@ import {
 import type { RunTracing } from '../tracing/runTracing.js';
 import type { ResumeTaskConfig } from './runTask.js';
 import {
-  readV3CheckpointConfiguration,
-  V3_UNBOUNDED_CEILING,
+  readCheckpointConfiguration,
+  UNBOUNDED_CEILING,
 } from './checkpoint.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../tools/browserExecute/browserExecute.js';
 import {
-  V3_PRODUCTION_DEFAULTS,
+  PRODUCTION_DEFAULTS,
   resumeTask,
   runTask,
 } from './runTask.js';
@@ -66,7 +66,7 @@ let tempRoot: string;
 let runsBaseDir: string;
 
 beforeEach(() => {
-  tempRoot = mkdtempSync(join(tmpdir(), 'sherlock-run-task-v3-'));
+  tempRoot = mkdtempSync(join(tmpdir(), 'sherlock-run-task-'));
   runsBaseDir = join(tempRoot, 'runs');
 });
 
@@ -75,12 +75,12 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('public runTask v3 adapter', () => {
-  it('uses v3 by default, persists finite defaults, and orders worker progress', async () => {
+describe('public runTask adapter', () => {
+  it('runs by default, persists finite defaults, and orders worker progress', async () => {
     const browser = fakeBrowser();
     const progress: ProgressEvent[] = [];
     const tracing = recordingTracing();
-    const run = await runVerifiedV3({
+    const run = await runVerified({
       browser,
       tracing: tracing.tracing,
       onProgress: (event) => progress.push(event),
@@ -94,22 +94,22 @@ describe('public runTask v3 adapter', () => {
     expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
       REPORT,
     );
-    const configuration = readV3CheckpointConfiguration(run.result.runDir);
+    const configuration = readCheckpointConfiguration(run.result.runDir);
     expect(configuration).toMatchObject({
-      maxOutputTokens: V3_PRODUCTION_DEFAULTS.maxOutputTokens,
-      maxContextTokens: V3_PRODUCTION_DEFAULTS.maxContextTokens,
+      maxOutputTokens: PRODUCTION_DEFAULTS.maxOutputTokens,
+      maxContextTokens: PRODUCTION_DEFAULTS.maxContextTokens,
       maxCompletionCheckFailures:
-        V3_PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
+        PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
       budgetLimits: {
-        maxWorkerTurns: V3_UNBOUNDED_CEILING,
-        maxToolCalls: V3_UNBOUNDED_CEILING,
-        maxModelTokens: V3_UNBOUNDED_CEILING,
-        maxWallTimeMs: V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
-        maxVerifierCorrections: V3_UNBOUNDED_CEILING,
+        maxWorkerTurns: UNBOUNDED_CEILING,
+        maxToolCalls: UNBOUNDED_CEILING,
+        maxModelTokens: UNBOUNDED_CEILING,
+        maxWallTimeMs: PRODUCTION_DEFAULTS.maxWallTimeMs,
+        maxVerifierCorrections: UNBOUNDED_CEILING,
       },
     });
     expect(
-      Object.entries(V3_PRODUCTION_DEFAULTS).every(
+      Object.entries(PRODUCTION_DEFAULTS).every(
         ([name, value]) =>
           name === 'maxModelTokens' ||
           name === 'maxWorkerTurns' ||
@@ -163,7 +163,7 @@ describe('public runTask v3 adapter', () => {
 
   it('makes javascriptPolicy=deny guidance agree with the real registry refusal', async () => {
     const browser = fakeBrowser();
-    const run = await runVerifiedV3({
+    const run = await runVerified({
       browser,
       javascriptPolicy: 'deny',
       workerResponses: [
@@ -216,7 +216,7 @@ describe('public runTask v3 adapter', () => {
         'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
-    expect(readV3CheckpointConfiguration(result.runDir).taskText).toBe(
+    expect(readCheckpointConfiguration(result.runDir).taskText).toBe(
       'A task whose initializer is unavailable.',
     );
     expect(readManifest(result.runDir).finishedAt).toBeDefined();
@@ -232,9 +232,9 @@ describe('public runTask v3 adapter', () => {
   });
 });
 
-describe('public v3 resumeTask', () => {
-  it('returns a terminal v3 checkpoint without model or browser effects', async () => {
-    const initial = await runVerifiedV3({ browser: fakeBrowser() });
+describe('public resumeTask', () => {
+  it('returns a terminal checkpoint without model or browser effects', async () => {
+    const initial = await runVerified({ browser: fakeBrowser() });
     const browser = fakeBrowser();
     const initializer = unexpectedCallModel('initializer must not resume');
     const worker = unexpectedCallModel('worker must not resume');
@@ -264,8 +264,8 @@ describe('public v3 resumeTask', () => {
     expect(tracing.closeCalls).toBe(1);
   });
 
-  it('requires an explicit authenticated assertion for v3 resume', async () => {
-    const initial = await runVerifiedV3({ browser: fakeBrowser() });
+  it('requires an explicit authenticated assertion for resume', async () => {
+    const initial = await runVerified({ browser: fakeBrowser() });
     const unsafeConfig = {
       browser: fakeBrowser().controller,
       tracing: noopTracing(),
@@ -398,7 +398,7 @@ function verifierResponse(): ModelResponse {
   );
 }
 
-async function runVerifiedV3(options: {
+async function runVerified(options: {
   browser: FakeBrowser;
   javascriptPolicy?: 'allow' | 'deny';
   workerResponses?: readonly ModelResponse[];

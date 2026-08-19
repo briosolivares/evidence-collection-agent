@@ -1,14 +1,14 @@
 // Past-run discovery for /runs: read the runs directory and classify each
 // run from its artifacts alone. The status semantics follow the core's
 // write contract. A run is complete only when its manifest is finalized and
-// its metrics report a successful terminal status. V3 projects metrics before
+// its metrics report a successful terminal status. The runtime projects metrics before
 // finalizing the manifest, so metrics existence alone cannot prove completion.
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest } from '../run/artifacts.js';
-import type { V3WorkerMetrics } from '../agent/worker/worker.js';
+import type { WorkerMetrics } from '../agent/worker/worker.js';
 import type { ManifestView, MetricsView } from './store/state.js';
 
 /** One row of the /runs list. */
@@ -127,7 +127,7 @@ export function loadRunSummary(
   try {
     const metrics = JSON.parse(
       readFileSync(join(runDir, 'metrics.json'), 'utf8'),
-    ) as V3WorkerMetrics;
+    ) as WorkerMetrics;
     return {
       manifest: manifestView,
       metrics: {

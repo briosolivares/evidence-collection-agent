@@ -34,28 +34,28 @@ import {
 } from '../../tools/registry.js';
 import { finishTool, type FinishInput } from '../../tools/finish/finish.js';
 import {
-  V3_MAX_PROTOCOL_CORRECTIONS,
-  V3_NO_TOOL_CONTINUATION,
-  appendV3FinishResult,
-  appendV3WorkerFeedback,
-  captureV3WorkerSessionSnapshot,
-  createV3WorkerSession,
-  dropV3UnansweredAssistantTurn,
-  readV3WorkerMetrics,
-  resumeV3PendingToolTurn,
-  restoreV3WorkerSession,
-  runV3WorkerTurn,
-  writeV3WorkerMetrics,
-  type V3WorkerSession,
-  type V3WorkerSessionDeps,
-  type V3PendingToolTurn,
+  MAX_PROTOCOL_CORRECTIONS,
+  NO_TOOL_CONTINUATION,
+  appendFinishResult,
+  appendWorkerFeedback,
+  captureWorkerSnapshot,
+  createWorker,
+  dropUnansweredAssistantTurn,
+  readWorkerMetrics,
+  resumePendingToolTurn,
+  restoreWorker,
+  runWorkerTurn,
+  writeWorkerMetrics,
+  type Worker,
+  type WorkerDeps,
+  type PendingToolTurn,
 } from './worker.js';
 
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-worker-'));
-  initManifest(runDir, 'test the v3 sequential worker');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-worker-'));
+  initManifest(runDir, 'test the sequential worker');
 });
 
 afterEach(() => {
@@ -138,15 +138,15 @@ function session(
   options: {
     budget?: Partial<RunBudgetConfig>;
     maxContextTokens?: number;
-    deps?: Partial<V3WorkerSessionDeps>;
+    deps?: Partial<WorkerDeps>;
     budgetNow?: () => number;
   } = {},
-): V3WorkerSession {
+): Worker {
   const budget = createRunBudgetTracker(
     { ...UNBOUNDED, ...options.budget },
     options.budgetNow === undefined ? {} : { now: options.budgetNow },
   );
-  return createV3WorkerSession(
+  return createWorker(
     'Collect the requested evidence.',
     {
       model,
@@ -162,7 +162,7 @@ function session(
   );
 }
 
-function lastResults(worker: V3WorkerSession): ToolResultBlock[] {
+function lastResults(worker: Worker): ToolResultBlock[] {
   const message = worker.state.messages.at(-1);
   if (message?.role !== 'user') throw new Error('expected trailing user result message');
   return message.content.filter(
@@ -178,7 +178,7 @@ function transcript(): Array<Record<string, unknown>> {
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 }
 
-describe('v3 ordinary response execution', () => {
+describe('ordinary response execution', () => {
   it('uses content rather than stop_reason and executes every call serially in result order', async () => {
     const events: string[] = [];
     let active = false;
@@ -217,7 +217,7 @@ describe('v3 ordinary response execution', () => {
     ]);
     const worker = session(model, [exploding, ordered]);
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     expect(events).toEqual([
       'explode',
@@ -249,16 +249,16 @@ describe('v3 ordinary response execution', () => {
       ]),
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     expect(worker.state.messages.at(-1)).toEqual({
       role: 'user',
-      content: [{ type: 'text', text: V3_NO_TOOL_CONTINUATION }],
+      content: [{ type: 'text', text: NO_TOOL_CONTINUATION }],
     });
   });
 });
 
-describe('v3 finish protocol', () => {
+describe('finish protocol', () => {
   it('rejects mixed finish without executing anything and answers every call', async () => {
     const execute = vi.fn(() => 'must not run');
     const ordinary = tool('ordinary', execute);
@@ -278,7 +278,7 @@ describe('v3 finish protocol', () => {
       [ordinary, finishTool],
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     expect(execute).not.toHaveBeenCalled();
     const results = lastResults(worker);
@@ -312,7 +312,7 @@ describe('v3 finish protocol', () => {
       [finishTool],
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     expect(lastResults(worker)).toEqual([
       expect.objectContaining({
@@ -339,7 +339,7 @@ describe('v3 finish protocol', () => {
       [finishTool],
     );
 
-    const outcome = await runV3WorkerTurn(worker);
+    const outcome = await runWorkerTurn(worker);
     expect(outcome).toMatchObject({
       kind: 'finish_requested',
       request: {
@@ -350,7 +350,7 @@ describe('v3 finish protocol', () => {
     });
     if (outcome.kind !== 'finish_requested') throw new Error('expected finish');
 
-    await appendV3FinishResult(
+    await appendFinishResult(
       worker,
       outcome.request,
       'Verifier found one missing source URL.',
@@ -411,7 +411,7 @@ describe('v3 finish protocol', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({
+    await expect(runWorkerTurn(worker)).resolves.toEqual({
       kind: 'incomplete',
       reason: entry.reason,
     });
@@ -448,7 +448,7 @@ describe('v3 finish protocol', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toMatchObject({
+    await expect(runWorkerTurn(worker)).resolves.toMatchObject({
       kind: 'finish_requested',
       request: { call: { id: 'finish-on-final-turn' } },
     });
@@ -456,7 +456,7 @@ describe('v3 finish protocol', () => {
   });
 });
 
-describe('v3 rejection and guards', () => {
+describe('rejection and guards', () => {
   it('charges known usage on a fatal retry failure without accepting content', async () => {
     const fatal = new ModelGenerationFailedError(
       new Error('replacement transport failed'),
@@ -464,7 +464,7 @@ describe('v3 rejection and guards', () => {
     );
     const worker = session(scriptedDriver([fatal]));
 
-    await expect(runV3WorkerTurn(worker)).rejects.toBe(fatal);
+    await expect(runWorkerTurn(worker)).rejects.toBe(fatal);
     expect(worker.config.budget.roleUsage().worker).toMatchObject({
       turns: 1,
       inputTokens: 7,
@@ -475,7 +475,7 @@ describe('v3 rejection and guards', () => {
 
   it('allows exactly three correctable model rejections, then ends incomplete', async () => {
     const rejections = Array.from(
-      { length: V3_MAX_PROTOCOL_CORRECTIONS + 1 },
+      { length: MAX_PROTOCOL_CORRECTIONS + 1 },
       () =>
         new ModelResponseRejectedError(
           'malformed_tool_call',
@@ -486,17 +486,17 @@ describe('v3 rejection and guards', () => {
     );
     const worker = session(scriptedDriver(rejections));
 
-    for (let index = 0; index < V3_MAX_PROTOCOL_CORRECTIONS; index += 1) {
-      await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    for (let index = 0; index < MAX_PROTOCOL_CORRECTIONS; index += 1) {
+      await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
     }
-    await expect(runV3WorkerTurn(worker)).resolves.toMatchObject({
+    await expect(runWorkerTurn(worker)).resolves.toMatchObject({
       kind: 'incomplete',
       reason: 'model_rejection_limit',
       modelRejection: 'malformed_tool_call',
     });
 
-    expect(worker.protocolCorrections).toBe(V3_MAX_PROTOCOL_CORRECTIONS);
-    expect(worker.state.messages).toHaveLength(1 + V3_MAX_PROTOCOL_CORRECTIONS);
+    expect(worker.protocolCorrections).toBe(MAX_PROTOCOL_CORRECTIONS);
+    expect(worker.state.messages).toHaveLength(1 + MAX_PROTOCOL_CORRECTIONS);
     expect(worker.config.budget.roleUsage().worker?.turns).toBe(4);
     expect(
       worker.state.messages.some((message) => message.role === 'assistant'),
@@ -537,7 +537,7 @@ describe('v3 rejection and guards', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({
+    await expect(runWorkerTurn(worker)).resolves.toEqual({
       kind: 'incomplete',
       reason: entry.reason,
     });
@@ -552,7 +552,7 @@ describe('v3 rejection and guards', () => {
       { budget: { maxToolCalls: 0 } },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({
+    await expect(runWorkerTurn(worker)).resolves.toEqual({
       kind: 'incomplete',
       reason: 'tool_calls',
     });
@@ -576,7 +576,7 @@ describe('v3 rejection and guards', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({
+    await expect(runWorkerTurn(worker)).resolves.toEqual({
       kind: 'incomplete',
       reason: 'wall_time',
     });
@@ -594,13 +594,13 @@ describe('v3 rejection and guards', () => {
       { maxContextTokens: 10 },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
     expect(worker.peakContextTokens).toBe(5);
     expect(worker.config.budget.totalModelTokens()).toBe(155);
   });
 });
 
-describe('v3 result bounds, cancellation, and lifecycle', () => {
+describe('result bounds, cancellation, and lifecycle', () => {
   it('charges and checkpoints an accepted response before cancellation wins', async () => {
     const controller = new AbortController();
     const accounting = vi.fn(async () => {});
@@ -620,7 +620,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).rejects.toMatchObject({
+    await expect(runWorkerTurn(worker)).rejects.toMatchObject({
       name: 'AbortError',
     });
     expect(worker.config.budget.totalModelTokens()).toBe(18);
@@ -657,7 +657,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).rejects.toMatchObject({
+    await expect(runWorkerTurn(worker)).rejects.toMatchObject({
       name: 'AbortError',
     });
     expect(worker.config.budget.totalModelTokens()).toBe(10);
@@ -699,7 +699,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    const running = runV3WorkerTurn(worker);
+    const running = runWorkerTurn(worker);
     await started;
     expect(worker.state.messages).toHaveLength(1);
 
@@ -725,7 +725,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
     ];
     const worker = session(scriptedDriver([accepted(calls)]), [smallCap, large]);
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     const results = lastResults(worker);
     expect(results).toHaveLength(6);
@@ -785,7 +785,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       deps: { signal: controller.signal },
     });
 
-    const running = runV3WorkerTurn(worker);
+    const running = runWorkerTurn(worker);
     await toolStarted;
     controller.abort();
 
@@ -826,7 +826,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
     expect(events).toEqual([
       'before:0:not_started',
@@ -861,16 +861,16 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await expect(runV3WorkerTurn(worker)).rejects.toThrow('checkpoint write failed');
+    await expect(runWorkerTurn(worker)).rejects.toThrow('checkpoint write failed');
     expect(execute).toHaveBeenCalledOnce();
     expect(worker.state.messages.at(-1)?.role).toBe('assistant');
   });
 
   it('resumes a not_started batch at the exact next call without replaying completed calls', async () => {
     const executed: string[] = [];
-    let savedPending: V3PendingToolTurn | undefined;
+    let savedPending: PendingToolTurn | undefined;
     let savedSnapshot;
-    let worker!: V3WorkerSession;
+    let worker!: Worker;
     worker = session(
       scriptedDriver([
         accepted([
@@ -890,7 +890,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
             beforeCall: async (pending) => {
               if (pending.nextCallIndex !== 1) return;
               savedPending = structuredClone(pending);
-              savedSnapshot = captureV3WorkerSessionSnapshot(worker);
+              savedSnapshot = captureWorkerSnapshot(worker);
               throw new Error('simulated stop before second dispatch');
             },
           },
@@ -898,16 +898,16 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await runV3WorkerTurn(worker);
+    await runWorkerTurn(worker);
     expect(executed).toEqual(['one']);
-    const restored = restoreV3WorkerSession(
+    const restored = restoreWorker(
       savedSnapshot!,
       { ...worker.deps, lifecycle: {} },
       worker.config,
     );
 
     await expect(
-      resumeV3PendingToolTurn(restored, savedPending!),
+      resumePendingToolTurn(restored, savedPending!),
     ).resolves.toEqual({ kind: 'working' });
     expect(executed).toEqual(['one', 'two']);
     expect(lastResults(restored).map((result) => result.content)).toEqual([
@@ -918,9 +918,9 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
 
   it('never replays an uncertain call and skips every remaining call in that response', async () => {
     const execute = vi.fn(() => 'must not run');
-    let savedPending: V3PendingToolTurn | undefined;
+    let savedPending: PendingToolTurn | undefined;
     let savedSnapshot;
-    let worker!: V3WorkerSession;
+    let worker!: Worker;
     worker = session(
       scriptedDriver([
         accepted([
@@ -935,7 +935,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
             afterDispatch: async (pending) => {
               if (savedPending === undefined) {
                 savedPending = structuredClone(pending);
-                savedSnapshot = captureV3WorkerSessionSnapshot(worker);
+                savedSnapshot = captureWorkerSnapshot(worker);
               }
               throw new Error('simulated crash after uncertain checkpoint');
             },
@@ -944,16 +944,16 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
       },
     );
 
-    await runV3WorkerTurn(worker);
+    await runWorkerTurn(worker);
     expect(execute).not.toHaveBeenCalled();
-    const restored = restoreV3WorkerSession(
+    const restored = restoreWorker(
       savedSnapshot!,
       { ...worker.deps, lifecycle: {} },
       worker.config,
     );
 
     await expect(
-      resumeV3PendingToolTurn(restored, savedPending!),
+      resumePendingToolTurn(restored, savedPending!),
     ).resolves.toEqual({ kind: 'working' });
     expect(execute).not.toHaveBeenCalled();
     const results = lastResults(restored);
@@ -963,7 +963,7 @@ describe('v3 result bounds, cancellation, and lifecycle', () => {
   });
 });
 
-describe('v3 snapshots and metrics', () => {
+describe('snapshots and metrics', () => {
   it('deep-copies capture/restore state and can drop a trailing unanswered turn', async () => {
     const worker = session(
       scriptedDriver([
@@ -978,16 +978,16 @@ describe('v3 snapshots and metrics', () => {
       ]),
       [finishTool],
     );
-    await runV3WorkerTurn(worker);
-    const snapshot = captureV3WorkerSessionSnapshot(worker);
+    await runWorkerTurn(worker);
+    const snapshot = captureWorkerSnapshot(worker);
 
-    appendV3WorkerFeedback(worker, 'later mutation');
+    appendWorkerFeedback(worker, 'later mutation');
     expect(JSON.stringify(snapshot.messages)).not.toContain('later mutation');
 
-    const restored = restoreV3WorkerSession(snapshot, worker.deps, worker.config);
-    expect(dropV3UnansweredAssistantTurn(restored)).toBe(true);
+    const restored = restoreWorker(snapshot, worker.deps, worker.config);
+    expect(dropUnansweredAssistantTurn(restored)).toBe(true);
     expect(restored.state.turnCount).toBe(1);
-    expect(dropV3UnansweredAssistantTurn(restored)).toBe(false);
+    expect(dropUnansweredAssistantTurn(restored)).toBe(false);
     expect(snapshot.messages.at(-1)?.role).toBe('assistant');
   });
 
@@ -1000,10 +1000,10 @@ describe('v3 snapshots and metrics', () => {
       [],
       { deps: { now: () => clock } },
     );
-    await runV3WorkerTurn(worker);
+    await runWorkerTurn(worker);
     clock = 175;
 
-    const metrics = readV3WorkerMetrics(worker, 'incomplete');
+    const metrics = readWorkerMetrics(worker, 'incomplete');
     expect(metrics).toMatchObject({
       status: 'incomplete',
       turns: 1,
@@ -1013,7 +1013,7 @@ describe('v3 snapshots and metrics', () => {
       wallClockMs: 75,
     });
 
-    writeV3WorkerMetrics(worker, 'incomplete');
+    writeWorkerMetrics(worker, 'incomplete');
     expect(
       JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')),
     ).toEqual(metrics);

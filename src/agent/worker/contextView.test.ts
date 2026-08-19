@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message, ToolResultBlock } from '../../model/messages.js';
 import {
-  V3_COLLAPSED_BROWSER_RESULT_MARKER,
-  buildV3ContextView,
-  isV3CollapsedBrowserResult,
+  COLLAPSED_BROWSER_RESULT_MARKER,
+  buildContextView,
+  isCollapsedBrowserResult,
 } from './contextView.js';
 
 function browserExchange(
@@ -48,7 +48,7 @@ function resultAt(messages: readonly Message[], index: number): ToolResultBlock 
   return block;
 }
 
-describe('buildV3ContextView', () => {
+describe('buildContextView', () => {
   it('stubs only older successful browser results and leaves full history untouched', () => {
     const first = {
       status: 'exited',
@@ -76,10 +76,10 @@ describe('buildV3ContextView', () => {
     ];
     const original = structuredClone(messages);
 
-    const view = buildV3ContextView(messages);
+    const view = buildContextView(messages);
 
     const stale = resultAt(view, 2);
-    expect(stale.content).toContain(V3_COLLAPSED_BROWSER_RESULT_MARKER);
+    expect(stale.content).toContain(COLLAPSED_BROWSER_RESULT_MARKER);
     expect(stale.content).toContain(
       'Identity: {"tool_use_id":"browser-1","requested_page_id":"page-1"}',
     );
@@ -87,7 +87,7 @@ describe('buildV3ContextView', () => {
     expect(stale.content).toContain(
       'Pages: [{"pageId":"page-1","url":"https://one.example/report","active":false}]',
     );
-    expect(isV3CollapsedBrowserResult(stale)).toBe(true);
+    expect(isCollapsedBrowserResult(stale)).toBe(true);
 
     expect(resultAt(view, 4)).toBe(messages[4]!.content[0]);
     expect(resultAt(view, 6)).toBe(messages[6]!.content[0]);
@@ -119,8 +119,8 @@ describe('buildV3ContextView', () => {
       ...browserExchange('c', undefined, { status: 'exited', pages: [] }),
     ];
 
-    const first = buildV3ContextView(messages);
-    const second = buildV3ContextView(messages);
+    const first = buildContextView(messages);
+    const second = buildContextView(messages);
     const stub = resultAt(first, 2);
 
     expect(stub.content).toContain('Status: "timed_out"');
@@ -137,11 +137,11 @@ describe('buildV3ContextView', () => {
       ...browserExchange('b', undefined, { status: 'exited', pages: [] }),
     ];
 
-    expect(buildV3ContextView(messages)).toBe(messages);
+    expect(buildContextView(messages)).toBe(messages);
     expect(
-      isV3CollapsedBrowserResult({
+      isCollapsedBrowserResult({
         type: 'tool_result',
-        content: `prefix ${V3_COLLAPSED_BROWSER_RESULT_MARKER}`,
+        content: `prefix ${COLLAPSED_BROWSER_RESULT_MARKER}`,
       }),
     ).toBe(false);
   });

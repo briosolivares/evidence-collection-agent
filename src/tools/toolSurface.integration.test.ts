@@ -23,8 +23,8 @@ import { publishArtifactTool } from './publishArtifact/publishArtifact.js';
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-tool-surface-'));
-  initManifest(runDir, 'publish every generic v3 artifact mode');
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-tool-surface-'));
+  initManifest(runDir, 'publish every generic artifact mode');
 });
 
 afterEach(() => {
@@ -56,7 +56,7 @@ function hash(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
-describe('v3 generic artifact surface', () => {
+describe('generic artifact surface', () => {
   it('publishes CSV, Markdown, screenshot, and download bytes with verified provenance', async () => {
     const csv = 'name,value\nalpha,1\nbeta,2\n';
     const markdown = '# Findings\n\nTwo rows were collected.\n';

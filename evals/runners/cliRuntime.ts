@@ -81,7 +81,7 @@ export function createBrowserBackedRunTask(options: BrowserBackedRunTaskOptions)
           ),
         // The headed lane is the persistent/login-capable browser. State the
         // authority and JavaScript grant explicitly; isolated trials are
-        // anonymous but use the same static v3 tool prefix.
+        // anonymous but use the same static tool prefix.
         authenticated: evalOptions.headed,
         javascriptPolicy: 'allow',
         signal: evalOptions.signal,

@@ -16,17 +16,17 @@ import {
   writeArtifact,
 } from '../../run/artifacts.js';
 import {
-  V3_VERIFIER_MAX_IMAGE_BYTES,
-  V3_VERIFIER_MAX_IMAGE_DIMENSION_PX,
-  createV3VerifierPathPolicy,
-  createV3VerifierRegistry,
-  executeV3VerifierToolUses,
+  VERIFIER_MAX_IMAGE_BYTES,
+  VERIFIER_MAX_IMAGE_DIMENSION_PX,
+  createVerifierPathPolicy,
+  createVerifierRegistry,
+  executeVerifierToolUses,
 } from './tools.js';
 
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-verifier-tools-'));
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-verifier-tools-'));
   initManifest(runDir, 'Inspect the published report.');
 });
 
@@ -43,9 +43,9 @@ function inspect(
   allowedArtifactPaths: readonly string[],
   abortSignal?: AbortSignal,
 ) {
-  const policy = createV3VerifierPathPolicy(allowedArtifactPaths);
-  return executeV3VerifierToolUses(
-    createV3VerifierRegistry(policy),
+  const policy = createVerifierPathPolicy(allowedArtifactPaths);
+  return executeVerifierToolUses(
+    createVerifierRegistry(policy),
     toolUses,
     { runDir, ...(abortSignal === undefined ? {} : { abortSignal }) },
     policy,
@@ -77,7 +77,7 @@ function jpegHeader(width: number, height: number): Buffer {
   return bytes;
 }
 
-describe('v3 verifier inspection', () => {
+describe('verifier inspection', () => {
   it('bounds oversized reads in memory without mutating manifest or scratch', async () => {
     writeArtifact(
       runDir,
@@ -111,7 +111,7 @@ describe('v3 verifier inspection', () => {
     );
 
     expect(result).toMatchObject({ is_error: true });
-    expect(JSON.stringify(result?.content)).toMatch(/outside v3 verifier scope/i);
+    expect(JSON.stringify(result?.content)).toMatch(/outside verifier scope/i);
   });
 
   it('rejects the raw manifest and published files omitted from the surfaced role set', async () => {
@@ -137,7 +137,7 @@ describe('v3 verifier inspection', () => {
     expect(manifestResult).toMatchObject({ is_error: true });
     expect(omittedResult).toMatchObject({ is_error: true });
     expect(JSON.stringify([manifestResult, omittedResult])).toMatch(
-      /outside v3 verifier scope/i,
+      /outside verifier scope/i,
     );
   });
 
@@ -197,19 +197,19 @@ describe('v3 verifier inspection', () => {
   });
 
   it('rejects an image one byte above the encoded-request safety cap', async () => {
-    const bytes = Buffer.alloc(V3_VERIFIER_MAX_IMAGE_BYTES + 1);
+    const bytes = Buffer.alloc(VERIFIER_MAX_IMAGE_BYTES + 1);
 
     const result = await readPublishedImage('oversized.png', bytes);
 
     expect(result).toMatchObject({ is_error: true });
     expect(result?.content).toContain(
-      `is ${V3_VERIFIER_MAX_IMAGE_BYTES + 1} bytes`,
+      `is ${VERIFIER_MAX_IMAGE_BYTES + 1} bytes`,
     );
-    expect(result?.content).toContain(`limit ${V3_VERIFIER_MAX_IMAGE_BYTES}`);
+    expect(result?.content).toContain(`limit ${VERIFIER_MAX_IMAGE_BYTES}`);
   });
 
   it('rejects a JPEG whose header declares an over-limit dimension', async () => {
-    const width = V3_VERIFIER_MAX_IMAGE_DIMENSION_PX + 1;
+    const width = VERIFIER_MAX_IMAGE_DIMENSION_PX + 1;
 
     const result = await readPublishedImage(
       'too-wide.jpg',
@@ -219,7 +219,7 @@ describe('v3 verifier inspection', () => {
     expect(result).toMatchObject({ is_error: true });
     expect(result?.content).toContain(`${width}x1 pixels`);
     expect(result?.content).toContain(
-      `limit ${V3_VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension`,
+      `limit ${VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension`,
     );
   });
 

@@ -19,7 +19,7 @@ import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
-// Public bridge coverage only: every case drives the real v3 runTask with an
+// Public bridge coverage only: every case drives the real runTask with an
 // immutable initializer contract, a scripted worker stream, and an injected
 // verifier. No live model, browser, or legacy runtime path is involved.
 
@@ -48,7 +48,7 @@ const initializerCallModel: CallModel = async () => ({
   content: [
     {
       type: 'tool_use',
-      id: 'contract-v3',
+      id: 'contract-1',
       name: 'set_output_contract',
       input: {
         contract: {
@@ -77,7 +77,7 @@ function verifierVerified(): ModelResponse {
     content: [
       {
         type: 'tool_use',
-        id: 'verification-v3',
+        id: 'verification-1',
         name: 'report_verification',
         input: { status: 'verified', findings: [] },
       },
@@ -95,7 +95,7 @@ function publishResponse(prose?: string): ModelStreamEvent[] {
         : [{ type: 'text' as const, text: prose, chunk: 5 }]),
       {
         type: 'tool_use',
-        id: 'publish-v3',
+        id: 'publish-1',
         name: 'publish_artifact',
         input: {
           kind: 'text',
@@ -115,7 +115,7 @@ function finishResponse(summary = 'Published report.csv.'): ModelStreamEvent[] {
     [
       {
         type: 'tool_use',
-        id: 'finish-v3',
+        id: 'finish-1',
         name: 'finish',
         input: {
           summary,
@@ -130,7 +130,7 @@ function finishResponse(summary = 'Published report.csv.'): ModelStreamEvent[] {
 
 function askResponse(): ModelStreamEvent[] {
   return scriptedResponse(
-    [{ type: 'tool_use', id: 'ask-v3', name: 'ask_user', input: ASK_INPUT }],
+    [{ type: 'tool_use', id: 'ask-1', name: 'ask_user', input: ASK_INPUT }],
     { input: 900, output: 40 },
     'tool_use',
   );
@@ -191,7 +191,7 @@ async function waitUntil(
   }
 }
 
-describe('startRun v3 public bridge', () => {
+describe('startRun public bridge', () => {
   it('publishes and finishes with ordered progress, tracing, reducer state, and signals', async () => {
     const { events, factory, handle } = startScripted(
       [publishResponse('Publishing report.'), finishResponse()],
@@ -271,7 +271,7 @@ describe('startRun v3 public bridge', () => {
       [
         {
           type: 'tool_use',
-          id: 'write-v3',
+          id: 'write-1',
           name: 'write_file',
           input: { file_path: 'scratch/note.txt', content: 'still working' },
         },
@@ -360,13 +360,13 @@ describe('startRun v3 public bridge', () => {
   });
 
   it(
-    'forwards cancellation into a running v3 bash command',
+    'forwards cancellation into a running bash command',
     async () => {
       const response = scriptedResponse(
         [
           {
             type: 'tool_use',
-            id: 'bash-v3',
+            id: 'bash-1',
             name: 'bash',
             input: {
               command: 'touch bridge-started && sleep 30',
@@ -404,7 +404,7 @@ describe('startRun v3 public bridge', () => {
   );
 });
 
-describe('startRun v3 ask_user channel', () => {
+describe('startRun ask_user channel', () => {
   it('announces, answers, executes, and returns the answer to the worker', async () => {
     const seen: unknown[] = [];
     const { events, factory, handle } = startScripted(

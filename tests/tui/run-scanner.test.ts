@@ -27,7 +27,7 @@ describe('scanRuns', () => {
     });
     writeFixtureRun(baseDir, {
       id: '2026-08-11T09-00-00-000Z-bbb',
-      task: 'v3 terminal projection interrupted before manifest finalization',
+      task: 'terminal projection interrupted before manifest finalization',
       startedAt: '2026-08-11T09:00:00.000Z',
       metrics: { status: 'verified', turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 60_000 },
     });

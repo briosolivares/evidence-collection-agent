@@ -3,56 +3,56 @@ import { join } from 'node:path';
 
 import { writeFileDurablyAtomic } from '../run/atomicFile.js';
 import {
-  toV3SettledFacts,
-  type V3FinishDefect,
-  type V3FinishFacts,
-  type V3SettledFact,
+  toSettledFacts,
+  type FinishDefect,
+  type FinishFacts,
+  type SettledFact,
 } from './completion/finishChecks.js';
 import type {
-  V3CorrectionFinding,
-  V3IncompleteFinding,
-  V3SurfacedArtifact,
-  V3VerificationHistoryEntry,
+  CorrectionFinding,
+  IncompleteFinding,
+  SurfacedArtifact,
+  VerificationHistoryEntry,
 } from './verifier/verifier.js';
 import type { FinishInput } from '../tools/finish/finish.js';
 import {
-  V3_HARNESS_DIR,
-  type V3Checkpoint,
-  type V3CheckpointPhase,
-  type V3DurableTerminalOutcome,
+  HARNESS_DIR,
+  type Checkpoint,
+  type CheckpointPhase,
+  type DurableTerminalOutcome,
 } from './checkpoint.js';
 
-export const V3_FINDINGS_REPORT_FILENAME = 'findings.md';
-export const V3_FINDINGS_REPORT_PATH = `${V3_HARNESS_DIR}/${V3_FINDINGS_REPORT_FILENAME}`;
+export const FINDINGS_REPORT_FILENAME = 'findings.md';
+export const FINDINGS_REPORT_PATH = `${HARNESS_DIR}/${FINDINGS_REPORT_FILENAME}`;
 
 /** The verdict this audit projection is currently carrying, if any. `none`
  * covers a fresh run, a verified terminus, and every terminal reason that
  * never reached a typed verifier decision (budget/model/protocol failures
  * already narrate themselves through the terminal outcome's own detail). */
-export type V3FindingsReportCurrentFindings =
+export type FindingsReportCurrentFindings =
   | { kind: 'none' }
-  | { kind: 'correction'; findings: readonly V3CorrectionFinding[] }
-  | { kind: 'incomplete'; findings: readonly V3IncompleteFinding[] };
+  | { kind: 'correction'; findings: readonly CorrectionFinding[] }
+  | { kind: 'incomplete'; findings: readonly IncompleteFinding[] };
 
 /** Already-available typed data this projection renders. Every field is
  * durable checkpoint/verifier state or a cheap re-derivation of it (surfaced
  * artifacts from the manifest); nothing here triggers new data collection. */
-export interface V3FindingsReportInput {
-  phase: V3CheckpointPhase;
+export interface FindingsReportInput {
+  phase: CheckpointPhase;
   /** Present only when `phase` is `'terminal'`. */
-  outcome?: V3DurableTerminalOutcome;
+  outcome?: DurableTerminalOutcome;
   completionReport?: FinishInput;
-  settledFacts: readonly V3SettledFact[];
-  structuralFindings: readonly V3FinishDefect[];
-  surfacedArtifacts: readonly V3SurfacedArtifact[];
-  currentFindings: V3FindingsReportCurrentFindings;
-  verificationHistory: readonly V3VerificationHistoryEntry[];
+  settledFacts: readonly SettledFact[];
+  structuralFindings: readonly FinishDefect[];
+  surfacedArtifacts: readonly SurfacedArtifact[];
+  currentFindings: FindingsReportCurrentFindings;
+  verificationHistory: readonly VerificationHistoryEntry[];
 }
 
 // Bounds below intentionally reuse the repo's existing diagnostic/schema
 // scales rather than inventing new ones.
 /** Matches `MAX_SAFE_DIAGNOSTIC_LENGTH` / the `boundedDiagnostic` cap used
- * for terminal-outcome detail strings elsewhere in the v3 coordinator. */
+ * for terminal-outcome detail strings elsewhere in the coordinator. */
 const DIAGNOSTIC_FIELD_MAX_BYTES = 16_000;
 /** Matches the `boundedNonBlank(4_000)` scale shared by verifier finding
  * and finish `unresolved` text fields. */
@@ -103,12 +103,12 @@ function renderUnresolved(
   );
 }
 
-function renderSettledFact(fact: V3SettledFact): string {
+function renderSettledFact(fact: SettledFact): string {
   const prefix = fact.outputId !== undefined ? `[${fact.outputId}] ` : '';
   return `- ${prefix}${fact.code}: ${truncateBytes(fact.statement, TEXT_FIELD_MAX_BYTES)}`;
 }
 
-function renderStructuralFinding(defect: V3FinishDefect): string {
+function renderStructuralFinding(defect: FinishDefect): string {
   const context = [
     defect.outputId !== undefined ? `output=${defect.outputId}` : undefined,
     defect.artifactPath !== undefined ? `path=${defect.artifactPath}` : undefined,
@@ -117,7 +117,7 @@ function renderStructuralFinding(defect: V3FinishDefect): string {
   return `- ${defect.code}: ${truncateBytes(defect.message, TEXT_FIELD_MAX_BYTES)}${suffix}`;
 }
 
-function renderCorrectionFinding(finding: V3CorrectionFinding): string {
+function renderCorrectionFinding(finding: CorrectionFinding): string {
   const evidence =
     'evidencePaths' in finding && finding.evidencePaths.length > 0
       ? ` (evidence: ${finding.evidencePaths.join(', ')})`
@@ -128,7 +128,7 @@ function renderCorrectionFinding(finding: V3CorrectionFinding): string {
   );
 }
 
-function renderIncompleteFinding(finding: V3IncompleteFinding): string {
+function renderIncompleteFinding(finding: IncompleteFinding): string {
   const evidence =
     finding.evidencePaths !== undefined && finding.evidencePaths.length > 0
       ? ` (evidence: ${finding.evidencePaths.join(', ')})`
@@ -139,7 +139,7 @@ function renderIncompleteFinding(finding: V3IncompleteFinding): string {
   );
 }
 
-function renderArtifactsTable(artifacts: readonly V3SurfacedArtifact[]): string[] {
+function renderArtifactsTable(artifacts: readonly SurfacedArtifact[]): string[] {
   if (artifacts.length === 0) return ['_None surfaced._'];
   const { kept, omitted } = truncateList(artifacts, ARTIFACT_LIST_MAX_ITEMS);
   const header = [
@@ -155,7 +155,7 @@ function renderArtifactsTable(artifacts: readonly V3SurfacedArtifact[]): string[
   return [...header, ...rows, ...elisionLine(omitted, 'artifact(s)')];
 }
 
-function renderHistoryCycle(entry: V3VerificationHistoryEntry): string[] {
+function renderHistoryCycle(entry: VerificationHistoryEntry): string[] {
   const { kept, omitted } = truncateList(entry.findings, LIST_MAX_ITEMS);
   return [
     `### Cycle ${entry.cycle}`,
@@ -175,9 +175,9 @@ function renderHistoryCycle(entry: V3VerificationHistoryEntry): string[] {
  * output out; the only "timestamps" rendered are ones already carried by
  * the durable data (e.g. `capturedAt` on a surfaced artifact).
  */
-export function renderV3FindingsReport(input: V3FindingsReportInput): string {
+export function renderFindingsReport(input: FindingsReportInput): string {
   const lines: string[] = [
-    '# v3 findings report',
+    '# findings report',
     '',
     '_Audit projection only. Not a requested output, not part of the manifest, ' +
       'never machine-read for control flow._',
@@ -290,12 +290,12 @@ export function renderV3FindingsReport(input: V3FindingsReportInput): string {
 /** Write the complete audit projection, rebuilding it atomically. Never
  * appends: a partial or torn write would misrepresent the run's durable
  * state, which this file only ever mirrors. */
-export function writeV3FindingsReport(
+export function writeFindingsReport(
   runDir: string,
-  input: V3FindingsReportInput,
+  input: FindingsReportInput,
 ): void {
-  const markdown = renderV3FindingsReport(input);
-  writeFileDurablyAtomic(join(runDir, V3_FINDINGS_REPORT_PATH), markdown, {
+  const markdown = renderFindingsReport(input);
+  writeFileDurablyAtomic(join(runDir, FINDINGS_REPORT_PATH), markdown, {
     fileMode: 0o600,
   });
 }
@@ -310,11 +310,11 @@ export function writeV3FindingsReport(
  * initializing) or the terminal outcome is not a verification decision
  * (`failed`/`cancelled`).
  */
-export function buildV3FindingsReportInputFromCheckpoint(
-  checkpoint: V3Checkpoint,
-  surfacedArtifacts: readonly V3SurfacedArtifact[],
-  verifiedFacts?: V3FinishFacts,
-): V3FindingsReportInput | undefined {
+export function buildFindingsReportInputFromCheckpoint(
+  checkpoint: Checkpoint,
+  surfacedArtifacts: readonly SurfacedArtifact[],
+  verifiedFacts?: FinishFacts,
+): FindingsReportInput | undefined {
   if (checkpoint.phase === 'initializing') return undefined;
 
   if (checkpoint.phase === 'terminal') {
@@ -329,7 +329,7 @@ export function buildV3FindingsReportInputFromCheckpoint(
         summary: outcome.finalText,
         unresolved: outcome.status === 'incomplete' ? outcome.unresolved : [],
       },
-      settledFacts: verifiedFacts === undefined ? [] : toV3SettledFacts(verifiedFacts),
+      settledFacts: verifiedFacts === undefined ? [] : toSettledFacts(verifiedFacts),
       structuralFindings: [],
       surfacedArtifacts,
       currentFindings: { kind: 'none' },
@@ -353,7 +353,7 @@ export function buildV3FindingsReportInputFromCheckpoint(
   return {
     phase: checkpoint.phase,
     ...(completionReport === undefined ? {} : { completionReport }),
-    settledFacts: facts === undefined ? [] : toV3SettledFacts(facts),
+    settledFacts: facts === undefined ? [] : toSettledFacts(facts),
     structuralFindings,
     surfacedArtifacts,
     currentFindings:

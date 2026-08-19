@@ -1,11 +1,11 @@
 import type { RunBudgetTracker } from '../run/runBudget.js';
-import { V3RoleBudgetExceededError } from '../model/budgetError.js';
+import { RoleBudgetExceededError } from '../model/budgetError.js';
 
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
-/** One absolute deadline shared by every active v3 operation. The signal's
+/** One absolute deadline shared by every active operation. The signal's
  * reason distinguishes operator cancellation from wall-budget exhaustion. */
-export interface V3RunDeadline {
+export interface RunDeadline {
   readonly signal: AbortSignal;
   dispose(): void;
 }
@@ -13,10 +13,10 @@ export interface V3RunDeadline {
 /** Combine optional user cancellation with the restored run budget's wall
  * deadline. Downtime is already included by the tracker, so a resumed run
  * whose deadline passed is aborted synchronously at construction. */
-export function createV3RunDeadline(
+export function createRunDeadline(
   budget: RunBudgetTracker,
   userSignal?: AbortSignal,
-): V3RunDeadline {
+): RunDeadline {
   const controller = new AbortController();
   let timer: NodeJS.Timeout | undefined;
   let disposed = false;
@@ -29,7 +29,7 @@ export function createV3RunDeadline(
 
   const abortFromWallTime = (): void => {
     if (!controller.signal.aborted) {
-      controller.abort(new V3RoleBudgetExceededError('wall_time'));
+      controller.abort(new RoleBudgetExceededError('wall_time'));
     }
   };
 
@@ -71,7 +71,7 @@ export function createV3RunDeadline(
  * its caller then persists that usage before enforcing the signal reason. A
  * genuinely non-cooperative promise is detached safely without an unhandled
  * late rejection. */
-export function raceWithV3RunSignal<T>(
+export function raceWithRunSignal<T>(
   startOperation: () => Promise<T>,
   signal: AbortSignal | undefined,
 ): Promise<T> {

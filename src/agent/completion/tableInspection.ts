@@ -5,7 +5,7 @@ import type {
   OutputSpec,
   TableRule,
 } from '../initializer/outputContract.js';
-import type { V3FinishDefect, V3TableFact } from './finishFacts.schema.js';
+import type { FinishDefect, TableFact } from './finishFacts.schema.js';
 
 interface ParsedCell {
   raw: unknown;
@@ -19,10 +19,10 @@ interface ParsedTable {
   hasShapeDefects: boolean;
 }
 
-export const V3_TABLE_MAX_BYTES = 16 * 1024 * 1024;
-export const V3_TABLE_MAX_ROWS = 100_000;
-export const V3_TABLE_MAX_CELLS = 1_000_000;
-export const V3_TABLE_MAX_DEFECTS = 100;
+export const TABLE_MAX_BYTES = 16 * 1024 * 1024;
+export const TABLE_MAX_ROWS = 100_000;
+export const TABLE_MAX_CELLS = 1_000_000;
+export const TABLE_MAX_DEFECTS = 100;
 
 const TABLE_POLL_INTERVAL = 16 * 1024;
 
@@ -45,15 +45,15 @@ interface TableInspectionContext {
   artifactPath: string;
   limits: TableInspectionLimits;
   checkActive?: () => void;
-  defects: V3FinishDefect[];
+  defects: FinishDefect[];
   halted: boolean;
 }
 
 const DEFAULT_TABLE_INSPECTION_LIMITS: TableInspectionLimits = {
-  maxBytes: V3_TABLE_MAX_BYTES,
-  maxRows: V3_TABLE_MAX_ROWS,
-  maxCells: V3_TABLE_MAX_CELLS,
-  maxDefects: V3_TABLE_MAX_DEFECTS,
+  maxBytes: TABLE_MAX_BYTES,
+  maxRows: TABLE_MAX_ROWS,
+  maxCells: TABLE_MAX_CELLS,
+  maxDefects: TABLE_MAX_DEFECTS,
 };
 
 export function inspectTable(
@@ -61,7 +61,7 @@ export function inspectTable(
   artifactPath: string,
   bytes: Uint8Array,
   options: TableInspectionOptions = {},
-): { defects: V3FinishDefect[]; fact?: V3TableFact } {
+): { defects: FinishDefect[]; fact?: TableFact } {
   const context: TableInspectionContext = {
     output,
     artifactPath,
@@ -872,7 +872,7 @@ function defect(
   artifactPath: string,
   code: string,
   message: string,
-): V3FinishDefect {
+): FinishDefect {
   return { code, message, outputId: output.id, artifactPath };
 }
 

@@ -30,7 +30,7 @@ export interface BrowserDownloadResult {
   suggestedFilename?: string;
 }
 
-/** A browser-native download source the v3 worker can actually obtain. */
+/** A browser-native download source the worker can actually obtain. */
 export type BrowserDownloadTarget = { pageId?: string } & (
   | { backendNodeId: number }
   | { url: string }
@@ -42,7 +42,7 @@ export interface BrowserOperationOptions {
   signal?: AbortSignal;
 }
 
-/** One v3-safe task-page startup transaction. */
+/** One safe task-page startup transaction. */
 export interface BrowserTaskPagePreparation extends BrowserOperationOptions {
   ownershipId: string;
   startUrl?: string;
@@ -78,7 +78,7 @@ export interface BrowserCommandSession {
   close(): Promise<void>;
 }
 
-/** Minimal browser authority used by the sole v3 production runtime. */
+/** Minimal browser authority used by the sole production runtime. */
 export interface BrowserController {
   screenshot(options?: BrowserScreenshotOptions): Promise<Uint8Array>;
   download(target: BrowserDownloadTarget): Promise<BrowserDownloadResult>;
@@ -100,7 +100,7 @@ export interface BrowserController {
   /** Close every page owned by the current run, preserving ambient user tabs. */
   closeTaskPages(): Promise<void>;
 
-  /** Share the abandoned-effect ledger with the sequential v3 runtime. */
+  /** Share the abandoned-effect ledger with the sequential runtime. */
   setBusyRegistry?(registry: BusyResourceRegistry): void;
 
   readonly sessionDiagnostics?: BrowserSessionDiagnostics;

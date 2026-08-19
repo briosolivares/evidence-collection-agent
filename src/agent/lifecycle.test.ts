@@ -34,14 +34,14 @@ import {
 } from '../run/artifactWriteTransaction.js';
 import { createRegistry } from '../tools/registry.js';
 import {
-  V3_RUN_CHECKPOINT_FILENAME,
-  V3_HARNESS_DIR,
-  v3CheckpointSchema,
-  type V3Checkpoint,
-  type V3DurableRunConfiguration,
+  RUN_CHECKPOINT_FILENAME,
+  HARNESS_DIR,
+  checkpointSchema,
+  type Checkpoint,
+  type DurableRunConfiguration,
 } from './checkpoint.js';
-import { runV3Coordinator } from './lifecycle.js';
-import { V3_OUTPUT_CONTRACT_PATH } from './initializer/contractFile.js';
+import { runAgent } from './lifecycle.js';
+import { OUTPUT_CONTRACT_PATH } from './initializer/contractFile.js';
 
 const TASK = 'Publish report.csv with exactly one name column and one row.';
 
@@ -63,7 +63,7 @@ const FINISH = {
   unresolved: [],
 };
 
-const CONFIGURATION: V3DurableRunConfiguration = {
+const CONFIGURATION: DurableRunConfiguration = {
   taskText: TASK,
   model: 'test-worker-model',
   maxOutputTokens: 4_096,
@@ -85,7 +85,7 @@ const CONFIGURATION: V3DurableRunConfiguration = {
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-coordinator-'));
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-coordinator-'));
   initManifest(runDir, TASK, 'local');
 });
 
@@ -94,7 +94,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('runV3Coordinator', () => {
+describe('runAgent', () => {
   it('runs initializer, worker finish checks, and verifier to one durable verified outcome', async () => {
     publishValidRunArtifacts();
     const models = happyModels();
@@ -112,7 +112,7 @@ describe('runV3Coordinator', () => {
     const checkpoint = readCheckpoint();
     expect(checkpoint).toMatchObject({ phase: 'terminal', outcome });
     expect(readManifest(runDir).finishedAt).toBeDefined();
-    expect(existsSync(join(runDir, V3_OUTPUT_CONTRACT_PATH))).toBe(true);
+    expect(existsSync(join(runDir, OUTPUT_CONTRACT_PATH))).toBe(true);
     expect(
       JSON.stringify(
         vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages,
@@ -220,14 +220,14 @@ describe('runV3Coordinator', () => {
   });
 
   it('terminalizes a resume whose wall deadline elapsed entirely during downtime', async () => {
-    const configuration: V3DurableRunConfiguration = {
+    const configuration: DurableRunConfiguration = {
       ...CONFIGURATION,
       budgetLimits: {
         ...CONFIGURATION.budgetLimits,
         maxWallTimeMs: 100,
       },
     };
-    const checkpoint: V3Checkpoint = v3CheckpointSchema.parse({
+    const checkpoint: Checkpoint = checkpointSchema.parse({
       version: 3,
       revision: 1,
       updatedAt: new Date(Date.now() - 1_000).toISOString(),
@@ -242,10 +242,10 @@ describe('runV3Coordinator', () => {
       progress: { verifierCycles: 0, completionCheckFailures: 0 },
       phase: 'initializing',
     });
-    const harnessDir = join(runDir, V3_HARNESS_DIR);
+    const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700, recursive: true });
     writeFileSync(
-      join(harnessDir, V3_RUN_CHECKPOINT_FILENAME),
+      join(harnessDir, RUN_CHECKPOINT_FILENAME),
       `${JSON.stringify(checkpoint, null, 2)}\n`,
       { mode: 0o600 },
     );
@@ -540,7 +540,7 @@ describe('runV3Coordinator', () => {
     const outcome = await run(happyModels(), {
       afterCheckpoint: (checkpoint) => {
         const contractFileExists = existsSync(
-          join(runDir, V3_OUTPUT_CONTRACT_PATH),
+          join(runDir, OUTPUT_CONTRACT_PATH),
         );
         if (checkpoint.phase === 'initializing' && checkpoint.contract !== undefined) {
           acceptedFileVisibility.push(contractFileExists);
@@ -610,15 +610,15 @@ function run(
     verifier: ModelDriver;
   },
   overrides: {
-    configuration?: V3DurableRunConfiguration;
+    configuration?: DurableRunConfiguration;
     browser?: BrowserController;
-    afterCheckpoint?: (checkpoint: V3Checkpoint) => void | Promise<void>;
+    afterCheckpoint?: (checkpoint: Checkpoint) => void | Promise<void>;
     signal?: AbortSignal;
     now?: () => number;
     terminalResumeInspectionTimeoutMs?: number;
   } = {},
 ) {
-  return runV3Coordinator({
+  return runAgent({
     runDir,
     configuration: overrides.configuration ?? CONFIGURATION,
     initializerModel: models.initializer,
@@ -738,11 +738,11 @@ function publishValidRunArtifacts(): void {
   );
 }
 
-function readCheckpoint(): V3Checkpoint {
-  return v3CheckpointSchema.parse(
+function readCheckpoint(): Checkpoint {
+  return checkpointSchema.parse(
     JSON.parse(
       readFileSync(
-        join(runDir, V3_HARNESS_DIR, V3_RUN_CHECKPOINT_FILENAME),
+        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
         'utf8',
       ),
     ),

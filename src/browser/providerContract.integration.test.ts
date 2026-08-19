@@ -102,7 +102,7 @@ afterAll(async () => {
   await fixture?.close();
 });
 
-describe('v3 provider-neutral browser contract', () => {
+describe('provider-neutral browser contract', () => {
   it.each(PROVIDERS)(
     '$name satisfies the same command/upload/download/cleanup contract',
     async (providerCase) => {
@@ -116,7 +116,7 @@ describe('v3 provider-neutral browser contract', () => {
         const { controller } = harness;
         controller.setBusyRegistry?.(createBusyResourceRegistry());
         if (controller.prepareTaskPage === undefined) {
-          throw new Error(`${providerCase.name} omitted v3 task-page preparation`);
+          throw new Error(`${providerCase.name} omitted task-page preparation`);
         }
 
         await controller.prepareTaskPage({

@@ -216,7 +216,7 @@ export interface PlaywrightBrowserControllerOptions {
    * {@link PlaywrightBrowserController.pages} and popup/task-tab fallbacks
    * report. */
   preexistingSessionPages?: readonly Page[];
-  /** Context-scoped Chromium target capability used for crash-recoverable V3
+  /** Context-scoped Chromium target capability used for crash-recoverable
    * task-page creation. Providers construct and own this capability; callers
    * never receive its raw CDP session or target ids. */
   targetControl?: ChromiumTargetControl;
@@ -848,7 +848,7 @@ export class PlaywrightBrowserController implements BrowserController {
     }
   }
 
-  /** Open the V3 task page through an exact hashed sentinel target. A process
+  /** Open the task page through an exact hashed sentinel target. A process
    * killed before the page marker is installed leaves that sentinel behind;
    * same-run recovery can therefore identify it without guessing from page
    * order or exposing the raw durable run id. */
@@ -1710,7 +1710,7 @@ export class PlaywrightBrowserController implements BrowserController {
     return count;
   }
 
-  /** Assign stable run-local identity and retain only lifecycle state v3 uses. */
+  /** Assign stable run-local identity and retain only lifecycle state the runtime uses. */
   private registerPage(page: Page): PageRecord {
     const existing = this.trackedPages.get(page);
     if (existing !== undefined) return existing;

@@ -343,7 +343,7 @@ describe('reduce (run lifecycle events)', () => {
     });
   });
 
-  it('settles an intercepted v3 finish as successful instead of retried', () => {
+  it('settles an intercepted finish as successful instead of retried', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
@@ -353,7 +353,7 @@ describe('reduce (run lifecycle events)', () => {
         type: 'run_finished',
         outcome: 'verified',
         finalText: 'done',
-        runDir: '/runs/v3',
+        runDir: '/runs/abc',
         at: 2_000,
       },
     ]);

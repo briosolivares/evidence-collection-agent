@@ -22,8 +22,8 @@ import type { ToolDef } from './registry.js';
 import { accessKey } from './registry.js';
 import { splitLines } from './lines.js';
 
-/** Maximum source or resulting file size handled by one v3 file-tool call. */
-export const V3_FILE_TOOL_MAX_BYTES = 64 * 1024 * 1024;
+/** Maximum source or resulting file size handled by one file-tool call. */
+export const FILE_TOOL_MAX_BYTES = 64 * 1024 * 1024;
 
 const LINE_NUMBER_PAD = 6;
 
@@ -267,7 +267,7 @@ interface ResolvedWorkerFile {
 
 /**
  * Resolve every model path through the repository chokepoint, then enforce
- * the narrower v3 visibility/mutation partition. Checking every existing
+ * the narrower visibility/mutation partition. Checking every existing
  * component with lstat prevents a lexically confined path from escaping
  * through a symlink in `scratch/` or `artifacts/`.
  */
@@ -416,10 +416,10 @@ export function assertWithinFileToolLimit(
   filePath: string,
   operation: string,
 ): void {
-  if (sizeBytes > V3_FILE_TOOL_MAX_BYTES) {
+  if (sizeBytes > FILE_TOOL_MAX_BYTES) {
     throw new Error(
       `${operation} refused ${JSON.stringify(filePath)}: it is ${sizeBytes} bytes, over the ` +
-        `${V3_FILE_TOOL_MAX_BYTES}-byte (64 MiB) file-tool limit. Nothing was changed.`,
+        `${FILE_TOOL_MAX_BYTES}-byte (64 MiB) file-tool limit. Nothing was changed.`,
     );
   }
 }

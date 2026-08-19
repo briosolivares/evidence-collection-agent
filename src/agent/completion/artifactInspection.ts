@@ -21,18 +21,18 @@ import {
 } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { SCRATCH_WORKSPACE_MAX_FILE_BYTES } from '../../run/syncScratchWorkspace.js';
-import type { V3FinishDefect } from './finishFacts.schema.js';
+import type { FinishDefect } from './finishFacts.schema.js';
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const CANONICAL_UTC_ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const STREAM_CHUNK_BYTES = 64 * 1024;
 
 /** Hard bounds for the untrusted run state inspected at finish/resume. */
-export const V3_FINISH_MAX_MANIFEST_BYTES = 4 * 1024 * 1024;
-export const V3_FINISH_MAX_MANIFEST_ENTRIES = 4_096;
-export const V3_FINISH_MAX_TOTAL_ARTIFACT_BYTES = 512 * 1024 * 1024;
-export const V3_FINISH_MAX_RETAINED_PUBLISHED_BYTES = 64 * 1024 * 1024;
-export const V3_FINISH_SIGNATURE_BYTES = 8;
+export const FINISH_MAX_MANIFEST_BYTES = 4 * 1024 * 1024;
+export const FINISH_MAX_MANIFEST_ENTRIES = 4_096;
+export const FINISH_MAX_TOTAL_ARTIFACT_BYTES = 512 * 1024 * 1024;
+export const FINISH_MAX_RETAINED_PUBLISHED_BYTES = 64 * 1024 * 1024;
+export const FINISH_SIGNATURE_BYTES = 8;
 
 const canonicalUtcIsoTimestampSchema = z.string().refine(isCanonicalUtcIsoTimestamp, {
   message: 'must be a canonical UTC ISO timestamp (YYYY-MM-DDTHH:mm:ss.sssZ)',
@@ -72,7 +72,7 @@ export interface InspectedEntry {
 export interface ManifestInspection {
   manifest?: Manifest;
   entries: InspectedEntry[];
-  defects: V3FinishDefect[];
+  defects: FinishDefect[];
 }
 
 export interface ManifestInspectionLimits {
@@ -95,10 +95,10 @@ export interface ManifestInspectionOptions {
 }
 
 const DEFAULT_INSPECTION_LIMITS: ManifestInspectionLimits = {
-  maxManifestBytes: V3_FINISH_MAX_MANIFEST_BYTES,
-  maxManifestEntries: V3_FINISH_MAX_MANIFEST_ENTRIES,
-  maxTotalArtifactBytes: V3_FINISH_MAX_TOTAL_ARTIFACT_BYTES,
-  maxRetainedPublishedBytes: V3_FINISH_MAX_RETAINED_PUBLISHED_BYTES,
+  maxManifestBytes: FINISH_MAX_MANIFEST_BYTES,
+  maxManifestEntries: FINISH_MAX_MANIFEST_ENTRIES,
+  maxTotalArtifactBytes: FINISH_MAX_TOTAL_ARTIFACT_BYTES,
+  maxRetainedPublishedBytes: FINISH_MAX_RETAINED_PUBLISHED_BYTES,
 };
 
 interface PreparedEntry {
@@ -190,13 +190,13 @@ export function inspectManifest(
           code: 'manifest_entry_limit_exceeded',
           message:
             `${MANIFEST_FILENAME} contains ${manifest.artifacts.length} entries, above the ` +
-            `${limits.maxManifestEntries}-entry v3 inspection limit. Reduce the run to bounded, relevant files.`,
+            `${limits.maxManifestEntries}-entry inspection limit. Reduce the run to bounded, relevant files.`,
         },
       ],
     };
   }
 
-  const defects: V3FinishDefect[] = [];
+  const defects: FinishDefect[] = [];
   const prepared: PreparedEntry[] = [];
   const seen = new Set<string>();
   const invalidTimestampEntries = validateTimestampOrder(manifest, defects);
@@ -326,7 +326,7 @@ export function inspectManifest(
       code: 'artifact_inspection_bytes_exceeded',
       message:
         `The manifest records ${totalArtifactBytes} artifact bytes, above the ` +
-        `${limits.maxTotalArtifactBytes}-byte aggregate v3 inspection limit. ` +
+        `${limits.maxTotalArtifactBytes}-byte aggregate inspection limit. ` +
         'Remove irrelevant scratch or published files before finishing.',
     });
     return { entries: [], defects };
@@ -436,7 +436,7 @@ export function inspectManifest(
 function canonicalManifestPath(
   runDir: string,
   filename: string,
-): { path: string } | { defect: V3FinishDefect } {
+): { path: string } | { defect: FinishDefect } {
   let absolute: string;
   try {
     absolute = resolveRunPath(runDir, filename);
@@ -463,7 +463,7 @@ function canonicalManifestPath(
 function inspectRegularFileMetadataNoFollow(
   runDir: string,
   artifactPath: string,
-): { byteLength: number } | { defect: V3FinishDefect } {
+): { byteLength: number } | { defect: FinishDefect } {
   const opened = openRegularFileNoFollow(runDir, artifactPath);
   if ('defect' in opened) return opened;
   try {
@@ -478,7 +478,7 @@ function openRegularFileNoFollow(
   artifactPath: string,
 ):
   | { descriptor: number; byteLength: number }
-  | { defect: V3FinishDefect } {
+  | { defect: FinishDefect } {
   let absolute: string;
   try {
     absolute = resolveRunPath(runDir, artifactPath);
@@ -580,7 +580,7 @@ function hashRegularFileNoFollow(
       contentPrefix?: Uint8Array;
       retentionExceeded: boolean;
     }
-  | { defect: V3FinishDefect; byteLength?: number } {
+  | { defect: FinishDefect; byteLength?: number } {
   const opened = openRegularFileNoFollow(runDir, artifactPath);
   if ('defect' in opened) return opened;
   if (opened.byteLength > SCRATCH_WORKSPACE_MAX_FILE_BYTES) {
@@ -623,7 +623,7 @@ function hashRegularFileNoFollow(
             code: 'artifact_inspection_bytes_exceeded',
             artifactPath,
             message:
-              `Artifact bytes grew beyond the ${totalBudget.max}-byte aggregate v3 ` +
+              `Artifact bytes grew beyond the ${totalBudget.max}-byte aggregate ` +
               'inspection limit while files were being hashed. Remove irrelevant files and retry.',
           },
           byteLength: byteLength + count,
@@ -683,7 +683,7 @@ function readManifestNoFollow(
   manifestPath: string,
   maxBytes: number,
   checkActive?: () => void,
-): { raw: string } | { defect: V3FinishDefect } {
+): { raw: string } | { defect: FinishDefect } {
   const flags =
     fsConstants.O_RDONLY |
     (fsConstants.O_NOFOLLOW ?? 0) |
@@ -761,7 +761,7 @@ function readManifestNoFollow(
 
 function validateTimestampOrder(
   manifest: Manifest,
-  defects: V3FinishDefect[],
+  defects: FinishDefect[],
 ): Set<number> {
   const invalidEntries = new Set<number>();
   const startedAt = Date.parse(manifest.startedAt);
@@ -812,25 +812,25 @@ function artifactTooLargeDefect(
   artifactPath: string,
   byteLength: number,
   grew = false,
-): V3FinishDefect {
+): FinishDefect {
   return {
     code: 'artifact_too_large',
     artifactPath,
     message: grew
-      ? `${artifactPath} grew beyond the ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}-byte v3 artifact inspection limit while being read.`
-      : `${artifactPath} is ${byteLength} bytes, above the v3 artifact inspection limit of ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}. Publish a bounded artifact.`,
+      ? `${artifactPath} grew beyond the ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}-byte artifact inspection limit while being read.`
+      : `${artifactPath} is ${byteLength} bytes, above the artifact inspection limit of ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}. Publish a bounded artifact.`,
   };
 }
 
 function manifestTooLargeDefect(
   observedBytes: number,
   maxBytes: number,
-): V3FinishDefect {
+): FinishDefect {
   return {
     code: 'manifest_bytes_limit_exceeded',
     message:
       `${MANIFEST_FILENAME} is at least ${observedBytes} bytes, above the ` +
-      `${maxBytes}-byte v3 inspection limit. Restore bounded provenance JSON.`,
+      `${maxBytes}-byte inspection limit. Restore bounded provenance JSON.`,
   };
 }
 

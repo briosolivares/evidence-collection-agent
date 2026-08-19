@@ -19,7 +19,7 @@ const browserSessionProvider = createBrowserSessionProvider({
 const browser = await browserSessionProvider.createSession();
 browser.setBusyRegistry?.(createBusyResourceRegistry());
 if (browser.prepareTaskPage === undefined) {
-  throw new Error('Configured browser provider lacks v3 task-page preparation');
+  throw new Error('Configured browser provider lacks task-page preparation');
 }
 
 let commandSession: Awaited<ReturnType<typeof browser.openCommandSession>> | undefined;

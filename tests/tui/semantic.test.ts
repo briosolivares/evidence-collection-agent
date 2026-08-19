@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { deriveSemanticLine } from '../../src/tui/store/semantic.js';
-import { V3_TOOL_ORDER } from '../../src/tools/index.js';
+import { WORKER_TOOL_ORDER } from '../../src/tools/index.js';
 
 describe('deriveSemanticLine', () => {
   const tools = [
@@ -64,7 +64,7 @@ describe('deriveSemanticLine', () => {
   ] as const;
 
   it('covers the frozen production tool order exactly', () => {
-    expect(tools.map((tool) => tool.name)).toEqual(V3_TOOL_ORDER);
+    expect(tools.map((tool) => tool.name)).toEqual(WORKER_TOOL_ORDER);
   });
 
   for (const tool of tools) {

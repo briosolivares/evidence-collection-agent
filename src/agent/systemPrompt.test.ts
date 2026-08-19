@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Message } from '../model/messages.js';
 import { buildRequestParams } from '../model/callModel.js';
 import { V3_SYSTEM_PROMPT } from './systemPrompt.js';
-import { V3_API_TOOL_DEFS, V3_TOOL_ORDER } from '../tools/index.js';
+import { WORKER_API_TOOL_DEFS, WORKER_TOOL_ORDER } from '../tools/index.js';
 
 describe('V3_SYSTEM_PROMPT', () => {
   it('teaches the programmable browser and bounded durable-memory workflow', () => {
@@ -95,11 +95,11 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).not.toContain('limitations list');
   });
 
-  it('names every v3 tool and no retired tool or protocol', () => {
+  it('names every tool and no retired tool or protocol', () => {
     for (const toolName of ['browser_execute', 'publish_artifact', 'ask_user', 'finish']) {
       expect(V3_SYSTEM_PROMPT).toContain(toolName);
     }
-    expect(V3_TOOL_ORDER).toEqual([
+    expect(WORKER_TOOL_ORDER).toEqual([
       'browser_execute',
       'publish_artifact',
       'read_file',
@@ -144,7 +144,7 @@ describe('V3_SYSTEM_PROMPT', () => {
     ];
     const config = {
       system: V3_SYSTEM_PROMPT,
-      apiToolDefs: V3_API_TOOL_DEFS,
+      apiToolDefs: WORKER_API_TOOL_DEFS,
       maxOutputTokens: 4_096,
     };
 

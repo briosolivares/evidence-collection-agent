@@ -57,7 +57,7 @@ describe('attached browser target authority', () => {
         }).createSession();
         controller.setBusyRegistry?.(createBusyResourceRegistry());
         if (controller.prepareTaskPage === undefined) {
-          throw new Error('Attached controller omitted v3 task-page preparation.');
+          throw new Error('Attached controller omitted task-page preparation.');
         }
         await controller.prepareTaskPage({
           ownershipId: 'attached-ambient-target-authority',

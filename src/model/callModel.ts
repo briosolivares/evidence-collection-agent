@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import type { CallModel, Message, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import { isV3CollapsedBrowserResult } from '../agent/worker/contextView.js';
+import { isCollapsedBrowserResult } from '../agent/worker/contextView.js';
 import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
@@ -19,7 +19,7 @@ import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDrive
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
 //    turn. A second marker rides the collapse frontier — the newest
-//    collapsed v3 browser-result stub in the API message view.
+//    collapsed browser-result stub in the API message view.
 //    It exists because the server matches cached prefixes only up to ~20
 //    content blocks back from a marker: when a new observation stubs the
 //    third-most-recent one, the request diverges at that stub — usually
@@ -209,7 +209,7 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     if (message.role !== 'user') continue;
     for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
       const block = message.content[blockIndex]!;
-      if (isV3CollapsedBrowserResult(block)) {
+      if (isCollapsedBrowserResult(block)) {
         return { messageIndex, blockIndex };
       }
     }

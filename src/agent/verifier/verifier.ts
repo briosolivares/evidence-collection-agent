@@ -22,27 +22,27 @@ import {
   type ToolCtx,
 } from '../../tools/registry.js';
 import type {
-  V3FinishDefect,
-  V3FinishFacts,
-  V3OutputFact,
-  V3SettledFact,
-  V3TableFact,
+  FinishDefect,
+  FinishFacts,
+  OutputFact,
+  SettledFact,
+  TableFact,
 } from '../completion/finishChecks.js';
 import { finishInputSchema } from '../../tools/finish/finish.js';
 import {
-  V3RoleBudgetExceededError,
-  createV3BudgetedCallModel,
-  isV3RoleBudgetExceededError,
+  RoleBudgetExceededError,
+  createBudgetedCallModel,
+  isRoleBudgetExceededError,
 } from '../../model/budgetedCall.js';
 import {
-  createV3VerifierPathPolicy,
-  createV3VerifierRegistry,
-  executeV3VerifierToolUses,
+  createVerifierPathPolicy,
+  createVerifierRegistry,
+  executeVerifierToolUses,
 } from './tools.js';
 
-export const V3_VERIFIER_MODEL = 'claude-haiku-4-5-20251001';
-export const V3_VERIFIER_MAX_CONTEXT_TOKENS = 150_000;
-export const V3_VERIFICATION_HISTORY_LIMIT = 20;
+export const VERIFIER_MODEL = 'claude-haiku-4-5-20251001';
+export const VERIFIER_MAX_CONTEXT_TOKENS = 150_000;
+export const VERIFICATION_HISTORY_LIMIT = 20;
 
 const boundedNonBlank = (maximum: number) =>
   z
@@ -57,14 +57,14 @@ const requirementProblemShape = {
 
 /** The verifier identifies the unsupported requirement; it never prescribes
  * artifact contents. The harness attaches a fixed research instruction. */
-export const v3ResearchFindingSchema = z.strictObject({
+export const researchFindingSchema = z.strictObject({
   kind: z.literal('research'),
   ...requirementProblemShape,
 });
 
 /** Permitted only when the cited, already-surfaced evidence supports the
  * repair. An "unavailable" note is never support for a synthetic row. */
-export const v3ArtifactRepairFindingSchema = z.strictObject({
+export const artifactRepairFindingSchema = z.strictObject({
   kind: z.literal('artifact_repair'),
   ...requirementProblemShape,
   evidencePaths: z.array(boundedNonBlank(1_024)).min(1).max(50),
@@ -72,27 +72,27 @@ export const v3ArtifactRepairFindingSchema = z.strictObject({
 
 /** Restricted to correcting the worker's own summary/unresolved report; it
  * cannot change artifacts or erase a material blocker. */
-export const v3ReportRepairFindingSchema = z.strictObject({
+export const reportRepairFindingSchema = z.strictObject({
   kind: z.literal('report_repair'),
   ...requirementProblemShape,
 });
 
-export const v3CorrectionFindingSchema = z.discriminatedUnion('kind', [
-  v3ResearchFindingSchema,
-  v3ArtifactRepairFindingSchema,
-  v3ReportRepairFindingSchema,
+export const correctionFindingSchema = z.discriminatedUnion('kind', [
+  researchFindingSchema,
+  artifactRepairFindingSchema,
+  reportRepairFindingSchema,
 ]);
 
-export const v3IncompleteFindingSchema = z.strictObject({
+export const incompleteFindingSchema = z.strictObject({
   requirement: boundedNonBlank(4_000),
   assessment: boundedNonBlank(4_000),
   evidencePaths: z.array(boundedNonBlank(1_024)).max(50).optional(),
 });
 
-export type V3CorrectionFinding = z.infer<typeof v3CorrectionFindingSchema>;
-export type V3IncompleteFinding = z.infer<typeof v3IncompleteFindingSchema>;
+export type CorrectionFinding = z.infer<typeof correctionFindingSchema>;
+export type IncompleteFinding = z.infer<typeof incompleteFindingSchema>;
 
-export const v3VerificationResultSchema = z.discriminatedUnion('status', [
+export const verificationResultSchema = z.discriminatedUnion('status', [
   z
     .strictObject({
       status: z.literal('verified'),
@@ -101,22 +101,22 @@ export const v3VerificationResultSchema = z.discriminatedUnion('status', [
   z
     .strictObject({
       status: z.literal('needs_correction'),
-      findings: z.array(v3CorrectionFindingSchema).min(1).max(50),
+      findings: z.array(correctionFindingSchema).min(1).max(50),
     }),
   z
     .strictObject({
       status: z.literal('incomplete'),
-      findings: z.array(v3IncompleteFindingSchema).min(1).max(50),
+      findings: z.array(incompleteFindingSchema).min(1).max(50),
     }),
 ]);
 
-export type V3VerificationResult = z.infer<typeof v3VerificationResultSchema>;
-export type V3VerifierOutcome =
-  | V3VerificationResult
+export type VerificationResult = z.infer<typeof verificationResultSchema>;
+export type VerifierOutcome =
+  | VerificationResult
   | { status: 'verifier_unavailable'; reason: string }
   | { status: 'invalid_verdict'; reason: string };
 
-export const v3SurfacedArtifactSchema = z.strictObject({
+export const surfacedArtifactSchema = z.strictObject({
   filename: boundedNonBlank(1_024),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   sourceUrl: boundedNonBlank(8_192).optional(),
@@ -125,20 +125,20 @@ export const v3SurfacedArtifactSchema = z.strictObject({
   completionStatus: z.enum(['complete', 'partial']).optional(),
 });
 
-export type V3SurfacedArtifact = z.infer<typeof v3SurfacedArtifactSchema>;
+export type SurfacedArtifact = z.infer<typeof surfacedArtifactSchema>;
 
-export const v3VerificationHistoryEntrySchema = z.strictObject({
+export const verificationHistoryEntrySchema = z.strictObject({
   cycle: z.number().int().positive(),
   completionReport: finishInputSchema,
   surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-  findings: z.array(v3CorrectionFindingSchema).min(1).max(50),
+  findings: z.array(correctionFindingSchema).min(1).max(50),
 });
 
-export type V3VerificationHistoryEntry = z.infer<
-  typeof v3VerificationHistoryEntrySchema
+export type VerificationHistoryEntry = z.infer<
+  typeof verificationHistoryEntrySchema
 >;
 
-export const V3_REPORT_VERIFICATION_TOOL: ApiToolDef = {
+export const REPORT_VERIFICATION_TOOL: ApiToolDef = {
   name: 'report_verification',
   description:
     'Report exactly one evidence-backed decision. Use verified only when every explicit ' +
@@ -205,25 +205,25 @@ Your read_file and grep tools are restricted by code to the surfaced requested-o
 
 Conclude with exactly one report_verification call by itself. Prose is not a verdict. Uncertainty is never verification.`;
 
-export const V3_VERIFIER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze([
-  ...toApiToolDefs(createV3VerifierRegistry()),
-  structuredClone(V3_REPORT_VERIFICATION_TOOL),
+export const VERIFIER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze([
+  ...toApiToolDefs(createVerifierRegistry()),
+  structuredClone(REPORT_VERIFICATION_TOOL),
 ]);
 
-export interface V3VerifierModelConfig {
+export interface VerifierModelConfig {
   model?: string;
   maxOutputTokens?: number;
   maxTokensRetryOutputTokens?: number;
   createStream?: ModelDriverConfig['createStream'];
 }
 
-export function createV3VerifierModelDriver(
-  config: V3VerifierModelConfig = {},
+export function createVerifierModelDriver(
+  config: VerifierModelConfig = {},
 ): ModelDriver {
   return createAnthropicModelDriver({
-    model: config.model ?? V3_VERIFIER_MODEL,
+    model: config.model ?? VERIFIER_MODEL,
     system: V3_VERIFIER_SYSTEM_PROMPT,
-    apiToolDefs: V3_VERIFIER_API_TOOL_DEFS,
+    apiToolDefs: VERIFIER_API_TOOL_DEFS,
     maxOutputTokens: config.maxOutputTokens ?? 2_048,
     ...(config.maxTokensRetryOutputTokens === undefined
       ? {}
@@ -234,19 +234,19 @@ export function createV3VerifierModelDriver(
   });
 }
 
-export interface RunV3VerifierOptions {
+export interface RunVerifierOptions {
   taskText: string;
   runDir: string;
   contract: OutputContract;
-  finish: V3FinishFacts['finish'];
-  surfacedArtifacts: readonly V3SurfacedArtifact[];
-  settled?: readonly V3SettledFact[];
+  finish: FinishFacts['finish'];
+  surfacedArtifacts: readonly SurfacedArtifact[];
+  settled?: readonly SettledFact[];
   /** Passed-check output facts, used only to render informational per-column
    * nonblank coverage counts (never a threshold) alongside the settled row
    * count. */
-  outputs?: readonly V3OutputFact[];
-  structuralFindings?: readonly V3FinishDefect[];
-  verificationHistory?: readonly V3VerificationHistoryEntry[];
+  outputs?: readonly OutputFact[];
+  structuralFindings?: readonly FinishDefect[];
+  verificationHistory?: readonly VerificationHistoryEntry[];
   model: ModelDriver;
   budget: RunBudgetTracker;
   signal?: AbortSignal;
@@ -256,23 +256,23 @@ export interface RunV3VerifierOptions {
   now?: () => number;
 }
 
-export class V3VerifierAccountingPersistenceError extends Error {
-  override readonly name = 'V3VerifierAccountingPersistenceError';
+export class VerifierAccountingPersistenceError extends Error {
+  override readonly name = 'VerifierAccountingPersistenceError';
 }
 
-export function isV3VerifierAccountingPersistenceError(
+export function isVerifierAccountingPersistenceError(
   error: unknown,
-): error is V3VerifierAccountingPersistenceError {
-  return error instanceof V3VerifierAccountingPersistenceError;
+): error is VerifierAccountingPersistenceError {
+  return error instanceof VerifierAccountingPersistenceError;
 }
 
-/** Run the preserved read-only fresh verifier with v3 aggregate accounting
+/** Run the preserved read-only fresh verifier with aggregate accounting
  * and one immutable contract revision. */
-export function runV3Verifier(
-  options: RunV3VerifierOptions,
-): Promise<V3VerifierOutcome> {
+export function runVerifier(
+  options: RunVerifierOptions,
+): Promise<VerifierOutcome> {
   options.signal?.throwIfAborted();
-  const callModel = createV3BudgetedCallModel({
+  const callModel = createBudgetedCallModel({
     model: options.model,
     budget: options.budget,
     role: 'verifier',
@@ -286,27 +286,27 @@ export function runV3Verifier(
     ...(options.afterAccounting === undefined
       ? {}
       : {
-          afterAttemptSettled: () => persistV3VerifierAccounting(options),
+          afterAttemptSettled: () => persistVerifierAccounting(options),
         }),
     ...(options.now === undefined ? {} : { now: options.now }),
   });
-  return runV3VerifierLoop(options, callModel);
+  return runVerifierLoop(options, callModel);
 }
 
-async function runV3VerifierLoop(
-  options: RunV3VerifierOptions,
+async function runVerifierLoop(
+  options: RunVerifierOptions,
   callModel: CallModel,
-): Promise<V3VerifierOutcome> {
+): Promise<VerifierOutcome> {
   const messages: Message[] = [
     {
       role: 'user',
-      content: [{ type: 'text', text: buildV3VerifierOpeningInput(options) }],
+      content: [{ type: 'text', text: buildVerifierOpeningInput(options) }],
     },
   ];
-  const pathPolicy = createV3VerifierPathPolicy(
+  const pathPolicy = createVerifierPathPolicy(
     options.surfacedArtifacts.map((artifact) => artifact.filename),
   );
-  const registry = createV3VerifierRegistry(pathPolicy);
+  const registry = createVerifierRegistry(pathPolicy);
   const toolCtx: ToolCtx = {
     runDir: options.runDir,
     ...(options.signal === undefined
@@ -324,8 +324,8 @@ async function runV3VerifierLoop(
       if (
         isAbortError(error) ||
         options.signal?.aborted === true ||
-        isV3RoleBudgetExceededError(error) ||
-        isV3VerifierAccountingPersistenceError(error)
+        isRoleBudgetExceededError(error) ||
+        isVerifierAccountingPersistenceError(error)
       ) {
         throw error;
       }
@@ -340,7 +340,7 @@ async function runV3VerifierLoop(
       (block): block is ToolUseBlock => block.type === 'tool_use',
     );
     const reports = toolUses.filter(
-      (block) => block.name === V3_REPORT_VERIFICATION_TOOL.name,
+      (block) => block.name === REPORT_VERIFICATION_TOOL.name,
     );
 
     if (reports.length > 0) {
@@ -363,7 +363,7 @@ async function runV3VerifierLoop(
         continue;
       }
 
-      const parsed = v3VerificationResultSchema.safeParse(reports[0]!.input);
+      const parsed = verificationResultSchema.safeParse(reports[0]!.input);
       const validityProblem = parsed.success
         ? findVerificationValidityProblem(parsed.data, options)
         : parsed.error.message;
@@ -414,13 +414,13 @@ async function runV3VerifierLoop(
       );
     }
 
-    if (responseContextTokens(response.usage) > V3_VERIFIER_MAX_CONTEXT_TOKENS) {
+    if (responseContextTokens(response.usage) > VERIFIER_MAX_CONTEXT_TOKENS) {
       forced = true;
       const results = closeToolUses(
         toolUses,
         "Not executed: the verifier's inspection budget is exhausted.",
       );
-      await accountV3VerifierResults(options, results);
+      await accountVerifierResults(options, results);
       messages.push({
         role: 'user',
         content: [
@@ -431,38 +431,38 @@ async function runV3VerifierLoop(
       continue;
     }
 
-    const results = await executeV3VerifierToolUses(
+    const results = await executeVerifierToolUses(
       registry,
       toolUses,
       toolCtx,
       pathPolicy,
     );
-    await accountV3VerifierResults(options, results);
+    await accountVerifierResults(options, results);
     messages.push({ role: 'user', content: results });
   }
 }
 
 async function appendRepair(
-  options: RunV3VerifierOptions,
+  options: RunVerifierOptions,
   messages: Message[],
   toolUses: readonly ToolUseBlock[],
   closedMessage: string,
   correction: string,
 ): Promise<void> {
   const results = closeToolUses(toolUses, closedMessage);
-  await accountV3VerifierResults(options, results);
+  await accountVerifierResults(options, results);
   messages.push({
     role: 'user',
     content: [...results, { type: 'text', text: correction }],
   });
 }
 
-async function accountV3VerifierResults(
-  options: RunV3VerifierOptions,
+async function accountVerifierResults(
+  options: RunVerifierOptions,
   results: readonly ToolResultBlock[],
 ): Promise<void> {
   options.budget.recordToolResultBytes(verifierResultBytes(results));
-  await persistV3VerifierAccounting(options);
+  await persistVerifierAccounting(options);
   throwIfVerifierBudgetExceeded(options.budget);
 }
 
@@ -492,11 +492,11 @@ function responseContextTokens(usage: {
   );
 }
 
-function unavailable(reason: string): V3VerifierOutcome {
+function unavailable(reason: string): VerifierOutcome {
   return { status: 'verifier_unavailable', reason };
 }
 
-function invalidVerdict(reason: string): V3VerifierOutcome {
+function invalidVerdict(reason: string): VerifierOutcome {
   return { status: 'invalid_verdict', reason };
 }
 
@@ -504,9 +504,9 @@ function invalidVerdict(reason: string): V3VerifierOutcome {
  * `verified` is impossible while unresolved/structural facts remain, and an
  * `artifact_repair` may only cite evidence that is actually surfaced. */
 function findVerificationValidityProblem(
-  result: V3VerificationResult,
+  result: VerificationResult,
   options: Pick<
-    RunV3VerifierOptions,
+    RunVerifierOptions,
     'finish' | 'structuralFindings' | 'surfacedArtifacts'
   >,
 ): string | undefined {
@@ -544,14 +544,14 @@ function findVerificationValidityProblem(
   return undefined;
 }
 
-/** Build the v3 verifier's complete opening context without touching the
+/** Build the verifier's complete opening context without touching the
  * filesystem. Deterministic checks already established the manifest facts;
  * raw bytes remain available through the bounded, no-follow inspection
  * registry. This keeps an unmanifested tree or symlink from running before
  * the verifier's cancellation and I/O bounds exist. */
-export function buildV3VerifierOpeningInput(
+export function buildVerifierOpeningInput(
   options: Pick<
-    RunV3VerifierOptions,
+    RunVerifierOptions,
     | 'taskText'
     | 'contract'
     | 'finish'
@@ -565,7 +565,7 @@ export function buildV3VerifierOpeningInput(
   const settled = options.settled ?? [];
   const structuralFindings = options.structuralFindings ?? [];
   const verificationHistory = options.verificationHistory ?? [];
-  const columnCoverage = formatV3ColumnCoverage(options.outputs);
+  const columnCoverage = formatColumnCoverage(options.outputs);
   return [
     '# Original user request (authoritative)',
     options.taskText,
@@ -615,11 +615,11 @@ export function buildV3VerifierOpeningInput(
 /** Render per-column nonblank cell counts as plain informational coverage
  * facts alongside the settled row count. Absent for outputs loaded from a
  * checkpoint written before this field existed, and never a threshold. */
-function formatV3ColumnCoverage(
-  outputs: readonly V3OutputFact[] | undefined,
+function formatColumnCoverage(
+  outputs: readonly OutputFact[] | undefined,
 ): string[] {
   const tables = (outputs ?? []).filter(
-    (output): output is V3TableFact =>
+    (output): output is TableFact =>
       output.kind === 'table' && output.columnNonblankCounts !== undefined,
   );
   if (tables.length === 0) return [];
@@ -636,15 +636,15 @@ function formatV3ColumnCoverage(
   ];
 }
 
-async function persistV3VerifierAccounting(
-  options: RunV3VerifierOptions,
+async function persistVerifierAccounting(
+  options: RunVerifierOptions,
 ): Promise<void> {
   if (options.afterAccounting === undefined) return;
   try {
     await options.afterAccounting();
   } catch (error) {
-    throw new V3VerifierAccountingPersistenceError(
-      `failed to persist v3 verifier accounting: ${errorMessage(error)}`,
+    throw new VerifierAccountingPersistenceError(
+      `failed to persist verifier accounting: ${errorMessage(error)}`,
       { cause: error },
     );
   }
@@ -652,7 +652,7 @@ async function persistV3VerifierAccounting(
 
 function throwIfVerifierBudgetExceeded(budget: RunBudgetTracker): void {
   const limit = budget.exceededLimit(['worker_turns']);
-  if (limit !== undefined) throw new V3RoleBudgetExceededError(limit);
+  if (limit !== undefined) throw new RoleBudgetExceededError(limit);
 }
 
 function verifierResultBytes(results: readonly ToolResultBlock[]): number {

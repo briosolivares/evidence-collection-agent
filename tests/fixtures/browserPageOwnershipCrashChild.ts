@@ -42,7 +42,7 @@ async function main(): Promise<void> {
     throw new Error('Sentinel crash fixture unexpectedly completed page preparation.');
   }
   if (controller.prepareTaskPage === undefined) {
-    throw new Error('Attached controller omitted v3 task-page preparation.');
+    throw new Error('Attached controller omitted task-page preparation.');
   }
   await controller.prepareTaskPage({ ownershipId });
   const popupSession = await controller.openCommandSession();

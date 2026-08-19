@@ -16,20 +16,20 @@ import {
   verifyManifestFiles,
 } from '../../run/artifacts.js';
 import { createRunBudgetTracker } from '../../run/runBudget.js';
-import { createV3ToolRegistry } from '../../tools/index.js';
+import { createWorkerToolRegistry } from '../../tools/index.js';
 import {
-  V3_NO_TOOL_CONTINUATION,
-  captureV3WorkerSessionSnapshot,
-  createV3WorkerSession,
-  restoreV3WorkerSession,
-  runV3WorkerSession,
-  runV3WorkerTurn,
+  NO_TOOL_CONTINUATION,
+  captureWorkerSnapshot,
+  createWorker,
+  restoreWorker,
+  runWorker,
+  runWorkerTurn,
 } from './worker.js';
 
 let runDir: string;
 
 beforeEach(() => {
-  runDir = mkdtempSync(join(tmpdir(), 'sherlock-v3-session-integration-'));
+  runDir = mkdtempSync(join(tmpdir(), 'sherlock-session-integration-'));
   initManifest(runDir, 'publish a two-column CSV report');
 });
 
@@ -61,7 +61,7 @@ function transcript(): Array<Record<string, unknown>> {
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 }
 
-describe('v3 session vertical acceptance', () => {
+describe('session vertical acceptance', () => {
   it('writes then publishes in order, resumes one conversation, continues after prose, and finishes explicitly', async () => {
     const responses = [
       accepted([
@@ -118,31 +118,31 @@ describe('v3 session vertical acceptance', () => {
     });
     const deps = {
       model,
-      registry: createV3ToolRegistry({
+      registry: createWorkerToolRegistry({
         javascriptPolicy: 'allow',
         secretEnvDenylist: ['TEST_SECRET'],
       }),
       runDir,
     };
     const config = { budget, maxContextTokens: Infinity };
-    const worker = createV3WorkerSession(
+    const worker = createWorker(
       'Publish artifacts/report.csv with exactly name,value columns.',
       deps,
       config,
       { guidance: ['Expected output: artifacts/report.csv'] },
     );
 
-    await expect(runV3WorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
     expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe(
       'name,value\nalpha,1\n',
     );
 
-    const restored = restoreV3WorkerSession(
-      captureV3WorkerSessionSnapshot(worker),
+    const restored = restoreWorker(
+      captureWorkerSnapshot(worker),
       deps,
       config,
     );
-    const outcome = await runV3WorkerSession(restored);
+    const outcome = await runWorker(restored);
 
     expect(outcome).toMatchObject({
       kind: 'finish_requested',
@@ -158,7 +158,7 @@ describe('v3 session vertical acceptance', () => {
     expect(restored.state.messages[0]).toEqual(worker.state.messages[0]);
     expect(
       requests[2]?.at(-1)?.content.some(
-        (block) => block.type === 'text' && block.text === V3_NO_TOOL_CONTINUATION,
+        (block) => block.type === 'text' && block.text === NO_TOOL_CONTINUATION,
       ),
     ).toBe(true);
 

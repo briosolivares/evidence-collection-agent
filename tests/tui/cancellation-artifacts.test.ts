@@ -8,7 +8,7 @@ import { startRun } from '../../src/tui/bridge/runSession.js';
 import { scriptedResponse } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
-// The v3 cancellation artifact contract: cancellation is a durable terminal
+// The cancellation artifact contract: cancellation is a durable terminal
 // outcome, so both the finalized manifest and a `cancelled` metrics projection
 // survive even though the public run promise maps it back to cancellation.
 

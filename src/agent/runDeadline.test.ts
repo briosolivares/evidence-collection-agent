@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createRunBudgetTracker } from '../run/runBudget.js';
 import {
-  createV3RunDeadline,
-  raceWithV3RunSignal,
+  createRunDeadline,
+  raceWithRunSignal,
 } from './runDeadline.js';
 
 function budget(maxWallTimeMs: number) {
@@ -16,17 +16,17 @@ function budget(maxWallTimeMs: number) {
   });
 }
 
-describe('v3 whole-run deadline', () => {
+describe('whole-run deadline', () => {
   it('interrupts a non-cooperative promise with a typed wall-time limit', async () => {
-    const deadline = createV3RunDeadline(budget(10));
+    const deadline = createRunDeadline(budget(10));
     try {
       await expect(
-        raceWithV3RunSignal(
+        raceWithRunSignal(
           () => new Promise<never>(() => undefined),
           deadline.signal,
         ),
       ).rejects.toMatchObject({
-        name: 'V3RoleBudgetExceededError',
+        name: 'RoleBudgetExceededError',
         limit: 'wall_time',
       });
     } finally {
@@ -38,10 +38,10 @@ describe('v3 whole-run deadline', () => {
     const user = new AbortController();
     const reason = new Error('operator stopped the run');
     user.abort(reason);
-    const deadline = createV3RunDeadline(budget(10), user.signal);
+    const deadline = createRunDeadline(budget(10), user.signal);
     try {
       await expect(
-        raceWithV3RunSignal(() => Promise.resolve('unused'), deadline.signal),
+        raceWithRunSignal(() => Promise.resolve('unused'), deadline.signal),
       ).rejects.toBe(reason);
     } finally {
       deadline.dispose();
@@ -58,8 +58,8 @@ describe('v3 whole-run deadline', () => {
         once: true,
       });
     });
-    const deadline = createV3RunDeadline(budget(Infinity), user.signal);
-    const running = raceWithV3RunSignal(() => operation, deadline.signal);
+    const deadline = createRunDeadline(budget(Infinity), user.signal);
+    const running = raceWithRunSignal(() => operation, deadline.signal);
 
     user.abort(new DOMException('cancelled', 'AbortError'));
 
@@ -70,7 +70,7 @@ describe('v3 whole-run deadline', () => {
   it('removes its user listener and timer when disposed', () => {
     const user = new AbortController();
     const remove = vi.spyOn(user.signal, 'removeEventListener');
-    const deadline = createV3RunDeadline(budget(60_000), user.signal);
+    const deadline = createRunDeadline(budget(60_000), user.signal);
 
     deadline.dispose();
     deadline.dispose();

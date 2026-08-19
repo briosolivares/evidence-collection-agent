@@ -172,7 +172,7 @@ function eventIndex(
   return index;
 }
 
-describe('Sherlock v3 TUI-to-grader acceptance', () => {
+describe('Sherlock TUI-to-grader acceptance', () => {
   it('carries ordered UI publications through manifest selection into a transcript-free grader', async () => {
     const browser = stubBrowser();
     vi.mocked(browser.currentUrl).mockReturnValue(SOURCE_URL);

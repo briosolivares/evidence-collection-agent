@@ -1,6 +1,6 @@
 import { truncate } from '../format.js';
 
-// Human-readable activity for the exact v3 worker surface. Publication gets
+// Human-readable activity for the exact worker surface. Publication gets
 // the pending evidence style; final artifact truth still comes from manifest
 // diffs in the reducer/tracing bridge.
 

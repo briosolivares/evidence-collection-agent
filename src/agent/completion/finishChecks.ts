@@ -15,34 +15,34 @@ import {
   inspectManifest,
   isPng,
   type InspectedEntry,
-  V3_FINISH_SIGNATURE_BYTES,
+  FINISH_SIGNATURE_BYTES,
 } from './artifactInspection.js';
 import { inspectTable } from './tableInspection.js';
 import type {
-  V3CaptureFact,
-  V3DocumentFact,
-  V3ExternalActionFact,
-  V3FinishCheckResult,
-  V3FinishDefect,
-  V3FinishFacts,
-  V3SettledFact,
+  CaptureFact,
+  DocumentFact,
+  ExternalActionFact,
+  FinishCheckResult,
+  FinishDefect,
+  FinishFacts,
+  SettledFact,
 } from './finishFacts.schema.js';
 
 export type {
-  V3CaptureFact,
-  V3ColumnNonblankCount,
-  V3DocumentFact,
-  V3FinishCheckResult,
-  V3FinishDefect,
-  V3FinishFacts,
-  V3ManifestFacts,
-  V3OutputFact,
-  V3SettledFact,
-  V3TableFact,
+  CaptureFact,
+  ColumnNonblankCount,
+  DocumentFact,
+  FinishCheckResult,
+  FinishDefect,
+  FinishFacts,
+  ManifestFacts,
+  OutputFact,
+  SettledFact,
+  TableFact,
 } from './finishFacts.schema.js';
-export { v3FinishDefectSchema, v3FinishFactsSchema } from './finishFacts.schema.js';
+export { finishDefectSchema, finishFactsSchema } from './finishFacts.schema.js';
 
-export interface RunV3FinishChecksInput {
+export interface RunFinishChecksInput {
   runDir: string;
   /** The initializer-authored contract. This function never mutates it. */
   contract: OutputContract;
@@ -63,15 +63,15 @@ type VerifiedContentEntry = InspectedEntry & {
  * contract, alter manifest roles, or depend on the retired row/evidence
  * stores.
  */
-export function runV3FinishChecks({
+export function runFinishChecks({
   runDir,
   contract,
   finish,
   checkActive,
-}: RunV3FinishChecksInput): V3FinishCheckResult {
+}: RunFinishChecksInput): FinishCheckResult {
   checkActive?.();
-  const defects: V3FinishDefect[] = [];
-  const facts: V3FinishFacts = {
+  const defects: FinishDefect[] = [];
+  const facts: FinishFacts = {
     finish: structuredClone(finish),
     outputs: [],
     evidenceScreenshotPaths: [],
@@ -85,7 +85,7 @@ export function runV3FinishChecks({
     ),
   );
   const inspection = inspectManifest(runDir, {
-    publishedPrefixBytes: V3_FINISH_SIGNATURE_BYTES,
+    publishedPrefixBytes: FINISH_SIGNATURE_BYTES,
     retainPublishedBytes: (entry, artifactPath) =>
       finishChecksNeedFullBytes(contract, entry, artifactPath),
     ...(checkActive === undefined ? {} : { checkActive }),
@@ -276,8 +276,8 @@ export function runV3FinishChecks({
  * protocol. The structured form remains checkpoint-friendly; this view lets
  * the preserved verifier consume it without re-reading counts or hashes.
  */
-export function toV3SettledFacts(facts: V3FinishFacts): V3SettledFact[] {
-  const settled: V3SettledFact[] = [];
+export function toSettledFacts(facts: FinishFacts): SettledFact[] {
+  const settled: SettledFact[] = [];
   if (facts.manifest !== undefined) {
     settled.push({
       code: 'manifest_integrity',
@@ -392,7 +392,7 @@ function inspectionBytes(entry: InspectedEntry): Uint8Array | undefined {
 
 function validateManifestDerivedFinishClaim(
   requestedEntries: readonly InspectedEntry[],
-  defects: V3FinishDefect[],
+  defects: FinishDefect[],
 ): void {
   if (requestedEntries.length === 0) {
     defects.push({
@@ -420,7 +420,7 @@ function requireRequestedOutput(
   output: Extract<OutputSpec, { kind: 'table' | 'document' }>,
   artifactPath: string,
   entriesByPath: ReadonlyMap<string, InspectedEntry>,
-  defects: V3FinishDefect[],
+  defects: FinishDefect[],
 ): InspectedEntry | undefined {
   const entry = entriesByPath.get(artifactPath);
   if (entry === undefined) {
@@ -464,8 +464,8 @@ function inspectDocument(
   artifactPath: string,
   bytes: Uint8Array,
   byteLength: number,
-): { defects: V3FinishDefect[]; fact?: V3DocumentFact } {
-  const defects: V3FinishDefect[] = [];
+): { defects: FinishDefect[]; fact?: DocumentFact } {
+  const defects: FinishDefect[] = [];
   if (byteLength === 0) {
     defects.push({
       outputId: output.id,
@@ -549,8 +549,8 @@ function inspectCaptureOutput(
   output: Extract<OutputSpec, { kind: 'screenshots' | 'download' }>,
   candidates: readonly VerifiedContentEntry[],
 ): {
-  defects: V3FinishDefect[];
-  fact: V3CaptureFact;
+  defects: FinishDefect[];
+  fact: CaptureFact;
   attemptedPaths: string[];
   validPaths: string[];
 } {
@@ -577,7 +577,7 @@ function inspectCaptureOutput(
       matchesFilenamePattern(entry.entry.sourceUrl, output.sourceUrlPattern);
     return mediaMatches || sourceMatches;
   });
-  const defects: V3FinishDefect[] = [];
+  const defects: FinishDefect[] = [];
   const valid: Array<{ entry: VerifiedContentEntry; sourceUrl: string }> = [];
 
   for (const entry of patternMatches) {
@@ -706,8 +706,8 @@ function inspectCaptureOutput(
 function inspectExternalAction(
   output: Extract<OutputSpec, { kind: 'external_action' }>,
   candidates: readonly InspectedEntry[],
-): { defects: V3FinishDefect[]; fact: V3ExternalActionFact; claimedPaths: string[] } {
-  const defects: V3FinishDefect[] = [];
+): { defects: FinishDefect[]; fact: ExternalActionFact; claimedPaths: string[] } {
+  const defects: FinishDefect[] = [];
   const proof = candidates.filter(
     (entry) =>
       hasSource(entry) &&
@@ -786,7 +786,7 @@ function inspectExternalAction(
 function validateCaptureCount(
   output: Extract<OutputSpec, { kind: 'screenshots' | 'download' }>,
   actual: number,
-): V3FinishDefect | undefined {
+): FinishDefect | undefined {
   const noun = output.kind === 'screenshots' ? 'screenshot' : 'download';
   const described =
     output.filenamePattern === undefined
@@ -814,7 +814,7 @@ function captureDefect(
   entry: InspectedEntry,
   code: string,
   message: string,
-): V3FinishDefect {
+): FinishDefect {
   return { code, message, outputId: output.id, artifactPath: entry.canonicalPath };
 }
 
@@ -823,10 +823,10 @@ function hasSource(entry: InspectedEntry): boolean {
 }
 
 function failed(
-  defects: V3FinishDefect[],
-  facts: V3FinishFacts,
-): Extract<V3FinishCheckResult, { status: 'failed' }> {
-  const fallback: V3FinishDefect = {
+  defects: FinishDefect[],
+  facts: FinishFacts,
+): Extract<FinishCheckResult, { status: 'failed' }> {
+  const fallback: FinishDefect = {
     code: 'finish_check_failed',
     message: 'Deterministic finish checks failed without a specific defect.',
   };

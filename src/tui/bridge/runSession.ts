@@ -8,7 +8,7 @@
 // client rather than constructing a second model or tool registry. `runTask`
 // threads `signal` and `createStream` through initializer, worker, and
 // verifier roles, so cancellation reaches the in-flight role and the bridge
-// always observes the exact production v3 tool surface.
+// always observes the exact production tool surface.
 //
 // Progress mapping is a straight passthrough of `ProgressEvent` (see
 // model/callModel.ts) onto this module's `UiEvent`s: turn_start →

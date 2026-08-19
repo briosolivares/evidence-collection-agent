@@ -6,10 +6,10 @@ import {
   type ModelDriver,
 } from './modelDriver.js';
 import { createRunBudgetTracker } from '../run/runBudget.js';
-import { createV3RunDeadline } from '../agent/runDeadline.js';
+import { createRunDeadline } from '../agent/runDeadline.js';
 import {
-  V3RoleBudgetExceededError,
-  createV3BudgetedCallModel,
+  RoleBudgetExceededError,
+  createBudgetedCallModel,
 } from './budgetedCall.js';
 
 const messages: Message[] = [
@@ -26,7 +26,7 @@ function budget() {
   });
 }
 
-describe('createV3BudgetedCallModel', () => {
+describe('createBudgetedCallModel', () => {
   it('returns accepted-attempt usage while charging aggregate known usage', async () => {
     const tracker = budget();
     const response = {
@@ -41,7 +41,7 @@ describe('createV3BudgetedCallModel', () => {
       usage: { input_tokens: 15, output_tokens: 6 },
     }));
 
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: { generate },
       budget: tracker,
       role: 'verifier',
@@ -66,7 +66,7 @@ describe('createV3BudgetedCallModel', () => {
         throw failure;
       }),
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model,
       budget: tracker,
       role: 'initializer',
@@ -91,7 +91,7 @@ describe('createV3BudgetedCallModel', () => {
         throw Object.assign(new Error('cancelled'), { name: 'AbortError' });
       }),
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model,
       budget: tracker,
       role: 'verifier',
@@ -110,14 +110,14 @@ describe('createV3BudgetedCallModel', () => {
     });
     tracker.recordModelUsage('initializer', { input_tokens: 2, output_tokens: 0 });
     const generate = vi.fn();
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: { generate },
       budget: tracker,
       role: 'verifier',
     });
 
     await expect(call(messages)).rejects.toMatchObject({
-      name: 'V3RoleBudgetExceededError',
+      name: 'RoleBudgetExceededError',
       limit: 'model_tokens',
     });
     expect(generate).not.toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe('createV3BudgetedCallModel', () => {
       stop_reason: 'end_turn' as const,
       usage: { input_tokens: 3, output_tokens: 3 },
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: {
         generate: vi.fn(async () => ({
           response,
@@ -147,7 +147,7 @@ describe('createV3BudgetedCallModel', () => {
     });
 
     await expect(call(messages)).rejects.toBeInstanceOf(
-      V3RoleBudgetExceededError,
+      RoleBudgetExceededError,
     );
     expect(tracker.totalModelTokens()).toBe(6);
   });
@@ -163,7 +163,7 @@ describe('createV3BudgetedCallModel', () => {
       stop_reason: 'end_turn' as const,
       usage: { input_tokens: 2, output_tokens: 1 },
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: {
         generate: vi.fn(async () => ({
           response,
@@ -180,7 +180,7 @@ describe('createV3BudgetedCallModel', () => {
     });
 
     await expect(call(messages)).rejects.toMatchObject({
-      name: 'V3RoleBudgetExceededError',
+      name: 'RoleBudgetExceededError',
       limit: 'model_tokens',
     });
     expect(observedTokens).toEqual([3]);
@@ -197,7 +197,7 @@ describe('createV3BudgetedCallModel', () => {
       stop_reason: 'end_turn' as const,
       usage: { input_tokens: 1, output_tokens: 1 },
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: {
         generate: vi.fn(async () => ({
           response,
@@ -221,7 +221,7 @@ describe('createV3BudgetedCallModel', () => {
       stop_reason: 'end_turn' as const,
       usage: { input_tokens: 4, output_tokens: 1 },
     };
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: {
         generate: vi.fn(async () => {
           controller.abort();
@@ -247,13 +247,13 @@ describe('createV3BudgetedCallModel', () => {
       ...budget().config,
       maxWallTimeMs: 10,
     });
-    const deadline = createV3RunDeadline(tracker);
+    const deadline = createRunDeadline(tracker);
     const accounting = vi.fn(async () => undefined);
     const failure = new ModelGenerationFailedError(
       new Error('provider stopped at deadline'),
       { input_tokens: 7, output_tokens: 2 },
     );
-    const call = createV3BudgetedCallModel({
+    const call = createBudgetedCallModel({
       model: {
         generate: vi.fn(async (options) =>
           new Promise<never>((_resolve, reject) => {
@@ -270,7 +270,7 @@ describe('createV3BudgetedCallModel', () => {
 
     try {
       await expect(call(messages)).rejects.toMatchObject({
-        name: 'V3RoleBudgetExceededError',
+        name: 'RoleBudgetExceededError',
         limit: 'wall_time',
       });
       expect(tracker.totalModelTokens()).toBe(9);

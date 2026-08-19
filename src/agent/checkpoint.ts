@@ -21,15 +21,15 @@ import type { Message } from '../model/messages.js';
 import { writeFileDurablyAtomic } from '../run/atomicFile.js';
 import type { ModelRole, RunBudgetSnapshot } from '../run/runBudget.js';
 import {
-  v3FinishDefectSchema,
-  v3FinishFactsSchema,
-  type V3FinishFacts,
+  finishDefectSchema,
+  finishFactsSchema,
+  type FinishFacts,
 } from './completion/finishFacts.schema.js';
 import {
-  V3_VERIFICATION_HISTORY_LIMIT,
-  v3CorrectionFindingSchema,
-  type V3CorrectionFinding,
-  type V3VerificationHistoryEntry,
+  VERIFICATION_HISTORY_LIMIT,
+  correctionFindingSchema,
+  type CorrectionFinding,
+  type VerificationHistoryEntry,
 } from './verifier/verifier.js';
 import {
   durableFinishInputSchema,
@@ -37,20 +37,20 @@ import {
   type FinishInput,
 } from '../tools/finish/finish.js';
 import type {
-  V3FinishRequest,
-  V3PendingToolTurn,
-  V3WorkerSessionSnapshot,
+  FinishRequest,
+  PendingToolTurn,
+  WorkerSnapshot,
 } from './worker/worker.js';
 
-/** The only checkpoint format understood by the v3 coordinator. */
-export const V3_CHECKPOINT_VERSION = 3 as const;
-export const V3_UNBOUNDED_CEILING = 'unbounded' as const;
+/** The only checkpoint format understood by the coordinator. */
+export const CHECKPOINT_VERSION = 3 as const;
+export const UNBOUNDED_CEILING = 'unbounded' as const;
 
-export const V3_HARNESS_DIR = 'harness';
-export const V3_RUN_LOCK_FILENAME = 'run.lock';
-export const V3_RUN_CHECKPOINT_FILENAME = 'checkpoint.json';
-/** Finite pre-parse allocation ceiling for durable v3 checkpoint state. */
-export const V3_CHECKPOINT_MAX_BYTES = 64 * 1024 * 1024;
+export const HARNESS_DIR = 'harness';
+export const RUN_LOCK_FILENAME = 'run.lock';
+export const RUN_CHECKPOINT_FILENAME = 'checkpoint.json';
+/** Finite pre-parse allocation ceiling for durable checkpoint state. */
+export const CHECKPOINT_MAX_BYTES = 64 * 1024 * 1024;
 
 /**
  * Short-lived compare/delete guard used only while replacing a stale run
@@ -59,7 +59,7 @@ export const V3_CHECKPOINT_MAX_BYTES = 64 * 1024 * 1024;
  * second process guessing that it is safe to delete another contender's
  * guard.
  */
-export const V3_RUN_LOCK_RECOVERY_FILENAME = 'run.lock.recovery';
+export const RUN_LOCK_RECOVERY_FILENAME = 'run.lock.recovery';
 
 const HARNESS_DIR_MODE = 0o700;
 const HARNESS_FILE_MODE = 0o600;
@@ -68,12 +68,12 @@ const MAX_SAFE_DIAGNOSTIC_LENGTH = 16_000;
 const MAX_TASK_LENGTH = 1_000_000;
 
 type JsonPrimitive = string | number | boolean | null;
-export type V3CheckpointJson =
+export type CheckpointJson =
   | JsonPrimitive
-  | V3CheckpointJson[]
-  | { [key: string]: V3CheckpointJson };
+  | CheckpointJson[]
+  | { [key: string]: CheckpointJson };
 
-const jsonValueSchema: z.ZodType<V3CheckpointJson> = z.lazy(() =>
+const jsonValueSchema: z.ZodType<CheckpointJson> = z.lazy(() =>
   z.union([
     z.string(),
     z.number().finite(),
@@ -98,20 +98,20 @@ const nonBlankString = (maximum: number) =>
     .refine((value) => value.trim().length > 0, 'must contain non-whitespace text');
 
 const serializedCeilingSchema = (minimum: number) =>
-  z.union([z.number().int().min(minimum), z.literal(V3_UNBOUNDED_CEILING)]);
+  z.union([z.number().int().min(minimum), z.literal(UNBOUNDED_CEILING)]);
 
-export type V3SerializedCeiling = number | typeof V3_UNBOUNDED_CEILING;
+export type SerializedCeiling = number | typeof UNBOUNDED_CEILING;
 
-export function v3CeilingToCheckpoint(value: number): V3SerializedCeiling {
-  if (value === Infinity) return V3_UNBOUNDED_CEILING;
+export function ceilingToCheckpoint(value: number): SerializedCeiling {
+  if (value === Infinity) return UNBOUNDED_CEILING;
   if (!Number.isFinite(value)) {
     throw new Error(`cannot serialize non-finite checkpoint ceiling ${value}`);
   }
   return value;
 }
 
-export function v3CeilingFromCheckpoint(value: V3SerializedCeiling): number {
-  return value === V3_UNBOUNDED_CEILING ? Infinity : value;
+export function ceilingFromCheckpoint(value: SerializedCeiling): number {
+  return value === UNBOUNDED_CEILING ? Infinity : value;
 }
 
 const textBlockSchema = z.strictObject({
@@ -180,7 +180,7 @@ const roleUsageSchema = z.strictObject({
 });
 
 /** Exact durable form returned by captureRunBudgetSnapshot(). */
-export const v3RunBudgetSnapshotSchema: z.ZodType<RunBudgetSnapshot> = z.strictObject({
+export const runBudgetSnapshotSchema: z.ZodType<RunBudgetSnapshot> = z.strictObject({
   elapsedWallTimeMs: z.number().finite().nonnegative(),
   roles: z.partialRecord(z.enum(modelRoles), roleUsageSchema),
   toolCalls: z.number().finite().nonnegative(),
@@ -188,7 +188,7 @@ export const v3RunBudgetSnapshotSchema: z.ZodType<RunBudgetSnapshot> = z.strictO
   corrections: z.number().finite().nonnegative(),
 });
 
-export const v3DurableRunConfigurationSchema = z.strictObject({
+export const durableRunConfigurationSchema = z.strictObject({
   /** Resume never has to infer the task from mutable or separately parsed state. */
   taskText: nonBlankString(MAX_TASK_LENGTH),
   model: nonBlankString(1_024),
@@ -204,7 +204,7 @@ export const v3DurableRunConfigurationSchema = z.strictObject({
     maxWorkerTurns: serializedCeilingSchema(1),
     maxToolCalls: serializedCeilingSchema(0),
     maxModelTokens: serializedCeilingSchema(1),
-    /** Retired whole-run ceiling accepted only so existing v3 checkpoints
+    /** Retired whole-run ceiling accepted only so existing checkpoints
      * remain resumable. New runs omit it and the runtime ignores it. */
     maxToolResultBytes: serializedCeilingSchema(0).optional(),
     maxWallTimeMs: serializedCeilingSchema(1),
@@ -212,8 +212,8 @@ export const v3DurableRunConfigurationSchema = z.strictObject({
   }),
 });
 
-export type V3DurableRunConfiguration = z.infer<
-  typeof v3DurableRunConfigurationSchema
+export type DurableRunConfiguration = z.infer<
+  typeof durableRunConfigurationSchema
 >;
 
 type DeepReadonly<T> = T extends readonly (infer Child)[]
@@ -225,26 +225,26 @@ type DeepReadonly<T> = T extends readonly (infer Child)[]
 /** Detached, recursively frozen configuration observed before resume opens
  * the mutating checkpoint store. The coordinator still re-reads and
  * revalidates the complete checkpoint after acquiring the run lock. */
-export type V3ReadonlyDurableRunConfiguration =
-  DeepReadonly<V3DurableRunConfiguration>;
+export type ReadonlyDurableRunConfiguration =
+  DeepReadonly<DurableRunConfiguration>;
 
-/** Minimal, immutable composition-time view used to route a v3 resume
+/** Minimal, immutable composition-time view used to route a resume
  * without exposing or mutating the checkpoint's actionable cargo. */
-export interface V3CheckpointResumeInfo {
-  readonly phase: V3CheckpointPhase;
-  readonly configuration: V3ReadonlyDurableRunConfiguration;
+export interface CheckpointResumeInfo {
+  readonly phase: CheckpointPhase;
+  readonly configuration: ReadonlyDurableRunConfiguration;
 }
 
 /** Initializer-only conversation state, absent before its first request. */
-export const v3InitializerProgressSchema = z.strictObject({
+export const initializerProgressSchema = z.strictObject({
   messages: z.array(messageSchema).min(1),
   attempts: z.number().int().min(0).max(2),
   lastProblem: nonBlankString(MAX_SAFE_DIAGNOSTIC_LENGTH).optional(),
 });
 
-export type V3InitializerProgress = z.infer<typeof v3InitializerProgressSchema>;
+export type InitializerProgress = z.infer<typeof initializerProgressSchema>;
 
-export const v3WorkerSessionSnapshotSchema: z.ZodType<V3WorkerSessionSnapshot> =
+export const workerSnapshotSchema: z.ZodType<WorkerSnapshot> =
   z.strictObject({
     messages: z.array(messageSchema).min(1),
     turnCount: z.number().int().nonnegative(),
@@ -259,7 +259,7 @@ const toolCallSchema = z.strictObject({
   input: jsonValueSchema,
 });
 
-export const v3PendingToolTurnSchema: z.ZodType<V3PendingToolTurn> = z
+export const pendingToolTurnSchema: z.ZodType<PendingToolTurn> = z
   .strictObject({
     turn: z.number().int().positive(),
     assistant: assistantMessageSchema,
@@ -320,7 +320,7 @@ export const v3PendingToolTurnSchema: z.ZodType<V3PendingToolTurn> = z
     });
   });
 
-export const v3PendingFinishSchema: z.ZodType<V3FinishRequest> = z
+export const pendingFinishSchema: z.ZodType<FinishRequest> = z
   .strictObject({
     turn: z.number().int().positive(),
     call: z.strictObject({
@@ -342,7 +342,7 @@ export const v3PendingFinishSchema: z.ZodType<V3FinishRequest> = z
   });
 
 /** State saved before deterministic checks, or their passed verifier facts. */
-export const v3PendingCheckSchema = z.discriminatedUnion('status', [
+export const pendingCheckSchema = z.discriminatedUnion('status', [
   z.strictObject({
     status: z.literal('pending'),
     attempt: z.number().int().positive(),
@@ -350,32 +350,32 @@ export const v3PendingCheckSchema = z.discriminatedUnion('status', [
   z.strictObject({
     status: z.literal('passed'),
     attempt: z.number().int().positive(),
-    facts: v3FinishFactsSchema,
+    facts: finishFactsSchema,
   }),
 ]);
 
-export type V3PendingCheck =
+export type PendingCheck =
   | { status: 'pending'; attempt: number }
-  | { status: 'passed'; attempt: number; facts: V3FinishFacts };
+  | { status: 'passed'; attempt: number; facts: FinishFacts };
 
 /** Verifying is intentionally restart-only. The verifier's private
  * conversation is not durable state: recovery reconstructs fresh context
  * from the task, contract, completion report, surfaced manifest entries,
  * structural facts/findings, and typed prior correction records, then reruns
  * the read-only verifier. */
-export const v3PendingVerifierSchema = z.strictObject({
+export const pendingVerifierSchema = z.strictObject({
   cycle: z.number().int().positive(),
   recovery: z.literal('restart_read_only'),
 });
 
-export type V3PendingVerifier = z.infer<typeof v3PendingVerifierSchema>;
+export type PendingVerifier = z.infer<typeof pendingVerifierSchema>;
 
-export const v3CheckpointProgressSchema = z.strictObject({
+export const checkpointProgressSchema = z.strictObject({
   verifierCycles: z.number().int().nonnegative(),
   completionCheckFailures: z.number().int().nonnegative(),
 });
 
-export type V3CheckpointProgress = z.infer<typeof v3CheckpointProgressSchema>;
+export type CheckpointProgress = z.infer<typeof checkpointProgressSchema>;
 
 const nonTerminalPhaseSchema = z.enum([
   'initializing',
@@ -385,7 +385,7 @@ const nonTerminalPhaseSchema = z.enum([
   'verifying',
 ]);
 
-export const v3DurableTerminalOutcomeSchema = z.discriminatedUnion('status', [
+export const durableTerminalOutcomeSchema = z.discriminatedUnion('status', [
   z.strictObject({
     status: z.literal('verified'),
     finalText: z.string(),
@@ -418,17 +418,17 @@ export const v3DurableTerminalOutcomeSchema = z.discriminatedUnion('status', [
   }),
 ]);
 
-export type V3DurableTerminalOutcome = z.infer<
-  typeof v3DurableTerminalOutcomeSchema
+export type DurableTerminalOutcome = z.infer<
+  typeof durableTerminalOutcomeSchema
 >;
 
 const checkpointCommonShape = {
-  version: z.literal(V3_CHECKPOINT_VERSION),
+  version: z.literal(CHECKPOINT_VERSION),
   revision: z.number().int().positive(),
   updatedAt: isoTimestampSchema,
-  configuration: v3DurableRunConfigurationSchema,
-  budget: v3RunBudgetSnapshotSchema,
-  progress: v3CheckpointProgressSchema,
+  configuration: durableRunConfigurationSchema,
+  budget: runBudgetSnapshotSchema,
+  progress: checkpointProgressSchema,
 } as const;
 
 const initializingCheckpointSchema = z
@@ -436,7 +436,7 @@ const initializingCheckpointSchema = z
     ...checkpointCommonShape,
     phase: z.literal('initializing'),
     contract: outputContractSchema.optional(),
-    initializer: v3InitializerProgressSchema.optional(),
+    initializer: initializerProgressSchema.optional(),
   })
   .superRefine((checkpoint, ctx) => {
     if (checkpoint.contract !== undefined && checkpoint.initializer !== undefined) {
@@ -462,7 +462,7 @@ const initializingCheckpointSchema = z
  * existed. Normalized at this read boundary into a non-actionable `research`
  * finding; `nextAction` and `outputId` are intentionally dropped so an old
  * free-form instruction can never be executed after upgrade. */
-const legacyV3CorrectionFindingSchema = z.strictObject({
+const legacyCorrectionFindingSchema = z.strictObject({
   requirement: nonBlankString(4_000),
   problem: nonBlankString(4_000),
   nextAction: nonBlankString(4_000),
@@ -474,10 +474,10 @@ const legacyV3CorrectionFindingSchema = z.strictObject({
  * finding round-trips unchanged; a legacy finding normalizes to `research`.
  * This union is the only place legacy finding handling lives — the
  * coordinator and verifier work purely with the new typed shape. */
-const durableV3CorrectionFindingSchema: z.ZodType<V3CorrectionFinding> = z.union([
-  v3CorrectionFindingSchema,
-  legacyV3CorrectionFindingSchema.transform(
-    (legacy): V3CorrectionFinding => ({
+const durableCorrectionFindingSchema: z.ZodType<CorrectionFinding> = z.union([
+  correctionFindingSchema,
+  legacyCorrectionFindingSchema.transform(
+    (legacy): CorrectionFinding => ({
       kind: 'research',
       requirement: legacy.requirement,
       problem: legacy.problem,
@@ -486,21 +486,21 @@ const durableV3CorrectionFindingSchema: z.ZodType<V3CorrectionFinding> = z.union
 ]);
 
 /** Durable read compatibility for one verification-history entry. */
-const durableV3VerificationHistoryEntrySchema: z.ZodType<V3VerificationHistoryEntry> =
+const durableVerificationHistoryEntrySchema: z.ZodType<VerificationHistoryEntry> =
   z.strictObject({
     cycle: z.number().int().positive(),
     completionReport: durableFinishInputSchema,
     surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-    findings: z.array(durableV3CorrectionFindingSchema).min(1).max(50),
+    findings: z.array(durableCorrectionFindingSchema).min(1).max(50),
   });
 
 const activeCommonShape = {
   ...checkpointCommonShape,
   contract: outputContractSchema,
-  worker: v3WorkerSessionSnapshotSchema,
+  worker: workerSnapshotSchema,
   verificationHistory: z
-    .array(durableV3VerificationHistoryEntrySchema)
-    .max(V3_VERIFICATION_HISTORY_LIMIT)
+    .array(durableVerificationHistoryEntrySchema)
+    .max(VERIFICATION_HISTORY_LIMIT)
     .optional(),
 } as const;
 
@@ -512,13 +512,13 @@ const readyCheckpointSchema = z.strictObject({
 const executingCheckpointSchema = z.strictObject({
   ...activeCommonShape,
   phase: z.literal('executing_tool'),
-  pendingTurn: v3PendingToolTurnSchema,
+  pendingTurn: pendingToolTurnSchema,
 });
 
 const checkingCheckpointSchema = z.strictObject({
   ...activeCommonShape,
   phase: z.literal('checking'),
-  pendingFinish: v3PendingFinishSchema,
+  pendingFinish: pendingFinishSchema,
   pendingCheck: z.strictObject({
     status: z.literal('pending'),
     attempt: z.number().int().positive(),
@@ -528,14 +528,14 @@ const checkingCheckpointSchema = z.strictObject({
 const verifyingCheckpointSchema = z.strictObject({
   ...activeCommonShape,
   phase: z.literal('verifying'),
-  pendingFinish: v3PendingFinishSchema,
+  pendingFinish: pendingFinishSchema,
   pendingCheck: z.strictObject({
     status: z.literal('passed'),
     attempt: z.number().int().positive(),
-    facts: v3FinishFactsSchema,
-    structuralFindings: z.array(v3FinishDefectSchema).optional(),
+    facts: finishFactsSchema,
+    structuralFindings: z.array(finishDefectSchema).optional(),
   }),
-  pendingVerifier: v3PendingVerifierSchema,
+  pendingVerifier: pendingVerifierSchema,
 });
 
 const terminalCheckpointSchema = z
@@ -543,11 +543,11 @@ const terminalCheckpointSchema = z
     ...checkpointCommonShape,
     phase: z.literal('terminal'),
     contract: outputContractSchema.optional(),
-    worker: v3WorkerSessionSnapshotSchema.optional(),
+    worker: workerSnapshotSchema.optional(),
     /** Exact accepted finish claims, required for verified terminal recovery
      * so deterministic checks can be rerun against the current manifest. */
     finish: durableFinishInputSchema.optional(),
-    outcome: v3DurableTerminalOutcomeSchema,
+    outcome: durableTerminalOutcomeSchema,
   })
   .superRefine((checkpoint, ctx) => {
     const stoppedDuringInitialization =
@@ -617,7 +617,7 @@ const terminalCheckpointSchema = z
  * Strict, phase-discriminated durable state. Phase-specific cargo cannot leak
  * into another phase and be mistaken for actionable resume state.
  */
-export const v3CheckpointSchema = z
+export const checkpointSchema = z
   .discriminatedUnion('phase', [
     initializingCheckpointSchema,
     readyCheckpointSchema,
@@ -700,11 +700,11 @@ export const v3CheckpointSchema = z
     }
   });
 
-export type V3Checkpoint = z.infer<typeof v3CheckpointSchema>;
-export type V3CheckpointPhase = V3Checkpoint['phase'];
+export type Checkpoint = z.infer<typeof checkpointSchema>;
+export type CheckpointPhase = Checkpoint['phase'];
 
 const VALID_PHASE_TRANSITIONS: Readonly<
-  Record<V3CheckpointPhase, readonly V3CheckpointPhase[]>
+  Record<CheckpointPhase, readonly CheckpointPhase[]>
 > = {
   initializing: ['initializing', 'ready_for_model', 'terminal'],
   ready_for_model: [
@@ -731,7 +731,7 @@ const runLockFileSchema: z.ZodType<RunLockFile> = z.strictObject({
   acquiredAt: isoTimestampSchema,
 });
 
-export interface V3CheckpointStoreOptions {
+export interface CheckpointStoreOptions {
   now?: () => number;
   /** Queue/serialization test seam, before ownership is rechecked. */
   beforeWrite?: () => void | Promise<void>;
@@ -741,14 +741,14 @@ export interface V3CheckpointStoreOptions {
   afterTempFileSync?: (tempPath: string) => void;
 }
 
-export interface V3CheckpointStore {
-  load(): V3Checkpoint | undefined;
-  save(checkpoint: V3Checkpoint): Promise<void>;
+export interface CheckpointStore {
+  load(): Checkpoint | undefined;
+  save(checkpoint: Checkpoint): Promise<void>;
   close(): Promise<void>;
 }
 
 /**
- * Observe the immutable configuration of an existing v3 run without taking
+ * Observe the immutable configuration of an existing run without taking
  * its lock or changing any run-directory state. This is deliberately only a
  * composition-time hint: resume must still open the checkpoint store and
  * revalidate the checkpoint under its exclusive lock before doing work.
@@ -757,25 +757,25 @@ export interface V3CheckpointStore {
  * a finite byte ceiling and no-follow regular-file checks. The returned value
  * is detached from the parsed checkpoint and recursively frozen.
  */
-export function readV3CheckpointConfiguration(
+export function readCheckpointConfiguration(
   runDir: string,
-): V3ReadonlyDurableRunConfiguration {
-  return readV3CheckpointResumeInfo(runDir).configuration;
+): ReadonlyDurableRunConfiguration {
+  return readCheckpointResumeInfo(runDir).configuration;
 }
 
 /** Observe the checkpoint phase together with its immutable configuration.
  * Terminal resumes use this hint to avoid constructing a new external trace;
  * the coordinator still re-reads and validates the full checkpoint under its
  * exclusive run lock before trusting either value. */
-export function readV3CheckpointResumeInfo(
+export function readCheckpointResumeInfo(
   runDir: string,
-): Readonly<V3CheckpointResumeInfo> {
+): Readonly<CheckpointResumeInfo> {
   assertRealRunDirectory(runDir);
   const harnessDir = existingHarnessDirectory(runDir);
-  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
+  const checkpointPath = join(harnessDir, RUN_CHECKPOINT_FILENAME);
   const checkpoint = readCheckpointFile(checkpointPath);
   if (checkpoint === undefined) {
-    throw new Error(`v3 checkpoint does not exist at ${checkpointPath}`);
+    throw new Error(`checkpoint does not exist at ${checkpointPath}`);
   }
   return Object.freeze({
     phase: checkpoint.phase,
@@ -784,19 +784,19 @@ export function readV3CheckpointResumeInfo(
 }
 
 /**
- * Open one exclusively locked v3 checkpoint store. Saves are schema-checked,
+ * Open one exclusively locked checkpoint store. Saves are schema-checked,
  * serialized, monotonic, configuration/contract immutable, and published via
  * fsync + same-directory atomic rename + parent-directory fsync.
  */
-export async function openV3CheckpointStore(
+export async function openCheckpointStore(
   runDir: string,
-  options: V3CheckpointStoreOptions = {},
-): Promise<V3CheckpointStore> {
+  options: CheckpointStoreOptions = {},
+): Promise<CheckpointStore> {
   assertRealRunDirectory(runDir);
 
   const now = options.now ?? Date.now;
   const harnessDir = ensureHarnessDirectory(runDir);
-  const checkpointPath = join(harnessDir, V3_RUN_CHECKPOINT_FILENAME);
+  const checkpointPath = join(harnessDir, RUN_CHECKPOINT_FILENAME);
   const instanceId = randomUUID();
 
   acquireRunLock(
@@ -806,7 +806,7 @@ export async function openV3CheckpointStore(
     options.beforeStaleLockUnlink,
   );
 
-  let seed: V3Checkpoint | undefined;
+  let seed: Checkpoint | undefined;
   try {
     seed = readCheckpointFile(checkpointPath);
   } catch (error) {
@@ -823,7 +823,7 @@ export async function openV3CheckpointStore(
   let closePromise: Promise<void> | undefined;
   let queueTail: Promise<void> = Promise.resolve();
 
-  async function performSave(checkpoint: V3Checkpoint): Promise<void> {
+  async function performSave(checkpoint: Checkpoint): Promise<void> {
     if (lastRevision !== undefined && checkpoint.revision <= lastRevision) {
       throw new Error(
         `checkpoint revision ${checkpoint.revision} must be strictly greater than ` +
@@ -835,7 +835,7 @@ export async function openV3CheckpointStore(
       !VALID_PHASE_TRANSITIONS[lastPhase].includes(checkpoint.phase)
     ) {
       throw new Error(
-        `invalid v3 checkpoint phase transition ${lastPhase} -> ${checkpoint.phase}; ` +
+        `invalid checkpoint phase transition ${lastPhase} -> ${checkpoint.phase}; ` +
           (lastPhase === 'terminal'
             ? 'terminal is absorbing'
             : `allowed next phases are ${VALID_PHASE_TRANSITIONS[lastPhase].join(', ')}`),
@@ -846,7 +846,7 @@ export async function openV3CheckpointStore(
       durableConfiguration !== undefined &&
       canonicalJson(checkpoint.configuration) !== canonicalJson(durableConfiguration)
     ) {
-      throw new Error('refusing to change immutable v3 run configuration');
+      throw new Error('refusing to change immutable run configuration');
     }
     if (durableContract !== undefined) {
       if (checkpoint.contract === undefined) {
@@ -875,14 +875,14 @@ export async function openV3CheckpointStore(
   return {
     load: () => readCheckpointFile(checkpointPath),
 
-    save(checkpoint: V3Checkpoint): Promise<void> {
-      if (closed) return Promise.reject(new Error('v3 checkpoint store is already closed'));
+    save(checkpoint: Checkpoint): Promise<void> {
+      if (closed) return Promise.reject(new Error('checkpoint store is already closed'));
       if (poisonedError !== undefined) return Promise.reject(poisonedError);
 
-      const parsed = v3CheckpointSchema.safeParse(checkpoint);
+      const parsed = checkpointSchema.safeParse(checkpoint);
       if (!parsed.success) {
         return Promise.reject(
-          new Error(`refusing to save an invalid v3 checkpoint:\n${formatZodIssues(parsed.error)}`),
+          new Error(`refusing to save an invalid checkpoint:\n${formatZodIssues(parsed.error)}`),
         );
       }
       // Zod returns fresh containers, preventing caller mutation while this
@@ -916,22 +916,22 @@ export async function openV3CheckpointStore(
 
 function assertRealRunDirectory(runDir: string): void {
   if (!isAbsolute(runDir)) {
-    throw new Error(`v3 checkpoint runDir must be absolute: ${runDir}`);
+    throw new Error(`checkpoint runDir must be absolute: ${runDir}`);
   }
   const runStats = lstatSync(runDir);
   if (!runStats.isDirectory() || runStats.isSymbolicLink()) {
-    throw new Error(`v3 checkpoint runDir must be a real directory: ${runDir}`);
+    throw new Error(`checkpoint runDir must be a real directory: ${runDir}`);
   }
 }
 
 function existingHarnessDirectory(runDir: string): string {
-  const harnessDir = join(runDir, V3_HARNESS_DIR);
+  const harnessDir = join(runDir, HARNESS_DIR);
   let stats: ReturnType<typeof lstatSync>;
   try {
     stats = lstatSync(harnessDir);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      throw new Error(`v3 checkpoint harness directory does not exist: ${harnessDir}`);
+      throw new Error(`checkpoint harness directory does not exist: ${harnessDir}`);
     }
     throw error;
   }
@@ -948,7 +948,7 @@ function existingHarnessDirectory(runDir: string): string {
 }
 
 function ensureHarnessDirectory(runDir: string): string {
-  const harnessDir = join(runDir, V3_HARNESS_DIR);
+  const harnessDir = join(runDir, HARNESS_DIR);
   try {
     const stats = lstatSync(harnessDir);
     if (!stats.isDirectory() || stats.isSymbolicLink()) {
@@ -969,11 +969,11 @@ function ensureHarnessDirectory(runDir: string): string {
 }
 
 function lockPath(harnessDir: string): string {
-  return join(harnessDir, V3_RUN_LOCK_FILENAME);
+  return join(harnessDir, RUN_LOCK_FILENAME);
 }
 
 function recoveryLockPath(harnessDir: string): string {
-  return join(harnessDir, V3_RUN_LOCK_RECOVERY_FILENAME);
+  return join(harnessDir, RUN_LOCK_RECOVERY_FILENAME);
 }
 
 function acquireRunLock(
@@ -1081,13 +1081,13 @@ function assertRunLockOwner(harnessDir: string, instanceId: string): void {
   try {
     current = readRunLock(lockPath(harnessDir));
   } catch (error) {
-    throw new V3LockOwnershipError(
-      `could not validate the v3 run lock in ${harnessDir}: ${errorMessage(error)}`,
+    throw new LockOwnershipError(
+      `could not validate the run lock in ${harnessDir}: ${errorMessage(error)}`,
     );
   }
   if (current?.harnessInstanceId !== instanceId) {
-    throw new V3LockOwnershipError(
-      `v3 run lock in ${harnessDir} is missing or owned by another instance`,
+    throw new LockOwnershipError(
+      `run lock in ${harnessDir} is missing or owned by another instance`,
     );
   }
 }
@@ -1096,8 +1096,8 @@ function releaseRunLock(harnessDir: string, instanceId: string): void {
   const path = lockPath(harnessDir);
   const current = readRunLock(path);
   if (current === undefined) {
-    throw new V3LockOwnershipError(
-      `v3 run lock in ${harnessDir} disappeared before it could be released`,
+    throw new LockOwnershipError(
+      `run lock in ${harnessDir} disappeared before it could be released`,
     );
   }
   // A reassigned lock is not ours to remove. The save path already poisons
@@ -1110,8 +1110,8 @@ function releaseRecoveryLock(harnessDir: string, instanceId: string): void {
   const path = recoveryLockPath(harnessDir);
   const current = readRunLock(path);
   if (current?.harnessInstanceId !== instanceId) {
-    throw new V3LockOwnershipError(
-      `v3 stale-lock recovery guard in ${harnessDir} is missing or owned by another instance`,
+    throw new LockOwnershipError(
+      `stale-lock recovery guard in ${harnessDir} is missing or owned by another instance`,
     );
   }
   unlinkSync(path);
@@ -1133,14 +1133,14 @@ function readRunLock(path: string): RunLockFile | undefined {
   return parsed.data;
 }
 
-function readCheckpointFile(path: string): V3Checkpoint | undefined {
+function readCheckpointFile(path: string): Checkpoint | undefined {
   const raw = readCheckpointText(path);
   if (raw === undefined) return undefined;
   const parsedJson = parseJson(raw, `checkpoint at ${path}`);
-  const parsed = v3CheckpointSchema.safeParse(parsedJson);
+  const parsed = checkpointSchema.safeParse(parsedJson);
   if (!parsed.success) {
     throw new Error(
-      `checkpoint at ${path} failed v3 schema validation; refusing to start fresh:\n` +
+      `checkpoint at ${path} failed schema validation; refusing to start fresh:\n` +
         formatZodIssues(parsed.error),
     );
   }
@@ -1185,7 +1185,7 @@ function readCheckpointText(path: string): string | undefined {
           `expected 0${HARNESS_FILE_MODE.toString(8)}`,
       );
     }
-    if (opened.size > V3_CHECKPOINT_MAX_BYTES) {
+    if (opened.size > CHECKPOINT_MAX_BYTES) {
       throw checkpointSizeLimitError(path, opened.size);
     }
 
@@ -1206,7 +1206,7 @@ function readCheckpointText(path: string): string | undefined {
     const overflowProbe = Buffer.allocUnsafe(1);
     const overflow = readSync(descriptor, overflowProbe, 0, 1, null);
     const after = fstatSync(descriptor);
-    if (after.size > V3_CHECKPOINT_MAX_BYTES) {
+    if (after.size > CHECKPOINT_MAX_BYTES) {
       throw checkpointSizeLimitError(path, Math.max(after.size, total + overflow));
     }
     if (
@@ -1225,7 +1225,7 @@ function readCheckpointText(path: string): string | undefined {
 function checkpointSizeLimitError(path: string, observedBytes: number): Error {
   return new Error(
     `checkpoint at ${path} is ${observedBytes} bytes, exceeding the ` +
-      `${V3_CHECKPOINT_MAX_BYTES}-byte read limit`,
+      `${CHECKPOINT_MAX_BYTES}-byte read limit`,
   );
 }
 
@@ -1246,10 +1246,10 @@ function processIsLive(pid: number): boolean {
   }
 }
 
-class V3LockOwnershipError extends Error {}
+class LockOwnershipError extends Error {}
 
 function isLockOwnershipError(error: unknown): boolean {
-  return error instanceof V3LockOwnershipError;
+  return error instanceof LockOwnershipError;
 }
 
 function canonicalJson(value: unknown): string {

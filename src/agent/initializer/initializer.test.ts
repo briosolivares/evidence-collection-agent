@@ -8,15 +8,15 @@ import type {
 import { ModelResponseRejectedError } from '../../model/modelDriver.js';
 import type { OutputContract } from './outputContract.js';
 import {
-  V3_CONTRACT_INITIALIZER_API_TOOL_DEFS,
+  CONTRACT_INITIALIZER_API_TOOL_DEFS,
   V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT,
-  V3_INITIALIZER_MAX_ATTEMPTS,
-  captureV3ContractInitializerState,
-  createV3ContractInitializerModelDriver,
-  createV3ContractInitializerState,
-  formatV3ContractGuidance,
-  restoreV3ContractInitializerState,
-  runV3ContractInitializer,
+  INITIALIZER_MAX_ATTEMPTS,
+  captureContractInitializerState,
+  createContractInitializerModelDriver,
+  createContractInitializerState,
+  formatContractGuidance,
+  restoreContractInitializerState,
+  runContractInitializer,
 } from './initializer.js';
 
 const CONTRACT: OutputContract = {
@@ -92,15 +92,15 @@ function scripted(responses: Array<ModelResponse | Error>): CallModel & {
   return Object.assign(calls, { calls });
 }
 
-describe('v3 contract initializer static prefix', () => {
+describe('contract initializer static prefix', () => {
   it('offers exactly one strict contract tool behind run-invariant instructions', () => {
-    expect(V3_CONTRACT_INITIALIZER_API_TOOL_DEFS).toHaveLength(1);
-    expect(V3_CONTRACT_INITIALIZER_API_TOOL_DEFS[0]).toMatchObject({
+    expect(CONTRACT_INITIALIZER_API_TOOL_DEFS).toHaveLength(1);
+    expect(CONTRACT_INITIALIZER_API_TOOL_DEFS[0]).toMatchObject({
       name: 'set_output_contract',
       input_schema: { type: 'object', additionalProperties: false },
     });
-    expect(Object.isFrozen(V3_CONTRACT_INITIALIZER_API_TOOL_DEFS)).toBe(true);
-    const schema = V3_CONTRACT_INITIALIZER_API_TOOL_DEFS[0]!.input_schema as {
+    expect(Object.isFrozen(CONTRACT_INITIALIZER_API_TOOL_DEFS)).toBe(true);
+    const schema = CONTRACT_INITIALIZER_API_TOOL_DEFS[0]!.input_schema as {
       properties?: Record<string, unknown>;
     };
     expect(Object.keys(schema.properties ?? {})).toEqual(['contract']);
@@ -127,17 +127,17 @@ describe('v3 contract initializer static prefix', () => {
 
   it('builds the strict driver with validated finite output limits', () => {
     expect(() =>
-      createV3ContractInitializerModelDriver({ maxOutputTokens: 0 }),
+      createContractInitializerModelDriver({ maxOutputTokens: 0 }),
     ).toThrow(/maxOutputTokens/);
   });
 });
 
-describe('runV3ContractInitializer', () => {
+describe('runContractInitializer', () => {
   it('accepts exactly one valid immutable contract', async () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
     const afterAttempt = vi.fn(async () => undefined);
 
-    const outcome = await runV3ContractInitializer(
+    const outcome = await runContractInitializer(
       state,
       scripted([response([contractCall()])]),
       { afterAttempt },
@@ -171,7 +171,7 @@ describe('runV3ContractInitializer', () => {
         ],
       },
     };
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
     const callModel = vi.fn<CallModel>(async (messages) => {
       if (messages.length === 1) return response([invalid]);
       expect(JSON.stringify(messages.at(-1))).toContain(
@@ -180,7 +180,7 @@ describe('runV3ContractInitializer', () => {
       return response([contractCall('repaired-contract')]);
     });
 
-    await expect(runV3ContractInitializer(state, callModel)).resolves.toEqual({
+    await expect(runContractInitializer(state, callModel)).resolves.toEqual({
       ok: true,
       contract: CONTRACT,
     });
@@ -188,9 +188,9 @@ describe('runV3ContractInitializer', () => {
   });
 
   it('accepts an enum column with contentExpectations scope in place of a presence gate', async () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
 
-    const outcome = await runV3ContractInitializer(
+    const outcome = await runContractInitializer(
       state,
       scripted([response([contractCall('enum-contract', ENUM_CONTRACT)])]),
     );
@@ -199,7 +199,7 @@ describe('runV3ContractInitializer', () => {
   });
 
   it('answers every invalid call, then accepts one bounded repair', async () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
     const callModel = vi.fn<CallModel>(async (messages) => {
       if (messages.length === 1) {
         return response([
@@ -223,15 +223,15 @@ describe('runV3ContractInitializer', () => {
     });
 
     await expect(
-      runV3ContractInitializer(state, callModel),
+      runContractInitializer(state, callModel),
     ).resolves.toEqual({ ok: true, contract: CONTRACT });
-    expect(state.attempts).toBe(V3_INITIALIZER_MAX_ATTEMPTS);
+    expect(state.attempts).toBe(INITIALIZER_MAX_ATTEMPTS);
     expect(callModel).toHaveBeenCalledTimes(2);
   });
 
   it('returns a stable failure after the second invalid accepted response', async () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
-    const outcome = await runV3ContractInitializer(
+    const state = createContractInitializerState('Create report.csv.');
+    const outcome = await runContractInitializer(
       state,
       scripted([
         response([{ type: 'text', text: 'I will explain instead.' }]),
@@ -245,12 +245,12 @@ describe('runV3ContractInitializer', () => {
     });
     expect(state.attempts).toBe(2);
     await expect(
-      runV3ContractInitializer(state, scripted([])),
+      runContractInitializer(state, scripted([])),
     ).resolves.toEqual(outcome);
   });
 
   it('uses one repair for a correctable whole-response rejection', async () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
     const rejected = new ModelResponseRejectedError(
       'malformed_tool_call',
       'malformed',
@@ -259,7 +259,7 @@ describe('runV3ContractInitializer', () => {
     );
 
     await expect(
-      runV3ContractInitializer(
+      runContractInitializer(
         state,
         scripted([rejected, response([contractCall()])]),
       ),
@@ -273,22 +273,22 @@ describe('runV3ContractInitializer', () => {
   });
 });
 
-describe('v3 initializer durability helpers', () => {
+describe('initializer durability helpers', () => {
   it('deep-copies snapshots and restores the bounded state', () => {
-    const state = createV3ContractInitializerState('Create report.csv.');
+    const state = createContractInitializerState('Create report.csv.');
     state.attempts = 1;
     state.lastProblem = 'first response was invalid';
-    const snapshot = captureV3ContractInitializerState(state);
+    const snapshot = captureContractInitializerState(state);
     state.messages[0]!.content[0] = { type: 'text', text: 'mutated' };
 
-    const restored = restoreV3ContractInitializerState(snapshot);
+    const restored = restoreContractInitializerState(snapshot);
     expect(restored.messages[0]?.content[0]).toEqual({
       type: 'text',
       text: 'Create report.csv.',
     });
     expect(restored).not.toBe(snapshot);
     expect(() =>
-      restoreV3ContractInitializerState({
+      restoreContractInitializerState({
         messages: snapshot.messages,
         attempts: 3,
       }),
@@ -296,8 +296,8 @@ describe('v3 initializer durability helpers', () => {
   });
 
   it('renders deterministic immutable per-run worker guidance', () => {
-    const first = formatV3ContractGuidance(CONTRACT);
-    const second = formatV3ContractGuidance(structuredClone(CONTRACT));
+    const first = formatContractGuidance(CONTRACT);
+    const second = formatContractGuidance(structuredClone(CONTRACT));
     expect(second).toBe(first);
     expect(first).toContain('# Immutable output contract');
     expect(first).toContain('"filename": "report.csv"');

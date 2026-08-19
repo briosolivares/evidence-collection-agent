@@ -53,7 +53,7 @@ export function setupBrowserToolSuite(name: string): BrowserToolSuite {
     runDir = mkdtempSync(join(tmpdir(), `${name}-run-`));
     initManifest(runDir, `test ${name}`);
     if (controller.prepareTaskPage === undefined) {
-      throw new Error('Browser test controller lacks v3 task-page preparation');
+      throw new Error('Browser test controller lacks task-page preparation');
     }
     await controller.prepareTaskPage({ ownershipId: runDir });
   });

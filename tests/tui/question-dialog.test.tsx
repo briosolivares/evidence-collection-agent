@@ -69,7 +69,7 @@ async function startRunWithQuestion(input: unknown) {
 }
 
 describe('QuestionDialog in the App', () => {
-  it('renders the v3 question, context, and options above the composer', async () => {
+  it('renders the question, context, and options above the composer', async () => {
     const { lastFrame, decision, stdin, unmount } = await startRunWithQuestion({
       question: 'Complete the login in the browser window, then tell me.',
       context: 'Use the already-open account; do not create a new one.',

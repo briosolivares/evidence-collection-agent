@@ -111,7 +111,7 @@ async function prepareTaskPage(
   startUrl: string,
 ): Promise<void> {
   if (browser.prepareTaskPage === undefined) {
-    throw new Error('Browserbase smoke requires v3 task-page preparation');
+    throw new Error('Browserbase smoke requires task-page preparation');
   }
   browser.setBusyRegistry?.(createBusyResourceRegistry());
   await browser.prepareTaskPage({ ownershipId, startUrl });
@@ -237,8 +237,8 @@ async function main(): Promise<void> {
 
   let commandSession: BrowserCommandSession | undefined;
   try {
-    // --- 2. V3 task-page lifecycle, raw commands, and accessibility. ---
-    section('2. v3 task page, commands, accessibility');
+    // --- 2. Task-page lifecycle, raw commands, and accessibility. ---
+    section('2. task page, commands, accessibility');
     await prepareTaskPage(browser, `${runDir}:primary`, FIXTURE_PAGE_URL);
     commandSession = await browser.openCommandSession();
     check('landed on the fixture page', browser.currentUrl().startsWith('https://example.com'));
