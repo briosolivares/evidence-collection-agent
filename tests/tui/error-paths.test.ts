@@ -92,10 +92,13 @@ describe('mid-stream failure', () => {
       status: 'incomplete',
       reason: 'worker_incomplete',
       detail: 'socket hang up',
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
 
-    // Fold the emitted events through the reducer: the failure lands as a
-    // persistent error item and the composer comes back (idle).
+    // Fold the emitted events through the reducer: the involuntary stop gets
+    // a deterministic human-facing response and the composer comes back.
     let state = createInitialState();
     state = reduce(state, { type: 'submit_task', text: 'doomed investigation' });
     for (const event of events) {
@@ -104,9 +107,12 @@ describe('mid-stream failure', () => {
     expect(state.mode).toBe('idle');
     expect(state.live).toBeUndefined();
     expect(state.transcript.at(-1)).toMatchObject({
-      kind: 'error',
-      message: expect.stringContaining('socket hang up'),
+      kind: 'completion',
+      outcome: 'incomplete',
     });
+    expect(state.completedRun?.finalText).toBe(
+      'The assistant stopped before it could prepare a final response.',
+    );
   });
 });
 

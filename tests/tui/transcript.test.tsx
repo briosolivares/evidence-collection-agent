@@ -73,6 +73,7 @@ describe('Transcript', () => {
       <Transcript
         items={items({
           kind: 'completion',
+          outcome: 'complete',
           verb: 'Brewed',
           elapsedMs: 42_000,
           tokens: 18_700,

@@ -96,6 +96,7 @@ describe('v3 session vertical acceptance', () => {
           name: 'finish',
           input: {
             summary: 'Published the requested two-column CSV report.',
+            unresolved: [],
           },
         },
       ]),
@@ -150,6 +151,7 @@ describe('v3 session vertical acceptance', () => {
         call: { id: 'finish-report', name: 'finish' },
         input: {
           summary: 'Published the requested two-column CSV report.',
+          unresolved: [],
         },
       },
     });

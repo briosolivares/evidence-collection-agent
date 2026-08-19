@@ -106,6 +106,7 @@ describe('completion line', () => {
         item={{
           id: 1,
           kind: 'completion',
+          outcome: 'complete',
           verb: 'Distilled',
           elapsedMs: 84_000,
           tokens: 31_200,

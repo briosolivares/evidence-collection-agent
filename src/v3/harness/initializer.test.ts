@@ -36,6 +36,30 @@ const CONTRACT: OutputContract = {
   contentExpectations: ['Use source-backed current values.'],
 };
 
+const ENUM_CONTRACT: OutputContract = {
+  outputs: [
+    {
+      id: 'report',
+      kind: 'table',
+      filename: 'report.csv',
+      format: 'csv',
+      columns: [
+        { name: 'name', required: true, type: 'string' },
+        {
+          name: 'chapter',
+          required: true,
+          type: 'enum',
+          values: ['Alpha', 'Beta', 'Gamma'],
+        },
+      ],
+      rules: [{ type: 'minimum_row_count', value: 1 }],
+    },
+  ],
+  contentExpectations: [
+    'Cover every enumerated chapter (Alpha, Beta, Gamma), or report it as credibly blocked.',
+  ],
+};
+
 function response(content: ModelResponse['content']): ModelResponse {
   return {
     content,
@@ -44,12 +68,15 @@ function response(content: ModelResponse['content']): ModelResponse {
   };
 }
 
-function contractCall(id = 'contract-1'): ToolUseBlock {
+function contractCall(
+  id = 'contract-1',
+  contract: OutputContract = CONTRACT,
+): ToolUseBlock {
   return {
     type: 'tool_use',
     id,
     name: 'set_output_contract',
-    input: { contract: CONTRACT },
+    input: { contract },
   };
 }
 
@@ -77,9 +104,24 @@ describe('v3 contract initializer static prefix', () => {
       properties?: Record<string, unknown>;
     };
     expect(Object.keys(schema.properties ?? {})).toEqual(['contract']);
+    const contractSchema = schema.properties?.contract as {
+      properties?: Record<string, unknown>;
+    };
+    expect(Object.keys(contractSchema.properties ?? {})).not.toContain(
+      'assumptions',
+    );
     expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).not.toContain('report.csv');
     expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
       'one immutable output contract',
+    );
+    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+      'original user request remains authoritative',
+    );
+    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+      'declare the matching column as type enum',
+    );
+    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+      'Never emit a matches_expected_values rule',
     );
   });
 
@@ -109,18 +151,32 @@ describe('runV3ContractInitializer', () => {
     );
   });
 
-  it('feeds contract validation errors back for one bounded repair', async () => {
+  it('rejects any matches_expected_values rule, even source original_task, and accepts one bounded repair', async () => {
     const invalid = contractCall('invalid-contract');
     invalid.input = {
       contract: {
         ...CONTRACT,
-        outputs: [{ ...CONTRACT.outputs[0]!, filename: 'nested/report.csv' }],
+        outputs: [
+          {
+            ...CONTRACT.outputs[0]!,
+            rules: [
+              {
+                type: 'matches_expected_values',
+                column: 'name',
+                expected: ['Chapter A', 'Chapter B'],
+                source: { kind: 'original_task' },
+              },
+            ],
+          },
+        ],
       },
     };
     const state = createV3ContractInitializerState('Create report.csv.');
     const callModel = vi.fn<CallModel>(async (messages) => {
       if (messages.length === 1) return response([invalid]);
-      expect(JSON.stringify(messages.at(-1))).toContain('bare filename');
+      expect(JSON.stringify(messages.at(-1))).toContain(
+        'never a deterministic presence rule',
+      );
       return response([contractCall('repaired-contract')]);
     });
 
@@ -129,6 +185,17 @@ describe('runV3ContractInitializer', () => {
       contract: CONTRACT,
     });
     expect(callModel).toHaveBeenCalledTimes(2);
+  });
+
+  it('accepts an enum column with contentExpectations scope in place of a presence gate', async () => {
+    const state = createV3ContractInitializerState('Create report.csv.');
+
+    const outcome = await runV3ContractInitializer(
+      state,
+      scripted([response([contractCall('enum-contract', ENUM_CONTRACT)])]),
+    );
+
+    expect(outcome).toEqual({ ok: true, contract: ENUM_CONTRACT });
   });
 
   it('answers every invalid call, then accepts one bounded repair', async () => {
@@ -234,6 +301,6 @@ describe('v3 initializer durability helpers', () => {
     expect(second).toBe(first);
     expect(first).toContain('# Immutable output contract');
     expect(first).toContain('"filename": "report.csv"');
-    expect(first).toContain('cannot be revised');
+    expect(first).toContain('original user request is authoritative');
   });
 });

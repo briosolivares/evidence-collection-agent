@@ -65,6 +65,7 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested one-row report.',
+  unresolved: [],
 };
 
 const CONFIGURATION: V3DurableRunConfiguration = {
@@ -412,10 +413,9 @@ function verifierModel(): ModelDriver {
                 status: 'needs_correction',
                 findings: [
                   {
-                    area: 'output',
-                    code: 'fixture_correction',
-                    message: 'Re-submit the exact published artifact for recovery testing.',
-                    outputId: 'report',
+                    kind: 'research',
+                    requirement: 'fixture_correction: re-submit the exact published artifact.',
+                    problem: 'Recovery has not observed the resubmission yet.',
                   },
                 ],
               }

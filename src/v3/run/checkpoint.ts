@@ -21,11 +21,19 @@ import type { Message } from '../../loop/messages.js';
 import { writeFileDurablyAtomic } from '../../run/atomicFile.js';
 import type { ModelRole, RunBudgetSnapshot } from '../../run/runBudget.js';
 import {
+  v3FinishDefectSchema,
   v3FinishFactsSchema,
   type V3FinishFacts,
 } from '../completion/types.js';
 import {
+  V3_VERIFICATION_HISTORY_LIMIT,
+  v3CorrectionFindingSchema,
+  type V3CorrectionFinding,
+  type V3VerificationHistoryEntry,
+} from '../harness/verifier.js';
+import {
   durableFinishInputSchema,
+  finishUnresolvedRequirementSchema,
   type FinishInput,
 } from '../tools/finish.js';
 import type {
@@ -352,8 +360,9 @@ export type V3PendingCheck =
 
 /** Verifying is intentionally restart-only. The verifier's private
  * conversation is not durable state: recovery reconstructs fresh context
- * from the task, contract, finish claims, clarifications, and settled facts,
- * then reruns the read-only verifier. */
+ * from the task, contract, completion report, surfaced manifest entries,
+ * structural facts/findings, and typed prior correction records, then reruns
+ * the read-only verifier. */
 export const v3PendingVerifierSchema = z.strictObject({
   cycle: z.number().int().positive(),
   recovery: z.literal('restart_read_only'),
@@ -390,10 +399,12 @@ export const v3DurableTerminalOutcomeSchema = z.discriminatedUnion('status', [
       'completion_check_attempts',
       'verifier_unavailable',
       'verification_attempts',
+      'verification_incomplete',
       'budget_exceeded',
     ]),
     detail: nonBlankString(MAX_SAFE_DIAGNOSTIC_LENGTH),
     finalText: z.string(),
+    unresolved: z.array(finishUnresolvedRequirementSchema).max(50).default([]),
   }),
   z.strictObject({
     status: z.literal('failed'),
@@ -447,10 +458,50 @@ const initializingCheckpointSchema = z
     }
   });
 
+/** Legacy durable correction-finding shape from before typed finding kinds
+ * existed. Normalized at this read boundary into a non-actionable `research`
+ * finding; `nextAction` and `outputId` are intentionally dropped so an old
+ * free-form instruction can never be executed after upgrade. */
+const legacyV3CorrectionFindingSchema = z.strictObject({
+  requirement: nonBlankString(4_000),
+  problem: nonBlankString(4_000),
+  nextAction: nonBlankString(4_000),
+  outputId: nonBlankString(1_024).optional(),
+  evidencePaths: z.array(nonBlankString(1_024)).max(50).optional(),
+});
+
+/** Durable read compatibility for one correction finding: a current typed
+ * finding round-trips unchanged; a legacy finding normalizes to `research`.
+ * This union is the only place legacy finding handling lives — the
+ * coordinator and verifier work purely with the new typed shape. */
+const durableV3CorrectionFindingSchema: z.ZodType<V3CorrectionFinding> = z.union([
+  v3CorrectionFindingSchema,
+  legacyV3CorrectionFindingSchema.transform(
+    (legacy): V3CorrectionFinding => ({
+      kind: 'research',
+      requirement: legacy.requirement,
+      problem: legacy.problem,
+    }),
+  ),
+]);
+
+/** Durable read compatibility for one verification-history entry. */
+const durableV3VerificationHistoryEntrySchema: z.ZodType<V3VerificationHistoryEntry> =
+  z.strictObject({
+    cycle: z.number().int().positive(),
+    completionReport: durableFinishInputSchema,
+    surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    findings: z.array(durableV3CorrectionFindingSchema).min(1).max(50),
+  });
+
 const activeCommonShape = {
   ...checkpointCommonShape,
   contract: outputContractSchema,
   worker: v3WorkerSessionSnapshotSchema,
+  verificationHistory: z
+    .array(durableV3VerificationHistoryEntrySchema)
+    .max(V3_VERIFICATION_HISTORY_LIMIT)
+    .optional(),
 } as const;
 
 const readyCheckpointSchema = z.strictObject({
@@ -482,6 +533,7 @@ const verifyingCheckpointSchema = z.strictObject({
     status: z.literal('passed'),
     attempt: z.number().int().positive(),
     facts: v3FinishFactsSchema,
+    structuralFindings: z.array(v3FinishDefectSchema).optional(),
   }),
   pendingVerifier: v3PendingVerifierSchema,
 });

@@ -37,6 +37,7 @@ const TASK =
 const REPORT = 'name\nAlice\n';
 const FINISH = {
   summary: 'Published the requested one-row report.',
+  unresolved: [],
 };
 
 const CONTRACT: OutputContract = {
@@ -101,17 +102,19 @@ describe('public runTask v3 adapter', () => {
         V3_PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
       budgetLimits: {
         maxWorkerTurns: V3_UNBOUNDED_CEILING,
-        maxToolCalls: V3_PRODUCTION_DEFAULTS.maxToolCalls,
+        maxToolCalls: V3_UNBOUNDED_CEILING,
         maxModelTokens: V3_UNBOUNDED_CEILING,
         maxWallTimeMs: V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
-        maxVerifierCorrections:
-          V3_PRODUCTION_DEFAULTS.maxVerifierCorrections,
+        maxVerifierCorrections: V3_UNBOUNDED_CEILING,
       },
     });
     expect(
       Object.entries(V3_PRODUCTION_DEFAULTS).every(
         ([name, value]) =>
-          name === 'maxModelTokens' || name === 'maxWorkerTurns'
+          name === 'maxModelTokens' ||
+          name === 'maxWorkerTurns' ||
+          name === 'maxToolCalls' ||
+          name === 'maxVerifierCorrections'
             ? value === Infinity
             : Number.isFinite(value) && value > 0,
       ),
@@ -209,7 +212,9 @@ describe('public runTask v3 adapter', () => {
       status: 'incomplete',
       reason: 'initializer_unavailable',
       detail: expect.stringContaining('initializer transport unavailable'),
-      finalText: '',
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
     expect(readV3CheckpointConfiguration(result.runDir).taskText).toBe(
       'A task whose initializer is unavailable.',

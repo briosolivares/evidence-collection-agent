@@ -72,7 +72,7 @@ describe('outputContractSchema shape', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error('unreachable');
     const doc = result.contract.outputs[0] as Extract<OutputSpec, { kind: 'document' }>;
-    expect(doc.evidenceRequirement).toBe('at_least_one');
+    expect(doc.evidenceRequirement).toBe('none');
     expect(doc.evidencePresentation).toBe('hidden');
   });
 });

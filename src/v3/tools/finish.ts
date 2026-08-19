@@ -13,27 +13,28 @@ const nonBlankString = (maximum: number, description: string) =>
     })
     .describe(description);
 
-const uniqueNonBlankStrings = (
-  maximumItems: number,
-  itemMaximum: number,
-  description: string,
-) =>
-  z
-    .array(nonBlankString(itemMaximum, description))
-    .max(maximumItems)
-    .superRefine((values, ctx) => {
-      const seen = new Set<string>();
-      for (const [index, value] of values.entries()) {
-        if (seen.has(value)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: [index],
-            message: 'must not contain duplicate values',
-          });
-        }
-        seen.add(value);
-      }
-    });
+export const finishUnresolvedRequirementSchema = z.strictObject({
+  requirement: nonBlankString(
+    2_000,
+    'The specific explicit requirement that remains unresolved',
+  ),
+  reason: nonBlankString(
+    4_000,
+    'Why the requirement could not be completed',
+  ),
+  attempts: z
+    .array(
+      nonBlankString(
+        2_000,
+        'A source, action, or approach already tried for this requirement',
+      ),
+    )
+    .max(20),
+});
+
+export type FinishUnresolvedRequirement = z.infer<
+  typeof finishUnresolvedRequirementSchema
+>;
 
 /**
  * Completion request produced by the worker. The loop validates this strict
@@ -45,6 +46,12 @@ export const finishInputSchema = z.strictObject({
     8_000,
     'User-facing summary of the completed work and what each output contains',
   ),
+  unresolved: z
+    .array(finishUnresolvedRequirementSchema)
+    .max(50)
+    .describe(
+      'Explicit requirements that remain unresolved; use [] when the request is complete',
+    ),
 });
 
 export type FinishInput = z.infer<typeof finishInputSchema>;
@@ -55,22 +62,25 @@ export type FinishInput = z.infer<typeof finishInputSchema>;
  */
 export const legacyFinishInputSchema = z.strictObject({
   summary: finishInputSchema.shape.summary,
-  artifacts: uniqueNonBlankStrings(
-    100,
-    1_024,
-    'Legacy run-relative requested-output path',
-  ).optional(),
-  limitations: uniqueNonBlankStrings(
-    100,
-    2_000,
-    'Legacy unresolved source, access, or freshness limitation',
-  ),
+  artifacts: z
+    .array(nonBlankString(1_024, 'Legacy artifact path'))
+    .max(100)
+    .optional(),
+  limitations: z
+    .array(nonBlankString(2_000, 'Legacy limitation'))
+    .max(100)
+    .optional(),
 });
 
 /** Read old v3 checkpoint cargo, but expose and rewrite only the current shape. */
 export const durableFinishInputSchema = z
   .union([finishInputSchema, legacyFinishInputSchema])
-  .transform((finish): FinishInput => ({ summary: finish.summary }));
+  .transform(
+    (finish): FinishInput =>
+      'unresolved' in finish
+        ? finish
+        : { summary: finish.summary, unresolved: [] },
+  );
 
 /**
  * Model-facing definition for the exclusive completion control call.
@@ -82,9 +92,10 @@ export const durableFinishInputSchema = z
 export const finishTool: ToolDef<FinishInput> = {
   name: FINISH_TOOL_NAME,
   description:
-    'Request deterministic checks and independent verification after every requested output ' +
-    'has been published and inspected. Provide a user-facing summary of the completed work and ' +
-    'outputs. Requested outputs and evidence are derived from the authoritative manifest. ' +
+    'Submit the work for deterministic checks and independent review. Provide the user-facing ' +
+    'summary to release after review and list each explicit unresolved requirement, why it is ' +
+    'blocked, and approaches already tried; use unresolved: [] when you believe the request is complete. ' +
+    'Requested outputs and evidence are derived only from the authoritative manifest. ' +
     'finish must be the only tool call in its assistant response; it requests review and cannot ' +
     'declare success by itself.',
   inputSchema: finishInputSchema,

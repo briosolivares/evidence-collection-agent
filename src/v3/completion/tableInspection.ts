@@ -132,9 +132,35 @@ export function inspectTable(
       format: output.format,
       columns: expectedColumns,
       rowCount: parsed.rows.length,
+      columnNonblankCounts: countNonblankCellsByColumn(expectedColumns, parsed.rows, context),
       satisfiedRules: tableRuleTypes(output.rules, context),
     },
   };
+}
+
+/**
+ * Purely informational per-declared-column nonblank cell counts, in contract
+ * order. A cell is nonblank when its trimmed text is nonempty. This never
+ * produces a defect or a threshold; it is surfaced so a downstream verifier
+ * can judge column coverage without re-parsing the table itself.
+ */
+function countNonblankCellsByColumn(
+  columns: readonly string[],
+  rows: readonly Record<string, ParsedCell>[],
+  context: TableInspectionContext,
+): Array<{ column: string; nonblankCount: number }> {
+  const counts = columns.map((column) => ({ column, nonblankCount: 0 }));
+  for (const row of rows) {
+    poll(context);
+    for (let index = 0; index < columns.length; index += 1) {
+      pollEvery(context, index);
+      const cell = row[columns[index]!];
+      if (cell !== undefined && cell.text.trim() !== '') {
+        counts[index]!.nonblankCount += 1;
+      }
+    }
+  }
+  return counts;
 }
 
 function parseDeclaredTable(
@@ -474,8 +500,12 @@ function validateRules(
         break;
       }
       case 'matches_expected_values':
-        validateExpectedValues(rows, rule, context);
-        if (context.halted) return;
+        if (rule.source.kind === 'original_task') {
+          validateExpectedValues(rows, rule, context);
+          if (context.halted) return;
+        }
+        // Evidence-derived sets remain semantic scope for the judge. They
+        // were not stated by the user and must not become deterministic gates.
         break;
     }
   }
@@ -501,7 +531,7 @@ function validateExpectedValues(
     if (!recordDefect(
       context,
       'missing_expected_values',
-      `${artifactPath} column ${JSON.stringify(rule.column)} is missing required value(s): ${formatValues(missing, context)}.`,
+      `${artifactPath} column ${JSON.stringify(rule.column)} is missing explicitly required value(s): ${formatValues(missing, context)}.`,
     )) return;
   }
   if (rule.exhaustive === true) {
@@ -515,7 +545,7 @@ function validateExpectedValues(
       recordDefect(
         context,
         'unexpected_values',
-        `${artifactPath} column ${JSON.stringify(rule.column)} contains value(s) outside the contract's exhaustive set: ${formatValues(unexpected, context)}.`,
+        `${artifactPath} column ${JSON.stringify(rule.column)} contains value(s) outside the explicitly required exhaustive set: ${formatValues(unexpected, context)}.`,
       );
     }
   }
@@ -806,7 +836,13 @@ function tableRuleTypes(
   const types: Array<TableRule['type']> = [];
   for (let index = 0; index < rules.length; index += 1) {
     pollEvery(context, index);
-    types.push(rules[index]!.type);
+    const rule = rules[index]!;
+    if (
+      rule.type !== 'matches_expected_values' ||
+      rule.source.kind === 'original_task'
+    ) {
+      types.push(rule.type);
+    }
   }
   return types;
 }

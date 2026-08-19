@@ -48,11 +48,12 @@ that make evidence trustworthy.
 6. The worker publishes requested outputs and supporting evidence through the
    artifact boundary. Browser-backed work normally includes at least one
    evidence screenshot of the final/source state.
-7. The worker calls `finish`. Deterministic checks validate files, hashes,
-   roles, exact schemas, and contract requirements before a fresh-context
-   verifier reviews the result. Any findings return to the same worker
-   conversation for correction.
-8. The TUI presents the final summary and published artifacts. In every exit
+7. The worker calls `finish` with a human summary and structured unresolved
+   requirements. Deterministic checks settle structural facts and findings,
+   then a fresh read-only judge returns `verified`, `needs_correction`, or
+   `incomplete`. Actionable findings return to the same worker conversation.
+8. The TUI presents the worker's latest summary and published artifacts for
+   both verified and incomplete runs. In every exit
    path Sherlock closes the task tab and every popup or tab the run created,
    while preserving browser pages that predated the run.
 9. A helper that proved useful may be published as a proposed patch. Sherlock
@@ -672,13 +673,22 @@ the next guard.
 
 ```json
 {
-  "summary": "What was done, what each output contains, and any unresolved constraint."
+  "summary": "What was accomplished and any material obstacle.",
+  "unresolved": [
+    {
+      "requirement": "The specific unresolved part of the request",
+      "reason": "Why it could not be completed",
+      "attempts": ["A source or approach already tried"]
+    }
+  ]
 }
 ```
 
 - `summary` is required and user-facing.
-- Concrete unresolved source, access, or freshness constraints belong in the
-  summary as claims for the verifier to evaluate.
+- `unresolved: []` means the worker believes the explicit request is complete;
+  nonempty entries submit useful partial work for blocker assessment.
+- The completion report is an untrusted worker claim. Its strings and arrays
+  are structurally bounded, but its prose is not scanned or treated as proof.
 - Requested outputs and evidence are derived from the authoritative manifest,
   rather than repeated as worker-authored finish input.
 - `finish` must be the only tool call in its assistant response.
@@ -691,7 +701,7 @@ Accuracy remains more important than eliminating every model role. V3 keeps a
 small initializer and verifier but removes the worker-facing contract mutation,
 typed-row database, and output-specific authoring tools.
 
-### 11.1 Immutable expected outputs
+### 11.1 Immutable explicit-output contract
 
 Before the worker starts, the initializer receives the task and is forced to
 return one typed output contract. It gets one bounded repair attempt. The
@@ -704,6 +714,12 @@ worker's first per-run message. It captures only user-observable requirements:
 - requested screenshots or downloads;
 - explicit required values and source constraints.
 
+The initializer must not invent expected values, entity lists, availability
+assumptions, domain heuristics, evidence requirements, or other desirable but
+unstated conditions. Requested scope remains a condition for the judge rather
+than a guessed deterministic rule. The original request is authoritative if
+the normalized contract conflicts with it.
+
 The worker cannot restate or revise the contract. New claims about source
 availability may be reported in the final summary; user clarifications are
 recorded in the conversation and verifier context. The verifier always
@@ -715,40 +731,53 @@ ends incomplete with its run directory preserved.
 
 ### 11.2 Deterministic finish checks
 
-On `finish`, code derives published outputs from the manifest and validates
-before spending a verifier attempt:
+On `finish`, code derives published outputs from the manifest and settles
+objective facts and structural findings:
 
 - every published requested output is confined, exists, has a matching hash,
   carries `requested_output`, and is not marked partial;
 - every contract-required output exists with the right kind and filename;
 - CSV/JSON/Markdown tables have exactly the declared columns and valid row
   shapes—extra columns fail;
-- exact/min/max/available count rules and required values hold;
+- explicitly requested mechanical counts and values hold;
 - documents and captures are non-empty and satisfy their declared structural
   and media requirements; prose quality is judged by the verifier rather than
   lexical placeholder matching;
 - requested screenshots/downloads carry appropriate roles and source data;
-- browser-backed runs include at least one evidence screenshot unless the task
-  itself explicitly forbids screenshots;
 - helper proposals are evidence-only unless the user requested them.
 
 Checks operate on generic artifact bytes and manifest metadata, not a hidden
-typed-row store. A failure answers the same `finish` call with objective,
-model-readable corrections. It does not spend a verifier cycle.
+typed-row store. They do not infer entity identity, expected-value sets, or
+domain completeness. For a completion claim, repairable structural failures
+answer the same `finish` call with objective corrections. When the worker
+reports unresolved requirements, the same findings are provided to the judge
+so truthful partial work cannot be trapped in a pre-judge repair loop.
 
 ### 11.3 Fresh-context verifier
 
-After checks pass, the verifier receives:
+Each fresh judge pass receives only:
 
-- original task and recorded user clarifications;
-- immutable output contract;
-- manifest and artifact listing;
-- deterministic facts already settled by code;
-- read-only verifier tools for bounded artifact inspection.
+- the original task and thin immutable output contract;
+- manifest entries carrying `requested_output` and/or `evidence`, including
+  provenance and hashes;
+- bounded contents or inspection facts for those surfaced files;
+- deterministic settled facts and structural findings;
+- prior judge findings needed for correction progress; and
+- the worker completion report, explicitly labeled as an untrusted claim.
 
-Only `verified` is success. Findings answer the worker's `finish` call and the
-same persistent conversation continues. An unavailable verifier, exhausted
-correction budget, or exhausted run budget ends `incomplete`; artifacts remain.
+Registry and path policy prohibit scratch files, transcripts, recovery state,
+unpublished observations, oracle data, and grader expectations. The judge maps
+each explicit requirement to surfaced evidence and returns exactly one typed
+decision: `verified`, `needs_correction`, or `incomplete`. Correction findings
+must identify the requirement, observed problem, and a concrete next action.
+There is no correction-specific attempt cap; the existing whole-run budgets
+remain authoritative. Repeated no-progress advice converges to `incomplete`.
+If a complete claim has a non-repairable blocker, the worker first receives a
+chance to submit a truthful summary and unresolved entry.
+
+Only `verified` is success. Verified and incomplete terminal presentation use
+the worker's latest summary and manifest-derived artifacts; an involuntary stop
+before any completion report uses a short deterministic fallback.
 
 Eval graders remain independent of the production verifier and continue to
 read only the run directory plus fresh oracle data.
@@ -766,13 +795,13 @@ stateDiagram-v2
   ExecutingTools --> ReadyForModel: ordered results appended
   ReadyForModel --> ReadyForModel: no tools / correctable protocol feedback
   ReadyForModel --> Checking: exclusive finish
-  Checking --> ReadyForModel: deterministic failures
-  Checking --> Verifying: checks pass
-  Verifying --> ReadyForModel: verifier findings
+  Checking --> ReadyForModel: repairable structural failures on complete claim
+  Checking --> Verifying: settled facts/findings ready
+  Verifying --> ReadyForModel: needs_correction
   Verifying --> Verified: verifier accepts
+  Verifying --> Incomplete: judge accepts credible blocker
   ReadyForModel --> Incomplete: budget / fatal model failure
-  Checking --> Incomplete: correction budget exhausted
-  Verifying --> Incomplete: verifier unavailable / cycle budget exhausted
+  Verifying --> Incomplete: verifier unavailable / whole-run budget exhausted
   Verified --> [*]
   Incomplete --> [*]
 ```
@@ -910,6 +939,11 @@ The existing `UiEvent`/reducer boundary remains authoritative. V3 must emit:
   entry, before the corresponding tool execution-end event;
 - exactly one terminal finished, incomplete, cancelled, or failed event.
 
+Incomplete terminal events retain the worker's latest summary, concise
+unresolved requirements, and all published artifacts. Internal reason codes,
+attempt details, and diagnostics remain secondary metadata rather than
+replacing the assistant's response.
+
 Langfuse remains a tracing delegate. The manifest is authoritative for
 artifacts; TUI events are derived. Tracing must never receive provider secrets,
 raw CDP URLs, or child environment blocks.
@@ -971,8 +1005,9 @@ the grader contract.
 | Browser disconnected | Classify browser death; current run fails/incompletes honestly; TUI runtime may relaunch for the next task. |
 | Tool timeout | Kill owned child/process group when possible; effect may be uncertain; require inspection. |
 | Cancellation | Abort model and child/tool work, finalize run files, close owned pages, emit cancelled once. |
-| Deterministic finish failure | Answer `finish` with exact defects; same cycle continues. |
-| Verifier correction | Answer `finish` with findings; same conversation continues. |
+| Deterministic finish failure | Answer a complete claim with exact repairable defects; submit findings to the judge with reported unresolved work. |
+| Judge correction | Answer `finish` with requirement-specific problem and next action; same conversation continues. |
+| Judge incomplete | Preserve the latest worker response and all surfaced artifacts. |
 | Verifier unavailable | End incomplete; preserve artifacts. |
 | Budget exhausted | End incomplete with named guard. |
 | Crash during state-changing tool | Checkpoint as uncertain; resume never blindly replays. |

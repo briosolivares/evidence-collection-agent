@@ -1,6 +1,11 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import type { ProgressEvent } from '../model/callModel.js';
+import { initManifest, writeArtifact } from '../run/artifacts.js';
 import type { RunTaskResult } from './runTask.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 
@@ -92,17 +97,56 @@ describe('formatRunSummary', () => {
     expect(summary).toContain('/runs/2026-08-10T00-00-00-abcd');
   });
 
-  it('reports the reason, detail, and run dir on an incomplete run', () => {
+  it('reports the worker response and unresolved requirements without internal diagnostics', () => {
     const result: RunTaskResult = {
       runDir: '/runs/2026-08-10T00-00-00-efgh',
       status: 'incomplete',
       reason: 'budget_exceeded',
       detail: 'max_turns exceeded',
-      finalText: '',
+      finalText: 'I saved the records available before access was denied.',
+      unresolved: [
+        {
+          requirement: 'Include the private account records',
+          reason: 'The account required an unavailable login.',
+          attempts: ['Opened the account page'],
+        },
+      ],
     };
     const summary = formatRunSummary(result);
-    expect(summary).toContain('budget_exceeded');
-    expect(summary).toContain('max_turns exceeded');
+    expect(summary).toContain('I saved the records available');
+    expect(summary).toContain('Include the private account records');
+    expect(summary).not.toContain('budget_exceeded');
+    expect(summary).not.toContain('max_turns exceeded');
+    expect(summary).not.toContain('Opened the account page');
     expect(summary).toContain('/runs/2026-08-10T00-00-00-efgh');
+  });
+
+  it('lists every published manifest artifact for an incomplete run', () => {
+    const runDir = mkdtempSync(join(tmpdir(), 'sherlock-repl-format-'));
+    try {
+      initManifest(runDir, 'Collect records');
+      writeArtifact(runDir, 'artifacts/records.csv', Buffer.from('name\nAlice\n'), {
+        roles: ['requested_output'],
+      });
+      writeArtifact(runDir, 'artifacts/source.png', Buffer.from('image'), {
+        roles: ['evidence'],
+      });
+      writeArtifact(runDir, 'scratch/private.txt', Buffer.from('not surfaced'));
+
+      const summary = formatRunSummary({
+        runDir,
+        status: 'incomplete',
+        reason: 'worker_incomplete',
+        detail: 'internal',
+        finalText: 'Saved the available records.',
+        unresolved: [],
+      });
+
+      expect(summary).toContain('artifacts/records.csv');
+      expect(summary).toContain('artifacts/source.png');
+      expect(summary).not.toContain('scratch/private.txt');
+    } finally {
+      rmSync(runDir, { recursive: true, force: true });
+    }
   });
 });

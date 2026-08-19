@@ -213,6 +213,7 @@ function recoveryResponses() {
           name: 'finish',
           input: {
             summary: 'The same TUI browser session completed a later task.',
+            unresolved: [],
           },
         },
       ],
@@ -389,7 +390,6 @@ describe('Sherlock v3 cancellation acceptance', () => {
           harness: {
             initializerCallModel,
             verifierCallModel,
-            maxWorkerCycles: 1,
           },
           tracingDelegate: noopTracing(),
         },

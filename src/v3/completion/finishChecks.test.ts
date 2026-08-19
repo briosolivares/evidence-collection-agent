@@ -65,6 +65,7 @@ function finish(
 ): FinishInput {
   return {
     summary,
+    unresolved: [],
   };
 }
 
@@ -116,6 +117,10 @@ describe('runV3FinishChecks — manifest-derived finish facts', () => {
         format: 'csv',
         columns: ['name', 'url'],
         rowCount: 1,
+        columnNonblankCounts: [
+          { column: 'name', nonblankCount: 1 },
+          { column: 'url', nonblankCount: 1 },
+        ],
         satisfiedRules: [],
       },
     ]);
@@ -656,7 +661,7 @@ describe('runV3FinishChecks — generic tables', () => {
     expect(codes(result)).toContain('row_shape_mismatch');
   });
 
-  it('parses quoted CSV fields/newlines and enforces row/count/value rules', () => {
+  it('parses quoted CSV fields/newlines and enforces mechanical row rules', () => {
     publish(
       'artifacts/roster.csv',
       'name,url\n"Alpha, Inc.\nNorth",https://e.test/a\nBeta,https://e.test/b\n',
@@ -683,6 +688,56 @@ describe('runV3FinishChecks — generic tables', () => {
     expect(result.facts.outputs[0]).toMatchObject({
       rowCount: 2,
       satisfiedRules: ['exact_row_count', 'unique', 'matches_expected_values'],
+    });
+
+    publish(
+      'artifacts/roster.csv',
+      'name,url\n"Alpha, Inc.\nNorth",https://e.test/a\nUnexpected,https://e.test/b\n',
+    );
+    const mismatched = runV3FinishChecks({
+      runDir,
+      contract: contract(spec),
+      finish: finish(),
+    });
+    expect(codes(mismatched)).toEqual(
+      expect.arrayContaining(['missing_expected_values', 'unexpected_values']),
+    );
+  });
+
+  it('computes per-column nonblank counts, treating whitespace-only cells as blank', () => {
+    publish(
+      'artifacts/roster.csv',
+      'name,url\nAlpha,https://example.test/a\nBeta,\nGamma, \n',
+    );
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(tableSpec()),
+      finish: finish(),
+    });
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs[0]).toMatchObject({
+      rowCount: 3,
+      columnNonblankCounts: [
+        { column: 'name', nonblankCount: 3 },
+        { column: 'url', nonblankCount: 1 },
+      ],
+    });
+  });
+
+  it('reports zero nonblank counts for every column on a zero-row table', () => {
+    publish('artifacts/roster.csv', 'name,url\n');
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(tableSpec()),
+      finish: finish(),
+    });
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs[0]).toMatchObject({
+      rowCount: 0,
+      columnNonblankCounts: [
+        { column: 'name', nonblankCount: 0 },
+        { column: 'url', nonblankCount: 0 },
+      ],
     });
   });
 
@@ -754,7 +809,7 @@ describe('runV3FinishChecks — generic tables', () => {
     expect(result.facts.outputs[0]).toMatchObject({ rowCount: 2 });
   });
 
-  it('allows placeholder words while enforcing expected/exhaustive values', () => {
+  it('leaves evidence-derived expected entity/value scope for the judge', () => {
     publish('artifacts/roster.csv', 'name,url\nTODO,\nUnexpected,\n');
     const spec = tableSpec({
       rules: [
@@ -763,7 +818,7 @@ describe('runV3FinishChecks — generic tables', () => {
           column: 'name',
           expected: ['Alpha'],
           exhaustive: true,
-          source: { kind: 'original_task' },
+          source: { kind: 'evidence', evidenceIds: ['source-list'] },
         },
       ],
     });
@@ -772,10 +827,8 @@ describe('runV3FinishChecks — generic tables', () => {
       contract: contract(spec),
       finish: finish(),
     });
-    expect(codes(result).sort()).toEqual([
-      'missing_expected_values',
-      'unexpected_values',
-    ]);
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs[0]).toMatchObject({ satisfiedRules: [] });
   });
 });
 
@@ -1037,14 +1090,15 @@ describe('runV3FinishChecks — browser evidence', () => {
     initManifest(runDir, TASK, 'local');
   });
 
-  it('requires a source-backed evidence screenshot for a browser-backed run', () => {
+  it('does not infer a screenshot requirement for a browser-backed run', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const result = runV3FinishChecks({
       runDir,
       contract: contract(tableSpec()),
       finish: finish(),
     });
-    expect(codes(result)).toContain('missing_browser_evidence_screenshot');
+    expect(result.status).toBe('passed');
+    expect(result.facts.evidenceScreenshotPaths).toEqual([]);
   });
 
   it('accepts a verified evidence screenshot and reports it as a fact', () => {
@@ -1077,7 +1131,7 @@ describe('runV3FinishChecks — browser evidence', () => {
     expect(result.facts.evidenceScreenshotPaths).toEqual(['artifacts/source.png']);
   });
 
-  it('does not let a summary claim waive required browser evidence', () => {
+  it('does not infer browser evidence from a summary reporting an obstacle', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const result = runV3FinishChecks({
       runDir,
@@ -1086,6 +1140,6 @@ describe('runV3FinishChecks — browser evidence', () => {
         'Published the table, but login access prevented a source screenshot.',
       ),
     });
-    expect(codes(result)).toContain('missing_browser_evidence_screenshot');
+    expect(result.status).toBe('passed');
   });
 });

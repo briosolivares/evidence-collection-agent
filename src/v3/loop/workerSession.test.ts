@@ -80,6 +80,7 @@ const USAGE: Usage = {
 
 const VALID_FINISH: FinishInput = {
   summary: 'The requested report and evidence were published.',
+  unresolved: [],
 };
 
 function accepted(

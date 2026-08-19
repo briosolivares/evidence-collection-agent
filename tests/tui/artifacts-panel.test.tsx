@@ -174,6 +174,44 @@ describe('ArtifactsPanel (passive)', () => {
     unmount();
   });
 
+  it('renders an incomplete worker response, unresolved requirements, and surviving artifacts', async () => {
+    const state = ([
+      { type: 'run_started', task: 'investigate', at: 0 },
+      { type: 'run_dir', runDir: RUN_DIR },
+      { type: 'turn_start', turn: 1 },
+      ...publishes(),
+      {
+        type: 'run_finished',
+        outcome: 'incomplete',
+        finalText: 'I saved the public records that were available.',
+        unresolved: [
+          {
+            requirement: 'Include the account-only records',
+            reason: 'The site required a login that was not available.',
+            attempts: ['Opened the account page'],
+          },
+        ],
+        reason: 'worker_incomplete',
+        detail: 'internal diagnostic that should stay hidden',
+        runDir: RUN_DIR,
+        at: 42_000,
+      },
+    ] satisfies StoreAction[]).reduce(reduce, createInitialState());
+
+    const { lastFrame, unmount } = render(<Harness initial={state} />);
+    await tick();
+    const frame = lastFrame() ?? '';
+    expect(frame).toContain('Incomplete after 42s');
+    expect(frame).toContain('I saved the public records that were available.');
+    expect(frame).toContain('Include the account-only records');
+    expect(frame).toContain('The site required a login');
+    expect(frame).toContain('artifacts/top5.csv');
+    expect(frame).not.toContain('worker_incomplete');
+    expect(frame).not.toContain('internal diagnostic');
+    expect(frame).not.toContain('Opened the account page');
+    unmount();
+  });
+
   it('lists requested outputs before evidence, publish order within groups', async () => {
     const { lastFrame, unmount } = render(<Harness initial={completedState()} />);
     await tick();

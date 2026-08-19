@@ -1,6 +1,7 @@
 import { Box, Text } from 'ink';
 
 import { formatDuration, formatTokens, truncate } from '../format.js';
+import { NO_COMPLETION_REPORT_TEXT } from '../../run/runOutcome.js';
 import { orderArtifactsForSummary, type UiAction } from '../store/reducer.js';
 import type {
   ArtifactUiState,
@@ -44,10 +45,10 @@ interface ArtifactsPanelProps {
 }
 
 /**
- * The completion summary panel: rendered above the composer once a run
- * completes — the ✓ header (matching the transcript's completion line),
- * a concise answer block, and the published artifacts with requested
- * outputs first. It renders passively (design decision 4 — no forced
+ * The terminal summary panel: rendered above the composer once a run ends
+ * verified or incomplete — its status header, concise worker response,
+ * unresolved requirements when present, and published artifacts with
+ * requested outputs first. It renders passively (design decision 4 — no forced
  * Esc after a run; the composer keeps focus and the next task types
  * immediately); Tab hands it the keys, where selection, the detail
  * card, and Space/o/r behave exactly as in the live rail. Esc and Tab
@@ -86,15 +87,31 @@ export function ArtifactsPanel({
       {summary !== undefined ? (
         <>
           <Box>
-            <Text color={theme.success}>{`${glyphs.success} `}</Text>
+            <Text color={summary.outcome === 'complete' ? theme.success : theme.error}>
+              {`${summary.outcome === 'complete' ? glyphs.success : glyphs.error} `}
+            </Text>
             <Text>
-              {`${summary.verb} in ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`}
+              {summary.outcome === 'complete'
+                ? `${summary.verb} in ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`
+                : `Incomplete after ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`}
             </Text>
           </Box>
           <Text color={theme.muted}>{`  ${summary.runDir}`}</Text>
           <Box paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
-            <Text>{clampAnswer(summary.finalText)}</Text>
+            <Text>{clampAnswer(summary.finalText, summary.outcome)}</Text>
           </Box>
+          {summary.outcome === 'incomplete' && summary.unresolved.length > 0 && (
+            <Box flexDirection="column" paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
+              <Text color={theme.primary} bold>
+                Unresolved
+              </Text>
+              {summary.unresolved.map((item, index) => (
+                <Text key={`${item.requirement}-${index}`}>
+                  {`  • ${truncate(item.requirement, 120)} — ${truncate(item.reason, 180)}`}
+                </Text>
+              ))}
+            </Box>
+          )}
         </>
       ) : (
         <>
@@ -131,7 +148,7 @@ export function ArtifactsPanel({
               cursor={focused ? ui.cursor : 0}
               showCursor={focused}
               limit={limit}
-              showVerifiedHelperProposals={summary !== undefined}
+              showVerifiedHelperProposals={summary?.outcome === 'complete'}
             />
             <Text color={theme.muted}>
               {focused
@@ -145,10 +162,15 @@ export function ArtifactsPanel({
   );
 }
 
-/** The concise answer: trimmed, clamped, "Task completed" when empty. */
-function clampAnswer(finalText: string | undefined): string {
+/** The concise answer with truthful deterministic fallbacks. */
+function clampAnswer(
+  finalText: string | undefined,
+  outcome: CompletedRunSummary['outcome'],
+): string {
   const text = (finalText ?? '').trim();
-  if (text === '') return 'Task completed';
+  if (text === '') {
+    return outcome === 'complete' ? 'Task completed' : NO_COMPLETION_REPORT_TEXT;
+  }
   const lines = truncate(text, ANSWER_MAX_CHARS).split('\n');
   if (lines.length <= ANSWER_MAX_LINES) return lines.join('\n');
   return `${lines.slice(0, ANSWER_MAX_LINES).join('\n')}\n…`;

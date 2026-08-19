@@ -119,6 +119,7 @@ function finishResponse(summary = 'Published report.csv.'): ModelStreamEvent[] {
         name: 'finish',
         input: {
           summary,
+          unresolved: [],
         },
       },
     ],
@@ -285,11 +286,17 @@ describe('startRun v3 public bridge', () => {
     expect(outcome).toMatchObject({
       status: 'incomplete',
       reason: 'budget_exceeded',
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
     expect(events.at(-1)).toMatchObject({
       type: 'run_finished',
       outcome: 'incomplete',
       reason: 'budget_exceeded',
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
   });
 
@@ -304,12 +311,18 @@ describe('startRun v3 public bridge', () => {
       status: 'incomplete',
       reason: 'worker_incomplete',
       detail: expect.stringContaining('api unreachable'),
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
     expect(events.at(-1)).toMatchObject({
       type: 'run_finished',
       outcome: 'incomplete',
       reason: 'worker_incomplete',
       detail: expect.stringContaining('api unreachable'),
+      finalText:
+        'The assistant stopped before it could prepare a final response.',
+      unresolved: [],
     });
   });
 

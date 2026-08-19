@@ -5,6 +5,7 @@
 
 import type { ArtifactRole, ManifestEntry } from '../../run/artifacts.js';
 import type { BrowserProviderKind } from '../../browser/sessionProvider.js';
+import type { UnresolvedRequirement } from '../../run/runOutcome.js';
 
 /** Interaction modes; overlays are modes so exactly one surface owns input. */
 export type SessionMode =
@@ -103,6 +104,7 @@ export type TranscriptItemBody =
   | { kind: 'evidence'; line: string; sourceUrl?: string; verbose?: { input: string; result: string } }
   | {
       kind: 'completion';
+      outcome: 'complete' | 'incomplete';
       verb: string;
       elapsedMs: number;
       tokens: number;
@@ -159,16 +161,21 @@ export interface PublishedArtifact {
 }
 
 /**
- * What the completion summary panel shows for the run that just finished:
- * the completion header's data plus the final answer prose. Recorded only
- * for interactive runs that end with outcome 'completed' (eval trials and
- * early stops never set it) and cleared by the next run_started, so its
- * presence is the panel's render condition while idle.
+ * What the terminal summary panel shows for the run that just finished:
+ * status, final answer prose, unresolved requirements, and deterministic
+ * timing/location data. Recorded for verified and incomplete interactive
+ * runs (eval trials, cancellation, and runtime failures never set it) and
+ * cleared by the next run_started.
  */
 export interface CompletedRunSummary {
-  /** Final model prose; the panel falls back to "Task completed" when
-   * this is absent or empty. Full prose stays in the transcript. */
+  /** Worker completion-report prose. Synthetic complete events may omit it;
+   * incomplete events then use the deterministic no-report fallback. */
   finalText?: string;
+  /** Whether the judge accepted the work. Synthetic demo completions use
+   * complete; real runs use complete only for verified outcomes. */
+  outcome: 'complete' | 'incomplete';
+  /** Worker-reported blockers shown concisely for incomplete runs. */
+  unresolved: readonly UnresolvedRequirement[];
   /** Completion-line verb, fixed from config at session start. */
   verb: string;
   /** Wall-clock duration of the run. */
@@ -303,6 +310,8 @@ export type UiEvent =
        * reducer still renders them; they are unreachable from a real run. */
       outcome: 'completed' | 'budget_exceeded' | 'verified' | 'incomplete';
       finalText?: string;
+      /** Worker-reported unresolved request parts for an incomplete run. */
+      unresolved?: readonly UnresolvedRequirement[];
       runDir: string;
       /** Which guard tripped (budget_exceeded) or why the run is
        * incomplete (incomplete). */
@@ -333,7 +342,7 @@ export interface SessionState {
   artifacts: readonly PublishedArtifact[];
   /** Cursor + view of the artifact rail/panel; reset on run_started. */
   artifactUi: ArtifactUiState;
-  /** Summary of the last completed interactive run — the completion
+  /** Summary of the last terminal interactive run — the answer/artifact
    * panel's data and its render condition; cleared on run_started. */
   completedRun?: CompletedRunSummary;
   /** Run dir of the most recent run whatever its outcome, retained as

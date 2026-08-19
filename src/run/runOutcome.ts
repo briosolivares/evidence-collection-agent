@@ -19,12 +19,33 @@ export type IncompleteRunReason =
    * bounded repair, or was unreachable. The worker's output may well be
    * fine; nobody trustworthy said so. */
   | 'verifier_unavailable'
-  /** The verifier kept requesting corrections until the correction budget
-   * ran out. The last cycle's output stands, unverified. */
+  /** Read compatibility for an older correction-cap terminal outcome. New
+   * runs use ordinary whole-run budgets instead of this reason. */
   | 'verification_attempts'
+  /** The judge accepted a credible reported blocker, or correction dialogue
+   * made no progress with unchanged surfaced evidence. */
+  | 'verification_incomplete'
   /** A whole-run budget guard (turns, tokens, tool calls, bytes, wall time,
    * or the per-request context ceiling) ended the run first. */
   | 'budget_exceeded';
+
+/** Public, human-relevant part of a worker-reported unresolved requirement. */
+export interface UnresolvedRequirement {
+  requirement: string;
+  reason: string;
+  attempts: readonly string[];
+}
+
+/** Used only when a run ended before the worker submitted any completion
+ * report. It is deliberately factual and does not invent an explanation. */
+export const NO_COMPLETION_REPORT_TEXT =
+  'The assistant stopped before it could prepare a final response.';
+
+/** Keep a worker-authored response when one exists, otherwise supply the
+ * deterministic involuntary-stop fallback used by public interfaces. */
+export function incompleteFinalText(finalText: string): string {
+  return finalText.trim() === '' ? NO_COMPLETION_REPORT_TEXT : finalText;
+}
 
 /** The outcome of a harness-mode run. */
 export type RunOutcome =
@@ -40,7 +61,11 @@ export type RunOutcome =
        * failure was, how many attempts were spent. */
       detail: string;
       /** The worker's final prose when its last cycle completed ("" when
-       * the run ended mid-cycle). Preserved because incomplete runs keep
-       * their artifacts — graders and humans still review them. */
+       * the run ended mid-cycle at the durable core boundary). Public
+       * adapters replace an empty value with NO_COMPLETION_REPORT_TEXT. */
       finalText: string;
+      /** Worker-reported unresolved request parts from its latest completion
+       * report. Empty when no report was submitted. Attempts remain available
+       * programmatically but presentation surfaces normally omit them. */
+      unresolved: readonly UnresolvedRequirement[];
     };

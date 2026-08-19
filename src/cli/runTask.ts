@@ -27,7 +27,10 @@ import {
 } from '../run/artifacts.js';
 import { createRunDir } from '../run/runDir.js';
 import { generateRunId } from '../run/runId.js';
-import type { RunOutcome } from '../run/runOutcome.js';
+import {
+  incompleteFinalText,
+  type RunOutcome,
+} from '../run/runOutcome.js';
 import { createRunTracing, type RunTracing } from '../tracing/runTracing.js';
 import type { ToolCtx } from '../tools/registry.js';
 import {
@@ -60,23 +63,24 @@ const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
 }).runsBaseDir;
 
 /** Production defaults. Tool outputs are bounded per result/message and
- * offloaded to disk; whole-run model/tool-result totals remain observable
- * without acting as arbitrary completion ceilings. */
+ * offloaded to disk; whole-run model, tool-call, and tool-result totals
+ * remain observable without acting as arbitrary completion ceilings. Wall
+ * time is the run's bound on research persistence. */
 export const V3_PRODUCTION_DEFAULTS = Object.freeze({
   maxOutputTokens: 8_192,
   maxWorkerTurns: Infinity,
   maxContextTokens: 900_000,
-  maxToolCalls: 100,
+  maxToolCalls: Infinity,
   maxModelTokens: Infinity,
   maxWallTimeMs: 3_600_000,
   maxCompletionCheckFailures: 5,
-  maxVerifierCorrections: 2,
+  /** Retained in durable budget configuration as an unbounded compatibility
+   * field. Correction cycles are bounded by the ordinary whole-run guards. */
+  maxVerifierCorrections: Infinity,
 });
 
 /** Run-scoped initializer/verifier tuning and injectable model seams. */
 export interface HarnessConfig {
-  /** Maximum worker/verifier cycles; defaults to three. */
-  maxWorkerCycles?: number;
   /** Test or alternate initializer model. */
   initializerCallModel?: CallModel;
   /** Test or alternate fresh verifier model. */
@@ -312,12 +316,6 @@ function buildFreshConfiguration(
     config.javascriptPolicy,
     authenticated,
   );
-  const maxWorkerCycles = config.harness?.maxWorkerCycles ?? 3;
-  if (!Number.isInteger(maxWorkerCycles) || maxWorkerCycles < 1) {
-    throw new Error(
-      `harness.maxWorkerCycles must be a positive integer, got ${maxWorkerCycles}`,
-    );
-  }
   const startUrl = usableStartUrl(config.startUrl);
   return v3DurableRunConfigurationSchema.parse({
     taskText,
@@ -348,7 +346,9 @@ function buildFreshConfiguration(
       maxWallTimeMs: v3CeilingToCheckpoint(
         config.maxWallTimeMs ?? V3_PRODUCTION_DEFAULTS.maxWallTimeMs,
       ),
-      maxVerifierCorrections: v3CeilingToCheckpoint(maxWorkerCycles - 1),
+      maxVerifierCorrections: v3CeilingToCheckpoint(
+        V3_PRODUCTION_DEFAULTS.maxVerifierCorrections,
+      ),
     },
   });
 }
@@ -418,13 +418,6 @@ function assertResumeConfigurationMatches(
     'harness.maxCompletionCheckFailures',
     config.harness?.maxCompletionCheckFailures,
     durable.maxCompletionCheckFailures,
-  );
-  check(
-    'harness.maxWorkerCycles',
-    config.harness?.maxWorkerCycles,
-    v3CeilingFromCheckpoint(
-      durable.budgetLimits.maxVerifierCorrections,
-    ) + 1,
   );
 }
 
@@ -558,7 +551,8 @@ function normalizeV3Outcome(
       status: 'incomplete',
       reason: outcome.reason,
       detail: outcome.detail,
-      finalText: outcome.finalText,
+      finalText: incompleteFinalText(outcome.finalText),
+      unresolved: outcome.unresolved,
     } satisfies { runDir: string } & RunOutcome;
   }
   if (outcome.status === 'cancelled') {

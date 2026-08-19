@@ -1,11 +1,11 @@
 import type { ProgressEvent } from '../model/callModel.js';
+import { readManifest } from '../run/artifacts.js';
 import type { RunTaskResult } from './runTask.js';
 
-// Pure ProgressEvent/RunTaskResult -> display-text formatting for the T15
-// REPL, kept separate from repl.ts's readline glue so it can be tested
-// without a terminal, a browser, or the network. repl.ts writes these
-// strings straight to stdout as they are produced; nothing here performs
-// I/O or buffers state across calls.
+// ProgressEvent/RunTaskResult -> display-text formatting for the T15 REPL,
+// kept separate from repl.ts's readline glue. The finished-run formatter
+// reads only the authoritative manifest so published artifacts are not lost
+// from an incomplete result; it never reads scratch or transcript state.
 
 /**
  * Render one live model-stream progress event as REPL display text.
@@ -58,14 +58,38 @@ export function formatProgressEvent(event: ProgressEvent): string {
  * @param result - the value `runTask` resolves with: the absolute run
  *   directory plus the harness's terminal outcome (see RunTaskResult) —
  *   `verified` (the only success) or `incomplete` (a reason plus specifics)
- * @returns a multi-line summary — the model's final message on `verified`,
- *   the reason and detail on `incomplete` — followed by the absolute run
- *   directory path, ending in a single trailing newline
+ * @returns a multi-line human-facing summary, unresolved requirements when
+ *   present, manifest-derived published artifact rows, and the absolute run
+ *   directory. Internal reason codes and diagnostics stay out of this view.
  */
 export function formatRunSummary(result: RunTaskResult): string {
-  const outcome =
-    result.status === 'verified'
-      ? `verified: ${result.finalText}`
-      : `incomplete (${result.reason}): ${result.detail}`;
-  return `\n${outcome}\nrun dir: ${result.runDir}\n`;
+  const lines = [
+    '',
+    result.status === 'verified' ? 'verified' : 'incomplete',
+    result.finalText,
+  ];
+  if (result.status === 'incomplete' && result.unresolved.length > 0) {
+    lines.push('unresolved:');
+    for (const item of result.unresolved) {
+      lines.push(`- ${item.requirement} — ${item.reason}`);
+    }
+  }
+  const artifacts = publishedArtifactPaths(result.runDir);
+  if (artifacts.length > 0) {
+    lines.push('artifacts:', ...artifacts.map((path) => `- ${path}`));
+  }
+  lines.push(`run dir: ${result.runDir}`);
+  return `${lines.join('\n')}\n`;
+}
+
+/** Read only surfaced manifest entries. A damaged/missing manifest must not
+ * hide the run outcome itself, so presentation falls back to no rows. */
+function publishedArtifactPaths(runDir: string): string[] {
+  try {
+    return readManifest(runDir).artifacts
+      .filter((entry) => entry.roles !== undefined)
+      .map((entry) => entry.filename);
+  } catch {
+    return [];
+  }
 }

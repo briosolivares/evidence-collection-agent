@@ -64,9 +64,13 @@ export function TranscriptItemView({
       return (
         <Box flexDirection="column" marginTop={1} paddingLeft={1}>
           <Box>
-            <Text color={theme.success}>{`${glyphs.success} `}</Text>
+            <Text color={item.outcome === 'complete' ? theme.success : theme.error}>
+              {`${item.outcome === 'complete' ? glyphs.success : glyphs.error} `}
+            </Text>
             <Text>
-              {`${item.verb} in ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`}
+              {item.outcome === 'complete'
+                ? `${item.verb} in ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`
+                : `Incomplete after ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`}
             </Text>
           </Box>
           {item.artifacts.map((artifact) => (

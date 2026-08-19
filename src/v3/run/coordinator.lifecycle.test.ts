@@ -1,4 +1,5 @@
 import {
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -27,7 +28,7 @@ import {
   type ToolRegistry,
 } from '../../tools/registry.js';
 import { publishArtifactTool } from '../tools/publishArtifact.js';
-import { finishTool } from '../tools/finish.js';
+import { finishTool, type FinishInput } from '../tools/finish.js';
 import {
   V3_HARNESS_DIR,
   V3_RUN_CHECKPOINT_FILENAME,
@@ -36,6 +37,7 @@ import {
   type V3DurableRunConfiguration,
 } from './checkpoint.js';
 import { runV3Coordinator } from './coordinator.js';
+import { V3_FINDINGS_REPORT_FILENAME } from './findingsReport.js';
 import { raceWithV3RunSignal } from './runDeadline.js';
 
 const TASK =
@@ -57,6 +59,7 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested one-row report.',
+  unresolved: [],
 };
 
 const CONFIGURATION: V3DurableRunConfiguration = {
@@ -99,10 +102,20 @@ afterEach(() => {
 });
 
 describe('v3 coordinator correction lifecycle', () => {
-  it('returns verifier findings to the worker, accepts its repair, and owns one browser page', async () => {
+  it('returns a research finding with the harness instruction, accepts new evidence, and owns one browser page', async () => {
+    const unresolvedFinish: FinishInput = {
+      summary: 'Published the available report; Bob is still unresolved.',
+      unresolved: [
+        {
+          requirement: 'Include Bob in the requested report.',
+          reason: 'The only source checked so far showed Alice.',
+          attempts: ['Checked the primary listing page.'],
+        },
+      ],
+    };
     const worker = scriptedDriver([
       publishReport('Alice', 'publish-initial'),
-      finishResponse('finish-initial'),
+      finishResponse('finish-initial', unresolvedFinish),
       publishReport('Bob', 'publish-corrected'),
       finishResponse('finish-corrected'),
     ]);
@@ -129,7 +142,16 @@ describe('v3 coordinator correction lifecycle', () => {
     expect(worker.generate).toHaveBeenCalledTimes(4);
     expect(verifier.generate).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(worker.requests[2])).toContain('needs_correction');
-    expect(JSON.stringify(worker.requests[2])).toContain('wrong_name');
+    expect(JSON.stringify(worker.requests[2])).toContain(
+      'Include Bob in the requested report.',
+    );
+    // The harness attaches its own fixed instruction to a research finding;
+    // the verifier never dictates artifact contents and no free-form
+    // model-authored nextAction is forwarded.
+    expect(JSON.stringify(worker.requests[2])).toContain(
+      'Continue evidence collection for this requirement',
+    );
+    expect(JSON.stringify(worker.requests[2])).not.toContain('nextAction');
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
       progress: { verifierCycles: 2, completionCheckFailures: 0 },
@@ -137,6 +159,217 @@ describe('v3 coordinator correction lifecycle', () => {
     });
     expect(readManifest(runDir).finishedAt).toBeDefined();
     expectBrowserLifecycle(browser);
+  });
+
+  it('writes a needs_correction cycle and the verified terminus into harness/findings.md', async () => {
+    const unresolvedFinish: FinishInput = {
+      summary: 'Published the available report; Bob is still unresolved.',
+      unresolved: [
+        {
+          requirement: 'Include Bob in the requested report.',
+          reason: 'The only source checked so far showed Alice.',
+          attempts: ['Checked the primary listing page.'],
+        },
+      ],
+    };
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-initial'),
+        finishResponse('finish-initial', unresolvedFinish),
+        publishReport('Bob', 'publish-corrected'),
+        finishResponse('finish-corrected'),
+      ]),
+      verifier: scriptedDriver([
+        verifierResponse('needs_correction'),
+        verifierResponse('verified'),
+      ]),
+      browser: fakeBrowser().controller,
+    });
+
+    expect(outcome.status).toBe('verified');
+    const findingsPath = join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME);
+    const findings = readFileSync(findingsPath, 'utf8');
+    expect(findings).toContain('Audit projection only');
+    expect(findings).toContain('Include Bob in the requested report.');
+    expect(findings).toContain('- Outcome: verified');
+  });
+
+  it('records a diagnostic and leaves the verification outcome unchanged when the findings-report write fails', async () => {
+    // Pre-create the harness directory with the exact convention the
+    // checkpoint store expects, then pre-occupy the findings-report path
+    // with a directory so the atomic rename onto it fails deterministically.
+    mkdirSync(join(runDir, V3_HARNESS_DIR), { mode: 0o700 });
+    mkdirSync(join(runDir, V3_HARNESS_DIR, V3_FINDINGS_REPORT_FILENAME));
+
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-write-failure'),
+        finishResponse('finish-write-failure'),
+      ]),
+      verifier: scriptedDriver([verifierResponse('verified')]),
+      browser: fakeBrowser().controller,
+    });
+
+    expect(outcome).toEqual({ status: 'verified', finalText: FINISH.summary });
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'terminal',
+      outcome: { status: 'verified' },
+    });
+    const events = readFileSync(join(runDir, 'transcript.jsonl'), 'utf8')
+      .trim()
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => JSON.parse(line) as { type?: string; message?: string });
+    const failure = events.find((event) => event.type === 'v3_findings_report_failed');
+    expect(failure).toBeDefined();
+    expect(failure?.message).toBeTruthy();
+  });
+
+  it('bounces a failed deterministic check to the worker even when unresolved is nonempty, never reaching the verifier', async () => {
+    const claimedBlockerFinish: FinishInput = {
+      summary: 'Published the report; one entity could not be confirmed.',
+      unresolved: [
+        {
+          requirement: 'Confirm the second entity.',
+          reason: 'The source was inconsistent.',
+          attempts: ['Checked the primary source.'],
+        },
+      ],
+    };
+    const worker = scriptedDriver([
+      publishReport(['Alice', 'Bob'], 'publish-invalid-with-blocker'),
+      finishResponse('finish-invalid-with-blocker', claimedBlockerFinish),
+      publishReport('Carol', 'publish-repaired-with-blocker'),
+      finishResponse('finish-repaired-with-blocker'),
+    ]);
+    const verifier = scriptedDriver([verifierResponse('verified')]);
+    const browser = fakeBrowser();
+
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker,
+      verifier,
+      browser: browser.controller,
+    });
+
+    expect(outcome.status).toBe('verified');
+    expect(verifier.generate).toHaveBeenCalledOnce();
+    expect(JSON.stringify(worker.requests[2])).toContain(
+      'deterministic_finish_checks',
+    );
+    expect(JSON.stringify(worker.requests[2])).toContain('exact_row_count');
+    expect(readCheckpoint()).toMatchObject({
+      phase: 'terminal',
+      progress: { verifierCycles: 1, completionCheckFailures: 1 },
+      outcome: { status: 'verified' },
+    });
+    expectBrowserLifecycle(browser);
+  });
+
+  it('ends credible unresolved work incomplete with the worker-written response', async () => {
+    const incompleteFinish: FinishInput = {
+      summary: 'Published the available report; the requested source was inaccessible.',
+      unresolved: [
+        {
+          requirement: 'Support the report with the requested source.',
+          reason: 'The source consistently returned an access-denied response.',
+          attempts: ['Opened the source directly.', 'Retried from the task page.'],
+        },
+      ],
+    };
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-partial'),
+        finishResponse('finish-partial', incompleteFinish),
+      ]),
+      verifier: scriptedDriver([verifierIncompleteResponse()]),
+      browser: fakeBrowser().controller,
+    });
+
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'verification_incomplete',
+      finalText: incompleteFinish.summary,
+      unresolved: incompleteFinish.unresolved,
+    });
+  });
+
+  it('continues on a genuinely new attempt but converges once the same attempt repeats', async () => {
+    const firstAttemptFinish: FinishInput = {
+      summary: 'Published the available report, but Bob could not be confirmed.',
+      unresolved: [
+        {
+          requirement: 'Include Bob in the requested report.',
+          reason: 'The only available source continued to show Alice.',
+          attempts: ['Rechecked the primary source listing.'],
+        },
+      ],
+    };
+    const repeatedAttemptFinish: FinishInput = {
+      ...firstAttemptFinish,
+      summary:
+        'Published the available report; Bob remains unconfirmed after another check.',
+    };
+    const verifier = scriptedDriver([
+      verifierResponse('needs_correction'),
+      verifierResponse('needs_correction'),
+      verifierResponse('needs_correction'),
+    ]);
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-no-progress'),
+        finishResponse('finish-claimed-complete'),
+        finishResponse('finish-first-attempt', firstAttemptFinish),
+        finishResponse('finish-repeated-attempt', repeatedAttemptFinish),
+      ]),
+      verifier,
+      browser: fakeBrowser().controller,
+    });
+
+    // Unchanged surfaced evidence and the same unsupported requirement, but a
+    // genuinely new distinct attempt string on the second cycle, must not
+    // converge yet; only the third cycle's exact repeat of that attempt
+    // converges to incomplete.
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'verification_incomplete',
+      finalText: repeatedAttemptFinish.summary,
+      unresolved: repeatedAttemptFinish.unresolved,
+    });
+    expect(verifier.generate).toHaveBeenCalledTimes(3);
+  });
+
+  it('preserves the latest worker completion report if a later worker turn stops involuntarily', async () => {
+    const latestFinish: FinishInput = {
+      summary: 'Published the available report; one requested row remains unsupported.',
+      unresolved: [
+        {
+          requirement: 'Include Bob in the requested report.',
+          reason: 'The surfaced source did not contain Bob.',
+          attempts: ['Checked the available source.'],
+        },
+      ],
+    };
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-before-worker-stop'),
+        finishResponse('finish-before-worker-stop', latestFinish),
+      ]),
+      verifier: scriptedDriver([verifierResponse('needs_correction')]),
+      browser: fakeBrowser().controller,
+    });
+
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'worker_incomplete',
+      finalText: latestFinish.summary,
+      unresolved: latestFinish.unresolved,
+    });
   });
 
   it('returns deterministic check defects to the worker before verifying its repair', async () => {
@@ -408,15 +641,105 @@ describe('v3 coordinator terminal lifecycle', () => {
     expectBrowserLifecycle(browser);
   });
 
-  it('answers the pending finish exactly once when verifier corrections are exhausted', async () => {
+  it('terminalizes verification_incomplete, not verifier_unavailable, when the verifier repeats an invalid artifact_repair', async () => {
+    const browser = fakeBrowser();
+    const citesUnsurfacedEvidence = accepted([
+      {
+        type: 'tool_use',
+        id: 'verdict-invalid-artifact-repair',
+        name: 'report_verification',
+        input: {
+          status: 'needs_correction',
+          findings: [
+            {
+              kind: 'artifact_repair',
+              requirement: 'Include Bob in the requested report.',
+              problem: 'Bob is already proven by evidence that was never surfaced.',
+              evidencePaths: ['artifacts/not-surfaced.png'],
+            },
+          ],
+        },
+      },
+    ]);
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-before-invalid-verdict'),
+        finishResponse('finish-before-invalid-verdict'),
+      ]),
+      verifier: scriptedDriver([citesUnsurfacedEvidence, citesUnsurfacedEvidence]),
+      browser: browser.controller,
+    });
+
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'verification_incomplete',
+    });
+    expect(outcome).not.toMatchObject({ reason: 'verifier_unavailable' });
+    const results = toolResultsFor(
+      readCheckpoint(),
+      'finish-before-invalid-verdict',
+    );
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ is_error: true });
+    expect(results[0]?.content).toContain('"source":"verifier"');
+    expectBrowserLifecycle(browser);
+  });
+
+  it('terminalizes verification_incomplete when the verifier repeats an invalid verified verdict', async () => {
+    const browser = fakeBrowser();
+    const creditableBlocker: FinishInput = {
+      summary: 'Published the available report; one entity could not be confirmed.',
+      unresolved: [
+        {
+          requirement: 'Confirm the second entity.',
+          reason: 'The only available source was inconsistent.',
+          attempts: ['Checked the primary source.', 'Checked the archived mirror.'],
+        },
+      ],
+    };
+    const invalidVerified = accepted([
+      {
+        type: 'tool_use',
+        id: 'verdict-invalid-verified',
+        name: 'report_verification',
+        input: { status: 'verified', findings: [] },
+      },
+    ]);
+    const outcome = await runCoordinator({
+      initializer: scriptedDriver([initializerAccepted()]),
+      worker: scriptedDriver([
+        publishReport('Alice', 'publish-before-invalid-verified'),
+        finishResponse('finish-before-invalid-verified', creditableBlocker),
+      ]),
+      verifier: scriptedDriver([invalidVerified, invalidVerified]),
+      browser: browser.controller,
+    });
+
+    expect(outcome).toMatchObject({
+      status: 'incomplete',
+      reason: 'verification_incomplete',
+      finalText: creditableBlocker.summary,
+      unresolved: creditableBlocker.unresolved,
+    });
+    expect(outcome).not.toMatchObject({ reason: 'verifier_unavailable' });
+    expectBrowserLifecycle(browser);
+  });
+
+  it('ignores the retired verifier-correction ceiling and continues the same worker session', async () => {
     const browser = fakeBrowser();
     const outcome = await runCoordinator({
       initializer: scriptedDriver([initializerAccepted()]),
       worker: scriptedDriver([
         publishReport('Alice', 'publish-before-correction-limit'),
         finishResponse('finish-correction-limit'),
+        publishReport('Bob', 'publish-after-correction-limit'),
+        finishResponse('finish-after-correction-limit'),
       ]),
-      verifier: scriptedDriver([verifierResponse('needs_correction')]),
+      verifier: scriptedDriver([
+        verifierResponse('needs_correction'),
+        verifierResponse('verified'),
+      ]),
       browser: browser.controller,
       configuration: {
         ...CONFIGURATION,
@@ -427,13 +750,10 @@ describe('v3 coordinator terminal lifecycle', () => {
       },
     });
 
-    expect(outcome).toMatchObject({
-      status: 'incomplete',
-      reason: 'verification_attempts',
-    });
+    expect(outcome).toMatchObject({ status: 'verified' });
     const results = toolResultsFor(readCheckpoint(), 'finish-correction-limit');
     expect(results).toHaveLength(1);
-    expect(results[0]?.content).toContain('"exhausted":true');
+    expect(results[0]?.content).toContain('"status":"needs_correction"');
     expectBrowserLifecycle(browser);
   });
 
@@ -850,13 +1170,36 @@ function publishReport(
   ]);
 }
 
-function finishResponse(id: string): AcceptedModelResponse {
+function finishResponse(
+  id: string,
+  input: FinishInput = FINISH,
+): AcceptedModelResponse {
   return accepted([
     {
       type: 'tool_use',
       id,
       name: 'finish',
-      input: FINISH,
+      input,
+    },
+  ]);
+}
+
+function verifierIncompleteResponse(): AcceptedModelResponse {
+  return accepted([
+    {
+      type: 'tool_use',
+      id: 'verdict-incomplete',
+      name: 'report_verification',
+      input: {
+        status: 'incomplete',
+        findings: [
+          {
+            requirement: 'Support the report with the requested source.',
+            assessment:
+              'The reported access denial is credible and equivalent retries are unlikely to help.',
+          },
+        ],
+      },
     },
   ]);
 }
@@ -876,10 +1219,9 @@ function verifierResponse(
               status,
               findings: [
                 {
-                  area: 'output',
-                  code: 'wrong_name',
-                  message: 'Replace Alice with Bob in the requested report.',
-                  outputId: 'report',
+                  kind: 'research',
+                  requirement: 'Include Bob in the requested report.',
+                  problem: 'The report contains Alice instead of Bob.',
                 },
               ],
             },

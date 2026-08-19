@@ -29,6 +29,7 @@ import type {
 
 export type {
   V3CaptureFact,
+  V3ColumnNonblankCount,
   V3DocumentFact,
   V3FinishCheckResult,
   V3FinishDefect,
@@ -38,7 +39,7 @@ export type {
   V3SettledFact,
   V3TableFact,
 } from './types.js';
-export { v3FinishFactsSchema } from './types.js';
+export { v3FinishDefectSchema, v3FinishFactsSchema } from './types.js';
 
 export interface RunV3FinishChecksInput {
   runDir: string;
@@ -70,7 +71,7 @@ export function runV3FinishChecks({
   checkActive?.();
   const defects: V3FinishDefect[] = [];
   const facts: V3FinishFacts = {
-    finish: { summary: finish.summary },
+    finish: structuredClone(finish),
     outputs: [],
     evidenceScreenshotPaths: [],
   };
@@ -235,19 +236,6 @@ export function runV3FinishChecks({
     (entry) => entry.canonicalPath,
   );
 
-  if (
-    browserProvider !== undefined &&
-    evidenceScreenshots.length === 0 &&
-    !taskExplicitlyForbidsScreenshots(inspection.manifest.task)
-  ) {
-    defects.push({
-      code: 'missing_browser_evidence_screenshot',
-      message:
-        'This browser-backed run has no verified evidence-role PNG with source provenance. ' +
-        'Publish a useful final/source screenshot, or explicitly report the access constraint that made capture impossible.',
-    });
-  }
-
   const documentNeedsEvidence = contract.outputs.some(
     (output) => output.kind === 'document' && output.evidenceRequirement !== 'none',
   );
@@ -291,7 +279,7 @@ export function toV3SettledFacts(facts: V3FinishFacts): V3SettledFact[] {
           statement:
             `${output.artifactPath} parsed as ${output.format} with exactly ${output.rowCount} ` +
             `data row(s) and columns [${output.columns.join(', ')}] in the required order. ` +
-            `Every declared rule passed (${output.satisfiedRules.join(', ') || 'none declared'}).`,
+            `Every explicitly mechanical rule passed (${output.satisfiedRules.join(', ') || 'none declared'}).`,
         });
         break;
       case 'document':
@@ -718,12 +706,6 @@ function captureDefect(
 
 function hasSource(entry: InspectedEntry): boolean {
   return (entry.entry.sourceUrl?.trim().length ?? 0) > 0;
-}
-
-function taskExplicitlyForbidsScreenshots(task: string): boolean {
-  return /(?:without|no|do not (?:take|include|capture|provide))\s+(?:any\s+)?screenshots?/i.test(
-    task,
-  );
 }
 
 function failed(

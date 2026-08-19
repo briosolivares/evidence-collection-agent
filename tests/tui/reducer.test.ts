@@ -830,6 +830,8 @@ describe('reduce (completion summary)', () => {
       },
     ]);
     expect(state.completedRun).toEqual({
+      outcome: 'complete',
+      unresolved: [],
       finalText: 'Here is the answer.',
       verb: 'Brewed',
       elapsedMs: 42_000,

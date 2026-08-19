@@ -743,16 +743,19 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       const live = state.live;
       if (live === undefined) return state;
       const successful = action.outcome === 'completed' || action.outcome === 'verified';
+      const humanFacing = successful || action.outcome === 'incomplete';
       let next = settleTerminalControlPending(
         finalizeStreamingText(state),
-        successful ? 'ok' : 'error',
+        humanFacing ? 'ok' : 'error',
       );
       next = settleDanglingPending(next);
       const elapsedMs = action.at - live.startedAt;
       const tokens = displayTokens(next.live!);
-      if (successful) {
+      if (humanFacing) {
+        const outcome = successful ? 'complete' : 'incomplete';
         next = append(next, {
           kind: 'completion',
+          outcome,
           verb: state.completionVerb,
           elapsedMs,
           tokens,
@@ -765,6 +768,8 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           next = {
             ...next,
             completedRun: {
+              outcome,
+              unresolved: action.unresolved ?? [],
               verb: state.completionVerb,
               elapsedMs,
               tokens,
@@ -774,15 +779,12 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           };
         }
       } else {
-        // Incomplete is an early stop with the run preserved — rendered on
-        // the same "stopped early" line as a budget stop, never as a
-        // runtime failure (run_failed owns those).
+        // Synthetic pre-v3 budget stops retain their historical diagnostic
+        // rendering. Real incomplete runs take the human-facing branch above.
         const reason =
-          action.outcome === 'incomplete'
-            ? `incomplete — ${action.reason ?? 'unverified'}`
-            : action.reason === 'max_turns'
-              ? 'turn limit reached'
-              : 'context budget exhausted';
+          action.reason === 'max_turns'
+            ? 'turn limit reached'
+            : 'context budget exhausted';
         next = append(next, {
           kind: 'error',
           message:

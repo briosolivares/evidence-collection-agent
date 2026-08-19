@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -41,6 +42,7 @@ import { inspectManifest } from '../completion/artifactInspection.js';
 import {
   runV3FinishChecks,
   toV3SettledFacts,
+  type V3FinishDefect,
   type V3FinishFacts,
 } from '../completion/finishChecks.js';
 import {
@@ -53,8 +55,11 @@ import {
   type V3ContractInitializerState,
 } from '../harness/initializer.js';
 import {
-  collectV3UserClarifications,
   runV3Verifier,
+  V3_VERIFICATION_HISTORY_LIMIT,
+  type V3CorrectionFinding,
+  type V3SurfacedArtifact,
+  type V3VerificationHistoryEntry,
 } from '../harness/verifier.js';
 import {
   appendV3FinishResult,
@@ -76,7 +81,10 @@ import {
   createV3BudgetedCallModel,
   isV3RoleBudgetExceededError,
 } from '../model/budgetedCall.js';
-import type { FinishInput } from '../tools/finish.js';
+import {
+  durableFinishInputSchema,
+  type FinishInput,
+} from '../tools/finish.js';
 import {
   V3_CHECKPOINT_VERSION,
   openV3CheckpointStore,
@@ -88,6 +96,12 @@ import {
   type V3DurableRunConfiguration,
   type V3DurableTerminalOutcome,
 } from './checkpoint.js';
+import {
+  buildV3FindingsReportInputFromCheckpoint,
+  writeV3FindingsReport,
+  type V3FindingsReportCurrentFindings,
+  type V3FindingsReportInput,
+} from './findingsReport.js';
 import { ensureV3OutputContractFile } from './outputContractFile.js';
 import {
   createV3RunDeadline,
@@ -190,22 +204,28 @@ export async function runV3Coordinator(
       if (loaded.contract !== undefined) {
         ensureV3OutputContractFile(options.runDir, loaded.contract);
       }
+      let verifiedChecks: ReturnType<typeof runV3FinishChecks> | undefined;
       if (loaded.outcome.status === 'verified') {
-        const checks = runV3FinishChecks({
+        verifiedChecks = runV3FinishChecks({
           runDir: options.runDir,
           contract: loaded.contract!,
           finish: loaded.finish!,
           checkActive,
         });
-        if (checks.status === 'failed') {
+        if (verifiedChecks.status === 'failed') {
           throw new Error(
             `verified terminal run no longer passes deterministic checks:\n${formatDefects(
-              checks.defects,
+              verifiedChecks.defects,
             )}`,
           );
         }
       }
       repairTerminalProjections(options.runDir, loaded);
+      writeFindingsReportOnResume(
+        options.runDir,
+        loaded,
+        verifiedChecks?.facts,
+      );
       return loaded.outcome;
     }
 
@@ -230,6 +250,7 @@ export async function runV3Coordinator(
         now,
         deadline.signal,
       );
+      if (loaded !== undefined) writeFindingsReportOnResume(options.runDir, loaded);
       const terminalizePreflightControl = async (
         outcome: V3DurableTerminalOutcome,
       ): Promise<V3DurableTerminalOutcome> => {
@@ -275,12 +296,22 @@ export async function runV3Coordinator(
         const deadlineError = wallDeadlineError(error, deadline.signal);
         if (deadlineError !== undefined) {
           return await terminalizePreflightControl(
-            incompleteBudget(deadlineError.limit, state.finalText(), state.phase),
+            incompleteBudget(
+              deadlineError.limit,
+              state.finalText(),
+              state.unresolved(),
+              state.phase,
+            ),
           );
         }
         if (isV3RoleBudgetExceededError(error)) {
           return await terminalizePreflightControl(
-            incompleteBudget(error.limit, state.finalText(), state.phase),
+            incompleteBudget(
+              error.limit,
+              state.finalText(),
+              state.unresolved(),
+              state.phase,
+            ),
           );
         }
         if (deadline.signal.aborted) {
@@ -300,12 +331,22 @@ export async function runV3Coordinator(
         const deadlineError = wallDeadlineError(error, deadline.signal);
         if (deadlineError !== undefined) {
           return await state.terminalize(
-            incompleteBudget(deadlineError.limit, state.finalText(), state.phase),
+            incompleteBudget(
+              deadlineError.limit,
+              state.finalText(),
+              state.unresolved(),
+              state.phase,
+            ),
           );
         }
         if (isV3RoleBudgetExceededError(error)) {
           return await state.terminalize(
-            incompleteBudget(error.limit, state.finalText(), state.phase),
+            incompleteBudget(
+              error.limit,
+              state.finalText(),
+              state.unresolved(),
+              state.phase,
+            ),
           );
         }
         if (deadline.signal.aborted) {
@@ -322,6 +363,7 @@ export async function runV3Coordinator(
             reason: 'initializer_unavailable',
             detail: boundedDiagnostic(errorMessage(error)),
             finalText: '',
+            unresolved: [],
           });
         }
         if (
@@ -334,6 +376,7 @@ export async function runV3Coordinator(
             reason: 'worker_incomplete',
             detail: boundedDiagnostic(errorMessage(error)),
             finalText: state.finalText(),
+            unresolved: state.unresolved(),
           });
         }
         return await state.terminalize({
@@ -359,6 +402,8 @@ class CoordinatorState {
   private pendingTurn: V3PendingToolTurn | undefined;
   private pendingFinish: V3FinishRequest | undefined;
   private pendingFacts: V3FinishFacts | undefined;
+  private pendingStructuralFindings: V3FinishDefect[] = [];
+  private verificationHistory: V3VerificationHistoryEntry[];
   private verifierCycles: number;
   private completionCheckFailures: number;
   private terminalizing = false;
@@ -382,12 +427,18 @@ class CoordinatorState {
     this.verifierCycles = loaded?.progress.verifierCycles ?? 0;
     this.completionCheckFailures =
       loaded?.progress.completionCheckFailures ?? 0;
+    this.verificationHistory =
+      loaded?.phase === 'initializing'
+        ? []
+        : structuredClone(loaded?.verificationHistory ?? []);
     if (loaded?.phase === 'executing_tool') this.pendingTurn = loaded.pendingTurn;
     if (loaded?.phase === 'checking' || loaded?.phase === 'verifying') {
       this.pendingFinish = loaded.pendingFinish;
     }
     if (loaded?.phase === 'verifying') {
       this.pendingFacts = loaded.pendingCheck.facts;
+      this.pendingStructuralFindings =
+        loaded.pendingCheck.structuralFindings ?? [];
     }
     this.busyRegistry = options.busyRegistry ?? createBusyResourceRegistry();
   }
@@ -413,7 +464,13 @@ class CoordinatorState {
         this.pendingTurn = undefined;
         if (outcome.kind === 'incomplete') {
           return this.terminalize(
-            workerIncomplete(outcome.reason, this.phase, outcome.detail),
+            workerIncomplete(
+              outcome.reason,
+              this.phase,
+              this.finalText(),
+              this.unresolved(),
+              outcome.detail,
+            ),
           );
         }
         this.phase = 'ready_for_model';
@@ -424,7 +481,13 @@ class CoordinatorState {
         const outcome = await runV3WorkerSession(this.requireSession());
         if (outcome.kind === 'incomplete') {
           return this.terminalize(
-            workerIncomplete(outcome.reason, this.phase, outcome.detail),
+            workerIncomplete(
+              outcome.reason,
+              this.phase,
+              this.finalText(),
+              this.unresolved(),
+              outcome.detail,
+            ),
           );
         }
         this.pendingFinish = outcome.request;
@@ -468,6 +531,10 @@ class CoordinatorState {
           checkActive: () => this.assertFinishInspectionActive(),
         });
         if (checks.status === 'failed') {
+          // Every failed deterministic check is authoritative and bounces
+          // raw to the worker, regardless of what it claims in unresolved.
+          // A structural defect never reaches the verifier for
+          // reinterpretation into a workaround.
           this.completionCheckFailures += 1;
           appendTranscriptEvent(this.options.runDir, {
             type: 'v3_finish_check_failed',
@@ -497,6 +564,7 @@ class CoordinatorState {
                   `time(s): ${formatDefects(checks.defects)}`,
               ),
               finalText: request.input.summary,
+              unresolved: request.input.unresolved,
             });
           }
           await appendV3FinishResult(
@@ -514,14 +582,19 @@ class CoordinatorState {
         }
 
         this.pendingFacts = checks.facts;
+        this.pendingStructuralFindings = checks.defects;
         this.verifierCycles += 1;
-        await this.saveVerifying(request, checks.facts);
+        await this.saveVerifying(request, checks.facts, checks.defects);
         this.phase = 'verifying';
       }
 
       if (this.phase === 'verifying') {
         const request = this.requirePendingFinish();
         const facts = this.requirePendingFacts();
+        const surfacedArtifacts = collectSurfacedArtifacts(this.options.runDir);
+        const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(
+          surfacedArtifacts,
+        );
         let verification: Awaited<ReturnType<typeof runV3Verifier>>;
         try {
           verification = await runV3Verifier({
@@ -529,12 +602,11 @@ class CoordinatorState {
             runDir: this.options.runDir,
             contract: this.requireContract(),
             finish: facts.finish,
-            requestedOutputPaths:
-              facts.manifest?.requestedOutputPaths ?? [],
-            clarifications: collectV3UserClarifications(
-              this.requireSession().state.messages,
-            ),
+            surfacedArtifacts,
             settled: toV3SettledFacts(facts),
+            outputs: facts.outputs,
+            structuralFindings: this.pendingStructuralFindings,
+            verificationHistory: this.verificationHistory,
             model: this.options.verifierModel,
             budget: this.budget,
             signal: this.runSignal,
@@ -545,7 +617,11 @@ class CoordinatorState {
                     this.options.onModelEvent?.('verifier', event),
                 }),
             afterAccounting: async () => {
-              await this.saveVerifying(request, facts);
+              await this.saveVerifying(
+                request,
+                facts,
+                this.pendingStructuralFindings,
+              );
             },
             now: this.now,
           });
@@ -554,7 +630,11 @@ class CoordinatorState {
           // Make that spend durable while retaining the `verifying` phase
           // before accepting its verdict. A deadline that fires after the
           // provider returns but before this boundary must still win.
-          await this.saveVerifying(request, facts);
+          await this.saveVerifying(
+            request,
+            facts,
+            this.pendingStructuralFindings,
+          );
           this.runSignal.throwIfAborted();
         } catch (error) {
           const budgetError = verifierBudgetError(error, this.runSignal);
@@ -573,6 +653,31 @@ class CoordinatorState {
           throw error;
         }
 
+        if (verification.status === 'invalid_verdict') {
+          // The model responded but never produced a valid verdict, even
+          // after its one bounded protocol repair. This is not the same
+          // failure as the provider/tool being unavailable; it terminates as
+          // a truthful incomplete result rather than `verifier_unavailable`.
+          await this.appendTerminalFinishFailure(
+            request,
+            JSON.stringify({
+              status: 'unavailable',
+              source: 'verifier',
+              message:
+                'Fresh-context verification could not produce a valid verdict, so completion was not accepted.',
+            }),
+          );
+          return this.terminalize({
+            status: 'incomplete',
+            during: this.phase,
+            reason: 'verification_incomplete',
+            detail: boundedDiagnostic(
+              `the evidence judge could not produce a valid verdict: ${verification.reason}`,
+            ),
+            finalText: request.input.summary,
+            unresolved: request.input.unresolved,
+          });
+        }
         if (verification.status === 'verifier_unavailable') {
           await this.appendTerminalFinishFailure(
             request,
@@ -589,42 +694,96 @@ class CoordinatorState {
             reason: 'verifier_unavailable',
             detail: boundedDiagnostic(verification.reason),
             finalText: request.input.summary,
+            unresolved: request.input.unresolved,
           });
         }
         if (verification.status === 'verified') {
           // Success is terminal control state, not feedback the worker will
           // consume. Avoid a transient ready_for_model checkpoint and avoid
           // charging unused result bytes after verification has accepted.
+          // `pendingFacts`/`pendingStructuralFindings` are left intact here
+          // (not nulled) so `terminalize` can still render them into the
+          // findings-report audit projection; the instance is discarded
+          // once this call returns, so nothing else observes them.
           this.verifiedFinish = structuredClone(request.input);
-          this.pendingFacts = undefined;
           return this.terminalize({
             status: 'verified',
             finalText: request.input.summary,
           });
         }
 
-        this.budget.recordCorrection();
-        const correctionLimit = this.budget.exceededLimit(['worker_turns']);
-        if (correctionLimit === 'verifier_corrections') {
-          await this.appendTerminalFinishFailure(
-            request,
-            JSON.stringify({
-              status: 'needs_correction',
-              exhausted: true,
-              findings: verification.findings,
-            }),
+        if (
+          verification.status === 'incomplete' &&
+          request.input.unresolved.length > 0
+        ) {
+          return this.terminalize(
+            {
+              status: 'incomplete',
+              during: this.phase,
+              reason: 'verification_incomplete',
+              detail: boundedDiagnostic(
+                `the evidence judge accepted the reported blocker(s): ${formatIncompleteFindings(
+                  verification.findings,
+                )}`,
+              ),
+              finalText: request.input.summary,
+              unresolved: request.input.unresolved,
+            },
+            { kind: 'incomplete', findings: verification.findings },
           );
-          return this.terminalize({
-            status: 'incomplete',
-            during: this.phase,
-            reason: 'verification_attempts',
-            detail: boundedDiagnostic(
-              `verifier requested another correction after ${this.verifierCycles} cycle(s): ` +
-                formatFindings(verification.findings),
-            ),
-            finalText: request.input.summary,
-          });
         }
+
+        // Reached only for needs_correction, or incomplete with an empty
+        // unresolved report (the worker claimed completion despite a
+        // credible blocker). The latter becomes report_repair findings: the
+        // harness never designs artifact contents, and this can only make
+        // the worker's own summary/unresolved report more truthful.
+        const correctionFindings: V3CorrectionFinding[] =
+          verification.status === 'incomplete'
+            ? verification.findings.map(
+                (finding): V3CorrectionFinding => ({
+                  kind: 'report_repair',
+                  requirement: finding.requirement,
+                  problem:
+                    'The completion report claims the request is complete, but this blocker ' +
+                    `remains and must be truthfully reported as unresolved: ${finding.assessment}`,
+                }),
+              )
+            : verification.findings;
+
+        this.budget.recordCorrection();
+        const previous = this.verificationHistory.at(-1);
+        if (
+          request.input.unresolved.length > 0 &&
+          previous !== undefined &&
+          previous.surfacedEvidenceFingerprint === surfacedEvidenceFingerprint &&
+          sameRequirementSet(previous.findings, correctionFindings) &&
+          !hasNewDistinctAttempt(
+            request.input.unresolved,
+            previous.completionReport.unresolved,
+          )
+        ) {
+          return this.terminalize(
+            {
+              status: 'incomplete',
+              during: this.phase,
+              reason: 'verification_incomplete',
+              detail: boundedDiagnostic(
+                'the same requirement(s) remained unsupported after an equivalent retry with no ' +
+                  `new surfaced evidence or new attempted approach: ${formatCorrectionFindings(
+                    correctionFindings,
+                  )}`,
+              ),
+              finalText: request.input.summary,
+              unresolved: request.input.unresolved,
+            },
+            { kind: 'correction', findings: correctionFindings },
+          );
+        }
+        const correctionLimit = this.budget.exceededLimit([
+          'worker_turns',
+          'verifier_corrections',
+        ]);
         if (correctionLimit !== undefined) {
           await this.appendTerminalFinishFailure(
             request,
@@ -632,11 +791,29 @@ class CoordinatorState {
               status: 'needs_correction',
               exhausted: true,
               budget_limit: correctionLimit,
-              findings: verification.findings,
+              findings: renderFindingsForWorker(correctionFindings),
             }),
           );
           return this.terminalize(
-            incompleteBudget(correctionLimit, request.input.summary, this.phase),
+            incompleteBudget(
+              correctionLimit,
+              request.input.summary,
+              request.input.unresolved,
+              this.phase,
+            ),
+            { kind: 'correction', findings: correctionFindings },
+          );
+        }
+        this.verificationHistory.push({
+          cycle: this.verifierCycles,
+          completionReport: structuredClone(request.input),
+          surfacedEvidenceFingerprint,
+          findings: structuredClone(correctionFindings),
+        });
+        if (this.verificationHistory.length > V3_VERIFICATION_HISTORY_LIMIT) {
+          this.verificationHistory.splice(
+            0,
+            this.verificationHistory.length - V3_VERIFICATION_HISTORY_LIMIT,
           );
         }
         await appendV3FinishResult(
@@ -644,11 +821,25 @@ class CoordinatorState {
           request,
           JSON.stringify({
             status: 'needs_correction',
-            findings: verification.findings,
+            findings: renderFindingsForWorker(correctionFindings),
           }),
         );
+        // The checkpoint save inside appendV3FinishResult's
+        // finishResultAppended hook just made this cycle's pushed
+        // verification-history entry durable; render the audit projection
+        // from that same now-durable state before clearing per-cycle cargo.
+        writeFindingsReportSafely(this.options.runDir, {
+          phase: this.phase,
+          completionReport: request.input,
+          settledFacts: toV3SettledFacts(facts),
+          structuralFindings: this.pendingStructuralFindings,
+          surfacedArtifacts,
+          currentFindings: { kind: 'correction', findings: correctionFindings },
+          verificationHistory: this.verificationHistory,
+        });
         this.pendingFinish = undefined;
         this.pendingFacts = undefined;
+        this.pendingStructuralFindings = [];
         this.phase = 'ready_for_model';
       }
     }
@@ -656,6 +847,12 @@ class CoordinatorState {
 
   async terminalize(
     outcome: V3DurableTerminalOutcome,
+    // Typed findings the calling branch already has in hand (a credible
+    // blocker's verifier findings, or the correction findings that just
+    // converged/exhausted budget). Every other terminal path has no open
+    // verifier findings to show; the terminal outcome's own `detail` string
+    // already narrates those.
+    currentFindings: V3FindingsReportCurrentFindings = { kind: 'none' },
   ): Promise<V3DurableTerminalOutcome> {
     if (this.terminalizing) throw new Error('recursive v3 terminalization');
     this.terminalizing = true;
@@ -714,6 +911,7 @@ class CoordinatorState {
         finalOutcome = incompleteBudget(
           limit,
           finalOutcome.finalText,
+          [],
           this.phase,
         );
       } else if (this.runSignal.aborted) {
@@ -743,11 +941,49 @@ class CoordinatorState {
       throw new Error('terminal checkpoint was not readable after its durable save');
     }
     repairTerminalProjections(this.options.runDir, terminal);
+    if (finalOutcome.status === 'verified' || finalOutcome.status === 'incomplete') {
+      writeFindingsReportSafely(this.options.runDir, {
+        phase: 'terminal',
+        outcome: finalOutcome,
+        completionReport: {
+          summary: finalOutcome.finalText,
+          unresolved: finalOutcome.status === 'incomplete' ? finalOutcome.unresolved : [],
+        },
+        settledFacts: this.pendingFacts === undefined ? [] : toV3SettledFacts(this.pendingFacts),
+        structuralFindings: this.pendingStructuralFindings,
+        surfacedArtifacts: collectSurfacedArtifacts(this.options.runDir),
+        currentFindings,
+        verificationHistory: this.verificationHistory,
+      });
+    }
     return finalOutcome;
   }
 
   finalText(): string {
-    return this.pendingFinish?.input.summary ?? '';
+    return this.latestCompletionReport()?.summary ?? '';
+  }
+
+  unresolved(): FinishInput['unresolved'] {
+    return structuredClone(this.latestCompletionReport()?.unresolved ?? []);
+  }
+
+  private latestCompletionReport(): FinishInput | undefined {
+    if (this.pendingFinish !== undefined) {
+      return structuredClone(this.pendingFinish.input);
+    }
+    const messages = this.session?.state.messages;
+    if (messages === undefined) return undefined;
+    for (let messageIndex = messages.length - 1; messageIndex >= 0; messageIndex -= 1) {
+      const message = messages[messageIndex]!;
+      if (message.role !== 'assistant') continue;
+      for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
+        const block = message.content[blockIndex]!;
+        if (block.type !== 'tool_use' || block.name !== 'finish') continue;
+        const parsed = durableFinishInputSchema.safeParse(block.input);
+        if (parsed.success) return parsed.data;
+      }
+    }
+    return undefined;
   }
 
   private assertFinishInspectionActive(): void {
@@ -1022,6 +1258,7 @@ class CoordinatorState {
     }
     this.pendingFinish = undefined;
     this.pendingFacts = undefined;
+    this.pendingStructuralFindings = [];
   }
 
   private async saveInitializing(
@@ -1046,6 +1283,7 @@ class CoordinatorState {
       phase: 'ready_for_model',
       contract: this.requireContract(),
       worker: snapshot,
+      verificationHistory: this.verificationHistory,
     });
   }
 
@@ -1054,6 +1292,7 @@ class CoordinatorState {
       phase: 'executing_tool',
       contract: this.requireContract(),
       worker: captureV3WorkerSessionSnapshot(this.requireSession()),
+      verificationHistory: this.verificationHistory,
       pendingTurn,
     });
   }
@@ -1066,6 +1305,7 @@ class CoordinatorState {
       phase: 'checking',
       contract: this.requireContract(),
       worker,
+      verificationHistory: this.verificationHistory,
       pendingFinish,
       pendingCheck: {
         status: 'pending',
@@ -1077,16 +1317,19 @@ class CoordinatorState {
   private async saveVerifying(
     pendingFinish: V3FinishRequest,
     facts: V3FinishFacts,
+    structuralFindings: readonly V3FinishDefect[],
   ): Promise<void> {
     await this.save({
       phase: 'verifying',
       contract: this.requireContract(),
       worker: captureV3WorkerSessionSnapshot(this.requireSession()),
+      verificationHistory: this.verificationHistory,
       pendingFinish,
       pendingCheck: {
         status: 'passed',
         attempt: this.completionCheckFailures + 1,
         facts,
+        structuralFindings: [...structuralFindings],
       },
       pendingVerifier: {
         cycle: this.verifierCycles,
@@ -1397,6 +1640,46 @@ function repairTerminalProjections(
   }
 }
 
+/** Best-effort audit-projection write: a render or write failure is recorded
+ * as a diagnostic transcript event and never changes the verification
+ * outcome or aborts the run. */
+function writeFindingsReportSafely(
+  runDir: string,
+  input: V3FindingsReportInput,
+): void {
+  try {
+    writeV3FindingsReport(runDir, input);
+  } catch (error) {
+    try {
+      appendTranscriptEvent(runDir, {
+        type: 'v3_findings_report_failed',
+        message: boundedDiagnostic(errorMessage(error)),
+      });
+    } catch {
+      // The audit projection is diagnostic-only; even the diagnostic write
+      // failing must never abort or alter the verification outcome.
+    }
+  }
+}
+
+/** Regenerate `harness/findings.md` from whatever a fresh process can read
+ * off a resumed checkpoint alone; no in-memory verifying-cycle context
+ * survives a restart. `verifiedFacts` is the caller's already re-run
+ * deterministic finish-check facts for a resumed verified terminal
+ * checkpoint (never freshly collected here); omit otherwise. */
+function writeFindingsReportOnResume(
+  runDir: string,
+  checkpoint: V3Checkpoint,
+  verifiedFacts?: V3FinishFacts,
+): void {
+  const input = buildV3FindingsReportInputFromCheckpoint(
+    checkpoint,
+    collectSurfacedArtifacts(runDir),
+    verifiedFacts,
+  );
+  if (input !== undefined) writeFindingsReportSafely(runDir, input);
+}
+
 function budgetConfig(
   configuration: V3DurableRunConfiguration,
 ): RunBudgetConfig {
@@ -1406,9 +1689,10 @@ function budgetConfig(
     maxToolCalls: v3CeilingFromCheckpoint(limits.maxToolCalls),
     maxModelTokens: v3CeilingFromCheckpoint(limits.maxModelTokens),
     maxWallTimeMs: v3CeilingFromCheckpoint(limits.maxWallTimeMs),
-    maxVerifierCorrections: v3CeilingFromCheckpoint(
-      limits.maxVerifierCorrections,
-    ),
+    // Retained in durable configuration only for old-checkpoint read
+    // compatibility. Correction dialogue is bounded by the ordinary whole-run
+    // turn/token/tool/wall budgets, never by a correction-specific cap.
+    maxVerifierCorrections: Infinity,
   };
 }
 
@@ -1435,6 +1719,8 @@ function formatV3RunCapabilityGuidance(
 function workerIncomplete(
   reason: V3WorkerIncompleteReason,
   during: Exclude<V3CheckpointPhase, 'terminal'>,
+  finalText: string,
+  unresolved: FinishInput['unresolved'],
   detail?: string,
 ): V3DurableTerminalOutcome {
   const budgetReasons: readonly V3WorkerIncompleteReason[] = [
@@ -1452,13 +1738,15 @@ function workerIncomplete(
       ? 'budget_exceeded'
       : 'worker_incomplete',
     detail: boundedDiagnostic(detail ?? `worker ended incomplete: ${reason}`),
-    finalText: '',
+    finalText,
+    unresolved,
   };
 }
 
 function incompleteBudget(
   limit: string,
   finalText: string,
+  unresolved: FinishInput['unresolved'],
   during: Exclude<V3CheckpointPhase, 'terminal'>,
 ): V3DurableTerminalOutcome {
   return {
@@ -1467,6 +1755,7 @@ function incompleteBudget(
     reason: 'budget_exceeded',
     detail: `run budget limit exceeded: ${limit}`,
     finalText,
+    unresolved,
   };
 }
 
@@ -1614,10 +1903,109 @@ function formatDefects(
   return defects.map((defect) => `${defect.code}: ${defect.message}`).join('; ');
 }
 
-function formatFindings(
-  findings: readonly { code: string; message: string }[],
+function formatCorrectionFindings(
+  findings: readonly { requirement: string; problem: string }[],
 ): string {
-  return findings.map((finding) => `${finding.code}: ${finding.message}`).join('; ');
+  return findings
+    .map((finding) => `${finding.requirement}: ${finding.problem}`)
+    .join('; ');
+}
+
+function formatIncompleteFindings(
+  findings: readonly { requirement: string; assessment: string }[],
+): string {
+  return findings
+    .map((finding) => `${finding.requirement}: ${finding.assessment}`)
+    .join('; ');
+}
+
+/** Fixed harness-owned instruction attached to research findings only when
+ * rendering the correction JSON for the worker. It is never model text and
+ * never stored in the durable typed finding itself. */
+const V3_RESEARCH_FINDING_INSTRUCTION =
+  'Continue evidence collection for this requirement using materially different applicable ' +
+  'sources or navigation; do not fabricate, pad, or weaken artifacts. If it remains genuinely ' +
+  'unobtainable after the applicable fallbacks, report it truthfully in unresolved.';
+
+function renderFindingsForWorker(
+  findings: readonly V3CorrectionFinding[],
+): unknown[] {
+  return findings.map((finding) =>
+    finding.kind === 'research'
+      ? { ...finding, instruction: V3_RESEARCH_FINDING_INSTRUCTION }
+      : finding,
+  );
+}
+
+function sameRequirementSet(
+  previous: readonly V3CorrectionFinding[],
+  current: readonly V3CorrectionFinding[],
+): boolean {
+  const previousRequirements = new Set(
+    previous.map((finding) => finding.requirement),
+  );
+  const currentRequirements = new Set(
+    current.map((finding) => finding.requirement),
+  );
+  if (previousRequirements.size !== currentRequirements.size) return false;
+  for (const requirement of currentRequirements) {
+    if (!previousRequirements.has(requirement)) return false;
+  }
+  return true;
+}
+
+/** Convergence input: a genuinely new distinct attempt string anywhere in
+ * the current unresolved report counts as progress, even when it later
+ * dead-ends without producing new surfaced evidence. */
+function hasNewDistinctAttempt(
+  current: FinishInput['unresolved'],
+  previous: FinishInput['unresolved'],
+): boolean {
+  const previousAttempts = new Set(
+    previous.flatMap((entry) => entry.attempts),
+  );
+  return current.some((entry) =>
+    entry.attempts.some((attempt) => !previousAttempts.has(attempt)),
+  );
+}
+
+function collectSurfacedArtifacts(runDir: string): V3SurfacedArtifact[] {
+  return readManifest(runDir).artifacts
+    .filter(
+      (entry) =>
+        entry.filename.startsWith('artifacts/') &&
+        entry.roles?.some(
+          (role) => role === 'requested_output' || role === 'evidence',
+        ) === true,
+    )
+    .map((entry) => ({
+      filename: entry.filename,
+      sha256: entry.sha256,
+      roles: [...entry.roles!] as ('requested_output' | 'evidence')[],
+      capturedAt: entry.capturedAt,
+      ...(entry.sourceUrl === undefined ? {} : { sourceUrl: entry.sourceUrl }),
+      ...(entry.completionStatus === undefined
+        ? {}
+        : { completionStatus: entry.completionStatus }),
+    }))
+    .sort((left, right) => left.filename.localeCompare(right.filename));
+}
+
+function fingerprintSurfacedArtifacts(
+  artifacts: readonly V3SurfacedArtifact[],
+): string {
+  const stableEvidence = artifacts.map(
+    ({ filename, sha256, sourceUrl, roles, completionStatus }) => ({
+      filename,
+      sha256,
+      ...(sourceUrl === undefined ? {} : { sourceUrl }),
+      roles: [...roles].sort(),
+      ...(completionStatus === undefined ? {} : { completionStatus }),
+    }),
+  );
+  return createHash('sha256')
+    .update(JSON.stringify(stableEvidence), 'utf8')
+    .digest('hex');
 }
 
 function formatOutcomeForDiagnostic(

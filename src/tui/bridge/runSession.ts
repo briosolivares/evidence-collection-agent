@@ -41,6 +41,7 @@ import { createTuiTracing } from './tuiTracing.js';
 import { isBrowserDeathMessage } from './browserDeath.js';
 import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
+import type { UnresolvedRequirement } from '../../run/runOutcome.js';
 
 /** How a bridged run ended, for callers awaiting `done`. `verified` and
  * `incomplete` are the only outcomes `runTask` itself can produce (every
@@ -49,7 +50,14 @@ import type { UiEvent } from '../store/state.js';
  * `failed` (a runtime crash outside the harness's own accounting). */
 export type RunOutcome =
   | { status: 'verified'; finalText: string; runDir: string }
-  | { status: 'incomplete'; reason: string; detail?: string; runDir: string }
+  | {
+      status: 'incomplete';
+      reason: string;
+      detail?: string;
+      finalText: string;
+      unresolved: readonly UnresolvedRequirement[];
+      runDir: string;
+    }
   | { status: 'cancelled' }
   | { status: 'failed'; message: string };
 
@@ -254,6 +262,8 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
             outcome: 'incomplete',
             reason: result.reason,
             detail: result.detail,
+            finalText: result.finalText,
+            unresolved: result.unresolved,
             runDir: result.runDir,
             at: now(),
           });
@@ -261,6 +271,8 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
             status: 'incomplete',
             reason: result.reason,
             detail: result.detail,
+            finalText: result.finalText,
+            unresolved: result.unresolved,
             runDir: result.runDir,
           } as const;
         }

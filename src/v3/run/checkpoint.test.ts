@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { OutputContract } from '../../contracts/outputContract.js';
-import type { V3FinishFacts } from '../completion/finishChecks.js';
+import type { V3FinishFacts, V3TableFact } from '../completion/finishChecks.js';
 import {
   V3_CHECKPOINT_MAX_BYTES,
   V3_HARNESS_DIR,
@@ -121,10 +121,12 @@ const finish = {
     name: 'finish' as const,
     input: {
       summary: 'Published the requested roster.',
+      unresolved: [],
     },
   },
   input: {
     summary: 'Published the requested roster.',
+    unresolved: [],
   },
   assistantText: 'The roster is ready.',
 };
@@ -209,6 +211,7 @@ const pendingToolTurn = {
 const facts: V3FinishFacts = {
   finish: {
     summary: finish.input.summary,
+    unresolved: [],
   },
   manifest: {
     task: configuration.taskText,
@@ -231,6 +234,43 @@ const facts: V3FinishFacts = {
   ],
   evidenceScreenshotPaths: [],
 };
+
+function typedVerificationHistory() {
+  return [
+    {
+      cycle: 1,
+      completionReport: finish.input,
+      surfacedEvidenceFingerprint: 'a'.repeat(64),
+      findings: [
+        {
+          kind: 'research' as const,
+          requirement: 'Include every requested row.',
+          problem: 'One row is absent.',
+        },
+      ],
+    },
+  ];
+}
+
+/** Durable correction-finding shape from before typed finding kinds existed:
+ * a free-form nextAction plus an optional outputId. */
+function legacyVerificationHistory() {
+  return [
+    {
+      cycle: 1,
+      completionReport: finish.input,
+      surfacedEvidenceFingerprint: 'a'.repeat(64),
+      findings: [
+        {
+          requirement: 'Include every requested row.',
+          problem: 'One row is absent.',
+          nextAction: 'Publish the missing row and republish the report.',
+          outputId: 'roster',
+        },
+      ],
+    },
+  ];
+}
 
 function common(revision = 1) {
   return {
@@ -312,6 +352,7 @@ function initializerTerminal(revision = 1): V3Checkpoint {
       reason: 'initializer_unavailable',
       detail: 'initializer unavailable',
       finalText: '',
+      unresolved: [],
     },
   };
 }
@@ -351,6 +392,59 @@ describe('v3 checkpoint schema', () => {
     expect(() => v3CeilingToCheckpoint(Number.NaN)).toThrow(/non-finite/);
   });
 
+  it('round-trips the optional per-column nonblank count field, and still parses without it', () => {
+    const tableFactWithCounts: V3TableFact = {
+      ...(facts.outputs[0] as V3TableFact),
+      columnNonblankCounts: [{ column: 'name', nonblankCount: 1 }],
+    };
+    const withCounts = {
+      ...verifying(),
+      pendingCheck: {
+        status: 'passed' as const,
+        attempt: 1,
+        facts: { ...facts, outputs: [tableFactWithCounts] },
+      },
+    };
+    expect(v3CheckpointSchema.parse(withCounts)).toEqual(withCounts);
+
+    // Checkpoints written before this field existed carry no
+    // `columnNonblankCounts` at all; they must still parse unchanged.
+    expect(v3CheckpointSchema.parse(verifying())).toEqual(verifying());
+  });
+
+  it('round-trips new typed verification-history findings and normalizes legacy nextAction findings', () => {
+    const withTypedHistory = {
+      ...verifying(),
+      verificationHistory: typedVerificationHistory(),
+    };
+    expect(v3CheckpointSchema.parse(withTypedHistory)).toEqual(withTypedHistory);
+
+    const withLegacyHistory = {
+      ...verifying(),
+      verificationHistory: legacyVerificationHistory(),
+    };
+    const parsedLegacy = v3CheckpointSchema.parse(withLegacyHistory);
+    if (parsedLegacy.phase !== 'verifying') {
+      throw new Error('expected a verifying checkpoint');
+    }
+    // nextAction and outputId are intentionally dropped: an old free-form
+    // instruction must never be executed after upgrade.
+    expect(parsedLegacy.verificationHistory).toEqual([
+      {
+        cycle: 1,
+        completionReport: finish.input,
+        surfacedEvidenceFingerprint: 'a'.repeat(64),
+        findings: [
+          {
+            kind: 'research',
+            requirement: 'Include every requested row.',
+            problem: 'One row is absent.',
+          },
+        ],
+      },
+    ]);
+  });
+
   it('accepts every phase with only its required durable state', () => {
     const values: V3Checkpoint[] = [
       initializing(),
@@ -368,6 +462,7 @@ describe('v3 checkpoint schema', () => {
           reason: 'initializer_unavailable',
           detail: 'The contract initializer exhausted its bounded attempts.',
           finalText: '',
+          unresolved: [],
         },
       },
       {
@@ -379,6 +474,7 @@ describe('v3 checkpoint schema', () => {
           reason: 'budget_exceeded',
           detail: 'The initializer exhausted the run model-token budget.',
           finalText: '',
+          unresolved: [],
         },
       },
     ];
@@ -811,6 +907,23 @@ describe('read-only checkpoint observation', () => {
 
     const store = await openV3CheckpointStore(runDir);
     expect(store.load()).toEqual(checking());
+    await store.close();
+    expect(readFileSync(checkpointPath)).toEqual(before);
+  });
+
+  it('migrates legacy nextAction verification-history findings without rewriting checkpoint bytes', async () => {
+    const legacy = {
+      ...verifying(),
+      verificationHistory: legacyVerificationHistory(),
+    };
+    const checkpointPath = writeCheckpoint(legacy);
+    const before = readFileSync(checkpointPath);
+
+    const store = await openV3CheckpointStore(runDir);
+    expect(store.load()).toEqual({
+      ...verifying(),
+      verificationHistory: typedVerificationHistory(),
+    });
     await store.close();
     expect(readFileSync(checkpointPath)).toEqual(before);
   });

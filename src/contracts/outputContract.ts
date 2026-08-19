@@ -28,10 +28,9 @@ import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 // the offending id, column, or filename — which is what makes one rejected
 // call enough for the model to correct course.
 
-/** A document's evidence requirement when the contract omits it. Most
- * requested prose makes source-backed factual claims, so the safe default is
- * "at least one piece of evidence", not "none". */
-export const DEFAULT_EVIDENCE_REQUIREMENT = 'at_least_one';
+/** A document's evidence requirement when the task does not explicitly state
+ * one. The initializer may preserve requirements, but must not create them. */
+export const DEFAULT_EVIDENCE_REQUIREMENT = 'none';
 
 /** A document's evidence presentation when the contract omits it. Citations
  * are structural metadata by default; visible footnotes are opt-in, because
@@ -227,9 +226,8 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
       .enum(['none', 'at_least_one', 'per_required_section'])
       .default(DEFAULT_EVIDENCE_REQUIREMENT)
       .describe(
-        'How much evidence the document must be backed by. Defaults to at_least_one; ' +
-          'use per_required_section for evidence-heavy reports; "none" only when the ' +
-          'document makes no source-backed factual claims',
+        'Evidence explicitly required by the task. Defaults to none when the task ' +
+          'does not state an evidence requirement',
       ),
     evidencePresentation: z
       .enum(['hidden', 'footnotes'])
@@ -290,7 +288,10 @@ export const outputContractSchema = z.strictObject({
   assumptions: z
     .array(nonBlankString)
     .optional()
-    .describe('Only the choices that materially affect the result'),
+    .describe(
+      'Deprecated compatibility field. Initializers must not add availability ' +
+        'assumptions or requirements the user did not state',
+    ),
 });
 
 /** One column of a table output. */

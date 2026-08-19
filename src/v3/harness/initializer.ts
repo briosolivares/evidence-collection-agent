@@ -29,20 +29,26 @@ const SET_OUTPUT_CONTRACT = 'set_output_contract';
  * conversation so this prefix remains byte-stable across runs. */
 export const V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT = `You derive one immutable output contract from a task description before any browsing happens.
 
-Your only job is to call set_output_contract exactly once, stating precisely what the finished run must contain: every required output file or capture, its format, its exact columns or required sections in the order the task implies, and the checkable rules that follow from the request.
+Your only job is to call set_output_contract exactly once with a thin projection of requirements explicitly stated in the user's request: requested artifacts and formats, exact columns and ordering, explicit counts, requested scope, and explicit evidence requirements.
 
 Rules:
 - Describe the END STATE only. Never include a research plan, browsing steps, preferred sites, or how the work should be carried out.
-- Copy exact column headers, filenames, formats, enumerated values, sections, and counts from the task wherever it states them. Do not rename or improve them.
-- State a row count only when the task itself fixes one. When the population is unknown until research, do not invent an exact count.
-- When the task names the complete entities to cover, add an exhaustive matches_expected_values rule listing them. Leave exhaustive off for examples or a population the run must discover.
-- Put judgment requirements in contentExpectations and only material choices in assumptions.
+- Copy exact column headers, filenames, formats, sections, and counts only where the request states them. Do not rename, improve, or infer them.
+- State count, uniqueness, required-cell, type, enum, source, and evidence constraints only when the request explicitly states them. Unknown research populations do not imply a count or identity rule.
+- When the request explicitly enumerates a value set (for example specific organizations, categories, or class years), declare the matching column as type enum with exactly that allowed set, and put required coverage of the enumerated values in contentExpectations for the judge to assess as covered or credibly blocked. Never emit a matches_expected_values rule for an enumerated set: it must not become a deterministic presence gate, or a truthful partial result becomes structurally impossible.
+- Put explicitly requested scope and other judgment requirements in contentExpectations so the judge can assess them against surfaced evidence.
+- Do not add assumptions, inferred expected-value sets or entity lists, availability claims, domain heuristics, or requirements that merely seem desirable.
 - Do not invent outputs the task did not ask for. V3 accepts one immutable initial contract.
+- The original user request remains authoritative if this projection is incomplete or conflicts with it.
 
 Respond with the set_output_contract call and nothing else.`;
 
+const v3InitializerOutputContractSchema = outputContractSchema.omit({
+  assumptions: true,
+});
+
 const v3SetOutputContractInputSchema = z.strictObject({
-  contract: outputContractSchema,
+  contract: v3InitializerOutputContractSchema,
 });
 
 /** Initializer-only definition for the run's one immutable contract. */
@@ -50,7 +56,7 @@ const v3SetOutputContractTool: ToolDef<{ contract: OutputContract }> = {
   name: SET_OUTPUT_CONTRACT,
   description:
     'Return the one immutable typed output contract for this run. Describe only the ' +
-    'required finished artifacts, exact shapes, and mechanically checkable rules. This ' +
+    'explicitly requested artifacts, exact shapes, counts, scope, and evidence needs. This ' +
     'contract is accepted once before work begins and is final after acceptance.',
   inputSchema: v3SetOutputContractInputSchema,
   getAccess: () => ({ reads: [], writes: [], exclusive: true }),
@@ -268,8 +274,9 @@ export function formatV3ContractGuidance(contract: OutputContract): string {
   const parsed = outputContractSchema.parse(contract);
   return [
     '# Immutable output contract',
-    'The initializer validated this exact contract. It cannot be revised during the run.',
-    'Satisfy every requirement with published artifacts and use these exact filenames and shapes.',
+    'The initializer produced this immutable projection of the user request.',
+    'The original user request is authoritative if this projection omits or conflicts with it.',
+    'Preserve its explicitly requested filenames, shapes, counts, scope, and evidence requirements.',
     '```json',
     JSON.stringify(parsed, null, 2),
     '```',
@@ -313,7 +320,32 @@ function validateInitialContractCall(
   input: unknown,
 ): ReturnType<typeof validateOutputContract> {
   const parsed = v3SetOutputContractInputSchema.safeParse(input);
-  if (parsed.success) return validateOutputContract(parsed.data.contract);
+  if (parsed.success) {
+    const validation = validateOutputContract(parsed.data.contract);
+    if (!validation.ok) return validation;
+
+    // A matches_expected_values rule is a deterministic presence gate: it
+    // demands every expected value literally appear, which makes a truthful
+    // partial result structurally impossible when a source is unreachable.
+    // New contracts express an enumerated set as an enum column (fabrication
+    // and shape) plus contentExpectations scope (verifier-judged coverage).
+    const presenceGateRules = validation.contract.outputs.flatMap((output) =>
+      output.kind === 'table'
+        ? output.rules.filter((rule) => rule.type === 'matches_expected_values')
+        : [],
+    );
+    if (presenceGateRules.length > 0) {
+      return {
+        ok: false,
+        errors: [
+          'matches_expected_values rules are not allowed in a newly initialized contract: ' +
+            'enumerated sets must be declared as enum columns plus contentExpectations scope, ' +
+            'never a deterministic presence rule',
+        ],
+      };
+    }
+    return validation;
+  }
 
   const errors = parsed.error.issues.map((issue) => {
     const path = issue.path.length > 0 ? issue.path.map(String).join('.') : '(input)';

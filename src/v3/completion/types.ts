@@ -2,17 +2,19 @@ import { z } from 'zod';
 
 import { durableFinishInputSchema } from '../tools/finish.js';
 
-/** One objective defect the worker can repair before a verifier is called. */
-export interface V3FinishDefect {
+/** Durable structural finding produced by deterministic finish inspection. */
+export const v3FinishDefectSchema = z.strictObject({
   /** Stable programmatic identifier. */
-  code: string;
-  /** Direct correction guidance suitable for a `finish` tool result. */
-  message: string;
-  /** Contract output affected by the defect, when applicable. */
-  outputId?: string;
-  /** Run-relative artifact involved in the defect, when applicable. */
-  artifactPath?: string;
-}
+  code: z.string(),
+  /** Concrete structural observation and correction guidance. */
+  message: z.string(),
+  /** Contract output affected by the finding, when applicable. */
+  outputId: z.string().optional(),
+  /** Run-relative artifact involved in the finding, when applicable. */
+  artifactPath: z.string().optional(),
+});
+
+export type V3FinishDefect = z.infer<typeof v3FinishDefectSchema>;
 
 /** Structural verifier fact; compatible with the preserved verifier seam. */
 export interface V3SettledFact {
@@ -21,6 +23,13 @@ export interface V3SettledFact {
   statement: string;
 }
 
+/** Per-declared-column nonblank cell count, purely informational: it carries
+ * no threshold and never becomes a deterministic defect on its own. */
+const v3ColumnNonblankCountSchema = z.strictObject({
+  column: z.string(),
+  nonblankCount: z.number().int().nonnegative(),
+});
+
 const v3TableFactSchema = z.strictObject({
   kind: z.literal('table'),
   outputId: z.string(),
@@ -28,6 +37,9 @@ const v3TableFactSchema = z.strictObject({
   format: z.enum(['csv', 'json', 'markdown']),
   columns: z.array(z.string()),
   rowCount: z.number().int().nonnegative(),
+  /** One entry per declared column, in contract order. Optional so
+   * checkpoints written before this field existed still parse. */
+  columnNonblankCounts: z.array(v3ColumnNonblankCountSchema).optional(),
   satisfiedRules: z.array(
     z.enum([
       'exact_row_count',
@@ -80,6 +92,7 @@ export const v3FinishFactsSchema = z.strictObject({
   evidenceScreenshotPaths: z.array(z.string()),
 });
 
+export type V3ColumnNonblankCount = z.infer<typeof v3ColumnNonblankCountSchema>;
 export type V3TableFact = z.infer<typeof v3TableFactSchema>;
 export type V3DocumentFact = z.infer<typeof v3DocumentFactSchema>;
 export type V3CaptureFact = z.infer<typeof v3CaptureFactSchema>;

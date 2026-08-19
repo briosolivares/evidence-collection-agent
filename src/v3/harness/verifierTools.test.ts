@@ -18,6 +18,7 @@ import {
 import {
   V3_VERIFIER_MAX_IMAGE_BYTES,
   V3_VERIFIER_MAX_IMAGE_DIMENSION_PX,
+  createV3VerifierPathPolicy,
   createV3VerifierRegistry,
   executeV3VerifierToolUses,
 } from './verifierTools.js';
@@ -37,6 +38,20 @@ function use(name: string, input: unknown, id = 'call-1'): ToolUseBlock {
   return { type: 'tool_use', id, name, input };
 }
 
+function inspect(
+  toolUses: readonly ToolUseBlock[],
+  allowedArtifactPaths: readonly string[],
+  abortSignal?: AbortSignal,
+) {
+  const policy = createV3VerifierPathPolicy(allowedArtifactPaths);
+  return executeV3VerifierToolUses(
+    createV3VerifierRegistry(policy),
+    toolUses,
+    { runDir, ...(abortSignal === undefined ? {} : { abortSignal }) },
+    policy,
+  );
+}
+
 async function readPublishedImage(
   filename: string,
   bytes: Buffer,
@@ -44,10 +59,9 @@ async function readPublishedImage(
   writeArtifact(runDir, `artifacts/${filename}`, bytes, {
     roles: ['evidence'],
   });
-  const [result] = await executeV3VerifierToolUses(
-    createV3VerifierRegistry(),
+  const [result] = await inspect(
     [use('read_file', { file_path: `artifacts/${filename}` })],
-    { runDir },
+    [`artifacts/${filename}`],
   );
   return result;
 }
@@ -73,10 +87,9 @@ describe('v3 verifier inspection', () => {
     );
     const before = readFileSync(join(runDir, MANIFEST_FILENAME), 'utf8');
 
-    const [result] = await executeV3VerifierToolUses(
-      createV3VerifierRegistry(),
+    const [result] = await inspect(
       [use('read_file', { file_path: 'artifacts/large.txt' })],
-      { runDir },
+      ['artifacts/large.txt'],
     );
 
     expect(result?.is_error).not.toBe(true);
@@ -92,14 +105,40 @@ describe('v3 verifier inspection', () => {
       Buffer.from('unsupported worker claim\n'),
     );
 
-    const [result] = await executeV3VerifierToolUses(
-      createV3VerifierRegistry(),
+    const [result] = await inspect(
       [use('read_file', { file_path: 'scratch/evidence/self-authored.txt' })],
-      { runDir },
+      [],
     );
 
     expect(result).toMatchObject({ is_error: true });
     expect(JSON.stringify(result?.content)).toMatch(/outside v3 verifier scope/i);
+  });
+
+  it('rejects the raw manifest and published files omitted from the surfaced role set', async () => {
+    writeArtifact(
+      runDir,
+      'artifacts/unpublished-to-judge.txt',
+      Buffer.from('not in the judge payload\n'),
+      { roles: ['evidence'] },
+    );
+
+    const [manifestResult, omittedResult] = await inspect(
+      [
+        use('read_file', { file_path: MANIFEST_FILENAME }, 'read-manifest'),
+        use(
+          'read_file',
+          { file_path: 'artifacts/unpublished-to-judge.txt' },
+          'read-omitted',
+        ),
+      ],
+      [],
+    );
+
+    expect(manifestResult).toMatchObject({ is_error: true });
+    expect(omittedResult).toMatchObject({ is_error: true });
+    expect(JSON.stringify([manifestResult, omittedResult])).toMatch(
+      /outside v3 verifier scope/i,
+    );
   });
 
   it('uses bounded literal grep instead of evaluating model-supplied regex', async () => {
@@ -110,10 +149,9 @@ describe('v3 verifier inspection', () => {
       { roles: ['requested_output'] },
     );
 
-    const [result] = await executeV3VerifierToolUses(
-      createV3VerifierRegistry(),
+    const [result] = await inspect(
       [use('grep', { pattern: '(a+)+$', path: 'artifacts' })],
-      { runDir },
+      ['artifacts/report.txt'],
     );
 
     expect(result?.is_error).not.toBe(true);
@@ -126,10 +164,10 @@ describe('v3 verifier inspection', () => {
     controller.abort();
 
     await expect(
-      executeV3VerifierToolUses(
-        createV3VerifierRegistry(),
+      inspect(
         [use('grep', { pattern: 'anything' })],
-        { runDir, abortSignal: controller.signal },
+        [],
+        controller.signal,
       ),
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
@@ -144,10 +182,9 @@ describe('v3 verifier inspection', () => {
       sourceUrl: 'https://example.test/source',
     });
 
-    const [result] = await executeV3VerifierToolUses(
-      createV3VerifierRegistry(),
+    const [result] = await inspect(
       [use('read_file', { file_path: 'artifacts/evidence.png' })],
-      { runDir },
+      ['artifacts/evidence.png'],
     );
 
     expect(result?.is_error).not.toBe(true);

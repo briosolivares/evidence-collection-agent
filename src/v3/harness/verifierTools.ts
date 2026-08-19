@@ -5,7 +5,6 @@ import {
   lstatSync,
   openSync,
   readSync,
-  readdirSync,
 } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
 
@@ -17,7 +16,7 @@ import type {
   ToolResultBlock,
   ToolUseBlock,
 } from '../../loop/messages.js';
-import { ARTIFACTS_DIR, MANIFEST_FILENAME } from '../../run/artifacts.js';
+import { ARTIFACTS_DIR } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { executeToolCall, type ToolCallResult } from '../../tools/pipeline.js';
 import {
@@ -47,7 +46,7 @@ export const v3VerifierReadFileInputSchema = z.strictObject({
     .min(1)
     .max(1_024)
     .describe(
-      'Path to a UTF-8 text file or PNG/JPEG under artifacts/, or manifest.json',
+      'Path to a surfaced UTF-8 text file or PNG/JPEG artifact',
     ),
   offset: z.number().int().min(1).optional(),
   limit: z.number().int().min(1).max(1_000).optional(),
@@ -73,116 +72,141 @@ export const v3VerifierGrepInputSchema = z.strictObject({
 type ReadInput = z.infer<typeof v3VerifierReadFileInputSchema>;
 type GrepInput = z.infer<typeof v3VerifierGrepInputSchema>;
 
-const readFileTool: ToolDef<ReadInput> = {
-  name: 'read_file',
-  description:
-    'Read a bounded window from a published UTF-8 artifact or manifest.json. PNG/JPEG ' +
-    'artifacts are returned as images. Only artifacts/ and manifest.json are visible; use ' +
-    'offset/limit for large text files.',
-  inputSchema: v3VerifierReadFileInputSchema,
-  getAccess: (input) => ({ reads: [accessKey.file(input.file_path)], writes: [] }),
-  // Results are bounded in memory below. Infinity prevents the generic
-  // pipeline from offloading and thereby mutating the run during verification.
-  maxBytes: Number.MAX_SAFE_INTEGER,
-  async execute(input, ctx) {
-    throwIfAborted(ctx.abortSignal);
-    const target = resolvePublishedPath(ctx.runDir, input.file_path);
-    const bytes = await readRegularFileNoFollow(
-      target.absolutePath,
-      input.file_path,
-      V3_VERIFIER_MAX_FILE_BYTES,
-      ctx.abortSignal,
-    );
-    const text = decodeText(bytes, input.file_path);
-    const lines = splitLines(text);
-    const offset = input.offset ?? 1;
-    if (offset > lines.length) {
-      return `The file has ${lines.length} line(s), shorter than offset ${offset}.`;
-    }
-    const limit = input.limit ?? READ_DEFAULT_LINES;
-    const selected = lines.slice(offset - 1, offset - 1 + limit);
-    const rendered = selected
-      .map(
-        (line, index) =>
-          `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`,
-      )
-      .join('\n');
-    const more = offset - 1 + selected.length < lines.length;
-    return boundText(
-      rendered,
-      more
-        ? `\n[Window ended at line ${offset + selected.length - 1} of ${lines.length}; read the next offset to continue.]`
-        : '',
-    );
-  },
-};
+export interface V3VerifierPathPolicy {
+  readonly allowedArtifactPaths: ReadonlySet<string>;
+}
 
-const grepTool: ToolDef<GrepInput> = {
-  name: 'grep',
-  description:
-    'Find bounded literal text matches in published UTF-8 artifacts or manifest.json. ' +
-    'Defaults to artifacts/. This is deliberately literal rather than regex so untrusted ' +
-    'file content cannot trigger unbounded regular-expression work.',
-  inputSchema: v3VerifierGrepInputSchema,
-  getAccess: (input) => ({
-    reads: [accessKey.file(input.path ?? ARTIFACTS_DIR)],
-    writes: [],
-  }),
-  maxBytes: Number.MAX_SAFE_INTEGER,
-  async execute(input, ctx) {
-    throwIfAborted(ctx.abortSignal);
-    const givenPath = input.path ?? ARTIFACTS_DIR;
-    const target = resolvePublishedPath(ctx.runDir, givenPath);
-    const files = collectFilesNoFollow(
-      ctx.runDir,
-      target.absolutePath,
-      V3_VERIFIER_MAX_FILES,
-    );
-    const needle = input.case_sensitive === false
-      ? input.pattern.toLocaleLowerCase('en-US')
-      : input.pattern;
-    const maxResults = input.max_results ?? 100;
-    const matches: string[] = [];
-    let totalBytes = 0;
+export function createV3VerifierPathPolicy(
+  allowedArtifactPaths: readonly string[] = [],
+): V3VerifierPathPolicy {
+  return {
+    allowedArtifactPaths: new Set(
+      allowedArtifactPaths.map(normalizeAllowedArtifactPath),
+    ),
+  };
+}
 
-    for (const file of files) {
+function createReadFileTool(
+  policy: V3VerifierPathPolicy,
+): ToolDef<ReadInput> {
+  return {
+    name: 'read_file',
+    description:
+      'Read a bounded window from a surfaced UTF-8 artifact. PNG/JPEG ' +
+      'artifacts are returned as images. Only requested-output/evidence files are visible; use ' +
+      'offset/limit for large text files.',
+    inputSchema: v3VerifierReadFileInputSchema,
+    getAccess: (input) => ({
+      reads: [accessKey.file(input.file_path)],
+      writes: [],
+    }),
+    // Results are bounded in memory below. Infinity prevents the generic
+    // pipeline from offloading and thereby mutating the run during verification.
+    maxBytes: Number.MAX_SAFE_INTEGER,
+    async execute(input, ctx) {
       throwIfAborted(ctx.abortSignal);
-      const remaining = V3_VERIFIER_MAX_GREP_BYTES - totalBytes;
-      if (remaining <= 0) {
-        throw new Error(
-          `grep inspection exceeds ${V3_VERIFIER_MAX_GREP_BYTES} total bytes; narrow path`,
-        );
-      }
+      const target = resolveSurfacedFile(ctx.runDir, input.file_path, policy);
       const bytes = await readRegularFileNoFollow(
-        file.absolutePath,
-        file.relativePath,
-        Math.min(V3_VERIFIER_MAX_FILE_BYTES, remaining),
+        target.absolutePath,
+        input.file_path,
+        V3_VERIFIER_MAX_FILE_BYTES,
         ctx.abortSignal,
       );
-      totalBytes += bytes.length;
-      const text = tryDecodeText(bytes, file.relativePath);
-      if (text === undefined) continue;
-      for (const [index, line] of splitLines(text).entries()) {
+      const text = decodeText(bytes, input.file_path);
+      const lines = splitLines(text);
+      const offset = input.offset ?? 1;
+      if (offset > lines.length) {
+        return `The file has ${lines.length} line(s), shorter than offset ${offset}.`;
+      }
+      const limit = input.limit ?? READ_DEFAULT_LINES;
+      const selected = lines.slice(offset - 1, offset - 1 + limit);
+      const rendered = selected
+        .map(
+          (line, index) =>
+            `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`,
+        )
+        .join('\n');
+      const more = offset - 1 + selected.length < lines.length;
+      return boundText(
+        rendered,
+        more
+          ? `\n[Window ended at line ${offset + selected.length - 1} of ${lines.length}; read the next offset to continue.]`
+          : '',
+      );
+    },
+  };
+}
+
+function createGrepTool(policy: V3VerifierPathPolicy): ToolDef<GrepInput> {
+  return {
+    name: 'grep',
+    description:
+      'Find bounded literal text matches in surfaced UTF-8 artifacts. ' +
+      'Defaults to artifacts/. This is deliberately literal rather than regex so untrusted ' +
+      'file content cannot trigger unbounded regular-expression work.',
+    inputSchema: v3VerifierGrepInputSchema,
+    getAccess: (input) => ({
+      reads: [accessKey.file(input.path ?? ARTIFACTS_DIR)],
+      writes: [],
+    }),
+    maxBytes: Number.MAX_SAFE_INTEGER,
+    async execute(input, ctx) {
+      throwIfAborted(ctx.abortSignal);
+      const givenPath = input.path ?? ARTIFACTS_DIR;
+      const files = collectSurfacedFiles(
+        ctx.runDir,
+        givenPath,
+        policy,
+        V3_VERIFIER_MAX_FILES,
+      );
+      const needle = input.case_sensitive === false
+        ? input.pattern.toLocaleLowerCase('en-US')
+        : input.pattern;
+      const maxResults = input.max_results ?? 100;
+      const matches: string[] = [];
+      let totalBytes = 0;
+
+      for (const file of files) {
         throwIfAborted(ctx.abortSignal);
-        const haystack = input.case_sensitive === false
-          ? line.toLocaleLowerCase('en-US')
-          : line;
-        if (!haystack.includes(needle)) continue;
-        matches.push(`${file.relativePath}:${index + 1}: ${line}`);
-        if (matches.length >= maxResults) {
-          return boundText(
-            matches.join('\n'),
-            `\n[Stopped at max_results=${maxResults}; narrow pattern or path for more.]`,
+        const remaining = V3_VERIFIER_MAX_GREP_BYTES - totalBytes;
+        if (remaining <= 0) {
+          throw new Error(
+            `grep inspection exceeds ${V3_VERIFIER_MAX_GREP_BYTES} total bytes; narrow path`,
           );
         }
+        const bytes = await readRegularFileNoFollow(
+          file.absolutePath,
+          file.relativePath,
+          Math.min(V3_VERIFIER_MAX_FILE_BYTES, remaining),
+          ctx.abortSignal,
+        );
+        totalBytes += bytes.length;
+        const text = tryDecodeText(bytes, file.relativePath);
+        if (text === undefined) continue;
+        for (const [index, line] of splitLines(text).entries()) {
+          throwIfAborted(ctx.abortSignal);
+          const haystack = input.case_sensitive === false
+            ? line.toLocaleLowerCase('en-US')
+            : line;
+          if (!haystack.includes(needle)) continue;
+          matches.push(`${file.relativePath}:${index + 1}: ${line}`);
+          if (matches.length >= maxResults) {
+            return boundText(
+              matches.join('\n'),
+              `\n[Stopped at max_results=${maxResults}; narrow pattern or path for more.]`,
+            );
+          }
+        }
       }
-    }
-    return boundText(matches.join('\n'));
-  },
-};
+      return boundText(matches.join('\n'));
+    },
+  };
+}
 
-export function createV3VerifierRegistry(): ToolRegistry {
-  return createRegistry([readFileTool, grepTool]);
+export function createV3VerifierRegistry(
+  policy: V3VerifierPathPolicy = createV3VerifierPathPolicy(),
+): ToolRegistry {
+  return createRegistry([createReadFileTool(policy), createGrepTool(policy)]);
 }
 
 /** Execute v3 inspection calls sequentially and without any write/offload
@@ -191,6 +215,7 @@ export async function executeV3VerifierToolUses(
   registry: ToolRegistry,
   toolUses: readonly ToolUseBlock[],
   ctx: ToolCtx,
+  policy: V3VerifierPathPolicy = createV3VerifierPathPolicy(),
 ): Promise<ToolResultBlock[]> {
   const results: ToolResultBlock[] = [];
   for (const block of toolUses) {
@@ -206,6 +231,7 @@ export async function executeV3VerifierToolUses(
               ctx.runDir,
               parsed.data.file_path,
               mediaType,
+              policy,
               ctx.abortSignal,
             ),
           );
@@ -228,10 +254,11 @@ async function readImageResult(
   runDir: string,
   givenPath: string,
   mediaType: ImageBlock['source']['media_type'],
+  policy: V3VerifierPathPolicy,
   signal?: AbortSignal,
 ): Promise<ToolResultBlock> {
   try {
-    const target = resolvePublishedPath(runDir, givenPath);
+    const target = resolveSurfacedFile(runDir, givenPath, policy);
     const bytes = await readRegularFileNoFollow(
       target.absolutePath,
       givenPath,
@@ -382,17 +409,17 @@ interface PublishedPath {
   relativePath: string;
 }
 
-function resolvePublishedPath(runDir: string, givenPath: string): PublishedPath {
+function resolveSurfacedFile(
+  runDir: string,
+  givenPath: string,
+  policy: V3VerifierPathPolicy,
+): PublishedPath {
   const absolutePath = resolveRunPath(runDir, givenPath);
   const root = resolve(runDir);
   const relativePath = relative(root, absolutePath).split(sep).join('/');
-  if (
-    relativePath !== MANIFEST_FILENAME &&
-    relativePath !== ARTIFACTS_DIR &&
-    !relativePath.startsWith(`${ARTIFACTS_DIR}/`)
-  ) {
+  if (!policy.allowedArtifactPaths.has(relativePath)) {
     throw new Error(
-      `outside v3 verifier scope: ${JSON.stringify(givenPath)}; only ${ARTIFACTS_DIR}/ and ${MANIFEST_FILENAME} are readable`,
+      `outside v3 verifier scope: ${JSON.stringify(givenPath)}; only surfaced requested-output and evidence files are readable`,
     );
   }
   assertNoSymlinkComponents(root, absolutePath, givenPath);
@@ -420,31 +447,44 @@ function assertNoSymlinkComponents(
   }
 }
 
-function collectFilesNoFollow(
+function collectSurfacedFiles(
   runDir: string,
-  absolutePath: string,
+  givenPath: string,
+  policy: V3VerifierPathPolicy,
   maximum: number,
 ): PublishedPath[] {
   const root = resolve(runDir);
-  const files: PublishedPath[] = [];
-  const visit = (current: string): void => {
-    const stat = lstatSync(current);
-    if (stat.isSymbolicLink()) throw new Error('grep refuses symbolic links');
-    if (stat.isFile()) {
-      files.push({
-        absolutePath: current,
-        relativePath: relative(root, current).split(sep).join('/'),
-      });
-      if (files.length > maximum) {
-        throw new Error(`grep inspection exceeds ${maximum} files; narrow path`);
-      }
-      return;
-    }
-    if (!stat.isDirectory()) throw new Error('grep refuses special files');
-    for (const name of readdirSync(current).sort()) visit(join(current, name));
-  };
-  visit(absolutePath);
-  return files;
+  const requested = relative(root, resolveRunPath(runDir, givenPath))
+    .split(sep)
+    .join('/');
+  const prefix = requested === ARTIFACTS_DIR ? `${ARTIFACTS_DIR}/` : `${requested}/`;
+  const matching = [...policy.allowedArtifactPaths]
+    .filter((path) => path === requested || path.startsWith(prefix))
+    .sort();
+  if (matching.length === 0) {
+    throw new Error(
+      `outside v3 verifier scope: ${JSON.stringify(givenPath)}; no surfaced files are available at that path`,
+    );
+  }
+  if (matching.length > maximum) {
+    throw new Error(`grep inspection exceeds ${maximum} files; narrow path`);
+  }
+  return matching.map((relativePath) => {
+    const absolutePath = resolveRunPath(runDir, relativePath);
+    assertNoSymlinkComponents(root, absolutePath, relativePath);
+    return { absolutePath, relativePath };
+  });
+}
+
+function normalizeAllowedArtifactPath(givenPath: string): string {
+  if (
+    !givenPath.startsWith(`${ARTIFACTS_DIR}/`) ||
+    givenPath.includes('\\') ||
+    givenPath.split('/').some((part) => part === '' || part === '.' || part === '..')
+  ) {
+    throw new Error(`invalid surfaced artifact path ${JSON.stringify(givenPath)}`);
+  }
+  return givenPath;
 }
 
 async function readRegularFileNoFollow(

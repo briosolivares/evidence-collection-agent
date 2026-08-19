@@ -1331,6 +1331,49 @@ proved, even if supporting code already exists.
   cycle. Report:
   `evals/experiments/2026-08-16_03-20-44am_eval-yc-w24-outreach_9f8c73.json`.
 
+### 2026-08-17 — narrow surfaced-evidence judge redesign complete
+
+- [x] Implement the agreed completion-flow and judge changes captured in
+  [narrow-evidence-judge-changes.md](narrow-evidence-judge-changes.md).
+- The initializer now projects only explicitly grounded request constraints;
+  deterministic checks retain integrity, exact shape, and explicit mechanical
+  rules while routing inferred scope to judgment.
+- `finish` now carries a bounded worker-authored summary plus structured
+  unresolved requirements. The fresh read-only judge sees only the original
+  request, thin contract, surfaced manifest entries/files, deterministic
+  facts/findings, and bounded typed correction history. Its only outcomes are
+  `verified`, `needs_correction`, and `incomplete`.
+- Correction feedback stays in the persistent worker session without a
+  correction-specific cap. Unchanged surfaced evidence plus identical advice
+  converges to incomplete; old finite correction ceilings are ignored while
+  remaining readable in durable configuration.
+- Verified and incomplete public/TUI/REPL presentation retains the latest
+  worker response and manifest-derived artifacts. A run with no completion
+  report uses the deterministic no-response fallback; internal diagnostics and
+  detailed attempts remain secondary metadata.
+- Existing schema, verifier/path-policy, coordinator/checkpoint, prompt,
+  public-run, REPL, and TUI tests were updated. Focused integration gates pass,
+  `npm run typecheck -- --pretty false` and `git diff --check` pass, and the
+  complete hermetic suite passes 136 files / 1,484 tests. No live eval or
+  Browserbase smoke was run.
+
+### 2026-08-18 — research persistence follow-up planned
+
+- [ ] Implement the regression fixes and simplification checklist in
+  [research-persistence-follow-up.md](research-persistence-follow-up.md).
+- The August 17 live batch kept Hacker News and YC W24 correct while making
+  both more efficient, but MIT sororities CSV regressed to 4/6. A verifier
+  correction explicitly allowed a placeholder row, the worker stopped
+  researching, and a later invalid `verified` verdict was misclassified as
+  `verifier_unavailable`.
+- The follow-up keeps deterministic failures authoritative, removes
+  model-authored artifact workarounds, distinguishes allowed values from
+  required coverage, retains typed evidence-backed artifact/report repairs,
+  adds bounded source and requested-field research depth, preserves old
+  checkpoints, and derives `harness/findings.md` without another model call.
+- Implementation has not started. Refactoring and behavior changes must remain
+  separate verified slices.
+
 ## Rules for coordinators and subagents
 
 - Read this file and the design before taking a task.

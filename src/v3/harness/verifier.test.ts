@@ -21,10 +21,10 @@ import {
   V3_VERIFIER_API_TOOL_DEFS,
   V3_VERIFIER_MAX_CONTEXT_TOKENS,
   V3_VERIFIER_SYSTEM_PROMPT,
-  collectV3UserClarifications,
   createV3VerifierModelDriver,
   runV3Verifier,
   v3VerificationResultSchema,
+  type V3SurfacedArtifact,
 } from './verifier.js';
 
 let runDir: string;
@@ -54,7 +54,17 @@ const CONTRACT: OutputContract = {
 
 const FINISH = {
   summary: 'Published the requested report.',
+  unresolved: [],
 };
+
+const SURFACED_ARTIFACTS: V3SurfacedArtifact[] = [
+  {
+    filename: 'artifacts/report.csv',
+    sha256: 'a'.repeat(64),
+    roles: ['requested_output'],
+    capturedAt: '2026-08-17T00:00:00.000Z',
+  },
+];
 
 function budget(overrides: Partial<RunBudgetConfig> = {}) {
   return createRunBudgetTracker({
@@ -75,10 +85,9 @@ function accepted(
       ? []
       : [
           {
-            area: 'evidence',
-            code: 'missing_source',
-            message: 'The report has no published source evidence.',
-            outputId: 'report',
+            kind: 'research' as const,
+            requirement: 'Support the requested report with source evidence.',
+            problem: 'The report has no published source evidence.',
           },
         ];
   return acceptedContent([
@@ -145,8 +154,7 @@ function verifyWith(model: ModelDriver) {
     runDir,
     contract: CONTRACT,
     finish: FINISH,
-    requestedOutputPaths: ['artifacts/report.csv'],
-    clarifications: [],
+    surfacedArtifacts: SURFACED_ARTIFACTS,
     model,
     budget: budget(),
   });
@@ -160,7 +168,7 @@ describe('v3 verifier binding', () => {
       'report_verification',
     ]);
     expect(Object.isFrozen(V3_VERIFIER_API_TOOL_DEFS)).toBe(true);
-    expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('fresh-context verifier');
+    expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('fresh, read-only evidence judge');
     expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('Prose is not a verdict');
     expect(V3_VERIFIER_SYSTEM_PROMPT).not.toContain('report.csv');
   });
@@ -193,59 +201,84 @@ describe('v3 verifier binding', () => {
         findings: [],
       }).success,
     ).toBe(false);
+    // The legacy free-form shape (nextAction, no kind) no longer parses.
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [
+          {
+            requirement: 'Publish report.csv.',
+            problem: 'The report is missing.',
+            nextAction: 'Publish the requested report.',
+          },
+        ],
+      }).success,
+    ).toBe(false);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [
+          {
+            kind: 'research',
+            requirement: 'Publish report.csv.',
+            problem: 'The report is missing.',
+          },
+        ],
+      }).success,
+    ).toBe(true);
+    // artifact_repair requires nonempty evidencePaths.
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [
+          {
+            kind: 'artifact_repair',
+            requirement: 'Publish report.csv.',
+            problem: 'The report is missing a row already proven by evidence.',
+          },
+        ],
+      }).success,
+    ).toBe(false);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [
+          {
+            kind: 'artifact_repair',
+            requirement: 'Publish report.csv.',
+            problem: 'The report is missing a row already proven by evidence.',
+            evidencePaths: ['artifacts/report.csv'],
+          },
+        ],
+      }).success,
+    ).toBe(true);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'needs_correction',
+        findings: [
+          {
+            kind: 'report_repair',
+            requirement: 'Report the actual state truthfully.',
+            problem: 'The summary claims completion despite a credible blocker.',
+          },
+        ],
+      }).success,
+    ).toBe(true);
+    expect(
+      v3VerificationResultSchema.safeParse({
+        status: 'incomplete',
+        findings: [
+          {
+            requirement: 'Use the inaccessible source.',
+            assessment: 'The source rejects the available authenticated session.',
+          },
+        ],
+      }).success,
+    ).toBe(true);
   });
 });
 
 describe('runV3Verifier', () => {
-  it('extracts successful ask_user answers without treating denied calls as clarification', () => {
-    expect(
-      collectV3UserClarifications([
-        {
-          role: 'assistant',
-          content: [
-            {
-              type: 'tool_use',
-              id: 'allowed',
-              name: 'ask_user',
-              input: {
-                question: 'Which period?',
-                context: 'Two periods are available.',
-              },
-            },
-            {
-              type: 'tool_use',
-              id: 'denied',
-              name: 'ask_user',
-              input: { question: 'May I continue?' },
-            },
-          ],
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'tool_result',
-              tool_use_id: 'allowed',
-              content: 'User answered: "Current period"',
-            },
-            {
-              type: 'tool_result',
-              tool_use_id: 'denied',
-              content: 'The user declined.',
-              is_error: true,
-            },
-          ],
-        },
-      ]),
-    ).toEqual([
-      {
-        question: 'Which period?',
-        context: 'Two periods are available.',
-        answer: 'User answered: "Current period"',
-      },
-    ]);
-  });
-
   it.each(['verified', 'needs_correction'] as const)(
     'returns a typed %s verdict and charges aggregate usage',
     async (status) => {
@@ -260,7 +293,7 @@ describe('runV3Verifier', () => {
           runDir,
           contract: CONTRACT,
           finish: FINISH,
-          clarifications: [],
+          surfacedArtifacts: SURFACED_ARTIFACTS,
           model,
           budget: tracker,
         }),
@@ -277,7 +310,7 @@ describe('runV3Verifier', () => {
   it('treats prose as no verdict and allows exactly one repair', async () => {
     const prose = acceptedContent([{ type: 'text', text: 'DONE' }]);
     await expect(verifyWith(scriptedModel([prose, prose]))).resolves.toEqual({
-      status: 'verifier_unavailable',
+      status: 'invalid_verdict',
       reason: 'verifier ended without a valid report_verification call',
     });
 
@@ -306,7 +339,11 @@ describe('runV3Verifier', () => {
       report({
         status: 'needs_correction',
         findings: [
-          { area: 'output', code: 'missing_row', message: 'One row is absent.' },
+          {
+            kind: 'research',
+            requirement: 'Include every requested row.',
+            problem: 'One row is absent.',
+          },
         ],
       }),
     ]);
@@ -320,9 +357,59 @@ describe('runV3Verifier', () => {
     await expect(
       verifyWith(scriptedModel([invalid, invalid])),
     ).resolves.toMatchObject({
-      status: 'verifier_unavailable',
+      status: 'invalid_verdict',
       reason: expect.stringContaining('invalid report_verification input'),
     });
+  });
+
+  it('rejects an artifact_repair citing a non-surfaced path, then fails closed on a repeat', async () => {
+    const citesUnsurfacedPath = report({
+      status: 'needs_correction',
+      findings: [
+        {
+          kind: 'artifact_repair',
+          requirement: 'Include every requested row.',
+          problem: 'One row is absent even though evidence already proves it.',
+          evidencePaths: ['artifacts/not-surfaced.png'],
+        },
+      ],
+    });
+    await expect(
+      verifyWith(scriptedModel([citesUnsurfacedPath, citesUnsurfacedPath])),
+    ).resolves.toEqual({
+      status: 'invalid_verdict',
+      reason: expect.stringContaining(
+        'artifact_repair evidencePaths must name only already-surfaced files',
+      ),
+    });
+  });
+
+  it('refuses verification while objective structural findings remain', async () => {
+    const model = scriptedModel([
+      report({ status: 'verified', findings: [] }),
+      accepted('needs_correction'),
+    ]);
+    await expect(
+      runV3Verifier({
+        taskText: 'Create report.csv.',
+        runDir,
+        contract: CONTRACT,
+        finish: FINISH,
+        surfacedArtifacts: SURFACED_ARTIFACTS,
+        structuralFindings: [
+          {
+            code: 'missing_requested_output',
+            message: 'artifacts/report.csv is missing.',
+            outputId: 'report',
+          },
+        ],
+        model,
+        budget: budget(),
+      }),
+    ).resolves.toMatchObject({ status: 'needs_correction' });
+    expect(
+      JSON.stringify(vi.mocked(model.generate).mock.calls[1]![0].messages),
+    ).toContain('objective structural findings remain');
   });
 
   it.each([
@@ -367,7 +454,7 @@ describe('runV3Verifier', () => {
     await expect(
       verifyWith(scriptedModel([invalid, invalid])),
     ).resolves.toMatchObject({
-      status: 'verifier_unavailable',
+      status: 'invalid_verdict',
       reason: expect.stringContaining(reason),
     });
   });
@@ -393,9 +480,9 @@ describe('runV3Verifier', () => {
         status: 'needs_correction',
         findings: [
           {
-            area: 'completeness',
-            code: 'unverified',
-            message: 'Inspection budget exhausted.',
+            kind: 'research',
+            requirement: 'Support every requested row.',
+            problem: 'The evidence could not be fully inspected.',
           },
         ],
       }),
@@ -410,7 +497,7 @@ describe('runV3Verifier', () => {
     await expect(
       verifyWith(scriptedModel([overCeiling, inspect('inspect-again')])),
     ).resolves.toMatchObject({
-      status: 'verifier_unavailable',
+      status: 'invalid_verdict',
       reason: expect.stringContaining('kept requesting tools'),
     });
   });
@@ -427,7 +514,7 @@ describe('runV3Verifier', () => {
         runDir,
         contract: CONTRACT,
         finish: FINISH,
-        clarifications: [],
+        surfacedArtifacts: SURFACED_ARTIFACTS,
         model,
         budget: tracker,
       }),
@@ -470,7 +557,7 @@ describe('runV3Verifier', () => {
       runDir,
       contract: CONTRACT,
       finish: FINISH,
-      clarifications: [],
+      surfacedArtifacts: SURFACED_ARTIFACTS,
       model,
       budget: tracker,
     })).resolves.toMatchObject({
@@ -494,7 +581,7 @@ describe('runV3Verifier', () => {
         runDir,
         contract: CONTRACT,
         finish: FINISH,
-        clarifications: [],
+        surfacedArtifacts: SURFACED_ARTIFACTS,
         model,
         budget: budget(),
         afterAccounting: async () => {
@@ -525,7 +612,7 @@ describe('runV3Verifier', () => {
         runDir,
         contract: CONTRACT,
         finish: FINISH,
-        clarifications: [],
+        surfacedArtifacts: SURFACED_ARTIFACTS,
         model,
         budget: tracker,
       }),
@@ -549,7 +636,7 @@ describe('runV3Verifier', () => {
         runDir,
         contract: CONTRACT,
         finish: FINISH,
-        clarifications: [],
+        surfacedArtifacts: SURFACED_ARTIFACTS,
         model,
         budget: budget(),
       }),
@@ -566,13 +653,7 @@ describe('runV3Verifier', () => {
       runDir,
       contract: CONTRACT,
       finish: FINISH,
-      requestedOutputPaths: ['artifacts/report.csv'],
-      clarifications: [
-        {
-          question: 'Which period should the report cover?',
-          answer: 'Use only the current reporting period.',
-        },
-      ],
+      surfacedArtifacts: SURFACED_ARTIFACTS,
       model,
       budget: budget(),
       settled: [
@@ -587,18 +668,79 @@ describe('runV3Verifier', () => {
     const opening = JSON.stringify(
       vi.mocked(model.generate).mock.calls[0]![0].messages,
     );
-    expect(opening).toContain('Run-specific completion claim (not code-settled)');
-    expect(opening).toContain(
-      'Published requested-output paths derived from the manifest',
-    );
+    expect(opening).toContain('Worker completion report (untrusted claim)');
+    expect(opening).toContain('Surfaced manifest entries');
     expect(opening).toContain('artifacts/report.csv');
     expect(opening).toContain(FINISH.summary);
-    expect(opening).toContain('Which period should the report cover?');
-    expect(opening).toContain('Use only the current reporting period.');
+    expect(opening).not.toContain('Which period should the report cover?');
     expect(opening).toContain('Already established by code');
     expect(opening.indexOf(FINISH.summary)).toBeLessThan(
       opening.indexOf('Already established by code'),
     );
+  });
+
+  it('renders per-column nonblank coverage as informational, and omits it when absent', async () => {
+    const model: ModelDriver = {
+      generate: vi.fn(async () => accepted('verified')),
+    };
+
+    await runV3Verifier({
+      taskText: 'Create report.csv.',
+      runDir,
+      contract: CONTRACT,
+      finish: FINISH,
+      surfacedArtifacts: SURFACED_ARTIFACTS,
+      model,
+      budget: budget(),
+      outputs: [
+        {
+          kind: 'table',
+          outputId: 'report',
+          artifactPath: 'artifacts/report.csv',
+          format: 'csv',
+          columns: ['name'],
+          rowCount: 5,
+          columnNonblankCounts: [{ column: 'name', nonblankCount: 2 }],
+          satisfiedRules: [],
+        },
+      ],
+    });
+    const opening = JSON.stringify(
+      vi.mocked(model.generate).mock.calls[0]![0].messages,
+    );
+    expect(opening).toContain('Per-column nonblank coverage');
+    expect(opening).toContain('informational');
+    expect(opening).toContain('name: 2 nonblank');
+
+    // Outputs loaded from an old checkpoint omit the field entirely; the
+    // section must not render at all rather than render an empty one.
+    const withoutCounts: ModelDriver = {
+      generate: vi.fn(async () => accepted('verified')),
+    };
+    await runV3Verifier({
+      taskText: 'Create report.csv.',
+      runDir,
+      contract: CONTRACT,
+      finish: FINISH,
+      surfacedArtifacts: SURFACED_ARTIFACTS,
+      model: withoutCounts,
+      budget: budget(),
+      outputs: [
+        {
+          kind: 'table',
+          outputId: 'report',
+          artifactPath: 'artifacts/report.csv',
+          format: 'csv',
+          columns: ['name'],
+          rowCount: 5,
+          satisfiedRules: [],
+        },
+      ],
+    });
+    const openingWithoutCounts = JSON.stringify(
+      vi.mocked(withoutCounts.generate).mock.calls[0]![0].messages,
+    );
+    expect(openingWithoutCounts).not.toContain('Per-column nonblank coverage');
   });
 
   it('builds its opening without walking an unmanifested symlink cycle', async () => {
@@ -615,7 +757,7 @@ describe('runV3Verifier', () => {
         runDir,
         contract: CONTRACT,
         finish: FINISH,
-        clarifications: [],
+        surfacedArtifacts: SURFACED_ARTIFACTS,
         model,
         budget: budget(),
       }),
@@ -625,6 +767,6 @@ describe('runV3Verifier', () => {
       vi.mocked(model.generate).mock.calls[0]![0].messages,
     );
     expect(opening).not.toContain('unmanifested-tree');
-    expect(opening).toContain('manifest.json');
+    expect(opening).not.toContain('unmanifested-tree');
   });
 });

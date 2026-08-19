@@ -11,6 +11,7 @@ import {
 
 const validInput: FinishInput = {
   summary: 'Collected the requested records and published the exact CSV.',
+  unresolved: [],
 };
 
 describe('finish schema', () => {
@@ -21,9 +22,9 @@ describe('finish schema', () => {
     expect(definition?.input_schema).toMatchObject({
       type: 'object',
       additionalProperties: false,
-      required: ['summary'],
+      required: ['summary', 'unresolved'],
     });
-    expect(Object.keys(finishInputSchema.shape)).toEqual(['summary']);
+    expect(Object.keys(finishInputSchema.shape)).toEqual(['summary', 'unresolved']);
     expect(finishInputSchema.parse(validInput)).toEqual(validInput);
   });
 
@@ -38,7 +39,27 @@ describe('finish schema', () => {
       expect(finishInputSchema.safeParse(invalid).success).toBe(false);
     }
 
-    expect(finishInputSchema.safeParse({ summary: 'done' }).success).toBe(true);
+    expect(
+      finishInputSchema.safeParse({ summary: 'done', unresolved: [] }).success,
+    ).toBe(true);
+    expect(
+      finishInputSchema.safeParse({
+        summary: 'Published useful partial work.',
+        unresolved: [
+          {
+            requirement: 'Collect the protected record.',
+            reason: 'The source requires unavailable account access.',
+            attempts: ['Tried the public record endpoint.'],
+          },
+        ],
+      }).success,
+    ).toBe(true);
+    expect(
+      finishInputSchema.safeParse({
+        summary: 'Partial work.',
+        unresolved: [{ requirement: 'Record', reason: 'Blocked', attempts: ['  '] }],
+      }).success,
+    ).toBe(false);
   });
 
   it('normalizes historical checkpoint inputs to the current shape', () => {
@@ -47,14 +68,14 @@ describe('finish schema', () => {
         summary: 'Published the requested report.',
         limitations: ['The source required an unavailable account.'],
       }),
-    ).toEqual({ summary: 'Published the requested report.' });
+    ).toEqual({ summary: 'Published the requested report.', unresolved: [] });
     expect(
       durableFinishInputSchema.parse({
         summary: 'Published the requested report.',
         artifacts: ['artifacts/report.csv'],
         limitations: [],
       }),
-    ).toEqual({ summary: 'Published the requested report.' });
+    ).toEqual({ summary: 'Published the requested report.', unresolved: [] });
   });
 });
 
