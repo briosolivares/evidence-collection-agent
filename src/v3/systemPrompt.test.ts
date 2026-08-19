@@ -55,6 +55,10 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain('work the fallback ladder before reporting an unresolved requirement');
     expect(V3_SYSTEM_PROMPT).toContain('retry the canonical page');
     expect(V3_SYSTEM_PROMPT).toContain('alternate scheme or host');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'including plain http:// for a public page when https fails to connect',
+    );
+    expect(V3_SYSTEM_PROMPT).toContain('never for logins or credentialed pages');
     expect(V3_SYSTEM_PROMPT).toContain('official navigation or a sitemap');
     expect(V3_SYSTEM_PROMPT).toContain('run a targeted search');
     expect(V3_SYSTEM_PROMPT).toContain('archived official pages');
