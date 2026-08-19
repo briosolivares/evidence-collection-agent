@@ -50,7 +50,7 @@ import {
   type DurableTerminalOutcome,
 } from './checkpoint.js';
 import { runAgent } from './lifecycle.js';
-import { V3_SYSTEM_PROMPT } from './systemPrompt.js';
+import { workerPrompt } from '../prompts/index.js';
 import {
   WORKER_API_TOOL_DEFS,
   createWorkerToolRegistry,
@@ -252,7 +252,7 @@ async function executeRun(
         () =>
           createAnthropicModelDriver({
             model: configuration.model,
-            system: V3_SYSTEM_PROMPT,
+            system: workerPrompt,
             apiToolDefs: WORKER_API_TOOL_DEFS,
             maxOutputTokens: configuration.maxOutputTokens,
             ...(config.createStream === undefined

@@ -20,12 +20,12 @@ import {
   REPORT_VERIFICATION_TOOL,
   VERIFIER_API_TOOL_DEFS,
   VERIFIER_MAX_CONTEXT_TOKENS,
-  V3_VERIFIER_SYSTEM_PROMPT,
   createVerifierModelDriver,
   runVerifier,
   verificationResultSchema,
   type SurfacedArtifact,
 } from './verifier.js';
+import { verifierPrompt } from '../../prompts/index.js';
 
 let runDir: string;
 
@@ -168,9 +168,9 @@ describe('verifier binding', () => {
       'report_verification',
     ]);
     expect(Object.isFrozen(VERIFIER_API_TOOL_DEFS)).toBe(true);
-    expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('fresh, read-only evidence judge');
-    expect(V3_VERIFIER_SYSTEM_PROMPT).toContain('Prose is not a verdict');
-    expect(V3_VERIFIER_SYSTEM_PROMPT).not.toContain('report.csv');
+    expect(verifierPrompt).toContain('fresh, read-only evidence judge');
+    expect(verifierPrompt).toContain('Prose is not a verdict');
+    expect(verifierPrompt).not.toContain('report.csv');
   });
 
   it('validates model-driver limits at construction', () => {

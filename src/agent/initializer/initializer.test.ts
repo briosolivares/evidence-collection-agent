@@ -6,10 +6,10 @@ import type {
   ToolUseBlock,
 } from '../../model/messages.js';
 import { ModelResponseRejectedError } from '../../model/modelDriver.js';
+import { contractPrompt } from '../../prompts/index.js';
 import type { OutputContract } from './outputContract.js';
 import {
   CONTRACT_INITIALIZER_API_TOOL_DEFS,
-  V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT,
   INITIALIZER_MAX_ATTEMPTS,
   captureContractInitializerState,
   createContractInitializerModelDriver,
@@ -110,17 +110,17 @@ describe('contract initializer static prefix', () => {
     expect(Object.keys(contractSchema.properties ?? {})).not.toContain(
       'assumptions',
     );
-    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).not.toContain('report.csv');
-    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+    expect(contractPrompt).not.toContain('report.csv');
+    expect(contractPrompt).toContain(
       'one immutable output contract',
     );
-    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+    expect(contractPrompt).toContain(
       'original user request remains authoritative',
     );
-    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+    expect(contractPrompt).toContain(
       'declare the matching column as type enum',
     );
-    expect(V3_CONTRACT_INITIALIZER_SYSTEM_PROMPT).toContain(
+    expect(contractPrompt).toContain(
       'Never emit a matches_expected_values rule',
     );
   });
