@@ -70,7 +70,8 @@ export const browserExecuteInputSchema = z.strictObject({
       },
     )
     .describe(
-      'Body of an async JavaScript function receiving the protected `browser` helper object. ' +
+      'Body of an async JavaScript function run in a bounded Node child process (not in the ' +
+      'page) receiving the protected `browser` helper object. ' +
         'Example batch shape: `const items = [/* known { id, url } items */]; const results = []; ' +
         'for (const item of items.slice(0, 20)) { try { const page = await browser.goto(item.url); ' +
         "results.push({ id: item.id, url: page.url, title: await browser.js('document.title') }); " +
@@ -137,6 +138,14 @@ export function createBrowserExecuteTool(
       'three or more known items require the same mechanical workflow, normally process a ' +
       'bounded batch of up to 20 in one call. Split when the next step requires judgment, ' +
       'visual inspection, human authority, or resolving an ambiguous target. ' +
+      'The program itself runs in a bounded Node child process whose working directory is ' +
+      'scratch/workspace — read and write workspace files there with ' +
+      "`await import('node:fs/promises')`, e.g. to move bulk data into a page expression. " +
+      'Only browser.js(expression) evaluates in the page; top-level const/let declared in ' +
+      'those expressions persist as page globals across calls, so wrap page expressions in ' +
+      'an IIFE. browser.click takes viewport x,y coordinates, browser.waitFor takes a JS ' +
+      'expression string, and there is no clipboard helper — use navigator.clipboard ' +
+      'through browser.js. ' +
       'browser.upload targets a backend DOM node and a path relative to scratch/workspace. ' +
       'Use page_id to target a page returned by a prior result; omit it for the active task ' +
       'page. Intermediate files belong in the current scratch/workspace directory and are ' +
