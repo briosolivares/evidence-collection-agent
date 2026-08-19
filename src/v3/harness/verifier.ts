@@ -534,7 +534,9 @@ function findVerificationValidityProblem(
       if (unsurfaced.length > 0) {
         return (
           'artifact_repair evidencePaths must name only already-surfaced files; ' +
-          `unrecognized path(s): ${unsurfaced.join(', ')}`
+          `unrecognized path(s): ${unsurfaced.join(', ')}. ` +
+          'Cite surfaced filenames exactly as listed, or, if the supporting ' +
+          'evidence is not surfaced, report a research finding instead'
         );
       }
     }
