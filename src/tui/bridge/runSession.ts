@@ -33,7 +33,7 @@ import {
   type HarnessConfig,
   type RunTaskConfig,
   type RunTaskResult,
-} from '../../cli/runTask.js';
+} from '../../agent/runTask.js';
 import type { ProgressEvent } from '../../model/callModel.js';
 import type { ModelDriverConfig } from '../../model/modelDriver.js';
 import type { RunTracing } from '../../tracing/runTracing.js';

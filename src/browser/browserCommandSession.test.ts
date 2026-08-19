@@ -16,7 +16,7 @@ import {
   createBusyResourceRegistry,
   EXCLUSIVE_ACCESS,
 } from '../tools/registry.js';
-import { runBrowserProgram } from '../v3/browser/runner.js';
+import { runBrowserProgram } from '../tools/browserExecute/runner.js';
 
 const TEST_TIMEOUT_MS = 15_000;
 const PRIVATE_CONNECT_URL =

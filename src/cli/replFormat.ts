@@ -1,6 +1,6 @@
 import type { ProgressEvent } from '../model/callModel.js';
 import { readManifest } from '../run/artifacts.js';
-import type { RunTaskResult } from './runTask.js';
+import type { RunTaskResult } from '../agent/runTask.js';
 
 // ProgressEvent/RunTaskResult -> display-text formatting for the T15 REPL,
 // kept separate from repl.ts's readline glue. The finished-run formatter

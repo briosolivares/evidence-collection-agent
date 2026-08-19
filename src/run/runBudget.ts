@@ -1,4 +1,4 @@
-import type { Usage } from '../loop/messages.js';
+import type { Usage } from '../model/messages.js';
 
 // One finite budget for the entire run, shared by every model role. The old
 // shape — each worker cycle getting a fresh runAgentLoop with fresh guards —

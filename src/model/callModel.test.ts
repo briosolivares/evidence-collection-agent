@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import type { Message } from '../loop/messages.js';
+import type { Message } from './messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
 import {
   V3_COLLAPSED_BROWSER_RESULT_MARKER,
   buildV3ContextView,
-} from '../v3/loop/contextView.js';
+} from '../agent/worker/contextView.js';
 import {
   buildRequestParams,
   DEFAULT_MODEL,

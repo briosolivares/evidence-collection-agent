@@ -2,7 +2,7 @@ import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import { useState } from 'react';
 
-import type { AskUserAnswers, AskUserInput } from '../../v3/tools/askUser.js';
+import type { AskUserAnswers, AskUserInput } from '../../tools/askUser/askUser.js';
 import { theme } from '../theme.js';
 
 interface QuestionDialogProps {

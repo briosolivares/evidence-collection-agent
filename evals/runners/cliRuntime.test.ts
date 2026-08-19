@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
-import type { RunTaskConfig } from '../../src/cli/runTask.js';
+import type { RunTaskConfig } from '../../src/agent/runTask.js';
 import type { EvalBrowserRuntime } from './browserRuntime.js';
 import { createBrowserBackedRunTask } from './cliRuntime.js';
 

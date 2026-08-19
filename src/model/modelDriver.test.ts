@@ -1,7 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import { describe, expect, it } from 'vitest';
 
-import type { ModelResponse } from '../loop/messages.js';
+import type { ModelResponse } from './messages.js';
 import {
   createAnthropicModelDriver,
   DEFAULT_MAX_TOOL_CALLS_PER_TURN,

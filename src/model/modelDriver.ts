@@ -1,6 +1,6 @@
 import type Anthropic from '@anthropic-ai/sdk';
 
-import type { Message, ModelResponse, ToolUseBlock, Usage } from '../loop/messages.js';
+import type { Message, ModelResponse, ToolUseBlock, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
 import { buildRequestParams, makeAnthropicClient } from './callModel.js';
 import { callWithRetry } from './callWithRetry.js';

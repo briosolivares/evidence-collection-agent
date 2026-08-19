@@ -9,7 +9,7 @@ import { TraceFlags, type SpanContext } from '@opentelemetry/api';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
-import type { CallModel } from '../loop/messages.js';
+import type { CallModel } from '../model/messages.js';
 import { knownModelUsageFromError } from '../model/modelDriver.js';
 import type { ModelRole } from '../run/runBudget.js';
 import type {

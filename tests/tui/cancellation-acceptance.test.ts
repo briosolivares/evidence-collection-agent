@@ -13,7 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
-import type { CallModel, ModelResponse } from '../../src/loop/messages.js';
+import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { readManifest } from '../../src/run/artifacts.js';
 import type { RunTracing } from '../../src/tracing/runTracing.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
@@ -27,7 +27,7 @@ import {
   V3_HARNESS_DIR,
   V3_RUN_CHECKPOINT_FILENAME,
   V3_RUN_LOCK_FILENAME,
-} from '../../src/v3/run/checkpoint.js';
+} from '../../src/agent/checkpoint.js';
 import {
   scriptedResponse,
   scriptedStreamFactory,

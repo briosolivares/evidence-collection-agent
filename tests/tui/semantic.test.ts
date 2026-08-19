@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { deriveSemanticLine } from '../../src/tui/store/semantic.js';
-import { V3_TOOL_ORDER } from '../../src/v3/tools/index.js';
+import { V3_TOOL_ORDER } from '../../src/tools/index.js';
 
 describe('deriveSemanticLine', () => {
   const tools = [

@@ -6,7 +6,7 @@ import type { BrowserContext, Page } from 'playwright';
 import { describe, expect, it } from 'vitest';
 
 import { createBusyResourceRegistry } from '../tools/registry.js';
-import { runBrowserProgram } from '../v3/browser/runner.js';
+import { runBrowserProgram } from '../tools/browserExecute/runner.js';
 import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSessionProvider.js';
 import type { BrowserController } from './controller.js';
 import { launchPersistentChrome } from './playwrightBrowserController.js';

@@ -12,7 +12,7 @@ import {
   type EvalReport,
 } from '../../../evals/runners/runner.js';
 import type { EvalRunOptions, EvalTask } from '../../../evals/types.js';
-import { usableStartUrl } from '../../cli/runTask.js';
+import { usableStartUrl } from '../../agent/runTask.js';
 import { DEFAULT_MODEL } from '../../model/callModel.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';

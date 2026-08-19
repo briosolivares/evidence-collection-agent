@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 
 import { z } from 'zod';
 
-import type { OutputContract } from '../../src/contracts/outputContract.js';
+import type { OutputContract } from '../../src/agent/initializer/outputContract.js';
 import type {
   AcceptedModelResponse,
   ModelDriver,
@@ -17,8 +17,8 @@ import { writeArtifact } from '../../src/run/artifacts.js';
 import type {
   V3Checkpoint,
   V3DurableRunConfiguration,
-} from '../../src/v3/run/checkpoint.js';
-import { runV3Coordinator } from '../../src/v3/run/coordinator.js';
+} from '../../src/agent/checkpoint.js';
+import { runV3Coordinator } from '../../src/agent/lifecycle.js';
 
 type Scenario =
   | 'contract'

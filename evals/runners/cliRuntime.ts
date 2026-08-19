@@ -1,5 +1,5 @@
 import type { BrowserController } from '../../src/browser/controller.js';
-import { runTask, usableStartUrl, type RunTaskConfig } from '../../src/cli/runTask.js';
+import { runTask, usableStartUrl, type RunTaskConfig } from '../../src/agent/runTask.js';
 import type { ProgressEvent } from '../../src/model/callModel.js';
 import type { PermissionRequest } from '../../src/tools/registry.js';
 import type { RunTaskFn } from '../types.js';

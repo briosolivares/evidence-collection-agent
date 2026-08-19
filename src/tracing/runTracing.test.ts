@@ -18,12 +18,12 @@ import type {
   BrowserScreenshotOptions,
   BrowserTaskPagePreparation,
 } from '../browser/controller.js';
-import { runTask } from '../cli/runTask.js';
+import { runTask } from '../agent/runTask.js';
 import {
   CallModel,
   ModelResponse,
   Usage,
-} from '../loop/messages.js';
+} from '../model/messages.js';
 import {
   MANIFEST_FILENAME,
   type Manifest,
@@ -32,9 +32,9 @@ import { TRANSCRIPT_FILENAME } from '../run/transcript.js';
 import {
   V3_METRICS_FILENAME,
   type V3WorkerMetrics,
-} from '../v3/loop/workerSession.js';
-import { V3_INITIALIZER_MODEL } from '../v3/harness/initializer.js';
-import { V3_VERIFIER_MODEL } from '../v3/harness/verifier.js';
+} from '../agent/worker/worker.js';
+import { V3_INITIALIZER_MODEL } from '../agent/initializer/initializer.js';
+import { V3_VERIFIER_MODEL } from '../agent/verifier/verifier.js';
 import { createRunTracing } from './runTracing.js';
 
 const FIRST_USAGE: Usage = {

@@ -8,7 +8,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest } from '../run/artifacts.js';
-import type { V3WorkerMetrics } from '../v3/loop/workerSession.js';
+import type { V3WorkerMetrics } from '../agent/worker/worker.js';
 import type { ManifestView, MetricsView } from './store/state.js';
 
 /** One row of the /runs list. */

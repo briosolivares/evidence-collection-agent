@@ -2,7 +2,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { runForegroundCommand } from '../../src/tools/bash/runForegroundCommand.js';
-import { runBrowserProgram } from '../../src/v3/browser/runner.js';
+import { runBrowserProgram } from '../../src/tools/browserExecute/runner.js';
 
 type Scenario = 'bash' | 'browser';
 

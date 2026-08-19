@@ -1,6 +1,6 @@
 import type Anthropic from '@anthropic-ai/sdk';
 
-import type { AssistantContentBlock, ModelResponse } from '../loop/messages.js';
+import type { AssistantContentBlock, ModelResponse } from './messages.js';
 
 // Turns the Anthropic streaming wire format back into the loop's
 // ModelResponse. Kept separate from the client so the assembly logic — the

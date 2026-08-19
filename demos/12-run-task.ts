@@ -12,12 +12,12 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
-import { runTask } from '../src/cli/runTask.js';
+import { runTask } from '../src/agent/runTask.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
 import {
   V3_METRICS_FILENAME,
   type V3WorkerMetrics,
-} from '../src/v3/loop/workerSession.js';
+} from '../src/agent/worker/worker.js';
 
 const DEFAULT_TASK =
   'Create a CSV of the top 5 Hacker News stories with title, URL, and points';

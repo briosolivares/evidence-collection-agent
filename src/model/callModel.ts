@@ -1,8 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-import type { CallModel, Message, Usage } from '../loop/messages.js';
+import type { CallModel, Message, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import { isV3CollapsedBrowserResult } from '../v3/loop/contextView.js';
+import { isV3CollapsedBrowserResult } from '../agent/worker/contextView.js';
 import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same

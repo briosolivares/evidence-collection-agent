@@ -33,7 +33,7 @@ import {
 } from '../config/paths.js';
 import { isBrowserDeathMessage } from '../tui/bridge/runtime.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
-import { runTask } from './runTask.js';
+import { runTask } from '../agent/runTask.js';
 
 // Repo-anchored in a checkout, ~/.sherlock installed — never cwd-bound:
 // a cwd-relative profile dir silently trades every saved login for a

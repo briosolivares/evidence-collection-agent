@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
-import type { CallModel } from '../../src/loop/messages.js';
+import type { CallModel } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import {
   createTuiRuntime,

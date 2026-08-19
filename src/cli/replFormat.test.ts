@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { ProgressEvent } from '../model/callModel.js';
 import { initManifest, writeArtifact } from '../run/artifacts.js';
-import type { RunTaskResult } from './runTask.js';
+import type { RunTaskResult } from '../agent/runTask.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 
 describe('formatProgressEvent', () => {

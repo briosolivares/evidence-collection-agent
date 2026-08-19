@@ -12,7 +12,7 @@ import {
   requestedOutputs,
   verifyManifestHashes,
 } from '../../evals/grading/manifestVerification.js';
-import type { CallModel, ModelResponse } from '../../src/loop/messages.js';
+import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
 import {
