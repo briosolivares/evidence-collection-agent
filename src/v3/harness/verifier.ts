@@ -515,7 +515,12 @@ function findVerificationValidityProblem(
     (options.finish.unresolved.length > 0 ||
       (options.structuralFindings?.length ?? 0) > 0)
   ) {
-    return 'verified is invalid while unresolved requirements or objective structural findings remain';
+    return (
+      'verified is never valid while unresolved requirements or objective ' +
+      'structural findings remain. If the reported blockers are credible, ' +
+      'return incomplete with one finding per blocked requirement; otherwise ' +
+      'return needs_correction with a typed finding per unsupported requirement'
+    );
   }
   if (result.status === 'needs_correction') {
     const surfacedPaths = new Set(

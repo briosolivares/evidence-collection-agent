@@ -412,6 +412,48 @@ describe('runV3Verifier', () => {
     ).toContain('objective structural findings remain');
   });
 
+  it('teaches the incomplete exit when verified contradicts unresolved requirements', async () => {
+    const model = scriptedModel([
+      report({ status: 'verified', findings: [] }),
+      report({
+        status: 'incomplete',
+        findings: [
+          {
+            requirement: 'Include majors for every member.',
+            assessment: 'The source lists names only; the blocker is credible.',
+          },
+        ],
+      }),
+    ]);
+    await expect(
+      runV3Verifier({
+        taskText: 'Create report.csv.',
+        runDir,
+        contract: CONTRACT,
+        finish: {
+          summary: 'Partial: majors are unavailable for two chapters.',
+          unresolved: [
+            {
+              requirement: 'Include majors for every member.',
+              reason: 'The official roster lists names only.',
+              attempts: ['official roster', 'chapter site', 'targeted search'],
+            },
+          ],
+        },
+        surfacedArtifacts: SURFACED_ARTIFACTS,
+        model,
+        budget: budget(),
+      }),
+    ).resolves.toMatchObject({ status: 'incomplete' });
+    const repairMessages = JSON.stringify(
+      vi.mocked(model.generate).mock.calls[1]![0].messages,
+    );
+    expect(repairMessages).toContain(
+      'return incomplete with one finding per blocked requirement',
+    );
+    expect(repairMessages).toContain('needs_correction with a typed finding');
+  });
+
   it.each([
     {
       name: 'a report mixed with inspection',

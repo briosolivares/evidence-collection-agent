@@ -17,10 +17,13 @@ describe('V3_SYSTEM_PROMPT', () => {
 
   it('teaches the canvas-editor entry and read-back recipe', () => {
     expect(V3_SYSTEM_PROMPT).toContain('canvas-rendered editors');
-    expect(V3_SYSTEM_PROMPT).toContain('writing it to the clipboard and pasting');
-    expect(V3_SYSTEM_PROMPT).toContain("app's own copy path");
-    expect(V3_SYSTEM_PROMPT).toContain('rather than DOM inspection');
+    expect(V3_SYSTEM_PROMPT).toContain("prefer the app's native import dialog");
     expect(V3_SYSTEM_PROMPT).toContain('browser.upload a workspace file to its file input');
+    expect(V3_SYSTEM_PROMPT).toContain('fall back to clipboard paste only when no import path exists');
+    expect(V3_SYSTEM_PROMPT).toContain('tabs and newlines only, so comma-separated text lands in one column');
+    expect(V3_SYSTEM_PROMPT).toContain("verify the result at the requirement's shape");
+    expect(V3_SYSTEM_PROMPT).toContain("app's own copy or export path");
+    expect(V3_SYSTEM_PROMPT).toContain('rather than DOM inspection');
   });
 
   it('teaches the external-action destination requirement', () => {
