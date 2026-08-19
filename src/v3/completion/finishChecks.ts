@@ -21,6 +21,7 @@ import { inspectTable } from './tableInspection.js';
 import type {
   V3CaptureFact,
   V3DocumentFact,
+  V3ExternalActionFact,
   V3FinishCheckResult,
   V3FinishDefect,
   V3FinishFacts,
@@ -163,6 +164,21 @@ export function runV3FinishChecks({
       continue;
     }
 
+    if (output.kind === 'external_action') {
+      const outcome = inspectExternalAction(
+        output,
+        inspection.entries.filter(
+          (entry) =>
+            entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) &&
+            entry.integrityVerified,
+        ),
+      );
+      defects.push(...outcome.defects);
+      facts.outputs.push(outcome.fact);
+      for (const path of outcome.claimedPaths) claimedContractPaths.add(path);
+      continue;
+    }
+
     const outcome = inspectCaptureOutput(
       output,
       inspection.entries.filter(
@@ -301,6 +317,17 @@ export function toV3SettledFacts(facts: V3FinishFacts): V3SettledFact[] {
             `${output.count} valid requested ${output.kind === 'screenshots' ? 'screenshot' : 'download'} ` +
             `artifact(s) satisfied the contract: [${output.artifactPaths.join(', ')}]. Their ` +
             'recorded source URLs and inferred byte formats passed deterministic checks.',
+        });
+        break;
+      case 'external_action':
+        settled.push({
+          outputId: output.outputId,
+          code: 'external_action_proof',
+          statement:
+            `${output.proofPaths.length} verified artifact(s) carry recorded source URLs matching ` +
+            `${JSON.stringify(output.sourceUrlPattern)}, including ${output.screenshotCount} valid ` +
+            `PNG proof screenshot(s): [${output.proofPaths.join(', ')}]. Only URL provenance is ` +
+            'settled; whether the captures show the requested action completed remains yours to judge.',
         });
         break;
     }
@@ -666,6 +693,93 @@ function inspectCaptureOutput(
     },
     attemptedPaths: patternMatches.map((entry) => entry.canonicalPath),
     validPaths: valid.map(({ entry }) => entry.canonicalPath),
+  };
+}
+
+/**
+ * Deterministic proof inspection for a required external action. Code settles
+ * only provenance: artifacts whose runtime-recorded source URL matches the
+ * declared destination, and how many of them are valid PNG proof screenshots
+ * carrying requested_output. Whether the captures show the action completed
+ * is judgment and stays with the verifier.
+ */
+function inspectExternalAction(
+  output: Extract<OutputSpec, { kind: 'external_action' }>,
+  candidates: readonly InspectedEntry[],
+): { defects: V3FinishDefect[]; fact: V3ExternalActionFact; claimedPaths: string[] } {
+  const defects: V3FinishDefect[] = [];
+  const proof = candidates.filter(
+    (entry) =>
+      hasSource(entry) &&
+      matchesFilenamePattern(entry.entry.sourceUrl ?? '', output.proof.sourceUrlPattern),
+  );
+
+  if (proof.length === 0) {
+    defects.push({
+      outputId: output.id,
+      code: 'missing_external_action_proof',
+      message:
+        `No published artifact's recorded source URL matches ` +
+        `${JSON.stringify(output.proof.sourceUrlPattern)}, so required external action ` +
+        `${JSON.stringify(output.id)} (${output.description}) has no auditable proof. ` +
+        'Perform the action at its real destination and publish proof captured there ' +
+        '(e.g. a screenshot of the destination page) with requested_output. A local ' +
+        'file never substitutes for the requested destination.',
+    });
+  }
+
+  const validScreenshots = proof.filter(
+    (entry) =>
+      isPng(inspectionBytes(entry)) &&
+      (entry.byteLength ?? 0) > 0 &&
+      hasRole(entry, 'requested_output'),
+  );
+
+  const required = output.proof.screenshots;
+  if (required !== undefined && proof.length > 0) {
+    const unroledPngs = proof.filter(
+      (entry) =>
+        isPng(inspectionBytes(entry)) &&
+        (entry.byteLength ?? 0) > 0 &&
+        !hasRole(entry, 'requested_output'),
+    ).length;
+    const roleHint =
+      unroledPngs > 0
+        ? ` ${unroledPngs} matching PNG capture(s) lack requested_output; re-publish them with that role.`
+        : '';
+    if ('exact' in required && validScreenshots.length !== required.exact) {
+      defects.push({
+        outputId: output.id,
+        code: 'external_action_screenshot_count_mismatch',
+        message:
+          `The run has ${validScreenshots.length} valid requested proof screenshot(s) whose ` +
+          `source URL matches ${JSON.stringify(output.proof.sourceUrlPattern)}; the contract ` +
+          `requires exactly ${required.exact}.${roleHint}`,
+      });
+    }
+    if ('minimum' in required && validScreenshots.length < required.minimum) {
+      defects.push({
+        outputId: output.id,
+        code: 'external_action_screenshots_below_minimum',
+        message:
+          `The run has ${validScreenshots.length} valid requested proof screenshot(s) whose ` +
+          `source URL matches ${JSON.stringify(output.proof.sourceUrlPattern)}; the contract ` +
+          `requires at least ${required.minimum}.${roleHint}`,
+      });
+    }
+  }
+
+  return {
+    defects,
+    fact: {
+      kind: 'external_action',
+      outputId: output.id,
+      sourceUrlPattern: output.proof.sourceUrlPattern,
+      proofPaths: proof.map((entry) => entry.canonicalPath),
+      screenshotCount: validScreenshots.length,
+      sourceUrls: proof.map((entry) => entry.entry.sourceUrl ?? ''),
+    },
+    claimedPaths: proof.map((entry) => entry.canonicalPath),
   };
 }
 

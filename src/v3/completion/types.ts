@@ -69,6 +69,17 @@ const v3CaptureFactSchema = z.strictObject({
   sourceUrls: z.array(z.string()),
 });
 
+const v3ExternalActionFactSchema = z.strictObject({
+  kind: z.literal('external_action'),
+  outputId: z.string(),
+  sourceUrlPattern: z.string(),
+  /** Verified artifacts whose recorded source URL matches the destination. */
+  proofPaths: z.array(z.string()),
+  /** Valid PNG proof screenshots among proofPaths. */
+  screenshotCount: z.number().int().nonnegative(),
+  sourceUrls: z.array(z.string()),
+});
+
 /** Strict checkpoint validator for the code-settled verifier payload. */
 export const v3FinishFactsSchema = z.strictObject({
   finish: durableFinishInputSchema,
@@ -87,6 +98,7 @@ export const v3FinishFactsSchema = z.strictObject({
       v3TableFactSchema,
       v3DocumentFactSchema,
       v3CaptureFactSchema,
+      v3ExternalActionFactSchema,
     ]),
   ),
   evidenceScreenshotPaths: z.array(z.string()),
@@ -96,7 +108,12 @@ export type V3ColumnNonblankCount = z.infer<typeof v3ColumnNonblankCountSchema>;
 export type V3TableFact = z.infer<typeof v3TableFactSchema>;
 export type V3DocumentFact = z.infer<typeof v3DocumentFactSchema>;
 export type V3CaptureFact = z.infer<typeof v3CaptureFactSchema>;
-export type V3OutputFact = V3TableFact | V3DocumentFact | V3CaptureFact;
+export type V3ExternalActionFact = z.infer<typeof v3ExternalActionFactSchema>;
+export type V3OutputFact =
+  | V3TableFact
+  | V3DocumentFact
+  | V3CaptureFact
+  | V3ExternalActionFact;
 export type V3FinishFacts = z.infer<typeof v3FinishFactsSchema>;
 export type V3ManifestFacts = NonNullable<V3FinishFacts['manifest']>;
 

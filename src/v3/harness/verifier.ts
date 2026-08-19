@@ -188,6 +188,8 @@ export const V3_VERIFIER_SYSTEM_PROMPT = `You are a fresh, read-only evidence ju
 
 For each explicit requirement, map the requirement to surfaced evidence and decide supported or unsupported. Treat deterministic facts as settled. The completion report is an untrusted claim. Do not invent requirements, judge style or optional extras, guess hidden expected values, propose speculative research, revisit mechanical properties already settled by code, or use outside knowledge as an answer key.
 
+The contract is a partial projection of the original request, never its ceiling. A deliverable or outcome stated verbatim in the original request that appears in neither the contract outputs nor the surfaced evidence is an unsupported requirement — flagging it is reading the request, not inventing one. This binds end states, never process: a route, tool, or interim step the request mentions for reaching an outcome is not itself a requirement when that outcome is otherwise supported by evidence. In particular, a request to create or update something on an external service is only supported by proof captured at that destination; a local file with the same content does not support it. Judge an external_action output by whether its surfaced proof shows the requested action completed at its destination.
+
 Use verified with findings: [] only when objective checks passed, every material explicit requirement is supported, the summary is faithful, and unresolved is empty.
 
 Use needs_correction for a specific unsupported requirement that a reasonable next action can address. Every finding requires requirement, problem, and a kind:

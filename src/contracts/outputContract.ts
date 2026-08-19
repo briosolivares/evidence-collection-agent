@@ -195,7 +195,8 @@ export const outputCountSchema = z.union([
 
 /** One required deliverable. `table` and `document` name a file; `screenshots`
  * and `download` describe a set of captures constrained by count, filename
- * pattern, media type, or source URL. */
+ * pattern, media type, or source URL; `external_action` is a requested action
+ * on an external service, proven by captures taken at its destination. */
 export const outputSpecSchema = z.discriminatedUnion('kind', [
   z.strictObject({
     id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
@@ -251,6 +252,38 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
       .describe(
         'What must be visible in the images. Deliberately semantic: checked by an ' +
           'image-capable verifier, never by code',
+      ),
+  }),
+  z.strictObject({
+    id: outputIdSchema.describe('Stable id later tool calls reference this output by'),
+    kind: z.literal('external_action'),
+    description: nonBlankString.describe(
+      'The requested action on an external service, copied verbatim from the request, ' +
+        'e.g. "add each member to a Google Sheets spreadsheet"',
+    ),
+    proof: z
+      .strictObject({
+        sourceUrlPattern: nonBlankString.describe(
+          'Pattern the destination URL of published proof captures must match, ' +
+            'e.g. "https://docs.google.com/spreadsheets/d/*"',
+        ),
+        screenshots: outputCountSchema
+          .optional()
+          .describe(
+            'How many PNG proof screenshots captured at the destination the run must publish',
+          ),
+        mustShow: z
+          .array(nonBlankString)
+          .min(1)
+          .optional()
+          .describe(
+            'What must be visible in the proof captures. Deliberately semantic: checked ' +
+              'by the verifier, never by code',
+          ),
+      })
+      .describe(
+        'Auditable proof the action happened at its real destination. Source URLs of ' +
+          'browser captures are runtime-derived provenance, never worker claims',
       ),
   }),
   z.strictObject({
@@ -330,7 +363,8 @@ export type OutputContractValidation =
  * expected values naming an undeclared column, more expected values than
  * rows); a download constrained by nothing; a document requiring
  * per-section evidence with no sections, or visible footnotes with no
- * evidence at all.
+ * evidence at all; an external action demanding visible proof content
+ * while requiring no proof screenshots.
  */
 export function validateOutputContract(input: unknown): OutputContractValidation {
   const parsed = outputContractSchema.safeParse(input);
@@ -389,6 +423,10 @@ function checkOutputs(outputs: readonly OutputSpec[]): string[] {
           errors.push(...checkFilenamePattern(output.id, output.filenamePattern));
         }
         errors.push(...checkDownload(output));
+        break;
+      }
+      case 'external_action': {
+        errors.push(...checkExternalAction(output));
         break;
       }
     }
@@ -633,6 +671,21 @@ function checkDocument(output: Extract<OutputSpec, { kind: 'document' }>): strin
     );
   }
   return errors;
+}
+
+/** External-action checks: the mustShow expectation binds to proof captures,
+ * so requiring visible content without requiring any capture is a contract
+ * no run could satisfy deliberately. */
+function checkExternalAction(
+  output: Extract<OutputSpec, { kind: 'external_action' }>,
+): string[] {
+  if (output.proof.mustShow !== undefined && output.proof.screenshots === undefined) {
+    return [
+      `output ${JSON.stringify(output.id)} lists proof.mustShow but requires no ` +
+        `proof.screenshots: require at least one screenshot or drop mustShow`,
+    ];
+  }
+  return [];
 }
 
 /** A download must constrain something. "Any file the browser happened to

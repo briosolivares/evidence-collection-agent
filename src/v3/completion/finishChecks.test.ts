@@ -1143,3 +1143,145 @@ describe('runV3FinishChecks — browser evidence', () => {
     expect(result.status).toBe('passed');
   });
 });
+
+describe('runV3FinishChecks — external actions', () => {
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/abc123/edit';
+
+  function externalActionSpec(overrides: Record<string, unknown> = {}): OutputSpec {
+    return {
+      id: 'roster_sheet',
+      kind: 'external_action',
+      description: 'add each member to a Google Sheets spreadsheet',
+      proof: {
+        sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*',
+        screenshots: { minimum: 1 },
+      },
+      ...overrides,
+    } as OutputSpec;
+  }
+
+  it('passes with a destination-captured proof screenshot and settles only provenance', () => {
+    publish('artifacts/sheet-proof.png', PNG, {
+      roles: ['requested_output', 'evidence'],
+      sourceUrl: SHEET_URL,
+    });
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(externalActionSpec()),
+      finish: finish(),
+    });
+
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs).toEqual([
+      {
+        kind: 'external_action',
+        outputId: 'roster_sheet',
+        sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*',
+        proofPaths: ['artifacts/sheet-proof.png'],
+        screenshotCount: 1,
+        sourceUrls: [SHEET_URL],
+      },
+    ]);
+    expect(toV3SettledFacts(result.facts)).toEqual([
+      expect.objectContaining({ code: 'manifest_integrity' }),
+      expect.objectContaining({
+        outputId: 'roster_sheet',
+        code: 'external_action_proof',
+        statement: expect.stringContaining('remains yours to judge'),
+      }),
+      expect.objectContaining({ code: 'evidence_screenshots' }),
+    ]);
+    expect(
+      v3FinishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts))),
+    ).toEqual(result.facts);
+  });
+
+  it('fails when no artifact was captured at the destination', () => {
+    publish('artifacts/roster.csv', 'name\nAlpha\n', {
+      roles: ['requested_output'],
+    });
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(externalActionSpec()),
+      finish: finish(),
+    });
+
+    expect(codes(result)).toContain('missing_external_action_proof');
+    // The local CSV is not claimed by the external action, so it is also
+    // flagged as a stray requested output: a file never substitutes for
+    // the destination.
+    expect(codes(result)).toContain('unexpected_requested_output');
+  });
+
+  it('counts only requested-output PNG proof and hints at wrong-role captures', () => {
+    publish('artifacts/sheet-proof.png', PNG, {
+      roles: ['evidence'],
+      sourceUrl: SHEET_URL,
+    });
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(externalActionSpec()),
+      finish: finish(),
+    });
+
+    expect(codes(result)).toContain('external_action_screenshots_below_minimum');
+    expect(result.status === 'failed' && result.defects.map((d) => d.message).join(' ')).toContain(
+      'lack requested_output',
+    );
+  });
+
+  it('enforces an exact proof screenshot count', () => {
+    publish('artifacts/sheet-1.png', PNG, {
+      roles: ['requested_output'],
+      sourceUrl: SHEET_URL,
+    });
+    publish('artifacts/sheet-2.png', PNG, {
+      roles: ['requested_output'],
+      sourceUrl: SHEET_URL,
+    });
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(
+        externalActionSpec({
+          proof: {
+            sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*',
+            screenshots: { exact: 1 },
+          },
+        }),
+      ),
+      finish: finish(),
+    });
+
+    expect(codes(result)).toContain('external_action_screenshot_count_mismatch');
+  });
+
+  it('accepts URL-only proof when the contract requires no screenshots', () => {
+    publish('artifacts/sheet-export.json', '{"rows":204}', {
+      roles: ['requested_output', 'evidence'],
+      sourceUrl: SHEET_URL,
+    });
+
+    const result = runV3FinishChecks({
+      runDir,
+      contract: contract(
+        externalActionSpec({
+          proof: { sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*' },
+        }),
+      ),
+      finish: finish(),
+    });
+
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs).toEqual([
+      expect.objectContaining({
+        kind: 'external_action',
+        proofPaths: ['artifacts/sheet-export.json'],
+        screenshotCount: 0,
+      }),
+    ]);
+  });
+});

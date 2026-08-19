@@ -210,3 +210,61 @@ describe('validateOutputContract cross-field rules', () => {
     expect(errorsOf(result).length).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe('validateOutputContract external actions', () => {
+  function externalAction(
+    overrides: Partial<Extract<OutputSpec, { kind: 'external_action' }>> = {},
+  ): OutputSpec {
+    return {
+      id: 'roster_sheet',
+      kind: 'external_action',
+      description: 'add each member to a Google Sheets spreadsheet',
+      proof: { sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*' },
+      ...overrides,
+    } as OutputSpec;
+  }
+
+  it('accepts an external action as the sole required output', () => {
+    const result = validate(contract([externalAction()]));
+    expect(result.ok).toBe(true);
+  });
+
+  it('accepts proof screenshots with mustShow', () => {
+    const result = validate(
+      contract([
+        externalAction({
+          proof: {
+            sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*',
+            screenshots: { minimum: 1 },
+            mustShow: ['the spreadsheet populated with the requested rows'],
+          },
+        }),
+      ]),
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects mustShow without required proof screenshots', () => {
+    const result = validate(
+      contract([
+        externalAction({
+          proof: {
+            sourceUrlPattern: 'https://docs.google.com/spreadsheets/d/*',
+            mustShow: ['the populated spreadsheet'],
+          },
+        }),
+      ]),
+    );
+    expect(errorsOf(result).join('\n')).toMatch(/mustShow/);
+  });
+
+  it('rejects a blank destination pattern at the schema layer', () => {
+    expect(
+      outputContractSchema.safeParse(
+        contract([
+          externalAction({ proof: { sourceUrlPattern: '   ' } }),
+        ]),
+      ).success,
+    ).toBe(false);
+  });
+});
