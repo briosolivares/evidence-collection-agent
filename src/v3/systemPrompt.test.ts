@@ -9,6 +9,12 @@ describe('V3_SYSTEM_PROMPT', () => {
   it('teaches the programmable browser and bounded durable-memory workflow', () => {
     expect(V3_SYSTEM_PROMPT).toContain('Use browser_execute for browser work.');
     expect(V3_SYSTEM_PROMPT).toContain('verify the expected postcondition');
+    expect(V3_SYSTEM_PROMPT).toContain(
+      "against what the page itself presents at the requirement's shape",
+    );
+    expect(V3_SYSTEM_PROMPT).toContain(
+      'never your own element count or your input echoed back',
+    );
     expect(V3_SYSTEM_PROMPT).toContain('bounded multi-line browser program');
     expect(V3_SYSTEM_PROMPT).toContain('batch of up to 20');
     expect(V3_SYSTEM_PROMPT).toContain('incremental workspace saves');
@@ -21,9 +27,9 @@ describe('V3_SYSTEM_PROMPT', () => {
     expect(V3_SYSTEM_PROMPT).toContain('browser.upload a workspace file to its file input');
     expect(V3_SYSTEM_PROMPT).toContain('fall back to clipboard paste only when no import path exists');
     expect(V3_SYSTEM_PROMPT).toContain('tabs and newlines only, so comma-separated text lands in one column');
-    expect(V3_SYSTEM_PROMPT).toContain("verify the result at the requirement's shape");
     expect(V3_SYSTEM_PROMPT).toContain("app's own copy or export path");
     expect(V3_SYSTEM_PROMPT).toContain('rather than DOM inspection');
+    expect(V3_SYSTEM_PROMPT).toContain('structure included — e.g. a non-first-column cell is non-empty');
   });
 
   it('teaches the external-action destination requirement', () => {
