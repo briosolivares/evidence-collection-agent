@@ -38,12 +38,9 @@ const tableFactSchema = z.strictObject({
   format: z.enum(['csv', 'json', 'markdown']),
   columns: z.array(z.string()),
   rowCount: z.number().int().nonnegative(),
-  /** One entry per declared column, in contract order. Optional so
-   * checkpoints written before this field existed still parse. */
-  columnNonblankCounts: z.array(columnNonblankCountSchema).optional(),
-  satisfiedRules: z.array(
-    z.enum(['exact_row_count', 'minimum_row_count', 'unique', 'matches_expected_values']),
-  ),
+  /** One entry per declared column, in contract order. */
+  columnNonblankCounts: z.array(columnNonblankCountSchema),
+  satisfiedRules: z.array(z.enum(['exact_row_count', 'minimum_row_count', 'unique'])),
 });
 
 const documentFactSchema = z.strictObject({

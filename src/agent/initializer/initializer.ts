@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { outputContractSchema, type OutputContract } from './outputContract.schema.js';
 import { validateOutputContract } from './validate.js';
 import { contractPrompt } from '../../prompts/index.js';
+import { deepFreezeJsonLike } from '../../deepFreeze.js';
 import type { CallModel, Message, ToolUseBlock } from '../../model/messages.js';
 import {
   createAnthropicModelDriver,
@@ -23,12 +24,8 @@ export const INITIALIZER_MODEL = 'claude-sonnet-5';
 export const INITIALIZER_MAX_ATTEMPTS = 2;
 const SET_OUTPUT_CONTRACT = 'set_output_contract';
 
-const initializerOutputContractSchema = outputContractSchema.omit({
-  assumptions: true,
-});
-
 const setOutputContractInputSchema = z.strictObject({
-  contract: initializerOutputContractSchema,
+  contract: outputContractSchema,
 });
 
 /** Initializer-only definition for the run's one immutable contract. */
@@ -39,13 +36,12 @@ const setOutputContractTool: ToolDef<{ contract: OutputContract }> = {
     'explicitly requested artifacts, exact shapes, counts, scope, and evidence needs. This ' +
     'contract is accepted once before work begins and is final after acceptance.',
   inputSchema: setOutputContractInputSchema,
-  getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {
     throw new Error('the initializer result is intercepted and never executed');
   },
 };
 
-export const CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
+export const CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreezeJsonLike(
   toApiToolDefs(createRegistry([setOutputContractTool as ToolDef])),
 );
 
@@ -264,43 +260,10 @@ function contractCorrectionMessage(problem: string, calls: readonly ToolUseBlock
   };
 }
 
-function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    for (const child of Object.values(value as Record<string, unknown>)) {
-      deepFreeze(child);
-    }
-    Object.freeze(value);
-  }
-  return value;
-}
-
 function validateInitialContractCall(input: unknown): ReturnType<typeof validateOutputContract> {
   const parsed = setOutputContractInputSchema.safeParse(input);
   if (parsed.success) {
-    const validation = validateOutputContract(parsed.data.contract);
-    if (!validation.ok) return validation;
-
-    // A matches_expected_values rule is a deterministic presence gate: it
-    // demands every expected value literally appear, which makes a truthful
-    // partial result structurally impossible when a source is unreachable.
-    // New contracts express an enumerated set as an enum column (fabrication
-    // and shape) plus contentExpectations scope (verifier-judged coverage).
-    const presenceGateRules = validation.contract.outputs.flatMap((output) =>
-      output.kind === 'table'
-        ? output.rules.filter((rule) => rule.type === 'matches_expected_values')
-        : [],
-    );
-    if (presenceGateRules.length > 0) {
-      return {
-        ok: false,
-        errors: [
-          'matches_expected_values rules are not allowed in a newly initialized contract: ' +
-            'enumerated sets must be declared as enum columns plus contentExpectations scope, ' +
-            'never a deterministic presence rule',
-        ],
-      };
-    }
-    return validation;
+    return validateOutputContract(parsed.data.contract);
   }
 
   const errors = parsed.error.issues.map((issue) => {

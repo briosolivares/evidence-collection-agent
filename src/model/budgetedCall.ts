@@ -1,6 +1,8 @@
-import type { CallModel, ModelResponse } from './messages.js';
+import type { CallModel, Message, ModelResponse, Usage } from './messages.js';
+import { isAbortError } from '../errors.js';
 import {
   knownModelUsageFromError,
+  type AcceptedModelResponse,
   type ModelAttemptEvent,
   type ModelDriver,
 } from './modelDriver.js';
@@ -29,6 +31,60 @@ export interface BudgetedCallModelOptions {
   now?: () => number;
 }
 
+export interface AccountedModelCallOptions {
+  model: ModelDriver;
+  messages: readonly Message[];
+  budget: RunBudgetTracker;
+  role: ModelRole;
+  signal?: AbortSignal;
+  onEvent?: (event: ModelAttemptEvent) => void;
+  /** Runs after accepted-response side effects have been charged, but before
+   * the durable usage hook and cancellation boundary. */
+  onAcceptedResponse?: (response: ModelResponse) => void | Promise<void>;
+  /** Runs after known usage has been charged for either outcome. */
+  afterUsageRecorded?: (usage: Usage, outcome: 'accepted' | 'failed') => void | Promise<void>;
+  /** Optional settlement hook for failures whose provider reported no usage. */
+  afterUnknownFailure?: (error: unknown) => void | Promise<void>;
+  now?: () => number;
+}
+
+/** Run one strict model call, charge every known provider usage record, then
+ * persist accounting before cancellation can win the response boundary. */
+export async function runAccountedModelCall(
+  options: AccountedModelCallOptions,
+): Promise<AcceptedModelResponse> {
+  const now = options.now ?? Date.now;
+  const startedMs = now();
+  let accepted: AcceptedModelResponse;
+  try {
+    accepted = await raceWithRunSignal(
+      () =>
+        options.model.generate({
+          messages: options.messages,
+          ...(options.signal === undefined ? {} : { signal: options.signal }),
+          ...(options.onEvent === undefined ? {} : { onEvent: options.onEvent }),
+        }),
+      options.signal,
+    );
+  } catch (error) {
+    const usage = knownModelUsageFromError(error);
+    if (usage === undefined) {
+      await options.afterUnknownFailure?.(error);
+    } else {
+      options.budget.recordModelUsage(options.role, usage, now() - startedMs);
+      await options.afterUsageRecorded?.(usage, 'failed');
+    }
+    options.signal?.throwIfAborted();
+    throw error;
+  }
+
+  options.budget.recordModelUsage(options.role, accepted.usage, now() - startedMs);
+  await options.onAcceptedResponse?.(accepted.response);
+  await options.afterUsageRecorded?.(accepted.usage, 'accepted');
+  options.signal?.throwIfAborted();
+  return accepted;
+}
+
 /**
  * Adapt the strict driver to a legacy CallModel consumer without losing the
  * runtime's aggregate accounting. The returned response carries only the accepted
@@ -38,33 +94,32 @@ export interface BudgetedCallModelOptions {
  * reported a complete usage record.
  */
 export function createBudgetedCallModel(options: BudgetedCallModelOptions): CallModel {
-  const now = options.now ?? Date.now;
   return async (messages) => {
     options.signal?.throwIfAborted();
     throwIfRoleBudgetExceeded(options.budget);
-    const startedMs = now();
     let accepted;
     try {
-      accepted = await raceWithRunSignal(
-        () =>
-          options.model.generate({
-            messages,
-            ...(options.signal === undefined ? {} : { signal: options.signal }),
-            ...(options.onEvent === undefined ? {} : { onEvent: options.onEvent }),
-          }),
-        options.signal,
-      );
+      accepted = await runAccountedModelCall({
+        model: options.model,
+        messages,
+        budget: options.budget,
+        role: options.role,
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+        ...(options.onEvent === undefined ? {} : { onEvent: options.onEvent }),
+        ...(options.onAcceptedResponse === undefined
+          ? {}
+          : { onAcceptedResponse: options.onAcceptedResponse }),
+        ...(options.afterAttemptSettled === undefined
+          ? {}
+          : {
+              afterUsageRecorded: options.afterAttemptSettled,
+              afterUnknownFailure: (error: unknown) =>
+                isRoleBudgetExceededError(error) ? undefined : options.afterAttemptSettled?.(),
+            }),
+        ...(options.now === undefined ? {} : { now: options.now }),
+      });
     } catch (error) {
       if (isRoleBudgetExceededError(error)) throw error;
-      const usage = knownModelUsageFromError(error);
-      if (usage !== undefined) {
-        options.budget.recordModelUsage(options.role, usage, now() - startedMs);
-      }
-      await options.afterAttemptSettled?.();
-      // Persist any known billing before cancellation wins. Abort-shaped
-      // failures normally carry no usage, but a provider that reports a
-      // complete attempt must not make that spend disappear.
-      options.signal?.throwIfAborted();
       if (isAbortError(error)) throw error;
       const exceeded = roleBudgetLimit(options.budget);
       if (exceeded !== undefined) {
@@ -73,13 +128,6 @@ export function createBudgetedCallModel(options: BudgetedCallModelOptions): Call
       throw error;
     }
 
-    options.budget.recordModelUsage(options.role, accepted.usage, now() - startedMs);
-    await options.onAcceptedResponse?.(accepted.response);
-    await options.afterAttemptSettled?.();
-    // The provider completed and reported billable usage, so charge and
-    // durably expose it; cancellation still wins before the response can
-    // become a verdict.
-    options.signal?.throwIfAborted();
     throwIfRoleBudgetExceeded(options.budget);
     return accepted.response;
   };
@@ -94,8 +142,4 @@ function throwIfRoleBudgetExceeded(budget: RunBudgetTracker): void {
  * every other whole-run limit remains binding before and after each call. */
 function roleBudgetLimit(budget: RunBudgetTracker): RunBudgetLimit | undefined {
   return budget.exceededLimit(['worker_turns']);
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
 }

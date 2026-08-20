@@ -105,7 +105,6 @@ describe('contract initializer static prefix', () => {
     expect(contractPrompt).toContain('one immutable output contract');
     expect(contractPrompt).toContain('original user request remains authoritative');
     expect(contractPrompt).toContain('declare the matching column as type enum');
-    expect(contractPrompt).toContain('Never emit a matches_expected_values rule');
   });
 
   it('builds the strict driver with validated finite output limits', () => {
@@ -132,7 +131,7 @@ describe('runContractInitializer', () => {
     );
   });
 
-  it('rejects any matches_expected_values rule, even source original_task, and accepts one bounded repair', async () => {
+  it('rejects a retired table-rule shape and accepts one bounded repair', async () => {
     const invalid = contractCall('invalid-contract');
     invalid.input = {
       contract: {
@@ -155,7 +154,7 @@ describe('runContractInitializer', () => {
     const state = createContractInitializerState('Create report.csv.');
     const callModel = vi.fn<CallModel>(async (messages) => {
       if (messages.length === 1) return response([invalid]);
-      expect(JSON.stringify(messages.at(-1))).toContain('never a deterministic presence rule');
+      expect(JSON.stringify(messages.at(-1))).toContain('contract.outputs.0.rules.0.type');
       return response([contractCall('repaired-contract')]);
     });
 

@@ -116,9 +116,9 @@ export const outputColumnSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
-/** A checkable, table-wide rule. Row counts, uniqueness, and known expected
- * values are exactly the properties code can settle without a model, which is
- * why they live in the contract instead of in prose. */
+/** A checkable, table-wide rule. Row counts and uniqueness are exactly the
+ * properties code can settle without a model, which is why they live in the
+ * contract instead of in prose. */
 export const tableRuleSchema = z.discriminatedUnion('type', [
   z.strictObject({
     type: z.literal('exact_row_count'),
@@ -134,32 +134,6 @@ export const tableRuleSchema = z.discriminatedUnion('type', [
       .array(nonBlankString)
       .min(1)
       .describe('Declared column names whose combined values must be distinct across rows'),
-  }),
-  z.strictObject({
-    type: z.literal('matches_expected_values'),
-    column: nonBlankString.describe('Declared column the expected values apply to'),
-    expected: z.array(nonBlankString).min(1).describe('Values that must appear in that column'),
-    exhaustive: z
-      .boolean()
-      .optional()
-      .describe(
-        'True when the expected values are the COMPLETE set of row keys: the column must ' +
-          'contain every one of them and nothing else. Set this whenever the population is ' +
-          'known up front, so code catches an invented or duplicated row instead of leaving ' +
-          'it to the verifier',
-      ),
-    source: z
-      .discriminatedUnion('kind', [
-        // Where the expectation came from. The verifier needs this to tell an
-        // explicit user requirement from something the run learned by
-        // browsing — only the first is authoritative on its own.
-        z.strictObject({ kind: z.literal('original_task') }),
-        z.strictObject({
-          kind: z.literal('evidence'),
-          evidenceIds: z.array(nonBlankString).min(1),
-        }),
-      ])
-      .describe('Whether the expectation comes from the original task or from collected evidence'),
   }),
 ]);
 
@@ -271,7 +245,7 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
 ]);
 
 /** The contract itself: required outputs, plus the judgment-shaped
- * expectations and material assumptions that surround them. */
+ * expectations that surround them. */
 export const outputContractSchema = z.strictObject({
   outputs: z
     .array(outputSpecSchema)
@@ -283,13 +257,6 @@ export const outputContractSchema = z.strictObject({
     .describe(
       'Requirements that need judgment rather than code, e.g. "explain the most ' +
         'material control gaps and support them with evidence"',
-    ),
-  assumptions: z
-    .array(nonBlankString)
-    .optional()
-    .describe(
-      'Deprecated compatibility field. Initializers must not add availability ' +
-        'assumptions or requirements the user did not state',
     ),
 });
 

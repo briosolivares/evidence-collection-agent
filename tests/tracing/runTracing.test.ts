@@ -17,6 +17,7 @@ import type {
 } from '../../src/browser/controller.js';
 import { runTask } from '../../src/agent/runTask.js';
 import { CallModel, ModelResponse, Usage } from '../../src/model/messages.js';
+import type { ModelDriver } from '../../src/model/modelDriver.js';
 import { MANIFEST_FILENAME, type Manifest } from '../../src/run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
 import { METRICS_FILENAME, type WorkerMetrics } from '../../src/agent/worker/worker.js';
@@ -285,6 +286,52 @@ describe('createRunTracing with runTask', () => {
       }),
     ]);
     expect(manifest.finishedAt).toBeDefined();
+  });
+
+  it('traces the accepted response while charging aggregate attempt usage', async () => {
+    const exporter = new InMemorySpanExporter();
+    const tracing = createRunTracing({
+      env: {},
+      spanProcessor: new SimpleSpanProcessor(exporter),
+    });
+    const response = publishResponse(FIRST_USAGE);
+    const aggregateUsage = { input_tokens: 101, output_tokens: 23 };
+    const driver: ModelDriver = {
+      generate: vi.fn(async () => ({
+        response,
+        stopReason: 'tool_use' as const,
+        attempts: 2,
+        usage: aggregateUsage,
+      })),
+    };
+    const traced = tracing.wrapModelDriver(driver, 'test-model', 'worker');
+
+    const accepted = await tracing.traceRun('trace one model call', () =>
+      traced.generate({
+        messages: [{ role: 'user', content: [{ type: 'text', text: 'collect evidence' }] }],
+      }),
+    );
+    await tracing.close();
+
+    expect(accepted.response).toBe(response);
+    const generation = exporter
+      .getFinishedSpans()
+      .find(
+        (span) => span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_TYPE] === 'generation',
+      );
+    expect(
+      JSON.parse(String(generation?.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT])),
+    ).toEqual(response);
+    expect(
+      JSON.parse(
+        String(generation?.attributes[LangfuseOtelSpanAttributes.OBSERVATION_USAGE_DETAILS]),
+      ),
+    ).toEqual({
+      input: 101,
+      output: 23,
+      cache_read_input_tokens: 0,
+      cache_creation_input_tokens: 0,
+    });
   });
 
   it('emits one agent trace with generation and tool observations', async () => {

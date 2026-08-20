@@ -166,8 +166,6 @@ describe('runTask browser acceptance', () => {
           authenticated: false,
           javascriptPolicy: 'allow',
           callModel: worker.callModel,
-          maxTurns: 4,
-          maxContextTokens: 10_000,
           harness: {
             initializerCallModel: initializer.callModel,
             verifierCallModel: verifier.callModel,

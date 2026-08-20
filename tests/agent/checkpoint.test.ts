@@ -4,7 +4,6 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
-  readdirSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -24,8 +23,6 @@ import {
   RUN_CHECKPOINT_FILENAME,
   RUN_LOCK_FILENAME,
   RUN_LOCK_RECOVERY_FILENAME,
-  readCheckpointConfiguration,
-  readCheckpointResumeInfo,
   ceilingFromCheckpoint,
   ceilingToCheckpoint,
   openCheckpointStore,
@@ -38,6 +35,7 @@ import {
   type Checkpoint,
   type DurableRunConfiguration,
 } from '../../src/agent/checkpoint.schema.js';
+import { MAX_PROTOCOL_CORRECTIONS } from '../../src/agent/worker/worker.js';
 
 let runDir: string;
 
@@ -63,11 +61,7 @@ const configuration: DurableRunConfiguration = {
     maxWorkerTurns: 24,
     maxToolCalls: 100,
     maxModelTokens: 250_000,
-    // Retained here to exercise read compatibility with checkpoints written
-    // before the cumulative tool-result ceiling was retired.
-    maxToolResultBytes: 5_000_000,
     maxWallTimeMs: 3_600_000,
-    maxVerifierCorrections: 3,
   },
 };
 
@@ -153,36 +147,6 @@ const finishWorker = {
   turnCount: finish.turn,
 };
 
-function legacyFinishInput(artifacts = ['artifacts/roster.csv']) {
-  return {
-    summary: finish.input.summary,
-    artifacts,
-    limitations: ['Historical source-access constraint.'],
-  };
-}
-
-function legacyFinishWorker(artifacts = ['artifacts/roster.csv']) {
-  const input = legacyFinishInput(artifacts);
-  return {
-    ...finishWorker,
-    messages: [
-      ...worker.messages,
-      {
-        role: 'assistant' as const,
-        content: [
-          { type: 'text' as const, text: finish.assistantText },
-          {
-            type: 'tool_use' as const,
-            id: finish.call.id,
-            name: finish.call.name,
-            input,
-          },
-        ],
-      },
-    ],
-  };
-}
-
 const toolAssistant = {
   role: 'assistant' as const,
   content: [
@@ -231,6 +195,7 @@ const facts: FinishFacts = {
       format: 'csv',
       columns: ['name'],
       rowCount: 1,
+      columnNonblankCounts: [{ column: 'name', nonblankCount: 1 }],
       satisfiedRules: [],
     },
   ],
@@ -248,26 +213,6 @@ function typedVerificationHistory() {
           kind: 'research' as const,
           requirement: 'Include every requested row.',
           problem: 'One row is absent.',
-        },
-      ],
-    },
-  ];
-}
-
-/** Durable correction-finding shape from before typed finding kinds existed:
- * a free-form nextAction plus an optional outputId. */
-function legacyVerificationHistory() {
-  return [
-    {
-      cycle: 1,
-      completionReport: finish.input,
-      surfacedEvidenceFingerprint: 'a'.repeat(64),
-      findings: [
-        {
-          requirement: 'Include every requested row.',
-          problem: 'One row is absent.',
-          nextAction: 'Publish the missing row and republish the report.',
-          outputId: 'roster',
         },
       ],
     },
@@ -412,37 +357,29 @@ describe('checkpoint schema', () => {
     expect(checkpointSchema.parse(verifying())).toEqual(verifying());
   });
 
-  it('round-trips new typed verification-history findings and normalizes legacy nextAction findings', () => {
+  it('round-trips typed verification history and rejects obsolete free-form findings', () => {
     const withTypedHistory = {
       ...verifying(),
       verificationHistory: typedVerificationHistory(),
     };
     expect(checkpointSchema.parse(withTypedHistory)).toEqual(withTypedHistory);
 
-    const withLegacyHistory = {
+    const withFreeFormFinding = {
       ...verifying(),
-      verificationHistory: legacyVerificationHistory(),
+      verificationHistory: [
+        {
+          ...typedVerificationHistory()[0],
+          findings: [
+            {
+              requirement: 'Include every requested row.',
+              problem: 'One row is absent.',
+              nextAction: 'Publish the missing row and republish the report.',
+            },
+          ],
+        },
+      ],
     };
-    const parsedLegacy = checkpointSchema.parse(withLegacyHistory);
-    if (parsedLegacy.phase !== 'verifying') {
-      throw new Error('expected a verifying checkpoint');
-    }
-    // nextAction and outputId are intentionally dropped: an old free-form
-    // instruction must never be executed after upgrade.
-    expect(parsedLegacy.verificationHistory).toEqual([
-      {
-        cycle: 1,
-        completionReport: finish.input,
-        surfacedEvidenceFingerprint: 'a'.repeat(64),
-        findings: [
-          {
-            kind: 'research',
-            requirement: 'Include every requested row.',
-            problem: 'One row is absent.',
-          },
-        ],
-      },
-    ]);
+    expect(checkpointSchema.safeParse(withFreeFormFinding).success).toBe(false);
   });
 
   it('accepts every phase with only its required durable state', () => {
@@ -503,6 +440,12 @@ describe('checkpoint schema', () => {
           messages: [{ role: 'user', content: [{ type: 'text', text: 'synthetic state' }] }],
           attempts: 0,
         },
+      }).success,
+    ).toBe(false);
+    expect(
+      checkpointSchema.safeParse({
+        ...ready(),
+        worker: { ...worker, protocolCorrections: MAX_PROTOCOL_CORRECTIONS + 1 },
       }).success,
     ).toBe(false);
   });
@@ -833,7 +776,7 @@ describe('checkpoint schema', () => {
   });
 });
 
-describe('read-only checkpoint observation', () => {
+describe('checkpoint input validation', () => {
   function writeCheckpoint(value: unknown): string {
     const harnessDir = join(runDir, HARNESS_DIR);
     mkdirSync(harnessDir, { mode: 0o700 });
@@ -844,97 +787,18 @@ describe('read-only checkpoint observation', () => {
     return path;
   }
 
-  it('returns a detached frozen configuration without touching lock or directory state', () => {
-    const checkpointPath = writeCheckpoint(ready());
-    const lockPath = pathInHarness(RUN_LOCK_FILENAME);
-    writeFileSync(lockPath, 'leave this corrupt lock untouched', { mode: 0o600 });
-    const namesBefore = readdirSync(join(runDir, HARNESS_DIR)).sort();
-    const checkpointBefore = readFileSync(checkpointPath);
-    const lockBefore = readFileSync(lockPath);
-
-    const observed = readCheckpointConfiguration(runDir);
-    const resumeInfo = readCheckpointResumeInfo(runDir);
-
-    expect(observed).toEqual(configuration);
-    expect(Object.isFrozen(observed)).toBe(true);
-    expect(Object.isFrozen(observed.budgetLimits)).toBe(true);
-    expect(Reflect.set(observed, 'model', 'mutated')).toBe(false);
-    expect(observed.model).toBe(configuration.model);
-    expect(resumeInfo).toEqual({
-      phase: 'ready_for_model',
-      configuration,
-    });
-    expect(Object.isFrozen(resumeInfo)).toBe(true);
-    expect(resumeInfo.configuration).not.toBe(observed);
-    expect(readdirSync(join(runDir, HARNESS_DIR)).sort()).toEqual(namesBefore);
-    expect(readFileSync(checkpointPath)).toEqual(checkpointBefore);
-    expect(readFileSync(lockPath)).toEqual(lockBefore);
-  });
-
-  it('migrates a legacy active finish list without rewriting checkpoint bytes', async () => {
-    const legacyInput = legacyFinishInput();
-    const legacy = {
+  it('rejects mismatched current finish claims', async () => {
+    const mismatched = {
       ...checking(),
-      worker: legacyFinishWorker(),
       pendingFinish: {
         ...finish,
-        call: { ...finish.call, input: legacyInput },
-        input: legacyInput,
-      },
-    };
-    const checkpointPath = writeCheckpoint(legacy);
-    const before = readFileSync(checkpointPath);
-
-    const store = await openCheckpointStore(runDir);
-    expect(store.load()).toEqual(checking());
-    await store.close();
-    expect(readFileSync(checkpointPath)).toEqual(before);
-  });
-
-  it('migrates legacy nextAction verification-history findings without rewriting checkpoint bytes', async () => {
-    const legacy = {
-      ...verifying(),
-      verificationHistory: legacyVerificationHistory(),
-    };
-    const checkpointPath = writeCheckpoint(legacy);
-    const before = readFileSync(checkpointPath);
-
-    const store = await openCheckpointStore(runDir);
-    expect(store.load()).toEqual({
-      ...verifying(),
-      verificationHistory: typedVerificationHistory(),
-    });
-    await store.close();
-    expect(readFileSync(checkpointPath)).toEqual(before);
-  });
-
-  it('migrates a legacy verified terminal finish list', async () => {
-    const legacy = {
-      ...terminal(),
-      worker: legacyFinishWorker(),
-      finish: legacyFinishInput(),
-    };
-    writeCheckpoint(legacy);
-
-    const store = await openCheckpointStore(runDir);
-    expect(store.load()).toEqual(terminal());
-    await store.close();
-  });
-
-  it('does not hide mismatched current finish claims while normalizing legacy paths', async () => {
-    const legacy = {
-      ...checking(),
-      worker: legacyFinishWorker(),
-      pendingFinish: {
-        ...finish,
-        call: { ...finish.call, input: legacyFinishInput() },
         input: {
-          ...legacyFinishInput(),
+          ...finish.input,
           summary: 'A different durable finish summary.',
         },
       },
     };
-    writeCheckpoint(legacy);
+    writeCheckpoint(mismatched);
 
     await expect(openCheckpointStore(runDir)).rejects.toThrow(
       /schema validation|must equal the validated finish input/,
@@ -942,27 +806,16 @@ describe('read-only checkpoint observation', () => {
     expect(existsSync(pathInHarness(RUN_LOCK_FILENAME))).toBe(false);
   });
 
-  it('does not create a missing harness directory or checkpoint', () => {
-    const harnessDir = join(runDir, HARNESS_DIR);
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/harness directory does not exist/);
-    expect(existsSync(harnessDir)).toBe(false);
-
-    mkdirSync(harnessDir, { mode: 0o700 });
-    chmodSync(harnessDir, 0o700);
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/checkpoint does not exist/);
-    expect(readdirSync(harnessDir)).toEqual([]);
-  });
-
-  it('rejects malformed JSON, the wrong version, and invalid durable configuration', () => {
+  it('rejects malformed JSON, the wrong version, and invalid durable configuration', async () => {
     const checkpointPath = writeCheckpoint(ready());
 
     writeFileSync(checkpointPath, '{bad json', { mode: 0o600 });
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/not valid JSON/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/not valid JSON/);
 
     writeFileSync(checkpointPath, JSON.stringify({ ...ready(), version: 2 }), {
       mode: 0o600,
     });
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/version/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/version/);
 
     writeFileSync(
       checkpointPath,
@@ -972,19 +825,29 @@ describe('read-only checkpoint observation', () => {
       }),
       { mode: 0o600 },
     );
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/configuration\.model/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/configuration\.model/);
   });
 
-  it('refuses an oversized checkpoint before parsing it', () => {
+  it('refuses an oversized checkpoint before parsing it', async () => {
     const checkpointPath = writeCheckpoint(ready());
     truncateSync(checkpointPath, CHECKPOINT_MAX_BYTES + 1);
 
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(
       new RegExp(`${CHECKPOINT_MAX_BYTES}-byte read limit`),
     );
   });
 
-  it('does not follow a checkpoint symlink', () => {
+  it('rejects a checkpoint whose descriptor is not owner-only', async () => {
+    const checkpointPath = writeCheckpoint(ready());
+    chmodSync(checkpointPath, 0o644);
+
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(
+      `checkpoint at ${checkpointPath} has mode 0644, expected 0600`,
+    );
+    expect(existsSync(pathInHarness(RUN_LOCK_FILENAME))).toBe(false);
+  });
+
+  it('does not follow a checkpoint symlink', async () => {
     const target = join(runDir, 'outside-checkpoint.json');
     const targetBytes = `${JSON.stringify(ready())}\n`;
     writeFileSync(target, targetBytes, { mode: 0o600 });
@@ -993,7 +856,7 @@ describe('read-only checkpoint observation', () => {
     chmodSync(harnessDir, 0o700);
     symlinkSync(target, pathInHarness(RUN_CHECKPOINT_FILENAME));
 
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(/symlinks are not followed/);
+    await expect(openCheckpointStore(runDir)).rejects.toThrow(/symlinks are not followed/);
     expect(readFileSync(target, 'utf8')).toBe(targetBytes);
   });
 });

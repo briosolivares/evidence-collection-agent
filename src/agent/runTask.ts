@@ -8,8 +8,8 @@ import {
 } from '../browser/browserJavaScript.js';
 import type { BrowserController } from '../browser/controller.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
-import type { CallModel, Message } from '../model/messages.js';
-import { DEFAULT_MODEL, type CallModelConfig, type ProgressEvent } from '../model/callModel.js';
+import type { CallModel } from '../model/messages.js';
+import { DEFAULT_MODEL, type ProgressEvent } from '../model/callModel.js';
 import {
   createAnthropicModelDriver,
   isModelResponseRejectedError,
@@ -17,6 +17,7 @@ import {
   type AcceptedModelResponse,
   type ModelAttemptEvent,
   type ModelDriver,
+  type ModelDriverConfig,
 } from '../model/modelDriver.js';
 import { initManifest } from '../run/artifacts.js';
 import { createRunDir } from '../run/runDir.js';
@@ -29,11 +30,7 @@ import {
   createContractInitializerModelDriver,
 } from './initializer/initializer.js';
 import { VERIFIER_MODEL, createVerifierModelDriver } from './verifier/verifier.js';
-import {
-  readCheckpointResumeInfo,
-  ceilingFromCheckpoint,
-  ceilingToCheckpoint,
-} from './checkpoint.js';
+import { ceilingToCheckpoint } from './checkpoint.js';
 import {
   durableRunConfigurationSchema,
   type DurableRunConfiguration,
@@ -61,9 +58,6 @@ export const PRODUCTION_DEFAULTS = Object.freeze({
   maxModelTokens: Infinity,
   maxWallTimeMs: 3_600_000,
   maxCompletionCheckFailures: 5,
-  /** Retained in durable budget configuration as an unbounded compatibility
-   * field. Correction cycles are bounded by the ordinary whole-run guards. */
-  maxVerifierCorrections: Infinity,
 });
 
 /** Run-scoped initializer/verifier tuning and injectable model seams. */
@@ -82,15 +76,9 @@ export interface RunTaskConfig {
   runsBaseDir?: string;
   startUrl?: string;
   model?: string;
-  maxOutputTokens?: number;
-  maxTurns?: number;
-  maxContextTokens?: number;
-  maxToolCalls?: number;
-  maxModelTokens?: number;
-  maxWallTimeMs?: number;
   onProgress?: (event: ProgressEvent) => void;
   callModel?: CallModel;
-  createStream?: CallModelConfig['createStream'];
+  createStream?: ModelDriverConfig['createStream'];
   tracing?: RunTracing;
   requestPermission?: ToolCtx['requestPermission'];
   authenticated?: boolean;
@@ -102,30 +90,6 @@ export interface RunTaskConfig {
 /** A finished run directory and its truthful terminal outcome. */
 export type RunTaskResult = { runDir: string } & RunOutcome;
 
-/** Live dependencies and optional durable-configuration assertions for
- * resuming a run. A fresh browser's authentication authority must always
- * be stated explicitly. */
-export interface ResumeTaskConfig {
-  browser: BrowserController;
-  model?: string;
-  maxOutputTokens?: number;
-  maxTurns?: number;
-  maxContextTokens?: number;
-  maxToolCalls?: number;
-  maxModelTokens?: number;
-  maxWallTimeMs?: number;
-  startUrl?: string;
-  onProgress?: (event: ProgressEvent) => void;
-  callModel?: CallModel;
-  createStream?: CallModelConfig['createStream'];
-  tracing?: RunTracing;
-  requestPermission?: ToolCtx['requestPermission'];
-  authenticated: boolean;
-  javascriptPolicy?: BrowserJavaScriptPolicy;
-  harness?: HarnessConfig;
-  signal?: AbortSignal;
-}
-
 /** Start a fresh run through the initializer → worker → verifier
  * coordinator while preserving runTask's public dependency seams. */
 export async function runTask(taskText: string, config: RunTaskConfig): Promise<RunTaskResult> {
@@ -133,20 +97,6 @@ export async function runTask(taskText: string, config: RunTaskConfig): Promise<
   const runDir = createRunDir(config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR, generateRunId(taskText));
   initManifest(runDir, taskText, configuration.browserProvider);
 
-  return executeRun(runDir, configuration, config);
-}
-
-/** Resume a checkpoint. The read-only loader performs no locking or
- * mutation; the coordinator re-reads the full checkpoint after acquiring its
- * run lock and rejects any configuration drift. */
-export async function resumeTask(runDir: string, config: ResumeTaskConfig): Promise<RunTaskResult> {
-  const resumeInfo = readCheckpointResumeInfo(runDir);
-  const durable = resumeInfo.configuration;
-  assertResumeConfigurationMatches(durable, config);
-  const configuration = structuredClone(durable) as DurableRunConfiguration;
-  if (resumeInfo.phase === 'terminal') {
-    return executeTerminalResume(runDir, configuration, config);
-  }
   return executeRun(runDir, configuration, config);
 }
 
@@ -161,38 +111,6 @@ type LiveRunConfig = Pick<
   | 'signal'
   | 'tracing'
 >;
-
-const TERMINAL_RESUME_MODEL: ModelDriver = {
-  generate: async () => {
-    throw new Error('terminal resume unexpectedly invoked a model');
-  },
-};
-
-/** Repair/read an already-terminal run without opening a new Langfuse root,
- * wrapping tools, or constructing live model clients. Explicit tracing still
- * receives the local run-directory announcement needed by the TUI. */
-async function executeTerminalResume(
-  runDir: string,
-  configuration: DurableRunConfiguration,
-  config: LiveRunConfig,
-): Promise<RunTaskResult> {
-  try {
-    config.tracing?.announceRunDir?.(runDir);
-    const outcome = await runAgent({
-      runDir,
-      configuration,
-      initializerModel: TERMINAL_RESUME_MODEL,
-      workerModel: TERMINAL_RESUME_MODEL,
-      verifierModel: TERMINAL_RESUME_MODEL,
-      registry: new Map(),
-      browser: config.browser,
-      ...(config.signal === undefined ? {} : { signal: config.signal }),
-    });
-    return normalizeOutcome(runDir, outcome);
-  } finally {
-    await config.tracing?.close();
-  }
-}
 
 async function executeRun(
   runDir: string,
@@ -210,17 +128,16 @@ async function executeRun(
       }),
     );
 
-    const initializerModel = traceModelDriver(
+    const initializerModel = tracing.wrapModelDriver(
       modelFromCallModel(config.harness?.initializerCallModel, () =>
         createContractInitializerModelDriver({
           ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
         }),
       ),
-      tracing,
       INITIALIZER_MODEL,
       'initializer',
     );
-    const workerModel = traceModelDriver(
+    const workerModel = tracing.wrapModelDriver(
       modelFromCallModel(config.callModel, () =>
         createAnthropicModelDriver({
           model: configuration.model,
@@ -230,17 +147,15 @@ async function executeRun(
           ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
         }),
       ),
-      tracing,
       configuration.model,
       'worker',
     );
-    const verifierModel = traceModelDriver(
+    const verifierModel = tracing.wrapModelDriver(
       modelFromCallModel(config.harness?.verifierCallModel, () =>
         createVerifierModelDriver({
           ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
         }),
       ),
-      tracing,
       VERIFIER_MODEL,
       'verifier',
     );
@@ -280,10 +195,8 @@ function buildFreshConfiguration(taskText: string, config: RunTaskConfig): Durab
   return durableRunConfigurationSchema.parse({
     taskText,
     model: config.model ?? DEFAULT_MODEL,
-    maxOutputTokens: config.maxOutputTokens ?? PRODUCTION_DEFAULTS.maxOutputTokens,
-    maxContextTokens: ceilingToCheckpoint(
-      config.maxContextTokens ?? PRODUCTION_DEFAULTS.maxContextTokens,
-    ),
+    maxOutputTokens: PRODUCTION_DEFAULTS.maxOutputTokens,
+    maxContextTokens: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxContextTokens),
     browserProvider: browserProvider(config.browser),
     authenticated,
     javascriptPolicy,
@@ -292,77 +205,12 @@ function buildFreshConfiguration(taskText: string, config: RunTaskConfig): Durab
     maxCompletionCheckFailures:
       config.harness?.maxCompletionCheckFailures ?? PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
     budgetLimits: {
-      maxWorkerTurns: ceilingToCheckpoint(config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns),
-      maxToolCalls: ceilingToCheckpoint(config.maxToolCalls ?? PRODUCTION_DEFAULTS.maxToolCalls),
-      maxModelTokens: ceilingToCheckpoint(
-        config.maxModelTokens ?? PRODUCTION_DEFAULTS.maxModelTokens,
-      ),
-      maxWallTimeMs: ceilingToCheckpoint(config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs),
-      maxVerifierCorrections: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxVerifierCorrections),
+      maxWorkerTurns: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxWorkerTurns),
+      maxToolCalls: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxToolCalls),
+      maxModelTokens: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxModelTokens),
+      maxWallTimeMs: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxWallTimeMs),
     },
   });
-}
-
-function assertResumeConfigurationMatches(
-  durable: Readonly<DurableRunConfiguration>,
-  config: ResumeTaskConfig,
-): void {
-  const check = (name: string, supplied: unknown, stored: unknown): void => {
-    if (supplied !== undefined && supplied !== stored) {
-      throw new Error(
-        `resume configuration mismatch for ${name}: checkpoint has ` +
-          `${JSON.stringify(stored)}, caller supplied ${JSON.stringify(supplied)}`,
-      );
-    }
-  };
-
-  if (typeof config.authenticated !== 'boolean') {
-    throw new Error('resume requires the caller to explicitly state authenticated=true or false');
-  }
-
-  const provider = browserProvider(config.browser);
-  if (provider !== durable.browserProvider) {
-    throw new Error(
-      `resume configuration mismatch for browserProvider: checkpoint has ` +
-        `${JSON.stringify(durable.browserProvider)}, live browser is ${JSON.stringify(provider)}`,
-    );
-  }
-
-  check('model', config.model, durable.model);
-  check('maxOutputTokens', config.maxOutputTokens, durable.maxOutputTokens);
-  check('maxTurns', config.maxTurns, ceilingFromCheckpoint(durable.budgetLimits.maxWorkerTurns));
-  check(
-    'maxContextTokens',
-    config.maxContextTokens,
-    ceilingFromCheckpoint(durable.maxContextTokens),
-  );
-  check(
-    'maxToolCalls',
-    config.maxToolCalls,
-    ceilingFromCheckpoint(durable.budgetLimits.maxToolCalls),
-  );
-  check(
-    'maxModelTokens',
-    config.maxModelTokens,
-    ceilingFromCheckpoint(durable.budgetLimits.maxModelTokens),
-  );
-  check(
-    'maxWallTimeMs',
-    config.maxWallTimeMs,
-    ceilingFromCheckpoint(durable.budgetLimits.maxWallTimeMs),
-  );
-  check(
-    'startUrl',
-    config.startUrl === undefined ? undefined : usableStartUrl(config.startUrl),
-    durable.startUrl,
-  );
-  check('authenticated', config.authenticated, durable.authenticated);
-  check('javascriptPolicy', config.javascriptPolicy, durable.javascriptPolicy);
-  check(
-    'harness.maxCompletionCheckFailures',
-    config.harness?.maxCompletionCheckFailures,
-    durable.maxCompletionCheckFailures,
-  );
 }
 
 function modelFromCallModel(
@@ -406,40 +254,6 @@ function adaptCallModel(callModel: CallModel): ModelDriver {
         }
         throw error;
       }
-    },
-  };
-}
-
-/** RunTracing's stable public decorator predates ModelDriver. This adapter
- * preserves aggregate driver accounting while letting the tracing layer see
- * the accepted response and exact per-call messages. */
-function traceModelDriver(
-  driver: ModelDriver,
-  tracing: RunTracing,
-  model: string,
-  role: 'initializer' | 'worker' | 'verifier',
-): ModelDriver {
-  return {
-    async generate(options): Promise<AcceptedModelResponse> {
-      let accepted: AcceptedModelResponse | undefined;
-      const traced = tracing.wrapCallModel(
-        async (messages: readonly Message[]) => {
-          accepted = await driver.generate({ ...options, messages });
-          return {
-            ...accepted.response,
-            // Langfuse must see every known billable attempt in this logical
-            // request, including a discarded max_tokens re-ask.
-            usage: accepted.usage,
-          };
-        },
-        model,
-        role,
-      );
-      await traced(options.messages);
-      if (accepted === undefined) {
-        throw new Error('traced model call returned without an accepted response');
-      }
-      return accepted;
     },
   };
 }

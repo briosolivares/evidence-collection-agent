@@ -130,6 +130,11 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     expect(finishFactsSchema.safeParse({ ...result.facts, unrecognized: true }).success).toBe(
       false,
     );
+    const tableWithoutCounts = structuredClone(result.facts.outputs[0]) as Record<string, unknown>;
+    delete tableWithoutCounts.columnNonblankCounts;
+    expect(
+      finishFactsSchema.safeParse({ ...result.facts, outputs: [tableWithoutCounts] }).success,
+    ).toBe(false);
   });
 
   it('does not mutate the immutable contract or finish input', () => {
@@ -482,6 +487,16 @@ describe('runFinishChecks — generic tables', () => {
     ).toEqual(['table_cell_limit_exceeded']);
   });
 
+  it('reports invalid UTF-8 before parsing the declared table format', () => {
+    const result = inspectTable(
+      tableSpec() as Extract<OutputSpec, { kind: 'table' }>,
+      'artifacts/roster.csv',
+      Buffer.from([0x6e, 0x61, 0x6d, 0x65, 0x0a, 0xff]),
+    );
+
+    expect(result.defects.map((defect) => defect.code)).toEqual(['invalid_text_encoding']);
+  });
+
   it.each([
     {
       format: 'csv' as const,
@@ -638,13 +653,6 @@ describe('runFinishChecks — generic tables', () => {
       rules: [
         { type: 'exact_row_count', value: 2 },
         { type: 'unique', columns: ['name'] },
-        {
-          type: 'matches_expected_values',
-          column: 'name',
-          expected: ['Alpha, Inc.\nNorth', 'Beta'],
-          exhaustive: true,
-          source: { kind: 'original_task' },
-        },
       ],
     });
     const result = runFinishChecks({
@@ -655,21 +663,19 @@ describe('runFinishChecks — generic tables', () => {
     expect(result.status).toBe('passed');
     expect(result.facts.outputs[0]).toMatchObject({
       rowCount: 2,
-      satisfiedRules: ['exact_row_count', 'unique', 'matches_expected_values'],
+      satisfiedRules: ['exact_row_count', 'unique'],
     });
 
     publish(
       'artifacts/roster.csv',
-      'name,url\n"Alpha, Inc.\nNorth",https://e.test/a\nUnexpected,https://e.test/b\n',
+      'name,url\n"Alpha, Inc.\nNorth",https://e.test/a\n"Alpha, Inc.\nNorth",https://e.test/b\n',
     );
     const mismatched = runFinishChecks({
       runDir,
       contract: contract(spec),
       finish: finish(),
     });
-    expect(codes(mismatched)).toEqual(
-      expect.arrayContaining(['missing_expected_values', 'unexpected_values']),
-    );
+    expect(codes(mismatched)).toContain('duplicate_rows');
   });
 
   it('computes per-column nonblank counts, treating whitespace-only cells as blank', () => {
@@ -772,28 +778,6 @@ describe('runFinishChecks — generic tables', () => {
     });
     expect(result.status).toBe('passed');
     expect(result.facts.outputs[0]).toMatchObject({ rowCount: 2 });
-  });
-
-  it('leaves evidence-derived expected entity/value scope for the judge', () => {
-    publish('artifacts/roster.csv', 'name,url\nTODO,\nUnexpected,\n');
-    const spec = tableSpec({
-      rules: [
-        {
-          type: 'matches_expected_values',
-          column: 'name',
-          expected: ['Alpha'],
-          exhaustive: true,
-          source: { kind: 'evidence', evidenceIds: ['source-list'] },
-        },
-      ],
-    });
-    const result = runFinishChecks({
-      runDir,
-      contract: contract(spec),
-      finish: finish(),
-    });
-    expect(result.status).toBe('passed');
-    expect(result.facts.outputs[0]).toMatchObject({ satisfiedRules: [] });
   });
 });
 
@@ -999,7 +983,7 @@ describe('runFinishChecks — documents and captures', () => {
     expect(codes(result)).toContain('missing_document_evidence');
   });
 
-  it('rejects stray requested outputs and requested-role helper proposals', () => {
+  it('reports a requested-role helper proposal only as a role error', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     mkdirSync(join(runDir, 'artifacts/helper-proposals'), { recursive: true });
     publish('artifacts/helper-proposals/helper.patch', 'diff --git a/a b/a\n');
@@ -1008,9 +992,8 @@ describe('runFinishChecks — documents and captures', () => {
       contract: contract(tableSpec()),
       finish: finish(),
     });
-    expect(codes(result)).toEqual(
-      expect.arrayContaining(['unexpected_requested_output', 'helper_proposal_wrong_role']),
-    );
+    expect(codes(result)).toContain('helper_proposal_wrong_role');
+    expect(codes(result)).not.toContain('unexpected_requested_output');
   });
 
   it('accepts a review-only helper patch and metadata record as evidence', () => {

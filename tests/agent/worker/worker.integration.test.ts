@@ -4,23 +4,26 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { inspectManifest } from '../../../src/agent/completion/artifactInspection.js';
 import type { Message } from '../../../src/model/messages.js';
 import type {
   AcceptedModelResponse,
   ModelDriver,
   ModelGenerateOptions,
 } from '../../../src/model/modelDriver.js';
-import { initManifest, readManifest, verifyManifestFiles } from '../../../src/run/artifacts.js';
+import { initManifest, readManifest } from '../../../src/run/artifacts.js';
 import { createRunBudgetTracker } from '../../../src/run/runBudget.js';
 import { createWorkerToolRegistry } from '../../../src/tools/index.js';
 import {
-  NO_TOOL_CONTINUATION,
   captureWorkerSnapshot,
   createWorker,
   restoreWorker,
   runWorker,
   runWorkerTurn,
 } from '../../../src/agent/worker/worker.js';
+
+const NO_TOOL_CONTINUATION =
+  'Continue working with tools, or call finish alone when the requested work is ready.';
 
 let runDir: string;
 
@@ -108,7 +111,6 @@ describe('session vertical acceptance', () => {
       maxToolCalls: Infinity,
       maxModelTokens: Infinity,
       maxWallTimeMs: Infinity,
-      maxVerifierCorrections: Infinity,
     });
     const deps = {
       model,
@@ -159,7 +161,7 @@ describe('session vertical acceptance', () => {
       roles: ['requested_output', 'evidence'],
       sourceUrl: 'https://example.test/source',
     });
-    verifyManifestFiles(runDir);
+    expect(inspectManifest(runDir).defects).toEqual([]);
 
     const events = transcript();
     expect(

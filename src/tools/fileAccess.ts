@@ -1,15 +1,8 @@
-import {
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  openSync,
-  readSync,
-  type Stats,
-} from 'node:fs';
+import { lstatSync, type Stats } from 'node:fs';
 import { relative, resolve, sep } from 'node:path';
 
 import { ARTIFACTS_DIR, SCRATCH_DIR } from '../run/artifacts.js';
+import { NoFollowFileError, readFileNoFollow } from '../run/noFollowFile.js';
 import { resolveRunPath } from '../run/runDir.js';
 
 /** Maximum source or resulting file size handled by one file-tool call. */
@@ -115,12 +108,8 @@ export function readRegularFileNoFollow(
   givenPath: string,
   toolName: 'read_file' | 'write_file' | 'edit_file',
 ): Buffer {
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-
-  let fd: number;
   try {
-    fd = openSync(absolutePath, flags);
+    return readFileNoFollow(absolutePath, { maxBytes: FILE_TOOL_MAX_BYTES });
   } catch (thrown) {
     const code = (thrown as NodeJS.ErrnoException).code;
     if (code === 'ENOENT') {
@@ -135,32 +124,16 @@ export function readRegularFileNoFollow(
           'File tools never follow links. Nothing was changed.',
       );
     }
-    throw thrown;
-  }
-
-  try {
-    const stat = fstatSync(fd);
-    if (!stat.isFile()) {
+    if (thrown instanceof NoFollowFileError && thrown.kind === 'not_regular') {
       throw new Error(
         `${toolName} cannot access ${JSON.stringify(givenPath)}: the path is not a regular file. ` +
           'Nothing was changed.',
       );
     }
-    assertWithinFileToolLimit(stat.size, givenPath, toolName);
-
-    const chunk = Buffer.alloc(1024 * 1024);
-    const chunks: Buffer[] = [];
-    let total = 0;
-    for (;;) {
-      const bytesRead = readSync(fd, chunk, 0, chunk.length, null);
-      if (bytesRead === 0) break;
-      total += bytesRead;
-      assertWithinFileToolLimit(total, givenPath, toolName);
-      chunks.push(Buffer.from(chunk.subarray(0, bytesRead)));
+    if (thrown instanceof NoFollowFileError && thrown.kind === 'max_bytes') {
+      assertWithinFileToolLimit(thrown.observedBytes!, givenPath, toolName);
     }
-    return Buffer.concat(chunks, total);
-  } finally {
-    closeSync(fd);
+    throw thrown;
   }
 }
 

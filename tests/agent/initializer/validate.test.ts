@@ -53,6 +53,29 @@ describe('outputContractSchema shape', () => {
     expect(validateOutputContract({ outputs: [tableOutput()], extra: 1 }).ok).toBe(false);
   });
 
+  it('rejects retired assumptions and matches_expected_values fields at the schema boundary', () => {
+    expect(
+      outputContractSchema.safeParse({ outputs: [tableOutput()], assumptions: ['available'] })
+        .success,
+    ).toBe(false);
+    expect(
+      outputContractSchema.safeParse({
+        outputs: [
+          tableOutput({
+            rules: [
+              {
+                type: 'matches_expected_values',
+                column: 'name',
+                expected: ['Alpha'],
+                source: { kind: 'original_task' },
+              },
+            ] as never,
+          }),
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
   it('normalizes empty optional constraint lists to absent instead of rejecting', () => {
     // Initializer models legitimately write [] for "none"; a wikipedia_reference
     // trial died in the initializer when requiredSections: [] was rejected.

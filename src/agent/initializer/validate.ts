@@ -33,10 +33,9 @@ export const RESERVED_OUTPUT_FILENAMES: readonly string[] = [
  * or `download` output spec. `*` matches any run of characters; everything
  * else is literal.
  *
- * Lives here, beside the field it interprets, because TWO places must agree on
- * it: the capture tools check a filename before writing it, and the submission
- * checks count the captures that matched. Two implementations would let a tool
- * accept a name the submission check then rejects.
+ * Lives here, beside the field it interprets: the finish checks are its one
+ * consumer today, and keeping the interpretation with the contract means any
+ * future consumer inherits the same semantics instead of reimplementing them.
  */
 export function matchesFilenamePattern(name: string, pattern: string): boolean {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
@@ -65,12 +64,11 @@ export type OutputContractValidation =
  * absolute paths, `.`/`..`, control characters, the run's own reserved
  * names); duplicate table columns; enum columns with repeated values;
  * invalid IANA timezones or BCP 47 locales; conflicting table rules
- * (repeated count rules, a minimum above an exact count, uniqueness or
- * expected values naming an undeclared column, more expected values than
- * rows); a download constrained by nothing; a document requiring
- * per-section evidence with no sections, or visible footnotes with no
- * evidence at all; an external action demanding visible proof content
- * while requiring no proof screenshots.
+ * (repeated count rules, a minimum above an exact count, uniqueness rules
+ * naming an undeclared column); a download constrained by nothing; a
+ * document requiring per-section evidence with no sections, or visible
+ * footnotes with no evidence at all; an external action demanding visible
+ * proof content while requiring no proof screenshots.
  */
 export function validateOutputContract(input: unknown): OutputContractValidation {
   const parsed = outputContractSchema.safeParse(input);
@@ -290,7 +288,6 @@ function checkRules(
   }
 
   const seenUniqueSets = new Set<string>();
-  const seenExpectedColumns = new Set<string>();
   for (const rule of rules) {
     if (rule.type === 'unique') {
       const duplicates = duplicatesOf(rule.columns);
@@ -314,36 +311,6 @@ function checkRules(
         );
       }
       seenUniqueSets.add(key);
-    }
-
-    if (rule.type === 'matches_expected_values') {
-      if (!declared.has(rule.column)) {
-        errors.push(
-          `${label} matches_expected_values rule names undeclared column ` +
-            `${JSON.stringify(rule.column)}`,
-        );
-      }
-      if (seenExpectedColumns.has(rule.column)) {
-        errors.push(
-          `${label} declares two matches_expected_values rules for column ` +
-            `${JSON.stringify(rule.column)}`,
-        );
-      }
-      seenExpectedColumns.add(rule.column);
-
-      const duplicates = duplicatesOf(rule.expected);
-      if (duplicates.length > 0) {
-        errors.push(
-          `${label} matches_expected_values rule for column ${JSON.stringify(rule.column)} ` +
-            `repeats value(s) ${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
-        );
-      }
-      if (exact !== undefined && rule.expected.length > exact.value) {
-        errors.push(
-          `${label} expects ${rule.expected.length} values in column ` +
-            `${JSON.stringify(rule.column)} but allows only ${exact.value} rows`,
-        );
-      }
     }
   }
   return errors;

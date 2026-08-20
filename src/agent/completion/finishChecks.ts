@@ -4,9 +4,9 @@ import type { OutputContract, OutputSpec } from '../initializer/outputContract.s
 import { matchesFilenamePattern } from '../initializer/validate.js';
 import { ARTIFACTS_DIR, type ManifestEntry } from '../../run/artifacts.js';
 import type { FinishInput } from '../../tools/finish/finish.js';
+import { decodeUtf8 } from '../../utf8.js';
 import {
   artifactBasename,
-  decodeUtf8,
   hasRole,
   inferMediaTypes,
   inspectManifest,
@@ -99,14 +99,11 @@ export function runFinishChecks({
   const evidenceEntries = inspection.entries.filter(
     (entry) => entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) && hasRole(entry, 'evidence'),
   );
-  const browserProvider =
-    inspection.manifest.browserProvider === 'local' ||
-    inspection.manifest.browserProvider === 'browserbase'
-      ? inspection.manifest.browserProvider
-      : undefined;
   facts.manifest = {
     task: inspection.manifest.task,
-    ...(browserProvider === undefined ? {} : { browserProvider }),
+    ...(inspection.manifest.browserProvider === undefined
+      ? {}
+      : { browserProvider: inspection.manifest.browserProvider }),
     entryCount: inspection.entries.length,
     verifiedPaths: inspection.entries
       .filter((entry) => entry.integrityVerified)
@@ -209,27 +206,22 @@ export function runFinishChecks({
   for (const entry of requestedEntries) {
     checkActive?.();
     if (!claimedContractPaths.has(entry.canonicalPath)) {
-      defects.push({
-        code: 'unexpected_requested_output',
-        artifactPath: entry.canonicalPath,
-        message:
-          `${entry.canonicalPath} carries requested_output but is not required by the immutable output contract. ` +
-          'Re-publish supporting material as evidence-only, or remove the stray requested-output publication.',
-      });
-    }
-  }
-
-  for (const entry of requestedEntries) {
-    checkActive?.();
-    if (
-      entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/helper-proposals/`) &&
-      !claimedContractPaths.has(entry.canonicalPath)
-    ) {
-      defects.push({
-        code: 'helper_proposal_wrong_role',
-        artifactPath: entry.canonicalPath,
-        message: `${entry.canonicalPath} is a helper proposal, so it must be evidence-only unless the contract explicitly requests it.`,
-      });
+      const helperProposal = entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/helper-proposals/`);
+      defects.push(
+        helperProposal
+          ? {
+              code: 'helper_proposal_wrong_role',
+              artifactPath: entry.canonicalPath,
+              message: `${entry.canonicalPath} is a helper proposal, so it must be evidence-only unless the contract explicitly requests it.`,
+            }
+          : {
+              code: 'unexpected_requested_output',
+              artifactPath: entry.canonicalPath,
+              message:
+                `${entry.canonicalPath} carries requested_output but is not required by the immutable output contract. ` +
+                'Re-publish supporting material as evidence-only, or remove the stray requested-output publication.',
+            },
+      );
     }
   }
 
@@ -384,18 +376,6 @@ function validateManifestDerivedFinishClaim(
         'The manifest contains no requested output. Publish every required output before ' +
         'finishing.',
     });
-  }
-
-  for (const entry of requestedEntries) {
-    if (entry.entry.completionStatus === 'partial') {
-      defects.push({
-        code: 'partial_requested_output',
-        artifactPath: entry.canonicalPath,
-        message:
-          `${entry.canonicalPath} is marked partial and cannot satisfy finish. ` +
-          'Publish the completed output before requesting verification.',
-      });
-    }
   }
 }
 
@@ -730,24 +710,28 @@ function inspectExternalAction(
       unroledPngs > 0
         ? ` ${unroledPngs} matching PNG capture(s) lack requested_output; re-publish them with that role.`
         : '';
-    if ('exact' in required && validScreenshots.length !== required.exact) {
+    const countProblem =
+      'exact' in required
+        ? validScreenshots.length === required.exact
+          ? undefined
+          : {
+              code: 'external_action_screenshot_count_mismatch',
+              requirement: `exactly ${required.exact}`,
+            }
+        : validScreenshots.length >= required.minimum
+          ? undefined
+          : {
+              code: 'external_action_screenshots_below_minimum',
+              requirement: `at least ${required.minimum}`,
+            };
+    if (countProblem !== undefined) {
       defects.push({
         outputId: output.id,
-        code: 'external_action_screenshot_count_mismatch',
+        code: countProblem.code,
         message:
           `The run has ${validScreenshots.length} valid requested proof screenshot(s) whose ` +
           `source URL matches ${JSON.stringify(output.proof.sourceUrlPattern)}; the contract ` +
-          `requires exactly ${required.exact}.${roleHint}`,
-      });
-    }
-    if ('minimum' in required && validScreenshots.length < required.minimum) {
-      defects.push({
-        outputId: output.id,
-        code: 'external_action_screenshots_below_minimum',
-        message:
-          `The run has ${validScreenshots.length} valid requested proof screenshot(s) whose ` +
-          `source URL matches ${JSON.stringify(output.proof.sourceUrlPattern)}; the contract ` +
-          `requires at least ${required.minimum}.${roleHint}`,
+          `requires ${countProblem.requirement}.${roleHint}`,
       });
     }
   }
@@ -775,21 +759,24 @@ function validateCaptureCount(
     output.filenamePattern === undefined
       ? ''
       : ` matching ${JSON.stringify(output.filenamePattern)}`;
-  if ('exact' in output.count && actual !== output.count.exact) {
-    return {
-      outputId: output.id,
-      code: 'capture_count_mismatch',
-      message: `The run has ${actual} valid requested ${noun}(s)${described}; the contract requires exactly ${output.count.exact}.`,
-    };
-  }
-  if ('minimum' in output.count && actual < output.count.minimum) {
-    return {
-      outputId: output.id,
-      code: 'capture_count_below_minimum',
-      message: `The run has ${actual} valid requested ${noun}(s)${described}; the contract requires at least ${output.count.minimum}.`,
-    };
-  }
-  return undefined;
+  const countProblem =
+    'exact' in output.count
+      ? actual === output.count.exact
+        ? undefined
+        : { code: 'capture_count_mismatch', requirement: `exactly ${output.count.exact}` }
+      : actual >= output.count.minimum
+        ? undefined
+        : {
+            code: 'capture_count_below_minimum',
+            requirement: `at least ${output.count.minimum}`,
+          };
+  return countProblem === undefined
+    ? undefined
+    : {
+        outputId: output.id,
+        code: countProblem.code,
+        message: `The run has ${actual} valid requested ${noun}(s)${described}; the contract requires ${countProblem.requirement}.`,
+      };
 }
 
 function captureDefect(

@@ -87,6 +87,20 @@ describe('verifier inspection', () => {
     expect(existsSync(join(runDir, 'scratch/tool-output'))).toBe(false);
   });
 
+  it('rejects invalid UTF-8 with the verifier-specific binary inspection guidance', async () => {
+    writeArtifact(runDir, 'artifacts/invalid.txt', Buffer.from([0x68, 0x69, 0xff]), {
+      roles: ['requested_output'],
+    });
+
+    const [result] = await inspect(
+      [use('read_file', { file_path: 'artifacts/invalid.txt' })],
+      ['artifacts/invalid.txt'],
+    );
+
+    expect(result).toMatchObject({ is_error: true });
+    expect(result?.content).toContain('not bounded UTF-8 text');
+  });
+
   // All three funnel through the same allowedArtifactPaths check, but each names a
   // distinct leak category: scratch evidence, the raw manifest, and a published file
   // the surfaced role set omitted.

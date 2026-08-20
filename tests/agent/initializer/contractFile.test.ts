@@ -5,6 +5,8 @@ import {
   readFileSync,
   rmSync,
   statSync,
+  symlinkSync,
+  truncateSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -14,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { OutputContract } from '../../../src/agent/initializer/outputContract.schema.js';
 import {
+  OUTPUT_CONTRACT_MAX_BYTES,
   OUTPUT_CONTRACT_PATH,
   ensureOutputContractFile,
   readOutputContractFile,
@@ -61,7 +64,7 @@ describe('immutable output contract file', () => {
     expect(() =>
       ensureOutputContractFile(runDir, {
         ...CONTRACT,
-        assumptions: ['different requirements'],
+        contentExpectations: ['Different requirements.'],
       }),
     ).toThrow(/refusing to revise/i);
     expect(readFileSync(path, 'utf8')).toBe(before);
@@ -73,5 +76,31 @@ describe('immutable output contract file', () => {
     });
 
     expect(() => ensureOutputContractFile(runDir, CONTRACT)).toThrow(/not valid JSON/i);
+  });
+
+  it('does not follow a contract-file symlink', () => {
+    const target = join(runDir, 'outside-contract.json');
+    writeFileSync(target, JSON.stringify(CONTRACT));
+    symlinkSync(target, join(runDir, OUTPUT_CONTRACT_PATH));
+
+    expect(() => readOutputContractFile(runDir)).toThrow(/must be a regular file/);
+    expect(readFileSync(target, 'utf8')).toBe(JSON.stringify(CONTRACT));
+  });
+
+  it('rejects an oversized durable projection before parsing or writing it', () => {
+    const path = join(runDir, OUTPUT_CONTRACT_PATH);
+    writeFileSync(path, '');
+    truncateSync(path, OUTPUT_CONTRACT_MAX_BYTES + 1);
+    expect(() => readOutputContractFile(runDir)).toThrow(
+      new RegExp(`${OUTPUT_CONTRACT_MAX_BYTES}-byte durable projection limit`),
+    );
+
+    rmSync(path);
+    expect(() =>
+      ensureOutputContractFile(runDir, {
+        ...CONTRACT,
+        contentExpectations: ['x'.repeat(OUTPUT_CONTRACT_MAX_BYTES)],
+      }),
+    ).toThrow(new RegExp(`${OUTPUT_CONTRACT_MAX_BYTES}-byte durable projection limit`));
   });
 });

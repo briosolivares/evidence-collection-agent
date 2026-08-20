@@ -290,8 +290,8 @@ describe('browser_execute tool', () => {
     });
     expect(existsSync(join(runDir, 'scratch/workspace'))).toBe(false);
     expect(busyRegistry.waitUntilFree).toHaveBeenCalledWith(
-      { reads: [], writes: [] },
       expect.any(Number),
+      abortController.signal,
     );
     expect(fake.openCommandSession).not.toHaveBeenCalled();
     expect(fake.send).not.toHaveBeenCalled();

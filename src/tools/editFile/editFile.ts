@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { writeArtifact } from '../../run/artifacts.js';
 import type { ToolDef } from '../registry.js';
-import { accessKey } from '../registry.js';
 import {
   assertNotAborted,
   assertWithinFileToolLimit,
@@ -42,10 +41,6 @@ export const editFileTool: ToolDef<EditFileInput> = {
     'line-ending, Unicode, quote, or replacement-token normalization is performed. This tool ' +
     'cannot edit published artifacts.',
   inputSchema: editFileInputSchema,
-  getAccess: (input) => ({
-    reads: [],
-    writes: [accessKey.file(input.file_path), accessKey.manifest()],
-  }),
   execute(input, ctx): EditFileResult {
     assertNotAborted(ctx.abortSignal, 'edit_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'write');

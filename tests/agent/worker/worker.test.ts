@@ -23,21 +23,19 @@ import { createRegistry, type ToolCtx, type ToolDef } from '../../../src/tools/r
 import { finishTool, type FinishInput } from '../../../src/tools/finish/finish.js';
 import {
   MAX_PROTOCOL_CORRECTIONS,
-  NO_TOOL_CONTINUATION,
   appendFinishResult,
-  appendWorkerFeedback,
   captureWorkerSnapshot,
   createWorker,
-  dropUnansweredAssistantTurn,
-  readWorkerMetrics,
   resumePendingToolTurn,
   restoreWorker,
   runWorkerTurn,
-  writeWorkerMetrics,
   type Worker,
   type WorkerDeps,
   type PendingToolTurn,
 } from '../../../src/agent/worker/worker.js';
+
+const NO_TOOL_CONTINUATION =
+  'Continue working with tools, or call finish alone when the requested work is ready.';
 
 let runDir: string;
 
@@ -56,7 +54,6 @@ const UNBOUNDED: RunBudgetConfig = {
   maxToolCalls: Infinity,
   maxModelTokens: Infinity,
   maxWallTimeMs: Infinity,
-  maxVerifierCorrections: Infinity,
 };
 
 const USAGE: Usage = {
@@ -114,7 +111,6 @@ function tool(
     name,
     description: `${name} test tool`,
     inputSchema: z.strictObject({ label: z.string().optional() }),
-    getAccess: () => ({ reads: [], writes: [], exclusive: true }),
     ...(maxBytes === undefined ? {} : { maxBytes }),
     execute,
   };
@@ -433,6 +429,18 @@ describe('rejection and guards', () => {
     expect(worker.state.messages).toHaveLength(1);
   });
 
+  it('does not checkpoint an unknown worker failure with no usage to persist', async () => {
+    const failure = new Error('transport failed before usage');
+    const afterModelAccounting = vi.fn(async () => undefined);
+    const worker = session(scriptedDriver([failure]), [], {
+      deps: { lifecycle: { afterModelAccounting } },
+    });
+
+    await expect(runWorkerTurn(worker)).rejects.toBe(failure);
+    expect(afterModelAccounting).not.toHaveBeenCalled();
+    expect(worker.config.budget.roleUsage().worker).toBeUndefined();
+  });
+
   it('allows exactly three correctable model rejections, then ends incomplete', async () => {
     const rejections = Array.from(
       { length: MAX_PROTOCOL_CORRECTIONS + 1 },
@@ -467,7 +475,7 @@ describe('rejection and guards', () => {
       budget: { maxWorkerTurns: 1 },
       maxContextTokens: Infinity,
       usage: USAGE,
-      reason: 'max_turns',
+      reason: 'worker_turns',
     },
     {
       name: 'model-token',
@@ -902,8 +910,8 @@ describe('result bounds, cancellation, and lifecycle', () => {
   });
 });
 
-describe('snapshots and metrics', () => {
-  it('deep-copies capture/restore state and can drop a trailing unanswered turn', async () => {
+describe('snapshots', () => {
+  it('deep-copies capture and restore state', async () => {
     const worker = session(
       scriptedDriver([
         accepted([
@@ -920,35 +928,20 @@ describe('snapshots and metrics', () => {
     await runWorkerTurn(worker);
     const snapshot = captureWorkerSnapshot(worker);
 
-    appendWorkerFeedback(worker, 'later mutation');
+    worker.state.messages.push({
+      role: 'user',
+      content: [{ type: 'text', text: 'later mutation' }],
+    });
     expect(JSON.stringify(snapshot.messages)).not.toContain('later mutation');
 
     const restored = restoreWorker(snapshot, worker.deps, worker.config);
-    expect(dropUnansweredAssistantTurn(restored)).toBe(true);
     expect(restored.state.turnCount).toBe(1);
-    expect(dropUnansweredAssistantTurn(restored)).toBe(false);
+    expect(restored.state.messages).toEqual(snapshot.messages);
+    restored.state.messages.push({
+      role: 'user',
+      content: [{ type: 'text', text: 'restored mutation' }],
+    });
+    expect(JSON.stringify(snapshot.messages)).not.toContain('restored mutation');
     expect(snapshot.messages.at(-1)?.role).toBe('assistant');
-  });
-
-  it('reports and writes aggregate metrics from the persistent budget', async () => {
-    let clock = 100;
-    const worker = session(scriptedDriver([accepted([{ type: 'text', text: 'continuing' }])]), [], {
-      deps: { now: () => clock },
-    });
-    await runWorkerTurn(worker);
-    clock = 175;
-
-    const metrics = readWorkerMetrics(worker, 'incomplete');
-    expect(metrics).toMatchObject({
-      status: 'incomplete',
-      turns: 1,
-      inputTokens: 10,
-      outputTokens: 5,
-      peakContextTokens: 18,
-      wallClockMs: 75,
-    });
-
-    writeWorkerMetrics(worker, 'incomplete');
-    expect(JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8'))).toEqual(metrics);
   });
 });

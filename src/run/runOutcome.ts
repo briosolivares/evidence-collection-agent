@@ -19,9 +19,6 @@ export type IncompleteRunReason =
    * bounded repair, or was unreachable. The worker's output may well be
    * fine; nobody trustworthy said so. */
   | 'verifier_unavailable'
-  /** Read compatibility for an older correction-cap terminal outcome. New
-   * runs use ordinary whole-run budgets instead of this reason. */
-  | 'verification_attempts'
   /** The judge accepted a credible reported blocker, or correction dialogue
    * made no progress with unchanged surfaced evidence. */
   | 'verification_incomplete'

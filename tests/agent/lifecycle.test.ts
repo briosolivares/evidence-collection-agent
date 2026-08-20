@@ -73,7 +73,6 @@ const CONFIGURATION: DurableRunConfiguration = {
     maxToolCalls: 20,
     maxModelTokens: 100_000,
     maxWallTimeMs: 1_000_000,
-    maxVerifierCorrections: 2,
   },
 };
 

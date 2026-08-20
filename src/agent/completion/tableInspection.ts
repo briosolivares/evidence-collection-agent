@@ -1,6 +1,8 @@
 import { isValid as isValidDate, parse as parseDate } from 'date-fns';
 
-import type { OutputColumn, OutputSpec, TableRule } from '../initializer/outputContract.schema.js';
+import { errorMessage } from '../../errors.js';
+import { decodeUtf8 } from '../../utf8.js';
+import type { OutputColumn, OutputSpec } from '../initializer/outputContract.schema.js';
 import type { FinishDefect, TableFact } from './finishFacts.schema.js';
 
 interface ParsedCell {
@@ -100,8 +102,8 @@ export function inspectTable(
   const parsed = parseDeclaredTable(text, context);
   if (parsed === undefined || context.halted) return { defects: context.defects };
 
-  const expectedColumns = tableColumnNames(output.columns, context);
-  if (!sameOrderedStrings(parsed.columns, expectedColumns, context)) {
+  const expectedColumns = output.columns.map((column) => column.name);
+  if (!sameOrderedStrings(parsed.columns, expectedColumns)) {
     recordDefect(
       context,
       'column_mismatch',
@@ -127,7 +129,7 @@ export function inspectTable(
       columns: expectedColumns,
       rowCount: parsed.rows.length,
       columnNonblankCounts: countNonblankCellsByColumn(expectedColumns, parsed.rows, context),
-      satisfiedRules: tableRuleTypes(output.rules, context),
+      satisfiedRules: output.rules.map((rule) => rule.type),
     },
   };
 }
@@ -210,7 +212,7 @@ function parseDeclaredTable(
             return undefined;
           }
         }
-        rows.push(rowFromTextCells(columns, cells, context));
+        rows.push(rowFromTextCells(columns, cells));
         if (context.halted) return undefined;
       }
       return { columns, rows, hasShapeDefects };
@@ -240,7 +242,7 @@ function parseDeclaredTable(
         stopForRowLimit(context, value.length);
         return undefined;
       }
-      const expected = tableColumnNames(output.columns, context);
+      const expected = output.columns.map((column) => column.name);
       if (normalizedCellsExceed(expected.length, value.length, context)) {
         return undefined;
       }
@@ -261,8 +263,7 @@ function parseDeclaredTable(
           ) {
             return undefined;
           }
-          rows.push(emptyJsonRow(expected, context));
-          if (context.halted) return undefined;
+          rows.push(emptyJsonRow(expected));
           continue;
         }
         const record = row as Record<string, unknown>;
@@ -272,7 +273,7 @@ function parseDeclaredTable(
           stopForCellLimit(context, observedCells);
           return undefined;
         }
-        if (!sameOrderedStrings(keys, expected, context)) {
+        if (!sameOrderedStrings(keys, expected)) {
           hasShapeDefects = true;
           if (
             !recordDefect(
@@ -331,8 +332,7 @@ function parseDeclaredTable(
             return undefined;
           }
         }
-        rows.push(rowFromTextCells(parsed.columns, cells, context));
-        if (context.halted) return undefined;
+        rows.push(rowFromTextCells(parsed.columns, cells));
       }
       return {
         columns: parsed.columns,
@@ -464,29 +464,21 @@ function validateRules(
     poll(context);
     switch (rule.type) {
       case 'exact_row_count':
-        if (rows.length !== rule.value) {
-          if (
-            !recordDefect(
-              context,
-              'row_count_mismatch',
-              `${artifactPath} has ${rows.length} data row(s); the contract requires exactly ${rule.value}.`,
-            )
+      case 'minimum_row_count': {
+        const exact = rule.type === 'exact_row_count';
+        const failed = exact ? rows.length !== rule.value : rows.length < rule.value;
+        if (
+          failed &&
+          !recordDefect(
+            context,
+            exact ? 'row_count_mismatch' : 'row_count_below_minimum',
+            `${artifactPath} has ${rows.length} data row(s); the contract requires ${exact ? 'exactly' : 'at least'} ${rule.value}.`,
           )
-            return;
+        ) {
+          return;
         }
         break;
-      case 'minimum_row_count':
-        if (rows.length < rule.value) {
-          if (
-            !recordDefect(
-              context,
-              'row_count_below_minimum',
-              `${artifactPath} has ${rows.length} data row(s); the contract requires at least ${rule.value}.`,
-            )
-          )
-            return;
-        }
-        break;
+      }
       case 'unique': {
         const seen = new Map<string, number>();
         for (const [index, row] of rows.entries()) {
@@ -513,57 +505,6 @@ function validateRules(
         }
         break;
       }
-      case 'matches_expected_values':
-        if (rule.source.kind === 'original_task') {
-          validateExpectedValues(rows, rule, context);
-          if (context.halted) return;
-        }
-        // Evidence-derived sets remain semantic scope for the judge. They
-        // were not stated by the user and must not become deterministic gates.
-        break;
-    }
-  }
-}
-
-function validateExpectedValues(
-  rows: readonly Record<string, ParsedCell>[],
-  rule: Extract<TableRule, { type: 'matches_expected_values' }>,
-  context: TableInspectionContext,
-): void {
-  const { artifactPath } = context;
-  const present = new Set<string>();
-  for (const row of rows) {
-    poll(context);
-    present.add(row[rule.column]?.text.trim() ?? '');
-  }
-  const missing: string[] = [];
-  for (const value of rule.expected) {
-    poll(context);
-    if (!present.has(value)) missing.push(value);
-  }
-  if (missing.length > 0) {
-    if (
-      !recordDefect(
-        context,
-        'missing_expected_values',
-        `${artifactPath} column ${JSON.stringify(rule.column)} is missing explicitly required value(s): ${formatValues(missing, context)}.`,
-      )
-    )
-      return;
-  }
-  if (rule.exhaustive === true) {
-    const allowed = new Set(rule.expected);
-    const unexpected: string[] = [];
-    for (const value of present) {
-      poll(context);
-      if (!allowed.has(value)) unexpected.push(value);
-    }
-    if (unexpected.length > 0) {
-      recordDefect(
-        context,
-        'unexpected_values',
-        `${artifactPath} column ${JSON.stringify(rule.column)} contains value(s) outside the explicitly required exhaustive set: ${formatValues(unexpected, context)}.`,
-      );
     }
   }
 }
@@ -660,7 +601,7 @@ function parseMarkdownTable(
       separator === undefined ||
       columns.length === 0 ||
       separator.length !== columns.length ||
-      !isMarkdownSeparator(separator, context)
+      !isMarkdownSeparator(separator)
     ) {
       first = second;
       continue;
@@ -754,37 +695,25 @@ function splitMarkdownRow(line: string, context: TableInspectionContext): string
   return cells;
 }
 
-function isMarkdownSeparator(cells: readonly string[], context: TableInspectionContext): boolean {
-  for (let index = 0; index < cells.length; index += 1) {
-    pollEvery(context, index);
-    if (!/^:?-{3,}:?$/.test(cells[index]!.trim())) return false;
-  }
-  return true;
+function isMarkdownSeparator(cells: readonly string[]): boolean {
+  return cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()));
 }
 
 function rowFromTextCells(
   columns: readonly string[],
   cells: readonly string[],
-  context: TableInspectionContext,
 ): Record<string, ParsedCell> {
   const row: Record<string, ParsedCell> = {};
-  for (let index = 0; index < columns.length; index += 1) {
-    pollEvery(context, index);
-    const column = columns[index]!;
+  for (const [index, column] of columns.entries()) {
     const text = cells[index] ?? '';
     row[column] = { raw: text, text, representation: 'text' };
   }
   return row;
 }
 
-function emptyJsonRow(
-  columns: readonly string[],
-  context: TableInspectionContext,
-): Record<string, ParsedCell> {
+function emptyJsonRow(columns: readonly string[]): Record<string, ParsedCell> {
   const row: Record<string, ParsedCell> = {};
-  for (let index = 0; index < columns.length; index += 1) {
-    pollEvery(context, index);
-    const column = columns[index]!;
+  for (const column of columns) {
     row[column] = { raw: undefined, text: '', representation: 'json' };
   }
   return row;
@@ -810,61 +739,9 @@ function matchesUnicodeDatePattern(value: string, pattern: string): boolean {
   }
 }
 
-function sameOrderedStrings(
-  left: readonly string[],
-  right: readonly string[],
-  context: TableInspectionContext,
-): boolean {
+function sameOrderedStrings(left: readonly string[], right: readonly string[]): boolean {
   if (left.length !== right.length) return false;
-  for (let index = 0; index < left.length; index += 1) {
-    pollEvery(context, index);
-    if (left[index] !== right[index]) return false;
-  }
-  return true;
-}
-
-function tableColumnNames(
-  columns: readonly OutputColumn[],
-  context: TableInspectionContext,
-): string[] {
-  const names: string[] = [];
-  for (let index = 0; index < columns.length; index += 1) {
-    pollEvery(context, index);
-    names.push(columns[index]!.name);
-  }
-  return names;
-}
-
-function tableRuleTypes(
-  rules: readonly TableRule[],
-  context: TableInspectionContext,
-): Array<TableRule['type']> {
-  const types: Array<TableRule['type']> = [];
-  for (let index = 0; index < rules.length; index += 1) {
-    pollEvery(context, index);
-    const rule = rules[index]!;
-    if (rule.type !== 'matches_expected_values' || rule.source.kind === 'original_task') {
-      types.push(rule.type);
-    }
-  }
-  return types;
-}
-
-function formatValues(values: readonly string[], context: TableInspectionContext): string {
-  const rendered: string[] = [];
-  for (let index = 0; index < values.length; index += 1) {
-    pollEvery(context, index);
-    rendered.push(JSON.stringify(values[index]));
-  }
-  return rendered.join(', ');
-}
-
-function decodeUtf8(bytes: Uint8Array): string | undefined {
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-  } catch {
-    return undefined;
-  }
+  return left.every((value, index) => value === right[index]);
 }
 
 function defect(
@@ -964,8 +841,4 @@ function pollEvery(context: TableInspectionContext, index: number): void {
 
 function safeAdd(left: number, right: number): number {
   return left > Number.MAX_SAFE_INTEGER - right ? Number.MAX_SAFE_INTEGER : left + right;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

@@ -775,13 +775,15 @@ describe('runBrowserProgram', () => {
     const result = await runBrowserProgram(
       options(`return browser.cdp('Example.fail');`, {
         sendCdp: async () => {
-          throw new Error('connect failed: wss://secret.example/devtools/browser/session-control');
+          throw new Error(
+            'connect failed with retained detail: http://127.0.0.1:9222/json/version?token=session-control',
+          );
         },
       }),
     );
 
     expect(result.status).toBe('failed');
-    expect(result.error?.message).toContain('[REDACTED_WEBSOCKET_URL]');
+    expect(result.error?.message).toBe('connect failed with retained detail: [REDACTED_CDP_URL]');
     expect(JSON.stringify(result)).not.toContain('session-control');
   });
 

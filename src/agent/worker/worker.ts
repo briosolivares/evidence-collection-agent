@@ -1,7 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { writeFileSync } from 'node:fs';
-import { join } from 'node:path';
 
+import { errorMessage, isAbortError } from '../../errors.js';
 import type {
   AssistantContentBlock,
   AssistantMessage,
@@ -15,17 +14,12 @@ import type {
 import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
-  knownModelUsageFromError,
   type ModelAttemptEvent,
   type ModelDriver,
   type ModelRejectionReason,
 } from '../../model/modelDriver.js';
-import {
-  captureRunBudgetSnapshot,
-  type RunBudgetLimit,
-  type RunBudgetTracker,
-  type RunRoleUsage,
-} from '../../run/runBudget.js';
+import { runAccountedModelCall } from '../../model/budgetedCall.js';
+import type { RunBudgetLimit, RunBudgetTracker, RunRoleUsage } from '../../run/runBudget.js';
 import { appendTranscriptEvent } from '../../run/transcript.js';
 import {
   DEFAULT_MAX_RESULT_BYTES,
@@ -46,13 +40,12 @@ import {
   finishInputSchema,
   type FinishInput,
 } from '../../tools/finish/finish.js';
-import { raceWithRunSignal } from '../../run/runDeadline.js';
 import { buildContextView } from './contextView.js';
 
 export const METRICS_FILENAME = 'metrics.json';
 export const MAX_PROTOCOL_CORRECTIONS = 3;
 
-export const NO_TOOL_CONTINUATION =
+const NO_TOOL_CONTINUATION =
   'Continue working with tools, or call finish alone when the requested work is ready.';
 
 export interface WorkerDeps {
@@ -83,7 +76,7 @@ export interface WorkerOpeningOptions {
   guidance?: readonly string[];
 }
 
-export interface WorkerState {
+interface WorkerState {
   /** Full, never-collapsed conversation. */
   messages: Message[];
   /** Logical worker model calls, including rejected responses. */
@@ -117,7 +110,7 @@ export interface PendingToolTurn {
   effect: 'not_started' | 'uncertain';
 }
 
-export interface BeforeModelRequestEvent {
+interface BeforeModelRequestEvent {
   turn: number;
   session: WorkerSnapshot;
   /** Pure collapsed request view; never aliases changed blocks into state. */
@@ -131,7 +124,7 @@ export interface FinishRequest {
   assistantText: string;
 }
 
-export interface ModelAccountingEvent {
+interface ModelAccountingEvent {
   turn: number;
   /** Aggregate known billable usage for this logical model call. */
   usage: Usage;
@@ -164,17 +157,16 @@ export interface WorkerHooks {
   }): Promise<void>;
 }
 
-export type WorkerGuardReason =
-  | 'max_turns'
+type WorkerGuardReason =
+  | 'worker_turns'
   | 'context_budget'
   | 'tool_calls'
   | 'model_tokens'
-  | 'wall_time'
-  | 'verifier_corrections';
+  | 'wall_time';
 
 export type WorkerIncompleteReason = WorkerGuardReason | 'model_rejected' | 'model_rejection_limit';
 
-export type WorkerTurnOutcome =
+type WorkerTurnOutcome =
   | { kind: 'working' }
   | { kind: 'finish_requested'; request: FinishRequest }
   | {
@@ -184,9 +176,9 @@ export type WorkerTurnOutcome =
       detail?: string;
     };
 
-export type WorkerOutcome = Exclude<WorkerTurnOutcome, { kind: 'working' }>;
+type WorkerOutcome = Exclude<WorkerTurnOutcome, { kind: 'working' }>;
 
-export type WorkerMetricsStatus = 'verified' | 'incomplete' | 'failed' | 'cancelled';
+type WorkerMetricsStatus = 'verified' | 'incomplete' | 'failed' | 'cancelled';
 
 export interface WorkerMetrics {
   status: WorkerMetricsStatus;
@@ -252,7 +244,6 @@ export function restoreWorker(
   config: WorkerConfig,
 ): Worker {
   assertContextCeiling(config.maxContextTokens);
-  assertSnapshot(snapshot);
   return {
     deps,
     config,
@@ -267,21 +258,11 @@ export function restoreWorker(
   };
 }
 
-export function appendWorkerFeedback(session: Worker, feedback: string): void {
+function appendWorkerFeedback(session: Worker, feedback: string): void {
   session.state.messages.push({
     role: 'user',
     content: [{ type: 'text', text: feedback }],
   });
-}
-
-/** Remove only a trailing assistant turn whose tool uses have no answer. */
-export function dropUnansweredAssistantTurn(session: Worker): boolean {
-  const last = session.state.messages.at(-1);
-  if (last?.role !== 'assistant' || !last.content.some((block) => block.type === 'tool_use')) {
-    return false;
-  }
-  session.state.messages.pop();
-  return true;
 }
 
 /** Advance one strict model turn and, for ordinary calls, one serial batch. */
@@ -308,32 +289,20 @@ export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome>
     messages: requestMessages,
   });
 
-  const startedMs = now(session);
   let accepted;
   try {
-    accepted = await raceWithRunSignal(
-      () =>
-        session.deps.model.generate({
-          messages: requestMessages,
-          ...(session.deps.signal === undefined ? {} : { signal: session.deps.signal }),
-          ...(session.deps.onModelEvent === undefined
-            ? {}
-            : { onEvent: session.deps.onModelEvent }),
-        }),
-      session.deps.signal,
-    );
+    accepted = await runAccountedModelCall({
+      model: session.deps.model,
+      messages: requestMessages,
+      budget: session.config.budget,
+      role: 'worker',
+      ...(session.deps.signal === undefined ? {} : { signal: session.deps.signal }),
+      ...(session.deps.onModelEvent === undefined ? {} : { onEvent: session.deps.onModelEvent }),
+      afterUsageRecorded: (usage, outcome) =>
+        persistWorkerModelAccounting(session, turn, usage, outcome),
+      ...(session.deps.now === undefined ? {} : { now: session.deps.now }),
+    });
   } catch (error) {
-    const knownUsage = knownModelUsageFromError(error);
-    if (knownUsage !== undefined) {
-      await recordWorkerModelAccounting(
-        session,
-        turn,
-        knownUsage,
-        now(session) - startedMs,
-        'failed',
-      );
-    }
-    throwIfAborted(session.deps.signal);
     if (!isModelResponseRejectedError(error)) throw error;
 
     appendTranscriptEvent(session.deps.runDir, {
@@ -375,14 +344,6 @@ export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome>
   }
 
   const response = accepted.response;
-  await recordWorkerModelAccounting(
-    session,
-    turn,
-    accepted.usage,
-    now(session) - startedMs,
-    'accepted',
-  );
-  throwIfAborted(session.deps.signal);
   recordAcceptedResponse(session, turn, response);
 
   const contextTokens = requestContextTokens(response.usage);
@@ -519,7 +480,6 @@ export async function resumePendingToolTurn(
   session: Worker,
   pending: PendingToolTurn,
 ): Promise<WorkerTurnOutcome> {
-  assertRestorablePendingTurn(session, pending);
   throwIfAborted(session.deps.signal);
 
   let completed = pending.completedResults.map(fromResultBlock);
@@ -609,42 +569,6 @@ export async function appendFinishResult(
     request: structuredClone(request),
     result: structuredClone(block),
   });
-}
-
-export function readWorkerMetrics(session: Worker, status: WorkerMetricsStatus): WorkerMetrics {
-  const roles = session.config.budget.roleUsage();
-  const budget = captureRunBudgetSnapshot(session.config.budget);
-  const totals = sumRoleUsage(roles);
-  return {
-    status,
-    turns: session.state.turnCount,
-    protocolCorrections: session.protocolCorrections,
-    ...totals,
-    toolCalls: budget.toolCalls,
-    toolResultBytes: budget.toolResultBytes,
-    peakContextTokens: session.peakContextTokens,
-    wallClockMs: now(session) - session.startedMs,
-    roles,
-  };
-}
-
-export function writeWorkerMetrics(session: Worker, status: WorkerMetricsStatus): void {
-  const metrics = readWorkerMetrics(session, status);
-  writeFileSync(
-    join(session.deps.runDir, METRICS_FILENAME),
-    `${JSON.stringify(metrics, null, 2)}\n`,
-    'utf8',
-  );
-}
-
-export function recordWorkerCrash(session: Worker, error: unknown): void {
-  if (session.deps.signal?.aborted === true || isAbortError(error)) return;
-  appendTranscriptEvent(session.deps.runDir, {
-    type: 'run_error',
-    turn: session.state.turnCount,
-    message: errorMessage(error),
-  });
-  writeWorkerMetrics(session, 'failed');
 }
 
 async function executeSequentialCalls(
@@ -881,14 +805,12 @@ function recordAcceptedResponse(session: Worker, turn: number, response: ModelRe
   });
 }
 
-async function recordWorkerModelAccounting(
+async function persistWorkerModelAccounting(
   session: Worker,
   turn: number,
   usage: Usage,
-  wallClockMs: number,
   outcome: ModelAccountingEvent['outcome'],
 ): Promise<void> {
-  session.config.budget.recordModelUsage('worker', usage, wallClockMs);
   await session.deps.lifecycle?.afterModelAccounting?.({
     turn,
     usage: structuredClone(usage),
@@ -908,26 +830,11 @@ function guardReason(
   ignoredLimits: readonly RunBudgetLimit[] = [],
 ): WorkerGuardReason | undefined {
   const limit = session.config.budget.exceededLimit(ignoredLimits);
-  if (limit !== undefined) return budgetReason(limit);
+  if (limit !== undefined) return limit;
   if (contextTokens !== undefined && contextTokens > session.config.maxContextTokens) {
     return 'context_budget';
   }
   return undefined;
-}
-
-function budgetReason(limit: RunBudgetLimit): WorkerGuardReason {
-  switch (limit) {
-    case 'worker_turns':
-      return 'max_turns';
-    case 'tool_calls':
-      return 'tool_calls';
-    case 'model_tokens':
-      return 'model_tokens';
-    case 'wall_time':
-      return 'wall_time';
-    case 'verifier_corrections':
-      return 'verifier_corrections';
-  }
 }
 
 function requestContextTokens(usage: Usage): number {
@@ -975,28 +882,6 @@ function resultBytes(results: readonly ToolCallResult[]): number {
   return results.reduce((sum, result) => sum + Buffer.byteLength(result.content, 'utf8'), 0);
 }
 
-function sumRoleUsage(
-  roles: Partial<Record<string, RunRoleUsage>>,
-): Pick<
-  WorkerMetrics,
-  'inputTokens' | 'outputTokens' | 'cacheReadInputTokens' | 'cacheCreationInputTokens'
-> {
-  const totals = {
-    inputTokens: 0,
-    outputTokens: 0,
-    cacheReadInputTokens: 0,
-    cacheCreationInputTokens: 0,
-  };
-  for (const usage of Object.values(roles)) {
-    if (usage === undefined) continue;
-    totals.inputTokens += usage.inputTokens;
-    totals.outputTokens += usage.outputTokens;
-    totals.cacheReadInputTokens += usage.cacheReadInputTokens;
-    totals.cacheCreationInputTokens += usage.cacheCreationInputTokens;
-  }
-  return totals;
-}
-
 function assertPendingFinishCall(session: Worker, request: FinishRequest): void {
   if (request.call.name !== FINISH_TOOL_NAME) {
     throw new Error(`expected a ${FINISH_TOOL_NAME} call, got ${request.call.name}`);
@@ -1017,79 +902,12 @@ function assertPendingFinishCall(session: Worker, request: FinishRequest): void 
   }
 }
 
-function assertRestorablePendingTurn(session: Worker, pending: PendingToolTurn): void {
-  if (pending.turn !== session.state.turnCount) {
-    throw new Error(
-      `pending tool turn ${pending.turn} does not match session turn ${session.state.turnCount}`,
-    );
-  }
-  const last = session.state.messages.at(-1);
-  if (last?.role !== 'assistant' || JSON.stringify(last) !== JSON.stringify(pending.assistant)) {
-    throw new Error('pending tool turn assistant does not match session history');
-  }
-  if (
-    pending.nextCallIndex < 0 ||
-    pending.nextCallIndex > pending.calls.length ||
-    pending.completedResults.length !== pending.nextCallIndex
-  ) {
-    throw new Error('pending tool turn result/index invariant is invalid');
-  }
-  pending.completedResults.forEach((result, index) => {
-    if (result.tool_use_id !== pending.calls[index]?.id) {
-      throw new Error('pending tool turn results are not in call order');
-    }
-  });
-  if (pending.effect === 'uncertain' && pending.nextCallIndex >= pending.calls.length) {
-    throw new Error('pending tool turn cannot be uncertain after its final call');
-  }
-}
-
 function assertContextCeiling(value: number): void {
   if (Number.isNaN(value) || value < 0) {
     throw new Error(`maxContextTokens must be >= 0, got ${value}`);
   }
 }
 
-function assertSnapshot(snapshot: WorkerSnapshot): void {
-  if (snapshot.messages.length === 0) {
-    throw new Error('WorkerSnapshot.messages must not be empty');
-  }
-  assertNonnegativeInteger('turnCount', snapshot.turnCount);
-  assertNonnegativeNumber('peakContextTokens', snapshot.peakContextTokens);
-  assertNonnegativeInteger('protocolCorrections', snapshot.protocolCorrections);
-  if (snapshot.protocolCorrections > MAX_PROTOCOL_CORRECTIONS) {
-    throw new Error(
-      'WorkerSnapshot.protocolCorrections must be <= ' +
-        `${MAX_PROTOCOL_CORRECTIONS}, got ${snapshot.protocolCorrections}`,
-    );
-  }
-  assertNonnegativeNumber('startedMs', snapshot.startedMs);
-}
-
-function assertNonnegativeInteger(name: string, value: number): void {
-  if (!Number.isInteger(value) || value < 0) {
-    throw new Error(`WorkerSnapshot.${name} must be an integer >= 0, got ${value}`);
-  }
-}
-
-function assertNonnegativeNumber(name: string, value: number): void {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`WorkerSnapshot.${name} must be finite and >= 0, got ${value}`);
-  }
-}
-
 function throwIfAborted(signal: AbortSignal | undefined): void {
   signal?.throwIfAborted();
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function now(session: Worker): number {
-  return (session.deps.now ?? Date.now)();
 }

@@ -7,9 +7,8 @@ import type { Usage } from '../model/messages.js';
 // "starting a correction" cannot restore any headroom, and the final metrics
 // can break usage down by role without a second accounting system.
 
-/** The model roles a run may spend budget on. `repair` is reserved for
- * later bounded schema-repair calls (T3+). */
-export type ModelRole = 'initializer' | 'worker' | 'verifier' | 'repair';
+/** The model roles a run may spend budget on. */
+export type ModelRole = 'initializer' | 'worker' | 'verifier';
 
 /** Per-role usage totals as written to metrics.json under `roles`. */
 export interface RunRoleUsage {
@@ -40,17 +39,10 @@ export interface RunBudgetConfig {
   maxModelTokens: number;
   /** Wall time from tracker creation; integer >= 1 (milliseconds). */
   maxWallTimeMs: number;
-  /** Verifier correction rounds the run may spend; integer >= 0. */
-  maxVerifierCorrections: number;
 }
 
 /** Which ceiling a budget check found exhausted. */
-export type RunBudgetLimit =
-  | 'worker_turns'
-  | 'tool_calls'
-  | 'model_tokens'
-  | 'wall_time'
-  | 'verifier_corrections';
+export type RunBudgetLimit = 'worker_turns' | 'tool_calls' | 'model_tokens' | 'wall_time';
 
 /** One shared budget for a run. Recording is monotone — nothing resets. */
 export interface RunBudgetTracker {
@@ -79,9 +71,6 @@ export interface RunBudgetTracker {
    * explicit; a finite result is clamped at zero and is safe to pass to a
    * deadline scheduler. */
   remainingWallTimeMs(): number;
-  /** The first exhausted ceiling, or undefined while all headroom remains.
-   * Deterministic order: worker_turns, tool_calls, model_tokens,
-   * wall_time, verifier_corrections. */
   /** The first exhausted ceiling, optionally ignoring limits that the caller
    * has already consumed lawfully at a phase boundary (for example a worker
    * finishing on its final allowed turn before the verifier runs). */
@@ -121,41 +110,6 @@ export function validateRunBudgetConfig(config: RunBudgetConfig): void {
   assertBudgetField('maxToolCalls', config.maxToolCalls, 0);
   assertBudgetField('maxModelTokens', config.maxModelTokens, 1);
   assertBudgetField('maxWallTimeMs', config.maxWallTimeMs, 1);
-  assertBudgetField('maxVerifierCorrections', config.maxVerifierCorrections, 0);
-}
-
-const ROLE_USAGE_NUMERIC_FIELDS = [
-  'turns',
-  'inputTokens',
-  'outputTokens',
-  'cacheReadInputTokens',
-  'cacheCreationInputTokens',
-  'wallClockMs',
-] as const;
-
-function assertSnapshotField(name: string, value: number): void {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`RunBudgetSnapshot.${name} must be a finite number >= 0, got ${value}`);
-  }
-}
-
-/**
- * Validate a restore snapshot before it seeds a tracker; throws naming the
- * first bad field. A malformed snapshot (negative, NaN, Infinity) must fail
- * loudly here rather than silently seed a tracker that under-counts —
- * which would hand a resumed run headroom the original run never had.
- */
-function assertValidRunBudgetSnapshot(snapshot: RunBudgetSnapshot): void {
-  assertSnapshotField('elapsedWallTimeMs', snapshot.elapsedWallTimeMs);
-  assertSnapshotField('toolCalls', snapshot.toolCalls);
-  assertSnapshotField('toolResultBytes', snapshot.toolResultBytes);
-  assertSnapshotField('corrections', snapshot.corrections);
-  for (const [role, usage] of Object.entries(snapshot.roles)) {
-    if (usage === undefined) continue;
-    for (const field of ROLE_USAGE_NUMERIC_FIELDS) {
-      assertSnapshotField(`roles.${role}.${field}`, usage[field]);
-    }
-  }
 }
 
 /** Keyed by tracker identity so `captureRunBudgetSnapshot` can read the
@@ -184,23 +138,19 @@ export function captureRunBudgetSnapshot(tracker: RunBudgetTracker): RunBudgetSn
 
 /**
  * Create the run's single budget tracker. Wall time counts from this call.
- * A restore always preserves the elapsed duration stored in its snapshot; if
- * `opts.restoreSnapshotAtMs` is also supplied, it additionally charges the
- * real downtime between that absolute checkpoint time and this construction.
+ * A restore preserves the snapshot's elapsed duration and charges the real
+ * downtime between its required absolute timestamp and this construction.
  *
  * @param config - validated ceilings (see RunBudgetConfig; throws on any
  *   invalid field before anything else starts)
  * @param opts.now - test seam for the clock; defaults to Date.now
- * @param opts.restore - a snapshot from `captureRunBudgetSnapshot`, taken on
- *   a prior (crashed or checkpointed) instance of this same run's tracker.
- *   Validated before anything else starts; a malformed snapshot throws
- *   rather than silently under-counting.
+ * @param opts.restore - a schema-validated snapshot from the durable
+ *   checkpoint, taken on a prior instance of this same run's tracker.
  * @param opts.restoreSnapshotAtMs - absolute `now()` time at which `restore`
  *   was captured. Supplying it makes a resumed tracker's elapsed wall time
  *   continue from the original run baseline, including process downtime. It
- *   must use the same clock as `opts.now`; an invalid or future value throws
- *   rather than granting ambiguous headroom. Omit only for legacy snapshots
- *   that did not durably record an absolute checkpoint time.
+ *   must use the same clock as `opts.now`; a missing, invalid, or future value
+ *   throws rather than granting ambiguous headroom.
  */
 export function createRunBudgetTracker(
   config: RunBudgetConfig,
@@ -212,13 +162,16 @@ export function createRunBudgetTracker(
 ): RunBudgetTracker {
   validateRunBudgetConfig(config);
   const restore = opts.restore;
-  if (restore !== undefined) assertValidRunBudgetSnapshot(restore);
   const now = opts.now ?? Date.now;
   const createdAtMs = now();
   const restoreSnapshotAtMs = opts.restoreSnapshotAtMs;
-  if (restoreSnapshotAtMs !== undefined) {
-    if (restore === undefined) {
-      throw new Error('restoreSnapshotAtMs requires a RunBudgetSnapshot in opts.restore');
+  let restoredElapsedMs = 0;
+  if (restore === undefined && restoreSnapshotAtMs !== undefined) {
+    throw new Error('restoreSnapshotAtMs requires a RunBudgetSnapshot in opts.restore');
+  }
+  if (restore !== undefined) {
+    if (restoreSnapshotAtMs === undefined) {
+      throw new Error('restoring a RunBudgetSnapshot requires restoreSnapshotAtMs');
     }
     if (!Number.isFinite(restoreSnapshotAtMs) || restoreSnapshotAtMs < 0) {
       throw new Error(
@@ -231,22 +184,17 @@ export function createRunBudgetTracker(
           `the current clock (${createdAtMs})`,
       );
     }
+    restoredElapsedMs = restore.elapsedWallTimeMs + createdAtMs - restoreSnapshotAtMs;
   }
 
-  // A duration-only legacy restore starts from the saved elapsed value. A
-  // durable restore also adds the time the process was down, reconstructing
-  // the original wall-clock baseline exactly:
+  // A durable restore adds the time the process was down, reconstructing the
+  // original wall-clock baseline exactly:
   //
   //   createdAt - (savedElapsed + createdAt - snapshotAt)
   //   === snapshotAt - savedElapsed === original startedAt
   //
   // Future timestamps fail above instead of being clamped: an unexplained
   // clock reversal cannot safely prove how much budget remains.
-  const restoredElapsedMs =
-    restore === undefined
-      ? 0
-      : restore.elapsedWallTimeMs +
-        (restoreSnapshotAtMs === undefined ? 0 : createdAtMs - restoreSnapshotAtMs);
   if (!Number.isFinite(restoredElapsedMs)) {
     throw new Error(`restored wall time must remain finite, got ${restoredElapsedMs}`);
   }
@@ -346,9 +294,6 @@ export function createRunBudgetTracker(
       }
       if (!ignored.has('wall_time') && now() - startedAt >= config.maxWallTimeMs) {
         return 'wall_time';
-      }
-      if (!ignored.has('verifier_corrections') && corrections > config.maxVerifierCorrections) {
-        return 'verifier_corrections';
       }
       return undefined;
     },

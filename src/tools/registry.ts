@@ -1,5 +1,3 @@
-import { normalize, sep } from 'node:path';
-
 import { z } from 'zod';
 
 import type { BrowserController } from '../browser/controller.js';
@@ -37,210 +35,33 @@ export interface ToolCtx {
    * TUI dialog). Headless environments omit it; tools that require user
    * interaction then fail closed. */
   requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
-  /** Cancellation for tools that own a long-running external resource (a
-   * spawned process group, a network connection) and can react to the run
-   * being cancelled before their own work naturally ends. This is the FIRST
-   * tool-level cancellation signal in the codebase — until now the only
-   * cancellation was the TUI wrapping `config.callModel`, which only ever
-   * lands at model-call boundaries and cannot reach into a tool already
-   * executing. Present in interactive environments that support cancelling
-   * an in-flight run; tools that do not own such a resource can ignore it. */
+  /** Cancellation for tools that own long-running external resources and can
+   * stop before their work naturally ends. */
   abortSignal?: AbortSignal;
-  /** This run's ledger of resources an abandoned (timed-out) call might
-   * still be touching — see `BusyResourceRegistry`. Always present for a
-   * run built through `buildRunToolchain`; absent only in tests that build
-   * a bare `ToolCtx` by hand, in which case the pipeline skips the gate and
-   * behaves exactly as it did before the registry existed. */
+  /** This run's ledger of abandoned timed-out effects — see
+   * `BusyResourceRegistry`. Always present for a
+   * run built by the lifecycle; absent only in tests that build a bare
+   * `ToolCtx` by hand, in which case the pipeline skips the gate. */
   busyRegistry?: BusyResourceRegistry;
 }
 
 /**
- * What a tool touches, derived from its VALIDATED input.
+ * The run's ledger of abandoned timed-out effects that might still be
+ * mutating state. Sequential worker execution makes per-resource access
+ * declarations unnecessary: while any abandoned effect remains live, every
+ * later tool call waits or fails closed.
  *
- * Concrete keys, not categories: `page:p1`, `observation:p1`, `table:roster`,
- * `file:artifacts/x.csv`, `origin:example.com`, `manifest`. Two calls may
- * overlap only when neither writes a key the other reads or writes — which is
- * strictly more permissive than the old read-only/state-changing split (two
- * writes to DIFFERENT pages can now run together) and strictly safer (a
- * "read-only" call that reads the page a concurrent write mutates no longer
- * slips through).
- *
- * Deriving this from input is the whole point: two calls to one file tool can
- * name different paths and therefore have different access.
- */
-export interface ToolAccess {
-  /** Keys this call reads and must see unchanged while it runs. */
-  reads: readonly string[];
-  /** Keys this call may modify. */
-  writes: readonly string[];
-  /**
-   * True when this call must run completely alone.
-   *
-   * An explicit flag rather than a sentinel key, because a sentinel only
-   * conflicts with calls that happen to name it — a call declaring
-   * `writes: ['*exclusive*']` does NOT conflict with one that merely reads
-   * something else, so a sentinel silently fails to be exclusive. That bug
-   * broke the write/read barrier when this was first written; the flag makes
-   * exclusivity unconditional.
-   */
-  exclusive?: boolean;
-}
-
-/** Access keys, built through helpers so a typo cannot silently create a key
- * nothing else collides with — the failure mode would be invisible
- * parallelism, not an error. */
-export const accessKey = {
-  page: (pageId: string): string => `page:${pageId}`,
-  observation: (pageId: string): string => `observation:${pageId}`,
-  table: (outputId: string): string => `table:${outputId}`,
-  file: (relPath: string): string => `file:${relPath}`,
-  origin: (host: string): string => `origin:${host}`,
-  /** The selected page, when a tool does not name one. Deliberately a single
-   * shared key: every unqualified browser action contends for it. */
-  selectedPage: (): string => 'page:selected',
-  contract: (): string => 'contract',
-  evidence: (): string => 'evidence',
-  manifest: (): string => 'manifest',
-} as const;
-
-const FILE_KEY_PREFIX = 'file:';
-
-/** Normalize a `file:` key's path portion so `.`, `./foo`, and `foo/` all
- * compare equal to `foo` — and the whole-run-dir key (`.`) reduces to `''`,
- * the sentinel `filePathsOverlap` treats as containing everything. Collapsing
- * this once here is what lets `grep`'s directory-scoped read key
- * (`accessKey.file(input.path ?? '.')`) line up with a sibling tool's
- * single-file write key (`accessKey.file(input.file_path)`) without either
- * side having to agree on a shared string representation. */
-function normalizeFileKeyPath(relPath: string): string {
-  const normalized = normalize(relPath);
-  if (normalized === '.') return '';
-  return normalized.endsWith(sep) ? normalized.slice(0, -sep.length) : normalized;
-}
-
-/**
- * Whether two `file:`-key paths overlap: equal, or one is an ancestor
- * directory of (or the run-dir root containing) the other.
- *
- * This is the piece plain string equality cannot express. A directory-scoped
- * read key like `file:.` (grep's default, or `file:artifacts`) must conflict
- * with a nested single-file write key like `file:artifacts/report.csv` —
- * the write happens inside the tree the read is scanning — even though the
- * two strings share no exact match. Comparing by path segment (via the
- * `sep`-joined prefix check, not a bare `startsWith`) is what keeps
- * `file:foo` from wrongly overlapping `file:foobar`.
- */
-function filePathsOverlap(leftPath: string, rightPath: string): boolean {
-  const left = normalizeFileKeyPath(leftPath);
-  const right = normalizeFileKeyPath(rightPath);
-  if (left === right) return true;
-  if (left === '' || right === '') return true; // '' is the whole run dir.
-  return left.startsWith(right + sep) || right.startsWith(left + sep);
-}
-
-/** Whether two access keys name overlapping resources. Every key but `file:`
- * is an opaque atom compared by exact equality; `file:` keys are paths and
- * compared by containment (see `filePathsOverlap`), since a tool may declare
- * a directory it reads or writes rather than a single file. */
-function keysOverlap(left: string, right: string): boolean {
-  if (left.startsWith(FILE_KEY_PREFIX) && right.startsWith(FILE_KEY_PREFIX)) {
-    return filePathsOverlap(
-      left.slice(FILE_KEY_PREFIX.length),
-      right.slice(FILE_KEY_PREFIX.length),
-    );
-  }
-  return left === right;
-}
-
-/** Whether two access declarations conflict — a write against any read or
- * write of the other. Read/read never conflicts, which is what allows
- * unbounded parallel observation.
- *
- * Pairwise rather than Set-based: overlap between two `file:` keys is a path
- * containment check, not a hash lookup, so every key on one side must be
- * compared against every key on the other. Each side's `reads`/`writes` is a
- * handful of concrete keys at most, so this stays cheap. */
-export function accessesConflict(left: ToolAccess, right: ToolAccess): boolean {
-  // Exclusivity is unconditional: an unclassifiable call conflicts with
-  // everything, including a call that touches nothing it names.
-  if (left.exclusive === true || right.exclusive === true) return true;
-  for (const leftKey of left.writes) {
-    for (const rightKey of right.writes) {
-      if (keysOverlap(leftKey, rightKey)) return true;
-    }
-  }
-  for (const leftKey of left.reads) {
-    for (const rightKey of right.writes) {
-      if (keysOverlap(leftKey, rightKey)) return true;
-    }
-  }
-  for (const rightKey of right.reads) {
-    for (const leftKey of left.writes) {
-      if (keysOverlap(leftKey, rightKey)) return true;
-    }
-  }
-  return false;
-}
-
-/** The fail-closed access for a call whose declaration threw: it conflicts
- * with everything, so it runs alone. */
-export const EXCLUSIVE_ACCESS: ToolAccess = { reads: [], writes: [], exclusive: true };
-
-/** Derive a tool call's access the same way for both scheduling (grouping
- * concurrent calls) and execution (gating/registering against abandoned
- * work) — one implementation, so the two can never silently disagree about
- * what a call touches. `getAccess` is mandatory on `ToolDef` (T16), so the
- * only failure mode left is a declaration that THROWS; that still degrades
- * to `EXCLUSIVE_ACCESS` rather than to unsafe parallelism — see
- * `ToolDef.getAccess`'s own doc. */
-export function deriveAccess(tool: ToolDef, input: unknown): ToolAccess {
-  try {
-    return tool.getAccess(input);
-  } catch {
-    return EXCLUSIVE_ACCESS;
-  }
-}
-
-/**
- * The run's ledger of resources an abandoned (timed-out) call might still be
- * touching.
- *
- * `withToolDeadline` cannot cancel a wedged tool call — nothing in this
- * codebase can reach into Playwright and stop it — so giving up on waiting
- * for it does not mean the real work stopped. Without this registry, the
- * scheduler's mutual-exclusion guarantee (two calls that write the same key
- * never run concurrently) silently breaks the moment a call times out: the
- * abandoned call's slot is released as an ordinary settled call, and
- * whatever runs next on the same resource races work that may still be in
- * flight. This registry is what lets a LATER call notice "the previous
- * occupant of this key never confirmed it was done" and wait for it (or a
- * bounded timeout of its own) instead of racing it blind.
- *
- * Deliberately NOT keyed by an id or ToolCall — only by the abandoned call's
- * `ToolAccess`, checked via the same `accessesConflict` the scheduler
- * already uses. A read that finishes late never blocks a later read (read/
- * read still never conflicts), but it does block a later write to the same
- * key — which is exactly the guarantee that was silently breaking.
+ * `withToolDeadline` cannot cancel a wedged tool call, so giving up on
+ * waiting does not mean the real work stopped. Without this registry, the
+ * sequential worker could start its next call while abandoned work is still
+ * in flight. The global gate waits for confirmation or fails closed.
  */
 export interface BusyResourceRegistry {
-  /** Record that a call touching `access` was abandoned — `settles`
-   * resolves or rejects whenever the real, still-running work eventually
-   * finishes, however long that takes. The entry clears itself the moment
-   * `settles` settles; nothing else needs to remove it. */
-  markAbandoned(access: ToolAccess, settles: Promise<unknown>): void;
-  /** Resolve `true` once nothing currently marked abandoned conflicts with
-   * `access` (immediately, in the common case where nothing is marked),
-   * or `false` once `timeoutMs` elapses first. A conflicting entry added
-   * AFTER this call starts waiting is not included — see the module note
-   * on why that snapshot is intentional, not a race. */
-  waitUntilFree(access: ToolAccess, timeoutMs: number, signal?: AbortSignal): Promise<boolean>;
-  /** Wait without releasing the caller until every conflicting abandoned
-   * effect has actually settled. Unlike `waitUntilFree`, this is a fixed-
-   * point drain: entries added while an earlier snapshot is settling are
-   * included before it returns. Terminalization uses this only after its
-   * finite safety gate expires, so a live effect can never outlive the run
-   * lock and race a fresh coordinator. */
-  drainUntilFree(access: ToolAccess): Promise<void>;
+  markAbandoned(settles: Promise<unknown>): void;
+  waitUntilFree(timeoutMs: number, signal?: AbortSignal): Promise<boolean>;
+  /** Drain to a fixed point, including effects registered while an earlier
+   * snapshot is settling. */
+  drainUntilFree(): Promise<void>;
 }
 
 /** Build an empty `BusyResourceRegistry`. One instance per run, shared by
@@ -250,40 +71,30 @@ export interface BusyResourceRegistry {
  * must be visible to both layers, or a call gated at one layer could still
  * race an abandonment the other layer never told it about.
  *
- * Snapshot semantics in `waitUntilFree`: a call that starts waiting sees
- * only the entries that exist at that instant, and waits for exactly those
- * to clear (or its own bound to elapse) — it does not keep growing its wait
- * for entries added afterward. This is safe rather than merely convenient:
- * every call that could ever conflict with a given key must itself pass
- * through this same gate before it is allowed to start touching that key,
- * so the only way a NEW conflicting entry can appear while an existing
- * waiter is waiting is for its own call to have already found the key
- * clear at the moment ITS gate ran — at which point the resource genuinely
- * was momentarily free, and both waiters proceeding is correct.
+ * Both waiting methods use fixed-point semantics so a browser abandonment
+ * registered while an earlier effect is clearing is included before the run
+ * proceeds.
  */
 export function createBusyResourceRegistry(): BusyResourceRegistry {
-  const abandoned = new Set<{ access: ToolAccess; cleared: Promise<void> }>();
+  const abandoned = new Set<Promise<void>>();
 
-  const conflictingEntries = (access: ToolAccess) =>
-    [...abandoned].filter((entry) => accessesConflict(entry.access, access));
+  const drainUntilFree = async (): Promise<void> => {
+    while (abandoned.size > 0) await Promise.all([...abandoned]);
+  };
 
   return {
-    markAbandoned(access, settles) {
-      const entry = {
-        access,
-        cleared: settles.then(
-          () => undefined,
-          () => undefined,
-        ),
-      };
-      abandoned.add(entry);
-      void entry.cleared.then(() => {
-        abandoned.delete(entry);
+    markAbandoned(settles) {
+      const cleared = settles.then(
+        () => undefined,
+        () => undefined,
+      );
+      abandoned.add(cleared);
+      void cleared.then(() => {
+        abandoned.delete(cleared);
       });
     },
-    async waitUntilFree(access, timeoutMs, signal) {
-      const conflicting = conflictingEntries(access);
-      if (conflicting.length === 0) return true;
+    async waitUntilFree(timeoutMs, signal) {
+      if (abandoned.size === 0) return true;
       signal?.throwIfAborted();
       let timer: NodeJS.Timeout | undefined;
       let abort: (() => void) | undefined;
@@ -295,7 +106,7 @@ export function createBusyResourceRegistry(): BusyResourceRegistry {
       });
       try {
         return await Promise.race([
-          Promise.all(conflicting.map((entry) => entry.cleared)).then(() => true),
+          drainUntilFree().then(() => true),
           new Promise<false>((resolve) => {
             timer = setTimeout(() => resolve(false), timeoutMs);
           }),
@@ -306,13 +117,7 @@ export function createBusyResourceRegistry(): BusyResourceRegistry {
         if (abort !== undefined) signal?.removeEventListener('abort', abort);
       }
     },
-    async drainUntilFree(access) {
-      for (;;) {
-        const conflicting = conflictingEntries(access);
-        if (conflicting.length === 0) return;
-        await Promise.all(conflicting.map((entry) => entry.cleared));
-      }
-    },
+    drainUntilFree,
   };
 }
 
@@ -331,17 +136,6 @@ export interface ToolDef<Input = unknown> {
   description: string;
   /** zod schema every input is validated against before `execute` runs. */
   inputSchema: z.ZodType<Input>;
-  /**
-   * What this call touches, derived from its validated input (see ToolAccess).
-   *
-   * Mandatory (T16): every production tool must be able to say what it
-   * touches, so there is no fallback left to reach for when a declaration is
-   * merely forgotten. A THROWING declaration is still tolerated — it
-   * degrades to `EXCLUSIVE_ACCESS` (see `deriveAccess`) rather than to unsafe
-   * parallelism — but an absent one is now a type error, not a silent
-   * "unknown".
-   */
-  getAccess(input: Input): ToolAccess;
   /** Maximum size in bytes of this tool's normalized result before the
    * pipeline offloads it to a file and hands the model a preview + path
    * (T5). Omitted means DEFAULT_MAX_RESULT_BYTES. */

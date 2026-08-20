@@ -2,10 +2,10 @@ import { fork, type ChildProcess } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
-import {
-  ParentDeathWatchdogError,
-  startParentDeathWatchdog,
-} from '../../process/parentDeathWatchdog.js';
+import { redactBrowserCapabilities } from '../../browser/capabilityRedaction.js';
+import { decodeCapturedOutput } from '../../process/decodeCapturedOutput.js';
+import { ParentDeathWatchdogError } from '../../process/parentDeathWatchdog.js';
+import { startAbortAwareParentDeathWatchdog } from '../../process/startAbortAwareParentDeathWatchdog.js';
 
 export const BROWSER_PROGRAM_LIMITS = Object.freeze({
   maxSourceBytes: 256_000,
@@ -147,33 +147,24 @@ function truncateUtf8(value: string, maxBytes: number): string {
   return `${bytes.subarray(0, end).toString('utf8')}…`;
 }
 
-function redactCapabilities(value: string): string {
-  return value
-    .replace(/wss?:\/\/[^\s)'"\]]+/gi, '[REDACTED_WEBSOCKET_URL]')
-    .replace(
-      /https?:\/\/[^\s)'"\]]*(?:\/devtools\/(?:browser|page)|browserbase)[^\s)'"\]]*/gi,
-      '[REDACTED_CDP_URL]',
-    );
-}
-
 function structuredError(thrown: unknown): BrowserProgramError {
   if (thrown instanceof Error) {
     return {
-      name: truncateUtf8(redactCapabilities(thrown.name || 'Error'), MAX_ERROR_NAME_BYTES),
+      name: truncateUtf8(redactBrowserCapabilities(thrown.name || 'Error'), MAX_ERROR_NAME_BYTES),
       message: truncateUtf8(
-        redactCapabilities(thrown.message || String(thrown)),
+        redactBrowserCapabilities(thrown.message || String(thrown)),
         MAX_ERROR_MESSAGE_BYTES,
       ),
       ...(typeof thrown.stack === 'string'
         ? {
-            stack: truncateUtf8(redactCapabilities(thrown.stack), MAX_ERROR_STACK_BYTES),
+            stack: truncateUtf8(redactBrowserCapabilities(thrown.stack), MAX_ERROR_STACK_BYTES),
           }
         : {}),
     };
   }
   return {
     name: 'Error',
-    message: truncateUtf8(redactCapabilities(String(thrown)), MAX_ERROR_MESSAGE_BYTES),
+    message: truncateUtf8(redactBrowserCapabilities(String(thrown)), MAX_ERROR_MESSAGE_BYTES),
   };
 }
 
@@ -185,7 +176,7 @@ function watchdogError(error: unknown, fallback: string): BrowserProgramError {
   const message = error instanceof ParentDeathWatchdogError ? error.message : fallback;
   return {
     name: 'ParentDeathWatchdogError',
-    message: truncateUtf8(redactCapabilities(message), MAX_ERROR_MESSAGE_BYTES),
+    message: truncateUtf8(redactBrowserCapabilities(message), MAX_ERROR_MESSAGE_BYTES),
   };
 }
 
@@ -222,20 +213,6 @@ export function sanitizeBrowserProgramEnvironment(env: NodeJS.ProcessEnv): NodeJ
     sanitized[name] = value;
   }
   return sanitized;
-}
-
-function decodeRetainedBytes(chunks: Buffer[]): string {
-  const bytes = Buffer.concat(chunks);
-  if (bytes.length === 0) return '';
-  let start = bytes.length - 1;
-  while (start >= 0 && (bytes[start]! & 0b1100_0000) === 0b1000_0000) start -= 1;
-  if (start < 0) return '';
-  const lead = bytes[start]!;
-  const expected = lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
-  const actual = bytes.length - start;
-  return bytes
-    .subarray(0, expected > 1 && actual < expected ? start : bytes.length)
-    .toString('utf8');
 }
 
 function validateOptions(options: BrowserProgramOptions): void {
@@ -294,10 +271,6 @@ function immediateResult(startedAt: number, outcome: TerminalOutcome): BrowserPr
   };
 }
 
-function isAborted(signal: AbortSignal | undefined): boolean {
-  return signal?.aborted === true;
-}
-
 /**
  * Run one model-authored browser program in a fresh, bounded Node child.
  *
@@ -313,7 +286,7 @@ export async function runBrowserProgram(
   validateOptions(options);
   const startedAt = performance.now();
 
-  if (isAborted(options.abortSignal)) {
+  if (options.abortSignal?.aborted === true) {
     return immediateResult(startedAt, { status: 'cancelled' });
   }
 
@@ -338,30 +311,17 @@ export async function runBrowserProgram(
     });
   }
 
-  let abortedDuringWatchdogStart = false;
-  const onWatchdogStartAbort = (): void => {
-    abortedDuringWatchdogStart = true;
-  };
-  options.abortSignal?.addEventListener('abort', onWatchdogStartAbort, {
-    once: true,
-  });
-
-  let watchdog;
-  try {
-    watchdog = await startParentDeathWatchdog();
-  } catch (error) {
+  const watchdogStart = await startAbortAwareParentDeathWatchdog(options.abortSignal);
+  if (watchdogStart.kind === 'start_failed') {
     return immediateResult(startedAt, {
       status: 'failed',
-      error: watchdogError(error, 'parent-death watchdog failed to start'),
+      error: watchdogError(watchdogStart.error, 'parent-death watchdog failed to start'),
     });
-  } finally {
-    options.abortSignal?.removeEventListener('abort', onWatchdogStartAbort);
   }
-
-  if (abortedDuringWatchdogStart || isAborted(options.abortSignal)) {
-    await watchdog.disarm();
+  if (watchdogStart.kind === 'cancelled') {
     return immediateResult(startedAt, { status: 'cancelled' });
   }
+  const watchdog = watchdogStart.watchdog;
 
   return new Promise<BrowserProgramResult>((resolve) => {
     let child: ChildProcess;
@@ -470,8 +430,8 @@ export async function runBrowserProgram(
         ...(Object.prototype.hasOwnProperty.call(finalOutcome, 'value')
           ? { value: finalOutcome.value }
           : {}),
-        stdout: decodeRetainedBytes(stdoutChunks),
-        stderr: decodeRetainedBytes(stderrChunks),
+        stdout: decodeCapturedOutput(stdoutChunks),
+        stderr: decodeCapturedOutput(stderrChunks),
         ...(finalOutcome.error ? { error: finalOutcome.error } : {}),
       };
       void watchdog.disarm().then(
@@ -904,15 +864,21 @@ export async function runBrowserProgram(
       const error: BrowserProgramError = {
         name:
           typeof message.error.name === 'string'
-            ? truncateUtf8(redactCapabilities(message.error.name), MAX_ERROR_NAME_BYTES)
+            ? truncateUtf8(redactBrowserCapabilities(message.error.name), MAX_ERROR_NAME_BYTES)
             : 'Error',
         message:
           typeof message.error.message === 'string'
-            ? truncateUtf8(redactCapabilities(message.error.message), MAX_ERROR_MESSAGE_BYTES)
+            ? truncateUtf8(
+                redactBrowserCapabilities(message.error.message),
+                MAX_ERROR_MESSAGE_BYTES,
+              )
             : 'browser program failed',
         ...(typeof message.error.stack === 'string'
           ? {
-              stack: truncateUtf8(redactCapabilities(message.error.stack), MAX_ERROR_STACK_BYTES),
+              stack: truncateUtf8(
+                redactBrowserCapabilities(message.error.stack),
+                MAX_ERROR_STACK_BYTES,
+              ),
             }
           : {}),
       };

@@ -2,7 +2,6 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import type { Message, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import type { ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
 // CallModel contract the T7 fake satisfies, so it drops into the loop
@@ -33,15 +32,15 @@ import type { ModelDriverConfig } from './modelDriver.js';
 //    silently miss at the tip; our turns append two messages with at most
 //    ~12 blocks (5-parallel tool cap).
 // 3. Always streaming. Long tool-filled turns can run for minutes;
-//    streaming avoids API timeouts and feeds live progress to the REPL.
+//    streaming avoids API timeouts and feeds live progress to the TUI.
 
 /** Model used when the config names none — the design's default (Sonnet
  * tier matches the deployment reality being evaluated against). */
 export const DEFAULT_MODEL = 'claude-sonnet-5';
 
 /**
- * Live progress emitted while a turn streams, for interactive surfaces
- * (the T15 REPL). Per turn, events arrive in this order: one `turn_start`;
+ * Live progress emitted while a turn streams, for interactive surfaces.
+ * Per turn, events arrive in this order: one `turn_start`;
  * then `text_delta` and `tool_use_start` events in stream order (the
  * concatenated text_delta texts reproduce the turn's prose; one
  * tool_use_start per tool call, when its name is known but its input is
@@ -82,20 +81,10 @@ export interface CallModelConfig {
   apiToolDefs: readonly ApiToolDef[];
   /** max_tokens for each response; a positive integer. */
   maxOutputTokens: number;
-  /** Optional live-progress callback (see ProgressEvent). */
-  onProgress?: (event: ProgressEvent) => void;
   /** Forces the model's tool use for every call — used by roles whose
    * response IS a single tool call (the contract initializer). Part of the
    * cached prefix, so it must stay fixed for the closure's lifetime. */
   toolChoice?: Anthropic.Messages.ToolChoice;
-  /** Cancellation carried into streaming and retry backoff. */
-  signal?: AbortSignal;
-  /** Per-response tool-call cap; the driver's default when omitted. */
-  maxToolCallsPerTurn?: number;
-  /** Larger allowance for the driver's single max_tokens re-ask. */
-  maxTokensRetryOutputTokens?: number;
-  /** Test seam passed through to the driver (see ModelDriverConfig). */
-  createStream?: ModelDriverConfig['createStream'];
 }
 
 /**

@@ -10,11 +10,9 @@ import type { Message, ModelResponse, Usage } from '../../src/model/messages.js'
 import type { ProgressEvent } from '../../src/model/callModel.js';
 import { readManifest } from '../../src/run/artifacts.js';
 import type { RunTracing } from '../../src/tracing/runTracing.js';
-import type { ResumeTaskConfig } from '../../src/agent/runTask.js';
-import { readCheckpointConfiguration } from '../../src/agent/checkpoint.js';
-import { UNBOUNDED_CEILING } from '../../src/agent/checkpoint.schema.js';
+import { checkpointSchema, UNBOUNDED_CEILING } from '../../src/agent/checkpoint.schema.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../../src/tools/browserExecute/browserExecute.js';
-import { PRODUCTION_DEFAULTS, resumeTask, runTask } from '../../src/agent/runTask.js';
+import { PRODUCTION_DEFAULTS, runTask } from '../../src/agent/runTask.js';
 
 const TASK =
   'Publish report.csv with exactly one name column and one data row. Do not take screenshots.';
@@ -76,7 +74,7 @@ describe('public runTask adapter', () => {
       finalText: FINISH.summary,
     });
     expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(REPORT);
-    const configuration = readCheckpointConfiguration(run.result.runDir);
+    const configuration = readCheckpoint(run.result.runDir).configuration;
     expect(configuration).toMatchObject({
       maxOutputTokens: PRODUCTION_DEFAULTS.maxOutputTokens,
       maxContextTokens: PRODUCTION_DEFAULTS.maxContextTokens,
@@ -86,15 +84,11 @@ describe('public runTask adapter', () => {
         maxToolCalls: UNBOUNDED_CEILING,
         maxModelTokens: UNBOUNDED_CEILING,
         maxWallTimeMs: PRODUCTION_DEFAULTS.maxWallTimeMs,
-        maxVerifierCorrections: UNBOUNDED_CEILING,
       },
     });
     expect(
       Object.entries(PRODUCTION_DEFAULTS).every(([name, value]) =>
-        name === 'maxModelTokens' ||
-        name === 'maxWorkerTurns' ||
-        name === 'maxToolCalls' ||
-        name === 'maxVerifierCorrections'
+        name === 'maxModelTokens' || name === 'maxWorkerTurns' || name === 'maxToolCalls'
           ? value === Infinity
           : Number.isFinite(value) && value > 0,
       ),
@@ -189,7 +183,7 @@ describe('public runTask adapter', () => {
       finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
-    expect(readCheckpointConfiguration(result.runDir).taskText).toBe(
+    expect(readCheckpoint(result.runDir).configuration.taskText).toBe(
       'A task whose initializer is unavailable.',
     );
     expect(readManifest(result.runDir).finishedAt).toBeDefined();
@@ -205,51 +199,6 @@ describe('public runTask adapter', () => {
   });
 });
 
-describe('public resumeTask', () => {
-  it('returns a terminal checkpoint without model or browser effects', async () => {
-    const initial = await runVerified({ browser: fakeBrowser() });
-    const browser = fakeBrowser();
-    const initializer = unexpectedCallModel('initializer must not resume');
-    const worker = unexpectedCallModel('worker must not resume');
-    const verifier = unexpectedCallModel('verifier must not resume');
-    const tracing = recordingTracing();
-
-    const resumed = await resumeTask(initial.result.runDir, {
-      browser: browser.controller,
-      authenticated: false,
-      callModel: worker,
-      tracing: tracing.tracing,
-      harness: {
-        initializerCallModel: initializer,
-        verifierCallModel: verifier,
-      },
-    });
-
-    expect(resumed).toEqual(initial.result);
-    expect(initializer).not.toHaveBeenCalled();
-    expect(worker).not.toHaveBeenCalled();
-    expect(verifier).not.toHaveBeenCalled();
-    for (const effect of browser.effects) expect(effect).not.toHaveBeenCalled();
-    expect(tracing.runDirs).toEqual([initial.result.runDir]);
-    expect(tracing.traceRuns).toBe(0);
-    expect(tracing.modelCalls).toBe(0);
-    expect(tracing.toolExecutions).toEqual([]);
-    expect(tracing.closeCalls).toBe(1);
-  });
-
-  it('requires an explicit authenticated assertion for resume', async () => {
-    const initial = await runVerified({ browser: fakeBrowser() });
-    const unsafeConfig = {
-      browser: fakeBrowser().controller,
-      tracing: noopTracing(),
-    } as unknown as ResumeTaskConfig;
-
-    await expect(resumeTask(initial.result.runDir, unsafeConfig)).rejects.toThrow(
-      /explicitly state authenticated=true or false/,
-    );
-  });
-});
-
 interface FakeBrowser {
   controller: BrowserController;
   setBusyRegistry: ReturnType<typeof vi.fn>;
@@ -259,7 +208,6 @@ interface FakeBrowser {
   refreshAfterExternalCommands: ReturnType<typeof vi.fn>;
   pages: ReturnType<typeof vi.fn>;
   listPendingDialogs: ReturnType<typeof vi.fn>;
-  effects: Array<ReturnType<typeof vi.fn>>;
 }
 
 function fakeBrowser(): FakeBrowser {
@@ -272,15 +220,6 @@ function fakeBrowser(): FakeBrowser {
   const refreshAfterExternalCommands = vi.fn(async () => undefined);
   const pages = vi.fn(async () => []);
   const listPendingDialogs = vi.fn(() => []);
-  const effects = [
-    setBusyRegistry,
-    prepareTaskPage,
-    closeTaskPages,
-    openCommandSession,
-    refreshAfterExternalCommands,
-    pages,
-    listPendingDialogs,
-  ];
   return {
     controller: {
       setBusyRegistry,
@@ -298,7 +237,6 @@ function fakeBrowser(): FakeBrowser {
     refreshAfterExternalCommands,
     pages,
     listPendingDialogs,
-    effects,
   };
 }
 
@@ -411,10 +349,12 @@ function recordingTracing(): {
       announceRunDir: (runDir) => {
         runDirs.push(runDir);
       },
-      wrapCallModel: (callModel) => async (messages) => {
-        modelCalls += 1;
-        return callModel(messages);
-      },
+      wrapModelDriver: (driver) => ({
+        generate: (options) => {
+          modelCalls += 1;
+          return driver.generate(options);
+        },
+      }),
       wrapRegistry: (registry) =>
         new Map(
           [...registry].map(([name, tool]) => [
@@ -432,7 +372,6 @@ function recordingTracing(): {
         traceRuns += 1;
         return operation();
       },
-      flush: async () => undefined,
       close: async () => {
         closeCalls += 1;
       },
@@ -453,10 +392,9 @@ function recordingTracing(): {
 
 function noopTracing(): RunTracing {
   return {
-    wrapCallModel: (callModel) => callModel,
+    wrapModelDriver: (driver) => driver,
     wrapRegistry: (registry) => registry,
     traceRun: (_taskText, operation) => operation(),
-    flush: async () => undefined,
     close: async () => undefined,
   };
 }
@@ -471,4 +409,8 @@ function readTranscript(runDir: string): Array<Record<string, unknown>> {
 
 function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
+}
+
+function readCheckpoint(runDir: string) {
+  return checkpointSchema.parse(readJson(join(runDir, 'harness/checkpoint.json')));
 }

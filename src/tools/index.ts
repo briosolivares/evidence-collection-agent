@@ -1,4 +1,5 @@
 import type { BrowserJavaScriptPolicy } from '../browser/browserJavaScript.js';
+import { deepFreezeJsonLike } from '../deepFreeze.js';
 import {
   createRegistry,
   toApiToolDefs,
@@ -85,7 +86,7 @@ export function createWorkerToolRegistry(deps: WorkerToolRegistryDeps): ToolRegi
  * affect tool closures, never names, descriptions, or schemas. Deep freezing
  * prevents a caller from corrupting the shared prefix for later runs.
  */
-export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
+export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreezeJsonLike(
   toApiToolDefs(
     createWorkerToolRegistry({
       javascriptPolicy: 'allow',
@@ -93,13 +94,3 @@ export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
     }),
   ),
 );
-
-function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    for (const child of Object.values(value as Record<string, unknown>)) {
-      deepFreeze(child);
-    }
-    Object.freeze(value);
-  }
-  return value;
-}

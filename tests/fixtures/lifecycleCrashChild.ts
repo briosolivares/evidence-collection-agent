@@ -77,7 +77,6 @@ const CONFIGURATION: DurableRunConfiguration = {
     maxToolCalls: 20,
     maxModelTokens: 100_000,
     maxWallTimeMs: 120_000,
-    maxVerifierCorrections: 2,
   },
 };
 
@@ -89,7 +88,6 @@ const effectTool: ToolDef<Record<string, never>> = {
   name: 'record_effect',
   description: 'Crash fixture tool that records one externally observable effect.',
   inputSchema: z.strictObject({}),
-  getAccess: () => ({ reads: [], writes: ['fixture:effect'] }),
   async execute(_input, ctx) {
     effectCalls += 1;
     if (args.scenario === 'cancelled_workspace_recovery') {
@@ -113,7 +111,6 @@ const repairTool: ToolDef<Record<string, never>> = {
   name: 'repair_report',
   description: 'Crash fixture tool that restores the valid one-row report.',
   inputSchema: z.strictObject({}),
-  getAccess: () => ({ reads: [], writes: ['fixture:report'] }),
   execute(_input, ctx) {
     writeArtifact(ctx.runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
       roles: ['requested_output'],

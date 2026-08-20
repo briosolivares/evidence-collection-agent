@@ -2,11 +2,9 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 import type { Writable } from 'node:stream';
 
-import {
-  ParentDeathWatchdogError,
-  startParentDeathWatchdog,
-  type ParentDeathWatchdog,
-} from '../../process/parentDeathWatchdog.js';
+import { decodeCapturedOutput } from '../../process/decodeCapturedOutput.js';
+import { ParentDeathWatchdogError } from '../../process/parentDeathWatchdog.js';
+import { startAbortAwareParentDeathWatchdog } from '../../process/startAbortAwareParentDeathWatchdog.js';
 
 export interface ForegroundCommandOptions {
   /** Path to the shell binary, e.g. '/bin/bash'. The gated child ultimately
@@ -74,59 +72,6 @@ const START_GATE_SCRIPT = [
   'exec "$0" -c "$1"',
 ].join('\n');
 
-function isAborted(signal: AbortSignal | undefined): boolean {
-  return signal?.aborted === true;
-}
-
-/**
- * Decode captured bytes, dropping a trailing INCOMPLETE UTF-8 sequence.
- *
- * The byte ceiling cuts at an exact byte offset, which can land in the middle
- * of a multibyte character. Decoding that partial sequence directly would
- * yield U+FFFD, and U+FFFD re-encodes to THREE bytes — so a result truncated
- * to exactly N bytes could come back as N+1 and break the very ceiling the
- * truncation exists to enforce.
- *
- * This trims at the concatenated boundary rather than per chunk on purpose: a
- * character can straddle two chunks, so only the final assembled buffer knows
- * where the last complete character actually ends. At most three bytes are
- * dropped, and only from output already declared over its limit.
- */
-function decodeRetainedBytes(chunks: Buffer[]): string {
-  const buffer = Buffer.concat(chunks);
-  // Walk back over continuation bytes (10xxxxxx) to the sequence's lead byte.
-  let cut = buffer.length;
-  let continuationBytes = 0;
-  while (cut > 0 && (buffer[cut - 1]! & 0b1100_0000) === 0b1000_0000 && continuationBytes < 3) {
-    cut -= 1;
-    continuationBytes += 1;
-  }
-  // cut === 0: the whole tail (up to 3 bytes) was continuation bytes with no
-  // lead byte before them at all — pathological input; leave it alone.
-  if (cut === 0) return buffer.toString('utf8');
-  const lead = buffer[cut - 1]!;
-  // Plain ASCII (or any byte with the high bit clear) ends the buffer: there
-  // is no multibyte sequence to check at all, complete or not — this also
-  // covers continuationBytes === 0 by way of `cut` never having moved.
-  if ((lead & 0b1000_0000) === 0) return buffer.toString('utf8');
-  // How many bytes the lead byte says its sequence needs, in total.
-  const expected = lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
-  // Not a lead byte at all (a stray continuation byte the walk-back stopped
-  // on, e.g. because it hit the 3-continuation-byte cap) — invalid input we
-  // leave alone rather than silently reshaping.
-  if (expected === 1) return buffer.toString('utf8');
-  // Complete iff the lead byte plus every continuation byte found together
-  // account for the whole sequence the lead byte declares. A genuinely
-  // complete trailing character always has exactly `expected - 1`
-  // continuation bytes, so comparing `expected` to `continuationBytes`
-  // directly (as opposed to `continuationBytes + 1`, the lead byte
-  // included) can never recognize a complete sequence as complete.
-  if (continuationBytes + 1 >= expected) return buffer.toString('utf8');
-  // Incomplete: drop the dangling lead byte and whatever continuation bytes
-  // were captured with it, keeping everything decodable before it.
-  return buffer.subarray(0, cut - 1).toString('utf8');
-}
-
 /**
  * Bounds ONE foreground process tree: spawn it, capture its output, and
  * guarantee it (and anything it forked) is gone by the time this resolves —
@@ -157,9 +102,10 @@ export async function runForegroundCommand(
   const now = options.now ?? (() => performance.now());
   const startedAt = now();
 
-  // An already-aborted signal must never spawn either a command or its
-  // supervisor.
-  if (isAborted(abortSignal)) {
+  const watchdogStart = await startAbortAwareParentDeathWatchdog(abortSignal);
+  if (watchdogStart.kind === 'start_failed') throw watchdogStart.error;
+  // Cancellation before or during watchdog startup must never spawn a command.
+  if (watchdogStart.kind === 'cancelled') {
     return {
       status: 'cancelled',
       exitCode: null,
@@ -169,33 +115,7 @@ export async function runForegroundCommand(
       stderr: '',
     };
   }
-
-  let abortedDuringWatchdogStart = false;
-  const onWatchdogStartAbort = (): void => {
-    abortedDuringWatchdogStart = true;
-  };
-  abortSignal?.addEventListener('abort', onWatchdogStartAbort, { once: true });
-
-  let watchdog: ParentDeathWatchdog;
-  try {
-    watchdog = await startParentDeathWatchdog();
-  } finally {
-    abortSignal?.removeEventListener('abort', onWatchdogStartAbort);
-  }
-
-  // Cancellation can race the watchdog handshake. Keep the no-command-spawn
-  // guarantee even when it arrives during that short setup window.
-  if (abortedDuringWatchdogStart || isAborted(abortSignal)) {
-    await watchdog.disarm();
-    return {
-      status: 'cancelled',
-      exitCode: null,
-      terminationSignal: null,
-      durationMs: now() - startedAt,
-      stdout: '',
-      stderr: '',
-    };
-  }
+  const watchdog = watchdogStart.watchdog;
 
   let child: ChildProcess;
   try {
@@ -364,8 +284,8 @@ export async function runForegroundCommand(
           exitCode,
           terminationSignal,
           durationMs: now() - startedAt,
-          stdout: decodeRetainedBytes(stdoutChunks),
-          stderr: decodeRetainedBytes(stderrChunks),
+          stdout: decodeCapturedOutput(stdoutChunks),
+          stderr: decodeCapturedOutput(stderrChunks),
         });
       });
     }

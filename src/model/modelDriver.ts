@@ -1,5 +1,6 @@
 import type Anthropic from '@anthropic-ai/sdk';
 
+import { errorMessage, isAbortError } from '../errors.js';
 import type { Message, ModelResponse, ToolUseBlock, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
 import { buildRequestParams, makeAnthropicClient } from './callModel.js';
@@ -107,12 +108,9 @@ export class ModelGenerationFailedError extends Error {
   readonly usage: Usage;
 
   constructor(cause: unknown, usage: Usage) {
-    super(
-      `model generation failed after an earlier billable attempt: ${
-        cause instanceof Error ? cause.message : String(cause)
-      }`,
-      { cause },
-    );
+    super(`model generation failed after an earlier billable attempt: ${errorMessage(cause)}`, {
+      cause,
+    });
     this.usage = usage;
   }
 }
@@ -458,7 +456,7 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
         // Cancellation must retain its conventional error shape. All other
         // failures preserve the transport/assembly error as `cause` while
         // carrying the first complete attempt's already-reported usage.
-        if (error instanceof Error && error.name === 'AbortError') throw error;
+        if (isAbortError(error)) throw error;
         options.signal?.throwIfAborted();
         throw new ModelGenerationFailedError(error, aggregateUsage(knownUsages));
       }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ToolAccess, ToolDef } from '../registry.js';
+import type { ToolDef } from '../registry.js';
 
 const nonBlankString = (maximum: number, description: string) =>
   z
@@ -52,7 +52,6 @@ export const askUserTool: ToolDef<AskUserInput> = {
     'four options when the answer space is known; otherwise allow a free-text response. ' +
     'The run fails closed with model-readable feedback when no interactive user is available.',
   inputSchema: askUserInputSchema,
-  getAccess: (): ToolAccess => ({ reads: [], writes: [], exclusive: true }),
   requiresUserInteraction: true,
   execute(input) {
     const parsed = answersSchema.safeParse((input as AskUserInput & { answers?: unknown }).answers);

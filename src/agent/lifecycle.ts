@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { BrowserController } from '../browser/controller.js';
+import { errorMessage, isAbortError } from '../errors.js';
 import type { OutputContract } from './initializer/outputContract.schema.js';
 import type { CallModel } from '../model/messages.js';
 import {
@@ -25,7 +26,6 @@ import { syncScratchWorkspace } from '../run/syncScratchWorkspace.js';
 import { BUSY_RESOURCE_GATE_TIMEOUT_MS } from '../tools/pipeline.js';
 import {
   createBusyResourceRegistry,
-  EXCLUSIVE_ACCESS,
   type BusyResourceRegistry,
   type PermissionDecision,
   type PermissionRequest,
@@ -101,11 +101,44 @@ type CheckpointCommonKey =
   | 'budget'
   | 'progress';
 
-type CheckpointPhaseState = Checkpoint extends infer Checkpoint
-  ? Checkpoint extends Checkpoint
-    ? Omit<Checkpoint, CheckpointCommonKey>
-    : never
+type PhaseState<Snapshot> = Snapshot extends Checkpoint
+  ? Omit<Snapshot, CheckpointCommonKey>
   : never;
+type CheckpointPhaseState = PhaseState<Checkpoint>;
+
+type InitializingCoordinatorState = {
+  phase: 'initializing';
+  contract?: OutputContract;
+  initializer?: ContractInitializerState;
+};
+
+type ActiveCoordinatorState = {
+  contract: OutputContract;
+  session: Worker;
+};
+
+type CoordinatorPhaseState =
+  | InitializingCoordinatorState
+  | (ActiveCoordinatorState & { phase: 'ready_for_model' })
+  | (ActiveCoordinatorState & { phase: 'executing_tool'; pendingTurn: PendingToolTurn })
+  | (ActiveCoordinatorState & { phase: 'checking'; pendingFinish: FinishRequest })
+  | (ActiveCoordinatorState & {
+      phase: 'verifying';
+      pendingFinish: FinishRequest;
+      facts: FinishFacts;
+      structuralFindings: FinishDefect[];
+    });
+
+type ReadyCoordinatorState = Extract<CoordinatorPhaseState, { phase: 'ready_for_model' }>;
+type ExecutingCoordinatorState = Extract<CoordinatorPhaseState, { phase: 'executing_tool' }>;
+type CheckingCoordinatorState = Extract<CoordinatorPhaseState, { phase: 'checking' }>;
+type VerifyingCoordinatorState = Extract<CoordinatorPhaseState, { phase: 'verifying' }>;
+
+const readyState = (active: ActiveCoordinatorState): ReadyCoordinatorState => ({
+  contract: active.contract,
+  session: active.session,
+  phase: 'ready_for_model',
+});
 
 export interface RunAgentOptions {
   runDir: string;
@@ -141,7 +174,7 @@ export interface RunAgentOptions {
 export const TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS = 10_000;
 export const TERMINAL_RESUME_INSPECTION_TIMEOUT_MS = 30_000;
 
-/** Run or resume one initializer → worker → checks → verifier lifecycle.
+/** Run or recover one initializer → worker → checks → verifier lifecycle.
  * The checkpoint is authoritative; a terminal checkpoint is returned without
  * invoking a model or touching the browser. */
 export async function runAgent(options: RunAgentOptions): Promise<DurableTerminalOutcome> {
@@ -227,13 +260,10 @@ export async function runAgent(options: RunAgentOptions): Promise<DurableTermina
         }
         return state.terminalize(outcome);
       };
-      const checkActive = (): void => {
-        deadline.signal.throwIfAborted();
-        const limit = budget.exceededLimit(['worker_turns']);
-        if (limit !== undefined) throw new RoleBudgetExceededError(limit);
-      };
       try {
-        recoverAndInspectRun(options.runDir, configuration, loaded?.phase, checkActive);
+        recoverAndInspectRun(options.runDir, configuration, loaded?.phase, () =>
+          state.assertActive(),
+        );
         if (loaded?.contract !== undefined) {
           ensureOutputContractFile(options.runDir, loaded.contract);
         }
@@ -326,22 +356,15 @@ export async function runAgent(options: RunAgentOptions): Promise<DurableTermina
 }
 
 class CoordinatorState {
-  phase: Exclude<CheckpointPhase, 'terminal'>;
-
+  private state: CoordinatorPhaseState;
   private revision: number;
-  private contract: OutputContract | undefined;
-  private session: Worker | undefined;
-  private pendingTurn: PendingToolTurn | undefined;
-  private pendingFinish: FinishRequest | undefined;
-  private pendingFacts: FinishFacts | undefined;
-  private pendingStructuralFindings: FinishDefect[] = [];
   private verificationHistory: VerificationHistoryEntry[];
   private verifierCycles: number;
   private completionCheckFailures: number;
   private terminalizing = false;
   private suppressFinishReadyCheckpoint = false;
+  private pendingFinishAnswered = false;
   private browserPrepared = false;
-  private verifiedFinish: FinishInput | undefined;
   private readonly busyRegistry: BusyResourceRegistry;
 
   constructor(
@@ -349,26 +372,56 @@ class CoordinatorState {
     private readonly configuration: DurableRunConfiguration,
     private readonly store: Awaited<ReturnType<typeof openCheckpointStore>>,
     private readonly budget: RunBudgetTracker,
-    private readonly loaded: Exclude<Checkpoint, { phase: 'terminal' }> | undefined,
+    loaded: Exclude<Checkpoint, { phase: 'terminal' }> | undefined,
     private readonly now: () => number,
     private readonly runSignal: AbortSignal,
   ) {
-    this.phase = loaded?.phase ?? 'initializing';
     this.revision = loaded?.revision ?? 0;
-    this.contract = loaded?.contract;
     this.verifierCycles = loaded?.progress.verifierCycles ?? 0;
     this.completionCheckFailures = loaded?.progress.completionCheckFailures ?? 0;
     this.verificationHistory =
       loaded?.phase === 'initializing' ? [] : structuredClone(loaded?.verificationHistory ?? []);
-    if (loaded?.phase === 'executing_tool') this.pendingTurn = loaded.pendingTurn;
-    if (loaded?.phase === 'checking' || loaded?.phase === 'verifying') {
-      this.pendingFinish = loaded.pendingFinish;
-    }
-    if (loaded?.phase === 'verifying') {
-      this.pendingFacts = loaded.pendingCheck.facts;
-      this.pendingStructuralFindings = loaded.pendingCheck.structuralFindings ?? [];
-    }
     this.busyRegistry = options.busyRegistry ?? createBusyResourceRegistry();
+    if (loaded === undefined) {
+      this.state = { phase: 'initializing' };
+    } else if (loaded.phase === 'initializing') {
+      this.state = {
+        phase: 'initializing',
+        ...(loaded.contract === undefined ? {} : { contract: loaded.contract }),
+        ...(loaded.initializer === undefined
+          ? {}
+          : { initializer: restoreContractInitializerState(loaded.initializer) }),
+      };
+    } else {
+      const active = {
+        contract: loaded.contract,
+        session: restoreWorker(loaded.worker, this.workerDeps(), this.workerConfig()),
+      };
+      switch (loaded.phase) {
+        case 'ready_for_model':
+          this.state = { phase: loaded.phase, ...active };
+          break;
+        case 'executing_tool':
+          this.state = { phase: loaded.phase, ...active, pendingTurn: loaded.pendingTurn };
+          break;
+        case 'checking':
+          this.state = { phase: loaded.phase, ...active, pendingFinish: loaded.pendingFinish };
+          break;
+        case 'verifying':
+          this.state = {
+            phase: loaded.phase,
+            ...active,
+            pendingFinish: loaded.pendingFinish,
+            facts: loaded.pendingCheck.facts,
+            structuralFindings: loaded.pendingCheck.structuralFindings ?? [],
+          };
+          break;
+      }
+    }
+  }
+
+  get phase(): Exclude<CheckpointPhase, 'terminal'> {
+    return this.state.phase;
   }
 
   async run(): Promise<DurableTerminalOutcome> {
@@ -378,66 +431,63 @@ class CoordinatorState {
     this.options.browser?.setBusyRegistry?.(this.busyRegistry);
     this.runSignal.throwIfAborted();
     if (this.phase === 'initializing') await this.initialize();
-    this.restoreOrCreateWorker();
 
     for (;;) {
       this.runSignal.throwIfAborted();
+      const state = this.state;
 
-      if (this.phase === 'executing_tool') {
+      if (state.phase === 'executing_tool') {
         await this.prepareBrowser();
-        const outcome = await resumePendingToolTurn(
-          this.requireSession(),
-          this.requirePendingTurn(),
-        );
-        this.pendingTurn = undefined;
+        const outcome = await resumePendingToolTurn(state.session, state.pendingTurn);
         if (outcome.kind === 'incomplete') {
           return this.terminalize(
             workerIncomplete(
               outcome.reason,
-              this.phase,
+              state.phase,
               this.finalText(),
               this.unresolved(),
               outcome.detail,
             ),
           );
         }
-        this.phase = 'ready_for_model';
+        this.state = readyState(state);
+        continue;
       }
 
-      if (this.phase === 'ready_for_model') {
+      if (state.phase === 'ready_for_model') {
         await this.prepareBrowser();
-        const outcome = await runWorker(this.requireSession());
+        const outcome = await runWorker(state.session);
         if (outcome.kind === 'incomplete') {
           return this.terminalize(
             workerIncomplete(
               outcome.reason,
-              this.phase,
+              state.phase,
               this.finalText(),
               this.unresolved(),
               outcome.detail,
             ),
           );
         }
-        this.pendingFinish = outcome.request;
         // finishRequested already made the checking checkpoint durable.
-        this.phase = 'checking';
+        this.state = {
+          phase: 'checking',
+          contract: state.contract,
+          session: state.session,
+          pendingFinish: outcome.request,
+        };
+        continue;
       }
 
-      if (this.phase === 'checking') {
-        const request = this.requirePendingFinish();
+      if (state.phase === 'checking') {
+        const request = state.pendingFinish;
         const resourcesSettled = await raceWithRunSignal(
-          () =>
-            this.busyRegistry.waitUntilFree(
-              EXCLUSIVE_ACCESS,
-              BUSY_RESOURCE_GATE_TIMEOUT_MS,
-              this.runSignal,
-            ),
+          () => this.busyRegistry.waitUntilFree(BUSY_RESOURCE_GATE_TIMEOUT_MS, this.runSignal),
           this.runSignal,
         );
         this.runSignal.throwIfAborted();
         if (!resourcesSettled) {
           await appendFinishResult(
-            this.requireSession(),
+            state.session,
             request,
             JSON.stringify({
               status: 'rejected',
@@ -448,15 +498,14 @@ class CoordinatorState {
                 'after the affected resource is confirmed settled.',
             }),
           );
-          this.pendingFinish = undefined;
-          this.phase = 'ready_for_model';
+          this.state = readyState(state);
           continue;
         }
         const checks = runFinishChecks({
           runDir: this.options.runDir,
-          contract: this.requireContract(),
+          contract: state.contract,
           finish: request.input,
-          checkActive: () => this.assertFinishInspectionActive(),
+          checkActive: () => this.assertActive(),
         });
         if (checks.status === 'failed') {
           // Every failed deterministic check is authoritative and bounces
@@ -482,7 +531,7 @@ class CoordinatorState {
             );
             return this.terminalize({
               status: 'incomplete',
-              during: this.phase,
+              during: state.phase,
               reason: 'completion_check_attempts',
               detail: boundedDiagnostic(
                 `deterministic finish checks failed ${this.completionCheckFailures} ` +
@@ -493,7 +542,7 @@ class CoordinatorState {
             });
           }
           await appendFinishResult(
-            this.requireSession(),
+            state.session,
             request,
             JSON.stringify({
               status: 'rejected',
@@ -501,21 +550,27 @@ class CoordinatorState {
               defects: checks.defects,
             }),
           );
-          this.pendingFinish = undefined;
-          this.phase = 'ready_for_model';
+          this.state = readyState(state);
           continue;
         }
 
-        this.pendingFacts = checks.facts;
-        this.pendingStructuralFindings = checks.defects;
         this.verifierCycles += 1;
-        await this.saveVerifying(request, checks.facts, checks.defects);
-        this.phase = 'verifying';
+        const verifying: VerifyingCoordinatorState = {
+          phase: 'verifying',
+          contract: state.contract,
+          session: state.session,
+          pendingFinish: request,
+          facts: checks.facts,
+          structuralFindings: checks.defects,
+        };
+        await this.saveVerifying(verifying);
+        this.state = verifying;
+        continue;
       }
 
-      if (this.phase === 'verifying') {
-        const request = this.requirePendingFinish();
-        const facts = this.requirePendingFacts();
+      if (state.phase === 'verifying') {
+        const request = state.pendingFinish;
+        const facts = state.facts;
         const surfacedArtifacts = collectSurfacedArtifacts(this.options.runDir);
         const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(surfacedArtifacts);
         let verification: Awaited<ReturnType<typeof runVerifier>>;
@@ -523,12 +578,12 @@ class CoordinatorState {
           verification = await runVerifier({
             taskText: this.configuration.taskText,
             runDir: this.options.runDir,
-            contract: this.requireContract(),
+            contract: state.contract,
             finish: facts.finish,
             surfacedArtifacts,
             settled: toSettledFacts(facts),
             outputs: facts.outputs,
-            structuralFindings: this.pendingStructuralFindings,
+            structuralFindings: state.structuralFindings,
             verificationHistory: this.verificationHistory,
             model: this.options.verifierModel,
             budget: this.budget,
@@ -539,7 +594,7 @@ class CoordinatorState {
                   onEvent: (event) => this.options.onModelEvent?.('verifier', event),
                 }),
             afterAccounting: async () => {
-              await this.saveVerifying(request, facts, this.pendingStructuralFindings);
+              await this.saveVerifying(state);
             },
             now: this.now,
           });
@@ -548,7 +603,7 @@ class CoordinatorState {
           // Make that spend durable while retaining the `verifying` phase
           // before accepting its verdict. A deadline that fires after the
           // provider returns but before this boundary must still win.
-          await this.saveVerifying(request, facts, this.pendingStructuralFindings);
+          await this.saveVerifying(state);
           this.runSignal.throwIfAborted();
         } catch (error) {
           const budgetError = verifierBudgetError(error, this.runSignal);
@@ -582,7 +637,7 @@ class CoordinatorState {
           );
           return this.terminalize({
             status: 'incomplete',
-            during: this.phase,
+            during: state.phase,
             reason: 'verification_incomplete',
             detail: boundedDiagnostic(
               `the evidence judge could not produce a valid verdict: ${verification.reason}`,
@@ -603,7 +658,7 @@ class CoordinatorState {
           );
           return this.terminalize({
             status: 'incomplete',
-            during: this.phase,
+            during: state.phase,
             reason: 'verifier_unavailable',
             detail: boundedDiagnostic(verification.reason),
             finalText: request.input.summary,
@@ -614,11 +669,6 @@ class CoordinatorState {
           // Success is terminal control state, not feedback the worker will
           // consume. Avoid a transient ready_for_model checkpoint and avoid
           // charging unused result bytes after verification has accepted.
-          // `pendingFacts`/`pendingStructuralFindings` are left intact here
-          // (not nulled) so `terminalize` can still render them into the
-          // findings-report audit projection; the instance is discarded
-          // once this call returns, so nothing else observes them.
-          this.verifiedFinish = structuredClone(request.input);
           return this.terminalize({
             status: 'verified',
             finalText: request.input.summary,
@@ -629,7 +679,7 @@ class CoordinatorState {
           return this.terminalize(
             {
               status: 'incomplete',
-              during: this.phase,
+              during: state.phase,
               reason: 'verification_incomplete',
               detail: boundedDiagnostic(
                 `the evidence judge accepted the reported blocker(s): ${formatIncompleteFindings(
@@ -673,7 +723,7 @@ class CoordinatorState {
           return this.terminalize(
             {
               status: 'incomplete',
-              during: this.phase,
+              during: state.phase,
               reason: 'verification_incomplete',
               detail: boundedDiagnostic(
                 'the same requirement(s) remained unsupported after an equivalent retry with no ' +
@@ -687,7 +737,7 @@ class CoordinatorState {
             { kind: 'correction', findings: correctionFindings },
           );
         }
-        const correctionLimit = this.budget.exceededLimit(['worker_turns', 'verifier_corrections']);
+        const correctionLimit = this.budget.exceededLimit(['worker_turns']);
         if (correctionLimit !== undefined) {
           await this.appendTerminalFinishFailure(
             request,
@@ -703,7 +753,7 @@ class CoordinatorState {
               correctionLimit,
               request.input.summary,
               request.input.unresolved,
-              this.phase,
+              state.phase,
             ),
             { kind: 'correction', findings: correctionFindings },
           );
@@ -721,7 +771,7 @@ class CoordinatorState {
           );
         }
         await appendFinishResult(
-          this.requireSession(),
+          state.session,
           request,
           JSON.stringify({
             status: 'needs_correction',
@@ -736,15 +786,13 @@ class CoordinatorState {
           phase: this.phase,
           completionReport: request.input,
           settledFacts: toSettledFacts(facts),
-          structuralFindings: this.pendingStructuralFindings,
+          structuralFindings: state.structuralFindings,
           surfacedArtifacts,
           currentFindings: { kind: 'correction', findings: correctionFindings },
           verificationHistory: this.verificationHistory,
         });
-        this.pendingFinish = undefined;
-        this.pendingFacts = undefined;
-        this.pendingStructuralFindings = [];
-        this.phase = 'ready_for_model';
+        this.state = readyState(state);
+        continue;
       }
     }
   }
@@ -760,13 +808,7 @@ class CoordinatorState {
   ): Promise<DurableTerminalOutcome> {
     if (this.terminalizing) throw new Error('recursive terminalization');
     this.terminalizing = true;
-    // Preflight cancellation/deadline failure can reach terminalization
-    // before `run()` restored the durable worker. Later-phase terminal
-    // checkpoints and pending finish feedback still require that exact
-    // session cargo, so restore it without invoking any model or tool.
-    if (this.phase !== 'initializing' && this.session === undefined) {
-      this.restoreOrCreateWorker();
-    }
+    const terminalState = this.state;
 
     // A timed-out executor is still a live effect, even though the model has
     // already received a timeout result. Never close pages, persist terminal
@@ -775,11 +817,10 @@ class CoordinatorState {
     // the run lock and drain to a fixed point; releasing the lock while the
     // effect remains live would let a fresh coordinator overlap it.
     const resourcesSettled = await this.busyRegistry.waitUntilFree(
-      EXCLUSIVE_ACCESS,
       terminalBusyResourceTimeout(this.options),
     );
     if (!resourcesSettled) {
-      await this.busyRegistry.drainUntilFree(EXCLUSIVE_ACCESS);
+      await this.busyRegistry.drainUntilFree();
     }
 
     let finalOutcome = outcome;
@@ -822,9 +863,17 @@ class CoordinatorState {
       }
     }
 
-    if (finalOutcome.status !== 'verified' && this.pendingFinish !== undefined) {
+    const pendingFinish =
+      terminalState.phase === 'checking' || terminalState.phase === 'verifying'
+        ? terminalState.pendingFinish
+        : undefined;
+    if (
+      finalOutcome.status !== 'verified' &&
+      pendingFinish !== undefined &&
+      !this.pendingFinishAnswered
+    ) {
       await this.appendTerminalFinishFailure(
-        this.pendingFinish,
+        pendingFinish,
         JSON.stringify({
           status: 'rejected',
           source: 'run_terminal',
@@ -834,7 +883,7 @@ class CoordinatorState {
       );
     }
 
-    await this.saveTerminal(finalOutcome);
+    await this.saveTerminal(finalOutcome, terminalState);
     const terminal = this.store.load();
     if (terminal?.phase !== 'terminal') {
       throw new Error('terminal checkpoint was not readable after its durable save');
@@ -848,8 +897,10 @@ class CoordinatorState {
           summary: finalOutcome.finalText,
           unresolved: finalOutcome.status === 'incomplete' ? finalOutcome.unresolved : [],
         },
-        settledFacts: this.pendingFacts === undefined ? [] : toSettledFacts(this.pendingFacts),
-        structuralFindings: this.pendingStructuralFindings,
+        settledFacts:
+          terminalState.phase === 'verifying' ? toSettledFacts(terminalState.facts) : [],
+        structuralFindings:
+          terminalState.phase === 'verifying' ? terminalState.structuralFindings : [],
         surfacedArtifacts: collectSurfacedArtifacts(this.options.runDir),
         currentFindings,
         verificationHistory: this.verificationHistory,
@@ -867,11 +918,12 @@ class CoordinatorState {
   }
 
   private latestCompletionReport(): FinishInput | undefined {
-    if (this.pendingFinish !== undefined) {
-      return structuredClone(this.pendingFinish.input);
+    const state = this.state;
+    if (state.phase === 'checking' || state.phase === 'verifying') {
+      return structuredClone(state.pendingFinish.input);
     }
-    const messages = this.session?.state.messages;
-    if (messages === undefined) return undefined;
+    if (state.phase === 'initializing') return undefined;
+    const messages = state.session.state.messages;
     for (let messageIndex = messages.length - 1; messageIndex >= 0; messageIndex -= 1) {
       const message = messages[messageIndex]!;
       if (message.role !== 'assistant') continue;
@@ -885,7 +937,7 @@ class CoordinatorState {
     return undefined;
   }
 
-  private assertFinishInspectionActive(): void {
+  assertActive(): void {
     this.runSignal.throwIfAborted();
     const limit = this.budget.exceededLimit(['worker_turns']);
     if (limit !== undefined) throw new RoleBudgetExceededError(limit);
@@ -896,18 +948,21 @@ class CoordinatorState {
   }
 
   private async initialize(): Promise<void> {
-    if (this.contract !== undefined) {
-      ensureOutputContractFile(this.options.runDir, this.contract);
-      this.createWorker();
-      await this.saveReady();
-      this.phase = 'ready_for_model';
+    const initial = this.state;
+    if (initial.phase !== 'initializing') return;
+    if (initial.contract !== undefined) {
+      ensureOutputContractFile(this.options.runDir, initial.contract);
+      const ready = readyState({
+        contract: initial.contract,
+        session: this.newWorker(initial.contract),
+      });
+      await this.saveReady(ready);
+      this.state = ready;
       return;
     }
 
     const state =
-      this.loaded?.phase === 'initializing' && this.loaded.initializer
-        ? restoreContractInitializerState(this.loaded.initializer)
-        : createContractInitializerState(this.configuration.taskText);
+      initial.initializer ?? createContractInitializerState(this.configuration.taskText);
     if (this.revision === 0) await this.saveInitializing({ initializer: state });
 
     const budgetedCallModel = createBudgetedCallModel({
@@ -942,8 +997,8 @@ class CoordinatorState {
             this.recordInitializerCorrectionResults(event.state);
           }
           if (event.outcome === 'accepted' && event.contract !== undefined) {
-            this.contract = event.contract;
             await this.saveInitializing({ contract: event.contract });
+            this.state = { phase: 'initializing', contract: event.contract };
             // The checkpoint is authoritative. Publishing this immutable
             // convenience copy after it means a crash can only leave a missing
             // file that resume reconstructs, never an orphan contract that was
@@ -965,34 +1020,18 @@ class CoordinatorState {
     if (!result.ok) {
       throw new InitializerUnavailableError(result.reason);
     }
-    this.contract = result.contract;
-    this.createWorker();
-    await this.saveReady();
-    this.phase = 'ready_for_model';
+    const ready = readyState({
+      contract: result.contract,
+      session: this.newWorker(result.contract),
+    });
+    await this.saveReady(ready);
+    this.state = ready;
   }
 
-  private restoreOrCreateWorker(): void {
-    if (this.session !== undefined) return;
-    const snapshot = this.loaded?.phase === 'initializing' ? undefined : this.loaded?.worker;
-    if (snapshot !== undefined) {
-      this.session = restoreWorker(snapshot, this.workerDeps(), this.workerConfig());
-      return;
-    }
-    if (this.contract !== undefined) this.createWorker();
-  }
-
-  private createWorker(): void {
-    this.session = createWorker(
-      this.configuration.taskText,
-      this.workerDeps(),
-      this.workerConfig(),
-      {
-        guidance: [
-          formatContractGuidance(this.requireContract()),
-          formatRunCapabilityGuidance(this.configuration),
-        ],
-      },
-    );
+  private newWorker(contract: OutputContract): Worker {
+    return createWorker(this.configuration.taskText, this.workerDeps(), this.workerConfig(), {
+      guidance: [formatContractGuidance(contract), formatRunCapabilityGuidance(this.configuration)],
+    });
   }
 
   private workerDeps() {
@@ -1034,53 +1073,59 @@ class CoordinatorState {
       return total + Buffer.byteLength(content, 'utf8');
     }, 0);
     this.budget.recordToolResultBytes(bytes);
-    this.throwIfSharedBudgetExceeded();
-  }
-
-  private throwIfSharedBudgetExceeded(): void {
-    const limit = this.budget.exceededLimit(['worker_turns']);
-    if (limit !== undefined) throw new RoleBudgetExceededError(limit);
+    this.assertActive();
   }
 
   private lifecycle(): WorkerHooks {
+    const transitionReady = async (snapshot: WorkerSnapshot): Promise<void> => {
+      const ready = readyState(this.activeState());
+      await this.saveReady(ready, snapshot);
+      this.state = ready;
+    };
+    const transitionExecuting = async (pendingTurn: PendingToolTurn): Promise<void> => {
+      const executing = {
+        phase: 'executing_tool' as const,
+        ...this.activeState(),
+        pendingTurn,
+      };
+      await this.saveExecuting(executing);
+      this.state = executing;
+    };
     return {
-      beforeModelRequest: async (event) => {
-        await this.saveReady(event.session);
-        this.phase = 'ready_for_model';
-      },
+      beforeModelRequest: async (event) => transitionReady(event.session),
       afterModelAccounting: async (event) => {
         // The response content is not accepted yet, but its known billable
         // usage is. Persist that monotone spend with the incremented turn so
         // a crash cannot retry the request from a pre-billing checkpoint.
-        await this.saveReady(event.session);
-        this.phase = 'ready_for_model';
+        await transitionReady(event.session);
       },
-      beforeCall: async (pending) => {
-        this.pendingTurn = pending;
-        await this.saveExecuting(pending);
-        this.phase = 'executing_tool';
-      },
-      afterDispatch: async (pending) => {
-        this.pendingTurn = pending;
-        await this.saveExecuting(pending);
-        this.phase = 'executing_tool';
-      },
-      afterResult: async (pending) => {
-        this.pendingTurn = pending;
-        await this.saveExecuting(pending);
-        this.phase = 'executing_tool';
-      },
+      beforeCall: transitionExecuting,
+      afterDispatch: transitionExecuting,
+      afterResult: transitionExecuting,
       finishRequested: async (event) => {
-        this.pendingFinish = event.request;
-        await this.saveChecking(event.session, event.request);
-        this.phase = 'checking';
+        this.pendingFinishAnswered = false;
+        const checking = {
+          phase: 'checking' as const,
+          ...this.activeState(),
+          pendingFinish: event.request,
+        };
+        await this.saveChecking(checking, event.session);
+        this.state = checking;
       },
       finishResultAppended: async (event) => {
+        this.pendingFinishAnswered = true;
         if (this.suppressFinishReadyCheckpoint) return;
-        await this.saveReady(event.session);
-        this.phase = 'ready_for_model';
+        await transitionReady(event.session);
       },
     };
+  }
+
+  private activeState(): ActiveCoordinatorState {
+    const state = this.state;
+    if (state.phase === 'initializing') {
+      throw new Error('worker state is unavailable during initialization');
+    }
+    return { contract: state.contract, session: state.session };
   }
 
   /** Open exactly one run-owned task page for this coordinator invocation.
@@ -1127,13 +1172,11 @@ class CoordinatorState {
   ): Promise<void> {
     this.suppressFinishReadyCheckpoint = true;
     try {
-      await appendFinishResult(this.requireSession(), request, content);
+      await appendFinishResult(this.activeState().session, request, content);
+      this.pendingFinishAnswered = true;
     } finally {
       this.suppressFinishReadyCheckpoint = false;
     }
-    this.pendingFinish = undefined;
-    this.pendingFacts = undefined;
-    this.pendingStructuralFindings = [];
   }
 
   private async saveInitializing(
@@ -1150,33 +1193,37 @@ class CoordinatorState {
   }
 
   private async saveReady(
-    snapshot: WorkerSnapshot = captureWorkerSnapshot(this.requireSession()),
+    state: ReadyCoordinatorState,
+    snapshot: WorkerSnapshot = captureWorkerSnapshot(state.session),
   ): Promise<void> {
     await this.save({
-      phase: 'ready_for_model',
-      contract: this.requireContract(),
+      phase: state.phase,
+      contract: state.contract,
       worker: snapshot,
       verificationHistory: this.verificationHistory,
     });
   }
 
-  private async saveExecuting(pendingTurn: PendingToolTurn): Promise<void> {
+  private async saveExecuting(state: ExecutingCoordinatorState): Promise<void> {
     await this.save({
-      phase: 'executing_tool',
-      contract: this.requireContract(),
-      worker: captureWorkerSnapshot(this.requireSession()),
+      phase: state.phase,
+      contract: state.contract,
+      worker: captureWorkerSnapshot(state.session),
       verificationHistory: this.verificationHistory,
-      pendingTurn,
+      pendingTurn: state.pendingTurn,
     });
   }
 
-  private async saveChecking(worker: WorkerSnapshot, pendingFinish: FinishRequest): Promise<void> {
+  private async saveChecking(
+    state: CheckingCoordinatorState,
+    worker: WorkerSnapshot,
+  ): Promise<void> {
     await this.save({
-      phase: 'checking',
-      contract: this.requireContract(),
+      phase: state.phase,
+      contract: state.contract,
       worker,
       verificationHistory: this.verificationHistory,
-      pendingFinish,
+      pendingFinish: state.pendingFinish,
       pendingCheck: {
         status: 'pending',
         attempt: this.completionCheckFailures + 1,
@@ -1184,22 +1231,18 @@ class CoordinatorState {
     });
   }
 
-  private async saveVerifying(
-    pendingFinish: FinishRequest,
-    facts: FinishFacts,
-    structuralFindings: readonly FinishDefect[],
-  ): Promise<void> {
+  private async saveVerifying(state: VerifyingCoordinatorState): Promise<void> {
     await this.save({
-      phase: 'verifying',
-      contract: this.requireContract(),
-      worker: captureWorkerSnapshot(this.requireSession()),
+      phase: state.phase,
+      contract: state.contract,
+      worker: captureWorkerSnapshot(state.session),
       verificationHistory: this.verificationHistory,
-      pendingFinish,
+      pendingFinish: state.pendingFinish,
       pendingCheck: {
         status: 'passed',
         attempt: this.completionCheckFailures + 1,
-        facts,
-        structuralFindings: [...structuralFindings],
+        facts: state.facts,
+        structuralFindings: state.structuralFindings,
       },
       pendingVerifier: {
         cycle: this.verifierCycles,
@@ -1208,12 +1251,20 @@ class CoordinatorState {
     });
   }
 
-  private async saveTerminal(outcome: DurableTerminalOutcome): Promise<void> {
+  private async saveTerminal(
+    outcome: DurableTerminalOutcome,
+    state: CoordinatorPhaseState,
+  ): Promise<void> {
+    if (outcome.status === 'verified' && state.phase !== 'verifying') {
+      throw new Error('verified terminal outcome requires verifying state');
+    }
     await this.save({
       phase: 'terminal',
-      ...(this.contract === undefined ? {} : { contract: this.contract }),
-      ...(this.session === undefined ? {} : { worker: captureWorkerSnapshot(this.session) }),
-      ...(outcome.status === 'verified' ? { finish: this.requireVerifiedFinish() } : {}),
+      ...(state.contract === undefined ? {} : { contract: state.contract }),
+      ...(state.phase === 'initializing' ? {} : { worker: captureWorkerSnapshot(state.session) }),
+      ...(outcome.status === 'verified' && state.phase === 'verifying'
+        ? { finish: structuredClone(state.pendingFinish.input) }
+        : {}),
       outcome,
     });
   }
@@ -1234,38 +1285,6 @@ class CoordinatorState {
     await this.store.save(checkpoint);
     this.revision = checkpoint.revision;
     await this.options.afterCheckpoint?.(structuredClone(checkpoint));
-  }
-
-  private requireSession(): Worker {
-    if (this.session === undefined) throw new Error('worker session is unavailable');
-    return this.session;
-  }
-
-  private requireContract(): OutputContract {
-    if (this.contract === undefined) throw new Error('output contract is unavailable');
-    return this.contract;
-  }
-
-  private requirePendingTurn(): PendingToolTurn {
-    if (this.pendingTurn === undefined) throw new Error('pending tool turn is unavailable');
-    return this.pendingTurn;
-  }
-
-  private requirePendingFinish(): FinishRequest {
-    if (this.pendingFinish === undefined) throw new Error('pending finish is unavailable');
-    return this.pendingFinish;
-  }
-
-  private requirePendingFacts(): FinishFacts {
-    if (this.pendingFacts === undefined) throw new Error('pending finish facts are unavailable');
-    return this.pendingFacts;
-  }
-
-  private requireVerifiedFinish(): FinishInput {
-    if (this.verifiedFinish === undefined) {
-      throw new Error('verified terminal outcome is missing its accepted finish claims');
-    }
-    return structuredClone(this.verifiedFinish);
   }
 }
 
@@ -1522,10 +1541,6 @@ function budgetConfig(configuration: DurableRunConfiguration): RunBudgetConfig {
     maxToolCalls: ceilingFromCheckpoint(limits.maxToolCalls),
     maxModelTokens: ceilingFromCheckpoint(limits.maxModelTokens),
     maxWallTimeMs: ceilingFromCheckpoint(limits.maxWallTimeMs),
-    // Retained in durable configuration only for old-checkpoint read
-    // compatibility. Correction dialogue is bounded by the ordinary whole-run
-    // turn/token/tool/wall budgets, never by a correction-specific cap.
-    maxVerifierCorrections: Infinity,
   };
 }
 
@@ -1555,12 +1570,11 @@ function workerIncomplete(
   detail?: string,
 ): DurableTerminalOutcome {
   const budgetReasons: readonly WorkerIncompleteReason[] = [
-    'max_turns',
+    'worker_turns',
     'context_budget',
     'tool_calls',
     'model_tokens',
     'wall_time',
-    'verifier_corrections',
   ];
   return {
     status: 'incomplete',
@@ -1632,26 +1646,29 @@ function finalizeManifestIfNeeded(runDir: string): void {
 }
 
 function terminalBrowserCleanupTimeout(options: RunAgentOptions): number {
-  const timeoutMs = options.terminalBrowserCleanupTimeoutMs ?? TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS;
-  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(`terminalBrowserCleanupTimeoutMs must be finite and > 0, got ${timeoutMs}`);
-  }
-  return timeoutMs;
+  return positiveTimeout(
+    'terminalBrowserCleanupTimeoutMs',
+    options.terminalBrowserCleanupTimeoutMs ?? TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS,
+  );
 }
 
 function terminalBusyResourceTimeout(options: RunAgentOptions): number {
-  const timeoutMs = options.terminalBusyResourceTimeoutMs ?? BUSY_RESOURCE_GATE_TIMEOUT_MS;
-  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(`terminalBusyResourceTimeoutMs must be finite and > 0, got ${timeoutMs}`);
-  }
-  return timeoutMs;
+  return positiveTimeout(
+    'terminalBusyResourceTimeoutMs',
+    options.terminalBusyResourceTimeoutMs ?? BUSY_RESOURCE_GATE_TIMEOUT_MS,
+  );
 }
 
 function terminalResumeInspectionTimeout(options: RunAgentOptions): number {
-  const timeoutMs =
-    options.terminalResumeInspectionTimeoutMs ?? TERMINAL_RESUME_INSPECTION_TIMEOUT_MS;
+  return positiveTimeout(
+    'terminalResumeInspectionTimeoutMs',
+    options.terminalResumeInspectionTimeoutMs ?? TERMINAL_RESUME_INSPECTION_TIMEOUT_MS,
+  );
+}
+
+function positiveTimeout(name: string, timeoutMs: number): number {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(`terminalResumeInspectionTimeoutMs must be finite and > 0, got ${timeoutMs}`);
+    throw new Error(`${name} must be finite and > 0, got ${timeoutMs}`);
   }
   return timeoutMs;
 }
@@ -1829,12 +1846,4 @@ function verifierBudgetError(
 ): RoleBudgetExceededError | undefined {
   if (isRoleBudgetExceededError(error)) return error;
   return isRoleBudgetExceededError(signal.reason) ? signal.reason : undefined;
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

@@ -328,6 +328,48 @@ describe('publish_artifact file and text modes', () => {
 });
 
 describe('publish_artifact browser modes', () => {
+  it('checks destination policy before browser acquisition', async () => {
+    writeFileSync(join(runDir, 'artifacts/untracked.png'), 'unmanifested');
+    const fake = fakeBrowser();
+
+    const result = await call(
+      {
+        kind: 'screenshot',
+        artifact_path: 'artifacts/untracked.png',
+        roles: ['evidence'],
+      },
+      { browser: fake.browser },
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content).toContain('unmanifested file');
+    expect(fake.currentUrl).not.toHaveBeenCalled();
+    expect(fake.screenshot).not.toHaveBeenCalled();
+  });
+
+  it('revalidates destination policy after browser acquisition', async () => {
+    const destination = join(runDir, 'artifacts/raced.png');
+    const fake = fakeBrowser();
+    fake.screenshot.mockImplementationOnce(async () => {
+      writeFileSync(destination, 'appeared during capture');
+      return Buffer.from('captured bytes');
+    });
+
+    const result = await call(
+      {
+        kind: 'screenshot',
+        artifact_path: 'artifacts/raced.png',
+        roles: ['evidence'],
+      },
+      { browser: fake.browser },
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content).toContain('unmanifested file');
+    expect(readFileSync(destination, 'utf8')).toBe('appeared during capture');
+    expect(readManifest(runDir).artifacts).toEqual([]);
+  });
+
   it('captures provider-neutral screenshot bytes and browser-derived source metadata', async () => {
     const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1, 2]);
     const fake = fakeBrowser({ screenshotBytes: png });
