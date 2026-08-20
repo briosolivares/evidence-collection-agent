@@ -8,11 +8,6 @@ import { glyphs, theme } from '../theme.js';
 import { ArtifactDetail } from './ArtifactDetail.js';
 import { ArtifactRows, useArtifactKeys, type ExternalAction } from './ArtifactRows.js';
 
-/** The answer block's clamp: a few source lines, never a wall of prose
- * (the full text is already in the transcript as agent_text). */
-const ANSWER_MAX_LINES = 3;
-const ANSWER_MAX_CHARS = 280;
-
 interface ArtifactsPanelProps {
   /** The completed run the panel summarizes (header + answer data).
    * Absent when /artifacts reopens artifacts retained from a run that
@@ -94,7 +89,7 @@ export function ArtifactsPanel({
           </Box>
           <Text color={theme.muted}>{`  ${summary.runDir}`}</Text>
           <Box paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
-            <Text>{clampAnswer(summary.finalText, summary.outcome)}</Text>
+            <Text>{completionAnswer(summary.finalText, summary.outcome)}</Text>
           </Box>
           {summary.outcome === 'incomplete' && summary.unresolved.length > 0 && (
             <Box flexDirection="column" paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>
@@ -158,8 +153,8 @@ export function ArtifactsPanel({
   );
 }
 
-/** The concise answer with truthful deterministic fallbacks. */
-function clampAnswer(
+/** The complete answer with truthful deterministic fallbacks. */
+function completionAnswer(
   finalText: string | undefined,
   outcome: CompletedRunSummary['outcome'],
 ): string {
@@ -167,7 +162,5 @@ function clampAnswer(
   if (text === '') {
     return outcome === 'complete' ? 'Task completed' : NO_COMPLETION_REPORT_TEXT;
   }
-  const lines = truncate(text, ANSWER_MAX_CHARS).split('\n');
-  if (lines.length <= ANSWER_MAX_LINES) return lines.join('\n');
-  return `${lines.slice(0, ANSWER_MAX_LINES).join('\n')}\n…`;
+  return text;
 }

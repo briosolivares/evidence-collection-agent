@@ -1,6 +1,6 @@
 // The completion summary panel's contract (plan item 6): a passive
 // summary above the composer — ✓ header matching the completion line,
-// clamped answer, artifact rows with requested outputs first, the tab
+// complete answer, artifact rows with requested outputs first, the tab
 // hint — and, once focused (mode 'artifacts'), the same selection /
 // detail / Space-o-r interaction as the live rail. Tab and Esc belong to
 // App (see app.test.tsx for the focus round-trip).
@@ -260,15 +260,16 @@ describe('ArtifactsPanel (passive)', () => {
     empty.unmount();
   });
 
-  it('clamps a long answer to a few lines with a trailing ellipsis', async () => {
-    const finalText = ['one', 'two', 'three', 'four', 'five'].join('\n');
+  it('renders the complete answer without a line or character clamp', async () => {
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${'a'.repeat(240)}/edit`;
+    const finalText = ['one', 'two', 'three', 'four', 'five', sheetUrl].join('\n');
     const { lastFrame, unmount } = render(<Harness initial={completedState({ finalText })} />);
     await tick();
     const frame = lastFrame() ?? '';
     expect(frame).toContain('one');
-    expect(frame).toContain('three');
-    expect(frame).not.toContain('four');
-    expect(frame).toContain('…');
+    expect(frame).toContain('four');
+    expect(frame).toContain('five');
+    expect(frame.replace(/\s/g, '')).toContain(sheetUrl);
     unmount();
   });
 

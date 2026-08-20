@@ -95,6 +95,20 @@ and the settled responsive drawer. There are no page/console errors or remote
 requests. The handoff, focused screenshot case, and whole-system routes were
 visually inspected in local Chrome.
 
+## Complete TUI completion summaries (2026-08-20)
+
+- [x] Remove the completion panel's three-line and 280-character clamps so the
+  worker's entire final summary remains visible, including long URLs.
+- [x] Preserve the existing truthful fallback for absent or whitespace-only
+  completion text and leave unresolved-requirement and artifact rendering
+  unchanged.
+- [x] Replace the old truncation assertion with a regression test that covers
+  more than three source lines and a URL extending beyond the former character
+  ceiling, normalized only for terminal line wrapping.
+
+Verification: `npx vitest run tests/tui/artifacts-panel.test.tsx` passes 17/17
+tests, `npm run typecheck` passes, and `git diff --check` is clean.
+
 ## Post-v3 simplification complete (2026-08-17)
 
 - [x] Remove the self-reported `finish.limitations` field from the current
