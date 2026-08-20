@@ -1,68 +1,100 @@
+import { EventEmitter } from 'node:events';
+
 import { render as renderWithInk, type Instance, type RenderOptions } from 'ink';
 import type { ReactNode } from 'react';
-import wrapAnsi from 'wrap-ansi';
 
-interface InkLogInternals {
-  setCursorPosition(position: { x: number; y: number } | undefined): void;
-  sync(output: string): void;
+/** One resize gesture may emit dozens of width changes. Ink repaints each one
+ * relative to terminal rows whose reflow semantics differ across emulators.
+ * Give the renderer only the settled size; App then performs one authoritative
+ * viewport replay from reducer state. */
+const RESIZE_SETTLE_MS = 100;
+
+interface ResizeRelay {
+  readonly stdout: NodeJS.WriteStream;
+  dispose(): void;
 }
 
-interface InkInstanceInternals {
-  cursorPosition: { x: number; y: number } | undefined;
-  lastOutputToRender: string;
-  lastTerminalWidth: number;
-  log: InkLogInternals;
-  resized: () => void;
-}
+function createResizeRelay(source: NodeJS.WriteStream): ResizeRelay {
+  const resizeEvents = new EventEmitter();
+  let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Ink keeps renderer instances in this private map. Ink 7.1.1 clears the old
-// dynamic frame when a terminal narrows, but its log still counts rows at the
-// old width. Terminals reflow that frame before the resize event, so the clear
-// misses the newly wrapped rows and leaves stamped borders behind. Resolve the
-// map beside Ink's public entry point so nested/global installs work too.
-const inkEntryUrl = import.meta.resolve('ink');
-const { default: inkInstances } = (await import(new URL('./instances.js', inkEntryUrl).href)) as {
-  default: WeakMap<NodeJS.WriteStream, InkInstanceInternals>;
-};
-const patchedInstances = new WeakSet<InkInstanceInternals>();
-
-function installResizeFix(stdout: NodeJS.WriteStream): void {
-  const instance = inkInstances.get(stdout);
-  if (instance === undefined || patchedInstances.has(instance)) return;
-
-  const inkResize = instance.resized;
-  const resize = () => {
-    const width = stdout.columns;
-    if (
-      width !== undefined &&
-      width > 0 &&
-      width < instance.lastTerminalWidth &&
-      instance.lastOutputToRender !== ''
-    ) {
-      const reflowedOutput = wrapAnsi(instance.lastOutputToRender, width, {
-        trim: false,
-        hard: true,
-      });
-
-      // Teach Ink's log where the terminal cursor and reflowed rows now are.
-      // Its own resize handler can then erase precisely the dynamic frame,
-      // without clearing or replaying Sherlock's <Static> scrollback.
-      instance.log.setCursorPosition(instance.cursorPosition);
-      instance.log.sync(reflowedOutput);
-    }
-
-    inkResize();
+  const onSourceResize = () => {
+    if (resizeTimer !== undefined) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resizeTimer = undefined;
+      resizeEvents.emit('resize');
+    }, RESIZE_SETTLE_MS);
   };
 
-  stdout.off('resize', inkResize);
-  instance.resized = resize;
-  stdout.on('resize', resize);
-  patchedInstances.add(instance);
+  let stdout: NodeJS.WriteStream;
+  const proxy = new Proxy(source, {
+    get(target, property) {
+      if (property === 'on' || property === 'addListener') {
+        return (event: string | symbol, listener: (...args: unknown[]) => void) => {
+          if (event === 'resize') resizeEvents.on(event, listener);
+          else target.on(event, listener);
+          return stdout;
+        };
+      }
+      if (property === 'once') {
+        return (event: string | symbol, listener: (...args: unknown[]) => void) => {
+          if (event === 'resize') resizeEvents.once(event, listener);
+          else target.once(event, listener);
+          return stdout;
+        };
+      }
+      if (property === 'off' || property === 'removeListener') {
+        return (event: string | symbol, listener: (...args: unknown[]) => void) => {
+          if (event === 'resize') resizeEvents.off(event, listener);
+          else target.off(event, listener);
+          return stdout;
+        };
+      }
+
+      const value = Reflect.get(target, property, target) as unknown;
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+  });
+  stdout = proxy as NodeJS.WriteStream;
+  source.on('resize', onSourceResize);
+
+  return {
+    stdout,
+    dispose() {
+      source.off('resize', onSourceResize);
+      if (resizeTimer !== undefined) clearTimeout(resizeTimer);
+      resizeEvents.removeAllListeners();
+    },
+  };
 }
 
-/** Ink render with accurate physical-row cleanup after terminal shrink. */
+/** Ink render whose stdout coalesces resize bursts into one final-width event. */
 export function render(node: ReactNode, options: RenderOptions = {}): Instance {
-  const instance = renderWithInk(node, options);
-  installResizeFix(options.stdout ?? process.stdout);
-  return instance;
+  const relay = createResizeRelay(options.stdout ?? process.stdout);
+  const instance = renderWithInk(node, { ...options, stdout: relay.stdout });
+  let disposed = false;
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    relay.dispose();
+  };
+
+  return {
+    ...instance,
+    unmount() {
+      dispose();
+      instance.unmount();
+    },
+    cleanup() {
+      dispose();
+      instance.cleanup();
+    },
+    async waitUntilExit() {
+      try {
+        return await instance.waitUntilExit();
+      } finally {
+        dispose();
+      }
+    },
+  };
 }

@@ -1,4 +1,4 @@
-import { Box, Text, useApp, useInput } from 'ink';
+import { Box, Text, useApp, useInput, useStdout } from 'ink';
 import { useEffect, useReducer, useRef, useState } from 'react';
 
 import type { EvalBatchHandle, EvalsFeature, EvalTaskChoice } from '../bridge/evalsFeature.js';
@@ -54,6 +54,8 @@ interface AppProps {
   onExit?: () => void;
 }
 
+const CLEAR_VIEWPORT = '\u001B[2J\u001B[H';
+
 /**
  * The Sherlock shell: transcript over <Static>, the live region while a
  * run is active, overlays for /runs and /evals, slash routing, and the
@@ -70,6 +72,7 @@ export function App({
   onExit,
 }: AppProps) {
   const { exit } = useApp();
+  const { stdout } = useStdout();
   const [state, dispatch] = useReducer(
     reduce,
     {
@@ -83,6 +86,7 @@ export function App({
   const evalHandle = useRef<EvalBatchHandle | undefined>(undefined);
   const [runEntries, setRunEntries] = useState<readonly RunListEntry[]>([]);
   const [evalTasks, setEvalTasks] = useState<readonly EvalTaskChoice[]>([]);
+  const [transcriptRenderKey, setTranscriptRenderKey] = useState(0);
   // A paused interactive tool call: the question plus its resolver (the
   // ToolUseConfirm shape). Deliberately App-local, not reducer state — a
   // resolve function has no place in the pure store.
@@ -93,6 +97,26 @@ export function App({
       }
     | undefined
   >(undefined);
+
+  // Terminal emulators disagree about whether already-painted rows reflow
+  // when their width changes. Ink's relative erase then either misses wrapped
+  // rows or erases too many, stamping old composer frames into the viewport.
+  // resizeSafeRender emits only after a resize gesture settles. Rebuild the
+  // visible screen from reducer state at that final width. CSI 2J intentionally
+  // preserves native scrollback; remounting only <Transcript> makes its
+  // immutable <Static> items render again without disturbing the live run,
+  // overlays, dialogs, or composer state.
+  useEffect(() => {
+    const repaint = () => {
+      stdout.write(CLEAR_VIEWPORT);
+      setTranscriptRenderKey((current) => current + 1);
+    };
+
+    stdout.on('resize', repaint);
+    return () => {
+      stdout.off('resize', repaint);
+    };
+  }, [stdout]);
 
   const settleQuestion = (decision: PermissionDecision) => {
     setQuestion((current) => {
@@ -263,7 +287,7 @@ export function App({
 
   return (
     <Box flexDirection="column">
-      <Transcript items={state.transcript} verbose={config.verbose} />
+      <Transcript key={transcriptRenderKey} items={state.transcript} verbose={config.verbose} />
       {running && state.live !== undefined && (
         <LiveRegion live={state.live} cancelling={state.mode === 'cancelling'} />
       )}

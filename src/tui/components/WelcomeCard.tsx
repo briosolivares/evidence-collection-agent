@@ -52,8 +52,8 @@ function footerLine(identity: BannerIdentity, contentWidth: number): string {
  * centered welcome line, the detective-owl illustration, and a muted
  * `model · cwd` footer. Terminals too narrow for the owl omit it rather
  * than wrap it. Without an injected identity it falls back to a generic
- * card (no name, no footer). Lives in <Static>, so the terminal width is
- * read once at first render — acceptable for a startup card.
+ * card (no name, no footer). Lives in <Static>; App remounts the transcript
+ * after a settled terminal resize so the width is refreshed then too.
  */
 export function WelcomeCard({
   apiKeyPresent,

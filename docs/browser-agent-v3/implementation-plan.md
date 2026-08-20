@@ -251,18 +251,21 @@ tests, `npm run typecheck` passes, and `git diff --check` is clean.
 
 ## Resize-safe TUI frame cleanup (2026-08-20)
 
-- [x] Correct Ink's dynamic-frame row bookkeeping before a narrower terminal
-  redraw so rows introduced by terminal reflow are erased instead of stamped
-  into a staircase of stale borders.
-- [x] Preserve the primary-screen `<Static>` transcript and native scrollback;
-  the correction neither clears the viewport nor switches Sherlock to an
-  alternate-screen UI.
-- [x] Pin the Ink version whose renderer internals the correction targets and
-  cover ten consecutive width reductions in a headless xterm regression that
-  retains the welcome card and only the current composer border.
+- [x] Replace the renderer-internal row-count patch: already-painted rows reflow
+  differently across terminal emulators and tmux, so no relative erase based
+  on one reflow model can be portable.
+- [x] Coalesce each raw resize burst into one settled event, clear only the
+  visible viewport, and replay Sherlock's immutable transcript from reducer
+  state at the final width while preserving the active run, overlays, dialogs,
+  composer draft, and native terminal scrollback.
+- [x] Remove the private Ink import, version pin, and direct `wrap-ansi`
+  dependency. Cover mixed shrink/grow sequences and two separate resize
+  gestures under both reflowing and non-reflowing headless terminals, including
+  retained transcript content, unsent input, and pre-Sherlock scrollback.
 
-Verification under Node 22.17: the complete TUI gate passes 32 files / 315
-tests, `npm run typecheck` passes, and `git diff --check` is clean.
+Verification under Node 22.17: the complete TUI gate passes 32 files / 316
+tests (including the packed-install smoke), `npm run typecheck` passes, and
+`git diff --check` is clean.
 
 ## User README refresh (2026-08-20)
 
