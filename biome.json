@@ -12,6 +12,8 @@
       "scripts/**/*.ts",
       "scripts/**/*.tsx",
       "scripts/**/*.mjs",
+      "docs/sherlock-system-atlas/**/*.ts",
+      "docs/sherlock-system-atlas/**/*.tsx",
       "bin/**/*.mjs"
     ]
   },

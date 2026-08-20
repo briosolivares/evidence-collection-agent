@@ -3,7 +3,7 @@
 **Status:** complete for local/hermetic acceptance; live external checks are
 explicitly deferred pending user authorization
 
-**Last updated:** 2026-08-17
+**Last updated:** 2026-08-19
 
 **Working branch:** `simplify/sherlock-core`
 
@@ -35,6 +35,32 @@ the legacy harness. New v3 modules reused stable seams without inheriting
 initializer/contract/table/evidence/scheduler complexity merely to avoid
 writing a smaller coherent replacement. After the new path passed its gates,
 the public cutover and legacy-production removal were completed.
+
+## Semantic system atlas complete (2026-08-19)
+
+- [x] Rebuild `docs/sherlock-system-atlas.html` around `@xyflow/react`, with
+  every visible position computed from semantic nodes and edges by ELK rather
+  than retained as hand-authored SVG coordinates.
+- [x] Start with a four-concept core run, then offer six learning routes up to
+  the 14-concept whole-system view; add manual one-concept tracing plus
+  Driver.js route walkthroughs that focus the active node and dim the rest.
+- [x] Make every concept expandable into a two-node implementation subgraph,
+  with ELK recomputing the graph after each expansion or route change.
+- [x] Give all 42 concept and implementation nodes explicit answers for what
+  the node is, inputs, outputs, creator, consumers, enforcement, authority,
+  rationale, and relevant current code.
+- [x] Keep the deliverable self-contained and offline by checking in the
+  generated HTML bundle, while retaining typed source data, React/CSS source,
+  and the deterministic `npm run build:atlas` build path.
+
+Verification: `npm run typecheck`, two consecutive atlas builds with the same
+SHA-256, and `git diff --check` pass. A temporary Playwright run against local
+Chrome exercises the four-node initial view, all nine inspector contracts,
+implementation expansion, route relayout, concept focus/dimming, two Driver.js
+steps, whole-system layout, an observability subgraph, and both responsive
+drawers. It reports zero page/console errors, unlabeled buttons, or remote
+requests. The four-concept, expanded, and 14-concept 1600×1000 renders were
+visually inspected; temporary screenshots were kept outside the repository.
 
 ## Post-v3 simplification complete (2026-08-17)
 
