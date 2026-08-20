@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type { BrowserContext } from 'playwright';
 
 import { AttachedChromeBrowserSessionProvider } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
-import { launchPersistentChrome } from '../../src/browser/playwrightBrowserController.js';
+import { launchPersistentChrome } from '../../src/browser/localChromeSessionProvider.js';
 import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 
 interface RunningFixture {

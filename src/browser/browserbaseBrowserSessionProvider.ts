@@ -28,14 +28,12 @@ import { chromium, type Browser, type BrowserContext, type Page } from 'playwrig
 
 import { errorMessage } from '../errors.js';
 import type { BrowserController } from './controller.js';
-import {
-  createChromiumTargetControl,
-  type ChromiumTargetControl,
-} from './chromiumTargetControl.js';
+import { createChromiumTargetControl } from './chromiumTargetControl.js';
+import { assembleBrowserController, prepareSessionPage } from './controllerAssembly.js';
 import { createBrowserbaseDownloadReader } from './browserbaseDownloads.js';
 import { withBrowserbaseRetry, type BrowserbaseRetryOptions } from './browserbaseRetry.js';
 import type { BrowserDownloadReader } from './downloadReader.js';
-import { PlaywrightBrowserController, prepareSessionPage } from './playwrightBrowserController.js';
+import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 import { remoteUploadEncoder } from './uploadEncoder.js';
 
@@ -307,36 +305,38 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
 
   async createSession(): Promise<BrowserController> {
     const raw = await this.createRawSession();
-    let downloadReader: BrowserDownloadReader;
-    let targetControl: ChromiumTargetControl | undefined;
-    try {
-      downloadReader = createBrowserbaseDownloadReader({
-        apiKey: this.options.apiKey,
-        sessionId: raw.sessionId,
-        ...(this.options.fetchImpl === undefined ? {} : { fetchImpl: this.options.fetchImpl }),
-        onWarning: this.warn,
-      });
-      targetControl = await createChromiumTargetControl({
-        context: raw.context,
-        anchorPage: raw.sessionPage,
-      });
-      return new PlaywrightBrowserController({
-        context: raw.context,
-        preexistingSessionPages: [raw.sessionPage],
-        targetControl,
-        closeSession: () => raw.close(),
-        downloadReader,
-        // The remote browser cannot read this filesystem, so an upload has to
-        // travel as bytes rather than as a path Playwright would otherwise
-        // send verbatim over CDP. See uploadEncoder.ts.
-        uploadEncoder: remoteUploadEncoder,
-        sessionDiagnostics: raw.diagnostics,
-      });
-    } catch (error) {
-      await targetControl?.close();
-      await raw.close();
-      throw error;
-    }
+    return assembleBrowserController({
+      build: async (own) => {
+        const downloadReader: BrowserDownloadReader = createBrowserbaseDownloadReader({
+          apiKey: this.options.apiKey,
+          sessionId: raw.sessionId,
+          ...(this.options.fetchImpl === undefined ? {} : { fetchImpl: this.options.fetchImpl }),
+          onWarning: this.warn,
+        });
+        const targetControl = own(
+          await createChromiumTargetControl({
+            context: raw.context,
+            anchorPage: raw.sessionPage,
+          }),
+        );
+        return new PlaywrightBrowserController({
+          context: raw.context,
+          preexistingSessionPages: [raw.sessionPage],
+          targetControl,
+          closeSession: () => raw.close(),
+          downloadReader,
+          // The remote browser cannot read this filesystem, so an upload has to
+          // travel as bytes rather than as a path Playwright would otherwise
+          // send verbatim over CDP. See uploadEncoder.ts.
+          uploadEncoder: remoteUploadEncoder,
+          sessionDiagnostics: raw.diagnostics,
+        });
+      },
+      // Disconnect, stop the heartbeat, and REQUEST_RELEASE the billable
+      // remote session — always after the target control has closed, exactly
+      // as the hand-rolled ladder ordered it.
+      releaseSession: () => raw.close(),
+    });
   }
 
   /** Live View plus the durable inspector link. A Live View lookup failure is

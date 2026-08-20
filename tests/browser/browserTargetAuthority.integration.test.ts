@@ -9,7 +9,7 @@ import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 import { runBrowserProgram } from '../../src/tools/browserExecute/runner.js';
 import { AttachedChromeBrowserSessionProvider } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
 import type { BrowserController } from '../../src/browser/controller.js';
-import { launchPersistentChrome } from '../../src/browser/playwrightBrowserController.js';
+import { launchPersistentChrome } from '../../src/browser/localChromeSessionProvider.js';
 
 const TEST_TIMEOUT_MS = 45_000;
 const AMBIENT_URL = 'about:blank#ambient-authority-attached';

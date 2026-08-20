@@ -10,7 +10,7 @@ import {
   type BrowserTargetCommandPolicy,
 } from '../../src/browser/browserCommandSession.js';
 import type { BrowserController } from '../../src/browser/controller.js';
-import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/localChromeSessionProvider.js';
 import type { BrowserUploadEncoder, UploadPayload } from '../../src/browser/uploadEncoder.js';
 import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 import { runBrowserProgram } from '../../src/tools/browserExecute/runner.js';

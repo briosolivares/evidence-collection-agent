@@ -11,10 +11,8 @@ import type {
 } from '../../src/browser/controller.js';
 import { AttachedChromeBrowserSessionProvider } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
 import { createChromiumTargetControl } from '../../src/browser/chromiumTargetControl.js';
-import {
-  launchPersistentChrome,
-  PlaywrightBrowserController,
-} from '../../src/browser/playwrightBrowserController.js';
+import { launchPersistentChrome } from '../../src/browser/localChromeSessionProvider.js';
+import { PlaywrightBrowserController } from '../../src/browser/playwrightBrowserController.js';
 import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 
 async function waitForOwnedPages(controller: BrowserController, count: number): Promise<void> {

@@ -1,8 +1,4 @@
-import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { isAbsolute, join } from 'node:path';
-
-import { chromium, type BrowserContext, type Dialog, type Disposable, type Page } from 'playwright';
+import type { BrowserContext, Dialog, Disposable, Page } from 'playwright';
 
 import {
   type BrowserDialog,
@@ -15,7 +11,7 @@ import {
   type BrowserScreenshotOptions,
   type BrowserTaskPagePreparation,
 } from './controller.js';
-import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
+import type { BrowserSessionDiagnostics } from './sessionProvider.js';
 import { localDownloadReader, type BrowserDownloadReader } from './downloadReader.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 import type { BusyResourceRegistry } from '../tools/registry.js';
@@ -27,24 +23,34 @@ import {
 } from './browserCommandSession.js';
 import {
   ChromiumTargetControlError,
-  createChromiumTargetControl,
   type ChromiumPageTargetRef,
   type ChromiumTargetControl,
 } from './chromiumTargetControl.js';
-import { settleWithin } from './boundedSettlement.js';
+import { raceWithAbortContainment, settleWithin } from './boundedSettlement.js';
+import {
+  installRunOwnershipInheritScript,
+  markPageWithRunOwnership,
+  pageHasRunOwnershipMarker,
+  runPageOwnershipMarker,
+  runPageTargetSentinel,
+  withRunPageOwnershipEvaluationDeadline,
+} from './runPageOwnership.js';
+import { resolvePageTarget } from './targetResolution.js';
 
-/** The browser-visible property/value namespace is deliberately generic and
- * versioned. The caller's durable run id is hashed before it crosses into a
- * page, so neither page content nor a driver error can disclose a local run
- * path/id. Exact descriptor/value equality is the only ownership test. */
-const RUN_PAGE_OWNERSHIP_PROPERTY = '__sherlock_run_page_owner_v1__';
-const RUN_PAGE_OWNERSHIP_MARKER_PREFIX = '__sherlock_run_page_owner_v1__:';
-const RUN_PAGE_TARGET_SENTINEL_PREFIX = '__sherlock_run_target_v1__:';
-const MAX_RUN_PAGE_OWNERSHIP_ID_BYTES = 4_096;
+/** Compatibility re-exports: the local provider and shared session-page
+ * preparation moved to their own modules, but callers outside src/browser
+ * (the login CLI, agent/tool tests) still import them from here. */
+export {
+  launchPersistentChrome,
+  LocalChromeBrowserSessionProvider,
+  pinProfileDownloadDirectory,
+  type LocalChromeBrowserSessionOptions,
+} from './localChromeSessionProvider.js';
+export { prepareSessionPage } from './controllerAssembly.js';
+
 const MAX_RAW_TARGET_URL_BYTES = 16_384;
 const RAW_TARGET_PAGE_APPEAR_TIMEOUT_MS = 2_000;
 const RAW_TARGET_PAGE_POLL_MS = 10;
-const RUN_PAGE_OWNERSHIP_EVALUATION_TIMEOUT_MS = 5_000;
 const MAX_RUN_PAGE_OWNERSHIP_RECOVERY_PASSES = 10;
 const MAX_RUN_PAGE_OWNERSHIP_CLEANUP_PASSES = 10;
 const RUN_PAGE_OWNERSHIP_CLEAN_PASSES = 2;
@@ -68,119 +74,6 @@ interface PendingDialogRecord {
 interface RunPageOwnershipEpoch {
   generation: number;
   marker: string | undefined;
-}
-
-/** Identity of one tracked frame; `documentId` rotates on navigation. */
-/** Configuration for browser sessions backed by persistent local Chrome. */
-export interface LocalChromeBrowserSessionOptions {
-  /** Absolute path to the persistent Chrome profile directory. */
-  profileDir: string;
-  /** Whether Chrome runs without a visible window; defaults to false. */
-  headless?: boolean;
-  /** Chrome/Chromium binary to launch. When omitted, Playwright
-   * discovers system Google Chrome via its `chrome` channel. */
-  executablePath?: string;
-}
-
-/** Launch the persistent-profile Chrome exactly as agent sessions do.
- * Exported so the `login` helper opens the SAME profile with the SAME
- * binary resolution — a second launch path would reintroduce the
- * logged-into-the-wrong-profile failure the helper exists to kill. */
-export async function launchPersistentChrome(
-  options: LocalChromeBrowserSessionOptions,
-): Promise<BrowserContext> {
-  if (!isAbsolute(options.profileDir)) {
-    throw new TypeError('Browser profileDir must be an absolute path.');
-  }
-  // Must happen BEFORE the launch: Chrome reads this preference at startup.
-  pinProfileDownloadDirectory(options.profileDir);
-  return chromium.launchPersistentContext(options.profileDir, {
-    ...(options.executablePath !== undefined
-      ? { executablePath: options.executablePath }
-      : { channel: 'chrome' }),
-    headless: options.headless ?? false,
-    // Keep an ephemeral loopback endpoint available for exact process-crash
-    // and reattachment coverage. Managed production composition never reads
-    // or exports the endpoint; command execution stays on the controller's
-    // provider-neutral attached CDP sessions.
-    args: ['--remote-debugging-port=0'],
-  });
-}
-
-/**
- * Point Chrome's own download directory inside the profile.
- *
- * Chrome — not Playwright — decides where a download it handles itself lands,
- * and it reads `download.default_directory` from the profile's Preferences at
- * startup. Unset, that resolves to the OS Downloads folder, so a download the
- * run never consumes is written into the user's home directory and left there.
- * The test suite deposited one file per run that way.
- *
- * Playwright's own `downloadsPath` does not cover this: it governs downloads
- * Playwright accepts and hands back as `Download` objects, and the leaking
- * case is one Chrome writes on its own. Neither do the CDP
- * `set*DownloadBehavior` commands, which were measured and did not stop it.
- *
- * Merged rather than overwritten, and best-effort: this profile may be a real
- * logged-in one whose other preferences must survive, and a preferences file
- * this cannot parse must not stop a session from launching.
- *
- * Exported for its own test: the leak this closes was timing-dependent (the
- * producing test leaked only when run after the other 51 in its file), so the
- * merge and best-effort behavior are pinned directly rather than left to be
- * inferred from whether a full-suite run happens to stay clean.
- */
-export function pinProfileDownloadDirectory(profileDir: string): void {
-  try {
-    const downloadDir = join(profileDir, 'downloads');
-    mkdirSync(downloadDir, { recursive: true });
-    const defaultDir = join(profileDir, 'Default');
-    mkdirSync(defaultDir, { recursive: true });
-    const prefsPath = join(defaultDir, 'Preferences');
-    const existing: Record<string, unknown> = existsSync(prefsPath)
-      ? (JSON.parse(readFileSync(prefsPath, 'utf8')) as Record<string, unknown>)
-      : {};
-    const download =
-      typeof existing.download === 'object' && existing.download !== null
-        ? (existing.download as Record<string, unknown>)
-        : {};
-    writeFileSync(
-      prefsPath,
-      JSON.stringify({
-        ...existing,
-        download: { ...download, default_directory: downloadDir, prompt_for_download: false },
-      }),
-    );
-  } catch {
-    // Best effort; see the note above.
-  }
-}
-
-/** Creates persistent local Chrome sessions controlled through Playwright. */
-export class LocalChromeBrowserSessionProvider implements BrowserSessionProvider {
-  constructor(private readonly options: LocalChromeBrowserSessionOptions) {}
-
-  async createSession(): Promise<BrowserController> {
-    const context = await launchPersistentChrome(this.options);
-    let targetControl: ChromiumTargetControl | undefined;
-
-    try {
-      const preexistingSessionPage = await prepareSessionPage(context);
-      targetControl = await createChromiumTargetControl({
-        context,
-        anchorPage: preexistingSessionPage,
-      });
-      return new PlaywrightBrowserController({
-        context,
-        preexistingSessionPages: [preexistingSessionPage],
-        targetControl,
-      });
-    } catch (error) {
-      await targetControl?.close();
-      await context.close();
-      throw error;
-    }
-  }
 }
 
 /**
@@ -692,36 +585,10 @@ export class PlaywrightBrowserController implements BrowserController {
 
     let initScript: Disposable;
     try {
-      // Runs before site JavaScript in every new document. A popup inherits
-      // ownership only from an exact marked opener; unrelated new tabs stay
-      // untouched. Per-page scripts installed by claimDurablyOwnedPage are
-      // the unconditional navigation-persistence layer after positive claim.
-      initScript = await this.context.addInitScript(
-        ({ property, marker }: { property: string; marker: string }) => {
-          const own = Object.getOwnPropertyDescriptor(window, property);
-          if (
-            own?.value === marker &&
-            own.enumerable === false &&
-            own.configurable === false &&
-            own.writable === false
-          ) {
-            return;
-          }
-          try {
-            const opener = window.opener as (Window & Record<string, unknown>) | null;
-            if (opener?.[property] !== marker) return;
-            Object.defineProperty(window, property, {
-              value: marker,
-              enumerable: false,
-              configurable: false,
-              writable: false,
-            });
-          } catch {
-            // A cross-origin or explicitly severed opener is not evidence.
-          }
-        },
-        { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker },
-      );
+      // Per-page scripts installed by claimDurablyOwnedPage remain the
+      // unconditional navigation-persistence layer after positive claim; this
+      // context script only handles opener inheritance for popups.
+      initScript = await installRunOwnershipInheritScript(this.context, marker);
     } catch {
       throw new Error('Could not arm durable page ownership for this browser session.');
     }
@@ -1213,18 +1080,8 @@ export class PlaywrightBrowserController implements BrowserController {
   /** Resolve a page's target through a short-lived attached session. Failure
    * is treated as no ownership evidence here; the real command/refresh path
    * still performs its own loud liveness checks. */
-  private async targetIdForPage(page: Page): Promise<string | undefined> {
-    let session: Awaited<ReturnType<BrowserContext['newCDPSession']>> | undefined;
-    try {
-      session = await this.context.newCDPSession(page);
-      const result = await session.send('Target.getTargetInfo');
-      const targetId = result.targetInfo?.targetId;
-      return typeof targetId === 'string' && targetId.length > 0 ? targetId : undefined;
-    } catch {
-      return undefined;
-    } finally {
-      await session?.detach().catch(() => undefined);
-    }
+  private targetIdForPage(page: Page): Promise<string | undefined> {
+    return resolvePageTarget(this.context, page, { failureMode: 'silent' });
   }
 
   private registerOwnedPage(page: Page): PageRecord {
@@ -1263,7 +1120,7 @@ export class PlaywrightBrowserController implements BrowserController {
       throw new Error('Task-page ownership changed before the page could be claimed.');
     }
     try {
-      await this.markDurablyOwnedPage(page, epoch.marker);
+      await markPageWithRunOwnership(page, epoch.marker);
     } catch {
       await page.close({ runBeforeUnload: false }).catch(() => undefined);
       throw new Error(
@@ -1275,51 +1132,6 @@ export class PlaywrightBrowserController implements BrowserController {
       throw new Error('Task-page ownership changed while the page was being claimed.');
     }
     return this.registerOwnedPage(page);
-  }
-
-  /** Install an unconditional per-page new-document script, then mark and
-   * verify the current document. `Page.addInitScript` follows this browsing
-   * context across same- and cross-origin navigation. */
-  private async markDurablyOwnedPage(page: Page, marker: string | undefined): Promise<void> {
-    if (marker === undefined) return;
-    const payload = { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker };
-    await page.addInitScript(
-      ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
-        Object.defineProperty(window, property, {
-          value: expectedMarker,
-          enumerable: false,
-          configurable: false,
-          writable: false,
-        });
-      },
-      payload,
-    );
-    const marked = await withRunPageOwnershipEvaluationDeadline(
-      page.evaluate(
-        ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
-          const existing = Object.getOwnPropertyDescriptor(window, property);
-          if (existing === undefined) {
-            Object.defineProperty(window, property, {
-              value: expectedMarker,
-              enumerable: false,
-              configurable: false,
-              writable: false,
-            });
-          }
-          const installed = Object.getOwnPropertyDescriptor(window, property);
-          return (
-            installed?.value === expectedMarker &&
-            installed.enumerable === false &&
-            installed.configurable === false &&
-            installed.writable === false
-          );
-        },
-        payload,
-      ),
-    );
-    if (marked !== true) {
-      throw new Error('The browser did not retain its durable task-page marker.');
-    }
   }
 
   private async drainPendingPageClaims(): Promise<void> {
@@ -1753,40 +1565,6 @@ function normalizeDialogType(type: string): BrowserDialog['type'] {
   return type === 'confirm' || type === 'prompt' || type === 'beforeunload' ? type : 'alert';
 }
 
-/** Derive a stable browser marker without placing the caller's local run id
- * into page state. Including the versioned namespace in the digest separates
- * this use from any other hash of the same opaque id. */
-function runPageOwnershipMarker(ownershipId: string): string {
-  if (typeof ownershipId !== 'string' || ownershipId.length === 0) {
-    throw new TypeError('Durable run page ownership requires a non-empty string id.');
-  }
-  if (Buffer.byteLength(ownershipId, 'utf8') > MAX_RUN_PAGE_OWNERSHIP_ID_BYTES) {
-    throw new RangeError(
-      `Durable run page ownership ids may not exceed ` +
-        `${MAX_RUN_PAGE_OWNERSHIP_ID_BYTES} UTF-8 bytes.`,
-    );
-  }
-  const digest = createHash('sha256')
-    .update(RUN_PAGE_OWNERSHIP_MARKER_PREFIX, 'utf8')
-    .update('\0', 'utf8')
-    .update(ownershipId, 'utf8')
-    .digest('base64url');
-  return `${RUN_PAGE_OWNERSHIP_MARKER_PREFIX}${digest}`;
-}
-
-/** Exact browser-only URL used between Chromium target commit and durable
- * page-marker installation. It contains only a namespace-separated digest of
- * the already-hashed marker; neither the durable run id nor a filesystem path
- * crosses into target metadata. */
-function runPageTargetSentinel(marker: string): string {
-  const digest = createHash('sha256')
-    .update(RUN_PAGE_TARGET_SENTINEL_PREFIX, 'utf8')
-    .update('\0', 'utf8')
-    .update(marker, 'utf8')
-    .digest('base64url');
-  return `about:blank#${RUN_PAGE_TARGET_SENTINEL_PREFIX}${digest}`;
-}
-
 function rawTargetCreationUrl(params: Record<string, unknown>): string {
   if (
     Object.keys(params).length !== 1 ||
@@ -1805,120 +1583,13 @@ function rawTargetCreationUrl(params: Record<string, unknown>): string {
   return params.url;
 }
 
-/** Read only an equality bit out of the page. The marker itself never comes
- * back through Playwright, so it cannot accidentally enter an error,
- * diagnostic, page listing, or tool result. */
-async function pageHasRunOwnershipMarker(page: Page, marker: string): Promise<boolean> {
-  return withRunPageOwnershipEvaluationDeadline(
-    page.evaluate(
-      ({ property, marker: expectedMarker }: { property: string; marker: string }) => {
-        const descriptor = Object.getOwnPropertyDescriptor(window, property);
-        return (
-          descriptor?.value === expectedMarker &&
-          descriptor.enumerable === false &&
-          descriptor.configurable === false &&
-          descriptor.writable === false
-        );
-      },
-      { property: RUN_PAGE_OWNERSHIP_PROPERTY, marker },
-    ),
-  );
-}
-
-/** Browser startup cannot trust a provider promise to observe cancellation.
- * Install the operation handlers first, then establish caller-supplied
- * containment before rejecting on abort. Once the signal fires, containment
- * wins over a provider promise settling at the same boundary. */
-function raceBrowserPreparationStep<T>(
-  operation: Promise<T>,
-  signal: AbortSignal | undefined,
-  containOnAbort: () => void | Promise<void>,
-): Promise<T> {
-  if (signal === undefined) return operation;
-
-  return new Promise<T>((resolve, reject) => {
-    let settled = false;
-    let aborting = false;
-    const finish = (complete: () => void): void => {
-      if (settled) return;
-      settled = true;
-      signal.removeEventListener('abort', onAbort);
-      complete();
-    };
-    const onAbort = (): void => {
-      if (aborting || settled) return;
-      aborting = true;
-      void Promise.resolve()
-        .then(containOnAbort)
-        .then(
-          () => finish(() => reject(signal.reason)),
-          (error) => finish(() => reject(error)),
-        );
-    };
-
-    operation.then(
-      (value) => {
-        if (!aborting) finish(() => resolve(value));
-      },
-      (error) => {
-        if (!aborting) finish(() => reject(error));
-      },
-    );
-    signal.addEventListener('abort', onAbort, { once: true });
-    if (signal.aborted) onAbort();
-  });
-}
+/** Browser startup cannot trust a provider promise to observe cancellation:
+ * every preparation step races through {@link raceWithAbortContainment}, whose
+ * containment-before-abort-rejection ordering is the load-bearing part. */
+const raceBrowserPreparationStep = raceWithAbortContainment;
 
 function browserOwnershipEventTurn(): Promise<void> {
   return new Promise((resolve) => setImmediate(resolve));
-}
-
-/** Renderer inspection cannot inherit Playwright's global 30s+ waits: this
- * gate runs before a resumed coordinator may safely do anything else. The
- * losing evaluation is read-only (or an idempotent exact marker install) and
- * is observed so a later driver rejection cannot become unhandled. */
-async function withRunPageOwnershipEvaluationDeadline<T>(evaluation: Promise<T>): Promise<T> {
-  let timer: NodeJS.Timeout | undefined;
-  const deadline = new Promise<never>((_resolve, reject) => {
-    timer = setTimeout(
-      () => reject(new Error('Durable page ownership inspection timed out.')),
-      RUN_PAGE_OWNERSHIP_EVALUATION_TIMEOUT_MS,
-    );
-  });
-  try {
-    return await Promise.race([evaluation, deadline]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-    void evaluation.catch(() => undefined);
-  }
-}
-
-/**
- * @returns the surviving pre-existing session page — never tracked, never
- *   closed by this codebase, and deliberately excluded from
- *   {@link PlaywrightBrowserController}'s page registry for the whole
- *   session. The caller threads it into the controller's constructor so later
- *   ownership rescans keep excluding it rather than adopting it as a task
- *   page.
- *
- * Exported so a remote provider prepares its default context's blank page
- * through the SAME code as a local launch. A second implementation of "which
- * page is the session page" is exactly how a provider ends up with a tracked
- * page the local one excludes.
- */
-export async function prepareSessionPage(context: BrowserContext): Promise<Page> {
-  const pages = context.pages();
-  const sessionPage = pages[0] ?? (await context.newPage());
-
-  for (const extraPage of pages.slice(1)) {
-    await extraPage.close();
-  }
-
-  if (sessionPage.url() !== 'about:blank') {
-    await sessionPage.goto('about:blank');
-  }
-
-  return sessionPage;
 }
 
 function assertHttpUrl(url: string): void {

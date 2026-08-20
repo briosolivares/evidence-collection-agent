@@ -8,12 +8,16 @@ import type {
 import { withBackendNodeLocator } from './backendNodeTarget.js';
 import { settleWithin } from './boundedSettlement.js';
 import { arbitraryCdpSend, isRecord, type ArbitraryCdpSend } from './cdpProtocol.js';
+import {
+  detachSessionWithinDeadline,
+  requireTargetIdFromResponse,
+  targetIdFromTargetInfoResponse,
+} from './targetResolution.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 
 /** Transport URLs are session-control capabilities. Even if a driver error
  * happens to echo one, it must stop at this controller-owned boundary. */
 const TRANSPORT_URL = /\b(?:https?|wss?):\/\/[^\s"'<>]+/giu;
-const DETACH_DEADLINE_MS = 1_000;
 const NAVIGATION_STOP_DEADLINE_MS = 1_000;
 const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const MAX_NAVIGATION_URL_BYTES = 256_000;
@@ -86,10 +90,6 @@ function commandError(operation: string, error: unknown): Error {
   return new Error(`${operation}: ${errorText(error)}`);
 }
 
-async function detachWithoutHanging(session: CDPSession): Promise<void> {
-  await settleWithin(session.detach(), DETACH_DEADLINE_MS);
-}
-
 function validateNavigation(url: string, options: BrowserNavigationOptions): void {
   if (
     typeof url !== 'string' ||
@@ -119,14 +119,11 @@ async function stopNavigationWithoutHanging(send: ArbitraryCdpSend): Promise<voi
 }
 
 function responseTargetId(value: unknown, operation: string): string {
-  if (!isRecord(value) || !isRecord(value.targetInfo)) {
-    throw new Error(`${operation} returned an invalid response.`);
-  }
-  const targetId = value.targetInfo.targetId;
-  if (typeof targetId !== 'string' || targetId.length === 0) {
-    throw new Error(`${operation} returned an invalid target identity.`);
-  }
-  return targetId;
+  return requireTargetIdFromResponse(
+    value,
+    () => new Error(`${operation} returned an invalid response.`),
+    () => new Error(`${operation} returned an invalid target identity.`),
+  );
 }
 
 function requiredTargetId(params: Record<string, unknown>, operation: string): string {
@@ -246,9 +243,8 @@ export async function openPlaywrightCommandSession(
   const uploadEncoder = hooks.uploadEncoder ?? localUploadEncoder;
   let targetId: string;
   try {
-    const response = await send('Target.getTargetInfo');
-    const candidate = (response as { targetInfo?: { targetId?: unknown } }).targetInfo?.targetId;
-    if (typeof candidate !== 'string' || candidate.length === 0) {
+    const candidate = targetIdFromTargetInfoResponse(await send('Target.getTargetInfo'));
+    if (candidate === undefined) {
       throw new Error('Target.getTargetInfo returned no target id');
     }
     targetId = candidate;
@@ -256,7 +252,7 @@ export async function openPlaywrightCommandSession(
       throw new Error(`pageId ${pageId} closed while its command session was opening`);
     }
   } catch (error) {
-    await detachWithoutHanging(session);
+    await detachSessionWithinDeadline(session);
     throw commandError(`Could not resolve the browser target for pageId ${pageId}`, error);
   }
 
@@ -368,7 +364,7 @@ export async function openPlaywrightCommandSession(
         await Promise.all([...inFlightUploads]);
         // Detach is cleanup: it is attempted exactly once and cannot mask the
         // command/program outcome merely because the target disappeared first.
-        const detach = () => detachWithoutHanging(session);
+        const detach = () => detachSessionWithinDeadline(session);
         await (hooks.release?.(detach, inFlightCommands.size > 0) ?? detach());
       })();
       return closePromise;

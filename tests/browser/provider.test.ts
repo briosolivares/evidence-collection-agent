@@ -5,7 +5,7 @@ import {
   AttachedChromeSetupBrowserSessionProvider,
 } from '../../src/browser/attachedChromeSetup.js';
 import { BrowserbaseBrowserSessionProvider } from '../../src/browser/browserbaseBrowserSessionProvider.js';
-import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/localChromeSessionProvider.js';
 import {
   BROWSER_PROVIDER_ENV_VAR,
   BROWSERBASE_CONTEXT_ENV_VAR,

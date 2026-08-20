@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { pinProfileDownloadDirectory } from '../../src/browser/playwrightBrowserController.js';
+import { pinProfileDownloadDirectory } from '../../src/browser/localChromeSessionProvider.js';
 
 /**
  * Chrome, not Playwright, decides where a download it handles itself lands,

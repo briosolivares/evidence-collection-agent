@@ -21,7 +21,7 @@ import {
   attachedChromeEndpoint,
   AttachedChromeSetupBrowserSessionProvider,
 } from './attachedChromeSetup.js';
-import { LocalChromeBrowserSessionProvider } from './playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from './localChromeSessionProvider.js';
 import type { BrowserProviderKind, BrowserSessionProvider } from './sessionProvider.js';
 
 /** The environment variable that selects the runtime. */
