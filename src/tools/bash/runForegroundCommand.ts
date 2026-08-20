@@ -2,7 +2,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 import type { Writable } from 'node:stream';
 
-import { decodeCapturedOutput } from '../../process/decodeCapturedOutput.js';
+import { superviseBoundedChildProcess } from '../../process/boundedChildProcess.js';
 import { ParentDeathWatchdogError } from '../../process/parentDeathWatchdog.js';
 import { startAbortAwareParentDeathWatchdog } from '../../process/startAbortAwareParentDeathWatchdog.js';
 
@@ -73,12 +73,30 @@ const START_GATE_SCRIPT = [
 ].join('\n');
 
 /**
+ * This runner resolves with a status for every real command result and
+ * *rejects* only for infrastructure failures (watchdog loss, an unusable
+ * start gate, a shell that never spawned at all) — the completion outcome
+ * keeps the two apart.
+ */
+type ForegroundOutcome =
+  | { kind: 'status'; status: ForegroundCommandStatus }
+  | { kind: 'reject'; error: unknown };
+
+const status = (value: ForegroundCommandStatus): ForegroundOutcome => ({
+  kind: 'status',
+  status: value,
+});
+const rejection = (error: unknown): ForegroundOutcome => ({ kind: 'reject', error });
+
+/**
  * Bounds ONE foreground process tree: spawn it, capture its output, and
  * guarantee it (and anything it forked) is gone by the time this resolves —
  * whether it finished on its own, ran past `timeoutMs`, wrote past
  * `maxOutputBytes`, or was cancelled via `abortSignal`. This function knows
  * nothing about tools, transcripts, or models; it only manages one process
- * group's lifecycle.
+ * group's lifecycle, delegating the shared machine (byte-capped capture,
+ * SIGTERM→grace→SIGKILL, stray-kill, stream-drain deadline, settle-once,
+ * watchdog wiring) to `superviseBoundedChildProcess`.
  *
  * A tiny shell gate waits until the independent parent-death watchdog is
  * armed, then `exec`s exactly `[shellPath, '-c', command]` — never a login
@@ -88,12 +106,10 @@ const START_GATE_SCRIPT = [
  * background jobs the command itself forks — can be reached with one signal
  * to `-pid`.
  *
- * Every path that can end the call (normal exit, spawn `error`, timeout,
- * abort, output overflow) funnels through one `settleOnce` guard so the
- * returned promise settles exactly once. The only path that *rejects*
- * instead of resolving is a spawn failure that never produced a process at
- * all (Node reports this as an `error` event with `child.pid` still
- * `undefined`) — see the comment on that branch below.
+ * The only path that *rejects* with a non-infrastructure error is a spawn
+ * failure that never produced a process at all (Node reports this as an
+ * `error` event with `child.pid` still `undefined`) — there is no command
+ * result of any kind to report in that case.
  */
 export async function runForegroundCommand(
   options: ForegroundCommandOptions,
@@ -130,259 +146,85 @@ export async function runForegroundCommand(
     throw error;
   }
 
-  return new Promise<ForegroundCommandResult>((resolve, reject) => {
-    const startGate = child.stdio[3] as Writable | null;
-    const stdout = child.stdout!;
-    const stderr = child.stderr!;
+  const startGate = child.stdio[3] as Writable | null;
 
-    let settled = false;
-    // Set by whichever of timeout/abort/overflow fires first, so the exit
-    // that our own kill signal causes is reported with the right reason
-    // instead of the generic 'exited'. Left null for a process that simply
-    // ran to completion (or died on its own, e.g. a self-inflicted signal).
-    let pendingStatus: ForegroundCommandStatus | null = null;
-    let terminationTriggered = false;
-    let infrastructureError: ParentDeathWatchdogError | null = null;
+  const supervision = superviseBoundedChildProcess<ForegroundOutcome>({
+    child,
+    watchdog,
+    abortSignal,
+    maxOutputBytes,
+    // A chunk that exactly fills the remaining budget needs no truncation but
+    // still means the ceiling is fully spent — terminate right away rather
+    // than leaving the output-limit kill path to the next chunk.
+    terminateOnExactFill: true,
+    timings: {
+      timeoutMs,
+      terminateGraceMs: TERMINATE_GRACE_MS,
+      strayKillDelayMs: STRAY_KILL_DELAY_MS,
+      drainDeadlineMs: DRAIN_DEADLINE_MS,
+    },
+    outcomes: {
+      timedOut: () => status('timed_out'),
+      outputLimitExceeded: () => status('output_limit_exceeded'),
+      aborted: () => status('cancelled'),
+      watchdogFailed: rejection,
+    },
+    onCleanup: () => startGate?.destroy(),
+  });
 
-    const stdoutChunks: Buffer[] = [];
-    const stderrChunks: Buffer[] = [];
-    let totalBytes = 0;
-    let stdoutEnded = false;
-    let stderrEnded = false;
-
-    let timeoutTimer: NodeJS.Timeout | null = null;
-    let graceKillTimer: NodeJS.Timeout | null = null;
-    let strayKillTimer: NodeJS.Timeout | null = null;
-    let drainDeadlineTimer: NodeJS.Timeout | null = null;
-
-    const clearAllTimers = (): void => {
-      if (timeoutTimer !== null) clearTimeout(timeoutTimer);
-      if (graceKillTimer !== null) clearTimeout(graceKillTimer);
-      if (strayKillTimer !== null) clearTimeout(strayKillTimer);
-      if (drainDeadlineTimer !== null) clearTimeout(drainDeadlineTimer);
-      timeoutTimer = null;
-      graceKillTimer = null;
-      strayKillTimer = null;
-      drainDeadlineTimer = null;
-    };
-
-    const onAbort = (): void => triggerTermination('cancelled');
-    const detachAbort = (): void => {
-      abortSignal?.removeEventListener('abort', onAbort);
-    };
-    const detachWatchdogFailure = watchdog.onFailure((error) => {
-      if (settled) return;
-      infrastructureError = error;
-      pendingStatus = 'cancelled';
-      terminationTriggered = true;
-      if (timeoutTimer !== null) {
-        clearTimeout(timeoutTimer);
-        timeoutTimer = null;
-      }
-      if (graceKillTimer !== null) {
-        clearTimeout(graceKillTimer);
-        graceKillTimer = null;
-      }
-      // The independent watcher is already gone. There can be no soft-kill
-      // interval during which a subsequent harness SIGKILL would abandon this
-      // group, so fail closed with an immediate synchronous hard signal.
-      killGroup('SIGKILL');
-    });
-
-    /** Signals the whole process group. The group may already be gone — that's fine, not an error. */
-    function killGroup(signal: NodeJS.Signals): void {
-      const pid = child.pid;
-      if (pid === undefined) return;
-      try {
-        process.kill(-pid, signal);
-      } catch {
-        // ESRCH (group already reaped) or similar — nothing left to clean up.
-      }
-    }
-
-    /**
-     * Idempotent: the first caller (timeout, abort, or output overflow) wins
-     * and records the reason; later callers are no-ops. Actually resolving
-     * the promise still waits for the resulting `exit` event (below), which
-     * is what lets a natural exit and a timeout/abort race safely — whichever
-     * reaches `settleOnce` first is the only one that matters.
-     */
-    function triggerTermination(status: ForegroundCommandStatus): void {
-      if (settled || terminationTriggered) return;
-      terminationTriggered = true;
-      pendingStatus = status;
-      killGroup('SIGTERM');
-      graceKillTimer = setTimeout(() => {
-        graceKillTimer = null;
-        killGroup('SIGKILL');
-      }, TERMINATE_GRACE_MS);
-    }
-
-    function appendChunk(target: Buffer[], chunk: Buffer): void {
-      if (settled) return;
-      const remaining = maxOutputBytes - totalBytes;
-      if (remaining <= 0) {
-        // Already at or over budget from an earlier chunk that exactly
-        // filled it (see below) — triggerTermination is idempotent, so this
-        // just guarantees the kill path fires even if that earlier chunk's
-        // own check somehow didn't.
-        triggerTermination('output_limit_exceeded');
-        return;
-      }
-      // Byte ceiling, enforced on the raw Buffer length — never on decoded
-      // string length, which would undercount multibyte UTF-8 text.
-      const toKeep = chunk.length <= remaining ? chunk : chunk.subarray(0, remaining);
-      target.push(toKeep);
-      totalBytes += toKeep.length;
-      // Checked against the running total, not `toKeep.length < chunk.length`:
-      // a chunk that exactly fills the remaining budget needs no truncation
-      // (toKeep === chunk) but still means the ceiling is now fully spent —
-      // the old per-chunk-truncation check missed exactly that boundary and
-      // left the output-limit kill path unreachable from it.
-      if (totalBytes >= maxOutputBytes) {
-        triggerTermination('output_limit_exceeded');
-      }
-    }
-
-    stdout.on('data', (chunk: Buffer) => appendChunk(stdoutChunks, chunk));
-    stderr.on('data', (chunk: Buffer) => appendChunk(stderrChunks, chunk));
-    stdout.on('end', () => {
-      stdoutEnded = true;
-    });
-    stderr.on('end', () => {
-      stderrEnded = true;
-    });
-
-    function settleOnce(action: () => void): void {
-      if (settled) return;
-      settled = true;
-      clearAllTimers();
-      detachAbort();
-      detachWatchdogFailure();
-      // This synchronous hard kill closes the target before the watchdog is
-      // disarmed. It also covers SIGTERM-resistant background descendants on
-      // ordinary completion.
-      killGroup('SIGKILL');
-      startGate?.destroy();
-      stdout.removeAllListeners();
-      stderr.removeAllListeners();
-      void watchdog.disarm().then(action, action);
-    }
-
-    function finalize(
-      status: ForegroundCommandStatus,
-      exitCode: number | null,
-      terminationSignal: string | null,
-    ): void {
-      settleOnce(() => {
-        if (infrastructureError !== null) {
-          reject(infrastructureError);
-          return;
-        }
-        resolve({
-          status,
-          exitCode,
-          terminationSignal,
-          durationMs: now() - startedAt,
-          stdout: decodeCapturedOutput(stdoutChunks),
-          stderr: decodeCapturedOutput(stderrChunks),
-        });
-      });
-    }
-
-    child.once('error', (err) => {
-      if (child.pid === undefined) {
-        // The process was never actually spawned (e.g. shellPath does not
-        // exist) — there is no command result of any kind to report, so
-        // this rejects instead of resolving through the normal result path.
-        settleOnce(() => reject(err));
-        return;
-      }
-      // A process did exist, so an 'error' here (e.g. an async failure
-      // delivering a signal) still leaves us with a real, if partial,
-      // result — resolve with whatever was captured rather than throwing it away.
-      finalize(pendingStatus ?? 'exited', null, null);
-    });
-
-    child.once('exit', (code, signal) => {
-      if (settled) return;
-      // The active-termination grace timer is now moot — the process is gone.
-      if (timeoutTimer !== null) {
-        clearTimeout(timeoutTimer);
-        timeoutTimer = null;
-      }
-      if (graceKillTimer !== null) {
-        clearTimeout(graceKillTimer);
-        graceKillTimer = null;
-      }
-
-      // The shell itself is gone, but it may have started a background
-      // descendant that is still alive and still in its process group — it
-      // must not outlive this call.
-      killGroup('SIGTERM');
-      strayKillTimer = setTimeout(() => {
-        strayKillTimer = null;
-        killGroup('SIGKILL');
-      }, STRAY_KILL_DELAY_MS);
-
-      const finishExit = (): void => {
-        stdout.off('end', onStreamsEnded);
-        stderr.off('end', onStreamsEnded);
-        finalize(pendingStatus ?? 'exited', code, signal);
-      };
-
-      const onStreamsEnded = (): void => {
-        if (stdoutEnded && stderrEnded) finishExit();
-      };
-
-      if (stdoutEnded && stderrEnded) {
-        finishExit();
-        return;
-      }
-      // A descendant that inherited these pipes can hold them open
-      // indefinitely, so this drain never waits past a hard deadline.
-      stdout.on('end', onStreamsEnded);
-      stderr.on('end', onStreamsEnded);
-      drainDeadlineTimer = setTimeout(finishExit, DRAIN_DEADLINE_MS);
-    });
-
-    if (abortSignal) {
-      abortSignal.addEventListener('abort', onAbort, { once: true });
-      if (abortSignal.aborted) onAbort();
-    }
-
-    // timeoutMs bounds the complete child lifecycle, including the gated arm
-    // handshake. The command still cannot execute until arm() acknowledges
-    // below, but a stalled supervisor must not extend the caller's budget.
-    timeoutTimer = setTimeout(() => {
-      timeoutTimer = null;
-      triggerTermination('timed_out');
-    }, timeoutMs);
-
-    if (startGate === null) {
-      infrastructureError = new ParentDeathWatchdogError(
-        'foreground command start gate was unavailable',
-      );
-      triggerTermination('cancelled');
+  child.once('error', (err) => {
+    if (child.pid === undefined) {
+      // The process was never actually spawned (e.g. shellPath does not
+      // exist) — there is no command result of any kind to report, so
+      // this rejects instead of resolving through the normal result path.
+      supervision.forceOutcome(rejection(err));
+      supervision.finishNow();
       return;
     }
+    // A process did exist, so an 'error' here (e.g. an async failure
+    // delivering a signal) still leaves us with a real, if partial,
+    // result — resolve with whatever was captured rather than throwing it away.
+    supervision.finishNow({ exitCode: null, terminationSignal: null });
+  });
 
+  if (startGate === null) {
+    supervision.forceOutcome(
+      rejection(new ParentDeathWatchdogError('foreground command start gate was unavailable')),
+    );
+    supervision.terminate(status('cancelled'));
+  } else {
     void watchdog.arm(child.pid ?? -1).then(
       () => {
-        if (settled || terminationTriggered) {
+        if (supervision.settled || supervision.terminationStarted) {
           startGate.destroy();
           return;
         }
         startGate.end('start\n');
       },
       (error: unknown) => {
-        infrastructureError =
-          error instanceof ParentDeathWatchdogError
-            ? error
-            : new ParentDeathWatchdogError('parent-death watchdog failed while arming the command');
+        supervision.forceOutcome(
+          rejection(
+            error instanceof ParentDeathWatchdogError
+              ? error
+              : new ParentDeathWatchdogError(
+                  'parent-death watchdog failed while arming the command',
+                ),
+          ),
+        );
         startGate.destroy();
-        triggerTermination('cancelled');
+        supervision.terminate(status('cancelled'));
       },
     );
-  });
+  }
+
+  const completion = await supervision.completion;
+  if (completion.outcome?.kind === 'reject') throw completion.outcome.error;
+  return {
+    status: completion.outcome?.status ?? 'exited',
+    exitCode: completion.exitCode,
+    terminationSignal: completion.terminationSignal,
+    durationMs: now() - startedAt,
+    stdout: completion.stdout,
+    stderr: completion.stderr,
+  };
 }
