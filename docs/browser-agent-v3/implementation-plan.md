@@ -3,7 +3,7 @@
 **Status:** complete for local/hermetic acceptance; live external checks are
 explicitly deferred pending user authorization
 
-**Last updated:** 2026-08-19
+**Last updated:** 2026-08-20
 
 **Working branch:** `simplify/sherlock-core`
 
@@ -36,7 +36,7 @@ initializer/contract/table/evidence/scheduler complexity merely to avoid
 writing a smaller coherent replacement. After the new path passed its gates,
 the public cutover and legacy-production removal were completed.
 
-## Semantic system atlas complete (2026-08-19)
+## Semantic system atlas complete (2026-08-20)
 
 - [x] Rebuild `docs/sherlock-system-atlas.html` around `@xyflow/react`, with
   every visible position computed from semantic nodes and edges by ELK rather
@@ -45,27 +45,33 @@ the public cutover and legacy-production removal were completed.
   deterministic checks → fresh verifier handoff, then offer seven learning
   routes up to the 14-concept whole-system view.
 - [x] Add manual one-concept tracing plus Driver.js walkthroughs that focus the
-  active node, dim the rest, and show the role's received inputs, handed-off
-  outputs, hard guardrail, and authority.
+  active node, dim the rest, and explain what happens, how the handoff works,
+  and where the role's authority stops in connected prose.
 - [x] Make every concept expandable into an implementation subgraph of at
   least two nodes, with the initializer opening into its model call,
   `set_output_contract` protocol, and OutputContract schema/persistence path.
 - [x] Give all 43 concept and implementation nodes explicit answers for what
   the node is, inputs, outputs, creator, consumers, enforcement, authority,
   rationale, and relevant current code.
+- [x] Keep those structured facts as the semantic source of truth while
+  presenting every node as a short teaching article. The primary four-stage
+  route has hand-written narratives covering mechanics, handoff, rationale,
+  authority, and a path into current implementation code; no inspector or
+  walkthrough exposes the old field-by-field checklist.
 - [x] Keep the deliverable self-contained and offline by checking in the
   generated HTML bundle, while retaining typed source data, React/CSS source,
   and the deterministic `npm run build:atlas` build path.
 
-Verification: `npm run typecheck`, two consecutive atlas builds with the same
-SHA-256, and `git diff --check` pass. A temporary Playwright run against local
-Chrome exercises the four-stage role handoff and five named transitions, all
-nine inspector contracts, the three-node initializer expansion, route
-relayout, manual handoff tracing, all four detailed Driver.js steps,
-whole-system and verifier-subgraph layout, and both responsive drawers. It
-reports zero page/console errors, unlabeled buttons, or remote requests. The
-default handoff and guided-tour 1600×1000 renders were visually inspected;
-temporary screenshots were kept outside the repository.
+Verification: `npm run typecheck`, two consecutive atlas builds with identical
+SHA-256 `8f5303569531d93a155082f4b653776b48da9a265cfcbad3647d22db68492e52`,
+and `git diff --check` pass. Temporary Playwright runs against local Chrome
+exercise the four-stage route, all prose article sections, manual narrative
+tracing, all four Driver.js steps, the initializer's three-node expansion, and
+the responsive detail drawer. They report zero page/console errors, unlabeled
+buttons, old checklist headings, walkthrough lists, horizontal mobile
+overflow, or remote requests. The default article view and guided tour at
+1600×1000 were visually inspected; temporary screenshots remain outside the
+repository.
 
 ## Post-v3 simplification complete (2026-08-17)
 

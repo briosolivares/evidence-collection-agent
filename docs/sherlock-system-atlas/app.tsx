@@ -97,10 +97,8 @@ function escapeMarkup(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
-function tourList(label: string, values: readonly string[]): string {
-  return `<div class="tour-handoff"><strong>${label}</strong><ul>${values
-    .map((value) => `<li>${escapeMarkup(value)}</li>`)
-    .join('')}</ul></div>`;
+function tourSection(label: string, value: string, className = ''): string {
+  return `<div class="tour-section ${className}"><strong>${label}</strong><p>${escapeMarkup(value)}</p></div>`;
 }
 
 function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
@@ -134,7 +132,7 @@ function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
       <div className="card-footer">
         <span>
           {data.handoffView
-            ? `${node.answers.inputs.length} in · ${node.answers.outputs.length} out`
+            ? 'read the handoff'
             : `${node.answers.code.length} code ${node.answers.code.length === 1 ? 'site' : 'sites'}`}
         </span>
         {isConcept ? (
@@ -259,14 +257,11 @@ async function layoutGraph(
   return { nodes, edges: resultEdges };
 }
 
-function AnswerList({ values }: { values: readonly string[] }) {
-  return (
-    <ul className="answer-list">
-      {values.map((value) => (
-        <li key={value}>{value}</li>
-      ))}
-    </ul>
-  );
+function proseList(values: readonly string[]): string {
+  if (values.length === 0) return '';
+  if (values.length === 1) return values[0];
+  if (values.length === 2) return `${values[0]} and ${values[1]}`;
+  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
 }
 
 function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: string) => void }) {
@@ -277,6 +272,30 @@ function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: stri
   ]
     .map((id) => nodeById.get(id))
     .filter((item): item is SemanticNode => item !== undefined);
+  const upstream = [
+    ...new Set(
+      inbound
+        .filter((edge) => edge.kind !== 'feedback')
+        .map((edge) => nodeById.get(edge.source)?.title)
+        .filter((title): title is string => title !== undefined),
+    ),
+  ];
+  const downstream = [
+    ...new Set(
+      outbound
+        .filter((edge) => edge.kind !== 'feedback')
+        .map((edge) => nodeById.get(edge.target)?.title)
+        .filter((title): title is string => title !== undefined),
+    ),
+  ];
+  const flowContext =
+    upstream.length > 0 && downstream.length > 0
+      ? `${proseList(upstream)} brings work into this boundary. From here, the main result continues to ${proseList(downstream)}.`
+      : upstream.length > 0
+        ? `${proseList(upstream)} brings work into this boundary, where this branch of the system reaches its result.`
+        : downstream.length > 0
+          ? `This boundary begins the flow, then hands its result to ${proseList(downstream)}.`
+          : 'This implementation detail is read as part of its parent concept rather than as a separate lifecycle stage.';
 
   return (
     <aside className="inspector" aria-label="Selected node details">
@@ -287,62 +306,65 @@ function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: stri
         </div>
         <h2>{node.title}</h2>
         <p className="inspector-summary">{node.summary}</p>
-
-        <section className="answer-section answer-primary">
-          <h3>What is it?</h3>
-          <p>{node.answers.what}</p>
-        </section>
-        <div className="answer-grid">
-          <section className="answer-section">
-            <h3>Inputs</h3>
-            <AnswerList values={node.answers.inputs} />
-          </section>
-          <section className="answer-section">
-            <h3>Outputs</h3>
-            <AnswerList values={node.answers.outputs} />
-          </section>
+        <div className="article-flowline">
+          <span>Where you are in the flow</span>
+          <p>{flowContext}</p>
         </div>
-        <section className="answer-section">
-          <h3>Creator</h3>
-          <p>{node.answers.creator}</p>
-        </section>
-        <section className="answer-section">
-          <h3>Consumers</h3>
-          <AnswerList values={node.answers.consumers} />
-        </section>
-        <section className="answer-section">
-          <h3>Enforcement</h3>
-          <AnswerList values={node.answers.enforcement} />
-        </section>
-        <section className="answer-section authority-section">
-          <h3>Authority</h3>
-          <p>{node.answers.authority}</p>
-        </section>
-        <section className="answer-section why-section">
-          <h3>Why it exists</h3>
-          <p>{node.answers.why}</p>
-        </section>
-        <section className="answer-section">
-          <h3>Relevant code</h3>
-          <div className="code-list">
-            {node.answers.code.map((file) => (
-              <code key={file}>{file}</code>
+
+        <article className="editorial-article">
+          <p className="article-lead">{node.narrative.opening}</p>
+
+          <section className="article-section">
+            <h3>What happens here</h3>
+            {node.narrative.mechanics.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
             ))}
-          </div>
-        </section>
-        {related.length > 0 ? (
-          <section className="answer-section related-section">
-            <h3>Related concepts</h3>
-            <div className="related-list">
-              {related.map((item) => (
-                <button key={item.id} type="button" onClick={() => onSelect(item.id)}>
-                  <span>{item.code}</span>
-                  {item.title}
-                </button>
+          </section>
+
+          <section className="article-section article-handoff">
+            <h3>How the handoff works</h3>
+            <p>{node.narrative.handoff}</p>
+          </section>
+
+          <blockquote className="authority-pullquote">
+            <span>Where its authority stops</span>
+            <p>{node.narrative.boundary}</p>
+          </blockquote>
+
+          <section className="article-section article-why">
+            <h3>Why Sherlock keeps this separate</h3>
+            <p>{node.answers.why}</p>
+          </section>
+
+          <section className="article-section">
+            <h3>Follow the implementation</h3>
+            <p className="article-note">
+              These are the best places to continue from the conceptual explanation into the source.
+            </p>
+            <div className="code-list">
+              {node.answers.code.map((file) => (
+                <code key={file}>{file}</code>
               ))}
             </div>
           </section>
-        ) : null}
+
+          {related.length > 0 ? (
+            <section className="article-section related-section">
+              <h3>Continue through the system</h3>
+              <p className="article-note">
+                Follow a neighboring boundary to see what prepares this work or receives it next.
+              </p>
+              <div className="related-list">
+                {related.map((item) => (
+                  <button key={item.id} type="button" onClick={() => onSelect(item.id)}>
+                    <span>{item.code}</span>
+                    {item.title}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </article>
       </div>
     </aside>
   );
@@ -567,11 +589,10 @@ function Atlas() {
         popover: {
           title: `${node.code} · ${node.title}`,
           description: [
-            `<p>${escapeMarkup(node.summary)}</p>`,
-            tourList('Receives', node.answers.inputs),
-            tourList('Hands off', node.answers.outputs),
-            `<div class="tour-answer tour-guardrail"><strong>Guardrail</strong>${escapeMarkup(node.answers.enforcement[0])}</div>`,
-            `<div class="tour-answer"><strong>Authority</strong>${escapeMarkup(node.answers.authority)}</div>`,
+            `<p class="tour-lede">${escapeMarkup(node.narrative.opening)}</p>`,
+            tourSection('What happens here', node.narrative.mechanics[0]),
+            tourSection('How the handoff works', node.narrative.handoff),
+            tourSection('Where its authority stops', node.narrative.boundary, 'tour-boundary'),
           ].join(''),
           side: 'bottom',
           align: 'start',
@@ -747,8 +768,8 @@ function Atlas() {
               <span className="section-kicker">Concept tracer</span>
               {traceNode === null ? (
                 <p>
-                  Step through this route one concept at a time. The graph will focus the active
-                  boundary.
+                  Step through this route one concept at a time. Each stop tells the story of the
+                  boundary and its handoff.
                 </p>
               ) : (
                 <div className="trace-node-copy">
@@ -756,15 +777,9 @@ function Atlas() {
                     {traceNode.code} · {traceNode.title}
                   </strong>
                   <p>{traceNode.summary}</p>
-                  <div className="trace-handoff">
-                    <span>
-                      <em>Receives</em>
-                      {traceNode.answers.inputs.join(' · ')}
-                    </span>
-                    <span>
-                      <em>Hands off</em>
-                      {traceNode.answers.outputs.join(' · ')}
-                    </span>
+                  <div className="trace-story">
+                    <em>How it connects</em>
+                    <span>{traceNode.narrative.handoff}</span>
                   </div>
                 </div>
               )}
@@ -800,7 +815,7 @@ function Atlas() {
         </div>
       </div>
       <footer className="footer">
-        <span>Semantic architecture snapshot · 2026-08-19</span>
+        <span>Semantic architecture snapshot · 2026-08-20</span>
         <span>
           <kbd>←</kbd>
           <kbd>→</kbd> trace · <kbd>esc</kbd> reset · scroll to zoom · drag to pan

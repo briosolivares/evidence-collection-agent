@@ -24,6 +24,13 @@ export interface NodeAnswers {
   code: readonly string[];
 }
 
+export interface NodeNarrative {
+  opening: string;
+  mechanics: readonly string[];
+  handoff: string;
+  boundary: string;
+}
+
 export interface SemanticNode {
   id: string;
   parentId?: string;
@@ -34,6 +41,7 @@ export interface SemanticNode {
   kicker: string;
   summary: string;
   answers: NodeAnswers;
+  narrative: NodeNarrative;
 }
 
 export interface SemanticEdge {
@@ -55,15 +63,41 @@ export interface LearningRoute {
   nodeIds: readonly string[];
 }
 
-const concept = (node: Omit<SemanticNode, 'kind'> & { kind?: never }): SemanticNode => ({
+type SemanticNodeInput = Omit<SemanticNode, 'kind' | 'parentId' | 'narrative'> & {
+  narrative?: NodeNarrative;
+};
+
+function naturalList(values: readonly string[]): string {
+  if (values.length === 0) return 'nothing';
+  if (values.length === 1) return values[0];
+  if (values.length === 2) return `${values[0]} and ${values[1]}`;
+  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
+}
+
+function defaultNarrative(node: SemanticNodeInput): NodeNarrative {
+  return {
+    opening: `${node.answers.what} ${node.answers.why}`,
+    mechanics: [
+      `${node.answers.creator} Once active, it works from ${naturalList(node.answers.inputs)} and produces ${naturalList(node.answers.outputs)}.`,
+      node.answers.enforcement.join(' '),
+    ],
+    handoff: `Its result moves to ${naturalList(node.answers.consumers)}, carrying ${naturalList(node.answers.outputs)} into the next part of the system.`,
+    boundary: node.answers.authority,
+  };
+}
+
+const concept = (node: SemanticNodeInput): SemanticNode => ({
   ...node,
+  narrative: node.narrative ?? defaultNarrative(node),
   kind: 'concept',
 });
 
-const implementation = (
-  parentId: string,
-  node: Omit<SemanticNode, 'kind' | 'parentId'>,
-): SemanticNode => ({ ...node, parentId, kind: 'implementation' });
+const implementation = (parentId: string, node: SemanticNodeInput): SemanticNode => ({
+  ...node,
+  parentId,
+  narrative: node.narrative ?? defaultNarrative(node),
+  kind: 'implementation',
+});
 
 export const concepts: readonly SemanticNode[] = [
   concept({
@@ -150,6 +184,18 @@ export const concepts: readonly SemanticNode[] = [
     title: 'Contract initializer',
     kicker: 'Model 1 · fresh context',
     summary: 'Reads the task and emits the one immutable, schema-valid output contract.',
+    narrative: {
+      opening:
+        "Before Sherlock opens a page, a short-lived Sonnet call turns the user's request into a typed description of the required end state. This is the contract initializer: it decides what must exist at the end, not how the research should be performed.",
+      mechanics: [
+        'The model receives the original task with one forced tool, set_output_contract. Its response must contain exactly that call. Sherlock intercepts the call instead of executing an external effect, validates its arguments, and permits one repair attempt if the first proposal is invalid.',
+        'The accepted value is checked against a Zod union for tables, documents, screenshots, external actions, and downloads. Cross-field rules catch contradictions that a field-by-field schema cannot, then the lifecycle writes the same object to harness/output-contract.json so every later stage works from one durable definition of done.',
+      ],
+      handoff:
+        'Once accepted, the original request and immutable contract travel together to the persistent worker. The same contract later reaches deterministic checks and the verifier, so a correction can change the work without silently changing the goal.',
+      boundary:
+        'The initializer can translate explicit requirements into typed filenames, columns, counts, evidence needs, and semantic expectations. It cannot browse, choose sources, invent requirements, or approve completion.',
+    },
     answers: {
       what: 'A bounded Sonnet model role that translates the original task into the end state the run must produce before any browsing begins.',
       inputs: ['Original task text', 'Initializer system prompt', 'set_output_contract schema'],
@@ -180,6 +226,18 @@ export const concepts: readonly SemanticNode[] = [
     title: 'Persistent worker',
     kicker: 'Model 2 · persistent context',
     summary: 'Browses, writes, publishes, and repairs through one sequential conversation.',
+    narrative: {
+      opening:
+        'The persistent worker is where the investigation actually happens. Unlike the initializer and verifier, it keeps one Sonnet conversation alive across research, tool results, failed checks, and verifier corrections, so it can repair its work without relearning the task from scratch.',
+      mechanics: [
+        'Each model turn is assembled and validated before any effect occurs. Valid tool calls then run in response order through the frozen eight-tool registry: the worker can operate the browser, work in private scratch files, publish artifacts, ask the user, run bounded shell commands, and eventually request finish.',
+        'Private work and public evidence stay separate throughout that loop. write_file and edit_file only change scratch space; publish_artifact is the deliberate crossing into the manifest. When the worker believes the contract is satisfied, finish must be the only tool call in its response. That pauses production and asks the rest of Sherlock to inspect the result—it does not declare success.',
+      ],
+      handoff:
+        'The worker receives the task and immutable contract from the initializer. Its exclusive finish request hands the completion report and published run state to deterministic checks. Mechanical defects and verifier findings return to this same conversation as concrete repair instructions.',
+      boundary:
+        'The worker has the broadest operational authority in the system, but only through its tools. It can research and produce evidence; it cannot revise the contract, skip publication, or turn its own confidence into a verified outcome.',
+    },
     answers: {
       what: 'The only stateful model role that performs research and produces requested artifacts; production defaults to Sonnet while preserving one useful conversation across corrections.',
       inputs: ['Task and contract', 'Tool results', 'Deterministic defects', 'Verifier findings'],
@@ -311,6 +369,18 @@ export const concepts: readonly SemanticNode[] = [
     title: 'Deterministic finish checks',
     kicker: 'Code gate · no model',
     summary: 'Settles integrity, role, shape, count, media, and other code-decidable requirements.',
+    narrative: {
+      opening:
+        "Deterministic finish checks form a code gate between the worker's finish request and the fresh verifier. No model runs here. Sherlock first settles everything that can be answered exactly from the immutable contract, manifest, and published bytes.",
+      mechanics: [
+        'The lifecycle waits for effects to become quiescent, then reads the manifest and artifacts with bounded, no-follow inspection. It can prove hashes, artifact roles, filenames, media validity, requested counts, and exact CSV, JSON, or Markdown shapes without asking another language model to guess.',
+        'A failed check produces a concrete defect and returns control directly to the same worker session. A successful check produces settled facts and a verifier-ready view of the surfaced files. This keeps objective failures cheap, repeatable, and authoritative while reserving subjective questions for the next stage.',
+      ],
+      handoff:
+        "If a mechanical requirement fails, the defect loops back to the persistent worker for repair. If every check passes, Sherlock gives the fresh verifier the settled facts, the worker's completion report, and only the manifest-selected requested outputs and evidence.",
+      boundary:
+        "This gate is authoritative about code-decidable facts, but deliberately narrow. It cannot decide whether prose is persuasive, research is semantically complete, or the evidence truly supports the user's request.",
+    },
     answers: {
       what: 'A synchronous inspection gate triggered only by an exclusive finish tool response.',
       inputs: ['Immutable contract', 'Finish report', 'Manifest and published bytes'],
@@ -342,6 +412,18 @@ export const concepts: readonly SemanticNode[] = [
     title: 'Fresh verifier',
     kicker: 'Model 3 · fresh context',
     summary: 'Reviews semantic completeness in a new read-only context and alone accepts success.',
+    narrative: {
+      opening:
+        "The verifier is a fresh Haiku call with none of the worker's conversational momentum. It approaches the result as an independent reviewer, comparing the original task and immutable contract with the files Sherlock is actually prepared to expose as evidence or requested output.",
+      mechanics: [
+        'Its context contains the task, contract, untrusted completion report, settled deterministic facts, surfaced manifest entries, and correction history. Bounded read_file and grep tools let it inspect those published files more closely, but it cannot see scratch work, browse the web, or change anything.',
+        'The verifier must finish with one typed judgment: verified, needs_correction with actionable findings, or incomplete with a credible reason. Invalid or unavailable judgments fail closed. Only verified becomes success; needs_correction reopens the existing worker conversation, while incomplete records an honest terminal limitation.',
+      ],
+      handoff:
+        'A verified judgment moves to the truthful terminal outcome. A typed correction returns to the same persistent worker, preserving its useful context while giving it an outside account of what remains wrong. The contract itself never changes during that loop.',
+      boundary:
+        'The verifier alone may accept semantic success, but its authority is read-only and evidence-bound. It has no browser, no scratch access, no mutation tools, and no permission to reinterpret the request or weaken the contract.',
+    },
     answers: {
       what: 'A fresh read-only Haiku model role that judges the request against the contract, code-settled facts, and published evidence.',
       inputs: [

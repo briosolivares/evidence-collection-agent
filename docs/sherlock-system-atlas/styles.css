@@ -186,7 +186,7 @@ button:focus-visible,
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-columns: 270px minmax(390px, 1fr) 380px;
+  grid-template-columns: 270px minmax(390px, 1fr) 420px;
 }
 
 .sidebar-shell,
@@ -755,27 +755,27 @@ button:focus-visible,
   margin: 0;
 }
 
-.trace-handoff {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
+.trace-story {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   margin-top: 7px;
 }
 
-.trace-handoff span {
-  display: block;
+.trace-story span {
   overflow: hidden;
   color: var(--ink-soft);
-  font-family: var(--mono);
-  font-size: 8px;
-  line-height: 1.35;
+  font-size: 9px;
+  line-height: 1.45;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.trace-handoff em {
-  margin-right: 6px;
+.trace-story em {
+  flex: none;
   color: var(--plum);
+  font-family: var(--mono);
+  font-size: 8px;
   font-style: normal;
   font-weight: 850;
   letter-spacing: 0.06em;
@@ -865,29 +865,21 @@ button:focus-visible,
 
 .inspector-summary {
   margin: 0;
-  padding: 0 17px 17px;
+  padding: 0 17px 19px;
   border-bottom: 1px solid var(--ink);
   color: var(--ink-soft);
   font-size: 11px;
   line-height: 1.5;
 }
 
-.answer-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.answer-grid .answer-section:first-child {
-  border-right: 1px solid var(--line);
-}
-
-.answer-section {
-  padding: 13px 17px;
+.article-flowline {
+  padding: 14px 17px 15px;
   border-bottom: 1px solid var(--line);
+  background: linear-gradient(125deg, var(--plum-wash), rgba(255, 255, 255, 0.35));
 }
 
-.answer-section h3 {
-  margin: 0 0 7px;
+.article-flowline span,
+.authority-pullquote span {
   color: var(--ink-faint);
   font-family: var(--mono);
   font-size: 8px;
@@ -896,50 +888,77 @@ button:focus-visible,
   text-transform: uppercase;
 }
 
-.answer-section p {
-  margin: 0;
+.article-flowline p {
+  margin: 6px 0 0;
   font-size: 11px;
+  line-height: 1.55;
+}
+
+.editorial-article {
+  color: var(--ink);
+}
+
+.article-lead {
+  margin: 0;
+  padding: 22px 22px 21px;
+  border-bottom: 1px solid var(--line);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  letter-spacing: -0.012em;
   line-height: 1.52;
 }
 
-.answer-primary {
-  background: linear-gradient(120deg, var(--plum-wash), transparent 72%);
+.article-section {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
 }
 
-.authority-section {
+.article-section h3 {
+  margin: 0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.article-section p {
+  margin: 0 0 11px;
+  font-size: 11px;
+  line-height: 1.68;
+}
+
+.article-section p:last-child {
+  margin-bottom: 0;
+}
+
+.article-handoff {
+  box-shadow: inset 3px 0 var(--plum);
+  background: rgba(239, 232, 249, 0.56);
+}
+
+.authority-pullquote {
+  margin: 0;
+  padding: 18px 22px 19px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
   box-shadow: inset 3px 0 var(--amber);
   background: var(--amber-wash);
 }
 
-.why-section {
-  box-shadow: inset 3px 0 var(--plum);
-  background: var(--plum-wash);
+.authority-pullquote p {
+  margin: 7px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.answer-list {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.article-why {
+  background: rgba(255, 255, 255, 0.48);
 }
 
-.answer-list li {
-  position: relative;
-  padding-left: 11px;
-  font-size: 10px;
-  line-height: 1.42;
-}
-
-.answer-list li::before {
-  position: absolute;
-  top: 0.55em;
-  left: 0;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--plum);
-  content: "";
+.article-note {
+  color: var(--ink-soft);
+  font-size: 10px !important;
 }
 
 .code-list {
@@ -962,7 +981,7 @@ button:focus-visible,
 }
 
 .related-section {
-  padding-bottom: 23px;
+  padding-bottom: 28px;
 }
 
 .related-list {
@@ -1049,27 +1068,22 @@ kbd {
   margin: 6px 0 12px;
 }
 
-.tour-answer {
-  margin-top: 7px;
-  padding: 8px 9px;
-  border-left: 2px solid var(--plum);
-  background: var(--plum-wash);
+.sherlock-tour .driver-popover-description .tour-lede {
+  margin: 7px 0 14px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.48;
 }
 
-.tour-answer.tour-guardrail {
-  border-left-color: var(--amber);
-  background: var(--amber-wash);
-}
-
-.tour-handoff {
-  display: grid;
-  grid-template-columns: 82px minmax(0, 1fr);
-  gap: 8px;
-  padding: 8px 0;
+.tour-section {
+  padding: 9px 0;
   border-top: 1px solid var(--line);
 }
 
-.tour-handoff strong {
+.tour-section strong {
+  display: block;
+  margin-bottom: 4px;
   color: var(--plum);
   font-family: var(--mono);
   font-size: 8px;
@@ -1077,38 +1091,17 @@ kbd {
   text-transform: uppercase;
 }
 
-.tour-handoff ul {
-  display: grid;
-  gap: 3px;
+.sherlock-tour .driver-popover-description .tour-section p {
   margin: 0;
-  padding: 0;
-  list-style: none;
+  color: var(--ink-soft);
+  line-height: 1.52;
 }
 
-.tour-handoff li {
-  position: relative;
-  padding-left: 9px;
-}
-
-.tour-handoff li::before {
-  position: absolute;
-  top: 0.58em;
-  left: 0;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--plum);
-  content: "";
-}
-
-.tour-answer strong {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--plum-deep);
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.tour-section.tour-boundary {
+  margin: 2px -9px -2px;
+  padding: 9px;
+  border-left: 2px solid var(--amber);
+  background: var(--amber-wash);
 }
 
 .sherlock-tour .driver-popover-progress-text {
@@ -1146,7 +1139,7 @@ kbd {
 
 @media (max-width: 1240px) {
   .workspace {
-    grid-template-columns: 235px minmax(390px, 1fr) 330px;
+    grid-template-columns: 235px minmax(390px, 1fr) 360px;
   }
 
   .topbar {
@@ -1161,13 +1154,6 @@ kbd {
     display: none;
   }
 
-  .answer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .answer-grid .answer-section:first-child {
-    border-right: 0;
-  }
 }
 
 @media (max-width: 920px) {
@@ -1295,7 +1281,7 @@ kbd {
     font-size: 9px;
   }
 
-  .trace-handoff {
+  .trace-story {
     display: none;
   }
 
