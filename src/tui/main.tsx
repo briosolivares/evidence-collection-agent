@@ -1,6 +1,5 @@
 // Sherlock entry point: env load, preflight, lazy browser runtimes,
 // render(<App/>), teardown.
-import { render } from 'ink';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { homedir, userInfo } from 'node:os';
@@ -27,6 +26,7 @@ import type { EvalsFeature } from './bridge/evalsFeature.js';
 import { createTuiRuntime } from './bridge/runtime.js';
 import { App } from './components/App.js';
 import { createConfig } from './config.js';
+import { render } from './resizeSafeRender.js';
 import type { BannerIdentity } from './store/state.js';
 
 /** First word of `git config user.name`, else the OS username

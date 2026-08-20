@@ -249,6 +249,21 @@ visually inspected in local Chrome.
 Verification: `npx vitest run tests/tui/artifacts-panel.test.tsx` passes 17/17
 tests, `npm run typecheck` passes, and `git diff --check` is clean.
 
+## Resize-safe TUI frame cleanup (2026-08-20)
+
+- [x] Correct Ink's dynamic-frame row bookkeeping before a narrower terminal
+  redraw so rows introduced by terminal reflow are erased instead of stamped
+  into a staircase of stale borders.
+- [x] Preserve the primary-screen `<Static>` transcript and native scrollback;
+  the correction neither clears the viewport nor switches Sherlock to an
+  alternate-screen UI.
+- [x] Pin the Ink version whose renderer internals the correction targets and
+  cover ten consecutive width reductions in a headless xterm regression that
+  retains the welcome card and only the current composer border.
+
+Verification under Node 22.17: the complete TUI gate passes 32 files / 315
+tests, `npm run typecheck` passes, and `git diff --check` is clean.
+
 ## User README refresh (2026-08-20)
 
 - [x] Replace the obsolete managed-window description with the attached local
