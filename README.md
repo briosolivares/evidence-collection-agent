@@ -19,7 +19,42 @@ sherlock
 ```
 
 On first launch, Sherlock asks for an Anthropic API key when no supported
-credential is already configured and can save it for future sessions.
+credential is already configured and can save it to `~/.sherlock/.env` for
+future sessions.
+
+## Configuration
+
+For an installed copy, put Sherlock's configuration in
+`~/.sherlock/.env`, one `KEY=value` entry per line. The first-launch prompt
+creates this file when you choose to save the Anthropic key. To create or edit
+it yourself:
+
+```bash
+mkdir -p ~/.sherlock
+touch ~/.sherlock/.env
+chmod 600 ~/.sherlock/.env
+```
+
+At minimum, add one supported Anthropic credential:
+
+```dotenv
+# ~/.sherlock/.env
+ANTHROPIC_API_KEY=...
+# or ANTHROPIC_AUTH_TOKEN=...
+```
+
+Runtime credentials and browser-provider variables documented below can go in
+this same file. Sherlock also accepts variables exported by the shell. To use a
+different file for one launch, pass
+`sherlock --env-file /path/to/sherlock.env`.
+
+Installed Sherlock checks `./.env` before `~/.sherlock/.env` when no explicit
+file is given. A development checkout uses the repository-root `.env`.
+
+`SHERLOCK_HOME` and `SHERLOCK_RUNS_DIR` are the exceptions: export them in the
+shell before launching Sherlock because they determine where Sherlock looks
+before it loads an environment file. Setting `SHERLOCK_HOME` this way moves the
+installed config file to `$SHERLOCK_HOME/.env`.
 
 By default, the interactive TUI attaches to your current local Chrome session
 so existing logins are available. If Chrome remote debugging is not enabled,
@@ -38,7 +73,8 @@ sherlock --demo
 
 Local Chrome is the default. Browserbase is available only when selected
 explicitly; merely setting a Browserbase API key never starts a billable remote
-session.
+session. To use it, add these entries to `~/.sherlock/.env` (or the explicit
+environment file you selected):
 
 ```dotenv
 SHERLOCK_BROWSER_PROVIDER=browserbase
@@ -103,8 +139,8 @@ Common overrides:
 - `sherlock --runs-dir <path>` — use another results directory
 - `sherlock --env-file <path>` — load a specific environment file
 - `sherlock --verbose` — print environment and browser-provider diagnostics
-- `SHERLOCK_HOME=<path>` — move Sherlock's data home
-- `SHERLOCK_RUNS_DIR=<path>` — move only the runs directory
+- `SHERLOCK_HOME=<path>` — move Sherlock's data home (shell environment)
+- `SHERLOCK_RUNS_DIR=<path>` — move only the runs directory (shell environment)
 - `SHERLOCK_CHROME_PATH=<path>` — use a specific Chrome/Chromium binary
 - `SHERLOCK_CHROME_CDP_ENDPOINT=<loopback-url>` — attach through an explicit
   loopback Chrome debugging endpoint

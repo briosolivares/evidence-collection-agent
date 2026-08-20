@@ -118,6 +118,10 @@ tests, `npm run typecheck` passes, and `git diff --check` is clean.
   Anthropic credential forms.
 - [x] Add the provider-aware login commands and replace the historical
   checkpoint-1 design link with the active v3 design and implementation plan.
+- [x] Put `~/.sherlock/.env` immediately after installation, state that every
+  runtime/provider variable can live there, and explain explicit-file,
+  current-dir, `SHERLOCK_HOME`, `SHERLOCK_RUNS_DIR`, and development-checkout
+  resolution before provider setup, including the two early path exceptions.
 
 Verification: every documented flag, environment variable, command, path, and
 local link was checked against its current owner; `git diff --check` is clean.
