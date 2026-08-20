@@ -10,8 +10,6 @@
     "bin",
     "native",
     "src",
-    "!src/**/*.test.ts",
-    "!src/**/*.test.tsx",
     "evals/runners/loadTask.ts",
     "evals/runners/report.ts",
     "evals/metrics/metrics.ts",
