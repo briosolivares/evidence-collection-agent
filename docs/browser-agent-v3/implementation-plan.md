@@ -109,6 +109,19 @@ visually inspected in local Chrome.
 Verification: `npx vitest run tests/tui/artifacts-panel.test.tsx` passes 17/17
 tests, `npm run typecheck` passes, and `git diff --check` is clean.
 
+## User README refresh (2026-08-20)
+
+- [x] Replace the obsolete managed-window description with the attached local
+  Chrome setup, permission, existing-login, and run-owned-page behavior.
+- [x] Document explicit Browserbase selection, optional authenticated Contexts,
+  the self-contained run layout, supported path/browser overrides, and both
+  Anthropic credential forms.
+- [x] Add the provider-aware login commands and replace the historical
+  checkpoint-1 design link with the active v3 design and implementation plan.
+
+Verification: every documented flag, environment variable, command, path, and
+local link was checked against its current owner; `git diff --check` is clean.
+
 ## Post-v3 simplification complete (2026-08-17)
 
 - [x] Remove the self-reported `finish.limitations` field from the current
