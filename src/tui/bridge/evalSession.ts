@@ -12,12 +12,8 @@ import { usableStartUrl } from '../../agent/runTask.js';
 import { DEFAULT_MODEL } from '../../model/callModel.js';
 import type { StoreAction } from '../store/reducer.js';
 import type { UiEvent } from '../store/state.js';
+import type { EvalBatchHandle, EvalTaskChoice } from './evalsFeature.js';
 import type { RunHandle, RunSessionDeps } from './runSession.js';
-
-export interface EvalTaskChoice {
-  name: string;
-  headed: boolean;
-}
 
 /** Starts one eval trial with its selected browser policy. The optional
  * dialog resolver rides along for headed trials only — the eval runtime
@@ -42,11 +38,6 @@ export interface EvalSessionDeps {
   loadTask?: (evalsDir: string, name: string) => Promise<EvalTask>;
   formatReportFn?: (report: EvalReport) => string;
   writeResultsFn?: (report: EvalReport, resultsDir: string) => string;
-}
-
-export interface EvalBatchHandle {
-  cancel(): void;
-  done: Promise<'completed' | 'cancelled' | 'failed'>;
 }
 
 export { usableStartUrl };

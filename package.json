@@ -10,10 +10,13 @@
     "bin",
     "native",
     "src",
-    "evals/runners/loadTask.ts",
-    "evals/runners/report.ts",
-    "evals/metrics/metrics.ts",
-    "evals/types.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/tui/developmentEvals.ts",
+    "!src/tui/bridge/evalRuntime.ts",
+    "!src/tui/bridge/evalSession.ts",
+    "!src/tui/components/EvalsMenu.tsx",
+    "!src/tui/components/EvalsLiveRegion.tsx",
     "tsconfig.json"
   ],
   "bin": {

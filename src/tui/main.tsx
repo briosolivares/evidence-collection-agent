@@ -23,7 +23,7 @@ import {
 // Read-only import of the core's default model id for the welcome card —
 // the sanctioned touch-point; the core itself stays untouched.
 import { DEFAULT_MODEL } from '../model/callModel.js';
-import { createTuiEvalRuntime } from './bridge/evalRuntime.js';
+import type { EvalsFeature } from './bridge/evalsFeature.js';
 import { createTuiRuntime } from './bridge/runtime.js';
 import { App } from './components/App.js';
 import { createConfig } from './config.js';
@@ -92,7 +92,8 @@ const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..'
 
 // Per-user state locations: repo-anchored in a dev checkout, under
 // ~/.sherlock when installed — see src/config/paths.ts for the rules.
-const paths = resolveSherlockPaths({ devRoot: findDevRoot(PACKAGE_ROOT) });
+const developmentRoot = findDevRoot(PACKAGE_ROOT);
+const paths = resolveSherlockPaths({ devRoot: developmentRoot });
 
 // The repo deliberately has no dotenv; Sherlock loads the first .env it
 // finds so a bare `sherlock` works without flags. All candidates being
@@ -221,15 +222,21 @@ try {
   console.error(formatBrowserStartupError(browserProvider, message, 'attached'));
   process.exit(1);
 }
-const evalRuntime =
-  runtime === undefined
-    ? undefined
-    : createTuiEvalRuntime({
-        authenticatedRunner: (task, onEvent, opts) => runtime.startRun(task, onEvent, opts),
-        authenticatedProfileDir: paths.profileDir,
-        browserExecutablePath,
-        runsBaseDir: config.runsBaseDir,
-      });
+let developmentEvals:
+  | { feature: EvalsFeature; close(): Promise<void> }
+  | undefined;
+if (runtime !== undefined && developmentRoot !== undefined) {
+  const { createDevelopmentEvals } = await import('./developmentEvals.js');
+  developmentEvals = createDevelopmentEvals({
+    authenticatedRunner: (task, onEvent, opts) =>
+      runtime.startRun(task, onEvent, opts),
+    authenticatedProfileDir: paths.profileDir,
+    browserExecutablePath,
+    runsBaseDir: config.runsBaseDir,
+    evalsDir: config.evalsDir,
+    resultsDir: config.evalResultsDir,
+  });
+}
 
 try {
   const instance = render(
@@ -243,12 +250,13 @@ try {
           ? undefined
           : (task, onEvent, opts) => runtime.startRun(task, onEvent, opts)
       }
-      evalRunner={evalRuntime?.startRun}
+      evalsEnabled={developmentRoot !== undefined}
+      evals={developmentEvals?.feature}
     />,
     { exitOnCtrlC: true },
   );
   await instance.waitUntilExit();
 } finally {
-  await evalRuntime?.close();
+  await developmentEvals?.close();
   await runtime?.shutdown();
 }

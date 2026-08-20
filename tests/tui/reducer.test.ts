@@ -1053,6 +1053,14 @@ describe('reduce (composer substate)', () => {
     });
   });
 
+  it('deriveSuggestions omits evals when development features are disabled', () => {
+    const initial = createInitialState({ evalsEnabled: false });
+    const typed = reduce(initial, { type: 'composer_changed', value: '/e' });
+    expect(deriveSuggestions(typed).suggestions.map((entry) => entry.name)).toEqual([
+      '/exit',
+    ]);
+  });
+
   it('deriveSuggestions is empty outside idle — the composer is disabled there', () => {
     const typed = fold([{ type: 'composer_changed', value: '/e' }]);
     const running = fold(started, typed);

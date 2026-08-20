@@ -1,9 +1,9 @@
 import { Box, Text } from 'ink';
 
-import type { EvalTrialLive } from '../store/state.js';
+import type { EvalsLiveRegionProps } from '../bridge/evalsFeature.js';
 import { theme } from '../theme.js';
 
-export function EvalsLiveRegion({ trials }: { trials: Readonly<Record<string, EvalTrialLive>> }) {
+export function EvalsLiveRegion({ trials }: EvalsLiveRegionProps) {
   const active = Object.values(trials);
   if (active.length === 0) return null;
   return (

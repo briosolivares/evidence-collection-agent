@@ -13,9 +13,9 @@
 
 import { formatDuration, formatTokens } from '../format.js';
 import {
+  availableCommands,
   filterCommands,
   findCommand,
-  SLASH_COMMANDS,
   type CommandKind,
   type SlashCommand,
 } from './commands.js';
@@ -99,29 +99,33 @@ export type RoutedInput =
   | { kind: 'exit' }
   | { kind: 'unknown'; command: string };
 
-/** /help's name column: the longest command name plus two spaces. */
-const HELP_NAME_PAD = Math.max(...SLASH_COMMANDS.map((entry) => entry.name.length)) + 2;
-
 /** The /help transcript block: commands and keys (R10), driven by the
  * single SLASH_COMMANDS registry (R1). */
-export const HELP_TEXT = [
-  'Commands',
-  ...SLASH_COMMANDS.map((entry) => `  ${entry.name.padEnd(HELP_NAME_PAD)}${entry.description}`),
-  'Keys',
-  `  ${'Esc'.padEnd(HELP_NAME_PAD)}Cancel the current run`,
-  `  ${'Ctrl+C'.padEnd(HELP_NAME_PAD)}Quit`,
-].join('\n');
+export function helpText(evalsEnabled = true): string {
+  const commands = availableCommands(evalsEnabled);
+  const namePad = Math.max(...commands.map((entry) => entry.name.length)) + 2;
+  return [
+    'Commands',
+    ...commands.map((entry) => `  ${entry.name.padEnd(namePad)}${entry.description}`),
+    'Keys',
+    `  ${'Esc'.padEnd(namePad)}Cancel the current run`,
+    `  ${'Ctrl+C'.padEnd(namePad)}Quit`,
+  ].join('\n');
+}
+
+/** Complete development-checkout help, retained for pure store callers. */
+export const HELP_TEXT = helpText();
 
 /**
  * Route one submitted composer line: `/`-prefixed lines are commands
  * (known — per the SLASH_COMMANDS registry — or unknown), everything
  * else is a task.
  */
-export function routeInput(text: string): RoutedInput {
+export function routeInput(text: string, evalsEnabled = true): RoutedInput {
   const trimmed = text.trim();
   if (!trimmed.startsWith('/')) return { kind: 'task', text: trimmed };
   const command = trimmed.split(/\s+/, 1)[0]!;
-  const known = findCommand(command);
+  const known = findCommand(command, evalsEnabled);
   if (known === undefined) return { kind: 'unknown', command };
   // Registry names are `/${kind}` by construction, so the slice is safe.
   return { kind: known.name.slice(1) as CommandKind };
@@ -140,6 +144,7 @@ export function createInitialState(
     apiKeyPresent?: boolean;
     completionVerb?: string;
     identity?: BannerIdentity | undefined;
+    evalsEnabled?: boolean;
   } = {},
 ): SessionState {
   return {
@@ -154,6 +159,7 @@ export function createInitialState(
     ],
     nextItemId: 1,
     completionVerb: options.completionVerb ?? 'Brewed',
+    evalsEnabled: options.evalsEnabled ?? true,
     composer: initialComposer(),
     artifacts: [],
     artifactUi: initialArtifactUi(),
@@ -192,7 +198,9 @@ export interface SuggestionView {
  */
 export function deriveSuggestions(state: SessionState): SuggestionView {
   const suggestions =
-    state.mode === 'idle' && !state.composer.dismissed ? filterCommands(state.composer.value) : [];
+    state.mode === 'idle' && !state.composer.dismissed
+      ? filterCommands(state.composer.value, state.evalsEnabled)
+      : [];
   const panelVisible = suggestions.length > 0;
   const cursor = Math.min(state.composer.selectedIndex, suggestions.length - 1);
   return {

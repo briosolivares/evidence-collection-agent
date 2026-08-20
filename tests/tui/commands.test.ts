@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { filterCommands, findCommand, SLASH_COMMANDS } from '../../src/tui/store/commands.js';
-import { HELP_TEXT, routeInput } from '../../src/tui/store/reducer.js';
+import { HELP_TEXT, helpText, routeInput } from '../../src/tui/store/reducer.js';
 
 describe('SLASH_COMMANDS registry', () => {
   it('lists exactly the five commands, each with a description', () => {
@@ -21,6 +21,16 @@ describe('SLASH_COMMANDS registry', () => {
     expect(findCommand('/runs')?.name).toBe('/runs');
     expect(findCommand('/run')).toBeUndefined();
     expect(findCommand('runs')).toBeUndefined();
+  });
+
+  it('omits the checkout-only eval command when evals are disabled', () => {
+    expect(findCommand('/evals', false)).toBeUndefined();
+    expect(filterCommands('/', false).map((entry) => entry.name)).toEqual([
+      '/help',
+      '/runs',
+      '/artifacts',
+      '/exit',
+    ]);
   });
 });
 
@@ -70,6 +80,15 @@ describe('registry drives routeInput and HELP_TEXT', () => {
     });
   });
 
+  it('treats /evals as unavailable and removes it from help when disabled', () => {
+    expect(routeInput('/evals', false)).toEqual({
+      kind: 'unknown',
+      command: '/evals',
+    });
+    expect(helpText(false)).not.toContain('/evals');
+  });
+
+  // The byte-for-byte lock below subsumes a name-by-name listing check.
   it('HELP_TEXT is locked byte-for-byte (one aligned name column)', () => {
     expect(HELP_TEXT).toBe(
       [

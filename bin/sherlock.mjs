@@ -4,6 +4,8 @@
 // then registers tsx's ESM loader (a runtime dependency — there is no
 // build step) and hands off to the TUI entry point. Kept as plain .mjs
 // so `npm install -g` / `npm link` can run it with a stock Node.
+import { fileURLToPath } from 'node:url';
+
 const nodeMajor = Number(process.versions.node.split('.')[0]);
 if (Number.isNaN(nodeMajor) || nodeMajor < 22) {
   console.error(
@@ -13,5 +15,11 @@ if (Number.isNaN(nodeMajor) || nodeMajor < 22) {
 }
 
 const { register } = await import('tsx/esm/api');
-register();
+// Programmatic tsx registration searches for tsconfig from the caller's cwd.
+// A global install lives elsewhere, so pass the package's config explicitly;
+// otherwise JSX falls back to the classic transform and expects a global
+// `React` variable that the react-jsx source intentionally does not import.
+register({
+  tsconfig: fileURLToPath(new URL('../tsconfig.json', import.meta.url)),
+});
 await import(new URL('../src/tui/main.tsx', import.meta.url).href);

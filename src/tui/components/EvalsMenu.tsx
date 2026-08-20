@@ -2,7 +2,7 @@ import { Box, Text, useInput } from 'ink';
 import { useState } from 'react';
 
 import { DEFAULT_EVAL_CONCURRENCY } from '../../../evals/config.js';
-import type { EvalTaskChoice } from '../bridge/evalSession.js';
+import type { EvalsMenuProps } from '../bridge/evalsFeature.js';
 import { theme } from '../theme.js';
 
 export function validateK(text: string): number | undefined {
@@ -11,12 +11,6 @@ export function validateK(text: string): number | undefined {
 
 export function validateConcurrency(text: string): number | undefined {
   return validatePositiveInteger(text);
-}
-
-interface EvalsMenuProps {
-  tasks: readonly EvalTaskChoice[];
-  onConfirm: (tasks: string[], k: number, concurrency: number) => void;
-  onClose: () => void;
 }
 
 /** Task selection followed by k and normal/headless concurrency prompts. */
