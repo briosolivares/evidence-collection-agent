@@ -58,18 +58,27 @@ the public cutover and legacy-production removal were completed.
   route has hand-written narratives covering mechanics, handoff, rationale,
   authority, and a path into current implementation code; no inspector or
   walkthrough exposes the old field-by-field checklist.
+- [x] Give real code symbols consistent inline-code typography across cards,
+  articles, tracers, and walkthroughs. Callable functions and model-facing
+  tools display with `()`, while types, constants, fields, and paths preserve
+  their exact source spelling. A source audit also replaced the stale
+  `WorkerSession` label with the real `createWorker()` factory and `Worker`
+  type.
 - [x] Keep the deliverable self-contained and offline by checking in the
   generated HTML bundle, while retaining typed source data, React/CSS source,
   and the deterministic `npm run build:atlas` build path.
 
 Verification: `npm run typecheck`, two consecutive atlas builds with identical
-SHA-256 `8f5303569531d93a155082f4b653776b48da9a265cfcbad3647d22db68492e52`,
+SHA-256 `4b9d500627a93199a3aaad8fa2045fdbc83b78fd91deca3eb0f081cc8922ac55`,
 and `git diff --check` pass. Temporary Playwright runs against local Chrome
 exercise the four-stage route, all prose article sections, manual narrative
 tracing, all four Driver.js steps, the initializer's three-node expansion, and
 the responsive detail drawer. They report zero page/console errors, unlabeled
 buttons, old checklist headings, walkthrough lists, horizontal mobile
-overflow, or remote requests. The default article view and guided tour at
+overflow, or remote requests. Exact inline rendering was exercised for
+`set_output_contract()`, `contract.outputs`, `OutputContract`,
+`validateInitialContractCall()`, code paths, and the `finish() alone` graph
+edge. The default article view, code-reference expansion, and guided tour at
 1600×1000 were visually inspected; temporary screenshots remain outside the
 repository.
 

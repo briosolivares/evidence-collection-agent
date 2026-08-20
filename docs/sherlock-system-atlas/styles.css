@@ -872,6 +872,35 @@ button:focus-visible,
   line-height: 1.5;
 }
 
+.inline-code {
+  box-decoration-break: clone;
+  padding: 0.08em 0.3em;
+  border: 1px solid #d7cbe5;
+  border-radius: 3px;
+  background: #eee8f6;
+  color: var(--plum-deep);
+  font-family: var(--mono);
+  font-size: 0.86em;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+}
+
+.semantic-card .inline-code {
+  padding: 0.06em 0.24em;
+  font-size: 0.72em;
+}
+
+.inspector h2 .inline-code {
+  font-size: 0.66em;
+  letter-spacing: -0.035em;
+}
+
+.trace-story .inline-code {
+  font-size: 0.88em;
+}
+
 .article-flowline {
   padding: 14px 17px 15px;
   border-bottom: 1px solid var(--line);
@@ -1074,6 +1103,10 @@ kbd {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13px;
   line-height: 1.48;
+}
+
+.sherlock-tour .inline-code {
+  font-size: 0.82em;
 }
 
 .tour-section {

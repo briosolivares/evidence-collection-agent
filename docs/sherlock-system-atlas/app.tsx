@@ -97,8 +97,143 @@ function escapeMarkup(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
+const callableReferences = new Set([
+  'ask_user',
+  'bash',
+  'BrowserSessionProvider.createSession',
+  'browser_execute',
+  'buildContextView',
+  'createRunDir',
+  'createWorker',
+  'createWorkerToolRegistry',
+  'edit_file',
+  'ensureOutputContractFile',
+  'executeRun',
+  'finish',
+  'getAccess',
+  'grep',
+  'publish_artifact',
+  'read_file',
+  'report_verification',
+  'resolveRunPath',
+  'resumeTask',
+  'runAgent',
+  'runFinishChecks',
+  'runTask',
+  'set_output_contract',
+  'syncScratchWorkspace',
+  'validateInitialContractCall',
+  'write_file',
+]);
+
+const literalReferences = [
+  'BrowserController',
+  'BrowserSessionProvider',
+  'CapResult',
+  'CoordinatorState',
+  'DurableRunConfiguration',
+  'DurableTerminalOutcome',
+  'FinishFacts',
+  'FinishRequest',
+  'getAccess(input)',
+  'ModelDriver',
+  'OutputContract.outputs',
+  'OutputContract',
+  'RunTaskConfig',
+  'RunTaskResult',
+  'RunTracing',
+  'ToolDef',
+  'ToolRegistry',
+  'VerificationResult',
+  'WORKER_API_TOOL_DEFS',
+  'WORKER_TOOL_ORDER',
+  'Worker',
+  'WorkerState',
+  'artifacts/',
+  'contentExpectations',
+  'contract.contentExpectations',
+  'contract.outputs',
+  'harness/output-contract.json',
+  'harness/',
+  'manifest.json',
+  'metrics.json',
+  'needs_correction',
+  'oracleData',
+  'requested_output',
+  'requiresLogin',
+  'runDir',
+  'scratch/workspace/',
+  'scratch/',
+  'SHERLOCK_BROWSER_PROVIDER',
+  'transcript.jsonl',
+];
+
+const codeReferences = [...callableReferences, ...literalReferences].sort(
+  (left, right) => right.length - left.length,
+);
+const codeReferencePattern = new RegExp(
+  `(?<![A-Za-z0-9_])(${codeReferences
+    .map((reference) => reference.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|')})(?![A-Za-z0-9_])`,
+  'g',
+);
+
+interface ReferencePart {
+  value: string;
+  code: boolean;
+}
+
+function referenceParts(value: string): ReferencePart[] {
+  const parts: ReferencePart[] = [];
+  let cursor = 0;
+  for (const match of value.matchAll(codeReferencePattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) parts.push({ value: value.slice(cursor, index), code: false });
+    const reference = match[0];
+    parts.push({
+      value: callableReferences.has(reference) ? `${reference}()` : reference,
+      code: true,
+    });
+    cursor = index + reference.length;
+  }
+  if (cursor < value.length) parts.push({ value: value.slice(cursor), code: false });
+  return parts;
+}
+
+function RichText({ value }: { value: string }) {
+  return (
+    <>
+      {referenceParts(value).map((part, index) =>
+        part.code ? (
+          <code className="inline-code" key={`${part.value}-${index}`}>
+            {part.value}
+          </code>
+        ) : (
+          part.value
+        ),
+      )}
+    </>
+  );
+}
+
+function richMarkup(value: string): string {
+  return referenceParts(value)
+    .map((part) =>
+      part.code
+        ? `<code class="inline-code">${escapeMarkup(part.value)}</code>`
+        : escapeMarkup(part.value),
+    )
+    .join('');
+}
+
+function richPlainText(value: string): string {
+  return referenceParts(value)
+    .map((part) => part.value)
+    .join('');
+}
+
 function tourSection(label: string, value: string, className = ''): string {
-  return `<div class="tour-section ${className}"><strong>${label}</strong><p>${escapeMarkup(value)}</p></div>`;
+  return `<div class="tour-section ${className}"><strong>${label}</strong><p>${richMarkup(value)}</p></div>`;
 }
 
 function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
@@ -120,15 +255,19 @@ function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
       ]
         .filter(Boolean)
         .join(' ')}
-      aria-label={`${node.title}. ${node.summary}`}
+      aria-label={`${richPlainText(node.title)}. ${richPlainText(node.summary)}`}
     >
       <Handle className="atlas-handle" type="target" position={Position.Left} />
       <div className="card-topline">
         <span className="card-code">{node.code}</span>
         <span className="card-tone">{data.handoffView ? node.kicker : toneLabel(node.tone)}</span>
       </div>
-      <h3>{node.title}</h3>
-      <p>{node.summary}</p>
+      <h3>
+        <RichText value={node.title} />
+      </h3>
+      <p>
+        <RichText value={node.summary} />
+      </p>
       <div className="card-footer">
         <span>
           {data.handoffView
@@ -304,36 +443,52 @@ function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: stri
           <span className={`inspector-code tone-${node.tone}`}>{node.code}</span>
           <span>{node.kicker}</span>
         </div>
-        <h2>{node.title}</h2>
-        <p className="inspector-summary">{node.summary}</p>
+        <h2>
+          <RichText value={node.title} />
+        </h2>
+        <p className="inspector-summary">
+          <RichText value={node.summary} />
+        </p>
         <div className="article-flowline">
           <span>Where you are in the flow</span>
-          <p>{flowContext}</p>
+          <p>
+            <RichText value={flowContext} />
+          </p>
         </div>
 
         <article className="editorial-article">
-          <p className="article-lead">{node.narrative.opening}</p>
+          <p className="article-lead">
+            <RichText value={node.narrative.opening} />
+          </p>
 
           <section className="article-section">
             <h3>What happens here</h3>
             {node.narrative.mechanics.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+              <p key={paragraph}>
+                <RichText value={paragraph} />
+              </p>
             ))}
           </section>
 
           <section className="article-section article-handoff">
             <h3>How the handoff works</h3>
-            <p>{node.narrative.handoff}</p>
+            <p>
+              <RichText value={node.narrative.handoff} />
+            </p>
           </section>
 
           <blockquote className="authority-pullquote">
             <span>Where its authority stops</span>
-            <p>{node.narrative.boundary}</p>
+            <p>
+              <RichText value={node.narrative.boundary} />
+            </p>
           </blockquote>
 
           <section className="article-section article-why">
             <h3>Why Sherlock keeps this separate</h3>
-            <p>{node.answers.why}</p>
+            <p>
+              <RichText value={node.answers.why} />
+            </p>
           </section>
 
           <section className="article-section">
@@ -358,7 +513,7 @@ function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: stri
                 {related.map((item) => (
                   <button key={item.id} type="button" onClick={() => onSelect(item.id)}>
                     <span>{item.code}</span>
-                    {item.title}
+                    <RichText value={item.title} />
                   </button>
                 ))}
               </div>
@@ -589,7 +744,7 @@ function Atlas() {
         popover: {
           title: `${node.code} · ${node.title}`,
           description: [
-            `<p class="tour-lede">${escapeMarkup(node.narrative.opening)}</p>`,
+            `<p class="tour-lede">${richMarkup(node.narrative.opening)}</p>`,
             tourSection('What happens here', node.narrative.mechanics[0]),
             tourSection('How the handoff works', node.narrative.handoff),
             tourSection('Where its authority stops', node.narrative.boundary, 'tour-boundary'),
@@ -774,12 +929,16 @@ function Atlas() {
               ) : (
                 <div className="trace-node-copy">
                   <strong>
-                    {traceNode.code} · {traceNode.title}
+                    {traceNode.code} · <RichText value={traceNode.title} />
                   </strong>
-                  <p>{traceNode.summary}</p>
+                  <p>
+                    <RichText value={traceNode.summary} />
+                  </p>
                   <div className="trace-story">
                     <em>How it connects</em>
-                    <span>{traceNode.narrative.handoff}</span>
+                    <span>
+                      <RichText value={traceNode.narrative.handoff} />
+                    </span>
                   </div>
                 </div>
               )}
