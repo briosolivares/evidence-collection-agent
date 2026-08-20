@@ -3,7 +3,9 @@ import { createRoot } from 'react-dom/client';
 import {
   Background,
   BackgroundVariant,
+  BaseEdge,
   Controls,
+  EdgeLabelRenderer,
   Handle,
   MarkerType,
   Position,
@@ -11,6 +13,7 @@ import {
   ReactFlowProvider,
   useReactFlow,
   type Edge,
+  type EdgeProps,
   type Node,
   type NodeProps,
 } from '@xyflow/react';
@@ -48,6 +51,9 @@ interface AtlasEdgeData extends Record<string, unknown> {
   semantic: SemanticEdge;
   dimmed: boolean;
   traced: boolean;
+  path: string;
+  labelX: number;
+  labelY: number;
 }
 
 type AtlasEdge = Edge<AtlasEdgeData>;
@@ -57,6 +63,34 @@ const NODE_SIZE = {
   implementation: { width: 226, height: 132 },
 } as const;
 
+interface ElkPoint {
+  x: number;
+  y: number;
+}
+
+interface ElkEdgeLabel {
+  id: string;
+  text: string;
+  width: number;
+  height: number;
+  x?: number;
+  y?: number;
+}
+
+interface ElkEdgeSection {
+  startPoint: ElkPoint;
+  endPoint: ElkPoint;
+  bendPoints?: ElkPoint[];
+}
+
+interface ElkGraphEdge {
+  id: string;
+  sources: string[];
+  targets: string[];
+  labels: ElkEdgeLabel[];
+  sections?: ElkEdgeSection[];
+}
+
 interface ElkGraphNode {
   id: string;
   x?: number;
@@ -65,13 +99,17 @@ interface ElkGraphNode {
   height?: number;
   layoutOptions?: Record<string, string>;
   children?: ElkGraphNode[];
-  edges?: Array<{ id: string; sources: string[]; targets: string[] }>;
+  edges?: ElkGraphEdge[];
 }
 
 const ElkConstructor = ELK as unknown as new () => {
   layout: (graph: ElkGraphNode) => Promise<ElkGraphNode>;
 };
 const elk = new ElkConstructor();
+
+function estimatedEdgeLabelWidth(label: string): number {
+  return Math.max(56, Math.ceil(label.length * 5.8 + 18));
+}
 
 function toneLabel(tone: SemanticNode['tone']): string {
   return {
@@ -301,6 +339,42 @@ const nodeTypes = {
   implementation: SemanticCard,
 };
 
+function SemanticEdgeView({ id, data, markerEnd, style, interactionWidth }: EdgeProps<AtlasEdge>) {
+  if (data === undefined) throw new Error(`Atlas edge ${id} is missing semantic data.`);
+  return (
+    <>
+      <BaseEdge
+        id={id}
+        path={data.path}
+        markerEnd={markerEnd}
+        style={style}
+        interactionWidth={interactionWidth}
+      />
+      <EdgeLabelRenderer>
+        <div
+          className={[
+            'atlas-edge-label',
+            `edge-${data.semantic.kind}`,
+            data.dimmed ? 'is-dimmed' : '',
+            data.traced ? 'is-traced' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          style={{
+            transform: `translate(-50%, -50%) translate(${data.labelX}px, ${data.labelY}px)`,
+          }}
+        >
+          {data.semantic.label}
+        </div>
+      </EdgeLabelRenderer>
+    </>
+  );
+}
+
+const edgeTypes = {
+  semantic: SemanticEdgeView,
+};
+
 function implementationEdges(parentId: string): SemanticEdge[] {
   const children = implementationNodes(parentId);
   if (children.length === 0) return [];
@@ -339,7 +413,7 @@ async function layoutGraph(
       'elk.direction': 'RIGHT',
       'elk.edgeRouting': 'ORTHOGONAL',
       'elk.spacing.nodeNode': '44',
-      'elk.layered.spacing.nodeNodeBetweenLayers': '86',
+      'elk.layered.spacing.nodeNodeBetweenLayers': '24',
       'elk.layered.spacing.edgeNodeBetweenLayers': '28',
       'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
       'elk.layered.cycleBreaking.strategy': 'DEPTH_FIRST',
@@ -354,6 +428,14 @@ async function layoutGraph(
       id: edge.id,
       sources: [edge.source],
       targets: [edge.target],
+      labels: [
+        {
+          id: `${edge.id}-label`,
+          text: edge.label,
+          width: estimatedEdgeLabelWidth(edge.label),
+          height: 18,
+        },
+      ],
     })),
   });
 
@@ -380,19 +462,40 @@ async function layoutGraph(
     };
   });
 
-  const resultEdges: AtlasEdge[] = visibleEdges.map((semantic) => ({
-    id: semantic.id,
-    source: semantic.source,
-    target: semantic.target,
-    type: 'smoothstep',
-    label: semantic.label,
-    markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
-    className: `semantic-edge edge-${semantic.kind}`,
-    labelShowBg: true,
-    labelBgPadding: [7, 4],
-    labelBgBorderRadius: 3,
-    data: { semantic, dimmed: false, traced: false },
-  }));
+  const laidOutEdges = new Map((graph.edges ?? []).map((edge) => [edge.id, edge]));
+  const resultEdges: AtlasEdge[] = visibleEdges.map((semantic) => {
+    const laidOut = laidOutEdges.get(semantic.id);
+    const section = laidOut?.sections?.[0];
+    const label = laidOut?.labels[0];
+    if (
+      section === undefined ||
+      label === undefined ||
+      label.x === undefined ||
+      label.y === undefined
+    ) {
+      throw new Error(`ELK returned incomplete edge geometry for ${semantic.id}`);
+    }
+    const points = [section.startPoint, ...(section.bendPoints ?? []), section.endPoint];
+    const path = points
+      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+      .join(' ');
+    return {
+      id: semantic.id,
+      source: semantic.source,
+      target: semantic.target,
+      type: 'semantic',
+      markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
+      className: `semantic-edge edge-${semantic.kind}`,
+      data: {
+        semantic,
+        dimmed: false,
+        traced: false,
+        path,
+        labelX: label.x + label.width / 2,
+        labelY: label.y + label.height / 2,
+      },
+    };
+  });
   return { nodes, edges: resultEdges };
 }
 
@@ -662,9 +765,10 @@ function Atlas() {
   const edges = useMemo(
     () =>
       baseEdges.map((edge) => {
-        const semantic = edge.data?.semantic;
-        if (semantic === undefined)
+        const edgeData = edge.data;
+        if (edgeData === undefined)
           throw new Error(`Atlas edge ${edge.id} is missing semantic data.`);
+        const semantic = edgeData.semantic;
         const touchesTrace =
           traceId !== null && (edge.source === traceId || edge.target === traceId);
         return {
@@ -677,7 +781,12 @@ function Atlas() {
           ]
             .filter(Boolean)
             .join(' '),
-          data: { semantic, dimmed: traceId !== null && !touchesTrace, traced: touchesTrace },
+          data: {
+            ...edgeData,
+            semantic,
+            dimmed: traceId !== null && !touchesTrace,
+            traced: touchesTrace,
+          },
         };
       }),
     [baseEdges, traceId],
@@ -898,6 +1007,7 @@ function Atlas() {
               nodes={nodes}
               edges={edges}
               nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
               onNodeClick={(_event, node) => selectNode(node.id)}
               nodesDraggable={false}
               nodesConnectable={false}

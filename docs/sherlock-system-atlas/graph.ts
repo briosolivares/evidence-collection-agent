@@ -1242,7 +1242,7 @@ export const edges: readonly SemanticEdge[] = [
     id: 'contract-worker',
     source: 'contract',
     target: 'worker',
-    label: 'task + immutable contract',
+    label: 'task + contract',
     explanation:
       'The worker opens with the original request and the exact accepted OutputContract as separate guidance.',
     kind: 'flow',
@@ -1324,7 +1324,7 @@ export const edges: readonly SemanticEdge[] = [
     id: 'checks-verifier',
     source: 'checks',
     target: 'verifier',
-    label: 'facts + surfaced files',
+    label: 'facts + files',
     explanation:
       'Passing checks provide code-settled facts and the manifest-selected evidence view for semantic judgment.',
     kind: 'flow',

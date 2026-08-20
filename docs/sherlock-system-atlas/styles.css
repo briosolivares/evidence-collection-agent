@@ -616,7 +616,7 @@ button:focus-visible,
   height: 7px !important;
   border: 2px solid white !important;
   background: var(--tone) !important;
-  opacity: 0.78;
+  opacity: 0;
 }
 
 .react-flow__edge-path {
@@ -653,15 +653,22 @@ button:focus-visible,
   stroke-width: 2.5;
 }
 
-.react-flow__edge-text {
-  fill: #6f6878;
+.atlas-edge-label {
+  position: absolute;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: rgba(247, 245, 251, 0.94);
+  color: #6f6878;
   font-family: var(--mono);
   font-size: 8px;
   font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-.route-handoff .react-flow__edge-text {
-  fill: var(--ink);
+.route-handoff .atlas-edge-label {
+  color: var(--ink);
   font-size: 9px;
   font-weight: 850;
 }
@@ -670,9 +677,12 @@ button:focus-visible,
   stroke-width: 1.7;
 }
 
-.react-flow__edge-textbg {
-  fill: rgba(247, 245, 251, 0.94);
-  fill-opacity: 1;
+.atlas-edge-label.is-dimmed {
+  opacity: 0.06;
+}
+
+.atlas-edge-label.is-traced {
+  color: var(--plum-deep);
 }
 
 .react-flow__controls {

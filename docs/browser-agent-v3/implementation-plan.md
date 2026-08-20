@@ -64,12 +64,17 @@ the public cutover and legacy-production removal were completed.
   their exact source spelling. A source audit also replaced the stale
   `WorkerSession` label with the real `createWorker()` factory and `Worker`
   type.
+- [x] Treat edge labels and routes as ELK geometry too. Label dimensions now
+  participate in layout, and the rendered orthogonal paths and label
+  coordinates come directly from ELK instead of React Flow midpoint guesses;
+  compact handoff labels and routed correction loops remain clear when fitted
+  or zoomed.
 - [x] Keep the deliverable self-contained and offline by checking in the
   generated HTML bundle, while retaining typed source data, React/CSS source,
   and the deterministic `npm run build:atlas` build path.
 
 Verification: `npm run typecheck`, two consecutive atlas builds with identical
-SHA-256 `4b9d500627a93199a3aaad8fa2045fdbc83b78fd91deca3eb0f081cc8922ac55`,
+SHA-256 `5a81ac3978d4fed22e82e7629c0ed75ac2b81483081266cddc5074e101610264`,
 and `git diff --check` pass. Temporary Playwright runs against local Chrome
 exercise the four-stage route, all prose article sections, manual narrative
 tracing, all four Driver.js steps, the initializer's three-node expansion, and
@@ -81,6 +86,14 @@ overflow, or remote requests. Exact inline rendering was exercised for
 edge. The default article view, code-reference expansion, and guided tour at
 1600×1000 were visually inspected; temporary screenshots remain outside the
 repository.
+
+Edge-layout follow-up: Playwright checks the reported initializer → worker
+case at focused zoom with equal 25.5 px label clearance, the four-node handoff
+and 14-node whole-system routes with zero label/node collisions, the
+seven-node initializer expansion, custom-label dim/focus state, Driver.js,
+and the settled responsive drawer. There are no page/console errors or remote
+requests. The handoff, focused screenshot case, and whole-system routes were
+visually inspected in local Chrome.
 
 ## Post-v3 simplification complete (2026-08-17)
 
