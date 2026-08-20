@@ -1,12 +1,12 @@
 # Sherlock
 
-Sherlock is a browser agent for collecting audit evidence. Give it a task in
-plain English and it uses Chrome to research, capture evidence, and publish
-requested outputs with provenance.
+Sherlock is a browser agent for collecting audit evidence. Describe what you
+need in plain English and it drives Chrome to dig up the answer, grab the
+evidence along the way, and hand back the outputs you asked for with provenance.
 
 ## Install and run
 
-You need:
+You'll need:
 
 - Node.js 22 or newer
 - an Anthropic API key or auth token (you can enter an API key on first launch)
@@ -20,13 +20,12 @@ npm install --global github:briosolivares/evidence-collection-agent
 sherlock
 ```
 
-You do not need `nvm`. It is only one way to install the required Node version.
-If your current Node version is older than 22 and you already use `nvm`, run
-`nvm install 22` and `nvm use 22` before the commands above.
+`nvm` isn't required — it's just one way to get Node 22. If you're on an older
+Node and already use `nvm`, run `nvm install 22` and `nvm use 22` first.
 
-On first launch, Sherlock asks for an Anthropic API key when no supported
-credential is already configured and can save it to `~/.sherlock/.env` for
-future sessions.
+The first time you launch it, Sherlock will ask for an Anthropic API key if it
+can't find one, and offers to save it to `~/.sherlock/.env` so you don't have
+to enter it again.
 
 ## Configuration
 
