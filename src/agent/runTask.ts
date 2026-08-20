@@ -219,9 +219,7 @@ function buildFreshConfiguration(taskText: string, config: RunTaskConfig): Durab
       maxWorkerTurns: ceilingToCheckpoint(config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns),
       maxToolCalls: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxToolCalls),
       maxModelTokens: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxModelTokens),
-      maxWallTimeMs: ceilingToCheckpoint(
-        config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs,
-      ),
+      maxWallTimeMs: ceilingToCheckpoint(config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs),
     },
   });
 }
