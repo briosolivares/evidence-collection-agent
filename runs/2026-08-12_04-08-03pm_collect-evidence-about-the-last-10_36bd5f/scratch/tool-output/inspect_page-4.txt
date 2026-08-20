@@ -1,0 +1,755 @@
+URL: https://github.com/openclaw/openclaw/pull/122841
+Title: fix(ui): let read-only operators copy task results by steipete · Pull Request #122841 · openclaw/openclaw · GitHub
+
+- generic [ref=f9e2]:
+  - generic [ref=f9e3]:
+    - link "Skip to content" [ref=f9e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f9e8]:
+      - heading "Navigation Menu" [level=2] [ref=f9e9]
+      - generic [ref=f9e10]:
+        - link "Homepage" [ref=f9e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f9e15]:
+          - navigation "Global" [ref=f9e16]:
+            - list [ref=f9e17]:
+              - listitem [ref=f9e18]:
+                - button "Platform" [ref=f9e20] [cursor=pointer]
+              - listitem [ref=f9e23]:
+                - button "Solutions" [ref=f9e25] [cursor=pointer]
+              - listitem [ref=f9e28]:
+                - button "Resources" [ref=f9e30] [cursor=pointer]
+              - listitem [ref=f9e33]:
+                - button "Open Source" [ref=f9e35] [cursor=pointer]
+              - listitem [ref=f9e38]:
+                - button "Enterprise" [ref=f9e40] [cursor=pointer]
+              - listitem [ref=f9e43]:
+                - link "Pricing" [ref=f9e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f9e45]:
+            - button "Search or jump to, type / to search" [ref=f9e47] [cursor=pointer]:
+              - generic [ref=f9e50]:
+                - text: Type
+                - generic [ref=f9e51]: /
+                - text: to search
+            - link "Sign in" [ref=f9e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122841
+            - link "Sign up" [ref=f9e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f9e55] [cursor=pointer]
+  - main [ref=f9e61]:
+    - generic [ref=f9e62]:
+      - generic [ref=f9e63]:
+        - generic [ref=f9e65]:
+          - link "openclaw" [ref=f9e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f9e70]: /
+          - strong [ref=f9e71]:
+            - link "openclaw" [ref=f9e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f9e73]: Public
+        - generic [ref=f9e74]:
+          - list:
+            - listitem [ref=f9e75]:
+              - link "Sponsor @openclaw" [ref=f9e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f9e77]: Sponsor
+            - listitem [ref=f9e81]:
+              - link "You must be signed in to change notification settings" [ref=f9e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f9e85]:
+              - link "Fork 81.1k" [ref=f9e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,147" [ref=f9e89]: 81.1k
+            - listitem [ref=f9e90]:
+              - link "You must be signed in to star a repository" [ref=f9e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386076 users starred this repository" [ref=f9e95]: 386k
+      - navigation "Repository" [ref=f9e96]:
+        - list [ref=f9e97]:
+          - listitem [ref=f9e98]:
+            - link "Code" [ref=f9e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f9e103]:
+            - link "Issues 3.4k" [ref=f9e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f9e108]: Issues
+              - generic "3,414" [ref=f9e109]: 3.4k
+          - listitem [ref=f9e110]:
+            - link "Pull requests 2.1k" [ref=f9e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f9e114]: Pull requests
+              - generic "2,113" [ref=f9e115]: 2.1k
+          - listitem [ref=f9e116]:
+            - link "Actions" [ref=f9e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f9e121]:
+            - link "Projects" [ref=f9e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f9e126]:
+            - link "Security and quality 647" [ref=f9e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f9e130]: Security and quality
+              - generic "647" [ref=f9e131]
+          - listitem [ref=f9e132]:
+            - link "Insights" [ref=f9e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f9e143]:
+      - generic [ref=f9e147]:
+        - generic [ref=f9e149]:
+          - 'heading "fix(ui): let read-only operators copy task results - #122841" [level=1] [ref=f9e150]':
+            - text: "fix(ui): let read-only operators copy task results"
+            - generic [ref=f9e151]: "- #122841"
+          - generic [ref=f9e152]: "#122841"
+        - generic [ref=f9e155]:
+          - generic [ref=f9e157]:
+            - img "Pull request" [ref=f9e158]
+            - text: Merged
+          - generic [ref=f9e161]:
+            - link "steipete" [ref=f9e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 2 commits into
+            - generic [ref=f9e163]:
+              - link "main" [ref=f9e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f9e165]: from
+              - generic [ref=f9e166]:
+                - link "fix/tasks-read-only-copy" [ref=f9e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/fix/tasks-read-only-copy
+                - button "Copy head branch name to clipboard" [ref=f9e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 3:58 PM PDT" [ref=f9e172]: Aug 12, 202610 minutes ago
+        - generic [ref=f9e173]:
+          - generic [ref=f9e175]:
+            - generic [ref=f9e176]: "+212"
+            - generic [ref=f9e177]: "-77"
+            - generic [ref=f9e178]: "Lines changed: 212 additions & 77 deletions"
+          - navigation "Pull request navigation tabs" [ref=f9e186]:
+            - generic [ref=f9e187]:
+              - link "Conversation (5)" [ref=f9e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122841
+                - text: Conversation
+                - generic [ref=f9e191]: "5"
+                - generic [ref=f9e192]: (5)
+              - link "Commits (2)" [ref=f9e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122841/commits
+                - text: Commits
+                - generic [ref=f9e196]: "2"
+                - generic [ref=f9e197]: (2)
+              - link "Checks (109)" [ref=f9e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122841/checks
+                - text: Checks
+                - generic [ref=f9e201]: "109"
+                - generic [ref=f9e202]: (109)
+              - link "Files changed (6)" [ref=f9e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122841/files
+                - text: Files changed
+                - generic [ref=f9e206]: "6"
+                - generic [ref=f9e207]: (6)
+      - generic [ref=f9e212]:
+        - generic [ref=f9e214]:
+          - heading "Conversation" [level=2] [ref=f9e215]
+          - generic [ref=f9e216]:
+            - generic [ref=f9e217]:
+              - generic [ref=f9e219]:
+                - link [ref=f9e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f9e221]
+                - generic [ref=f9e223]:
+                  - generic [ref=f9e224]:
+                    - heading "steipete commented Aug 12, 202653 minutes ago •" [level=3] [ref=f9e225]:
+                      - generic [ref=f9e226]:
+                        - strong [ref=f9e227]:
+                          - link "steipete" [ref=f9e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 202653 minutes ago" [ref=f9e229] [cursor=pointer]:
+                          - /url: "#issue-5135766739"
+                        - generic [ref=f9e230]:
+                          - generic [ref=f9e231]: •
+                          - group [ref=f9e232]:
+                            - button "edited" [ref=f9e233] [cursor=pointer]
+                    - generic [ref=f9e237]:
+                      - group [ref=f9e239]:
+                        - button [ref=f9e240] [cursor=pointer]:
+                          - img "Show options" [ref=f9e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f9e246]: Contributor
+                  - generic [ref=f9e251]:
+                    - paragraph [ref=f9e252]:
+                      - text: Closes
+                      - link "#122799" [ref=f9e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/122799
+                    - heading "What Problem This Solves" [level=2] [ref=f9e254]
+                    - paragraph [ref=f9e255]: Fixes an issue where read-only Control UI operators could inspect a retained task result but could not use the normal Copy result action unless they were also granted write access.
+                    - heading "Why This Change Was Made" [level=2] [ref=f9e256]
+                    - paragraph [ref=f9e257]:
+                      - text: The Control UI now projects read access through the canonical operator-scope implication rules and passes separate copy and mutation capabilities into the Tasks view. Copy remains a read-only
+                      - code [ref=f9e258]: tasks.get
+                      - text: flow; Retry, Dismiss, and Cancel remain gated by
+                      - code [ref=f9e259]: operator.write
+                      - text: .
+                    - paragraph [ref=f9e260]:
+                      - text: "Scope contract: no new strings, protocol fields, configuration, Gateway methods, generated locale data, or translation memory. The existing Gateway identity/reconnect fencing around"
+                      - code [ref=f9e261]: tasks.get
+                      - text: is unchanged.
+                    - heading "User Impact" [level=2] [ref=f9e262]
+                    - paragraph [ref=f9e263]:
+                      - text: Operators with
+                      - code [ref=f9e264]: operator.read
+                      - text: can copy retained completed-task results without receiving broader mutation privileges. Write-authorized and legacy operators keep their existing behavior, while read-only operators still cannot retry, dismiss, or cancel tasks.
+                    - heading "Evidence" [level=2] [ref=f9e265]
+                    - list [ref=f9e266]:
+                      - listitem [ref=f9e267]: "Pre-fix regression: the scoped unit fixture had no Copy result button, and the browser flow timed out waiting for Copy."
+                      - listitem [ref=f9e268]:
+                        - text: "Focused unit proof: 31/31 passed across"
+                        - code [ref=f9e269]: operator-access.test.ts
+                        - text: and
+                        - code [ref=f9e270]: tasks-page.test.ts
+                        - text: .
+                      - listitem [ref=f9e271]:
+                        - text: "Browser proof:"
+                        - code [ref=f9e272]: ui/src/pages/tasks/tasks.e2e.test.ts
+                        - text: passed 2/2 on final-head Blacksmith Testbox
+                        - code [ref=f9e273]: tbx_01kzw1e3qa05dtawhnhpzrx6gy
+                        - text: . The read-only scenario observed exact
+                        - code [ref=f9e274]: tasks.get
+                        - text: parameters, exact synthetic clipboard content, and zero
+                        - code [ref=f9e275]: tasks.retry
+                        - text: ","
+                        - code [ref=f9e276]: tasks.dismiss
+                        - text: ", or"
+                        - code [ref=f9e277]: tasks.cancel
+                        - text: requests.
+                      - listitem [ref=f9e278]:
+                        - text: "Testbox changed gate: passed on the same final-head lease; Control UI/core-test typechecks, formatting, lint, i18n verification, dead-export checks, and guards were clean. Hydration/run:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31647071810" [ref=f9e279] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31647071810
+                        - text: .
+                      - listitem [ref=f9e280]: An earlier first browser attempt proved the changed read-only scenario but the unrelated sibling video test lacked Playwright ffmpeg. Playwright's ffmpeg helper was installed before the complete final-head file reran green 2/2.
+                      - listitem [ref=f9e281]:
+                        - text: "Format and patch checks: six-file"
+                        - code [ref=f9e282]: oxfmt --check
+                        - text: and
+                        - code [ref=f9e283]: git diff --check
+                        - text: passed.
+                      - listitem [ref=f9e284]: "Source-blind behavior contract: passed for Copy visibility and execution, mutation absence, exact clipboard output, and no mutation requests."
+                      - listitem [ref=f9e285]: "Fresh final-head autoreview: TruffleHog clean; no accepted/actionable findings; patch correct (0.98 confidence)."
+                      - listitem [ref=f9e286]: "ClawSweeper rank-up: applied by consolidating the repeated operator-scope predicate while preserving missing-auth semantics; the focused 31-test unit suite, browser E2E, changed gate, and autoreview all reran clean."
+                      - listitem [ref=f9e287]:
+                        - text: "Exact-head CI:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31647652128/attempts/2" [ref=f9e288] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31647652128/attempts/2
+                        - text: passed. Attempt 1 had one unrelated socket-teardown
+                        - code [ref=f9e289]: ECONNRESET
+                        - text: after 5,336 passing tests in
+                        - code [ref=f9e290]: desktop-stream-command.test.ts
+                        - text: ; the isolated file passed 3/3 locally and the failed CI shard reran green without a code change.
+                      - listitem [ref=f9e291]: "Production LOC: +63/-75 (net -12). Tests: +149/-2."
+                    - heading "Visual proof" [level=3] [ref=f9e292]
+                    - paragraph [ref=f9e293]: Both captures use the same synthetic 1440x900 read-only retained-task fixture; neither image contains credentials, private data, or internal-only identifiers.
+                    - paragraph [ref=f9e294]:
+                      - strong [ref=f9e295]: Before
+                      - text: — no permitted task action is visible.
+                    - paragraph [ref=f9e296]:
+                      - link [ref=f9e297] [cursor=pointer]:
+                        - /url: https://private-user-images.githubusercontent.com/58493/635152868-dcef5087-d208-4511-8a99-cdb255787e20.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY1NzY0NDcsIm5iZiI6MTc4NjU3NjE0NywicGF0aCI6Ii81ODQ5My82MzUxNTI4NjgtZGNlZjUwODctZDIwOC00NTExLThhOTktY2RiMjU1Nzg3ZTIwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEyVDIzMDkwN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTIwYzYxZDNjYTUwZTYxMzgzMWRiYjkwMDJiODM1YzkzZTE2YWMyMTBkMjNkYmE3NmVjOTE0MDRkY2MxNmIxMWEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.30tLxqEQOn6H26FPRmz8WSB1a_9I7deTb9zFUV5u2zw
+                        - 'img "Before: read-only retained task has no Copy result action" [ref=f9e298]'
+                    - paragraph [ref=f9e299]:
+                      - strong [ref=f9e300]: After
+                      - text: — Copy result is visible while mutation actions remain absent.
+                    - paragraph [ref=f9e301]:
+                      - link [ref=f9e302] [cursor=pointer]:
+                        - /url: https://private-user-images.githubusercontent.com/58493/635152876-b20d79b6-da3c-4788-98b8-468bfa32fc90.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY1NzY0NDcsIm5iZiI6MTc4NjU3NjE0NywicGF0aCI6Ii81ODQ5My82MzUxNTI4NzYtYjIwZDc5YjYtZGEzYy00Nzg4LTk4YjgtNDY4YmZhMzJmYzkwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEyVDIzMDkwN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTZhMjM1YmU5YWExZWY2MTg0ZWJjOGUwZDQ0ZDY0YjMyY2JhYmNmM2UzMWM0OWIwZDFjYTU4MDFmOTZlOWNjN2QmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.uJEecJSZEb7dr3WeR9bq3BWX7IJilQ5E9V1Pu7uKAwc
+                        - 'img "After: read-only retained task shows Copy result only" [ref=f9e303]'
+                    - heading "AI-assisted" [level=2] [ref=f9e304]
+                    - paragraph [ref=f9e305]: Yes. The patch and proof were produced with Codex assistance, then inspected and verified against the scope helper, Tasks controller/view, Gateway method policy, focused unit tests, real browser E2E, Testbox changed gate, and fresh autoreview.
+                  - 'button "eyes (1): steipete, 10:15PM today" [disabled] [ref=f9e310]':
+                    - generic [ref=f9e311]: 👀
+                    - generic [ref=f9e312]: "1"
+              - generic [ref=f9e313]:
+                - generic [ref=f9e324]:
+                  - link [ref=f9e327] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f9e328]
+                  - code [ref=f9e330]:
+                    - 'link "fix(ui): let read-only operators copy task results" [ref=f9e331] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122841/commits/cfb9d8fac26ee1f260bc35a0d19cd14ab0814b75
+                  - button "Unverified" [ref=f9e333] [cursor=pointer]
+                  - group [ref=f9e338]:
+                    - img "72 / 97 checks OK" [ref=f9e340] [cursor=pointer]
+                  - code [ref=f9e343]:
+                    - link "cfb9d8f" [ref=f9e344] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122841/commits/cfb9d8fac26ee1f260bc35a0d19cd14ab0814b75
+                - generic [ref=f9e346]:
+                  - link [ref=f9e348] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e349]
+                  - generic [ref=f9e351]:
+                    - generic [ref=f9e352]:
+                      - heading "clawsweeper Bot commented Aug 12, 202653 minutes ago" [level=3] [ref=f9e353]:
+                        - generic [ref=f9e354]:
+                          - strong [ref=f9e355]:
+                            - link "clawsweeper" [ref=f9e356] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e357]: Bot
+                          - text: commented
+                          - link "Aug 12, 202653 minutes ago" [ref=f9e358] [cursor=pointer]:
+                            - /url: "#issuecomment-5273405844"
+                      - generic [ref=f9e359]:
+                        - group [ref=f9e361]:
+                          - button [ref=f9e362] [cursor=pointer]:
+                            - img "Show options" [ref=f9e365]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e368]: Contributor
+                    - table [ref=f9e372]:
+                      - rowgroup [ref=f9e373]:
+                        - row [ref=f9e374]:
+                          - cell [ref=f9e375]:
+                            - paragraph [ref=f9e376]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f9e377]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f9e378]:
+                  - generic [ref=f9e384]:
+                    - link [ref=f9e386] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f9e387]
+                    - generic [ref=f9e388]:
+                      - link "steipete" [ref=f9e389] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 12, 2026 22:1553 minutes ago" [ref=f9e390] [cursor=pointer]:
+                        - /url: "#event-29368586733"
+                  - generic [ref=f9e395]:
+                    - link [ref=f9e396] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f9e397]
+                    - link "openclaw-barnacle" [ref=f9e398] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f9e399]: Bot
+                    - text: added
+                    - 'link "app: web-ui" [ref=f9e400] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+                    - 'link "size: M" [ref=f9e401] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f9e402] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 202653 minutes ago" [ref=f9e403] [cursor=pointer]:
+                      - /url: "#event-29368589024"
+                  - generic [ref=f9e408]:
+                    - link [ref=f9e409] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f9e410]
+                    - link "clawsweeper" [ref=f9e411] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f9e412]: Bot
+                    - text: added
+                    - link "P2" [ref=f9e413] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                    - 'link "rating: 🐚 platinum hermit" [ref=f9e414] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f9e415] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 12, 202647 minutes ago" [ref=f9e416] [cursor=pointer]:
+                      - /url: "#event-29368801831"
+                - generic [ref=f9e418]:
+                  - link [ref=f9e420] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e421]
+                  - generic [ref=f9e423]:
+                    - generic [ref=f9e424]:
+                      - heading "clawsweeper Bot commented Aug 12, 202647 minutes ago" [level=3] [ref=f9e425]:
+                        - generic [ref=f9e426]:
+                          - strong [ref=f9e427]:
+                            - link "clawsweeper" [ref=f9e428] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e429]: Bot
+                          - text: commented
+                          - link "Aug 12, 202647 minutes ago" [ref=f9e430] [cursor=pointer]:
+                            - /url: "#issuecomment-5273463516"
+                      - generic [ref=f9e431]:
+                        - group [ref=f9e433]:
+                          - button [ref=f9e434] [cursor=pointer]:
+                            - img "Show options" [ref=f9e437]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e440]: Contributor
+                    - table [ref=f9e444]:
+                      - rowgroup [ref=f9e445]:
+                        - row [ref=f9e446]:
+                          - cell [ref=f9e447]:
+                            - paragraph [ref=f9e448]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f9e449]: Reviewed August 12, 2026, 6:21 PM ET / 22:21 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f9e450]
+                            - heading "What this changes" [level=2] [ref=f9e451]
+                            - paragraph [ref=f9e452]: The PR lets read-authorized Control UI operators copy retained task results while keeping retry, dismiss, and cancel restricted to write-authorized operators.
+                            - heading "Regression provenance" [level=2] [ref=f9e453]
+                            - paragraph [ref=f9e454]: Possible regression — probable (reviewed change; reproduction). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f9e455]
+                            - paragraph [ref=f9e456]:
+                              - generic [ref=f9e457]: ⚠️
+                              - strong [ref=f9e458]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f9e459]: Keep open. Current main still hides Copy result behind write access; this focused PR correctly separates the read-only Copy action from write-only task mutations, with no blocking findings.
+                            - paragraph [ref=f9e460]:
+                              - strong [ref=f9e461]: "Priority:"
+                              - text: P2
+                              - strong [ref=f9e462]: "Reviewed head:"
+                              - code [ref=f9e463]: cfb9d8fac26ee1f260bc35a0d19cd14ab0814b75
+                            - heading "Review scores" [level=2] [ref=f9e464]
+                            - table [ref=f9e466]:
+                              - rowgroup [ref=f9e467]:
+                                - row [ref=f9e468]:
+                                  - columnheader "Measure" [ref=f9e469]
+                                  - columnheader "Result" [ref=f9e470]
+                                  - columnheader "What it means" [ref=f9e471]
+                              - rowgroup [ref=f9e472]:
+                                - row [ref=f9e473]:
+                                  - cell [ref=f9e474]:
+                                    - strong [ref=f9e475]: Overall readiness
+                                  - cell [ref=f9e476]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f9e477]: (4/6)
+                                  - cell "A focused owner-boundary repair with behavior-level unit and browser coverage; exact-head CI remains the normal merge gate." [ref=f9e478]
+                                - row [ref=f9e479]:
+                                  - cell [ref=f9e480]:
+                                    - strong [ref=f9e481]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f9e482]
+                                  - 'cell "Not applicable: This maintainer-authored PR is exempt from the contributor proof gate; its body additionally reports a passing browser E2E scenario and before/after captures." [ref=f9e483]'
+                                - row [ref=f9e484]:
+                                  - cell [ref=f9e485]:
+                                    - strong [ref=f9e486]: Patch quality
+                                  - cell [ref=f9e487]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f9e488]: (5/6)
+                                  - cell "No actionable review findings were identified." [ref=f9e489]
+                            - heading "Verification" [level=2] [ref=f9e490]
+                            - table [ref=f9e492]:
+                              - rowgroup [ref=f9e493]:
+                                - row [ref=f9e494]:
+                                  - columnheader "Check" [ref=f9e495]
+                                  - columnheader "Result" [ref=f9e496]
+                                  - columnheader "Evidence" [ref=f9e497]
+                              - rowgroup [ref=f9e498]:
+                                - row [ref=f9e499]:
+                                  - cell [ref=f9e500]:
+                                    - strong [ref=f9e501]: Real behavior
+                                  - cell "Not applicable" [ref=f9e502]
+                                  - 'cell "Not applicable: This maintainer-authored PR is exempt from the contributor proof gate; its body additionally reports a passing browser E2E scenario and before/after captures." [ref=f9e503]'
+                                - row [ref=f9e504]:
+                                  - cell [ref=f9e505]:
+                                    - strong [ref=f9e506]: Evidence reviewed
+                                  - cell "6 items" [ref=f9e507]
+                                  - 'cell "Current-main defect: Current main renders Copy result inside the write-gated retained-result block, so an operator with only operator.read cannot see the otherwise permitted action. Gateway authorization contract: The Gateway classifies tasks.get as operator.read and tasks.cancel, tasks.retry, and tasks.dismiss as operator.write. Canonical scope implication: The shared scope helper explicitly treats operator.write and operator.admin as satisfying operator.read." [ref=f9e508]': "Current-main defect: Current main renders Copy result inside the write-gated retained-result block, so an operator with only operator.read cannot see the otherwise permitted action.Gateway authorization contract: The Gateway classifies tasks.get as operator.read and tasks.cancel, tasks.retry, and tasks.dismiss as operator.write.Canonical scope implication: The shared scope helper explicitly treats operator.write and operator.admin as satisfying operator.read."
+                                - row [ref=f9e509]:
+                                  - cell [ref=f9e510]:
+                                    - strong [ref=f9e511]: Findings
+                                  - cell "None" [ref=f9e512]
+                                  - cell "None." [ref=f9e513]
+                                - row [ref=f9e514]:
+                                  - cell [ref=f9e515]:
+                                    - strong [ref=f9e516]: Security
+                                  - cell "None" [ref=f9e517]
+                                  - cell "None." [ref=f9e518]
+                            - heading "How this fits together" [level=2] [ref=f9e519]
+                            - paragraph [ref=f9e520]: The Control UI reads the Gateway authorization snapshot to decide which task controls to render. Copying retrieves a retained result through the read-authorized task lookup, while recovery and cancellation remain Gateway write operations.
+                            - region "mermaid rendered output container" [ref=f9e521]:
+                              - generic [ref=f9e522]:
+                                - generic [ref=f9e523]:
+                                  - group [ref=f9e524]:
+                                    - button "Open dialog" [ref=f9e525] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f9e528] [cursor=pointer]
+                                - iframe [ref=f9e533]:
+                                  - generic [ref=f10e1]:
+                                    - document [ref=f10e5]:
+                                      - generic [ref=f10e7]:
+                                        - generic [ref=f10e11]:
+                                          - paragraph [ref=f10e17]: Copy result
+                                          - paragraph [ref=f10e23]: Retry dismiss cancel
+                                        - generic [ref=f10e24]:
+                                          - paragraph [ref=f10e31]: Gateway authorization snapshot
+                                          - paragraph [ref=f10e38]: Operator scope implication
+                                          - paragraph [ref=f10e45]: Tasks page
+                                          - paragraph [ref=f10e52]: Task action
+                                          - paragraph [ref=f10e59]: Read-authorized task lookup
+                                          - paragraph [ref=f10e66]: Browser clipboard
+                                          - paragraph [ref=f10e73]: Write-authorized task controls
+                                    - generic [ref=f10e74]:
+                                      - button "Zoom in" [ref=f10e75]
+                                      - button "Zoom out" [ref=f10e79]
+                                      - button "Reset view" [ref=f10e83]
+                                      - button "Pan up" [ref=f10e86]
+                                      - button "Pan down" [ref=f10e89]
+                                      - button "Pan left" [ref=f10e92]
+                                      - button "Pan right" [ref=f10e95]
+                            - heading "Before merge" [level=2] [ref=f9e534]
+                            - list [ref=f9e535]:
+                              - listitem [ref=f9e536]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e537]
+                                - strong [ref=f9e538]: Resolve merge risk (P1)
+                                - text: "- The bug fix is production net +5 lines; a small internal scope-predicate consolidation could absorb the duplicated role-scope call shape before merge."
+                              - listitem [ref=f9e539]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e540]
+                                - strong [ref=f9e541]: Complete next step (P2)
+                                - text: "- The focused maintainer-authored fix is already present; remaining work is normal exact-head CI and merge review, not an automated repair lane."
+                            - group [ref=f9e542]:
+                              - strong [ref=f9e544] [cursor=pointer]: Agent review details
+                - generic [ref=f9e555]:
+                  - link [ref=f9e558] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f9e559]
+                  - code [ref=f9e561]:
+                    - 'link "refactor(ui): consolidate operator scope checks" [ref=f9e562] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122841/commits/5f7265f8de1271f70fb0a97a8392367f1d34b115
+                  - button "Unverified" [ref=f9e564] [cursor=pointer]
+                  - group [ref=f9e569]:
+                    - img "74 / 97 checks OK" [ref=f9e571] [cursor=pointer]
+                  - code [ref=f9e574]:
+                    - link "5f7265f" [ref=f9e575] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122841/commits/5f7265f8de1271f70fb0a97a8392367f1d34b115
+                - generic [ref=f9e577]:
+                  - link [ref=f9e579] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e580]
+                  - generic [ref=f9e582]:
+                    - generic [ref=f9e583]:
+                      - heading "clawsweeper Bot commented Aug 12, 202630 minutes ago" [level=3] [ref=f9e584]:
+                        - generic [ref=f9e585]:
+                          - strong [ref=f9e586]:
+                            - link "clawsweeper" [ref=f9e587] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e588]: Bot
+                          - text: commented
+                          - link "Aug 12, 202630 minutes ago" [ref=f9e589] [cursor=pointer]:
+                            - /url: "#issuecomment-5273601867"
+                      - generic [ref=f9e590]:
+                        - group [ref=f9e592]:
+                          - button [ref=f9e593] [cursor=pointer]:
+                            - img "Show options" [ref=f9e596]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e599]: Contributor
+                    - table [ref=f9e603]:
+                      - rowgroup [ref=f9e604]:
+                        - row [ref=f9e605]:
+                          - cell [ref=f9e606]:
+                            - paragraph [ref=f9e607]: "ClawSweeper status: review started."
+                            - paragraph [ref=f9e608]: "I am starting a fresh review of this pull request: fix(ui): let read-only operators copy task results This is item 1/1 in the current shard. Shard 0/1."
+                            - paragraph [ref=f9e609]: This placeholder means the worker is alive and reading the current context. I will edit this same comment with the actual review when the claws are done clicking.
+                            - paragraph [ref=f9e610]: "Crustacean status: shell secured, claws on keyboard, evidence pebbles being sorted."
+                - generic [ref=f9e612]:
+                  - link [ref=f9e614] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f9e615]
+                  - generic [ref=f9e617]:
+                    - generic [ref=f9e618]:
+                      - heading [level=3] [ref=f9e619]:
+                        - generic [ref=f9e620]:
+                          - strong [ref=f9e621]:
+                            - link "steipete" [ref=f9e622] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202614 minutes ago" [ref=f9e623] [cursor=pointer]:
+                            - /url: "#issuecomment-5273717435"
+                      - generic [ref=f9e624]:
+                        - group [ref=f9e626]:
+                          - button [ref=f9e627] [cursor=pointer]:
+                            - img "Show options" [ref=f9e630]
+                        - generic [ref=f9e632]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f9e633]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f9e635]: Author
+                    - table [ref=f9e639]:
+                      - rowgroup [ref=f9e640]:
+                        - row [ref=f9e641]:
+                          - cell [ref=f9e642]:
+                            - paragraph [ref=f9e643]:
+                              - text: Land-ready proof for exact head
+                              - link [ref=f9e644] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/commit/5f7265f8de1271f70fb0a97a8392367f1d34b115
+                                - code [ref=f9e645]: 5f7265f8de1271f70fb0a97a8392367f1d34b115
+                              - text: ":"
+                            - list [ref=f9e646]:
+                              - listitem [ref=f9e647]:
+                                - text: "Root cause: the Tasks view coupled read-only Copy to the"
+                                - code [ref=f9e648]: operator.write
+                                - text: mutation gate even though Copy's sole RPC is read-authorized
+                                - code [ref=f9e649]: tasks.get
+                                - text: .
+                              - listitem [ref=f9e650]:
+                                - text: "Owner-boundary fix: the Control UI now derives Copy from canonical operator read-scope implication and keeps Retry, Dismiss, and Cancel on write access. The existing"
+                                - code [ref=f9e651]: tasks.get
+                                - text: Gateway identity/reconnect fence is unchanged; no protocol, config, Gateway method, string, locale, or translation-memory surface changed.
+                              - listitem [ref=f9e652]: "ClawSweeper rank-up move: applied. Repeated UI operator-scope predicate plumbing was consolidated in a second commit, preserving distinct missing-auth behavior and moving production LOC from net +5 to net -12."
+                              - listitem [ref=f9e653]:
+                                - text: "Unit proof: 31/31 passed across"
+                                - code [ref=f9e654]: operator-access.test.ts
+                                - text: and
+                                - code [ref=f9e655]: tasks-page.test.ts
+                                - text: after the final refactor.
+                              - listitem [ref=f9e656]:
+                                - text: "Browser proof: 2/2 passed on Blacksmith Testbox"
+                                - code [ref=f9e657]: tbx_01kzw1e3qa05dtawhnhpzrx6gy
+                                - text: ; the read-only scenario observed exact
+                                - code [ref=f9e658]: tasks.get
+                                - text: "parameters, exact clipboard content, and zero retry/dismiss/cancel requests. Testbox changed gate also passed. Run:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31647071810" [ref=f9e659] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31647071810
+                                - text: .
+                              - listitem [ref=f9e660]:
+                                - text: "Exact-head CI:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31647652128/attempts/2" [ref=f9e661] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31647652128/attempts/2
+                                - text: passed. Attempt 1 had one unrelated socket-teardown
+                                - code [ref=f9e662]: ECONNRESET
+                                - text: after 5,336 passing tests; the isolated
+                                - code [ref=f9e663]: desktop-stream-command.test.ts
+                                - text: file passed 3/3 and the failed shard reran green unchanged.
+                              - listitem [ref=f9e664]: "Fresh final-head autoreview: TruffleHog clean; no accepted/actionable findings; patch correct at 0.98 confidence."
+                              - listitem [ref=f9e665]: Visual proof is embedded in the PR body using repository-scoped synthetic before/after attachments.
+                              - listitem [ref=f9e666]: "LOC: production +63/-75 (net -12); tests +149/-2. Six files only; no changelog or generated locale/translation-memory changes."
+                            - paragraph [ref=f9e667]: "Known proof gaps: none for this deterministic Control UI/Gateway-scope contract."
+                - generic [ref=f9e668]:
+                  - generic [ref=f9e673]:
+                    - button "View details" [ref=f9e674] [cursor=pointer]
+                    - generic [ref=f9e675]:
+                      - link [ref=f9e677] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e678]
+                      - generic [ref=f9e679]:
+                        - link "steipete" [ref=f9e680] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f9e681] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/adf8e254ab810a2d2cbf67afeb53c5bdf2bc948a
+                          - code [ref=f9e682]: adf8e25
+                        - text: into
+                        - generic [ref=f9e683]: main
+                        - link "Aug 12, 202610 minutes ago" [ref=f9e685] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122841#event-29370010861
+                        - generic [ref=f9e686]: 180 of 182 checks passed
+                  - generic [ref=f9e693]:
+                    - link [ref=f9e695] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f9e696]
+                    - generic [ref=f9e697]:
+                      - link "steipete" [ref=f9e698] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f9e699]: fix/tasks-read-only-copy
+                      - text: branch
+                      - link "August 12, 2026 22:5810 minutes ago" [ref=f9e701] [cursor=pointer]:
+                        - /url: "#event-29370012442"
+                - generic [ref=f9e703]:
+                  - link [ref=f9e705] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f9e706]
+                  - generic [ref=f9e708]:
+                    - generic [ref=f9e709]:
+                      - heading [level=3] [ref=f9e710]:
+                        - generic [ref=f9e711]:
+                          - strong [ref=f9e712]:
+                            - link "steipete" [ref=f9e713] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202610 minutes ago" [ref=f9e714] [cursor=pointer]:
+                            - /url: "#issuecomment-5273762371"
+                      - generic [ref=f9e715]:
+                        - group [ref=f9e717]:
+                          - button [ref=f9e718] [cursor=pointer]:
+                            - img "Show options" [ref=f9e721]
+                        - generic [ref=f9e723]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f9e724]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f9e726]: Author
+                    - table [ref=f9e730]:
+                      - rowgroup [ref=f9e731]:
+                        - row [ref=f9e732]:
+                          - cell [ref=f9e733]:
+                            - paragraph [ref=f9e734]: Merged via squash.
+                            - list [ref=f9e735]:
+                              - listitem [ref=f9e736]:
+                                - text: "Prepared head SHA:"
+                                - link "5f7265f8de1271f70fb0a97a8392367f1d34b115" [ref=f9e737] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122841/commits/5f7265f8de1271f70fb0a97a8392367f1d34b115
+                              - listitem [ref=f9e738]:
+                                - text: "Landed commit:"
+                                - link "adf8e254ab810a2d2cbf67afeb53c5bdf2bc948a" [ref=f9e739] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/adf8e254ab810a2d2cbf67afeb53c5bdf2bc948a
+            - generic [ref=f9e743]:
+              - link "Sign up for free" [ref=f9e744] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f9e745]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f9e746] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122841
+        - generic [ref=f9e750]:
+          - form "Select reviewers" [ref=f9e752]:
+            - heading "Reviewers" [level=3] [ref=f9e753]
+            - text: No reviews
+          - form "Select assignees" [ref=f9e755]:
+            - heading "Assignees" [level=3] [ref=f9e756]
+            - text: No one assigned
+          - generic [ref=f9e757]:
+            - heading "Labels" [level=3] [ref=f9e758]
+            - generic [ref=f9e759]:
+              - 'link "app: web-ui" [ref=f9e760] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+              - link "maintainer" [ref=f9e762] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P2" [ref=f9e764] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "rating: 🐚 platinum hermit" [ref=f9e766] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: M" [ref=f9e768] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f9e770] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f9e773]:
+            - heading "Projects" [level=3] [ref=f9e774]
+            - text: None yet
+          - form "Select milestones" [ref=f9e776]:
+            - heading "Milestone" [level=3] [ref=f9e777]
+            - text: No milestone
+          - form "Link issues" [ref=f9e783]:
+            - heading "Development" [level=3] [ref=f9e784]
+            - paragraph [ref=f9e785]: Successfully merging this pull request may close these issues.
+            - link [ref=f9e787] [cursor=pointer]:
+              - /url: https://github.com/openclaw/openclaw/issues/122799
+              - img "Closed issue" [ref=f9e788]
+              - text: "Control UI: allow read-only operators to copy retained task results"
+          - generic [ref=f9e792]:
+            - heading "1 participant" [level=3] [ref=f9e793]
+            - link [ref=f9e795] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f9e796]
+  - contentinfo [ref=f9e797]:
+    - heading "Footer" [level=2] [ref=f9e798]
+    - generic [ref=f9e799]:
+      - generic [ref=f9e800]:
+        - link "GitHub Homepage" [ref=f9e801] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f9e804]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f9e805]:
+        - heading "Footer navigation" [level=3] [ref=f9e806]
+        - list "Footer navigation" [ref=f9e807]:
+          - listitem [ref=f9e808]:
+            - link "Terms" [ref=f9e809] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f9e810]:
+            - link "Privacy" [ref=f9e811] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f9e812]:
+            - link "Security" [ref=f9e813] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f9e814]:
+            - link "Status" [ref=f9e815] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f9e816]:
+            - link "Community" [ref=f9e817] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f9e818]:
+            - link "Docs" [ref=f9e819] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f9e820]:
+            - link "Contact" [ref=f9e821] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f9e822]:
+            - button "Manage cookies" [ref=f9e824] [cursor=pointer]
+          - listitem [ref=f9e825]:
+            - button "Do not share my personal information" [ref=f9e827] [cursor=pointer]

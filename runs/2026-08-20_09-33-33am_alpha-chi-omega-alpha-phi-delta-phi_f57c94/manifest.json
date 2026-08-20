@@ -1,0 +1,112 @@
+{
+  "task": "\"Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa\r\rFor each of the above sororities at MIT above can you do the following\r1. identify the sorority website by googling 'sorority name MIT' and finding the sorority website \r2. identifying the sisters page in the website\r3. identify the seniors (class of 2026) and juniors (class of 2027)\r4. adding their name + info to a google spreadsheet and filling out the relevant information (name, class, major, affiliation, interests, other)\"",
+  "startedAt": "2026-08-20T16:33:33.125Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/data.json",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "capturedAt": "2026-08-20T16:36:56.068Z"
+    },
+    {
+      "filename": "scratch/workspace/aphi.json",
+      "sha256": "aa5601000c41275fac50af72878cb8490fa52f9b3c256ffd49ed793db95a6383",
+      "capturedAt": "2026-08-20T16:37:23.430Z"
+    },
+    {
+      "filename": "scratch/workspace/dphie.json",
+      "sha256": "29091a343a3f13be51983afa0fa032ec23e895986c25edec62e2b031ee5e6558",
+      "capturedAt": "2026-08-20T16:38:59.183Z"
+    },
+    {
+      "filename": "scratch/workspace/theta_raw.txt",
+      "sha256": "edf30bb3d79c1fb6ba2c349537e9a5c96f2d7c9e4c51a5021e3119e710a60237",
+      "capturedAt": "2026-08-20T16:39:34.921Z"
+    },
+    {
+      "filename": "scratch/workspace/theta.json",
+      "sha256": "f4442c0e10120ccbc4a8f87b186b65da53f90397d0c4bdab0ac139857369afa1",
+      "capturedAt": "2026-08-20T16:40:03.823Z"
+    },
+    {
+      "filename": "scratch/workspace/pibetaphi.json",
+      "sha256": "ca38061d9c8654fc77658165ebcb01eeb028f0b7f46302dd0a466524c8461924",
+      "capturedAt": "2026-08-20T16:40:39.626Z"
+    },
+    {
+      "filename": "scratch/workspace/sigmakappa.json",
+      "sha256": "cbbb1db4487b7663e3c110ede64ebbda2d73e19453f039ee7f9e16375ad96d84",
+      "capturedAt": "2026-08-20T16:41:43.956Z"
+    },
+    {
+      "filename": "scratch/workspace/axo.json",
+      "sha256": "d117be0839eda738da8d9f815e898119fac9ab37c6abb141e34e4b52a81cabb7",
+      "capturedAt": "2026-08-20T16:43:28.877Z"
+    },
+    {
+      "filename": "scratch/workspace/combined.csv",
+      "sha256": "14a80239bc3e1bfc06cf32e9884112b19cda04eb990138a30008fffa489e0ebf",
+      "capturedAt": "2026-08-20T16:43:48.411Z"
+    },
+    {
+      "filename": "artifacts/debug_menu.png",
+      "sha256": "240ad3c3458bd9baefc764a2d8522d32cb2bcc559e5c004e726bf1d9c6c14b33",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1GacfA2Y9I5ELKNr3iFam8ykSGbXJiSVBSdF4GSkMHaA/edit?gid=0#gid=0",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T16:45:05.862Z"
+    },
+    {
+      "filename": "scratch/workspace/picker.png",
+      "sha256": "80d5155907b7b0d4fa6d5a676f0e6e1bd4ca8120ae3921b42b30c35230257190",
+      "capturedAt": "2026-08-20T16:47:31.856Z"
+    },
+    {
+      "filename": "artifacts/debug/picker.png",
+      "sha256": "80d5155907b7b0d4fa6d5a676f0e6e1bd4ca8120ae3921b42b30c35230257190",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T16:47:35.166Z"
+    },
+    {
+      "filename": "scratch/workspace/combined.tsv",
+      "sha256": "abd7fceec9d0e0856ae35e2cbc2df7353e7cc9473ee704c13007283d42c3a818",
+      "capturedAt": "2026-08-20T16:48:55.678Z"
+    },
+    {
+      "filename": "scratch/workspace/notes.tsv",
+      "sha256": "3399a8c041ee9d45ba6572a34c0fee33a238dce9ab6be558a725b85ca9191192",
+      "capturedAt": "2026-08-20T16:50:57.431Z"
+    },
+    {
+      "filename": "artifacts/google_sheet_screenshot.png",
+      "sha256": "564a7a19ca35535c2a276be0425cb80d582d863247cc0ef7be8b0ecc62024c1e",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1GacfA2Y9I5ELKNr3iFam8ykSGbXJiSVBSdF4GSkMHaA/edit?gid=0#gid=0",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T16:51:22.286Z"
+    },
+    {
+      "filename": "artifacts/google_sheet_full.png",
+      "sha256": "52c984f32e50e15e6d1afa2605dc0928529c412c7c0b56861c899985ee4bbec7",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1GacfA2Y9I5ELKNr3iFam8ykSGbXJiSVBSdF4GSkMHaA/edit?gid=0#gid=0",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T16:51:34.729Z"
+    },
+    {
+      "filename": "artifacts/combined_data.csv",
+      "sha256": "14a80239bc3e1bfc06cf32e9884112b19cda04eb990138a30008fffa489e0ebf",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T16:51:38.757Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T16:52:43.116Z"
+}

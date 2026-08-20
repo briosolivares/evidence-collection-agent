@@ -1,0 +1,919 @@
+URL: https://marginalia-search.com/search?query=Alpha+Phi+MIT+chapter+sisters
+Title: Alpha Phi MIT chapter sisters - Marginalia Search
+
+- generic [active] [ref=f85e1]:
+  - link "Skip To Content" [ref=f85e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f85e3]:
+    - navigation [ref=f85e5]:
+      - generic [ref=f85e7]:
+        - link "Search" [ref=f85e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f85e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f85e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f85e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f85e13]:
+    - generic [ref=f85e15]:
+      - heading [level=1] [ref=f85e17]:
+        - link "Marginalia Search" [ref=f85e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f85e21]:
+        - textbox "Search the web!" [ref=f85e22]: Alpha Phi MIT chapter sisters
+        - button " Search" [ref=f85e23] [cursor=pointer]:
+          - generic [ref=f85e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f85e25]:
+    - complementary [ref=f85e26]:
+      - generic [ref=f85e28]:
+        - heading " Filter" [level=2] [ref=f85e29]:
+          - generic [ref=f85e30]: 
+          - text: Filter
+        - generic [ref=f85e31]:
+          - button [ref=f85e33] [cursor=pointer]:
+            - link " All" [ref=f85e34]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e35]: 
+              - text: All
+          - button [ref=f85e37] [cursor=pointer]:
+            - link " Blogs" [ref=f85e38]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=blogosphere&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e39]: 
+              - text: Blogs
+          - button [ref=f85e41] [cursor=pointer]:
+            - link " Academia" [ref=f85e42]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=academia&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e43]: 
+              - text: Academia
+          - button [ref=f85e45] [cursor=pointer]:
+            - link " Vintage" [ref=f85e46]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=vintage&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e47]: 
+              - text: Vintage
+          - button [ref=f85e49] [cursor=pointer]:
+            - link " Small Web" [ref=f85e50]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=modern&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e51]: 
+              - text: Small Web
+          - button [ref=f85e54] [cursor=pointer]:
+            - link " Wikis" [ref=f85e55]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=wiki&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e56]: 
+              - text: Wikis
+          - button [ref=f85e58] [cursor=pointer]:
+            - link " Forums" [ref=f85e59]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=forum&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e60]: 
+              - text: Forums
+          - button [ref=f85e62] [cursor=pointer]:
+            - link " Recipes" [ref=f85e63]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=food&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e64]: 
+              - text: Recipes
+          - button [ref=f85e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f85e68]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&profile=custom&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f85e70]:
+      - generic [ref=f85e71]:
+        - heading "Results" [level=1] [ref=f85e72]
+        - generic [ref=f85e73]:
+          - generic [ref=f85e75]:
+            - generic [ref=f85e76]:
+              - generic [ref=f85e77]:
+                - generic [ref=f85e78]:
+                  - generic "Match density" [ref=f85e79]
+                  - generic [ref=f85e83]:
+                    - heading [level=2] [ref=f85e84]:
+                      - link "MIT Alpha Phi" [ref=f85e85] [cursor=pointer]:
+                        - /url: http://aphi.mit.edu/dei/
+                    - link "http://aphi.mit.edu/dei/" [ref=f85e87] [cursor=pointer]:
+                      - /url: http://aphi.mit.edu/dei/
+                - paragraph [ref=f85e89]: Alpha Phi is committed to providing education and resources that build cultural competence to actively engage in conversations that challenge one another to uphold the highest tenants of Human Dignity. As Alpha Phis, we expect our members to live up to ou
+              - generic [ref=f85e90]:
+                - link "" [ref=f85e91] [cursor=pointer]:
+                  - /url: /site/aphi.mit.edu
+                - link "" [ref=f85e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://aphi.mit.edu/dei/
+            - generic [ref=f85e95]:
+              - paragraph [ref=f85e96]: "Also from aphi.mit.edu:"
+              - list [ref=f85e97]:
+                - listitem [ref=f85e98]:
+                  - link "MIT Alpha Phi" [ref=f85e99] [cursor=pointer]:
+                    - /url: http://aphi.mit.edu/philanthropy/
+                - listitem [ref=f85e100]:
+                  - link "MIT Alpha Phi" [ref=f85e101] [cursor=pointer]:
+                    - /url: http://aphi.mit.edu/
+                - listitem [ref=f85e102]:
+                  - link "MIT Alpha Phi" [ref=f85e103] [cursor=pointer]:
+                    - /url: http://aphi.mit.edu/about/
+            - generic "Contains JavaScript" [ref=f85e106]: JS
+          - generic [ref=f85e108]:
+            - generic [ref=f85e109]:
+              - generic [ref=f85e110]:
+                - generic [ref=f85e111]:
+                  - generic "Match density" [ref=f85e112]
+                  - generic [ref=f85e116]:
+                    - heading [level=2] [ref=f85e117]:
+                      - link "Phi Gamma Delta" [ref=f85e118] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/Phi_Gamma_Delta
+                    - link "https://en.wikipedia.org/wiki/Phi_Gamma_Delta" [ref=f85e120] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/Phi_Gamma_Delta
+                - paragraph [ref=f85e122]: Phi Gamma Delta ΦΓΔ ), commonly known as Phi Gam and sometimes written as FIJI, is a North American social fraternity with 139 active chapters and 13 colonies across the United States and Canada. It was founded at Jefferson College, Pennsylvania, in 1848.
+              - generic [ref=f85e123]:
+                - link "" [ref=f85e124] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f85e126] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/Phi_Gamma_Delta
+            - generic [ref=f85e128]:
+              - paragraph [ref=f85e129]: "Also from en.wikipedia.org:"
+              - list [ref=f85e130]:
+                - listitem [ref=f85e131]:
+                  - link "Union College" [ref=f85e132] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Union_College
+                - listitem [ref=f85e133]:
+                  - link "Whitney Young" [ref=f85e134] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Whitney_Young
+            - generic [ref=f85e135]:
+              - generic [ref=f85e137]: Wiki
+              - generic "Contains JavaScript" [ref=f85e138]: JS
+          - generic [ref=f85e140]:
+            - generic [ref=f85e141]:
+              - generic [ref=f85e142]:
+                - generic [ref=f85e143]:
+                  - generic "Match density" [ref=f85e144]
+                  - generic [ref=f85e148]:
+                    - heading [level=2] [ref=f85e149]:
+                      - link "Stomp the Yard, MIT style | MIT Admissions" [ref=f85e150] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/
+                    - link "https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/" [ref=f85e152] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/
+                - paragraph [ref=f85e154]: The Divine 9 and NALFO organizations on campus January 26, 2009 I am sure that many of you have read blogs about Greek life from some of our current all-star bloggers like or even some of the superstar blogger alumni like , or . What you haven”t heard abo
+              - generic [ref=f85e155]:
+                - link "" [ref=f85e156] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f85e158] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/
+            - generic [ref=f85e160]:
+              - paragraph [ref=f85e161]: "Also from mitadmissions.org:"
+              - list [ref=f85e162]:
+                - listitem [ref=f85e163]:
+                  - link "Sororities @ MIT- Become a part of it! | MIT Admissions" [ref=f85e164] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/
+                - listitem [ref=f85e165]:
+                  - link "MIT and Black Greek Letter Organizations | MIT Admissions" [ref=f85e166] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/
+                - listitem [ref=f85e167]:
+                  - link "[Guest Post] All About the MIT Panhellenic Association | MIT Admissions" [ref=f85e168] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/guest-post-find-your-home-under-the-dome/
+                - listitem [ref=f85e169]:
+                  - link "A Week in the Life of My MIT Junior Fall | MIT Admissions" [ref=f85e170] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/a-week-in-the-life-of-my-mit-junior-fall/
+            - generic "Contains JavaScript" [ref=f85e173]: JS
+          - generic [ref=f85e175]:
+            - generic [ref=f85e176]:
+              - generic [ref=f85e177]:
+                - generic [ref=f85e178]:
+                  - generic "Match density" [ref=f85e179]
+                  - generic [ref=f85e183]:
+                    - heading [level=2] [ref=f85e184]:
+                      - link "One In Four USA" [ref=f85e185] [cursor=pointer]:
+                        - /url: https://www.oneinfourusa.org/nationalorganization.html
+                    - link "https://www.oneinfourusa.org/nationalorganization.html" [ref=f85e187] [cursor=pointer]:
+                      - /url: https://www.oneinfourusa.org/nationalorganization.html
+                - paragraph [ref=f85e189]: John D. Foubert, Ph.D. is the National President of One in Four and Professor of Higher Education and Student Affairs at Oklahoma State University. He earned his undergraduate degree in Psychology from the College of William and Mary, his Masterï¿½s in Ps
+              - generic [ref=f85e190]:
+                - link "" [ref=f85e191] [cursor=pointer]:
+                  - /url: /site/www.oneinfourusa.org
+                - link "" [ref=f85e193] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.oneinfourusa.org/nationalorganization.html
+            - generic "Contains JavaScript" [ref=f85e197]: JS
+          - generic [ref=f85e199]:
+            - generic [ref=f85e200]:
+              - generic [ref=f85e201]:
+                - generic [ref=f85e202]:
+                  - generic "Match density" [ref=f85e203]
+                  - generic [ref=f85e207]:
+                    - heading [level=2] [ref=f85e208]:
+                      - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f85e209] [cursor=pointer]:
+                        - /url: https://www.aephi.org/foundation-trustees
+                    - link "https://www.aephi.org/foundation-trustees" [ref=f85e211] [cursor=pointer]:
+                      - /url: https://www.aephi.org/foundation-trustees
+                - paragraph [ref=f85e213]: The Alpha Epsilon Phi Foundation is directed by a volunteer board of seventeen trustees, including the sorority national president and the sorority executive director who serves ex officio. The trustees bring a mix of Sorority involvement, non-profit expe
+              - generic [ref=f85e214]:
+                - link "" [ref=f85e215] [cursor=pointer]:
+                  - /url: /site/www.aephi.org
+                - link "" [ref=f85e217] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.aephi.org/foundation-trustees
+            - generic "Contains JavaScript" [ref=f85e221]: JS
+          - generic [ref=f85e223]:
+            - generic [ref=f85e224]:
+              - generic [ref=f85e225]:
+                - generic [ref=f85e226]:
+                  - generic "Match density" [ref=f85e227]
+                  - generic [ref=f85e231]:
+                    - heading [level=2] [ref=f85e232]:
+                      - link "NCSU Timelines" [ref=f85e233] [cursor=pointer]:
+                        - /url: https://historicalstate.lib.ncsu.edu/timelines/student-life
+                    - link "https://historicalstate.lib.ncsu.edu/timelines/student-life" [ref=f85e235] [cursor=pointer]:
+                      - /url: https://historicalstate.lib.ncsu.edu/timelines/student-life
+                - paragraph [ref=f85e237]: 1928Textile Exposition and Style Show began The School of Textiles hosted the inaugural Textile Exposition and Style Show. Students organized style shows to display their fabric designs. Students from local women's colleges participated in the event by cr
+              - generic [ref=f85e238]:
+                - link "" [ref=f85e239] [cursor=pointer]:
+                  - /url: /site/historicalstate.lib.ncsu.edu
+                - link "" [ref=f85e241] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://historicalstate.lib.ncsu.edu/timelines/student-life
+            - generic "Contains JavaScript" [ref=f85e245]: JS
+          - generic [ref=f85e247]:
+            - generic [ref=f85e248]:
+              - generic [ref=f85e249]:
+                - generic [ref=f85e250]:
+                  - generic "Match density" [ref=f85e251]
+                  - generic [ref=f85e255]:
+                    - heading [level=2] [ref=f85e256]:
+                      - link "Artificial Intelligence (Stanford Encyclopedia of Philosophy)" [ref=f85e257] [cursor=pointer]:
+                        - /url: https://plato.stanford.edu/entries/artificial-intelligence/
+                    - link "https://plato.stanford.edu/entries/artificial-intelligence/" [ref=f85e259] [cursor=pointer]:
+                      - /url: https://plato.stanford.edu/entries/artificial-intelligence/
+                - paragraph [ref=f85e261]: Entry Navigation First published Thu Jul 12, 2018 Artificial intelligence (AI) is the field devoted to building artificial animals (or at least artificial creatures that – in suitable contexts – appear to be animals) and, for many, artificial persons (or
+              - generic [ref=f85e262]:
+                - link "" [ref=f85e263] [cursor=pointer]:
+                  - /url: /site/plato.stanford.edu
+                - link "" [ref=f85e265] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://plato.stanford.edu/entries/artificial-intelligence/
+            - generic "Contains JavaScript" [ref=f85e269]: JS
+          - generic [ref=f85e271]:
+            - generic [ref=f85e272]:
+              - generic [ref=f85e273]:
+                - generic [ref=f85e274]:
+                  - generic "Match density" [ref=f85e275]
+                  - generic [ref=f85e279]:
+                    - heading [level=2] [ref=f85e280]:
+                      - link "Panhel votes for new sorority | The Tech" [ref=f85e281] [cursor=pointer]:
+                        - /url: https://thetech.com/2014/11/04/newsorority-v134-n52
+                    - link "https://thetech.com/2014/11/04/newsorority-v134-n52" [ref=f85e283] [cursor=pointer]:
+                      - /url: https://thetech.com/2014/11/04/newsorority-v134-n52
+                - paragraph [ref=f85e285]: By Discussions are underway to introduce a new sorority on campus after a unanimous vote from the Panhellenic Council on Sept. 29 to “open campus to extension,” according to Panhel President Yasmin C. Inam ’15. The sorority will join six other sororities
+              - generic [ref=f85e286]:
+                - link "" [ref=f85e287] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f85e289] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/2014/11/04/newsorority-v134-n52
+            - generic [ref=f85e291]:
+              - paragraph [ref=f85e292]: "Also from thetech.com:"
+              - list [ref=f85e293]:
+                - listitem [ref=f85e294]:
+                  - 'link "IT’S ALL GREEK TO ME: Sports and sororities | The Tech" [ref=f85e295] [cursor=pointer]':
+                    - /url: https://thetech.com/2012/10/16/sororityathletics-v132-n45
+                - listitem [ref=f85e296]:
+                  - link "Asian-interest sorority planned | The Tech" [ref=f85e297] [cursor=pointer]:
+                    - /url: https://thetech.com/2011/02/11/asiansorority-v131-n4
+                - listitem [ref=f85e298]:
+                  - link "Panhel Reports Record Bid Numbers | The Tech" [ref=f85e299] [cursor=pointer]:
+                    - /url: https://thetech.com/2007/02/09/2panhel-v127-n2
+                - listitem [ref=f85e300]:
+                  - link "Letters to the Editor | The Tech" [ref=f85e301] [cursor=pointer]:
+                    - /url: https://thetech.com/2007/03/09/letters-v127-n10
+            - generic [ref=f85e302]:
+              - link "2 more" [ref=f85e304] [cursor=pointer]:
+                - /url: /search?query=Alpha+Phi+MIT+chapter+sisters+site%3Athetech.com&sst=SE-4a3f38ee65742378
+              - generic "Contains JavaScript" [ref=f85e306]: JS
+          - generic [ref=f85e308]:
+            - generic [ref=f85e309]:
+              - generic [ref=f85e310]:
+                - generic [ref=f85e311]:
+                  - generic "Match density" [ref=f85e312]
+                  - generic [ref=f85e316]:
+                    - heading [level=2] [ref=f85e317]:
+                      - link "Rising to the Challenge | MIT News | Massachusetts Institute of Technology" [ref=f85e318] [cursor=pointer]:
+                        - /url: https://news.mit.edu/2012/rising-to-the-challenge
+                    - link "https://news.mit.edu/2012/rising-to-the-challenge" [ref=f85e320] [cursor=pointer]:
+                      - /url: https://news.mit.edu/2012/rising-to-the-challenge
+                - paragraph [ref=f85e322]: Serving the community as a community — this is a concept that 15 residential teams took to heart in the 2012 FSILG&D Community Service Challenge. As part of the Service Challenge, participating MIT fraternities, sororities, independent living groups (FSIL
+              - generic [ref=f85e323]:
+                - link "" [ref=f85e324] [cursor=pointer]:
+                  - /url: /site/news.mit.edu
+                - link "" [ref=f85e326] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2012/rising-to-the-challenge
+            - generic "Contains JavaScript" [ref=f85e330]: JS
+          - generic [ref=f85e332]:
+            - generic [ref=f85e333]:
+              - generic [ref=f85e334]:
+                - generic [ref=f85e335]:
+                  - generic "Match density" [ref=f85e336]
+                  - generic [ref=f85e340]:
+                    - heading [level=2] [ref=f85e341]:
+                      - link "Archives | Union College News Archives" [ref=f85e342] [cursor=pointer]:
+                        - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                    - link "https://muse.union.edu/newsarchives/2003/08/page/4/" [ref=f85e344] [cursor=pointer]:
+                      - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                - paragraph [ref=f85e346]: Posts made in August, 2003 Posted on Aug 25, 2003 The modern fraternity system at colleges and universities across the nation is generally recognized as beginning with the founding of Kappa Alpha (1825), Sigma Phi (1827), and Delta Phi (1827) at Union. Al
+              - generic [ref=f85e347]:
+                - link "" [ref=f85e348] [cursor=pointer]:
+                  - /url: /site/muse.union.edu
+                - link "" [ref=f85e350] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://muse.union.edu/newsarchives/2003/08/page/4/
+            - generic "Contains JavaScript" [ref=f85e354]: JS
+          - generic [ref=f85e356]:
+            - generic [ref=f85e357]:
+              - generic [ref=f85e358]:
+                - generic [ref=f85e359]:
+                  - generic "Match density" [ref=f85e360]
+                  - generic [ref=f85e364]:
+                    - heading [level=2] [ref=f85e365]:
+                      - link "Philanthropy and Service – Delta Phi Epsilon" [ref=f85e366] [cursor=pointer]:
+                        - /url: http://dphie.mit.edu/events/philanthropy-2/
+                    - link "http://dphie.mit.edu/events/philanthropy-2/" [ref=f85e368] [cursor=pointer]:
+                      - /url: http://dphie.mit.edu/events/philanthropy-2/
+                - paragraph [ref=f85e370]: Every semester, we host events for our philanthropies! Our three primary philanthropies are the National Association of Anorexia Nervosa and Associated Disorders (or ANAD), the Cystic Fibrosis Foundation (or CFF), and the DPhiE Educational Foundation. Del
+              - generic [ref=f85e371]:
+                - link "" [ref=f85e372] [cursor=pointer]:
+                  - /url: /site/dphie.mit.edu
+                - link "" [ref=f85e374] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://dphie.mit.edu/events/philanthropy-2/
+            - generic "Contains JavaScript" [ref=f85e378]: JS
+          - generic [ref=f85e380]:
+            - generic [ref=f85e381]:
+              - generic [ref=f85e382]:
+                - generic [ref=f85e383]:
+                  - generic "Match density" [ref=f85e384]
+                  - generic [ref=f85e388]:
+                    - heading [level=2] [ref=f85e389]:
+                      - link "Q0KSPU3 liommentator 171 ' tf A--" [ref=f85e390] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/88598804-20da-44ca-8610-c4002a7f3a9a/content
+                    - generic [ref=f85e391]:
+                      - generic "PDF" [ref=f85e392]: 
+                      - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/88598804-20da-44ca-8610-c4002a7f3a9a/content" [ref=f85e393] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/88598804-20da-44ca-8610-c4002a7f3a9a/content
+                - paragraph [ref=f85e395]: "A- 1 VOL. XLIX. SALEM, OREGON, THURSDAY, MAY 19, 1938 No. 29 Dear George: \"Durb\" Southard, bard hit- For the past 28 issues of the For May 8th ting outfielder of the Willam- us ' an we have featured X ' '..\"V Collegi ette university baseball nine, Campus"
+              - generic [ref=f85e396]:
+                - link "" [ref=f85e397] [cursor=pointer]:
+                  - /url: /site/digitalcollections.willamette.edu
+                - link "" [ref=f85e399] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://digitalcollections.willamette.edu/server/api/core/bitstreams/88598804-20da-44ca-8610-c4002a7f3a9a/content
+            - generic [ref=f85e401]:
+              - paragraph [ref=f85e402]: "Also from digitalcollections.willamette.edu:"
+              - list [ref=f85e403]:
+                - listitem [ref=f85e404]:
+                  - generic "PDF": 
+                  - link "Willamette CDol" [ref=f85e405] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content
+                - listitem [ref=f85e406]:
+                  - generic "PDF": 
+                  - link "willamette Delegates Storm MUN Twelve Represent Niger" [ref=f85e407] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/d9143b4f-2aad-4519-97f3-80bec9425a49/content
+                - listitem [ref=f85e408]:
+                  - generic "PDF": 
+                  - link "nnmpus ,n.. Ujotnmentslor wrT'mrt T Willamette CDolleasan" [ref=f85e409] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content
+                - listitem [ref=f85e410]:
+                  - generic "PDF": 
+                  - link "Willamette Calk" [ref=f85e411] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/4902b434-ca6d-4561-bd9f-41ce5649959f/content
+            - generic [ref=f85e412]:
+              - link "27 more" [ref=f85e414] [cursor=pointer]:
+                - /url: /search?query=Alpha+Phi+MIT+chapter+sisters+site%3Adigitalcollections.willamette.edu&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e416]: PDF File
+          - generic [ref=f85e418]:
+            - generic [ref=f85e419]:
+              - generic [ref=f85e420]:
+                - generic [ref=f85e421]:
+                  - generic "Match density" [ref=f85e422]
+                  - generic [ref=f85e426]:
+                    - heading [level=2] [ref=f85e427]:
+                      - link "ENTERTAINMENT SPORTS" [ref=f85e428] [cursor=pointer]:
+                        - /url: https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content
+                    - generic [ref=f85e429]:
+                      - generic "PDF" [ref=f85e430]: 
+                      - link "https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content" [ref=f85e431] [cursor=pointer]:
+                        - /url: https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content
+                - paragraph [ref=f85e433]: March 4, 2016•Volume 101, Issue 24•nique.net . . News 2 Opinions 6 Life 10 Entertainment 14 Sports 24 LIFE BRENDA LIN EDITOR-IN-CHIEF On March 1, the Georgia Tech Collegiate Panhellenic Council (CPC) announced that Kappa Alpha Theta (KAT) fraternity, more
+              - generic [ref=f85e434]:
+                - link "" [ref=f85e435] [cursor=pointer]:
+                  - /url: /site/repository.gatech.edu
+                - link "" [ref=f85e437] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content
+            - generic [ref=f85e439]: PDF File
+          - generic [ref=f85e443]:
+            - generic [ref=f85e444]:
+              - generic [ref=f85e445]:
+                - generic [ref=f85e446]:
+                  - generic "Match density" [ref=f85e447]
+                  - generic [ref=f85e451]:
+                    - heading [level=2] [ref=f85e452]:
+                      - 'link "Journal of Contents Articles The logical foundations of strategic reasoning: inconsistency-management as a test case for logi..." [ref=f85e453] [cursor=pointer]':
+                        - /url: https://www.collegepublications.co.uk/downloads/ifcolog00025.pdf
+                    - generic [ref=f85e454]:
+                      - generic "PDF" [ref=f85e455]: 
+                      - link "https://www.collegepublications.co.uk/downloads/ifcolog00025.pdf" [ref=f85e456] [cursor=pointer]:
+                        - /url: https://www.collegepublications.co.uk/downloads/ifcolog00025.pdf
+                - paragraph [ref=f85e458]: The logical foundations of strategic reasoning . . . admit of doctrinally foundational theories to possess foundations in the material sense. Sometimes a good theory contains known falsehoods. Sometimes the false- hoods are derivationally indispensable to
+              - generic [ref=f85e459]:
+                - link "" [ref=f85e460] [cursor=pointer]:
+                  - /url: /site/www.collegepublications.co.uk
+                - link "" [ref=f85e462] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.collegepublications.co.uk/downloads/ifcolog00025.pdf
+            - generic [ref=f85e464]: PDF File
+          - generic [ref=f85e468]:
+            - generic [ref=f85e469]:
+              - generic [ref=f85e470]:
+                - generic [ref=f85e471]:
+                  - generic "Match density" [ref=f85e472]
+                  - generic [ref=f85e476]:
+                    - heading [level=2] [ref=f85e477]:
+                      - 'link "The 10 Best Fraternities in the US: A Guide for Prospective Members | AdmissionSight" [ref=f85e478] [cursor=pointer]':
+                        - /url: https://admissionsight.com/best-fraternities/
+                    - generic [ref=f85e479]:
+                      - text: 2026-06-05 ·
+                      - link "https://admissionsight.com/best-fraternities/" [ref=f85e480] [cursor=pointer]:
+                        - /url: https://admissionsight.com/best-fraternities/
+                - paragraph [ref=f85e482]: Fraternities have been part of American college life for nearly two centuries. Today, operate through 6,100 chapters on 800 campuses, with 380,000 undergraduate members and 4.2 million alumni. Each year, hundreds of thousands of college men go through rus
+              - generic [ref=f85e483]:
+                - link "" [ref=f85e484] [cursor=pointer]:
+                  - /url: /site/admissionsight.com
+                - link "" [ref=f85e486] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://admissionsight.com/best-fraternities/
+            - generic "Contains JavaScript" [ref=f85e490]: JS
+          - generic [ref=f85e492]:
+            - generic [ref=f85e493]:
+              - generic [ref=f85e494]:
+                - generic [ref=f85e495]:
+                  - generic "Match density" [ref=f85e496]
+                  - generic [ref=f85e500]:
+                    - heading [level=2] [ref=f85e501]:
+                      - link "Boston Book Fair Featured Items | News | ABAA" [ref=f85e502] [cursor=pointer]:
+                        - /url: https://www.abaa.org/articles/boston-book-fair-featured-items-2022
+                    - link "https://www.abaa.org/articles/boston-book-fair-featured-items-2022" [ref=f85e504] [cursor=pointer]:
+                      - /url: https://www.abaa.org/articles/boston-book-fair-featured-items-2022
+                - paragraph [ref=f85e506]: ABAA News Search News Keywords Select All TopicsAll Topics Book Fairs Bookseller News Bookselling Et Cetera Events On Collecting Security Search Preview some highlights from next week's Boston Book Fair! The returns to the Hynes Convention Center in Bosto
+              - generic [ref=f85e507]:
+                - link "" [ref=f85e508] [cursor=pointer]:
+                  - /url: /site/www.abaa.org
+                - link "" [ref=f85e510] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.abaa.org/articles/boston-book-fair-featured-items-2022
+            - generic "Contains JavaScript" [ref=f85e514]: JS
+          - generic [ref=f85e516]:
+            - generic [ref=f85e517]:
+              - generic [ref=f85e518]:
+                - generic [ref=f85e519]:
+                  - generic "Match density" [ref=f85e520]
+                  - generic [ref=f85e524]:
+                    - heading [level=2] [ref=f85e525]:
+                      - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f85e526] [cursor=pointer]:
+                        - /url: https://www.franbecque.com/page/33/
+                    - link "https://www.franbecque.com/page/33/" [ref=f85e528] [cursor=pointer]:
+                      - /url: https://www.franbecque.com/page/33/
+                - paragraph [ref=f85e530]: Posted onby Phi Gamma Delta was founded on May 1, 1848. John Templeton McCarty, Samuel Beatty Wilson, James Elliott, Daniel Webster Crofts, Ellis Bailey Gregg and Naaman Fletcher – the Immortal Six – were students at Jefferson College in Canonsburg, Penns
+              - generic [ref=f85e531]:
+                - link "" [ref=f85e532] [cursor=pointer]:
+                  - /url: /site/www.franbecque.com
+                - link "" [ref=f85e534] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.franbecque.com/page/33/
+            - generic [ref=f85e536]:
+              - paragraph [ref=f85e537]: "Also from www.franbecque.com:"
+              - list [ref=f85e538]:
+                - listitem [ref=f85e539]:
+                  - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f85e540] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/page/61/
+            - generic "Contains JavaScript" [ref=f85e543]: JS
+          - generic [ref=f85e545]:
+            - generic [ref=f85e546]:
+              - generic [ref=f85e547]:
+                - generic [ref=f85e548]:
+                  - generic "Match density" [ref=f85e549]
+                  - generic [ref=f85e553]:
+                    - heading [level=2] [ref=f85e554]:
+                      - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f85e555] [cursor=pointer]:
+                        - /url: https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+                    - link "https://theta.scripts.mit.edu/aboutzmhouseandhistory.php" [ref=f85e557] [cursor=pointer]:
+                      - /url: https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+                - paragraph [ref=f85e559]: Founded in 1991, the Zeta Mu chapter of Kappa Alpha Theta is MIT's fourth Panhellenic sorority. With a sorority house on campus, the Theta house occupies a prime piece of real estate at the start of ''dorm row'' between McCormick and Baker. Home to 40 sis
+              - generic [ref=f85e560]:
+                - link "" [ref=f85e561] [cursor=pointer]:
+                  - /url: /site/theta.scripts.mit.edu
+                - link "" [ref=f85e563] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+            - generic "Contains JavaScript" [ref=f85e567]: JS
+          - generic [ref=f85e569]:
+            - generic [ref=f85e570]:
+              - generic [ref=f85e571]:
+                - generic [ref=f85e572]:
+                  - generic "Match density" [ref=f85e573]
+                  - generic [ref=f85e577]:
+                    - heading [level=2] [ref=f85e578]:
+                      - link "B I O G R A P H I C A L D I R E C T O R Y O F T H E U N I T E D S T A T E S C O N G R E S S 1 7 7 4 – 2 0 0 5 T H E C O N T I..." [ref=f85e579] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                    - generic [ref=f85e580]:
+                      - generic "PDF" [ref=f85e581]: 
+                      - link "https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf" [ref=f85e582] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                - paragraph [ref=f85e584]: ington as President; reelected in 1792 and served from April ADAMS, Parmenio, a Representative from New York; 21, 1789, to March 3, 1797; elected President of the United born in Hartford, Conn., September 9, 1776; attended the States and served from March
+              - generic [ref=f85e585]:
+                - link "" [ref=f85e586] [cursor=pointer]:
+                  - /url: /site/www.govinfo.gov
+                - link "" [ref=f85e588] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+            - generic [ref=f85e590]: PDF File
+          - generic [ref=f85e594]:
+            - generic [ref=f85e595]:
+              - generic [ref=f85e596]:
+                - generic [ref=f85e597]:
+                  - generic "Match density" [ref=f85e598]
+                  - generic [ref=f85e602]:
+                    - heading [level=2] [ref=f85e603]:
+                      - link "Winter 2019 class notes | Ohio Wesleyan University" [ref=f85e604] [cursor=pointer]:
+                        - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                    - link "https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/" [ref=f85e606] [cursor=pointer]:
+                      - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                - paragraph [ref=f85e608]: Richard Jackson ’53 is the founder of One People, the Delaware, Ohio-based organization that co-hosted the Community Festival Celebrating Juneteenth in June. Juneteenth is a holiday predominantly celebrated in African-American communities in commemoration
+              - generic [ref=f85e609]:
+                - link "" [ref=f85e610] [cursor=pointer]:
+                  - /url: /site/www.owu.edu
+                - link "" [ref=f85e612] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+            - generic [ref=f85e614]:
+              - paragraph [ref=f85e615]: "Also from www.owu.edu:"
+              - list [ref=f85e616]:
+                - listitem [ref=f85e617]:
+                  - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f85e618] [cursor=pointer]:
+                    - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+            - generic "Contains JavaScript" [ref=f85e621]: JS
+          - generic [ref=f85e623]:
+            - generic [ref=f85e624]:
+              - generic [ref=f85e625]:
+                - generic [ref=f85e626]:
+                  - generic "Match density" [ref=f85e627]
+                  - generic [ref=f85e631]:
+                    - heading [level=2] [ref=f85e632]:
+                      - 'link "DOOMCom :: View topic - Weiner Wednesday" [ref=f85e633] [cursor=pointer]':
+                        - /url: http://doomcom.mit.edu/viewtopic.php?t=185
+                    - link "http://doomcom.mit.edu/viewtopic.php?t=185" [ref=f85e635] [cursor=pointer]:
+                      - /url: http://doomcom.mit.edu/viewtopic.php?t=185
+                - paragraph [ref=f85e637]: "Quote: Tired of the high prices of food on campus? Then come to Weiner Wednesday, this Wednesday afternoon, 12/5, in the *Hillel Center* (building W)! The lovely sisters of Alpha Epsilon Phi, Beta Epsilon chapter, will be selling hot dogs for $1 apiece fr"
+              - generic [ref=f85e638]:
+                - link "" [ref=f85e639] [cursor=pointer]:
+                  - /url: /site/doomcom.mit.edu
+                - link "" [ref=f85e641] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://doomcom.mit.edu/viewtopic.php?t=185
+            - generic "Contains JavaScript" [ref=f85e645]: JS
+          - generic [ref=f85e647]:
+            - generic [ref=f85e648]:
+              - generic [ref=f85e649]:
+                - generic [ref=f85e650]:
+                  - generic "Match density" [ref=f85e651]
+                  - generic [ref=f85e655]:
+                    - heading [level=2] [ref=f85e656]:
+                      - link "Showcase of Languages" [ref=f85e657] [cursor=pointer]:
+                        - /url: https://codegolf.stackexchange.com/questions/44680
+                    - link "https://codegolf.stackexchange.com/questions/44680" [ref=f85e659] [cursor=pointer]:
+                      - /url: https://codegolf.stackexchange.com/questions/44680
+                - paragraph [ref=f85e661]: Showcase of Languages Notes This thread is open and unlocked only because the community decided to make an exception. Please do not use this question as evidence that you can ask similar questions here. Please do not create additional showcase questions.
+              - generic [ref=f85e662]:
+                - link "" [ref=f85e663] [cursor=pointer]:
+                  - /url: /site/codegolf.stackexchange.com
+                - link "" [ref=f85e665] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://codegolf.stackexchange.com/questions/44680
+            - generic "Contains JavaScript" [ref=f85e669]: JS
+          - generic [ref=f85e671]:
+            - generic [ref=f85e672]:
+              - generic [ref=f85e673]:
+                - generic [ref=f85e674]:
+                  - generic "Match density" [ref=f85e675]
+                  - generic [ref=f85e679]:
+                    - heading [level=2] [ref=f85e680]:
+                      - link "Wofford College | 35 inducted into Phi Beta Kappa at Wofford" [ref=f85e681] [cursor=pointer]:
+                        - /url: https://www.wofford.edu/about/news/news-archives/2015/35-inducted-into-phi-beta-kappa-at-wofford
+                    - link "https://www.wofford.edu/about/news/news-archives/2015/35-inducted-into-phi-beta-kappa-at-wofford" [ref=f85e683] [cursor=pointer]:
+                      - /url: https://www.wofford.edu/about/news/news-archives/2015/35-inducted-into-phi-beta-kappa-at-wofford
+                - paragraph [ref=f85e685]: 35 inducted into Phi Beta Kappa at Wofford Nation’s oldest, most widely known academic honor society 2015-05-14 SPARTANBURG, S.C. – Wofford College recently inducted 35 students and recent graduates into its chapter of , the nation’s oldest and most widel
+              - generic [ref=f85e686]:
+                - link "" [ref=f85e687] [cursor=pointer]:
+                  - /url: /site/www.wofford.edu
+                - link "" [ref=f85e689] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.wofford.edu/about/news/news-archives/2015/35-inducted-into-phi-beta-kappa-at-wofford
+            - generic "Contains JavaScript" [ref=f85e693]: JS
+          - generic [ref=f85e695]:
+            - generic [ref=f85e696]:
+              - generic [ref=f85e697]:
+                - generic [ref=f85e698]:
+                  - generic "Match density" [ref=f85e699]
+                  - generic [ref=f85e703]:
+                    - heading [level=2] [ref=f85e704]:
+                      - link "2.0 100 1.5 75 L/D" [ref=f85e705] [cursor=pointer]:
+                        - /url: https://baylor-ir.tdl.org/server/api/core/bitstreams/2553b328-6d16-4dcd-9067-3008a260ef2b/content
+                    - generic [ref=f85e706]:
+                      - generic "PDF" [ref=f85e707]: 
+                      - link "https://baylor-ir.tdl.org/server/api/core/bitstreams/2553b328-6d16-4dcd-9067-3008a260ef2b/content" [ref=f85e708] [cursor=pointer]:
+                        - /url: https://baylor-ir.tdl.org/server/api/core/bitstreams/2553b328-6d16-4dcd-9067-3008a260ef2b/content
+                - paragraph [ref=f85e710]: ACKNOWLEDGMENTS First and foremost, I must always thank God for all that I have been blessed with and for the opportunity to attend Baylor University for the past six years. Dr. Kenneth Van Treuren has had a major impact on my schooling career as well as
+              - generic [ref=f85e711]:
+                - link "" [ref=f85e712] [cursor=pointer]:
+                  - /url: /site/baylor-ir.tdl.org
+                - link "" [ref=f85e714] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://baylor-ir.tdl.org/server/api/core/bitstreams/2553b328-6d16-4dcd-9067-3008a260ef2b/content
+            - generic [ref=f85e716]: PDF File
+          - generic [ref=f85e720]:
+            - generic [ref=f85e721]:
+              - generic [ref=f85e722]:
+                - generic [ref=f85e723]:
+                  - generic "Match density" [ref=f85e724]
+                  - generic [ref=f85e728]:
+                    - heading [level=2] [ref=f85e729]:
+                      - link "The Office of Workers’ Compensation Programs (OWCP) admin- isters the Federal Employees’ Compensation Act, the Longshore and ..." [ref=f85e730] [cursor=pointer]:
+                        - /url: https://docs.house.gov/meetings/AP/AP00/20220630/114968/HMKP-117-AP00-20220630-SD003.PDF
+                    - generic [ref=f85e731]:
+                      - generic "PDF" [ref=f85e732]: 
+                      - link "https://docs.house.gov/meetings/AP/AP00/20220630/114968/HMKP-117-AP00-20220630-SD003.PDF" [ref=f85e733] [cursor=pointer]:
+                        - /url: https://docs.house.gov/meetings/AP/AP00/20220630/114968/HMKP-117-AP00-20220630-SD003.PDF
+                - paragraph [ref=f85e735]: 22 Higher Education Workforce Development Initiative.—The Com- mittee encourages the Department of Labor to partner with the De- partment of Education to explore the feasibility of creating work- force development programs at 4-year higher education insti
+              - generic [ref=f85e736]:
+                - link "" [ref=f85e737] [cursor=pointer]:
+                  - /url: /site/docs.house.gov
+                - link "" [ref=f85e739] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://docs.house.gov/meetings/AP/AP00/20220630/114968/HMKP-117-AP00-20220630-SD003.PDF
+            - generic [ref=f85e741]: PDF File
+      - generic [ref=f85e744]:
+        - link "1" [ref=f85e745] [cursor=pointer]:
+          - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&sst=SE-4a3f38ee65742378
+        - link "2" [ref=f85e746] [cursor=pointer]:
+          - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&page=2&sst=SE-4a3f38ee65742378
+        - link "3" [ref=f85e747] [cursor=pointer]:
+          - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&page=3&sst=SE-4a3f38ee65742378
+        - link "4" [ref=f85e748] [cursor=pointer]:
+          - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&page=4&sst=SE-4a3f38ee65742378
+        - link "5" [ref=f85e749] [cursor=pointer]:
+          - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&page=5&sst=SE-4a3f38ee65742378
+    - complementary [ref=f85e750]:
+      - text: 
+      - generic [ref=f85e752]:
+        - heading " Search Settings" [level=2] [ref=f85e753]:
+          - generic [ref=f85e754]: 
+          - text: Search Settings
+        - generic [ref=f85e755]:
+          - button [ref=f85e757] [cursor=pointer]:
+            - link " Search In Title" [ref=f85e758]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&searchTitle=title&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e759]: 
+              - generic [ref=f85e760]: Search In Title
+          - button [ref=f85e762] [cursor=pointer]:
+            - link " Recent Results" [ref=f85e763]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&recent=recent&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e764]: 
+              - generic [ref=f85e765]: Recent Results
+          - button [ref=f85e767] [cursor=pointer]:
+            - link " Remove JS" [ref=f85e768]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&js=no-js&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e769]: 
+              - generic [ref=f85e770]: Remove JS
+          - button [ref=f85e772] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f85e773]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&adtech=reduce&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e774]: 
+              - generic [ref=f85e775]: Reduce Adtech
+          - button [ref=f85e777] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f85e778]:
+              - /url: /search?query=Alpha+Phi+MIT+chapter+sisters&nsfw=smut&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f85e779]: 
+              - generic [ref=f85e780]: Reduce NSFW
+          - button [ref=f85e783] [cursor=pointer]:
+            - generic [ref=f85e784]:
+              - generic [ref=f85e785]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f85e787]:
+    - heading "Search Help" [level=1] [ref=f85e788]
+    - generic [ref=f85e789]:
+      - generic [ref=f85e790]:
+        - heading " Syntax" [level=2] [ref=f85e791]:
+          - generic [ref=f85e792]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f85e793]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f85e794]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f85e795]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f85e796]
+        - heading "Samples" [level=2] [ref=f85e797]
+        - generic [ref=f85e798]:
+          - term [ref=f85e799]: soup -chicken
+          - definition [ref=f85e800]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f85e801]: "\"keyboard\""
+          - definition [ref=f85e802]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f85e803]: "\"steve mcqueen\""
+          - definition [ref=f85e804]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f85e805]: apology (plato)
+          - definition [ref=f85e806]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f85e807]:
+          - generic [ref=f85e808]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f85e809]
+        - generic [ref=f85e810]: This is by the beginning
+        - generic [ref=f85e818]: This is in the middle
+        - generic [ref=f85e826]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f85e832]:
+          - generic [ref=f85e833]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f85e834]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f85e835]
+        - heading " Webmaster Information" [level=2] [ref=f85e836]:
+          - generic [ref=f85e837]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f85e838]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f85e839] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f85e840] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f85e841]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f85e842] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f85e843]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f85e844] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f85e845]:
+        - heading " Special Keywords" [level=2] [ref=f85e846]:
+          - generic [ref=f85e847]: 
+          - text: Special Keywords
+        - table [ref=f85e848]:
+          - rowgroup [ref=f85e849]:
+            - row [ref=f85e850]:
+              - columnheader "Keyword" [ref=f85e851]
+              - columnheader "Meaning" [ref=f85e852]
+          - rowgroup [ref=f85e853]:
+            - row [ref=f85e854]:
+              - cell [ref=f85e855]:
+                - text: "site:"
+                - emphasis [ref=f85e856]: example.com
+              - cell [ref=f85e857]:
+                - text: Display site information about
+                - emphasis [ref=f85e858]: example.com
+            - row [ref=f85e859]:
+              - cell [ref=f85e860]:
+                - text: "site:"
+                - emphasis [ref=f85e861]: example.com
+                - emphasis [ref=f85e862]: keyword
+              - cell [ref=f85e863]:
+                - text: Search
+                - emphasis [ref=f85e864]: example.com
+                - text: for
+                - emphasis [ref=f85e865]: keyword
+            - row [ref=f85e866]:
+              - cell [ref=f85e867]:
+                - text: "site:"
+                - emphasis [ref=f85e868]: "*.example.com"
+                - emphasis [ref=f85e869]: keyword
+              - cell [ref=f85e870]:
+                - text: Search
+                - emphasis [ref=f85e871]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f85e872]: keyword
+            - row [ref=f85e873]:
+              - cell [ref=f85e874]:
+                - text: "browse:"
+                - emphasis [ref=f85e875]: example.com
+              - cell [ref=f85e876]:
+                - text: Show similar websites to
+                - emphasis [ref=f85e877]: example.com
+            - row [ref=f85e878]:
+              - cell [ref=f85e879]:
+                - text: "ip:"
+                - emphasis [ref=f85e880]: 127.0.0.1
+              - cell [ref=f85e881]:
+                - text: Search documents hosted at
+                - emphasis [ref=f85e882]: 127.0.0.1
+            - row [ref=f85e883]:
+              - cell [ref=f85e884]:
+                - text: "links:"
+                - emphasis [ref=f85e885]: example.com
+              - cell [ref=f85e886]:
+                - text: Search documents linking to
+                - emphasis [ref=f85e887]: example.com
+            - row [ref=f85e888]:
+              - cell [ref=f85e889]:
+                - text: "tld:"
+                - emphasis [ref=f85e890]: edu
+                - emphasis [ref=f85e891]: keyword
+              - cell [ref=f85e892]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f85e893]: edu
+                - text: .
+            - row [ref=f85e894]:
+              - cell [ref=f85e895]:
+                - text: "?tld:"
+                - emphasis [ref=f85e896]: edu
+                - emphasis [ref=f85e897]: keyword
+              - cell [ref=f85e898]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f85e899]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f85e900]:
+              - cell "q>5" [ref=f85e901]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f85e902]
+            - row [ref=f85e903]:
+              - cell "q<5" [ref=f85e904]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f85e905]
+            - row [ref=f85e906]:
+              - cell "year>2005" [ref=f85e907]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f85e908]
+            - row [ref=f85e909]:
+              - cell "year=2005" [ref=f85e910]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f85e911]
+            - row [ref=f85e912]:
+              - cell "year<2005" [ref=f85e913]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f85e914]
+            - row [ref=f85e915]:
+              - cell "rank>50" [ref=f85e916]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f85e917]
+            - row [ref=f85e918]:
+              - cell "rank<50" [ref=f85e919]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f85e920]
+            - row [ref=f85e921]:
+              - cell "format:html5" [ref=f85e922]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f85e923]
+            - row [ref=f85e924]:
+              - cell "format:xhtml" [ref=f85e925]
+              - cell "Filter documents using the XHTML standard" [ref=f85e926]
+            - row [ref=f85e927]:
+              - cell "format:html123" [ref=f85e928]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f85e929]
+            - row [ref=f85e930]:
+              - cell "generator:wordpress" [ref=f85e931]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f85e932]
+            - row [ref=f85e933]:
+              - cell "file:zip" [ref=f85e934]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f85e935]
+            - row [ref=f85e936]:
+              - cell "file:audio" [ref=f85e937]
+              - cell "Filter documents containing a link to an audio file" [ref=f85e938]
+            - row [ref=f85e939]:
+              - cell "file:video" [ref=f85e940]
+              - cell "Filter documents containing a link to a video file" [ref=f85e941]
+            - row [ref=f85e942]:
+              - cell "file:archive" [ref=f85e943]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f85e944]
+            - row [ref=f85e945]:
+              - cell "file:document" [ref=f85e946]
+              - cell "Filter documents containing a link to a document" [ref=f85e947]
+            - row [ref=f85e948]:
+              - cell "-special:media" [ref=f85e949]
+              - cell "Filter out documents with audio or video tags" [ref=f85e950]
+            - row [ref=f85e951]:
+              - cell "-special:scripts" [ref=f85e952]
+              - cell "Filter out documents with javascript" [ref=f85e953]
+            - row [ref=f85e954]:
+              - cell "-special:affiliate" [ref=f85e955]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f85e956]
+            - row [ref=f85e957]:
+              - cell "-special:tracking" [ref=f85e958]
+              - cell "Filter out documents with analytics or tracking code" [ref=f85e959]
+            - row [ref=f85e960]:
+              - cell "-special:cookies" [ref=f85e961]
+              - cell "Filter out documents with cookies" [ref=f85e962]
+  - contentinfo [ref=f85e963]:
+    - heading "Policy Information" [level=1] [ref=f85e964]
+    - generic [ref=f85e965]:
+      - generic [ref=f85e966]:
+        - heading " Policies" [level=2] [ref=f85e967]:
+          - generic [ref=f85e968]: 
+          - text: Policies
+        - generic [ref=f85e969]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f85e970]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f85e971]:
+        - heading " Contact" [level=2] [ref=f85e972]:
+          - generic [ref=f85e973]: 
+          - text: Contact
+        - generic [ref=f85e974]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f85e975] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f85e976]:
+          - generic [ref=f85e977]: 
+          - text: Sources
+        - generic [ref=f85e978]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f85e979] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f85e980]:
+        - heading " Data" [level=2] [ref=f85e981]:
+          - generic [ref=f85e982]: 
+          - text: Data
+        - generic [ref=f85e983]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f85e984] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f85e985] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

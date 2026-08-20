@@ -1,0 +1,982 @@
+URL: https://www.bing.com/
+Title: Search - Microsoft Bing
+
+- generic [ref=f46e3]:
+  - main [ref=f46e16]:
+    - generic [ref=f46e17]:
+      - generic [ref=f46e18]:
+        - heading [level=1] [ref=f46e19]:
+          - img "Microsoft Logo Image" [ref=f46e20] [cursor=pointer]
+        - navigation [ref=f46e28]:
+          - menubar [ref=f46e29]:
+            - menuitem [ref=f46e30] [cursor=pointer]:
+              - link "Images" [ref=f46e31]:
+                - /url: /images?FORM=Z9LH
+            - menuitem [ref=f46e32] [cursor=pointer]:
+              - link "Videos" [ref=f46e33]:
+                - /url: /videos?FORM=Z9LH1
+            - menuitem [ref=f46e34] [cursor=pointer]:
+              - link "Shopping" [ref=f46e35]:
+                - /url: /shop?FORM=Z9LHS4
+            - menuitem [ref=f46e36] [cursor=pointer]:
+              - link "Maps" [ref=f46e37]:
+                - /url: /maps?FORM=Z9LH2
+            - menuitem [ref=f46e38] [cursor=pointer]:
+              - link "News" [ref=f46e39]:
+                - /url: /news/search?q=Top+stories&nvaug=%5bNewsVertical+Category%3d%22rt_MaxClass%22%5d&FORM=Z9LH3
+            - menuitem [ref=f46e40] [cursor=pointer]:
+              - text: . . .
+              - button "More" [ref=f46e41]
+      - complementary "Account Rewards and Preferences" [ref=f46e44]:
+        - link "Sign in Sign in" [ref=f46e45] [cursor=pointer]:
+          - /url: javascript:void(0)
+          - generic [ref=f46e46]: Sign in
+          - generic "Sign in" [ref=f46e47]
+        - button "Microsoft Rewards" [ref=f46e48] [cursor=pointer]:
+          - generic [ref=f46e49]: Rewards
+        - button "Settings and quick links" [ref=f46e58] [cursor=pointer]
+    - generic [ref=f46e59]:
+      - search [ref=f46e60]:
+        - generic "Enter your search term" [ref=f46e61]:
+          - combobox "Enter your search term" [active] [ref=f46e62]: Alpha Chi Omega MIT chapter official website
+        - button "Search the web"
+        - generic "Search the web" [ref=f46e63] [cursor=pointer]
+      - generic [ref=f46e70]:
+        - link "Create wallpaper" [ref=f46e71] [cursor=pointer]:
+          - /url: /search?q=create wallpaper&filters=aimode%3A%2235%22&FORM=bichpw
+        - link "Text creator" [ref=f46e74] [cursor=pointer]:
+          - /url: /search?q=bing ai writing&FORM=btcbhp
+  - generic [ref=f46e79]:
+    - generic [ref=f46e80]:
+      - dialog [ref=f46e82]:
+        - group "Bing homepage quiz Which Kenyan park is famous for elephant family migrations?" [ref=f46e83]:
+          - generic [ref=f46e84]: Bing homepage quiz
+          - generic [ref=f46e85]: Which Kenyan park is famous for elephant family migrations?
+          - list [ref=f46e86]:
+            - listitem [ref=f46e87]:
+              - 'link "Answer: A, Tsavo East, 1 of 3" [ref=f46e88] [cursor=pointer]':
+                - /url: /search?q=Amboseli&filters=mgzv3configlist%3A%22BingQA_Quiz_layout%22+IsConversation%3A%22True%22+btrequestsource%3A%22homepage%22+WQOskey%3A%22HPQuiz_20260812_ElephantDay%22+WQId%3A%221%22+WQQI%3A%220%22+WQCI%3A%220%22+UserChoices%3A%220%22+ShowTimesTaskPaneTrigger%3A%22false%22+WQSCORE%3A%220%22&FORM=HPQUIZ
+                - generic [ref=f46e89]: A
+                - text: Tsavo East
+            - listitem [ref=f46e90]:
+              - 'link "Answer: B, Maasai Mara, 2 of 3" [ref=f46e91] [cursor=pointer]':
+                - /url: /search?q=Amboseli&filters=mgzv3configlist%3A%22BingQA_Quiz_layout%22+IsConversation%3A%22True%22+btrequestsource%3A%22homepage%22+WQOskey%3A%22HPQuiz_20260812_ElephantDay%22+WQId%3A%221%22+WQQI%3A%220%22+WQCI%3A%221%22+UserChoices%3A%221%22+ShowTimesTaskPaneTrigger%3A%22false%22+WQSCORE%3A%220%22&FORM=HPQUIZ
+                - generic [ref=f46e92]: B
+                - text: Maasai Mara
+            - listitem [ref=f46e93]:
+              - 'link "Answer: C, Amboseli, 3 of 3" [ref=f46e94] [cursor=pointer]':
+                - /url: /search?q=Amboseli&filters=mgzv3configlist%3A%22BingQA_Quiz_layout%22+IsConversation%3A%22True%22+btrequestsource%3A%22homepage%22+WQOskey%3A%22HPQuiz_20260812_ElephantDay%22+WQId%3A%221%22+WQQI%3A%220%22+WQCI%3A%222%22+UserChoices%3A%222%22+ShowTimesTaskPaneTrigger%3A%22false%22+WQSCORE%3A%221%22&FORM=HPQUIZ
+                - generic [ref=f46e95]: C
+                - text: Amboseli
+      - generic [ref=f46e96]:
+        - generic:
+          - generic:
+            - link "Get the Bing Wallpaper app":
+              - /url: https://go.microsoft.com/fwlink/?linkid=2127455
+          - 'heading "Image of the day: A group of elephants, Amboseli National Park, Kenya" [level=3]':
+            - 'link "Image of the day: A group of elephants, Amboseli National Park, Kenya"':
+              - /url: /search?q=World+Elephant+Day&form=hpcapt&filters=HpDate:"20260812_0700"+mgzv3configlist:"BingQA_Encyclopedia_Layout"
+              - text: A group of elephants, Amboseli National Park, Kenya
+          - generic:
+            - generic: © Ibrahim Suha Derbent/Getty Images
+            - list:
+              - listitem:
+                - button "Download this image. Use of this image is restricted to wallpaper only."
+        - generic [ref=f46e97]:
+          - link [ref=f46e99] [cursor=pointer]:
+            - /url: /search?q=World+Elephant+Day&form=hpcapt&filters=HpDate:"20260812_0700"+mgzv3configlist:"BingQA_Encyclopedia_Layout"
+            - heading "Giants worth protecting" [level=2] [ref=f46e104]
+          - generic [ref=f46e105] [cursor=pointer]:
+            - status [ref=f46e106]
+            - button "Previous image" [ref=f46e107]
+            - button "Next image" [disabled] [ref=f46e109]
+    - button "Feedback" [ref=f46e111] [cursor=pointer]
+    - generic [ref=f46e114]:
+      - region "Trending on Bing" [ref=f46e115]:
+        - generic:
+          - status [ref=f46e116]
+          - button "Toggle feed area position" [expanded] [ref=f46e117] [cursor=pointer]
+          - button "Previous news" [disabled]
+          - button "More news" [ref=f46e119] [cursor=pointer]
+        - list [ref=f46e121]:
+          - listitem [ref=f46e122]:
+            - list [ref=f46e123]:
+              - listitem [ref=f46e124] [cursor=pointer]:
+                - link [ref=f46e125]:
+                  - /url: /search?q=White+House+press+secretary+Karoline+Leavitt+is+leaving+her+role%2c+Trump+says&efirst=0&ecount=50&filters=tnTID%3a%22PE_016D425C-A34E-4B9C-9BCB-72C23A58ABE5%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%220%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e126]:
+                    - 'heading "Trump: Leavitt leaving WH" [level=2] [ref=f46e127]'
+                    - img "© Photo by Jim WATSON / AFP via Getty Images © Photo by SAUL LOEB / AFP via Getty Images" [ref=f46e128]
+              - listitem [ref=f46e129] [cursor=pointer]:
+                - link [ref=f46e130]:
+                  - /url: /search?q=Cristiano+Ronaldo+and+Georgina+Rodriguez+tie+the+knot+after+10+years&efirst=0&ecount=50&filters=tnTID%3a%22PE_67F86EAF-D00B-45DE-94A9-76B414856252%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%221%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e131]:
+                    - heading "Ronaldo, Rodriguez tie knot" [level=2] [ref=f46e132]
+                    - img "©Photo by Joel C Ryan/Invision/AP" [ref=f46e133]
+              - listitem [ref=f46e134] [cursor=pointer]:
+                - link [ref=f46e135]:
+                  - /url: /search?q=Bruce+the+dog+euthanized+in+California&efirst=0&ecount=50&filters=tnTID%3a%22PE_3675AF2D-C4FF-4CA4-972D-BFA03A437F7A%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%222%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e136]:
+                    - heading "Bruce the dog euthanized" [level=2] [ref=f46e137]
+                    - img "© Thanasis / Moment / Getty Images" [ref=f46e138]
+              - listitem [ref=f46e139] [cursor=pointer]:
+                - link [ref=f46e140]:
+                  - /url: /search?q=16+inmates+hospitalized+after+lightning+strike+at+Ohio+prison&efirst=0&ecount=50&filters=tnTID%3a%22PE_05C496F1-FF20-41DF-8043-960B425AB272%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%223%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e141]:
+                    - heading "16 inmates hospitalized" [level=2] [ref=f46e142]
+                    - img "© Nancy Newell/Getty Images" [ref=f46e143]
+              - listitem [ref=f46e144] [cursor=pointer]:
+                - link [ref=f46e145]:
+                  - /url: /search?q=Bank+of+America+unveils+%24250+billion+to+bolster+AI%2c+energy+infrastructure&efirst=0&ecount=50&filters=tnTID%3a%22PE_8FF9C875-CC92-44DC-95EA-75B127B060A1%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%224%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e146]:
+                    - heading "BofA unveils $250B initiative" [level=2] [ref=f46e147]
+                    - img "© AP Photo/Charles Krupa" [ref=f46e148]
+              - listitem [ref=f46e149] [cursor=pointer]:
+                - link [ref=f46e150]:
+                  - /url: /search?q=David+Crowley+wins+Wisconsin+Democratic+primary&efirst=0&ecount=50&filters=tnTID%3a%22PE_B71CEAA7-39FE-4680-9E68-B2E1B5B8DEE7%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%225%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e151]:
+                    - heading "Wins WI Democratic primary" [level=2] [ref=f46e152]
+                    - 'img "© Credit: Scott Olson / Getty Images" [ref=f46e153]'
+              - listitem [ref=f46e154] [cursor=pointer]:
+                - link [ref=f46e155]:
+                  - /url: /search?q=Hit-and-run+crash+in+Santa+Ana%2c+California&efirst=0&ecount=50&filters=tnTID%3a%22PE_9685120E-C752-4D80-92C8-4F896A484E8F%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%226%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e156]:
+                    - heading "CA hit-and-run crash" [level=2] [ref=f46e157]
+                    - img "©NBC Los Angeles" [ref=f46e158]
+              - listitem [ref=f46e159] [cursor=pointer]:
+                - link [ref=f46e160]:
+                  - /url: /search?q=Perez+Hilton%e2%80%99s+mother+seeks+temporary+custody+of+his+children&efirst=0&ecount=50&filters=tnTID%3a%22PE_951415DE-534A-43A7-81F4-21E61756E93C%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%227%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e161]:
+                    - heading "Hilton's mother seeks custody" [level=2] [ref=f46e162]
+                    - img "© Photo by Presley Ann/Getty Images" [ref=f46e163]
+              - listitem [ref=f46e164] [cursor=pointer]:
+                - link [ref=f46e165]:
+                  - /url: /search?q=Trump+administration+set+to+spend+at+least+%24900M+on+White+House+construction&efirst=0&ecount=50&filters=tnTID%3a%22PE_E06A14D8-EC42-4FA5-93BB-81D965551067%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%228%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e166]:
+                    - heading "To spend $900M on construction" [level=2] [ref=f46e167]
+                    - img "© Photo by Alex Wong/Getty Images" [ref=f46e168]
+              - listitem [ref=f46e169] [cursor=pointer]:
+                - link [ref=f46e170]:
+                  - /url: /search?q=Acton+teen+in+custody+after+2+found+dead&efirst=0&ecount=50&filters=tnTID%3a%22PE_32F68BD8-3D5A-410D-8773-13212376251A%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%229%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e171]:
+                    - heading "Teen held in Acton case" [level=2] [ref=f46e172]
+                    - img "© CBS Boston" [ref=f46e173]
+              - listitem [ref=f46e174] [cursor=pointer]:
+                - link [ref=f46e175]:
+                  - /url: /search?q=Nicholas+Hoult+joins+Harry+Potter+TV+show&efirst=0&ecount=50&filters=tnTID%3a%22PE_74CE5391-773C-4689-81A2-FD546D3B7134%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2210%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e176]:
+                    - heading "Joins Harry Potter TV show" [level=2] [ref=f46e177]
+                    - img "© Photo by Evan Agostini/Invision/AP" [ref=f46e178]
+              - listitem [ref=f46e179] [cursor=pointer]:
+                - link [ref=f46e180]:
+                  - /url: /search?q=Josh+Kushner%2c+Bob+Iger+to+buy+Lakers+for+%2412.5B%2c+source&efirst=0&ecount=50&filters=tnTID%3a%22PE_157DFE75-07EA-472C-9939-0EDE81B186C9%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2211%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e181]:
+                    - heading "To buy Lakers for $12.5B?" [level=2] [ref=f46e182]
+                    - img "© Photo by Sarah Stier/Getty Images © Photo by Nic Antaya/Getty Images" [ref=f46e183]
+              - listitem [ref=f46e184] [cursor=pointer]:
+                - link [ref=f46e185]:
+                  - /url: /search?q=Nick+Reiner+indicted+on+murder+charges+in+killing+of+parents&efirst=0&ecount=50&filters=tnTID%3a%22PE_3874D08D-DE4A-4D76-A96F-8CFA6BA21C17%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2212%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e186]:
+                    - heading "Indicted on murder charges" [level=2] [ref=f46e187]
+                    - img "© Photo by Chris Torres-Pool/Getty Images" [ref=f46e188]
+              - listitem [ref=f46e189] [cursor=pointer]:
+                - link [ref=f46e190]:
+                  - /url: /search?q=Rod+Stewart+calls+off+US+tour&efirst=0&ecount=50&filters=tnTID%3a%22PE_9CFA2104-E4E0-4B2F-90DB-BA8AD0D84EAB%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2213%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e191]:
+                    - heading "Rod Stewart cancels US tour" [level=2] [ref=f46e192]
+                    - img "©Photo by Kevin Mazur/Getty Images" [ref=f46e193]
+              - listitem [ref=f46e194] [cursor=pointer]:
+                - link [ref=f46e195]:
+                  - /url: /search?q=Eli+Lilly+sues+six+companies+over+illegal+retatrutide+sales&efirst=0&ecount=50&filters=tnTID%3a%22PE_84F810D4-9347-493E-A542-A5EBDA8112E8%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2214%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e196]:
+                    - heading "Eli Lilly sues 6 companies" [level=2] [ref=f46e197]
+                    - img "©Photo by Smith Collection/Gado/Getty Images" [ref=f46e198]
+              - listitem [ref=f46e199] [cursor=pointer]:
+                - link [ref=f46e200]:
+                  - /url: /search?q=Blake+Snell+returns+to+Dodgers+after+a+3-month+elbow+injury+layoff&efirst=0&ecount=50&filters=tnTID%3a%22PE_5A0A1E04-F96C-43EF-A1F2-8F0E8D004CD8%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2215%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e201]:
+                    - heading "Snell returns to Dodgers" [level=2] [ref=f46e202]
+                    - img "©AP Photo/Caroline Brehman, File" [ref=f46e203]
+              - listitem [ref=f46e204] [cursor=pointer]:
+                - link [ref=f46e205]:
+                  - /url: /search?q=Paul+Skenes+exits+after+65+pitches&efirst=0&ecount=50&filters=tnTID%3a%22PE_BA9767D3-83D9-4306-BB1E-FCD43C3B4780%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2216%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e206]:
+                    - heading "Exits after 65 pitches" [level=2] [ref=f46e207]
+                    - img "© AP Photo/Matt Slocum" [ref=f46e208]
+              - listitem [ref=f46e209] [cursor=pointer]:
+                - link [ref=f46e210]:
+                  - /url: /search?q=Meta+faces+29+states+in+the+largest+youth+social+media+trial+yet&efirst=0&ecount=50&filters=tnTID%3a%22PE_085CEE3F-F791-42AF-83D8-8890FA533FD9%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2217%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e211]:
+                    - heading "Faces 29 states in US court" [level=2] [ref=f46e212]
+                    - img "© The Statesman" [ref=f46e213]
+              - listitem [ref=f46e214] [cursor=pointer]:
+                - link [ref=f46e215]:
+                  - /url: /search?q=Damien+Woody+will+exit+ESPN+after+15+years&efirst=0&ecount=50&filters=tnTID%3a%22PE_55AB205B-DA6E-4A6B-A796-4FD886D3465B%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2218%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e216]:
+                    - heading "To exit ESPN after 15 years" [level=2] [ref=f46e217]
+                    - img "© Photo by Kevin Carter/Getty Images" [ref=f46e218]
+              - listitem [ref=f46e219] [cursor=pointer]:
+                - link [ref=f46e220]:
+                  - /url: /search?q=Ferry+capsizes+on+Zimbabwe%e2%80%99s+Lake+Kariba&efirst=0&ecount=50&filters=tnTID%3a%22PE_9D0D024D-D343-42A1-969A-1538F01336C0%22+tnVersion%3a%226809617%22+Segment%3a%22popularnow.carousel%22+tnCol%3a%2219%22+tnOrder%3a%224e6a1fb8-9cd2-4962-9d5f-26ee6a5f9987%22&form=HPNN01
+                  - generic [ref=f46e221]:
+                    - heading "Zimbabwe ferry capsizes" [level=2] [ref=f46e222]
+                    - img "© Mid-Day" [ref=f46e223]
+      - complementary [ref=f46e224]:
+        - generic [ref=f46e226]:
+          - generic [ref=f46e227]: DISCOVER
+          - main [ref=f46e336]:
+            - generic [ref=f46e338]:
+              - generic [ref=f46e339]:
+                - generic [ref=f46e342]:
+                  - tablist [ref=f46e344]:
+                    - tab "News story" [ref=f46e345] [cursor=pointer]
+                    - tab "News story" [selected] [ref=f46e347] [cursor=pointer]
+                    - tab "Sponsored" [ref=f46e349] [cursor=pointer]
+                    - tab "News story" [ref=f46e351] [cursor=pointer]
+                    - tab "News story" [ref=f46e353] [cursor=pointer]
+                    - tab "Sponsored" [ref=f46e355] [cursor=pointer]
+                    - tab "News story" [ref=f46e357] [cursor=pointer]
+                    - tab "News story" [ref=f46e359] [cursor=pointer]
+                    - tab "News story" [ref=f46e361] [cursor=pointer]
+                    - tab "News story" [ref=f46e363] [cursor=pointer]
+                    - tab "Sponsored" [ref=f46e365] [cursor=pointer]
+                    - tab "News story" [ref=f46e367] [cursor=pointer]
+                    - tab "News story" [ref=f46e369] [cursor=pointer]
+                    - tab "News story" [ref=f46e371] [cursor=pointer]
+                    - tab "News story" [ref=f46e373] [cursor=pointer]
+                    - tab "News story" [ref=f46e375] [cursor=pointer]
+                  - button [ref=f46e379]
+                  - button [ref=f46e382]
+                  - article "Please stop adding this ingredient to scrambled eggs" [ref=f46e1490] [cursor=pointer]:
+                    - generic [ref=f46e1492]:
+                      - generic [ref=f46e1494]:
+                        - generic [ref=f46e1495]:
+                          - generic [ref=f46e1496]:
+                            - generic [ref=f46e1497]: Simply Recipes
+                            - generic [ref=f46e1500]: ·
+                            - generic [ref=f46e1501]: 1w
+                          - link "Please stop adding this ingredient to scrambled eggs, Simply Recipes" [ref=f46e1502]:
+                            - /url: https://www.msn.com/en-us/food-and-drink/recipes/please-stop-adding-this-ingredient-to-scrambled-eggs/ar-AA29qSp5
+                            - text: Please stop adding this ingredient to scrambled eggs
+                        - generic "Please stop adding this ingredient to scrambled eggs" [ref=f46e1506]:
+                          - generic [ref=f46e1508]:
+                            - generic [ref=f46e1509]:
+                              - button "978 Likes" [ref=f46e1510]:
+                                - generic [ref=f46e1511]: "978"
+                              - button "965 Dislikes" [ref=f46e1515]
+                            - link "View comments 228 Comment" [ref=f46e1520]:
+                              - /url: https://www.msn.com/en-us/food-and-drink/recipes/please-stop-adding-this-ingredient-to-scrambled-eggs/ar-AA29qSp5#comments
+                              - button "View comments 228 Comment" [ref=f46e1521]
+                              - generic [ref=f46e1524]: "228"
+                      - generic [ref=f46e1525]:
+                        - button "Hide this story" [ref=f46e1526]
+                        - button "See more" [ref=f46e1528]
+                - article "Adult toy shuts down traffic in DC for nearly 2 hours" [ref=f46e423] [cursor=pointer]:
+                  - generic [ref=f46e425]:
+                    - generic [ref=f46e427]:
+                      - generic [ref=f46e428]:
+                        - generic [ref=f46e429]:
+                          - generic [ref=f46e430]: USA TODAY
+                          - generic [ref=f46e433]: ·
+                          - generic [ref=f46e434]: 4h
+                        - link "Adult toy shuts down traffic in DC for nearly 2 hours, USA TODAY" [ref=f46e435]:
+                          - /url: https://www.msn.com/en-us/news/other/adult-toy-shuts-down-traffic-in-dc-for-nearly-2-hours/ar-AA29Yg1s
+                          - text: Adult toy shuts down traffic in DC for nearly 2 hours
+                      - generic "Adult toy shuts down traffic in DC for nearly 2 hours" [ref=f46e439]:
+                        - generic [ref=f46e441]:
+                          - generic [ref=f46e442]:
+                            - button "74 Likes" [ref=f46e443]:
+                              - generic [ref=f46e444]: "74"
+                            - button "38 Dislikes" [ref=f46e448]
+                          - link "View comments 35 Comment" [ref=f46e453]:
+                            - /url: https://www.msn.com/en-us/news/other/adult-toy-shuts-down-traffic-in-dc-for-nearly-2-hours/ar-AA29Yg1s#comments
+                            - button "View comments 35 Comment" [ref=f46e454]
+                            - generic [ref=f46e457]: "35"
+                    - generic [ref=f46e458]:
+                      - button "Hide this story" [ref=f46e459]
+                      - button "See more" [ref=f46e461]
+                - article [ref=f46e463] [cursor=pointer]:
+                  - generic [ref=f46e469]:
+                    - generic [ref=f46e471]:
+                      - img "Watchlist suggestions" [ref=f46e473]
+                      - link [ref=f46e474]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?ocid=BingHp01
+                        - heading "Watchlist suggestions" [level=2] [ref=f46e475]
+                      - button "More options" [ref=f46e477]
+                    - generic [ref=f46e482]:
+                      - link "VIX VIX ‎-4.78%‎ 14.55" [ref=f46e484]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?id=a33pk2&ocid=BingHp01
+                        - generic [ref=f46e485]:
+                          - generic [ref=f46e486]: VIX
+                          - generic [ref=f46e488]: VIX
+                        - generic [ref=f46e494]:
+                          - generic [ref=f46e495]: ‎-4.78%‎
+                          - generic [ref=f46e496]: "14.55"
+                        - button "Add to watchlist" [ref=f46e499]
+                      - link "NVIDIA CORPORATION NVIDIA CORPORATION Rising fast ‎+3.03%‎ 224.09" [ref=f46e504]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?id=a1yv52&noti=Price&ocid=BingHp01
+                        - generic [ref=f46e505]:
+                          - generic [ref=f46e506]:
+                            - generic [ref=f46e507]: NVIDIA CORPORATION
+                            - img "NVIDIA CORPORATION" [ref=f46e508]
+                          - generic [ref=f46e509]: Rising fast
+                        - generic [ref=f46e515]:
+                          - generic [ref=f46e516]: ‎+3.03%‎
+                          - generic [ref=f46e517]: "224.09"
+                        - button "Add to watchlist" [ref=f46e520]
+                      - link "MICROSOFT CORPORATION MICROSOFT CORPORATION Dropping fast ‎-2.26%‎ 492.43" [ref=f46e525]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?id=a1xzim&noti=Price&ocid=BingHp01
+                        - generic [ref=f46e526]:
+                          - generic [ref=f46e527]:
+                            - generic [ref=f46e528]: MICROSOFT CORPORATION
+                            - img "MICROSOFT CORPORATION" [ref=f46e529]
+                          - generic [ref=f46e530]: Dropping fast
+                        - generic [ref=f46e536]:
+                          - generic [ref=f46e537]: ‎-2.26%‎
+                          - generic [ref=f46e538]: "492.43"
+                        - button "Add to watchlist" [ref=f46e541]
+                      - link "TESLA, INC. TESLA, INC. Dropping fast ‎-1.59%‎ 327.51" [ref=f46e546]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?id=a24kar&noti=Price&ocid=BingHp01
+                        - generic [ref=f46e547]:
+                          - generic [ref=f46e548]:
+                            - generic [ref=f46e549]: TESLA, INC.
+                            - img "TESLA, INC." [ref=f46e550]
+                          - generic [ref=f46e551]: Dropping fast
+                        - generic [ref=f46e557]:
+                          - generic [ref=f46e558]: ‎-1.59%‎
+                          - generic [ref=f46e559]: "327.51"
+                        - button "Add to watchlist" [ref=f46e562]
+                      - link "AMAZON.COM, INC. AMAZON.COM, INC. Dropping fast ‎-1.83%‎ 267.28" [ref=f46e567]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?id=a1nhlh&noti=Price&ocid=BingHp01
+                        - generic [ref=f46e568]:
+                          - generic [ref=f46e569]:
+                            - generic [ref=f46e570]: AMAZON.COM, INC.
+                            - img "AMAZON.COM, INC." [ref=f46e571]
+                          - generic [ref=f46e572]: Dropping fast
+                        - generic [ref=f46e578]:
+                          - generic [ref=f46e579]: ‎-1.83%‎
+                          - generic [ref=f46e580]: "267.28"
+                        - button "Add to watchlist" [ref=f46e583]
+                    - generic [ref=f46e588]:
+                      - generic [ref=f46e589]:
+                        - generic "Previous" [ref=f46e590]:
+                          - button "Previous" [ref=f46e591]
+                        - tablist [ref=f46e593]:
+                          - tab "tab-0" [selected] [ref=f46e594]
+                          - tab "tab-1" [ref=f46e596]
+                          - tab "tab-2" [ref=f46e598]
+                          - tab "tab-3" [ref=f46e600]
+                          - tab "tab-4" [ref=f46e602]
+                          - tab "tab-5"
+                          - tab "tab-6"
+                        - generic "Next" [ref=f46e604]:
+                          - button "Next" [ref=f46e605]
+                      - link "See watchlist suggestions" [ref=f46e607]:
+                        - /url: https://www.msn.com/en-us/money/watchlist?ocid=BingHp01
+                - article [ref=f46e608] [cursor=pointer]:
+                  - generic [ref=f46e613]:
+                    - generic [ref=f46e615]:
+                      - link [ref=f46e617]:
+                        - /url: https://www.msn.com/en-us/channel/topic/Top%20Stories/tp-Y_46b78bbb-31c4-4fc5-8a4a-858072348d06?cvid=8d156f46a09f48a4b9ca4c8562bbb905&ocid=BingHp01
+                        - heading "Top stories" [level=2] [ref=f46e618]
+                      - button "More options" [ref=f46e620]
+                    - list [ref=f46e623]:
+                      - listitem [ref=f46e624]:
+                        - link "The Wall Street Journal 2h How Trump’s ruse to evade an Iranian threat unfolded on the tarmac in Turkey" [ref=f46e625]:
+                          - /url: https://www.msn.com/en-us/news/other/how-trump-s-ruse-to-evade-an-iranian-threat-unfolded-on-the-tarmac-in-turkey/ar-AA29Yjnj
+                          - generic [ref=f46e626]:
+                            - generic [ref=f46e627]: The Wall Street Journal ·2h
+                            - generic [ref=f46e630]: How Trump’s ruse to evade an Iranian threat unfolded on the tarmac in Turkey
+                      - listitem [ref=f46e631]:
+                        - link "Newsweek 1h David Crowley's chances of beating Tom Tiffany after Wisconsin primary win" [ref=f46e632]:
+                          - /url: https://www.msn.com/en-us/news/other/david-crowley-s-chances-of-beating-tom-tiffany-after-wisconsin-primary-win/ar-AA29VTye
+                          - generic [ref=f46e633]:
+                            - generic [ref=f46e634]: Newsweek ·1h
+                            - generic [ref=f46e637]: David Crowley's chances of beating Tom Tiffany after Wisconsin primary win
+                      - listitem [ref=f46e638]:
+                        - link "CNN 38m Why Karoline Leavitt might be impossible for Trump to replace" [ref=f46e639]:
+                          - /url: https://www.msn.com/en-us/news/other/why-karoline-leavitt-might-be-impossible-for-trump-to-replace/ar-AA29Ztmo
+                          - generic [ref=f46e640]:
+                            - generic [ref=f46e641]: CNN ·38m
+                            - generic [ref=f46e644]: Why Karoline Leavitt might be impossible for Trump to replace
+                    - generic [ref=f46e646]:
+                      - generic [ref=f46e647]:
+                        - generic "Previous" [ref=f46e648]:
+                          - button "Previous" [ref=f46e649]
+                        - tablist [ref=f46e651]:
+                          - tab "tab-0" [selected] [ref=f46e652]
+                          - tab "tab-1" [ref=f46e654]
+                          - tab "tab-2" [ref=f46e656]
+                        - generic "Next" [ref=f46e658]:
+                          - button "Next" [ref=f46e659]
+                      - link "See more" [ref=f46e661]:
+                        - /url: https://www.msn.com/en-us/channel/topic/Top%20Stories/tp-Y_46b78bbb-31c4-4fc5-8a4a-858072348d06?cvid=8d156f46a09f48a4b9ca4c8562bbb905&ocid=BingHp01
+                - article "Master Kubernetes performance with our detailed eBook and metrics guide." [ref=f46e662] [cursor=pointer]:
+                  - generic [ref=f46e664]:
+                    - generic [ref=f46e666]:
+                      - generic [ref=f46e667]:
+                        - generic [ref=f46e668]: Datadog
+                        - link "Master Kubernetes performance with our detailed eBook and metrics guide., Datadog" [ref=f46e671]:
+                          - /url: https://www.bing.com/api/v1/mediation/tracking?adUnit=1732768568&auId=f0991612-ba63-4c55-8668-61d9ca0ee035&bdc=pu&bidId=11&bidderId=4&cmExpId=RSV&impId=5&impTy=1&ldc=jhf2nczr&mkt=en-us&oAdUnit=1732768568&pId=1&publisherId=17160724&rId=714c7c93-ab6f-4362-b48e-65d9b27b4730&region=na&rlink=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8pXPXSCdrZvTAACdSgnkdcDVUCUwS2i2QANqwlLg6f3y9wBrHGBULvpFoYS9hCi4creVbHE8Y6Hwua8G0D9pk2vRvmGSARvEGX9prPHVBBJZepW1Qz_4uBuHYPEZaRR36HTn2u2ej7Uacf9kDy_LC87SIUnHzpCd21N09c8yp8lDFfUAAOJQpX5zQIGDkFJP18ZXP_ZCzQIGTX7-k9EfA_2-Vv5M%26u%3DaHR0cHMlM2ElMmYlMmZtb25pdG9yLmx1bmlvLmFpJTJmdjMuMCUyZnRlbXBsYXRlJTNmYWNjaWQlM2QxNjg5NiUyNnVybGRlY29kZSUzZDElMjZrdyUzZGtleXdvcmQlMjZtdCUzZGUlMjZudyUzZGElMjZjcG4lM2Q2MDM3MDY1NzUlMjZkZXZpJTNkYyUyNmRldm0lM2QlMjZsb2NwJTNkODY4NDElMjZsb2NpJTNkJTI2cGwlM2QlMjZjciUzZCUyNmFkcCUzZCUyNnNhZHQlM2QlMjZ1cmwlM2RodHRwcyUyNTNBJTI1MkYlMjUyRnd3dy5kYXRhZG9naHEuY29tJTI1MkZyZXNvdXJjZXMlMjUyRjE1LWt1YmVybmV0ZXMtbWV0cmljcy1lYm9vayUyNTJGJTI1M0Z1dG1fc291cmNlJTI1M0RiaW5nJTI1MjZ1dG1fbWVkaXVtJTI1M0RwYWlkLXNlYXJjaCUyNTI2dXRtX2NhbXBhaWduJTI1M0RkZy1hdWRpZW5jZS1uYS1yZW1hcmtldGluZy1rdWJlcm5ldGVzbWV0cmljc2NoZWF0c2hlZXQlMjUyNmlnYWFnJTI1M0QxMzA4NDE5OTY4MzkzNTQ4JTI1MjZpZ2FhdCUyNTNEJTI1MjZpZ2FjbSUyNTNENjAzNzA2NTc1JTI1MjZpZ2FjciUyNTNEJTI1MjZpZ2FrdyUyNTNEa2V5d29yZCUyNTI2aWdhbXQlMjUzRGUlMjUyNmlnYW50JTI1M0RhJTI1MjZ1dG1fY2FtcGFpZ25pZCUyNTNENjAzNzA2NTc1JTI1MjZ1dG1fYWRncm91cGlkJTI1M0QxMzA4NDE5OTY4MzkzNTQ4JTI2bXNjbGtpZCUzZDFiZGY5YzVmYzU0ODFjNzQ5OTc3ZjYyMjhmZWM1NGFk%26rlid%3D1bdf9c5fc5481c749977f6228fec54ad&rtype=targetURL&tagId=binghp-river-1&trafficGroup=zfa_angvir&trafficSubGroup=erfreir&uberGroup=hore_1c&uberSubGroup=erfreir
+                          - text: Master Kubernetes performance with our detailed eBook and metrics guide.
+                      - generic [ref=f46e672]:
+                        - link "Sponsored" [ref=f46e673]:
+                          - /url: https://www.bing.com/api/v1/mediation/tracking?adUnit=1732768568&auId=f0991612-ba63-4c55-8668-61d9ca0ee035&bdc=pu&bidId=11&bidderId=4&cmExpId=RSV&impId=5&impTy=1&ldc=jhf2nczr&mkt=en-us&oAdUnit=1732768568&pId=1&publisherId=17160724&rId=714c7c93-ab6f-4362-b48e-65d9b27b4730&region=na&rlink=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8pXPXSCdrZvTAACdSgnkdcDVUCUwS2i2QANqwlLg6f3y9wBrHGBULvpFoYS9hCi4creVbHE8Y6Hwua8G0D9pk2vRvmGSARvEGX9prPHVBBJZepW1Qz_4uBuHYPEZaRR36HTn2u2ej7Uacf9kDy_LC87SIUnHzpCd21N09c8yp8lDFfUAAOJQpX5zQIGDkFJP18ZXP_ZCzQIGTX7-k9EfA_2-Vv5M%26u%3DaHR0cHMlM2ElMmYlMmZtb25pdG9yLmx1bmlvLmFpJTJmdjMuMCUyZnRlbXBsYXRlJTNmYWNjaWQlM2QxNjg5NiUyNnVybGRlY29kZSUzZDElMjZrdyUzZGtleXdvcmQlMjZtdCUzZGUlMjZudyUzZGElMjZjcG4lM2Q2MDM3MDY1NzUlMjZkZXZpJTNkYyUyNmRldm0lM2QlMjZsb2NwJTNkODY4NDElMjZsb2NpJTNkJTI2cGwlM2QlMjZjciUzZCUyNmFkcCUzZCUyNnNhZHQlM2QlMjZ1cmwlM2RodHRwcyUyNTNBJTI1MkYlMjUyRnd3dy5kYXRhZG9naHEuY29tJTI1MkZyZXNvdXJjZXMlMjUyRjE1LWt1YmVybmV0ZXMtbWV0cmljcy1lYm9vayUyNTJGJTI1M0Z1dG1fc291cmNlJTI1M0RiaW5nJTI1MjZ1dG1fbWVkaXVtJTI1M0RwYWlkLXNlYXJjaCUyNTI2dXRtX2NhbXBhaWduJTI1M0RkZy1hdWRpZW5jZS1uYS1yZW1hcmtldGluZy1rdWJlcm5ldGVzbWV0cmljc2NoZWF0c2hlZXQlMjUyNmlnYWFnJTI1M0QxMzA4NDE5OTY4MzkzNTQ4JTI1MjZpZ2FhdCUyNTNEJTI1MjZpZ2FjbSUyNTNENjAzNzA2NTc1JTI1MjZpZ2FjciUyNTNEJTI1MjZpZ2FrdyUyNTNEa2V5d29yZCUyNTI2aWdhbXQlMjUzRGUlMjUyNmlnYW50JTI1M0RhJTI1MjZ1dG1fY2FtcGFpZ25pZCUyNTNENjAzNzA2NTc1JTI1MjZ1dG1fYWRncm91cGlkJTI1M0QxMzA4NDE5OTY4MzkzNTQ4JTI2bXNjbGtpZCUzZDFiZGY5YzVmYzU0ODFjNzQ5OTc3ZjYyMjhmZWM1NGFk%26rlid%3D1bdf9c5fc5481c749977f6228fec54ad&rtype=targetURL&tagId=binghp-river-1&trafficGroup=zfa_angvir&trafficSubGroup=erfreir&uberGroup=hore_1c&uberSubGroup=erfreir
+                        - link "Ad Choice" [ref=f46e675]:
+                          - /url: https://account.microsoft.com/privacy/ad-settings
+                    - button "See more" [ref=f46e678]
+                - article "Texas megachurch sued over changing bylaws without telling congregants" [ref=f46e680] [cursor=pointer]:
+                  - generic [ref=f46e682]:
+                    - generic [ref=f46e684]:
+                      - generic [ref=f46e685]:
+                        - generic [ref=f46e686]:
+                          - generic [ref=f46e687]: The Independent
+                          - generic [ref=f46e690]: ·
+                          - generic [ref=f46e691]: 9h
+                        - link "Texas megachurch sued over changing bylaws without telling congregants, The Independent" [ref=f46e692]:
+                          - /url: https://www.msn.com/en-us/news/other/texas-megachurch-sued-over-changing-bylaws-without-telling-congregants/ar-AA29XXjP
+                          - text: Texas megachurch sued over changing bylaws without telling congregants
+                      - generic "Texas megachurch sued over changing bylaws without telling congregants" [ref=f46e696]:
+                        - generic [ref=f46e698]:
+                          - generic [ref=f46e699]:
+                            - button "71 Likes" [ref=f46e700]:
+                              - generic [ref=f46e701]: "71"
+                            - button "11 Dislikes" [ref=f46e705]
+                          - link "View comments 4 Comment" [ref=f46e710]:
+                            - /url: https://www.msn.com/en-us/news/other/texas-megachurch-sued-over-changing-bylaws-without-telling-congregants/ar-AA29XXjP#comments
+                            - button "View comments 4 Comment" [ref=f46e711]
+                            - generic [ref=f46e714]: "4"
+                    - generic [ref=f46e715]:
+                      - button "Hide this story" [ref=f46e716]
+                      - button "See more" [ref=f46e718]
+                - article "Toyota’s mysterious new truck could be a baby Tacoma with RAV4 bones" [ref=f46e720] [cursor=pointer]:
+                  - generic [ref=f46e722]:
+                    - generic [ref=f46e724]:
+                      - generic [ref=f46e725]:
+                        - generic [ref=f46e726]:
+                          - generic [ref=f46e727]: HotCars
+                          - generic [ref=f46e730]: ·
+                          - generic [ref=f46e731]: 1d
+                        - link "Toyota’s mysterious new truck could be a baby Tacoma with RAV4 bones, HotCars" [ref=f46e732]:
+                          - /url: https://www.msn.com/en-us/autos/trucks/toyota-s-mysterious-new-truck-could-be-a-baby-tacoma-with-rav4-bones/ar-AA29SOwQ
+                          - text: Toyota’s mysterious new truck could be a baby Tacoma with RAV4 bones
+                      - generic "Toyota’s mysterious new truck could be a baby Tacoma with RAV4 bones" [ref=f46e736]:
+                        - generic [ref=f46e738]:
+                          - generic [ref=f46e739]:
+                            - button "19 Likes" [ref=f46e740]:
+                              - generic [ref=f46e741]: "19"
+                            - button "1 Dislike" [ref=f46e745]
+                          - link "View comments 3 Comment" [ref=f46e750]:
+                            - /url: https://www.msn.com/en-us/autos/trucks/toyota-s-mysterious-new-truck-could-be-a-baby-tacoma-with-rav4-bones/ar-AA29SOwQ#comments
+                            - button "View comments 3 Comment" [ref=f46e751]
+                            - generic [ref=f46e754]: "3"
+                    - generic [ref=f46e755]:
+                      - button "Hide this story" [ref=f46e756]
+                      - button "See more" [ref=f46e758]
+                - article "Learn To Monitor Azure OpenAI" [ref=f46e760] [cursor=pointer]:
+                  - generic [ref=f46e762]:
+                    - generic [ref=f46e764]:
+                      - generic [ref=f46e765]:
+                        - generic [ref=f46e766]: Datadog
+                        - link "Learn To Monitor Azure OpenAI, Datadog" [ref=f46e769]:
+                          - /url: https://www.bing.com/api/v1/mediation/tracking?adUnit=1732768568&auId=5932ddac-c0b6-4efc-8cf2-ae8dae51c615&bdc=pu&bidId=5&bidderId=4&cmExpId=RSV&impId=6&impTy=1&ldc=jhf2nczr&mkt=en-us&oAdUnit=1732768568&pId=1&publisherId=17160724&rId=714c7c93-ab6f-4362-b48e-65d9b27b4730&region=na&rlink=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8nhAlrz7gUSV47iVw-bmo8DVUCUzI2DP-d9FLxuDxJHDcFwHtaJwZpV8eErcRExmNpGQHmrUMPpndRX2vkdDOHpGS57b8221bYcjfgdvDs49kPJjpbIcJ2Pr3nDCS6ce6stfcJljBycWfQaRoJNgOnLYCNTBFGc4cqtOm77JPBBcBlbRdb0CFCTsnU-3M1QeyiYPKQDXyMhgg7Kf6pIhOm5rNP-k%26u%3DaHR0cHMlM2ElMmYlMmZtb25pdG9yLmx1bmlvLmFpJTJmdjMuMCUyZnRlbXBsYXRlJTNmYWNjaWQlM2QxNjg5NiUyNnVybGRlY29kZSUzZDElMjZrdyUzZGtleXdvcmQlMjZtdCUzZGUlMjZudyUzZGElMjZjcG4lM2Q2MDM3MDY1NzUlMjZkZXZpJTNkYyUyNmRldm0lM2QlMjZsb2NwJTNkODY4NDElMjZsb2NpJTNkJTI2cGwlM2QlMjZjciUzZCUyNmFkcCUzZCUyNnNhZHQlM2QlMjZ1cmwlM2RodHRwcyUyNTNBJTI1MkYlMjUyRnd3dy5kYXRhZG9naHEuY29tJTI1MkZyZXNvdXJjZXMlMjUyRmF6dXJlLW9wZW5haS1tb25pdG9yaW5nJTI1MkYlMjUzRnV0bV9zb3VyY2UlMjUzRGJpbmclMjUyNnV0bV9tZWRpdW0lMjUzRHBhaWQtc2VhcmNoJTI1MjZ1dG1fY2FtcGFpZ24lMjUzRGRnLWF1ZGllbmNlLW5hLXJlbWFya2V0aW5nLW9wZW5haWNoZWF0c2hlZXQlMjUyNnV0bV9rZXl3b3JkJTI1M0RrZXl3b3JkJTI1MjZ1dG1fbWF0Y2h0eXBlJTI1M0RlJTI1MjZpZ2FhZyUyNTNEMTMwODQxOTk2ODM5MzU0OCUyNTI2aWdhYXQlMjUzRCUyNTI2aWdhY20lMjUzRDYwMzcwNjU3NSUyNTI2aWdhY3IlMjUzRCUyNTI2aWdha3clMjUzRGtleXdvcmQlMjUyNmlnYW10JTI1M0RlJTI1MjZpZ2FudCUyNTNEYSUyNTI2dXRtX2NhbXBhaWduaWQlMjUzRDYwMzcwNjU3NSUyNTI2dXRtX2FkZ3JvdXBpZCUyNTNEMTMwODQxOTk2ODM5MzU0OCUyNm1zY2xraWQlM2Q5ZDUyYTZkOGRjZTIxZWM0MTY0M2NjYTU5NjQ2ZmRhNQ%26rlid%3D9d52a6d8dce21ec41643cca59646fda5&rtype=targetURL&tagId=binghp-river-2&trafficGroup=zfa_angvir&trafficSubGroup=erfreir&uberGroup=hore_1c&uberSubGroup=erfreir
+                          - text: Learn To Monitor Azure OpenAI
+                      - generic [ref=f46e770]:
+                        - link "Sponsored" [ref=f46e771]:
+                          - /url: https://www.bing.com/api/v1/mediation/tracking?adUnit=1732768568&auId=5932ddac-c0b6-4efc-8cf2-ae8dae51c615&bdc=pu&bidId=5&bidderId=4&cmExpId=RSV&impId=6&impTy=1&ldc=jhf2nczr&mkt=en-us&oAdUnit=1732768568&pId=1&publisherId=17160724&rId=714c7c93-ab6f-4362-b48e-65d9b27b4730&region=na&rlink=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8nhAlrz7gUSV47iVw-bmo8DVUCUzI2DP-d9FLxuDxJHDcFwHtaJwZpV8eErcRExmNpGQHmrUMPpndRX2vkdDOHpGS57b8221bYcjfgdvDs49kPJjpbIcJ2Pr3nDCS6ce6stfcJljBycWfQaRoJNgOnLYCNTBFGc4cqtOm77JPBBcBlbRdb0CFCTsnU-3M1QeyiYPKQDXyMhgg7Kf6pIhOm5rNP-k%26u%3DaHR0cHMlM2ElMmYlMmZtb25pdG9yLmx1bmlvLmFpJTJmdjMuMCUyZnRlbXBsYXRlJTNmYWNjaWQlM2QxNjg5NiUyNnVybGRlY29kZSUzZDElMjZrdyUzZGtleXdvcmQlMjZtdCUzZGUlMjZudyUzZGElMjZjcG4lM2Q2MDM3MDY1NzUlMjZkZXZpJTNkYyUyNmRldm0lM2QlMjZsb2NwJTNkODY4NDElMjZsb2NpJTNkJTI2cGwlM2QlMjZjciUzZCUyNmFkcCUzZCUyNnNhZHQlM2QlMjZ1cmwlM2RodHRwcyUyNTNBJTI1MkYlMjUyRnd3dy5kYXRhZG9naHEuY29tJTI1MkZyZXNvdXJjZXMlMjUyRmF6dXJlLW9wZW5haS1tb25pdG9yaW5nJTI1MkYlMjUzRnV0bV9zb3VyY2UlMjUzRGJpbmclMjUyNnV0bV9tZWRpdW0lMjUzRHBhaWQtc2VhcmNoJTI1MjZ1dG1fY2FtcGFpZ24lMjUzRGRnLWF1ZGllbmNlLW5hLXJlbWFya2V0aW5nLW9wZW5haWNoZWF0c2hlZXQlMjUyNnV0bV9rZXl3b3JkJTI1M0RrZXl3b3JkJTI1MjZ1dG1fbWF0Y2h0eXBlJTI1M0RlJTI1MjZpZ2FhZyUyNTNEMTMwODQxOTk2ODM5MzU0OCUyNTI2aWdhYXQlMjUzRCUyNTI2aWdhY20lMjUzRDYwMzcwNjU3NSUyNTI2aWdhY3IlMjUzRCUyNTI2aWdha3clMjUzRGtleXdvcmQlMjUyNmlnYW10JTI1M0RlJTI1MjZpZ2FudCUyNTNEYSUyNTI2dXRtX2NhbXBhaWduaWQlMjUzRDYwMzcwNjU3NSUyNTI2dXRtX2FkZ3JvdXBpZCUyNTNEMTMwODQxOTk2ODM5MzU0OCUyNm1zY2xraWQlM2Q5ZDUyYTZkOGRjZTIxZWM0MTY0M2NjYTU5NjQ2ZmRhNQ%26rlid%3D9d52a6d8dce21ec41643cca59646fda5&rtype=targetURL&tagId=binghp-river-2&trafficGroup=zfa_angvir&trafficSubGroup=erfreir&uberGroup=hore_1c&uberSubGroup=erfreir
+                        - link "Ad Choice" [ref=f46e773]:
+                          - /url: https://account.microsoft.com/privacy/ad-settings
+                    - button "See more" [ref=f46e776]
+                - article [ref=f46e778] [cursor=pointer]:
+                  - generic [ref=f46e784]:
+                    - generic [ref=f46e786]:
+                      - link [ref=f46e788]:
+                        - /url: https://www.msn.com/en-us/weather/forecast/in-San-Francisco,CA
+                        - heading "San Francisco" [level=2] [ref=f46e789]
+                      - button "My location" [ref=f46e790]
+                      - button "More options" [ref=f46e792]
+                    - generic [ref=f46e796]:
+                      - generic [ref=f46e797]:
+                        - generic [ref=f46e799]:
+                          - link [ref=f46e800]:
+                            - /url: https://www.msn.com/en-us/weather/forecast/in-San-Francisco,CA
+                            - img "Partly cloudy" [ref=f46e801]
+                          - link "58°F" [ref=f46e802]:
+                            - /url: https://www.msn.com/en-us/weather/forecast/in-San-Francisco,CA
+                            - generic [ref=f46e803]: ‎58‎
+                            - generic [ref=f46e804]: ‎°F‎
+                        - generic [ref=f46e807]:
+                          - link [ref=f46e809]:
+                            - /url: https://www.msn.com/en-us/weather/maps/severeweather/in-San-Francisco,CA
+                            - img "Coastal Flood - Advisory" [ref=f46e811]
+                            - text: Coastal flood advisory
+                          - link "See full forecast" [ref=f46e812]:
+                            - /url: https://www.msn.com/en-us/weather/maps/severeweather/in-San-Francisco,CA
+                            - img "arrow" [ref=f46e813]
+                      - generic [ref=f46e818]:
+                        - link "Larger map" [ref=f46e819]:
+                          - /url: ""
+                        - link "Check more alert details" [ref=f46e821]:
+                          - /url: ""
+                        - link "Click to see more information" [ref=f46e825]:
+                          - /url: ""
+                    - button "See full forecast" [ref=f46e829]
+              - generic [ref=f46e830]:
+                - article "Chick-fil-A has 2 brand-new chicken sandwiches on the menu for a limited time—and we tried them first" [ref=f46e831] [cursor=pointer]:
+                  - generic [ref=f46e833]:
+                    - generic [ref=f46e835]:
+                      - generic [ref=f46e836]:
+                        - generic [ref=f46e837]:
+                          - generic [ref=f46e838]: Allrecipes
+                          - generic [ref=f46e841]: ·
+                          - generic [ref=f46e842]: 16h
+                        - link "Chick-fil-A has 2 brand-new chicken sandwiches on the menu for a limited time—and we tried them first, Allrecipes" [ref=f46e843]:
+                          - /url: https://www.msn.com/en-us/food-and-drink/recipes/chick-fil-a-has-2-brand-new-chicken-sandwiches-on-the-menu-for-a-limited-time-and-we-tried-them-first/ar-AA29WBFv
+                          - text: Chick-fil-A has 2 brand-new chicken sandwiches on the menu for a limited time—and we tried them first
+                      - generic "Chick-fil-A has 2 brand-new chicken sandwiches on the menu for a limited time—and we tried them first" [ref=f46e847]:
+                        - generic [ref=f46e849]:
+                          - generic [ref=f46e850]:
+                            - button "115 Likes" [ref=f46e851]:
+                              - generic [ref=f46e852]: "115"
+                            - button "129 Dislikes" [ref=f46e856]
+                          - link "View comments 1 Comment" [ref=f46e861]:
+                            - /url: https://www.msn.com/en-us/food-and-drink/recipes/chick-fil-a-has-2-brand-new-chicken-sandwiches-on-the-menu-for-a-limited-time-and-we-tried-them-first/ar-AA29WBFv#comments
+                            - button "View comments 1 Comment" [ref=f46e862]
+                            - generic [ref=f46e865]: "1"
+                    - generic [ref=f46e866]:
+                      - button "Hide this story" [ref=f46e867]
+                      - button "See more" [ref=f46e869]
+                - article [ref=f46e871] [cursor=pointer]
+                - article "King Charles 'dreadfully saddened' in emotional statement with Queen Camilla about Colombia earthquake" [ref=f46e878] [cursor=pointer]:
+                  - generic [ref=f46e880]:
+                    - generic [ref=f46e882]:
+                      - generic [ref=f46e883]:
+                        - generic [ref=f46e884]:
+                          - generic [ref=f46e885]: Hello! US
+                          - generic [ref=f46e888]: ·
+                          - generic [ref=f46e889]: 17h
+                        - link "King Charles 'dreadfully saddened' in emotional statement with Queen Camilla about Colombia earthquake, Hello! US" [ref=f46e890]:
+                          - /url: https://www.msn.com/en-us/news/other/king-charles-dreadfully-saddened-in-emotional-statement-with-queen-camilla-about-colombia-earthquake/ar-AA29WdxA
+                          - text: King Charles 'dreadfully saddened' in emotional statement with Queen Camilla about Colombia earthquake
+                      - generic "King Charles 'dreadfully saddened' in emotional statement with Queen Camilla about Colombia earthquake" [ref=f46e894]:
+                        - generic [ref=f46e896]:
+                          - generic [ref=f46e897]:
+                            - button "50 Likes" [ref=f46e898]:
+                              - generic [ref=f46e899]: "50"
+                            - button "43 Dislikes" [ref=f46e903]
+                          - link "View comments 1 Comment" [ref=f46e908]:
+                            - /url: https://www.msn.com/en-us/news/other/king-charles-dreadfully-saddened-in-emotional-statement-with-queen-camilla-about-colombia-earthquake/ar-AA29WdxA#comments
+                            - button "View comments 1 Comment" [ref=f46e909]
+                            - generic [ref=f46e912]: "1"
+                    - generic [ref=f46e913]:
+                      - button "Hide this story" [ref=f46e914]
+                      - button "See more" [ref=f46e916]
+                - article [ref=f46e918] [cursor=pointer]:
+                  - generic [ref=f46e923]:
+                    - generic [ref=f46e925]:
+                      - link [ref=f46e927]:
+                        - /url: https://www.msn.com/en-us/play
+                        - heading "Games" [level=2] [ref=f46e928]
+                      - button "More options" [ref=f46e930]
+                    - list [ref=f46e934]:
+                      - generic:
+                        - listitem [ref=f46e935]:
+                          - link "Mergest Kingdom" [ref=f46e936]:
+                            - /url: https://www.msn.com/en-us/play/games/mergest-kingdom/cg-9pc19rxfzl82?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e937]:
+                              - img "Mergest Kingdom"
+                        - listitem [ref=f46e938]:
+                          - link "Daily Mahjong" [ref=f46e939]:
+                            - /url: https://www.msn.com/en-us/play/games/daily-mahjong/cg-9pnlb0jggpmw?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e940]:
+                              - img "Daily Mahjong"
+                        - listitem [ref=f46e941]:
+                          - link "Cat Disco" [ref=f46e942]:
+                            - /url: https://www.msn.com/en-us/play/games/cat-disco/cg-9pmcmvrvfqkk?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e943]:
+                              - img "Cat Disco"
+                        - listitem [ref=f46e944]:
+                          - link "Save The Pets" [ref=f46e945]:
+                            - /url: https://www.msn.com/en-us/play/games/save-the-pets/cg-9p3610rr8qt5?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e946]:
+                              - img "Save The Pets"
+                        - listitem [ref=f46e947]:
+                          - link "Wordmeister" [ref=f46e948]:
+                            - /url: https://www.msn.com/en-us/play/games/wordmeister/cg-9n48sfvb0c4f?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e949]:
+                              - img "Wordmeister"
+                        - listitem [ref=f46e950]:
+                          - 'link "Screw Out: Bolts and Nuts" [ref=f46e951]':
+                            - /url: https://www.msn.com/en-us/play/games/screw-out-bolts-and-nuts/cg-9nvd4v66kdj7?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e952]:
+                              - 'img "Screw Out: Bolts and Nuts"'
+                        - listitem [ref=f46e953]:
+                          - link "TapTap Arrow" [ref=f46e954]:
+                            - /url: https://www.msn.com/en-us/play/games/taptap-arrow/cg-9ng0c12cnfsk?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e955]:
+                              - img "TapTap Arrow"
+                        - listitem [ref=f46e956]:
+                          - link "Cars Merge" [ref=f46e957]:
+                            - /url: https://www.msn.com/en-us/play/games/cars-merge/cg-9n022gfn8gsb?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e958]:
+                              - img "Cars Merge"
+                        - listitem [ref=f46e959]:
+                          - link "Hexa Stack" [ref=f46e960]:
+                            - /url: https://www.msn.com/en-us/play/games/hexa-stack/cg-9nrtsrw7wfqb?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905&ei=6
+                            - generic [ref=f46e961]:
+                              - img "Hexa Stack"
+                    - generic [ref=f46e963]:
+                      - generic [ref=f46e964]:
+                        - generic "Previous" [ref=f46e965]:
+                          - button "Previous" [ref=f46e966]
+                        - tablist [ref=f46e968]:
+                          - tab "tab-0" [selected] [ref=f46e969]
+                          - tab "tab-1" [ref=f46e971]
+                          - tab "tab-2" [ref=f46e973]
+                          - tab "tab-3" [ref=f46e975]
+                          - tab "tab-4" [ref=f46e977]
+                          - tab "tab-5"
+                          - tab "tab-6"
+                          - tab "tab-7"
+                          - tab "tab-8"
+                        - generic "Next" [ref=f46e979]:
+                          - button "Next" [ref=f46e980]
+                      - link "Explore more games" [ref=f46e982]:
+                        - /url: https://www.msn.com/en-us/play
+                - article "Nick Reiner allegedly laid in wait before murdering parents Rob Reiner and Michele Reiner, DA says" [ref=f46e983] [cursor=pointer]:
+                  - generic [ref=f46e985]:
+                    - generic [ref=f46e991]:
+                      - generic [ref=f46e992]:
+                        - generic [ref=f46e993]:
+                          - generic [ref=f46e994]: E! News
+                          - generic [ref=f46e997]: ·
+                          - generic [ref=f46e998]: 5h
+                        - link "Nick Reiner allegedly laid in wait before murdering parents Rob Reiner and Michele Reiner, DA says, E! News" [ref=f46e999]:
+                          - /url: https://www.msn.com/en-us/news/other/nick-reiner-allegedly-laid-in-wait-before-murdering-parents-rob-reiner-and-michele-reiner-da-says/vi-AA29YIh5
+                          - text: Nick Reiner allegedly laid in wait before murdering parents Rob Reiner and Michele Reiner, DA says
+                      - generic "Nick Reiner allegedly laid in wait before murdering parents Rob Reiner and Michele Reiner, DA says" [ref=f46e1003]:
+                        - generic [ref=f46e1005]:
+                          - generic [ref=f46e1006]:
+                            - button "12 Likes" [ref=f46e1007]:
+                              - generic [ref=f46e1008]: "12"
+                            - button "8 Dislikes" [ref=f46e1012]
+                          - link "Start the conversation" [ref=f46e1017]:
+                            - /url: https://www.msn.com/en-us/news/other/nick-reiner-allegedly-laid-in-wait-before-murdering-parents-rob-reiner-and-michele-reiner-da-says/vi-AA29YIh5#comments
+                            - button "Start the conversation" [ref=f46e1018]
+                    - generic [ref=f46e1021]:
+                      - button "Hide this story" [ref=f46e1022]
+                      - button "See more" [ref=f46e1024]
+                - article "Trump-backed Mike Lindell refuses to concede Minnesota election loss" [ref=f46e1026] [cursor=pointer]:
+                  - generic [ref=f46e1028]:
+                    - generic [ref=f46e1030]:
+                      - generic [ref=f46e1031]:
+                        - generic [ref=f46e1032]:
+                          - generic [ref=f46e1033]: USA TODAY
+                          - generic [ref=f46e1036]: ·
+                          - generic [ref=f46e1037]: 6h
+                        - link "Trump-backed Mike Lindell refuses to concede Minnesota election loss, USA TODAY" [ref=f46e1038]:
+                          - /url: https://www.msn.com/en-us/news/other/trump-backed-mike-lindell-refuses-to-concede-minnesota-election-loss/ar-AA29WFTa
+                          - text: Trump-backed Mike Lindell refuses to concede Minnesota election loss
+                      - generic "Trump-backed Mike Lindell refuses to concede Minnesota election loss" [ref=f46e1042]:
+                        - generic [ref=f46e1044]:
+                          - generic [ref=f46e1045]:
+                            - button "373 Likes" [ref=f46e1046]:
+                              - generic [ref=f46e1047]: "373"
+                            - button "521 Dislikes" [ref=f46e1051]
+                          - link "View comments 462 Comment" [ref=f46e1056]:
+                            - /url: https://www.msn.com/en-us/news/other/trump-backed-mike-lindell-refuses-to-concede-minnesota-election-loss/ar-AA29WFTa#comments
+                            - button "View comments 462 Comment" [ref=f46e1057]
+                            - generic [ref=f46e1060]: "462"
+                    - generic [ref=f46e1061]:
+                      - button "Hide this story" [ref=f46e1062]
+                      - button "See more" [ref=f46e1064]
+                - article [ref=f46e1066] [cursor=pointer]
+                - article [ref=f46e1073] [cursor=pointer]:
+                  - generic [ref=f46e1079]:
+                    - generic [ref=f46e1081]:
+                      - img "MLB" [ref=f46e1083]
+                      - link [ref=f46e1084]:
+                        - /url: https://www.msn.com/en-us/sports/mlb?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905
+                        - heading "MLB" [level=2] [ref=f46e1085]
+                      - button "More interests" [ref=f46e1086]
+                      - generic [ref=f46e1087]:
+                        - generic "Live now" [ref=f46e1088]:
+                          - button "Live now" [ref=f46e1089]
+                        - button "More options" [ref=f46e1090]
+                    - generic [ref=f46e1094]:
+                      - link "Rangers Live Bot 7 Angels" [ref=f46e1096]:
+                        - /url: https://www.msn.com/en-us/sports/mlb/game-center/sp-id-6ada99dc32b44df3b73d975b259dc69c?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905
+                        - generic [ref=f46e1097]:
+                          - generic [ref=f46e1098]:
+                            - generic [ref=f46e1099]:
+                              - button "Click to follow Rangers"
+                            - generic "Rangers" [ref=f46e1100]
+                          - generic [ref=f46e1102]:
+                            - generic "click to see score and details" [ref=f46e1104]: Live
+                            - generic "Bot 7" [ref=f46e1105]
+                          - generic [ref=f46e1107]:
+                            - generic [ref=f46e1108]:
+                              - button "Click to follow Angels"
+                            - generic "Angels" [ref=f46e1109]
+                      - link "Royals Live Top 9 Dodgers" [ref=f46e1111]:
+                        - /url: https://www.msn.com/en-us/sports/mlb/game-center/sp-id-c57e68bb78e340b9b0856f4e54953545?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905
+                        - generic [ref=f46e1112]:
+                          - generic [ref=f46e1113]:
+                            - generic [ref=f46e1114]:
+                              - button "Click to follow Royals"
+                            - generic "Royals" [ref=f46e1115]
+                          - generic [ref=f46e1117]:
+                            - generic "click to see score and details" [ref=f46e1119]: Live
+                            - generic "Top 9" [ref=f46e1120]
+                          - generic [ref=f46e1122]:
+                            - generic [ref=f46e1123]:
+                              - button "Click to follow Dodgers"
+                            - generic "Dodgers" [ref=f46e1124]
+                      - link "Reds Final · Aug 12 0 - 5 View game stats White Sox" [ref=f46e1126]:
+                        - /url: https://www.msn.com/en-us/sports/mlb/game-center/sp-id-c02d9acdbad440108ab6c43d2b03a7cd?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905
+                        - generic [ref=f46e1127]:
+                          - generic [ref=f46e1128]:
+                            - generic [ref=f46e1129]:
+                              - button "Click to follow Reds"
+                            - generic "Reds" [ref=f46e1130]
+                          - generic [ref=f46e1132]:
+                            - generic "Aug 12 - Final" [ref=f46e1133]: Final · Aug 12
+                            - generic [ref=f46e1134]:
+                              - generic [ref=f46e1135]: "0"
+                              - generic [ref=f46e1137]: "-"
+                              - generic [ref=f46e1138]: "5"
+                            - generic "View game stats" [ref=f46e1143]
+                          - generic [ref=f46e1145]:
+                            - generic [ref=f46e1146]:
+                              - button "Click to follow White Sox"
+                            - generic "White Sox" [ref=f46e1147]
+                    - generic [ref=f46e1149]:
+                      - generic [ref=f46e1150]:
+                        - generic "Previous" [ref=f46e1151]:
+                          - button "Previous" [ref=f46e1152]
+                        - tablist [ref=f46e1154]:
+                          - tab "tab-0" [selected] [ref=f46e1155]
+                          - tab "tab-1" [ref=f46e1157]
+                          - tab "tab-2" [ref=f46e1159]
+                          - tab "tab-3" [ref=f46e1161]
+                          - tab "tab-4" [ref=f46e1163]
+                          - tab "tab-5"
+                          - tab "tab-6"
+                          - tab "tab-7"
+                          - tab "tab-8"
+                          - tab "tab-9"
+                          - tab "tab-10"
+                          - tab "tab-11"
+                        - generic "Next" [ref=f46e1165]:
+                          - button "Next" [ref=f46e1166]
+                      - link "See more MLB" [ref=f46e1168]:
+                        - /url: https://www.msn.com/en-us/sports/mlb?ocid=BingHp01&cvid=8d156f46a09f48a4b9ca4c8562bbb905
+                - article "A family found a strange metal sphere in the woods. It started moving on its own—then the Navy got involved." [ref=f46e1169] [cursor=pointer]:
+                  - generic [ref=f46e1171]:
+                    - generic [ref=f46e1173]:
+                      - generic [ref=f46e1174]:
+                        - generic [ref=f46e1175]: Popular Mechanics
+                        - link "A family found a strange metal sphere in the woods. It started moving on its own—then the Navy got involved., Popular Mechanics" [ref=f46e1179]:
+                          - /url: https://www.msn.com/en-us/science/aeronautics/a-family-found-a-strange-metal-sphere-in-the-woods-it-started-moving-on-its-own-then-the-navy-got-involved/ar-AA1XFRJq
+                          - text: A family found a strange metal sphere in the woods. It started moving on its own—then the Navy got involved.
+                      - generic "A family found a strange metal sphere in the woods. It started moving on its own—then the Navy got involved." [ref=f46e1183]:
+                        - generic [ref=f46e1185]:
+                          - generic [ref=f46e1186]:
+                            - button "4,060 Likes" [ref=f46e1187]:
+                              - generic [ref=f46e1188]: 4k
+                            - button "2,847 Dislikes" [ref=f46e1192]
+                          - link "View comments 144 Comment" [ref=f46e1197]:
+                            - /url: https://www.msn.com/en-us/science/aeronautics/a-family-found-a-strange-metal-sphere-in-the-woods-it-started-moving-on-its-own-then-the-navy-got-involved/ar-AA1XFRJq#comments
+                            - button "View comments 144 Comment" [ref=f46e1198]
+                            - generic [ref=f46e1201]: "144"
+                    - generic [ref=f46e1202]:
+                      - button "Hide this story" [ref=f46e1203]
+                      - button "See more" [ref=f46e1205]
+                - article "Latest day of severe Midwest storms unleashes 'catastrophic' flooding in Indiana" [ref=f46e1207] [cursor=pointer]:
+                  - generic [ref=f46e1209]:
+                    - generic [ref=f46e1211]:
+                      - generic [ref=f46e1212]:
+                        - generic [ref=f46e1213]:
+                          - generic [ref=f46e1214]: CNN
+                          - generic [ref=f46e1217]: ·
+                          - generic [ref=f46e1218]: 2h
+                        - link "Latest day of severe Midwest storms unleashes 'catastrophic' flooding in Indiana, CNN" [ref=f46e1219]:
+                          - /url: https://www.msn.com/en-us/weather/general/latest-day-of-severe-midwest-storms-unleashes-catastrophic-flooding-in-indiana/ar-AA29TZFs
+                          - text: Latest day of severe Midwest storms unleashes 'catastrophic' flooding in Indiana
+                      - generic "Latest day of severe Midwest storms unleashes 'catastrophic' flooding in Indiana" [ref=f46e1223]:
+                        - generic [ref=f46e1225]:
+                          - generic [ref=f46e1226]:
+                            - button "134 Likes" [ref=f46e1227]:
+                              - generic [ref=f46e1228]: "134"
+                            - button "42 Dislikes" [ref=f46e1232]
+                          - link "View comments 24 Comment" [ref=f46e1237]:
+                            - /url: https://www.msn.com/en-us/weather/general/latest-day-of-severe-midwest-storms-unleashes-catastrophic-flooding-in-indiana/ar-AA29TZFs#comments
+                            - button "View comments 24 Comment" [ref=f46e1238]
+                            - generic [ref=f46e1241]: "24"
+                    - generic [ref=f46e1242]:
+                      - button "Hide this story" [ref=f46e1243]
+                      - button "See more" [ref=f46e1245]
+                - 'article "$1 billion Powerball jackpot: Which payout option is best if you win?" [ref=f46e1247] [cursor=pointer]':
+                  - generic [ref=f46e1249]:
+                    - generic [ref=f46e1251]:
+                      - generic [ref=f46e1252]:
+                        - generic [ref=f46e1253]:
+                          - generic [ref=f46e1254]: The Hill
+                          - generic [ref=f46e1257]: ·
+                          - generic [ref=f46e1258]: 1d
+                        - 'link "$1 billion Powerball jackpot: Which payout option is best if you win?, The Hill" [ref=f46e1259]':
+                          - /url: https://www.msn.com/en-us/entertainment/general/1-billion-powerball-jackpot-which-payout-option-is-best-if-you-win/ar-AA29RZ9k
+                          - text: "$1 billion Powerball jackpot: Which payout option is best if you win?"
+                      - 'generic "$1 billion Powerball jackpot: Which payout option is best if you win?" [ref=f46e1263]':
+                        - generic [ref=f46e1265]:
+                          - generic [ref=f46e1266]:
+                            - button "42 Likes" [ref=f46e1267]:
+                              - generic [ref=f46e1268]: "42"
+                            - button "27 Dislikes" [ref=f46e1272]
+                          - link "View comments 2 Comment" [ref=f46e1277]:
+                            - /url: https://www.msn.com/en-us/entertainment/general/1-billion-powerball-jackpot-which-payout-option-is-best-if-you-win/ar-AA29RZ9k#comments
+                            - button "View comments 2 Comment" [ref=f46e1278]
+                            - generic [ref=f46e1281]: "2"
+                    - generic [ref=f46e1282]:
+                      - button "Hide this story" [ref=f46e1283]
+                      - button "See more" [ref=f46e1285]
+                - article "Karoline Leavitt leaving White House press secretary role" [ref=f46e1287] [cursor=pointer]:
+                  - generic [ref=f46e1289]:
+                    - generic [ref=f46e1295]:
+                      - generic [ref=f46e1296]:
+                        - generic [ref=f46e1297]:
+                          - generic [ref=f46e1298]: FOX News
+                          - generic [ref=f46e1301]: ·
+                          - generic [ref=f46e1302]: 7h
+                        - link "Karoline Leavitt leaving White House press secretary role, FOX News" [ref=f46e1303]:
+                          - /url: https://www.msn.com/en-us/news/other/karoline-leavitt-leaving-white-house-press-secretary-role/vi-AA29YskV
+                          - text: Karoline Leavitt leaving White House press secretary role
+                      - generic "Karoline Leavitt leaving White House press secretary role" [ref=f46e1307]:
+                        - generic [ref=f46e1309]:
+                          - generic [ref=f46e1310]:
+                            - button "57 Likes" [ref=f46e1311]:
+                              - generic [ref=f46e1312]: "57"
+                            - button "10 Dislikes" [ref=f46e1316]
+                          - link "View comments 5 Comment" [ref=f46e1321]:
+                            - /url: https://www.msn.com/en-us/news/other/karoline-leavitt-leaving-white-house-press-secretary-role/vi-AA29YskV#comments
+                            - button "View comments 5 Comment" [ref=f46e1322]
+                            - generic [ref=f46e1325]: "5"
+                    - generic [ref=f46e1326]:
+                      - button "Hide this story" [ref=f46e1327]
+                      - button "See more" [ref=f46e1329]
+              - generic [ref=f46e1331]:
+                - article "Psychologists call it 'self alienation' and at 52 I realise I've been doing it for decades" [ref=f46e1332] [cursor=pointer]:
+                  - generic [ref=f46e1334]:
+                    - generic [ref=f46e1336]:
+                      - generic [ref=f46e1337]:
+                        - generic [ref=f46e1338]: Hello! US
+                        - link "Psychologists call it 'self alienation' and at 52 I realise I've been doing it for decades, Hello! US" [ref=f46e1342]:
+                          - /url: https://www.msn.com/en-us/lifestyle/other/psychologists-call-it-self-alienation-and-at-52-i-realise-i-ve-been-doing-it-for-decades/ar-AA21FYzG
+                          - text: Psychologists call it 'self alienation' and at 52 I realise I've been doing it for decades
+                      - generic "Psychologists call it 'self alienation' and at 52 I realise I've been doing it for decades" [ref=f46e1346]:
+                        - generic [ref=f46e1348]:
+                          - generic [ref=f46e1349]:
+                            - button "1,021 Likes" [ref=f46e1350]:
+                              - generic [ref=f46e1351]: 1k
+                            - button "1,251 Dislikes" [ref=f46e1355]
+                          - link "View comments 114 Comment" [ref=f46e1360]:
+                            - /url: https://www.msn.com/en-us/lifestyle/other/psychologists-call-it-self-alienation-and-at-52-i-realise-i-ve-been-doing-it-for-decades/ar-AA21FYzG#comments
+                            - button "View comments 114 Comment" [ref=f46e1361]
+                            - generic [ref=f46e1364]: "114"
+                    - generic [ref=f46e1365]:
+                      - button "Hide this story" [ref=f46e1366]
+                      - button "See more" [ref=f46e1368]
+                - article "Fever president sends clear message on coach Stephanie White amid fan tension" [ref=f46e1370] [cursor=pointer]:
+                  - generic [ref=f46e1372]:
+                    - generic [ref=f46e1374]:
+                      - generic [ref=f46e1375]:
+                        - generic [ref=f46e1376]:
+                          - generic [ref=f46e1377]: Newsweek
+                          - generic [ref=f46e1380]: ·
+                          - generic [ref=f46e1381]: 9h
+                        - link "Fever president sends clear message on coach Stephanie White amid fan tension, Newsweek" [ref=f46e1382]:
+                          - /url: https://www.msn.com/en-us/sports/basketball/fever-president-sends-clear-message-on-coach-stephanie-white-amid-fan-tension/ar-AA29Y4Qx
+                          - text: Fever president sends clear message on coach Stephanie White amid fan tension
+                      - generic "Fever president sends clear message on coach Stephanie White amid fan tension" [ref=f46e1386]:
+                        - generic [ref=f46e1388]:
+                          - generic [ref=f46e1389]:
+                            - button "26 Likes" [ref=f46e1390]:
+                              - generic [ref=f46e1391]: "26"
+                            - button "29 Dislikes" [ref=f46e1395]
+                          - link "View comments 3 Comment" [ref=f46e1400]:
+                            - /url: https://www.msn.com/en-us/sports/basketball/fever-president-sends-clear-message-on-coach-stephanie-white-amid-fan-tension/ar-AA29Y4Qx#comments
+                            - button "View comments 3 Comment" [ref=f46e1401]
+                            - generic [ref=f46e1404]: "3"
+                    - generic [ref=f46e1405]:
+                      - button "Hide this story" [ref=f46e1406]
+                      - button "See more" [ref=f46e1408]
+                - article "Riding Africa’s Craziest Transport Scooters Made By Hands" [ref=f46e1410] [cursor=pointer]:
+                  - generic [ref=f46e1412]:
+                    - generic [ref=f46e1418]:
+                      - generic [ref=f46e1419]:
+                        - generic [ref=f46e1420]: Fluctus - Video
+                        - link "Riding Africa’s Craziest Transport Scooters Made By Hands, Fluctus - Video" [ref=f46e1424]:
+                          - /url: https://www.msn.com/en-us/lifestyle/other/riding-africa-s-craziest-transport-scooters-made-by-hands/vi-AA27mf2O
+                          - text: Riding Africa’s Craziest Transport Scooters Made By Hands
+                      - generic "Riding Africa’s Craziest Transport Scooters Made By Hands" [ref=f46e1428]:
+                        - generic [ref=f46e1430]:
+                          - generic [ref=f46e1431]:
+                            - button "1,496 Likes" [ref=f46e1432]:
+                              - generic [ref=f46e1433]: 1k
+                            - button "553 Dislikes" [ref=f46e1437]
+                          - link "View comments 50 Comment" [ref=f46e1442]:
+                            - /url: https://www.msn.com/en-us/lifestyle/other/riding-africa-s-craziest-transport-scooters-made-by-hands/vi-AA27mf2O#comments
+                            - button "View comments 50 Comment" [ref=f46e1443]
+                            - generic [ref=f46e1446]: "50"
+                    - generic [ref=f46e1447]:
+                      - button "Hide this story" [ref=f46e1448]
+                      - button "See more" [ref=f46e1450]
+                - article "What would happen if Yellowstone’s 'supervolcano' erupted today?" [ref=f46e1452] [cursor=pointer]:
+                  - generic [ref=f46e1454]:
+                    - generic [ref=f46e1456]:
+                      - generic [ref=f46e1457]:
+                        - generic [ref=f46e1458]: Popular Science
+                        - link "What would happen if Yellowstone’s 'supervolcano' erupted today?, Popular Science" [ref=f46e1462]:
+                          - /url: https://www.msn.com/en-us/money/general/what-would-happen-if-yellowstone-s-supervolcano-erupted-today/ar-AA21z9HD
+                          - text: What would happen if Yellowstone’s 'supervolcano' erupted today?
+                      - generic "What would happen if Yellowstone’s 'supervolcano' erupted today?" [ref=f46e1466]:
+                        - generic [ref=f46e1468]:
+                          - generic [ref=f46e1469]:
+                            - button "1,378 Likes" [ref=f46e1470]:
+                              - generic [ref=f46e1471]: 1k
+                            - button "1,066 Dislikes" [ref=f46e1475]
+                          - link "View comments 123 Comment" [ref=f46e1480]:
+                            - /url: https://www.msn.com/en-us/money/general/what-would-happen-if-yellowstone-s-supervolcano-erupted-today/ar-AA21z9HD#comments
+                            - button "View comments 123 Comment" [ref=f46e1481]
+                            - generic [ref=f46e1484]: "123"
+                    - generic [ref=f46e1485]:
+                      - button "Hide this story" [ref=f46e1486]
+                      - button "See more" [ref=f46e1488]
+    - contentinfo:
+      - generic [ref=f46e311]:
+        - generic [ref=f46e312]: © 2026 Microsoft
+        - list [ref=f46e313]:
+          - listitem [ref=f46e314]:
+            - link "Privacy and Cookies" [ref=f46e315] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?LinkId=521839
+          - listitem [ref=f46e316]:
+            - link "Legal" [ref=f46e317] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?LinkID=246338
+          - listitem [ref=f46e318]:
+            - link "Advertise" [ref=f46e319] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?linkid=868923
+          - listitem [ref=f46e320]:
+            - link "About our ads" [ref=f46e321] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?LinkID=286759
+          - listitem [ref=f46e322]:
+            - link "Help" [ref=f46e323] [cursor=pointer]:
+              - /url: //support.microsoft.com/topic/82d20721-2d6f-4012-a13d-d1910ccf203f
+          - listitem [ref=f46e324]:
+            - link "Feedback" [ref=f46e325] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f46e326]:
+            - link "Your Privacy Choices" [ref=f46e327] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?linkid=2214802
+          - listitem [ref=f46e329]:
+            - link "Consumer Health Privacy" [ref=f46e330] [cursor=pointer]:
+              - /url: //go.microsoft.com/fwlink/?linkid=2259814

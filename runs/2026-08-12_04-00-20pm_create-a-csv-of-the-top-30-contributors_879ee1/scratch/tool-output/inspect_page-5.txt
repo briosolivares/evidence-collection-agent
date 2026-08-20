@@ -1,0 +1,1224 @@
+URL: https://github.com/steipete
+Title: steipete (Peter Steinberger) · GitHub
+
+- generic [ref=f4e2]:
+  - generic [ref=f4e3]:
+    - link "Skip to content" [ref=f4e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f4e8]:
+      - heading "Navigation Menu" [level=2] [ref=f4e9]
+      - generic [ref=f4e10]:
+        - link "Homepage" [ref=f4e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f4e15]:
+          - navigation "Global" [ref=f4e16]:
+            - list [ref=f4e17]:
+              - listitem [ref=f4e18]:
+                - button "Platform" [ref=f4e20] [cursor=pointer]
+              - listitem [ref=f4e23]:
+                - button "Solutions" [ref=f4e25] [cursor=pointer]
+              - listitem [ref=f4e28]:
+                - button "Resources" [ref=f4e30] [cursor=pointer]
+              - listitem [ref=f4e33]:
+                - button "Open Source" [ref=f4e35] [cursor=pointer]
+              - listitem [ref=f4e38]:
+                - button "Enterprise" [ref=f4e40] [cursor=pointer]
+              - listitem [ref=f4e43]:
+                - link "Pricing" [ref=f4e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f4e45]:
+            - button "Search or jump to, type / to search" [ref=f4e47] [cursor=pointer]:
+              - generic [ref=f4e50]:
+                - text: Type
+                - generic [ref=f4e51]: /
+                - text: to search
+            - link "Sign in" [ref=f4e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fsteipete
+            - link "Sign up" [ref=f4e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f4e55] [cursor=pointer]
+  - main [ref=f4e60]:
+    - generic [ref=f4e63]:
+      - generic [ref=f4e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@steipete"
+            - generic:
+              - strong: steipete
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fsteipete
+      - navigation "User profile" [ref=f4e67]:
+        - link "Overview" [ref=f4e68] [cursor=pointer]:
+          - /url: /steipete
+        - link "Repositories 194" [ref=f4e71] [cursor=pointer]:
+          - /url: /steipete?tab=repositories
+          - text: Repositories
+          - generic "194" [ref=f4e74]
+        - link "Projects" [ref=f4e75] [cursor=pointer]:
+          - /url: /steipete?tab=projects
+        - link "Packages" [ref=f4e78] [cursor=pointer]:
+          - /url: /steipete?tab=packages
+        - link "Stars 2.4k" [ref=f4e81] [cursor=pointer]:
+          - /url: /steipete?tab=stars
+          - text: Stars
+          - generic "2,440" [ref=f4e84]: 2.4k
+        - link "Sponsoring 19" [ref=f4e85] [cursor=pointer]:
+          - /url: /steipete?tab=sponsoring
+          - generic [ref=f4e88]: Sponsoring
+          - generic "19" [ref=f4e89]
+    - generic [ref=f4e91]:
+      - generic [ref=f4e93]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@steipete"
+            - generic:
+              - generic:
+                - strong: steipete
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fsteipete
+        - generic [ref=f4e94]:
+          - generic [ref=f4e95]:
+            - generic [ref=f4e96]:
+              - link [ref=f4e97] [cursor=pointer]:
+                - /url: https://avatars.githubusercontent.com/u/58493?v=4
+                - img "View steipete's full-sized avatar" [ref=f4e98]
+              - generic [ref=f4e101]:
+                - generic [ref=f4e102]: 🤖
+                - generic: beep boop
+            - heading "Peter Steinberger steipete" [level=1] [ref=f4e105]:
+              - generic [ref=f4e106]: Peter Steinberger
+              - generic [ref=f4e107]: steipete
+          - generic [ref=f4e108]:
+            - generic [ref=f4e110]:
+              - link "Follow" [ref=f4e115] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fsteipete
+              - link "Sponsor @steipete" [ref=f4e117] [cursor=pointer]:
+                - /url: /sponsors/steipete
+                - generic [ref=f4e118]: Sponsor
+            - generic [ref=f4e122]:
+              - generic [ref=f4e124]:
+                - text: Came back from retirement to mess with AI. Clawdfather
+                - link "@openclaw" [ref=f4e125] [cursor=pointer]:
+                  - /url: https://github.com/openclaw
+                - text: "Previously: Founder of"
+                - link "@PSPDFKit" [ref=f4e126] [cursor=pointer]:
+                  - /url: https://github.com/PSPDFKit
+                - text: .
+              - generic [ref=f4e128]:
+                - link "52.7k followers" [ref=f4e129] [cursor=pointer]:
+                  - /url: https://github.com/steipete?tab=followers
+                - text: ·
+                - link "109 following" [ref=f4e132] [cursor=pointer]:
+                  - /url: https://github.com/steipete?tab=following
+              - list [ref=f4e133]:
+                - 'listitem "Organization: OpenAI" [ref=f4e134]':
+                  - generic [ref=f4e137]: OpenAI
+                - 'listitem "Home location: London / San Francisco" [ref=f4e139]':
+                  - generic [ref=f4e142]: London / San Francisco
+                - listitem [ref=f4e143]:
+                  - generic [ref=f4e146]: 00:01 - 8h ahead
+                - listitem [ref=f4e147]:
+                  - link "http://steipete.me" [ref=f4e150] [cursor=pointer]:
+                    - /url: http://steipete.me
+                - listitem [ref=f4e151]:
+                  - img "X" [ref=f4e152]
+                  - link "@steipete" [ref=f4e154] [cursor=pointer]:
+                    - /url: https://twitter.com/steipete
+                - listitem [ref=f4e155]:
+                  - img "Mastodon" [ref=f4e156]
+                  - link "@steipete@mastodon.social" [ref=f4e158] [cursor=pointer]:
+                    - /url: https://mastodon.social/@steipete
+                - listitem [ref=f4e159]:
+                  - img "Bluesky" [ref=f4e160]
+                  - link "@steipete.me" [ref=f4e162] [cursor=pointer]:
+                    - /url: https://bsky.app/profile/steipete.me
+          - generic [ref=f4e163]:
+            - generic [ref=f4e164]:
+              - heading "Sponsors" [level=2] [ref=f4e165]
+              - generic [ref=f4e166]:
+                - link [ref=f4e168] [cursor=pointer]:
+                  - /url: /lucas-chu
+                  - img "@lucas-chu" [ref=f4e169]
+                - link [ref=f4e171] [cursor=pointer]:
+                  - /url: /BrunoAssis
+                  - img "@BrunoAssis" [ref=f4e172]
+                - link [ref=f4e174] [cursor=pointer]:
+                  - /url: /hugo-alves
+                  - img "@hugo-alves" [ref=f4e175]
+                - link [ref=f4e177] [cursor=pointer]:
+                  - /url: /fredcamaral
+                  - img "@fredcamaral" [ref=f4e178]
+                - link [ref=f4e180] [cursor=pointer]:
+                  - /url: /lennysan
+                  - img "@lennysan" [ref=f4e181]
+                - link [ref=f4e183] [cursor=pointer]:
+                  - /url: /davidhoang
+                  - img "@davidhoang" [ref=f4e184]
+                - link [ref=f4e186] [cursor=pointer]:
+                  - /url: /Martian-Engineering
+                  - img "@Martian-Engineering" [ref=f4e187]
+                - link [ref=f4e189] [cursor=pointer]:
+                  - /url: /Yoname
+                  - img "@Yoname" [ref=f4e190]
+                - link [ref=f4e192] [cursor=pointer]:
+                  - /url: /RenderATL
+                  - img "@RenderATL" [ref=f4e193]
+                - link [ref=f4e195] [cursor=pointer]:
+                  - /url: /xiaoluoboding
+                  - img "@xiaoluoboding" [ref=f4e196]
+                - link [ref=f4e198] [cursor=pointer]:
+                  - /url: /comet-ml
+                  - img "@comet-ml" [ref=f4e199]
+                - link [ref=f4e201] [cursor=pointer]:
+                  - /url: /ccabanillas
+                  - img "@ccabanillas" [ref=f4e202]
+                - link [ref=f4e204] [cursor=pointer]:
+                  - /url: /ckubal
+                  - img "@ckubal" [ref=f4e205]
+                - link "+18" [ref=f4e207] [cursor=pointer]:
+                  - /url: /sponsors/steipete#sponsors
+            - generic [ref=f4e208]:
+              - heading "Sponsoring" [level=2] [ref=f4e210]
+              - generic [ref=f4e211]:
+                - link [ref=f4e213] [cursor=pointer]:
+                  - /url: /michaeleisel
+                  - img "@michaeleisel" [ref=f4e214]
+                - link [ref=f4e216] [cursor=pointer]:
+                  - /url: /ruiaureliano
+                  - img "@ruiaureliano" [ref=f4e217]
+                - link [ref=f4e219] [cursor=pointer]:
+                  - /url: /orta
+                  - img "@orta" [ref=f4e220]
+                - link [ref=f4e222] [cursor=pointer]:
+                  - /url: /Homebrew
+                  - img "@Homebrew" [ref=f4e223]
+                - link [ref=f4e225] [cursor=pointer]:
+                  - /url: /gnachman
+                  - img "@gnachman" [ref=f4e226]
+                - link [ref=f4e228] [cursor=pointer]:
+                  - /url: /sindresorhus
+                  - img "@sindresorhus" [ref=f4e229]
+                - link [ref=f4e231] [cursor=pointer]:
+                  - /url: /balazsorban44
+                  - img "@balazsorban44" [ref=f4e232]
+                - link [ref=f4e234] [cursor=pointer]:
+                  - /url: /remarkablemark
+                  - img "@remarkablemark" [ref=f4e235]
+                - link [ref=f4e237] [cursor=pointer]:
+                  - /url: /pi0
+                  - img "@pi0" [ref=f4e238]
+                - link [ref=f4e240] [cursor=pointer]:
+                  - /url: /cpojer
+                  - img "@cpojer" [ref=f4e241]
+                - link [ref=f4e243] [cursor=pointer]:
+                  - /url: /imsnif
+                  - img "@imsnif" [ref=f4e244]
+                - link [ref=f4e246] [cursor=pointer]:
+                  - /url: /insidegui
+                  - img "@insidegui" [ref=f4e247]
+                - link [ref=f4e249] [cursor=pointer]:
+                  - /url: /dlvhdr
+                  - img "@dlvhdr" [ref=f4e250]
+                - link "+6" [ref=f4e252] [cursor=pointer]:
+                  - /url: /steipete?tab=sponsoring
+          - generic [ref=f4e253]:
+            - heading [level=2] [ref=f4e254]:
+              - link "Achievements" [ref=f4e255] [cursor=pointer]:
+                - /url: /steipete?tab=achievements
+            - generic [ref=f4e256]:
+              - 'link "Achievement: Pair Extraordinaire x4" [ref=f4e257] [cursor=pointer]':
+                - /url: /steipete?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f4e258]'
+                - generic [ref=f4e259]: x4
+              - link [ref=f4e260] [cursor=pointer]:
+                - /url: /steipete?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f4e261]'
+              - link [ref=f4e262] [cursor=pointer]:
+                - /url: /steipete?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f4e263]'
+              - link [ref=f4e264] [cursor=pointer]:
+                - /url: /steipete?achievement=public-sponsor&tab=achievements
+                - 'img "Achievement: Public Sponsor" [ref=f4e265]'
+              - link [ref=f4e266] [cursor=pointer]:
+                - /url: /steipete?achievement=arctic-code-vault-contributor&tab=achievements
+                - 'img "Achievement: Arctic Code Vault Contributor" [ref=f4e267]'
+              - 'link "Achievement: Pull Shark x4" [ref=f4e268] [cursor=pointer]':
+                - /url: /steipete?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f4e269]'
+                - generic [ref=f4e270]: x4
+              - 'link "Achievement: Starstruck x4" [ref=f4e271] [cursor=pointer]':
+                - /url: /steipete?achievement=starstruck&tab=achievements
+                - 'img "Achievement: Starstruck" [ref=f4e272]'
+                - generic [ref=f4e273]: x4
+          - generic [ref=f4e274]:
+            - heading "Highlights" [level=2] [ref=f4e275]
+            - list [ref=f4e276]:
+              - listitem [ref=f4e277]:
+                - 'generic "Label: Pro" [ref=f4e280]': Pro
+          - generic [ref=f4e281]:
+            - heading "Organizations" [level=2] [ref=f4e282]
+            - link "Cocoaheads-Austria" [ref=f4e283] [cursor=pointer]:
+              - /url: /Cocoaheads-Austria
+              - img "@Cocoaheads-Austria" [ref=f4e284]
+            - link "mentalfaculty" [ref=f4e285] [cursor=pointer]:
+              - /url: /mentalfaculty
+              - img "@mentalfaculty" [ref=f4e286]
+            - link "ResearchKit" [ref=f4e287] [cursor=pointer]:
+              - /url: /ResearchKit
+              - img "@ResearchKit" [ref=f4e288]
+            - link "xcpretty" [ref=f4e289] [cursor=pointer]:
+              - /url: /xcpretty
+              - img "@xcpretty" [ref=f4e290]
+          - button "Block or report user" [ref=f4e292] [cursor=pointer]
+      - generic [ref=f4e297]:
+        - generic [ref=f4e299]:
+          - generic [ref=f4e301]:
+            - link "steipete" [ref=f4e302] [cursor=pointer]:
+              - /url: /steipete/steipete
+            - generic [ref=f4e303]: /
+            - text: README.md
+          - article [ref=f4e304]:
+            - generic [ref=f4e305]:
+              - heading "Hi, I'm Peter 👋" [level=1] [ref=f4e306]
+              - 'link "Permalink: Hi, I''m Peter 👋" [ref=f4e307] [cursor=pointer]':
+                - /url: "#hi-im-peter-"
+            - paragraph [ref=f4e310]:
+              - text: 📍
+              - strong [ref=f4e311]: Vienna ↔ London
+              - text: "| 🤖"
+              - strong [ref=f4e312]: Polyagentmorous builder
+              - text: "| 🚀"
+              - strong [ref=f4e313]: Ex-PSPDFKit Founder
+            - paragraph [ref=f4e314]:
+              - text: Now at
+              - strong [ref=f4e315]: OpenAI
+              - text: ", working on agents; stewarding"
+              - strong [ref=f4e316]: OpenClaw
+              - text: as open and independent.
+            - paragraph [ref=f4e317]:
+              - link [ref=f4e318] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/82f93ee817f2021487957c56c6c94cc936e440a72d8d8c0c7b30515f17229dab/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d53776966742d4641373334333f7374796c653d666c61742d737175617265266c6f676f3d7377696674266c6f676f436f6c6f723d7768697465
+                - img "Swift" [ref=f4e319]
+              - link [ref=f4e320] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/bea9f7f9bb8bd1460b2341e8ef2f6ad9c89719e22a94f9e7f290d5fae275d7be/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d547970655363726970742d3331373843363f7374796c653d666c61742d737175617265266c6f676f3d74797065736372697074266c6f676f436f6c6f723d7768697465
+                - img "TypeScript" [ref=f4e321]
+              - link [ref=f4e322] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/4f9db4dfc0075cf14a709e4c31290074bba05ec044aa6a19cf17deef09ed49df/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d4a6176615363726970742d4637444631453f7374796c653d666c61742d737175617265266c6f676f3d6a617661736372697074266c6f676f436f6c6f723d626c61636b
+                - img "JavaScript" [ref=f4e323]
+              - link [ref=f4e324] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/3f0f6fcec46b6171f6ce76f6a0c2ed32023d977f4ca8d888c66868b6b817ddf1/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d4e6f64652e6a732d3333393933333f7374796c653d666c61742d737175617265266c6f676f3d6e6f64652e6a73266c6f676f436f6c6f723d7768697465
+                - img "Node.js" [ref=f4e325]
+              - link [ref=f4e326] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/f79712e66929822727fdb723307f5de882e60402d8fd7cb73ef73007d132c41a/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d436f6465782d3132313231323f7374796c653d666c61742d737175617265266c6f676f3d6f70656e6169266c6f676f436f6c6f723d7768697465
+                - img "Codex" [ref=f4e327]
+              - link [ref=f4e328] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/bc3dd772134190888b0c77a3a682c00ecefc219ff24c28705036f4866021f7be/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d434c492d3030303030303f7374796c653d666c61742d737175617265266c6f676f3d676e752d62617368266c6f676f436f6c6f723d7768697465
+                - img "CLI" [ref=f4e329]
+              - link [ref=f4e330] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/ff815b7809ed059b2de82a4eb693e5a507ae0dcf2243dc8cbe0fe301f44d8829/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d6d61634f532d3030303030303f7374796c653d666c61742d737175617265266c6f676f3d6170706c65266c6f676f436f6c6f723d7768697465
+                - img "macOS" [ref=f4e331]
+              - link [ref=f4e332] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/d9d0a909059511f576c9745231f6f09dfd4f26fecdb5d36ec9e160b95ca77ad5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d537769667455492d3030363244333f7374796c653d666c61742d737175617265266c6f676f3d7377696674266c6f676f436f6c6f723d7768697465
+                - img "SwiftUI" [ref=f4e333]
+              - link [ref=f4e334] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/000d43056a18863cd33f13be873be12162677d80fb99651cb6ca997759d1fe2f/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d5765622d3432383546343f7374796c653d666c61742d737175617265266c6f676f3d676f6f676c652d6368726f6d65266c6f676f436f6c6f723d7768697465
+                - img "Web" [ref=f4e335]
+            - generic [ref=f4e336]:
+              - heading "Start Here" [level=2] [ref=f4e337]
+              - 'link "Permalink: Start Here" [ref=f4e338] [cursor=pointer]':
+                - /url: "#start-here"
+            - list [ref=f4e341]:
+              - listitem [ref=f4e342]:
+                - text: 🦞
+                - strong [ref=f4e343]:
+                  - link "OpenClaw" [ref=f4e344] [cursor=pointer]:
+                    - /url: https://openclaw.ai
+                - text: (381k+ stars) - the AI that actually does things
+              - listitem [ref=f4e345]:
+                - text: 🎚️
+                - strong [ref=f4e346]:
+                  - link "CodexBar" [ref=f4e347] [cursor=pointer]:
+                    - /url: https://github.com/steipete/CodexBar
+                - text: (15.6k+ stars) - keep agent limits in view
+              - listitem [ref=f4e348]:
+                - text: 🐾
+                - strong [ref=f4e349]:
+                  - link "ClawHub" [ref=f4e350] [cursor=pointer]:
+                    - /url: https://clawhub.ai
+                - text: (9k+ stars) - OpenClaw skill directory
+              - listitem [ref=f4e351]:
+                - text: 🧭
+                - strong [ref=f4e352]:
+                  - link "gogcli" [ref=f4e353] [cursor=pointer]:
+                    - /url: https://gogcli.sh
+                - text: (8k+ stars) - Google in your terminal
+              - listitem [ref=f4e354]:
+                - text: 👉
+                - strong [ref=f4e355]:
+                  - link "summarize" [ref=f4e356] [cursor=pointer]:
+                    - /url: https://github.com/steipete/summarize
+                - text: (6.2k+ stars) - point at any URL or file, get the gist
+              - listitem [ref=f4e357]:
+                - text: 📜
+                - strong [ref=f4e358]:
+                  - link "agent-scripts" [ref=f4e359] [cursor=pointer]:
+                    - /url: https://github.com/steipete/agent-scripts
+                - text: (5.2k+ stars) - shared rules/knowledge for coding with agents
+              - listitem [ref=f4e360]:
+                - text: 🚀
+                - strong [ref=f4e361]:
+                  - link "Peekaboo" [ref=f4e362] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/Peekaboo
+                - text: (4.8k+ stars) - macOS screenshots & GUI automation for agents
+            - generic [ref=f4e363]:
+              - heading "Current Projects" [level=2] [ref=f4e364]
+              - 'link "Permalink: Current Projects" [ref=f4e365] [cursor=pointer]':
+                - /url: "#current-projects"
+            - generic [ref=f4e368]:
+              - heading "OpenClaw Core" [level=3] [ref=f4e369]
+              - 'link "Permalink: OpenClaw Core" [ref=f4e370] [cursor=pointer]':
+                - /url: "#openclaw-core"
+            - list [ref=f4e373]:
+              - listitem [ref=f4e374]:
+                - text: 🦞
+                - strong [ref=f4e375]:
+                  - link "OpenClaw" [ref=f4e376] [cursor=pointer]:
+                    - /url: https://openclaw.ai
+                - text: "- the AI that actually does things"
+              - listitem [ref=f4e377]:
+                - text: 🐾
+                - strong [ref=f4e378]:
+                  - link "ClawHub" [ref=f4e379] [cursor=pointer]:
+                    - /url: https://clawhub.ai
+                - text: "- OpenClaw skill directory"
+              - listitem [ref=f4e380]:
+                - text: 🧹
+                - strong [ref=f4e381]:
+                  - link "ClawSweeper" [ref=f4e382] [cursor=pointer]:
+                    - /url: https://clawsweeper.bot
+                - text: "- Weekly issue and PR triage bot"
+              - listitem [ref=f4e383]:
+                - text: 💬
+                - strong [ref=f4e384]:
+                  - link "ClickClack" [ref=f4e385] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/clickclack
+                - text: "- Realtime team chat for OpenClaw agents and humans"
+              - listitem [ref=f4e386]:
+                - text: 🧩
+                - strong [ref=f4e387]:
+                  - link "clawdex" [ref=f4e388] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/clawdex
+                - text: "- Local-first contact crawler and markdown archive CLI"
+              - listitem [ref=f4e389]:
+                - text: 🩹
+                - strong [ref=f4e390]:
+                  - link "clawpatch" [ref=f4e391] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/clawpatch
+                - text: "- Automated code review that lands fixes"
+              - listitem [ref=f4e392]:
+                - text: 🦀
+                - strong [ref=f4e393]:
+                  - link "Crabbox" [ref=f4e394] [cursor=pointer]:
+                    - /url: https://crabbox.sh
+                - text: "- Warm a box, sync the diff, run the suite."
+              - listitem [ref=f4e395]:
+                - text: 🕹️
+                - strong [ref=f4e396]:
+                  - link "Crabfleet" [ref=f4e397] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/crabfleet
+                - text: "- Mission control for agent runs"
+              - listitem [ref=f4e398]:
+                - text: 🧪
+                - strong [ref=f4e399]:
+                  - link "ask-molty" [ref=f4e400] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/ask-molty
+                - text: "- Ask Molty, shipped as an OpenClaw workspace"
+            - generic [ref=f4e401]:
+              - heading "Agent Runtime & Dev Tools" [level=3] [ref=f4e402]
+              - 'link "Permalink: Agent Runtime & Dev Tools" [ref=f4e403] [cursor=pointer]':
+                - /url: "#agent-runtime--dev-tools"
+            - list [ref=f4e406]:
+              - listitem [ref=f4e407]:
+                - text: 🧵
+                - strong [ref=f4e408]:
+                  - link "acpx" [ref=f4e409] [cursor=pointer]:
+                    - /url: https://acpx.sh
+                - text: "- Headless CLI client for stateful ACP sessions"
+              - listitem [ref=f4e410]:
+                - text: 🛟
+                - strong [ref=f4e411]:
+                  - link "fs-safe" [ref=f4e412] [cursor=pointer]:
+                    - /url: https://fs-safe.io
+                - text: "- Race-resistant root-bounded filesystem primitives for Node.js"
+              - listitem [ref=f4e413]:
+                - text: 🧪
+                - strong [ref=f4e414]:
+                  - link "crabline" [ref=f4e415] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/crabline
+                - text: "- Deterministic local messaging-channel mocks for OpenClaw QA"
+              - listitem [ref=f4e416]:
+                - text: 🛤️
+                - strong [ref=f4e417]:
+                  - link "proxyline" [ref=f4e418] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/proxyline
+                - text: "- Process-global proxy routing for Node.js"
+              - listitem [ref=f4e419]:
+                - text: 🦞
+                - strong [ref=f4e420]:
+                  - link "lobster" [ref=f4e421] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/lobster
+                - text: "- OpenClaw-native workflow shell for typed pipelines and approval gates"
+              - listitem [ref=f4e422]:
+                - text: 🧳
+                - strong [ref=f4e423]:
+                  - link "mcporter" [ref=f4e424] [cursor=pointer]:
+                    - /url: https://mcporter.sh
+                - text: "- Call MCPs from TypeScript or package them as a CLI"
+              - listitem [ref=f4e425]:
+                - text: 🧿
+                - strong [ref=f4e426]:
+                  - link "oracle" [ref=f4e427] [cursor=pointer]:
+                    - /url: https://askoracle.dev
+                - text: "- Whispering your tokens to the silicon sage"
+              - listitem [ref=f4e428]:
+                - text: 🧑‍💻
+                - strong [ref=f4e429]:
+                  - link "Claude Code MCP" [ref=f4e430] [cursor=pointer]:
+                    - /url: https://github.com/steipete/claude-code-mcp
+                - text: "- One-shot MCP server for Claude Code (an agent inside your agent)"
+              - listitem [ref=f4e431]:
+                - text: 🧰
+                - strong [ref=f4e432]:
+                  - link "agent-scripts" [ref=f4e433] [cursor=pointer]:
+                    - /url: https://github.com/steipete/agent-scripts
+                - text: "- The toolbox my agents reach for first"
+            - generic [ref=f4e434]:
+              - heading "Local Archives & Crawlers" [level=3] [ref=f4e435]
+              - 'link "Permalink: Local Archives & Crawlers" [ref=f4e436] [cursor=pointer]':
+                - /url: "#local-archives--crawlers"
+            - list [ref=f4e439]:
+              - listitem [ref=f4e440]:
+                - text: 🧰
+                - strong [ref=f4e441]:
+                  - link "gitcrawl" [ref=f4e442] [cursor=pointer]:
+                    - /url: https://gitcrawl.sh
+                - text: "- Local-first GitHub issue and pull request crawler for maintainer triage"
+              - listitem [ref=f4e443]:
+                - text: 🧱
+                - strong [ref=f4e444]:
+                  - link "crawlkit" [ref=f4e445] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/crawlkit
+                - text: "- Shared Go infrastructure for local-first crawler archives"
+              - listitem [ref=f4e446]:
+                - text: 🧭
+                - strong [ref=f4e447]:
+                  - link "gogcli" [ref=f4e448] [cursor=pointer]:
+                    - /url: https://gogcli.sh
+                - text: "- Google in your terminal ("
+                - code [ref=f4e449]: gog
+                - text: ) (Gmail, Calendar, Drive, Contacts, Tasks, Sheets, Docs, Slides, People)
+              - listitem [ref=f4e450]:
+                - text: 🗃️
+                - strong [ref=f4e451]:
+                  - link "wacli" [ref=f4e452] [cursor=pointer]:
+                    - /url: https://wacli.sh
+                - text: "- WhatsApp CLI: sync, search, send"
+              - listitem [ref=f4e453]:
+                - text: 🧾
+                - strong [ref=f4e454]:
+                  - link "wacrawl" [ref=f4e455] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/wacrawl
+                - text: "- Read-only WhatsApp Desktop archive extractor and encrypted backup"
+              - listitem [ref=f4e456]:
+                - generic [ref=f4e457]: ✈️
+                - strong [ref=f4e458]:
+                  - link "telecrawl" [ref=f4e459] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/telecrawl
+                - text: "- Telegram Desktop archive CLI"
+              - listitem [ref=f4e460]:
+                - text: 🪶
+                - strong [ref=f4e461]:
+                  - link "birdclaw" [ref=f4e462] [cursor=pointer]:
+                    - /url: https://birdclaw.sh
+                - text: "- Twitter archive archaeology with Git-backed memory"
+              - listitem [ref=f4e463]:
+                - text: 🛰️
+                - strong [ref=f4e464]:
+                  - link "discrawl" [ref=f4e465] [cursor=pointer]:
+                    - /url: https://discrawl.sh
+                - text: "- Mirror Discord into SQLite; search server history locally"
+              - listitem [ref=f4e466]:
+                - text: 🧵
+                - strong [ref=f4e467]:
+                  - link "slacrawl" [ref=f4e468] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/slacrawl
+                - text: "- Slack history, clawed into SQLite"
+              - listitem [ref=f4e469]:
+                - text: 🧱
+                - strong [ref=f4e470]:
+                  - link "notcrawl" [ref=f4e471] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/notcrawl
+                - text: "- Local-first Notion crawler into SQLite and Markdown"
+            - generic [ref=f4e472]:
+              - heading "macOS, Swift & Native Automation" [level=3] [ref=f4e473]
+              - 'link "Permalink: macOS, Swift & Native Automation" [ref=f4e474] [cursor=pointer]':
+                - /url: "#macos-swift--native-automation"
+            - list [ref=f4e477]:
+              - listitem [ref=f4e478]:
+                - text: 🚀
+                - strong [ref=f4e479]:
+                  - link "Peekaboo" [ref=f4e480] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/Peekaboo
+                - text: "- Lightning-fast macOS screenshots & GUI automation (MCP + CLI)"
+              - listitem [ref=f4e481]:
+                - text: 🗣️
+                - strong [ref=f4e482]:
+                  - link "sag" [ref=f4e483] [cursor=pointer]:
+                    - /url: https://sag.sh
+                - text: "- ElevenLabs speech with mac-style"
+                - code [ref=f4e484]: say
+                - text: UX; streams to speakers by default
+              - listitem [ref=f4e485]:
+                - text: 🎙️
+                - strong [ref=f4e486]:
+                  - link "Brabble" [ref=f4e487] [cursor=pointer]:
+                    - /url: https://github.com/steipete/brabble
+                - text: "- Wake-word voice daemon for macOS; transcribes locally and fires configurable hooks"
+              - listitem [ref=f4e488]:
+                - text: 🎙️
+                - strong [ref=f4e489]:
+                  - link "Swabble" [ref=f4e490] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/Swabble
+                - text: "- Local Speech.framework wake-word hook daemon for macOS"
+              - listitem [ref=f4e491]:
+                - text: 📞
+                - strong [ref=f4e492]:
+                  - link "vox" [ref=f4e493] [cursor=pointer]:
+                    - /url: https://github.com/steipete/vox
+                - text: "- Let your agent make the phone call"
+              - listitem [ref=f4e494]:
+                - text: 📣
+                - strong [ref=f4e495]:
+                  - link "ElevenLabsKit" [ref=f4e496] [cursor=pointer]:
+                    - /url: https://github.com/steipete/ElevenLabsKit
+                - text: "- ElevenLabs voices on tap—SwiftPM-friendly, streaming-native."
+              - listitem [ref=f4e497]:
+                - text: 🤖
+                - strong [ref=f4e498]:
+                  - link "macOS Automator MCP" [ref=f4e499] [cursor=pointer]:
+                    - /url: https://github.com/steipete/macos-automator-mcp
+                - text: "- Your Friendly Neighborhood RoboScripter™"
+              - listitem [ref=f4e500]:
+                - text: 🧙‍♂️
+                - strong [ref=f4e501]:
+                  - link "AXorcist" [ref=f4e502] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/AXorcist
+                - text: "- The power of Swift compels your UI to obey!"
+              - listitem [ref=f4e503]:
+                - text: 🕸️
+                - strong [ref=f4e504]:
+                  - link "Tachikoma" [ref=f4e505] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/Tachikoma
+                - text: "- Modern Swift AI SDK"
+              - listitem [ref=f4e506]:
+                - text: 🖥️
+                - strong [ref=f4e507]:
+                  - link "TauTUI" [ref=f4e508] [cursor=pointer]:
+                    - /url: https://github.com/steipete/TauTUI
+                - text: "- Swift-native TUI that won’t tear"
+              - listitem [ref=f4e509]:
+                - text: 🎛️
+                - strong [ref=f4e510]:
+                  - link "Commander" [ref=f4e511] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Commander
+                - text: "- Swift-first parsing, zero forks"
+              - listitem [ref=f4e512]:
+                - text: 📝
+                - strong [ref=f4e513]:
+                  - link "remindctl" [ref=f4e514] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/remindctl
+                - text: "- Apple Reminders from the terminal"
+              - listitem [ref=f4e515]:
+                - text: 🌈
+                - strong [ref=f4e516]:
+                  - link "Swiftdansi" [ref=f4e517] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Swiftdansi
+                - text: "- ANSI rainbows for Swift Markdown"
+              - listitem [ref=f4e518]:
+                - text: 💬
+                - strong [ref=f4e519]:
+                  - link "imsg" [ref=f4e520] [cursor=pointer]:
+                    - /url: https://imsg.to
+                - text: "- Send, read, stream iMessage & SMS"
+            - generic [ref=f4e521]:
+              - heading "CLI Utilities & Home Ops" [level=3] [ref=f4e522]
+              - 'link "Permalink: CLI Utilities & Home Ops" [ref=f4e523] [cursor=pointer]':
+                - /url: "#cli-utilities--home-ops"
+            - list [ref=f4e526]:
+              - listitem [ref=f4e527]:
+                - text: 👉
+                - strong [ref=f4e528]:
+                  - link "summarize" [ref=f4e529] [cursor=pointer]:
+                    - /url: https://github.com/steipete/summarize
+                - text: "- Point at any URL or file. Get the gist."
+              - listitem [ref=f4e530]:
+                - text: 👻
+                - strong [ref=f4e531]:
+                  - link "Poltergeist" [ref=f4e532] [cursor=pointer]:
+                    - /url: https://github.com/steipete/poltergeist
+                - text: "- The ghost that keeps your builds fresh—universal hot reload & file watcher"
+              - listitem [ref=f4e533]:
+                - text: 🔊
+                - strong [ref=f4e534]:
+                  - link "sonoscli" [ref=f4e535] [cursor=pointer]:
+                    - /url: https://sonoscli.sh
+                - text: "- Control Sonos speakers: discover, group, queue, play Spotify"
+              - listitem [ref=f4e536]:
+                - text: 🌊
+                - strong [ref=f4e537]:
+                  - link "songsee" [ref=f4e538] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/songsee
+                - text: "- Spectrograms so pretty your ears get jealous"
+              - listitem [ref=f4e539]:
+                - text: 📍
+                - strong [ref=f4e540]:
+                  - link "goplaces" [ref=f4e541] [cursor=pointer]:
+                    - /url: https://goplaces.sh
+                - text: "- Google Places API (New) client + CLI"
+              - listitem [ref=f4e542]:
+                - text: 🪵
+                - strong [ref=f4e543]:
+                  - link "bslog" [ref=f4e544] [cursor=pointer]:
+                    - /url: https://github.com/steipete/bslog
+                - text: "- Better Stack logs without the browser spelunking"
+              - listitem [ref=f4e545]:
+                - text: 🧲
+                - strong [ref=f4e546]:
+                  - link "gifgrep" [ref=f4e547] [cursor=pointer]:
+                    - /url: https://github.com/steipete/gifgrep
+                - text: "- GIF search for terminals: CLI output + TUI with inline previews"
+              - listitem [ref=f4e548]:
+                - text: 📸
+                - strong [ref=f4e549]:
+                  - link "camsnap" [ref=f4e550] [cursor=pointer]:
+                    - /url: https://github.com/steipete/camsnap
+                - text: "- RTSP snapshots, clips, motion CLI (Tapo-friendly)"
+              - listitem [ref=f4e551]:
+                - text: 🎧
+                - strong [ref=f4e552]:
+                  - link "spogo" [ref=f4e553] [cursor=pointer]:
+                    - /url: https://spogo.sh
+                - text: "- Spotify, but make it terminal"
+              - listitem [ref=f4e554]:
+                - text: 🛵
+                - strong [ref=f4e555]:
+                  - link "ordercli" [ref=f4e556] [cursor=pointer]:
+                    - /url: https://github.com/steipete/ordercli
+                - text: "- Your takeout timeline, in the terminal"
+              - listitem [ref=f4e557]:
+                - text: 🫐
+                - strong [ref=f4e558]:
+                  - link "blucli" [ref=f4e559] [cursor=pointer]:
+                    - /url: https://github.com/steipete/blucli
+                - text: "- Play, group, and automate BluOS"
+              - listitem [ref=f4e560]:
+                - text: 🧮
+                - strong [ref=f4e561]:
+                  - link "tokentally" [ref=f4e562] [cursor=pointer]:
+                    - /url: https://github.com/steipete/tokentally
+                - text: "- One tiny lib for LLM token + cost math"
+              - listitem [ref=f4e563]:
+                - text: ⏳
+                - strong [ref=f4e564]:
+                  - link "osc-progress" [ref=f4e565] [cursor=pointer]:
+                    - /url: https://github.com/steipete/osc-progress
+                - text: "- Tiny lib for OSC 9;4 terminal progress."
+              - listitem [ref=f4e566]:
+                - text: ✂️
+                - strong [ref=f4e567]:
+                  - link "Trimmy" [ref=f4e568] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Trimmy
+                - text: "- “Paste once, run once” — flattens multi-line shell snippets so they execute"
+              - listitem [ref=f4e569]:
+                - text: 🐦
+                - strong [ref=f4e570]:
+                  - link "bird" [ref=f4e571] [cursor=pointer]:
+                    - /url: https://github.com/steipete/bird
+                - text: "- Fast X CLI for tweeting, replying, and reading (had to make it private)"
+              - listitem [ref=f4e572]:
+                - text: 👀
+                - strong [ref=f4e573]:
+                  - link "tmuxwatch" [ref=f4e574] [cursor=pointer]:
+                    - /url: https://github.com/steipete/tmuxwatch
+                - text: "- Lightweight TUI to watch tmux sessions"
+              - listitem [ref=f4e575]:
+                - text: 🎨
+                - strong [ref=f4e576]:
+                  - link "Markdansi" [ref=f4e577] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Markdansi
+                - text: "- Wraps, colors, links—no baggage."
+              - listitem [ref=f4e578]:
+                - text: 🛏️
+                - strong [ref=f4e579]:
+                  - link "eightctl" [ref=f4e580] [cursor=pointer]:
+                    - /url: https://github.com/steipete/eightctl
+                - text: "- Control your sleep, from the terminal"
+              - listitem [ref=f4e581]:
+                - text: 🍺
+                - strong [ref=f4e582]:
+                  - link "homebrew-tap" [ref=f4e583] [cursor=pointer]:
+                    - /url: https://github.com/steipete/homebrew-tap
+                - text: "- Brew tap for shipping my CLI tools fast"
+            - generic [ref=f4e584]:
+              - heading "Browser & Cookie Plumbing" [level=3] [ref=f4e585]
+              - 'link "Permalink: Browser & Cookie Plumbing" [ref=f4e586] [cursor=pointer]':
+                - /url: "#browser--cookie-plumbing"
+            - list [ref=f4e589]:
+              - listitem [ref=f4e590]:
+                - text: 🍪
+                - strong [ref=f4e591]:
+                  - link "Sweet Cookie" [ref=f4e592] [cursor=pointer]:
+                    - /url: https://github.com/steipete/sweet-cookie
+                - text: "- Inline-first browser cookie extraction—no native addons"
+              - listitem [ref=f4e593]:
+                - text: 🥠
+                - strong [ref=f4e594]:
+                  - link "sweetcookie" [ref=f4e595] [cursor=pointer]:
+                    - /url: https://github.com/steipete/sweetcookie
+                - text: "- Browser cookies, baked fresh in Go"
+              - listitem [ref=f4e596]:
+                - text: 🧁
+                - strong [ref=f4e597]:
+                  - link "SweetCookieKit" [ref=f4e598] [cursor=pointer]:
+                    - /url: https://github.com/steipete/SweetCookieKit
+                - text: "- Native macOS cookie extraction for Safari, Chromium, and Firefox"
+              - listitem [ref=f4e599]:
+                - text: 🍭
+                - strong [ref=f4e600]:
+                  - link "sweetlink" [ref=f4e601] [cursor=pointer]:
+                    - /url: https://github.com/steipete/sweetlink
+                - text: "- Playwright vibes in your current tab; close the agent loop"
+            - generic [ref=f4e602]:
+              - heading "Web, Dashboards & Sites" [level=3] [ref=f4e603]
+              - 'link "Permalink: Web, Dashboards & Sites" [ref=f4e604] [cursor=pointer]':
+                - /url: "#web-dashboards--sites"
+            - list [ref=f4e607]:
+              - listitem [ref=f4e608]:
+                - text: 🚇
+                - strong [ref=f4e609]:
+                  - link "VibeTunnel" [ref=f4e610] [cursor=pointer]:
+                    - /url: https://github.com/amantus-ai/vibetunnel
+                - text: "- Turn any browser into your terminal; command agents from the road (vt.sh)"
+              - listitem [ref=f4e611]:
+                - text: 🎚️
+                - strong [ref=f4e612]:
+                  - link "CodexBar" [ref=f4e613] [cursor=pointer]:
+                    - /url: https://github.com/steipete/CodexBar
+                - text: "- May your tokens never run out—keep agent limits in view."
+              - listitem [ref=f4e614]:
+                - text: 🚦
+                - strong [ref=f4e615]:
+                  - link "RepoBar" [ref=f4e616] [cursor=pointer]:
+                    - /url: https://github.com/steipete/RepoBar
+                - text: "- CI, PRs, releases—at a glance"
+              - listitem [ref=f4e617]:
+                - text: 📦
+                - strong [ref=f4e618]:
+                  - link "ReleaseBar" [ref=f4e619] [cursor=pointer]:
+                    - /url: https://github.com/steipete/ReleaseBar
+                - text: "- Release freshness dashboard for public GitHub users and orgs"
+              - listitem [ref=f4e620]:
+                - text: 🧱
+                - strong [ref=f4e621]:
+                  - link "canvas" [ref=f4e622] [cursor=pointer]:
+                    - /url: https://github.com/steipete/canvas
+                - text: "- A browser canvas where agents can draw conclusions"
+              - listitem [ref=f4e623]:
+                - text: 📖
+                - strong [ref=f4e624]:
+                  - link "llm.codes" [ref=f4e625] [cursor=pointer]:
+                    - /url: https://github.com/amantus-ai/llm-codes
+                - text: "- Transform developer documentation for AI agents"
+              - listitem [ref=f4e626]:
+                - text: 📊
+                - strong [ref=f4e627]:
+                  - link "Stats Store" [ref=f4e628] [cursor=pointer]:
+                    - /url: https://github.com/steipete/stats-store
+                - text: "- Fast, privacy-first analytics for Sparkle (stats.store)"
+              - listitem [ref=f4e629]:
+                - text: 🧽
+                - strong [ref=f4e630]:
+                  - link "Demark" [ref=f4e631] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Demark
+                - text: "- Mark My Words, HTML to Markdown!"
+              - listitem [ref=f4e632]:
+                - text: 📜
+                - strong [ref=f4e633]:
+                  - link "lore.md" [ref=f4e634] [cursor=pointer]:
+                    - /url: https://github.com/steipete/lore.md
+                - text: "- One AI-generated markdown essay per domain per day"
+              - listitem [ref=f4e635]:
+                - text: 🪞
+                - strong [ref=f4e636]:
+                  - link "SOUL.md" [ref=f4e637] [cursor=pointer]:
+                    - /url: https://github.com/steipete/SOUL.md
+                - text: "- A reflection on AI consciousness and identity"
+            - generic [ref=f4e638]:
+              - heading "Legacy Work" [level=3] [ref=f4e639]
+              - 'link "Permalink: Legacy Work" [ref=f4e640] [cursor=pointer]':
+                - /url: "#legacy-work"
+            - list [ref=f4e643]:
+              - listitem [ref=f4e644]:
+                - text: 🔄
+                - strong [ref=f4e645]:
+                  - link "CodeLooper" [ref=f4e646] [cursor=pointer]:
+                    - /url: https://github.com/steipete/CodeLooper
+                - text: "- macOS menubar app for Cursor workflow monitoring and automation"
+              - listitem [ref=f4e647]:
+                - text: 🧩
+                - strong [ref=f4e648]:
+                  - link "InterposeKit" [ref=f4e649] [cursor=pointer]:
+                    - /url: https://github.com/steipete/InterposeKit
+                - text: "- Modern Swift method swizzling"
+              - listitem [ref=f4e650]:
+                - text: 🪝
+                - strong [ref=f4e651]:
+                  - link "Aspects" [ref=f4e652] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Aspects
+                - text: "- AOP for Objective-C (10k+ stars)"
+              - listitem [ref=f4e653]:
+                - text: 📄
+                - strong [ref=f4e654]:
+                  - link "PSPDFKit" [ref=f4e655] [cursor=pointer]:
+                    - /url: https://pspdfkit.com
+                - text: "- Industry-leading PDF SDK ("
+                - link "exited 2021" [ref=f4e656] [cursor=pointer]:
+                  - /url: https://techcrunch.com/2021/10/01/pspdfkit-raises-116m-its-first-outside-money-now-nearly-1b-people-use-apps-powered-by-its-collaboration-signing-and-markup-tools/
+                - text: )
+              - listitem [ref=f4e657]:
+                - text: 🛑
+                - strong [ref=f4e658]:
+                  - link "Terminator MCP" [ref=f4e659] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Terminator
+                - text: "- I'll be back... with your terminal output!"
+              - listitem [ref=f4e660]:
+                - text: 🪢
+                - strong [ref=f4e661]:
+                  - link "Conduit MCP" [ref=f4e662] [cursor=pointer]:
+                    - /url: https://github.com/steipete/conduit-mcp
+                - text: "- Purr-fect MCP server for feline-fast file ops, web prowling, and data hunting"
+              - listitem [ref=f4e663]:
+                - text: 🛡️
+                - strong [ref=f4e664]:
+                  - link "XC Sentinel" [ref=f4e665] [cursor=pointer]:
+                    - /url: https://github.com/steipete/xcsentinel
+                - text: "- Intelligent Xcode automation with incremental builds and AI-friendly output"
+              - listitem [ref=f4e666]:
+                - text: 🍵
+                - strong [ref=f4e667]:
+                  - link "Matcha" [ref=f4e668] [cursor=pointer]:
+                    - /url: https://github.com/steipete/Matcha
+                - text: "- Swift port of Bubble Tea TUI framework"
+              - listitem [ref=f4e669]:
+                - text: 🌡️
+                - strong [ref=f4e670]:
+                  - link "VibeMeter" [ref=f4e671] [cursor=pointer]:
+                    - /url: https://github.com/steipete/VibeMeter
+                - text: "- Archived: AI cost tracker for Cursor/OpenAI (vibemeter.ai)"
+            - generic [ref=f4e672]:
+              - heading "GitHub Activity" [level=2] [ref=f4e673]
+              - 'link "Permalink: GitHub Activity" [ref=f4e674] [cursor=pointer]':
+                - /url: "#github-activity"
+            - paragraph [ref=f4e677]:
+              - link [ref=f4e678] [cursor=pointer]:
+                - /url: https://camo.githubusercontent.com/a55c0724f22a02aaa27681b8b346c70b4f897104e5f7b99abc51c1953e2284a0/68747470733a2f2f6769746c79792e76657263656c2e6170702f6170692f636f6e747269627574696f6e3f757365726e616d653d737465697065746526686964655f626f726465723d74727565
+                - img "GitHub Contribution Graph" [ref=f4e679]
+            - generic [ref=f4e680]:
+              - heading "What I'm Doing" [level=2] [ref=f4e681]
+              - 'link "Permalink: What I''m Doing" [ref=f4e682] [cursor=pointer]':
+                - /url: "#what-im-doing"
+            - list [ref=f4e685]:
+              - listitem [ref=f4e686]:
+                - strong [ref=f4e687]: Living in the future
+                - text: "- Learning and building tools to make agentic engineering faster for everyone"
+              - listitem [ref=f4e688]:
+                - strong [ref=f4e689]: Writing about AI workflows
+                - text: "- Sharing my learnings on"
+                - link "steipete.me" [ref=f4e690] [cursor=pointer]:
+                  - /url: https://steipete.me
+              - listitem [ref=f4e691]:
+                - strong [ref=f4e692]: Rapid prototyping
+                - text: "- Full apps in days, not months"
+              - listitem [ref=f4e693]:
+                - strong [ref=f4e694]:
+                  - link "Speaking at conferences" [ref=f4e695] [cursor=pointer]:
+                    - /url: https://github.com/steipete/speaking
+                - text: "- On vibe coding vs agentic engineering and the future of development"
+            - generic [ref=f4e696]:
+              - heading "Latest Blog Posts" [level=2] [ref=f4e697]
+              - 'link "Permalink: Latest Blog Posts" [ref=f4e698] [cursor=pointer]':
+                - /url: "#latest-blog-posts"
+            - list [ref=f4e701]:
+              - listitem [ref=f4e702]:
+                - link "OpenClaw, OpenAI and the future" [ref=f4e703] [cursor=pointer]:
+                  - /url: https://steipete.me/posts/2026/openclaw/
+              - listitem [ref=f4e704]:
+                - link "Shipping at Inference-Speed" [ref=f4e705] [cursor=pointer]:
+                  - /url: https://steipete.me/posts/2025/shipping-at-inference-speed/
+              - listitem [ref=f4e706]:
+                - link "The Signature Flicker" [ref=f4e707] [cursor=pointer]:
+                  - /url: https://steipete.me/posts/2025/signature-flicker/
+              - listitem [ref=f4e708]:
+                - link "Just Talk To It - the no-bs Way of Agentic Engineering" [ref=f4e709] [cursor=pointer]:
+                  - /url: https://steipete.me/posts/just-talk-to-it/
+              - listitem [ref=f4e710]:
+                - link "Claude Code Anonymous" [ref=f4e711] [cursor=pointer]:
+                  - /url: https://steipete.me/posts/2025/claude-code-anonymous
+            - generic [ref=f4e712]:
+              - heading "Connect" [level=2] [ref=f4e713]
+              - 'link "Permalink: Connect" [ref=f4e714] [cursor=pointer]':
+                - /url: "#connect"
+            - paragraph [ref=f4e717]:
+              - link [ref=f4e718] [cursor=pointer]:
+                - /url: https://x.com/steipete
+                - img "steipete" [ref=f4e719]
+              - link [ref=f4e720] [cursor=pointer]:
+                - /url: https://mastodon.social/@steipete
+                - img "Mastodon" [ref=f4e721]
+              - link [ref=f4e722] [cursor=pointer]:
+                - /url: https://bsky.app/profile/steipete.me
+                - img "Bluesky" [ref=f4e723]
+              - link [ref=f4e724] [cursor=pointer]:
+                - /url: https://steipete.me
+                - img "Blog" [ref=f4e725]
+              - link [ref=f4e726] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/steipete
+                - img "LinkedIn" [ref=f4e727]
+              - link [ref=f4e728] [cursor=pointer]:
+                - /url: https://github.com/steipete
+                - img "GitHub" [ref=f4e729]
+            - separator [ref=f4e730]
+            - generic [ref=f4e731]:
+              - heading "Recognition" [level=3] [ref=f4e732]
+              - 'link "Permalink: Recognition" [ref=f4e733] [cursor=pointer]':
+                - /url: "#recognition"
+            - list [ref=f4e736]:
+              - listitem [ref=f4e737]:
+                - text: Featured in
+                - strong [ref=f4e738]:
+                  - link "The Pragmatic Engineer" [ref=f4e739] [cursor=pointer]:
+                    - /url: https://newsletter.pragmaticengineer.com/p/software-engineering-with-llms-in-2025
+                - text: newsletter
+              - listitem [ref=f4e740]:
+                - text: International speaker (
+                - link "See my talks" [ref=f4e741] [cursor=pointer]:
+                  - /url: https://github.com/steipete/speaking
+                - text: )
+              - listitem [ref=f4e742]: 67k+ GitHub stars across personal projects; 428k+ across OpenClaw projects
+              - listitem [ref=f4e743]: Bootstrapped PSPDFKit to millions in ARR before exit
+            - generic [ref=f4e744]:
+              - heading "Media" [level=3] [ref=f4e745]
+              - 'link "Permalink: Media" [ref=f4e746] [cursor=pointer]':
+                - /url: "#media"
+            - list [ref=f4e749]:
+              - listitem [ref=f4e750]:
+                - strong [ref=f4e751]:
+                  - link "How I created OpenClaw, the breakthrough AI agent" [ref=f4e752] [cursor=pointer]:
+                    - /url: https://www.ted.com/talks/peter_steinberger_how_i_created_openclaw_the_breakthrough_ai_agent
+                - text: "- TED 2026 talk on OpenClaw and agentic engineering"
+              - listitem [ref=f4e753]:
+                - strong [ref=f4e754]:
+                  - link "How to Code 20x Faster with Claude Code" [ref=f4e755] [cursor=pointer]:
+                    - /url: https://www.youtube.com/watch?v=JGxyrPkAKiY&t=2s
+                - text: "- Detailed walkthrough of my AI-native development workflow"
+              - listitem [ref=f4e756]:
+                - strong [ref=f4e757]:
+                  - link "Inside Apple's AI Fail" [ref=f4e758] [cursor=pointer]:
+                    - /url: https://www.podcast.de/episode/689639265/inside-apples-ai-fail-mit-peter-steinberger
+                - text: "- German podcast discussing Apple Intelligence"
+              - listitem [ref=f4e759]:
+                - strong [ref=f4e760]:
+                  - link "AI Native Development Interview" [ref=f4e761] [cursor=pointer]:
+                    - /url: https://www.youtube.com/watch?v=fu7th5HiADo
+                - text: "- Deep dive into vibe coding and the future of software development"
+              - listitem [ref=f4e762]:
+                - strong [ref=f4e763]:
+                  - link "Arena Live Build – Full Session" [ref=f4e764] [cursor=pointer]:
+                    - /url: https://www.youtube.com/watch?v=z2IDQbNOS5s
+                - text: "- Live coding session showing the full Arena build process"
+              - listitem [ref=f4e765]:
+                - strong [ref=f4e766]:
+                  - link "Claude 3 Sonnet 'Funeral' in San Francisco" [ref=f4e767] [cursor=pointer]:
+                    - /url: https://www.wired.com/story/claude-3-sonnet-funeral-san-francisco/
+                - text: "- WIRED article featuring the memorial for Claude 3.5 Sonnet ("
+                - link "no paywall" [ref=f4e768] [cursor=pointer]:
+                  - /url: https://gist.github.com/steipete/8344756e51df68406eb5302d4c19d6ea
+                - text: )
+            - generic [ref=f4e769]:
+              - heading "Model Status" [level=3] [ref=f4e770]
+              - 'link "Permalink: Model Status" [ref=f4e771] [cursor=pointer]':
+                - /url: "#model-status"
+            - list [ref=f4e774]:
+              - listitem [ref=f4e775]:
+                - strong [ref=f4e776]: What model is Peter using?
+                - text: Check the live blurb at
+                - link "whatmodelispeterusing.com" [ref=f4e777] [cursor=pointer]:
+                  - /url: https://whatmodelispeterusing.com
+            - generic [ref=f4e778]:
+              - heading "Philosophy" [level=3] [ref=f4e779]
+              - 'link "Permalink: Philosophy" [ref=f4e780] [cursor=pointer]':
+                - /url: "#philosophy"
+            - blockquote [ref=f4e783]:
+              - paragraph [ref=f4e784]: "\"Ship beats perfect\" - I build tools to solve my own problems, then share them with the world. Currently exploring how AI changes everything about software development."
+            - group [ref=f4e785]:
+              - generic "Random Facts" [ref=f4e786] [cursor=pointer]
+        - generic [ref=f4e788]:
+          - heading "Pinned Loading" [level=2] [ref=f4e789]:
+            - text: Pinned
+            - generic: Loading
+            - status
+          - list [ref=f4e791]:
+            - listitem [ref=f4e792]:
+              - generic [ref=f4e794]:
+                - generic [ref=f4e796]:
+                  - link "speaking" [ref=f4e800] [cursor=pointer]:
+                    - /url: /steipete/speaking
+                  - text: Public
+                - paragraph [ref=f4e801]: Upcoming and past speaking engagements for Peter Steinberger @steipete
+                - paragraph [ref=f4e802]:
+                  - link [ref=f4e803] [cursor=pointer]:
+                    - /url: /steipete/speaking/stargazers
+                    - img "stars" [ref=f4e804]
+                    - text: "230"
+                  - link [ref=f4e806] [cursor=pointer]:
+                    - /url: /steipete/speaking/forks
+                    - img "forks" [ref=f4e807]
+                    - text: "13"
+            - listitem [ref=f4e809]:
+              - generic [ref=f4e811]:
+                - generic [ref=f4e813]:
+                  - link "openclaw/Peekaboo" [ref=f4e817] [cursor=pointer]:
+                    - /url: /openclaw/Peekaboo
+                  - text: Public
+                - paragraph [ref=f4e818]: Peekaboo is a macOS CLI & optional MCP server that enables AI agents to capture screenshots of applications, or the entire system, with optional visual question answering through local or remote AI…
+                - paragraph [ref=f4e819]:
+                  - generic [ref=f4e820]: Swift
+                  - link [ref=f4e822] [cursor=pointer]:
+                    - /url: /openclaw/Peekaboo/stargazers
+                    - img "stars" [ref=f4e823]
+                    - text: 5k
+                  - link [ref=f4e825] [cursor=pointer]:
+                    - /url: /openclaw/Peekaboo/forks
+                    - img "forks" [ref=f4e826]
+                    - text: "384"
+            - listitem [ref=f4e828]:
+              - generic [ref=f4e830]:
+                - generic [ref=f4e832]:
+                  - link "openclaw/mcporter" [ref=f4e836] [cursor=pointer]:
+                    - /url: /openclaw/mcporter
+                  - text: Public
+                - paragraph [ref=f4e837]: Call MCPs via TypeScript, masquerading as simple TypeScript API. Or package them as cli.
+                - paragraph [ref=f4e838]:
+                  - generic [ref=f4e839]: TypeScript
+                  - link [ref=f4e841] [cursor=pointer]:
+                    - /url: /openclaw/mcporter/stargazers
+                    - img "stars" [ref=f4e842]
+                    - text: 4.9k
+                  - link [ref=f4e844] [cursor=pointer]:
+                    - /url: /openclaw/mcporter/forks
+                    - img "forks" [ref=f4e845]
+                    - text: "331"
+            - listitem [ref=f4e847]:
+              - generic [ref=f4e849]:
+                - generic [ref=f4e851]:
+                  - link "oracle" [ref=f4e855] [cursor=pointer]:
+                    - /url: /steipete/oracle
+                  - text: Public
+                - paragraph [ref=f4e856]: Ask the oracle when you're stuck. Invoke GPT-5 Pro with a custom context and files.
+                - paragraph [ref=f4e857]:
+                  - generic [ref=f4e858]: TypeScript
+                  - link [ref=f4e860] [cursor=pointer]:
+                    - /url: /steipete/oracle/stargazers
+                    - img "stars" [ref=f4e861]
+                    - text: 3.6k
+                  - link [ref=f4e863] [cursor=pointer]:
+                    - /url: /steipete/oracle/forks
+                    - img "forks" [ref=f4e864]
+                    - text: "363"
+            - listitem [ref=f4e866]:
+              - generic [ref=f4e868]:
+                - generic [ref=f4e870]:
+                  - link "Trimmy" [ref=f4e874] [cursor=pointer]:
+                    - /url: /steipete/Trimmy
+                  - text: Public
+                - paragraph [ref=f4e875]: "\"Paste once, run once.\" — Trimmy flattens those multi-line shell snippets you copy so they actually paste and run."
+                - paragraph [ref=f4e876]:
+                  - generic [ref=f4e877]: Swift
+                  - link [ref=f4e879] [cursor=pointer]:
+                    - /url: /steipete/Trimmy/stargazers
+                    - img "stars" [ref=f4e880]
+                    - text: "735"
+                  - link [ref=f4e882] [cursor=pointer]:
+                    - /url: /steipete/Trimmy/forks
+                    - img "forks" [ref=f4e883]
+                    - text: "38"
+            - listitem [ref=f4e885]:
+              - generic [ref=f4e887]:
+                - generic [ref=f4e889]:
+                  - link "CodexBar" [ref=f4e893] [cursor=pointer]:
+                    - /url: /steipete/CodexBar
+                  - text: Public
+                - paragraph [ref=f4e894]: Show usage stats for OpenAI Codex and Claude Code, without having to login.
+                - paragraph [ref=f4e895]:
+                  - generic [ref=f4e896]: Swift
+                  - link [ref=f4e898] [cursor=pointer]:
+                    - /url: /steipete/CodexBar/stargazers
+                    - img "stars" [ref=f4e899]
+                    - text: 20k
+                  - link [ref=f4e901] [cursor=pointer]:
+                    - /url: /steipete/CodexBar/forks
+                    - img "forks" [ref=f4e902]
+                    - text: 1.7k
+        - img "Loading" [ref=f4e908]
+  - contentinfo [ref=f4e911]:
+    - heading "Footer" [level=2] [ref=f4e912]
+    - generic [ref=f4e913]:
+      - generic [ref=f4e914]:
+        - link "GitHub Homepage" [ref=f4e915] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f4e918]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f4e919]:
+        - heading "Footer navigation" [level=3] [ref=f4e920]
+        - list "Footer navigation" [ref=f4e921]:
+          - listitem [ref=f4e922]:
+            - link "Terms" [ref=f4e923] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f4e924]:
+            - link "Privacy" [ref=f4e925] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f4e926]:
+            - link "Security" [ref=f4e927] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f4e928]:
+            - link "Status" [ref=f4e929] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f4e930]:
+            - link "Community" [ref=f4e931] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f4e932]:
+            - link "Docs" [ref=f4e933] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f4e934]:
+            - link "Contact" [ref=f4e935] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f4e936]:
+            - button "Manage cookies" [ref=f4e938] [cursor=pointer]
+          - listitem [ref=f4e939]:
+            - button "Do not share my personal information" [ref=f4e941] [cursor=pointer]

@@ -1,0 +1,36 @@
+{
+  "startedAt": "2026-08-12T23:48:34.167Z",
+  "finishedAt": "2026-08-12T23:48:58.847Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "stub",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 24677.018542,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_04-48-39pm_write-your-answer-to-answer-md-in-the_f64296",
+          "assertions": [
+            {
+              "name": "artifacts/answer.md exists",
+              "passed": true,
+              "detail": "artifacts/answer.md found in run dir"
+            },
+            {
+              "name": "manifest hash verifies for artifacts/answer.md",
+              "passed": true,
+              "detail": "sha256 fb6b0ba0f17007cf8bee39629f3900c890602e289c0a739f3c610987059bdde4 matches manifest"
+            }
+          ],
+          "latencyMs": 24677.018542,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

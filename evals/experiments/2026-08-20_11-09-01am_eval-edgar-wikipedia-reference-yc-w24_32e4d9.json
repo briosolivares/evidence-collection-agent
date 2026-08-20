@@ -1,0 +1,114 @@
+{
+  "startedAt": "2026-08-20T18:05:55.813Z",
+  "finishedAt": "2026-08-20T18:09:01.654Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "edgar",
+      "k": 1,
+      "accuracy": 0.3333333333333333,
+      "taskPassed": false,
+      "meanLatencyMs": 15051.147083000002,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-20_11-05-59am_find-apple-s-8-k-filing-from-january-29_942648",
+          "assertions": [
+            {
+              "name": "downloaded document hash-matches the accession's document",
+              "passed": false,
+              "detail": "no artifact matches sha256 301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a for accession 0000320193-26-000005 (aapl-20260129.htm)"
+            },
+            {
+              "name": "screenshot artifact exists with a manifest entry",
+              "passed": false,
+              "detail": "no .png artifact with valid PNG bytes and a manifest entry was found"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "0 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 15051.147083000002,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "wikipedia_reference",
+      "k": 1,
+      "accuracy": 0,
+      "taskPassed": false,
+      "meanLatencyMs": 152055.43275,
+      "trials": [
+        {
+          "assertions": [],
+          "latencyMs": 152055.43275,
+          "error": "ENOSPC: no space left on device, open '/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-20_11-06-00am_find-the-275th-reference-in-the_f6bf32/harness/.checkpoint.json.98561.87d98429-188f-492e-87ab-a67ba4e20279.tmp'",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "yc_w24_outreach",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 180919.01979199998,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-20_11-06-00am_from-yc-winter-2024-pick-5-ai-focused_226631",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/cold_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "12 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "12 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": true,
+              "detail": "5 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct personal profile URL",
+              "passed": true,
+              "detail": "12 distinct personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "12 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "7 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 180919.01979199998,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

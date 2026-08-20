@@ -1,0 +1,55 @@
+{
+  "startedAt": "2026-08-12T22:48:42.066Z",
+  "finishedAt": "2026-08-12T22:48:58.665Z",
+  "k": 1,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "hacker_news",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 15830.959333000003,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_03-48-42pm_create-a-csv-of-the-top-5-stories-on_e859b2",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 15830.959333000003,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

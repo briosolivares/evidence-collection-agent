@@ -1,0 +1,29 @@
+{
+  "task": "Find Apple's 8-K filing from January 29, 2026 on SEC EDGAR, download the filing document, and take a screenshot of the filing page.",
+  "startedAt": "2026-08-13T00:36:55.027Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "258fa18c2ce820ef56b3ab9b8b12e20a35e54c7c7e4b7c502624f68ac5b303a3",
+      "capturedAt": "2026-08-13T00:37:37.604Z"
+    },
+    {
+      "filename": "artifacts/sec_edgar_access_blocked.png",
+      "sha256": "851f34c3d27cc972f87a1e138646478a4dedc49e7c262bb9c03eb95c856385d1",
+      "sourceUrl": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=8-K&dateb=&owner=include&count=40",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:39:49.459Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "70d3ee7b781bd1beab1c090e8b149b9751a778fd500cedb26312982a6b8fef29",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:40:05.771Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:40:16.488Z"
+}

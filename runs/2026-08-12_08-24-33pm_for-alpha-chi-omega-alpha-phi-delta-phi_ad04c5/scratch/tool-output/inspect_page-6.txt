@@ -1,0 +1,999 @@
+URL: https://marginalia-search.com/search?query=Sigma+Kappa+MIT+sisters
+Title: Sigma Kappa MIT sisters - Marginalia Search
+
+- generic [active] [ref=f112e1]:
+  - link "Skip To Content" [ref=f112e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f112e3]:
+    - navigation [ref=f112e5]:
+      - generic [ref=f112e7]:
+        - link "Search" [ref=f112e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f112e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f112e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f112e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f112e13]:
+    - generic [ref=f112e15]:
+      - heading [level=1] [ref=f112e17]:
+        - link "Marginalia Search" [ref=f112e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f112e21]:
+        - textbox "Search the web!" [ref=f112e22]: Sigma Kappa MIT sisters
+        - button " Search" [ref=f112e23] [cursor=pointer]:
+          - generic [ref=f112e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f112e25]:
+    - complementary [ref=f112e26]:
+      - generic [ref=f112e28]:
+        - heading " Filter" [level=2] [ref=f112e29]:
+          - generic [ref=f112e30]: 
+          - text: Filter
+        - generic [ref=f112e31]:
+          - button [ref=f112e33] [cursor=pointer]:
+            - link " All" [ref=f112e34]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e35]: 
+              - text: All
+          - button [ref=f112e37] [cursor=pointer]:
+            - link " Blogs" [ref=f112e38]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=blogosphere&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e39]: 
+              - text: Blogs
+          - button [ref=f112e41] [cursor=pointer]:
+            - link " Academia" [ref=f112e42]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=academia&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e43]: 
+              - text: Academia
+          - button [ref=f112e45] [cursor=pointer]:
+            - link " Vintage" [ref=f112e46]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=vintage&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e47]: 
+              - text: Vintage
+          - button [ref=f112e49] [cursor=pointer]:
+            - link " Small Web" [ref=f112e50]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=modern&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e51]: 
+              - text: Small Web
+          - button [ref=f112e54] [cursor=pointer]:
+            - link " Wikis" [ref=f112e55]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=wiki&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e56]: 
+              - text: Wikis
+          - button [ref=f112e58] [cursor=pointer]:
+            - link " Forums" [ref=f112e59]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=forum&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e60]: 
+              - text: Forums
+          - button [ref=f112e62] [cursor=pointer]:
+            - link " Recipes" [ref=f112e63]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=food&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e64]: 
+              - text: Recipes
+          - button [ref=f112e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f112e68]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&profile=custom&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f112e70]:
+      - generic [ref=f112e71]:
+        - heading "Results" [level=1] [ref=f112e72]
+        - generic [ref=f112e73]:
+          - generic [ref=f112e75]:
+            - generic [ref=f112e76]:
+              - generic [ref=f112e77]:
+                - generic [ref=f112e78]:
+                  - generic "Match density" [ref=f112e79]
+                  - generic [ref=f112e83]:
+                    - heading [level=2] [ref=f112e84]:
+                      - link "Philip Gale" [ref=f112e85] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/Philip_Gale
+                    - link "https://en.wikipedia.org/wiki/Philip_Gale" [ref=f112e87] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/Philip_Gale
+                - paragraph [ref=f112e89]: Philip Chandler Gale (1978 – March 13, 1998) was an American Internet software developer and sophomore student at the Massachusetts Institute of Technology (MIT). He was notable for having written Total Access while at MIT, and was hired by EarthLink at t
+              - generic [ref=f112e90]:
+                - link "" [ref=f112e91] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f112e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/Philip_Gale
+            - generic [ref=f112e95]:
+              - paragraph [ref=f112e96]: "Also from en.wikipedia.org:"
+              - list [ref=f112e97]:
+                - listitem [ref=f112e98]:
+                  - link "Marie Jakus" [ref=f112e99] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Marie_Jakus
+                - listitem [ref=f112e100]:
+                  - link "Lynda Marie Jordan" [ref=f112e101] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Lynda_Marie_Jordan
+                - listitem [ref=f112e102]:
+                  - link "Mildred Allen (physicist)" [ref=f112e103] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Mildred_Allen_%28physicist%29
+                - listitem [ref=f112e104]:
+                  - link "Union College" [ref=f112e105] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Union_College
+            - generic [ref=f112e106]:
+              - link "7 more" [ref=f112e108] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Aen.wikipedia.org&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e110]: Wiki
+              - generic "Contains JavaScript" [ref=f112e111]: JS
+          - generic [ref=f112e113]:
+            - generic [ref=f112e114]:
+              - generic [ref=f112e115]:
+                - generic [ref=f112e116]:
+                  - generic "Match density" [ref=f112e117]
+                  - generic [ref=f112e121]:
+                    - heading [level=2] [ref=f112e122]:
+                      - link "How to MC Hammer | MIT Admissions" [ref=f112e123] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/how-to-mc-hammer/
+                    - link "https://mitadmissions.org/blogs/entry/how-to-mc-hammer/" [ref=f112e125] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/how-to-mc-hammer/
+                - paragraph [ref=f112e127]: AKA embarrassing yourself for charity October 20, 2011 The Class of 2015 list of 101 things to do before you graduate has challenges of varying degrees–I can proudly say I’ve already seen a concert in Boston (#37), but I have yet to earn my pirate’s licen
+              - generic [ref=f112e128]:
+                - link "" [ref=f112e129] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f112e131] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/how-to-mc-hammer/
+            - generic [ref=f112e133]:
+              - paragraph [ref=f112e134]: "Also from mitadmissions.org:"
+              - list [ref=f112e135]:
+                - listitem [ref=f112e136]:
+                  - link "Stepping Up | MIT Admissions" [ref=f112e137] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/stepping_up_1/
+                - listitem [ref=f112e138]:
+                  - link "Incentive to Drop Out | MIT Admissions" [ref=f112e139] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/incentive_to_drop_out/
+                - listitem [ref=f112e140]:
+                  - link "Stomp the Yard, MIT style | MIT Admissions" [ref=f112e141] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/
+                - listitem [ref=f112e142]:
+                  - link "MIT and Black Greek Letter Organizations | MIT Admissions" [ref=f112e143] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/
+            - generic [ref=f112e144]:
+              - link "7 more" [ref=f112e146] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Amitadmissions.org&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e148]: JS
+          - generic [ref=f112e150]:
+            - generic [ref=f112e151]:
+              - generic [ref=f112e152]:
+                - generic [ref=f112e153]:
+                  - generic "Match density" [ref=f112e154]
+                  - generic [ref=f112e158]:
+                    - heading [level=2] [ref=f112e159]:
+                      - link "Brothers of Phi Beta Epsilon win first annual FSILG&D Community Service Challenge Photo Contest | MIT News | Massachusetts In..." [ref=f112e160] [cursor=pointer]:
+                        - /url: https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+                    - link "https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest" [ref=f112e162] [cursor=pointer]:
+                      - /url: https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+                - paragraph [ref=f112e164]: The MIT fraternity Phi Beta Epsilon (PBE) won the community vote for the first annual Fraternities, Sororities, Independent Living Groups and Dorms (FSILG&D) Community Service Challenge Photo Contest. The contest encouraged students to submit photos of th
+              - generic [ref=f112e165]:
+                - link "" [ref=f112e166] [cursor=pointer]:
+                  - /url: /site/news.mit.edu
+                - link "" [ref=f112e168] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+            - generic [ref=f112e170]:
+              - paragraph [ref=f112e171]: "Also from news.mit.edu:"
+              - list [ref=f112e172]:
+                - listitem [ref=f112e173]:
+                  - link "Rising to the Challenge | MIT News | Massachusetts Institute of Technology" [ref=f112e174] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2012/rising-to-the-challenge
+                - listitem [ref=f112e175]:
+                  - link "MIT Professor Peter Elias dies at 78; Was computer science pioneer | MIT News | Massachusetts Institute of Technology" [ref=f112e176] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2001/elias
+                - listitem [ref=f112e177]:
+                  - link "Discovering community and cultural connections | MIT News | Massachusetts Institute of Technology" [ref=f112e178] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2024/discovering-community-cultural-connections-grace-mcmillan-0509
+                - listitem [ref=f112e179]:
+                  - link "Four from MIT awarded 2018 Schwarzman Scholarships | MIT News | Massachusetts Institute of Technology" [ref=f112e180] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2017/four-from-mit-awarded-2018-schwarzman-scholarships-1204
+            - generic [ref=f112e181]:
+              - link "1 more" [ref=f112e183] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Anews.mit.edu&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e185]: JS
+          - generic [ref=f112e187]:
+            - generic [ref=f112e188]:
+              - generic [ref=f112e189]:
+                - generic [ref=f112e190]:
+                  - generic "Match density" [ref=f112e191]
+                  - generic [ref=f112e195]:
+                    - heading [level=2] [ref=f112e196]:
+                      - link "Sorority women prohibited at frat rush | The Tech" [ref=f112e197] [cursor=pointer]:
+                        - /url: https://thetech.com/2012/09/18/rushpolicy-v132-n38
+                    - link "https://thetech.com/2012/09/18/rushpolicy-v132-n38" [ref=f112e199] [cursor=pointer]:
+                      - /url: https://thetech.com/2012/09/18/rushpolicy-v132-n38
+                - paragraph [ref=f112e201]: By Jiaming Zengand Tushar Kamath The National Panhellenic Conference (NPC) recently passed a regulation restricting sorority women from participating in fraternity Rush events. This especially restricts sorority members from being “Rush girls,” friends of
+              - generic [ref=f112e202]:
+                - link "" [ref=f112e203] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f112e205] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/2012/09/18/rushpolicy-v132-n38
+            - generic [ref=f112e207]:
+              - paragraph [ref=f112e208]: "Also from thetech.com:"
+              - list [ref=f112e209]:
+                - listitem [ref=f112e210]:
+                  - link "LETTERS TO THE EDITOR | The Tech" [ref=f112e211] [cursor=pointer]:
+                    - /url: https://thetech.com/2014/12/09/letters60-v134-n60
+                - listitem [ref=f112e212]:
+                  - link "Trump blocks student’s return to MIT | The Tech" [ref=f112e213] [cursor=pointer]:
+                    - /url: https://thetech.com/2017/01/29/immigration-order-blocks-students-from-mit
+                - listitem [ref=f112e214]:
+                  - link "Remembering Kate Hunter | The Tech" [ref=f112e215] [cursor=pointer]:
+                    - /url: https://thetech.com/2018/01/11/remembering-katherine-hunter
+                - listitem [ref=f112e216]:
+                  - link "Letters to the Editor | The Tech" [ref=f112e217] [cursor=pointer]:
+                    - /url: https://thetech.com/2007/03/09/letters-v127-n10
+            - generic [ref=f112e218]:
+              - link "2 more" [ref=f112e220] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Athetech.com&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e222]: JS
+          - generic [ref=f112e224]:
+            - generic [ref=f112e225]:
+              - generic [ref=f112e226]:
+                - generic [ref=f112e227]:
+                  - generic "Match density" [ref=f112e228]
+                  - generic [ref=f112e232]:
+                    - heading [level=2] [ref=f112e233]:
+                      - link "Francis Amasa Walker - Alchetron, The Free Social Encyclopedia" [ref=f112e234] [cursor=pointer]:
+                        - /url: https://alchetron.com/Francis-Amasa-Walker
+                    - link "https://alchetron.com/Francis-Amasa-Walker" [ref=f112e236] [cursor=pointer]:
+                      - /url: https://alchetron.com/Francis-Amasa-Walker
+                - paragraph [ref=f112e238]: Updated on Jun 19, 2022 Edit Like Comment Share Sign in Ethnicity British American Parents Amasa Walker Alma mater Amherst College Education Amherst College Name Francis Walker Successor James Crafts Role Statistician Born July 2, 1840 ( 1840-07-02 Boston
+              - generic [ref=f112e239]:
+                - link "" [ref=f112e240] [cursor=pointer]:
+                  - /url: /site/alchetron.com
+                - link "" [ref=f112e242] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alchetron.com/Francis-Amasa-Walker
+            - generic "Contains JavaScript" [ref=f112e246]: JS
+          - generic [ref=f112e248]:
+            - generic [ref=f112e249]:
+              - generic [ref=f112e250]:
+                - generic [ref=f112e251]:
+                  - generic "Match density" [ref=f112e252]
+                  - generic [ref=f112e256]:
+                    - heading [level=2] [ref=f112e257]:
+                      - link "sororities podcasts | Ivy.fm" [ref=f112e258] [cursor=pointer]:
+                        - /url: https://ivy.fm/tag/sororities
+                    - link "https://ivy.fm/tag/sororities" [ref=f112e260] [cursor=pointer]:
+                      - /url: https://ivy.fm/tag/sororities
+                - paragraph [ref=f112e262]: Kathleen Barber & Amayah Shaienne's collaboration on their sorority rush thriller, SISTERHOOD ABOVE ALL Jul 14, 202627:33 Kathleen Barber is the author of Truth Be Told, which was adapted into a series on AppleTV+, Follow Me, Both Things Are True, and Sis
+              - generic [ref=f112e263]:
+                - link "" [ref=f112e264] [cursor=pointer]:
+                  - /url: /site/ivy.fm
+                - link "" [ref=f112e266] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ivy.fm/tag/sororities
+            - generic [ref=f112e268]:
+              - paragraph [ref=f112e269]: "Also from ivy.fm:"
+              - list [ref=f112e270]:
+                - listitem [ref=f112e271]:
+                  - link "Boromir podcasts | Ivy.fm" [ref=f112e272] [cursor=pointer]:
+                    - /url: https://ivy.fm/tag/boromir
+            - generic "Contains JavaScript" [ref=f112e275]: JS
+          - generic [ref=f112e277]:
+            - generic [ref=f112e278]:
+              - generic [ref=f112e279]:
+                - generic [ref=f112e280]:
+                  - generic "Match density" [ref=f112e281]
+                  - generic [ref=f112e285]:
+                    - heading [level=2] [ref=f112e286]:
+                      - link "Total Sorority Move | Sigma Kappa Nationals Steps Up When Sister Can’t Travel Home From Iran" [ref=f112e287] [cursor=pointer]:
+                        - /url: https://totalsororitymove.com/sigma-kappa-nationals-steps-up-when-sister-cant-travel-home-from-iran/
+                    - generic [ref=f112e288]:
+                      - text: 2017-01-31 ·
+                      - link "https://totalsororitymove.com/sigma-kappa-nationals-steps-up-when-sister-cant-travel-home-from-iran/" [ref=f112e289] [cursor=pointer]:
+                        - /url: https://totalsororitymove.com/sigma-kappa-nationals-steps-up-when-sister-cant-travel-home-from-iran/
+                - paragraph [ref=f112e291]: by For obvious reasons, sororities try to keep politics (the government kind, not the chapter kind) out of the picture. If you joined in the last eight or so years, you likely learned that you shouldn’t talk about the three Bs – booze, boys, and Barack –
+              - generic [ref=f112e292]:
+                - link "" [ref=f112e293] [cursor=pointer]:
+                  - /url: /site/totalsororitymove.com
+                - link "" [ref=f112e295] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://totalsororitymove.com/sigma-kappa-nationals-steps-up-when-sister-cant-travel-home-from-iran/
+            - generic [ref=f112e297]:
+              - link "Tracking" [ref=f112e299] [cursor=pointer]:
+                - /url: /site/totalsororitymove.com?view=traffic
+              - generic "Contains JavaScript" [ref=f112e300]: JS
+              - link "Has Ads" [ref=f112e301] [cursor=pointer]:
+                - /url: /site/totalsororitymove.com?view=traffic
+              - generic "Contains Affiliate Link" [ref=f112e302]: Has Affiliate
+          - generic [ref=f112e305]:
+            - generic [ref=f112e306]:
+              - generic [ref=f112e307]:
+                - generic "Match density" [ref=f112e308]
+                - generic [ref=f112e312]:
+                  - heading [level=2] [ref=f112e313]:
+                    - link "Women Who Made a Difference" [ref=f112e314] [cursor=pointer]:
+                      - /url: https://historicexhibits.lib.iastate.edu/Seeds/women.htm
+                  - link "https://historicexhibits.lib.iastate.edu/Seeds/women.htm" [ref=f112e316] [cursor=pointer]:
+                    - /url: https://historicexhibits.lib.iastate.edu/Seeds/women.htm
+              - paragraph [ref=f112e318]: was born in Saskatchewan in 1912 and received her Bachelor of Household Science degree (1939) from the University of Saskatchewan. She taught home economics in British Columbia (1939-1942) and then received a research assistantship in nutrition at Iowa St
+            - generic [ref=f112e319]:
+              - link "" [ref=f112e320] [cursor=pointer]:
+                - /url: /site/historicexhibits.lib.iastate.edu
+              - link "" [ref=f112e322] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/https://historicexhibits.lib.iastate.edu/Seeds/women.htm
+          - generic [ref=f112e325]:
+            - generic [ref=f112e326]:
+              - generic [ref=f112e327]:
+                - generic [ref=f112e328]:
+                  - generic "Match density" [ref=f112e329]
+                  - generic [ref=f112e333]:
+                    - heading [level=2] [ref=f112e334]:
+                      - link "NCSU Timelines" [ref=f112e335] [cursor=pointer]:
+                        - /url: https://historicalstate.lib.ncsu.edu/timelines/women
+                    - link "https://historicalstate.lib.ncsu.edu/timelines/women" [ref=f112e337] [cursor=pointer]:
+                      - /url: https://historicalstate.lib.ncsu.edu/timelines/women
+                - paragraph [ref=f112e339]: Caroline Sherman was the first woman hired as librarian at NC State. During Sherman’s tenure as librarian from 1903 to 1906, library holdings moved from the third floor of Main Building (later Holladay Hall) to the first floor of old Pullen Hall. With inp
+              - generic [ref=f112e340]:
+                - link "" [ref=f112e341] [cursor=pointer]:
+                  - /url: /site/historicalstate.lib.ncsu.edu
+                - link "" [ref=f112e343] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://historicalstate.lib.ncsu.edu/timelines/women
+            - generic [ref=f112e345]:
+              - paragraph [ref=f112e346]: "Also from historicalstate.lib.ncsu.edu:"
+              - list [ref=f112e347]:
+                - listitem [ref=f112e348]:
+                  - link "NCSU Timelines" [ref=f112e349] [cursor=pointer]:
+                    - /url: https://historicalstate.lib.ncsu.edu/timelines/student-life
+            - generic "Contains JavaScript" [ref=f112e352]: JS
+          - generic [ref=f112e354]:
+            - generic [ref=f112e355]:
+              - generic [ref=f112e356]:
+                - generic [ref=f112e357]:
+                  - generic "Match density" [ref=f112e358]
+                  - generic [ref=f112e362]:
+                    - heading [level=2] [ref=f112e363]:
+                      - link "David White, founding director of the MIT Energy Laboratory, dies at 89 | MIT Energy Initiative" [ref=f112e364] [cursor=pointer]:
+                        - /url: https://energy.mit.edu/news/david-white-founding-director-of-the-mit-energy-laboratory-dies-at-89/
+                    - link "https://energy.mit.edu/news/david-white-founding-director-of-the-mit-energy-laboratory-dies-at-89/" [ref=f112e366] [cursor=pointer]:
+                      - /url: https://energy.mit.edu/news/david-white-founding-director-of-the-mit-energy-laboratory-dies-at-89/
+                - paragraph [ref=f112e368]: David Calvin White, founding director of the MIT Energy Laboratory and a longtime faculty member, died on Jan. 11. He was 89. A resident of Scottsdale, Ariz., and formerly of Mashpee, Mass., White joined MIT in 1952 and spent four decades at the Institute
+              - generic [ref=f112e369]:
+                - link "" [ref=f112e370] [cursor=pointer]:
+                  - /url: /site/energy.mit.edu
+                - link "" [ref=f112e372] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://energy.mit.edu/news/david-white-founding-director-of-the-mit-energy-laboratory-dies-at-89/
+            - generic "Contains JavaScript" [ref=f112e376]: JS
+          - generic [ref=f112e378]:
+            - generic [ref=f112e379]:
+              - generic [ref=f112e380]:
+                - generic [ref=f112e381]:
+                  - generic "Match density" [ref=f112e382]
+                  - generic [ref=f112e386]:
+                    - heading [level=2] [ref=f112e387]:
+                      - link "Class of 1967 | Brown Alumni Magazine" [ref=f112e388] [cursor=pointer]:
+                        - /url: https://www.brownalumnimagazine.com/classes/class-of-1967
+                    - link "https://www.brownalumnimagazine.com/classes/class-of-1967" [ref=f112e390] [cursor=pointer]:
+                      - /url: https://www.brownalumnimagazine.com/classes/class-of-1967
+                - paragraph [ref=f112e392]: "Send your news to class copresident Sharon Drager, co-president Glenn Mitchell, class gift chair and nominating chair Dave Chichester, or directly to the BAM at Sep, 2025 David Gardner writes: “This is my first contribution to class notes since my graduat"
+              - generic [ref=f112e393]:
+                - link "" [ref=f112e394] [cursor=pointer]:
+                  - /url: /site/www.brownalumnimagazine.com
+                - link "" [ref=f112e396] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.brownalumnimagazine.com/classes/class-of-1967
+            - generic [ref=f112e398]:
+              - paragraph [ref=f112e399]: "Also from www.brownalumnimagazine.com:"
+              - list [ref=f112e400]:
+                - listitem [ref=f112e401]:
+                  - link "Obituaries | Brown Alumni Magazine" [ref=f112e402] [cursor=pointer]:
+                    - /url: https://www.brownalumnimagazine.com/articles/2007-08-10/obituaries
+                - listitem [ref=f112e403]:
+                  - link "Obituaries | Brown Alumni Magazine" [ref=f112e404] [cursor=pointer]:
+                    - /url: https://www.brownalumnimagazine.com/articles/2015-05-08/obituaries
+                - listitem [ref=f112e405]:
+                  - link "Obituaries | Brown Alumni Magazine" [ref=f112e406] [cursor=pointer]:
+                    - /url: https://www.brownalumnimagazine.com/articles/2010-07-19/obituaries
+                - listitem [ref=f112e407]:
+                  - link "Obituaries | Brown Alumni Magazine" [ref=f112e408] [cursor=pointer]:
+                    - /url: https://www.brownalumnimagazine.com/articles/2013-09-09/obituaries
+            - generic [ref=f112e409]:
+              - link "39 more" [ref=f112e411] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Awww.brownalumnimagazine.com&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e413]: JS
+          - generic [ref=f112e415]:
+            - generic [ref=f112e416]:
+              - generic [ref=f112e417]:
+                - generic [ref=f112e418]:
+                  - generic "Match density" [ref=f112e419]
+                  - generic [ref=f112e423]:
+                    - heading [level=2] [ref=f112e424]:
+                      - link "Winter 2019 class notes | Ohio Wesleyan University" [ref=f112e425] [cursor=pointer]:
+                        - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                    - link "https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/" [ref=f112e427] [cursor=pointer]:
+                      - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                - paragraph [ref=f112e429]: Richard Jackson ’53 is the founder of One People, the Delaware, Ohio-based organization that co-hosted the Community Festival Celebrating Juneteenth in June. Juneteenth is a holiday predominantly celebrated in African-American communities in commemoration
+              - generic [ref=f112e430]:
+                - link "" [ref=f112e431] [cursor=pointer]:
+                  - /url: /site/www.owu.edu
+                - link "" [ref=f112e433] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+            - generic [ref=f112e435]:
+              - paragraph [ref=f112e436]: "Also from www.owu.edu:"
+              - list [ref=f112e437]:
+                - listitem [ref=f112e438]:
+                  - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f112e439] [cursor=pointer]:
+                    - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+            - generic "Contains JavaScript" [ref=f112e442]: JS
+          - generic [ref=f112e444]:
+            - generic [ref=f112e445]:
+              - generic [ref=f112e446]:
+                - generic [ref=f112e447]:
+                  - generic "Match density" [ref=f112e448]
+                  - generic [ref=f112e452]:
+                    - heading [level=2] [ref=f112e453]:
+                      - link "List of AMSA Peer Advisors" [ref=f112e454] [cursor=pointer]:
+                        - /url: http://amsa.mit.edu/list_of_peer_advisors/
+                    - link "http://amsa.mit.edu/list_of_peer_advisors/" [ref=f112e456] [cursor=pointer]:
+                      - /url: http://amsa.mit.edu/list_of_peer_advisors/
+                - paragraph [ref=f112e458]: "Course 5 | Course 7 | Course 8 | Course 9 | Course 10 | Course 20 To contact all the peer advisors in a giving major, email the appropriate mailing list below: Eric Trac Major: Chemical-Biological Engineering (10) Year: 2013 Email: Intended degree: MD Act"
+              - generic [ref=f112e459]:
+                - link "" [ref=f112e460] [cursor=pointer]:
+                  - /url: /site/amsa.mit.edu
+                - link "" [ref=f112e462] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://amsa.mit.edu/list_of_peer_advisors/
+            - generic "Contains JavaScript" [ref=f112e466]: JS
+          - generic [ref=f112e468]:
+            - generic [ref=f112e469]:
+              - generic [ref=f112e470]:
+                - generic [ref=f112e471]:
+                  - generic "Match density" [ref=f112e472]
+                  - generic [ref=f112e476]:
+                    - heading [level=2] [ref=f112e477]:
+                      - 'link "The 10 Best Fraternities in the US: A Guide for Prospective Members | AdmissionSight" [ref=f112e478] [cursor=pointer]':
+                        - /url: https://admissionsight.com/best-fraternities/
+                    - generic [ref=f112e479]:
+                      - text: 2026-06-05 ·
+                      - link "https://admissionsight.com/best-fraternities/" [ref=f112e480] [cursor=pointer]:
+                        - /url: https://admissionsight.com/best-fraternities/
+                - paragraph [ref=f112e482]: Fraternities have been part of American college life for nearly two centuries. Today, operate through 6,100 chapters on 800 campuses, with 380,000 undergraduate members and 4.2 million alumni. Each year, hundreds of thousands of college men go through rus
+              - generic [ref=f112e483]:
+                - link "" [ref=f112e484] [cursor=pointer]:
+                  - /url: /site/admissionsight.com
+                - link "" [ref=f112e486] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://admissionsight.com/best-fraternities/
+            - generic "Contains JavaScript" [ref=f112e490]: JS
+          - generic [ref=f112e492]:
+            - generic [ref=f112e493]:
+              - generic [ref=f112e494]:
+                - generic [ref=f112e495]:
+                  - generic "Match density" [ref=f112e496]
+                  - generic [ref=f112e500]:
+                    - heading [level=2] [ref=f112e501]:
+                      - link "<title>Congratulations to Mechanical Engineering’s 2020 Honors and Awards Recipients" [ref=f112e502] [cursor=pointer]:
+                        - /url: http://www.aml.umd.edu/news/news_story.php?id=13078
+                    - link "http://www.aml.umd.edu/news/news_story.php?id=13078" [ref=f112e504] [cursor=pointer]:
+                      - /url: http://www.aml.umd.edu/news/news_story.php?id=13078
+                - paragraph [ref=f112e506]: searchUMD AML Congratulations to Mechanical Engineering’s 2020 Honors and Awards Recipients The Department of Mechanical Engineering would like to congratulate all of this year’s honors and awards recipients recognized for their outstanding scholarship an
+              - generic [ref=f112e507]:
+                - link "" [ref=f112e508] [cursor=pointer]:
+                  - /url: /site/www.aml.umd.edu
+                - link "" [ref=f112e510] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://www.aml.umd.edu/news/news_story.php?id=13078
+            - generic "Contains JavaScript" [ref=f112e514]: JS
+          - generic [ref=f112e516]:
+            - generic [ref=f112e517]:
+              - generic [ref=f112e518]:
+                - generic [ref=f112e519]:
+                  - generic "Match density" [ref=f112e520]
+                  - generic [ref=f112e524]:
+                    - heading [level=2] [ref=f112e525]:
+                      - link "www.TownTopics.com — Obituaries" [ref=f112e526] [cursor=pointer]:
+                        - /url: https://www.towntopics.com/backissues/feb2509/obits.php
+                    - link "https://www.towntopics.com/backissues/feb2509/obits.php" [ref=f112e528] [cursor=pointer]:
+                      - /url: https://www.towntopics.com/backissues/feb2509/obits.php
+                - paragraph [ref=f112e530]: Sheila W. Hart Sheila Whitestone Cook Hart, 81, of Princeton and Vero Beach, Fla., died February 18 in Vero Beach. The daughter of the late Henry A. Whitestone and Eileen O’Reilly Whitestone, she was born by flashlight in New York City. She graduated from
+              - generic [ref=f112e531]:
+                - link "" [ref=f112e532] [cursor=pointer]:
+                  - /url: /site/www.towntopics.com
+                - link "" [ref=f112e534] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.towntopics.com/backissues/feb2509/obits.php
+            - generic [ref=f112e536]:
+              - paragraph [ref=f112e537]: "Also from www.towntopics.com:"
+              - list [ref=f112e538]:
+                - listitem [ref=f112e539]:
+                  - link "Obituaries 3/19/14 – Town Topics" [ref=f112e540] [cursor=pointer]:
+                    - /url: https://www.towntopics.com/2014/03/19/obituaries-31914/
+            - generic "Contains JavaScript" [ref=f112e543]: JS
+          - generic [ref=f112e545]:
+            - generic [ref=f112e546]:
+              - generic [ref=f112e547]:
+                - generic [ref=f112e548]:
+                  - generic "Match density" [ref=f112e549]
+                  - generic [ref=f112e553]:
+                    - heading [level=2] [ref=f112e554]:
+                      - link "PCAD - Paul Raymond Dermanis" [ref=f112e555] [cursor=pointer]:
+                        - /url: https://pcad.lib.washington.edu/person/3130/
+                    - link "https://pcad.lib.washington.edu/person/3130/" [ref=f112e557] [cursor=pointer]:
+                      - /url: https://pcad.lib.washington.edu/person/3130/
+                - paragraph [ref=f112e559]: Résumé Draftsman, Naramore, Bain, Brady and Johanson (NBBJ), Architects, Seattle, WA, 1954. Military service, United States Navy, 1955-1957. Architect, John M. Morse and Associates, Seattle, WA, 1961-1962. Associate, Fred Bassetti and Company, Architects,
+              - generic [ref=f112e560]:
+                - link "" [ref=f112e561] [cursor=pointer]:
+                  - /url: /site/pcad.lib.washington.edu
+                - link "" [ref=f112e563] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://pcad.lib.washington.edu/person/3130/
+            - generic [ref=f112e565]:
+              - link "1 more" [ref=f112e567] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Apcad.lib.washington.edu&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e569]: JS
+          - generic [ref=f112e571]:
+            - generic [ref=f112e572]:
+              - generic [ref=f112e573]:
+                - generic [ref=f112e574]:
+                  - generic "Match density" [ref=f112e575]
+                  - generic [ref=f112e579]:
+                    - heading [level=2] [ref=f112e580]:
+                      - link "MIT Alpha Phi" [ref=f112e581] [cursor=pointer]:
+                        - /url: http://aphi.mit.edu/philanthropy/
+                    - link "http://aphi.mit.edu/philanthropy/" [ref=f112e583] [cursor=pointer]:
+                      - /url: http://aphi.mit.edu/philanthropy/
+                - paragraph [ref=f112e585]: Women's heart health is at the core of Alpha Phi's national philanthropy — cardiovascular disease is responsible for nearly one in five deaths in American women, yet remains widely under-researched. Through the Alpha Phi Foundation's Heart to Heart Grant,
+              - generic [ref=f112e586]:
+                - link "" [ref=f112e587] [cursor=pointer]:
+                  - /url: /site/aphi.mit.edu
+                - link "" [ref=f112e589] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://aphi.mit.edu/philanthropy/
+            - generic "Contains JavaScript" [ref=f112e593]: JS
+          - generic [ref=f112e595]:
+            - generic [ref=f112e596]:
+              - generic [ref=f112e597]:
+                - generic [ref=f112e598]:
+                  - generic "Match density" [ref=f112e599]
+                  - generic [ref=f112e603]:
+                    - heading [level=2] [ref=f112e604]:
+                      - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f112e605] [cursor=pointer]:
+                        - /url: https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+                    - link "https://theta.scripts.mit.edu/aboutzmhouseandhistory.php" [ref=f112e607] [cursor=pointer]:
+                      - /url: https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+                - paragraph [ref=f112e609]: Founded in 1991, the Zeta Mu chapter of Kappa Alpha Theta is MIT's fourth Panhellenic sorority. With a sorority house on campus, the Theta house occupies a prime piece of real estate at the start of ''dorm row'' between McCormick and Baker. Home to 40 sis
+              - generic [ref=f112e610]:
+                - link "" [ref=f112e611] [cursor=pointer]:
+                  - /url: /site/theta.scripts.mit.edu
+                - link "" [ref=f112e613] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+            - generic "Contains JavaScript" [ref=f112e617]: JS
+          - generic [ref=f112e619]:
+            - generic [ref=f112e620]:
+              - generic [ref=f112e621]:
+                - generic [ref=f112e622]:
+                  - generic "Match density" [ref=f112e623]
+                  - generic [ref=f112e627]:
+                    - heading [level=2] [ref=f112e628]:
+                      - link "Announcing the 2017 Class of Razorback Classics | Arkansas News | University of Arkansas" [ref=f112e629] [cursor=pointer]:
+                        - /url: https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+                    - link "https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics" [ref=f112e631] [cursor=pointer]:
+                      - /url: https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+                - paragraph [ref=f112e633]: The Arkansas Alumni Association is proud to announce the 2017 Class of Razorback Classics.
+              - generic [ref=f112e634]:
+                - link "" [ref=f112e635] [cursor=pointer]:
+                  - /url: /site/news.uark.edu
+                - link "" [ref=f112e637] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+            - generic "Contains JavaScript" [ref=f112e641]: JS
+          - generic [ref=f112e643]:
+            - generic [ref=f112e644]:
+              - generic [ref=f112e645]:
+                - generic [ref=f112e646]:
+                  - generic "Match density" [ref=f112e647]
+                  - generic [ref=f112e651]:
+                    - heading [level=2] [ref=f112e652]:
+                      - link "09/04/12, Deaths - Almanac, Vol. 59, No. 02" [ref=f112e653] [cursor=pointer]:
+                        - /url: https://almanac.upenn.edu/archive/volumes/v59/n02/obit.html
+                    - link "https://almanac.upenn.edu/archive/volumes/v59/n02/obit.html" [ref=f112e655] [cursor=pointer]:
+                      - /url: https://almanac.upenn.edu/archive/volumes/v59/n02/obit.html
+                - paragraph [ref=f112e657]: Loading Deaths September 4, 2012, Volume 59, No. 02 Dr. Ajzenberg-Selove, Physics Dr. Fay Ajzenberg-Selove, emeritus professor of physics, died on August 8 at home at age 86. She was best known in the physics community for the publication of a series of r
+              - generic [ref=f112e658]:
+                - link "" [ref=f112e659] [cursor=pointer]:
+                  - /url: /site/almanac.upenn.edu
+                - link "" [ref=f112e661] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://almanac.upenn.edu/archive/volumes/v59/n02/obit.html
+            - generic [ref=f112e663]:
+              - link "3 more" [ref=f112e665] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Aalmanac.upenn.edu&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e667]: JS
+          - generic [ref=f112e669]:
+            - generic [ref=f112e670]:
+              - generic [ref=f112e671]:
+                - generic [ref=f112e672]:
+                  - generic "Match density" [ref=f112e673]
+                  - generic [ref=f112e677]:
+                    - heading [level=2] [ref=f112e678]:
+                      - link "Obituaries - March/April 2001 | STANFORD magazine" [ref=f112e679] [cursor=pointer]:
+                        - /url: https://stanfordmag.org/contents/obituaries-10653
+                    - link "https://stanfordmag.org/contents/obituaries-10653" [ref=f112e681] [cursor=pointer]:
+                      - /url: https://stanfordmag.org/contents/obituaries-10653
+                - paragraph [ref=f112e683]: "FAREWELLS Reading time min Charles Edward Fagg, '26, of Los Altos, October 24, at 97. He earned an undergraduate degree in law and was a member of El Capitan. He worked for Wells Fargo Bank. His wife of 65 years, Dorotha, '25, predeceased him. Survivors:"
+              - generic [ref=f112e684]:
+                - link "" [ref=f112e685] [cursor=pointer]:
+                  - /url: /site/stanfordmag.org
+                - link "" [ref=f112e687] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://stanfordmag.org/contents/obituaries-10653
+            - generic [ref=f112e689]:
+              - paragraph [ref=f112e690]: "Also from stanfordmag.org:"
+              - list [ref=f112e691]:
+                - listitem [ref=f112e692]:
+                  - link "Obituaries - January/February 2010 | STANFORD magazine" [ref=f112e693] [cursor=pointer]:
+                    - /url: https://stanfordmag.org/contents/obituaries-4675
+                - listitem [ref=f112e694]:
+                  - link "Obituaries - May/June 2008 | STANFORD magazine" [ref=f112e695] [cursor=pointer]:
+                    - /url: https://stanfordmag.org/contents/obituaries-2418
+                - listitem [ref=f112e696]:
+                  - link "Obituaries - May 2018 | STANFORD magazine" [ref=f112e697] [cursor=pointer]:
+                    - /url: https://stanfordmag.org/contents/obituaries-15243
+                - listitem [ref=f112e698]:
+                  - link "Obituaries - March/April 2011 | STANFORD magazine" [ref=f112e699] [cursor=pointer]:
+                    - /url: https://stanfordmag.org/contents/obituaries-4448
+            - generic [ref=f112e700]:
+              - link "53 more" [ref=f112e702] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Astanfordmag.org&sst=SE-083ccf5e7a7ae2cb
+              - link "Tracking" [ref=f112e704] [cursor=pointer]:
+                - /url: /site/stanfordmag.org?view=traffic
+              - generic "Contains JavaScript" [ref=f112e705]: JS
+              - link "Has Ads" [ref=f112e706] [cursor=pointer]:
+                - /url: /site/stanfordmag.org?view=traffic
+          - generic [ref=f112e708]:
+            - generic [ref=f112e709]:
+              - generic [ref=f112e710]:
+                - generic [ref=f112e711]:
+                  - generic "Match density" [ref=f112e712]
+                  - generic [ref=f112e716]:
+                    - heading [level=2] [ref=f112e717]:
+                      - link "517 Beacon | Back Bay Houses" [ref=f112e718] [cursor=pointer]:
+                        - /url: https://backbayhouses.org/517-beacon/
+                    - link "https://backbayhouses.org/517-beacon/" [ref=f112e720] [cursor=pointer]:
+                      - /url: https://backbayhouses.org/517-beacon/
+                - paragraph [ref=f112e722]: "517 Beacon (2014) Irregular Lot: 22′ on Beacon (2,415 sf) 517 Beacon is located on the south side of Beacon, between Massachusetts Avenue and Charlesgate East, with to the east and to the west. 517 Beacon is one of ten contiguous houses (511-529 Beacon) d"
+              - generic [ref=f112e723]:
+                - link "" [ref=f112e724] [cursor=pointer]:
+                  - /url: /site/backbayhouses.org
+                - link "" [ref=f112e726] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://backbayhouses.org/517-beacon/
+            - generic [ref=f112e728]:
+              - paragraph [ref=f112e729]: "Also from backbayhouses.org:"
+              - list [ref=f112e730]:
+                - listitem [ref=f112e731]:
+                  - link "16 Exeter (196 Marlborough) | Back Bay Houses" [ref=f112e732] [cursor=pointer]:
+                    - /url: https://backbayhouses.org/16-exeter-196-marlborough/
+            - generic [ref=f112e733]:
+              - link "1 more" [ref=f112e735] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Abackbayhouses.org&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f112e737]: JS
+          - generic [ref=f112e739]:
+            - generic [ref=f112e740]:
+              - generic [ref=f112e741]:
+                - generic [ref=f112e742]:
+                  - generic "Match density" [ref=f112e743]
+                  - generic [ref=f112e747]:
+                    - heading [level=2] [ref=f112e748]:
+                      - link "Jack Kerrebrock, professor emeritus of aeronautics and astronautics, dies at 91 - MIT AeroAstro" [ref=f112e749] [cursor=pointer]:
+                        - /url: https://aeroastro.mit.edu/news-impact/jack-kerrebrock-professor-emeritus-of-aeronautics-and-astronautics-dies-at-91/
+                    - link "https://aeroastro.mit.edu/news-impact/jack-kerrebrock-professor-emeritus-of-aeronautics-and-astronautics-dies-at-91/" [ref=f112e751] [cursor=pointer]:
+                      - /url: https://aeroastro.mit.edu/news-impact/jack-kerrebrock-professor-emeritus-of-aeronautics-and-astronautics-dies-at-91/
+                - paragraph [ref=f112e753]: Photo courtesy of Crickett Kerrebrock Jack Kerrebrock's accomplishments included serving as faculty leader of the Daedalus Project, which developed an aircraft that still holds the world record for human-powered flight. Photo courtesy of Crickett Kerrebro
+              - generic [ref=f112e754]:
+                - link "" [ref=f112e755] [cursor=pointer]:
+                  - /url: /site/aeroastro.mit.edu
+                - link "" [ref=f112e757] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://aeroastro.mit.edu/news-impact/jack-kerrebrock-professor-emeritus-of-aeronautics-and-astronautics-dies-at-91/
+            - generic "Contains JavaScript" [ref=f112e761]: JS
+          - generic [ref=f112e763]:
+            - generic [ref=f112e764]:
+              - generic [ref=f112e765]:
+                - generic [ref=f112e766]:
+                  - generic "Match density" [ref=f112e767]
+                  - generic [ref=f112e771]:
+                    - heading [level=2] [ref=f112e772]:
+                      - link "nnmpus ,n.. Ujotnmentslor wrT'mrt T Willamette CDolleasan" [ref=f112e773] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content
+                    - generic [ref=f112e774]:
+                      - generic "PDF" [ref=f112e775]: 
+                      - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content" [ref=f112e776] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content
+                - paragraph [ref=f112e778]: . . i 0 VOL. XLIX. SALEM, OREGON, FRIDAY, APRIL 22, 1938 No. 25 r ' By I sincerely congratulate Ed and his upon their remark- able letter. Really, Ed, though I sharply disagree with the con- enjoyed your letter Immensely. It is well written, probably the
+              - generic [ref=f112e779]:
+                - link "" [ref=f112e780] [cursor=pointer]:
+                  - /url: /site/digitalcollections.willamette.edu
+                - link "" [ref=f112e782] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content
+            - generic [ref=f112e784]:
+              - paragraph [ref=f112e785]: "Also from digitalcollections.willamette.edu:"
+              - list [ref=f112e786]:
+                - listitem [ref=f112e787]:
+                  - generic "PDF": 
+                  - link "Student Leader Federation Picks Willamette For 1940 Annual Conference Meet Willamette Collegian" [ref=f112e788] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/f1def515-1533-4e34-95c3-01ecfa18c3b5/content
+                - listitem [ref=f112e789]:
+                  - generic "PDF": 
+                  - link "-The Student Handbook- -Willamette University- -1991-1992-" [ref=f112e790] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/9d87d39a-1e3d-44a2-982c-43ee482f4f45/content
+                - listitem [ref=f112e791]:
+                  - generic "PDF": 
+                  - link "Q0KSPU3 liommentator 171 ' tf A--" [ref=f112e792] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/88598804-20da-44ca-8610-c4002a7f3a9a/content
+                - listitem [ref=f112e793]:
+                  - generic "PDF": 
+                  - link "Beginning With MITH SPIKE Reported Presidential Bids \"All Rumor\"? fi o HENOVATED No Collegian Next BRUCE BAXTER" [ref=f112e794] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/4cabe708-92b5-4fe0-9996-8d4b7a343cb5/content
+            - generic [ref=f112e795]:
+              - link "24 more" [ref=f112e797] [cursor=pointer]:
+                - /url: /search?query=Sigma+Kappa+MIT+sisters+site%3Adigitalcollections.willamette.edu&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e799]: PDF File
+      - generic [ref=f112e800]:
+        - link "1" [ref=f112e801] [cursor=pointer]:
+          - /url: /search?query=Sigma+Kappa+MIT+sisters&sst=SE-083ccf5e7a7ae2cb
+        - link "2" [ref=f112e802] [cursor=pointer]:
+          - /url: /search?query=Sigma+Kappa+MIT+sisters&page=2&sst=SE-083ccf5e7a7ae2cb
+        - link "3" [ref=f112e803] [cursor=pointer]:
+          - /url: /search?query=Sigma+Kappa+MIT+sisters&page=3&sst=SE-083ccf5e7a7ae2cb
+        - link "4" [ref=f112e804] [cursor=pointer]:
+          - /url: /search?query=Sigma+Kappa+MIT+sisters&page=4&sst=SE-083ccf5e7a7ae2cb
+        - link "5" [ref=f112e805] [cursor=pointer]:
+          - /url: /search?query=Sigma+Kappa+MIT+sisters&page=5&sst=SE-083ccf5e7a7ae2cb
+    - complementary [ref=f112e806]:
+      - text: 
+      - generic [ref=f112e808]:
+        - heading " Search Settings" [level=2] [ref=f112e809]:
+          - generic [ref=f112e810]: 
+          - text: Search Settings
+        - generic [ref=f112e811]:
+          - button [ref=f112e813] [cursor=pointer]:
+            - link " Search In Title" [ref=f112e814]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&searchTitle=title&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e815]: 
+              - generic [ref=f112e816]: Search In Title
+          - button [ref=f112e818] [cursor=pointer]:
+            - link " Recent Results" [ref=f112e819]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&recent=recent&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e820]: 
+              - generic [ref=f112e821]: Recent Results
+          - button [ref=f112e823] [cursor=pointer]:
+            - link " Remove JS" [ref=f112e824]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&js=no-js&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e825]: 
+              - generic [ref=f112e826]: Remove JS
+          - button [ref=f112e828] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f112e829]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&adtech=reduce&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e830]: 
+              - generic [ref=f112e831]: Reduce Adtech
+          - button [ref=f112e833] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f112e834]:
+              - /url: /search?query=Sigma+Kappa+MIT+sisters&nsfw=smut&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f112e835]: 
+              - generic [ref=f112e836]: Reduce NSFW
+          - button [ref=f112e839] [cursor=pointer]:
+            - generic [ref=f112e840]:
+              - generic [ref=f112e841]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f112e843]:
+    - heading "Search Help" [level=1] [ref=f112e844]
+    - generic [ref=f112e845]:
+      - generic [ref=f112e846]:
+        - heading " Syntax" [level=2] [ref=f112e847]:
+          - generic [ref=f112e848]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f112e849]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f112e850]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f112e851]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f112e852]
+        - heading "Samples" [level=2] [ref=f112e853]
+        - generic [ref=f112e854]:
+          - term [ref=f112e855]: soup -chicken
+          - definition [ref=f112e856]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f112e857]: "\"keyboard\""
+          - definition [ref=f112e858]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f112e859]: "\"steve mcqueen\""
+          - definition [ref=f112e860]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f112e861]: apology (plato)
+          - definition [ref=f112e862]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f112e863]:
+          - generic [ref=f112e864]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f112e865]
+        - generic [ref=f112e866]: This is by the beginning
+        - generic [ref=f112e874]: This is in the middle
+        - generic [ref=f112e882]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f112e888]:
+          - generic [ref=f112e889]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f112e890]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f112e891]
+        - heading " Webmaster Information" [level=2] [ref=f112e892]:
+          - generic [ref=f112e893]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f112e894]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f112e895] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f112e896] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f112e897]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f112e898] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f112e899]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f112e900] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f112e901]:
+        - heading " Special Keywords" [level=2] [ref=f112e902]:
+          - generic [ref=f112e903]: 
+          - text: Special Keywords
+        - table [ref=f112e904]:
+          - rowgroup [ref=f112e905]:
+            - row [ref=f112e906]:
+              - columnheader "Keyword" [ref=f112e907]
+              - columnheader "Meaning" [ref=f112e908]
+          - rowgroup [ref=f112e909]:
+            - row [ref=f112e910]:
+              - cell [ref=f112e911]:
+                - text: "site:"
+                - emphasis [ref=f112e912]: example.com
+              - cell [ref=f112e913]:
+                - text: Display site information about
+                - emphasis [ref=f112e914]: example.com
+            - row [ref=f112e915]:
+              - cell [ref=f112e916]:
+                - text: "site:"
+                - emphasis [ref=f112e917]: example.com
+                - emphasis [ref=f112e918]: keyword
+              - cell [ref=f112e919]:
+                - text: Search
+                - emphasis [ref=f112e920]: example.com
+                - text: for
+                - emphasis [ref=f112e921]: keyword
+            - row [ref=f112e922]:
+              - cell [ref=f112e923]:
+                - text: "site:"
+                - emphasis [ref=f112e924]: "*.example.com"
+                - emphasis [ref=f112e925]: keyword
+              - cell [ref=f112e926]:
+                - text: Search
+                - emphasis [ref=f112e927]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f112e928]: keyword
+            - row [ref=f112e929]:
+              - cell [ref=f112e930]:
+                - text: "browse:"
+                - emphasis [ref=f112e931]: example.com
+              - cell [ref=f112e932]:
+                - text: Show similar websites to
+                - emphasis [ref=f112e933]: example.com
+            - row [ref=f112e934]:
+              - cell [ref=f112e935]:
+                - text: "ip:"
+                - emphasis [ref=f112e936]: 127.0.0.1
+              - cell [ref=f112e937]:
+                - text: Search documents hosted at
+                - emphasis [ref=f112e938]: 127.0.0.1
+            - row [ref=f112e939]:
+              - cell [ref=f112e940]:
+                - text: "links:"
+                - emphasis [ref=f112e941]: example.com
+              - cell [ref=f112e942]:
+                - text: Search documents linking to
+                - emphasis [ref=f112e943]: example.com
+            - row [ref=f112e944]:
+              - cell [ref=f112e945]:
+                - text: "tld:"
+                - emphasis [ref=f112e946]: edu
+                - emphasis [ref=f112e947]: keyword
+              - cell [ref=f112e948]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f112e949]: edu
+                - text: .
+            - row [ref=f112e950]:
+              - cell [ref=f112e951]:
+                - text: "?tld:"
+                - emphasis [ref=f112e952]: edu
+                - emphasis [ref=f112e953]: keyword
+              - cell [ref=f112e954]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f112e955]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f112e956]:
+              - cell "q>5" [ref=f112e957]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f112e958]
+            - row [ref=f112e959]:
+              - cell "q<5" [ref=f112e960]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f112e961]
+            - row [ref=f112e962]:
+              - cell "year>2005" [ref=f112e963]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f112e964]
+            - row [ref=f112e965]:
+              - cell "year=2005" [ref=f112e966]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f112e967]
+            - row [ref=f112e968]:
+              - cell "year<2005" [ref=f112e969]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f112e970]
+            - row [ref=f112e971]:
+              - cell "rank>50" [ref=f112e972]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f112e973]
+            - row [ref=f112e974]:
+              - cell "rank<50" [ref=f112e975]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f112e976]
+            - row [ref=f112e977]:
+              - cell "format:html5" [ref=f112e978]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f112e979]
+            - row [ref=f112e980]:
+              - cell "format:xhtml" [ref=f112e981]
+              - cell "Filter documents using the XHTML standard" [ref=f112e982]
+            - row [ref=f112e983]:
+              - cell "format:html123" [ref=f112e984]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f112e985]
+            - row [ref=f112e986]:
+              - cell "generator:wordpress" [ref=f112e987]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f112e988]
+            - row [ref=f112e989]:
+              - cell "file:zip" [ref=f112e990]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f112e991]
+            - row [ref=f112e992]:
+              - cell "file:audio" [ref=f112e993]
+              - cell "Filter documents containing a link to an audio file" [ref=f112e994]
+            - row [ref=f112e995]:
+              - cell "file:video" [ref=f112e996]
+              - cell "Filter documents containing a link to a video file" [ref=f112e997]
+            - row [ref=f112e998]:
+              - cell "file:archive" [ref=f112e999]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f112e1000]
+            - row [ref=f112e1001]:
+              - cell "file:document" [ref=f112e1002]
+              - cell "Filter documents containing a link to a document" [ref=f112e1003]
+            - row [ref=f112e1004]:
+              - cell "-special:media" [ref=f112e1005]
+              - cell "Filter out documents with audio or video tags" [ref=f112e1006]
+            - row [ref=f112e1007]:
+              - cell "-special:scripts" [ref=f112e1008]
+              - cell "Filter out documents with javascript" [ref=f112e1009]
+            - row [ref=f112e1010]:
+              - cell "-special:affiliate" [ref=f112e1011]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f112e1012]
+            - row [ref=f112e1013]:
+              - cell "-special:tracking" [ref=f112e1014]
+              - cell "Filter out documents with analytics or tracking code" [ref=f112e1015]
+            - row [ref=f112e1016]:
+              - cell "-special:cookies" [ref=f112e1017]
+              - cell "Filter out documents with cookies" [ref=f112e1018]
+  - contentinfo [ref=f112e1019]:
+    - heading "Policy Information" [level=1] [ref=f112e1020]
+    - generic [ref=f112e1021]:
+      - generic [ref=f112e1022]:
+        - heading " Policies" [level=2] [ref=f112e1023]:
+          - generic [ref=f112e1024]: 
+          - text: Policies
+        - generic [ref=f112e1025]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f112e1026]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f112e1027]:
+        - heading " Contact" [level=2] [ref=f112e1028]:
+          - generic [ref=f112e1029]: 
+          - text: Contact
+        - generic [ref=f112e1030]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f112e1031] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f112e1032]:
+          - generic [ref=f112e1033]: 
+          - text: Sources
+        - generic [ref=f112e1034]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f112e1035] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f112e1036]:
+        - heading " Data" [level=2] [ref=f112e1037]:
+          - generic [ref=f112e1038]: 
+          - text: Data
+        - generic [ref=f112e1039]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f112e1040] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f112e1041] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

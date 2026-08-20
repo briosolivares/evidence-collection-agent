@@ -1,0 +1,33 @@
+{
+  "outputs": [
+    {
+      "id": "top_hn_stories",
+      "kind": "table",
+      "filename": "hacker_news_top5.csv",
+      "format": "csv",
+      "columns": [
+        {
+          "name": "title",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "URL",
+          "required": true,
+          "type": "url"
+        },
+        {
+          "name": "points",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "rules": [
+        {
+          "type": "exact_row_count",
+          "value": 5
+        }
+      ]
+    }
+  ]
+}

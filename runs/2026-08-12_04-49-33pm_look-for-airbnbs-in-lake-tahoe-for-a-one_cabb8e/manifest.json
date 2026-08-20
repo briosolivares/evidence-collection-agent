@@ -1,0 +1,54 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-12T23:49:33.549Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "e800950354dec62b537d760ba23c3aebeaa784e4fda328e1edc18917f4010997",
+      "capturedAt": "2026-08-12T23:50:20.868Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "beeeba0c5fdc2b6676785ce9f9f936edcc50ddc8eaf24a5e11d4b0aafadcbdb7",
+      "capturedAt": "2026-08-12T23:50:43.887Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "ea81784afa80d1616e6028f0e0b2df94333415227e863f87e359ee5b60effca7",
+      "capturedAt": "2026-08-12T23:50:54.819Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "5063bfa5cb6a06e29c908bc737604f18ae1b84dc50a6f23cd008890d443cc40c",
+      "capturedAt": "2026-08-12T23:50:57.655Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-4.txt",
+      "sha256": "1141646659be6828a0c366417a048672d83227e1756216af48f2070caa5ee3e8",
+      "capturedAt": "2026-08-12T23:51:11.234Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "8089b526b934c343c4579e423615961f33f3b7093e497f7c3769a8f63187d02f",
+      "capturedAt": "2026-08-12T23:51:17.658Z"
+    },
+    {
+      "filename": "artifacts/search_results_page2.png",
+      "sha256": "7e107cc97ae8a71810b2b613b51a92b6be482eb817f908b47ee65e788064cda3",
+      "sourceUrl": "https://www.airbnb.com/s/Lake-Tahoe/homes?refinement_paths%5B%5D=%2Fhomes&date_picker_type=calendar&checkin=2026-08-17&checkout=2026-08-24&query=Lake%20Tahoe&place_id=ChIJUREfuaF4mYARILWv7q8fP4w&flexible_trip_lengths%5B%5D=one_week&monthly_start_date=2026-09-01&monthly_length=3&monthly_end_date=2026-12-01&price_filter_input_type=2&price_filter_num_nights=7&channel=EXPLORE&federated_search_session_id=ac19e736-00ed-411d-8cf1-c678f59df7cd&pagination_search=true&cursor=eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0%3D",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:51:36.883Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "0930b5af2267db4524c3df8cfbb2265a4ab890a44312404fc30af441ff2b65d8",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-12T23:52:36.364Z"
+    }
+  ],
+  "finishedAt": "2026-08-12T23:52:50.186Z"
+}

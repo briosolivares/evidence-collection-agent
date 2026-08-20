@@ -1,0 +1,68 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T00:30:37.280Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/evidence_marr_labs.png",
+      "sha256": "824a86ab0f601486c0b0cbf43d783f3c8774b7db99d3088ba5308d9168ad4582",
+      "sourceUrl": "https://www.ycombinator.com/companies/marr-labs",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:31:01.093Z"
+    },
+    {
+      "filename": "artifacts/evidence_retailready.png",
+      "sha256": "1284ba25ef7f8c95e420d0b3a37d03710b16b0158930d432242d9d1ac18f641c",
+      "sourceUrl": "https://www.ycombinator.com/companies/retailready",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:31:08.904Z"
+    },
+    {
+      "filename": "artifacts/evidence_dragoneye.png",
+      "sha256": "9b094a6cc3da8e6b7796d1eb3c0e04aef925069d337f58f18cb83b29b204a133",
+      "sourceUrl": "https://www.ycombinator.com/companies/dragoneye",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:31:15.218Z"
+    },
+    {
+      "filename": "artifacts/evidence_silogy.png",
+      "sha256": "7ca145bd3a238883ab2f4cbe4ddf66f1c4a6e075b130493447f21909e38315c3",
+      "sourceUrl": "https://www.ycombinator.com/companies/silogy",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:31:20.008Z"
+    },
+    {
+      "filename": "artifacts/evidence_reprompt.png",
+      "sha256": "05296fdab6e8ab47cc03586b726fc8dcf41f70e5be630820c852ce566c546d30",
+      "sourceUrl": "https://www.ycombinator.com/companies/reprompt",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:31:24.937Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "b1ff21be52bb7d4603a1ef2d900276f0103677fae9a111362f4e92c3eaab883f",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:31:52.742Z"
+    },
+    {
+      "filename": "artifacts/selection_notes.md",
+      "sha256": "6198191726e972f589c536115ac30319a02e4d3c86679d29fd1c06d01de333ec",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:32:07.938Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:32:13.807Z"
+}

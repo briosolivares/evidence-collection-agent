@@ -1,0 +1,1307 @@
+URL: https://github.com/openclaw/openclaw/pull/121192
+Title: fix(gateway): preserve terminal task run identity by Alix-007 · Pull Request #121192 · openclaw/openclaw · GitHub
+
+- generic [ref=f37e2]:
+  - generic [ref=f37e3]:
+    - link "Skip to content" [ref=f37e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f37e8]:
+      - heading "Navigation Menu" [level=2] [ref=f37e9]
+      - generic [ref=f37e10]:
+        - link "Homepage" [ref=f37e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f37e15]:
+          - navigation "Global" [ref=f37e16]:
+            - list [ref=f37e17]:
+              - listitem [ref=f37e18]:
+                - button "Platform" [ref=f37e20] [cursor=pointer]
+              - listitem [ref=f37e23]:
+                - button "Solutions" [ref=f37e25] [cursor=pointer]
+              - listitem [ref=f37e28]:
+                - button "Resources" [ref=f37e30] [cursor=pointer]
+              - listitem [ref=f37e33]:
+                - button "Open Source" [ref=f37e35] [cursor=pointer]
+              - listitem [ref=f37e38]:
+                - button "Enterprise" [ref=f37e40] [cursor=pointer]
+              - listitem [ref=f37e43]:
+                - link "Pricing" [ref=f37e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f37e45]:
+            - button "Search or jump to, type / to search" [ref=f37e47] [cursor=pointer]:
+              - generic [ref=f37e50]:
+                - text: Type
+                - generic [ref=f37e51]: /
+                - text: to search
+            - link "Sign in" [ref=f37e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F121192
+            - link "Sign up" [ref=f37e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f37e55] [cursor=pointer]
+  - main [ref=f37e61]:
+    - generic [ref=f37e62]:
+      - generic [ref=f37e63]:
+        - generic [ref=f37e65]:
+          - link "openclaw" [ref=f37e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f37e70]: /
+          - strong [ref=f37e71]:
+            - link "openclaw" [ref=f37e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f37e73]: Public
+        - generic [ref=f37e74]:
+          - list:
+            - listitem [ref=f37e75]:
+              - link "Sponsor @openclaw" [ref=f37e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f37e77]: Sponsor
+            - listitem [ref=f37e81]:
+              - link "You must be signed in to change notification settings" [ref=f37e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f37e85]:
+              - link "Fork 81.2k" [ref=f37e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,157" [ref=f37e89]: 81.2k
+            - listitem [ref=f37e90]:
+              - link "You must be signed in to star a repository" [ref=f37e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386110 users starred this repository" [ref=f37e95]: 386k
+      - navigation "Repository" [ref=f37e96]:
+        - list [ref=f37e97]:
+          - listitem [ref=f37e98]:
+            - link "Code" [ref=f37e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f37e103]:
+            - link "Issues 3.4k" [ref=f37e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f37e108]: Issues
+              - generic "3,405" [ref=f37e109]: 3.4k
+          - listitem [ref=f37e110]:
+            - link "Pull requests 2.1k" [ref=f37e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f37e114]: Pull requests
+              - generic "2,101" [ref=f37e115]: 2.1k
+          - listitem [ref=f37e116]:
+            - link "Actions" [ref=f37e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f37e121]:
+            - link "Projects" [ref=f37e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f37e126]:
+            - link "Security and quality 647" [ref=f37e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f37e130]: Security and quality
+              - generic "647" [ref=f37e131]
+          - listitem [ref=f37e132]:
+            - link "Insights" [ref=f37e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f37e143]:
+      - generic [ref=f37e147]:
+        - generic [ref=f37e149]:
+          - 'heading "fix(gateway): preserve terminal task run identity - #121192" [level=1] [ref=f37e150]':
+            - text: "fix(gateway): preserve terminal task run identity"
+            - generic [ref=f37e151]: "- #121192"
+          - generic [ref=f37e152]: "#121192"
+        - generic [ref=f37e155]:
+          - generic [ref=f37e157]:
+            - img "Pull request" [ref=f37e158]
+            - text: Merged
+          - generic [ref=f37e161]:
+            - link "vincentkoc" [ref=f37e162] [cursor=pointer]:
+              - /url: /vincentkoc
+            - text: merged 1 commit into
+            - generic [ref=f37e163]:
+              - link "openclaw:main" [ref=f37e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f37e165]: from
+              - generic [ref=f37e166]:
+                - link "Alix-007:alix/task-terminal-open-completion-race" [ref=f37e167] [cursor=pointer]:
+                  - /url: /Alix-007/openclaw/tree/alix/task-terminal-open-completion-race
+                - button "Copy head branch name to clipboard" [ref=f37e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 10:28 PM PDT" [ref=f37e172]: Aug 13, 202631 minutes ago
+        - generic [ref=f37e173]:
+          - generic [ref=f37e175]:
+            - generic [ref=f37e176]: "+166"
+            - generic [ref=f37e177]: "-15"
+            - generic [ref=f37e178]: "Lines changed: 166 additions & 15 deletions"
+          - navigation "Pull request navigation tabs" [ref=f37e186]:
+            - generic [ref=f37e187]:
+              - link "Conversation (14)" [ref=f37e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121192
+                - text: Conversation
+                - generic [ref=f37e191]: "14"
+                - generic [ref=f37e192]: (14)
+              - link "Commits (1)" [ref=f37e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121192/commits
+                - text: Commits
+                - generic [ref=f37e196]: "1"
+                - generic [ref=f37e197]: (1)
+              - link "Checks (140)" [ref=f37e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121192/checks
+                - text: Checks
+                - generic [ref=f37e201]: "140"
+                - generic [ref=f37e202]: (140)
+              - link "Files changed (5)" [ref=f37e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121192/files
+                - text: Files changed
+                - generic [ref=f37e206]: "5"
+                - generic [ref=f37e207]: (5)
+      - generic [ref=f37e212]:
+        - generic [ref=f37e214]:
+          - heading "Conversation" [level=2] [ref=f37e215]
+          - generic [ref=f37e216]:
+            - generic [ref=f37e217]:
+              - generic [ref=f37e219]:
+                - link [ref=f37e220] [cursor=pointer]:
+                  - /url: /Alix-007
+                  - img "@Alix-007" [ref=f37e221]
+                - generic [ref=f37e223]:
+                  - generic [ref=f37e224]:
+                    - heading "Alix-007 commented Aug 9, 20263 days ago •" [level=3] [ref=f37e225]:
+                      - generic [ref=f37e226]:
+                        - strong [ref=f37e227]:
+                          - link "Alix-007" [ref=f37e228] [cursor=pointer]:
+                            - /url: /Alix-007
+                        - text: commented
+                        - link "Aug 9, 20263 days ago" [ref=f37e229] [cursor=pointer]:
+                          - /url: "#issue-5104086007"
+                        - generic [ref=f37e230]:
+                          - generic [ref=f37e231]: •
+                          - group [ref=f37e232]:
+                            - button "edited by vincentkoc" [ref=f37e233] [cursor=pointer]
+                    - generic [ref=f37e237]:
+                      - group [ref=f37e239]:
+                        - button [ref=f37e240] [cursor=pointer]:
+                          - img "Show options" [ref=f37e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f37e246]: Contributor
+                  - generic [ref=f37e251]:
+                    - paragraph [ref=f37e252]:
+                      - text: "Related:"
+                      - link "#121070" [ref=f37e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/121070
+                    - heading "What Problem This Solves" [level=2] [ref=f37e254]
+                    - paragraph [ref=f37e255]: Fixes an issue where a terminal opened through the Gateway MCP loopback could survive its task's completion when another child session had a task with the same run ID.
+                    - paragraph [ref=f37e256]: "Gateway tool resolution dropped the prepared run ID. Forwarding it exposed a second issue: terminal ownership used the registry's global preferred run-ID match, then discarded a mismatched child session without searching the correct scope."
+                    - heading "Why This Change Was Made" [level=2] [ref=f37e257]
+                    - paragraph [ref=f37e258]:
+                      - text: The Gateway now forwards its existing prepared
+                      - code [ref=f37e259]: runId
+                      - text: . Terminal ownership resolves the task through the canonical task-registry scope
+                      - code [ref=f37e260]: "{ runId, childSessionKey }"
+                      - text: ", then records the exact private task ID used by lifecycle cleanup."
+                    - paragraph [ref=f37e261]: This is the complete owner-boundary repair. It adds no config, protocol, SDK, migration, persistence, identity, fallback, or cache surface. The detached-task runtime retains its existing global lookup because it has a different ownership contract.
+                    - paragraph [ref=f37e262]: This change was developed with AI assistance and rewritten by a maintainer after ClawSweeper found the cross-child collision.
+                    - heading "User Impact" [level=2] [ref=f37e263]
+                    - paragraph [ref=f37e264]: Completing one Gateway/loopback task now closes that task's PTY even when another child session reuses the same run ID. The sibling task's terminal remains live and writable.
+                    - heading "Evidence" [level=2] [ref=f37e265]
+                    - list [ref=f37e266]:
+                      - listitem [ref=f37e267]:
+                        - strong [ref=f37e268]: "Red/green collision regression:"
+                        - text: before the rewrite, the terminal lookup received only
+                        - code [ref=f37e269]: shared-run
+                        - text: ; the new duplicate-run-ID test failed because the child session was absent. After the rewrite, both terminal and Gateway regressions pass and assert lookup by
+                        - code [ref=f37e270]: ("shared-run", childSessionKey)
+                        - text: .
+                      - listitem [ref=f37e271]:
+                        - strong [ref=f37e272]: "Focused tests:"
+                        - text: 86 assertions passed across
+                        - code [ref=f37e273]: terminal-tool
+                        - text: ", Gateway resolver/exclusion, terminal session lifecycle, runtime subscriptions, task status access, and the two registry cross-scope collision cases."
+                      - listitem [ref=f37e274]:
+                        - strong [ref=f37e275]: "Changed gate:"
+                        - text: Blacksmith Testbox
+                        - code [ref=f37e276]: tbx_01kzwqhv8vfftahjzk8tj8thq4
+                        - text: ", run"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31668517679" [ref=f37e277] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31668517679
+                        - text: ", completed with exit 0. Core production/test typechecks, changed-file lint/format, import-cycle, dead-code, database-first, SDK, and repository guards passed."
+                      - listitem [ref=f37e278]:
+                        - strong [ref=f37e279]: "Autoreview:"
+                        - code [ref=f37e280]: .agents/skills/autoreview/scripts/autoreview --mode uncommitted --engine codex --model gpt-5.6-sol --thinking high --stream-engine-output
+                        - text: reported no accepted/actionable findings; overall correctness 0.98.
+                      - listitem [ref=f37e281]:
+                        - strong [ref=f37e282]: "Static:"
+                        - code [ref=f37e283]: git diff --check
+                        - text: passed.
+                    - heading "Exact-head MCP-to-real-PTY collision proof" [level=3] [ref=f37e284]
+                    - paragraph [ref=f37e285]:
+                      - text: "Exact commit:"
+                      - code [ref=f37e286]: ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                    - paragraph [ref=f37e287]:
+                      - text: The transient harness traversed real loopback HTTP
+                      - code [ref=f37e288]: /mcp
+                      - text: "-> bound shared-run grant -> production Gateway resolver -> production terminal tool -> real"
+                      - code [ref=f37e289]: "@lydell/node-pty"
+                      - text: "-> production task-registry observer cleanup."
+                    - paragraph [ref=f37e290]: It deliberately created two tasks with the same run ID in different child sessions. Task 1 was the registry's global preferred match, so the pre-rewrite lookup would leave task 2's terminal unbound. On the rewritten head, terminalizing task 2 reduced live PTYs from two to one; task 1 stayed writable and emitted output after cleanup.
+                    - paragraph [ref=f37e291]:
+                      - text: "Harness SHA-256:"
+                      - code [ref=f37e292]: fc8842e6788a2ee81a9f148f1eb218395927f2917ad05e46a2231fc14aad03d6
+                    - paragraph [ref=f37e293]:
+                      - text: "Verdict SHA-256:"
+                      - code [ref=f37e294]: 49aafa97112e9d068de81f70fee9697342318ff8e56b9b3c761bebc8c74bc752
+                    - generic [ref=f37e295]:
+                      - generic [ref=f37e296]:
+                        - text: "{ \"schemaVersion\": 1, \"verdict\":"
+                        - generic [ref=f37e297]: "\"pass\""
+                        - text: ", \"targetSha\":"
+                        - generic [ref=f37e298]: "\"ae68f2d4e2f8b659af6c7754aa74eed1fced3246\""
+                        - text: ", \"boundary\": ["
+                        - generic [ref=f37e299]: "\"real-loopback-http-/mcp\""
+                        - text: ","
+                        - generic [ref=f37e300]: "\"bound-runId-grant\""
+                        - text: ","
+                        - generic [ref=f37e301]: "\"production-gateway-tool-resolver\""
+                        - text: ","
+                        - generic [ref=f37e302]: "\"production-terminal-tool\""
+                        - text: ","
+                        - generic [ref=f37e303]: "\"real-node-pty\""
+                        - text: ","
+                        - generic [ref=f37e304]: "\"production-task-registry-observer-cleanup\""
+                        - text: "], \"assertions\": { \"exactGrantPublishedOnlyTerminal\": true, \"duplicateRunIdAcrossChildSessions\": true, \"globalPreferredTaskBelongsToOtherChild\": true, \"distinctRealPtyProcesses\": true, \"completedTaskTerminalClosed\": true, \"siblingTerminalRemainedWritable\": true, \"siblingOutputObservedAfterCleanup\": true }, \"observations\": { \"httpStatus\": 200, \"taskCount\": 2, \"ptyProcessCount\": 2, \"sessionCountBeforeCleanup\": 2, \"sessionCountAfterCleanup\": 1, \"capturedTerminalCalls\": 7, \"emittedTerminalEvents\": 0 }, \"redaction\": { \"bearerTokensIncluded\": false, \"filesystemPathsIncluded\": false, \"terminalOutputIncluded\": false } }"
+                      - button "Copy code to clipboard" [ref=f37e306] [cursor=pointer]
+                    - paragraph [ref=f37e310]:
+                      - text: The earlier Linux public proof remains available at
+                      - link "https://github.com/Alix-007/openclaw/actions/runs/31376607923" [ref=f37e311] [cursor=pointer]:
+                        - /url: https://github.com/Alix-007/openclaw/actions/runs/31376607923
+                      - text: and establishes the same production MCP-to-PTY boundary on the contributor branch before the collision rewrite.
+                    - heading "Dependency contract" [level=3] [ref=f37e312]
+                    - paragraph [ref=f37e313]:
+                      - text: Direct sibling Codex inspection on commit
+                      - code [ref=f37e314]: 414782450952a196bbb64b1605a458c2531c47b6
+                      - text: ":"
+                    - list [ref=f37e315]:
+                      - listitem [ref=f37e316]:
+                        - code [ref=f37e317]: codex-rs/core/src/session/mcp.rs:292-303
+                        - text: forwards server, tool, arguments, and request metadata into the MCP manager.
+                      - listitem [ref=f37e318]:
+                        - code [ref=f37e319]: codex-rs/core/src/mcp_tool_call.rs:576-607
+                        - text: adds Codex thread/sandbox/trace metadata, but carries no OpenClaw task-row identity.
+                      - listitem [ref=f37e320]:
+                        - code [ref=f37e321]: codex-rs/core/src/session/mod.rs:3267-3276
+                        - text: shows the same MCP call contract.
+                    - paragraph [ref=f37e322]: Therefore OpenClaw must preserve the prepared run ID at tool construction and resolve its own exact child-session task scope.
+                    - heading "Scope" [level=3] [ref=f37e323]
+                    - list [ref=f37e324]:
+                      - listitem [ref=f37e325]:
+                        - text: "Production:"
+                        - strong [ref=f37e326]: +35/-8
+                      - listitem [ref=f37e327]:
+                        - text: "Tests:"
+                        - strong [ref=f37e328]: +131/-7
+                      - listitem [ref=f37e329]:
+                        - text: "Config/default surfaces:"
+                        - strong [ref=f37e330]: "0"
+                    - paragraph [ref=f37e331]: The positive production delta is the canonical scoped status projection needed to enforce the task-ownership boundary. No changelog entry is included because contributor PRs leave changelog updates to the landing workflow.
+                    - paragraph [ref=f37e332]: "Punchcard-Session: calm-workshop-cedar-hx"
+                  - 'button "eyes (1): Alix-007, 06:32PM on August 09" [disabled] [ref=f37e337]':
+                    - generic [ref=f37e338]: 👀
+                    - generic [ref=f37e339]: "1"
+              - generic [ref=f37e340]:
+                - generic [ref=f37e342]:
+                  - link [ref=f37e344] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e345]
+                  - generic [ref=f37e347]:
+                    - generic [ref=f37e348]:
+                      - heading "clawsweeper Bot commented Aug 9, 20263 days ago" [level=3] [ref=f37e349]:
+                        - generic [ref=f37e350]:
+                          - strong [ref=f37e351]:
+                            - link "clawsweeper" [ref=f37e352] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e353]: Bot
+                          - text: commented
+                          - link "Aug 9, 20263 days ago" [ref=f37e354] [cursor=pointer]:
+                            - /url: "#issuecomment-5233171344"
+                      - generic [ref=f37e355]:
+                        - group [ref=f37e357]:
+                          - button [ref=f37e358] [cursor=pointer]:
+                            - img "Show options" [ref=f37e361]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e364]: Contributor
+                    - table [ref=f37e368]:
+                      - rowgroup [ref=f37e369]:
+                        - row [ref=f37e370]:
+                          - cell [ref=f37e371]:
+                            - paragraph [ref=f37e372]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f37e373]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f37e379]:
+                  - link [ref=f37e380] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                    - img "@openclaw-barnacle" [ref=f37e381]
+                  - link "openclaw-barnacle" [ref=f37e382] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                  - generic [ref=f37e383]: Bot
+                  - text: added
+                  - link "gateway" [ref=f37e384] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+                  - link "agents" [ref=f37e385] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                  - 'link "size: S" [ref=f37e386] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                  - text: labels
+                  - link "Aug 9, 20263 days ago" [ref=f37e387] [cursor=pointer]:
+                    - /url: "#event-29189563159"
+                - generic [ref=f37e389]:
+                  - link [ref=f37e391] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e392]
+                  - generic [ref=f37e394]:
+                    - generic [ref=f37e395]:
+                      - heading [level=3] [ref=f37e396]:
+                        - generic [ref=f37e397]:
+                          - strong [ref=f37e398]:
+                            - link "Alix-007" [ref=f37e399] [cursor=pointer]:
+                              - /url: /Alix-007
+                          - text: commented
+                          - link "Aug 9, 20263 days ago" [ref=f37e400] [cursor=pointer]:
+                            - /url: "#issuecomment-5233311389"
+                      - generic [ref=f37e401]:
+                        - group [ref=f37e403]:
+                          - button [ref=f37e404] [cursor=pointer]:
+                            - img "Show options" [ref=f37e407]
+                        - generic [ref=f37e409]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f37e410]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f37e412]: Author
+                    - table [ref=f37e416]:
+                      - rowgroup [ref=f37e417]:
+                        - row [ref=f37e418]:
+                          - cell [ref=f37e419]:
+                            - paragraph [ref=f37e420]:
+                              - link "@clawsweeper" [ref=f37e421] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f37e423]:
+                  - link [ref=f37e425] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e426]
+                  - generic [ref=f37e428]:
+                    - generic [ref=f37e429]:
+                      - heading "clawsweeper Bot commented Aug 9, 20263 days ago •" [level=3] [ref=f37e430]:
+                        - generic [ref=f37e431]:
+                          - strong [ref=f37e432]:
+                            - link "clawsweeper" [ref=f37e433] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e434]: Bot
+                          - text: commented
+                          - link "Aug 9, 20263 days ago" [ref=f37e435] [cursor=pointer]:
+                            - /url: "#issuecomment-5233311551"
+                          - generic [ref=f37e436]:
+                            - generic [ref=f37e437]: •
+                            - group [ref=f37e438]:
+                              - button "edited" [ref=f37e439] [cursor=pointer]
+                      - generic [ref=f37e443]:
+                        - group [ref=f37e445]:
+                          - button [ref=f37e446] [cursor=pointer]:
+                            - img "Show options" [ref=f37e449]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e452]: Contributor
+                    - table [ref=f37e456]:
+                      - rowgroup [ref=f37e457]:
+                        - row [ref=f37e458]:
+                          - cell [ref=f37e459]:
+                            - paragraph [ref=f37e460]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f37e461]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f37e462]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f37e463]: repository_dispatch
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f37e464]: "Re-review progress:"
+                            - list [ref=f37e465]:
+                              - listitem [ref=f37e466]: "State: Failed"
+                              - listitem [ref=f37e467]: "Detail: Durable publication exhausted its retry budget and was retained for operator dead-letter recovery."
+                              - listitem [ref=f37e468]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31337571524" [ref=f37e469] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31337571524
+                              - listitem [ref=f37e470]: "Updated: 2026-08-09T21:43:48.176Z"
+                - generic [ref=f37e476]:
+                  - link [ref=f37e477] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e478]
+                  - link "clawsweeper" [ref=f37e479] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f37e480]: Bot
+                  - text: added
+                  - 'link "rating: 🦪 silver shellfish" [ref=f37e481] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                  - 'link "status: 📣 needs proof" [ref=f37e482] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%93%A3%20needs%20proof%22
+                  - link "P1" [ref=f37e483] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                  - 'link "merge-risk: 🚨 availability" [ref=f37e484] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20availability%22
+                  - text: labels
+                  - link "Aug 9, 20263 days ago" [ref=f37e485] [cursor=pointer]:
+                    - /url: "#event-29190941216"
+                - generic [ref=f37e487]:
+                  - link [ref=f37e489] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e490]
+                  - generic [ref=f37e492]:
+                    - generic [ref=f37e493]:
+                      - heading "clawsweeper Bot commented Aug 9, 20263 days ago •" [level=3] [ref=f37e494]:
+                        - generic [ref=f37e495]:
+                          - strong [ref=f37e496]:
+                            - link "clawsweeper" [ref=f37e497] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e498]: Bot
+                          - text: commented
+                          - link "Aug 9, 20263 days ago" [ref=f37e499] [cursor=pointer]:
+                            - /url: "#issuecomment-5233517056"
+                          - generic [ref=f37e500]:
+                            - generic [ref=f37e501]: •
+                            - group [ref=f37e502]:
+                              - button "edited" [ref=f37e503] [cursor=pointer]
+                      - generic [ref=f37e507]:
+                        - group [ref=f37e509]:
+                          - button [ref=f37e510] [cursor=pointer]:
+                            - img "Show options" [ref=f37e513]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e516]: Contributor
+                    - table [ref=f37e520]:
+                      - rowgroup [ref=f37e521]:
+                        - row [ref=f37e522]:
+                          - cell [ref=f37e523]:
+                            - paragraph [ref=f37e524]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f37e525]: Reviewed August 13, 2026, 1:12 AM ET / 05:12 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f37e526]
+                            - heading "What this changes" [level=2] [ref=f37e527]
+                            - paragraph [ref=f37e528]: The PR forwards Gateway loopback run identity into terminal creation and binds task-owned PTYs using both run ID and child session.
+                            - heading "Regression provenance" [level=2] [ref=f37e529]
+                            - paragraph [ref=f37e530]: Possible regression — suspected (reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f37e531]
+                            - paragraph [ref=f37e532]:
+                              - generic [ref=f37e533]: ⚠️
+                              - strong [ref=f37e534]: Ready for maintainer review - 1 item remains
+                            - paragraph [ref=f37e535]: Keep open. Current main does not contain the PR head, and the prior cross-child lookup blocker is resolved by carrying the prepared run ID and selecting the task within its child-session scope.
+                            - paragraph [ref=f37e536]:
+                              - strong [ref=f37e537]: "Priority:"
+                              - text: P1
+                              - strong [ref=f37e538]: "Reviewed head:"
+                              - code [ref=f37e539]: ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                            - heading "Review scores" [level=2] [ref=f37e540]
+                            - table [ref=f37e542]:
+                              - rowgroup [ref=f37e543]:
+                                - row [ref=f37e544]:
+                                  - columnheader "Measure" [ref=f37e545]
+                                  - columnheader "Result" [ref=f37e546]
+                                  - columnheader "What it means" [ref=f37e547]
+                              - rowgroup [ref=f37e548]:
+                                - row [ref=f37e549]:
+                                  - cell [ref=f37e550]:
+                                    - strong [ref=f37e551]: Overall readiness
+                                  - cell [ref=f37e552]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f37e553]: (4/6)
+                                  - cell "The patch is a focused owner-boundary repair with direct collision coverage and strong exact-head runtime evidence." [ref=f37e554]
+                                - row [ref=f37e555]:
+                                  - cell [ref=f37e556]:
+                                    - strong [ref=f37e557]: Proof confidence
+                                  - cell [ref=f37e558]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f37e559]: (5/6)
+                                  - 'cell "Sufficient (live_output): The PR body provides exact-head after-fix live output for an injected duplicate-run collision through loopback HTTP, production resolution, a real PTY, and task-observer cleanup." [ref=f37e560]'
+                                - row [ref=f37e561]:
+                                  - cell [ref=f37e562]:
+                                    - strong [ref=f37e563]: Patch quality
+                                  - cell [ref=f37e564]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f37e565]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f37e566]
+                            - heading "Verification" [level=2] [ref=f37e567]
+                            - table [ref=f37e569]:
+                              - rowgroup [ref=f37e570]:
+                                - row [ref=f37e571]:
+                                  - columnheader "Check" [ref=f37e572]
+                                  - columnheader "Result" [ref=f37e573]
+                                  - columnheader "Evidence" [ref=f37e574]
+                              - rowgroup [ref=f37e575]:
+                                - row [ref=f37e576]:
+                                  - cell [ref=f37e577]:
+                                    - strong [ref=f37e578]: Real behavior
+                                  - cell "Verified" [ref=f37e579]
+                                  - 'cell "Sufficient (live_output): The PR body provides exact-head after-fix live output for an injected duplicate-run collision through loopback HTTP, production resolution, a real PTY, and task-observer cleanup." [ref=f37e580]'
+                                - row [ref=f37e581]:
+                                  - cell [ref=f37e582]:
+                                    - strong [ref=f37e583]: Evidence reviewed
+                                  - cell "7 items" [ref=f37e584]
+                                  - 'cell "Gateway-to-terminal identity propagation: The changed Gateway construction forwards the already prepared run ID into the general OpenClaw tool factory; that factory passes it to terminal creation. Scoped ownership repair: The new status-access projection searches the registry by run ID and child session, then returns only the private task fields needed for terminal lifecycle binding. Lifecycle owner: Gateway cleanup derives the exact terminal task ID only when a task first becomes terminal, then closes sessions bound to that task ID." [ref=f37e585]': "Gateway-to-terminal identity propagation: The changed Gateway construction forwards the already prepared run ID into the general OpenClaw tool factory; that factory passes it to terminal creation.Scoped ownership repair: The new status-access projection searches the registry by run ID and child session, then returns only the private task fields needed for terminal lifecycle binding.Lifecycle owner: Gateway cleanup derives the exact terminal task ID only when a task first becomes terminal, then closes sessions bound to that task ID."
+                                - row [ref=f37e586]:
+                                  - cell [ref=f37e587]:
+                                    - strong [ref=f37e588]: Findings
+                                  - cell "None" [ref=f37e589]
+                                  - cell "None." [ref=f37e590]
+                                - row [ref=f37e591]:
+                                  - cell [ref=f37e592]:
+                                    - strong [ref=f37e593]: Security
+                                  - cell "None" [ref=f37e594]
+                                  - cell "None." [ref=f37e595]
+                            - heading "How this fits together" [level=2] [ref=f37e596]
+                            - paragraph [ref=f37e597]: Gateway MCP requests construct tools for an agent session, including terminals. The task registry later emits a terminal task transition, and Gateway cleanup closes the PTY recorded with that exact task ID.
+                            - region "mermaid rendered output container" [ref=f37e598]:
+                              - generic [ref=f37e599]:
+                                - generic [ref=f37e600]:
+                                  - group [ref=f37e601]:
+                                    - button "Open dialog" [ref=f37e602] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f37e605] [cursor=pointer]
+                                - iframe [ref=f37e610]:
+                                  - generic [ref=f38e1]:
+                                    - document [ref=f38e5]:
+                                      - generic [ref=f38e8]:
+                                        - paragraph [ref=f38e15]: Gateway MCP request
+                                        - paragraph [ref=f38e22]: Prepared run identity
+                                        - paragraph [ref=f38e29]: Gateway tool resolution
+                                        - paragraph [ref=f38e36]: Terminal task lookup
+                                        - paragraph [ref=f38e43]: Child-session task scope
+                                        - paragraph [ref=f38e50]: PTY task binding
+                                        - paragraph [ref=f38e57]: Terminal task cleanup
+                                    - generic [ref=f38e58]:
+                                      - button "Zoom in" [ref=f38e59]
+                                      - button "Zoom out" [ref=f38e63]
+                                      - button "Reset view" [ref=f38e67]
+                                      - button "Pan up" [ref=f38e70]
+                                      - button "Pan down" [ref=f38e73]
+                                      - button "Pan left" [ref=f38e76]
+                                      - button "Pan right" [ref=f38e79]
+                            - heading "Before merge" [level=2] [ref=f37e611]
+                            - list [ref=f37e612]:
+                              - listitem [ref=f37e613]:
+                                - checkbox "Incomplete task" [disabled] [ref=f37e614]
+                                - strong [ref=f37e615]: Resolve merge risk (P1)
+                                - text: "- Production code grows by 27 net lines; the narrow scoped projection is warranted because folding it into the global lookup would either preserve ambiguous selection or broaden the general status-access contract."
+                            - group [ref=f37e616]:
+                              - strong [ref=f37e618] [cursor=pointer]: Agent review details
+                - generic [ref=f37e619]:
+                  - generic [ref=f37e624]:
+                    - link [ref=f37e625] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f37e626]
+                    - link "clawsweeper" [ref=f37e627] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f37e628]: Bot
+                    - text: added
+                    - 'link "rating: 🧂 unranked krab" [ref=f37e629] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A7%82%20unranked%20krab%22
+                    - text: and removed
+                    - 'link "rating: 🦪 silver shellfish" [ref=f37e630] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - text: labels
+                    - link "Aug 9, 20263 days ago" [ref=f37e631] [cursor=pointer]:
+                      - /url: "#event-29192209270"
+                  - generic [ref=f37e637]:
+                    - link [ref=f37e639] [cursor=pointer]:
+                      - /url: /Alix-007
+                      - img "@Alix-007" [ref=f37e640]
+                    - generic [ref=f37e641]:
+                      - link "Alix-007" [ref=f37e642] [cursor=pointer]:
+                        - /url: /Alix-007
+                      - link "force-pushed" [ref=f37e643] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/bea5ea569c8e1cfa4cca52020b25977c6e17b21d..105795f9a227a1348aee076d4302bc193aba997e
+                      - text: the
+                      - generic [ref=f37e644]: alix/task-terminal-open-completion-race
+                      - text: branch from
+                      - link [ref=f37e646] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/bea5ea569c8e1cfa4cca52020b25977c6e17b21d
+                        - code [ref=f37e647]: bea5ea5
+                      - text: to
+                      - link [ref=f37e648] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/105795f9a227a1348aee076d4302bc193aba997e
+                        - code [ref=f37e649]: 105795f
+                      - link "Compare" [ref=f37e650] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/bea5ea569c8e1cfa4cca52020b25977c6e17b21d..105795f9a227a1348aee076d4302bc193aba997e
+                      - link "August 10, 2026 03:153 days ago" [ref=f37e653] [cursor=pointer]:
+                        - /url: "#event-29200354184"
+                  - generic [ref=f37e658]:
+                    - link [ref=f37e659] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f37e660]
+                    - link "openclaw-barnacle" [ref=f37e661] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f37e662]: Bot
+                    - text: removed the
+                    - link "agents" [ref=f37e663] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                    - text: label
+                    - link "Aug 10, 20263 days ago" [ref=f37e664] [cursor=pointer]:
+                      - /url: "#event-29200359545"
+                  - generic [ref=f37e669]:
+                    - link [ref=f37e670] [cursor=pointer]:
+                      - /url: /Alix-007
+                      - img "@Alix-007" [ref=f37e671]
+                    - link "Alix-007" [ref=f37e672] [cursor=pointer]:
+                      - /url: /Alix-007
+                    - text: changed the title
+                    - deletion [ref=f37e673]: "fix(gateway): close task terminals across lifecycle races"
+                    - insertion [ref=f37e674]: "fix(gateway): preserve terminal task run identity"
+                    - link "Aug 10, 20263 days ago" [ref=f37e675] [cursor=pointer]:
+                      - /url: "#event-29200416918"
+                - generic [ref=f37e677]:
+                  - link [ref=f37e679] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e680]
+                  - generic [ref=f37e682]:
+                    - generic [ref=f37e683]:
+                      - heading [level=3] [ref=f37e684]:
+                        - generic [ref=f37e685]:
+                          - strong [ref=f37e686]:
+                            - link "Alix-007" [ref=f37e687] [cursor=pointer]:
+                              - /url: /Alix-007
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f37e688] [cursor=pointer]:
+                            - /url: "#issuecomment-5235487574"
+                      - generic [ref=f37e689]:
+                        - group [ref=f37e691]:
+                          - button [ref=f37e692] [cursor=pointer]:
+                            - img "Show options" [ref=f37e695]
+                        - generic [ref=f37e697]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f37e698]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f37e700]: Author
+                    - table [ref=f37e704]:
+                      - rowgroup [ref=f37e705]:
+                        - row [ref=f37e706]:
+                          - cell [ref=f37e707]:
+                            - paragraph [ref=f37e708]:
+                              - link "@clawsweeper" [ref=f37e709] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f37e711]:
+                  - link [ref=f37e713] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e714]
+                  - generic [ref=f37e716]:
+                    - generic [ref=f37e717]:
+                      - heading "clawsweeper Bot commented Aug 10, 20263 days ago" [level=3] [ref=f37e718]:
+                        - generic [ref=f37e719]:
+                          - strong [ref=f37e720]:
+                            - link "clawsweeper" [ref=f37e721] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e722]: Bot
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f37e723] [cursor=pointer]:
+                            - /url: "#issuecomment-5235487830"
+                      - generic [ref=f37e724]:
+                        - group [ref=f37e726]:
+                          - button [ref=f37e727] [cursor=pointer]:
+                            - img "Show options" [ref=f37e730]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e733]: Contributor
+                    - table [ref=f37e737]:
+                      - rowgroup [ref=f37e738]:
+                        - row [ref=f37e739]:
+                          - cell [ref=f37e740]:
+                            - paragraph [ref=f37e741]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f37e742]: Command router queued. I will update this comment with the next step.
+                - generic [ref=f37e749]:
+                  - link [ref=f37e751] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e752]
+                  - generic [ref=f37e753]:
+                    - link "Alix-007" [ref=f37e754] [cursor=pointer]:
+                      - /url: /Alix-007
+                    - link "force-pushed" [ref=f37e755] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/105795f9a227a1348aee076d4302bc193aba997e..3b7e72f5b3c35109d7128ca2697931ee4b4cbc0d
+                    - text: the
+                    - generic [ref=f37e756]: alix/task-terminal-open-completion-race
+                    - text: branch from
+                    - link [ref=f37e758] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/105795f9a227a1348aee076d4302bc193aba997e
+                      - code [ref=f37e759]: 105795f
+                    - text: to
+                    - link [ref=f37e760] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/3b7e72f5b3c35109d7128ca2697931ee4b4cbc0d
+                      - code [ref=f37e761]: 3b7e72f
+                    - link "Compare" [ref=f37e762] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/105795f9a227a1348aee076d4302bc193aba997e..3b7e72f5b3c35109d7128ca2697931ee4b4cbc0d
+                    - link "August 10, 2026 03:353 days ago" [ref=f37e765] [cursor=pointer]:
+                      - /url: "#event-29200871442"
+                - generic [ref=f37e767]:
+                  - link [ref=f37e769] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e770]
+                  - generic [ref=f37e772]:
+                    - generic [ref=f37e773]:
+                      - heading [level=3] [ref=f37e774]:
+                        - generic [ref=f37e775]:
+                          - strong [ref=f37e776]:
+                            - link "Alix-007" [ref=f37e777] [cursor=pointer]:
+                              - /url: /Alix-007
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f37e778] [cursor=pointer]:
+                            - /url: "#issuecomment-5235586419"
+                      - generic [ref=f37e779]:
+                        - group [ref=f37e781]:
+                          - button [ref=f37e782] [cursor=pointer]:
+                            - img "Show options" [ref=f37e785]
+                        - generic [ref=f37e787]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f37e788]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f37e790]: Author
+                    - table [ref=f37e794]:
+                      - rowgroup [ref=f37e795]:
+                        - row [ref=f37e796]:
+                          - cell [ref=f37e797]:
+                            - paragraph [ref=f37e798]:
+                              - link "@clawsweeper" [ref=f37e799] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f37e801]:
+                  - link [ref=f37e803] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e804]
+                  - generic [ref=f37e806]:
+                    - generic [ref=f37e807]:
+                      - heading "clawsweeper Bot commented Aug 10, 20263 days ago •" [level=3] [ref=f37e808]:
+                        - generic [ref=f37e809]:
+                          - strong [ref=f37e810]:
+                            - link "clawsweeper" [ref=f37e811] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e812]: Bot
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f37e813] [cursor=pointer]:
+                            - /url: "#issuecomment-5235586665"
+                          - generic [ref=f37e814]:
+                            - generic [ref=f37e815]: •
+                            - group [ref=f37e816]:
+                              - button "edited" [ref=f37e817] [cursor=pointer]
+                      - generic [ref=f37e821]:
+                        - group [ref=f37e823]:
+                          - button [ref=f37e824] [cursor=pointer]:
+                            - img "Show options" [ref=f37e827]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e830]: Contributor
+                    - table [ref=f37e834]:
+                      - rowgroup [ref=f37e835]:
+                        - row [ref=f37e836]:
+                          - cell [ref=f37e837]:
+                            - paragraph [ref=f37e838]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f37e839]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f37e840]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f37e841]: repository_dispatch
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f37e842]: "Re-review progress:"
+                            - list [ref=f37e843]:
+                              - listitem [ref=f37e844]: "State: Complete"
+                              - listitem [ref=f37e845]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f37e846]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31363387016" [ref=f37e847] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31363387016
+                              - listitem [ref=f37e848]: "Updated: 2026-08-10T06:49:01.876Z"
+                - generic [ref=f37e849]:
+                  - generic [ref=f37e854]:
+                    - generic [ref=f37e855]:
+                      - link [ref=f37e856] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                        - img "@clawsweeper" [ref=f37e857]
+                      - link "clawsweeper" [ref=f37e858] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                      - generic [ref=f37e859]: Bot
+                      - text: mentioned this pull request
+                      - link "Aug 10, 20263 days ago" [ref=f37e860] [cursor=pointer]:
+                        - /url: "#ref-pullrequest-5096120197"
+                    - generic [ref=f37e861]:
+                      - 'link "feat(tools): per-turn per-target send budget guard for message tools #120491" [ref=f37e863] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/120491
+                      - 'generic "Status: Open" [ref=f37e865]': Open
+                  - generic [ref=f37e872]:
+                    - link [ref=f37e873] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f37e874]
+                    - link "clawsweeper" [ref=f37e875] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f37e876]: Bot
+                    - text: added
+                    - 'link "rating: 🦐 gold shrimp" [ref=f37e877] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "rating: 🦪 silver shellfish" [ref=f37e878] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - text: and removed
+                    - 'link "rating: 🧂 unranked krab" [ref=f37e879] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A7%82%20unranked%20krab%22
+                    - 'link "rating: 🦐 gold shrimp" [ref=f37e880] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - text: labels
+                    - link "Aug 10, 20263 days ago" [ref=f37e881] [cursor=pointer]:
+                      - /url: "#event-29202783046"
+                - generic [ref=f37e883]:
+                  - link [ref=f37e885] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e886]
+                  - generic [ref=f37e888]:
+                    - generic [ref=f37e889]:
+                      - heading [level=3] [ref=f37e890]:
+                        - generic [ref=f37e891]:
+                          - strong [ref=f37e892]:
+                            - link "Alix-007" [ref=f37e893] [cursor=pointer]:
+                              - /url: /Alix-007
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f37e894] [cursor=pointer]:
+                            - /url: "#issuecomment-5236574764"
+                      - generic [ref=f37e895]:
+                        - group [ref=f37e897]:
+                          - button [ref=f37e898] [cursor=pointer]:
+                            - img "Show options" [ref=f37e901]
+                        - generic [ref=f37e903]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f37e904]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f37e906]: Author
+                    - table [ref=f37e910]:
+                      - rowgroup [ref=f37e911]:
+                        - row [ref=f37e912]:
+                          - cell [ref=f37e913]:
+                            - paragraph [ref=f37e914]:
+                              - text: Maintainer proof request for exact head
+                              - code [ref=f37e915]: 3b7e72f5b3c35109d7128ca2697931ee4b4cbc0d
+                              - text: ":"
+                            - paragraph [ref=f37e916]:
+                              - text: All exact-head CI checks are green. A synthetic merge into current upstream
+                              - code [ref=f37e917]: main
+                              - text: at
+                              - code [ref=f37e918]: 627e5bb06306cc5218e7e64247626456e8767881
+                              - text: is clean (result tree
+                              - code [ref=f37e919]: 8d0c16e7f0a5f1462b3b4bdd07e948647b854d90
+                              - text: ), so the remaining gate is only changed-boundary runtime proof. The contributor-dispatchable exact-head workflow has no Gateway terminal proof kind, and current Mantis scenarios do not cover MCP terminal ownership.
+                            - paragraph [ref=f37e920]:
+                              - text: "Please run one maintainer Testbox/Crabbox harness through the real chain:"
+                              - code [ref=f37e921]: /mcp
+                              - text: HTTP -> request-bound
+                              - code [ref=f37e922]: runId
+                              - text: grant -> Gateway resolver ->
+                              - code [ref=f37e923]: createOpenClawTools
+                              - text: "->"
+                              - code [ref=f37e924]: createTerminalTool
+                              - text: "-> real"
+                              - code [ref=f37e925]: node-pty
+                              - text: "-> task observer/cleanup. Use two tasks sharing one child session but carrying distinct"
+                              - code [ref=f37e926]: run-1
+                              - text: /
+                              - code [ref=f37e927]: run-2
+                              - text: identities, open their terminals through MCP, complete task 2, and capture a redacted exact-head trace showing task 2's terminal closes while the sibling remains live and writable. Please upload an inspectable artifact and link it in the PR body so the proof gate can refresh automatically.
+                - generic [ref=f37e933]:
+                  - link [ref=f37e934] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e935]
+                  - link "clawsweeper" [ref=f37e936] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f37e937]: Bot
+                  - text: added
+                  - 'link "proof: sufficient" [ref=f37e938] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                  - 'link "rating: 🦞 diamond lobster" [ref=f37e939] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                  - text: and removed
+                  - 'link "rating: 🦪 silver shellfish" [ref=f37e940] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                  - text: labels
+                  - link "Aug 10, 20263 days ago" [ref=f37e941] [cursor=pointer]:
+                    - /url: "#event-29217606835"
+                - generic [ref=f37e947]:
+                  - link [ref=f37e948] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e949]
+                  - link "clawsweeper" [ref=f37e950] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f37e951]: Bot
+                  - text: added
+                  - 'link "status: 👀 ready for maintainer look" [ref=f37e952] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                  - text: and removed
+                  - 'link "status: 📣 needs proof" [ref=f37e953] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%93%A3%20needs%20proof%22
+                  - text: labels
+                  - link "Aug 10, 20263 days ago" [ref=f37e954] [cursor=pointer]:
+                    - /url: "#event-29217606881"
+                - generic [ref=f37e956]:
+                  - link [ref=f37e958] [cursor=pointer]:
+                    - /url: /Alix-007
+                    - img "@Alix-007" [ref=f37e959]
+                  - generic [ref=f37e961]:
+                    - generic [ref=f37e962]:
+                      - heading [level=3] [ref=f37e963]:
+                        - generic [ref=f37e964]:
+                          - strong [ref=f37e965]:
+                            - link "Alix-007" [ref=f37e966] [cursor=pointer]:
+                              - /url: /Alix-007
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f37e967] [cursor=pointer]:
+                            - /url: "#issuecomment-5275872664"
+                      - generic [ref=f37e968]:
+                        - group [ref=f37e970]:
+                          - button [ref=f37e971] [cursor=pointer]:
+                            - img "Show options" [ref=f37e974]
+                        - generic [ref=f37e976]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f37e977]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f37e979]: Author
+                    - table [ref=f37e983]:
+                      - rowgroup [ref=f37e984]:
+                        - row [ref=f37e985]:
+                          - cell [ref=f37e986]:
+                            - paragraph [ref=f37e987]:
+                              - link "@clawsweeper" [ref=f37e988] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f37e990]:
+                  - link [ref=f37e992] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e993]
+                  - generic [ref=f37e995]:
+                    - generic [ref=f37e996]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago •" [level=3] [ref=f37e997]:
+                        - generic [ref=f37e998]:
+                          - strong [ref=f37e999]:
+                            - link "clawsweeper" [ref=f37e1000] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e1001]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f37e1002] [cursor=pointer]:
+                            - /url: "#issuecomment-5275873229"
+                          - generic [ref=f37e1003]:
+                            - generic [ref=f37e1004]: •
+                            - group [ref=f37e1005]:
+                              - button "edited" [ref=f37e1006] [cursor=pointer]
+                      - generic [ref=f37e1010]:
+                        - group [ref=f37e1012]:
+                          - button [ref=f37e1013] [cursor=pointer]:
+                            - img "Show options" [ref=f37e1016]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e1019]: Contributor
+                    - table [ref=f37e1023]:
+                      - rowgroup [ref=f37e1024]:
+                        - row [ref=f37e1025]:
+                          - cell [ref=f37e1026]:
+                            - paragraph [ref=f37e1027]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f37e1028]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f37e1029]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f37e1030]: exact_review_queue
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f37e1031]: "Re-review progress:"
+                            - list [ref=f37e1032]:
+                              - listitem [ref=f37e1033]: "State: Complete"
+                              - listitem [ref=f37e1034]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f37e1035]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31666788352" [ref=f37e1036] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31666788352
+                              - listitem [ref=f37e1037]: "Updated: 2026-08-13T04:22:12.561Z"
+                - generic [ref=f37e1043]:
+                  - link [ref=f37e1044] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e1045]
+                  - link "clawsweeper" [ref=f37e1046] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f37e1047]: Bot
+                  - text: added
+                  - 'link "rating: 🦐 gold shrimp" [ref=f37e1048] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                  - 'link "status: ⏳ waiting on author" [ref=f37e1049] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                  - text: and removed
+                  - 'link "rating: 🦞 diamond lobster" [ref=f37e1050] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f37e1051] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                  - text: labels
+                  - link "Aug 13, 20261 hour ago" [ref=f37e1052] [cursor=pointer]:
+                    - /url: "#event-29379361436"
+                - generic [ref=f37e1063]:
+                  - generic [ref=f37e1065]:
+                    - link [ref=f37e1066] [cursor=pointer]:
+                      - /url: /Alix-007
+                      - img "@Alix-007" [ref=f37e1067]
+                    - link [ref=f37e1068] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f37e1069]
+                  - generic [ref=f37e1070]:
+                    - code [ref=f37e1071]:
+                      - 'link "fix(gateway): scope task-owned terminals by child session" [ref=f37e1072] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/121192/commits/ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                    - button "Commit message body" [ref=f37e1074] [cursor=pointer]: …
+                  - button "Verified" [ref=f37e1076] [cursor=pointer]
+                  - group [ref=f37e1081]:
+                    - img "78 / 119 checks OK" [ref=f37e1083] [cursor=pointer]
+                  - code [ref=f37e1086]:
+                    - link "ae68f2d" [ref=f37e1087] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/121192/commits/ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                - generic [ref=f37e1088]:
+                  - generic [ref=f37e1094]:
+                    - link [ref=f37e1096] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f37e1097]
+                    - generic [ref=f37e1098]:
+                      - link "vincentkoc" [ref=f37e1099] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f37e1100] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/3e32755af9e6ad9eaff457476370d770382b50d1..ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                      - text: the
+                      - generic [ref=f37e1101]: alix/task-terminal-open-completion-race
+                      - text: branch from
+                      - link [ref=f37e1103] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/3e32755af9e6ad9eaff457476370d770382b50d1
+                        - code [ref=f37e1104]: "3e32755"
+                      - text: to
+                      - link [ref=f37e1105] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                        - code [ref=f37e1106]: ae68f2d
+                      - link "Compare" [ref=f37e1107] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/3e32755af9e6ad9eaff457476370d770382b50d1..ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                      - link "August 13, 2026 05:0653 minutes ago" [ref=f37e1110] [cursor=pointer]:
+                        - /url: "#event-29380686142"
+                  - generic [ref=f37e1115]:
+                    - link [ref=f37e1116] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f37e1117]
+                    - link "openclaw-barnacle" [ref=f37e1118] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f37e1119]: Bot
+                    - text: added the
+                    - link "agents" [ref=f37e1120] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                    - text: label
+                    - link "Aug 13, 202652 minutes ago" [ref=f37e1121] [cursor=pointer]:
+                      - /url: "#event-29380691186"
+                  - generic [ref=f37e1126]:
+                    - link [ref=f37e1127] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f37e1128]
+                    - link "vincentkoc" [ref=f37e1129] [cursor=pointer]:
+                      - /url: /vincentkoc
+                    - text: self-assigned this
+                    - link "Aug 13, 202652 minutes ago" [ref=f37e1130] [cursor=pointer]:
+                      - /url: "#event-29380718498"
+                - generic [ref=f37e1132]:
+                  - link [ref=f37e1134] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f37e1135]
+                  - generic [ref=f37e1137]:
+                    - generic [ref=f37e1138]:
+                      - heading [level=3] [ref=f37e1139]:
+                        - generic [ref=f37e1140]:
+                          - strong [ref=f37e1141]:
+                            - link "vincentkoc" [ref=f37e1142] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202651 minutes ago" [ref=f37e1143] [cursor=pointer]:
+                            - /url: "#issuecomment-5276209414"
+                      - generic [ref=f37e1144]:
+                        - group [ref=f37e1146]:
+                          - button [ref=f37e1147] [cursor=pointer]:
+                            - img "Show options" [ref=f37e1150]
+                        - generic "This user is a member of the openclaw organization." [ref=f37e1153]: Member
+                    - table [ref=f37e1157]:
+                      - rowgroup [ref=f37e1158]:
+                        - row [ref=f37e1159]:
+                          - cell [ref=f37e1160]:
+                            - paragraph [ref=f37e1161]:
+                              - link "@clawsweeper" [ref=f37e1162] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f37e1164]:
+                  - link [ref=f37e1166] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f37e1167]
+                  - generic [ref=f37e1169]:
+                    - generic [ref=f37e1170]:
+                      - heading "clawsweeper Bot commented Aug 13, 202651 minutes ago •" [level=3] [ref=f37e1171]:
+                        - generic [ref=f37e1172]:
+                          - strong [ref=f37e1173]:
+                            - link "clawsweeper" [ref=f37e1174] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f37e1175]: Bot
+                          - text: commented
+                          - link "Aug 13, 202651 minutes ago" [ref=f37e1176] [cursor=pointer]:
+                            - /url: "#issuecomment-5276209828"
+                          - generic [ref=f37e1177]:
+                            - generic [ref=f37e1178]: •
+                            - group [ref=f37e1179]:
+                              - button "edited" [ref=f37e1180] [cursor=pointer]
+                      - generic [ref=f37e1184]:
+                        - group [ref=f37e1186]:
+                          - button [ref=f37e1187] [cursor=pointer]:
+                            - img "Show options" [ref=f37e1190]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f37e1193]: Contributor
+                    - table [ref=f37e1197]:
+                      - rowgroup [ref=f37e1198]:
+                        - row [ref=f37e1199]:
+                          - cell [ref=f37e1200]:
+                            - paragraph [ref=f37e1201]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f37e1202]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f37e1203]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f37e1204]: exact_review_queue
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f37e1205]: "Re-review progress:"
+                            - list [ref=f37e1206]:
+                              - listitem [ref=f37e1207]: "State: Complete"
+                              - listitem [ref=f37e1208]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f37e1209]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31669615738" [ref=f37e1210] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31669615738
+                              - listitem [ref=f37e1211]: "Updated: 2026-08-13T05:14:10.559Z"
+                - generic [ref=f37e1212]:
+                  - generic [ref=f37e1217]:
+                    - link [ref=f37e1218] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f37e1219]
+                    - link "clawsweeper" [ref=f37e1220] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f37e1221]: Bot
+                    - text: added
+                    - 'link "rating: 🐚 platinum hermit" [ref=f37e1222] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f37e1223] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: and removed
+                    - 'link "rating: 🦐 gold shrimp" [ref=f37e1224] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f37e1225] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 202646 minutes ago" [ref=f37e1226] [cursor=pointer]:
+                      - /url: "#event-29380882131"
+                  - generic [ref=f37e1231]:
+                    - button "View details" [ref=f37e1232] [cursor=pointer]
+                    - generic [ref=f37e1233]:
+                      - link [ref=f37e1235] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f37e1236]
+                      - generic [ref=f37e1237]:
+                        - link "vincentkoc" [ref=f37e1238] [cursor=pointer]:
+                          - /url: /vincentkoc
+                        - text: merged commit
+                        - link [ref=f37e1239] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/2dffeae12692f6524a1b624ae49108f6832486bc
+                          - code [ref=f37e1240]: 2dffeae
+                        - text: into
+                        - generic [ref=f37e1241]: openclaw:main
+                        - link "Aug 13, 202631 minutes ago" [ref=f37e1243] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/121192#event-29381307638
+                        - generic [ref=f37e1244]: 140 checks passed
+                - generic [ref=f37e1247]:
+                  - link [ref=f37e1249] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f37e1250]
+                  - generic [ref=f37e1252]:
+                    - generic [ref=f37e1253]:
+                      - heading [level=3] [ref=f37e1254]:
+                        - generic [ref=f37e1255]:
+                          - strong [ref=f37e1256]:
+                            - link "vincentkoc" [ref=f37e1257] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202631 minutes ago" [ref=f37e1258] [cursor=pointer]:
+                            - /url: "#issuecomment-5276342885"
+                      - generic [ref=f37e1259]:
+                        - group [ref=f37e1261]:
+                          - button [ref=f37e1262] [cursor=pointer]:
+                            - img "Show options" [ref=f37e1265]
+                        - generic "This user is a member of the openclaw organization." [ref=f37e1268]: Member
+                    - table [ref=f37e1272]:
+                      - rowgroup [ref=f37e1273]:
+                        - row [ref=f37e1274]:
+                          - cell [ref=f37e1275]:
+                            - paragraph [ref=f37e1276]: Merged via squash.
+                            - list [ref=f37e1277]:
+                              - listitem [ref=f37e1278]:
+                                - text: "Prepared head SHA:"
+                                - link "ae68f2d4e2f8b659af6c7754aa74eed1fced3246" [ref=f37e1279] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/121192/commits/ae68f2d4e2f8b659af6c7754aa74eed1fced3246
+                              - listitem [ref=f37e1280]:
+                                - text: "Landed commit:"
+                                - link "2dffeae12692f6524a1b624ae49108f6832486bc" [ref=f37e1281] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/2dffeae12692f6524a1b624ae49108f6832486bc
+            - generic [ref=f37e1285]:
+              - link "Sign up for free" [ref=f37e1286] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f37e1287]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f37e1288] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F121192
+        - generic [ref=f37e1292]:
+          - form "Select reviewers" [ref=f37e1294]:
+            - heading "Reviewers" [level=3] [ref=f37e1295]
+            - text: No reviews
+          - form "Select assignees" [ref=f37e1297]:
+            - heading "Assignees" [level=3] [ref=f37e1298]
+            - paragraph [ref=f37e1300]:
+              - generic [ref=f37e1301]:
+                - link [ref=f37e1302] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f37e1303]
+                - link "vincentkoc" [ref=f37e1304] [cursor=pointer]:
+                  - /url: /vincentkoc
+          - generic [ref=f37e1305]:
+            - heading "Labels" [level=3] [ref=f37e1306]
+            - generic [ref=f37e1307]:
+              - link "agents" [ref=f37e1308] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+              - link "gateway" [ref=f37e1310] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+              - 'link "merge-risk: 🚨 availability" [ref=f37e1312] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20availability%22
+              - link "P1" [ref=f37e1314] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "proof: sufficient" [ref=f37e1316] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "rating: 🐚 platinum hermit" [ref=f37e1318] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: S" [ref=f37e1320] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f37e1322] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f37e1325]:
+            - heading "Projects" [level=3] [ref=f37e1326]
+            - text: None yet
+          - form "Select milestones" [ref=f37e1328]:
+            - heading "Milestone" [level=3] [ref=f37e1329]
+            - text: No milestone
+          - form "Link issues" [ref=f37e1335]:
+            - heading "Development" [level=3] [ref=f37e1336]
+            - paragraph [ref=f37e1337]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f37e1339]: None yet
+          - generic [ref=f37e1341]:
+            - heading "2 participants" [level=3] [ref=f37e1342]
+            - generic [ref=f37e1343]:
+              - link [ref=f37e1344] [cursor=pointer]:
+                - /url: /Alix-007
+                - img "@Alix-007" [ref=f37e1345]
+              - link [ref=f37e1346] [cursor=pointer]:
+                - /url: /vincentkoc
+                - img "@vincentkoc" [ref=f37e1347]
+  - contentinfo [ref=f37e1348]:
+    - heading "Footer" [level=2] [ref=f37e1349]
+    - generic [ref=f37e1350]:
+      - generic [ref=f37e1351]:
+        - link "GitHub Homepage" [ref=f37e1352] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f37e1355]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f37e1356]:
+        - heading "Footer navigation" [level=3] [ref=f37e1357]
+        - list "Footer navigation" [ref=f37e1358]:
+          - listitem [ref=f37e1359]:
+            - link "Terms" [ref=f37e1360] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f37e1361]:
+            - link "Privacy" [ref=f37e1362] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f37e1363]:
+            - link "Security" [ref=f37e1364] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f37e1365]:
+            - link "Status" [ref=f37e1366] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f37e1367]:
+            - link "Community" [ref=f37e1368] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f37e1369]:
+            - link "Docs" [ref=f37e1370] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f37e1371]:
+            - link "Contact" [ref=f37e1372] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f37e1373]:
+            - button "Manage cookies" [ref=f37e1375] [cursor=pointer]
+          - listitem [ref=f37e1376]:
+            - button "Do not share my personal information" [ref=f37e1378] [cursor=pointer]

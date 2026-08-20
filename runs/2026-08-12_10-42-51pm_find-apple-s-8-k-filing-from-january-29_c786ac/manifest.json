@@ -1,0 +1,44 @@
+{
+  "task": "Find Apple's 8-K filing from January 29, 2026 on SEC EDGAR, download the filing document, and take a screenshot of the filing page.",
+  "startedAt": "2026-08-13T05:42:51.892Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/apple_8k_2026-01-29_filing_page.png",
+      "sha256": "5011b484fd63c89bdec55708d589cd881cdbca2ea4cf55c78f55a16a1f99e91a",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000005/0000320193-26-000005-index.htm",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:43:19.601Z"
+    },
+    {
+      "filename": "artifacts/aapl-20260129_8-K.htm",
+      "sha256": "301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000005/aapl-20260129.htm",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:43:23.820Z"
+    },
+    {
+      "filename": "artifacts/aapl-20260129_EX-99.1_press_release.htm",
+      "sha256": "28d8600ea68c13702a58336336c035843df7989d96b4edb90468fb56b1a1b6b0",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000005/a8-kex991q1202612272025.htm",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:43:34.481Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "54629d1bc432032efbd103318d8d1b354914aec42e154dfd596f503d1ee6e38a",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:43:41.942Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T05:43:47.911Z"
+}

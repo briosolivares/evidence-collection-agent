@@ -1,0 +1,859 @@
+URL: https://marginalia-search.com/search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website
+Title: "Alpha Phi" MIT Beta Epsilon chapter website - Marginalia Search
+
+- generic [active] [ref=f95e1]:
+  - link "Skip To Content" [ref=f95e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f95e3]:
+    - navigation [ref=f95e5]:
+      - generic [ref=f95e7]:
+        - link "Search" [ref=f95e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f95e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f95e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f95e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f95e13]:
+    - generic [ref=f95e15]:
+      - heading [level=1] [ref=f95e17]:
+        - link "Marginalia Search" [ref=f95e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f95e21]:
+        - textbox "Search the web!" [ref=f95e22]: "\"Alpha Phi\" MIT Beta Epsilon chapter website"
+        - button " Search" [ref=f95e23] [cursor=pointer]:
+          - generic [ref=f95e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f95e25]:
+    - complementary [ref=f95e26]:
+      - generic [ref=f95e28]:
+        - heading " Filter" [level=2] [ref=f95e29]:
+          - generic [ref=f95e30]: 
+          - text: Filter
+        - generic [ref=f95e31]:
+          - button [ref=f95e33] [cursor=pointer]:
+            - link " All" [ref=f95e34]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e35]: 
+              - text: All
+          - button [ref=f95e37] [cursor=pointer]:
+            - link " Blogs" [ref=f95e38]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=blogosphere&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e39]: 
+              - text: Blogs
+          - button [ref=f95e41] [cursor=pointer]:
+            - link " Academia" [ref=f95e42]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=academia&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e43]: 
+              - text: Academia
+          - button [ref=f95e45] [cursor=pointer]:
+            - link " Vintage" [ref=f95e46]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=vintage&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e47]: 
+              - text: Vintage
+          - button [ref=f95e49] [cursor=pointer]:
+            - link " Small Web" [ref=f95e50]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=modern&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e51]: 
+              - text: Small Web
+          - button [ref=f95e54] [cursor=pointer]:
+            - link " Wikis" [ref=f95e55]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=wiki&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e56]: 
+              - text: Wikis
+          - button [ref=f95e58] [cursor=pointer]:
+            - link " Forums" [ref=f95e59]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=forum&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e60]: 
+              - text: Forums
+          - button [ref=f95e62] [cursor=pointer]:
+            - link " Recipes" [ref=f95e63]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=food&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e64]: 
+              - text: Recipes
+          - button [ref=f95e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f95e68]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&profile=custom&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f95e70]:
+      - generic [ref=f95e71]:
+        - heading "Results" [level=1] [ref=f95e72]
+        - generic [ref=f95e73]:
+          - generic [ref=f95e75]:
+            - generic [ref=f95e76]:
+              - generic [ref=f95e77]:
+                - generic [ref=f95e78]:
+                  - generic "Match density" [ref=f95e79]
+                  - generic [ref=f95e83]:
+                    - heading [level=2] [ref=f95e84]:
+                      - link "Union College" [ref=f95e85] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/Union_College
+                    - link "https://en.wikipedia.org/wiki/Union_College" [ref=f95e87] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/Union_College
+                - paragraph [ref=f95e89]: Union College is a private liberal arts college in Schenectady, New York, United States. Founded in 1795, it was the first institution of higher learning chartered by the New York State Board of Regents, and second in the state of New York, after Columbia
+              - generic [ref=f95e90]:
+                - link "" [ref=f95e91] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f95e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/Union_College
+            - generic [ref=f95e95]:
+              - paragraph [ref=f95e96]: "Also from en.wikipedia.org:"
+              - list [ref=f95e97]:
+                - listitem [ref=f95e98]:
+                  - link "Syracuse University" [ref=f95e99] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Syracuse_University
+            - generic [ref=f95e100]:
+              - generic [ref=f95e102]: Wiki
+              - generic "Contains JavaScript" [ref=f95e103]: JS
+          - generic [ref=f95e105]:
+            - generic [ref=f95e106]:
+              - generic [ref=f95e107]:
+                - generic [ref=f95e108]:
+                  - generic "Match density" [ref=f95e109]
+                  - generic [ref=f95e113]:
+                    - heading [level=2] [ref=f95e114]:
+                      - link "Panhel votes for new sorority | The Tech" [ref=f95e115] [cursor=pointer]:
+                        - /url: https://thetech.com/2014/11/04/newsorority-v134-n52
+                    - link "https://thetech.com/2014/11/04/newsorority-v134-n52" [ref=f95e117] [cursor=pointer]:
+                      - /url: https://thetech.com/2014/11/04/newsorority-v134-n52
+                - paragraph [ref=f95e119]: By Discussions are underway to introduce a new sorority on campus after a unanimous vote from the Panhellenic Council on Sept. 29 to “open campus to extension,” according to Panhel President Yasmin C. Inam ’15. The sorority will join six other sororities
+              - generic [ref=f95e120]:
+                - link "" [ref=f95e121] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f95e123] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/2014/11/04/newsorority-v134-n52
+            - generic "Contains JavaScript" [ref=f95e127]: JS
+          - generic [ref=f95e130]:
+            - generic [ref=f95e131]:
+              - generic [ref=f95e132]:
+                - generic "Match density" [ref=f95e133]
+                - generic [ref=f95e137]:
+                  - heading [level=2] [ref=f95e138]:
+                    - link "delta sigma phi nc state" [ref=f95e139] [cursor=pointer]:
+                      - /url: http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+                  - link "http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1" [ref=f95e141] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+              - paragraph [ref=f95e143]: Richard Boone South Carolina State Director Delta Kappa Sigma Rock Hill, SC Bro. This honor is awarded to the best overall IFC fraternity at NC State. Four members of Sigma Kappa with a poster and paddle showing the sorority's insignia, North Carolina Sta
+            - generic [ref=f95e144]:
+              - link "" [ref=f95e145] [cursor=pointer]:
+                - /url: /site/www.senorcafe.com
+              - link "" [ref=f95e147] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+          - generic [ref=f95e150]:
+            - generic [ref=f95e151]:
+              - generic [ref=f95e152]:
+                - generic [ref=f95e153]:
+                  - generic "Match density" [ref=f95e154]
+                  - generic [ref=f95e158]:
+                    - heading [level=2] [ref=f95e159]:
+                      - link "Archives | Union College News Archives" [ref=f95e160] [cursor=pointer]:
+                        - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                    - link "https://muse.union.edu/newsarchives/2003/08/page/4/" [ref=f95e162] [cursor=pointer]:
+                      - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                - paragraph [ref=f95e164]: Posts made in August, 2003 Posted on Aug 25, 2003 The modern fraternity system at colleges and universities across the nation is generally recognized as beginning with the founding of Kappa Alpha (1825), Sigma Phi (1827), and Delta Phi (1827) at Union. Al
+              - generic [ref=f95e165]:
+                - link "" [ref=f95e166] [cursor=pointer]:
+                  - /url: /site/muse.union.edu
+                - link "" [ref=f95e168] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://muse.union.edu/newsarchives/2003/08/page/4/
+            - generic "Contains JavaScript" [ref=f95e172]: JS
+          - generic [ref=f95e174]:
+            - generic [ref=f95e175]:
+              - generic [ref=f95e176]:
+                - generic [ref=f95e177]:
+                  - generic "Match density" [ref=f95e178]
+                  - generic [ref=f95e182]:
+                    - heading [level=2] [ref=f95e183]:
+                      - link "2007-08 Undergraduate Catalogue" [ref=f95e184] [cursor=pointer]:
+                        - /url: https://www.shu.edu/documents/SetonHallUndergraduate0708.pdf
+                    - generic [ref=f95e185]:
+                      - generic "PDF" [ref=f95e186]: 
+                      - link "https://www.shu.edu/documents/SetonHallUndergraduate0708.pdf" [ref=f95e187] [cursor=pointer]:
+                        - /url: https://www.shu.edu/documents/SetonHallUndergraduate0708.pdf
+                - paragraph [ref=f95e189]: "x01 ug front matter.qxp 7/24/2007 10:09 AM Page 8 8 University Overview University Overview One thing that has remained consistent, however, is the University’s commitment to individual attention: With more Seton Hall University was founded in 1856 by Bis"
+              - generic [ref=f95e190]:
+                - link "" [ref=f95e191] [cursor=pointer]:
+                  - /url: /site/www.shu.edu
+                - link "" [ref=f95e193] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.shu.edu/documents/SetonHallUndergraduate0708.pdf
+            - generic [ref=f95e195]:
+              - paragraph [ref=f95e196]: "Also from www.shu.edu:"
+              - list [ref=f95e197]:
+                - listitem [ref=f95e198]:
+                  - generic "PDF": 
+                  - link "Undergraduate Catalogue 2005-07 Seton Hall University" [ref=f95e199] [cursor=pointer]:
+                    - /url: https://www.shu.edu/documents/2005_07ug.pdf
+            - generic [ref=f95e200]:
+              - generic [ref=f95e202]: PDF File
+              - link "Tracking" [ref=f95e203] [cursor=pointer]:
+                - /url: /site/www.shu.edu?view=traffic
+              - link "Has Ads" [ref=f95e204] [cursor=pointer]:
+                - /url: /site/www.shu.edu?view=traffic
+          - generic [ref=f95e206]:
+            - generic [ref=f95e207]:
+              - generic [ref=f95e208]:
+                - generic [ref=f95e209]:
+                  - generic "Match density" [ref=f95e210]
+                  - generic [ref=f95e214]:
+                    - heading [level=2] [ref=f95e215]:
+                      - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f95e216] [cursor=pointer]:
+                        - /url: https://www.franbecque.com/page/33/
+                    - link "https://www.franbecque.com/page/33/" [ref=f95e218] [cursor=pointer]:
+                      - /url: https://www.franbecque.com/page/33/
+                - paragraph [ref=f95e220]: Posted onby Phi Gamma Delta was founded on May 1, 1848. John Templeton McCarty, Samuel Beatty Wilson, James Elliott, Daniel Webster Crofts, Ellis Bailey Gregg and Naaman Fletcher – the Immortal Six – were students at Jefferson College in Canonsburg, Penns
+              - generic [ref=f95e221]:
+                - link "" [ref=f95e222] [cursor=pointer]:
+                  - /url: /site/www.franbecque.com
+                - link "" [ref=f95e224] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.franbecque.com/page/33/
+            - generic [ref=f95e226]:
+              - paragraph [ref=f95e227]: "Also from www.franbecque.com:"
+              - list [ref=f95e228]:
+                - listitem [ref=f95e229]:
+                  - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f95e230] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/page/61/
+                - listitem [ref=f95e231]:
+                  - link "Park Valentine Perkins on Theta Chi's Founders' Day - Fraternity History & MoreFraternity History & More" [ref=f95e232] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/park-valentine-perkins-on-theta-chis-founders-day/
+                - listitem [ref=f95e233]:
+                  - link "Happy Founders' Day, Theta Chi - Fraternity History & MoreFraternity History & More" [ref=f95e234] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/happy-founders-day-theta-chi/
+            - generic "Contains JavaScript" [ref=f95e237]: JS
+          - generic [ref=f95e239]:
+            - generic [ref=f95e240]:
+              - generic [ref=f95e241]:
+                - generic [ref=f95e242]:
+                  - generic "Match density" [ref=f95e243]
+                  - generic [ref=f95e247]:
+                    - heading [level=2] [ref=f95e248]:
+                      - link "University of New Haven Undergraduate Catalog 2010-2012" [ref=f95e249] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2010-2012.pdf
+                    - generic [ref=f95e250]:
+                      - generic "PDF" [ref=f95e251]: 
+                      - link "https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2010-2012.pdf" [ref=f95e252] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2010-2012.pdf
+                - paragraph [ref=f95e254]: "College of Arts and Sciences 85 Associate Professors: Nancy S. Niemi, Ph.D., Introduction to Education, provides students with an University of Rochester; Judy Randi, Ed.D., overview of the field of education. (All credit require- Teachers College of Colu"
+              - generic [ref=f95e255]:
+                - link "" [ref=f95e256] [cursor=pointer]:
+                  - /url: /site/www.newhaven.edu
+                - link "" [ref=f95e258] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2010-2012.pdf
+            - generic [ref=f95e260]:
+              - paragraph [ref=f95e261]: "Also from www.newhaven.edu:"
+              - list [ref=f95e262]:
+                - listitem [ref=f95e263]:
+                  - generic "PDF": 
+                  - link "Undergraduate Catalog 2004-2006" [ref=f95e264] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2004-2006.pdf
+                - listitem [ref=f95e265]:
+                  - generic "PDF": 
+                  - link "U N I V E R S I T Y O F N E W H A V E N" [ref=f95e266] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2006-2008.pdf
+            - generic [ref=f95e267]: PDF File
+          - generic [ref=f95e271]:
+            - generic [ref=f95e272]:
+              - generic [ref=f95e273]:
+                - generic [ref=f95e274]:
+                  - generic "Match density" [ref=f95e275]
+                  - generic [ref=f95e279]:
+                    - heading [level=2] [ref=f95e280]:
+                      - link "Boston University - Wikipedia" [ref=f95e281] [cursor=pointer]:
+                        - /url: https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_
+                    - link "https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_" [ref=f95e283] [cursor=pointer]:
+                      - /url: https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_
+                - paragraph [ref=f95e285]: In 1869, three trustees of the Boston Theological Institute obtained from the Massachusetts Legislature a charter for a university by name of "Boston University". These trustees were successful Boston businessmen and Methodist laymen, with a history of in
+              - generic [ref=f95e286]:
+                - link "" [ref=f95e287] [cursor=pointer]:
+                  - /url: /site/www.satellite-sightseer.com
+                - link "" [ref=f95e289] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_
+            - generic [ref=f95e291]:
+              - generic [ref=f95e293]: Wiki
+              - link "Tracking" [ref=f95e294] [cursor=pointer]:
+                - /url: /site/www.satellite-sightseer.com?view=traffic
+              - generic "Contains JavaScript" [ref=f95e295]: JS
+              - link "Has Ads" [ref=f95e296] [cursor=pointer]:
+                - /url: /site/www.satellite-sightseer.com?view=traffic
+          - generic [ref=f95e298]:
+            - generic [ref=f95e299]:
+              - generic [ref=f95e300]:
+                - generic [ref=f95e301]:
+                  - generic "Match density" [ref=f95e302]
+                  - generic [ref=f95e306]:
+                    - heading [level=2] [ref=f95e307]:
+                      - link "When and Where to List Phi Beta Kappa on a Resume" [ref=f95e308] [cursor=pointer]:
+                        - /url: https://enhancv.com/blog/phi-beta-kappa-on-resume/
+                    - link "https://enhancv.com/blog/phi-beta-kappa-on-resume/" [ref=f95e310] [cursor=pointer]:
+                      - /url: https://enhancv.com/blog/phi-beta-kappa-on-resume/
+                - paragraph [ref=f95e312]: "If you’ve been invited to join Phi Beta Kappa, congratulations—you’re in the top tier of academic achievers. But now you’re probably wondering: Should I even list it on my resume? Will anyone care? And where does it actually go? That’s exactly the kind of"
+              - generic [ref=f95e313]:
+                - link "" [ref=f95e314] [cursor=pointer]:
+                  - /url: /site/enhancv.com
+                - link "" [ref=f95e316] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://enhancv.com/blog/phi-beta-kappa-on-resume/
+            - generic [ref=f95e318]:
+              - link "Tracking" [ref=f95e320] [cursor=pointer]:
+                - /url: /site/enhancv.com?view=traffic
+              - generic "Contains JavaScript" [ref=f95e321]: JS
+              - link "Has Ads" [ref=f95e322] [cursor=pointer]:
+                - /url: /site/enhancv.com?view=traffic
+          - generic [ref=f95e324]:
+            - generic [ref=f95e325]:
+              - generic [ref=f95e326]:
+                - generic [ref=f95e327]:
+                  - generic "Match density" [ref=f95e328]
+                  - generic [ref=f95e332]:
+                    - heading [level=2] [ref=f95e333]:
+                      - link "Kappa Alpha Theta Honors Westminster Faculty Member | Westminster College | News & Blog" [ref=f95e334] [cursor=pointer]:
+                        - /url: https://news.wcmo.edu/kappaalphathetahonorscinnamonbrown/
+                    - generic [ref=f95e335]:
+                      - text: 2013-09-10 ·
+                      - link "https://news.wcmo.edu/kappaalphathetahonorscinnamonbrown/" [ref=f95e336] [cursor=pointer]:
+                        - /url: https://news.wcmo.edu/kappaalphathetahonorscinnamonbrown/
+                - paragraph [ref=f95e338]: ", the first Greek-letter fraternity for women, announces its Ten Outstanding Faculty Members for 2013. This marks the second year the Fraternity recognizes faculty for contributions to colleges and universities where Theta chapters are present via an offi"
+              - generic [ref=f95e339]:
+                - link "" [ref=f95e340] [cursor=pointer]:
+                  - /url: /site/news.wcmo.edu
+                - link "" [ref=f95e342] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.wcmo.edu/kappaalphathetahonorscinnamonbrown/
+            - generic "Contains JavaScript" [ref=f95e346]: JS
+          - generic [ref=f95e348]:
+            - generic [ref=f95e349]:
+              - generic [ref=f95e350]:
+                - generic [ref=f95e351]:
+                  - generic "Match density" [ref=f95e352]
+                  - generic [ref=f95e356]:
+                    - heading [level=2] [ref=f95e357]:
+                      - link "Welcome to the Oakwood Register" [ref=f95e358] [cursor=pointer]:
+                        - /url: https://www.oakwoodregister.com/archives/2008/v17num35_082608/obituaries.html
+                    - link "https://www.oakwoodregister.com/archives/2008/v17num35_082608/obituaries.html" [ref=f95e360] [cursor=pointer]:
+                      - /url: https://www.oakwoodregister.com/archives/2008/v17num35_082608/obituaries.html
+                - paragraph [ref=f95e362]: The Independent Voice of the Oakwood Community Also featuring photos from our monthly supplement... Orval Edwards Cook, age 75, of Oakwood, passed away unexpectedly on July 19, 2008. Born in Dayton, he grew up in a military family and enjoyed the experien
+              - generic [ref=f95e363]:
+                - link "" [ref=f95e364] [cursor=pointer]:
+                  - /url: /site/www.oakwoodregister.com
+                - link "" [ref=f95e366] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.oakwoodregister.com/archives/2008/v17num35_082608/obituaries.html
+            - generic [ref=f95e368]:
+              - paragraph [ref=f95e369]: "Also from www.oakwoodregister.com:"
+              - list [ref=f95e370]:
+                - listitem [ref=f95e371]:
+                  - link "Welcome to the Oakwood Register" [ref=f95e372] [cursor=pointer]:
+                    - /url: https://www.oakwoodregister.com/archives/2008/v17num42_101408/obituaries.html
+                - listitem [ref=f95e373]:
+                  - link "Welcome to the Oakwood Register" [ref=f95e374] [cursor=pointer]:
+                    - /url: https://www.oakwoodregister.com/archives/2008/v17num44_102808/obituaries.html
+                - listitem [ref=f95e375]:
+                  - link "Welcome to the Oakwood Register" [ref=f95e376] [cursor=pointer]:
+                    - /url: https://www.oakwoodregister.com/archives/2008/v17num43_102108/obituaries.html
+                - listitem [ref=f95e377]:
+                  - link "Welcome to the Oakwood Register" [ref=f95e378] [cursor=pointer]:
+                    - /url: https://www.oakwoodregister.com/archives/2008/v17num46_111108/obituaries.html
+            - generic [ref=f95e379]:
+              - link "2 more" [ref=f95e381] [cursor=pointer]:
+                - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website+site%3Awww.oakwoodregister.com&sst=SE-4a3f38ee65742378
+              - generic "Contains JavaScript" [ref=f95e383]: JS
+          - generic [ref=f95e385]:
+            - generic [ref=f95e386]:
+              - generic [ref=f95e387]:
+                - generic [ref=f95e388]:
+                  - generic "Match density" [ref=f95e389]
+                  - generic [ref=f95e393]:
+                    - heading [level=2] [ref=f95e394]:
+                      - link "2016–2017 Undergraduate Catalog Table of Contents" [ref=f95e395] [cursor=pointer]:
+                        - /url: https://www.mercy.edu/media/2016-2017-ug-catalog-addendum
+                    - generic [ref=f95e396]:
+                      - generic "PDF" [ref=f95e397]: 
+                      - link "https://www.mercy.edu/media/2016-2017-ug-catalog-addendum" [ref=f95e398] [cursor=pointer]:
+                        - /url: https://www.mercy.edu/media/2016-2017-ug-catalog-addendum
+                - paragraph [ref=f95e400]: "3 / A Mercy College Education Mercy College is a private, nonprofit institution, providing an engaging learning experience for students and offer- ing more than 90 undergraduate and graduate degree and certificate programs within five schools: Business, E"
+              - generic [ref=f95e401]:
+                - link "" [ref=f95e402] [cursor=pointer]:
+                  - /url: /site/www.mercy.edu
+                - link "" [ref=f95e404] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.mercy.edu/media/2016-2017-ug-catalog-addendum
+            - generic [ref=f95e406]:
+              - paragraph [ref=f95e407]: "Also from www.mercy.edu:"
+              - list [ref=f95e408]:
+                - listitem [ref=f95e409]:
+                  - generic "PDF": 
+                  - link "2016–2017 Graduate Catalog Table of Contents" [ref=f95e410] [cursor=pointer]:
+                    - /url: https://www.mercy.edu/media/2016-2017-gr-catalog-addendum
+            - generic [ref=f95e411]:
+              - generic [ref=f95e413]: PDF File
+              - link "Tracking" [ref=f95e414] [cursor=pointer]:
+                - /url: /site/www.mercy.edu?view=traffic
+              - link "Has Ads" [ref=f95e415] [cursor=pointer]:
+                - /url: /site/www.mercy.edu?view=traffic
+          - generic [ref=f95e417]:
+            - generic [ref=f95e418]:
+              - generic [ref=f95e419]:
+                - generic [ref=f95e420]:
+                  - generic "Match density" [ref=f95e421]
+                  - generic [ref=f95e425]:
+                    - heading [level=2] [ref=f95e426]:
+                      - link "St. John’s University Undergraduate Bulletin" [ref=f95e427] [cursor=pointer]:
+                        - /url: https://www.stjohns.edu/sites/default/files/uploads/2021-2023_UG_Bulletin_Full_Bulletin.pdf
+                    - generic [ref=f95e428]:
+                      - generic "PDF" [ref=f95e429]: 
+                      - link "https://www.stjohns.edu/sites/default/files/uploads/2021-2023_UG_Bulletin_Full_Bulletin.pdf" [ref=f95e430] [cursor=pointer]:
+                        - /url: https://www.stjohns.edu/sites/default/files/uploads/2021-2023_UG_Bulletin_Full_Bulletin.pdf
+                - paragraph [ref=f95e432]: Student Support Services Program primarily seniors at Long Island City HS and first- services and to expose the students to a world of (SSS) year college students, attending various colleges alternative ways of living and working. Specifically, and univer
+              - generic [ref=f95e433]:
+                - link "" [ref=f95e434] [cursor=pointer]:
+                  - /url: /site/www.stjohns.edu
+                - link "" [ref=f95e436] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.stjohns.edu/sites/default/files/uploads/2021-2023_UG_Bulletin_Full_Bulletin.pdf
+            - generic [ref=f95e438]:
+              - generic [ref=f95e440]: PDF File
+              - link "Tracking" [ref=f95e441] [cursor=pointer]:
+                - /url: /site/www.stjohns.edu?view=traffic
+              - link "Has Ads" [ref=f95e442] [cursor=pointer]:
+                - /url: /site/www.stjohns.edu?view=traffic
+          - generic [ref=f95e444]:
+            - generic [ref=f95e445]:
+              - generic [ref=f95e446]:
+                - generic [ref=f95e447]:
+                  - generic "Match density" [ref=f95e448]
+                  - generic [ref=f95e452]:
+                    - heading [level=2] [ref=f95e453]:
+                      - link "July / August 2021 - Cornellians | Cornell University" [ref=f95e454] [cursor=pointer]:
+                        - /url: https://alumni.cornell.edu/cornellians/class-notes-july-august-2021/
+                    - link "https://alumni.cornell.edu/cornellians/class-notes-july-august-2021/" [ref=f95e456] [cursor=pointer]:
+                      - /url: https://alumni.cornell.edu/cornellians/class-notes-july-august-2021/
+                - paragraph [ref=f95e458]: Columns compiled by your class correspondents In December 2020, our class and the Cornell community lost Shigeo “Shig” Kondo, who passed away at age 98. Shig—a retired physician, husband, father of four, and grandfather—was awarded the William “Bill” Vann
+              - generic [ref=f95e459]:
+                - link "" [ref=f95e460] [cursor=pointer]:
+                  - /url: /site/alumni.cornell.edu
+                - link "" [ref=f95e462] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alumni.cornell.edu/cornellians/class-notes-july-august-2021/
+            - generic [ref=f95e464]:
+              - paragraph [ref=f95e465]: "Also from alumni.cornell.edu:"
+              - list [ref=f95e466]:
+                - listitem [ref=f95e467]:
+                  - link "November / December 2023 - Cornellians | Cornell University" [ref=f95e468] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/class-notes-november-december-2023/
+            - generic "Contains JavaScript" [ref=f95e471]: JS
+          - generic [ref=f95e473]:
+            - generic [ref=f95e474]:
+              - generic [ref=f95e475]:
+                - generic [ref=f95e476]:
+                  - generic "Match density" [ref=f95e477]
+                  - generic [ref=f95e481]:
+                    - heading [level=2] [ref=f95e482]:
+                      - 'link "UIS News Archived: 2006" [ref=f95e483] [cursor=pointer]':
+                        - /url: https://news.uis.edu/2006/
+                    - link "https://news.uis.edu/2006/" [ref=f95e485] [cursor=pointer]:
+                      - /url: https://news.uis.edu/2006/
+                - paragraph [ref=f95e487]: Springfield attorneys Peter Wise and Pete Cavanagh have volunteered to provide pro bono representation in a Macon County murder case at the request of the three defendants and the Downstate Illinois Innocence Project at UIS.On December 12, Wise and Cavana
+              - generic [ref=f95e488]:
+                - link "" [ref=f95e489] [cursor=pointer]:
+                  - /url: /site/news.uis.edu
+                - link "" [ref=f95e491] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.uis.edu/2006/
+            - generic "Contains JavaScript" [ref=f95e495]: JS
+          - generic [ref=f95e497]:
+            - generic [ref=f95e498]:
+              - generic [ref=f95e499]:
+                - generic [ref=f95e500]:
+                  - generic "Match density" [ref=f95e501]
+                  - generic [ref=f95e505]:
+                    - heading [level=2] [ref=f95e506]:
+                      - link "PAID" [ref=f95e507] [cursor=pointer]:
+                        - /url: https://wuir.washburn.edu/server/api/core/bitstreams/c38834ab-dd2c-4186-9b6e-5736d3917d7e/content
+                    - generic [ref=f95e508]:
+                      - generic "PDF" [ref=f95e509]: 
+                      - link "https://wuir.washburn.edu/server/api/core/bitstreams/c38834ab-dd2c-4186-9b6e-5736d3917d7e/content" [ref=f95e510] [cursor=pointer]:
+                        - /url: https://wuir.washburn.edu/server/api/core/bitstreams/c38834ab-dd2c-4186-9b6e-5736d3917d7e/content
+                - paragraph [ref=f95e512]: NON-PROFIT ORG. US POSTAGE WASHBURN UNIVERSITY 1700 SW COLLEGE AVE. TOPEKA, KS 66621 Address Service Requested Pacheco, Cindy Packard, Dave Packard, Sue Palmer, Kent Pellegrino, Debbie Pomeroy, Duane Pomeroy, Liz Post, Ann Ratliff, Carolyn Rebek, Paul Reb
+              - generic [ref=f95e513]:
+                - link "" [ref=f95e514] [cursor=pointer]:
+                  - /url: /site/wuir.washburn.edu
+                - link "" [ref=f95e516] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://wuir.washburn.edu/server/api/core/bitstreams/c38834ab-dd2c-4186-9b6e-5736d3917d7e/content
+            - generic [ref=f95e518]:
+              - paragraph [ref=f95e519]: "Also from wuir.washburn.edu:"
+              - list [ref=f95e520]:
+                - listitem [ref=f95e521]:
+                  - generic "PDF": 
+                  - link "UNIVERSITY" [ref=f95e522] [cursor=pointer]:
+                    - /url: https://wuir.washburn.edu/server/api/core/bitstreams/b46bf221-1988-46ab-b939-f9f1116f1ebf/content
+            - generic [ref=f95e523]: PDF File
+          - generic [ref=f95e527]:
+            - generic [ref=f95e528]:
+              - generic [ref=f95e529]:
+                - generic [ref=f95e530]:
+                  - generic "Match density" [ref=f95e531]
+                  - generic [ref=f95e535]:
+                    - heading [level=2] [ref=f95e536]:
+                      - link "CMA Obituaries" [ref=f95e537] [cursor=pointer]:
+                        - /url: https://clanmcalister.org/n_obituaries.shtml
+                    - link "https://clanmcalister.org/n_obituaries.shtml" [ref=f95e539] [cursor=pointer]:
+                      - /url: https://clanmcalister.org/n_obituaries.shtml
+                - paragraph [ref=f95e541]: "Helen C McAlister - 1927-2026 Birth: 06 October 1927 Death: 04 April 2026 Helen C. McAlister, 98, died April 4, 2026 Helen was born near Lacey in Drew Co. AR on October 6, 1927, to Kirby and Lucille (Spencer) Forester, raised in Fountain Hill, and graduat"
+              - generic [ref=f95e542]:
+                - link "" [ref=f95e543] [cursor=pointer]:
+                  - /url: /site/clanmcalister.org
+                - link "" [ref=f95e545] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://clanmcalister.org/n_obituaries.shtml
+            - generic "Contains JavaScript" [ref=f95e549]: JS
+          - generic [ref=f95e551]:
+            - generic [ref=f95e552]:
+              - generic [ref=f95e553]:
+                - generic [ref=f95e554]:
+                  - generic "Match density" [ref=f95e555]
+                  - generic [ref=f95e559]:
+                    - heading [level=2] [ref=f95e560]:
+                      - link "2021–2022 CATALOG 126 PARK AVENUE, BRIDGEPORT, CT 06604 ––––––––––" [ref=f95e561] [cursor=pointer]:
+                        - /url: https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+                    - generic [ref=f95e562]:
+                      - generic "PDF" [ref=f95e563]: 
+                      - link "https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf" [ref=f95e564] [cursor=pointer]:
+                        - /url: https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+                - paragraph [ref=f95e566]: 3 lecture hours; 3 semester hours Clinical Practice III tory and clinical settings. The comprehensive DENTAL HYGIENE 129 This course provides students the opportunity content areas will include rational for pain Clinical Practice I to expand on the basic
+              - generic [ref=f95e567]:
+                - link "" [ref=f95e568] [cursor=pointer]:
+                  - /url: /site/www.bridgeport.edu
+                - link "" [ref=f95e570] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+            - generic [ref=f95e572]:
+              - paragraph [ref=f95e573]: "Also from www.bridgeport.edu:"
+              - list [ref=f95e574]:
+                - listitem [ref=f95e575]:
+                  - generic "PDF": 
+                  - link "2021–2022 CATALOG 126 PARK AVENUE, BRIDGEPORT, CT 06604 ––––––––––" [ref=f95e576] [cursor=pointer]:
+                    - /url: https://www.bridgeport.edu/files/docs/academics/catalogs/catalog-2021-2022.pdf
+            - generic [ref=f95e577]:
+              - generic [ref=f95e579]: PDF File
+              - link "Tracking" [ref=f95e580] [cursor=pointer]:
+                - /url: /site/www.bridgeport.edu?view=traffic
+              - link "Has Ads" [ref=f95e581] [cursor=pointer]:
+                - /url: /site/www.bridgeport.edu?view=traffic
+          - generic [ref=f95e583]:
+            - generic [ref=f95e584]:
+              - generic [ref=f95e585]:
+                - generic [ref=f95e586]:
+                  - generic "Match density" [ref=f95e587]
+                  - generic [ref=f95e591]:
+                    - heading [level=2] [ref=f95e592]:
+                      - link "2006-2007" [ref=f95e593] [cursor=pointer]:
+                        - /url: https://dspace.sewanee.edu/server/api/core/bitstreams/adcb1721-7526-44cd-a8cb-22761d835dd3/content
+                    - generic [ref=f95e594]:
+                      - generic "PDF" [ref=f95e595]: 
+                      - link "https://dspace.sewanee.edu/server/api/core/bitstreams/adcb1721-7526-44cd-a8cb-22761d835dd3/content" [ref=f95e596] [cursor=pointer]:
+                        - /url: https://dspace.sewanee.edu/server/api/core/bitstreams/adcb1721-7526-44cd-a8cb-22761d835dd3/content
+                - paragraph [ref=f95e598]: ACADEMIC LIFE/GENERAL DISTRIBUTION REQUIREMENTS discipline is required of all students to help them become more critical, more reflective, and more aware oftranscendent values. This requirement also provides another perspective on moral and ethical proble
+              - generic [ref=f95e599]:
+                - link "" [ref=f95e600] [cursor=pointer]:
+                  - /url: /site/dspace.sewanee.edu
+                - link "" [ref=f95e602] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://dspace.sewanee.edu/server/api/core/bitstreams/adcb1721-7526-44cd-a8cb-22761d835dd3/content
+            - generic [ref=f95e604]:
+              - paragraph [ref=f95e605]: "Also from dspace.sewanee.edu:"
+              - list [ref=f95e606]:
+                - listitem [ref=f95e607]:
+                  - generic "PDF": 
+                  - 'link "2010-2011}" [ref=f95e608] [cursor=pointer]':
+                    - /url: https://dspace.sewanee.edu/server/api/core/bitstreams/343c874b-2b3a-4ab2-ab0a-51a5325d9218/content
+                - listitem [ref=f95e609]:
+                  - generic "PDF": 
+                  - link "CATALOG & ANNOUNCEMENTS *w 2003-2004" [ref=f95e610] [cursor=pointer]:
+                    - /url: https://dspace.sewanee.edu/server/api/core/bitstreams/45f2bad6-4209-42e6-91d9-e2da67f24708/content
+                - listitem [ref=f95e611]:
+                  - generic "PDF": 
+                  - link "COLLEGE OFARTS & SCIENCES CATALOG AND POLICIES 2007-2008 Sewanee THE UNIVERSITY OF THE SOUTH" [ref=f95e612] [cursor=pointer]:
+                    - /url: https://dspace.sewanee.edu/server/api/core/bitstreams/5af622bd-9380-41b1-b42e-659cff816191/content
+            - generic [ref=f95e613]: PDF File
+          - generic [ref=f95e617]:
+            - generic [ref=f95e618]:
+              - generic [ref=f95e619]:
+                - generic [ref=f95e620]:
+                  - generic "Match density" [ref=f95e621]
+                  - generic [ref=f95e625]:
+                    - heading [level=2] [ref=f95e626]:
+                      - link "CHAIRMAN’S REPORT" [ref=f95e627] [cursor=pointer]:
+                        - /url: https://trustees.osu.edu/sites/default/files/documents/2018/11/archived_minutes_2003-2004.pdf
+                    - generic [ref=f95e628]:
+                      - generic "PDF" [ref=f95e629]: 
+                      - link "https://trustees.osu.edu/sites/default/files/documents/2018/11/archived_minutes_2003-2004.pdf" [ref=f95e630] [cursor=pointer]:
+                        - /url: https://trustees.osu.edu/sites/default/files/documents/2018/11/archived_minutes_2003-2004.pdf
+                - paragraph [ref=f95e632]: "July 11, 2003 meeting, Board of Trustees Dean Hogan: (contd) As you know, and as Chairman Sofia has said before, at most major universities the academic core of the institution is organized in a single arts and sciences college and there is good reason fo"
+              - generic [ref=f95e633]:
+                - link "" [ref=f95e634] [cursor=pointer]:
+                  - /url: /site/trustees.osu.edu
+                - link "" [ref=f95e636] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://trustees.osu.edu/sites/default/files/documents/2018/11/archived_minutes_2003-2004.pdf
+            - generic [ref=f95e638]: PDF File
+    - complementary [ref=f95e641]:
+      - text: 
+      - generic [ref=f95e643]:
+        - heading " Search Settings" [level=2] [ref=f95e644]:
+          - generic [ref=f95e645]: 
+          - text: Search Settings
+        - generic [ref=f95e646]:
+          - button [ref=f95e648] [cursor=pointer]:
+            - link " Search In Title" [ref=f95e649]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&searchTitle=title&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e650]: 
+              - generic [ref=f95e651]: Search In Title
+          - button [ref=f95e653] [cursor=pointer]:
+            - link " Recent Results" [ref=f95e654]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&recent=recent&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e655]: 
+              - generic [ref=f95e656]: Recent Results
+          - button [ref=f95e658] [cursor=pointer]:
+            - link " Remove JS" [ref=f95e659]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&js=no-js&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e660]: 
+              - generic [ref=f95e661]: Remove JS
+          - button [ref=f95e663] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f95e664]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&adtech=reduce&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e665]: 
+              - generic [ref=f95e666]: Reduce Adtech
+          - button [ref=f95e668] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f95e669]:
+              - /url: /search?query=%22Alpha+Phi%22+MIT+Beta+Epsilon+chapter+website&nsfw=smut&newfilter=true&sst=SE-4a3f38ee65742378
+              - generic [ref=f95e670]: 
+              - generic [ref=f95e671]: Reduce NSFW
+          - button [ref=f95e674] [cursor=pointer]:
+            - generic [ref=f95e675]:
+              - generic [ref=f95e676]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f95e678]:
+    - heading "Search Help" [level=1] [ref=f95e679]
+    - generic [ref=f95e680]:
+      - generic [ref=f95e681]:
+        - heading " Syntax" [level=2] [ref=f95e682]:
+          - generic [ref=f95e683]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f95e684]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f95e685]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f95e686]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f95e687]
+        - heading "Samples" [level=2] [ref=f95e688]
+        - generic [ref=f95e689]:
+          - term [ref=f95e690]: soup -chicken
+          - definition [ref=f95e691]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f95e692]: "\"keyboard\""
+          - definition [ref=f95e693]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f95e694]: "\"steve mcqueen\""
+          - definition [ref=f95e695]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f95e696]: apology (plato)
+          - definition [ref=f95e697]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f95e698]:
+          - generic [ref=f95e699]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f95e700]
+        - generic [ref=f95e701]: This is by the beginning
+        - generic [ref=f95e709]: This is in the middle
+        - generic [ref=f95e717]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f95e723]:
+          - generic [ref=f95e724]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f95e725]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f95e726]
+        - heading " Webmaster Information" [level=2] [ref=f95e727]:
+          - generic [ref=f95e728]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f95e729]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f95e730] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f95e731] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f95e732]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f95e733] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f95e734]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f95e735] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f95e736]:
+        - heading " Special Keywords" [level=2] [ref=f95e737]:
+          - generic [ref=f95e738]: 
+          - text: Special Keywords
+        - table [ref=f95e739]:
+          - rowgroup [ref=f95e740]:
+            - row [ref=f95e741]:
+              - columnheader "Keyword" [ref=f95e742]
+              - columnheader "Meaning" [ref=f95e743]
+          - rowgroup [ref=f95e744]:
+            - row [ref=f95e745]:
+              - cell [ref=f95e746]:
+                - text: "site:"
+                - emphasis [ref=f95e747]: example.com
+              - cell [ref=f95e748]:
+                - text: Display site information about
+                - emphasis [ref=f95e749]: example.com
+            - row [ref=f95e750]:
+              - cell [ref=f95e751]:
+                - text: "site:"
+                - emphasis [ref=f95e752]: example.com
+                - emphasis [ref=f95e753]: keyword
+              - cell [ref=f95e754]:
+                - text: Search
+                - emphasis [ref=f95e755]: example.com
+                - text: for
+                - emphasis [ref=f95e756]: keyword
+            - row [ref=f95e757]:
+              - cell [ref=f95e758]:
+                - text: "site:"
+                - emphasis [ref=f95e759]: "*.example.com"
+                - emphasis [ref=f95e760]: keyword
+              - cell [ref=f95e761]:
+                - text: Search
+                - emphasis [ref=f95e762]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f95e763]: keyword
+            - row [ref=f95e764]:
+              - cell [ref=f95e765]:
+                - text: "browse:"
+                - emphasis [ref=f95e766]: example.com
+              - cell [ref=f95e767]:
+                - text: Show similar websites to
+                - emphasis [ref=f95e768]: example.com
+            - row [ref=f95e769]:
+              - cell [ref=f95e770]:
+                - text: "ip:"
+                - emphasis [ref=f95e771]: 127.0.0.1
+              - cell [ref=f95e772]:
+                - text: Search documents hosted at
+                - emphasis [ref=f95e773]: 127.0.0.1
+            - row [ref=f95e774]:
+              - cell [ref=f95e775]:
+                - text: "links:"
+                - emphasis [ref=f95e776]: example.com
+              - cell [ref=f95e777]:
+                - text: Search documents linking to
+                - emphasis [ref=f95e778]: example.com
+            - row [ref=f95e779]:
+              - cell [ref=f95e780]:
+                - text: "tld:"
+                - emphasis [ref=f95e781]: edu
+                - emphasis [ref=f95e782]: keyword
+              - cell [ref=f95e783]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f95e784]: edu
+                - text: .
+            - row [ref=f95e785]:
+              - cell [ref=f95e786]:
+                - text: "?tld:"
+                - emphasis [ref=f95e787]: edu
+                - emphasis [ref=f95e788]: keyword
+              - cell [ref=f95e789]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f95e790]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f95e791]:
+              - cell "q>5" [ref=f95e792]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f95e793]
+            - row [ref=f95e794]:
+              - cell "q<5" [ref=f95e795]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f95e796]
+            - row [ref=f95e797]:
+              - cell "year>2005" [ref=f95e798]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f95e799]
+            - row [ref=f95e800]:
+              - cell "year=2005" [ref=f95e801]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f95e802]
+            - row [ref=f95e803]:
+              - cell "year<2005" [ref=f95e804]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f95e805]
+            - row [ref=f95e806]:
+              - cell "rank>50" [ref=f95e807]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f95e808]
+            - row [ref=f95e809]:
+              - cell "rank<50" [ref=f95e810]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f95e811]
+            - row [ref=f95e812]:
+              - cell "format:html5" [ref=f95e813]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f95e814]
+            - row [ref=f95e815]:
+              - cell "format:xhtml" [ref=f95e816]
+              - cell "Filter documents using the XHTML standard" [ref=f95e817]
+            - row [ref=f95e818]:
+              - cell "format:html123" [ref=f95e819]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f95e820]
+            - row [ref=f95e821]:
+              - cell "generator:wordpress" [ref=f95e822]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f95e823]
+            - row [ref=f95e824]:
+              - cell "file:zip" [ref=f95e825]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f95e826]
+            - row [ref=f95e827]:
+              - cell "file:audio" [ref=f95e828]
+              - cell "Filter documents containing a link to an audio file" [ref=f95e829]
+            - row [ref=f95e830]:
+              - cell "file:video" [ref=f95e831]
+              - cell "Filter documents containing a link to a video file" [ref=f95e832]
+            - row [ref=f95e833]:
+              - cell "file:archive" [ref=f95e834]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f95e835]
+            - row [ref=f95e836]:
+              - cell "file:document" [ref=f95e837]
+              - cell "Filter documents containing a link to a document" [ref=f95e838]
+            - row [ref=f95e839]:
+              - cell "-special:media" [ref=f95e840]
+              - cell "Filter out documents with audio or video tags" [ref=f95e841]
+            - row [ref=f95e842]:
+              - cell "-special:scripts" [ref=f95e843]
+              - cell "Filter out documents with javascript" [ref=f95e844]
+            - row [ref=f95e845]:
+              - cell "-special:affiliate" [ref=f95e846]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f95e847]
+            - row [ref=f95e848]:
+              - cell "-special:tracking" [ref=f95e849]
+              - cell "Filter out documents with analytics or tracking code" [ref=f95e850]
+            - row [ref=f95e851]:
+              - cell "-special:cookies" [ref=f95e852]
+              - cell "Filter out documents with cookies" [ref=f95e853]
+  - contentinfo [ref=f95e854]:
+    - heading "Policy Information" [level=1] [ref=f95e855]
+    - generic [ref=f95e856]:
+      - generic [ref=f95e857]:
+        - heading " Policies" [level=2] [ref=f95e858]:
+          - generic [ref=f95e859]: 
+          - text: Policies
+        - generic [ref=f95e860]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f95e861]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f95e862]:
+        - heading " Contact" [level=2] [ref=f95e863]:
+          - generic [ref=f95e864]: 
+          - text: Contact
+        - generic [ref=f95e865]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f95e866] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f95e867]:
+          - generic [ref=f95e868]: 
+          - text: Sources
+        - generic [ref=f95e869]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f95e870] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f95e871]:
+        - heading " Data" [level=2] [ref=f95e872]:
+          - generic [ref=f95e873]: 
+          - text: Data
+        - generic [ref=f95e874]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f95e875] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f95e876] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

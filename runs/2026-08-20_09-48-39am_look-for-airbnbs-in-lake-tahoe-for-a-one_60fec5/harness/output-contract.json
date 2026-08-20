@@ -1,0 +1,24 @@
+{
+  "outputs": [
+    {
+      "id": "answer",
+      "kind": "document",
+      "filename": "answer.md",
+      "format": "markdown",
+      "requiredSections": [
+        "Check-in and Check-out Dates",
+        "Listings",
+        "Overall Summary"
+      ],
+      "evidenceRequirement": "none",
+      "evidencePresentation": "hidden"
+    }
+  ],
+  "contentExpectations": [
+    "State the exact check-in and check-out dates for a one-week stay next week (7 nights), consistent with when the research was conducted.",
+    "Include a numbered list from 1 through 30, one entry per Airbnb listing reviewed, covering the first 30 suggested places for Lake Tahoe.",
+    "Each numbered entry must identify the place (listing name/title), include its Airbnb listing URL, and give a brief listing-specific summary (e.g. notable features, location, price, capacity, or other listing-specific details).",
+    "After the numbered list, include an overall summary synthesizing observations across the 30 options (e.g. price range, common amenities, location trends, variety of property types).",
+    "Scope is limited to Airbnb listings for Lake Tahoe for the specified one-week date range, reviewing exactly the first 30 suggested places."
+  ]
+}

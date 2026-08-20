@@ -1,0 +1,941 @@
+URL: https://marginalia-search.com/search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&sst=SE-5d87c2279f98cc43
+Title: Pi Beta Phi MIT Massachusetts Institute Technology - Marginalia Search
+
+- generic [active] [ref=f76e1]:
+  - link "Skip To Content" [ref=f76e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f76e3]:
+    - navigation [ref=f76e5]:
+      - generic [ref=f76e7]:
+        - link "Search" [ref=f76e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f76e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f76e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f76e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f76e13]:
+    - generic [ref=f76e15]:
+      - heading [level=1] [ref=f76e17]:
+        - link "Marginalia Search" [ref=f76e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f76e21]:
+        - textbox "Search the web!" [ref=f76e22]: Pi Beta Phi MIT Massachusetts Institute Technology
+        - button " Search" [ref=f76e23] [cursor=pointer]:
+          - generic [ref=f76e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f76e25]:
+    - complementary [ref=f76e26]:
+      - generic [ref=f76e28]:
+        - heading " Filter" [level=2] [ref=f76e29]:
+          - generic [ref=f76e30]: 
+          - text: Filter
+        - generic [ref=f76e31]:
+          - button [ref=f76e33] [cursor=pointer]:
+            - link " All" [ref=f76e34]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e35]: 
+              - text: All
+          - button [ref=f76e37] [cursor=pointer]:
+            - link " Blogs" [ref=f76e38]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=blogosphere&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e39]: 
+              - text: Blogs
+          - button [ref=f76e41] [cursor=pointer]:
+            - link " Academia" [ref=f76e42]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=academia&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e43]: 
+              - text: Academia
+          - button [ref=f76e45] [cursor=pointer]:
+            - link " Vintage" [ref=f76e46]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=vintage&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e47]: 
+              - text: Vintage
+          - button [ref=f76e49] [cursor=pointer]:
+            - link " Small Web" [ref=f76e50]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=modern&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e51]: 
+              - text: Small Web
+          - button [ref=f76e54] [cursor=pointer]:
+            - link " Wikis" [ref=f76e55]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=wiki&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e56]: 
+              - text: Wikis
+          - button [ref=f76e58] [cursor=pointer]:
+            - link " Forums" [ref=f76e59]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=forum&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e60]: 
+              - text: Forums
+          - button [ref=f76e62] [cursor=pointer]:
+            - link " Recipes" [ref=f76e63]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=food&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e64]: 
+              - text: Recipes
+          - button [ref=f76e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f76e68]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&profile=custom&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f76e70]:
+      - generic [ref=f76e71]:
+        - heading "Results" [level=1] [ref=f76e72]
+        - generic [ref=f76e73]:
+          - generic [ref=f76e75]:
+            - generic [ref=f76e76]:
+              - generic [ref=f76e77]:
+                - generic [ref=f76e78]:
+                  - generic "Match density" [ref=f76e79]
+                  - generic [ref=f76e83]:
+                    - heading [level=2] [ref=f76e84]:
+                      - link "Pi Beta Phi finds a home on campus | MIT News | Massachusetts Institute of Technology" [ref=f76e85] [cursor=pointer]:
+                        - /url: https://news.mit.edu/2011/pi-beta-phi-home
+                    - link "https://news.mit.edu/2011/pi-beta-phi-home" [ref=f76e87] [cursor=pointer]:
+                      - /url: https://news.mit.edu/2011/pi-beta-phi-home
+                - paragraph [ref=f76e89]: The Office of the Dean for Student Life announced this week that the Massachusetts Gamma chapter of the Pi Beta Phi women’s fraternity has been selected to take residence of , effective August 2012. Applications for the on campus building were solicited e
+              - generic [ref=f76e90]:
+                - link "" [ref=f76e91] [cursor=pointer]:
+                  - /url: /site/news.mit.edu
+                - link "" [ref=f76e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2011/pi-beta-phi-home
+            - generic [ref=f76e95]:
+              - paragraph [ref=f76e96]: "Also from news.mit.edu:"
+              - list [ref=f76e97]:
+                - listitem [ref=f76e98]:
+                  - link "MIT announces steps to promote community well-being, strengthen mental health services | MIT News | Massachusetts Institute o..." [ref=f76e99] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2015/mind-hand-heart-0902
+                - listitem [ref=f76e100]:
+                  - link "Four researchers with MIT ties earn Schmidt Science Fellowships | MIT News | Massachusetts Institute of Technology" [ref=f76e101] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2022/three-researchers-earn-schmidt-science-fellowships-0718
+                - listitem [ref=f76e102]:
+                  - link "Grace Moore ’21 receives Michel David-Weill Scholarship | MIT News | Massachusetts Institute of Technology" [ref=f76e103] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2021/grace-moore-receives-michel-david-weill-scholarship-0622
+                - listitem [ref=f76e104]:
+                  - link "Six from MIT awarded 2023 Paul and Daisy Soros Fellowships for New Americans | MIT News | Massachusetts Institute of Technology" [ref=f76e105] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2023/paul-daisy-soros-fellowships-new-americans-0425
+            - generic [ref=f76e106]:
+              - link "2 more" [ref=f76e108] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Anews.mit.edu&sst=SE-5d87c2279f98cc43
+              - generic "Contains JavaScript" [ref=f76e110]: JS
+          - generic [ref=f76e112]:
+            - generic [ref=f76e113]:
+              - generic [ref=f76e114]:
+                - generic [ref=f76e115]:
+                  - generic "Match density" [ref=f76e116]
+                  - generic [ref=f76e120]:
+                    - heading [level=2] [ref=f76e121]:
+                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f76e122] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f76e124] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                - paragraph [ref=f76e126]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+              - generic [ref=f76e127]:
+                - link "" [ref=f76e128] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f76e130] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+            - generic [ref=f76e132]:
+              - paragraph [ref=f76e133]: "Also from en.wikipedia.org:"
+              - list [ref=f76e134]:
+                - listitem [ref=f76e135]:
+                  - link "James M. Turner (physicist)" [ref=f76e136] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/James_M._Turner_%28physicist%29
+                - listitem [ref=f76e137]:
+                  - link "James Ross MacDonald" [ref=f76e138] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/James_Ross_MacDonald
+                - listitem [ref=f76e139]:
+                  - link "Celeste Nelson" [ref=f76e140] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Celeste_Nelson
+                - listitem [ref=f76e141]:
+                  - link "Alan Sherman" [ref=f76e142] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Alan_Sherman
+            - generic [ref=f76e143]:
+              - link "8 more" [ref=f76e145] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Aen.wikipedia.org&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e147]: Wiki
+              - generic "Contains JavaScript" [ref=f76e148]: JS
+          - generic [ref=f76e150]:
+            - generic [ref=f76e151]:
+              - generic [ref=f76e152]:
+                - generic [ref=f76e153]:
+                  - generic "Match density" [ref=f76e154]
+                  - generic [ref=f76e158]:
+                    - heading [level=2] [ref=f76e159]:
+                      - link "Chamitoff" [ref=f76e160] [cursor=pointer]:
+                        - /url: http://www.astronautix.com/c/chamitoff.html
+                    - link "http://www.astronautix.com/c/chamitoff.html" [ref=f76e162] [cursor=pointer]:
+                      - /url: http://www.astronautix.com/c/chamitoff.html
+                - paragraph [ref=f76e164]: "- Alphabetic Index: Chamitoff, Gregory Errol ChamitoffCredit: Canadian engineer mission specialist astronaut 1998-2013. Status: Inactive; Active 1998-2013. Born: 1962-08-06. Spaceflights: 2 . Total time in space: 198.75 days. Birth Place: Jewish. Grew up"
+              - generic [ref=f76e165]:
+                - link "" [ref=f76e166] [cursor=pointer]:
+                  - /url: /site/www.astronautix.com
+                - link "" [ref=f76e168] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://www.astronautix.com/c/chamitoff.html
+            - generic [ref=f76e170]:
+              - paragraph [ref=f76e171]: "Also from www.astronautix.com:"
+              - list [ref=f76e172]:
+                - listitem [ref=f76e173]:
+                  - link "Ronney" [ref=f76e174] [cursor=pointer]:
+                    - /url: http://www.astronautix.com/r/ronney.html
+                - listitem [ref=f76e175]:
+                  - link "Bowen" [ref=f76e176] [cursor=pointer]:
+                    - /url: http://www.astronautix.com/b/bowen.html
+            - generic "Contains JavaScript" [ref=f76e179]: JS
+          - generic [ref=f76e182]:
+            - generic [ref=f76e183]:
+              - generic [ref=f76e184]:
+                - generic "Match density" [ref=f76e185]
+                - generic [ref=f76e189]:
+                  - heading [level=2] [ref=f76e190]:
+                    - link "Howard J. Herzog -- Curriculum Vitae" [ref=f76e191] [cursor=pointer]:
+                      - /url: https://sequestration.mit.edu/people/hjherzog/cv.html
+                  - link "https://sequestration.mit.edu/people/hjherzog/cv.html" [ref=f76e193] [cursor=pointer]:
+                    - /url: https://sequestration.mit.edu/people/hjherzog/cv.html
+              - paragraph [ref=f76e195]: "B.S., Chemical Engineering, Massachusetts Institute of Technology Honors: - American Institute of Chemists' Student Award - Phi Lambda Upsilon (Honorary Chemical Society) - Tau Beta Pi (Honorary Engineering Society)"
+            - generic [ref=f76e196]:
+              - link "" [ref=f76e197] [cursor=pointer]:
+                - /url: /site/sequestration.mit.edu
+              - link "" [ref=f76e199] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/https://sequestration.mit.edu/people/hjherzog/cv.html
+          - generic [ref=f76e202]:
+            - generic [ref=f76e203]:
+              - generic [ref=f76e204]:
+                - generic [ref=f76e205]:
+                  - generic "Match density" [ref=f76e206]
+                  - generic [ref=f76e210]:
+                    - heading [level=2] [ref=f76e211]:
+                      - link "Chapter Histories | Pi Beta Phi Fraternity For Women" [ref=f76e212] [cursor=pointer]:
+                        - /url: https://www.pibetaphi.org/history/chapter-histories
+                    - link "https://www.pibetaphi.org/history/chapter-histories" [ref=f76e214] [cursor=pointer]:
+                      - /url: https://www.pibetaphi.org/history/chapter-histories
+                - paragraph [ref=f76e216]: "Arizona Beta Arizona State University Founding Date: February 14, 1965 Arizona State University Founding Date: February 14, 1965 Installing Officers Grand President Alice Weber Mansfield (Johnson), Missouri Beta Installation of Arizona Beta The chapter wa"
+              - generic [ref=f76e217]:
+                - link "" [ref=f76e218] [cursor=pointer]:
+                  - /url: /site/www.pibetaphi.org
+                - link "" [ref=f76e220] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.pibetaphi.org/history/chapter-histories
+            - generic "Contains JavaScript" [ref=f76e224]: JS
+          - generic [ref=f76e226]:
+            - generic [ref=f76e227]:
+              - generic [ref=f76e228]:
+                - generic [ref=f76e229]:
+                  - generic "Match density" [ref=f76e230]
+                  - generic [ref=f76e234]:
+                    - heading [level=2] [ref=f76e235]:
+                      - 'link "Jay Dweck :: JuliaCon 2019 :: pretalx" [ref=f76e236] [cursor=pointer]':
+                        - /url: https://pretalx.com/juliacon2019/speaker/9ZPV7Y/
+                    - link "https://pretalx.com/juliacon2019/speaker/9ZPV7Y/" [ref=f76e238] [cursor=pointer]:
+                      - /url: https://pretalx.com/juliacon2019/speaker/9ZPV7Y/
+                - paragraph [ref=f76e240]: Most recently, Jay has been consulting on large-scale cloud migrations for financial firms. Prior to this, he served as the CTO for Arxis Capital, a wholesale market maker and high frequency proprietary trading firm. He has also consulted for hedge funds,
+              - generic [ref=f76e241]:
+                - link "" [ref=f76e242] [cursor=pointer]:
+                  - /url: /site/pretalx.com
+                - link "" [ref=f76e244] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://pretalx.com/juliacon2019/speaker/9ZPV7Y/
+            - generic [ref=f76e246]:
+              - paragraph [ref=f76e247]: "Also from pretalx.com:"
+              - list [ref=f76e248]:
+                - listitem [ref=f76e249]:
+                  - 'link "Ultimate Datetime :: JuliaCon 2019 :: pretalx" [ref=f76e250] [cursor=pointer]':
+                    - /url: https://pretalx.com/juliacon2019/talk/UUESUW/
+            - generic "Contains JavaScript" [ref=f76e253]: JS
+          - generic [ref=f76e255]:
+            - generic [ref=f76e256]:
+              - generic [ref=f76e257]:
+                - generic [ref=f76e258]:
+                  - generic "Match density" [ref=f76e259]
+                  - generic [ref=f76e263]:
+                    - heading [level=2] [ref=f76e264]:
+                      - link "B I O G R A P H I C A L D I R E C T O R Y O F T H E U N I T E D S T A T E S C O N G R E S S 1 7 7 4 – 2 0 0 5 T H E C O N T I..." [ref=f76e265] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                    - generic [ref=f76e266]:
+                      - generic "PDF" [ref=f76e267]: 
+                      - link "https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf" [ref=f76e268] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                - paragraph [ref=f76e270]: ington as President; reelected in 1792 and served from April ADAMS, Parmenio, a Representative from New York; 21, 1789, to March 3, 1797; elected President of the United born in Hartford, Conn., September 9, 1776; attended the States and served from March
+              - generic [ref=f76e271]:
+                - link "" [ref=f76e272] [cursor=pointer]:
+                  - /url: /site/www.govinfo.gov
+                - link "" [ref=f76e274] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+            - generic [ref=f76e276]: PDF File
+          - generic [ref=f76e280]:
+            - generic [ref=f76e281]:
+              - generic [ref=f76e282]:
+                - generic [ref=f76e283]:
+                  - generic "Match density" [ref=f76e284]
+                  - generic [ref=f76e288]:
+                    - heading [level=2] [ref=f76e289]:
+                      - link "LIDS Student Conference 2011" [ref=f76e290] [cursor=pointer]:
+                        - /url: https://lidsconf.mit.edu/2011/abstracts/dowdle.html
+                    - link "https://lidsconf.mit.edu/2011/abstracts/dowdle.html" [ref=f76e292] [cursor=pointer]:
+                      - /url: https://lidsconf.mit.edu/2011/abstracts/dowdle.html
+                - paragraph [ref=f76e294]: The past 20 years have seen tremendous growth in information science, giving rise to significant research, development and deployment of autonomous systems, advanced networking and communications technologies, and decision support systems. By the year 202
+              - generic [ref=f76e295]:
+                - link "" [ref=f76e296] [cursor=pointer]:
+                  - /url: /site/lidsconf.mit.edu
+                - link "" [ref=f76e298] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://lidsconf.mit.edu/2011/abstracts/dowdle.html
+            - generic "Contains JavaScript" [ref=f76e302]: JS
+          - generic [ref=f76e304]:
+            - generic [ref=f76e305]:
+              - generic [ref=f76e306]:
+                - generic [ref=f76e307]:
+                  - generic "Match density" [ref=f76e308]
+                  - generic [ref=f76e312]:
+                    - heading [level=2] [ref=f76e313]:
+                      - link "Speaking in MITese | MIT Admissions" [ref=f76e314] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+                    - link "https://mitadmissions.org/blogs/entry/speaking_mitese/" [ref=f76e316] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+                - paragraph [ref=f76e318]: A language all our own. August 19, 2008 Almost every time I return home from MIT, I find myself mentally translating certain MIT concepts or words or course numbers when I’m talking to my parents or friends. Things like “I just got back from my 5.112 lect
+              - generic [ref=f76e319]:
+                - link "" [ref=f76e320] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f76e322] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/speaking_mitese/
+            - generic "Contains JavaScript" [ref=f76e326]: JS
+          - generic [ref=f76e329]:
+            - generic [ref=f76e330]:
+              - generic [ref=f76e331]:
+                - generic "Match density" [ref=f76e332]
+                - generic [ref=f76e336]:
+                  - heading [level=2] [ref=f76e337]:
+                    - link "https://bartonlab.ucr.edu/cv.html" [ref=f76e338] [cursor=pointer]:
+                      - /url: https://bartonlab.ucr.edu/cv.html
+                  - link "https://bartonlab.ucr.edu/cv.html" [ref=f76e340] [cursor=pointer]:
+                    - /url: https://bartonlab.ucr.edu/cv.html
+              - paragraph [ref=f76e342]: I use methods from statistical mechanics and machine learning to study pathogen evolution and human immunity. I am particularly interested in highly mutable pathogens such as HIV, and the dynamical interactions between microbes and the immune system.
+            - generic [ref=f76e343]:
+              - link "" [ref=f76e344] [cursor=pointer]:
+                - /url: /site/bartonlab.ucr.edu
+              - link "" [ref=f76e346] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/https://bartonlab.ucr.edu/cv.html
+          - generic [ref=f76e349]:
+            - generic [ref=f76e350]:
+              - generic [ref=f76e351]:
+                - generic [ref=f76e352]:
+                  - generic "Match density" [ref=f76e353]
+                  - generic [ref=f76e357]:
+                    - heading [level=2] [ref=f76e358]:
+                      - link "Samuel N. Alexander - Engineering and Technology History Wiki" [ref=f76e359] [cursor=pointer]:
+                        - /url: https://ethw.org/Samuel_N._Alexander
+                    - generic [ref=f76e360]:
+                      - text: 2018-07-30 ·
+                      - link "https://ethw.org/Samuel_N._Alexander" [ref=f76e361] [cursor=pointer]:
+                        - /url: https://ethw.org/Samuel_N._Alexander
+                - paragraph [ref=f76e363]: Samuel N. Alexander Birthdate 1910/02/22 Birthplace Wharton, TX, USA Associated organizations Computing Fields of study National Bureau of Standards, MIT, Simplex Wire and Cable Company Samuel N. Alexander (IRE Associate, 1944; Member, 1955; Senior Member
+              - generic [ref=f76e364]:
+                - link "" [ref=f76e365] [cursor=pointer]:
+                  - /url: /site/ethw.org
+                - link "" [ref=f76e367] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ethw.org/Samuel_N._Alexander
+            - generic [ref=f76e369]:
+              - paragraph [ref=f76e370]: "Also from ethw.org:"
+              - list [ref=f76e371]:
+                - listitem [ref=f76e372]:
+                  - link "Joseph Bordogna - Engineering and Technology History Wiki" [ref=f76e373] [cursor=pointer]:
+                    - /url: https://ethw.org/Joseph_Bordogna
+            - generic [ref=f76e374]:
+              - link "1 more" [ref=f76e376] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Aethw.org&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e378]: Wiki
+              - generic "Contains JavaScript" [ref=f76e379]: JS
+          - generic [ref=f76e381]:
+            - generic [ref=f76e382]:
+              - generic [ref=f76e383]:
+                - generic [ref=f76e384]:
+                  - generic "Match density" [ref=f76e385]
+                  - generic [ref=f76e389]:
+                    - heading [level=2] [ref=f76e390]:
+                      - link "Menu" [ref=f76e391] [cursor=pointer]:
+                        - /url: https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+                    - generic [ref=f76e392]:
+                      - generic "PDF" [ref=f76e393]: 
+                      - link "https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content" [ref=f76e394] [cursor=pointer]:
+                        - /url: https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+                - paragraph [ref=f76e396]: University Honors, and Italian that may count toward Curriculum for Liberal Education and major requirements. Students may participate in semester-long programs in the fall and spring or short-term programs in the summer. Virginia Tech also has a growing
+              - generic [ref=f76e397]:
+                - link "" [ref=f76e398] [cursor=pointer]:
+                  - /url: /site/vtechworks.lib.vt.edu
+                - link "" [ref=f76e400] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+            - generic [ref=f76e402]: PDF File
+          - generic [ref=f76e406]:
+            - generic [ref=f76e407]:
+              - generic [ref=f76e408]:
+                - generic [ref=f76e409]:
+                  - generic "Match density" [ref=f76e410]
+                  - generic [ref=f76e414]:
+                    - heading [level=2] [ref=f76e415]:
+                      - link "Gregory Francis, Ph.D - Department of Physics | Montana State University" [ref=f76e416] [cursor=pointer]:
+                        - /url: https://www.physics.montana.edu/directory/emeritus/francis-gregory.html
+                    - link "https://www.physics.montana.edu/directory/emeritus/francis-gregory.html" [ref=f76e418] [cursor=pointer]:
+                      - /url: https://www.physics.montana.edu/directory/emeritus/francis-gregory.html
+                - paragraph [ref=f76e420]: Greg Francis is first and foremost a teacher. As an undergraduate at Brigham Young University, he taught recitation sections normally reserved for graduate students. Later as a graduate student studying plasma physics at MIT, he regularly found opportunit
+              - generic [ref=f76e421]:
+                - link "" [ref=f76e422] [cursor=pointer]:
+                  - /url: /site/www.physics.montana.edu
+                - link "" [ref=f76e424] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.physics.montana.edu/directory/emeritus/francis-gregory.html
+            - generic "Contains JavaScript" [ref=f76e428]: JS
+          - generic [ref=f76e430]:
+            - generic [ref=f76e431]:
+              - generic [ref=f76e432]:
+                - generic [ref=f76e433]:
+                  - generic "Match density" [ref=f76e434]
+                  - generic [ref=f76e438]:
+                    - heading [level=2] [ref=f76e439]:
+                      - link "viXra.org e-Print archive, Physics of Biology" [ref=f76e440] [cursor=pointer]:
+                        - /url: https://vixra.org/phbio/
+                    - link "https://vixra.org/phbio/" [ref=f76e442] [cursor=pointer]:
+                      - /url: https://vixra.org/phbio/
+                - paragraph [ref=f76e444]: "> Physics of Biology Previous months:2009 - (1) - (2) - (2) - (1) - (3) - (1)2010 - (1) - (1)2011 - (1) - (1) - (6) - (3)2012 - (1) - (2) - (1) - (2) - (2) - (2)2013 - (4) - (4) - (5) - (9) - (2) - (1)2014 - (3) - (1) - (1) - (1) - (6) - (3) - (2)2015 - ("
+              - generic [ref=f76e445]:
+                - link "" [ref=f76e446] [cursor=pointer]:
+                  - /url: /site/vixra.org
+                - link "" [ref=f76e448] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://vixra.org/phbio/
+            - generic [ref=f76e450]:
+              - link "Tracking" [ref=f76e452] [cursor=pointer]:
+                - /url: /site/vixra.org?view=traffic
+              - link "Has Ads" [ref=f76e453] [cursor=pointer]:
+                - /url: /site/vixra.org?view=traffic
+          - generic [ref=f76e455]:
+            - generic [ref=f76e456]:
+              - generic [ref=f76e457]:
+                - generic [ref=f76e458]:
+                  - generic "Match density" [ref=f76e459]
+                  - generic [ref=f76e463]:
+                    - heading [level=2] [ref=f76e464]:
+                      - link "Energy Sources and Pollutant Emissions | AirUCI" [ref=f76e465] [cursor=pointer]:
+                        - /url: https://airuci.uci.edu/taxonomy/term/4
+                    - link "https://airuci.uci.edu/taxonomy/term/4" [ref=f76e467] [cursor=pointer]:
+                      - /url: https://airuci.uci.edu/taxonomy/term/4
+                - paragraph [ref=f76e469]: Joint Professorship in UCI's Department of Chemical and Biomolecular Engineering and Department of Chemistry (Ph.D. in Physical Chemistry, University of Belgrade, Serbia, 2001) Prof. Stamenkovic came from a career at the U.S. National Labs to UCI in 2020.
+              - generic [ref=f76e470]:
+                - link "" [ref=f76e471] [cursor=pointer]:
+                  - /url: /site/airuci.uci.edu
+                - link "" [ref=f76e473] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://airuci.uci.edu/taxonomy/term/4
+            - generic "Contains JavaScript" [ref=f76e477]: JS
+          - generic [ref=f76e479]:
+            - generic [ref=f76e480]:
+              - generic [ref=f76e481]:
+                - generic [ref=f76e482]:
+                  - generic "Match density" [ref=f76e483]
+                  - generic [ref=f76e487]:
+                    - heading [level=2] [ref=f76e488]:
+                      - link "Earthly Issues" [ref=f76e489] [cursor=pointer]:
+                        - /url: http://www.earthlyissues.com/apollo9.htm
+                    - link "http://www.earthlyissues.com/apollo9.htm" [ref=f76e491] [cursor=pointer]:
+                      - /url: http://www.earthlyissues.com/apollo9.htm
+                - paragraph [ref=f76e493]: Launched 03 March 1969 First crewed Lunar Module test Splashdown 13 March 1969 Astronauts Russell L. Schweickart, David R. Scott, and James A. McDivitt. Apollo 9 was the third crewed Apollo flight and the first crewed flight to include the Lunar Module (L
+              - generic [ref=f76e494]:
+                - link "" [ref=f76e495] [cursor=pointer]:
+                  - /url: /site/www.earthlyissues.com
+                - link "" [ref=f76e497] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://www.earthlyissues.com/apollo9.htm
+            - link "1 more" [ref=f76e501] [cursor=pointer]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Awww.earthlyissues.com&sst=SE-5d87c2279f98cc43
+          - generic [ref=f76e504]:
+            - generic [ref=f76e505]:
+              - generic [ref=f76e506]:
+                - generic [ref=f76e507]:
+                  - generic "Match density" [ref=f76e508]
+                  - generic [ref=f76e512]:
+                    - heading [level=2] [ref=f76e513]:
+                      - link "VINCI 2017 - InfoVis:Wiki" [ref=f76e514] [cursor=pointer]:
+                        - /url: https://infovis-wiki.net/wiki/VINCI_2017
+                    - link "https://infovis-wiki.net/wiki/VINCI_2017" [ref=f76e516] [cursor=pointer]:
+                      - /url: https://infovis-wiki.net/wiki/VINCI_2017
+                - paragraph [ref=f76e518]: ================================================ VINCI 2017 The 10th International Symposium on Visual Information Communication and Interaction Bangkok, Thailand, 14-16 August 2017 Paper submission deadline 28 April 2017 vinci-conf.org ==================
+              - generic [ref=f76e519]:
+                - link "" [ref=f76e520] [cursor=pointer]:
+                  - /url: /site/infovis-wiki.net
+                - link "" [ref=f76e522] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://infovis-wiki.net/wiki/VINCI_2017
+            - generic [ref=f76e524]:
+              - generic [ref=f76e526]: Wiki
+              - generic "Contains JavaScript" [ref=f76e527]: JS
+          - generic [ref=f76e530]:
+            - generic [ref=f76e531]:
+              - generic [ref=f76e532]:
+                - generic "Match density" [ref=f76e533]
+                - generic [ref=f76e537]:
+                  - heading [level=2] [ref=f76e538]:
+                    - link "Computer Pioneers - Grace Brewster Murray Hopper" [ref=f76e539] [cursor=pointer]:
+                      - /url: https://history.computer.org/pioneers/hopper.html
+                  - link "https://history.computer.org/pioneers/hopper.html" [ref=f76e541] [cursor=pointer]:
+                    - /url: https://history.computer.org/pioneers/hopper.html
+              - paragraph [ref=f76e543]: Born December 17, 1906, New York City; died January 1, 1992, Arlington, Va.; Rear Admiral, US Navy; developer of programming technology for the Harvard Mark I [Known within IBM as the Automatic Sequence Controlled Calculator (ASCC).] and the Univac I, ear
+            - generic [ref=f76e544]:
+              - link "" [ref=f76e545] [cursor=pointer]:
+                - /url: /site/history.computer.org
+              - link "" [ref=f76e547] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/https://history.computer.org/pioneers/hopper.html
+          - generic [ref=f76e550]:
+            - generic [ref=f76e551]:
+              - generic [ref=f76e552]:
+                - generic [ref=f76e553]:
+                  - generic "Match density" [ref=f76e554]
+                  - generic [ref=f76e558]:
+                    - heading [level=2] [ref=f76e559]:
+                      - link "PROCEEDINGS OF" [ref=f76e560] [cursor=pointer]:
+                        - /url: https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+                    - generic [ref=f76e561]:
+                      - generic "PDF" [ref=f76e562]: 
+                      - link "https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25" [ref=f76e563] [cursor=pointer]:
+                        - /url: https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+                - paragraph [ref=f76e565]: shown in relation to the reference system simulations with compressor capacity control is a purposeful with the R-744-based air conditioning systems without solution. For this reason a detailed model of an R-744 the refrigerant compressor capacity control
+              - generic [ref=f76e566]:
+                - link "" [ref=f76e567] [cursor=pointer]:
+                  - /url: /site/ecp.ep.liu.se
+                - link "" [ref=f76e569] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+            - generic [ref=f76e571]:
+              - link "1 more" [ref=f76e573] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Aecp.ep.liu.se&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e575]: PDF File
+          - generic [ref=f76e577]:
+            - generic [ref=f76e578]:
+              - generic [ref=f76e579]:
+                - generic [ref=f76e580]:
+                  - generic "Match density" [ref=f76e581]
+                  - generic [ref=f76e585]:
+                    - heading [level=2] [ref=f76e586]:
+                      - link "Past Speakers | neafspaceexpo" [ref=f76e587] [cursor=pointer]:
+                        - /url: https://www.neafexpo.com/copy-of-speakers-1
+                    - link "https://www.neafexpo.com/copy-of-speakers-1" [ref=f76e589] [cursor=pointer]:
+                      - /url: https://www.neafexpo.com/copy-of-speakers-1
+                - paragraph [ref=f76e591]: EILEEN COLLINS was the first female pilot and first female commander of a Space Shuttle. She is a retired NASA astronaut and United States Air Force colonel and a former military instructor and test pilot. She was awarded several medals for her work. Colo
+              - generic [ref=f76e592]:
+                - link "" [ref=f76e593] [cursor=pointer]:
+                  - /url: /site/www.neafexpo.com
+                - link "" [ref=f76e595] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.neafexpo.com/copy-of-speakers-1
+            - generic "Contains JavaScript" [ref=f76e599]: JS
+          - generic [ref=f76e601]:
+            - generic [ref=f76e602]:
+              - generic [ref=f76e603]:
+                - generic [ref=f76e604]:
+                  - generic "Match density" [ref=f76e605]
+                  - generic [ref=f76e609]:
+                    - heading [level=2] [ref=f76e610]:
+                      - link "September 2022 - Cornellians | Cornell University" [ref=f76e611] [cursor=pointer]:
+                        - /url: https://alumni.cornell.edu/cornellians/memoriam-september-2022/
+                    - link "https://alumni.cornell.edu/cornellians/memoriam-september-2022/" [ref=f76e613] [cursor=pointer]:
+                      - /url: https://alumni.cornell.edu/cornellians/memoriam-september-2022/
+                - paragraph [ref=f76e615]: The University recently learned of the passing of these Cornellians 1919, BS Ag 1920—Paul N. Boughton of Middletown, NY, July 13, 1996; owner/president, Paul N. Boughton Realtor; sold farms in Orange County and in Upstate New York. ’35 MD—John H. Carlquis
+              - generic [ref=f76e616]:
+                - link "" [ref=f76e617] [cursor=pointer]:
+                  - /url: /site/alumni.cornell.edu
+                - link "" [ref=f76e619] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alumni.cornell.edu/cornellians/memoriam-september-2022/
+            - generic [ref=f76e621]:
+              - paragraph [ref=f76e622]: "Also from alumni.cornell.edu:"
+              - list [ref=f76e623]:
+                - listitem [ref=f76e624]:
+                  - link "February 2024 - Cornellians | Cornell University" [ref=f76e625] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-february-2024/
+                - listitem [ref=f76e626]:
+                  - link "May 2025 - Cornellians | Cornell University" [ref=f76e627] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-may-2025/
+                - listitem [ref=f76e628]:
+                  - link "October 2023 - Cornellians | Cornell University" [ref=f76e629] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-october-2023/
+                - listitem [ref=f76e630]:
+                  - link "July 2025 - Cornellians | Cornell University" [ref=f76e631] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-july-2025/
+            - generic [ref=f76e632]:
+              - link "12 more" [ref=f76e634] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Aalumni.cornell.edu&sst=SE-5d87c2279f98cc43
+              - generic "Contains JavaScript" [ref=f76e636]: JS
+          - generic [ref=f76e638]:
+            - generic [ref=f76e639]:
+              - generic [ref=f76e640]:
+                - generic [ref=f76e641]:
+                  - generic "Match density" [ref=f76e642]
+                  - generic [ref=f76e646]:
+                    - heading [level=2] [ref=f76e647]:
+                      - link "James Turner (physicist) - Wikitia" [ref=f76e648] [cursor=pointer]:
+                        - /url: https://wikitia.com/wiki/James_Turner_%28physicist%29
+                    - link "https://wikitia.com/wiki/James_Turner_(physicist)" [ref=f76e650] [cursor=pointer]:
+                      - /url: https://wikitia.com/wiki/James_Turner_%28physicist%29
+                - paragraph [ref=f76e652]: James Henry Turner is an American physicist and retired government official. Over the course of his career, he served as Director of the National Oceanic and Atmospheric Administration’s Office of International Affairs and as deputy director of the Nation
+              - generic [ref=f76e653]:
+                - link "" [ref=f76e654] [cursor=pointer]:
+                  - /url: /site/wikitia.com
+                - link "" [ref=f76e656] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://wikitia.com/wiki/James_Turner_%28physicist%29
+            - generic [ref=f76e658]:
+              - generic [ref=f76e660]: Wiki
+              - generic "Contains JavaScript" [ref=f76e661]: JS
+          - generic [ref=f76e663]:
+            - generic [ref=f76e664]:
+              - generic [ref=f76e665]:
+                - generic [ref=f76e666]:
+                  - generic "Match density" [ref=f76e667]
+                  - generic [ref=f76e671]:
+                    - heading [level=2] [ref=f76e672]:
+                      - link "Overview ‹ Dava Newman — MIT Media Lab" [ref=f76e673] [cursor=pointer]:
+                        - /url: https://www.media.mit.edu/people/dnewman/overview/
+                    - link "https://www.media.mit.edu/people/dnewman/overview/" [ref=f76e675] [cursor=pointer]:
+                      - /url: https://www.media.mit.edu/people/dnewman/overview/
+                - paragraph [ref=f76e677]: "Find People, Projects, etc. Email: Password: Work for a Member organization and need a Member Portal account? Register here with your official email address.Register a Member Account Past Member Former Director, MIT Media Lab; Apollo Professor of Astronau"
+              - generic [ref=f76e678]:
+                - link "" [ref=f76e679] [cursor=pointer]:
+                  - /url: /site/www.media.mit.edu
+                - link "" [ref=f76e681] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.media.mit.edu/people/dnewman/overview/
+            - generic [ref=f76e683]:
+              - link "1 more" [ref=f76e685] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Awww.media.mit.edu&sst=SE-5d87c2279f98cc43
+              - generic "Contains JavaScript" [ref=f76e687]: JS
+          - generic [ref=f76e689]:
+            - generic [ref=f76e690]:
+              - generic [ref=f76e691]:
+                - generic [ref=f76e692]:
+                  - generic "Match density" [ref=f76e693]
+                  - generic [ref=f76e697]:
+                    - heading [level=2] [ref=f76e698]:
+                      - link "Graduate School" [ref=f76e699] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+                    - generic [ref=f76e700]:
+                      - generic "PDF" [ref=f76e701]: 
+                      - link "https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf" [ref=f76e702] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+                - paragraph [ref=f76e704]: 136 Accounting and income tax provisions regarding tributable net income and income the definition of corporation vs. in respect of a decedent. Taxation association and limited liability company issues and how they A 610 Estate Planning affect corporation
+              - generic [ref=f76e705]:
+                - link "" [ref=f76e706] [cursor=pointer]:
+                  - /url: /site/www.newhaven.edu
+                - link "" [ref=f76e708] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+            - generic [ref=f76e710]:
+              - paragraph [ref=f76e711]: "Also from www.newhaven.edu:"
+              - list [ref=f76e712]:
+                - listitem [ref=f76e713]:
+                  - generic "PDF": 
+                  - link "Undergraduate Catalog 2004-2006" [ref=f76e714] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2004-2006.pdf
+                - listitem [ref=f76e715]:
+                  - generic "PDF": 
+                  - link "U N I V E R S I T Y O F N E W H A V E N" [ref=f76e716] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2006-2008.pdf
+                - listitem [ref=f76e717]:
+                  - generic "PDF": 
+                  - link "university of new haven Graduate School" [ref=f76e718] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2005-2007.pdf
+                - listitem [ref=f76e719]:
+                  - generic "PDF": 
+                  - link "University of New Haven Undergraduate Catalog 2010-2012" [ref=f76e720] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2010-2012.pdf
+            - generic [ref=f76e721]:
+              - link "1 more" [ref=f76e723] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Awww.newhaven.edu&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e725]: PDF File
+          - generic [ref=f76e727]:
+            - generic [ref=f76e728]:
+              - generic [ref=f76e729]:
+                - generic [ref=f76e730]:
+                  - generic "Match density" [ref=f76e731]
+                  - generic [ref=f76e735]:
+                    - heading [level=2] [ref=f76e736]:
+                      - link "VINCI' 2017 Call for Paper - Paper submission deadline extended to - Infovis - infovis.org" [ref=f76e737] [cursor=pointer]:
+                        - /url: https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+                    - link "https://www.infovis.org/archives/list/infovis@infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/" [ref=f76e739] [cursor=pointer]:
+                      - /url: https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+                - paragraph [ref=f76e741]: 15 Mar 2017 15 Mar '17 8:51 p.m. VINCI 2017 The 10th International Symposium on Visual Information Communication and Interaction Bangkok, Thailand, 14-16 August 2017 Paper submission deadline extended to 9 April 2017 vinci-conf.org Visual communication th
+              - generic [ref=f76e742]:
+                - link "" [ref=f76e743] [cursor=pointer]:
+                  - /url: /site/www.infovis.org
+                - link "" [ref=f76e745] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+            - generic [ref=f76e747]:
+              - link "1 more" [ref=f76e749] [cursor=pointer]:
+                - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology+site%3Awww.infovis.org&sst=SE-5d87c2279f98cc43
+              - generic "Contains JavaScript" [ref=f76e751]: JS
+      - generic [ref=f76e752]:
+        - link "1" [ref=f76e753] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&sst=SE-5d87c2279f98cc43
+        - link "2" [ref=f76e754] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&page=2&sst=SE-5d87c2279f98cc43
+        - link "3" [ref=f76e755] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&page=3&sst=SE-5d87c2279f98cc43
+        - link "4" [ref=f76e756] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&page=4&sst=SE-5d87c2279f98cc43
+        - link "5" [ref=f76e757] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&page=5&sst=SE-5d87c2279f98cc43
+        - link "6" [ref=f76e758] [cursor=pointer]:
+          - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&page=6&sst=SE-5d87c2279f98cc43
+    - complementary [ref=f76e759]:
+      - text: 
+      - generic [ref=f76e761]:
+        - heading " Search Settings" [level=2] [ref=f76e762]:
+          - generic [ref=f76e763]: 
+          - text: Search Settings
+        - generic [ref=f76e764]:
+          - button [ref=f76e766] [cursor=pointer]:
+            - link " Search In Title" [ref=f76e767]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&searchTitle=title&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e768]: 
+              - generic [ref=f76e769]: Search In Title
+          - button [ref=f76e771] [cursor=pointer]:
+            - link " Recent Results" [ref=f76e772]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&recent=recent&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e773]: 
+              - generic [ref=f76e774]: Recent Results
+          - button [ref=f76e776] [cursor=pointer]:
+            - link " Remove JS" [ref=f76e777]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&js=no-js&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e778]: 
+              - generic [ref=f76e779]: Remove JS
+          - button [ref=f76e781] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f76e782]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&adtech=reduce&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e783]: 
+              - generic [ref=f76e784]: Reduce Adtech
+          - button [ref=f76e786] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f76e787]:
+              - /url: /search?query=Pi+Beta+Phi+MIT+Massachusetts+Institute+Technology&nsfw=smut&newfilter=true&sst=SE-5d87c2279f98cc43
+              - generic [ref=f76e788]: 
+              - generic [ref=f76e789]: Reduce NSFW
+          - button [ref=f76e792] [cursor=pointer]:
+            - generic [ref=f76e793]:
+              - generic [ref=f76e794]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f76e796]:
+    - heading "Search Help" [level=1] [ref=f76e797]
+    - generic [ref=f76e798]:
+      - generic [ref=f76e799]:
+        - heading " Syntax" [level=2] [ref=f76e800]:
+          - generic [ref=f76e801]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f76e802]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f76e803]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f76e804]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f76e805]
+        - heading "Samples" [level=2] [ref=f76e806]
+        - generic [ref=f76e807]:
+          - term [ref=f76e808]: soup -chicken
+          - definition [ref=f76e809]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f76e810]: "\"keyboard\""
+          - definition [ref=f76e811]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f76e812]: "\"steve mcqueen\""
+          - definition [ref=f76e813]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f76e814]: apology (plato)
+          - definition [ref=f76e815]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f76e816]:
+          - generic [ref=f76e817]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f76e818]
+        - generic [ref=f76e819]: This is by the beginning
+        - generic [ref=f76e827]: This is in the middle
+        - generic [ref=f76e835]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f76e841]:
+          - generic [ref=f76e842]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f76e843]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f76e844]
+        - heading " Webmaster Information" [level=2] [ref=f76e845]:
+          - generic [ref=f76e846]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f76e847]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f76e848] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f76e849] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f76e850]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f76e851] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f76e852]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f76e853] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f76e854]:
+        - heading " Special Keywords" [level=2] [ref=f76e855]:
+          - generic [ref=f76e856]: 
+          - text: Special Keywords
+        - table [ref=f76e857]:
+          - rowgroup [ref=f76e858]:
+            - row [ref=f76e859]:
+              - columnheader "Keyword" [ref=f76e860]
+              - columnheader "Meaning" [ref=f76e861]
+          - rowgroup [ref=f76e862]:
+            - row [ref=f76e863]:
+              - cell [ref=f76e864]:
+                - text: "site:"
+                - emphasis [ref=f76e865]: example.com
+              - cell [ref=f76e866]:
+                - text: Display site information about
+                - emphasis [ref=f76e867]: example.com
+            - row [ref=f76e868]:
+              - cell [ref=f76e869]:
+                - text: "site:"
+                - emphasis [ref=f76e870]: example.com
+                - emphasis [ref=f76e871]: keyword
+              - cell [ref=f76e872]:
+                - text: Search
+                - emphasis [ref=f76e873]: example.com
+                - text: for
+                - emphasis [ref=f76e874]: keyword
+            - row [ref=f76e875]:
+              - cell [ref=f76e876]:
+                - text: "site:"
+                - emphasis [ref=f76e877]: "*.example.com"
+                - emphasis [ref=f76e878]: keyword
+              - cell [ref=f76e879]:
+                - text: Search
+                - emphasis [ref=f76e880]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f76e881]: keyword
+            - row [ref=f76e882]:
+              - cell [ref=f76e883]:
+                - text: "browse:"
+                - emphasis [ref=f76e884]: example.com
+              - cell [ref=f76e885]:
+                - text: Show similar websites to
+                - emphasis [ref=f76e886]: example.com
+            - row [ref=f76e887]:
+              - cell [ref=f76e888]:
+                - text: "ip:"
+                - emphasis [ref=f76e889]: 127.0.0.1
+              - cell [ref=f76e890]:
+                - text: Search documents hosted at
+                - emphasis [ref=f76e891]: 127.0.0.1
+            - row [ref=f76e892]:
+              - cell [ref=f76e893]:
+                - text: "links:"
+                - emphasis [ref=f76e894]: example.com
+              - cell [ref=f76e895]:
+                - text: Search documents linking to
+                - emphasis [ref=f76e896]: example.com
+            - row [ref=f76e897]:
+              - cell [ref=f76e898]:
+                - text: "tld:"
+                - emphasis [ref=f76e899]: edu
+                - emphasis [ref=f76e900]: keyword
+              - cell [ref=f76e901]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f76e902]: edu
+                - text: .
+            - row [ref=f76e903]:
+              - cell [ref=f76e904]:
+                - text: "?tld:"
+                - emphasis [ref=f76e905]: edu
+                - emphasis [ref=f76e906]: keyword
+              - cell [ref=f76e907]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f76e908]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f76e909]:
+              - cell "q>5" [ref=f76e910]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f76e911]
+            - row [ref=f76e912]:
+              - cell "q<5" [ref=f76e913]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f76e914]
+            - row [ref=f76e915]:
+              - cell "year>2005" [ref=f76e916]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f76e917]
+            - row [ref=f76e918]:
+              - cell "year=2005" [ref=f76e919]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f76e920]
+            - row [ref=f76e921]:
+              - cell "year<2005" [ref=f76e922]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f76e923]
+            - row [ref=f76e924]:
+              - cell "rank>50" [ref=f76e925]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f76e926]
+            - row [ref=f76e927]:
+              - cell "rank<50" [ref=f76e928]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f76e929]
+            - row [ref=f76e930]:
+              - cell "format:html5" [ref=f76e931]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f76e932]
+            - row [ref=f76e933]:
+              - cell "format:xhtml" [ref=f76e934]
+              - cell "Filter documents using the XHTML standard" [ref=f76e935]
+            - row [ref=f76e936]:
+              - cell "format:html123" [ref=f76e937]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f76e938]
+            - row [ref=f76e939]:
+              - cell "generator:wordpress" [ref=f76e940]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f76e941]
+            - row [ref=f76e942]:
+              - cell "file:zip" [ref=f76e943]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f76e944]
+            - row [ref=f76e945]:
+              - cell "file:audio" [ref=f76e946]
+              - cell "Filter documents containing a link to an audio file" [ref=f76e947]
+            - row [ref=f76e948]:
+              - cell "file:video" [ref=f76e949]
+              - cell "Filter documents containing a link to a video file" [ref=f76e950]
+            - row [ref=f76e951]:
+              - cell "file:archive" [ref=f76e952]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f76e953]
+            - row [ref=f76e954]:
+              - cell "file:document" [ref=f76e955]
+              - cell "Filter documents containing a link to a document" [ref=f76e956]
+            - row [ref=f76e957]:
+              - cell "-special:media" [ref=f76e958]
+              - cell "Filter out documents with audio or video tags" [ref=f76e959]
+            - row [ref=f76e960]:
+              - cell "-special:scripts" [ref=f76e961]
+              - cell "Filter out documents with javascript" [ref=f76e962]
+            - row [ref=f76e963]:
+              - cell "-special:affiliate" [ref=f76e964]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f76e965]
+            - row [ref=f76e966]:
+              - cell "-special:tracking" [ref=f76e967]
+              - cell "Filter out documents with analytics or tracking code" [ref=f76e968]
+            - row [ref=f76e969]:
+              - cell "-special:cookies" [ref=f76e970]
+              - cell "Filter out documents with cookies" [ref=f76e971]
+  - contentinfo [ref=f76e972]:
+    - heading "Policy Information" [level=1] [ref=f76e973]
+    - generic [ref=f76e974]:
+      - generic [ref=f76e975]:
+        - heading " Policies" [level=2] [ref=f76e976]:
+          - generic [ref=f76e977]: 
+          - text: Policies
+        - generic [ref=f76e978]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f76e979]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f76e980]:
+        - heading " Contact" [level=2] [ref=f76e981]:
+          - generic [ref=f76e982]: 
+          - text: Contact
+        - generic [ref=f76e983]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f76e984] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f76e985]:
+          - generic [ref=f76e986]: 
+          - text: Sources
+        - generic [ref=f76e987]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f76e988] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f76e989]:
+        - heading " Data" [level=2] [ref=f76e990]:
+          - generic [ref=f76e991]: 
+          - text: Data
+        - generic [ref=f76e992]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f76e993] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f76e994] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

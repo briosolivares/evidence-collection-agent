@@ -134,6 +134,10 @@ runs/<run-id>/
 Only files published under `artifacts/` are deliverables. Scratch files remain
 private run state.
 
+This repository includes a shared historical snapshot under `runs/` and
+`evals/experiments/` for reviewing prior outputs and eval results. New local
+records remain ignored unless they are explicitly staged for another snapshot.
+
 Common overrides:
 
 - `sherlock --runs-dir <path>` — use another results directory

@@ -1,0 +1,37 @@
+{
+  "task": "Create a CSV of the top 30 contributors to the OpenClaw GitHub repository, with columns github_handle, name, linkedin_url.",
+  "startedAt": "2026-08-20T16:49:13.570Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/top30.json",
+      "sha256": "5fbd1afba184af7b3cc2167e6906325af533bdebdf0e6a55fe8782ce4b45c514",
+      "capturedAt": "2026-08-20T16:50:53.074Z"
+    },
+    {
+      "filename": "scratch/workspace/profiles_part1.json",
+      "sha256": "4a37c4ae160d60e7db90a9ac67381d428af1222ce464d230af730d4f5b1a4061",
+      "capturedAt": "2026-08-20T16:51:09.319Z"
+    },
+    {
+      "filename": "scratch/workspace/profiles_part2.json",
+      "sha256": "eef6b7c20c420d7290420e833799fc03e9df173123437ccf14baa09c91ccccd5",
+      "capturedAt": "2026-08-20T16:51:27.625Z"
+    },
+    {
+      "filename": "scratch/workspace/openclaw_top_contributors.csv",
+      "sha256": "05b1234d5d17b51b1e3e2db2aab4e212a02033a9e2cb47bb308f8d510b9d5d3f",
+      "capturedAt": "2026-08-20T16:52:02.090Z"
+    },
+    {
+      "filename": "artifacts/openclaw_top_contributors.csv",
+      "sha256": "05b1234d5d17b51b1e3e2db2aab4e212a02033a9e2cb47bb308f8d510b9d5d3f",
+      "sourceUrl": "https://github.com/openclaw/openclaw/graphs/contributors",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-20T16:52:06.269Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T16:52:28.123Z"
+}

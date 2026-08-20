@@ -1,0 +1,789 @@
+URL: https://github.com/openclaw/openclaw/pull/123005
+Title: fix(agent): finish turns when providers fail after tools complete by obviyus · Pull Request #123005 · openclaw/openclaw · GitHub
+
+- generic [ref=f51e2]:
+  - generic [ref=f51e3]:
+    - link "Skip to content" [ref=f51e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f51e8]:
+      - heading "Navigation Menu" [level=2] [ref=f51e9]
+      - generic [ref=f51e10]:
+        - link "Homepage" [ref=f51e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f51e15]:
+          - navigation "Global" [ref=f51e16]:
+            - list [ref=f51e17]:
+              - listitem [ref=f51e18]:
+                - button "Platform" [ref=f51e20] [cursor=pointer]
+              - listitem [ref=f51e23]:
+                - button "Solutions" [ref=f51e25] [cursor=pointer]
+              - listitem [ref=f51e28]:
+                - button "Resources" [ref=f51e30] [cursor=pointer]
+              - listitem [ref=f51e33]:
+                - button "Open Source" [ref=f51e35] [cursor=pointer]
+              - listitem [ref=f51e38]:
+                - button "Enterprise" [ref=f51e40] [cursor=pointer]
+              - listitem [ref=f51e43]:
+                - link "Pricing" [ref=f51e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f51e45]:
+            - button "Search or jump to, type / to search" [ref=f51e47] [cursor=pointer]:
+              - generic [ref=f51e50]:
+                - text: Type
+                - generic [ref=f51e51]: /
+                - text: to search
+            - link "Sign in" [ref=f51e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123005
+            - link "Sign up" [ref=f51e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f51e55] [cursor=pointer]
+  - main [ref=f51e61]:
+    - generic [ref=f51e62]:
+      - generic [ref=f51e63]:
+        - generic [ref=f51e65]:
+          - link "openclaw" [ref=f51e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f51e70]: /
+          - strong [ref=f51e71]:
+            - link "openclaw" [ref=f51e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f51e73]: Public
+        - generic [ref=f51e74]:
+          - list:
+            - listitem [ref=f51e75]:
+              - link "Sponsor @openclaw" [ref=f51e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f51e77]: Sponsor
+            - listitem [ref=f51e81]:
+              - link "You must be signed in to change notification settings" [ref=f51e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f51e85]:
+              - link "Fork 81.2k" [ref=f51e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f51e89]: 81.2k
+            - listitem [ref=f51e90]:
+              - link "You must be signed in to star a repository" [ref=f51e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386124 users starred this repository" [ref=f51e95]: 386k
+      - navigation "Repository" [ref=f51e96]:
+        - list [ref=f51e97]:
+          - listitem [ref=f51e98]:
+            - link "Code" [ref=f51e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f51e103]:
+            - link "Issues 3.4k" [ref=f51e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f51e108]: Issues
+              - generic "3,402" [ref=f51e109]: 3.4k
+          - listitem [ref=f51e110]:
+            - link "Pull requests 2.1k" [ref=f51e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f51e114]: Pull requests
+              - generic "2,088" [ref=f51e115]: 2.1k
+          - listitem [ref=f51e116]:
+            - link "Actions" [ref=f51e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f51e121]:
+            - link "Projects" [ref=f51e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f51e126]:
+            - link "Security and quality 647" [ref=f51e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f51e130]: Security and quality
+              - generic "647" [ref=f51e131]
+          - listitem [ref=f51e132]:
+            - link "Insights" [ref=f51e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f51e143]:
+      - generic [ref=f51e147]:
+        - generic [ref=f51e149]:
+          - 'heading "fix(agent): finish turns when providers fail after tools complete - #123005" [level=1] [ref=f51e150]':
+            - text: "fix(agent): finish turns when providers fail after tools complete"
+            - generic [ref=f51e151]: "- #123005"
+          - generic [ref=f51e152]: "#123005"
+        - generic [ref=f51e155]:
+          - generic [ref=f51e157]:
+            - img "Pull request" [ref=f51e158]
+            - text: Merged
+          - generic [ref=f51e161]:
+            - link "obviyus" [ref=f51e162] [cursor=pointer]:
+              - /url: /obviyus
+            - text: merged 3 commits into
+            - generic [ref=f51e163]:
+              - link "main" [ref=f51e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f51e165]: from
+              - generic [ref=f51e166]:
+                - link "t3code/fix-agent-no-response-error" [ref=f51e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/t3code/fix-agent-no-response-error
+                - button "Copy head branch name to clipboard" [ref=f51e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 11:47 PM PDT" [ref=f51e172]: Aug 13, 202615 minutes ago
+        - generic [ref=f51e173]:
+          - generic [ref=f51e175]:
+            - generic [ref=f51e176]: "+220"
+            - generic [ref=f51e177]: "-86"
+            - generic [ref=f51e178]: "Lines changed: 220 additions & 86 deletions"
+          - navigation "Pull request navigation tabs" [ref=f51e186]:
+            - generic [ref=f51e187]:
+              - link "Conversation (2)" [ref=f51e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123005
+                - text: Conversation
+                - generic [ref=f51e191]: "2"
+                - generic [ref=f51e192]: (2)
+              - link "Commits (3)" [ref=f51e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123005/commits
+                - text: Commits
+                - generic [ref=f51e196]: "3"
+                - generic [ref=f51e197]: (3)
+              - link "Checks (151)" [ref=f51e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123005/checks
+                - text: Checks
+                - generic [ref=f51e201]: "151"
+                - generic [ref=f51e202]: (151)
+              - link "Files changed (11)" [ref=f51e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123005/files
+                - text: Files changed
+                - generic [ref=f51e206]: "11"
+                - generic [ref=f51e207]: (11)
+      - generic [ref=f51e212]:
+        - generic [ref=f51e214]:
+          - heading "Conversation" [level=2] [ref=f51e215]
+          - generic [ref=f51e216]:
+            - generic [ref=f51e217]:
+              - generic [ref=f51e219]:
+                - link [ref=f51e220] [cursor=pointer]:
+                  - /url: /obviyus
+                  - img "@obviyus" [ref=f51e221]
+                - generic [ref=f51e223]:
+                  - generic [ref=f51e224]:
+                    - heading "obviyus commented Aug 13, 20262 hours ago •" [level=3] [ref=f51e225]:
+                      - generic [ref=f51e226]:
+                        - strong [ref=f51e227]:
+                          - link "obviyus" [ref=f51e228] [cursor=pointer]:
+                            - /url: /obviyus
+                        - text: commented
+                        - link "Aug 13, 20262 hours ago" [ref=f51e229] [cursor=pointer]:
+                          - /url: "#issue-5137894525"
+                        - generic [ref=f51e230]:
+                          - generic [ref=f51e231]: •
+                          - group [ref=f51e232]:
+                            - button "edited" [ref=f51e233] [cursor=pointer]
+                    - generic [ref=f51e237]:
+                      - group [ref=f51e239]:
+                        - button [ref=f51e240] [cursor=pointer]:
+                          - img "Show options" [ref=f51e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f51e246]: Contributor
+                  - generic [ref=f51e251]:
+                    - heading "What Problem This Solves" [level=2] [ref=f51e252]
+                    - paragraph [ref=f51e253]: A provider can fail after tools already completed. OpenClaw then warned that actions might have run instead of safely finishing the response; recovered Codex answers could also be suppressed on message-tool-only channels.
+                    - heading "Fix" [level=2] [ref=f51e254]
+                    - list [ref=f51e255]:
+                      - listitem [ref=f51e256]:
+                        - text: Capture the exact frozen settled transcript after successful turns and structured Codex
+                        - code [ref=f51e257]: serverOverloaded
+                        - text: failures. The context itself is the single finalization authority; no new SDK capability flag.
+                      - listitem [ref=f51e258]: Run the existing isolated, tools-disabled finalizer only from that context. Usage-limit, unauthorized, unknown, partial, and unproven failures remain fail-closed.
+                      - listitem [ref=f51e259]: Mark finalizer text as host-owned delivery because that isolated run cannot call a channel message tool.
+                    - paragraph [ref=f51e260]: Original tools are never replayed.
+                    - heading "Proof" [level=2] [ref=f51e261]
+                    - list [ref=f51e262]:
+                      - listitem [ref=f51e263]: "Regression test fails on pre-fix code: a completed side-effecting tool followed by provider failure performs no finalization and surfaces the incomplete-turn fallback. Fixed code performs one isolated finalizer and never reruns the tool."
+                      - listitem [ref=f51e264]: Codex boundary tests prove both official failed-turn and terminal-error overload producers capture the settled context; usage-limit and unauthorized failures do not.
+                      - listitem [ref=f51e265]:
+                        - text: "Focused exact-head suites: 195 tests passed. Production/test typechecks, plugin SDK API baseline, full lint, format, build, and"
+                        - code [ref=f51e266]: git diff --check
+                        - text: passed.
+                      - listitem [ref=f51e267]:
+                        - text: Exact CI run
+                        - code [ref=f51e268]: "31672578857"
+                        - text: ": all selected checks and aggregate gate passed."
+                      - listitem [ref=f51e269]:
+                        - text: "Production:"
+                        - code [ref=f51e270]: +16/-9
+                        - text: (net
+                        - code [ref=f51e271]: "+7"
+                        - text: "). Tests/support:"
+                        - code [ref=f51e272]: +204/-77
+                        - text: .
+                    - heading "Redacted Telegram QA transcript" [level=3] [ref=f51e273]
+                    - paragraph [ref=f51e274]:
+                      - text: "Exact head:"
+                      - code [ref=f51e275]: d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                      - text: . Real Telegram QA user through TDLib; fresh isolated Gateway; synthetic Codex app-server fixture.
+                    - generic [ref=f51e276]:
+                      - code [ref=f51e278]: "QA user -> bot: [synthetic settled-tool overload recovery prompt] bot -> QA user: Working / Bash fixture: command completed; side-effect log appended once fixture: structured serverOverloaded terminal error Gateway: running isolated settled-turn finalization bot -> QA user: OPENCLAW_E2E_SETTLED_ERROR_RECOVERED bot edit: 1 tool call / 1s"
+                      - button "Copy code to clipboard" [ref=f51e280] [cursor=pointer]
+                    - paragraph [ref=f51e284]:
+                      - text: "Observed counts: Telegram messages"
+                      - code [ref=f51e285]: "2"
+                      - text: ", edits"
+                      - code [ref=f51e286]: "1"
+                      - text: ", side-effect log lines"
+                      - code [ref=f51e287]: "1"
+                      - text: ", Codex request/event records"
+                      - code [ref=f51e288]: "36"
+                      - text: ". Forbidden output counts: incomplete-turn fallback"
+                      - code [ref=f51e289]: "0"
+                      - text: ", finalization failure"
+                      - code [ref=f51e290]: "0"
+                      - text: ", scary warning"
+                      - code [ref=f51e291]: "0"
+                      - text: . Account, chat, message, run, session, and trace identifiers redacted.
+                    - heading "Pinned Codex contract" [level=3] [ref=f51e292]
+                    - paragraph [ref=f51e293]:
+                      - text: OpenClaw pins
+                      - code [ref=f51e294]: "@openai/codex"
+                      - text: 0.147.0 (
+                      - code [ref=f51e295]: rust-v0.147.0
+                      - text: ", commit"
+                      - code [ref=f51e296]: be6e8eac029b183056b7e4402879f15d2c85f61b
+                      - text: "). Direct source inspection proves:"
+                    - list [ref=f51e297]:
+                      - listitem [ref=f51e298]:
+                        - text: Tool calls are recorded before execution, all tool futures are drained into transcript results, and tool calls force a follow-up sampling request (
+                        - link "stream_events_utils.rs" [ref=f51e299] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/core/src/stream_events_utils.rs#L296-L327
+                        - text: ","
+                        - link "turn.rs" [ref=f51e300] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/core/src/session/turn.rs#L2086-L2110
+                        - text: ).
+                      - listitem [ref=f51e301]:
+                        - code [ref=f51e302]: ServerOverloaded
+                        - text: is structured and non-retryable; app-server preserves it on the terminal
+                        - code [ref=f51e303]: "will_retry: false"
+                        - text: error while transient retries use
+                        - code [ref=f51e304]: "will_retry: true"
+                        - text: (
+                        - link "error.rs" [ref=f51e305] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/protocol/src/error.rs#L362-L386
+                        - text: ","
+                        - link "shared.rs" [ref=f51e306] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server-protocol/src/protocol/v2/shared.rs#L70-L128
+                        - text: ","
+                        - link "bespoke_event_handling.rs" [ref=f51e307] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server/src/bespoke_event_handling.rs#L920-L975
+                        - text: ).
+                      - listitem [ref=f51e308]:
+                        - text: A failed follow-up emits the turn-error lifecycle and can return with no assistant message (
+                        - link "turn.rs" [ref=f51e309] [cursor=pointer]:
+                          - /url: https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/core/src/session/turn.rs#L520-L552
+                        - text: ).
+                  - 'button "eyes (1): obviyus, 04:42AM today" [disabled] [ref=f51e314]':
+                    - generic [ref=f51e315]: 👀
+                    - generic [ref=f51e316]: "1"
+              - generic [ref=f51e317]:
+                - generic [ref=f51e319]:
+                  - link [ref=f51e321] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f51e322]
+                  - generic [ref=f51e324]:
+                    - generic [ref=f51e325]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago" [level=3] [ref=f51e326]:
+                        - generic [ref=f51e327]:
+                          - strong [ref=f51e328]:
+                            - link "clawsweeper" [ref=f51e329] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f51e330]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f51e331] [cursor=pointer]:
+                            - /url: "#issuecomment-5276057972"
+                      - generic [ref=f51e332]:
+                        - group [ref=f51e334]:
+                          - button [ref=f51e335] [cursor=pointer]:
+                            - img "Show options" [ref=f51e338]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f51e341]: Contributor
+                    - table [ref=f51e345]:
+                      - rowgroup [ref=f51e346]:
+                        - row [ref=f51e347]:
+                          - cell [ref=f51e348]:
+                            - paragraph [ref=f51e349]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f51e350]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f51e351]:
+                  - generic [ref=f51e356]:
+                    - link [ref=f51e357] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f51e358]
+                    - link "openclaw-barnacle" [ref=f51e359] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f51e360]: Bot
+                    - text: added
+                    - link "agents" [ref=f51e361] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                    - 'link "extensions: codex" [ref=f51e362] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20codex%22
+                    - 'link "size: S" [ref=f51e363] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                    - link "maintainer" [ref=f51e364] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20262 hours ago" [ref=f51e365] [cursor=pointer]:
+                      - /url: "#event-29380004247"
+                  - generic [ref=f51e370]:
+                    - link [ref=f51e371] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f51e372]
+                    - link "clawsweeper" [ref=f51e373] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f51e374]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 auth-provider" [ref=f51e375] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20auth-provider%22
+                    - link "P1" [ref=f51e376] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "rating: 🦐 gold shrimp" [ref=f51e377] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f51e378] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 20262 hours ago" [ref=f51e379] [cursor=pointer]:
+                      - /url: "#event-29380648727"
+                - generic [ref=f51e381]:
+                  - link [ref=f51e383] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f51e384]
+                  - generic [ref=f51e386]:
+                    - generic [ref=f51e387]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago •" [level=3] [ref=f51e388]:
+                        - generic [ref=f51e389]:
+                          - strong [ref=f51e390]:
+                            - link "clawsweeper" [ref=f51e391] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f51e392]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f51e393] [cursor=pointer]:
+                            - /url: "#issuecomment-5276194593"
+                          - generic [ref=f51e394]:
+                            - generic [ref=f51e395]: •
+                            - group [ref=f51e396]:
+                              - button "edited" [ref=f51e397] [cursor=pointer]
+                      - generic [ref=f51e401]:
+                        - group [ref=f51e403]:
+                          - button [ref=f51e404] [cursor=pointer]:
+                            - img "Show options" [ref=f51e407]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f51e410]: Contributor
+                    - table [ref=f51e414]:
+                      - rowgroup [ref=f51e415]:
+                        - row [ref=f51e416]:
+                          - cell [ref=f51e417]:
+                            - paragraph [ref=f51e418]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f51e419]: Reviewed August 13, 2026, 2:21 AM ET / 06:21 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f51e420]
+                            - heading "What this changes" [level=2] [ref=f51e421]
+                            - paragraph [ref=f51e422]: The PR captures a settled tool transcript after a terminal Codex overload, runs one tools-disabled finalizer, and delivers that final response on message-tool-only channels.
+                            - heading "Regression provenance" [level=2] [ref=f51e423]
+                            - paragraph [ref=f51e424]: Possible regression — probable (reproduction; reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f51e425]
+                            - paragraph [ref=f51e426]:
+                              - generic [ref=f51e427]: ⚠️
+                              - strong [ref=f51e428]: Needs maintainer review before merge - 3 items remain
+                            - paragraph [ref=f51e429]: "Keep open for maintainer review: the fix is narrowly structured, has strong regression and Telegram evidence, but its Codex overload allowlist still needs direct verification against the pinned upstream 0.147.0 app-server source."
+                            - paragraph [ref=f51e430]:
+                              - strong [ref=f51e431]: "Priority:"
+                              - text: P1
+                              - strong [ref=f51e432]: "Reviewed head:"
+                              - code [ref=f51e433]: d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                              - strong [ref=f51e434]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f51e435] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f51e436]
+                            - table [ref=f51e438]:
+                              - rowgroup [ref=f51e439]:
+                                - row [ref=f51e440]:
+                                  - columnheader "Measure" [ref=f51e441]
+                                  - columnheader "Result" [ref=f51e442]
+                                  - columnheader "What it means" [ref=f51e443]
+                              - rowgroup [ref=f51e444]:
+                                - row [ref=f51e445]:
+                                  - cell [ref=f51e446]:
+                                    - strong [ref=f51e447]: Overall readiness
+                                  - cell [ref=f51e448]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f51e449]: (3/6)
+                                  - cell "The patch and real behavior proof are strong, but exact upstream provider-contract verification remains unresolved." [ref=f51e450]
+                                - row [ref=f51e451]:
+                                  - cell [ref=f51e452]:
+                                    - strong [ref=f51e453]: Proof confidence
+                                  - cell [ref=f51e454]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f51e455]: (5/6)
+                                  - 'cell "Sufficient (logs): The PR body supplies a redacted TDLib Telegram after-fix transcript with one tool side effect, one final reply, and no incomplete-turn warning or finalization failure." [ref=f51e456]'
+                                - row [ref=f51e457]:
+                                  - cell [ref=f51e458]:
+                                    - strong [ref=f51e459]: Patch quality
+                                  - cell [ref=f51e460]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f51e461]: (3/6)
+                                  - cell "No actionable review findings were identified." [ref=f51e462]
+                            - heading "Verification" [level=2] [ref=f51e463]
+                            - table [ref=f51e465]:
+                              - rowgroup [ref=f51e466]:
+                                - row [ref=f51e467]:
+                                  - columnheader "Check" [ref=f51e468]
+                                  - columnheader "Result" [ref=f51e469]
+                                  - columnheader "Evidence" [ref=f51e470]
+                              - rowgroup [ref=f51e471]:
+                                - row [ref=f51e472]:
+                                  - cell [ref=f51e473]:
+                                    - strong [ref=f51e474]: Real behavior
+                                  - cell "Verified" [ref=f51e475]
+                                  - 'cell "Sufficient (logs): The PR body supplies a redacted TDLib Telegram after-fix transcript with one tool side effect, one final reply, and no incomplete-turn warning or finalization failure." [ref=f51e476]'
+                                - row [ref=f51e477]:
+                                  - cell [ref=f51e478]:
+                                    - strong [ref=f51e479]: Evidence reviewed
+                                  - cell "6 items" [ref=f51e480]
+                                  - 'cell "Producer-owned recovery fact: The PR records overload eligibility in the Codex event projector for both terminal error notifications and failed turns, before transcript capture consumes it. Fail-closed core boundary: A failed terminal attempt cannot enter settled-tool finalization without the plugin-produced frozen context; ordinary failures remain blocked. Regression coverage: The integration-style Codex attempt test covers completed tools followed by overload, usage-limit, and unauthorized outcomes, and asserts that only overload captures an immutable finalization context." [ref=f51e481]': "Producer-owned recovery fact: The PR records overload eligibility in the Codex event projector for both terminal error notifications and failed turns, before transcript capture consumes it.Fail-closed core boundary: A failed terminal attempt cannot enter settled-tool finalization without the plugin-produced frozen context; ordinary failures remain blocked.Regression coverage: The integration-style Codex attempt test covers completed tools followed by overload, usage-limit, and unauthorized outcomes, and asserts that only overload captures an immutable finalization context."
+                                - row [ref=f51e482]:
+                                  - cell [ref=f51e483]:
+                                    - strong [ref=f51e484]: Findings
+                                  - cell "None" [ref=f51e485]
+                                  - cell "None." [ref=f51e486]
+                                - row [ref=f51e487]:
+                                  - cell [ref=f51e488]:
+                                    - strong [ref=f51e489]: Security
+                                  - cell "None" [ref=f51e490]
+                                  - cell "None." [ref=f51e491]
+                            - heading "How this fits together" [level=2] [ref=f51e492]
+                            - paragraph [ref=f51e493]: The Codex plugin projects app-server events into an embedded agent attempt. The core runner may then use a frozen settled transcript to request one isolated final answer before channel reply dispatch.
+                            - region "mermaid rendered output container" [ref=f51e494]:
+                              - generic [ref=f51e495]:
+                                - generic [ref=f51e496]:
+                                  - group [ref=f51e497]:
+                                    - button "Open dialog" [ref=f51e498] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f51e501] [cursor=pointer]
+                                - iframe [ref=f51e506]:
+                                  - generic [ref=f52e1]:
+                                    - document [ref=f52e5]:
+                                      - generic [ref=f52e7]:
+                                        - generic [ref=f52e13]:
+                                          - paragraph [ref=f52e19]: "yes"
+                                          - paragraph [ref=f52e25]: "no"
+                                        - generic [ref=f52e26]:
+                                          - paragraph [ref=f52e33]: Codex app-server events
+                                          - paragraph [ref=f52e40]: Event projector
+                                          - paragraph [ref=f52e47]: Settled transcript
+                                          - paragraph [ref=f52e54]: Terminal overload verified?
+                                          - paragraph [ref=f52e61]: Tools-disabled finalizer
+                                          - paragraph [ref=f52e68]: Fail-closed outcome
+                                          - paragraph [ref=f52e75]: Channel reply dispatch
+                                    - generic [ref=f52e76]:
+                                      - button "Zoom in" [ref=f52e77]
+                                      - button "Zoom out" [ref=f52e81]
+                                      - button "Reset view" [ref=f52e85]
+                                      - button "Pan up" [ref=f52e88]
+                                      - button "Pan down" [ref=f52e91]
+                                      - button "Pan left" [ref=f52e94]
+                                      - button "Pan right" [ref=f52e97]
+                            - heading "Decision needed" [level=2] [ref=f51e507]
+                            - table [ref=f51e509]:
+                              - rowgroup [ref=f51e510]:
+                                - row [ref=f51e511]:
+                                  - columnheader "Question" [ref=f51e512]
+                                  - columnheader "Recommendation" [ref=f51e513]
+                              - rowgroup [ref=f51e514]:
+                                - row [ref=f51e515]:
+                                  - cell "Should this PR wait for direct @openai/codex 0.147.0 app-server source proof that non-retry serverOverloaded is terminal after settled tools, or may it merge on the vendored schema and submitted live proof?" [ref=f51e516]
+                                  - cell [ref=f51e517]:
+                                    - strong [ref=f51e518]: "Obtain exact upstream contract proof:"
+                                    - text: Re-review after inspecting the 0.147.0 app-server producer, notification ordering, and terminal semantics for serverOverloaded.
+                            - paragraph [ref=f51e519]: "Why: The repository policy requires the exact upstream contract for Codex-dependent verdicts, while this environment could inspect only an older installed wrapper and the vendored protocol schema."
+                            - heading "Before merge" [level=2] [ref=f51e520]
+                            - list [ref=f51e521]:
+                              - listitem [ref=f51e522]:
+                                - checkbox "Incomplete task" [disabled] [ref=f51e523]
+                                - strong [ref=f51e524]: Resolve merge risk (P1)
+                                - text: "- The pinned @openai/codex 0.147.0 source was unavailable, so the vendored schema proves the error-code shape but not that a non-retry serverOverloaded event is terminal and safe for finalization."
+                              - listitem [ref=f51e525]:
+                                - checkbox "Incomplete task" [disabled] [ref=f51e526]
+                                - strong [ref=f51e527]: Resolve merge risk (P1)
+                                - text: "- Production code is +7 lines for a new authoritative recovery fact; this is justified because neither an absent completed turn nor generic core terminal state distinguishes the relevant provider error, but it should remain this narrow."
+                            - group [ref=f51e528]:
+                              - strong [ref=f51e530] [cursor=pointer]: Agent review details
+                - generic [ref=f51e531]:
+                  - generic [ref=f51e536]:
+                    - link [ref=f51e537] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f51e538]
+                    - link "clawsweeper" [ref=f51e539] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f51e540]: Bot
+                    - text: added
+                    - 'link "rating: 🦪 silver shellfish" [ref=f51e541] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - text: and removed
+                    - 'link "rating: 🦐 gold shrimp" [ref=f51e542] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f51e543] [cursor=pointer]:
+                      - /url: "#event-29380908759"
+                  - generic [ref=f51e548]:
+                    - link [ref=f51e549] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f51e550]
+                    - link "openclaw-barnacle" [ref=f51e551] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f51e552]: Bot
+                    - text: added
+                    - 'link "size: M" [ref=f51e553] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - text: and removed
+                    - 'link "size: S" [ref=f51e554] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f51e555] [cursor=pointer]:
+                      - /url: "#event-29381049797"
+                  - generic [ref=f51e561]:
+                    - link [ref=f51e563] [cursor=pointer]:
+                      - /url: /obviyus
+                      - img "@obviyus" [ref=f51e564]
+                    - generic [ref=f51e565]:
+                      - link "obviyus" [ref=f51e566] [cursor=pointer]:
+                        - /url: /obviyus
+                      - link "force-pushed" [ref=f51e567] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/fad438793126f574c97d3c80f51c46a5b92818bd..74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef
+                      - text: the
+                      - generic [ref=f51e568]: t3code/fix-agent-no-response-error
+                      - text: branch 4 times, most recently from
+                      - link [ref=f51e570] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/fad438793126f574c97d3c80f51c46a5b92818bd
+                        - code [ref=f51e571]: fad4387
+                      - text: to
+                      - link [ref=f51e572] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef
+                        - code [ref=f51e573]: 74aa8bd
+                      - link "Compare" [ref=f51e574] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/fad438793126f574c97d3c80f51c46a5b92818bd..74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef
+                      - link "August 13, 2026 05:511 hour ago" [ref=f51e577] [cursor=pointer]:
+                        - /url: "#event-29382008018"
+                - generic [ref=f51e579]:
+                  - generic [ref=f51e584]:
+                    - link "obviyus" [ref=f51e585] [cursor=pointer]:
+                      - /url: /obviyus
+                    - text: added 3 commits
+                    - link "August 13, 2026 08:051 hour ago" [ref=f51e586] [cursor=pointer]:
+                      - /url: "#commits-pushed-9993587"
+                  - generic [ref=f51e587]:
+                    - generic [ref=f51e595]:
+                      - link [ref=f51e598] [cursor=pointer]:
+                        - /url: /obviyus
+                        - img "@obviyus" [ref=f51e599]
+                      - code [ref=f51e601]:
+                        - 'link "fix(agent): finalize settled tools after provider errors" [ref=f51e602] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/123005/commits/9993587216756fc288db8ba7d9b46c9ece8717a5
+                      - button "Verified" [ref=f51e604] [cursor=pointer]
+                      - group [ref=f51e609]:
+                        - img "0 / 1 checks OK" [ref=f51e611] [cursor=pointer]
+                      - code [ref=f51e614]:
+                        - link "9993587" [ref=f51e615] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/123005/commits/9993587216756fc288db8ba7d9b46c9ece8717a5
+                    - generic [ref=f51e623]:
+                      - link [ref=f51e626] [cursor=pointer]:
+                        - /url: /obviyus
+                        - img "@obviyus" [ref=f51e627]
+                      - code [ref=f51e629]:
+                        - 'link "fix(agent): deliver settled-turn final answers" [ref=f51e630] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/123005/commits/1d32fd74fd108e3801c93540b2dd9e4ef958f0a2
+                      - button "Verified" [ref=f51e632] [cursor=pointer]
+                      - group [ref=f51e637]:
+                        - img "0 / 1 checks OK" [ref=f51e639] [cursor=pointer]
+                      - code [ref=f51e642]:
+                        - link "1d32fd7" [ref=f51e643] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/123005/commits/1d32fd74fd108e3801c93540b2dd9e4ef958f0a2
+                    - generic [ref=f51e651]:
+                      - link [ref=f51e654] [cursor=pointer]:
+                        - /url: /obviyus
+                        - img "@obviyus" [ref=f51e655]
+                      - code [ref=f51e657]:
+                        - 'link "fix(agent): gate settled-turn failure recovery" [ref=f51e658] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/123005/commits/d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                      - button "Verified" [ref=f51e660] [cursor=pointer]
+                      - group [ref=f51e665]:
+                        - img "80 / 121 checks OK" [ref=f51e667] [cursor=pointer]
+                      - code [ref=f51e670]:
+                        - link "d3eb7ab" [ref=f51e671] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/123005/commits/d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                - generic [ref=f51e672]:
+                  - generic [ref=f51e678]:
+                    - link [ref=f51e680] [cursor=pointer]:
+                      - /url: /obviyus
+                      - img "@obviyus" [ref=f51e681]
+                    - generic [ref=f51e682]:
+                      - link "obviyus" [ref=f51e683] [cursor=pointer]:
+                        - /url: /obviyus
+                      - link "force-pushed" [ref=f51e684] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef..d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                      - text: the
+                      - generic [ref=f51e685]: t3code/fix-agent-no-response-error
+                      - text: branch from
+                      - link [ref=f51e687] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef
+                        - code [ref=f51e688]: 74aa8bd
+                      - text: to
+                      - link [ref=f51e689] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                        - code [ref=f51e690]: d3eb7ab
+                      - link "Compare" [ref=f51e691] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/74aa8bdb9c6a88f7b2de1e03fe9f3e7bde27bfef..d3eb7ab82d8fe5ed989cec3559c39b9d647b0149
+                      - link "August 13, 2026 06:051 hour ago" [ref=f51e694] [cursor=pointer]:
+                        - /url: "#event-29382459947"
+                  - generic [ref=f51e699]:
+                    - link [ref=f51e700] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f51e701]
+                    - link "clawsweeper" [ref=f51e702] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f51e703]: Bot
+                    - text: added
+                    - 'link "rating: 🦐 gold shrimp" [ref=f51e704] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f51e705] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - 'link "mantis: telegram-visible-proof" [ref=f51e706] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22mantis%3A%20telegram-visible-proof%22
+                    - 'link "proof: sufficient" [ref=f51e707] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                    - text: and removed
+                    - 'link "rating: 🦪 silver shellfish" [ref=f51e708] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: ⏳ waiting on author" [ref=f51e709] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 202650 minutes ago" [ref=f51e710] [cursor=pointer]:
+                      - /url: "#event-29382695131"
+                  - generic [ref=f51e715]:
+                    - link [ref=f51e716] [cursor=pointer]:
+                      - /url: /obviyus
+                      - img "@obviyus" [ref=f51e717]
+                    - link "obviyus" [ref=f51e718] [cursor=pointer]:
+                      - /url: /obviyus
+                    - text: self-assigned this
+                    - link "Aug 13, 202615 minutes ago" [ref=f51e719] [cursor=pointer]:
+                      - /url: "#event-29384012310"
+                  - generic [ref=f51e724]:
+                    - button "View details" [ref=f51e725] [cursor=pointer]
+                    - generic [ref=f51e726]:
+                      - link [ref=f51e728] [cursor=pointer]:
+                        - /url: /obviyus
+                        - img "@obviyus" [ref=f51e729]
+                      - generic [ref=f51e730]:
+                        - link "obviyus" [ref=f51e731] [cursor=pointer]:
+                          - /url: /obviyus
+                        - text: merged commit
+                        - link [ref=f51e732] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/0b9842d138c0ac28ca2f70180a27ddc6e7c30624
+                          - code [ref=f51e733]: 0b9842d
+                        - text: into
+                        - generic [ref=f51e734]: main
+                        - link "Aug 13, 202615 minutes ago" [ref=f51e736] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123005#event-29384021717
+                        - generic [ref=f51e737]: 151 checks passed
+                - generic [ref=f51e745]:
+                  - link [ref=f51e747] [cursor=pointer]:
+                    - /url: /obviyus
+                    - img "@obviyus" [ref=f51e748]
+                  - generic [ref=f51e749]:
+                    - link "obviyus" [ref=f51e750] [cursor=pointer]:
+                      - /url: /obviyus
+                    - text: deleted the
+                    - generic [ref=f51e751]: t3code/fix-agent-no-response-error
+                    - text: branch
+                    - link "August 13, 2026 06:4714 minutes ago" [ref=f51e753] [cursor=pointer]:
+                      - /url: "#event-29384023197"
+            - generic [ref=f51e757]:
+              - link "Sign up for free" [ref=f51e758] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f51e759]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f51e760] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123005
+        - generic [ref=f51e764]:
+          - form "Select reviewers" [ref=f51e766]:
+            - heading "Reviewers" [level=3] [ref=f51e767]
+            - text: No reviews
+          - form "Select assignees" [ref=f51e769]:
+            - heading "Assignees" [level=3] [ref=f51e770]
+            - paragraph [ref=f51e772]:
+              - generic [ref=f51e773]:
+                - link [ref=f51e774] [cursor=pointer]:
+                  - /url: /obviyus
+                  - img "@obviyus" [ref=f51e775]
+                - link "obviyus" [ref=f51e776] [cursor=pointer]:
+                  - /url: /obviyus
+          - generic [ref=f51e777]:
+            - heading "Labels" [level=3] [ref=f51e778]
+            - generic [ref=f51e779]:
+              - link "agents" [ref=f51e780] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+              - 'link "extensions: codex" [ref=f51e782] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20codex%22
+              - link "maintainer" [ref=f51e784] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "mantis: telegram-visible-proof" [ref=f51e786] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22mantis%3A%20telegram-visible-proof%22
+              - 'link "merge-risk: 🚨 auth-provider" [ref=f51e788] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20auth-provider%22
+              - link "P1" [ref=f51e790] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "proof: sufficient" [ref=f51e792] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "rating: 🦐 gold shrimp" [ref=f51e794] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+              - 'link "size: M" [ref=f51e796] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f51e798] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f51e801]:
+            - heading "Projects" [level=3] [ref=f51e802]
+            - text: None yet
+          - form "Select milestones" [ref=f51e804]:
+            - heading "Milestone" [level=3] [ref=f51e805]
+            - text: No milestone
+          - form "Link issues" [ref=f51e811]:
+            - heading "Development" [level=3] [ref=f51e812]
+            - paragraph [ref=f51e813]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f51e815]: None yet
+          - generic [ref=f51e817]:
+            - heading "1 participant" [level=3] [ref=f51e818]
+            - link [ref=f51e820] [cursor=pointer]:
+              - /url: /obviyus
+              - img "@obviyus" [ref=f51e821]
+  - contentinfo [ref=f51e822]:
+    - heading "Footer" [level=2] [ref=f51e823]
+    - generic [ref=f51e824]:
+      - generic [ref=f51e825]:
+        - link "GitHub Homepage" [ref=f51e826] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f51e829]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f51e830]:
+        - heading "Footer navigation" [level=3] [ref=f51e831]
+        - list "Footer navigation" [ref=f51e832]:
+          - listitem [ref=f51e833]:
+            - link "Terms" [ref=f51e834] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f51e835]:
+            - link "Privacy" [ref=f51e836] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f51e837]:
+            - link "Security" [ref=f51e838] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f51e839]:
+            - link "Status" [ref=f51e840] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f51e841]:
+            - link "Community" [ref=f51e842] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f51e843]:
+            - link "Docs" [ref=f51e844] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f51e845]:
+            - link "Contact" [ref=f51e846] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f51e847]:
+            - button "Manage cookies" [ref=f51e849] [cursor=pointer]
+          - listitem [ref=f51e850]:
+            - button "Do not share my personal information" [ref=f51e852] [cursor=pointer]

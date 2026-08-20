@@ -1,0 +1,10 @@
+{
+  "status": "completed",
+  "turns": 10,
+  "inputTokens": 20,
+  "outputTokens": 2458,
+  "cacheReadInputTokens": 157784,
+  "cacheCreationInputTokens": 24457,
+  "peakContextTokens": 28434,
+  "wallClockMs": 45878
+}

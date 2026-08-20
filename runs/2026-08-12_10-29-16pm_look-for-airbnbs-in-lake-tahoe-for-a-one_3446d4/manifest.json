@@ -1,0 +1,49 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-13T05:29:16.216Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "a5b9e9d526efd99c14f9aa0e4c7d3105beb3ddc0a47ab2e9de12a5b6ab5df213",
+      "capturedAt": "2026-08-13T05:29:58.400Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "4e6fcc0f59e540d415456e9c32cb9536540502cae5eb40d53e0d52954eb17e6a",
+      "capturedAt": "2026-08-13T05:30:00.741Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "0f081ce6e4d6fae9074625f970958f7f0466fe93dac3864eddfa9b79f353351d",
+      "capturedAt": "2026-08-13T05:30:03.281Z"
+    },
+    {
+      "filename": "scratch/listings_raw.md",
+      "sha256": "fbe87d9965f5ea15b276cc9a9cb6fd0422c2587c1ec9d00012e6ef79390cde2c",
+      "capturedAt": "2026-08-13T05:32:44.140Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-2.txt",
+      "sha256": "6d86be293e4019f57292221264becf7233772647dd8d933e54ee622cc32957df",
+      "capturedAt": "2026-08-13T05:30:23.889Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "a5b9e9d526efd99c14f9aa0e4c7d3105beb3ddc0a47ab2e9de12a5b6ab5df213",
+      "capturedAt": "2026-08-13T05:30:32.151Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "752eef03a82e5d6b4ddd01cc53eb26edfe60fcb59a11396e62c5815d794b1d0e",
+      "capturedAt": "2026-08-13T05:31:41.876Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "5955db686e956d5cf174b225e5a1b33bc3da6d7698e10880635a7f4993e09c33",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:33:40.217Z"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "outputs": [
+    {
+      "id": "homepage_screenshots",
+      "kind": "screenshots",
+      "count": {
+        "exact": 3
+      },
+      "filenamePattern": "homepage-*.png",
+      "mustShow": [
+        "Notion company website homepage",
+        "Figma company website homepage",
+        "Eight Sleep company website homepage"
+      ]
+    },
+    {
+      "id": "blog_content_screenshots",
+      "kind": "screenshots",
+      "count": {
+        "exact": 3
+      },
+      "filenamePattern": "blog-*.png",
+      "mustShow": [
+        "Most recent official blog/content item released by Notion, showing it is still active",
+        "Most recent official blog/content item released by Figma, showing it is still active",
+        "Most recent official blog/content item released by Eight Sleep, showing it is still active"
+      ]
+    }
+  ],
+  "contentExpectations": [
+    "Cover exactly the three companies: Notion, Figma, and Eight Sleep",
+    "For each company, provide one homepage screenshot and one screenshot of its most recent official blog/content item",
+    "The blog/content screenshot for each company should give evidence that the company is still active (e.g. a recent publish date or timestamp visible)",
+    "All six screenshots must be produced as PNG artifacts"
+  ]
+}

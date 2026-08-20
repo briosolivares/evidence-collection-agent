@@ -1,0 +1,23 @@
+{
+  "sorority": "Pi Beta Phi",
+  "website": "https://mit.pibetaphi.org/",
+  "sistersPage": "https://mit.pibetaphi.org/members",
+  "note": "Site lists Class of 2027, 2028, 2029 only. No Class of 2026 (seniors) section present on the members page.",
+  "members": [
+    {"name":"Claire Chen","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Hannah Chung","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Kat Dou","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Allison Fan","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Jue Gong","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Amy He","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Yina Wang","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Jessica Kim","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Sasha Krigel","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Ashley Lam","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Belinda Lin","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Tea Piccinatto","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Audrey Wei","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Jasmine Shone","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""},
+    {"name":"Hannah Tao","class":"2027","major":"","affiliation":"Pi Beta Phi","interests":"","other":""}
+  ]
+}

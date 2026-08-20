@@ -1,0 +1,20 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T06:53:59.017Z",
+  "artifacts": [
+    {
+      "filename": "scratch/roster.md",
+      "sha256": "fd3dc67ef2805447af756ceb01e1b1bcd4824875af1e8bda5d4e835f6cbd20b2",
+      "capturedAt": "2026-08-13T06:55:37.676Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "5528df12cd805b9066188167af7e0e2aa4b8016f2f9d5d6f8f7be9a5a92c6094",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:56:00.705Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:56:16.816Z"
+}

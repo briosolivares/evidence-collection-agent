@@ -1,0 +1,754 @@
+URL: https://github.com/openclaw/openclaw/pull/123013
+Title: feat(worker): expose supervised terminal outcomes by steipete · Pull Request #123013 · openclaw/openclaw · GitHub
+
+- generic [ref=f16e2]:
+  - generic [ref=f16e3]:
+    - link "Skip to content" [ref=f16e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f16e8]:
+      - heading "Navigation Menu" [level=2] [ref=f16e9]
+      - generic [ref=f16e10]:
+        - link "Homepage" [ref=f16e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f16e15]:
+          - navigation "Global" [ref=f16e16]:
+            - list [ref=f16e17]:
+              - listitem [ref=f16e18]:
+                - button "Platform" [ref=f16e20] [cursor=pointer]
+              - listitem [ref=f16e23]:
+                - button "Solutions" [ref=f16e25] [cursor=pointer]
+              - listitem [ref=f16e28]:
+                - button "Resources" [ref=f16e30] [cursor=pointer]
+              - listitem [ref=f16e33]:
+                - button "Open Source" [ref=f16e35] [cursor=pointer]
+              - listitem [ref=f16e38]:
+                - button "Enterprise" [ref=f16e40] [cursor=pointer]
+              - listitem [ref=f16e43]:
+                - link "Pricing" [ref=f16e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f16e45]:
+            - button "Search or jump to, type / to search" [ref=f16e47] [cursor=pointer]:
+              - generic [ref=f16e50]:
+                - text: Type
+                - generic [ref=f16e51]: /
+                - text: to search
+            - link "Sign in" [ref=f16e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123013
+            - link "Sign up" [ref=f16e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f16e55] [cursor=pointer]
+  - main [ref=f16e61]:
+    - generic [ref=f16e62]:
+      - generic [ref=f16e63]:
+        - generic [ref=f16e65]:
+          - link "openclaw" [ref=f16e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f16e70]: /
+          - strong [ref=f16e71]:
+            - link "openclaw" [ref=f16e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f16e73]: Public
+        - generic [ref=f16e74]:
+          - list:
+            - listitem [ref=f16e75]:
+              - link "Sponsor @openclaw" [ref=f16e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f16e77]: Sponsor
+            - listitem [ref=f16e81]:
+              - link "You must be signed in to change notification settings" [ref=f16e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f16e85]:
+              - link "Fork 81.2k" [ref=f16e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f16e89]: 81.2k
+            - listitem [ref=f16e90]:
+              - link "You must be signed in to star a repository" [ref=f16e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386127 users starred this repository" [ref=f16e95]: 386k
+      - navigation "Repository" [ref=f16e96]:
+        - list [ref=f16e97]:
+          - listitem [ref=f16e98]:
+            - link "Code" [ref=f16e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f16e103]:
+            - link "Issues 3.4k" [ref=f16e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f16e108]: Issues
+              - generic "3,402" [ref=f16e109]: 3.4k
+          - listitem [ref=f16e110]:
+            - link "Pull requests 2.1k" [ref=f16e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f16e114]: Pull requests
+              - generic "2,086" [ref=f16e115]: 2.1k
+          - listitem [ref=f16e116]:
+            - link "Actions" [ref=f16e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f16e121]:
+            - link "Projects" [ref=f16e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f16e126]:
+            - link "Security and quality 647" [ref=f16e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f16e130]: Security and quality
+              - generic "647" [ref=f16e131]
+          - listitem [ref=f16e132]:
+            - link "Insights" [ref=f16e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f16e143]:
+      - generic [ref=f16e147]:
+        - generic [ref=f16e149]:
+          - 'heading "feat(worker): expose supervised terminal outcomes - #123013" [level=1] [ref=f16e150]':
+            - text: "feat(worker): expose supervised terminal outcomes"
+            - generic [ref=f16e151]: "- #123013"
+          - generic [ref=f16e152]: "#123013"
+        - generic [ref=f16e155]:
+          - generic [ref=f16e157]:
+            - img "Pull request" [ref=f16e158]
+            - text: Merged
+          - generic [ref=f16e161]:
+            - link "steipete" [ref=f16e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 2 commits into
+            - generic [ref=f16e163]:
+              - link "main" [ref=f16e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f16e165]: from
+              - generic [ref=f16e166]:
+                - link "steipete/device-worker-turn-launch" [ref=f16e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/device-worker-turn-launch
+                - button "Copy head branch name to clipboard" [ref=f16e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 10:19 PM PDT" [ref=f16e172]: Aug 13, 20261 hour ago
+        - generic [ref=f16e173]:
+          - generic [ref=f16e175]:
+            - generic [ref=f16e176]: "+461"
+            - generic [ref=f16e177]: "-189"
+            - generic [ref=f16e178]: "Lines changed: 461 additions & 189 deletions"
+          - navigation "Pull request navigation tabs" [ref=f16e186]:
+            - generic [ref=f16e187]:
+              - link "Conversation (4)" [ref=f16e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123013
+                - text: Conversation
+                - generic [ref=f16e191]: "4"
+                - generic [ref=f16e192]: (4)
+              - link "Commits (2)" [ref=f16e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123013/commits
+                - text: Commits
+                - generic [ref=f16e196]: "2"
+                - generic [ref=f16e197]: (2)
+              - link "Checks (188)" [ref=f16e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123013/checks
+                - text: Checks
+                - generic [ref=f16e201]: "188"
+                - generic [ref=f16e202]: (188)
+              - link "Files changed (8)" [ref=f16e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123013/files
+                - text: Files changed
+                - generic [ref=f16e206]: "8"
+                - generic [ref=f16e207]: (8)
+      - generic [ref=f16e212]:
+        - generic [ref=f16e214]:
+          - heading "Conversation" [level=2] [ref=f16e215]
+          - generic [ref=f16e216]:
+            - generic [ref=f16e217]:
+              - generic [ref=f16e219]:
+                - link [ref=f16e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f16e221]
+                - generic [ref=f16e223]:
+                  - generic [ref=f16e224]:
+                    - heading [level=3] [ref=f16e225]:
+                      - generic [ref=f16e226]:
+                        - strong [ref=f16e227]:
+                          - link "steipete" [ref=f16e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 13, 20262 hours ago" [ref=f16e229] [cursor=pointer]:
+                          - /url: "#issue-5138004282"
+                    - generic [ref=f16e230]:
+                      - group [ref=f16e232]:
+                        - button [ref=f16e233] [cursor=pointer]:
+                          - img "Show options" [ref=f16e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f16e239]: Contributor
+                  - generic [ref=f16e244]:
+                    - heading "What Problem This Solves" [level=2] [ref=f16e245]
+                    - paragraph [ref=f16e246]: The durable node worker supervisor can report that a turn completed or failed, but its private Gateway receipt exposes only identity and state. A Gateway-side node launch client therefore cannot collect the bounded worker runtime JSON that the existing turn launcher consumes, or the redacted diagnostic for a failed child.
+                    - heading "Why This Change Was Made" [level=2] [ref=f16e247]
+                    - paragraph [ref=f16e248]: "This moves the private launch/request/identity DTOs and plan hash into a worker-owned shared contract, then makes terminal receipts a closed discriminated union:"
+                    - list [ref=f16e249]:
+                      - listitem [ref=f16e250]:
+                        - code [ref=f16e251]: pending
+                        - text: /
+                        - code [ref=f16e252]: running
+                        - text: carry identity and state only;
+                      - listitem [ref=f16e253]:
+                        - code [ref=f16e254]: completed
+                        - text: additionally carries bounded, valid JSON (
+                        - code [ref=f16e255]: resultJson
+                        - text: );
+                      - listitem [ref=f16e256]:
+                        - code [ref=f16e257]: failed
+                        - text: /
+                        - code [ref=f16e258]: interrupted
+                        - text: /
+                        - code [ref=f16e259]: cancelled
+                        - text: additionally carry bounded single-line
+                        - code [ref=f16e260]: errorText
+                        - text: .
+                    - paragraph [ref=f16e261]: The node-host projection validates every durable receipt before it crosses the private capability-bound transport. Inconsistent rows fail closed as a generic supervisor error. PIDs, process identities, gateway namespace, descriptor, credential, timestamps, and filesystem internals remain absent. Request parsing and plan hashing keep one canonical worker-owned implementation; the obsolete node-host identity module is removed.
+                    - paragraph [ref=f16e262]:
+                      - text: This is deliberately a prerequisite, not device turn launch. It does not enable
+                      - code [ref=f16e263]: "sessions.dispatch({ deviceId })"
+                      - text: ", create a node tunnel, install bundles, synthesize"
+                      - code [ref=f16e264]: SpawnResult
+                      - text: ", or bypass the existing workspace-transfer gate."
+                    - paragraph [ref=f16e265]:
+                      - text: The patch also repairs an inherited red-main CI failure by renaming an internal migration-assertion map that accidentally matched the
+                      - code [ref=f16e266]: OPENCLAW_*
+                      - text: environment-variable ratchet. The ratchet stays at 502; no environment surface is added.
+                    - heading "User Impact" [level=2] [ref=f16e267]
+                    - paragraph [ref=f16e268]: No user-visible device-runner capability is enabled yet. This gives the next Gateway adapter a strict, replayable terminal-result seam without exposing node-host internals or weakening the private supervisor boundary.
+                    - heading "Evidence" [level=2] [ref=f16e269]
+                    - list [ref=f16e270]:
+                      - listitem [ref=f16e271]:
+                        - text: "Pre-fix regression:"
+                        - code [ref=f16e272]: node scripts/run-vitest.mjs src/node-host/invoke-worker-supervisor.test.ts
+                        - text: failed because a completed receipt omitted
+                        - code [ref=f16e273]: resultJson
+                        - text: .
+                      - listitem [ref=f16e274]: "Broad supervisor proof: 61 tests passed across the shared protocol, worker runtime result, private invocation, real process supervision/recovery, and node runtime integration."
+                      - listitem [ref=f16e275]: "Shared wire-contract proof: 15 closed-shape/bounds tests passed, including malformed/extra fields, missing terminal data, invalid JSON, multiline diagnostics, and byte ceilings."
+                      - listitem [ref=f16e276]:
+                        - text: "Red-main repair proof:"
+                        - code [ref=f16e277]: OPENCLAW_* count 502/502
+                        - text: ;
+                        - code [ref=f16e278]: src/state/openclaw-state-db.test.ts
+                        - text: passed 142 tests with one skip.
+                      - listitem [ref=f16e279]: "Canonical changed gate passed after trusted-source local fallback because no remote provider was ready: formatting, unchanged Plugin SDK API baseline, dead exports, production/test types, full core lint, schema/database/auth/pairing guards, and zero runtime cycles."
+                      - listitem [ref=f16e280]: "Final structured review and secret scan: clean."
+                      - listitem [ref=f16e281]:
+                        - code [ref=f16e282]: git diff --check
+                        - text: ": clean."
+                    - paragraph [ref=f16e283]: "LOC classification against the branch base:"
+                    - list [ref=f16e284]:
+                      - listitem [ref=f16e285]: "production: +322/−181, net +141;"
+                      - listitem [ref=f16e286]: "tests: +138/−7, net +131."
+                    - paragraph [ref=f16e287]: The production growth is the strict terminal receipt parser and bounded union required by the forthcoming launch adapter; moving the existing request/identity/hash contract removes duplicate ownership rather than preserving a compatibility facade.
+                  - 'button "eyes (1): steipete, 05:04AM today" [disabled] [ref=f16e292]':
+                    - generic [ref=f16e293]: 👀
+                    - generic [ref=f16e294]: "1"
+              - generic [ref=f16e295]:
+                - generic [ref=f16e306]:
+                  - link [ref=f16e309] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f16e310]
+                  - code [ref=f16e312]:
+                    - 'link "feat(worker): expose supervised terminal outcomes" [ref=f16e313] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/123013/commits/b99b70355926588d50e205220fec0ef8f099434e
+                  - button "Unverified" [ref=f16e315] [cursor=pointer]
+                  - group [ref=f16e320]:
+                    - img "4 / 69 checks OK" [ref=f16e322] [cursor=pointer]
+                  - code [ref=f16e325]:
+                    - link "b99b703" [ref=f16e326] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/123013/commits/b99b70355926588d50e205220fec0ef8f099434e
+                - generic [ref=f16e328]:
+                  - link [ref=f16e330] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f16e331]
+                  - generic [ref=f16e333]:
+                    - generic [ref=f16e334]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago" [level=3] [ref=f16e335]:
+                        - generic [ref=f16e336]:
+                          - strong [ref=f16e337]:
+                            - link "clawsweeper" [ref=f16e338] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f16e339]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f16e340] [cursor=pointer]:
+                            - /url: "#issuecomment-5276186698"
+                      - generic [ref=f16e341]:
+                        - group [ref=f16e343]:
+                          - button [ref=f16e344] [cursor=pointer]:
+                            - img "Show options" [ref=f16e347]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f16e350]: Contributor
+                    - table [ref=f16e354]:
+                      - rowgroup [ref=f16e355]:
+                        - row [ref=f16e356]:
+                          - cell [ref=f16e357]:
+                            - paragraph [ref=f16e358]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f16e359]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f16e365]:
+                  - link [ref=f16e366] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                    - img "@openclaw-barnacle" [ref=f16e367]
+                  - link "openclaw-barnacle" [ref=f16e368] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                  - generic [ref=f16e369]: Bot
+                  - text: added
+                  - 'link "size: L" [ref=f16e370] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20L%22
+                  - link "maintainer" [ref=f16e371] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                  - text: labels
+                  - link "Aug 13, 20262 hours ago" [ref=f16e372] [cursor=pointer]:
+                    - /url: "#event-29380623631"
+                - generic [ref=f16e383]:
+                  - link [ref=f16e386] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f16e387]
+                  - code [ref=f16e389]:
+                    - 'link "docs(plan): track supervisor terminal outcomes" [ref=f16e390] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/123013/commits/017c31bdf722c1e3053d811663139fbe5578f1e5
+                  - button "Unverified" [ref=f16e392] [cursor=pointer]
+                  - group [ref=f16e397]:
+                    - img "77 / 120 checks OK" [ref=f16e399] [cursor=pointer]
+                  - code [ref=f16e402]:
+                    - link "017c31b" [ref=f16e403] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/123013/commits/017c31bdf722c1e3053d811663139fbe5578f1e5
+                - generic [ref=f16e404]:
+                  - generic [ref=f16e410]:
+                    - link [ref=f16e412] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f16e413]
+                    - generic [ref=f16e414]:
+                      - link "steipete" [ref=f16e415] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 05:042 hours ago" [ref=f16e416] [cursor=pointer]:
+                        - /url: "#event-29380630010"
+                  - generic [ref=f16e421]:
+                    - link [ref=f16e422] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f16e423]
+                    - link "openclaw-barnacle" [ref=f16e424] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f16e425]: Bot
+                    - text: added the
+                    - link "docs" [ref=f16e426] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+                    - text: label
+                    - link "Aug 13, 20262 hours ago" [ref=f16e427] [cursor=pointer]:
+                      - /url: "#event-29380632643"
+                  - generic [ref=f16e432]:
+                    - link [ref=f16e433] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f16e434]
+                    - link "clawsweeper" [ref=f16e435] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f16e436]: Bot
+                    - text: added
+                    - link "P2" [ref=f16e437] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                    - 'link "rating: 🐚 platinum hermit" [ref=f16e438] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f16e439] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f16e440] [cursor=pointer]:
+                      - /url: "#event-29380957246"
+                - generic [ref=f16e442]:
+                  - link [ref=f16e444] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f16e445]
+                  - generic [ref=f16e447]:
+                    - generic [ref=f16e448]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago" [level=3] [ref=f16e449]:
+                        - generic [ref=f16e450]:
+                          - strong [ref=f16e451]:
+                            - link "clawsweeper" [ref=f16e452] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f16e453]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f16e454] [cursor=pointer]:
+                            - /url: "#issuecomment-5276265934"
+                      - generic [ref=f16e455]:
+                        - group [ref=f16e457]:
+                          - button [ref=f16e458] [cursor=pointer]:
+                            - img "Show options" [ref=f16e461]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f16e464]: Contributor
+                    - table [ref=f16e468]:
+                      - rowgroup [ref=f16e469]:
+                        - row [ref=f16e470]:
+                          - cell [ref=f16e471]:
+                            - paragraph [ref=f16e472]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f16e473]: Reviewed August 13, 2026, 1:15 AM ET / 05:15 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f16e474]
+                            - heading "What this changes" [level=2] [ref=f16e475]
+                            - paragraph [ref=f16e476]: The PR moves node-worker launch parsing into a worker-owned contract and adds bounded completed output or redacted terminal diagnostics to private supervisor receipts.
+                            - heading "Merge readiness" [level=2] [ref=f16e477]
+                            - paragraph [ref=f16e478]:
+                              - generic [ref=f16e479]: ⚠️
+                              - strong [ref=f16e480]: Ready for maintainer review - 1 item remains
+                            - paragraph [ref=f16e481]: Keep open for normal maintainer review. Current main still projects supervisor terminal state without output or diagnostics; this branch adds the missing validated terminal-result seam, and no blocking correctness defect was found.
+                            - paragraph [ref=f16e482]:
+                              - strong [ref=f16e483]: "Priority:"
+                              - text: P2
+                              - strong [ref=f16e484]: "Reviewed head:"
+                              - code [ref=f16e485]: 017c31bdf722c1e3053d811663139fbe5578f1e5
+                            - heading "Review scores" [level=2] [ref=f16e486]
+                            - table [ref=f16e488]:
+                              - rowgroup [ref=f16e489]:
+                                - row [ref=f16e490]:
+                                  - columnheader "Measure" [ref=f16e491]
+                                  - columnheader "Result" [ref=f16e492]
+                                  - columnheader "What it means" [ref=f16e493]
+                              - rowgroup [ref=f16e494]:
+                                - row [ref=f16e495]:
+                                  - cell [ref=f16e496]:
+                                    - strong [ref=f16e497]: Overall readiness
+                                  - cell [ref=f16e498]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f16e499]: (4/6)
+                                  - cell "A focused internal contract change with strong boundary validation and no blocking review finding." [ref=f16e500]
+                                - row [ref=f16e501]:
+                                  - cell [ref=f16e502]:
+                                    - strong [ref=f16e503]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f16e504]
+                                  - 'cell "Not applicable: This maintainer-authored internal boundary PR is exempt from the external-contributor real-behavior-proof gate; its supplied test evidence remains supplemental." [ref=f16e505]'
+                                - row [ref=f16e506]:
+                                  - cell [ref=f16e507]:
+                                    - strong [ref=f16e508]: Patch quality
+                                  - cell [ref=f16e509]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f16e510]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f16e511]
+                            - heading "Verification" [level=2] [ref=f16e512]
+                            - table [ref=f16e514]:
+                              - rowgroup [ref=f16e515]:
+                                - row [ref=f16e516]:
+                                  - columnheader "Check" [ref=f16e517]
+                                  - columnheader "Result" [ref=f16e518]
+                                  - columnheader "Evidence" [ref=f16e519]
+                              - rowgroup [ref=f16e520]:
+                                - row [ref=f16e521]:
+                                  - cell [ref=f16e522]:
+                                    - strong [ref=f16e523]: Real behavior
+                                  - cell "Not applicable" [ref=f16e524]
+                                  - 'cell "Not applicable: This maintainer-authored internal boundary PR is exempt from the external-contributor real-behavior-proof gate; its supplied test evidence remains supplemental." [ref=f16e525]'
+                                - row [ref=f16e526]:
+                                  - cell [ref=f16e527]:
+                                    - strong [ref=f16e528]: Evidence reviewed
+                                  - cell "5 items" [ref=f16e529]
+                                  - 'cell "Current main behavior: Current main defines a receipt containing only identity and lifecycle state, and its projection omits durable result and diagnostic fields before the private command response. Changed receipt boundary: The branch defines a closed receipt union and rejects malformed, oversized, multiline, or extra-field terminal receipts before they leave the node-host boundary. Caller and runtime contract: The command path projects the durable receipt at the private invocation boundary, while the existing worker runtime and gateway parser already use object-shaped, closed runtime results." [ref=f16e530]': "Current main behavior: Current main defines a receipt containing only identity and lifecycle state, and its projection omits durable result and diagnostic fields before the private command response.Changed receipt boundary: The branch defines a closed receipt union and rejects malformed, oversized, multiline, or extra-field terminal receipts before they leave the node-host boundary.Caller and runtime contract: The command path projects the durable receipt at the private invocation boundary, while the existing worker runtime and gateway parser already use object-shaped, closed runtime results."
+                                - row [ref=f16e531]:
+                                  - cell [ref=f16e532]:
+                                    - strong [ref=f16e533]: Findings
+                                  - cell "None" [ref=f16e534]
+                                  - cell "None." [ref=f16e535]
+                                - row [ref=f16e536]:
+                                  - cell [ref=f16e537]:
+                                    - strong [ref=f16e538]: Security
+                                  - cell "None" [ref=f16e539]
+                                  - cell "None." [ref=f16e540]
+                            - heading "How this fits together" [level=2] [ref=f16e541]
+                            - paragraph [ref=f16e542]: A Gateway-side node client invokes the node host’s private supervisor commands, which start and observe durable worker processes. The supervisor receipt is the bounded result passed back to the future node-worker launch adapter.
+                            - region "mermaid rendered output container" [ref=f16e543]:
+                              - generic [ref=f16e544]:
+                                - generic [ref=f16e545]:
+                                  - group [ref=f16e546]:
+                                    - button "Open dialog" [ref=f16e547] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f16e550] [cursor=pointer]
+                                - iframe [ref=f16e555]:
+                                  - generic [ref=f17e1]:
+                                    - document [ref=f17e5]:
+                                      - generic [ref=f17e8]:
+                                        - paragraph [ref=f17e15]: Gateway node client
+                                        - paragraph [ref=f17e22]: Private node command
+                                        - paragraph [ref=f17e29]: Node-host supervisor
+                                        - paragraph [ref=f17e36]: Durable launch receipt
+                                        - paragraph [ref=f17e43]: Receipt validation
+                                        - paragraph [ref=f17e50]: Future worker launch adapter
+                                    - generic [ref=f17e51]:
+                                      - button "Zoom in" [ref=f17e52]
+                                      - button "Zoom out" [ref=f17e56]
+                                      - button "Reset view" [ref=f17e60]
+                                      - button "Pan up" [ref=f17e63]
+                                      - button "Pan down" [ref=f17e66]
+                                      - button "Pan left" [ref=f17e69]
+                                      - button "Pan right" [ref=f17e72]
+                            - heading "Before merge" [level=2] [ref=f16e556]
+                            - list [ref=f16e557]:
+                              - listitem [ref=f16e558]:
+                                - checkbox "Incomplete task" [disabled] [ref=f16e559]
+                                - strong [ref=f16e560]: Resolve merge risk (P1)
+                                - text: "- The head is behind current main and required checks were still running in the supplied state; merge should use an exact-head CI and mergeability refresh."
+                            - group [ref=f16e561]:
+                              - strong [ref=f16e563] [cursor=pointer]: Agent review details
+                - generic [ref=f16e565]:
+                  - link [ref=f16e567] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f16e568]
+                  - generic [ref=f16e570]:
+                    - generic [ref=f16e571]:
+                      - heading [level=3] [ref=f16e572]:
+                        - generic [ref=f16e573]:
+                          - strong [ref=f16e574]:
+                            - link "steipete" [ref=f16e575] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f16e576] [cursor=pointer]:
+                            - /url: "#issuecomment-5276287666"
+                      - generic [ref=f16e577]:
+                        - group [ref=f16e579]:
+                          - button [ref=f16e580] [cursor=pointer]:
+                            - img "Show options" [ref=f16e583]
+                        - generic [ref=f16e585]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f16e586]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f16e588]: Author
+                    - table [ref=f16e592]:
+                      - rowgroup [ref=f16e593]:
+                        - row [ref=f16e594]:
+                          - cell [ref=f16e595]:
+                            - paragraph [ref=f16e596]:
+                              - text: Land-ready proof for
+                              - code [ref=f16e597]: 017c31bdf722c1e3053d811663139fbe5578f1e5
+                              - text: .
+                            - paragraph [ref=f16e598]:
+                              - text: "The private supervisor receipt is now a closed terminal-state union: active states carry identity/state only, completed carries bounded valid"
+                              - code [ref=f16e599]: resultJson
+                              - text: ", and failed/interrupted/cancelled carry bounded single-line"
+                              - code [ref=f16e600]: errorText
+                              - text: . The node-host projection revalidates the durable receipt and fails closed on inconsistent terminal persistence. PIDs, descriptor, credential, gateway namespace, timestamps, and filesystem internals remain absent; public node/plugin/operator/SDK surfaces are unchanged.
+                            - paragraph [ref=f16e601]: "Proof run:"
+                            - list [ref=f16e602]:
+                              - listitem [ref=f16e603]:
+                                - text: Pre-fix
+                                - code [ref=f16e604]: src/node-host/invoke-worker-supervisor.test.ts
+                                - text: reproduced the missing completed output.
+                              - listitem [ref=f16e605]: 61 supervisor protocol/runtime/process/recovery tests passed.
+                              - listitem [ref=f16e606]: 15 closed-shape and byte-bound receipt tests passed.
+                              - listitem [ref=f16e607]:
+                                - text: "Inherited red-main ratchet repair:"
+                                - code [ref=f16e608]: OPENCLAW_* count 502/502
+                                - text: ; 142 state-database tests passed with one skip. The budget was not raised.
+                              - listitem [ref=f16e609]: "Canonical changed gate passed: formatting, unchanged Plugin SDK API baseline, dead exports, production/test types, full core lint, native schema/database/auth/pairing guards, and zero runtime cycles."
+                              - listitem [ref=f16e610]: "Final structured review and secret scan: clean."
+                              - listitem [ref=f16e611]:
+                                - text: Required exact-head CI /
+                                - code [ref=f16e612]: openclaw/ci-gate
+                                - text: ":"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31669070004" [ref=f16e613] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31669070004
+                                - text: — green. Unrelated Apple/periphery detector jobs failed despite no Apple changes and were correctly excluded by native relevance gating.
+                              - listitem [ref=f16e614]:
+                                - text: Native
+                                - code [ref=f16e615]: OPENCLAW_TESTBOX=1 scripts/pr prepare-run 123013
+                                - text: ": passed in"
+                                - code [ref=f16e616]: hosted_exact_or_recent_parent
+                                - text: mode; remote PR tree matches the prepared head.
+                            - paragraph [ref=f16e617]: This remains an internal prerequisite. Device dispatch and the existing workspace/install gates are unchanged.
+                - generic [ref=f16e618]:
+                  - generic [ref=f16e623]:
+                    - button "View details" [ref=f16e624] [cursor=pointer]
+                    - generic [ref=f16e625]:
+                      - link [ref=f16e627] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f16e628]
+                      - generic [ref=f16e629]:
+                        - link "steipete" [ref=f16e630] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f16e631] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/3f4d89505a22de70de267905c93dbcd746969c4d
+                          - code [ref=f16e632]: 3f4d895
+                        - text: into
+                        - generic [ref=f16e633]: main
+                        - link "Aug 13, 20261 hour ago" [ref=f16e635] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123013#event-29381072543
+                        - generic [ref=f16e636]: 181 of 188 checks passed
+                  - generic [ref=f16e643]:
+                    - link [ref=f16e645] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f16e646]
+                    - generic [ref=f16e647]:
+                      - link "steipete" [ref=f16e648] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f16e649]: steipete/device-worker-turn-launch
+                      - text: branch
+                      - link "August 13, 2026 05:191 hour ago" [ref=f16e651] [cursor=pointer]:
+                        - /url: "#event-29381074384"
+                - generic [ref=f16e653]:
+                  - link [ref=f16e655] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f16e656]
+                  - generic [ref=f16e658]:
+                    - generic [ref=f16e659]:
+                      - heading [level=3] [ref=f16e660]:
+                        - generic [ref=f16e661]:
+                          - strong [ref=f16e662]:
+                            - link "steipete" [ref=f16e663] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f16e664] [cursor=pointer]:
+                            - /url: "#issuecomment-5276291124"
+                      - generic [ref=f16e665]:
+                        - group [ref=f16e667]:
+                          - button [ref=f16e668] [cursor=pointer]:
+                            - img "Show options" [ref=f16e671]
+                        - generic [ref=f16e673]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f16e674]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f16e676]: Author
+                    - table [ref=f16e680]:
+                      - rowgroup [ref=f16e681]:
+                        - row [ref=f16e682]:
+                          - cell [ref=f16e683]:
+                            - paragraph [ref=f16e684]: Merged via squash.
+                            - list [ref=f16e685]:
+                              - listitem [ref=f16e686]:
+                                - text: "Prepared head SHA:"
+                                - link "017c31bdf722c1e3053d811663139fbe5578f1e5" [ref=f16e687] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/123013/commits/017c31bdf722c1e3053d811663139fbe5578f1e5
+                              - listitem [ref=f16e688]:
+                                - text: "Landed commit:"
+                                - link "3f4d89505a22de70de267905c93dbcd746969c4d" [ref=f16e689] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/3f4d89505a22de70de267905c93dbcd746969c4d
+                - generic [ref=f16e690]:
+                  - generic [ref=f16e695]:
+                    - link "fuller-stack-dev" [ref=f16e696] [cursor=pointer]:
+                      - /url: /fuller-stack-dev
+                    - text: pushed a commit to fuller-stack-dev/openclaw that referenced this pull request
+                    - link "Aug 13, 20261 hour ago" [ref=f16e697] [cursor=pointer]:
+                      - /url: "#ref-commit-1d8a491"
+                    - generic [ref=f16e701]:
+                      - generic [ref=f16e703]:
+                        - link [ref=f16e704] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f16e705]
+                        - link [ref=f16e706] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f16e707]
+                      - generic [ref=f16e708]:
+                        - code [ref=f16e709]:
+                          - 'link "feat(worker): expose supervised terminal outcomes (" [ref=f16e710] [cursor=pointer]':
+                            - /url: /fuller-stack-dev/openclaw/commit/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                          - link "openclaw#123013" [ref=f16e711] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/123013
+                          - link ")" [ref=f16e712] [cursor=pointer]:
+                            - /url: /fuller-stack-dev/openclaw/commit/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                        - button "Commit message body" [ref=f16e714] [cursor=pointer]: …
+                      - button "Verified" [ref=f16e716] [cursor=pointer]
+                      - code [ref=f16e721]:
+                        - link "1d8a491" [ref=f16e722] [cursor=pointer]:
+                          - /url: /fuller-stack-dev/openclaw/commit/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                  - generic [ref=f16e727]:
+                    - link "fuller-stack-dev" [ref=f16e728] [cursor=pointer]:
+                      - /url: /fuller-stack-dev
+                    - text: added a commit that referenced this pull request
+                    - link "Aug 13, 202624 minutes ago" [ref=f16e729] [cursor=pointer]:
+                      - /url: "#ref-commit-ad4856c"
+                    - generic [ref=f16e733]:
+                      - generic [ref=f16e735]:
+                        - link [ref=f16e736] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f16e737]
+                        - link [ref=f16e738] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f16e739]
+                        - link [ref=f16e740] [cursor=pointer]:
+                          - /url: /vyctorbrzezowski
+                          - img "@vyctorbrzezowski" [ref=f16e741]
+                        - link [ref=f16e742] [cursor=pointer]:
+                          - /url: /ampagent
+                          - img "@ampagent" [ref=f16e743]
+                        - link [ref=f16e744] [cursor=pointer]:
+                          - /url: /jjjhenriksen
+                          - img "@jjjhenriksen" [ref=f16e745]
+                        - img "Kiran Magic" [ref=f16e746]
+                      - generic [ref=f16e747]:
+                        - code [ref=f16e748]:
+                          - 'link "fix: prevent bundled plugin startup convergence loops (" [ref=f16e749] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/commit/ad4856c51c672434596c5d7f64dad4079a8dd194
+                          - link "#122871" [ref=f16e750] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122871
+                          - link ")" [ref=f16e751] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/commit/ad4856c51c672434596c5d7f64dad4079a8dd194
+                        - button "Commit message body" [ref=f16e753] [cursor=pointer]: …
+                      - button "Partially verified" [ref=f16e755] [cursor=pointer]
+                      - group [ref=f16e759]:
+                        - img "66 / 85 checks OK" [ref=f16e761] [cursor=pointer]
+                      - code [ref=f16e764]:
+                        - link "ad4856c" [ref=f16e765] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/ad4856c51c672434596c5d7f64dad4079a8dd194
+            - generic [ref=f16e769]:
+              - link "Sign up for free" [ref=f16e770] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f16e771]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f16e772] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123013
+        - generic [ref=f16e776]:
+          - form "Select reviewers" [ref=f16e778]:
+            - heading "Reviewers" [level=3] [ref=f16e779]
+            - text: No reviews
+          - form "Select assignees" [ref=f16e781]:
+            - heading "Assignees" [level=3] [ref=f16e782]
+            - text: No one assigned
+          - generic [ref=f16e783]:
+            - heading "Labels" [level=3] [ref=f16e784]
+            - generic [ref=f16e785]:
+              - link "docs" [ref=f16e786] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+              - link "maintainer" [ref=f16e788] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P2" [ref=f16e790] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "rating: 🐚 platinum hermit" [ref=f16e792] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: L" [ref=f16e794] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20L%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f16e796] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f16e799]:
+            - heading "Projects" [level=3] [ref=f16e800]
+            - text: None yet
+          - form "Select milestones" [ref=f16e802]:
+            - heading "Milestone" [level=3] [ref=f16e803]
+            - text: No milestone
+          - form "Link issues" [ref=f16e809]:
+            - heading "Development" [level=3] [ref=f16e810]
+            - paragraph [ref=f16e811]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f16e813]: None yet
+          - generic [ref=f16e815]:
+            - heading "1 participant" [level=3] [ref=f16e816]
+            - link [ref=f16e818] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f16e819]
+  - contentinfo [ref=f16e820]:
+    - heading "Footer" [level=2] [ref=f16e821]
+    - generic [ref=f16e822]:
+      - generic [ref=f16e823]:
+        - link "GitHub Homepage" [ref=f16e824] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f16e827]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f16e828]:
+        - heading "Footer navigation" [level=3] [ref=f16e829]
+        - list "Footer navigation" [ref=f16e830]:
+          - listitem [ref=f16e831]:
+            - link "Terms" [ref=f16e832] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f16e833]:
+            - link "Privacy" [ref=f16e834] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f16e835]:
+            - link "Security" [ref=f16e836] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f16e837]:
+            - link "Status" [ref=f16e838] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f16e839]:
+            - link "Community" [ref=f16e840] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f16e841]:
+            - link "Docs" [ref=f16e842] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f16e843]:
+            - link "Contact" [ref=f16e844] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f16e845]:
+            - button "Manage cookies" [ref=f16e847] [cursor=pointer]
+          - listitem [ref=f16e848]:
+            - button "Do not share my personal information" [ref=f16e850] [cursor=pointer]

@@ -1,0 +1,1136 @@
+URL: https://github.com/obviyus
+Title: obviyus (Ayaan Zaidi) · GitHub
+
+- generic [ref=f5e2]:
+  - generic [ref=f5e3]:
+    - link "Skip to content" [ref=f5e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f5e8]:
+      - heading "Navigation Menu" [level=2] [ref=f5e9]
+      - generic [ref=f5e10]:
+        - link "Homepage" [ref=f5e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f5e15]:
+          - navigation "Global" [ref=f5e16]:
+            - list [ref=f5e17]:
+              - listitem [ref=f5e18]:
+                - button "Platform" [ref=f5e20] [cursor=pointer]
+              - listitem [ref=f5e23]:
+                - button "Solutions" [ref=f5e25] [cursor=pointer]
+              - listitem [ref=f5e28]:
+                - button "Resources" [ref=f5e30] [cursor=pointer]
+              - listitem [ref=f5e33]:
+                - button "Open Source" [ref=f5e35] [cursor=pointer]
+              - listitem [ref=f5e38]:
+                - button "Enterprise" [ref=f5e40] [cursor=pointer]
+              - listitem [ref=f5e43]:
+                - link "Pricing" [ref=f5e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f5e45]:
+            - button "Search or jump to, type / to search" [ref=f5e47] [cursor=pointer]:
+              - generic [ref=f5e50]:
+                - text: Type
+                - generic [ref=f5e51]: /
+                - text: to search
+            - link "Sign in" [ref=f5e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fobviyus
+            - link "Sign up" [ref=f5e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f5e55] [cursor=pointer]
+  - main [ref=f5e60]:
+    - generic [ref=f5e63]:
+      - generic [ref=f5e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@obviyus"
+            - generic:
+              - strong: obviyus
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fobviyus
+      - navigation "User profile" [ref=f5e67]:
+        - link "Overview" [ref=f5e68] [cursor=pointer]:
+          - /url: /obviyus
+        - link "Repositories 35" [ref=f5e71] [cursor=pointer]:
+          - /url: /obviyus?tab=repositories
+          - text: Repositories
+          - generic "35" [ref=f5e74]
+        - link "Projects" [ref=f5e75] [cursor=pointer]:
+          - /url: /obviyus?tab=projects
+        - link "Packages 12" [ref=f5e78] [cursor=pointer]:
+          - /url: /obviyus?tab=packages
+          - text: Packages
+          - generic "12" [ref=f5e81]
+        - link "Stars 65" [ref=f5e82] [cursor=pointer]:
+          - /url: /obviyus?tab=stars
+          - text: Stars
+          - generic "65" [ref=f5e85]
+    - generic [ref=f5e87]:
+      - generic [ref=f5e89]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@obviyus"
+            - generic:
+              - generic:
+                - strong: obviyus
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fobviyus
+        - generic [ref=f5e90]:
+          - generic [ref=f5e91]:
+            - generic [ref=f5e92]:
+              - link [ref=f5e93] [cursor=pointer]:
+                - /url: https://avatars.githubusercontent.com/u/22031114?v=4
+                - img "View obviyus's full-sized avatar" [ref=f5e94]
+              - generic: 🦕
+            - heading "Ayaan Zaidi obviyus" [level=1] [ref=f5e101]:
+              - generic [ref=f5e102]: Ayaan Zaidi
+              - generic [ref=f5e103]: obviyus
+          - generic [ref=f5e104]:
+            - link "Follow" [ref=f5e111] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fobviyus
+            - generic [ref=f5e112]:
+              - generic [ref=f5e113]: Maintainer @ OpenClaw
+              - generic [ref=f5e116]:
+                - link "465 followers" [ref=f5e117] [cursor=pointer]:
+                  - /url: https://github.com/obviyus?tab=followers
+                - text: ·
+                - link "22 following" [ref=f5e120] [cursor=pointer]:
+                  - /url: https://github.com/obviyus?tab=following
+              - list [ref=f5e121]:
+                - 'listitem "Home location: Hyderabad" [ref=f5e122]':
+                  - generic [ref=f5e125]: Hyderabad
+                - listitem [ref=f5e126]:
+                  - link "https://obviy.us" [ref=f5e129] [cursor=pointer]:
+                    - /url: https://obviy.us
+                - listitem [ref=f5e130]:
+                  - img "X" [ref=f5e131]
+                  - link "@obviyus" [ref=f5e133] [cursor=pointer]:
+                    - /url: https://x.com/obviyus
+          - generic [ref=f5e134]:
+            - heading [level=2] [ref=f5e135]:
+              - link "Achievements" [ref=f5e136] [cursor=pointer]:
+                - /url: /obviyus?tab=achievements
+            - generic [ref=f5e137]:
+              - 'link "Achievement: Pull Shark x4" [ref=f5e138] [cursor=pointer]':
+                - /url: /obviyus?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f5e139]'
+                - generic [ref=f5e140]: x4
+              - 'link "Achievement: Starstruck x2" [ref=f5e141] [cursor=pointer]':
+                - /url: /obviyus?achievement=starstruck&tab=achievements
+                - 'img "Achievement: Starstruck" [ref=f5e142]'
+                - generic [ref=f5e143]: x2
+              - 'link "Achievement: Pair Extraordinaire x4" [ref=f5e144] [cursor=pointer]':
+                - /url: /obviyus?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f5e145]'
+                - generic [ref=f5e146]: x4
+              - link [ref=f5e147] [cursor=pointer]:
+                - /url: /obviyus?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f5e148]'
+              - link [ref=f5e149] [cursor=pointer]:
+                - /url: /obviyus?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f5e150]'
+              - link [ref=f5e151] [cursor=pointer]:
+                - /url: /obviyus?achievement=arctic-code-vault-contributor&tab=achievements
+                - 'img "Achievement: Arctic Code Vault Contributor" [ref=f5e152]'
+          - generic [ref=f5e153]:
+            - heading "Organizations" [level=2] [ref=f5e154]
+            - link "UplauseApp" [ref=f5e155] [cursor=pointer]:
+              - /url: /UplauseApp
+              - img "@UplauseApp" [ref=f5e156]
+          - button "Block or report user" [ref=f5e158] [cursor=pointer]
+      - generic [ref=f5e163]:
+        - generic [ref=f5e165]:
+          - generic [ref=f5e167]:
+            - link "obviyus" [ref=f5e168] [cursor=pointer]:
+              - /url: /obviyus/obviyus
+            - generic [ref=f5e169]: /
+            - text: README.md
+          - article [ref=f5e170]:
+            - generic [ref=f5e171]:
+              - heading "Hi, I'm Ayaan" [level=1] [ref=f5e172]
+              - 'link "Permalink: Hi, I''m Ayaan" [ref=f5e173] [cursor=pointer]':
+                - /url: "#hi-im-ayaan"
+            - paragraph [ref=f5e176]:
+              - text: Co-founder/CTO at
+              - link "Crossroads" [ref=f5e177] [cursor=pointer]:
+                - /url: https://crossroads.sh/
+              - text: and a maintainer of
+              - link "OpenClaw" [ref=f5e178] [cursor=pointer]:
+                - /url: https://github.com/openclaw/openclaw
+              - text: (~383k ⭐). Former Google Summer of Code contributor with CERN on the ALICE experiment. Into scalable systems, performance work, bots, embedded tinkering, and aircraft.
+            - generic [ref=f5e179]:
+              - heading "Projects I Built" [level=2] [ref=f5e180]
+              - 'link "Permalink: Projects I Built" [ref=f5e181] [cursor=pointer]':
+                - /url: "#projects-i-built"
+            - paragraph [ref=f5e184]:
+              - strong [ref=f5e185]: Systems & tools
+            - list [ref=f5e186]:
+              - listitem [ref=f5e187]:
+                - text: 📻
+                - link "chanson.live" [ref=f5e188] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/chanson.live
+                - text: ": Ultra-low-latency WebRTC radio for listening together without noticeable desync."
+              - listitem [ref=f5e189]:
+                - text: 🔒
+                - link "agentwall" [ref=f5e190] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/agentwall
+                - text: ": macOS sandbox for AI coding agents with file and network approval controls."
+              - listitem [ref=f5e191]:
+                - text: 🖥️
+                - link "shelleport" [ref=f5e192] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/shelleport
+                - text: ": Browser-based remote control for AI coding sessions on any machine."
+              - listitem [ref=f5e193]:
+                - text: 🤖
+                - link "SuperSeriousBot" [ref=f5e194] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/SuperSeriousBot
+                - text: ": Telegram bot with APIs and chat-management features, used by 5,000+ people."
+              - listitem [ref=f5e195]:
+                - text: 🖼️
+                - link "musee" [ref=f5e196] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/musee
+                - text: ": Fast self-hosted image gallery that ships minimal JavaScript."
+              - listitem [ref=f5e197]:
+                - text: ⚡
+                - link "pong" [ref=f5e198] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/pong
+                - text: ": TUI that pings AWS regions around the world and shows the latency spread."
+              - listitem [ref=f5e199]:
+                - text: 🐍
+                - link "uvlift" [ref=f5e200] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/uvlift
+                - text: ": Interactive dependency updater for Python projects using"
+                - code [ref=f5e201]: uv
+                - text: .
+              - listitem [ref=f5e202]:
+                - text: 📚
+                - link "anki-mcp" [ref=f5e203] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/anki-mcp
+                - text: ": CLI MCP server for Anki via AnkiConnect."
+              - listitem [ref=f5e204]:
+                - text: 💸
+                - link "ynab-mcp" [ref=f5e205] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/ynab-mcp
+                - text: ": CLI MCP server for YNAB."
+              - listitem [ref=f5e206]:
+                - text: 📝
+                - link "codex-changelog" [ref=f5e207] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/codex-changelog
+                - text: ": Release-to-post automation for"
+                - code [ref=f5e208]: openai/codex
+                - text: changelogs.
+              - listitem [ref=f5e209]:
+                - text: 🧾
+                - link "india-tax" [ref=f5e210] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/india-tax
+                - text: ": Simple India income-tax calculator comparing the current and proposed regimes."
+            - paragraph [ref=f5e211]:
+              - strong [ref=f5e212]: For the fun of it
+            - list [ref=f5e213]:
+              - listitem [ref=f5e214]:
+                - generic [ref=f5e215]: ✈️
+                - link "pilane-web" [ref=f5e216] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/pilane-web
+                - text: ": DIY plane-spotting project using YOLO and an old Android phone."
+              - listitem [ref=f5e217]:
+                - text: 🎮
+                - link "playtime-panorama" [ref=f5e218] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/playtime-panorama
+                - text: ": Dense, responsive collage of your Steam library with tile sizes driven by playtime."
+              - listitem [ref=f5e219]:
+                - text: 🗳️
+                - link "gotm-remix" [ref=f5e220] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/gotm-remix
+                - text: ": Game of the Month voting site for the Patient Gamers Discord server."
+              - listitem [ref=f5e221]:
+                - text: 🏎️
+                - link "HamVerBot" [ref=f5e222] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/HamVerBot
+                - text: ": F1 bot for"
+                - code [ref=f5e223]: "#f1"
+                - text: on Libera.Chat.
+              - listitem [ref=f5e224]:
+                - text: 🎞️
+                - link "trilbys-archive" [ref=f5e225] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/trilbys-archive
+                - text: ": Searchable archive of Zero Punctuation and Fully Ramblomatic transcripts."
+              - listitem [ref=f5e226]:
+                - text: 💉
+                - link "vnb" [ref=f5e227] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/vnb
+                - text: ": Rust Telegram bot for monitoring CoWin vaccination slot availability."
+              - listitem [ref=f5e228]:
+                - text: 😵
+                - link "spurdify" [ref=f5e229] [cursor=pointer]:
+                  - /url: https://github.com/obviyus/spurdify
+                - text: ": Python library that converts text into Spurdo-style nonsense."
+            - generic [ref=f5e230]:
+              - heading "OSS I Contribute To" [level=2] [ref=f5e231]
+              - 'link "Permalink: OSS I Contribute To" [ref=f5e232] [cursor=pointer]':
+                - /url: "#oss-i-contribute-to"
+            - list [ref=f5e235]:
+              - listitem [ref=f5e236]:
+                - text: 🦞
+                - link "OpenClaw" [ref=f5e237] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/openclaw
+                - text: "(~383k ⭐): Personal AI assistant across platforms; one of the main projects I maintain and contribute to."
+              - listitem [ref=f5e238]:
+                - text: 📈
+                - link "openclaw-rtt" [ref=f5e239] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/openclaw-rtt
+                - text: ": Round-trip-timing harness and auto-published dashboard measuring real agent reply latency across Discord, Telegram, Slack, and WhatsApp."
+              - listitem [ref=f5e240]:
+                - text: 🧰
+                - link "clawhub" [ref=f5e241] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clawhub
+                - text: ": Skill and plugin registry for OpenClaw."
+              - listitem [ref=f5e242]:
+                - text: ⚛️
+                - link "AliceO2Group/Control" [ref=f5e243] [cursor=pointer]:
+                  - /url: https://github.com/AliceO2Group/Control
+                - text: ": ALICE experiment control system; part of my CERN / GSoC work."
+              - listitem [ref=f5e244]:
+                - text: ⚡
+                - link "Bun" [ref=f5e245] [cursor=pointer]:
+                  - /url: https://github.com/oven-sh/bun
+                - text: ": JavaScript runtime, bundler, test runner, and package manager."
+              - listitem [ref=f5e246]:
+                - text: 🤖
+                - link "Codex" [ref=f5e247] [cursor=pointer]:
+                  - /url: https://github.com/openai/codex
+                - text: ": OpenAI's terminal coding agent."
+            - paragraph [ref=f5e248]: Feel free to reach out to me on hi @ obviy.us!
+        - generic [ref=f5e250]:
+          - heading "Pinned Loading" [level=2] [ref=f5e251]:
+            - text: Pinned
+            - generic: Loading
+            - status
+          - list [ref=f5e253]:
+            - listitem [ref=f5e254]:
+              - generic [ref=f5e256]:
+                - generic [ref=f5e258]:
+                  - link "openclaw/openclaw" [ref=f5e262] [cursor=pointer]:
+                    - /url: /openclaw/openclaw
+                  - text: Public
+                - paragraph [ref=f5e263]: Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞
+                - paragraph [ref=f5e264]:
+                  - generic [ref=f5e265]: TypeScript
+                  - link [ref=f5e267] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/stargazers
+                    - img "stars" [ref=f5e268]
+                    - text: 386k
+                  - link [ref=f5e270] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/forks
+                    - img "forks" [ref=f5e271]
+                    - text: 81.2k
+            - listitem [ref=f5e273]:
+              - generic [ref=f5e275]:
+                - generic [ref=f5e277]:
+                  - link "playtime-panorama" [ref=f5e281] [cursor=pointer]:
+                    - /url: /obviyus/playtime-panorama
+                  - text: Public
+                - paragraph [ref=f5e282]: Generate a dense, responsive collage of your Steam library where each header image tile is sized by the playtime.
+                - paragraph [ref=f5e283]:
+                  - generic [ref=f5e284]: HTML
+                  - link [ref=f5e286] [cursor=pointer]:
+                    - /url: /obviyus/playtime-panorama/stargazers
+                    - img "stars" [ref=f5e287]
+                    - text: "136"
+                  - link [ref=f5e289] [cursor=pointer]:
+                    - /url: /obviyus/playtime-panorama/forks
+                    - img "forks" [ref=f5e290]
+                    - text: "11"
+            - listitem [ref=f5e292]:
+              - generic [ref=f5e294]:
+                - generic [ref=f5e296]:
+                  - link "musee" [ref=f5e300] [cursor=pointer]:
+                    - /url: /obviyus/musee
+                  - text: Public
+                - paragraph [ref=f5e301]: Fast, responsive , self-hosted image gallery. Ships minimal JS to the client.
+                - paragraph [ref=f5e302]:
+                  - generic [ref=f5e303]: Astro
+                  - link [ref=f5e305] [cursor=pointer]:
+                    - /url: /obviyus/musee/stargazers
+                    - img "stars" [ref=f5e306]
+                    - text: "15"
+            - listitem [ref=f5e308]:
+              - generic [ref=f5e310]:
+                - generic [ref=f5e312]:
+                  - link "SuperSeriousBot" [ref=f5e316] [cursor=pointer]:
+                    - /url: /obviyus/SuperSeriousBot
+                  - text: Public
+                - paragraph [ref=f5e317]: A fast, modular, asynchronous, highly-configurable, plug and play Telegram bot 🤖
+                - paragraph [ref=f5e318]:
+                  - generic [ref=f5e319]: Python
+                  - link [ref=f5e321] [cursor=pointer]:
+                    - /url: /obviyus/SuperSeriousBot/stargazers
+                    - img "stars" [ref=f5e322]
+                    - text: "29"
+                  - link [ref=f5e324] [cursor=pointer]:
+                    - /url: /obviyus/SuperSeriousBot/forks
+                    - img "forks" [ref=f5e325]
+                    - text: "8"
+            - listitem [ref=f5e327]:
+              - generic [ref=f5e329]:
+                - generic [ref=f5e331]:
+                  - link "AliceO2Group/Control" [ref=f5e335] [cursor=pointer]:
+                    - /url: /AliceO2Group/Control
+                  - text: Public
+                - paragraph [ref=f5e336]: AliECS - The ALICE Experiment Control System
+                - paragraph [ref=f5e337]:
+                  - generic [ref=f5e338]: Go
+                  - link [ref=f5e340] [cursor=pointer]:
+                    - /url: /AliceO2Group/Control/stargazers
+                    - img "stars" [ref=f5e341]
+                    - text: "7"
+                  - link [ref=f5e343] [cursor=pointer]:
+                    - /url: /AliceO2Group/Control/forks
+                    - img "forks" [ref=f5e344]
+                    - text: "24"
+            - listitem [ref=f5e346]:
+              - generic [ref=f5e348]:
+                - generic [ref=f5e350]:
+                  - link "chanson.live" [ref=f5e354] [cursor=pointer]:
+                    - /url: /obviyus/chanson.live
+                  - text: Public
+                - paragraph [ref=f5e355]: An ultra low-latency WebRTC radio
+                - paragraph [ref=f5e356]:
+                  - generic [ref=f5e357]: TypeScript
+                  - link [ref=f5e359] [cursor=pointer]:
+                    - /url: /obviyus/chanson.live/stargazers
+                    - img "stars" [ref=f5e360]
+                    - text: "32"
+                  - link [ref=f5e362] [cursor=pointer]:
+                    - /url: /obviyus/chanson.live/forks
+                    - img "fork" [ref=f5e363]
+                    - text: "1"
+        - generic [ref=f5e366]:
+          - generic [ref=f5e367]:
+            - generic [ref=f5e368]:
+              - generic [ref=f5e369]:
+                - heading "11,650 contributions in the last year" [level=2] [ref=f5e370]
+                - link "Skip to contributions year list" [ref=f5e371] [cursor=pointer]:
+                  - /url: "#year-link-2026"
+                - generic [ref=f5e373]:
+                  - grid [ref=f5e375]:
+                    - caption [ref=f5e376]: Contribution Graph
+                    - rowgroup [ref=f5e377]:
+                      - row [ref=f5e378]:
+                        - gridcell "Day of Week" [ref=f5e379]
+                        - gridcell "August" [ref=f5e381]:
+                          - generic [ref=f5e383]: Aug
+                        - gridcell "September" [ref=f5e384]:
+                          - generic [ref=f5e386]: Sep
+                        - gridcell "October" [ref=f5e387]:
+                          - generic [ref=f5e389]: Oct
+                        - gridcell "November" [ref=f5e390]:
+                          - generic [ref=f5e392]: Nov
+                        - gridcell "December" [ref=f5e393]:
+                          - generic [ref=f5e395]: Dec
+                        - gridcell "January" [ref=f5e396]:
+                          - generic [ref=f5e398]: Jan
+                        - gridcell "February" [ref=f5e399]:
+                          - generic [ref=f5e401]: Feb
+                        - gridcell "March" [ref=f5e402]:
+                          - generic [ref=f5e404]: Mar
+                        - gridcell "April" [ref=f5e405]:
+                          - generic [ref=f5e407]: Apr
+                        - gridcell "May" [ref=f5e408]
+                        - gridcell "June" [ref=f5e411]:
+                          - generic [ref=f5e413]: Jun
+                        - gridcell "July" [ref=f5e414]:
+                          - generic [ref=f5e416]: Jul
+                        - gridcell "August" [ref=f5e417]:
+                          - generic [ref=f5e419]: Aug
+                    - rowgroup [ref=f5e420]:
+                      - row [ref=f5e421]:
+                        - gridcell "Sunday" [ref=f5e422]:
+                          - generic [ref=f5e424]: Sun
+                        - gridcell "9 contributions on August 10th." [ref=f5e425]
+                        - gridcell "1 contribution on August 17th." [ref=f5e426]
+                        - gridcell "No contributions on August 24th." [ref=f5e427]
+                        - gridcell "No contributions on August 31st." [ref=f5e428]
+                        - gridcell "7 contributions on September 7th." [ref=f5e429]
+                        - gridcell "4 contributions on September 14th." [ref=f5e430]
+                        - gridcell "No contributions on September 21st." [ref=f5e431]
+                        - gridcell "No contributions on September 28th." [ref=f5e432]
+                        - gridcell "No contributions on October 5th." [ref=f5e433]
+                        - gridcell "13 contributions on October 12th." [ref=f5e434]
+                        - gridcell "No contributions on October 19th." [ref=f5e435]
+                        - gridcell "17 contributions on October 26th." [ref=f5e436]
+                        - gridcell "9 contributions on November 2nd." [ref=f5e437]
+                        - gridcell "8 contributions on November 9th." [ref=f5e438]
+                        - gridcell "1 contribution on November 16th." [ref=f5e439]
+                        - gridcell "No contributions on November 23rd." [ref=f5e440]
+                        - gridcell "9 contributions on November 30th." [ref=f5e441]
+                        - gridcell "4 contributions on December 7th." [ref=f5e442]
+                        - gridcell "28 contributions on December 14th." [ref=f5e443]
+                        - gridcell "No contributions on December 21st." [ref=f5e444]
+                        - gridcell "1 contribution on December 28th." [ref=f5e445]
+                        - gridcell "15 contributions on January 4th." [ref=f5e446]
+                        - gridcell "34 contributions on January 11th." [ref=f5e447]
+                        - gridcell "18 contributions on January 18th." [ref=f5e448]
+                        - gridcell "No contributions on January 25th." [ref=f5e449]
+                        - gridcell "32 contributions on February 1st." [ref=f5e450]
+                        - gridcell "2 contributions on February 8th." [ref=f5e451]
+                        - gridcell "37 contributions on February 15th." [ref=f5e452]
+                        - gridcell "28 contributions on February 22nd." [ref=f5e453]
+                        - gridcell "30 contributions on March 1st." [ref=f5e454]
+                        - gridcell "42 contributions on March 8th." [ref=f5e455]
+                        - gridcell "36 contributions on March 15th." [ref=f5e456]
+                        - gridcell "25 contributions on March 22nd." [ref=f5e457]
+                        - gridcell "112 contributions on March 29th." [ref=f5e458]
+                        - gridcell "62 contributions on April 5th." [ref=f5e459]
+                        - gridcell "60 contributions on April 12th." [ref=f5e460]
+                        - gridcell "68 contributions on April 19th." [ref=f5e461]
+                        - gridcell "63 contributions on April 26th." [ref=f5e462]
+                        - gridcell "20 contributions on May 3rd." [ref=f5e463]
+                        - gridcell "48 contributions on May 10th." [ref=f5e464]
+                        - gridcell "25 contributions on May 17th." [ref=f5e465]
+                        - gridcell "26 contributions on May 24th." [ref=f5e466]
+                        - gridcell "26 contributions on May 31st." [ref=f5e467]
+                        - gridcell "3 contributions on June 7th." [ref=f5e468]
+                        - gridcell "21 contributions on June 14th." [ref=f5e469]
+                        - gridcell "13 contributions on June 21st." [ref=f5e470]
+                        - gridcell "No contributions on June 28th." [ref=f5e471]
+                        - gridcell "14 contributions on July 5th." [ref=f5e472]
+                        - gridcell "53 contributions on July 12th." [ref=f5e473]
+                        - gridcell "No contributions on July 19th." [ref=f5e474]
+                        - gridcell "16 contributions on July 26th." [ref=f5e475]
+                        - gridcell "12 contributions on August 2nd." [ref=f5e476]
+                        - gridcell "103 contributions on August 9th." [ref=f5e477]
+                      - row [ref=f5e478]:
+                        - gridcell "Monday" [ref=f5e479]:
+                          - generic [ref=f5e481]: Mon
+                        - gridcell "28 contributions on August 11th." [ref=f5e482]
+                        - gridcell "4 contributions on August 18th." [ref=f5e483]
+                        - gridcell "No contributions on August 25th." [ref=f5e484]
+                        - gridcell "20 contributions on September 1st." [ref=f5e485]
+                        - gridcell "2 contributions on September 8th." [ref=f5e486]
+                        - gridcell "18 contributions on September 15th." [ref=f5e487]
+                        - gridcell "8 contributions on September 22nd." [ref=f5e488]
+                        - gridcell "21 contributions on September 29th." [ref=f5e489]
+                        - gridcell "33 contributions on October 6th." [ref=f5e490]
+                        - gridcell "34 contributions on October 13th." [ref=f5e491]
+                        - gridcell "1 contribution on October 20th." [ref=f5e492]
+                        - gridcell "39 contributions on October 27th." [ref=f5e493]
+                        - gridcell "8 contributions on November 3rd." [ref=f5e494]
+                        - gridcell "14 contributions on November 10th." [ref=f5e495]
+                        - gridcell "21 contributions on November 17th." [ref=f5e496]
+                        - gridcell "No contributions on November 24th." [ref=f5e497]
+                        - gridcell "8 contributions on December 1st." [ref=f5e498]
+                        - gridcell "14 contributions on December 8th." [ref=f5e499]
+                        - gridcell "16 contributions on December 15th." [ref=f5e500]
+                        - gridcell "25 contributions on December 22nd." [ref=f5e501]
+                        - gridcell "No contributions on December 29th." [ref=f5e502]
+                        - gridcell "11 contributions on January 5th." [ref=f5e503]
+                        - gridcell "48 contributions on January 12th." [ref=f5e504]
+                        - gridcell "30 contributions on January 19th." [ref=f5e505]
+                        - gridcell "7 contributions on January 26th." [ref=f5e506]
+                        - gridcell "53 contributions on February 2nd." [ref=f5e507]
+                        - gridcell "46 contributions on February 9th." [ref=f5e508]
+                        - gridcell "45 contributions on February 16th." [ref=f5e509]
+                        - gridcell "43 contributions on February 23rd." [ref=f5e510]
+                        - gridcell "12 contributions on March 2nd." [ref=f5e511]
+                        - gridcell "32 contributions on March 9th." [ref=f5e512]
+                        - gridcell "64 contributions on March 16th." [ref=f5e513]
+                        - gridcell "42 contributions on March 23rd." [ref=f5e514]
+                        - gridcell "125 contributions on March 30th." [ref=f5e515]
+                        - gridcell "140 contributions on April 6th." [ref=f5e516]
+                        - gridcell "93 contributions on April 13th." [ref=f5e517]
+                        - gridcell "114 contributions on April 20th." [ref=f5e518]
+                        - gridcell "32 contributions on April 27th." [ref=f5e519]
+                        - gridcell "22 contributions on May 4th." [ref=f5e520]
+                        - gridcell "65 contributions on May 11th." [ref=f5e521]
+                        - gridcell "67 contributions on May 18th." [ref=f5e522]
+                        - gridcell "44 contributions on May 25th." [ref=f5e523]
+                        - gridcell "32 contributions on June 1st." [ref=f5e524]
+                        - gridcell "38 contributions on June 8th." [ref=f5e525]
+                        - gridcell "18 contributions on June 15th." [ref=f5e526]
+                        - gridcell "4 contributions on June 22nd." [ref=f5e527]
+                        - gridcell "53 contributions on June 29th." [ref=f5e528]
+                        - gridcell "10 contributions on July 6th." [ref=f5e529]
+                        - gridcell "60 contributions on July 13th." [ref=f5e530]
+                        - gridcell "1 contribution on July 20th." [ref=f5e531]
+                        - gridcell "16 contributions on July 27th." [ref=f5e532]
+                        - gridcell "3 contributions on August 3rd." [ref=f5e533]
+                        - gridcell "84 contributions on August 10th." [ref=f5e534]
+                      - row [ref=f5e535]:
+                        - gridcell "Tuesday" [ref=f5e536]:
+                          - generic [ref=f5e538]: Tue
+                        - gridcell "8 contributions on August 12th." [ref=f5e539]
+                        - gridcell "5 contributions on August 19th." [ref=f5e540]
+                        - gridcell "No contributions on August 26th." [ref=f5e541]
+                        - gridcell "9 contributions on September 2nd." [ref=f5e542]
+                        - gridcell "23 contributions on September 9th." [ref=f5e543]
+                        - gridcell "13 contributions on September 16th." [ref=f5e544]
+                        - gridcell "27 contributions on September 23rd." [ref=f5e545]
+                        - gridcell "4 contributions on September 30th." [ref=f5e546]
+                        - gridcell "35 contributions on October 7th." [ref=f5e547]
+                        - gridcell "25 contributions on October 14th." [ref=f5e548]
+                        - gridcell "2 contributions on October 21st." [ref=f5e549]
+                        - gridcell "14 contributions on October 28th." [ref=f5e550]
+                        - gridcell "33 contributions on November 4th." [ref=f5e551]
+                        - gridcell "21 contributions on November 11th." [ref=f5e552]
+                        - gridcell "5 contributions on November 18th." [ref=f5e553]
+                        - gridcell "37 contributions on November 25th." [ref=f5e554]
+                        - gridcell "7 contributions on December 2nd." [ref=f5e555]
+                        - gridcell "40 contributions on December 9th." [ref=f5e556]
+                        - gridcell "9 contributions on December 16th." [ref=f5e557]
+                        - gridcell "5 contributions on December 23rd." [ref=f5e558]
+                        - gridcell "23 contributions on December 30th." [ref=f5e559]
+                        - gridcell "22 contributions on January 6th." [ref=f5e560]
+                        - gridcell "39 contributions on January 13th." [ref=f5e561]
+                        - gridcell "39 contributions on January 20th." [ref=f5e562]
+                        - gridcell "52 contributions on January 27th." [ref=f5e563]
+                        - gridcell "9 contributions on February 3rd." [ref=f5e564]
+                        - gridcell "13 contributions on February 10th." [ref=f5e565]
+                        - gridcell "31 contributions on February 17th." [ref=f5e566]
+                        - gridcell "55 contributions on February 24th." [ref=f5e567]
+                        - gridcell "22 contributions on March 3rd." [ref=f5e568]
+                        - gridcell "40 contributions on March 10th." [ref=f5e569]
+                        - gridcell "36 contributions on March 17th." [ref=f5e570]
+                        - gridcell "37 contributions on March 24th." [ref=f5e571]
+                        - gridcell "63 contributions on March 31st." [ref=f5e572]
+                        - gridcell "111 contributions on April 7th." [ref=f5e573]
+                        - gridcell "74 contributions on April 14th." [ref=f5e574]
+                        - gridcell "85 contributions on April 21st." [ref=f5e575]
+                        - gridcell "74 contributions on April 28th." [ref=f5e576]
+                        - gridcell "63 contributions on May 5th." [ref=f5e577]
+                        - gridcell "27 contributions on May 12th." [ref=f5e578]
+                        - gridcell "75 contributions on May 19th." [ref=f5e579]
+                        - gridcell "40 contributions on May 26th." [ref=f5e580]
+                        - gridcell "30 contributions on June 2nd." [ref=f5e581]
+                        - gridcell "8 contributions on June 9th." [ref=f5e582]
+                        - gridcell "41 contributions on June 16th." [ref=f5e583]
+                        - gridcell "30 contributions on June 23rd." [ref=f5e584]
+                        - gridcell "92 contributions on June 30th." [ref=f5e585]
+                        - gridcell "97 contributions on July 7th." [ref=f5e586]
+                        - gridcell "63 contributions on July 14th." [ref=f5e587]
+                        - gridcell "1 contribution on July 21st." [ref=f5e588]
+                        - gridcell "19 contributions on July 28th." [ref=f5e589]
+                        - gridcell "59 contributions on August 4th." [ref=f5e590]
+                        - gridcell "102 contributions on August 11th." [ref=f5e591]
+                      - row [ref=f5e592]:
+                        - gridcell "Wednesday" [ref=f5e593]:
+                          - generic [ref=f5e595]: Wed
+                        - gridcell "No contributions on August 13th." [ref=f5e596]
+                        - gridcell "27 contributions on August 20th." [ref=f5e597]
+                        - gridcell "No contributions on August 27th." [ref=f5e598]
+                        - gridcell "36 contributions on September 3rd." [ref=f5e599]
+                        - gridcell "11 contributions on September 10th." [ref=f5e600]
+                        - gridcell "32 contributions on September 17th." [ref=f5e601]
+                        - gridcell "7 contributions on September 24th." [ref=f5e602]
+                        - gridcell "3 contributions on October 1st." [ref=f5e603]
+                        - gridcell "55 contributions on October 8th." [ref=f5e604]
+                        - gridcell "25 contributions on October 15th." [ref=f5e605]
+                        - gridcell "18 contributions on October 22nd." [ref=f5e606]
+                        - gridcell "10 contributions on October 29th." [ref=f5e607]
+                        - gridcell "4 contributions on November 5th." [ref=f5e608]
+                        - gridcell "10 contributions on November 12th." [ref=f5e609]
+                        - gridcell "4 contributions on November 19th." [ref=f5e610]
+                        - gridcell "8 contributions on November 26th." [ref=f5e611]
+                        - gridcell "11 contributions on December 3rd." [ref=f5e612]
+                        - gridcell "18 contributions on December 10th." [ref=f5e613]
+                        - gridcell "42 contributions on December 17th." [ref=f5e614]
+                        - gridcell "29 contributions on December 24th." [ref=f5e615]
+                        - gridcell "1 contribution on December 31st." [ref=f5e616]
+                        - gridcell "43 contributions on January 7th." [ref=f5e617]
+                        - gridcell "4 contributions on January 14th." [ref=f5e618]
+                        - gridcell "31 contributions on January 21st." [ref=f5e619]
+                        - gridcell "56 contributions on January 28th." [ref=f5e620]
+                        - gridcell "38 contributions on February 4th." [ref=f5e621]
+                        - gridcell "38 contributions on February 11th." [ref=f5e622]
+                        - gridcell "26 contributions on February 18th." [ref=f5e623]
+                        - gridcell "86 contributions on February 25th." [ref=f5e624]
+                        - gridcell "25 contributions on March 4th." [ref=f5e625]
+                        - gridcell "48 contributions on March 11th." [ref=f5e626]
+                        - gridcell "52 contributions on March 18th." [ref=f5e627]
+                        - gridcell "90 contributions on March 25th." [ref=f5e628]
+                        - gridcell "82 contributions on April 1st." [ref=f5e629]
+                        - gridcell "64 contributions on April 8th." [ref=f5e630]
+                        - gridcell "76 contributions on April 15th." [ref=f5e631]
+                        - gridcell "91 contributions on April 22nd." [ref=f5e632]
+                        - gridcell "51 contributions on April 29th." [ref=f5e633]
+                        - gridcell "46 contributions on May 6th." [ref=f5e634]
+                        - gridcell "41 contributions on May 13th." [ref=f5e635]
+                        - gridcell "9 contributions on May 20th." [ref=f5e636]
+                        - gridcell "48 contributions on May 27th." [ref=f5e637]
+                        - gridcell "43 contributions on June 3rd." [ref=f5e638]
+                        - gridcell "49 contributions on June 10th." [ref=f5e639]
+                        - gridcell "69 contributions on June 17th." [ref=f5e640]
+                        - gridcell "44 contributions on June 24th." [ref=f5e641]
+                        - gridcell "182 contributions on July 1st." [ref=f5e642]
+                        - gridcell "51 contributions on July 8th." [ref=f5e643]
+                        - gridcell "25 contributions on July 15th." [ref=f5e644]
+                        - gridcell "2 contributions on July 22nd." [ref=f5e645]
+                        - gridcell "40 contributions on July 29th." [ref=f5e646]
+                        - gridcell "16 contributions on August 5th." [ref=f5e647]
+                        - gridcell "41 contributions on August 12th." [ref=f5e648]
+                      - row [ref=f5e649]:
+                        - gridcell "Thursday" [ref=f5e650]:
+                          - generic [ref=f5e652]: Thu
+                        - gridcell "4 contributions on August 14th." [ref=f5e653]
+                        - gridcell "2 contributions on August 21st." [ref=f5e654]
+                        - gridcell "1 contribution on August 28th." [ref=f5e655]
+                        - gridcell "23 contributions on September 4th." [ref=f5e656]
+                        - gridcell "17 contributions on September 11th." [ref=f5e657]
+                        - gridcell "12 contributions on September 18th." [ref=f5e658]
+                        - gridcell "14 contributions on September 25th." [ref=f5e659]
+                        - gridcell "No contributions on October 2nd." [ref=f5e660]
+                        - gridcell "1 contribution on October 9th." [ref=f5e661]
+                        - gridcell "3 contributions on October 16th." [ref=f5e662]
+                        - gridcell "10 contributions on October 23rd." [ref=f5e663]
+                        - gridcell "28 contributions on October 30th." [ref=f5e664]
+                        - gridcell "11 contributions on November 6th." [ref=f5e665]
+                        - gridcell "6 contributions on November 13th." [ref=f5e666]
+                        - gridcell "2 contributions on November 20th." [ref=f5e667]
+                        - gridcell "26 contributions on November 27th." [ref=f5e668]
+                        - gridcell "5 contributions on December 4th." [ref=f5e669]
+                        - gridcell "35 contributions on December 11th." [ref=f5e670]
+                        - gridcell "7 contributions on December 18th." [ref=f5e671]
+                        - gridcell "6 contributions on December 25th." [ref=f5e672]
+                        - gridcell "1 contribution on January 1st." [ref=f5e673]
+                        - gridcell "53 contributions on January 8th." [ref=f5e674]
+                        - gridcell "21 contributions on January 15th." [ref=f5e675]
+                        - gridcell "47 contributions on January 22nd." [ref=f5e676]
+                        - gridcell "53 contributions on January 29th." [ref=f5e677]
+                        - gridcell "26 contributions on February 5th." [ref=f5e678]
+                        - gridcell "29 contributions on February 12th." [ref=f5e679]
+                        - gridcell "13 contributions on February 19th." [ref=f5e680]
+                        - gridcell "97 contributions on February 26th." [ref=f5e681]
+                        - gridcell "10 contributions on March 5th." [ref=f5e682]
+                        - gridcell "56 contributions on March 12th." [ref=f5e683]
+                        - gridcell "48 contributions on March 19th." [ref=f5e684]
+                        - gridcell "81 contributions on March 26th." [ref=f5e685]
+                        - gridcell "64 contributions on April 2nd." [ref=f5e686]
+                        - gridcell "105 contributions on April 9th." [ref=f5e687]
+                        - gridcell "76 contributions on April 16th." [ref=f5e688]
+                        - gridcell "56 contributions on April 23rd." [ref=f5e689]
+                        - gridcell "25 contributions on April 30th." [ref=f5e690]
+                        - gridcell "22 contributions on May 7th." [ref=f5e691]
+                        - gridcell "30 contributions on May 14th." [ref=f5e692]
+                        - gridcell "No contributions on May 21st." [ref=f5e693]
+                        - gridcell "31 contributions on May 28th." [ref=f5e694]
+                        - gridcell "31 contributions on June 4th." [ref=f5e695]
+                        - gridcell "32 contributions on June 11th." [ref=f5e696]
+                        - gridcell "41 contributions on June 18th." [ref=f5e697]
+                        - gridcell "47 contributions on June 25th." [ref=f5e698]
+                        - gridcell "57 contributions on July 2nd." [ref=f5e699]
+                        - gridcell "60 contributions on July 9th." [ref=f5e700]
+                        - gridcell "69 contributions on July 16th." [ref=f5e701]
+                        - gridcell "17 contributions on July 23rd." [ref=f5e702]
+                        - gridcell "78 contributions on July 30th." [ref=f5e703]
+                        - gridcell "24 contributions on August 6th." [ref=f5e704]
+                        - gridcell "2 contributions on August 13th." [ref=f5e705]
+                      - row [ref=f5e706]:
+                        - gridcell "Friday" [ref=f5e707]:
+                          - generic [ref=f5e709]: Fri
+                        - gridcell "7 contributions on August 15th." [ref=f5e710]
+                        - gridcell "3 contributions on August 22nd." [ref=f5e711]
+                        - gridcell "No contributions on August 29th." [ref=f5e712]
+                        - gridcell "22 contributions on September 5th." [ref=f5e713]
+                        - gridcell "9 contributions on September 12th." [ref=f5e714]
+                        - gridcell "7 contributions on September 19th." [ref=f5e715]
+                        - gridcell "12 contributions on September 26th." [ref=f5e716]
+                        - gridcell "19 contributions on October 3rd." [ref=f5e717]
+                        - gridcell "30 contributions on October 10th." [ref=f5e718]
+                        - gridcell "1 contribution on October 17th." [ref=f5e719]
+                        - gridcell "9 contributions on October 24th." [ref=f5e720]
+                        - gridcell "16 contributions on October 31st." [ref=f5e721]
+                        - gridcell "30 contributions on November 7th." [ref=f5e722]
+                        - gridcell "21 contributions on November 14th." [ref=f5e723]
+                        - gridcell "5 contributions on November 21st." [ref=f5e724]
+                        - gridcell "24 contributions on November 28th." [ref=f5e725]
+                        - gridcell "4 contributions on December 5th." [ref=f5e726]
+                        - gridcell "14 contributions on December 12th." [ref=f5e727]
+                        - gridcell "7 contributions on December 19th." [ref=f5e728]
+                        - gridcell "7 contributions on December 26th." [ref=f5e729]
+                        - gridcell "9 contributions on January 2nd." [ref=f5e730]
+                        - gridcell "40 contributions on January 9th." [ref=f5e731]
+                        - gridcell "30 contributions on January 16th." [ref=f5e732]
+                        - gridcell "23 contributions on January 23rd." [ref=f5e733]
+                        - gridcell "32 contributions on January 30th." [ref=f5e734]
+                        - gridcell "48 contributions on February 6th." [ref=f5e735]
+                        - gridcell "7 contributions on February 13th." [ref=f5e736]
+                        - gridcell "26 contributions on February 20th." [ref=f5e737]
+                        - gridcell "95 contributions on February 27th." [ref=f5e738]
+                        - gridcell "30 contributions on March 6th." [ref=f5e739]
+                        - gridcell "66 contributions on March 13th." [ref=f5e740]
+                        - gridcell "104 contributions on March 20th." [ref=f5e741]
+                        - gridcell "219 contributions on March 27th." [ref=f5e742]
+                        - gridcell "68 contributions on April 3rd." [ref=f5e743]
+                        - gridcell "135 contributions on April 10th." [ref=f5e744]
+                        - gridcell "91 contributions on April 17th." [ref=f5e745]
+                        - gridcell "55 contributions on April 24th." [ref=f5e746]
+                        - gridcell "52 contributions on May 1st." [ref=f5e747]
+                        - gridcell "40 contributions on May 8th." [ref=f5e748]
+                        - gridcell "30 contributions on May 15th." [ref=f5e749]
+                        - gridcell "No contributions on May 22nd." [ref=f5e750]
+                        - gridcell "56 contributions on May 29th." [ref=f5e751]
+                        - gridcell "53 contributions on June 5th." [ref=f5e752]
+                        - gridcell "13 contributions on June 12th." [ref=f5e753]
+                        - gridcell "46 contributions on June 19th." [ref=f5e754]
+                        - gridcell "69 contributions on June 26th." [ref=f5e755]
+                        - gridcell "22 contributions on July 3rd." [ref=f5e756]
+                        - gridcell "56 contributions on July 10th." [ref=f5e757]
+                        - gridcell "58 contributions on July 17th." [ref=f5e758]
+                        - gridcell "No contributions on July 24th." [ref=f5e759]
+                        - gridcell "55 contributions on July 31st." [ref=f5e760]
+                        - gridcell "27 contributions on August 7th." [ref=f5e761]
+                        - gridcell [ref=f5e762]
+                      - row [ref=f5e763]:
+                        - gridcell "Saturday" [ref=f5e764]:
+                          - generic [ref=f5e766]: Sat
+                        - gridcell "No contributions on August 16th." [ref=f5e767]
+                        - gridcell "No contributions on August 23rd." [ref=f5e768]
+                        - gridcell "No contributions on August 30th." [ref=f5e769]
+                        - gridcell "1 contribution on September 6th." [ref=f5e770]
+                        - gridcell "2 contributions on September 13th." [ref=f5e771]
+                        - gridcell "5 contributions on September 20th." [ref=f5e772]
+                        - gridcell "No contributions on September 27th." [ref=f5e773]
+                        - gridcell "10 contributions on October 4th." [ref=f5e774]
+                        - gridcell "27 contributions on October 11th." [ref=f5e775]
+                        - gridcell "3 contributions on October 18th." [ref=f5e776]
+                        - gridcell "40 contributions on October 25th." [ref=f5e777]
+                        - gridcell "2 contributions on November 1st." [ref=f5e778]
+                        - gridcell "No contributions on November 8th." [ref=f5e779]
+                        - gridcell "8 contributions on November 15th." [ref=f5e780]
+                        - gridcell "5 contributions on November 22nd." [ref=f5e781]
+                        - gridcell "6 contributions on November 29th." [ref=f5e782]
+                        - gridcell "16 contributions on December 6th." [ref=f5e783]
+                        - gridcell "14 contributions on December 13th." [ref=f5e784]
+                        - gridcell "No contributions on December 20th." [ref=f5e785]
+                        - gridcell "15 contributions on December 27th." [ref=f5e786]
+                        - gridcell "No contributions on January 3rd." [ref=f5e787]
+                        - gridcell "94 contributions on January 10th." [ref=f5e788]
+                        - gridcell "27 contributions on January 17th." [ref=f5e789]
+                        - gridcell "1 contribution on January 24th." [ref=f5e790]
+                        - gridcell "50 contributions on January 31st." [ref=f5e791]
+                        - gridcell "10 contributions on February 7th." [ref=f5e792]
+                        - gridcell "18 contributions on February 14th." [ref=f5e793]
+                        - gridcell "36 contributions on February 21st." [ref=f5e794]
+                        - gridcell "87 contributions on February 28th." [ref=f5e795]
+                        - gridcell "55 contributions on March 7th." [ref=f5e796]
+                        - gridcell "59 contributions on March 14th." [ref=f5e797]
+                        - gridcell "35 contributions on March 21st." [ref=f5e798]
+                        - gridcell "161 contributions on March 28th." [ref=f5e799]
+                        - gridcell "101 contributions on April 4th." [ref=f5e800]
+                        - gridcell "79 contributions on April 11th." [ref=f5e801]
+                        - gridcell "53 contributions on April 18th." [ref=f5e802]
+                        - gridcell "45 contributions on April 25th." [ref=f5e803]
+                        - gridcell "50 contributions on May 2nd." [ref=f5e804]
+                        - gridcell "43 contributions on May 9th." [ref=f5e805]
+                        - gridcell "13 contributions on May 16th." [ref=f5e806]
+                        - gridcell "No contributions on May 23rd." [ref=f5e807]
+                        - gridcell "21 contributions on May 30th." [ref=f5e808]
+                        - gridcell "2 contributions on June 6th." [ref=f5e809]
+                        - gridcell "49 contributions on June 13th." [ref=f5e810]
+                        - gridcell "No contributions on June 20th." [ref=f5e811]
+                        - gridcell "8 contributions on June 27th." [ref=f5e812]
+                        - gridcell "15 contributions on July 4th." [ref=f5e813]
+                        - gridcell "65 contributions on July 11th." [ref=f5e814]
+                        - gridcell "1 contribution on July 18th." [ref=f5e815]
+                        - gridcell "4 contributions on July 25th." [ref=f5e816]
+                        - gridcell "16 contributions on August 1st." [ref=f5e817]
+                        - gridcell "6 contributions on August 8th." [ref=f5e818]
+                        - gridcell [ref=f5e819]
+                  - generic [ref=f5e820]:
+                    - link "Learn how we count contributions" [ref=f5e822] [cursor=pointer]:
+                      - /url: https://docs.github.com/articles/why-are-my-contributions-not-showing-up-on-my-profile
+                    - generic [ref=f5e823]:
+                      - generic [ref=f5e824]: Less
+                      - generic [ref=f5e825]: No contributions.
+                      - generic [ref=f5e827]: Low contributions.
+                      - generic [ref=f5e829]: Medium-low contributions.
+                      - generic [ref=f5e831]: Medium-high contributions.
+                      - generic [ref=f5e833]: High contributions.
+                      - generic [ref=f5e835]: More
+              - generic [ref=f5e837]:
+                - navigation "Organizations" [ref=f5e839]:
+                  - link "@openclaw" [ref=f5e840] [cursor=pointer]:
+                    - /url: /obviyus?tab=overview&org=openclaw
+                  - link "@pwrdrvr" [ref=f5e841] [cursor=pointer]:
+                    - /url: /obviyus?tab=overview&org=pwrdrvr
+                  - link "@openai" [ref=f5e842] [cursor=pointer]:
+                    - /url: /obviyus?tab=overview&org=openai
+                  - group [ref=f5e843]:
+                    - button "More" [ref=f5e844] [cursor=pointer]
+                - generic [ref=f5e845]:
+                  - generic [ref=f5e846]:
+                    - heading "Activity overview" [level=3] [ref=f5e847]
+                    - generic [ref=f5e851]:
+                      - text: Contributed to
+                      - link "openclaw/openclaw" [ref=f5e852] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: ","
+                      - link "obviyus/shelleport" [ref=f5e853] [cursor=pointer]:
+                        - /url: /obviyus/shelleport
+                      - text: ","
+                      - link "obviyus/SuperSeriousBot" [ref=f5e854] [cursor=pointer]:
+                        - /url: /obviyus/SuperSeriousBot
+                      - text: and 36 other repositories
+                  - generic [ref=f5e856]:
+                    - generic: Loading
+                    - img "A graph representing obviyus's contributions from August 10, 2025 to August 13, 2026. The contributions are 87% commits, 9% pull requests, 3% code review, 1% issues." [ref=f5e858]:
+                      - generic [ref=f5e859]:
+                        - generic [ref=f5e865]: 3%
+                        - generic [ref=f5e866]: Code review
+                        - generic [ref=f5e867]: 1%
+                        - generic [ref=f5e868]: Issues
+                        - generic [ref=f5e869]: 9%
+                        - generic [ref=f5e870]: Pull requests
+                        - generic [ref=f5e871]: 87%
+                        - generic [ref=f5e872]: Commits
+            - generic [ref=f5e873]:
+              - heading "Contribution activity" [level=2] [ref=f5e874]
+              - generic [ref=f5e876]:
+                - heading "August 2026" [level=3] [ref=f5e877]
+                - group [ref=f5e885]:
+                  - button [expanded] [ref=f5e886] [cursor=pointer]
+                  - list [ref=f5e892]:
+                    - listitem [ref=f5e893]:
+                      - generic [ref=f5e894]:
+                        - link "openclaw/openclaw" [ref=f5e895] [cursor=pointer]:
+                          - /url: /openclaw/openclaw
+                        - link "67 commits" [ref=f5e896] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "83% of commits in August were made to openclaw/openclaw" [ref=f5e898]
+                    - listitem [ref=f5e900]:
+                      - generic [ref=f5e901]:
+                        - link "obviyus/SuperSeriousBot" [ref=f5e902] [cursor=pointer]:
+                          - /url: /obviyus/SuperSeriousBot
+                        - link "10 commits" [ref=f5e903] [cursor=pointer]:
+                          - /url: /obviyus/SuperSeriousBot/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "13% of commits in August were made to obviyus/SuperSeriousBot" [ref=f5e905]
+                    - listitem [ref=f5e907]:
+                      - generic [ref=f5e908]:
+                        - link "openclaw/fs-safe" [ref=f5e909] [cursor=pointer]:
+                          - /url: /openclaw/fs-safe
+                        - link "1 commit" [ref=f5e910] [cursor=pointer]:
+                          - /url: /openclaw/fs-safe/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "2% of commits in August were made to openclaw/fs-safe" [ref=f5e912]
+                    - listitem [ref=f5e914]:
+                      - generic [ref=f5e915]:
+                        - link "openclaw/gitcrawl" [ref=f5e916] [cursor=pointer]:
+                          - /url: /openclaw/gitcrawl
+                        - link "1 commit" [ref=f5e917] [cursor=pointer]:
+                          - /url: /openclaw/gitcrawl/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "2% of commits in August were made to openclaw/gitcrawl" [ref=f5e919]
+                    - listitem [ref=f5e921]:
+                      - generic [ref=f5e922]:
+                        - link "openclaw/plugin-inspector" [ref=f5e923] [cursor=pointer]:
+                          - /url: /openclaw/plugin-inspector
+                        - link "1 commit" [ref=f5e924] [cursor=pointer]:
+                          - /url: /openclaw/plugin-inspector/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "2% of commits in August were made to openclaw/plugin-inspector" [ref=f5e926]
+                    - listitem [ref=f5e928]:
+                      - generic [ref=f5e929]:
+                        - link "obviyus/gotm-remix" [ref=f5e930] [cursor=pointer]:
+                          - /url: /obviyus/gotm-remix
+                        - link "1 commit" [ref=f5e931] [cursor=pointer]:
+                          - /url: /obviyus/gotm-remix/commits?author=obviyus&since=2026-08-01&until=2026-08-14
+                      - img "2% of commits in August were made to obviyus/gotm-remix" [ref=f5e933]
+                - generic [ref=f5e939]:
+                  - generic [ref=f5e940]:
+                    - heading [level=4] [ref=f5e941]:
+                      - text: Created a pull request in
+                      - link "openclaw/openclaw" [ref=f5e942] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 23 comments
+                    - link [ref=f5e943] [cursor=pointer]:
+                      - /url: /obviyus?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f5e944]: Aug 4
+                  - generic [ref=f5e948]:
+                    - heading [level=3] [ref=f5e949]:
+                      - 'link "feat(cron): enable automation failure alerts by default" [ref=f5e950] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/119205
+                    - paragraph [ref=f5e952]: What Problem This Solves A scheduled automation that starts failing — expired OAuth, rate limit, dead endpoint — produces zero output on the defaul…
+                    - generic [ref=f5e953]:
+                      - generic [ref=f5e954]: +573 −96 lines changed •
+                      - text: 23 comments
+                - group [ref=f5e966]:
+                  - button "Opened 68 other pull requests in 6 repositories" [expanded] [ref=f5e967] [cursor=pointer]
+                  - generic [ref=f5e973]:
+                    - group [ref=f5e975]:
+                      - button "openclaw/openclaw 1 open 48 merged 5 closed" [ref=f5e976] [cursor=pointer]:
+                        - generic [ref=f5e977]:
+                          - generic [ref=f5e978]: openclaw/openclaw
+                          - generic [ref=f5e979]:
+                            - generic [ref=f5e980]: "1"
+                            - text: open
+                            - generic [ref=f5e981]: "48"
+                            - text: merged
+                            - generic [ref=f5e982]: "5"
+                            - text: closed
+                    - group [ref=f5e988]:
+                      - button "obviyus/SuperSeriousBot 10 merged" [ref=f5e989] [cursor=pointer]:
+                        - generic [ref=f5e990]:
+                          - generic [ref=f5e991]: obviyus/SuperSeriousBot
+                          - generic [ref=f5e992]:
+                            - generic [ref=f5e993]: "10"
+                            - text: merged
+                    - group [ref=f5e999]:
+                      - button "openclaw/gitcrawl 1 merged" [ref=f5e1000] [cursor=pointer]:
+                        - generic [ref=f5e1001]:
+                          - generic [ref=f5e1002]: openclaw/gitcrawl
+                          - generic [ref=f5e1003]:
+                            - generic [ref=f5e1004]: "1"
+                            - text: merged
+                    - group [ref=f5e1010]:
+                      - button "openclaw/fs-safe 1 merged" [ref=f5e1011] [cursor=pointer]:
+                        - generic [ref=f5e1012]:
+                          - generic [ref=f5e1013]: openclaw/fs-safe
+                          - generic [ref=f5e1014]:
+                            - generic [ref=f5e1015]: "1"
+                            - text: merged
+                    - group [ref=f5e1021]:
+                      - button "obviyus/gotm-remix 1 merged" [ref=f5e1022] [cursor=pointer]:
+                        - generic [ref=f5e1023]:
+                          - generic [ref=f5e1024]: obviyus/gotm-remix
+                          - generic [ref=f5e1025]:
+                            - generic [ref=f5e1026]: "1"
+                            - text: merged
+                    - group [ref=f5e1032]:
+                      - button "openclaw/plugin-inspector 1 merged" [ref=f5e1033] [cursor=pointer]:
+                        - generic [ref=f5e1034]:
+                          - generic [ref=f5e1035]: openclaw/plugin-inspector
+                          - generic [ref=f5e1036]:
+                            - generic [ref=f5e1037]: "1"
+                            - text: merged
+                - group [ref=f5e1048]:
+                  - button "Reviewed 1 pull request in 1 repository" [expanded] [ref=f5e1049] [cursor=pointer]
+                  - group [ref=f5e1058]:
+                    - button "openclaw/openclaw 1 pull request" [expanded] [ref=f5e1059] [cursor=pointer]:
+                      - generic [ref=f5e1060]:
+                        - generic [ref=f5e1061]: openclaw/openclaw
+                        - generic [ref=f5e1062]: 1 pull request
+                    - list [ref=f5e1068]:
+                      - listitem [ref=f5e1069]:
+                        - 'link "fix(media): retain resolved images when native current media partially resolves" [ref=f5e1074] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122361
+                        - generic [ref=f5e1075]:
+                          - generic [ref=f5e1076]: This contribution was made on Aug 12
+                          - time [ref=f5e1077]: Aug 12
+                - generic [ref=f5e1082]:
+                  - generic [ref=f5e1083]:
+                    - heading [level=4] [ref=f5e1084]:
+                      - text: Created an issue in
+                      - link "openclaw/openclaw" [ref=f5e1085] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 5 comments
+                    - link [ref=f5e1086] [cursor=pointer]:
+                      - /url: /obviyus?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f5e1087]: Aug 11
+                  - generic [ref=f5e1092]:
+                    - heading [level=3] [ref=f5e1093]:
+                      - 'link "ci: Telegram dispatch test files never execute in any CI lane" [ref=f5e1094] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/issues/122029
+                    - paragraph [ref=f5e1096]:
+                      - text: What happened
+                      - code [ref=f5e1097]: extensions/telegram/src/bot-message-dispatch.*.test.ts
+                      - text: (17 files, ~8k LOC covering the Telegram dispatch/draft/progress/delivery pipe…
+                    - generic [ref=f5e1098]: 5 comments
+                - group [ref=f5e1106]:
+                  - button "Opened 17 other issues in 1 repository" [expanded] [ref=f5e1107] [cursor=pointer]
+                  - group [ref=f5e1115]:
+                    - button "openclaw/openclaw 10 closed 7 open" [ref=f5e1116] [cursor=pointer]:
+                      - generic [ref=f5e1117]:
+                        - generic [ref=f5e1118]: openclaw/openclaw
+                        - generic [ref=f5e1119]:
+                          - generic [ref=f5e1120]: "10"
+                          - text: closed
+                          - generic [ref=f5e1121]: "7"
+                          - text: open
+                - generic [ref=f5e1130]:
+                  - text: 326 contributions in private repositories
+                  - generic [ref=f5e1131]: Aug 1 – Aug 13
+              - generic [ref=f5e1132]:
+                - generic: Loading
+                - button "Show more activity" [ref=f5e1134] [cursor=pointer]
+          - list [ref=f5e1137]:
+            - listitem [ref=f5e1138]:
+              - link "Contribution activity in 2026, 1 of 11" [ref=f5e1139] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2026-08-01&to=2026-08-13
+                - text: "2026"
+            - listitem [ref=f5e1140]:
+              - link "Contribution activity in 2025, 2 of 11" [ref=f5e1141] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2025-12-01&to=2025-12-31
+                - text: "2025"
+            - listitem [ref=f5e1142]:
+              - link "Contribution activity in 2024, 3 of 11" [ref=f5e1143] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2024-12-01&to=2024-12-31
+                - text: "2024"
+            - listitem [ref=f5e1144]:
+              - link "Contribution activity in 2023, 4 of 11" [ref=f5e1145] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2023-12-01&to=2023-12-31
+                - text: "2023"
+            - listitem [ref=f5e1146]:
+              - link "Contribution activity in 2022, 5 of 11" [ref=f5e1147] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2022-12-01&to=2022-12-31
+                - text: "2022"
+            - listitem [ref=f5e1148]:
+              - link "Contribution activity in 2021, 6 of 11" [ref=f5e1149] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2021-12-01&to=2021-12-31
+                - text: "2021"
+            - listitem [ref=f5e1150]:
+              - link "Contribution activity in 2020, 7 of 11" [ref=f5e1151] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2020-12-01&to=2020-12-31
+                - text: "2020"
+            - listitem [ref=f5e1152]:
+              - link "Contribution activity in 2019, 8 of 11" [ref=f5e1153] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2019-12-01&to=2019-12-31
+                - text: "2019"
+            - listitem [ref=f5e1154]:
+              - link "Contribution activity in 2018, 9 of 11" [ref=f5e1155] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2018-12-01&to=2018-12-31
+                - text: "2018"
+            - listitem [ref=f5e1156]:
+              - link "Contribution activity in 2017, 10 of 11" [ref=f5e1157] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2017-12-01&to=2017-12-31
+                - text: "2017"
+            - listitem [ref=f5e1158]:
+              - link "Contribution activity in 2016, 11 of 11" [ref=f5e1159] [cursor=pointer]:
+                - /url: /obviyus?tab=overview&from=2016-12-01&to=2016-12-31
+                - text: "2016"
+  - contentinfo [ref=f5e1160]:
+    - heading "Footer" [level=2] [ref=f5e1161]
+    - generic [ref=f5e1162]:
+      - generic [ref=f5e1163]:
+        - link "GitHub Homepage" [ref=f5e1164] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f5e1167]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f5e1168]:
+        - heading "Footer navigation" [level=3] [ref=f5e1169]
+        - list "Footer navigation" [ref=f5e1170]:
+          - listitem [ref=f5e1171]:
+            - link "Terms" [ref=f5e1172] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f5e1173]:
+            - link "Privacy" [ref=f5e1174] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f5e1175]:
+            - link "Security" [ref=f5e1176] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f5e1177]:
+            - link "Status" [ref=f5e1178] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f5e1179]:
+            - link "Community" [ref=f5e1180] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f5e1181]:
+            - link "Docs" [ref=f5e1182] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f5e1183]:
+            - link "Contact" [ref=f5e1184] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f5e1185]:
+            - button "Manage cookies" [ref=f5e1187] [cursor=pointer]
+          - listitem [ref=f5e1188]:
+            - button "Do not share my personal information" [ref=f5e1190] [cursor=pointer]

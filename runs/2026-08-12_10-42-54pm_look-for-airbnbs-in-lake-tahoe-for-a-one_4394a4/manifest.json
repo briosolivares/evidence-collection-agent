@@ -1,0 +1,58 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-13T05:42:54.408Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "8df3b393ada203aeda4a3e49cca113d93d40c678ee992a88d4195f61619b3f3b",
+      "capturedAt": "2026-08-13T05:43:33.576Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "ca1c1c7d476bfeb9548c552c754c0b17aded9ec0066a5ebc0eb849ee49f5dad0",
+      "capturedAt": "2026-08-13T05:43:35.576Z"
+    },
+    {
+      "filename": "scratch/listings_notes.md",
+      "sha256": "842d8ca0f0bec5046e047e42bd818d963dc6225a5d6fee72ad9513856aa843da",
+      "capturedAt": "2026-08-13T05:44:38.286Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "cc5516fee9d790f7f54d16796268b68b83bb15ae4f705fa2b53ff9e555eba2cc",
+      "capturedAt": "2026-08-13T05:44:54.282Z"
+    },
+    {
+      "filename": "scratch/listings_notes2.md",
+      "sha256": "8f27998e89b9db41200ff3d21c2a491df14657785cca46805ebce11f4ebef15c",
+      "capturedAt": "2026-08-13T05:45:35.145Z"
+    },
+    {
+      "filename": "artifacts/search_results_page2.png",
+      "sha256": "ccee6433d7fcdec83acce9836c98fced839ab35fee3c1ac5ce5ec04c4d3ea6c4",
+      "sourceUrl": "https://www.airbnb.com/s/Lake-Tahoe/homes?refinement_paths%5B%5D=%2Fhomes&place_id=ChIJUREfuaF4mYARILWv7q8fP4w&acp_id=236baac8-79d8-4942-8ca5-65ec5de48d70&date_picker_type=calendar&checkin=2026-08-17&checkout=2026-08-24&query=Lake%20Tahoe&flexible_trip_lengths%5B%5D=one_week&price_filter_input_type=2&price_filter_num_nights=7&channel=EXPLORE&pagination_search=true&cursor=eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0%3D",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:45:38.130Z"
+    },
+    {
+      "filename": "artifacts/search_results_page1.png",
+      "sha256": "c1c48d220722869381b6f2de4135dedf4a0b7b2e498bb4f048b052663008320e",
+      "sourceUrl": "https://www.airbnb.com/s/Lake-Tahoe/homes?refinement_paths%5B%5D=%2Fhomes&place_id=ChIJUREfuaF4mYARILWv7q8fP4w&acp_id=236baac8-79d8-4942-8ca5-65ec5de48d70&date_picker_type=calendar&checkin=2026-08-17&checkout=2026-08-24&search_type=autocomplete_click",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:45:49.080Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "cc6077f8fca10838e7e241a5207d37670bbc795f96f8f761c2f07dc0aa328a33",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:46:38.897Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T05:46:51.474Z"
+}

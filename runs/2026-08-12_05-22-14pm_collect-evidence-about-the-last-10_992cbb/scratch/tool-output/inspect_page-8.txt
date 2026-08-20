@@ -1,0 +1,797 @@
+URL: https://github.com/openclaw/openclaw/pull/122853
+Title: refactor(agents): split subagent announce delivery by steipete · Pull Request #122853 · openclaw/openclaw · GitHub
+
+- generic [ref=f20e2]:
+  - generic [ref=f20e3]:
+    - link "Skip to content" [ref=f20e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f20e8]:
+      - heading "Navigation Menu" [level=2] [ref=f20e9]
+      - generic [ref=f20e10]:
+        - link "Homepage" [ref=f20e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f20e15]:
+          - navigation "Global" [ref=f20e16]:
+            - list [ref=f20e17]:
+              - listitem [ref=f20e18]:
+                - button "Platform" [ref=f20e20] [cursor=pointer]
+              - listitem [ref=f20e23]:
+                - button "Solutions" [ref=f20e25] [cursor=pointer]
+              - listitem [ref=f20e28]:
+                - button "Resources" [ref=f20e30] [cursor=pointer]
+              - listitem [ref=f20e33]:
+                - button "Open Source" [ref=f20e35] [cursor=pointer]
+              - listitem [ref=f20e38]:
+                - button "Enterprise" [ref=f20e40] [cursor=pointer]
+              - listitem [ref=f20e43]:
+                - link "Pricing" [ref=f20e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f20e45]:
+            - button "Search or jump to, type / to search" [ref=f20e47] [cursor=pointer]:
+              - generic [ref=f20e50]:
+                - text: Type
+                - generic [ref=f20e51]: /
+                - text: to search
+            - link "Sign in" [ref=f20e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122853
+            - link "Sign up" [ref=f20e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f20e55] [cursor=pointer]
+  - main [ref=f20e61]:
+    - generic [ref=f20e62]:
+      - generic [ref=f20e63]:
+        - generic [ref=f20e65]:
+          - link "openclaw" [ref=f20e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f20e70]: /
+          - strong [ref=f20e71]:
+            - link "openclaw" [ref=f20e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f20e73]: Public
+        - generic [ref=f20e74]:
+          - list:
+            - listitem [ref=f20e75]:
+              - link "Sponsor @openclaw" [ref=f20e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f20e77]: Sponsor
+            - listitem [ref=f20e81]:
+              - link "You must be signed in to change notification settings" [ref=f20e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f20e85]:
+              - link "Fork 81.2k" [ref=f20e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,150" [ref=f20e89]: 81.2k
+            - listitem [ref=f20e90]:
+              - link "You must be signed in to star a repository" [ref=f20e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386084 users starred this repository" [ref=f20e95]: 386k
+      - navigation "Repository" [ref=f20e96]:
+        - list [ref=f20e97]:
+          - listitem [ref=f20e98]:
+            - link "Code" [ref=f20e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f20e103]:
+            - link "Issues 3.4k" [ref=f20e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f20e108]: Issues
+              - generic "3,414" [ref=f20e109]: 3.4k
+          - listitem [ref=f20e110]:
+            - link "Pull requests 2.1k" [ref=f20e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f20e114]: Pull requests
+              - generic "2,112" [ref=f20e115]: 2.1k
+          - listitem [ref=f20e116]:
+            - link "Actions" [ref=f20e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f20e121]:
+            - link "Projects" [ref=f20e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f20e126]:
+            - link "Security and quality 647" [ref=f20e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f20e130]: Security and quality
+              - generic "647" [ref=f20e131]
+          - listitem [ref=f20e132]:
+            - link "Insights" [ref=f20e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f20e143]:
+      - generic [ref=f20e147]:
+        - generic [ref=f20e149]:
+          - 'heading "refactor(agents): split subagent announce delivery - #122853" [level=1] [ref=f20e150]':
+            - text: "refactor(agents): split subagent announce delivery"
+            - generic [ref=f20e151]: "- #122853"
+          - generic [ref=f20e152]: "#122853"
+        - generic [ref=f20e155]:
+          - generic [ref=f20e157]:
+            - img "Pull request" [ref=f20e158]
+            - text: Merged
+          - generic [ref=f20e161]:
+            - link "steipete" [ref=f20e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 2 commits into
+            - generic [ref=f20e163]:
+              - link "main" [ref=f20e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f20e165]: from
+              - generic [ref=f20e166]:
+                - link "steipete/split-announce-delivery-t4f8" [ref=f20e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/split-announce-delivery-t4f8
+                - button "Copy head branch name to clipboard" [ref=f20e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 4:23 PM PDT" [ref=f20e172]: Aug 12, 20261 hour ago
+        - generic [ref=f20e173]:
+          - generic [ref=f20e175]:
+            - generic [ref=f20e176]: +1,671
+            - generic [ref=f20e177]: "-1,497"
+            - generic [ref=f20e178]: "Lines changed: 1671 additions & 1497 deletions"
+          - navigation "Pull request navigation tabs" [ref=f20e186]:
+            - generic [ref=f20e187]:
+              - link "Conversation (3)" [ref=f20e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122853
+                - text: Conversation
+                - generic [ref=f20e191]: "3"
+                - generic [ref=f20e192]: (3)
+              - link "Commits (2)" [ref=f20e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122853/commits
+                - text: Commits
+                - generic [ref=f20e196]: "2"
+                - generic [ref=f20e197]: (2)
+              - link "Checks (134)" [ref=f20e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122853/checks
+                - text: Checks
+                - generic [ref=f20e201]: "134"
+                - generic [ref=f20e202]: (134)
+              - link "Files changed (9)" [ref=f20e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122853/files
+                - text: Files changed
+                - generic [ref=f20e206]: "9"
+                - generic [ref=f20e207]: (9)
+      - generic [ref=f20e212]:
+        - generic [ref=f20e214]:
+          - heading "Conversation" [level=2] [ref=f20e215]
+          - generic [ref=f20e216]:
+            - generic [ref=f20e217]:
+              - generic [ref=f20e219]:
+                - link [ref=f20e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f20e221]
+                - generic [ref=f20e223]:
+                  - generic [ref=f20e224]:
+                    - heading "steipete commented Aug 12, 20261 hour ago •" [level=3] [ref=f20e225]:
+                      - generic [ref=f20e226]:
+                        - strong [ref=f20e227]:
+                          - link "steipete" [ref=f20e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 20261 hour ago" [ref=f20e229] [cursor=pointer]:
+                          - /url: "#issue-5135912195"
+                        - generic [ref=f20e230]:
+                          - generic [ref=f20e231]: •
+                          - group [ref=f20e232]:
+                            - button "edited" [ref=f20e233] [cursor=pointer]
+                    - generic [ref=f20e237]:
+                      - group [ref=f20e239]:
+                        - button [ref=f20e240] [cursor=pointer]:
+                          - img "Show options" [ref=f20e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f20e246]: Contributor
+                  - generic [ref=f20e251]:
+                    - heading "What Problem This Solves" [level=2] [ref=f20e252]
+                    - paragraph [ref=f20e253]: The subagent completion-delivery owner had grown to 1,605 lines and remained the last grandfathered max-lines suppression in the subagent family. Its active-wake, direct-handoff, delivery-evidence, retry, and durable-queue responsibilities could no longer evolve independently without making lifecycle-sensitive review harder.
+                    - heading "Why This Change Was Made" [level=2] [ref=f20e254]
+                    - paragraph [ref=f20e255]:
+                      - text: This behavior-preserving refactor separates the existing owner boundaries while keeping the test-overridable mutable runtime dependencies in the established runtime seam. It does not introduce state-bag plumbing, factory chains, compatibility paths, or new barrels, and it preserves the existing
+                      - code [ref=f20e256]: subagent-announce-delivery.ts
+                      - text: importer surface. The rebase onto current
+                      - code [ref=f20e257]: main
+                      - text: also preserves its explicit requester-agent ownership checks in the corresponding split owners.
+                    - paragraph [ref=f20e258]: "Boundary map:"
+                    - table [ref=f20e260]:
+                      - rowgroup [ref=f20e261]:
+                        - row [ref=f20e262]:
+                          - columnheader "Module" [ref=f20e263]
+                          - columnheader "Responsibility" [ref=f20e264]
+                          - columnheader "LOC" [ref=f20e265]
+                      - rowgroup [ref=f20e266]:
+                        - row [ref=f20e267]:
+                          - cell [ref=f20e268]:
+                            - code [ref=f20e269]: subagent-announce-delivery.ts
+                          - cell "Durable generated-media queue admission, ordered dispatch composition, and the stable public delivery facade" [ref=f20e270]
+                          - cell "279" [ref=f20e271]
+                        - row [ref=f20e272]:
+                          - cell [ref=f20e273]:
+                            - code [ref=f20e274]: subagent-announce-delivery.runtime.ts
+                          - cell "Runtime/test dependency ownership, explicit requester-agent resolution, and canonical requester-session loading" [ref=f20e275]
+                          - cell "269" [ref=f20e276]
+                        - row [ref=f20e277]:
+                          - cell [ref=f20e278]:
+                            - code [ref=f20e279]: subagent-announce-delivery-retry.ts
+                          - cell "Timeout resolution, retry/backoff policy, nested error classification, and source-owner terminal results" [ref=f20e280]
+                          - cell "264" [ref=f20e281]
+                        - row [ref=f20e282]:
+                          - cell [ref=f20e283]:
+                            - code [ref=f20e284]: subagent-announce-active-wake.ts
+                          - cell "Owner-scoped active requester discovery, compaction/transcript retry, and steer delivery" [ref=f20e285]
+                          - cell "276" [ref=f20e286]
+                        - row [ref=f20e287]:
+                          - cell [ref=f20e288]:
+                            - code [ref=f20e289]: subagent-announce-completion-delivery.ts
+                          - cell "Direct text fallback, direct-target classification, and source message-tool evidence" [ref=f20e290]
+                          - cell "238" [ref=f20e291]
+                        - row [ref=f20e292]:
+                          - cell [ref=f20e293]:
+                            - code [ref=f20e294]: subagent-announce-direct-delivery.ts
+                          - cell "Requester-agent handoff, delivery-mode selection, and final visible-delivery validation" [ref=f20e295]
+                          - cell "595" [ref=f20e296]
+                    - paragraph [ref=f20e297]: "The split required internal-only, grep-able exports between these owner modules. New internal exports are:"
+                    - list [ref=f20e298]:
+                      - listitem [ref=f20e299]:
+                        - text: "runtime ownership:"
+                        - code [ref=f20e300]: SubagentAnnounceDeliveryDeps
+                        - text: ","
+                        - code [ref=f20e301]: tryResolveSubagentRequesterAgentId
+                        - text: ","
+                        - code [ref=f20e302]: setSubagentAnnounceDeliveryDepsForTest
+                        - text: ","
+                        - code [ref=f20e303]: getSubagentAnnounceRuntimeConfig
+                        - text: ","
+                        - code [ref=f20e304]: getSubagentRequesterSessionActivity
+                        - text: ","
+                        - code [ref=f20e305]: isSubagentRequesterSessionAbandoned
+                        - text: ","
+                        - code [ref=f20e306]: queueSubagentAnnounceMessage
+                        - text: ","
+                        - code [ref=f20e307]: dispatchSubagentAnnounceAgent
+                        - text: ", and"
+                        - code [ref=f20e308]: sendSubagentAnnounceMessage
+                      - listitem [ref=f20e309]:
+                        - text: "active wake:"
+                        - code [ref=f20e310]: resolveRequesterSessionActivity
+                        - text: ","
+                        - code [ref=f20e311]: resolveActiveWakeWithRetries
+                        - text: ","
+                        - code [ref=f20e312]: maybeSteerSubagentAnnounce
+                        - text: ","
+                        - code [ref=f20e313]: formatActiveWakeFailure
+                        - text: ", and"
+                        - code [ref=f20e314]: isSourceOwnerChangedWake
+                      - listitem [ref=f20e315]:
+                        - text: "completion delivery:"
+                        - code [ref=f20e316]: isGatewayAgentRunPending
+                        - text: ","
+                        - code [ref=f20e317]: isDirectMessageDeliveryTarget
+                        - text: ","
+                        - code [ref=f20e318]: hasFailedSubagentNoOutputCompletion
+                        - text: ","
+                        - code [ref=f20e319]: deliverCompletionDirect
+                        - text: ", and"
+                        - code [ref=f20e320]: hasMessagingToolDeliveryToSource
+                      - listitem [ref=f20e321]:
+                        - text: "retry policy:"
+                        - code [ref=f20e322]: SourceOwnerChangedError
+                        - text: ","
+                        - code [ref=f20e323]: sourceOwnerChangedResult
+                        - text: ","
+                        - code [ref=f20e324]: summarizeDeliveryError
+                        - text: ","
+                        - code [ref=f20e325]: isPermanentAnnounceDeliveryError
+                        - text: ","
+                        - code [ref=f20e326]: isIncompleteAnnounceAgentResultError
+                        - text: ", and"
+                        - code [ref=f20e327]: waitForAnnounceRetryDelay
+                        - text: ; existing timeout/retry exports continue through the original facade
+                      - listitem [ref=f20e328]:
+                        - text: "direct delivery:"
+                        - code [ref=f20e329]: sendSubagentAnnounceDirectly
+                    - heading "User Impact" [level=2] [ref=f20e330]
+                    - paragraph [ref=f20e331]: No user-visible behavior changes. Maintainers get smaller, concept-owned delivery modules with the same lifecycle and persistence ordering, and the subagent family no longer needs this grandfathered max-lines exception.
+                    - paragraph [ref=f20e332]:
+                      - text: The removal of the file-level
+                      - code [ref=f20e333]: oxlint-disable max-lines
+                      - text: comment and
+                      - code [ref=f20e334]: config/max-lines-baseline.txt
+                      - text: entry is the authorized retirement of that suppression.
+                    - heading "Evidence" [level=2] [ref=f20e335]
+                    - list [ref=f20e336]:
+                      - listitem [ref=f20e337]: All six production modules are below 700 lines; largest is 595 lines.
+                      - listitem [ref=f20e338]: "Final rebased focused matrix: 471 tests passed across 11 owner/importer files."
+                      - listitem [ref=f20e339]:
+                        - code [ref=f20e340]: subagent-announce.format.e2e.test.ts
+                        - text: ": 84 tests passed."
+                      - listitem [ref=f20e341]:
+                        - text: Exact local reconstruction of failed CI bundle
+                        - code [ref=f20e342]: checks-node-compact-large-5
+                        - text: ": 11,274 tests passed across its sessions, subagents, embedded-run, gateway-methods, and unit-fast groups."
+                      - listitem [ref=f20e343]:
+                        - text: Initial exact-head CI run
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31647926454" [ref=f20e344] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31647926454
+                        - text: passed lint, production/test types, architecture/topology, max-lines, and all but two Node shards. The two failures were caused by eager reads of runtime defaults under unrelated full module mocks; defaults now defer capability reads until invocation. The named
+                        - code [ref=f20e345]: src/agents/btw.test.ts
+                        - text: repro passes 57/57, the reconstructed large-5 bundle passes, and the follow-up autoreview found no issue.
+                      - listitem [ref=f20e346]:
+                        - code [ref=f20e347]: subagent-registry.lifecycle-retry-grace.e2e.test.ts
+                        - text: still shows its existing zero-agent-call failure before delivery starts; the identical focused failure was reproduced on the clean canonical
+                        - code [ref=f20e348]: main
+                        - text: checkout at the initial base SHA. No change to that test is included.
+                      - listitem [ref=f20e349]:
+                        - text: Final rebased
+                        - code [ref=f20e350]: pnpm build
+                        - text: ": passed in 3m 6.4s with zero"
+                        - code [ref=f20e351]: INEFFECTIVE_DYNAMIC_IMPORT
+                        - text: diagnostics.
+                      - listitem [ref=f20e352]:
+                        - code [ref=f20e353]: pnpm check:import-cycles
+                        - text: ": 0 runtime value cycles."
+                      - listitem [ref=f20e354]:
+                        - code [ref=f20e355]: pnpm check:madge-import-cycles
+                        - text: ": 0 cycles."
+                      - listitem [ref=f20e356]:
+                        - code [ref=f20e357]: pnpm plugin-sdk:surface:check
+                        - text: ": passed (144 public / 329 total entrypoints)."
+                      - listitem [ref=f20e358]: Core and core-test typechecks, max-lines ratchet, exact touched-file oxlint, formatting, dead-code scans, and comment-preservation audit passed.
+                      - listitem [ref=f20e359]: "Final branch autoreview: TruffleHog clean; one integrated Codex pass; no accepted/actionable findings; overall correctness 0.98."
+                      - listitem [ref=f20e360]: "Production LOC: +1,662/-1,483 (net +179), consisting of split-module imports/headers and named runtime/ownership capability boundaries; tests: +9/-13 (net -4); suppression baseline: -1."
+                  - 'button "eyes (1): steipete, 10:39PM yesterday" [disabled] [ref=f20e365]':
+                    - generic [ref=f20e366]: 👀
+                    - generic [ref=f20e367]: "1"
+              - generic [ref=f20e368]:
+                - generic [ref=f20e370]:
+                  - link [ref=f20e372] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f20e373]
+                  - generic [ref=f20e375]:
+                    - generic [ref=f20e376]:
+                      - heading "clawsweeper Bot commented Aug 12, 20261 hour ago" [level=3] [ref=f20e377]:
+                        - generic [ref=f20e378]:
+                          - strong [ref=f20e379]:
+                            - link "clawsweeper" [ref=f20e380] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f20e381]: Bot
+                          - text: commented
+                          - link "Aug 12, 20261 hour ago" [ref=f20e382] [cursor=pointer]:
+                            - /url: "#issuecomment-5273609219"
+                      - generic [ref=f20e383]:
+                        - group [ref=f20e385]:
+                          - button [ref=f20e386] [cursor=pointer]:
+                            - img "Show options" [ref=f20e389]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f20e392]: Contributor
+                    - table [ref=f20e396]:
+                      - rowgroup [ref=f20e397]:
+                        - row [ref=f20e398]:
+                          - cell [ref=f20e399]:
+                            - paragraph [ref=f20e400]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f20e401]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f20e402]:
+                  - generic [ref=f20e407]:
+                    - link [ref=f20e408] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f20e409]
+                    - link "openclaw-barnacle" [ref=f20e410] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f20e411]: Bot
+                    - text: added
+                    - link "agents" [ref=f20e412] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                    - 'link "size: XL" [ref=f20e413] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+                    - link "maintainer" [ref=f20e414] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 20261 hour ago" [ref=f20e415] [cursor=pointer]:
+                      - /url: "#event-29369387993"
+                  - generic [ref=f20e421]:
+                    - link [ref=f20e423] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e424]
+                    - generic [ref=f20e425]:
+                      - link "steipete" [ref=f20e426] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 12, 2026 22:401 hour ago" [ref=f20e427] [cursor=pointer]:
+                        - /url: "#event-29369397532"
+                - generic [ref=f20e429]:
+                  - generic [ref=f20e434]:
+                    - link "steipete" [ref=f20e435] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: added 2 commits
+                    - link "August 12, 2026 16:031 hour ago" [ref=f20e436] [cursor=pointer]:
+                      - /url: "#commits-pushed-d830180"
+                  - generic [ref=f20e437]:
+                    - generic [ref=f20e445]:
+                      - link [ref=f20e448] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f20e449]
+                      - code [ref=f20e451]:
+                        - 'link "refactor(agents): split subagent announce delivery" [ref=f20e452] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122853/commits/d830180cbb67b3c11486d63c00fe6a089819ec23
+                      - button "Unverified" [ref=f20e454] [cursor=pointer]
+                      - group [ref=f20e459]:
+                        - img "0 / 1 checks OK" [ref=f20e461] [cursor=pointer]
+                      - code [ref=f20e464]:
+                        - link "d830180" [ref=f20e465] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122853/commits/d830180cbb67b3c11486d63c00fe6a089819ec23
+                    - generic [ref=f20e473]:
+                      - link [ref=f20e476] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f20e477]
+                      - code [ref=f20e479]:
+                        - 'link "fix(agents): defer announce runtime dependency reads" [ref=f20e480] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122853/commits/caa08d8100f23d301222cea2653589a6b3722393
+                      - button "Unverified" [ref=f20e482] [cursor=pointer]
+                      - group [ref=f20e487]:
+                        - img "76 / 120 checks OK" [ref=f20e489] [cursor=pointer]
+                      - code [ref=f20e492]:
+                        - link "caa08d8" [ref=f20e493] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122853/commits/caa08d8100f23d301222cea2653589a6b3722393
+                - generic [ref=f20e499]:
+                  - link [ref=f20e500] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f20e501]
+                  - link "clawsweeper" [ref=f20e502] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f20e503]: Bot
+                  - text: added
+                  - 'link "merge-risk: 🚨 compatibility" [ref=f20e504] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                  - 'link "merge-risk: 🚨 message-delivery" [ref=f20e505] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+                  - 'link "merge-risk: 🚨 session-state" [ref=f20e506] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+                  - link "P1" [ref=f20e507] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                  - 'link "rating: 🦪 silver shellfish" [ref=f20e508] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                  - 'link "status: ⏳ waiting on author" [ref=f20e509] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                  - text: labels
+                  - link "Aug 12, 20261 hour ago" [ref=f20e510] [cursor=pointer]:
+                    - /url: "#event-29370302310"
+                - generic [ref=f20e512]:
+                  - link [ref=f20e514] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f20e515]
+                  - generic [ref=f20e517]:
+                    - generic [ref=f20e518]:
+                      - heading "clawsweeper Bot commented Aug 12, 20261 hour ago •" [level=3] [ref=f20e519]:
+                        - generic [ref=f20e520]:
+                          - strong [ref=f20e521]:
+                            - link "clawsweeper" [ref=f20e522] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f20e523]: Bot
+                          - text: commented
+                          - link "Aug 12, 20261 hour ago" [ref=f20e524] [cursor=pointer]:
+                            - /url: "#issuecomment-5273836237"
+                          - generic [ref=f20e525]:
+                            - generic [ref=f20e526]: •
+                            - group [ref=f20e527]:
+                              - button "edited" [ref=f20e528] [cursor=pointer]
+                      - generic [ref=f20e532]:
+                        - group [ref=f20e534]:
+                          - button [ref=f20e535] [cursor=pointer]:
+                            - img "Show options" [ref=f20e538]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f20e541]: Contributor
+                    - table [ref=f20e545]:
+                      - rowgroup [ref=f20e546]:
+                        - row [ref=f20e547]:
+                          - cell [ref=f20e548]:
+                            - paragraph [ref=f20e549]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f20e550]: Reviewed August 12, 2026, 7:17 PM ET / 23:17 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f20e551]
+                            - heading "What this changes" [level=2] [ref=f20e552]
+                            - paragraph [ref=f20e553]: This PR splits subagent completion-announcement delivery into focused runtime, retry, active-wake, completion-fallback, and direct-delivery modules while retaining the existing facade.
+                            - heading "Merge readiness" [level=2] [ref=f20e554]
+                            - paragraph [ref=f20e555]:
+                              - generic [ref=f20e556]: ⚠️
+                              - strong [ref=f20e557]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f20e558]: "No blocking correctness finding on the rebased split: the requester agent is passed from both current callers through the facade into active-wake and direct-delivery paths. This maintainer-owned, lifecycle-sensitive refactor should remain open for explicit owner acceptance after exact-head delivery checks finish."
+                            - paragraph [ref=f20e559]:
+                              - strong [ref=f20e560]: "Priority:"
+                              - text: P1
+                              - strong [ref=f20e561]: "Reviewed head:"
+                              - code [ref=f20e562]: caa08d8100f23d301222cea2653589a6b3722393
+                              - strong [ref=f20e563]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f20e564] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f20e565]
+                            - table [ref=f20e567]:
+                              - rowgroup [ref=f20e568]:
+                                - row [ref=f20e569]:
+                                  - columnheader "Measure" [ref=f20e570]
+                                  - columnheader "Result" [ref=f20e571]
+                                  - columnheader "What it means" [ref=f20e572]
+                              - rowgroup [ref=f20e573]:
+                                - row [ref=f20e574]:
+                                  - cell [ref=f20e575]:
+                                    - strong [ref=f20e576]: Overall readiness
+                                  - cell [ref=f20e577]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f20e578]: (4/6)
+                                  - cell "A well-scoped structural refactor with the prior ownership blocker addressed; exact-head checks remain the appropriate merge gate." [ref=f20e579]
+                                - row [ref=f20e580]:
+                                  - cell [ref=f20e581]:
+                                    - strong [ref=f20e582]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f20e583]
+                                  - 'cell "Not applicable: This maintainer-authored internal refactor is exempt from the external-contributor real-behavior-proof gate; its focused test and CI evidence remains relevant validation." [ref=f20e584]'
+                                - row [ref=f20e585]:
+                                  - cell [ref=f20e586]:
+                                    - strong [ref=f20e587]: Patch quality
+                                  - cell [ref=f20e588]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f20e589]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f20e590]
+                            - heading "Verification" [level=2] [ref=f20e591]
+                            - table [ref=f20e593]:
+                              - rowgroup [ref=f20e594]:
+                                - row [ref=f20e595]:
+                                  - columnheader "Check" [ref=f20e596]
+                                  - columnheader "Result" [ref=f20e597]
+                                  - columnheader "Evidence" [ref=f20e598]
+                              - rowgroup [ref=f20e599]:
+                                - row [ref=f20e600]:
+                                  - cell [ref=f20e601]:
+                                    - strong [ref=f20e602]: Real behavior
+                                  - cell "Not applicable" [ref=f20e603]
+                                  - 'cell "Not applicable: This maintainer-authored internal refactor is exempt from the external-contributor real-behavior-proof gate; its focused test and CI evidence remains relevant validation." [ref=f20e604]'
+                                - row [ref=f20e605]:
+                                  - cell [ref=f20e606]:
+                                    - strong [ref=f20e607]: Evidence reviewed
+                                  - cell "6 items" [ref=f20e608]
+                                  - 'cell "Facade preserves requester ownership: The split facade passes requesterAgentId into both active wake and direct-delivery callbacks. Runtime resolver fails closed on conflicting owners: Explicit requester IDs, encoded session owners, and persisted store owners must agree before the runtime returns an agent ID. Current caller supplies explicit owner: The main announcement path passes targetRequesterAgentId into delivery before the split boundary." [ref=f20e609]': "Facade preserves requester ownership: The split facade passes requesterAgentId into both active wake and direct-delivery callbacks.Runtime resolver fails closed on conflicting owners: Explicit requester IDs, encoded session owners, and persisted store owners must agree before the runtime returns an agent ID.Current caller supplies explicit owner: The main announcement path passes targetRequesterAgentId into delivery before the split boundary."
+                                - row [ref=f20e610]:
+                                  - cell [ref=f20e611]:
+                                    - strong [ref=f20e612]: Findings
+                                  - cell "None" [ref=f20e613]
+                                  - cell "None." [ref=f20e614]
+                                - row [ref=f20e615]:
+                                  - cell [ref=f20e616]:
+                                    - strong [ref=f20e617]: Security
+                                  - cell "None" [ref=f20e618]
+                                  - cell "None." [ref=f20e619]
+                            - heading "How this fits together" [level=2] [ref=f20e620]
+                            - paragraph [ref=f20e621]: Subagent completion events enter the announcement facade, resolve the requester’s session owner, and then use an active-session wakeup or direct delivery path. Each outcome is returned to the caller so completion state can be recorded and retried appropriately.
+                            - region "mermaid rendered output container" [ref=f20e622]:
+                              - generic [ref=f20e623]:
+                                - generic [ref=f20e624]:
+                                  - group [ref=f20e625]:
+                                    - button "Open dialog" [ref=f20e626] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f20e629] [cursor=pointer]
+                                - iframe [ref=f20e634]:
+                                  - generic [ref=f21e1]:
+                                    - document [ref=f21e5]:
+                                      - generic [ref=f21e13]:
+                                        - paragraph [ref=f21e20]: Subagent completion
+                                        - paragraph [ref=f21e27]: Announcement facade
+                                        - paragraph [ref=f21e34]: Requester owner resolution
+                                        - paragraph [ref=f21e41]: Active-session wake
+                                        - paragraph [ref=f21e48]: Direct requester handoff
+                                        - paragraph [ref=f21e55]: Queue delivery outcome
+                                        - paragraph [ref=f21e62]: Channel delivery outcome
+                                        - paragraph [ref=f21e69]: Completion result
+                                    - generic [ref=f21e70]:
+                                      - button "Zoom in" [ref=f21e71]
+                                      - button "Zoom out" [ref=f21e75]
+                                      - button "Reset view" [ref=f21e79]
+                                      - button "Pan up" [ref=f21e82]
+                                      - button "Pan down" [ref=f21e85]
+                                      - button "Pan left" [ref=f21e88]
+                                      - button "Pan right" [ref=f21e91]
+                            - heading "Decision needed" [level=2] [ref=f20e635]
+                            - table [ref=f20e637]:
+                              - rowgroup [ref=f20e638]:
+                                - row [ref=f20e639]:
+                                  - columnheader "Question" [ref=f20e640]
+                                  - columnheader "Recommendation" [ref=f20e641]
+                              - rowgroup [ref=f20e642]:
+                                - row [ref=f20e643]:
+                                  - cell "Does the agents owner accept this lifecycle-sensitive delivery refactor once the exact-head delivery checks are green?" [ref=f20e644]
+                                  - cell [ref=f20e645]:
+                                    - strong [ref=f20e646]: "Accept after exact-head validation:"
+                                    - text: Merge after the current head’s relevant delivery checks complete successfully.
+                            - paragraph [ref=f20e647]: "Why: The patch is correctness-clean on source review, but it restructures message delivery and session ownership under a protected maintainer workflow."
+                            - heading "Before merge" [level=2] [ref=f20e648]
+                            - list [ref=f20e649]:
+                              - listitem [ref=f20e650]:
+                                - checkbox "Incomplete task" [disabled] [ref=f20e651]
+                                - strong [ref=f20e652]: Resolve merge risk (P1)
+                                - text: "- The refactor redistributes queueing, direct sends, and requester-session resolution across six production modules; merge only after the in-progress exact-head delivery matrix completes."
+                            - group [ref=f20e653]:
+                              - strong [ref=f20e655] [cursor=pointer]: Agent review details
+                - generic [ref=f20e656]:
+                  - generic [ref=f20e662]:
+                    - link [ref=f20e664] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e665]
+                    - generic [ref=f20e666]:
+                      - link "steipete" [ref=f20e667] [cursor=pointer]:
+                        - /url: /steipete
+                      - link "force-pushed" [ref=f20e668] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/034e4000950dceb8a4ac02e75041d0ef6c99ccec..caa08d8100f23d301222cea2653589a6b3722393
+                      - text: the
+                      - generic [ref=f20e669]: steipete/split-announce-delivery-t4f8
+                      - text: branch from
+                      - link [ref=f20e671] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/034e4000950dceb8a4ac02e75041d0ef6c99ccec
+                        - code [ref=f20e672]: "034e400"
+                      - text: to
+                      - link [ref=f20e673] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/caa08d8100f23d301222cea2653589a6b3722393
+                        - code [ref=f20e674]: caa08d8
+                      - link "Compare" [ref=f20e675] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/034e4000950dceb8a4ac02e75041d0ef6c99ccec..caa08d8100f23d301222cea2653589a6b3722393
+                      - link "August 12, 2026 23:111 hour ago" [ref=f20e678] [cursor=pointer]:
+                        - /url: "#event-29370436538"
+                  - generic [ref=f20e683]:
+                    - link [ref=f20e684] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f20e685]
+                    - link "clawsweeper" [ref=f20e686] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f20e687]: Bot
+                    - text: added
+                    - 'link "rating: 🐚 platinum hermit" [ref=f20e688] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f20e689] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: and removed
+                    - 'link "rating: 🦪 silver shellfish" [ref=f20e690] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: ⏳ waiting on author" [ref=f20e691] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 12, 20261 hour ago" [ref=f20e692] [cursor=pointer]:
+                      - /url: "#event-29370681335"
+                  - generic [ref=f20e697]:
+                    - button "View details" [ref=f20e698] [cursor=pointer]
+                    - generic [ref=f20e699]:
+                      - link [ref=f20e701] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f20e702]
+                      - generic [ref=f20e703]:
+                        - link "steipete" [ref=f20e704] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f20e705] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/ae6f813e73bb33bb1356e307ceb037562d924928
+                          - code [ref=f20e706]: ae6f813
+                        - text: into
+                        - generic [ref=f20e707]: main
+                        - link "Aug 12, 20261 hour ago" [ref=f20e709] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122853#event-29370859689
+                        - generic [ref=f20e710]: 134 checks passed
+                  - generic [ref=f20e717]:
+                    - link [ref=f20e719] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e720]
+                    - generic [ref=f20e721]:
+                      - link "steipete" [ref=f20e722] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f20e723]: steipete/split-announce-delivery-t4f8
+                      - text: branch
+                      - link "August 12, 2026 23:231 hour ago" [ref=f20e725] [cursor=pointer]:
+                        - /url: "#event-29370860871"
+                - generic [ref=f20e727]:
+                  - link [ref=f20e729] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f20e730]
+                  - generic [ref=f20e732]:
+                    - generic [ref=f20e733]:
+                      - heading [level=3] [ref=f20e734]:
+                        - generic [ref=f20e735]:
+                          - strong [ref=f20e736]:
+                            - link "steipete" [ref=f20e737] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 20261 hour ago" [ref=f20e738] [cursor=pointer]:
+                            - /url: "#issuecomment-5273963148"
+                      - generic [ref=f20e739]:
+                        - group [ref=f20e741]:
+                          - button [ref=f20e742] [cursor=pointer]:
+                            - img "Show options" [ref=f20e745]
+                        - generic [ref=f20e747]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f20e748]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f20e750]: Author
+                    - table [ref=f20e754]:
+                      - rowgroup [ref=f20e755]:
+                        - row [ref=f20e756]:
+                          - cell [ref=f20e757]:
+                            - paragraph [ref=f20e758]: Merged via squash.
+                            - list [ref=f20e759]:
+                              - listitem [ref=f20e760]:
+                                - text: "Prepared head SHA:"
+                                - link "caa08d8100f23d301222cea2653589a6b3722393" [ref=f20e761] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122853/commits/caa08d8100f23d301222cea2653589a6b3722393
+                              - listitem [ref=f20e762]:
+                                - text: "Landed commit:"
+                                - link "ae6f813e73bb33bb1356e307ceb037562d924928" [ref=f20e763] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/ae6f813e73bb33bb1356e307ceb037562d924928
+            - generic [ref=f20e767]:
+              - link "Sign up for free" [ref=f20e768] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f20e769]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f20e770] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122853
+        - generic [ref=f20e774]:
+          - form "Select reviewers" [ref=f20e776]:
+            - heading "Reviewers" [level=3] [ref=f20e777]
+            - text: No reviews
+          - form "Select assignees" [ref=f20e779]:
+            - heading "Assignees" [level=3] [ref=f20e780]
+            - text: No one assigned
+          - generic [ref=f20e781]:
+            - heading "Labels" [level=3] [ref=f20e782]
+            - generic [ref=f20e783]:
+              - link "agents" [ref=f20e784] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+              - link "maintainer" [ref=f20e786] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f20e788] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - 'link "merge-risk: 🚨 message-delivery" [ref=f20e790] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+              - 'link "merge-risk: 🚨 session-state" [ref=f20e792] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+              - link "P1" [ref=f20e794] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🐚 platinum hermit" [ref=f20e796] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: XL" [ref=f20e798] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f20e800] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f20e803]:
+            - heading "Projects" [level=3] [ref=f20e804]
+            - text: None yet
+          - form "Select milestones" [ref=f20e806]:
+            - heading "Milestone" [level=3] [ref=f20e807]
+            - text: No milestone
+          - form "Link issues" [ref=f20e813]:
+            - heading "Development" [level=3] [ref=f20e814]
+            - paragraph [ref=f20e815]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f20e817]: None yet
+          - generic [ref=f20e819]:
+            - heading "1 participant" [level=3] [ref=f20e820]
+            - link [ref=f20e822] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f20e823]
+  - contentinfo [ref=f20e824]:
+    - heading "Footer" [level=2] [ref=f20e825]
+    - generic [ref=f20e826]:
+      - generic [ref=f20e827]:
+        - link "GitHub Homepage" [ref=f20e828] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f20e831]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f20e832]:
+        - heading "Footer navigation" [level=3] [ref=f20e833]
+        - list "Footer navigation" [ref=f20e834]:
+          - listitem [ref=f20e835]:
+            - link "Terms" [ref=f20e836] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f20e837]:
+            - link "Privacy" [ref=f20e838] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f20e839]:
+            - link "Security" [ref=f20e840] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f20e841]:
+            - link "Status" [ref=f20e842] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f20e843]:
+            - link "Community" [ref=f20e844] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f20e845]:
+            - link "Docs" [ref=f20e846] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f20e847]:
+            - link "Contact" [ref=f20e848] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f20e849]:
+            - button "Manage cookies" [ref=f20e851] [cursor=pointer]
+          - listitem [ref=f20e852]:
+            - button "Do not share my personal information" [ref=f20e854] [cursor=pointer]

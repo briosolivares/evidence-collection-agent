@@ -1,0 +1,26 @@
+{
+  "outputs": [
+    {
+      "id": "sorority_members_sheet",
+      "kind": "external_action",
+      "description": "adding their name + info to a google spreadsheet and filling out the relevant information (name, class, major, affiliation, interests, other)",
+      "proof": {
+        "sourceUrlPattern": "https://docs.google.com/spreadsheets/d/*",
+        "screenshots": {
+          "minimum": 1
+        },
+        "mustShow": [
+          "Google Sheet containing rows with name, class, major, affiliation, interests, other for identified sisters"
+        ]
+      }
+    }
+  ],
+  "contentExpectations": [
+    "Cover each of the six named sororities at MIT: Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa",
+    "For each sorority, identify the sorority's MIT chapter website found via searching 'sorority name MIT'",
+    "For each sorority, identify the sisters/members page on that website",
+    "From each sisters page, identify seniors (class of 2026) and juniors (class of 2027)",
+    "For each identified senior/junior, record name, class, major, affiliation, interests, and other relevant information in the spreadsheet",
+    "Where a sorority's website or sisters page or class-year info is unavailable or cannot be found, note this as a credible blocker rather than fabricating entries"
+  ]
+}

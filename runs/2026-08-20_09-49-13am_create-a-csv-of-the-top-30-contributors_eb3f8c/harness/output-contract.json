@@ -1,0 +1,39 @@
+{
+  "outputs": [
+    {
+      "id": "openclaw_top_contributors",
+      "kind": "table",
+      "filename": "openclaw_top_contributors.csv",
+      "format": "csv",
+      "columns": [
+        {
+          "name": "github_handle",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "linkedin_url",
+          "required": false,
+          "type": "url"
+        }
+      ],
+      "rules": [
+        {
+          "type": "exact_row_count",
+          "value": 30
+        },
+        {
+          "type": "unique",
+          "columns": [
+            "github_handle"
+          ]
+        }
+      ]
+    }
+  ]
+}

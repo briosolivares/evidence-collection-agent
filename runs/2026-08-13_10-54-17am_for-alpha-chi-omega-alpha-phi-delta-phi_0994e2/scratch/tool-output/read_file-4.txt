@@ -1,0 +1,1990 @@
+  3160→          class="list-item-content__title"
+  3161→          style="max-width: 100%;"
+  3162→        >Macy Brennan</h2>
+  3163→      
+  3164→
+  3165→      
+  3166→        <div class="list-item-content__description
+  3167→          
+  3168→          "
+  3169→          style="
+  3170→            margin-top: 1%;
+  3171→            max-width: 100%;
+  3172→          "
+  3173→        >
+  3174→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Westlake, OH</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 16</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Track &amp; Field, UROP, Tech Catholic Community, MISTI</p>
+  3175→        </div>
+  3176→      
+  3177→
+  3178→    </div>
+  3179→  
+  3180→
+  3181→  
+  3182→</div>
+  3183→
+  3184→      
+  3185→      
+  3186→    </li>
+  3187→  
+  3188→    
+  3189→    <li
+  3190→      class="
+  3191→        list-item
+  3192→        
+  3193→          list-item-basic-animation
+  3194→        
+  3195→      "
+  3196→      style="
+  3197→        
+  3198→          padding-top: 6%;
+  3199→          padding-right: 6%;
+  3200→          padding-bottom: 6%;
+  3201→          padding-left: 6%;
+  3202→        
+  3203→      "
+  3204→      data-is-card-enabled="true"
+  3205→    >
+  3206→      
+  3207→      
+  3208→      
+  3209→        
+  3210→  
+  3211→      <div class="list-item-media"
+  3212→        style="
+  3213→          
+  3214→            margin-bottom: 4%;
+  3215→          
+  3216→          width: 100%;
+  3217→        "
+  3218→      >
+  3219→        <div class="list-item-media-inner"
+  3220→          data-aspect-ratio="3:4"
+  3221→          data-animation-role="image"
+  3222→        >
+  3223→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg" data-image-dimensions="1618x2157" data-image-focal-point="0.5,0.5" alt="IMG_5209 - Michelle Cao.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg" width="1618" height="2157" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0001545356204604), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0001545356204604), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0001545356204604), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0001545356204604), calc((100vw - 80px) / 5 * 1.0001545356204604)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/23bf2e00-9094-4d0a-a063-3224e60905d6/IMG_5209+-+Michelle+Cao.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3224→      </div>
+  3225→  
+  3226→
+  3227→
+  3228→        <div class="list-item-content">
+  3229→
+  3230→  
+  3231→    <div class="list-item-content__text-wrapper">
+  3232→
+  3233→      
+  3234→        <h2
+  3235→          class="list-item-content__title"
+  3236→          style="max-width: 100%;"
+  3237→        >Michelle Cao</h2>
+  3238→      
+  3239→
+  3240→      
+  3241→        <div class="list-item-content__description
+  3242→          
+  3243→          "
+  3244→          style="
+  3245→            margin-top: 1%;
+  3246→            max-width: 100%;
+  3247→          "
+  3248→        >
+  3249→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Maple Grove, MN</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-14 &amp; 18</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Brass Rat Investments, SBC, UMA</p>
+  3250→        </div>
+  3251→      
+  3252→
+  3253→    </div>
+  3254→  
+  3255→
+  3256→  
+  3257→</div>
+  3258→
+  3259→      
+  3260→      
+  3261→    </li>
+  3262→  
+  3263→    
+  3264→    <li
+  3265→      class="
+  3266→        list-item
+  3267→        
+  3268→          list-item-basic-animation
+  3269→        
+  3270→      "
+  3271→      style="
+  3272→        
+  3273→          padding-top: 6%;
+  3274→          padding-right: 6%;
+  3275→          padding-bottom: 6%;
+  3276→          padding-left: 6%;
+  3277→        
+  3278→      "
+  3279→      data-is-card-enabled="true"
+  3280→    >
+  3281→      
+  3282→      
+  3283→      
+  3284→        
+  3285→  
+  3286→      <div class="list-item-media"
+  3287→        style="
+  3288→          
+  3289→            margin-bottom: 4%;
+  3290→          
+  3291→          width: 100%;
+  3292→        "
+  3293→      >
+  3294→        <div class="list-item-media-inner"
+  3295→          data-aspect-ratio="3:4"
+  3296→          data-animation-role="image"
+  3297→        >
+  3298→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg" data-image-dimensions="2130x2840" data-image-focal-point="0.5,0.5" alt="IMG_0055 - Allie Chinchar.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg" width="2130" height="2840" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/6e4bb5f1-5d31-4934-afce-7896632bdbba/IMG_0055+-+Allie+Chinchar.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3299→      </div>
+  3300→  
+  3301→
+  3302→
+  3303→        <div class="list-item-content">
+  3304→
+  3305→  
+  3306→    <div class="list-item-content__text-wrapper">
+  3307→
+  3308→      
+  3309→        <h2
+  3310→          class="list-item-content__title"
+  3311→          style="max-width: 100%;"
+  3312→        >Allie Chinchar</h2>
+  3313→      
+  3314→
+  3315→      
+  3316→        <div class="list-item-content__description
+  3317→          
+  3318→          "
+  3319→          style="
+  3320→            margin-top: 1%;
+  3321→            max-width: 100%;
+  3322→          "
+  3323→        >
+  3324→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> North Ridgeville, OH</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 14-2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Camp Kesem, Scholars of Finance</p>
+  3325→        </div>
+  3326→      
+  3327→
+  3328→    </div>
+  3329→  
+  3330→
+  3331→  
+  3332→</div>
+  3333→
+  3334→      
+  3335→      
+  3336→    </li>
+  3337→  
+  3338→    
+  3339→    <li
+  3340→      class="
+  3341→        list-item
+  3342→        
+  3343→          list-item-basic-animation
+  3344→        
+  3345→      "
+  3346→      style="
+  3347→        
+  3348→          padding-top: 6%;
+  3349→          padding-right: 6%;
+  3350→          padding-bottom: 6%;
+  3351→          padding-left: 6%;
+  3352→        
+  3353→      "
+  3354→      data-is-card-enabled="true"
+  3355→    >
+  3356→      
+  3357→      
+  3358→      
+  3359→        
+  3360→  
+  3361→      <div class="list-item-media"
+  3362→        style="
+  3363→          
+  3364→            margin-bottom: 4%;
+  3365→          
+  3366→          width: 100%;
+  3367→        "
+  3368→      >
+  3369→        <div class="list-item-media-inner"
+  3370→          data-aspect-ratio="3:4"
+  3371→          data-animation-role="image"
+  3372→        >
+  3373→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg" data-image-dimensions="1297x1730" data-image-focal-point="0.5,0.5" alt="IMG_7197 - Alexa L Cohen.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg" width="1297" height="1730" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/972d4f2e-88a8-4f3e-bfcc-2e75c2a31619/IMG_7197+-+Alexa+L+Cohen.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3374→      </div>
+  3375→  
+  3376→
+  3377→
+  3378→        <div class="list-item-content">
+  3379→
+  3380→  
+  3381→    <div class="list-item-content__text-wrapper">
+  3382→
+  3383→      
+  3384→        <h2
+  3385→          class="list-item-content__title"
+  3386→          style="max-width: 100%;"
+  3387→        >Alexa Cohen</h2>
+  3388→      
+  3389→
+  3390→      
+  3391→        <div class="list-item-content__description
+  3392→          
+  3393→          "
+  3394→          style="
+  3395→            margin-top: 1%;
+  3396→            max-width: 100%;
+  3397→          "
+  3398→        >
+  3399→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Media, PA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 20</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Lacrosse, Little Beavers, Camp Kesem</p>
+  3400→        </div>
+  3401→      
+  3402→
+  3403→    </div>
+  3404→  
+  3405→
+  3406→  
+  3407→</div>
+  3408→
+  3409→      
+  3410→      
+  3411→    </li>
+  3412→  
+  3413→    
+  3414→    <li
+  3415→      class="
+  3416→        list-item
+  3417→        
+  3418→          list-item-basic-animation
+  3419→        
+  3420→      "
+  3421→      style="
+  3422→        
+  3423→          padding-top: 6%;
+  3424→          padding-right: 6%;
+  3425→          padding-bottom: 6%;
+  3426→          padding-left: 6%;
+  3427→        
+  3428→      "
+  3429→      data-is-card-enabled="true"
+  3430→    >
+  3431→      
+  3432→      
+  3433→      
+  3434→        
+  3435→  
+  3436→      <div class="list-item-media"
+  3437→        style="
+  3438→          
+  3439→            margin-bottom: 4%;
+  3440→          
+  3441→          width: 100%;
+  3442→        "
+  3443→      >
+  3444→        <div class="list-item-media-inner"
+  3445→          data-aspect-ratio="3:4"
+  3446→          data-animation-role="image"
+  3447→        >
+  3448→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg" data-image-dimensions="735x980" data-image-focal-point="0.5,0.5" alt="100_0899.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg" width="735" height="980" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/819aacd5-f38e-4260-928c-c024ca689bd6/100_0899.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3449→      </div>
+  3450→  
+  3451→
+  3452→
+  3453→        <div class="list-item-content">
+  3454→
+  3455→  
+  3456→    <div class="list-item-content__text-wrapper">
+  3457→
+  3458→      
+  3459→        <h2
+  3460→          class="list-item-content__title"
+  3461→          style="max-width: 100%;"
+  3462→        >An Dinh</h2>
+  3463→      
+  3464→
+  3465→      
+  3466→        <div class="list-item-content__description
+  3467→          
+  3468→          "
+  3469→          style="
+  3470→            margin-top: 1%;
+  3471→            max-width: 100%;
+  3472→          "
+  3473→        >
+  3474→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Houston, TX</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-3</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> UROP, AppDev@MIT, New Vassar House Government</p>
+  3475→        </div>
+  3476→      
+  3477→
+  3478→    </div>
+  3479→  
+  3480→
+  3481→  
+  3482→</div>
+  3483→
+  3484→      
+  3485→      
+  3486→    </li>
+  3487→  
+  3488→    
+  3489→    <li
+  3490→      class="
+  3491→        list-item
+  3492→        
+  3493→          list-item-basic-animation
+  3494→        
+  3495→      "
+  3496→      style="
+  3497→        
+  3498→          padding-top: 6%;
+  3499→          padding-right: 6%;
+  3500→          padding-bottom: 6%;
+  3501→          padding-left: 6%;
+  3502→        
+  3503→      "
+  3504→      data-is-card-enabled="true"
+  3505→    >
+  3506→      
+  3507→      
+  3508→      
+  3509→        
+  3510→  
+  3511→      <div class="list-item-media"
+  3512→        style="
+  3513→          
+  3514→            margin-bottom: 4%;
+  3515→          
+  3516→          width: 100%;
+  3517→        "
+  3518→      >
+  3519→        <div class="list-item-media-inner"
+  3520→          data-aspect-ratio="3:4"
+  3521→          data-animation-role="image"
+  3522→        >
+  3523→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg" data-image-dimensions="1617x2210" data-image-focal-point="0.5,0.5" alt="IMG_2299 Copy - Abi Dixon.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg" width="1617" height="2210" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/512e8219-7857-409f-a79b-efe916a99872/IMG_2299+Copy+-+Abi+Dixon.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3524→      </div>
+  3525→  
+  3526→
+  3527→
+  3528→        <div class="list-item-content">
+  3529→
+  3530→  
+  3531→    <div class="list-item-content__text-wrapper">
+  3532→
+  3533→      
+  3534→        <h2
+  3535→          class="list-item-content__title"
+  3536→          style="max-width: 100%;"
+  3537→        >Abi Dixon</h2>
+  3538→      
+  3539→
+  3540→      
+  3541→        <div class="list-item-content__description
+  3542→          
+  3543→          "
+  3544→          style="
+  3545→            margin-top: 1%;
+  3546→            max-width: 100%;
+  3547→          "
+  3548→        >
+  3549→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Ipswich, MA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> MIT Combat Robotics Team, Chamber Chorus</p>
+  3550→        </div>
+  3551→      
+  3552→
+  3553→    </div>
+  3554→  
+  3555→
+  3556→  
+  3557→</div>
+  3558→
+  3559→      
+  3560→      
+  3561→    </li>
+  3562→  
+  3563→    
+  3564→    <li
+  3565→      class="
+  3566→        list-item
+  3567→        
+  3568→          list-item-basic-animation
+  3569→        
+  3570→      "
+  3571→      style="
+  3572→        
+  3573→          padding-top: 6%;
+  3574→          padding-right: 6%;
+  3575→          padding-bottom: 6%;
+  3576→          padding-left: 6%;
+  3577→        
+  3578→      "
+  3579→      data-is-card-enabled="true"
+  3580→    >
+  3581→      
+  3582→      
+  3583→      
+  3584→        
+  3585→  
+  3586→      <div class="list-item-media"
+  3587→        style="
+  3588→          
+  3589→            margin-bottom: 4%;
+  3590→          
+  3591→          width: 100%;
+  3592→        "
+  3593→      >
+  3594→        <div class="list-item-media-inner"
+  3595→          data-aspect-ratio="3:4"
+  3596→          data-animation-role="image"
+  3597→        >
+  3598→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG" data-image-dimensions="5472x3648" data-image-focal-point="0.5,0.5" alt="IMG_9383.JPG"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG" width="5472" height="3648" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 2), (max-width: 767px) calc((100vw - 20px) / 2 * 2), (max-width: 1099px) calc((100vw - 40px) / 3 * 2), (max-width: 1199px) calc((100vw - 60px) / 4 * 2), calc((100vw - 80px) / 5 * 2)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/769a3b98-9c09-442d-9564-e2f98a90fc3d/IMG_9383.JPG?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3599→      </div>
+  3600→  
+  3601→
+  3602→
+  3603→        <div class="list-item-content">
+  3604→
+  3605→  
+  3606→    <div class="list-item-content__text-wrapper">
+  3607→
+  3608→      
+  3609→        <h2
+  3610→          class="list-item-content__title"
+  3611→          style="max-width: 100%;"
+  3612→        >Paige Dzenutis</h2>
+  3613→      
+  3614→
+  3615→      
+  3616→        <div class="list-item-content__description
+  3617→          
+  3618→          "
+  3619→          style="
+  3620→            margin-top: 1%;
+  3621→            max-width: 100%;
+  3622→          "
+  3623→        >
+  3624→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Norfolk, CT</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Track &amp; Field</p>
+  3625→        </div>
+  3626→      
+  3627→
+  3628→    </div>
+  3629→  
+  3630→
+  3631→  
+  3632→</div>
+  3633→
+  3634→      
+  3635→      
+  3636→    </li>
+  3637→  
+  3638→    
+  3639→    <li
+  3640→      class="
+  3641→        list-item
+  3642→        
+  3643→          list-item-basic-animation
+  3644→        
+  3645→      "
+  3646→      style="
+  3647→        
+  3648→          padding-top: 6%;
+  3649→          padding-right: 6%;
+  3650→          padding-bottom: 6%;
+  3651→          padding-left: 6%;
+  3652→        
+  3653→      "
+  3654→      data-is-card-enabled="true"
+  3655→    >
+  3656→      
+  3657→      
+  3658→      
+  3659→        
+  3660→  
+  3661→      <div class="list-item-media"
+  3662→        style="
+  3663→          
+  3664→            margin-bottom: 4%;
+  3665→          
+  3666→          width: 100%;
+  3667→        "
+  3668→      >
+  3669→        <div class="list-item-media-inner"
+  3670→          data-aspect-ratio="3:4"
+  3671→          data-animation-role="image"
+  3672→        >
+  3673→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg" data-image-dimensions="1153x1538" data-image-focal-point="0.5,0.5" alt="IMG_5344 - 점 ..jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg" width="1153" height="1538" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4f35a6dd-53a2-4474-9fa5-62c990702476/IMG_5344+-+%E1%84%8C%E1%85%A5%E1%86%B7+..jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3674→      </div>
+  3675→  
+  3676→
+  3677→
+  3678→        <div class="list-item-content">
+  3679→
+  3680→  
+  3681→    <div class="list-item-content__text-wrapper">
+  3682→
+  3683→      
+  3684→        <h2
+  3685→          class="list-item-content__title"
+  3686→          style="max-width: 100%;"
+  3687→        >Alex Han</h2>
+  3688→      
+  3689→
+  3690→      
+  3691→        <div class="list-item-content__description
+  3692→          
+  3693→          "
+  3694→          style="
+  3695→            margin-top: 1%;
+  3696→            max-width: 100%;
+  3697→          "
+  3698→        >
+  3699→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Seoul, South Korea</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 20</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Wellbeing Lab, AAA, Medlinks, UROP</p>
+  3700→        </div>
+  3701→      
+  3702→
+  3703→    </div>
+  3704→  
+  3705→
+  3706→  
+  3707→</div>
+  3708→
+  3709→      
+  3710→      
+  3711→    </li>
+  3712→  
+  3713→    
+  3714→    <li
+  3715→      class="
+  3716→        list-item
+  3717→        
+  3718→          list-item-basic-animation
+  3719→        
+  3720→      "
+  3721→      style="
+  3722→        
+  3723→          padding-top: 6%;
+  3724→          padding-right: 6%;
+  3725→          padding-bottom: 6%;
+  3726→          padding-left: 6%;
+  3727→        
+  3728→      "
+  3729→      data-is-card-enabled="true"
+  3730→    >
+  3731→      
+  3732→      
+  3733→      
+  3734→        
+  3735→  
+  3736→      <div class="list-item-media"
+  3737→        style="
+  3738→          
+  3739→            margin-bottom: 4%;
+  3740→          
+  3741→          width: 100%;
+  3742→        "
+  3743→      >
+  3744→        <div class="list-item-media-inner"
+  3745→          data-aspect-ratio="3:4"
+  3746→          data-animation-role="image"
+  3747→        >
+  3748→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png" data-image-dimensions="1082x1344" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-11-30 at 3.04.45 PM.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png" width="1082" height="1344" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0734126984126984), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0734126984126984), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0734126984126984), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0734126984126984), calc((100vw - 80px) / 5 * 1.0734126984126984)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d3cd1106-3db3-4a43-a4e0-4ad37263a6b3/Screenshot+2024-11-30+at+3.04.45%E2%80%AFPM.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3749→      </div>
+  3750→  
+  3751→
+  3752→
+  3753→        <div class="list-item-content">
+  3754→
+  3755→  
+  3756→    <div class="list-item-content__text-wrapper">
+  3757→
+  3758→      
+  3759→        <h2
+  3760→          class="list-item-content__title"
+  3761→          style="max-width: 100%;"
+  3762→        >Hailey Harden</h2>
+  3763→      
+  3764→
+  3765→      
+  3766→        <div class="list-item-content__description
+  3767→          
+  3768→          "
+  3769→          style="
+  3770→            margin-top: 1%;
+  3771→            max-width: 100%;
+  3772→          "
+  3773→        >
+  3774→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Fort Worth, TX</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 10B</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Associate Advisor, Peer Mentor, UROP, National Society of Black Engineers</p>
+  3775→        </div>
+  3776→      
+  3777→
+  3778→    </div>
+  3779→  
+  3780→
+  3781→  
+  3782→</div>
+  3783→
+  3784→      
+  3785→      
+  3786→    </li>
+  3787→  
+  3788→    
+  3789→    <li
+  3790→      class="
+  3791→        list-item
+  3792→        
+  3793→          list-item-basic-animation
+  3794→        
+  3795→      "
+  3796→      style="
+  3797→        
+  3798→          padding-top: 6%;
+  3799→          padding-right: 6%;
+  3800→          padding-bottom: 6%;
+  3801→          padding-left: 6%;
+  3802→        
+  3803→      "
+  3804→      data-is-card-enabled="true"
+  3805→    >
+  3806→      
+  3807→      
+  3808→      
+  3809→        
+  3810→  
+  3811→      <div class="list-item-media"
+  3812→        style="
+  3813→          
+  3814→            margin-bottom: 4%;
+  3815→          
+  3816→          width: 100%;
+  3817→        "
+  3818→      >
+  3819→        <div class="list-item-media-inner"
+  3820→          data-aspect-ratio="3:4"
+  3821→          data-animation-role="image"
+  3822→        >
+  3823→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg" data-image-dimensions="1078x1437" data-image-focal-point="0.5,0.5" alt="IMG_7903 - Ellie Hasegawa.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg" width="1078" height="1437" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0002319647413593), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0002319647413593), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0002319647413593), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0002319647413593), calc((100vw - 80px) / 5 * 1.0002319647413593)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/12c3eace-f45a-4e31-a8c0-5f14225cf7aa/IMG_7903+-+Ellie+Hasegawa.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3824→      </div>
+  3825→  
+  3826→
+  3827→
+  3828→        <div class="list-item-content">
+  3829→
+  3830→  
+  3831→    <div class="list-item-content__text-wrapper">
+  3832→
+  3833→      
+  3834→        <h2
+  3835→          class="list-item-content__title"
+  3836→          style="max-width: 100%;"
+  3837→        >Ellie Hasegawa</h2>
+  3838→      
+  3839→
+  3840→      
+  3841→        <div class="list-item-content__description
+  3842→          
+  3843→          "
+  3844→          style="
+  3845→            margin-top: 1%;
+  3846→            max-width: 100%;
+  3847→          "
+  3848→        >
+  3849→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Columbia. MD</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Softball, MIT Glass Lab</p>
+  3850→        </div>
+  3851→      
+  3852→
+  3853→    </div>
+  3854→  
+  3855→
+  3856→  
+  3857→</div>
+  3858→
+  3859→      
+  3860→      
+  3861→    </li>
+  3862→  
+  3863→    
+  3864→    <li
+  3865→      class="
+  3866→        list-item
+  3867→        
+  3868→          list-item-basic-animation
+  3869→        
+  3870→      "
+  3871→      style="
+  3872→        
+  3873→          padding-top: 6%;
+  3874→          padding-right: 6%;
+  3875→          padding-bottom: 6%;
+  3876→          padding-left: 6%;
+  3877→        
+  3878→      "
+  3879→      data-is-card-enabled="true"
+  3880→    >
+  3881→      
+  3882→      
+  3883→      
+  3884→        
+  3885→  
+  3886→      <div class="list-item-media"
+  3887→        style="
+  3888→          
+  3889→            margin-bottom: 4%;
+  3890→          
+  3891→          width: 100%;
+  3892→        "
+  3893→      >
+  3894→        <div class="list-item-media-inner"
+  3895→          data-aspect-ratio="3:4"
+  3896→          data-animation-role="image"
+  3897→        >
+  3898→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg" data-image-dimensions="1595x2263" data-image-focal-point="0.5,0.5" alt="IMG_1499 - Katherine Jankowski.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg" width="1595" height="2263" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/a60af97a-da37-4c03-ac3d-0ffbb168fb14/IMG_1499+-+Katherine+Jankowski.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3899→      </div>
+  3900→  
+  3901→
+  3902→
+  3903→        <div class="list-item-content">
+  3904→
+  3905→  
+  3906→    <div class="list-item-content__text-wrapper">
+  3907→
+  3908→      
+  3909→        <h2
+  3910→          class="list-item-content__title"
+  3911→          style="max-width: 100%;"
+  3912→        >Katherine Jankowski</h2>
+  3913→      
+  3914→
+  3915→      
+  3916→        <div class="list-item-content__description
+  3917→          
+  3918→          "
+  3919→          style="
+  3920→            margin-top: 1%;
+  3921→            max-width: 100%;
+  3922→          "
+  3923→        >
+  3924→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Burlingame, CA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 8</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Sailing, EVT, UROP</p>
+  3925→        </div>
+  3926→      
+  3927→
+  3928→    </div>
+  3929→  
+  3930→
+  3931→  
+  3932→</div>
+  3933→
+  3934→      
+  3935→      
+  3936→    </li>
+  3937→  
+  3938→    
+  3939→    <li
+  3940→      class="
+  3941→        list-item
+  3942→        
+  3943→          list-item-basic-animation
+  3944→        
+  3945→      "
+  3946→      style="
+  3947→        
+  3948→          padding-top: 6%;
+  3949→          padding-right: 6%;
+  3950→          padding-bottom: 6%;
+  3951→          padding-left: 6%;
+  3952→        
+  3953→      "
+  3954→      data-is-card-enabled="true"
+  3955→    >
+  3956→      
+  3957→      
+  3958→      
+  3959→        
+  3960→  
+  3961→      <div class="list-item-media"
+  3962→        style="
+  3963→          
+  3964→            margin-bottom: 4%;
+  3965→          
+  3966→          width: 100%;
+  3967→        "
+  3968→      >
+  3969→        <div class="list-item-media-inner"
+  3970→          data-aspect-ratio="3:4"
+  3971→          data-animation-role="image"
+  3972→        >
+  3973→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg" data-image-dimensions="742x989" data-image-focal-point="0.5,0.5" alt="DSC05871 - Alicia Ji.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg" width="742" height="989" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0003370407819345), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0003370407819345), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0003370407819345), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0003370407819345), calc((100vw - 80px) / 5 * 1.0003370407819345)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/4e721d08-0ece-4396-8819-a80ea1e29bda/DSC05871+-+Alicia+Ji.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  3974→      </div>
+  3975→  
+  3976→
+  3977→
+  3978→        <div class="list-item-content">
+  3979→
+  3980→  
+  3981→    <div class="list-item-content__text-wrapper">
+  3982→
+  3983→      
+  3984→        <h2
+  3985→          class="list-item-content__title"
+  3986→          style="max-width: 100%;"
+  3987→        >Alicia Ji</h2>
+  3988→      
+  3989→
+  3990→      
+  3991→        <div class="list-item-content__description
+  3992→          
+  3993→          "
+  3994→          style="
+  3995→            margin-top: 1%;
+  3996→            max-width: 100%;
+  3997→          "
+  3998→        >
+  3999→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> San Diego, CA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-4</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> MINCE, SBC, AAA</p>
+  4000→        </div>
+  4001→      
+  4002→
+  4003→    </div>
+  4004→  
+  4005→
+  4006→  
+  4007→</div>
+  4008→
+  4009→      
+  4010→      
+  4011→    </li>
+  4012→  
+  4013→    
+  4014→    <li
+  4015→      class="
+  4016→        list-item
+  4017→        
+  4018→          list-item-basic-animation
+  4019→        
+  4020→      "
+  4021→      style="
+  4022→        
+  4023→          padding-top: 6%;
+  4024→          padding-right: 6%;
+  4025→          padding-bottom: 6%;
+  4026→          padding-left: 6%;
+  4027→        
+  4028→      "
+  4029→      data-is-card-enabled="true"
+  4030→    >
+  4031→      
+  4032→      
+  4033→      
+  4034→        
+  4035→  
+  4036→      <div class="list-item-media"
+  4037→        style="
+  4038→          
+  4039→            margin-bottom: 4%;
+  4040→          
+  4041→          width: 100%;
+  4042→        "
+  4043→      >
+  4044→        <div class="list-item-media-inner"
+  4045→          data-aspect-ratio="3:4"
+  4046→          data-animation-role="image"
+  4047→        >
+  4048→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg" data-image-dimensions="680x985" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-08-20 at 3.25.45 PM.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg" width="680" height="985" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/54051ddc-349c-42cd-bd08-62cf384d244a/Screenshot+2024-08-20+at+3.25.45%E2%80%AFPM.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4049→      </div>
+  4050→  
+  4051→
+  4052→
+  4053→        <div class="list-item-content">
+  4054→
+  4055→  
+  4056→    <div class="list-item-content__text-wrapper">
+  4057→
+  4058→      
+  4059→        <h2
+  4060→          class="list-item-content__title"
+  4061→          style="max-width: 100%;"
+  4062→        >Abby Kaplan</h2>
+  4063→      
+  4064→
+  4065→      
+  4066→        <div class="list-item-content__description
+  4067→          
+  4068→          "
+  4069→          style="
+  4070→            margin-top: 1%;
+  4071→            max-width: 100%;
+  4072→          "
+  4073→        >
+  4074→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Rye, NY</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 3</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Crew</p>
+  4075→        </div>
+  4076→      
+  4077→
+  4078→    </div>
+  4079→  
+  4080→
+  4081→  
+  4082→</div>
+  4083→
+  4084→      
+  4085→      
+  4086→    </li>
+  4087→  
+  4088→    
+  4089→    <li
+  4090→      class="
+  4091→        list-item
+  4092→        
+  4093→          list-item-basic-animation
+  4094→        
+  4095→      "
+  4096→      style="
+  4097→        
+  4098→          padding-top: 6%;
+  4099→          padding-right: 6%;
+  4100→          padding-bottom: 6%;
+  4101→          padding-left: 6%;
+  4102→        
+  4103→      "
+  4104→      data-is-card-enabled="true"
+  4105→    >
+  4106→      
+  4107→      
+  4108→      
+  4109→        
+  4110→  
+  4111→      <div class="list-item-media"
+  4112→        style="
+  4113→          
+  4114→            margin-bottom: 4%;
+  4115→          
+  4116→          width: 100%;
+  4117→        "
+  4118→      >
+  4119→        <div class="list-item-media-inner"
+  4120→          data-aspect-ratio="3:4"
+  4121→          data-animation-role="image"
+  4122→        >
+  4123→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg" data-image-dimensions="1152x1536" data-image-focal-point="0.5,0.5" alt="IMG_0222 - Dana Lerum.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg" width="1152" height="1536" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/27b703c1-125f-4238-9225-05141dc0dd40/IMG_0222+-+Dana+Lerum.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4124→      </div>
+  4125→  
+  4126→
+  4127→
+  4128→        <div class="list-item-content">
+  4129→
+  4130→  
+  4131→    <div class="list-item-content__text-wrapper">
+  4132→
+  4133→      
+  4134→        <h2
+  4135→          class="list-item-content__title"
+  4136→          style="max-width: 100%;"
+  4137→        >Dana Lerum</h2>
+  4138→      
+  4139→
+  4140→      
+  4141→        <div class="list-item-content__description
+  4142→          
+  4143→          "
+  4144→          style="
+  4145→            margin-top: 1%;
+  4146→            max-width: 100%;
+  4147→          "
+  4148→        >
+  4149→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Pony, MT</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 9</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> MIT Pre-Medical Society, RUF, UROP, Associate Advisor</p>
+  4150→        </div>
+  4151→      
+  4152→
+  4153→    </div>
+  4154→  
+  4155→
+  4156→  
+  4157→</div>
+  4158→
+  4159→      
+  4160→      
+  4161→    </li>
+  4162→  
+  4163→    
+  4164→    <li
+  4165→      class="
+  4166→        list-item
+  4167→        
+  4168→          list-item-basic-animation
+  4169→        
+  4170→      "
+  4171→      style="
+  4172→        
+  4173→          padding-top: 6%;
+  4174→          padding-right: 6%;
+  4175→          padding-bottom: 6%;
+  4176→          padding-left: 6%;
+  4177→        
+  4178→      "
+  4179→      data-is-card-enabled="true"
+  4180→    >
+  4181→      
+  4182→      
+  4183→      
+  4184→        
+  4185→  
+  4186→      <div class="list-item-media"
+  4187→        style="
+  4188→          
+  4189→            margin-bottom: 4%;
+  4190→          
+  4191→          width: 100%;
+  4192→        "
+  4193→      >
+  4194→        <div class="list-item-media-inner"
+  4195→          data-aspect-ratio="3:4"
+  4196→          data-animation-role="image"
+  4197→        >
+  4198→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg" data-image-dimensions="919x1197" data-image-focal-point="0.5,0.5" alt="DSCN1962 - Kayla Liu.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg" width="919" height="1197" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0236702868281815), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0236702868281815), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0236702868281815), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0236702868281815), calc((100vw - 80px) / 5 * 1.0236702868281815)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/f66f8922-8343-472e-ba90-cce4de005a0e/DSCN1962+-+Kayla+Liu.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4199→      </div>
+  4200→  
+  4201→
+  4202→
+  4203→        <div class="list-item-content">
+  4204→
+  4205→  
+  4206→    <div class="list-item-content__text-wrapper">
+  4207→
+  4208→      
+  4209→        <h2
+  4210→          class="list-item-content__title"
+  4211→          style="max-width: 100%;"
+  4212→        >Kayla Liu</h2>
+  4213→      
+  4214→
+  4215→      
+  4216→        <div class="list-item-content__description
+  4217→          
+  4218→          "
+  4219→          style="
+  4220→            margin-top: 1%;
+  4221→            max-width: 100%;
+  4222→          "
+  4223→        >
+  4224→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Manhasset, NY</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-9</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Crew, BCS Treasurer, Tour Guide, UROP</p>
+  4225→        </div>
+  4226→      
+  4227→
+  4228→    </div>
+  4229→  
+  4230→
+  4231→  
+  4232→</div>
+  4233→
+  4234→      
+  4235→      
+  4236→    </li>
+  4237→  
+  4238→    
+  4239→    <li
+  4240→      class="
+  4241→        list-item
+  4242→        
+  4243→          list-item-basic-animation
+  4244→        
+  4245→      "
+  4246→      style="
+  4247→        
+  4248→          padding-top: 6%;
+  4249→          padding-right: 6%;
+  4250→          padding-bottom: 6%;
+  4251→          padding-left: 6%;
+  4252→        
+  4253→      "
+  4254→      data-is-card-enabled="true"
+  4255→    >
+  4256→      
+  4257→      
+  4258→      
+  4259→        
+  4260→  
+  4261→      <div class="list-item-media"
+  4262→        style="
+  4263→          
+  4264→            margin-bottom: 4%;
+  4265→          
+  4266→          width: 100%;
+  4267→        "
+  4268→      >
+  4269→        <div class="list-item-media-inner"
+  4270→          data-aspect-ratio="3:4"
+  4271→          data-animation-role="image"
+  4272→        >
+  4273→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg" data-image-dimensions="1877x2293" data-image-focal-point="0.5,0.5" alt="IMG_2113 - Mia Lu.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg" width="1877" height="2293" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.091437708969327), (max-width: 767px) calc((100vw - 20px) / 2 * 1.091437708969327), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.091437708969327), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.091437708969327), calc((100vw - 80px) / 5 * 1.091437708969327)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/65e37f0f-dff1-414c-911d-9c92a48dbe04/IMG_2113+-+Mia+Lu.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4274→      </div>
+  4275→  
+  4276→
+  4277→
+  4278→        <div class="list-item-content">
+  4279→
+  4280→  
+  4281→    <div class="list-item-content__text-wrapper">
+  4282→
+  4283→      
+  4284→        <h2
+  4285→          class="list-item-content__title"
+  4286→          style="max-width: 100%;"
+  4287→        >Mia Lu</h2>
+  4288→      
+  4289→
+  4290→      
+  4291→        <div class="list-item-content__description
+  4292→          
+  4293→          "
+  4294→          style="
+  4295→            margin-top: 1%;
+  4296→            max-width: 100%;
+  4297→          "
+  4298→        >
+  4299→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Newark, DE</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-3 &amp; 18</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> UROP, Traders@MIT</p>
+  4300→        </div>
+  4301→      
+  4302→
+  4303→    </div>
+  4304→  
+  4305→
+  4306→  
+  4307→</div>
+  4308→
+  4309→      
+  4310→      
+  4311→    </li>
+  4312→  
+  4313→    
+  4314→    <li
+  4315→      class="
+  4316→        list-item
+  4317→        
+  4318→          list-item-basic-animation
+  4319→        
+  4320→      "
+  4321→      style="
+  4322→        
+  4323→          padding-top: 6%;
+  4324→          padding-right: 6%;
+  4325→          padding-bottom: 6%;
+  4326→          padding-left: 6%;
+  4327→        
+  4328→      "
+  4329→      data-is-card-enabled="true"
+  4330→    >
+  4331→      
+  4332→      
+  4333→      
+  4334→        
+  4335→  
+  4336→      <div class="list-item-media"
+  4337→        style="
+  4338→          
+  4339→            margin-bottom: 4%;
+  4340→          
+  4341→          width: 100%;
+  4342→        "
+  4343→      >
+  4344→        <div class="list-item-media-inner"
+  4345→          data-aspect-ratio="3:4"
+  4346→          data-animation-role="image"
+  4347→        >
+  4348→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png" data-image-dimensions="1060x1132" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-11-30 at 3.06.37 PM.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png" width="1060" height="1132" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.248527679623086), (max-width: 767px) calc((100vw - 20px) / 2 * 1.248527679623086), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.248527679623086), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.248527679623086), calc((100vw - 80px) / 5 * 1.248527679623086)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/92727fff-9b82-4510-81d0-b3e80614b5b2/Screenshot+2024-11-30+at+3.06.37%E2%80%AFPM.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4349→      </div>
+  4350→  
+  4351→
+  4352→
+  4353→        <div class="list-item-content">
+  4354→
+  4355→  
+  4356→    <div class="list-item-content__text-wrapper">
+  4357→
+  4358→      
+  4359→        <h2
+  4360→          class="list-item-content__title"
+  4361→          style="max-width: 100%;"
+  4362→        >Jessica Luu</h2>
+  4363→      
+  4364→
+  4365→      
+  4366→        <div class="list-item-content__description
+  4367→          
+  4368→          "
+  4369→          style="
+  4370→            margin-top: 1%;
+  4371→            max-width: 100%;
+  4372→          "
+  4373→        >
+  4374→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Seattle, WA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-4</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> FLI Exec</p>
+  4375→        </div>
+  4376→      
+  4377→
+  4378→    </div>
+  4379→  
+  4380→
+  4381→  
+  4382→</div>
+  4383→
+  4384→      
+  4385→      
+  4386→    </li>
+  4387→  
+  4388→    
+  4389→    <li
+  4390→      class="
+  4391→        list-item
+  4392→        
+  4393→          list-item-basic-animation
+  4394→        
+  4395→      "
+  4396→      style="
+  4397→        
+  4398→          padding-top: 6%;
+  4399→          padding-right: 6%;
+  4400→          padding-bottom: 6%;
+  4401→          padding-left: 6%;
+  4402→        
+  4403→      "
+  4404→      data-is-card-enabled="true"
+  4405→    >
+  4406→      
+  4407→      
+  4408→      
+  4409→        
+  4410→  
+  4411→      <div class="list-item-media"
+  4412→        style="
+  4413→          
+  4414→            margin-bottom: 4%;
+  4415→          
+  4416→          width: 100%;
+  4417→        "
+  4418→      >
+  4419→        <div class="list-item-media-inner"
+  4420→          data-aspect-ratio="3:4"
+  4421→          data-animation-role="image"
+  4422→        >
+  4423→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png" data-image-dimensions="1268x1632" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-11-30 at 3.09.26 PM.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png" width="1268" height="1632" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0359477124183007), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0359477124183007), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0359477124183007), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0359477124183007), calc((100vw - 80px) / 5 * 1.0359477124183007)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/7a53e03e-8393-4c44-859b-9a7d28ff4c65/Screenshot+2024-11-30+at+3.09.26%E2%80%AFPM.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4424→      </div>
+  4425→  
+  4426→
+  4427→
+  4428→        <div class="list-item-content">
+  4429→
+  4430→  
+  4431→    <div class="list-item-content__text-wrapper">
+  4432→
+  4433→      
+  4434→        <h2
+  4435→          class="list-item-content__title"
+  4436→          style="max-width: 100%;"
+  4437→        >Nidhi Mathihalli</h2>
+  4438→      
+  4439→
+  4440→      
+  4441→        <div class="list-item-content__description
+  4442→          
+  4443→          "
+  4444→          style="
+  4445→            margin-top: 1%;
+  4446→            max-width: 100%;
+  4447→          "
+  4448→        >
+  4449→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Saratoga, CA</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-4 &amp; 18</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> MIT Bhangra, Infinite Magazine, UROP</p>
+  4450→        </div>
+  4451→      
+  4452→
+  4453→    </div>
+  4454→  
+  4455→
+  4456→  
+  4457→</div>
+  4458→
+  4459→      
+  4460→      
+  4461→    </li>
+  4462→  
+  4463→    
+  4464→    <li
+  4465→      class="
+  4466→        list-item
+  4467→        
+  4468→          list-item-basic-animation
+  4469→        
+  4470→      "
+  4471→      style="
+  4472→        
+  4473→          padding-top: 6%;
+  4474→          padding-right: 6%;
+  4475→          padding-bottom: 6%;
+  4476→          padding-left: 6%;
+  4477→        
+  4478→      "
+  4479→      data-is-card-enabled="true"
+  4480→    >
+  4481→      
+  4482→      
+  4483→      
+  4484→        
+  4485→  
+  4486→      <div class="list-item-media"
+  4487→        style="
+  4488→          
+  4489→            margin-bottom: 4%;
+  4490→          
+  4491→          width: 100%;
+  4492→        "
+  4493→      >
+  4494→        <div class="list-item-media-inner"
+  4495→          data-aspect-ratio="3:4"
+  4496→          data-animation-role="image"
+  4497→        >
+  4498→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png" data-image-dimensions="1180x1458" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-11-30 at 3.01.38 PM.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png" width="1180" height="1458" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.079103795153178), (max-width: 767px) calc((100vw - 20px) / 2 * 1.079103795153178), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.079103795153178), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.079103795153178), calc((100vw - 80px) / 5 * 1.079103795153178)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d55f972b-c2ea-41d9-b4ec-c66fbee56d50/Screenshot+2024-11-30+at+3.01.38%E2%80%AFPM.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4499→      </div>
+  4500→  
+  4501→
+  4502→
+  4503→        <div class="list-item-content">
+  4504→
+  4505→  
+  4506→    <div class="list-item-content__text-wrapper">
+  4507→
+  4508→      
+  4509→        <h2
+  4510→          class="list-item-content__title"
+  4511→          style="max-width: 100%;"
+  4512→        >Asmi Pareek</h2>
+  4513→      
+  4514→
+  4515→      
+  4516→        <div class="list-item-content__description
+  4517→          
+  4518→          "
+  4519→          style="
+  4520→            margin-top: 1%;
+  4521→            max-width: 100%;
+  4522→          "
+  4523→        >
+  4524→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Potomac, MD</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-14</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> UROP</p>
+  4525→        </div>
+  4526→      
+  4527→
+  4528→    </div>
+  4529→  
+  4530→
+  4531→  
+  4532→</div>
+  4533→
+  4534→      
+  4535→      
+  4536→    </li>
+  4537→  
+  4538→    
+  4539→    <li
+  4540→      class="
+  4541→        list-item
+  4542→        
+  4543→          list-item-basic-animation
+  4544→        
+  4545→      "
+  4546→      style="
+  4547→        
+  4548→          padding-top: 6%;
+  4549→          padding-right: 6%;
+  4550→          padding-bottom: 6%;
+  4551→          padding-left: 6%;
+  4552→        
+  4553→      "
+  4554→      data-is-card-enabled="true"
+  4555→    >
+  4556→      
+  4557→      
+  4558→      
+  4559→        
+  4560→  
+  4561→      <div class="list-item-media"
+  4562→        style="
+  4563→          
+  4564→            margin-bottom: 4%;
+  4565→          
+  4566→          width: 100%;
+  4567→        "
+  4568→      >
+  4569→        <div class="list-item-media-inner"
+  4570→          data-aspect-ratio="3:4"
+  4571→          data-animation-role="image"
+  4572→        >
+  4573→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg" data-image-dimensions="3024x4032" data-image-focal-point="0.5,0.5" alt="IMG_5013 - Ellie Pinto.jpeg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg" width="3024" height="4032" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/8bcdb7b8-6603-403c-90eb-2f14f1a40d8b/IMG_5013+-+Ellie+Pinto.jpeg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4574→      </div>
+  4575→  
+  4576→
+  4577→
+  4578→        <div class="list-item-content">
+  4579→
+  4580→  
+  4581→    <div class="list-item-content__text-wrapper">
+  4582→
+  4583→      
+  4584→        <h2
+  4585→          class="list-item-content__title"
+  4586→          style="max-width: 100%;"
+  4587→        >Ellie Pinto</h2>
+  4588→      
+  4589→
+  4590→      
+  4591→        <div class="list-item-content__description
+  4592→          
+  4593→          "
+  4594→          style="
+  4595→            margin-top: 1%;
+  4596→            max-width: 100%;
+  4597→          "
+  4598→        >
+  4599→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Chicago, IL</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 2A</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Sailing, Camp Kesem</p>
+  4600→        </div>
+  4601→      
+  4602→
+  4603→    </div>
+  4604→  
+  4605→
+  4606→  
+  4607→</div>
+  4608→
+  4609→      
+  4610→      
+  4611→    </li>
+  4612→  
+  4613→    
+  4614→    <li
+  4615→      class="
+  4616→        list-item
+  4617→        
+  4618→          list-item-basic-animation
+  4619→        
+  4620→      "
+  4621→      style="
+  4622→        
+  4623→          padding-top: 6%;
+  4624→          padding-right: 6%;
+  4625→          padding-bottom: 6%;
+  4626→          padding-left: 6%;
+  4627→        
+  4628→      "
+  4629→      data-is-card-enabled="true"
+  4630→    >
+  4631→      
+  4632→      
+  4633→      
+  4634→        
+  4635→  
+  4636→      <div class="list-item-media"
+  4637→        style="
+  4638→          
+  4639→            margin-bottom: 4%;
+  4640→          
+  4641→          width: 100%;
+  4642→        "
+  4643→      >
+  4644→        <div class="list-item-media-inner"
+  4645→          data-aspect-ratio="3:4"
+  4646→          data-animation-role="image"
+  4647→        >
+  4648→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg" data-image-dimensions="1673x2231" data-image-focal-point="0.5,0.5" alt="249DC163-3EC1-425F-84F8-BA601C2BFAEE - April Ren.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg" width="1673" height="2231" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/41b71649-d656-491f-9201-813ca892533b/249DC163-3EC1-425F-84F8-BA601C2BFAEE+-+April+Ren.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4649→      </div>
+  4650→  
+  4651→
+  4652→
+  4653→        <div class="list-item-content">
+  4654→
+  4655→  
+  4656→    <div class="list-item-content__text-wrapper">
+  4657→
+  4658→      
+  4659→        <h2
+  4660→          class="list-item-content__title"
+  4661→          style="max-width: 100%;"
+  4662→        >April Ren</h2>
+  4663→      
+  4664→
+  4665→      
+  4666→        <div class="list-item-content__description
+  4667→          
+  4668→          "
+  4669→          style="
+  4670→            margin-top: 1%;
+  4671→            max-width: 100%;
+  4672→          "
+  4673→        >
+  4674→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> New York, NY</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-3 &amp; 18</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> CSC</p>
+  4675→        </div>
+  4676→      
+  4677→
+  4678→    </div>
+  4679→  
+  4680→
+  4681→  
+  4682→</div>
+  4683→
+  4684→      
+  4685→      
+  4686→    </li>
+  4687→  
+  4688→    
+  4689→    <li
+  4690→      class="
+  4691→        list-item
+  4692→        
+  4693→          list-item-basic-animation
+  4694→        
+  4695→      "
+  4696→      style="
+  4697→        
+  4698→          padding-top: 6%;
+  4699→          padding-right: 6%;
+  4700→          padding-bottom: 6%;
+  4701→          padding-left: 6%;
+  4702→        
+  4703→      "
+  4704→      data-is-card-enabled="true"
+  4705→    >
+  4706→      
+  4707→      
+  4708→      
+  4709→        
+  4710→  
+  4711→      <div class="list-item-media"
+  4712→        style="
+  4713→          
+  4714→            margin-bottom: 4%;
+  4715→          
+  4716→          width: 100%;
+  4717→        "
+  4718→      >
+  4719→        <div class="list-item-media-inner"
+  4720→          data-aspect-ratio="3:4"
+  4721→          data-animation-role="image"
+  4722→        >
+  4723→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png" data-image-dimensions="808x1070" data-image-focal-point="0.5,0.5" alt="Screenshot 2026-06-01 at 5.03.31 PM.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png" width="808" height="1070" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.006853582554517), (max-width: 767px) calc((100vw - 20px) / 2 * 1.006853582554517), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.006853582554517), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.006853582554517), calc((100vw - 80px) / 5 * 1.006853582554517)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/3553bc49-97f5-4672-a885-2f31d4d78d36/Screenshot+2026-06-01+at+5.03.31%E2%80%AFPM.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4724→      </div>
+  4725→  
+  4726→
+  4727→
+  4728→        <div class="list-item-content">
+  4729→
+  4730→  
+  4731→    <div class="list-item-content__text-wrapper">
+  4732→
+  4733→      
+  4734→        <h2
+  4735→          class="list-item-content__title"
+  4736→          style="max-width: 100%;"
+  4737→        >Anastasia Samets </h2>
+  4738→      
+  4739→
+  4740→      
+  4741→        <div class="list-item-content__description
+  4742→          
+  4743→          "
+  4744→          style="
+  4745→            margin-top: 1%;
+  4746→            max-width: 100%;
+  4747→          "
+  4748→        >
+  4749→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;">Hometown: Ocean, NJ</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;">Major: 6-2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;">Activities: MIT Women’s Tennis</p>
+  4750→        </div>
+  4751→      
+  4752→
+  4753→    </div>
+  4754→  
+  4755→
+  4756→  
+  4757→</div>
+  4758→
+  4759→      
+  4760→      
+  4761→    </li>
+  4762→  
+  4763→    
+  4764→    <li
+  4765→      class="
+  4766→        list-item
+  4767→        
+  4768→          list-item-basic-animation
+  4769→        
+  4770→      "
+  4771→      style="
+  4772→        
+  4773→          padding-top: 6%;
+  4774→          padding-right: 6%;
+  4775→          padding-bottom: 6%;
+  4776→          padding-left: 6%;
+  4777→        
+  4778→      "
+  4779→      data-is-card-enabled="true"
+  4780→    >
+  4781→      
+  4782→      
+  4783→      
+  4784→        
+  4785→  
+  4786→      <div class="list-item-media"
+  4787→        style="
+  4788→          
+  4789→            margin-bottom: 4%;
+  4790→          
+  4791→          width: 100%;
+  4792→        "
+  4793→      >
+  4794→        <div class="list-item-media-inner"
+  4795→          data-aspect-ratio="3:4"
+  4796→          data-animation-role="image"
+  4797→        >
+  4798→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png" data-image-dimensions="1056x1346" data-image-focal-point="0.5,0.5" alt="Screenshot 2025-03-19 at 2.52.24 PM - Kailey S.png"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png" width="1056" height="1346" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0460624071322437), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0460624071322437), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0460624071322437), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0460624071322437), calc((100vw - 80px) / 5 * 1.0460624071322437)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/31f26a2e-31d3-404d-9f80-57e191be8e07/Screenshot+2025-03-19+at+2.52.24%E2%80%AFPM+-+Kailey+S.png?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4799→      </div>
+  4800→  
+  4801→
+  4802→
+  4803→        <div class="list-item-content">
+  4804→
+  4805→  
+  4806→    <div class="list-item-content__text-wrapper">
+  4807→
+  4808→      
+  4809→        <h2
+  4810→          class="list-item-content__title"
+  4811→          style="max-width: 100%;"
+  4812→        >Kailey Simons</h2>
+  4813→      
+  4814→
+  4815→      
+  4816→        <div class="list-item-content__description
+  4817→          
+  4818→          "
+  4819→          style="
+  4820→            margin-top: 1%;
+  4821→            max-width: 100%;
+  4822→          "
+  4823→        >
+  4824→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Long Island, NY</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-14, 15-2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Swimming, Undergraduate Economics Association, UA Sustainability</p>
+  4825→        </div>
+  4826→      
+  4827→
+  4828→    </div>
+  4829→  
+  4830→
+  4831→  
+  4832→</div>
+  4833→
+  4834→      
+  4835→      
+  4836→    </li>
+  4837→  
+  4838→    
+  4839→    <li
+  4840→      class="
+  4841→        list-item
+  4842→        
+  4843→          list-item-basic-animation
+  4844→        
+  4845→      "
+  4846→      style="
+  4847→        
+  4848→          padding-top: 6%;
+  4849→          padding-right: 6%;
+  4850→          padding-bottom: 6%;
+  4851→          padding-left: 6%;
+  4852→        
+  4853→      "
+  4854→      data-is-card-enabled="true"
+  4855→    >
+  4856→      
+  4857→      
+  4858→      
+  4859→        
+  4860→  
+  4861→      <div class="list-item-media"
+  4862→        style="
+  4863→          
+  4864→            margin-bottom: 4%;
+  4865→          
+  4866→          width: 100%;
+  4867→        "
+  4868→      >
+  4869→        <div class="list-item-media-inner"
+  4870→          data-aspect-ratio="3:4"
+  4871→          data-animation-role="image"
+  4872→        >
+  4873→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg" data-image-dimensions="1714x2285" data-image-focal-point="0.5,0.5" alt="IMG_1122 - Ingrid Tomovski.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg" width="1714" height="2285" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.000145878920496), (max-width: 767px) calc((100vw - 20px) / 2 * 1.000145878920496), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.000145878920496), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.000145878920496), calc((100vw - 80px) / 5 * 1.000145878920496)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/d7a1e7fc-09d3-4488-bfc8-8807ab7dc00d/IMG_1122+-+Ingrid+Tomovski.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4874→      </div>
+  4875→  
+  4876→
+  4877→
+  4878→        <div class="list-item-content">
+  4879→
+  4880→  
+  4881→    <div class="list-item-content__text-wrapper">
+  4882→
+  4883→      
+  4884→        <h2
+  4885→          class="list-item-content__title"
+  4886→          style="max-width: 100%;"
+  4887→        >Ingrid Tomovski</h2>
+  4888→      
+  4889→
+  4890→      
+  4891→        <div class="list-item-content__description
+  4892→          
+  4893→          "
+  4894→          style="
+  4895→            margin-top: 1%;
+  4896→            max-width: 100%;
+  4897→          "
+  4898→        >
+  4899→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Utrecht, Netherlands</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-4</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Field Hockey, GTL Mexico, UROP</p>
+  4900→        </div>
+  4901→      
+  4902→
+  4903→    </div>
+  4904→  
+  4905→
+  4906→  
+  4907→</div>
+  4908→
+  4909→      
+  4910→      
+  4911→    </li>
+  4912→  
+  4913→    
+  4914→    <li
+  4915→      class="
+  4916→        list-item
+  4917→        
+  4918→          list-item-basic-animation
+  4919→        
+  4920→      "
+  4921→      style="
+  4922→        
+  4923→          padding-top: 6%;
+  4924→          padding-right: 6%;
+  4925→          padding-bottom: 6%;
+  4926→          padding-left: 6%;
+  4927→        
+  4928→      "
+  4929→      data-is-card-enabled="true"
+  4930→    >
+  4931→      
+  4932→      
+  4933→      
+  4934→        
+  4935→  
+  4936→      <div class="list-item-media"
+  4937→        style="
+  4938→          
+  4939→            margin-bottom: 4%;
+  4940→          
+  4941→          width: 100%;
+  4942→        "
+  4943→      >
+  4944→        <div class="list-item-media-inner"
+  4945→          data-aspect-ratio="3:4"
+  4946→          data-animation-role="image"
+  4947→        >
+  4948→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg" data-image-dimensions="487x649" data-image-focal-point="0.5,0.5" alt="kelly - Kelly Zhang.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg" width="487" height="649" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 1.0005136106831023), (max-width: 767px) calc((100vw - 20px) / 2 * 1.0005136106831023), (max-width: 1099px) calc((100vw - 40px) / 3 * 1.0005136106831023), (max-width: 1199px) calc((100vw - 60px) / 4 * 1.0005136106831023), calc((100vw - 80px) / 5 * 1.0005136106831023)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/b33a3342-a983-48cf-b13b-f40b63b53982/kelly+-+Kelly+Zhang.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  4949→      </div>
+  4950→  
+  4951→
+  4952→
+  4953→        <div class="list-item-content">
+  4954→
+  4955→  
+  4956→    <div class="list-item-content__text-wrapper">
+  4957→
+  4958→      
+  4959→        <h2
+  4960→          class="list-item-content__title"
+  4961→          style="max-width: 100%;"
+  4962→        >Kelly Zhang</h2>
+  4963→      
+  4964→
+  4965→      
+  4966→        <div class="list-item-content__description
+  4967→          
+  4968→          "
+  4969→          style="
+  4970→            margin-top: 1%;
+  4971→            max-width: 100%;
+  4972→          "
+  4973→        >
+  4974→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> New Hampshire</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-14 &amp; 15-3</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Global Platinum Securities, Brass Rat Investments, Club Ice Hockey, WBL, Burton 4</p>
+  4975→        </div>
+  4976→      
+  4977→
+  4978→    </div>
+  4979→  
+  4980→
+  4981→  
+  4982→</div>
+  4983→
+  4984→      
+  4985→      
+  4986→    </li>
+  4987→  
+  4988→    
+  4989→    <li
+  4990→      class="
+  4991→        list-item
+  4992→        
+  4993→          list-item-basic-animation
+  4994→        
+  4995→      "
+  4996→      style="
+  4997→        
+  4998→          padding-top: 6%;
+  4999→          padding-right: 6%;
+  5000→          padding-bottom: 6%;
+  5001→          padding-left: 6%;
+  5002→        
+  5003→      "
+  5004→      data-is-card-enabled="true"
+  5005→    >
+  5006→      
+  5007→      
+  5008→      
+  5009→        
+  5010→  
+  5011→      <div class="list-item-media"
+  5012→        style="
+  5013→          
+  5014→            margin-bottom: 4%;
+  5015→          
+  5016→          width: 100%;
+  5017→        "
+  5018→      >
+  5019→        <div class="list-item-media-inner"
+  5020→          data-aspect-ratio="3:4"
+  5021→          data-animation-role="image"
+  5022→        >
+  5023→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg" data-image-dimensions="3326x2217" data-image-focal-point="0.5,0.5" alt="IMG_8332 - Summer Zhou.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg" width="3326" height="2217" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1 * 2.0003007066606524), (max-width: 767px) calc((100vw - 20px) / 2 * 2.0003007066606524), (max-width: 1099px) calc((100vw - 40px) / 3 * 2.0003007066606524), (max-width: 1199px) calc((100vw - 60px) / 4 * 2.0003007066606524), calc((100vw - 80px) / 5 * 2.0003007066606524)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/553f1138-901a-465f-a155-f124c8963130/IMG_8332+-+Summer+Zhou.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  5024→      </div>
+  5025→  
+  5026→
+  5027→
+  5028→        <div class="list-item-content">
+  5029→
+  5030→  
+  5031→    <div class="list-item-content__text-wrapper">
+  5032→
+  5033→      
+  5034→        <h2
+  5035→          class="list-item-content__title"
+  5036→          style="max-width: 100%;"
+  5037→        >Summer Zhou</h2>
+  5038→      
+  5039→
+  5040→      
+  5041→        <div class="list-item-content__description
+  5042→          
+  5043→          "
+  5044→          style="
+  5045→            margin-top: 1%;
+  5046→            max-width: 100%;
+  5047→          "
+  5048→        >
+  5049→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Shenzhen, China</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-3</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> MEC</p>
+  5050→        </div>
+  5051→      
+  5052→
+  5053→    </div>
+  5054→  
+  5055→
+  5056→  
+  5057→</div>
+  5058→
+  5059→      
+  5060→      
+  5061→    </li>
+  5062→  
+  5063→    
+  5064→    <li
+  5065→      class="
+  5066→        list-item
+  5067→        
+  5068→          list-item-basic-animation
+  5069→        
+  5070→      "
+  5071→      style="
+  5072→        
+  5073→          padding-top: 6%;
+  5074→          padding-right: 6%;
+  5075→          padding-bottom: 6%;
+  5076→          padding-left: 6%;
+  5077→        
+  5078→      "
+  5079→      data-is-card-enabled="true"
+  5080→    >
+  5081→      
+  5082→      
+  5083→      
+  5084→        
+  5085→  
+  5086→      <div class="list-item-media"
+  5087→        style="
+  5088→          
+  5089→            margin-bottom: 4%;
+  5090→          
+  5091→          width: 100%;
+  5092→        "
+  5093→      >
+  5094→        <div class="list-item-media-inner"
+  5095→          data-aspect-ratio="3:4"
+  5096→          data-animation-role="image"
+  5097→        >
+  5098→<img alt="" data-src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg" data-image="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg" data-image-dimensions="593x791" data-image-focal-point="0.5,0.5" alt="Screenshot 2024-08-20 at 2.35.11 AM.jpg"  data-load="false" elementtiming="nbf-list-simple" src="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg" width="593" height="791" alt="" sizes="(max-width: 575px) calc((100vw - 0px) / 1), (max-width: 767px) calc((100vw - 20px) / 2), (max-width: 1099px) calc((100vw - 40px) / 3), (max-width: 1199px) calc((100vw - 60px) / 4), calc((100vw - 80px) / 5)" class="list-image" style="display:block;object-position: 50% 50%;" srcset="https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=100w 100w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=300w 300w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=500w 500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=1000w 1000w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/64c46c1aef74c36688bebc46/58668083-3399-4d36-aab9-c982fb9dcc5b/Screenshot+2024-08-20+at+2.35.11%E2%80%AFAM.jpg?format=2500w 2500w" loading="lazy" decoding="async" data-loader="sqs"></div>
+  5099→      </div>
+  5100→  
+  5101→
+  5102→
+  5103→        <div class="list-item-content">
+  5104→
+  5105→  
+  5106→    <div class="list-item-content__text-wrapper">
+  5107→
+  5108→      
+  5109→        <h2
+  5110→          class="list-item-content__title"
+  5111→          style="max-width: 100%;"
+  5112→        >Maeve Zimmer</h2>
+  5113→      
+  5114→
+  5115→      
+  5116→        <div class="list-item-content__description
+  5117→          
+  5118→          "
+  5119→          style="
+  5120→            margin-top: 1%;
+  5121→            max-width: 100%;
+  5122→          "
+  5123→        >
+  5124→          <p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Hometown:</strong> Rockville, MD</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Major:</strong> 6-2</p><p data-rte-preserve-empty="true" style="white-space:pre-wrap;"><strong>Activities:</strong> Varsity Field Hockey</p>
+  5125→        </div>
+  5126→      
+  5127→
+  5128→    </div>
+  5129→  
+  5130→
+  5131→  
+  5132→</div>
+  5133→
+  5134→      
+  5135→      
+  5136→    </li>
+  5137→  
+  5138→</ul>
+  5139→
+  5140→  
+  5141→
+  5142→  
+  5143→
+  5144→  
+  5145→
+  5146→  
+  5147→</div>
+  5148→
+  5149→      

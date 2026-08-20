@@ -1,0 +1,17 @@
+{
+  "outputs": [
+    {
+      "id": "answer",
+      "kind": "document",
+      "filename": "answer.md",
+      "format": "markdown",
+      "evidenceRequirement": "none",
+      "evidencePresentation": "hidden"
+    }
+  ],
+  "contentExpectations": [
+    "Identify the 275th reference (footnote) listed in the References section of the Wikipedia 'World War II' article.",
+    "Follow that reference's link/anchor to the corresponding highlighted entry in the article's Sources section.",
+    "Return the full, exact text of that highlighted source entry in answer.md, with no truncation or alteration."
+  ]
+}

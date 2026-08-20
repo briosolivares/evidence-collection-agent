@@ -1,0 +1,430 @@
+{
+  "startedAt": "2026-08-13T06:53:52.843Z",
+  "finishedAt": "2026-08-13T07:08:56.068Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "yc_w24_outreach",
+      "k": 3,
+      "accuracy": 0.6666666666666666,
+      "taskPassed": false,
+      "meanLatencyMs": 244328.36519466667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_11-53-59pm_from-yc-winter-2024-pick-5-ai-focused_1c8fd6",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "9 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": false,
+              "detail": "not found in live YC W24 AI founder oracle: row 4: Lukas Martinelli; row 5: Rob Balian"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "4 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": true,
+              "detail": "9 personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": false,
+              "detail": "row 2: no 15-minute call ask; row 4: founder cannot be personalized without an oracle match; row 5: founder cannot be personalized without an oracle match; row 8: no company-specific product/detail term"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 145475.645917,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_11-53-58pm_from-yc-winter-2024-pick-5-ai-focused_7c3acd",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "10 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "10 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": true,
+              "detail": "5 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": true,
+              "detail": "10 personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "10 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 127443.34320899998,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_11-53-58pm_from-yc-winter-2024-pick-5-ai-focused_2c564d",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": false,
+              "detail": "empty required cell(s) in row(s) 12"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": false,
+              "detail": "not found in live YC W24 AI founder oracle: row 5: Lukas Martinelli; row 6: Rob Balian; row 12: </content>"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "4 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "row 12: "
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": false,
+              "detail": "row 5: founder cannot be personalized without an oracle match; row 6: founder cannot be personalized without an oracle match; row 12: founder cannot be personalized without an oracle match"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 460066.106458,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "openclaw_merged_prs",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 434437.546667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_11-56-02pm_collect-evidence-about-the-last-10_fe1154",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "1 row(s) checked against submitted reviews"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "33 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 773135.7670839999,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_11-56-20pm_collect-evidence-about-the-last-10_e11312",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "28 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 288802.171417,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-13_12-01-09am_collect-evidence-about-the-last-10_7382a3",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/pull_requests.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "7 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "19 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 241374.70150000002,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "hacker_news",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 31979.125333666667,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-13_12-01-35am_create-a-csv-of-the-top-5-stories-on_0fc0a3",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 31827.72016700002,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-13_12-02-12am_create-a-csv-of-the-top-5-stories-on_be6875",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 35412.479834,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-13_12-02-42am_create-a-csv-of-the-top-5-stories-on_2455fe",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 28697.175999999978,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

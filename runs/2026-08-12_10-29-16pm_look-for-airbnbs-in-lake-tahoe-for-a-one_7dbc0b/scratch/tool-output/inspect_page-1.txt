@@ -1,0 +1,1306 @@
+URL: https://www.airbnb.com/s/Lake-Tahoe/homes?refinement_paths%5B%5D=%2Fhomes&place_id=ChIJUREfuaF4mYARILWv7q8fP4w&location_bb=Qhz%2B%2BMLv2hhCG78XwvBT9A%3D%3D&acp_id=236baac8-79d8-4942-8ca5-65ec5de48d70&date_picker_type=calendar&checkin=2026-08-17&checkout=2026-08-24&search_type=autocomplete_click
+Title: Airbnb | Lake Tahoe - Vacation Rentals & Places to Stay
+
+- generic [ref=e1]:
+  - link [ref=e782] [cursor=pointer]:
+    - /url: "#site-content"
+    - text: Skip to content
+  - generic [ref=e8]:
+    - generic [ref=e783]:
+      - banner [ref=e784]:
+        - generic [ref=e788]:
+          - link [ref=e790] [cursor=pointer]:
+            - /url: /
+          - search [ref=e794]:
+            - generic:
+              - generic:
+                - generic:
+                  - tablist:
+                    - tab [selected]:
+                      - generic: Homes
+                      - generic: Homes
+                    - tab:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - text: NEW
+                            - generic: NEW
+                      - generic: Experiences
+                      - generic: Experiences, new
+                    - tab:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - text: NEW
+                            - generic: NEW
+                      - generic: Services
+                      - generic: Services, new
+                - search [ref=e796] [cursor=pointer]:
+                  - generic [ref=e797]: Start your search
+                  - generic [ref=e798]:
+                    - button [ref=e799]:
+                      - generic [ref=e800]: Location
+                      - generic [ref=e802]: Homes in Lake Tahoe
+                    - button [ref=e804]:
+                      - generic [ref=e805]: Check in / Check out
+                      - generic [ref=e806]: Aug 17 – 24
+                    - button [ref=e808]:
+                      - generic [ref=e809]: Guests
+                      - generic [ref=e810]: Add guests
+          - navigation [ref=e819]:
+            - generic [ref=e820]:
+              - button [ref=e821] [cursor=pointer]:
+                - generic [ref=e822]: Become a host
+              - button [ref=e824] [cursor=pointer]
+            - button [ref=e830] [cursor=pointer]
+        - group [ref=e839]:
+          - generic [ref=e840]: filters
+          - generic [ref=e842]:
+            - button [ref=e845] [cursor=pointer]:
+              - generic [ref=e849]: Filters
+            - generic [ref=e851]:
+              - checkbox [ref=e854] [cursor=pointer]: Allows pets
+              - checkbox [ref=e857] [cursor=pointer]: Wifi
+              - checkbox [ref=e860] [cursor=pointer]: Free parking
+              - checkbox [ref=e863] [cursor=pointer]: Washer
+              - checkbox [ref=e866] [cursor=pointer]: Air conditioning
+              - checkbox [ref=e869] [cursor=pointer]: Dryer
+              - checkbox [ref=e872] [cursor=pointer]: Kitchen
+              - checkbox [ref=e875] [cursor=pointer]: TV
+              - checkbox [ref=e878] [cursor=pointer]: 1+ bathrooms
+              - checkbox [ref=e881] [cursor=pointer]: Self check-in
+      - main [ref=e882]:
+        - generic [ref=e883]:
+          - generic [ref=e887]:
+            - heading [level=1] [ref=e890]:
+              - generic [ref=e891]: Search results; Over 1,000 homes
+              - text: Over 1,000 homes
+            - generic [ref=e896]:
+              - generic [ref=e897]:
+                - generic [ref=e898]: Prices include all fees
+                - generic [ref=e899]: Prices include all fees
+                - generic [ref=e900]: Prices include all fees
+                - generic [ref=e901]: Prices include all fees
+                - generic [ref=e902]: Prices include all fees
+                - generic [ref=e903]: Prices include all fees
+                - generic [ref=e904]: Prices include all fees
+                - generic [ref=e905]: Prices include all fees
+                - generic [ref=e906]: Prices include all fees
+                - generic [ref=e907]: Prices include all fees
+                - generic [ref=e908]: Prices include all fees
+                - generic [ref=e909]: Prices include all fees
+                - generic [ref=e910]: Prices include all fees
+                - generic [ref=e911]: Prices include all fees
+                - generic [ref=e912]: Prices include all fees
+                - generic [ref=e913]: Prices include all fees
+                - generic [ref=e914]: Prices include all fees
+                - generic [ref=e915]: Prices include all fees
+                - generic [ref=e916]: Prices include all fees
+                - generic [ref=e917]: Prices include all fees
+                - generic [ref=e918]: Prices include all fees
+                - generic [ref=e919]: Prices include all fees
+                - generic [ref=e920]: Prices include all fees
+              - generic [ref=e921]: Prices include all fees
+          - generic [ref=e927]:
+            - group [ref=e950]:
+              - link [ref=e951] [cursor=pointer]:
+                - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e952]:
+                - group [ref=e955]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e957] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e961] [cursor=pointer]
+                      - button [ref=e966] [cursor=pointer]
+                  - generic [ref=e974]:
+                    - link [ref=e975] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e979] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e980] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e981] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e982] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e983] [cursor=pointer]:
+                      - /url: /rooms/23545038?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3ErSCOj3YtqQApA&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e984]:
+                  - generic [ref=e985]: Home in Incline Village
+                  - generic [ref=e986]: Lake View 3BR Home in Incline Village
+                  - generic [ref=e988]:
+                    - generic [ref=e989]:
+                      - generic [ref=e990]: 3 bedrooms
+                      - generic [ref=e991]: 3 bedrooms
+                    - generic [ref=e992]:
+                      - generic [ref=e993]: ","
+                      - generic [ref=e994]: ·
+                      - generic [ref=e995]: 4 beds
+                      - generic [ref=e996]: 4 beds
+                    - generic [ref=e997]:
+                      - generic [ref=e998]: ","
+                      - generic [ref=e999]: ·
+                      - generic [ref=e1000]: 2 baths
+                      - generic [ref=e1001]: 2 baths
+                  - generic [ref=e1005]:
+                    - button [ref=e1010] [cursor=pointer]:
+                      - text: $2,495
+                      - generic [ref=e1011]: Show price breakdown
+                    - generic [ref=e1012]: for 7 nights
+                    - generic [ref=e1014]: $2,495 for 7 nights
+                  - generic [ref=e1015]:
+                    - generic:
+                      - generic: 4.75 out of 5 average rating, 57 reviews
+                      - generic: 4.75 (57)
+            - group [ref=e1038]:
+              - link [ref=e1039] [cursor=pointer]:
+                - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1040]:
+                - group [ref=e1043]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1045] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1049] [cursor=pointer]
+                      - button [ref=e1054] [cursor=pointer]
+                  - generic [ref=e1062]:
+                    - link [ref=e1063] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1067] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1068] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1069] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1070] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1071] [cursor=pointer]:
+                      - /url: /rooms/1421190065331657251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3tzI3O8Zqg9gPiy&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1072]:
+                  - generic [ref=e1073]: Apartment in Incline Village
+                  - generic [ref=e1074]: 115 McCloud Quiet & Comfortable
+                  - generic [ref=e1076]:
+                    - generic [ref=e1077]:
+                      - generic [ref=e1078]: 2 bedrooms
+                      - generic [ref=e1079]: 2 bedrooms
+                    - generic [ref=e1080]:
+                      - generic [ref=e1081]: ","
+                      - generic [ref=e1082]: ·
+                      - generic [ref=e1083]: 3 beds
+                      - generic [ref=e1084]: 3 beds
+                    - generic [ref=e1085]:
+                      - generic [ref=e1086]: ","
+                      - generic [ref=e1087]: ·
+                      - generic [ref=e1088]: 2 baths
+                      - generic [ref=e1089]: 2 baths
+                  - generic [ref=e1095]:
+                    - generic [ref=e1096]:
+                      - generic [ref=e1097]: $2,944
+                      - button [ref=e1100] [cursor=pointer]:
+                        - text: $1,923
+                        - generic [ref=e1101]: Show price breakdown
+                    - generic [ref=e1102]: for 7 nights
+                  - generic [ref=e1105]:
+                    - generic:
+                      - generic: 4.91 out of 5 average rating, 11 reviews
+                      - generic: 4.91 (11)
+            - group [ref=e1128]:
+              - link [ref=e1129] [cursor=pointer]:
+                - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1130]:
+                - group [ref=e1133]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Superhost
+                          - generic: Superhost
+                      - button [ref=e1135] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1139] [cursor=pointer]
+                      - button [ref=e1144] [cursor=pointer]
+                  - generic [ref=e1152]:
+                    - link [ref=e1153] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1157] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1158] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1159] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1160] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1161] [cursor=pointer]:
+                      - /url: /rooms/936234357176767343?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3OtSQUt1Q_PHadz&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1162]:
+                  - generic [ref=e1163]: Condo in Stateline
+                  - generic [ref=e1164]: Cozy Condo | Near Heavenly-Fireplace | Sleeps 6
+                  - generic [ref=e1166]:
+                    - generic [ref=e1167]:
+                      - generic [ref=e1168]: 2 bedrooms
+                      - generic [ref=e1169]: 2 bedrooms
+                    - generic [ref=e1170]:
+                      - generic [ref=e1171]: ","
+                      - generic [ref=e1172]: ·
+                      - generic [ref=e1173]: 3 beds
+                      - generic [ref=e1174]: 3 beds
+                    - generic [ref=e1175]:
+                      - generic [ref=e1176]: ","
+                      - generic [ref=e1177]: ·
+                      - generic [ref=e1178]: 2 baths
+                      - generic [ref=e1179]: 2 baths
+                  - generic [ref=e1180]:
+                    - generic [ref=e1185]:
+                      - generic [ref=e1186]:
+                        - generic [ref=e1187]: $1,304
+                        - button [ref=e1190] [cursor=pointer]:
+                          - text: $1,171
+                          - generic [ref=e1191]: Show price breakdown
+                      - generic [ref=e1192]: for 7 nights
+                    - generic [ref=e1195]: Weekly discount
+                  - generic [ref=e1197]:
+                    - generic:
+                      - generic: 4.77 out of 5 average rating, 98 reviews
+                      - generic: 4.77 (98)
+            - group [ref=e1220]:
+              - link [ref=e1221] [cursor=pointer]:
+                - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1222]:
+                - group [ref=e1225]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Superhost
+                          - generic: Superhost
+                      - button [ref=e1227] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1231] [cursor=pointer]
+                      - button [ref=e1236] [cursor=pointer]
+                  - generic [ref=e1244]:
+                    - link [ref=e1245] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1249] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1250] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1251] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1252] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1253] [cursor=pointer]:
+                      - /url: /rooms/44449491?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3l4YXdBL8luA1Jk&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1254]:
+                  - generic [ref=e1255]: Condo in Tahoe Vista
+                  - generic [ref=e1256]: Comfy Studio, Lake Tahoe Beaches and Ski Resorts
+                  - generic [ref=e1258]:
+                    - generic [ref=e1259]:
+                      - generic [ref=e1260]: 2 beds
+                      - generic [ref=e1261]: 2 beds
+                    - generic [ref=e1262]:
+                      - generic [ref=e1263]: ","
+                      - generic [ref=e1264]: ·
+                      - generic [ref=e1265]: 1 bath
+                      - generic [ref=e1266]: 1 bath
+                  - generic [ref=e1267]:
+                    - generic [ref=e1272]:
+                      - generic [ref=e1273]:
+                        - generic [ref=e1274]: $1,290
+                        - button [ref=e1277] [cursor=pointer]:
+                          - text: $1,172
+                          - generic [ref=e1278]: Show price breakdown
+                      - generic [ref=e1279]: for 7 nights
+                    - generic [ref=e1282]: Weekly discount
+                  - generic [ref=e1284]:
+                    - generic:
+                      - generic: 4.9 out of 5 average rating, 336 reviews
+                      - generic: 4.9 (336)
+            - group [ref=e1307]:
+              - link [ref=e1308] [cursor=pointer]:
+                - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1309]:
+                - group [ref=e1312]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Top guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1314] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1318] [cursor=pointer]
+                      - button [ref=e1323] [cursor=pointer]
+                  - generic [ref=e1331]:
+                    - link [ref=e1332] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1336] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1337] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1338] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1339] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1340] [cursor=pointer]:
+                      - /url: /rooms/1001827428698682854?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3J7a3dA4XUT9x4u&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1341]:
+                  - generic [ref=e1342]: Cabin in Homewood
+                  - generic [ref=e1343]: Cozy Modern A-Frame | Sugar Pine Speakeasy
+                  - generic [ref=e1345]:
+                    - generic [ref=e1346]:
+                      - generic [ref=e1347]: 3 bedrooms
+                      - generic [ref=e1348]: 3 bedrooms
+                    - generic [ref=e1349]:
+                      - generic [ref=e1350]: ","
+                      - generic [ref=e1351]: ·
+                      - generic [ref=e1352]: 3 beds
+                      - generic [ref=e1353]: 3 beds
+                    - generic [ref=e1354]:
+                      - generic [ref=e1355]: ","
+                      - generic [ref=e1356]: ·
+                      - generic [ref=e1357]: 1.5 baths
+                      - generic [ref=e1358]: 1.5 baths
+                  - generic [ref=e1362]:
+                    - button [ref=e1367] [cursor=pointer]:
+                      - text: $4,401
+                      - generic [ref=e1368]: Show price breakdown
+                    - generic [ref=e1369]: for 7 nights
+                    - generic [ref=e1371]: $4,401 for 7 nights
+                  - generic [ref=e1372]:
+                    - generic:
+                      - generic: 5.0 out of 5 average rating, 127 reviews
+                      - generic: 5.0 (127)
+            - group [ref=e1395]:
+              - link [ref=e1396] [cursor=pointer]:
+                - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1397]:
+                - group [ref=e1400]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1402] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1406] [cursor=pointer]
+                      - button [ref=e1411] [cursor=pointer]
+                  - generic [ref=e1419]:
+                    - link [ref=e1420] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1423] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1424] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1425] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1426] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1427] [cursor=pointer]:
+                      - /url: /rooms/868211075181482270?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_CYr2-0kS_HWjj&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1428]:
+                  - generic [ref=e1429]: Home in Tahoe City
+                  - generic [ref=e1430]: Rustic & Modern 3BDR Tahoe Cabin
+                  - generic [ref=e1432]:
+                    - generic [ref=e1433]:
+                      - generic [ref=e1434]: 3 bedrooms
+                      - generic [ref=e1435]: 3 bedrooms
+                    - generic [ref=e1436]:
+                      - generic [ref=e1437]: ","
+                      - generic [ref=e1438]: ·
+                      - generic [ref=e1439]: 3 queen beds
+                      - generic [ref=e1440]: 3 queen beds
+                    - generic [ref=e1441]:
+                      - generic [ref=e1442]: ","
+                      - generic [ref=e1443]: ·
+                      - generic [ref=e1444]: 2 baths
+                      - generic [ref=e1445]: 2 baths
+                  - generic [ref=e1449]:
+                    - button [ref=e1454] [cursor=pointer]:
+                      - text: $1,843
+                      - generic [ref=e1455]: Show price breakdown
+                    - generic [ref=e1456]: for 7 nights
+                    - generic [ref=e1458]: $1,843 for 7 nights
+                  - generic [ref=e1459]:
+                    - generic:
+                      - generic: 4.92 out of 5 average rating, 74 reviews
+                      - generic: 4.92 (74)
+            - group [ref=e1482]:
+              - link [ref=e1483] [cursor=pointer]:
+                - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1484]:
+                - group [ref=e1487]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Top guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1489] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1493] [cursor=pointer]
+                      - button [ref=e1498] [cursor=pointer]
+                  - generic [ref=e1506]:
+                    - link [ref=e1507] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1510] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1511] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1512] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1513] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1514] [cursor=pointer]:
+                      - /url: /rooms/1669752142489887155?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3P-h2UR-k8mDqIW&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1515]:
+                  - generic [ref=e1516]: Chalet in South Lake Tahoe
+                  - generic [ref=e1517]: Modern Chalet Among The Pines
+                  - generic [ref=e1519]:
+                    - generic [ref=e1520]:
+                      - generic [ref=e1521]: 3 bedrooms
+                      - generic [ref=e1522]: 3 bedrooms
+                    - generic [ref=e1523]:
+                      - generic [ref=e1524]: ","
+                      - generic [ref=e1525]: ·
+                      - generic [ref=e1526]: 5 beds
+                      - generic [ref=e1527]: 5 beds
+                    - generic [ref=e1528]:
+                      - generic [ref=e1529]: ","
+                      - generic [ref=e1530]: ·
+                      - generic [ref=e1531]: 2 baths
+                      - generic [ref=e1532]: 2 baths
+                  - generic [ref=e1533]:
+                    - generic [ref=e1538]:
+                      - generic [ref=e1539]:
+                        - generic [ref=e1540]: $4,138
+                        - button [ref=e1543] [cursor=pointer]:
+                          - text: $3,793
+                          - generic [ref=e1544]: Show price breakdown
+                      - generic [ref=e1545]: for 7 nights
+                    - generic [ref=e1548]: Weekly discount
+                  - generic [ref=e1550]:
+                    - generic:
+                      - generic: 5.0 out of 5 average rating, 16 reviews
+                      - generic: 5.0 (16)
+            - group [ref=e1573]:
+              - link [ref=e1574] [cursor=pointer]:
+                - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1575]:
+                - group [ref=e1578]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1580] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1584] [cursor=pointer]
+                      - button [ref=e1589] [cursor=pointer]
+                  - generic [ref=e1597]:
+                    - link [ref=e1598] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1601] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1602] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1603] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1604] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1605] [cursor=pointer]:
+                      - /url: /rooms/23545100?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3fH1pMzyqDhtDJE&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1606]:
+                  - generic [ref=e1607]: Home in Incline Village
+                  - generic [ref=e1608]: Mountain Retreat in Incline Village
+                  - generic [ref=e1610]:
+                    - generic [ref=e1611]:
+                      - generic [ref=e1612]: 4 bedrooms
+                      - generic [ref=e1613]: 4 bedrooms
+                    - generic [ref=e1614]:
+                      - generic [ref=e1615]: ","
+                      - generic [ref=e1616]: ·
+                      - generic [ref=e1617]: 7 beds
+                      - generic [ref=e1618]: 7 beds
+                    - generic [ref=e1619]:
+                      - generic [ref=e1620]: ","
+                      - generic [ref=e1621]: ·
+                      - generic [ref=e1622]: 3.5 baths
+                      - generic [ref=e1623]: 3.5 baths
+                  - generic [ref=e1629]:
+                    - generic [ref=e1630]:
+                      - generic [ref=e1631]: $2,914
+                      - button [ref=e1634] [cursor=pointer]:
+                        - text: $2,492
+                        - generic [ref=e1635]: Show price breakdown
+                    - generic [ref=e1636]: for 7 nights
+                  - generic [ref=e1639]:
+                    - generic:
+                      - generic: 4.95 out of 5 average rating, 88 reviews
+                      - generic: 4.95 (88)
+            - group [ref=e1662]:
+              - link [ref=e1663] [cursor=pointer]:
+                - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1664]:
+                - group [ref=e1667]:
+                  - generic:
+                    - button [ref=e1669] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1673] [cursor=pointer]
+                      - button [ref=e1678] [cursor=pointer]
+                  - generic [ref=e1686]:
+                    - link [ref=e1687] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1690] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1691] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1692] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1693] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1694] [cursor=pointer]:
+                      - /url: /rooms/990528905768430626?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3AERJ1jlPsEP1XT&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1695]:
+                  - generic [ref=e1696]: Townhouse in South Lake Tahoe
+                  - generic [ref=e1697]: Woodland 2BR with loft & pools near the lake
+                  - generic [ref=e1699]:
+                    - generic [ref=e1700]:
+                      - generic [ref=e1701]: 2 bedrooms
+                      - generic [ref=e1702]: 2 bedrooms
+                    - generic [ref=e1703]:
+                      - generic [ref=e1704]: ","
+                      - generic [ref=e1705]: ·
+                      - generic [ref=e1706]: 4 beds
+                      - generic [ref=e1707]: 4 beds
+                    - generic [ref=e1708]:
+                      - generic [ref=e1709]: ","
+                      - generic [ref=e1710]: ·
+                      - generic [ref=e1711]: 2 baths
+                      - generic [ref=e1712]: 2 baths
+                  - generic [ref=e1718]:
+                    - generic [ref=e1719]:
+                      - generic [ref=e1720]: $5,580
+                      - button [ref=e1723] [cursor=pointer]:
+                        - text: $2,839
+                        - generic [ref=e1724]: Show price breakdown
+                    - generic [ref=e1725]: for 7 nights
+                  - generic [ref=e1728]:
+                    - generic:
+                      - generic: 4.13 out of 5 average rating, 8 reviews
+                      - generic: 4.13 (8)
+            - group [ref=e1751]:
+              - link [ref=e1752] [cursor=pointer]:
+                - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1753]:
+                - group [ref=e1756]:
+                  - generic:
+                    - button [ref=e1758] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1762] [cursor=pointer]
+                      - button [ref=e1767] [cursor=pointer]
+                  - generic [ref=e1775]:
+                    - link [ref=e1776] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1779] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1780] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1781] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1782] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1783] [cursor=pointer]:
+                      - /url: /rooms/1630538945134337788?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P31PlkEytwdY54p7&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1784]:
+                  - generic [ref=e1785]: Townhouse in South Lake Tahoe
+                  - generic [ref=e1786]: Lakefront Home w/Lake & Pool Views, Private Beach
+                  - generic [ref=e1788]:
+                    - generic [ref=e1789]:
+                      - generic [ref=e1790]: 3 bedrooms
+                      - generic [ref=e1791]: 3 bedrooms
+                    - generic [ref=e1792]:
+                      - generic [ref=e1793]: ","
+                      - generic [ref=e1794]: ·
+                      - generic [ref=e1795]: 6 beds
+                      - generic [ref=e1796]: 6 beds
+                    - generic [ref=e1797]:
+                      - generic [ref=e1798]: ","
+                      - generic [ref=e1799]: ·
+                      - generic [ref=e1800]: 2 baths
+                      - generic [ref=e1801]: 2 baths
+                  - generic [ref=e1805]:
+                    - button [ref=e1810] [cursor=pointer]:
+                      - text: $4,443
+                      - generic [ref=e1811]: Show price breakdown
+                    - generic [ref=e1812]: for 7 nights
+                    - generic [ref=e1814]: $4,443 for 7 nights
+            - group [ref=e1837]:
+              - link [ref=e1838] [cursor=pointer]:
+                - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1839]:
+                - group [ref=e1842]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Superhost
+                          - generic: Superhost
+                      - button [ref=e1844] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1848] [cursor=pointer]
+                      - button [ref=e1853] [cursor=pointer]
+                  - generic [ref=e1861]:
+                    - link [ref=e1862] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1865] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1866] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1867] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1868] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1869] [cursor=pointer]:
+                      - /url: /rooms/53137419?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3_uszYHKuTB2f0S&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1870]:
+                  - generic [ref=e1871]: Home in Kings Beach
+                  - generic [ref=e1872]: 8733 - Townhouse near Kings Beach & Northstar
+                  - generic [ref=e1874]:
+                    - generic [ref=e1875]:
+                      - generic [ref=e1876]: 3 bedrooms
+                      - generic [ref=e1877]: 3 bedrooms
+                    - generic [ref=e1878]:
+                      - generic [ref=e1879]: ","
+                      - generic [ref=e1880]: ·
+                      - generic [ref=e1881]: 5 beds
+                      - generic [ref=e1882]: 5 beds
+                    - generic [ref=e1883]:
+                      - generic [ref=e1884]: ","
+                      - generic [ref=e1885]: ·
+                      - generic [ref=e1886]: 2.5 baths
+                      - generic [ref=e1887]: 2.5 baths
+                  - generic [ref=e1893]:
+                    - generic [ref=e1894]:
+                      - generic [ref=e1895]: $2,737
+                      - button [ref=e1898] [cursor=pointer]:
+                        - text: $2,263
+                        - generic [ref=e1899]: Show price breakdown
+                    - generic [ref=e1900]: for 7 nights
+                  - generic [ref=e1903]:
+                    - generic:
+                      - generic: 4.7 out of 5 average rating, 108 reviews
+                      - generic: 4.7 (108)
+            - group [ref=e1926]:
+              - link [ref=e1927] [cursor=pointer]:
+                - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e1928]:
+                - group [ref=e1931]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e1933] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e1937] [cursor=pointer]
+                      - button [ref=e1942] [cursor=pointer]
+                  - generic [ref=e1950]:
+                    - link [ref=e1951] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1954] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1955] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1956] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1957] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e1958] [cursor=pointer]:
+                      - /url: /rooms/981465918386465432?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3yhbIft67tyqqDS&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e1959]:
+                  - generic [ref=e1960]: Cabin in South Lake Tahoe
+                  - generic [ref=e1961]: "EchoView Adventure Lodge: Hot Tub+Game Room, Trail"
+                  - generic [ref=e1963]:
+                    - generic [ref=e1964]:
+                      - generic [ref=e1965]: 5 bedrooms
+                      - generic [ref=e1966]: 5 bedrooms
+                    - generic [ref=e1967]:
+                      - generic [ref=e1968]: ","
+                      - generic [ref=e1969]: ·
+                      - generic [ref=e1970]: 8 beds
+                      - generic [ref=e1971]: 8 beds
+                    - generic [ref=e1972]:
+                      - generic [ref=e1973]: ","
+                      - generic [ref=e1974]: ·
+                      - generic [ref=e1975]: 3 baths
+                      - generic [ref=e1976]: 3 baths
+                  - generic [ref=e1977]:
+                    - generic [ref=e1982]:
+                      - generic [ref=e1983]:
+                        - generic [ref=e1984]: $4,612
+                        - button [ref=e1987] [cursor=pointer]:
+                          - text: $4,236
+                          - generic [ref=e1988]: Show price breakdown
+                      - generic [ref=e1989]: for 7 nights
+                    - generic [ref=e1992]: Weekly discount
+                  - generic [ref=e1994]:
+                    - generic:
+                      - generic: 4.88 out of 5 average rating, 112 reviews
+                      - generic: 4.88 (112)
+            - group [ref=e2017]:
+              - link [ref=e2018] [cursor=pointer]:
+                - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2019]:
+                - group [ref=e2022]:
+                  - generic:
+                    - button [ref=e2024] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2028] [cursor=pointer]
+                      - button [ref=e2033] [cursor=pointer]
+                  - generic [ref=e2041]:
+                    - link [ref=e2042] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2045] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2046] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2047] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2048] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2049] [cursor=pointer]:
+                      - /url: /rooms/1744274461340134192?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3c0dwb2BM7mImxm&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2050]:
+                  - generic [ref=e2051]: Cabin in Tahoe City
+                  - generic [ref=e2052]: Classic Tahoe Cabin Retreat | Tahoe Park Private B
+                  - generic [ref=e2054]:
+                    - generic [ref=e2055]:
+                      - generic [ref=e2056]: 3 bedrooms
+                      - generic [ref=e2057]: 3 bedrooms
+                    - generic [ref=e2058]:
+                      - generic [ref=e2059]: ","
+                      - generic [ref=e2060]: ·
+                      - generic [ref=e2061]: 5 queen beds
+                      - generic [ref=e2062]: 5 queen beds
+                    - generic [ref=e2063]:
+                      - generic [ref=e2064]: ","
+                      - generic [ref=e2065]: ·
+                      - generic [ref=e2066]: 2 baths
+                      - generic [ref=e2067]: 2 baths
+                  - generic [ref=e2073]:
+                    - generic [ref=e2074]:
+                      - generic [ref=e2075]: $1,626
+                      - button [ref=e2078] [cursor=pointer]:
+                        - text: $1,363
+                        - generic [ref=e2079]: Show price breakdown
+                    - generic [ref=e2080]: for 7 nights
+                  - generic [ref=e2083]:
+                    - generic:
+                      - generic: New place to stay
+                      - generic: New
+            - group [ref=e2106]:
+              - link [ref=e2107] [cursor=pointer]:
+                - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2108]:
+                - group [ref=e2111]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e2113] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2117] [cursor=pointer]
+                      - button [ref=e2122] [cursor=pointer]
+                  - generic [ref=e2130]:
+                    - link [ref=e2131] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2134] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2135] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2136] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2137] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2138] [cursor=pointer]:
+                      - /url: /rooms/628317980246128436?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3b3fLs3c5bFGSIe&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2139]:
+                  - generic [ref=e2140]: Home in Carnelian Bay
+                  - generic [ref=e2141]: Serene Woodland Lodge in Carnelian Bay - Hot Tub
+                  - generic [ref=e2143]:
+                    - generic [ref=e2144]:
+                      - generic [ref=e2145]: 3 bedrooms
+                      - generic [ref=e2146]: 3 bedrooms
+                    - generic [ref=e2147]:
+                      - generic [ref=e2148]: ","
+                      - generic [ref=e2149]: ·
+                      - generic [ref=e2150]: 4 beds
+                      - generic [ref=e2151]: 4 beds
+                    - generic [ref=e2152]:
+                      - generic [ref=e2153]: ","
+                      - generic [ref=e2154]: ·
+                      - generic [ref=e2155]: 3 baths
+                      - generic [ref=e2156]: 3 baths
+                  - generic [ref=e2160]:
+                    - button [ref=e2165] [cursor=pointer]:
+                      - text: $3,198
+                      - generic [ref=e2166]: Show price breakdown
+                    - generic [ref=e2167]: for 7 nights
+                    - generic [ref=e2169]: $3,198 for 7 nights
+                  - generic [ref=e2170]:
+                    - generic:
+                      - generic: 5.0 out of 5 average rating, 9 reviews
+                      - generic: 5.0 (9)
+            - group [ref=e2193]:
+              - link [ref=e2194] [cursor=pointer]:
+                - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2195]:
+                - group [ref=e2198]:
+                  - generic:
+                    - button [ref=e2200] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2204] [cursor=pointer]
+                      - button [ref=e2209] [cursor=pointer]
+                  - generic [ref=e2217]:
+                    - link [ref=e2218] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2221] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2222] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2223] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2224] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2225] [cursor=pointer]:
+                      - /url: /rooms/1016059785401904161?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3DP-ZP78vKb2oaM&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2226]:
+                  - generic [ref=e2227]: Home in Kings Beach
+                  - generic [ref=e2228]: Great Lake View - Kings Beach, Dogs ok, Pool Table
+                  - generic [ref=e2230]:
+                    - generic [ref=e2231]:
+                      - generic [ref=e2232]: 3 bedrooms
+                      - generic [ref=e2233]: 3 bedrooms
+                    - generic [ref=e2234]:
+                      - generic [ref=e2235]: ","
+                      - generic [ref=e2236]: ·
+                      - generic [ref=e2237]: 6 beds
+                      - generic [ref=e2238]: 6 beds
+                    - generic [ref=e2239]:
+                      - generic [ref=e2240]: ","
+                      - generic [ref=e2241]: ·
+                      - generic [ref=e2242]: 2 baths
+                      - generic [ref=e2243]: 2 baths
+                  - generic [ref=e2247]:
+                    - button [ref=e2252] [cursor=pointer]:
+                      - text: $3,310
+                      - generic [ref=e2253]: Show price breakdown
+                    - generic [ref=e2254]: for 7 nights
+                    - generic [ref=e2256]: $3,310 for 7 nights
+                  - generic [ref=e2257]:
+                    - generic:
+                      - generic: 5.0 out of 5 average rating, 11 reviews
+                      - generic: 5.0 (11)
+            - group [ref=e2280]:
+              - link [ref=e2281] [cursor=pointer]:
+                - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2282]:
+                - group [ref=e2285]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e2287] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2291] [cursor=pointer]
+                      - button [ref=e2296] [cursor=pointer]
+                  - generic [ref=e2304]:
+                    - link [ref=e2305] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2308] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2309] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2310] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2311] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2312] [cursor=pointer]:
+                      - /url: /rooms/21426276?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3GlAy_cO-IIJeMu&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2313]:
+                  - generic [ref=e2314]: Cabin in Homewood
+                  - generic [ref=e2315]: Chamberlands HOA Free Pool & Beach Access!
+                  - generic [ref=e2317]:
+                    - generic [ref=e2318]:
+                      - generic [ref=e2319]: 3 bedrooms
+                      - generic [ref=e2320]: 3 bedrooms
+                    - generic [ref=e2321]:
+                      - generic [ref=e2322]: ","
+                      - generic [ref=e2323]: ·
+                      - generic [ref=e2324]: 6 beds
+                      - generic [ref=e2325]: 6 beds
+                    - generic [ref=e2326]:
+                      - generic [ref=e2327]: ","
+                      - generic [ref=e2328]: ·
+                      - generic [ref=e2329]: 2 baths
+                      - generic [ref=e2330]: 2 baths
+                  - generic [ref=e2334]:
+                    - button [ref=e2339] [cursor=pointer]:
+                      - text: $2,678
+                      - generic [ref=e2340]: Show price breakdown
+                    - generic [ref=e2341]: for 7 nights
+                    - generic [ref=e2343]: $2,678 for 7 nights
+                  - generic [ref=e2344]:
+                    - generic:
+                      - generic: 4.93 out of 5 average rating, 30 reviews
+                      - generic: 4.93 (30)
+            - group [ref=e2367]:
+              - link [ref=e2368] [cursor=pointer]:
+                - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2369]:
+                - group [ref=e2372]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e2374] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2378] [cursor=pointer]
+                      - button [ref=e2383] [cursor=pointer]
+                  - generic [ref=e2391]:
+                    - link [ref=e2392] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2395] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2396] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2397] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2398] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2399] [cursor=pointer]:
+                      - /url: /rooms/967012534340633251?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P33q2-I0jovPst3U&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2400]:
+                  - generic [ref=e2401]: Home in Tahoe Vista
+                  - generic [ref=e2402]: Your quiet stretch of Tahoe shoreline, and a pool!
+                  - generic [ref=e2404]:
+                    - generic [ref=e2405]:
+                      - generic [ref=e2406]: 1 bedroom
+                      - generic [ref=e2407]: 1 bedroom
+                    - generic [ref=e2408]:
+                      - generic [ref=e2409]: ","
+                      - generic [ref=e2410]: ·
+                      - generic [ref=e2411]: 2 queen beds
+                      - generic [ref=e2412]: 2 queen beds
+                    - generic [ref=e2413]:
+                      - generic [ref=e2414]: ","
+                      - generic [ref=e2415]: ·
+                      - generic [ref=e2416]: 1.5 baths
+                      - generic [ref=e2417]: 1.5 baths
+                  - generic [ref=e2423]:
+                    - generic [ref=e2424]:
+                      - generic [ref=e2425]: $2,906
+                      - button [ref=e2428] [cursor=pointer]:
+                        - text: $2,248
+                        - generic [ref=e2429]: Show price breakdown
+                    - generic [ref=e2430]: for 7 nights
+                  - generic [ref=e2433]:
+                    - generic:
+                      - generic: 4.95 out of 5 average rating, 57 reviews
+                      - generic: 4.95 (57)
+            - group [ref=e2456]:
+              - link [ref=e2457] [cursor=pointer]:
+                - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+              - generic [ref=e2458]:
+                - group [ref=e2461]:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Top guest favorite
+                          - generic: Guest favorite
+                      - button [ref=e2463] [cursor=pointer]
+                    - generic:
+                      - button [disabled] [ref=e2467] [cursor=pointer]
+                      - button [ref=e2472] [cursor=pointer]
+                  - generic [ref=e2480]:
+                    - link [ref=e2481] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2484] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2485] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2486] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2487] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                    - link [ref=e2488] [cursor=pointer]:
+                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786598990_P3xyLXCnSc5xTKqR&previous_page_section_name=1000&federated_search_id=d0d97030-68ad-4138-8026-2cb5fcbcbcb5
+                - generic [ref=e2489]:
+                  - generic [ref=e2490]: Cabin in Homewood
+                  - generic [ref=e2491]: Charming Tahoe Pines Log Cabin at low elevation.
+                  - generic [ref=e2493]:
+                    - generic [ref=e2494]:
+                      - generic [ref=e2495]: 2 bedrooms
+                      - generic [ref=e2496]: 2 bedrooms
+                    - generic [ref=e2497]:
+                      - generic [ref=e2498]: ","
+                      - generic [ref=e2499]: ·
+                      - generic [ref=e2500]: 3 beds
+                      - generic [ref=e2501]: 3 beds
+                    - generic [ref=e2502]:
+                      - generic [ref=e2503]: ","
+                      - generic [ref=e2504]: ·
+                      - generic [ref=e2505]: 1.5 baths
+                      - generic [ref=e2506]: 1.5 baths
+                  - generic [ref=e2507]:
+                    - generic [ref=e2512]:
+                      - generic [ref=e2513]:
+                        - generic [ref=e2514]: $2,500
+                        - button [ref=e2517] [cursor=pointer]:
+                          - text: $2,186
+                          - generic [ref=e2518]: Show price breakdown
+                      - generic [ref=e2519]: for 7 nights
+                    - generic [ref=e2522]: Weekly discount
+                  - generic [ref=e2524]:
+                    - generic:
+                      - generic: 5.0 out of 5 average rating, 12 reviews
+                      - generic: 5.0 (12)
+        - application [ref=e2530]
+      - contentinfo [ref=e2539]:
+        - generic [ref=e2540]:
+          - heading [level=2] [ref=e2542]: Site Footer
+          - generic [ref=e2543]:
+            - generic [ref=e2544]:
+              - heading [level=3] [ref=e2545]: Support
+              - list [ref=e2546]:
+                - listitem [ref=e2547]:
+                  - link [ref=e2548] [cursor=pointer]:
+                    - /url: /help/home?from=footer
+                    - text: Help Center
+                - listitem [ref=e2549]:
+                  - link [ref=e2550] [cursor=pointer]:
+                    - /url: /help/contact-us?entry=DESKTOP_FOOTER_SAFETY
+                    - text: Get help with a safety issue
+                - listitem [ref=e2551]:
+                  - link [ref=e2552] [cursor=pointer]:
+                    - /url: /aircover
+                    - text: AirCover
+                - listitem [ref=e2553]:
+                  - link [ref=e2554] [cursor=pointer]:
+                    - /url: /travelinsurance
+                    - text: Travel insurance
+                - listitem [ref=e2555]:
+                  - link [ref=e2556] [cursor=pointer]:
+                    - /url: /against-discrimination
+                    - text: Anti-discrimination
+                - listitem [ref=e2557]:
+                  - link [ref=e2558] [cursor=pointer]:
+                    - /url: /accessibility
+                    - text: Disability support
+                - listitem [ref=e2559]:
+                  - link [ref=e2560] [cursor=pointer]:
+                    - /url: /help/article/2701/extenuating-circumstances-policy-and-the-coronavirus-covid19
+                    - text: Cancellation options
+                - listitem [ref=e2561]:
+                  - link [ref=e2562] [cursor=pointer]:
+                    - /url: /neighbors
+                    - text: Report neighborhood concern
+            - generic [ref=e2563]:
+              - heading [level=3] [ref=e2564]: Hosting
+              - list [ref=e2565]:
+                - listitem [ref=e2566]:
+                  - link [ref=e2567] [cursor=pointer]:
+                    - /url: /host/homes?from_footer=1
+                    - text: Airbnb your home
+                - listitem [ref=e2568]:
+                  - link [ref=e2569] [cursor=pointer]:
+                    - /url: /host/experiences
+                    - text: Airbnb your experience
+                - listitem [ref=e2570]:
+                  - link [ref=e2571] [cursor=pointer]:
+                    - /url: /host/services
+                    - text: Airbnb your service
+                - listitem [ref=e2572]:
+                  - link [ref=e2573] [cursor=pointer]:
+                    - /url: /aircover-for-hosts
+                    - text: AirCover for Hosts
+                - listitem [ref=e2574]:
+                  - link [ref=e2575] [cursor=pointer]:
+                    - /url: /resources
+                    - text: Hosting resources
+                - listitem [ref=e2576]:
+                  - link [ref=e2577] [cursor=pointer]:
+                    - /url: https://community.withairbnb.com/t5/Community-Center/ct-p/community-center
+                    - text: Community forum
+                - listitem [ref=e2578]:
+                  - link [ref=e2579] [cursor=pointer]:
+                    - /url: /help/responsible-hosting
+                    - text: Hosting responsibly
+                - listitem [ref=e2580]:
+                  - link [ref=e2581] [cursor=pointer]:
+                    - /url: /airbnb-friendly
+                    - text: Airbnb-friendly apartments
+                - listitem [ref=e2582]:
+                  - link [ref=e2583] [cursor=pointer]:
+                    - /url: /e/intro-to-hosting
+                    - text: Join a free hosting class
+                - listitem [ref=e2584]:
+                  - link [ref=e2585] [cursor=pointer]:
+                    - /url: /host/co-hosts
+                    - text: Find a co‑host
+                - listitem [ref=e2586]:
+                  - link [ref=e2587] [cursor=pointer]:
+                    - /url: /refer
+                    - text: Refer a host
+            - generic [ref=e2588]:
+              - heading [level=3] [ref=e2589]: Airbnb
+              - list [ref=e2590]:
+                - listitem [ref=e2591]:
+                  - link [ref=e2592] [cursor=pointer]:
+                    - /url: /release
+                    - text: 2026 Summer Release
+                - listitem [ref=e2593]:
+                  - link [ref=e2594] [cursor=pointer]:
+                    - /url: /press/news
+                    - text: Newsroom
+                - listitem [ref=e2595]:
+                  - link [ref=e2596] [cursor=pointer]:
+                    - /url: /careers
+                    - text: Careers
+                - listitem [ref=e2597]:
+                  - link [ref=e2598] [cursor=pointer]:
+                    - /url: https://investors.airbnb.com
+                    - text: Investors
+                - listitem [ref=e2599]:
+                  - link [ref=e2600] [cursor=pointer]:
+                    - /url: /giftcards
+                    - text: Gift cards
+                - listitem [ref=e2601]:
+                  - link [ref=e2602] [cursor=pointer]:
+                    - /url: https://www.airbnb.org?locale=en
+                    - text: Airbnb.org emergency stays
+          - generic [ref=e2603]:
+            - generic [ref=e2604]: Footer section
+            - generic [ref=e2606]:
+              - generic [ref=e2608]:
+                - generic [ref=e2609]: © 2026 Airbnb, Inc.
+                - generic [ref=e2610]:
+                  - generic [ref=e2611]: ·
+                  - list [ref=e2614]:
+                    - listitem [ref=e2615]:
+                      - link [ref=e2616] [cursor=pointer]:
+                        - /url: /terms/privacy_policy
+                        - text: Privacy
+                      - generic [ref=e2617]: ·
+                    - listitem [ref=e2618]:
+                      - link [ref=e2619] [cursor=pointer]:
+                        - /url: /terms
+                        - text: Terms
+                      - generic [ref=e2620]: ·
+                    - listitem [ref=e2621]:
+                      - link [ref=e2622] [cursor=pointer]:
+                        - /url: /help/sale-share-opt-out
+                        - generic [ref=e2623]: Your Privacy Choices
+              - generic [ref=e2631]:
+                - generic [ref=e2633]:
+                  - button [ref=e2635] [cursor=pointer]:
+                    - generic [ref=e2636]: English (US)
+                  - button [ref=e2638] [cursor=pointer]:
+                    - generic [ref=e2640]:
+                      - generic [ref=e2641]: $
+                      - generic [ref=e2642]: USD
+                - list [ref=e2644]:
+                  - listitem [ref=e2645]:
+                    - link [ref=e2646] [cursor=pointer]:
+                      - /url: https://www.facebook.com/airbnb
+                  - listitem [ref=e2650]:
+                    - link [ref=e2651] [cursor=pointer]:
+                      - /url: https://twitter.com/airbnb
+                  - listitem [ref=e2655]:
+                    - link [ref=e2656] [cursor=pointer]:
+                      - /url: https://instagram.com/airbnb
+    - generic [ref=e344]: Loading
+  - dialog "Now you’ll see one price for your trip, all fees included." [active] [ref=e2667]:
+    - button "Close" [ref=e2669] [cursor=pointer]
+    - generic [ref=e2677]:
+      - generic [ref=e2678]:
+        - generic [ref=e2679]:
+          - generic [ref=e2680]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2681]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2682]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2683]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2684]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2685]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2686]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2687]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2688]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2689]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2690]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2691]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2692]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2693]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2694]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2695]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2696]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2697]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2698]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2699]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2700]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2701]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2702]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2703]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2704]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2705]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2706]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2707]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2708]: Now you’ll see one price foryour trip, all fees included.
+          - generic [ref=e2709]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2710]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2711]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2712]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2713]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2714]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2715]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2716]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2717]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2718]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2719]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2720]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2721]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2722]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2723]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2724]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2725]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2726]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2727]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2728]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2729]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2730]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2731]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2732]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2733]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2734]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2735]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2736]: Now you’ll see one price for your trip, all fees included.
+          - generic [ref=e2737]: Now you’ll see one price for your trip, all fees included.
+        - generic [ref=e2738]: Now you’ll see one price for your trip, all fees included.
+      - button "Got it" [ref=e2739] [cursor=pointer]

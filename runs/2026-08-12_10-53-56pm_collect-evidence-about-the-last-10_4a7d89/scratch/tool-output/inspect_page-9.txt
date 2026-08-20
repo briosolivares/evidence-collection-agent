@@ -1,0 +1,1073 @@
+URL: https://github.com/openclaw/openclaw/pull/121179
+Title: fix(replies): keep approval-unavailable notices durable by Leon-SK668 · Pull Request #121179 · openclaw/openclaw · GitHub
+
+- generic [ref=f39e2]:
+  - generic [ref=f39e3]:
+    - link "Skip to content" [ref=f39e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f39e8]:
+      - heading "Navigation Menu" [level=2] [ref=f39e9]
+      - generic [ref=f39e10]:
+        - link "Homepage" [ref=f39e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f39e15]:
+          - navigation "Global" [ref=f39e16]:
+            - list [ref=f39e17]:
+              - listitem [ref=f39e18]:
+                - button "Platform" [ref=f39e20] [cursor=pointer]
+              - listitem [ref=f39e23]:
+                - button "Solutions" [ref=f39e25] [cursor=pointer]
+              - listitem [ref=f39e28]:
+                - button "Resources" [ref=f39e30] [cursor=pointer]
+              - listitem [ref=f39e33]:
+                - button "Open Source" [ref=f39e35] [cursor=pointer]
+              - listitem [ref=f39e38]:
+                - button "Enterprise" [ref=f39e40] [cursor=pointer]
+              - listitem [ref=f39e43]:
+                - link "Pricing" [ref=f39e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f39e45]:
+            - button "Search or jump to, type / to search" [ref=f39e47] [cursor=pointer]:
+              - generic [ref=f39e50]:
+                - text: Type
+                - generic [ref=f39e51]: /
+                - text: to search
+            - link "Sign in" [ref=f39e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F121179
+            - link "Sign up" [ref=f39e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f39e55] [cursor=pointer]
+  - main [ref=f39e61]:
+    - generic [ref=f39e62]:
+      - generic [ref=f39e63]:
+        - generic [ref=f39e65]:
+          - link "openclaw" [ref=f39e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f39e70]: /
+          - strong [ref=f39e71]:
+            - link "openclaw" [ref=f39e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f39e73]: Public
+        - generic [ref=f39e74]:
+          - list:
+            - listitem [ref=f39e75]:
+              - link "Sponsor @openclaw" [ref=f39e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f39e77]: Sponsor
+            - listitem [ref=f39e81]:
+              - link "You must be signed in to change notification settings" [ref=f39e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f39e85]:
+              - link "Fork 81.2k" [ref=f39e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,157" [ref=f39e89]: 81.2k
+            - listitem [ref=f39e90]:
+              - link "You must be signed in to star a repository" [ref=f39e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386110 users starred this repository" [ref=f39e95]: 386k
+      - navigation "Repository" [ref=f39e96]:
+        - list [ref=f39e97]:
+          - listitem [ref=f39e98]:
+            - link "Code" [ref=f39e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f39e103]:
+            - link "Issues 3.4k" [ref=f39e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f39e108]: Issues
+              - generic "3,405" [ref=f39e109]: 3.4k
+          - listitem [ref=f39e110]:
+            - link "Pull requests 2.1k" [ref=f39e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f39e114]: Pull requests
+              - generic "2,101" [ref=f39e115]: 2.1k
+          - listitem [ref=f39e116]:
+            - link "Actions" [ref=f39e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f39e121]:
+            - link "Projects" [ref=f39e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f39e126]:
+            - link "Security and quality 647" [ref=f39e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f39e130]: Security and quality
+              - generic "647" [ref=f39e131]
+          - listitem [ref=f39e132]:
+            - link "Insights" [ref=f39e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f39e143]:
+      - generic [ref=f39e147]:
+        - generic [ref=f39e149]:
+          - 'heading "fix(replies): keep approval-unavailable notices durable - #121179" [level=1] [ref=f39e150]':
+            - text: "fix(replies): keep approval-unavailable notices durable"
+            - generic [ref=f39e151]: "- #121179"
+          - generic [ref=f39e152]: "#121179"
+        - generic [ref=f39e155]:
+          - generic [ref=f39e157]:
+            - img "Pull request" [ref=f39e158]
+            - text: Merged
+          - generic [ref=f39e161]:
+            - link "vincentkoc" [ref=f39e162] [cursor=pointer]:
+              - /url: /vincentkoc
+            - text: merged 1 commit into
+            - generic [ref=f39e163]:
+              - link "openclaw:main" [ref=f39e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f39e165]: from
+              - generic [ref=f39e166]:
+                - link "Leon-SK668:fix/approval-unavailable-durable-20260810" [ref=f39e167] [cursor=pointer]:
+                  - /url: /Leon-SK668/openclaw/tree/fix/approval-unavailable-durable-20260810
+                - button "Copy head branch name to clipboard" [ref=f39e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 10:23 PM PDT" [ref=f39e172]: Aug 13, 202635 minutes ago
+        - generic [ref=f39e173]:
+          - generic [ref=f39e175]:
+            - generic [ref=f39e176]: "+72"
+            - generic [ref=f39e177]: "-8"
+            - generic [ref=f39e178]: "Lines changed: 72 additions & 8 deletions"
+          - navigation "Pull request navigation tabs" [ref=f39e186]:
+            - generic [ref=f39e187]:
+              - link "Conversation (10)" [ref=f39e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121179
+                - text: Conversation
+                - generic [ref=f39e191]: "10"
+                - generic [ref=f39e192]: (10)
+              - link "Commits (1)" [ref=f39e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121179/commits
+                - text: Commits
+                - generic [ref=f39e196]: "1"
+                - generic [ref=f39e197]: (1)
+              - link "Checks (131)" [ref=f39e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121179/checks
+                - text: Checks
+                - generic [ref=f39e201]: "131"
+                - generic [ref=f39e202]: (131)
+              - link "Files changed (7)" [ref=f39e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/121179/files
+                - text: Files changed
+                - generic [ref=f39e206]: "7"
+                - generic [ref=f39e207]: (7)
+      - generic [ref=f39e212]:
+        - generic [ref=f39e214]:
+          - heading "Conversation" [level=2] [ref=f39e215]
+          - generic [ref=f39e216]:
+            - generic [ref=f39e217]:
+              - generic [ref=f39e219]:
+                - link [ref=f39e220] [cursor=pointer]:
+                  - /url: /Leon-SK668
+                  - img "@Leon-SK668" [ref=f39e221]
+                - generic [ref=f39e223]:
+                  - generic [ref=f39e224]:
+                    - heading "Leon-SK668 commented Aug 9, 20264 days ago •" [level=3] [ref=f39e225]:
+                      - generic [ref=f39e226]:
+                        - strong [ref=f39e227]:
+                          - link "Leon-SK668" [ref=f39e228] [cursor=pointer]:
+                            - /url: /Leon-SK668
+                        - text: commented
+                        - link "Aug 9, 20264 days ago" [ref=f39e229] [cursor=pointer]:
+                          - /url: "#issue-5103846591"
+                        - generic [ref=f39e230]:
+                          - generic [ref=f39e231]: •
+                          - group [ref=f39e232]:
+                            - button "edited by vincentkoc" [ref=f39e233] [cursor=pointer]
+                    - generic [ref=f39e237]:
+                      - group [ref=f39e239]:
+                        - button [ref=f39e240] [cursor=pointer]:
+                          - img "Show options" [ref=f39e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f39e246]: Contributor
+                  - generic [ref=f39e251]:
+                    - paragraph [ref=f39e252]:
+                      - text: Fixes
+                      - link "#121127" [ref=f39e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/121127
+                    - paragraph [ref=f39e254]:
+                      - text: "Related:"
+                      - link "#60445" [ref=f39e255] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/60445
+                      - text: ","
+                      - link "#121048" [ref=f39e256] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/121048
+                    - heading "What Problem This Solves" [level=2] [ref=f39e257]
+                    - paragraph [ref=f39e258]: Fixes an issue where users whose exec command could not enter the interactive approval flow could miss the actionable unavailable notice when transient progress delivery was active.
+                    - heading "Why This Change Was Made" [level=2] [ref=f39e259]
+                    - paragraph [ref=f39e260]: Approval-unavailable replies now carry a typed channel-data marker on both builder return paths. The existing shared delivery classifier recognizes that marker, and the quiet direct resolver preserves the same marker beside pending approvals. Direct, queued, and non-forced quiet flows therefore route the notice through durable tool-result delivery without changing ordinary progress messages.
+                    - heading "User Impact" [level=2] [ref=f39e261]
+                    - paragraph [ref=f39e262]: Users reliably receive the explanation and recovery guidance when an exec approval route is unavailable, including when a channel progress callback is active or verbose tool summaries are disabled.
+                    - heading "Evidence" [level=2] [ref=f39e263]
+                    - list [ref=f39e264]:
+                      - listitem [ref=f39e265]: Added builder regressions for both unavailable reasons and both payload return shapes.
+                      - listitem [ref=f39e266]: Added direct and queued dispatcher-policy regressions proving the unavailable marker bypasses transient callbacks.
+                      - listitem [ref=f39e267]:
+                        - text: Added a non-forced, verbose-off direct-dispatch regression proving the quiet resolver reaches durable
+                        - code [ref=f39e268]: sendToolResult
+                        - text: delivery.
+                      - listitem [ref=f39e269]:
+                        - text: Targeted
+                        - code [ref=f39e270]: oxfmt
+                        - text: ","
+                        - code [ref=f39e271]: oxlint
+                        - text: ", and"
+                        - code [ref=f39e272]: git diff --check
+                        - text: pass on the changed files.
+                      - listitem [ref=f39e273]:
+                        - text: "Controlled red proof restored the three production files to main while retaining the new tests: all four new producer assertions failed because"
+                        - code [ref=f39e274]: channelData
+                        - text: was undefined, then the approved patch was restored byte-for-byte.
+                      - listitem [ref=f39e275]:
+                        - text: Exact head
+                        - code [ref=f39e276]: c68595480345d68519a4834553ec52c84a727ea0
+                        - text: passed 41 producer tests, 351 direct-dispatch tests, and 28 queued follow-up tests.
+                      - listitem [ref=f39e277]:
+                        - text: "Blacksmith Testbox passed the full changed gate against the exact seven-file diff:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31667726128" [ref=f39e278] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31667726128
+                      - listitem [ref=f39e279]: Fresh exact-head autoreview is clean with 0.99 confidence and no actionable finding.
+                      - listitem [ref=f39e280]:
+                        - text: A fresh secretless production-boundary proof entered through
+                        - code [ref=f39e281]: qaChannelPlugin.gateway.startAccount
+                        - text: ", used"
+                        - code [ref=f39e282]: channelRuntime.inbound.dispatch
+                        - text: plus the production durable classifier, and produced exactly one outbound QA channel API send.
+                      - listitem [ref=f39e283]: The proof mocked only the provider reply resolver and loopback channel API. It asserted the production approval-unavailable payload, target, reply id, one provider call, and one durable send without credentials or private output. This is a focused Gateway/channel boundary proof, not a full QA E2E.
+                    - heading "Focused Runtime Transcript" [level=2] [ref=f39e284]
+                    - generic [ref=f39e285]:
+                      - code [ref=f39e287]: "PR121179_EPHEMERAL_GATEWAY_DURABLE_SEND_PROOF {\"head\":\"c68595480345d68519a4834553ec52c84a727ea0\",\"gatewayOwner\":\"qaChannelPlugin.gateway.startAccount\",\"runtimeOwner\":\"createRuntimeChannel\",\"dispatchOwner\":\"channelRuntime.inbound.dispatch\",\"providerEdge\":\"mock-replyResolver\",\"channelApiEdge\":\"loopback-http\",\"inboundEvents\":1,\"providerCalls\":1,\"durableChannelSends\":1,\"target\":\"dm:[redacted]\",\"replyTo\":\"[redacted]\",\"reason\":\"no-approval-route\",\"privateDataPrinted\":false}"
+                      - button "Copy code to clipboard" [ref=f39e289] [cursor=pointer]
+                    - heading "Current-Main Refresh (2026-08-13)" [level=2] [ref=f39e293]
+                    - list [ref=f39e294]:
+                      - listitem [ref=f39e295]:
+                        - text: The contributor branch was rewritten from current main after
+                        - code [ref=f39e296]: e4e558df215a009fb24faa4471c4ee8dc7730151
+                        - text: repaired the unrelated env-var ratchet failure; exact PR head is
+                        - code [ref=f39e297]: c68595480345d68519a4834553ec52c84a727ea0
+                        - text: .
+                      - listitem [ref=f39e298]: The PR diff remains the same seven approval-delivery files at +72/-8; both rebases applied without conflict or integration edits.
+                      - listitem [ref=f39e299]:
+                        - text: Native
+                        - code [ref=f39e300]: scripts/pr
+                        - text: review initialization and guard passed against current main
+                        - code [ref=f39e301]: 64e8791601b
+                        - text: .
+                      - listitem [ref=f39e302]:
+                        - text: Native review artifacts validate as
+                        - code [ref=f39e303]: READY FOR /prepare-pr
+                        - text: with zero findings, behavioral sweep pass, and no silent-drop risk.
+                      - listitem [ref=f39e304]:
+                        - text: Official exact-head CI completed with 82 successful and 42 skipped checks, zero pending, and zero failures; the final lint shard passed in
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31668801488" [ref=f39e305] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31668801488
+                    - paragraph [ref=f39e306]: "Punchcard-Session: clear-lantern-summit-v2"
+                  - 'button "eyes (1): Leon-SK668, 05:38PM on August 09" [disabled] [ref=f39e311]':
+                    - generic [ref=f39e312]: 👀
+                    - generic [ref=f39e313]: "1"
+              - generic [ref=f39e314]:
+                - generic [ref=f39e316]:
+                  - link [ref=f39e318] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e319]
+                  - generic [ref=f39e321]:
+                    - generic [ref=f39e322]:
+                      - heading "clawsweeper Bot commented Aug 9, 20264 days ago" [level=3] [ref=f39e323]:
+                        - generic [ref=f39e324]:
+                          - strong [ref=f39e325]:
+                            - link "clawsweeper" [ref=f39e326] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f39e327]: Bot
+                          - text: commented
+                          - link "Aug 9, 20264 days ago" [ref=f39e328] [cursor=pointer]:
+                            - /url: "#issuecomment-5232833031"
+                      - generic [ref=f39e329]:
+                        - group [ref=f39e331]:
+                          - button [ref=f39e332] [cursor=pointer]:
+                            - img "Show options" [ref=f39e335]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f39e338]: Contributor
+                    - table [ref=f39e342]:
+                      - rowgroup [ref=f39e343]:
+                        - row [ref=f39e344]:
+                          - cell [ref=f39e345]:
+                            - paragraph [ref=f39e346]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f39e347]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f39e348]:
+                  - generic [ref=f39e353]:
+                    - link [ref=f39e354] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f39e355]
+                    - link "openclaw-barnacle" [ref=f39e356] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f39e357]: Bot
+                    - text: added the
+                    - 'link "size: XS" [ref=f39e358] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XS%22
+                    - text: label
+                    - link "Aug 9, 20264 days ago" [ref=f39e359] [cursor=pointer]:
+                      - /url: "#event-29188552143"
+                  - generic [ref=f39e364]:
+                    - link [ref=f39e365] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f39e366]
+                    - link "clawsweeper" [ref=f39e367] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f39e368]: Bot
+                    - text: added
+                    - 'link "rating: 🧂 unranked krab" [ref=f39e369] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A7%82%20unranked%20krab%22
+                    - 'link "status: 📣 needs proof" [ref=f39e370] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%93%A3%20needs%20proof%22
+                    - link "P1" [ref=f39e371] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "merge-risk: 🚨 message-delivery" [ref=f39e372] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+                    - text: labels
+                    - link "Aug 9, 20264 days ago" [ref=f39e373] [cursor=pointer]:
+                      - /url: "#event-29188643785"
+                - generic [ref=f39e375]:
+                  - link [ref=f39e377] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e378]
+                  - generic [ref=f39e380]:
+                    - generic [ref=f39e381]:
+                      - heading "clawsweeper Bot commented Aug 9, 20264 days ago •" [level=3] [ref=f39e382]:
+                        - generic [ref=f39e383]:
+                          - strong [ref=f39e384]:
+                            - link "clawsweeper" [ref=f39e385] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f39e386]: Bot
+                          - text: commented
+                          - link "Aug 9, 20264 days ago" [ref=f39e387] [cursor=pointer]:
+                            - /url: "#issuecomment-5232857647"
+                          - generic [ref=f39e388]:
+                            - generic [ref=f39e389]: •
+                            - group [ref=f39e390]:
+                              - button "edited" [ref=f39e391] [cursor=pointer]
+                      - generic [ref=f39e395]:
+                        - group [ref=f39e397]:
+                          - button [ref=f39e398] [cursor=pointer]:
+                            - img "Show options" [ref=f39e401]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f39e404]: Contributor
+                    - table [ref=f39e408]:
+                      - rowgroup [ref=f39e409]:
+                        - row [ref=f39e410]:
+                          - cell [ref=f39e411]:
+                            - paragraph [ref=f39e412]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f39e413]: Reviewed August 13, 2026, 1:18 AM ET / 05:18 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f39e414]
+                            - heading "What this changes" [level=2] [ref=f39e415]
+                            - paragraph [ref=f39e416]: This PR adds an unavailable-exec-approval marker to reply payloads so direct and queued dispatch routes recovery notices through durable tool-result delivery rather than transient progress.
+                            - heading "Merge readiness" [level=2] [ref=f39e417]
+                            - paragraph [ref=f39e418]:
+                              - generic [ref=f39e419]: ⚠️
+                              - strong [ref=f39e420]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f39e421]: "No blocking patch or security finding: the branch repairs a current-main silent delivery gap through the shared durable-delivery owner. Keep it open until the remaining exact-head check completes and the clean merge is refreshed against current main."
+                            - paragraph [ref=f39e422]:
+                              - strong [ref=f39e423]: "Priority:"
+                              - text: P1
+                              - strong [ref=f39e424]: "Reviewed head:"
+                              - code [ref=f39e425]: c68595480345d68519a4834553ec52c84a727ea0
+                            - heading "Review scores" [level=2] [ref=f39e426]
+                            - table [ref=f39e428]:
+                              - rowgroup [ref=f39e429]:
+                                - row [ref=f39e430]:
+                                  - columnheader "Measure" [ref=f39e431]
+                                  - columnheader "Result" [ref=f39e432]
+                                  - columnheader "What it means" [ref=f39e433]
+                              - rowgroup [ref=f39e434]:
+                                - row [ref=f39e435]:
+                                  - cell [ref=f39e436]:
+                                    - strong [ref=f39e437]: Overall readiness
+                                  - cell [ref=f39e438]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f39e439]: (4/6)
+                                  - cell "The repair is focused and boundary-tested with sufficient real-behavior proof; only current-head integration completion remains before merge." [ref=f39e440]
+                                - row [ref=f39e441]:
+                                  - cell [ref=f39e442]:
+                                    - strong [ref=f39e443]: Proof confidence
+                                  - cell [ref=f39e444]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f39e445]: (5/6)
+                                  - 'cell "Sufficient (live_output): The PR supplies an exact-head, redacted ephemeral Gateway/channel boundary transcript that exercises the production dispatcher and observes one durable outbound send after the fix." [ref=f39e446]'
+                                - row [ref=f39e447]:
+                                  - cell [ref=f39e448]:
+                                    - strong [ref=f39e449]: Patch quality
+                                  - cell [ref=f39e450]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f39e451]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f39e452]
+                            - heading "Verification" [level=2] [ref=f39e453]
+                            - table [ref=f39e455]:
+                              - rowgroup [ref=f39e456]:
+                                - row [ref=f39e457]:
+                                  - columnheader "Check" [ref=f39e458]
+                                  - columnheader "Result" [ref=f39e459]
+                                  - columnheader "Evidence" [ref=f39e460]
+                              - rowgroup [ref=f39e461]:
+                                - row [ref=f39e462]:
+                                  - cell [ref=f39e463]:
+                                    - strong [ref=f39e464]: Real behavior
+                                  - cell "Verified" [ref=f39e465]
+                                  - 'cell "Sufficient (live_output): The PR supplies an exact-head, redacted ephemeral Gateway/channel boundary transcript that exercises the production dispatcher and observes one durable outbound send after the fix." [ref=f39e466]'
+                                - row [ref=f39e467]:
+                                  - cell [ref=f39e468]:
+                                    - strong [ref=f39e469]: Evidence reviewed
+                                  - cell "6 items" [ref=f39e470]
+                                  - 'cell "Current-main defect: Current main builds approval-unavailable replies as text-only and its durable classifier recognizes pending approvals and ask-user prompts but not unavailable approvals, so the stated forced-progress path is source-reproducible. Producer and dispatch repair: The PR emits the typed marker on both unavailable-builder return paths, classifies it in the shared durable predicate, and preserves it when quiet direct dispatch filters normal tool summaries. Sibling-path coverage: The changed tests extend existing durable-delivery tables for forced direct dispatch and queued follow-up dispatch, plus cover non-forced quiet direct delivery and both builder return shapes." [ref=f39e471]': "Current-main defect: Current main builds approval-unavailable replies as text-only and its durable classifier recognizes pending approvals and ask-user prompts but not unavailable approvals, so the stated forced-progress path is source-reproducible.Producer and dispatch repair: The PR emits the typed marker on both unavailable-builder return paths, classifies it in the shared durable predicate, and preserves it when quiet direct dispatch filters normal tool summaries.Sibling-path coverage: The changed tests extend existing durable-delivery tables for forced direct dispatch and queued follow-up dispatch, plus cover non-forced quiet direct delivery and both builder return shapes."
+                                - row [ref=f39e472]:
+                                  - cell [ref=f39e473]:
+                                    - strong [ref=f39e474]: Findings
+                                  - cell "None" [ref=f39e475]
+                                  - cell "None." [ref=f39e476]
+                                - row [ref=f39e477]:
+                                  - cell [ref=f39e478]:
+                                    - strong [ref=f39e479]: Security
+                                  - cell "None" [ref=f39e480]
+                                  - cell "None." [ref=f39e481]
+                            - heading "How this fits together" [level=2] [ref=f39e482]
+                            - paragraph [ref=f39e483]: The exec tool produces an approval-unavailable result, and the embedded agent converts it into a reply payload. The auto-reply dispatcher then classifies that payload for either transient progress callbacks or a durable channel send.
+                            - region "mermaid rendered output container" [ref=f39e484]:
+                              - generic [ref=f39e485]:
+                                - generic [ref=f39e486]:
+                                  - group [ref=f39e487]:
+                                    - button "Open dialog" [ref=f39e488] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f39e491] [cursor=pointer]
+                                - iframe [ref=f39e496]:
+                                  - generic [ref=f40e1]:
+                                    - document [ref=f40e5]:
+                                      - generic [ref=f40e11]:
+                                        - paragraph [ref=f40e18]: Exec approval unavailable
+                                        - paragraph [ref=f40e25]: Reply payload builder
+                                        - paragraph [ref=f40e32]: Durable delivery marker
+                                        - paragraph [ref=f40e39]: Reply dispatcher
+                                        - paragraph [ref=f40e46]: Direct or queued route
+                                        - paragraph [ref=f40e53]: Durable tool-result send
+                                        - paragraph [ref=f40e60]: Transient progress callback
+                                    - generic [ref=f40e61]:
+                                      - button "Zoom in" [ref=f40e62]
+                                      - button "Zoom out" [ref=f40e66]
+                                      - button "Reset view" [ref=f40e70]
+                                      - button "Pan up" [ref=f40e73]
+                                      - button "Pan down" [ref=f40e76]
+                                      - button "Pan left" [ref=f40e79]
+                                      - button "Pan right" [ref=f40e82]
+                            - heading "Before merge" [level=2] [ref=f39e497]
+                            - list [ref=f39e498]:
+                              - listitem [ref=f39e499]:
+                                - checkbox "Incomplete task" [disabled] [ref=f39e500]
+                                - strong [ref=f39e501]: Resolve merge risk (P1)
+                                - text: "- The PR is cleanly mergeable but behind current main, and the exact-head check matrix still has lint in progress; final merge evidence should use the resulting three-way merge."
+                              - listitem [ref=f39e502]:
+                                - checkbox "Incomplete task" [disabled] [ref=f39e503]
+                                - strong [ref=f39e504]: Resolve merge risk (P2)
+                                - text: "- Production code grows by 16 net lines for this bug fix; the marker must survive the builder and two canonical delivery decisions, but a final reviewer should retain that narrow boundary rather than introduce channel-specific fallback routing."
+                            - group [ref=f39e505]:
+                              - strong [ref=f39e507] [cursor=pointer]: Agent review details
+                - generic [ref=f39e508]:
+                  - generic [ref=f39e514]:
+                    - link [ref=f39e516] [cursor=pointer]:
+                      - /url: /Leon-SK668
+                      - img "@Leon-SK668" [ref=f39e517]
+                    - generic [ref=f39e518]:
+                      - link "Leon-SK668" [ref=f39e519] [cursor=pointer]:
+                        - /url: /Leon-SK668
+                      - link "force-pushed" [ref=f39e520] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/f6b45fee18dbb2b99768bc77afbb8206f0201e6c..230833306b145718884a9bef70a6d0f008b922b5
+                      - text: the
+                      - generic [ref=f39e521]: fix/approval-unavailable-durable-20260810
+                      - text: branch from
+                      - link [ref=f39e523] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/f6b45fee18dbb2b99768bc77afbb8206f0201e6c
+                        - code [ref=f39e524]: f6b45fe
+                      - text: to
+                      - link [ref=f39e525] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/230833306b145718884a9bef70a6d0f008b922b5
+                        - code [ref=f39e526]: "2308333"
+                      - link "Compare" [ref=f39e527] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/f6b45fee18dbb2b99768bc77afbb8206f0201e6c..230833306b145718884a9bef70a6d0f008b922b5
+                      - link "August 9, 2026 18:014 days ago" [ref=f39e530] [cursor=pointer]:
+                        - /url: "#event-29188959975"
+                  - generic [ref=f39e535]:
+                    - link [ref=f39e536] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f39e537]
+                    - link "openclaw-barnacle" [ref=f39e538] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f39e539]: Bot
+                    - text: added
+                    - 'link "size: S" [ref=f39e540] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                    - text: and removed
+                    - 'link "size: XS" [ref=f39e541] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XS%22
+                    - text: labels
+                    - link "Aug 10, 20263 days ago" [ref=f39e542] [cursor=pointer]:
+                      - /url: "#event-29202184365"
+                - generic [ref=f39e544]:
+                  - link [ref=f39e546] [cursor=pointer]:
+                    - /url: /Leon-SK668
+                    - img "@Leon-SK668" [ref=f39e547]
+                  - generic [ref=f39e549]:
+                    - generic [ref=f39e550]:
+                      - heading "Leon-SK668 commented Aug 10, 20263 days ago •" [level=3] [ref=f39e551]:
+                        - generic [ref=f39e552]:
+                          - strong [ref=f39e553]:
+                            - link "Leon-SK668" [ref=f39e554] [cursor=pointer]:
+                              - /url: /Leon-SK668
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f39e555] [cursor=pointer]:
+                            - /url: "#issuecomment-5235872711"
+                          - generic [ref=f39e556]:
+                            - generic [ref=f39e557]: •
+                            - group [ref=f39e558]:
+                              - button "edited" [ref=f39e559] [cursor=pointer]
+                      - generic [ref=f39e563]:
+                        - group [ref=f39e565]:
+                          - button [ref=f39e566] [cursor=pointer]:
+                            - img "Show options" [ref=f39e569]
+                        - generic [ref=f39e571]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f39e572]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f39e574]: Author
+                    - table [ref=f39e578]:
+                      - rowgroup [ref=f39e579]:
+                        - row [ref=f39e580]:
+                          - cell [ref=f39e581]:
+                            - paragraph [ref=f39e582]:
+                              - text: Addressed the remaining quiet-delivery finding at exact head
+                              - code [ref=f39e583]: 3a784b4404e443beec96cef4f8fa90c5949823f3
+                              - text: .
+                            - list [ref=f39e584]:
+                              - listitem [ref=f39e585]:
+                                - text: Exported the existing
+                                - code [ref=f39e586]: execApprovalUnavailable
+                                - text: predicate and consumed it beside pending approvals in the quiet direct resolver.
+                              - listitem [ref=f39e587]:
+                                - text: Added a non-forced, verbose-off direct-dispatch regression proving the notice reaches
+                                - code [ref=f39e588]: sendToolResult
+                                - text: instead of being filtered.
+                              - listitem [ref=f39e589]:
+                                - code [ref=f39e590]: git diff --check
+                                - text: and the current-main merge-tree preflight are clean.
+                              - listitem [ref=f39e591]: Fresh uncommitted autoreview reports no actionable findings (correctness 0.99).
+                            - paragraph [ref=f39e592]:
+                              - text: The new exact-head CI is now running.
+                              - code [ref=f39e593]: "@clawsweeper re-review"
+                - generic [ref=f39e595]:
+                  - link [ref=f39e597] [cursor=pointer]:
+                    - /url: /Leon-SK668
+                    - img "@Leon-SK668" [ref=f39e598]
+                  - generic [ref=f39e600]:
+                    - generic [ref=f39e601]:
+                      - heading [level=3] [ref=f39e602]:
+                        - generic [ref=f39e603]:
+                          - strong [ref=f39e604]:
+                            - link "Leon-SK668" [ref=f39e605] [cursor=pointer]:
+                              - /url: /Leon-SK668
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f39e606] [cursor=pointer]:
+                            - /url: "#issuecomment-5236010033"
+                      - generic [ref=f39e607]:
+                        - group [ref=f39e609]:
+                          - button [ref=f39e610] [cursor=pointer]:
+                            - img "Show options" [ref=f39e613]
+                        - generic [ref=f39e615]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f39e616]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f39e618]: Author
+                    - table [ref=f39e622]:
+                      - rowgroup [ref=f39e623]:
+                        - row [ref=f39e624]:
+                          - cell [ref=f39e625]:
+                            - paragraph [ref=f39e626]: Exact-head CI is now complete and green, and the PR body records the current proof boundary.
+                            - paragraph [ref=f39e627]:
+                              - link "@clawsweeper" [ref=f39e628] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f39e630]:
+                  - link [ref=f39e632] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e633]
+                  - generic [ref=f39e635]:
+                    - generic [ref=f39e636]:
+                      - heading "clawsweeper Bot commented Aug 10, 20263 days ago •" [level=3] [ref=f39e637]:
+                        - generic [ref=f39e638]:
+                          - strong [ref=f39e639]:
+                            - link "clawsweeper" [ref=f39e640] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f39e641]: Bot
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f39e642] [cursor=pointer]:
+                            - /url: "#issuecomment-5236010243"
+                          - generic [ref=f39e643]:
+                            - generic [ref=f39e644]: •
+                            - group [ref=f39e645]:
+                              - button "edited" [ref=f39e646] [cursor=pointer]
+                      - generic [ref=f39e650]:
+                        - group [ref=f39e652]:
+                          - button [ref=f39e653] [cursor=pointer]:
+                            - img "Show options" [ref=f39e656]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f39e659]: Contributor
+                    - table [ref=f39e663]:
+                      - rowgroup [ref=f39e664]:
+                        - row [ref=f39e665]:
+                          - cell [ref=f39e666]:
+                            - paragraph [ref=f39e667]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f39e668]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f39e669]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f39e670]: repository_dispatch
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f39e671]: "Re-review progress:"
+                            - list [ref=f39e672]:
+                              - listitem [ref=f39e673]: "State: Complete"
+                              - listitem [ref=f39e674]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f39e675]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31431429550" [ref=f39e676] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31431429550
+                              - listitem [ref=f39e677]: "Updated: 2026-08-10T20:56:17.596Z"
+                - generic [ref=f39e679]:
+                  - link [ref=f39e681] [cursor=pointer]:
+                    - /url: /Leon-SK668
+                    - img "@Leon-SK668" [ref=f39e682]
+                  - generic [ref=f39e684]:
+                    - generic [ref=f39e685]:
+                      - heading "Leon-SK668 commented Aug 10, 20263 days ago •" [level=3] [ref=f39e686]:
+                        - generic [ref=f39e687]:
+                          - strong [ref=f39e688]:
+                            - link "Leon-SK668" [ref=f39e689] [cursor=pointer]:
+                              - /url: /Leon-SK668
+                          - text: commented
+                          - link "Aug 10, 20263 days ago" [ref=f39e690] [cursor=pointer]:
+                            - /url: "#issuecomment-5237192484"
+                          - generic [ref=f39e691]:
+                            - generic [ref=f39e692]: •
+                            - group [ref=f39e693]:
+                              - button "edited" [ref=f39e694] [cursor=pointer]
+                      - generic [ref=f39e698]:
+                        - group [ref=f39e700]:
+                          - button [ref=f39e701] [cursor=pointer]:
+                            - img "Show options" [ref=f39e704]
+                        - generic [ref=f39e706]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f39e707]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f39e709]: Author
+                    - table [ref=f39e713]:
+                      - rowgroup [ref=f39e714]:
+                        - row [ref=f39e715]:
+                          - cell [ref=f39e716]:
+                            - paragraph [ref=f39e717]:
+                              - text: "Focused exact-head production-boundary proof is now green:"
+                              - link "https://github.com/Leon-SK668/openclaw/actions/runs/31365954077" [ref=f39e718] [cursor=pointer]:
+                                - /url: https://github.com/Leon-SK668/openclaw/actions/runs/31365954077
+                            - paragraph [ref=f39e719]:
+                              - text: It verified PR head
+                              - code [ref=f39e720]: 3a784b4404e443beec96cef4f8fa90c5949823f3
+                              - text: ", built the unavailable payload with the production owner, classified it as durable, and delivered it exactly once as a"
+                              - code [ref=f39e721]: tool
+                              - text: result through the production reply dispatcher to a local sink. A separately filtered owner regression proved verbose-off routing reaches durable
+                              - code [ref=f39e722]: sendToolResult
+                              - text: ". Canonical exact-head CI remains fully green:"
+                              - link "https://github.com/openclaw/openclaw/actions/runs/31355595079" [ref=f39e723] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/actions/runs/31355595079
+                            - paragraph [ref=f39e724]: This is intentionally a focused dispatcher proof, not a live-channel or full-Gateway E2E.
+                            - paragraph [ref=f39e725]:
+                              - link "@clawsweeper" [ref=f39e726] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f39e732]:
+                  - link [ref=f39e733] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e734]
+                  - link "clawsweeper" [ref=f39e735] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f39e736]: Bot
+                  - text: added
+                  - 'link "rating: 🦐 gold shrimp" [ref=f39e737] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                  - 'link "rating: 🦪 silver shellfish" [ref=f39e738] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                  - text: and removed
+                  - 'link "rating: 🧂 unranked krab" [ref=f39e739] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A7%82%20unranked%20krab%22
+                  - 'link "rating: 🦐 gold shrimp" [ref=f39e740] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                  - text: labels
+                  - link "Aug 10, 20263 days ago" [ref=f39e741] [cursor=pointer]:
+                    - /url: "#event-29209408373"
+                - generic [ref=f39e743]:
+                  - link [ref=f39e745] [cursor=pointer]:
+                    - /url: /Leon-SK668
+                    - img "@Leon-SK668" [ref=f39e746]
+                  - generic [ref=f39e748]:
+                    - generic [ref=f39e749]:
+                      - heading [level=3] [ref=f39e750]:
+                        - generic [ref=f39e751]:
+                          - strong [ref=f39e752]:
+                            - link "Leon-SK668" [ref=f39e753] [cursor=pointer]:
+                              - /url: /Leon-SK668
+                          - text: commented
+                          - link "Aug 10, 20262 days ago" [ref=f39e754] [cursor=pointer]:
+                            - /url: "#issuecomment-5245424389"
+                      - generic [ref=f39e755]:
+                        - group [ref=f39e757]:
+                          - button [ref=f39e758] [cursor=pointer]:
+                            - img "Show options" [ref=f39e761]
+                        - generic [ref=f39e763]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f39e764]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f39e766]: Author
+                    - table [ref=f39e770]:
+                      - rowgroup [ref=f39e771]:
+                        - row [ref=f39e772]:
+                          - cell [ref=f39e773]:
+                            - paragraph [ref=f39e774]:
+                              - text: "Focused exact-head Gateway/channel boundary proof is now green:"
+                              - link "https://github.com/Leon-SK668/openclaw/actions/runs/31426764793" [ref=f39e775] [cursor=pointer]:
+                                - /url: https://github.com/Leon-SK668/openclaw/actions/runs/31426764793
+                            - paragraph [ref=f39e776]:
+                              - text: It anonymously fetched and verified
+                              - code [ref=f39e777]: 3a784b4404e443beec96cef4f8fa90c5949823f3
+                              - text: ", entered through"
+                              - code [ref=f39e778]: qaChannelPlugin.gateway.startAccount
+                              - text: ", used"
+                              - code [ref=f39e779]: channelRuntime.inbound.dispatch
+                              - text: "plus the production durable classifier, and observed exactly one outbound QA channel API send. Only the provider reply resolver and loopback channel API were mocked; the marker records one provider call, one durable send, redacted target/reply ids, and no private output. Canonical exact-head CI remains fully green:"
+                              - link "https://github.com/openclaw/openclaw/actions/runs/31355595079" [ref=f39e780] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/actions/runs/31355595079
+                            - paragraph [ref=f39e781]: The proof workflow received clean exact-head autoreview (0.98), and its final runner-bound adjustment was separately clean (0.99).
+                            - paragraph [ref=f39e782]:
+                              - link "@clawsweeper" [ref=f39e783] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f39e789]:
+                  - link [ref=f39e790] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e791]
+                  - link "clawsweeper" [ref=f39e792] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f39e793]: Bot
+                  - text: added
+                  - 'link "proof: sufficient" [ref=f39e794] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                  - 'link "rating: 🐚 platinum hermit" [ref=f39e795] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f39e796] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                  - 'link "rating: 🦞 diamond lobster" [ref=f39e797] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                  - text: and removed
+                  - 'link "rating: 🦪 silver shellfish" [ref=f39e798] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                  - 'link "status: 📣 needs proof" [ref=f39e799] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%93%A3%20needs%20proof%22
+                  - 'link "rating: 🐚 platinum hermit" [ref=f39e800] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                  - text: labels
+                  - link "Aug 10, 20262 days ago" [ref=f39e801] [cursor=pointer]:
+                    - /url: "#event-29246144987"
+                - generic [ref=f39e803]:
+                  - link [ref=f39e805] [cursor=pointer]:
+                    - /url: /Leon-SK668
+                    - img "@Leon-SK668" [ref=f39e806]
+                  - generic [ref=f39e808]:
+                    - generic [ref=f39e809]:
+                      - heading [level=3] [ref=f39e810]:
+                        - generic [ref=f39e811]:
+                          - strong [ref=f39e812]:
+                            - link "Leon-SK668" [ref=f39e813] [cursor=pointer]:
+                              - /url: /Leon-SK668
+                          - text: commented
+                          - link "Aug 11, 20262 days ago" [ref=f39e814] [cursor=pointer]:
+                            - /url: "#issuecomment-5256202160"
+                      - generic [ref=f39e815]:
+                        - group [ref=f39e817]:
+                          - button [ref=f39e818] [cursor=pointer]:
+                            - img "Show options" [ref=f39e821]
+                        - generic [ref=f39e823]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f39e824]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f39e826]: Author
+                    - table [ref=f39e830]:
+                      - rowgroup [ref=f39e831]:
+                        - row [ref=f39e832]:
+                          - cell [ref=f39e833]:
+                            - paragraph [ref=f39e834]:
+                              - link "@clawsweeper" [ref=f39e835] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f39e837]:
+                  - link [ref=f39e839] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e840]
+                  - generic [ref=f39e842]:
+                    - generic [ref=f39e843]:
+                      - heading "clawsweeper Bot commented Aug 11, 20262 days ago •" [level=3] [ref=f39e844]:
+                        - generic [ref=f39e845]:
+                          - strong [ref=f39e846]:
+                            - link "clawsweeper" [ref=f39e847] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f39e848]: Bot
+                          - text: commented
+                          - link "Aug 11, 20262 days ago" [ref=f39e849] [cursor=pointer]:
+                            - /url: "#issuecomment-5256202696"
+                          - generic [ref=f39e850]:
+                            - generic [ref=f39e851]: •
+                            - group [ref=f39e852]:
+                              - button "edited" [ref=f39e853] [cursor=pointer]
+                      - generic [ref=f39e857]:
+                        - group [ref=f39e859]:
+                          - button [ref=f39e860] [cursor=pointer]:
+                            - img "Show options" [ref=f39e863]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f39e866]: Contributor
+                    - table [ref=f39e870]:
+                      - rowgroup [ref=f39e871]:
+                        - row [ref=f39e872]:
+                          - cell [ref=f39e873]:
+                            - paragraph [ref=f39e874]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f39e875]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f39e876]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f39e877]: repository_dispatch
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f39e878]: "Re-review progress:"
+                            - list [ref=f39e879]:
+                              - listitem [ref=f39e880]: "State: Complete"
+                              - listitem [ref=f39e881]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f39e882]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31515474652" [ref=f39e883] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31515474652
+                              - listitem [ref=f39e884]: "Updated: 2026-08-11T17:02:05.446Z"
+                - generic [ref=f39e890]:
+                  - link [ref=f39e891] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f39e892]
+                  - link "clawsweeper" [ref=f39e893] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f39e894]: Bot
+                  - text: added
+                  - 'link "rating: 🐚 platinum hermit" [ref=f39e895] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                  - text: and removed
+                  - 'link "rating: 🦞 diamond lobster" [ref=f39e896] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                  - text: labels
+                  - link "Aug 11, 20262 days ago" [ref=f39e897] [cursor=pointer]:
+                    - /url: "#event-29293266396"
+                - generic [ref=f39e903]:
+                  - link [ref=f39e904] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f39e905]
+                  - link "vincentkoc" [ref=f39e906] [cursor=pointer]:
+                    - /url: /vincentkoc
+                  - text: self-assigned this
+                  - link "Aug 13, 20261 hour ago" [ref=f39e907] [cursor=pointer]:
+                    - /url: "#event-29379436427"
+                - generic [ref=f39e918]:
+                  - generic [ref=f39e920]:
+                    - link [ref=f39e921] [cursor=pointer]:
+                      - /url: /Leon-SK668
+                      - img "@Leon-SK668" [ref=f39e922]
+                    - link [ref=f39e923] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f39e924]
+                  - generic [ref=f39e925]:
+                    - code [ref=f39e926]:
+                      - 'link "fix(replies): keep approval-unavailable notices durable" [ref=f39e927] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/121179/commits/c68595480345d68519a4834553ec52c84a727ea0
+                    - button "Commit message body" [ref=f39e929] [cursor=pointer]: …
+                  - button "Verified" [ref=f39e931] [cursor=pointer]
+                  - group [ref=f39e936]:
+                    - img "78 / 119 checks OK" [ref=f39e938] [cursor=pointer]
+                  - code [ref=f39e941]:
+                    - link "c685954" [ref=f39e942] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/121179/commits/c68595480345d68519a4834553ec52c84a727ea0
+                - generic [ref=f39e943]:
+                  - generic [ref=f39e949]:
+                    - link [ref=f39e951] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f39e952]
+                    - generic [ref=f39e953]:
+                      - link "vincentkoc" [ref=f39e954] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f39e955] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/d5bdf0938ea2a740313772601ad937a802abcb7f..c68595480345d68519a4834553ec52c84a727ea0
+                      - text: the
+                      - generic [ref=f39e956]: fix/approval-unavailable-durable-20260810
+                      - text: branch from
+                      - link [ref=f39e958] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/d5bdf0938ea2a740313772601ad937a802abcb7f
+                        - code [ref=f39e959]: d5bdf09
+                      - text: to
+                      - link [ref=f39e960] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/c68595480345d68519a4834553ec52c84a727ea0
+                        - code [ref=f39e961]: c685954
+                      - link "Compare" [ref=f39e962] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/d5bdf0938ea2a740313772601ad937a802abcb7f..c68595480345d68519a4834553ec52c84a727ea0
+                      - link "August 13, 2026 04:591 hour ago" [ref=f39e965] [cursor=pointer]:
+                        - /url: "#event-29380495711"
+                  - generic [ref=f39e970]:
+                    - button "View details" [ref=f39e971] [cursor=pointer]
+                    - generic [ref=f39e972]:
+                      - link [ref=f39e974] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f39e975]
+                      - generic [ref=f39e976]:
+                        - link "vincentkoc" [ref=f39e977] [cursor=pointer]:
+                          - /url: /vincentkoc
+                        - text: merged commit
+                        - link [ref=f39e978] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/7d6dfa1939b46cf093389355dbe67254e7bf0756
+                          - code [ref=f39e979]: 7d6dfa1
+                        - text: into
+                        - generic [ref=f39e980]: openclaw:main
+                        - link "Aug 13, 202635 minutes ago" [ref=f39e982] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/121179#event-29381189526
+                        - generic [ref=f39e983]: 131 checks passed
+                - generic [ref=f39e986]:
+                  - link [ref=f39e988] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f39e989]
+                  - generic [ref=f39e991]:
+                    - generic [ref=f39e992]:
+                      - heading [level=3] [ref=f39e993]:
+                        - generic [ref=f39e994]:
+                          - strong [ref=f39e995]:
+                            - link "vincentkoc" [ref=f39e996] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202635 minutes ago" [ref=f39e997] [cursor=pointer]:
+                            - /url: "#issuecomment-5276315898"
+                      - generic [ref=f39e998]:
+                        - group [ref=f39e1000]:
+                          - button [ref=f39e1001] [cursor=pointer]:
+                            - img "Show options" [ref=f39e1004]
+                        - generic "This user is a member of the openclaw organization." [ref=f39e1007]: Member
+                    - table [ref=f39e1011]:
+                      - rowgroup [ref=f39e1012]:
+                        - row [ref=f39e1013]:
+                          - cell [ref=f39e1014]:
+                            - paragraph [ref=f39e1015]: Merged via squash.
+                            - list [ref=f39e1016]:
+                              - listitem [ref=f39e1017]:
+                                - text: "Prepared head SHA:"
+                                - link "c68595480345d68519a4834553ec52c84a727ea0" [ref=f39e1018] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/121179/commits/c68595480345d68519a4834553ec52c84a727ea0
+                              - listitem [ref=f39e1019]:
+                                - text: "Landed commit:"
+                                - link "7d6dfa1939b46cf093389355dbe67254e7bf0756" [ref=f39e1020] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/7d6dfa1939b46cf093389355dbe67254e7bf0756
+                - generic [ref=f39e1026]:
+                  - link "fuller-stack-dev" [ref=f39e1027] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                  - text: pushed a commit to fuller-stack-dev/openclaw that referenced this pull request
+                  - link "Aug 13, 202621 minutes ago" [ref=f39e1028] [cursor=pointer]:
+                    - /url: "#ref-commit-ab7ce36"
+                  - generic [ref=f39e1032]:
+                    - generic [ref=f39e1034]:
+                      - link [ref=f39e1035] [cursor=pointer]:
+                        - /url: /Leon-SK668
+                        - img "@Leon-SK668" [ref=f39e1036]
+                      - link [ref=f39e1037] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f39e1038]
+                    - generic [ref=f39e1039]:
+                      - code [ref=f39e1040]:
+                        - 'link "fix(replies): keep approval-unavailable notices durable (" [ref=f39e1041] [cursor=pointer]':
+                          - /url: /fuller-stack-dev/openclaw/commit/ab7ce36a888f02ed37c79b3110cc7efaa42b9352
+                        - link "openclaw#121179" [ref=f39e1042] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/121179
+                      - button "Commit message body" [ref=f39e1044] [cursor=pointer]: …
+                    - button "Verified" [ref=f39e1046] [cursor=pointer]
+                    - code [ref=f39e1051]:
+                      - link "ab7ce36" [ref=f39e1052] [cursor=pointer]:
+                        - /url: /fuller-stack-dev/openclaw/commit/ab7ce36a888f02ed37c79b3110cc7efaa42b9352
+            - generic [ref=f39e1056]:
+              - link "Sign up for free" [ref=f39e1057] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f39e1058]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f39e1059] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F121179
+        - generic [ref=f39e1063]:
+          - form "Select reviewers" [ref=f39e1065]:
+            - heading "Reviewers" [level=3] [ref=f39e1066]
+            - text: No reviews
+          - form "Select assignees" [ref=f39e1068]:
+            - heading "Assignees" [level=3] [ref=f39e1069]
+            - paragraph [ref=f39e1071]:
+              - generic [ref=f39e1072]:
+                - link [ref=f39e1073] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f39e1074]
+                - link "vincentkoc" [ref=f39e1075] [cursor=pointer]:
+                  - /url: /vincentkoc
+          - generic [ref=f39e1076]:
+            - heading "Labels" [level=3] [ref=f39e1077]
+            - generic [ref=f39e1078]:
+              - 'link "merge-risk: 🚨 message-delivery" [ref=f39e1079] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+              - link "P1" [ref=f39e1081] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "proof: sufficient" [ref=f39e1083] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "rating: 🐚 platinum hermit" [ref=f39e1085] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: S" [ref=f39e1087] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f39e1089] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f39e1092]:
+            - heading "Projects" [level=3] [ref=f39e1093]
+            - text: None yet
+          - form "Select milestones" [ref=f39e1095]:
+            - heading "Milestone" [level=3] [ref=f39e1096]
+            - text: No milestone
+          - form "Link issues" [ref=f39e1102]:
+            - heading "Development" [level=3] [ref=f39e1103]
+            - paragraph [ref=f39e1104]: Successfully merging this pull request may close these issues.
+            - link [ref=f39e1106] [cursor=pointer]:
+              - /url: https://github.com/openclaw/openclaw/issues/121127
+              - img "Closed issue" [ref=f39e1107]
+              - text: "[Bug]: Exec approval-unavailable notices can take transient delivery path"
+          - generic [ref=f39e1111]:
+            - heading "2 participants" [level=3] [ref=f39e1112]
+            - generic [ref=f39e1113]:
+              - link [ref=f39e1114] [cursor=pointer]:
+                - /url: /Leon-SK668
+                - img "@Leon-SK668" [ref=f39e1115]
+              - link [ref=f39e1116] [cursor=pointer]:
+                - /url: /vincentkoc
+                - img "@vincentkoc" [ref=f39e1117]
+  - contentinfo [ref=f39e1118]:
+    - heading "Footer" [level=2] [ref=f39e1119]
+    - generic [ref=f39e1120]:
+      - generic [ref=f39e1121]:
+        - link "GitHub Homepage" [ref=f39e1122] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f39e1125]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f39e1126]:
+        - heading "Footer navigation" [level=3] [ref=f39e1127]
+        - list "Footer navigation" [ref=f39e1128]:
+          - listitem [ref=f39e1129]:
+            - link "Terms" [ref=f39e1130] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f39e1131]:
+            - link "Privacy" [ref=f39e1132] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f39e1133]:
+            - link "Security" [ref=f39e1134] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f39e1135]:
+            - link "Status" [ref=f39e1136] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f39e1137]:
+            - link "Community" [ref=f39e1138] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f39e1139]:
+            - link "Docs" [ref=f39e1140] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f39e1141]:
+            - link "Contact" [ref=f39e1142] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f39e1143]:
+            - button "Manage cookies" [ref=f39e1145] [cursor=pointer]
+          - listitem [ref=f39e1146]:
+            - button "Do not share my personal information" [ref=f39e1148] [cursor=pointer]

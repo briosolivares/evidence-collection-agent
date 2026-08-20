@@ -1,0 +1,103 @@
+founder_name,linkedin_url,cold_outreach_email
+"Dave Grannan","https://linkedin.com/in/grannan","Subject: Quick 15 min re: Marr Labs' voice AI approach
+
+Hi Dave,
+
+I've been following Marr Labs and was struck by your goal of building AI voice agents that are truly indistinguishable from humans -- it's a much harder bar than most conversational AI teams are aiming for, and I'd love to understand how you're approaching latency, prosody, and turn-taking to get there.
+
+Would you have 15 minutes this week or next for a quick call? I'd like to learn more about what you're building at Marr Labs and share a few thoughts on where I might be able to help.
+
+Happy to work around your schedule -- let me know what works.
+
+Best,
+Alex"
+"Han Shu","https://linkedin.com/in/hanshu","Subject: Quick 15 min re: Marr Labs' voice AI stack
+
+Hi Han,
+
+I came across Marr Labs and was impressed by the ambition of making AI voice agents indistinguishable from humans. As the technical co-founder, I imagine you're deep in the weeds of speech synthesis, real-time inference, and conversational latency -- an area I find genuinely fascinating.
+
+Could I grab 15 minutes of your time this week or next? I'd love to hear more about the architecture behind Marr Labs and see if there's a way I can be useful to what you're building.
+
+Whatever time works best for you is fine by me.
+
+Best,
+Alex"
+"Alex Liao","https://linkedin.com/in/alexliaoo","Subject: Quick 15 min re: Dragoneye's custom vision models
+
+Hi Alex,
+
+I came across Dragoneye and was really impressed that you've made it possible to train custom video detection models in under 5 minutes -- that's a huge unlock for teams that would otherwise need weeks of ML engineering time to ship computer vision features.
+
+Given your background at Jane Street and Facebook, I'd love to hear more about how you're approaching the data and infra challenges behind such fast custom model training. Would you be open to a quick 15-minute call this week or next?
+
+Happy to work around your schedule.
+
+Best,
+Alex"
+"Lukas Martinelli","https://linkedin.com/in/lukas-martinelli","Subject: Quick 15 min re: Reprompt's location AI agents
+
+Hi Lukas,
+
+I've been following Reprompt and think building AI agents specifically for location data is a smart, underserved niche -- especially given your background running Search at Mapbox. I'd love to learn more about how you're thinking about grounding LLMs in geospatial context and what's proven hardest to solve so far.
+
+Would you be open to a 15-minute call in the next week or two? I'd enjoy hearing more about Reprompt's roadmap and seeing if there's a way I could be helpful.
+
+Let me know what time works for you.
+
+Best,
+Alex"
+"Rob Balian","https://linkedin.com/in/robbalian","Subject: Quick 15 min re: Reprompt's growth and product
+
+Hi Rob,
+
+I came across Reprompt and was intrigued by the idea of AI agents built specifically for location use cases. Given your growth background at Robinhood and product experience at Facebook, I imagine you're thinking hard about how to get this into the hands of the right early customers.
+
+Would you have 15 minutes for a call this week or next? I'd love to hear more about what you're building and share a few thoughts on where I might be able to add value.
+
+Happy to work around your calendar.
+
+Best,
+Alex"
+"Yvonne Chou","https://linkedin.com/in/yvonne-chou","Subject: Quick 15 min re: kater.ai and Butler
+
+Hi Yvonne,
+
+I came across kater.ai and loved the framing -- turning a single business question into a full, contextualized data analysis instead of a 4-day wait on the data team. Having built the data stack at Crexi yourself, I'd imagine you have a very clear picture of exactly where that workflow breaks down for most companies.
+
+Would you be open to a quick 15-minute call this week or next? I'd love to hear more about how Butler works under the hood and see if there's a way I could be useful to kater.ai.
+
+Let me know a time that works for you.
+
+Best,
+Alex"
+"Robin Seitz","https://linkedin.com/in/robin-seitz-12029970","Subject: Quick 15 min re: kater.ai's data agent architecture
+
+Hi Robin,
+
+I've been looking at kater.ai and think the idea of an AI agent that auto-generates a data map and lets anyone ask business questions in plain English is a great answer to the analyst bottleneck most companies face. Given your engineering background at Microsoft, I'd love to hear how you're approaching the RAG and GenAI pieces that let Butler keep learning.
+
+Would you have 15 minutes for a call in the next week or two? I'd enjoy learning more about what you're building and sharing a few thoughts on where I might help.
+
+Best,
+Alex"
+"Kay Li","https://linkedin.com/in/kay-li-84924128b","Subject: Quick 15 min re: Silogy's chip verification platform
+
+Hi Kay,
+
+I came across Silogy and found your pitch compelling -- chip teams spend 70% of their time on testing, and the state of the art is still often walking over to a coworker's desk to point at a waveform file. Coming from a background in HFT before diving into chips, I imagine you have a sharp sense for where the biggest inefficiencies are.
+
+Would you be open to a 15-minute call this week or next? I'd love to learn more about how Silogy's test orchestration and collaboration features are coming together, and see if there's a way I could be helpful.
+
+Best,
+Alex"
+"Paul Kim","https://linkedin.com/in/paul-kim-7b766262","Subject: Quick 15 min re: Silogy's verification tooling
+
+Hi Paul,
+
+I've been following Silogy and think building a unified platform for chip test running, results tracking, and collaborative debugging addresses a real pain point in digital verification. Given your engineering background at Cloudflare, I'd love to hear how you're thinking about scaling test infrastructure in the cloud for verification teams.
+
+Would you have 15 minutes for a call this week or next? I'd enjoy learning more about what you're building at Silogy and sharing a few thoughts on where I might be able to help.
+
+Best,
+Alex"

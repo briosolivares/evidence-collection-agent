@@ -1,0 +1,46 @@
+{
+  "task": "Give me a CSV of all of Elon Musk's tweets posted today, with exactly these columns: text, likes, time_posted.",
+  "startedAt": "2026-08-13T05:47:38.268Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/profile_screenshot_1.png",
+      "sha256": "6f6eeb530753a21beed3184786564c7aedd8195fec56f7f4fb5917df1e3b0268",
+      "sourceUrl": "https://x.com/elonmusk",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:48:03.123Z"
+    },
+    {
+      "filename": "scratch/tweet_data.md",
+      "sha256": "7b31a4fafc1787ec9a0694ef27bff669411481e2a8e35ae879b80420fce92ccb",
+      "capturedAt": "2026-08-13T05:49:54.195Z"
+    },
+    {
+      "filename": "artifacts/elonmusk_profile_evidence.png",
+      "sha256": "cfa140d24548069736930b614a30417b601c3dc13b67f178022a47b0b9fc2050",
+      "sourceUrl": "https://x.com/elonmusk",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:49:59.470Z"
+    },
+    {
+      "filename": "artifacts/elonmusk_tweets_today.csv",
+      "sha256": "3882d49fc48932c08087723e1bee09094ba34d60cd3f6d2c8bb8e0fe89627559",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:50:07.391Z"
+    },
+    {
+      "filename": "artifacts/notes.md",
+      "sha256": "79cfd455be36d54a6d2a3c283924a7a592a50e89a24e86d0412cda72c9185eef",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:50:18.508Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T05:50:24.715Z"
+}

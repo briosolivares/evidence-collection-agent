@@ -1,0 +1,37 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T05:59:32.745Z",
+  "artifacts": [
+    {
+      "filename": "scratch/company_data.md",
+      "sha256": "56718bfdb426fecbaf6c8da7747eafe69ad462bd1d51f7302dcfcd263e5093d9",
+      "capturedAt": "2026-08-13T06:00:42.807Z"
+    },
+    {
+      "filename": "artifacts/silogy_yc_page.png",
+      "sha256": "7bbdcc493073d336720a139498b91b5e4c5af5613479d908396dba9a9739ffb5",
+      "sourceUrl": "https://www.ycombinator.com/companies/silogy",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:00:45.508Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "908a0f2e31d762f033eaadc51bfd1a9e430b5d22a81bae8b1dc7a481b84c4671",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:01:13.681Z"
+    },
+    {
+      "filename": "artifacts/selection_summary.md",
+      "sha256": "f5af33a27463d8f3ba5cd987795973262a8c39423beb76679fd3d1dfc67f86c9",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:01:25.350Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:01:30.650Z"
+}

@@ -1,0 +1,876 @@
+URL: https://github.com/openclaw/openclaw/pull/122477
+Title: feat(gateway): add /startupz startup probe and fix deployment template admission by steipete · Pull Request #122477 · openclaw/openclaw · GitHub
+
+- generic [ref=f13e2]:
+  - generic [ref=f13e3]:
+    - link "Skip to content" [ref=f13e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f13e8]:
+      - heading "Navigation Menu" [level=2] [ref=f13e9]
+      - generic [ref=f13e10]:
+        - link "Homepage" [ref=f13e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f13e15]:
+          - navigation "Global" [ref=f13e16]:
+            - list [ref=f13e17]:
+              - listitem [ref=f13e18]:
+                - button "Platform" [ref=f13e20] [cursor=pointer]
+              - listitem [ref=f13e23]:
+                - button "Solutions" [ref=f13e25] [cursor=pointer]
+              - listitem [ref=f13e28]:
+                - button "Resources" [ref=f13e30] [cursor=pointer]
+              - listitem [ref=f13e33]:
+                - button "Open Source" [ref=f13e35] [cursor=pointer]
+              - listitem [ref=f13e38]:
+                - button "Enterprise" [ref=f13e40] [cursor=pointer]
+              - listitem [ref=f13e43]:
+                - link "Pricing" [ref=f13e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f13e45]:
+            - button "Search or jump to, type / to search" [ref=f13e47] [cursor=pointer]:
+              - generic [ref=f13e50]:
+                - text: Type
+                - generic [ref=f13e51]: /
+                - text: to search
+            - link "Sign in" [ref=f13e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122477
+            - link "Sign up" [ref=f13e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f13e55] [cursor=pointer]
+  - main [ref=f13e61]:
+    - generic [ref=f13e62]:
+      - generic [ref=f13e63]:
+        - generic [ref=f13e65]:
+          - link "openclaw" [ref=f13e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f13e70]: /
+          - strong [ref=f13e71]:
+            - link "openclaw" [ref=f13e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f13e73]: Public
+        - generic [ref=f13e74]:
+          - list:
+            - listitem [ref=f13e75]:
+              - link "Sponsor @openclaw" [ref=f13e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f13e77]: Sponsor
+            - listitem [ref=f13e81]:
+              - link "You must be signed in to change notification settings" [ref=f13e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f13e85]:
+              - link "Fork 81.1k" [ref=f13e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,127" [ref=f13e89]: 81.1k
+            - listitem [ref=f13e90]:
+              - link "You must be signed in to star a repository" [ref=f13e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386011 users starred this repository" [ref=f13e95]: 386k
+      - navigation "Repository" [ref=f13e96]:
+        - list [ref=f13e97]:
+          - listitem [ref=f13e98]:
+            - link "Code" [ref=f13e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f13e103]:
+            - link "Issues 3.5k" [ref=f13e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f13e108]: Issues
+              - generic "3,482" [ref=f13e109]: 3.5k
+          - listitem [ref=f13e110]:
+            - link "Pull requests 2.1k" [ref=f13e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f13e114]: Pull requests
+              - generic "2,139" [ref=f13e115]: 2.1k
+          - listitem [ref=f13e116]:
+            - link "Actions" [ref=f13e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f13e121]:
+            - link "Projects" [ref=f13e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f13e126]:
+            - link "Security and quality 647" [ref=f13e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f13e130]: Security and quality
+              - generic "647" [ref=f13e131]
+          - listitem [ref=f13e132]:
+            - link "Insights" [ref=f13e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f13e143]:
+      - generic [ref=f13e147]:
+        - generic [ref=f13e149]:
+          - 'heading "feat(gateway): add /startupz startup probe and fix deployment template admission - #122477" [level=1] [ref=f13e150]':
+            - text: "feat(gateway): add /startupz startup probe and fix deployment template admission"
+            - generic [ref=f13e151]: "- #122477"
+          - generic [ref=f13e152]: "#122477"
+        - generic [ref=f13e155]:
+          - generic [ref=f13e157]:
+            - img "Pull request" [ref=f13e158]
+            - text: Merged
+          - generic [ref=f13e161]:
+            - link "steipete" [ref=f13e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 3 commits into
+            - generic [ref=f13e163]:
+              - link "main" [ref=f13e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f13e165]: from
+              - generic [ref=f13e166]:
+                - link "steipete/gateway-startup-probe" [ref=f13e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/gateway-startup-probe
+                - button "Copy head branch name to clipboard" [ref=f13e168] [cursor=pointer]
+            - generic "Aug 11, 2026, 11:36 PM PDT" [ref=f13e172]: Aug 12, 202618 minutes ago
+        - generic [ref=f13e173]:
+          - generic [ref=f13e175]:
+            - generic [ref=f13e176]: "+401"
+            - generic [ref=f13e177]: "-64"
+            - generic [ref=f13e178]: "Lines changed: 401 additions & 64 deletions"
+          - navigation "Pull request navigation tabs" [ref=f13e186]:
+            - generic [ref=f13e187]:
+              - link "Conversation (5)" [ref=f13e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122477
+                - text: Conversation
+                - generic [ref=f13e191]: "5"
+                - generic [ref=f13e192]: (5)
+              - link "Commits (3)" [ref=f13e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122477/commits
+                - text: Commits
+                - generic [ref=f13e196]: "3"
+                - generic [ref=f13e197]: (3)
+              - link "Checks (120)" [ref=f13e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122477/checks
+                - text: Checks
+                - generic [ref=f13e201]: "120"
+                - generic [ref=f13e202]: (120)
+              - link "Files changed (16)" [ref=f13e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122477/files
+                - text: Files changed
+                - generic [ref=f13e206]: "16"
+                - generic [ref=f13e207]: (16)
+      - generic [ref=f13e212]:
+        - generic [ref=f13e214]:
+          - heading "Conversation" [level=2] [ref=f13e215]
+          - generic [ref=f13e216]:
+            - generic [ref=f13e217]:
+              - generic [ref=f13e219]:
+                - link [ref=f13e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f13e221]
+                - generic [ref=f13e223]:
+                  - generic [ref=f13e224]:
+                    - heading [level=3] [ref=f13e225]:
+                      - generic [ref=f13e226]:
+                        - strong [ref=f13e227]:
+                          - link "steipete" [ref=f13e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 202649 minutes ago" [ref=f13e229] [cursor=pointer]:
+                          - /url: "#issue-5127758338"
+                    - generic [ref=f13e230]:
+                      - group [ref=f13e232]:
+                        - button [ref=f13e233] [cursor=pointer]:
+                          - img "Show options" [ref=f13e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f13e239]: Contributor
+                  - generic [ref=f13e244]:
+                    - heading "What Problem This Solves" [level=2] [ref=f13e245]
+                    - paragraph [ref=f13e246]:
+                      - text: Orchestrators (Kubernetes, Fly, Render, container platforms) have no probe that answers "has the Gateway finished starting?" without also folding in downstream channel health.
+                      - code [ref=f13e247]: /readyz
+                      - text: flips to 503 when any channel account hard-fails (
+                      - code [ref=f13e248]: blocked
+                      - text: ","
+                      - code [ref=f13e249]: terminal-disconnect
+                      - text: ", post-grace"
+                      - code [ref=f13e250]: not-running
+                      - text: —
+                      - code [ref=f13e251]: src/gateway/server/readiness.ts
+                      - text: ), so one broken Telegram account takes an otherwise healthy Gateway and Control UI out of traffic rotation or blocks a rollout. There is also no HTTP surface exposing the running version, which makes "which build is this deployment actually running?" needlessly hard to answer for cloud operators.
+                    - paragraph [ref=f13e252]: "The bundled deployment templates compound this:"
+                    - list [ref=f13e253]:
+                      - listitem [ref=f13e254]:
+                        - code [ref=f13e255]: fly.toml
+                        - text: declared no health checks at all.
+                      - listitem [ref=f13e256]:
+                        - code [ref=f13e257]: render.yaml
+                        - text: used
+                        - code [ref=f13e258]: /health
+                        - text: (pure liveness) as Render's traffic-admission signal.
+                      - listitem [ref=f13e259]:
+                        - text: The Kubernetes manifest combined the mutable
+                        - code [ref=f13e260]: :slim
+                        - text: tag with
+                        - code [ref=f13e261]: "imagePullPolicy: IfNotPresent"
+                        - text: (upgrades silently never happen) and an init container that unconditionally overwrote the persisted
+                        - code [ref=f13e262]: openclaw.json
+                        - text: and workspace
+                        - code [ref=f13e263]: AGENTS.md
+                        - text: on every pod start, erasing product-made edits.
+                      - listitem [ref=f13e264]:
+                        - code [ref=f13e265]: docs/install/fly.md
+                        - text: still claimed the image
+                        - code [ref=f13e266]: HEALTHCHECK
+                        - text: is pinned to port 18789; stale since
+                        - code [ref=f13e267]: bc4221a07e9
+                        - text: (
+                        - 'link "fix(docker): keep custom-port containers healthy #116639" [ref=f13e271] [cursor=pointer]':
+                          - /url: https://github.com/openclaw/openclaw/pull/116639
+                        - text: ) made
+                        - code [ref=f13e272]: docker-healthcheck
+                        - text: resolve the active Gateway lock port.
+                    - heading "Why This Change Was Made" [level=2] [ref=f13e273]
+                    - paragraph [ref=f13e274]:
+                      - text: "First step of the cloud-container deployment track: give every host one correct, additive probe contract before building anything platform-specific."
+                      - code [ref=f13e275]: /readyz
+                      - text: semantics are a shipped public contract (existing manifests probe it), so this adds a probe rather than changing one.
+                    - list [ref=f13e276]:
+                      - listitem [ref=f13e277]:
+                        - text: New
+                        - code [ref=f13e278]: /startup
+                        - text: +
+                        - code [ref=f13e279]: /startupz
+                        - text: "routes:"
+                        - code [ref=f13e280]: "200 {\"ok\":true,\"status\":\"started\"}"
+                        - text: once startup work is complete and the Gateway is not draining;
+                        - code [ref=f13e281]: "503"
+                        - text: with
+                        - code [ref=f13e282]: status:"starting"
+                        - text: (plus
+                        - code [ref=f13e283]: pendingReason
+                        - text: for privileged callers) during startup;
+                        - code [ref=f13e284]: "503"
+                        - text: with
+                        - code [ref=f13e285]: status:"draining"
+                        - text: during drain. Channel health is never consulted.
+                      - listitem [ref=f13e286]:
+                        - text: The startup policy is one factory (
+                        - code [ref=f13e287]: createStartupChecker
+                        - text: ); the readiness checker now composes it instead of duplicating the startup/draining branches.
+                      - listitem [ref=f13e288]:
+                        - text: Version (
+                        - code [ref=f13e289]: resolveRuntimeServiceVersion
+                        - text: ) and
+                        - code [ref=f13e290]: uptimeMs
+                        - text: are included only for local-direct or authenticated callers, reusing the exact detail-gating already applied to
+                        - code [ref=f13e291]: /readyz
+                        - text: subsystem names (now a shared helper). Remote unauthenticated probes get
+                        - code [ref=f13e292]: "{ok,status}"
+                        - text: only — no build fingerprinting surface.
+                      - listitem [ref=f13e293]:
+                        - text: Templates now use
+                        - code [ref=f13e294]: /startupz
+                        - text: for startup/traffic admission, keep
+                        - code [ref=f13e295]: /healthz
+                        - text: for liveness, and leave
+                        - code [ref=f13e296]: /readyz
+                        - text: for channel-aware monitoring. K8s image pinned to the immutable
+                        - code [ref=f13e297]: 2026.7.1-2-slim
+                        - text: tag; init container seeds config only when missing.
+                    - heading "User Impact" [level=2] [ref=f13e298]
+                    - list [ref=f13e299]:
+                      - listitem [ref=f13e300]: A failed channel account no longer evicts a healthy Gateway/Control UI from Service endpoints or fails platform health checks on the bundled templates.
+                      - listitem [ref=f13e301]: Operators and supervisors can read the running Gateway version over HTTP with their existing token (or locally) — no WebSocket handshake needed.
+                      - listitem [ref=f13e302]: Kubernetes deployments stop silently ignoring upgrades and stop losing config edits on pod restart.
+                      - listitem [ref=f13e303]:
+                        - text: No behavior change to
+                        - code [ref=f13e304]: /healthz
+                        - text: ","
+                        - code [ref=f13e305]: /readyz
+                        - text: ", or any existing response shape. No new config or env surface."
+                    - heading "Evidence" [level=2] [ref=f13e306]
+                    - list [ref=f13e307]:
+                      - listitem [ref=f13e308]:
+                        - text: "Regression proof: the new assertions fail on pre-change code ("
+                        - code [ref=f13e309]: node scripts/run-vitest.mjs src/gateway/server-http.probe.test.ts src/gateway/server.plugin-http-auth.test.ts
+                        - text: → 6 failed pre-fix, all for the missing routes/factory).
+                      - listitem [ref=f13e310]:
+                        - text: "Post-fix:"
+                        - code [ref=f13e311]: node scripts/run-vitest.mjs src/gateway/server-http.probe.test.ts src/gateway/server.plugin-http-auth.test.ts src/gateway/server/readiness.test.ts
+                        - text: green (output in PR checks / see below).
+                      - listitem [ref=f13e312]:
+                        - text: "New coverage: startup lifecycle transitions (starting → started → draining), hard channel failure flips"
+                        - code [ref=f13e313]: /readyz
+                        - text: but not
+                        - code [ref=f13e314]: /startupz
+                        - text: ", detail gating (remote unauthenticated gets minimal body; authenticated gets version/uptime/pendingReason), GET/HEAD parity with Content-Length, 404 on suffixed probe paths."
+                      - listitem [ref=f13e315]:
+                        - text: K8s image tag verified against Docker Hub's exact-tag API (active amd64/arm64 manifest) and the
+                        - code [ref=f13e316]: <release-tag>-slim
+                        - text: publication rule in
+                        - code [ref=f13e317]: .github/workflows/docker-release.yml
+                        - text: .
+                      - listitem [ref=f13e318]:
+                        - text: "Docs updated:"
+                        - code [ref=f13e319]: docs/gateway/health.md
+                        - text: (probe table + semantics),
+                        - code [ref=f13e320]: "docs/install/{docker,fly,kubernetes,render}"
+                        - text: including the corrected Fly healthcheck-port explanation.
+                  - 'button "eyes (1): steipete, 06:05AM today" [disabled] [ref=f13e325]':
+                    - generic [ref=f13e326]: 👀
+                    - generic [ref=f13e327]: "1"
+              - generic [ref=f13e328]:
+                - generic [ref=f13e330]:
+                  - generic [ref=f13e335]:
+                    - link "steipete" [ref=f13e336] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: added 2 commits
+                    - link "August 11, 2026 23:0450 minutes ago" [ref=f13e337] [cursor=pointer]:
+                      - /url: "#commits-pushed-246ded3"
+                  - generic [ref=f13e338]:
+                    - generic [ref=f13e346]:
+                      - link [ref=f13e349] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f13e350]
+                      - generic [ref=f13e351]:
+                        - code [ref=f13e352]:
+                          - 'link "feat(gateway): add /startupz startup probe with auth-gated version de…" [ref=f13e353] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122477/commits/246ded3831036ba69a3907c69f1fceffeb9dc626
+                        - button "Commit message body" [ref=f13e355] [cursor=pointer]: …
+                      - button "Unverified" [ref=f13e357] [cursor=pointer]
+                      - group [ref=f13e362]:
+                        - img "0 / 1 checks OK" [ref=f13e364] [cursor=pointer]
+                      - code [ref=f13e367]:
+                        - link "246ded3" [ref=f13e368] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122477/commits/246ded3831036ba69a3907c69f1fceffeb9dc626
+                    - generic [ref=f13e376]:
+                      - link [ref=f13e379] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f13e380]
+                      - generic [ref=f13e381]:
+                        - code [ref=f13e382]:
+                          - 'link "fix(deploy): use /startupz for traffic admission in bundled templates" [ref=f13e383] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122477/commits/b00480ad5c950a8bf8ef603fdb9b31f6b221fc5e
+                        - button "Commit message body" [ref=f13e385] [cursor=pointer]: …
+                      - button "Unverified" [ref=f13e387] [cursor=pointer]
+                      - group [ref=f13e392]:
+                        - img "78 / 120 checks OK" [ref=f13e394] [cursor=pointer]
+                      - code [ref=f13e397]:
+                        - link "b00480a" [ref=f13e398] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122477/commits/b00480ad5c950a8bf8ef603fdb9b31f6b221fc5e
+                - generic [ref=f13e400]:
+                  - link [ref=f13e402] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e403]
+                  - generic [ref=f13e405]:
+                    - generic [ref=f13e406]:
+                      - heading "clawsweeper Bot commented Aug 12, 202649 minutes ago" [level=3] [ref=f13e407]:
+                        - generic [ref=f13e408]:
+                          - strong [ref=f13e409]:
+                            - link "clawsweeper" [ref=f13e410] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e411]: Bot
+                          - text: commented
+                          - link "Aug 12, 202649 minutes ago" [ref=f13e412] [cursor=pointer]:
+                            - /url: "#issuecomment-5262997950"
+                      - generic [ref=f13e413]:
+                        - group [ref=f13e415]:
+                          - button [ref=f13e416] [cursor=pointer]:
+                            - img "Show options" [ref=f13e419]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e422]: Contributor
+                    - table [ref=f13e426]:
+                      - rowgroup [ref=f13e427]:
+                        - row [ref=f13e428]:
+                          - cell [ref=f13e429]:
+                            - paragraph [ref=f13e430]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f13e431]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f13e432]:
+                  - generic [ref=f13e438]:
+                    - link [ref=f13e440] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f13e441]
+                    - generic [ref=f13e442]:
+                      - link "steipete" [ref=f13e443] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 12, 2026 06:0549 minutes ago" [ref=f13e444] [cursor=pointer]:
+                        - /url: "#event-29321975009"
+                  - generic [ref=f13e450]:
+                    - link [ref=f13e452] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f13e453]
+                    - generic [ref=f13e454]:
+                      - link "steipete" [ref=f13e455] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: requested a review from a team as a
+                      - link "code owner" [ref=f13e456] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/blob/baefefa8152abfbc1bbf903431761b2c07706698/.github/CODEOWNERS#L32
+                      - link "August 12, 2026 06:0549 minutes ago" [ref=f13e457] [cursor=pointer]:
+                        - /url: "#event-29321975467"
+                  - generic [ref=f13e462]:
+                    - link [ref=f13e463] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f13e464]
+                    - link "openclaw-barnacle" [ref=f13e465] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f13e466]: Bot
+                    - text: added
+                    - link "docs" [ref=f13e467] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+                    - link "gateway" [ref=f13e468] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+                    - link "scripts" [ref=f13e469] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+                    - link "docker" [ref=f13e470] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocker
+                    - 'link "size: M" [ref=f13e471] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f13e472] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 202649 minutes ago" [ref=f13e473] [cursor=pointer]:
+                      - /url: "#event-29321977572"
+                  - generic [ref=f13e478]:
+                    - link [ref=f13e479] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f13e480]
+                    - link "clawsweeper" [ref=f13e481] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f13e482]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 compatibility" [ref=f13e483] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                    - link "P1" [ref=f13e484] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "rating: 🦐 gold shrimp" [ref=f13e485] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f13e486] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 12, 202641 minutes ago" [ref=f13e487] [cursor=pointer]:
+                      - /url: "#event-29322255046"
+                - generic [ref=f13e489]:
+                  - link [ref=f13e491] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e492]
+                  - generic [ref=f13e494]:
+                    - generic [ref=f13e495]:
+                      - heading "clawsweeper Bot commented Aug 12, 202641 minutes ago" [level=3] [ref=f13e496]:
+                        - generic [ref=f13e497]:
+                          - strong [ref=f13e498]:
+                            - link "clawsweeper" [ref=f13e499] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e500]: Bot
+                          - text: commented
+                          - link "Aug 12, 202641 minutes ago" [ref=f13e501] [cursor=pointer]:
+                            - /url: "#issuecomment-5263057817"
+                      - generic [ref=f13e502]:
+                        - group [ref=f13e504]:
+                          - button [ref=f13e505] [cursor=pointer]:
+                            - img "Show options" [ref=f13e508]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e511]: Contributor
+                    - table [ref=f13e515]:
+                      - rowgroup [ref=f13e516]:
+                        - row [ref=f13e517]:
+                          - cell [ref=f13e518]:
+                            - paragraph [ref=f13e519]:
+                              - text: "Codex review: found issues before merge."
+                              - emphasis [ref=f13e520]: Reviewed August 12, 2026, 2:12 AM ET / 06:12 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f13e521]
+                            - heading "What this changes" [level=2] [ref=f13e522]
+                            - paragraph [ref=f13e523]: The PR adds a channel-independent Gateway startup probe, uses it for bundled deployment admission checks, and documents the probe semantics.
+                            - heading "Regression provenance" [level=2] [ref=f13e524]
+                            - paragraph [ref=f13e525]: Possible regression — suspected (reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f13e526]
+                            - paragraph [ref=f13e527]:
+                              - generic [ref=f13e528]: ⚠️
+                              - strong [ref=f13e529]: Ready for maintainer review - 5 items remain
+                            - paragraph [ref=f13e530]: "Keep open: the Gateway probe split is coherent, but the Kubernetes template silently changes the established ConfigMap update contract for existing PVC deployments and needs an explicit upgrade decision before merge."
+                            - paragraph [ref=f13e531]:
+                              - strong [ref=f13e532]: "Priority:"
+                              - text: P1
+                              - strong [ref=f13e533]: "Reviewed head:"
+                              - code [ref=f13e534]: b00480ad5c950a8bf8ef603fdb9b31f6b221fc5e
+                              - strong [ref=f13e535]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f13e536] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f13e537]
+                            - table [ref=f13e539]:
+                              - rowgroup [ref=f13e540]:
+                                - row [ref=f13e541]:
+                                  - columnheader "Measure" [ref=f13e542]
+                                  - columnheader "Result" [ref=f13e543]
+                                  - columnheader "What it means" [ref=f13e544]
+                              - rowgroup [ref=f13e545]:
+                                - row [ref=f13e546]:
+                                  - cell [ref=f13e547]:
+                                    - strong [ref=f13e548]: Overall readiness
+                                  - cell [ref=f13e549]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f13e550]: (3/6)
+                                  - cell "The runtime design is well-scoped, but a P1 upgrade-compatibility decision blocks merge readiness." [ref=f13e551]
+                                - row [ref=f13e552]:
+                                  - cell [ref=f13e553]:
+                                    - strong [ref=f13e554]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f13e555]
+                                  - 'cell "Not applicable: This member-authored PR is not subject to the external-contributor proof gate; its claimed focused test evidence remains supplemental to the required upgrade decision." [ref=f13e556]'
+                                - row [ref=f13e557]:
+                                  - cell [ref=f13e558]:
+                                    - strong [ref=f13e559]: Patch quality
+                                  - cell [ref=f13e560]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f13e561]: (3/6)
+                                  - cell "1 actionable review finding remain." [ref=f13e562]
+                            - heading "Verification" [level=2] [ref=f13e563]
+                            - table [ref=f13e565]:
+                              - rowgroup [ref=f13e566]:
+                                - row [ref=f13e567]:
+                                  - columnheader "Check" [ref=f13e568]
+                                  - columnheader "Result" [ref=f13e569]
+                                  - columnheader "Evidence" [ref=f13e570]
+                              - rowgroup [ref=f13e571]:
+                                - row [ref=f13e572]:
+                                  - cell [ref=f13e573]:
+                                    - strong [ref=f13e574]: Real behavior
+                                  - cell "Not applicable" [ref=f13e575]
+                                  - 'cell "Not applicable: This member-authored PR is not subject to the external-contributor proof gate; its claimed focused test evidence remains supplemental to the required upgrade decision." [ref=f13e576]'
+                                - row [ref=f13e577]:
+                                  - cell [ref=f13e578]:
+                                    - strong [ref=f13e579]: Evidence reviewed
+                                  - cell "5 items" [ref=f13e580]
+                                  - 'cell "Changed Kubernetes ownership boundary: The new file-exists guards preserve both persisted files, so an existing PVC can no longer receive later ConfigMap edits during a normal deployment. Current documented update contract: Current main directs Kubernetes operators to edit the ConfigMap-backed openclaw.json and redeploy, which conflicts with silently retaining the old PVC copy. Probe owner boundary: The branch factors startup/draining state into one startup checker and has readiness compose it before channel-health evaluation." [ref=f13e581]': "Changed Kubernetes ownership boundary: The new file-exists guards preserve both persisted files, so an existing PVC can no longer receive later ConfigMap edits during a normal deployment.Current documented update contract: Current main directs Kubernetes operators to edit the ConfigMap-backed openclaw.json and redeploy, which conflicts with silently retaining the old PVC copy.Probe owner boundary: The branch factors startup/draining state into one startup checker and has readiness compose it before channel-health evaluation."
+                                - row [ref=f13e582]:
+                                  - cell [ref=f13e583]:
+                                    - strong [ref=f13e584]: Findings
+                                  - cell "1 actionable finding" [ref=f13e585]
+                                  - cell "[P1] Preserve ConfigMap updates for existing PVC deployments" [ref=f13e586]
+                                - row [ref=f13e587]:
+                                  - cell [ref=f13e588]:
+                                    - strong [ref=f13e589]: Security
+                                  - cell "None" [ref=f13e590]
+                                  - cell "None." [ref=f13e591]
+                            - heading "How this fits together" [level=2] [ref=f13e592]
+                            - paragraph [ref=f13e593]: The Gateway exposes liveness, startup, and channel-aware readiness probes to operators and container platforms. Bundled Kubernetes, Fly, and Render templates consume those endpoints to decide when to restart a process or admit traffic.
+                            - region "mermaid rendered output container" [ref=f13e594]:
+                              - generic [ref=f13e595]:
+                                - generic [ref=f13e596]:
+                                  - group [ref=f13e597]:
+                                    - button "Open dialog" [ref=f13e598] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f13e601] [cursor=pointer]
+                                - iframe [ref=f13e606]:
+                                  - generic [ref=f14e1]:
+                                    - document [ref=f14e5]:
+                                      - generic [ref=f14e11]:
+                                        - paragraph [ref=f14e18]: Gateway startup state
+                                        - paragraph [ref=f14e25]: Startup probe
+                                        - paragraph [ref=f14e32]: Channel account health
+                                        - paragraph [ref=f14e39]: Readiness probe
+                                        - paragraph [ref=f14e46]: Startup endpoint
+                                        - paragraph [ref=f14e53]: Readiness endpoint
+                                        - paragraph [ref=f14e60]: Platform traffic admission
+                                        - paragraph [ref=f14e67]: Operator monitoring
+                                        - paragraph [ref=f14e74]: ConfigMap and PVC
+                                    - generic [ref=f14e75]:
+                                      - button "Zoom in" [ref=f14e76]
+                                      - button "Zoom out" [ref=f14e80]
+                                      - button "Reset view" [ref=f14e84]
+                                      - button "Pan up" [ref=f14e87]
+                                      - button "Pan down" [ref=f14e90]
+                                      - button "Pan left" [ref=f14e93]
+                                      - button "Pan right" [ref=f14e96]
+                            - heading "Decision needed" [level=2] [ref=f13e607]
+                            - table [ref=f13e609]:
+                              - rowgroup [ref=f13e610]:
+                                - row [ref=f13e611]:
+                                  - columnheader "Question" [ref=f13e612]
+                                  - columnheader "Recommendation" [ref=f13e613]
+                              - rowgroup [ref=f13e614]:
+                                - row [ref=f13e615]:
+                                  - cell "Should existing Kubernetes PVC deployments continue to apply ConfigMap edits on redeploy, or should the template intentionally move configuration and workspace instructions to persistent-file ownership?" [ref=f13e616]
+                                  - cell [ref=f13e617]:
+                                    - strong [ref=f13e618]: "Preserve ConfigMap updates:"
+                                    - text: Keep the current redeploy behavior for existing PVCs and add an explicit migration path before introducing persistent ownership.
+                            - paragraph [ref=f13e619]: "Why: The changed init container makes a previously documented deployment update path silently ineffective, and the correct reconciliation policy cannot be inferred from code alone."
+                            - heading "Before merge" [level=2] [ref=f13e620]
+                            - list [ref=f13e621]:
+                              - listitem [ref=f13e622]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e623]
+                                - strong [ref=f13e624]: Preserve ConfigMap updates for existing PVC deployments (P1)
+                                - text: "- Existing installations already have these files because the prior init container copied them on every start. These guards then ignore later ConfigMap changes forever, even though the documented customization flow tells operators to edit the ConfigMap and redeploy. Retain that upgrade path or add an explicit, tested migration and ownership choice before landing."
+                              - listitem [ref=f13e625]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e626]
+                                - strong [ref=f13e627]: Resolve merge risk (P1)
+                                - text: "- Existing Kubernetes users who change the documented ConfigMap and redeploy will silently continue running the older PVC configuration and workspace instructions."
+                              - listitem [ref=f13e628]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e629]
+                                - strong [ref=f13e630]: Resolve merge risk (P1)
+                                - text: "- The platform-specific admission claims target Kubernetes, Fly, and Render, but external platform contracts could not be independently checked in this network-restricted review."
+                              - listitem [ref=f13e631]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e632]
+                                - strong [ref=f13e633]: Complete next step (P2)
+                                - text: "- A maintainer must choose the Kubernetes configuration ownership and upgrade policy before any safe implementation path can be selected."
+                            - heading "Findings" [level=2] [ref=f13e634]
+                            - list [ref=f13e635]:
+                              - listitem [ref=f13e636]:
+                                - text: "[P1] Preserve ConfigMap updates for existing PVC deployments —"
+                                - code [ref=f13e637]: scripts/k8s/manifests/deployment.yaml:32-34
+                            - group [ref=f13e638]:
+                              - strong [ref=f13e640] [cursor=pointer]: Agent review details
+                - generic [ref=f13e651]:
+                  - link [ref=f13e654] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e655]
+                  - generic [ref=f13e656]:
+                    - code [ref=f13e657]:
+                      - 'link "docs(k8s): make persistent-file config ownership explicit with reseed…" [ref=f13e658] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/122477/commits/7376f8e44bae650cdbbf640be26d543c66923245
+                    - button "Commit message body" [ref=f13e660] [cursor=pointer]: …
+                  - button "Unverified" [ref=f13e662] [cursor=pointer]
+                  - group [ref=f13e667]:
+                    - img "80 / 120 checks OK" [ref=f13e669] [cursor=pointer]
+                  - code [ref=f13e672]:
+                    - link "7376f8e" [ref=f13e673] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122477/commits/7376f8e44bae650cdbbf640be26d543c66923245
+                - generic [ref=f13e675]:
+                  - link [ref=f13e677] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e678]
+                  - generic [ref=f13e680]:
+                    - generic [ref=f13e681]:
+                      - heading [level=3] [ref=f13e682]:
+                        - generic [ref=f13e683]:
+                          - strong [ref=f13e684]:
+                            - link "steipete" [ref=f13e685] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202636 minutes ago" [ref=f13e686] [cursor=pointer]:
+                            - /url: "#issuecomment-5263096010"
+                      - generic [ref=f13e687]:
+                        - group [ref=f13e689]:
+                          - button [ref=f13e690] [cursor=pointer]:
+                            - img "Show options" [ref=f13e693]
+                        - generic [ref=f13e695]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f13e696]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f13e698]: Author
+                    - table [ref=f13e702]:
+                      - rowgroup [ref=f13e703]:
+                        - row [ref=f13e704]:
+                          - cell [ref=f13e705]:
+                            - paragraph [ref=f13e706]:
+                              - text: "Maintainer decision on the ClawSweeper P1 (Kubernetes config ownership):"
+                              - strong [ref=f13e707]: adopting the persistent-file model deliberately
+                              - text: (reviewer option 2), now made explicit in
+                              - code [ref=f13e708]: 7376f8e44ba
+                              - text: .
+                            - paragraph [ref=f13e709]:
+                              - text: "Rationale: OpenClaw's config is product-mutated —"
+                              - code [ref=f13e710]: onboard
+                              - text: ","
+                              - code [ref=f13e711]: channels add
+                              - text: ","
+                              - code [ref=f13e712]: doctor --fix
+                              - text: ", and the Control UI all write"
+                              - code [ref=f13e713]: openclaw.json
+                              - text: . The previous init container re-applied the ConfigMap on every pod start, silently reverting those product-made changes on each restart, which is the worse defect class (silent loss of a user action) and also fought doctor migrations. After this PR the PVC copy owns config after first boot; ConfigMap edits reseed via a documented explicit path.
+                            - paragraph [ref=f13e714]: "What changed for the finding:"
+                            - list [ref=f13e715]:
+                              - listitem [ref=f13e716]:
+                                - code [ref=f13e717]: scripts/k8s/manifests/deployment.yaml
+                                - text: ": ownership contract stated at the code site (seed-if-missing, why, and where the reseed path lives)."
+                              - listitem [ref=f13e718]:
+                                - code [ref=f13e719]: docs/install/kubernetes.md
+                                - text: ": exact reseed commands ("
+                                - code [ref=f13e720]: kubectl exec ... rm
+                                - text: +
+                                - code [ref=f13e721]: rollout restart
+                                - text: ), plus an explicit note for operators of the previous template who relied on ConfigMap-edit-on-redeploy.
+                            - paragraph [ref=f13e722]:
+                              - text: "On the remaining checklist items: the two other P1 \"merge risk\" entries restate this same decision, which is now made and documented. The network-restricted platform-contract note:"
+                              - code [ref=f13e723]: "[[http_service.checks]]"
+                              - text: fields (
+                              - code [ref=f13e724]: grace_period
+                              - text: /
+                              - code [ref=f13e725]: interval
+                              - text: /
+                              - code [ref=f13e726]: timeout
+                              - text: /
+                              - code [ref=f13e727]: method
+                              - text: /
+                              - code [ref=f13e728]: path
+                              - text: ) follow Fly's current app-config reference, and
+                              - code [ref=f13e729]: healthCheckPath
+                              - text: is Render's documented blueprint key — both templates only change the probe path/target, not the mechanism. The "stored data model" flag points at a test fixture (
+                              - code [ref=f13e730]: server.plugin-http-auth.test.ts
+                              - text: ), not persisted state; no schema or migration surface is touched.
+                - generic [ref=f13e732]:
+                  - link [ref=f13e734] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e735]
+                  - generic [ref=f13e737]:
+                    - generic [ref=f13e738]:
+                      - heading "clawsweeper Bot commented Aug 12, 202633 minutes ago" [level=3] [ref=f13e739]:
+                        - generic [ref=f13e740]:
+                          - strong [ref=f13e741]:
+                            - link "clawsweeper" [ref=f13e742] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e743]: Bot
+                          - text: commented
+                          - link "Aug 12, 202633 minutes ago" [ref=f13e744] [cursor=pointer]:
+                            - /url: "#issuecomment-5263113504"
+                      - generic [ref=f13e745]:
+                        - group [ref=f13e747]:
+                          - button [ref=f13e748] [cursor=pointer]:
+                            - img "Show options" [ref=f13e751]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e754]: Contributor
+                    - table [ref=f13e758]:
+                      - rowgroup [ref=f13e759]:
+                        - row [ref=f13e760]:
+                          - cell [ref=f13e761]:
+                            - paragraph [ref=f13e762]: "ClawSweeper status: review started."
+                            - paragraph [ref=f13e763]: "I am starting a fresh review of this pull request: feat(gateway): add /startupz startup probe and fix deployment template admission This is item 1/1 in the current shard. Shard 0/1."
+                            - paragraph [ref=f13e764]: This placeholder means the worker is alive and reading the current context. I will edit this same comment with the actual review when the claws are done clicking.
+                            - paragraph [ref=f13e765]: "Crustacean status: shell secured, claws on keyboard, evidence pebbles being sorted."
+                - generic [ref=f13e766]:
+                  - generic [ref=f13e771]:
+                    - button "View details" [ref=f13e772] [cursor=pointer]
+                    - generic [ref=f13e773]:
+                      - link [ref=f13e775] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f13e776]
+                      - generic [ref=f13e777]:
+                        - link "steipete" [ref=f13e778] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f13e779] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/8190c326ce491324331c8b9793f3f4dddd5c7d91
+                          - code [ref=f13e780]: 8190c32
+                        - text: into
+                        - generic [ref=f13e781]: main
+                        - link "Aug 12, 202618 minutes ago" [ref=f13e783] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122477#event-29323073694
+                        - generic [ref=f13e784]: 122 of 123 checks passed
+                  - generic [ref=f13e791]:
+                    - link [ref=f13e793] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f13e794]
+                    - generic [ref=f13e795]:
+                      - link "steipete" [ref=f13e796] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f13e797]: steipete/gateway-startup-probe
+                      - text: branch
+                      - link "August 12, 2026 06:3618 minutes ago" [ref=f13e799] [cursor=pointer]:
+                        - /url: "#event-29323076072"
+                - generic [ref=f13e801]:
+                  - link [ref=f13e803] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e804]
+                  - generic [ref=f13e806]:
+                    - generic [ref=f13e807]:
+                      - heading [level=3] [ref=f13e808]:
+                        - generic [ref=f13e809]:
+                          - strong [ref=f13e810]:
+                            - link "steipete" [ref=f13e811] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202616 minutes ago" [ref=f13e812] [cursor=pointer]:
+                            - /url: "#issuecomment-5263242436"
+                      - generic [ref=f13e813]:
+                        - group [ref=f13e815]:
+                          - button [ref=f13e816] [cursor=pointer]:
+                            - img "Show options" [ref=f13e819]
+                        - generic [ref=f13e821]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f13e822]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f13e824]: Author
+                    - table [ref=f13e828]:
+                      - rowgroup [ref=f13e829]:
+                        - row [ref=f13e830]:
+                          - cell [ref=f13e831]:
+                            - paragraph [ref=f13e832]: Merged via squash.
+                            - list [ref=f13e833]:
+                              - listitem [ref=f13e834]:
+                                - text: "Prepared head SHA:"
+                                - link "7376f8e44bae650cdbbf640be26d543c66923245" [ref=f13e835] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122477/commits/7376f8e44bae650cdbbf640be26d543c66923245
+                              - listitem [ref=f13e836]:
+                                - text: "Landed commit:"
+                                - link "8190c326ce491324331c8b9793f3f4dddd5c7d91" [ref=f13e837] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/8190c326ce491324331c8b9793f3f4dddd5c7d91
+            - generic [ref=f13e841]:
+              - link "Sign up for free" [ref=f13e842] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f13e843]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f13e844] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122477
+        - generic [ref=f13e848]:
+          - form "Select reviewers" [ref=f13e850]:
+            - heading "Reviewers" [level=3] [ref=f13e851]
+            - text: No reviews
+          - form "Select assignees" [ref=f13e853]:
+            - heading "Assignees" [level=3] [ref=f13e854]
+            - text: No one assigned
+          - generic [ref=f13e855]:
+            - heading "Labels" [level=3] [ref=f13e856]
+            - generic [ref=f13e857]:
+              - link "docker" [ref=f13e858] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocker
+              - link "docs" [ref=f13e860] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+              - link "gateway" [ref=f13e862] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+              - link "maintainer" [ref=f13e864] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f13e866] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - link "P1" [ref=f13e868] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🦐 gold shrimp" [ref=f13e870] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+              - link "scripts" [ref=f13e872] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+              - 'link "size: M" [ref=f13e874] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: ⏳ waiting on author" [ref=f13e876] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+          - form "Select projects" [ref=f13e879]:
+            - heading "Projects" [level=3] [ref=f13e880]
+            - text: None yet
+          - form "Select milestones" [ref=f13e882]:
+            - heading "Milestone" [level=3] [ref=f13e883]
+            - text: No milestone
+          - form "Link issues" [ref=f13e889]:
+            - heading "Development" [level=3] [ref=f13e890]
+            - paragraph [ref=f13e891]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f13e893]: None yet
+          - generic [ref=f13e895]:
+            - heading "1 participant" [level=3] [ref=f13e896]
+            - link [ref=f13e898] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f13e899]
+  - contentinfo [ref=f13e900]:
+    - heading "Footer" [level=2] [ref=f13e901]
+    - generic [ref=f13e902]:
+      - generic [ref=f13e903]:
+        - link "GitHub Homepage" [ref=f13e904] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f13e907]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f13e908]:
+        - heading "Footer navigation" [level=3] [ref=f13e909]
+        - list "Footer navigation" [ref=f13e910]:
+          - listitem [ref=f13e911]:
+            - link "Terms" [ref=f13e912] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f13e913]:
+            - link "Privacy" [ref=f13e914] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f13e915]:
+            - link "Security" [ref=f13e916] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f13e917]:
+            - link "Status" [ref=f13e918] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f13e919]:
+            - link "Community" [ref=f13e920] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f13e921]:
+            - link "Docs" [ref=f13e922] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f13e923]:
+            - link "Contact" [ref=f13e924] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f13e925]:
+            - button "Manage cookies" [ref=f13e927] [cursor=pointer]
+          - listitem [ref=f13e928]:
+            - button "Do not share my personal information" [ref=f13e930] [cursor=pointer]

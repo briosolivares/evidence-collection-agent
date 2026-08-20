@@ -1,0 +1,921 @@
+{
+  "startedAt": "2026-08-13T00:13:31.762Z",
+  "finishedAt": "2026-08-13T00:43:30.742Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "mit_sororities",
+      "k": 3,
+      "accuracy": 0,
+      "taskPassed": false,
+      "meanLatencyMs": 649543.1727913333,
+      "trials": [
+        {
+          "assertions": [],
+          "latencyMs": 652608.6393329999,
+          "error": "model stream ended with unterminated content blocks — response is truncated",
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 775277.3861659999,
+          "error": "model stream ended with unterminated content blocks — response is truncated",
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 520743.492875,
+          "error": "model stream ended with unterminated content blocks — response is truncated",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "openclaw_merged_prs",
+      "k": 3,
+      "accuracy": 0.9166666666666666,
+      "taskPassed": false,
+      "meanLatencyMs": 182507.87951366664,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-22-14pm_collect-evidence-about-the-last-10_992cbb",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_last10_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "8 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "20 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 169594.68291699997,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-24-26pm_collect-evidence-about-the-last-10_f1edd4",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": false,
+              "detail": "#122867: committer \"ampagent\" does not name author steipete"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "16 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 197041.431583,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-25-03pm_collect-evidence-about-the-last-10_2cf8f5",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": false,
+              "detail": "#122867: committer \"ampagent\" does not name author steipete"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "17 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 180887.52404100006,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "openclaw_contributors",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 253913.1216393333,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-26-33pm_create-a-csv-of-the-top-30-contributors_4900b3",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "28 of 30 handles found among the oracle's top 100; not found: claude, ampagent"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "23 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "20 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 248304.135459,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-27-43pm_create-a-csv-of-the-top-30-contributors_d5c5e9",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top_30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "27 of 30 handles found among the oracle's top 100; not found: claude, ampagent, cursoragent"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "24 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "20 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 279687.2766669999,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-28-04pm_create-a-csv-of-the-top-30-contributors_fc9ce6",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "28 of 30 handles found among the oracle's top 100; not found: claude, ampagent"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "23 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "19 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 233747.9527919999,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "yc_w24_outreach",
+      "k": 3,
+      "accuracy": 0.75,
+      "taskPassed": false,
+      "meanLatencyMs": 101675.81612533338,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-30-37pm_from-yc-winter-2024-pick-5-ai-focused_9b3e6c",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "9 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": false,
+              "detail": "not found in live YC W24 AI founder oracle: row 8: Lukas Martinelli; row 9: Rob Balian"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "4 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": true,
+              "detail": "9 personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": false,
+              "detail": "row 7: no company-specific product/detail term; row 8: founder cannot be personalized without an oracle match; row 9: founder cannot be personalized without an oracle match"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "7 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 99569.33150000009,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-31-58pm_from-yc-winter-2024-pick-5-ai-focused_6d995e",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "9 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "9 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": true,
+              "detail": "5 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "row 8: https://linkedin.com/in/sacellarius"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "9 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 89347.43870899989,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-32-16pm_from-yc-winter-2024-pick-5-ai-focused_5c3390",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/yc_w24_ai_founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "12 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "12 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": false,
+              "detail": "5 distinct companies; missing founder row(s): Artisan: Rupert Dodkins"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct plausible personal profile for its founder",
+              "passed": false,
+              "detail": "row 1: https://linkedin.com/in/binw"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "12 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 116110.67816700018,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "company_freshness",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 120044.04620866656,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-32-22pm_for-notion-figma-and-eight-sleep-take_1a2128",
+          "assertions": [
+            {
+              "name": "at least six valid manifested PNG screenshots exist",
+              "passed": true,
+              "detail": "6 valid PNG(s) with source URL provenance"
+            },
+            {
+              "name": "each company has a valid screenshot of its official homepage",
+              "passed": true,
+              "detail": "Notion: artifacts/notion_homepage.png; Figma: artifacts/figma_homepage.png; Eight Sleep: artifacts/eightsleep_homepage.png"
+            },
+            {
+              "name": "each company has a valid screenshot from its live latest-content window",
+              "passed": true,
+              "detail": "Notion: https://www.notion.com/blog/rebuilding-notions-lexical-search-reindexer; Figma: https://www.figma.com/blog/measuring-time-savings-from-figma-make/; Eight Sleep: https://www.eightsleep.com/blog/federico-chingotto-8-things-you-didnt-know-padel (pixel contents are human-reviewed)"
+            },
+            {
+              "name": "homepage and content evidence are distinct for all three companies",
+              "passed": true,
+              "detail": "3 homepage/content pair(s) are distinct"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "10 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 93687.11266699992,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-33-28pm_for-notion-figma-and-eight-sleep-take_33dcba",
+          "assertions": [
+            {
+              "name": "at least six valid manifested PNG screenshots exist",
+              "passed": true,
+              "detail": "6 valid PNG(s) with source URL provenance"
+            },
+            {
+              "name": "each company has a valid screenshot of its official homepage",
+              "passed": true,
+              "detail": "Notion: artifacts/notion_homepage.png; Figma: artifacts/figma_homepage.png; Eight Sleep: artifacts/eightsleep_homepage.png"
+            },
+            {
+              "name": "each company has a valid screenshot from its live latest-content window",
+              "passed": true,
+              "detail": "Notion: https://www.notion.com/blog/rebuilding-notions-lexical-search-reindexer; Figma: https://www.figma.com/blog/measuring-time-savings-from-figma-make/; Eight Sleep: https://www.eightsleep.com/blog/federico-chingotto-8-things-you-didnt-know-padel (pixel contents are human-reviewed)"
+            },
+            {
+              "name": "homepage and content evidence are distinct for all three companies",
+              "passed": true,
+              "detail": "3 homepage/content pair(s) are distinct"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "9 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 131774.36366699985,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-33-57pm_for-notion-figma-and-eight-sleep-take_b7e7d1",
+          "assertions": [
+            {
+              "name": "at least six valid manifested PNG screenshots exist",
+              "passed": true,
+              "detail": "6 valid PNG(s) with source URL provenance"
+            },
+            {
+              "name": "each company has a valid screenshot of its official homepage",
+              "passed": true,
+              "detail": "Notion: artifacts/notion_homepage.png; Figma: artifacts/figma_homepage.png; Eight Sleep: artifacts/eightsleep_homepage.png"
+            },
+            {
+              "name": "each company has a valid screenshot from its live latest-content window",
+              "passed": true,
+              "detail": "Notion: https://www.notion.com/blog/rebuilding-notions-lexical-search-reindexer; Figma: https://www.figma.com/blog/measuring-time-savings-from-figma-make/; Eight Sleep: https://www.eightsleep.com/blog/federico-chingotto-8-things-you-didnt-know-padel (pixel contents are human-reviewed)"
+            },
+            {
+              "name": "homepage and content evidence are distinct for all three companies",
+              "passed": true,
+              "detail": "3 homepage/content pair(s) are distinct"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "9 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 134670.6622919999,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "wikipedia_reference",
+      "k": 3,
+      "accuracy": 0.9166666666666666,
+      "taskPassed": false,
+      "meanLatencyMs": 115060.26519433332,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-34-20pm_find-the-275th-reference-in-the_a11899",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": true,
+              "detail": "full normalized text of CITEREFBeevor2012 found (91 source characters)"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "186 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "9 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 161941.32516600005,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-35-40pm_find-the-275th-reference-in-the_c70e77",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "full normalized text of CITEREFBeevor2012 not found; reference text was \"Beevor 2012 , pp. 555–560.\""
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "275 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "7 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 75085.53241700004,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-36-12pm_find-the-275th-reference-in-the_8a980b",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": true,
+              "detail": "full normalized text of CITEREFBeevor2012 found (91 source characters)"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "195 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "8 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 108153.93799999985,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "edgar",
+      "k": 3,
+      "accuracy": 0.2222222222222222,
+      "taskPassed": false,
+      "meanLatencyMs": 218367.63708333336,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-36-55pm_find-apple-s-8-k-filing-from-january-29_7639b1",
+          "assertions": [
+            {
+              "name": "downloaded document hash-matches the accession's document",
+              "passed": false,
+              "detail": "no artifact matches sha256 301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a for accession 0000320193-26-000005 (aapl-20260129.htm)"
+            },
+            {
+              "name": "screenshot artifact exists with a manifest entry",
+              "passed": false,
+              "detail": "no .png artifact with valid PNG bytes and a manifest entry was found"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 397456.802625,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-36-55pm_find-apple-s-8-k-filing-from-january-29_72f60d",
+          "assertions": [
+            {
+              "name": "downloaded document hash-matches the accession's document",
+              "passed": false,
+              "detail": "no artifact matches sha256 301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a for accession 0000320193-26-000005 (aapl-20260129.htm)"
+            },
+            {
+              "name": "screenshot artifact exists with a manifest entry",
+              "passed": false,
+              "detail": "no .png artifact with valid PNG bytes and a manifest entry was found"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 217883.91149999993,
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 39762.19712500018,
+          "error": "page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.sec.gov/edgar/search/\", waiting until \"load\"\u001b[22m\n",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "task": "openclaw_pr",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 62712.43569466658,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-38-40pm_what-is-the-most-recent-pull-request-on_82febb",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "artifacts/answer.md found in run dir"
+            },
+            {
+              "name": "answer.md mentions the number and title of a most-recent-in-window PR",
+              "passed": true,
+              "detail": "mentions #122879 \"fix(ci): prevent channel add command test timeout\""
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 53157.88704199996,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-39-43pm_what-is-the-most-recent-pull-request-on_ae4e63",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "artifacts/answer.md found in run dir"
+            },
+            {
+              "name": "answer.md mentions the number and title of a most-recent-in-window PR",
+              "passed": true,
+              "detail": "mentions #122879 \"fix(ci): prevent channel add command test timeout\""
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 75993.36674999981,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-40-43pm_what-is-the-most-recent-pull-request-on_48f675",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "artifacts/answer.md found in run dir"
+            },
+            {
+              "name": "answer.md mentions the number and title of a most-recent-in-window PR",
+              "passed": true,
+              "detail": "mentions #122882 \"fix(gateway): preserve explicit zero-byte artifact downloads\""
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 58986.05329199997,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "hacker_news",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 23673.961472333332,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-40-53pm_create-a-csv-of-the-top-5-stories-on_0778d8",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 25600.501958000008,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-41-15pm_create-a-csv-of-the-top-5-stories-on_9c6b8e",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 20216.736375000095,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_05-41-36pm_create-a-csv-of-the-top-5-stories-on_bd1ffc",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hn_top5.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 25204.64608399989,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

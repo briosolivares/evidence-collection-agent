@@ -1,0 +1,21 @@
+{
+  "outputs": [
+    {
+      "id": "openclaw_pr_answer",
+      "kind": "document",
+      "filename": "openclaw_latest_pr.md",
+      "format": "markdown",
+      "requiredSections": [
+        "Most Recent Pull Request",
+        "Explanation"
+      ],
+      "evidenceRequirement": "at_least_one",
+      "evidencePresentation": "footnotes"
+    }
+  ],
+  "contentExpectations": [
+    "Identify the most recent pull request on the OpenClaw GitHub repository, including its title and a link/reference to it.",
+    "Provide a brief explanation of what the pull request does.",
+    "Answer should reflect the current/most recent state of the OpenClaw GitHub repository's pull requests at time of research."
+  ]
+}

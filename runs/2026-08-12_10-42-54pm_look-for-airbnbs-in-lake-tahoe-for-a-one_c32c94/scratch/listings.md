@@ -1,0 +1,10 @@
+1. Wake to mountain-lake views from this Incline Village home with a fireplace and grill | /rooms/23545038 | 4.75 (57 reviews) | 3 bedrooms, 4 beds, 2 baths | $2,495 for 7 nights | Guest favorite
+2. This peaceful Incline Village condo gives you a fireplace, deck, and community sauna | /rooms/1421190065331657251 | 4.91 (11 reviews) | 2 bedrooms, 3 beds, 2 baths | $1,923 for 7 nights (orig $2,944) | Guest favorite
+3. This A-frame cabin in Tahoe puts you among the trees with a wood-burning fireplace | /rooms/868211075181482270 | 4.92 (74 reviews) | 3 bedrooms, 3 beds, 2 baths | $1,843 for 7 nights | Guest favorite
+4. Forest views and a gas fireplace greet you at this Kingsbury condo near Heavenly | /rooms/936234357176767343 | 4.77 (98 reviews) | 2 bedrooms, 3 beds, 2 baths | $1,171 for 7 nights (orig $1,304, weekly discount) | Superhost
+5. This Tahoe condo nestles you in the pines with a gas fireplace and patio | /rooms/44449491 | 4.9 (336 reviews) | 2 beds, 1 bath | $1,172 for 7 nights (orig $1,290, weekly discount) | Superhost
+6. Mountain views greet you at this alpine Incline Village home with a fireplace | /rooms/23545100 | 4.95 (88 reviews) | 4 bedrooms, 7 beds, 3.5 baths | $2,492 for 7 nights (orig $2,914) | Guest favorite
+7. This South Lake Tahoe chalet gives you a hot tub, fire pit, and pines all around | /rooms/1669752142489887155 | 5.0 (16 reviews) | 3 bedrooms, 5 beds, 2 baths | $3,793 for 7 nights (orig $4,138, weekly discount) | Top guest favorite
+8. Wake to forest views at this modern A-frame cabin with a hot tub in Tahoe | /rooms/1001827428698682854 | 5.0 (127 reviews) | 3 bedrooms, 3 beds, 1.5 baths | $4,401 for 7 nights | Top guest favorite
+9. This wooded South Lake Tahoe townhouse gives you beach access, pools, and a sauna | /rooms/990528905768430626 | 4.13 (8 reviews) | 2 bedrooms, 4 beds, 2 baths | $2,839 for 7 nights (orig $5,580) | (none listed)
+10. This Brockway Tract townhouse puts you a 5-minute walk from the beach | /rooms/53137419 | 4.7 (108 reviews) | (details TBD) | (price TBD) | Superhost

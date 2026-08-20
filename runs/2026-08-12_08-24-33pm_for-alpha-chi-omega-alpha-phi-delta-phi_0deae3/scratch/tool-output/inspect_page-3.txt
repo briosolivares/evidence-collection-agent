@@ -1,0 +1,918 @@
+URL: https://marginalia-search.com/search?query=Alpha+Phi+MIT+sorority+iota+chapter
+Title: Alpha Phi MIT sorority iota chapter - Marginalia Search
+
+- generic [active] [ref=f103e1]:
+  - link "Skip To Content" [ref=f103e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f103e3]:
+    - navigation [ref=f103e5]:
+      - generic [ref=f103e7]:
+        - link "Search" [ref=f103e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f103e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f103e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f103e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f103e13]:
+    - generic [ref=f103e15]:
+      - heading [level=1] [ref=f103e17]:
+        - link "Marginalia Search" [ref=f103e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f103e21]:
+        - textbox "Search the web!" [ref=f103e22]: Alpha Phi MIT sorority iota chapter
+        - button " Search" [ref=f103e23] [cursor=pointer]:
+          - generic [ref=f103e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f103e25]:
+    - complementary [ref=f103e26]:
+      - generic [ref=f103e28]:
+        - heading " Filter" [level=2] [ref=f103e29]:
+          - generic [ref=f103e30]: 
+          - text: Filter
+        - generic [ref=f103e31]:
+          - button [ref=f103e33] [cursor=pointer]:
+            - link " All" [ref=f103e34]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e35]: 
+              - text: All
+          - button [ref=f103e37] [cursor=pointer]:
+            - link " Blogs" [ref=f103e38]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=blogosphere&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e39]: 
+              - text: Blogs
+          - button [ref=f103e41] [cursor=pointer]:
+            - link " Academia" [ref=f103e42]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=academia&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e43]: 
+              - text: Academia
+          - button [ref=f103e45] [cursor=pointer]:
+            - link " Vintage" [ref=f103e46]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=vintage&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e47]: 
+              - text: Vintage
+          - button [ref=f103e49] [cursor=pointer]:
+            - link " Small Web" [ref=f103e50]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=modern&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e51]: 
+              - text: Small Web
+          - button [ref=f103e54] [cursor=pointer]:
+            - link " Wikis" [ref=f103e55]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=wiki&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e56]: 
+              - text: Wikis
+          - button [ref=f103e58] [cursor=pointer]:
+            - link " Forums" [ref=f103e59]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=forum&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e60]: 
+              - text: Forums
+          - button [ref=f103e62] [cursor=pointer]:
+            - link " Recipes" [ref=f103e63]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=food&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e64]: 
+              - text: Recipes
+          - button [ref=f103e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f103e68]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&profile=custom&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f103e70]:
+      - generic [ref=f103e71]:
+        - heading "Results" [level=1] [ref=f103e72]
+        - generic [ref=f103e73]:
+          - generic [ref=f103e75]:
+            - generic [ref=f103e76]:
+              - generic [ref=f103e77]:
+                - generic [ref=f103e78]:
+                  - generic "Match density" [ref=f103e79]
+                  - generic [ref=f103e83]:
+                    - heading [level=2] [ref=f103e84]:
+                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f103e85] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f103e87] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                - paragraph [ref=f103e89]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+              - generic [ref=f103e90]:
+                - link "" [ref=f103e91] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f103e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+            - generic [ref=f103e95]:
+              - paragraph [ref=f103e96]: "Also from en.wikipedia.org:"
+              - list [ref=f103e97]:
+                - listitem [ref=f103e98]:
+                  - link "Phi Sigma Kappa" [ref=f103e99] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Sigma_Kappa
+                - listitem [ref=f103e100]:
+                  - link "Union College" [ref=f103e101] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Union_College
+            - generic [ref=f103e102]:
+              - generic [ref=f103e104]: Wiki
+              - generic "Contains JavaScript" [ref=f103e105]: JS
+          - generic [ref=f103e107]:
+            - generic [ref=f103e108]:
+              - generic [ref=f103e109]:
+                - generic [ref=f103e110]:
+                  - generic "Match density" [ref=f103e111]
+                  - generic [ref=f103e115]:
+                    - heading [level=2] [ref=f103e116]:
+                      - link "Drexel University - Alchetron, The Free Social Encyclopedia" [ref=f103e117] [cursor=pointer]:
+                        - /url: https://alchetron.com/Drexel-University
+                    - link "https://alchetron.com/Drexel-University" [ref=f103e119] [cursor=pointer]:
+                      - /url: https://alchetron.com/Drexel-University
+                - paragraph [ref=f103e121]: Updated on Jan 20, 2026 Edit Like Comment Share Sign in Motto Science, Industry, Art President Acceptance rate 75% (2015) Total enrollment 25,595 (2016) Mascot Mario the Magnificent Established 1891 (1891) Provost M. Brian Blake Phone +1 215-895-2000 Endo
+              - generic [ref=f103e122]:
+                - link "" [ref=f103e123] [cursor=pointer]:
+                  - /url: /site/alchetron.com
+                - link "" [ref=f103e125] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alchetron.com/Drexel-University
+            - generic "Contains JavaScript" [ref=f103e129]: JS
+          - generic [ref=f103e131]:
+            - generic [ref=f103e132]:
+              - generic [ref=f103e133]:
+                - generic [ref=f103e134]:
+                  - generic "Match density" [ref=f103e135]
+                  - generic [ref=f103e139]:
+                    - heading [level=2] [ref=f103e140]:
+                      - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f103e141] [cursor=pointer]:
+                        - /url: https://www.aephi.org/foundation-trustees
+                    - link "https://www.aephi.org/foundation-trustees" [ref=f103e143] [cursor=pointer]:
+                      - /url: https://www.aephi.org/foundation-trustees
+                - paragraph [ref=f103e145]: The Alpha Epsilon Phi Foundation is directed by a volunteer board of seventeen trustees, including the sorority national president and the sorority executive director who serves ex officio. The trustees bring a mix of Sorority involvement, non-profit expe
+              - generic [ref=f103e146]:
+                - link "" [ref=f103e147] [cursor=pointer]:
+                  - /url: /site/www.aephi.org
+                - link "" [ref=f103e149] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.aephi.org/foundation-trustees
+            - generic "Contains JavaScript" [ref=f103e153]: JS
+          - generic [ref=f103e155]:
+            - generic [ref=f103e156]:
+              - generic [ref=f103e157]:
+                - generic [ref=f103e158]:
+                  - generic "Match density" [ref=f103e159]
+                  - generic [ref=f103e163]:
+                    - heading [level=2] [ref=f103e164]:
+                      - link "Archives | Union College News Archives" [ref=f103e165] [cursor=pointer]:
+                        - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                    - link "https://muse.union.edu/newsarchives/2003/08/page/4/" [ref=f103e167] [cursor=pointer]:
+                      - /url: https://muse.union.edu/newsarchives/2003/08/page/4/
+                - paragraph [ref=f103e169]: Posts made in August, 2003 Posted on Aug 25, 2003 The modern fraternity system at colleges and universities across the nation is generally recognized as beginning with the founding of Kappa Alpha (1825), Sigma Phi (1827), and Delta Phi (1827) at Union. Al
+              - generic [ref=f103e170]:
+                - link "" [ref=f103e171] [cursor=pointer]:
+                  - /url: /site/muse.union.edu
+                - link "" [ref=f103e173] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://muse.union.edu/newsarchives/2003/08/page/4/
+            - generic "Contains JavaScript" [ref=f103e177]: JS
+          - generic [ref=f103e179]:
+            - generic [ref=f103e180]:
+              - generic [ref=f103e181]:
+                - generic [ref=f103e182]:
+                  - generic "Match density" [ref=f103e183]
+                  - generic [ref=f103e187]:
+                    - heading [level=2] [ref=f103e188]:
+                      - link "MIT and Black Greek Letter Organizations | MIT Admissions" [ref=f103e189] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/
+                    - link "https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/" [ref=f103e191] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/
+                - paragraph [ref=f103e193]: An Interview September 13, 2020 A few weeks ago, I called three friends, AudreyRose ‘21, Nikayah ‘19, and Kenneth ‘19, to talk about their experiences as members of historically Black Greek letter organizations. My goal is to illustrate that there is a D9
+              - generic [ref=f103e194]:
+                - link "" [ref=f103e195] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f103e197] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/mit-and-black-greek-letter-organizations/
+            - generic "Contains JavaScript" [ref=f103e201]: JS
+          - generic [ref=f103e203]:
+            - generic [ref=f103e204]:
+              - generic [ref=f103e205]:
+                - generic [ref=f103e206]:
+                  - generic "Match density" [ref=f103e207]
+                  - generic [ref=f103e211]:
+                    - heading [level=2] [ref=f103e212]:
+                      - link "Willamette CDol" [ref=f103e213] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content
+                    - generic [ref=f103e214]:
+                      - generic "PDF" [ref=f103e215]: 
+                      - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content" [ref=f103e216] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content
+                - paragraph [ref=f103e218]: Vol. XL No. 1 WILLAMETTE UNIVERSITY, SALEM, OREGON, SEPTEMBER 27, 1928 PRICE FIVE CENTS SOPHS VICTORIOUS IN UNIVERSITY LIBRARIAN T PROTECTING BEARCAT MAKES EXTENDED TRIP Freshmen Take to Mill Stream As Result of Wishes of the Leader and then. Stage I,ittl
+              - generic [ref=f103e219]:
+                - link "" [ref=f103e220] [cursor=pointer]:
+                  - /url: /site/digitalcollections.willamette.edu
+                - link "" [ref=f103e222] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content
+            - generic [ref=f103e224]:
+              - paragraph [ref=f103e225]: "Also from digitalcollections.willamette.edu:"
+              - list [ref=f103e226]:
+                - listitem [ref=f103e227]:
+                  - generic "PDF": 
+                  - link "V .i MM I" [ref=f103e228] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/ee3a422e-be96-4cea-99d2-20444d198009/content
+                - listitem [ref=f103e229]:
+                  - generic "PDF": 
+                  - link "- IT" [ref=f103e230] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/021857b9-fb45-4e1b-b98b-605e1931f833/content
+                - listitem [ref=f103e231]:
+                  - generic "PDF": 
+                  - link "Flamenco Dancers K & \"W? JUL To Give Musicale" [ref=f103e232] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/4801fbc8-47c7-4107-bda4-7455a3650996/content
+            - generic [ref=f103e233]: PDF File
+          - generic [ref=f103e237]:
+            - generic [ref=f103e238]:
+              - generic [ref=f103e239]:
+                - generic [ref=f103e240]:
+                  - generic "Match density" [ref=f103e241]
+                  - generic [ref=f103e245]:
+                    - heading [level=2] [ref=f103e246]:
+                      - link "alpha kappa lambda hazing" [ref=f103e247] [cursor=pointer]:
+                        - /url: http://www.senorcafe.com/e62np1kl/c93270-alpha-kappa-lambda-hazing
+                    - link "http://www.senorcafe.com/e62np1kl/c93270-alpha-kappa-lambda-hazing" [ref=f103e249] [cursor=pointer]:
+                      - /url: http://www.senorcafe.com/e62np1kl/c93270-alpha-kappa-lambda-hazing
+                - paragraph [ref=f103e251]: The Hotline provides an anonymous telephone line for anyone to report a suspected or recent hazing incident to one number 1-888-NOT-HAZE (1-888-668-4293) that accepts calls 24 hours […] In 1999, Alpha Kappa Alpha Sorority reaffirmed its total opposition t
+              - generic [ref=f103e252]:
+                - link "" [ref=f103e253] [cursor=pointer]:
+                  - /url: /site/www.senorcafe.com
+                - link "" [ref=f103e255] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://www.senorcafe.com/e62np1kl/c93270-alpha-kappa-lambda-hazing
+            - generic [ref=f103e257]:
+              - paragraph [ref=f103e258]: "Also from www.senorcafe.com:"
+              - list [ref=f103e259]:
+                - listitem [ref=f103e260]:
+                  - link "delta sigma phi nc state" [ref=f103e261] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+          - generic [ref=f103e263]:
+            - generic [ref=f103e264]:
+              - generic [ref=f103e265]:
+                - generic [ref=f103e266]:
+                  - generic "Match density" [ref=f103e267]
+                  - generic [ref=f103e271]:
+                    - heading [level=2] [ref=f103e272]:
+                      - link "Chapter Histories | Pi Beta Phi Fraternity For Women" [ref=f103e273] [cursor=pointer]:
+                        - /url: https://www.pibetaphi.org/history/chapter-histories
+                    - link "https://www.pibetaphi.org/history/chapter-histories" [ref=f103e275] [cursor=pointer]:
+                      - /url: https://www.pibetaphi.org/history/chapter-histories
+                - paragraph [ref=f103e277]: "Arizona Beta Arizona State University Founding Date: February 14, 1965 Arizona State University Founding Date: February 14, 1965 Installing Officers Grand President Alice Weber Mansfield (Johnson), Missouri Beta Installation of Arizona Beta The chapter wa"
+              - generic [ref=f103e278]:
+                - link "" [ref=f103e279] [cursor=pointer]:
+                  - /url: /site/www.pibetaphi.org
+                - link "" [ref=f103e281] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.pibetaphi.org/history/chapter-histories
+            - generic "Contains JavaScript" [ref=f103e285]: JS
+          - generic [ref=f103e287]:
+            - generic [ref=f103e288]:
+              - generic [ref=f103e289]:
+                - generic [ref=f103e290]:
+                  - generic "Match density" [ref=f103e291]
+                  - generic [ref=f103e295]:
+                    - heading [level=2] [ref=f103e296]:
+                      - link "Chapter News – District I - Phi Kappa Psi Fraternity" [ref=f103e297] [cursor=pointer]:
+                        - /url: https://www.phikappapsi.com/blog/chapter-news-district-i-summer-25/
+                    - link "https://www.phikappapsi.com/blog/chapter-news-district-i-summer-25/" [ref=f103e299] [cursor=pointer]:
+                      - /url: https://www.phikappapsi.com/blog/chapter-news-district-i-summer-25/
+                - paragraph [ref=f103e301]: "Delaware Alpha – Delaware Submitted By: Ryan Morosanu ’24 Our brothers have remained actively engaged in philanthropy, making a meaningful impact both on and off campus. We participated in the UDance fundraiser, joining the campus-wide effort to raise mon"
+              - generic [ref=f103e302]:
+                - link "" [ref=f103e303] [cursor=pointer]:
+                  - /url: /site/www.phikappapsi.com
+                - link "" [ref=f103e305] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.phikappapsi.com/blog/chapter-news-district-i-summer-25/
+            - generic "Contains JavaScript" [ref=f103e309]: JS
+          - generic [ref=f103e311]:
+            - generic [ref=f103e312]:
+              - generic [ref=f103e313]:
+                - generic [ref=f103e314]:
+                  - generic "Match density" [ref=f103e315]
+                  - generic [ref=f103e319]:
+                    - heading [level=2] [ref=f103e320]:
+                      - 'link "Halls, Tombs and Houses: Student Society Architecture at Dartmouth. Notes. View [index.html] for frames version" [ref=f103e321] [cursor=pointer]':
+                        - /url: https://www.dartmo.com/halls/hallsnotes.html
+                    - link "https://www.dartmo.com/halls/hallsnotes.html" [ref=f103e323] [cursor=pointer]:
+                      - /url: https://www.dartmo.com/halls/hallsnotes.html
+                - paragraph [ref=f103e325]: "The only recent book to deal exclusively with the architecture of secret societies seems to be C. Lance Brockman's Theatre of the Fraternity: Staging the Ritual Space of the Scottish Rite of Freemasonry 1896-1929 (Minneapolis: Frederick R. Weisman Art Mus"
+              - generic [ref=f103e326]:
+                - link "" [ref=f103e327] [cursor=pointer]:
+                  - /url: /site/www.dartmo.com
+                - link "" [ref=f103e329] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.dartmo.com/halls/hallsnotes.html
+            - generic [ref=f103e331]:
+              - link "Tracking" [ref=f103e333] [cursor=pointer]:
+                - /url: /site/www.dartmo.com?view=traffic
+              - link "Has Ads" [ref=f103e334] [cursor=pointer]:
+                - /url: /site/www.dartmo.com?view=traffic
+              - generic "Contains Affiliate Link" [ref=f103e335]: Has Affiliate
+          - generic [ref=f103e337]:
+            - generic [ref=f103e338]:
+              - generic [ref=f103e339]:
+                - generic [ref=f103e340]:
+                  - generic "Match density" [ref=f103e341]
+                  - generic [ref=f103e345]:
+                    - heading [level=2] [ref=f103e346]:
+                      - link "Black Alumni Council Members | Auburn Alumni Association" [ref=f103e347] [cursor=pointer]:
+                        - /url: https://alumni.auburn.edu/black-alumni-council/black-alumni-council-members/
+                    - link "https://alumni.auburn.edu/black-alumni-council/black-alumni-council-members/" [ref=f103e349] [cursor=pointer]:
+                      - /url: https://alumni.auburn.edu/black-alumni-council/black-alumni-council-members/
+                - paragraph [ref=f103e351]: Chair-Elect College of Liberal Arts Chelsea S. Phillips is a dual entrepreneur in both Sports Public Relations for professional athletes/ sports executives as well as her family’s business in financial services. Her impact extends to mentorship with middl
+              - generic [ref=f103e352]:
+                - link "" [ref=f103e353] [cursor=pointer]:
+                  - /url: /site/alumni.auburn.edu
+                - link "" [ref=f103e355] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alumni.auburn.edu/black-alumni-council/black-alumni-council-members/
+            - generic "Contains JavaScript" [ref=f103e359]: JS
+          - generic [ref=f103e361]:
+            - generic [ref=f103e362]:
+              - generic [ref=f103e363]:
+                - generic [ref=f103e364]:
+                  - generic "Match density" [ref=f103e365]
+                  - generic [ref=f103e369]:
+                    - heading [level=2] [ref=f103e370]:
+                      - link "Gold Honors Scholars - Juris Doctor (JD) | USC Gould School of Law" [ref=f103e371] [cursor=pointer]:
+                        - /url: https://gould.usc.edu/academics/degrees/jd/financial-aid/honors/
+                    - link "https://gould.usc.edu/academics/degrees/jd/financial-aid/honors/" [ref=f103e373] [cursor=pointer]:
+                      - /url: https://gould.usc.edu/academics/degrees/jd/financial-aid/honors/
+                - paragraph [ref=f103e375]: USC Gould School of Law In this Section Launched through the generosity of USC Trustee Stanley Gold, JD 1967, and his wife, Ilene, the Honors Scholars combines financial support with mentoring and networking opportunities for selected, highly ranked incom
+              - generic [ref=f103e376]:
+                - link "" [ref=f103e377] [cursor=pointer]:
+                  - /url: /site/gould.usc.edu
+                - link "" [ref=f103e379] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://gould.usc.edu/academics/degrees/jd/financial-aid/honors/
+            - generic [ref=f103e381]:
+              - link "Tracking" [ref=f103e383] [cursor=pointer]:
+                - /url: /site/gould.usc.edu?view=traffic
+              - generic "Contains JavaScript" [ref=f103e384]: JS
+              - link "Has Ads" [ref=f103e385] [cursor=pointer]:
+                - /url: /site/gould.usc.edu?view=traffic
+          - generic [ref=f103e387]:
+            - generic [ref=f103e388]:
+              - generic [ref=f103e389]:
+                - generic [ref=f103e390]:
+                  - generic "Match density" [ref=f103e391]
+                  - generic [ref=f103e395]:
+                    - heading [level=2] [ref=f103e396]:
+                      - link "Introducing the 2025 Hands On Atlanta Civic Fellows — Hands On Atlanta" [ref=f103e397] [cursor=pointer]:
+                        - /url: https://www.handsonatlanta.org/blog/introducing-the-2025-hands-on-atlanta-civic-fellows
+                    - link "https://www.handsonatlanta.org/blog/introducing-the-2025-hands-on-atlanta-civic-fellows" [ref=f103e399] [cursor=pointer]:
+                      - /url: https://www.handsonatlanta.org/blog/introducing-the-2025-hands-on-atlanta-civic-fellows
+                - paragraph [ref=f103e401]: The 2025 Hands On Atlanta Civic Leadership Program, powered by Constellation, has officially begun! From October 2024 to May 2025, 31 Civic Fellows will drive positive change by organizing at least one volunteer project each month with their partner organ
+              - generic [ref=f103e402]:
+                - link "" [ref=f103e403] [cursor=pointer]:
+                  - /url: /site/www.handsonatlanta.org
+                - link "" [ref=f103e405] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.handsonatlanta.org/blog/introducing-the-2025-hands-on-atlanta-civic-fellows
+            - generic "Contains JavaScript" [ref=f103e409]: JS
+          - generic [ref=f103e411]:
+            - generic [ref=f103e412]:
+              - generic [ref=f103e413]:
+                - generic [ref=f103e414]:
+                  - generic "Match density" [ref=f103e415]
+                  - generic [ref=f103e419]:
+                    - heading [level=2] [ref=f103e420]:
+                      - link "Community — The Six Viewpoints" [ref=f103e421] [cursor=pointer]:
+                        - /url: https://www.sixviewpoints.com/communityhappenings
+                    - link "https://www.sixviewpoints.com/communityhappenings" [ref=f103e423] [cursor=pointer]:
+                      - /url: https://www.sixviewpoints.com/communityhappenings
+                - paragraph [ref=f103e425]: "A PHOTOGRAPHIC ODYSSEY AND ROLY POLIES WITH THE MILLION UNDERSCORES__ Opening June 6 and running till June 30 The Million Underscores: A photographic Odyssey by José Miranda Jose has been the photographer for The Million Underscores since 2020 and has bee"
+              - generic [ref=f103e426]:
+                - link "" [ref=f103e427] [cursor=pointer]:
+                  - /url: /site/www.sixviewpoints.com
+                - link "" [ref=f103e429] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.sixviewpoints.com/communityhappenings
+            - generic "Contains JavaScript" [ref=f103e433]: JS
+          - generic [ref=f103e435]:
+            - generic [ref=f103e436]:
+              - generic [ref=f103e437]:
+                - generic [ref=f103e438]:
+                  - generic "Match density" [ref=f103e439]
+                  - generic [ref=f103e443]:
+                    - heading [level=2] [ref=f103e444]:
+                      - link "Truman Today | Features - Vol. 17 No. 8 - Oct. 15, 2012" [ref=f103e445] [cursor=pointer]:
+                        - /url: https://newsletter.truman.edu/issue.asp?id=395
+                    - link "https://newsletter.truman.edu/issue.asp?id=395" [ref=f103e447] [cursor=pointer]:
+                      - /url: https://newsletter.truman.edu/issue.asp?id=395
+                - paragraph [ref=f103e449]: Search Truman Today Vol. 17 No. 8 - Oct. 15, 2012 Features Announcements Notables Notes
+              - generic [ref=f103e450]:
+                - link "" [ref=f103e451] [cursor=pointer]:
+                  - /url: /site/newsletter.truman.edu
+                - link "" [ref=f103e453] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://newsletter.truman.edu/issue.asp?id=395
+            - generic "Contains JavaScript" [ref=f103e457]: JS
+          - generic [ref=f103e459]:
+            - generic [ref=f103e460]:
+              - generic [ref=f103e461]:
+                - generic [ref=f103e462]:
+                  - generic "Match density" [ref=f103e463]
+                  - generic [ref=f103e467]:
+                    - heading [level=2] [ref=f103e468]:
+                      - link "CoAL Distinguished Alumni" [ref=f103e469] [cursor=pointer]:
+                        - /url: https://www.apsu.edu/coal/awards/distinguishedalumni.php
+                    - link "https://www.apsu.edu/coal/awards/distinguishedalumni.php" [ref=f103e471] [cursor=pointer]:
+                      - /url: https://www.apsu.edu/coal/awards/distinguishedalumni.php
+                - paragraph [ref=f103e473]: Starting in 2020, each department within the College of Arts & Letters began selecting one alumnus annually from their programs to be awarded the Distinguished Alumni Award. Recipients are chosen to recognize their individual achievements, contributions t
+              - generic [ref=f103e474]:
+                - link "" [ref=f103e475] [cursor=pointer]:
+                  - /url: /site/www.apsu.edu
+                - link "" [ref=f103e477] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.apsu.edu/coal/awards/distinguishedalumni.php
+            - generic [ref=f103e479]:
+              - link "Tracking" [ref=f103e481] [cursor=pointer]:
+                - /url: /site/www.apsu.edu?view=traffic
+              - generic "Contains JavaScript" [ref=f103e482]: JS
+              - link "Has Ads" [ref=f103e483] [cursor=pointer]:
+                - /url: /site/www.apsu.edu?view=traffic
+          - generic [ref=f103e485]:
+            - generic [ref=f103e486]:
+              - generic [ref=f103e487]:
+                - generic [ref=f103e488]:
+                  - generic "Match density" [ref=f103e489]
+                  - generic [ref=f103e493]:
+                    - heading [level=2] [ref=f103e494]:
+                      - link "~~~~~~~~~ ~ \" ~\" - ~~':sier ~l~~~:e ~ > . . PI !~ iI March By William C. FitzGibbon, '40 31 Day." [ref=f103e495] [cursor=pointer]:
+                        - /url: https://institutionalmemory.iu.edu/aimrest/api/core/bitstreams/e3a524dc-7135-4b3b-9768-17ea118efdb1/content
+                    - generic [ref=f103e496]:
+                      - generic "PDF" [ref=f103e497]: 
+                      - link "https://institutionalmemory.iu.edu/aimrest/api/core/bitstreams/e3a524dc-7135-4b3b-9768-17ea118efdb1/content" [ref=f103e498] [cursor=pointer]:
+                        - /url: https://institutionalmemory.iu.edu/aimrest/api/core/bitstreams/e3a524dc-7135-4b3b-9768-17ea118efdb1/content
+                - paragraph [ref=f103e500]: ~~':. ~ 8 Ed Kemp and his fa III 0 u::; 1940 March 1940 who was forced to cancel his ; .,~~!~r<1 band return to the ca mpus to p1ay engagement. ~ '~b for all Gther Junior Prom . .. S M T W T F S 'Jp ~j Kemp's Inusicians made a last· '" '" * * * 1 2 19 Cam
+              - generic [ref=f103e501]:
+                - link "" [ref=f103e502] [cursor=pointer]:
+                  - /url: /site/institutionalmemory.iu.edu
+                - link "" [ref=f103e504] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://institutionalmemory.iu.edu/aimrest/api/core/bitstreams/e3a524dc-7135-4b3b-9768-17ea118efdb1/content
+            - generic [ref=f103e506]: PDF File
+          - generic [ref=f103e510]:
+            - generic [ref=f103e511]:
+              - generic [ref=f103e512]:
+                - generic [ref=f103e513]:
+                  - generic "Match density" [ref=f103e514]
+                  - generic [ref=f103e518]:
+                    - heading [level=2] [ref=f103e519]:
+                      - link "The Frater - Leadership Institute demonstrates the value of leadership and followership - Pi Lambda Phi" [ref=f103e520] [cursor=pointer]:
+                        - /url: https://www.readkong.com/page/the-frater-leadership-institute-demonstrates-the-value-of-4934684
+                    - link "https://www.readkong.com/page/the-frater-leadership-institute-demonstrates-the-value-of-4934684" [ref=f103e522] [cursor=pointer]:
+                      - /url: https://www.readkong.com/page/the-frater-leadership-institute-demonstrates-the-value-of-4934684
+                - paragraph [ref=f103e524]: "Page created by Leo Schwartz CONTINUE READING Page content transcription If your browser does not render page correctly, please read the page content below The Frater THE MAGAZINE OF PI LAMBDA PHI FRATERNITY SINCE 1915 Volume #113, Issue No."
+              - generic [ref=f103e525]:
+                - link "" [ref=f103e526] [cursor=pointer]:
+                  - /url: /site/www.readkong.com
+                - link "" [ref=f103e528] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.readkong.com/page/the-frater-leadership-institute-demonstrates-the-value-of-4934684
+            - generic [ref=f103e530]:
+              - link "Tracking" [ref=f103e532] [cursor=pointer]:
+                - /url: /site/www.readkong.com?view=traffic
+              - generic "Contains JavaScript" [ref=f103e533]: JS
+              - link "Has Ads" [ref=f103e534] [cursor=pointer]:
+                - /url: /site/www.readkong.com?view=traffic
+          - generic [ref=f103e536]:
+            - generic [ref=f103e537]:
+              - generic [ref=f103e538]:
+                - generic [ref=f103e539]:
+                  - generic "Match density" [ref=f103e540]
+                  - generic [ref=f103e544]:
+                    - heading [level=2] [ref=f103e545]:
+                      - link "The Wolverine observer. (Atlanta, Georgia) 1936-2001, March 12, 1954, Image 1 « Georgia Historic Newspapers" [ref=f103e546] [cursor=pointer]:
+                        - /url: https://gahistoricnewspapers.galileo.usg.edu/lccn/sn54110460/1954-03-12/ed-1/seq-1/ocr/
+                    - link "https://gahistoricnewspapers.galileo.usg.edu/lccn/sn54110460/1954-03-12/ed-1/seq-1/ocr/" [ref=f103e548] [cursor=pointer]:
+                      - /url: https://gahistoricnewspapers.galileo.usg.edu/lccn/sn54110460/1954-03-12/ed-1/seq-1/ocr/
+                - paragraph [ref=f103e550]: Below is the for this newspapers page. It is also available as as well as Vol. 20 Morris Brown College, Atlanta, Ga., March 12, 1954 ~ A ~ Povfr t~<- No. 1 M. B. C. iMERRATES 69th FOUNDERS’ DAY PROFESSOR GILES BECOMES LIEUTENANT COLONEL On January 14,
+              - generic [ref=f103e551]:
+                - link "" [ref=f103e552] [cursor=pointer]:
+                  - /url: /site/gahistoricnewspapers.galileo.usg.edu
+                - link "" [ref=f103e554] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://gahistoricnewspapers.galileo.usg.edu/lccn/sn54110460/1954-03-12/ed-1/seq-1/ocr/
+            - generic "Contains JavaScript" [ref=f103e558]: JS
+          - generic [ref=f103e560]:
+            - generic [ref=f103e561]:
+              - generic [ref=f103e562]:
+                - generic [ref=f103e563]:
+                  - generic "Match density" [ref=f103e564]
+                  - generic [ref=f103e568]:
+                    - heading [level=2] [ref=f103e569]:
+                      - link "Meet The Fellows - WKKF Community Leadership Network" [ref=f103e570] [cursor=pointer]:
+                        - /url: https://wkkfcln.org/meet-the-fellows/
+                    - link "https://wkkfcln.org/meet-the-fellows/" [ref=f103e572] [cursor=pointer]:
+                      - /url: https://wkkfcln.org/meet-the-fellows/
+                - paragraph [ref=f103e574]: Community Builder New Orleans, Louisiana Aaron Frumin is a community builder who believes young people rise when they’re given real responsibility, trusted guidance and the chance to contribute in meaningful ways. His work is grounded in the idea that opp
+              - generic [ref=f103e575]:
+                - link "" [ref=f103e576] [cursor=pointer]:
+                  - /url: /site/wkkfcln.org
+                - link "" [ref=f103e578] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://wkkfcln.org/meet-the-fellows/
+            - generic [ref=f103e580]:
+              - link "Tracking" [ref=f103e582] [cursor=pointer]:
+                - /url: /site/wkkfcln.org?view=traffic
+              - generic "Contains JavaScript" [ref=f103e583]: JS
+              - link "Has Ads" [ref=f103e584] [cursor=pointer]:
+                - /url: /site/wkkfcln.org?view=traffic
+          - generic [ref=f103e586]:
+            - generic [ref=f103e587]:
+              - generic [ref=f103e588]:
+                - generic [ref=f103e589]:
+                  - generic "Match density" [ref=f103e590]
+                  - generic [ref=f103e594]:
+                    - heading [level=2] [ref=f103e595]:
+                      - link "WKU in the News Archive | Western Kentucky University" [ref=f103e596] [cursor=pointer]:
+                        - /url: https://www.wku.edu/news/in-the-news-archive.php
+                    - link "https://www.wku.edu/news/in-the-news-archive.php" [ref=f103e598] [cursor=pointer]:
+                      - /url: https://www.wku.edu/news/in-the-news-archive.php
+                - paragraph [ref=f103e600]: The WKU in the News Archive page contains a listing of news reports about WKU from 2018 to 2023.
+              - generic [ref=f103e601]:
+                - link "" [ref=f103e602] [cursor=pointer]:
+                  - /url: /site/www.wku.edu
+                - link "" [ref=f103e604] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.wku.edu/news/in-the-news-archive.php
+            - generic "Contains JavaScript" [ref=f103e608]: JS
+          - generic [ref=f103e610]:
+            - generic [ref=f103e611]:
+              - generic [ref=f103e612]:
+                - generic [ref=f103e613]:
+                  - generic "Match density" [ref=f103e614]
+                  - generic [ref=f103e618]:
+                    - heading [level=2] [ref=f103e619]:
+                      - link "Success Stories - Scholarships.com" [ref=f103e620] [cursor=pointer]:
+                        - /url: https://www.scholarships.com/financial-aid/college-scholarships/success-stories
+                    - link "https://www.scholarships.com/financial-aid/college-scholarships/success-stories" [ref=f103e622] [cursor=pointer]:
+                      - /url: https://www.scholarships.com/financial-aid/college-scholarships/success-stories
+                - paragraph [ref=f103e624]: "Updated: July 10, 2025 on Scholarships.com are sharing their achievements! Check out their stories and the scholarships they've been awarded. See how they use our platform to find and win college scholarships! Scholarships Awarded: \"There were so many sch"
+              - generic [ref=f103e625]:
+                - link "" [ref=f103e626] [cursor=pointer]:
+                  - /url: /site/www.scholarships.com
+                - link "" [ref=f103e628] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.scholarships.com/financial-aid/college-scholarships/success-stories
+            - generic [ref=f103e630]:
+              - link "Tracking" [ref=f103e632] [cursor=pointer]:
+                - /url: /site/www.scholarships.com?view=traffic
+              - generic "Contains JavaScript" [ref=f103e633]: JS
+              - link "Has Ads" [ref=f103e634] [cursor=pointer]:
+                - /url: /site/www.scholarships.com?view=traffic
+          - generic [ref=f103e636]:
+            - generic [ref=f103e637]:
+              - generic [ref=f103e638]:
+                - generic [ref=f103e639]:
+                  - generic "Match density" [ref=f103e640]
+                  - generic [ref=f103e644]:
+                    - heading [level=2] [ref=f103e645]:
+                      - link "Class Notes - Stony Brook Matters" [ref=f103e646] [cursor=pointer]:
+                        - /url: https://sbmatters.stonybrook.edu/class-notes-2-2/
+                    - generic [ref=f103e647]:
+                      - text: 2022-03-30 ·
+                      - link "https://sbmatters.stonybrook.edu/class-notes-2-2/" [ref=f103e648] [cursor=pointer]:
+                        - /url: https://sbmatters.stonybrook.edu/class-notes-2-2/
+                - paragraph [ref=f103e650]: Spencer Utter ’17, ’22 was chosen by the Knowles Teacher Initiative as a member of its 2023 Cohort of Teaching Fellows. This year, 37 promising high school mathematics and science teachers who are just beginning their careers were awarded Knowles Teaching
+              - generic [ref=f103e651]:
+                - link "" [ref=f103e652] [cursor=pointer]:
+                  - /url: /site/sbmatters.stonybrook.edu
+                - link "" [ref=f103e654] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://sbmatters.stonybrook.edu/class-notes-2-2/
+            - generic [ref=f103e656]:
+              - link "Tracking" [ref=f103e658] [cursor=pointer]:
+                - /url: /site/sbmatters.stonybrook.edu?view=traffic
+              - generic "Contains JavaScript" [ref=f103e659]: JS
+              - link "Has Ads" [ref=f103e660] [cursor=pointer]:
+                - /url: /site/sbmatters.stonybrook.edu?view=traffic
+          - generic [ref=f103e662]:
+            - generic [ref=f103e663]:
+              - generic [ref=f103e664]:
+                - generic [ref=f103e665]:
+                  - generic "Match density" [ref=f103e666]
+                  - generic [ref=f103e670]:
+                    - heading [level=2] [ref=f103e671]:
+                      - link "2021–2022 CATALOG 126 PARK AVENUE, BRIDGEPORT, CT 06604 ––––––––––" [ref=f103e672] [cursor=pointer]:
+                        - /url: https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+                    - generic [ref=f103e673]:
+                      - generic "PDF" [ref=f103e674]: 
+                      - link "https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf" [ref=f103e675] [cursor=pointer]:
+                        - /url: https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+                - paragraph [ref=f103e677]: 3 lecture hours; 3 semester hours Clinical Practice III tory and clinical settings. The comprehensive DENTAL HYGIENE 129 This course provides students the opportunity content areas will include rational for pain Clinical Practice I to expand on the basic
+              - generic [ref=f103e678]:
+                - link "" [ref=f103e679] [cursor=pointer]:
+                  - /url: /site/www.bridgeport.edu
+                - link "" [ref=f103e681] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.bridgeport.edu/files/docs/academics/registrar/catalog/catalog-2021-2022.pdf
+            - generic [ref=f103e683]:
+              - paragraph [ref=f103e684]: "Also from www.bridgeport.edu:"
+              - list [ref=f103e685]:
+                - listitem [ref=f103e686]:
+                  - generic "PDF": 
+                  - link "2021–2022 CATALOG 126 PARK AVENUE, BRIDGEPORT, CT 06604 ––––––––––" [ref=f103e687] [cursor=pointer]:
+                    - /url: https://www.bridgeport.edu/files/docs/academics/catalogs/catalog-2021-2022.pdf
+            - generic [ref=f103e688]:
+              - generic [ref=f103e690]: PDF File
+              - link "Tracking" [ref=f103e691] [cursor=pointer]:
+                - /url: /site/www.bridgeport.edu?view=traffic
+              - link "Has Ads" [ref=f103e692] [cursor=pointer]:
+                - /url: /site/www.bridgeport.edu?view=traffic
+          - generic [ref=f103e694]:
+            - generic [ref=f103e695]:
+              - generic [ref=f103e696]:
+                - generic [ref=f103e697]:
+                  - generic "Match density" [ref=f103e698]
+                  - generic [ref=f103e702]:
+                    - heading [level=2] [ref=f103e703]:
+                      - link "Leading the Way" [ref=f103e704] [cursor=pointer]:
+                        - /url: https://www.colorado.edu/registrar/media/293
+                    - generic [ref=f103e705]:
+                      - generic "PDF" [ref=f103e706]: 
+                      - link "https://www.colorado.edu/registrar/media/293" [ref=f103e707] [cursor=pointer]:
+                        - /url: https://www.colorado.edu/registrar/media/293
+                - paragraph [ref=f103e709]: 290 ANTH 4200-3. North American Archaeology. Surveys archaeological evidence ANTH 4440-3. Egyptian Hieroglyphics 1. Studies the ancient Egyptian language for the development and diversity of Native American ways of life in North to shed light on the histo
+              - generic [ref=f103e710]:
+                - link "" [ref=f103e711] [cursor=pointer]:
+                  - /url: /site/www.colorado.edu
+                - link "" [ref=f103e713] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.colorado.edu/registrar/media/293
+            - generic [ref=f103e715]:
+              - paragraph [ref=f103e716]: "Also from www.colorado.edu:"
+              - list [ref=f103e717]:
+                - listitem [ref=f103e718]:
+                  - generic "PDF": 
+                  - link "Catalog" [ref=f103e719] [cursor=pointer]:
+                    - /url: https://www.colorado.edu/registrar/media/292
+                - listitem [ref=f103e720]:
+                  - generic "PDF": 
+                  - link "University of Colorado at Boulder Catalog 2005–06" [ref=f103e721] [cursor=pointer]:
+                    - /url: https://www.colorado.edu/registrar/media/254
+                - listitem [ref=f103e722]:
+                  - generic "PDF": 
+                  - link "Contents" [ref=f103e723] [cursor=pointer]:
+                    - /url: https://www.colorado.edu/registrar/media/255
+                - listitem [ref=f103e724]:
+                  - generic "PDF": 
+                  - link "University of Colorado Catalog" [ref=f103e725] [cursor=pointer]:
+                    - /url: https://www.colorado.edu/registrar/media/533
+            - generic [ref=f103e726]:
+              - link "5 more" [ref=f103e728] [cursor=pointer]:
+                - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter+site%3Awww.colorado.edu&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e730]: PDF File
+              - link "Tracking" [ref=f103e731] [cursor=pointer]:
+                - /url: /site/www.colorado.edu?view=traffic
+              - link "Has Ads" [ref=f103e732] [cursor=pointer]:
+                - /url: /site/www.colorado.edu?view=traffic
+    - complementary [ref=f103e733]:
+      - text: 
+      - generic [ref=f103e735]:
+        - heading " Search Settings" [level=2] [ref=f103e736]:
+          - generic [ref=f103e737]: 
+          - text: Search Settings
+        - generic [ref=f103e738]:
+          - button [ref=f103e740] [cursor=pointer]:
+            - link " Search In Title" [ref=f103e741]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&searchTitle=title&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e742]: 
+              - generic [ref=f103e743]: Search In Title
+          - button [ref=f103e745] [cursor=pointer]:
+            - link " Recent Results" [ref=f103e746]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&recent=recent&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e747]: 
+              - generic [ref=f103e748]: Recent Results
+          - button [ref=f103e750] [cursor=pointer]:
+            - link " Remove JS" [ref=f103e751]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&js=no-js&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e752]: 
+              - generic [ref=f103e753]: Remove JS
+          - button [ref=f103e755] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f103e756]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&adtech=reduce&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e757]: 
+              - generic [ref=f103e758]: Reduce Adtech
+          - button [ref=f103e760] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f103e761]:
+              - /url: /search?query=Alpha+Phi+MIT+sorority+iota+chapter&nsfw=smut&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f103e762]: 
+              - generic [ref=f103e763]: Reduce NSFW
+          - button [ref=f103e766] [cursor=pointer]:
+            - generic [ref=f103e767]:
+              - generic [ref=f103e768]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f103e770]:
+    - heading "Search Help" [level=1] [ref=f103e771]
+    - generic [ref=f103e772]:
+      - generic [ref=f103e773]:
+        - heading " Syntax" [level=2] [ref=f103e774]:
+          - generic [ref=f103e775]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f103e776]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f103e777]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f103e778]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f103e779]
+        - heading "Samples" [level=2] [ref=f103e780]
+        - generic [ref=f103e781]:
+          - term [ref=f103e782]: soup -chicken
+          - definition [ref=f103e783]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f103e784]: "\"keyboard\""
+          - definition [ref=f103e785]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f103e786]: "\"steve mcqueen\""
+          - definition [ref=f103e787]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f103e788]: apology (plato)
+          - definition [ref=f103e789]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f103e790]:
+          - generic [ref=f103e791]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f103e792]
+        - generic [ref=f103e793]: This is by the beginning
+        - generic [ref=f103e801]: This is in the middle
+        - generic [ref=f103e809]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f103e815]:
+          - generic [ref=f103e816]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f103e817]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f103e818]
+        - heading " Webmaster Information" [level=2] [ref=f103e819]:
+          - generic [ref=f103e820]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f103e821]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f103e822] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f103e823] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f103e824]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f103e825] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f103e826]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f103e827] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f103e828]:
+        - heading " Special Keywords" [level=2] [ref=f103e829]:
+          - generic [ref=f103e830]: 
+          - text: Special Keywords
+        - table [ref=f103e831]:
+          - rowgroup [ref=f103e832]:
+            - row [ref=f103e833]:
+              - columnheader "Keyword" [ref=f103e834]
+              - columnheader "Meaning" [ref=f103e835]
+          - rowgroup [ref=f103e836]:
+            - row [ref=f103e837]:
+              - cell [ref=f103e838]:
+                - text: "site:"
+                - emphasis [ref=f103e839]: example.com
+              - cell [ref=f103e840]:
+                - text: Display site information about
+                - emphasis [ref=f103e841]: example.com
+            - row [ref=f103e842]:
+              - cell [ref=f103e843]:
+                - text: "site:"
+                - emphasis [ref=f103e844]: example.com
+                - emphasis [ref=f103e845]: keyword
+              - cell [ref=f103e846]:
+                - text: Search
+                - emphasis [ref=f103e847]: example.com
+                - text: for
+                - emphasis [ref=f103e848]: keyword
+            - row [ref=f103e849]:
+              - cell [ref=f103e850]:
+                - text: "site:"
+                - emphasis [ref=f103e851]: "*.example.com"
+                - emphasis [ref=f103e852]: keyword
+              - cell [ref=f103e853]:
+                - text: Search
+                - emphasis [ref=f103e854]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f103e855]: keyword
+            - row [ref=f103e856]:
+              - cell [ref=f103e857]:
+                - text: "browse:"
+                - emphasis [ref=f103e858]: example.com
+              - cell [ref=f103e859]:
+                - text: Show similar websites to
+                - emphasis [ref=f103e860]: example.com
+            - row [ref=f103e861]:
+              - cell [ref=f103e862]:
+                - text: "ip:"
+                - emphasis [ref=f103e863]: 127.0.0.1
+              - cell [ref=f103e864]:
+                - text: Search documents hosted at
+                - emphasis [ref=f103e865]: 127.0.0.1
+            - row [ref=f103e866]:
+              - cell [ref=f103e867]:
+                - text: "links:"
+                - emphasis [ref=f103e868]: example.com
+              - cell [ref=f103e869]:
+                - text: Search documents linking to
+                - emphasis [ref=f103e870]: example.com
+            - row [ref=f103e871]:
+              - cell [ref=f103e872]:
+                - text: "tld:"
+                - emphasis [ref=f103e873]: edu
+                - emphasis [ref=f103e874]: keyword
+              - cell [ref=f103e875]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f103e876]: edu
+                - text: .
+            - row [ref=f103e877]:
+              - cell [ref=f103e878]:
+                - text: "?tld:"
+                - emphasis [ref=f103e879]: edu
+                - emphasis [ref=f103e880]: keyword
+              - cell [ref=f103e881]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f103e882]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f103e883]:
+              - cell "q>5" [ref=f103e884]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f103e885]
+            - row [ref=f103e886]:
+              - cell "q<5" [ref=f103e887]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f103e888]
+            - row [ref=f103e889]:
+              - cell "year>2005" [ref=f103e890]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f103e891]
+            - row [ref=f103e892]:
+              - cell "year=2005" [ref=f103e893]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f103e894]
+            - row [ref=f103e895]:
+              - cell "year<2005" [ref=f103e896]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f103e897]
+            - row [ref=f103e898]:
+              - cell "rank>50" [ref=f103e899]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f103e900]
+            - row [ref=f103e901]:
+              - cell "rank<50" [ref=f103e902]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f103e903]
+            - row [ref=f103e904]:
+              - cell "format:html5" [ref=f103e905]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f103e906]
+            - row [ref=f103e907]:
+              - cell "format:xhtml" [ref=f103e908]
+              - cell "Filter documents using the XHTML standard" [ref=f103e909]
+            - row [ref=f103e910]:
+              - cell "format:html123" [ref=f103e911]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f103e912]
+            - row [ref=f103e913]:
+              - cell "generator:wordpress" [ref=f103e914]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f103e915]
+            - row [ref=f103e916]:
+              - cell "file:zip" [ref=f103e917]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f103e918]
+            - row [ref=f103e919]:
+              - cell "file:audio" [ref=f103e920]
+              - cell "Filter documents containing a link to an audio file" [ref=f103e921]
+            - row [ref=f103e922]:
+              - cell "file:video" [ref=f103e923]
+              - cell "Filter documents containing a link to a video file" [ref=f103e924]
+            - row [ref=f103e925]:
+              - cell "file:archive" [ref=f103e926]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f103e927]
+            - row [ref=f103e928]:
+              - cell "file:document" [ref=f103e929]
+              - cell "Filter documents containing a link to a document" [ref=f103e930]
+            - row [ref=f103e931]:
+              - cell "-special:media" [ref=f103e932]
+              - cell "Filter out documents with audio or video tags" [ref=f103e933]
+            - row [ref=f103e934]:
+              - cell "-special:scripts" [ref=f103e935]
+              - cell "Filter out documents with javascript" [ref=f103e936]
+            - row [ref=f103e937]:
+              - cell "-special:affiliate" [ref=f103e938]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f103e939]
+            - row [ref=f103e940]:
+              - cell "-special:tracking" [ref=f103e941]
+              - cell "Filter out documents with analytics or tracking code" [ref=f103e942]
+            - row [ref=f103e943]:
+              - cell "-special:cookies" [ref=f103e944]
+              - cell "Filter out documents with cookies" [ref=f103e945]
+  - contentinfo [ref=f103e946]:
+    - heading "Policy Information" [level=1] [ref=f103e947]
+    - generic [ref=f103e948]:
+      - generic [ref=f103e949]:
+        - heading " Policies" [level=2] [ref=f103e950]:
+          - generic [ref=f103e951]: 
+          - text: Policies
+        - generic [ref=f103e952]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f103e953]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f103e954]:
+        - heading " Contact" [level=2] [ref=f103e955]:
+          - generic [ref=f103e956]: 
+          - text: Contact
+        - generic [ref=f103e957]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f103e958] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f103e959]:
+          - generic [ref=f103e960]: 
+          - text: Sources
+        - generic [ref=f103e961]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f103e962] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f103e963]:
+        - heading " Data" [level=2] [ref=f103e964]:
+          - generic [ref=f103e965]: 
+          - text: Data
+        - generic [ref=f103e966]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f103e967] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f103e968] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

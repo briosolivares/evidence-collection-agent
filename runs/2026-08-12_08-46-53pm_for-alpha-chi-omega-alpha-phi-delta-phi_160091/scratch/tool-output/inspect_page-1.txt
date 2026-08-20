@@ -1,0 +1,990 @@
+URL: https://marginalia-search.com/search?query=Alpha+Chi+Omega+MIT+sorority&sst=SE-1bc25e84c4c8be68
+Title: Alpha Chi Omega MIT sorority - Marginalia Search
+
+- generic [active] [ref=f102e1]:
+  - link "Skip To Content" [ref=f102e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f102e3]:
+    - navigation [ref=f102e5]:
+      - generic [ref=f102e7]:
+        - link "Search" [ref=f102e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f102e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f102e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f102e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f102e13]:
+    - generic [ref=f102e15]:
+      - heading [level=1] [ref=f102e17]:
+        - link "Marginalia Search" [ref=f102e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f102e21]:
+        - textbox "Search the web!" [ref=f102e22]: Alpha Chi Omega MIT sorority
+        - button " Search" [ref=f102e23] [cursor=pointer]:
+          - generic [ref=f102e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f102e25]:
+    - complementary [ref=f102e26]:
+      - generic [ref=f102e28]:
+        - heading " Filter" [level=2] [ref=f102e29]:
+          - generic [ref=f102e30]: 
+          - text: Filter
+        - generic [ref=f102e31]:
+          - button [ref=f102e33] [cursor=pointer]:
+            - link " All" [ref=f102e34]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e35]: 
+              - text: All
+          - button [ref=f102e37] [cursor=pointer]:
+            - link " Blogs" [ref=f102e38]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=blogosphere&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e39]: 
+              - text: Blogs
+          - button [ref=f102e41] [cursor=pointer]:
+            - link " Academia" [ref=f102e42]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=academia&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e43]: 
+              - text: Academia
+          - button [ref=f102e45] [cursor=pointer]:
+            - link " Vintage" [ref=f102e46]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=vintage&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e47]: 
+              - text: Vintage
+          - button [ref=f102e49] [cursor=pointer]:
+            - link " Small Web" [ref=f102e50]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=modern&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e51]: 
+              - text: Small Web
+          - button [ref=f102e54] [cursor=pointer]:
+            - link " Wikis" [ref=f102e55]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=wiki&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e56]: 
+              - text: Wikis
+          - button [ref=f102e58] [cursor=pointer]:
+            - link " Forums" [ref=f102e59]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=forum&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e60]: 
+              - text: Forums
+          - button [ref=f102e62] [cursor=pointer]:
+            - link " Recipes" [ref=f102e63]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=food&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e64]: 
+              - text: Recipes
+          - button [ref=f102e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f102e68]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&profile=custom&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f102e70]:
+      - generic [ref=f102e71]:
+        - heading "Results" [level=1] [ref=f102e72]
+        - generic [ref=f102e73]:
+          - generic [ref=f102e75]:
+            - generic [ref=f102e76]:
+              - generic [ref=f102e77]:
+                - generic [ref=f102e78]:
+                  - generic "Match density" [ref=f102e79]
+                  - generic [ref=f102e83]:
+                    - heading [level=2] [ref=f102e84]:
+                      - link "Alpha Chi Omega" [ref=f102e85] [cursor=pointer]:
+                        - /url: https://axo.mit.edu/faq/
+                    - link "https://axo.mit.edu/faq/" [ref=f102e87] [cursor=pointer]:
+                      - /url: https://axo.mit.edu/faq/
+                - paragraph [ref=f102e89]: New members bring excitement each year to the Theta Omicron chapter. During Formal Recruitment in the fall, potential new members are guided through the recruitment process with the hope that they will fall in love with their future sorority. What is recr
+              - generic [ref=f102e90]:
+                - link "" [ref=f102e91] [cursor=pointer]:
+                  - /url: /site/axo.mit.edu
+                - link "" [ref=f102e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://axo.mit.edu/faq/
+            - generic [ref=f102e95]:
+              - link "4 more" [ref=f102e97] [cursor=pointer]:
+                - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Aaxo.mit.edu&sst=SE-1bc25e84c4c8be68
+              - generic "Contains JavaScript" [ref=f102e99]: JS
+          - generic [ref=f102e101]:
+            - generic [ref=f102e102]:
+              - generic [ref=f102e103]:
+                - generic [ref=f102e104]:
+                  - generic "Match density" [ref=f102e105]
+                  - generic [ref=f102e109]:
+                    - heading [level=2] [ref=f102e110]:
+                      - link "One In Four USA" [ref=f102e111] [cursor=pointer]:
+                        - /url: https://www.oneinfourusa.org/nationalorganization.html
+                    - link "https://www.oneinfourusa.org/nationalorganization.html" [ref=f102e113] [cursor=pointer]:
+                      - /url: https://www.oneinfourusa.org/nationalorganization.html
+                - paragraph [ref=f102e115]: John D. Foubert, Ph.D. is the National President of One in Four and Professor of Higher Education and Student Affairs at Oklahoma State University. He earned his undergraduate degree in Psychology from the College of William and Mary, his Masterï¿½s in Ps
+              - generic [ref=f102e116]:
+                - link "" [ref=f102e117] [cursor=pointer]:
+                  - /url: /site/www.oneinfourusa.org
+                - link "" [ref=f102e119] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.oneinfourusa.org/nationalorganization.html
+            - generic "Contains JavaScript" [ref=f102e123]: JS
+          - generic [ref=f102e125]:
+            - generic [ref=f102e126]:
+              - generic [ref=f102e127]:
+                - generic [ref=f102e128]:
+                  - generic "Match density" [ref=f102e129]
+                  - generic [ref=f102e133]:
+                    - heading [level=2] [ref=f102e134]:
+                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f102e135] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f102e137] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                - paragraph [ref=f102e139]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+              - generic [ref=f102e140]:
+                - link "" [ref=f102e141] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f102e143] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+            - generic [ref=f102e145]:
+              - paragraph [ref=f102e146]: "Also from en.wikipedia.org:"
+              - list [ref=f102e147]:
+                - listitem [ref=f102e148]:
+                  - link "Phi Sigma Kappa" [ref=f102e149] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Sigma_Kappa
+                - listitem [ref=f102e150]:
+                  - link "Southern Methodist University" [ref=f102e151] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Southern_Methodist_University
+                - listitem [ref=f102e152]:
+                  - link "Neil Armstrong" [ref=f102e153] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Neil_Armstrong
+                - listitem [ref=f102e154]:
+                  - link "College of the University of Chicago" [ref=f102e155] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/College_of_the_University_of_Chicago
+            - generic [ref=f102e156]:
+              - link "4 more" [ref=f102e158] [cursor=pointer]:
+                - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Aen.wikipedia.org&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e160]: Wiki
+              - generic "Contains JavaScript" [ref=f102e161]: JS
+          - generic [ref=f102e163]:
+            - generic [ref=f102e164]:
+              - generic [ref=f102e165]:
+                - generic [ref=f102e166]:
+                  - generic "Match density" [ref=f102e167]
+                  - generic [ref=f102e171]:
+                    - heading [level=2] [ref=f102e172]:
+                      - link "a house tour of mit sororities! | MIT Admissions" [ref=f102e173] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/come-on-a-house-tour-of-mit-sororities/
+                    - link "https://mitadmissions.org/blogs/entry/come-on-a-house-tour-of-mit-sororities/" [ref=f102e175] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/come-on-a-house-tour-of-mit-sororities/
+                - paragraph [ref=f102e177]: "the six sororities include: Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Phi, and Sigma Kappa"
+              - generic [ref=f102e178]:
+                - link "" [ref=f102e179] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f102e181] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/come-on-a-house-tour-of-mit-sororities/
+            - generic [ref=f102e183]:
+              - paragraph [ref=f102e184]: "Also from mitadmissions.org:"
+              - list [ref=f102e185]:
+                - listitem [ref=f102e186]:
+                  - link "Sororities @ MIT- Become a part of it! | MIT Admissions" [ref=f102e187] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/
+                - listitem [ref=f102e188]:
+                  - link "Speaking in MITese | MIT Admissions" [ref=f102e189] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+                - listitem [ref=f102e190]:
+                  - link "Melis A. ’08 | MIT Admissions" [ref=f102e191] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/author/melis/
+                - listitem [ref=f102e192]:
+                  - link "CPW-ing the Weekend (Guest Entry) | MIT Admissions" [ref=f102e193] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/cpwing_the_weekend/
+            - generic [ref=f102e194]:
+              - link "7 more" [ref=f102e196] [cursor=pointer]:
+                - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Amitadmissions.org&sst=SE-1bc25e84c4c8be68
+              - generic "Contains JavaScript" [ref=f102e198]: JS
+          - generic [ref=f102e200]:
+            - generic [ref=f102e201]:
+              - generic [ref=f102e202]:
+                - generic [ref=f102e203]:
+                  - generic "Match density" [ref=f102e204]
+                  - generic [ref=f102e208]:
+                    - heading [level=2] [ref=f102e209]:
+                      - link "Signatures for the 2020 Petition — MIT BGSA" [ref=f102e210] [cursor=pointer]:
+                        - /url: https://bgsa.mit.edu/2020-signs
+                    - link "https://bgsa.mit.edu/2020-signs" [ref=f102e212] [cursor=pointer]:
+                      - /url: https://bgsa.mit.edu/2020-signs
+                - paragraph [ref=f102e214]: Community Signatures for the Organizations updated daily 150 Supporting Organizations Individuals updated every 10 minutes Signature list is loading, please wait.
+              - generic [ref=f102e215]:
+                - link "" [ref=f102e216] [cursor=pointer]:
+                  - /url: /site/bgsa.mit.edu
+                - link "" [ref=f102e218] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://bgsa.mit.edu/2020-signs
+            - generic "Contains JavaScript" [ref=f102e222]: JS
+          - generic [ref=f102e224]:
+            - generic [ref=f102e225]:
+              - generic [ref=f102e226]:
+                - generic [ref=f102e227]:
+                  - generic "Match density" [ref=f102e228]
+                  - generic [ref=f102e232]:
+                    - heading [level=2] [ref=f102e233]:
+                      - link "Aflfleim9 OflDiraally, URaaimyaiffi IT MunSe Ciasot" [ref=f102e234] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/29305a41-a7ac-4ded-9add-6ebb95861623/content
+                    - generic [ref=f102e235]:
+                      - generic "PDF" [ref=f102e236]: 
+                      - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/29305a41-a7ac-4ded-9add-6ebb95861623/content" [ref=f102e237] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/29305a41-a7ac-4ded-9add-6ebb95861623/content
+                - paragraph [ref=f102e239]: Comprising the May Court for Chi Omega house, Miss Cloudy Tr-r-u-. ''" '":,v 1947 will be Margaret Allen, has been active on the campus Elaine Cloudy and Mary East Runyan, elected in in the music field as a public close ballot- ing that began Wednesday an
+              - generic [ref=f102e240]:
+                - link "" [ref=f102e241] [cursor=pointer]:
+                  - /url: /site/digitalcollections.willamette.edu
+                - link "" [ref=f102e243] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://digitalcollections.willamette.edu/server/api/core/bitstreams/29305a41-a7ac-4ded-9add-6ebb95861623/content
+            - generic [ref=f102e245]:
+              - paragraph [ref=f102e246]: "Also from digitalcollections.willamette.edu:"
+              - list [ref=f102e247]:
+                - listitem [ref=f102e248]:
+                  - generic "PDF": 
+                  - link "Betting Days Willamette Collegian On Gambling" [ref=f102e249] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/5b5f3767-c010-431f-b9e0-87d97dfd63ce/content
+                - listitem [ref=f102e250]:
+                  - generic "PDF": 
+                  - link "IFaiurlliifflimm WMH lEmle.May WeeIk.Diidl" [ref=f102e251] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/8855afb1-896d-4f5a-a333-0022f026bc6f/content
+                - listitem [ref=f102e252]:
+                  - generic "PDF": 
+                  - link "D--D sDDom3Era D3e HgghbExs Size Unknown; Willamette Co Prospect Good" [ref=f102e253] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/7e88da55-253e-4d43-b539-66fd3ccc7359/content
+                - listitem [ref=f102e254]:
+                  - generic "PDF": 
+                  - link "Varsity Varieties Searche For W'llameite Co Ileg'ian Nominations Due For s Class Officers Talent This Week" [ref=f102e255] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/b00242b1-5294-4a65-b7bb-ada582b0b1a3/content
+            - generic [ref=f102e256]:
+              - link "27 more" [ref=f102e258] [cursor=pointer]:
+                - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Adigitalcollections.willamette.edu&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e260]: PDF File
+          - generic [ref=f102e262]:
+            - generic [ref=f102e263]:
+              - generic [ref=f102e264]:
+                - generic [ref=f102e265]:
+                  - generic "Match density" [ref=f102e266]
+                  - generic [ref=f102e270]:
+                    - heading [level=2] [ref=f102e271]:
+                      - link "Sophie Thompson | TEDxMIT" [ref=f102e272] [cursor=pointer]:
+                        - /url: https://tedx.mit.edu/organizers/sophie-thompson
+                    - link "https://tedx.mit.edu/organizers/sophie-thompson" [ref=f102e274] [cursor=pointer]:
+                      - /url: https://tedx.mit.edu/organizers/sophie-thompson
+                - paragraph [ref=f102e276]: Sophie is a junior studying Chemical Engineering with an interest in biomedical engineering. She is a member of the Lightweight Women’s rowing team, Alpha Chi Omega sorority, AIChE, and conducts research with the Biomechatronics Group on optimizing the ma
+              - generic [ref=f102e277]:
+                - link "" [ref=f102e278] [cursor=pointer]:
+                  - /url: /site/tedx.mit.edu
+                - link "" [ref=f102e280] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://tedx.mit.edu/organizers/sophie-thompson
+            - generic "Contains JavaScript" [ref=f102e284]: JS
+          - generic [ref=f102e286]:
+            - generic [ref=f102e287]:
+              - generic [ref=f102e288]:
+                - generic [ref=f102e289]:
+                  - generic "Match density" [ref=f102e290]
+                  - generic [ref=f102e294]:
+                    - heading [level=2] [ref=f102e295]:
+                      - link "MIT Spectrum - Lucy Kanias ’26 Savors the Full MIT Experience | MIT for a Better World" [ref=f102e296] [cursor=pointer]:
+                        - /url: https://betterworld.mit.edu/spectrum/issues/fall-2025/lucy-kanias-26-savors-the-full-mit-experience/
+                    - link "https://betterworld.mit.edu/spectrum/issues/fall-2025/lucy-kanias-26-savors-the-full-mit-experience/" [ref=f102e298] [cursor=pointer]:
+                      - /url: https://betterworld.mit.edu/spectrum/issues/fall-2025/lucy-kanias-26-savors-the-full-mit-experience/
+                - paragraph [ref=f102e300]: "Fall 2025 / Chemical engineering major, sorority member, and scholarship recipient thrives on campus and abroad Lucy Kanias, center, with her Alpha Chi Omega sisters Megha Vemuri '25 (left) and Elizabeth Jackson '27 (right) at a sorority event. PHOTO: COU"
+              - generic [ref=f102e301]:
+                - link "" [ref=f102e302] [cursor=pointer]:
+                  - /url: /site/betterworld.mit.edu
+                - link "" [ref=f102e304] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://betterworld.mit.edu/spectrum/issues/fall-2025/lucy-kanias-26-savors-the-full-mit-experience/
+            - generic "Contains JavaScript" [ref=f102e308]: JS
+          - generic [ref=f102e310]:
+            - generic [ref=f102e311]:
+              - generic [ref=f102e312]:
+                - generic [ref=f102e313]:
+                  - generic "Match density" [ref=f102e314]
+                  - generic [ref=f102e318]:
+                    - heading [level=2] [ref=f102e319]:
+                      - link "Winter 2019 class notes | Ohio Wesleyan University" [ref=f102e320] [cursor=pointer]:
+                        - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                    - link "https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/" [ref=f102e322] [cursor=pointer]:
+                      - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+                - paragraph [ref=f102e324]: Richard Jackson ’53 is the founder of One People, the Delaware, Ohio-based organization that co-hosted the Community Festival Celebrating Juneteenth in June. Juneteenth is a holiday predominantly celebrated in African-American communities in commemoration
+              - generic [ref=f102e325]:
+                - link "" [ref=f102e326] [cursor=pointer]:
+                  - /url: /site/www.owu.edu
+                - link "" [ref=f102e328] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/
+            - generic [ref=f102e330]:
+              - paragraph [ref=f102e331]: "Also from www.owu.edu:"
+              - list [ref=f102e332]:
+                - listitem [ref=f102e333]:
+                  - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f102e334] [cursor=pointer]:
+                    - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+            - generic "Contains JavaScript" [ref=f102e337]: JS
+          - generic [ref=f102e339]:
+            - generic [ref=f102e340]:
+              - generic [ref=f102e341]:
+                - generic [ref=f102e342]:
+                  - generic "Match density" [ref=f102e343]
+                  - generic [ref=f102e347]:
+                    - heading [level=2] [ref=f102e348]:
+                      - link "Fraternities and sororities at MIT raise funds for local charities | MIT News | Massachusetts Institute of Technology" [ref=f102e349] [cursor=pointer]:
+                        - /url: https://news.mit.edu/2025/mit-fraternities-sororities-raise-funds-local-charities-1212
+                    - link "https://news.mit.edu/2025/mit-fraternities-sororities-raise-funds-local-charities-1212" [ref=f102e351] [cursor=pointer]:
+                      - /url: https://news.mit.edu/2025/mit-fraternities-sororities-raise-funds-local-charities-1212
+                - paragraph [ref=f102e353]: “Our students’ ... dedication reflects not only their generosity, but also the spirit of engaging the MIT community in giving back through philanthropy.”
+              - generic [ref=f102e354]:
+                - link "" [ref=f102e355] [cursor=pointer]:
+                  - /url: /site/news.mit.edu
+                - link "" [ref=f102e357] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2025/mit-fraternities-sororities-raise-funds-local-charities-1212
+            - generic [ref=f102e359]:
+              - paragraph [ref=f102e360]: "Also from news.mit.edu:"
+              - list [ref=f102e361]:
+                - listitem [ref=f102e362]:
+                  - link "Bridging careers in aerospace manufacturing and fusion energy, with a focus on intentional inclusion | MIT News | Massachuset..." [ref=f102e363] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2022/bridging-careers-aerospace-manufacturing-fusion-energy-focus-intentional-inclusion-0823
+            - generic "Contains JavaScript" [ref=f102e366]: JS
+          - generic [ref=f102e368]:
+            - generic [ref=f102e369]:
+              - generic [ref=f102e370]:
+                - generic [ref=f102e371]:
+                  - generic "Match density" [ref=f102e372]
+                  - generic [ref=f102e376]:
+                    - heading [level=2] [ref=f102e377]:
+                      - link "Sororities Get Forty Fewer Members, Pi Beta Phi Still To Bid | The Tech" [ref=f102e378] [cursor=pointer]:
+                        - /url: https://thetech.com/2008/09/05/sororities-v128-n36
+                    - link "https://thetech.com/2008/09/05/sororities-v128-n36" [ref=f102e380] [cursor=pointer]:
+                      - /url: https://thetech.com/2008/09/05/sororities-v128-n36
+                - paragraph [ref=f102e382]: By Sorority recruitment wrapped up Wednesday night, bringing in approximately forty fewer members than last year. Recruitment this year was marked by the presence of the new sorority, Pi Beta Phi, and keeping the move from fall to spring recruitment that
+              - generic [ref=f102e383]:
+                - link "" [ref=f102e384] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f102e386] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/2008/09/05/sororities-v128-n36
+            - generic [ref=f102e388]:
+              - paragraph [ref=f102e389]: "Also from thetech.com:"
+              - list [ref=f102e390]:
+                - listitem [ref=f102e391]:
+                  - link "New fraternity establishes MIT interest group | The Tech" [ref=f102e392] [cursor=pointer]:
+                    - /url: https://thetech.com/2012/03/09/alphasigfrat-v132-n10
+                - listitem [ref=f102e393]:
+                  - link "Bonding beyond college | The Tech" [ref=f102e394] [cursor=pointer]:
+                    - /url: https://thetech.com/2013/02/05/sororityalumni-v133-n1
+                - listitem [ref=f102e395]:
+                  - link "Slight increase in bids given in sorority recruitment | The Tech" [ref=f102e396] [cursor=pointer]:
+                    - /url: https://thetech.com/2013/09/24/recruitment-v133-n40
+                - listitem [ref=f102e397]:
+                  - link "Saferide route changes to go into effect in Dec. | The Tech" [ref=f102e398] [cursor=pointer]:
+                    - /url: https://thetech.com/2014/11/25/saferide-v134-n57
+            - generic [ref=f102e399]:
+              - link "8 more" [ref=f102e401] [cursor=pointer]:
+                - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Athetech.com&sst=SE-1bc25e84c4c8be68
+              - generic "Contains JavaScript" [ref=f102e403]: JS
+          - generic [ref=f102e405]:
+            - generic [ref=f102e406]:
+              - generic [ref=f102e407]:
+                - generic [ref=f102e408]:
+                  - generic "Match density" [ref=f102e409]
+                  - generic [ref=f102e413]:
+                    - heading [level=2] [ref=f102e414]:
+                      - link "FSILG Awards Celebrate FSILG Contributions at MIT - MIT Division of Student Life" [ref=f102e415] [cursor=pointer]:
+                        - /url: https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/
+                    - link "https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/" [ref=f102e417] [cursor=pointer]:
+                      - /url: https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/
+                - paragraph [ref=f102e419]: On April 27, faculty, staff, and affiliated students gathered in Twenty Chimneys for the annual s reception to present the 2014-2015 Fraternity, Sorority, and Independent Living Group (FSILG) Awards. The event acknowledged individuals and groups that have
+              - generic [ref=f102e420]:
+                - link "" [ref=f102e421] [cursor=pointer]:
+                  - /url: /site/studentlife.mit.edu
+                - link "" [ref=f102e423] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/
+            - generic [ref=f102e425]:
+              - paragraph [ref=f102e426]: "Also from studentlife.mit.edu:"
+              - list [ref=f102e427]:
+                - listitem [ref=f102e428]:
+                  - link "Lucy Kanias ’26 Savors the Full MIT Experience - MIT Division of Student Life" [ref=f102e429] [cursor=pointer]:
+                    - /url: https://studentlife.mit.edu/campus-communities/community-stories/lucy-kanias-26-savors-the-full-mit-experience/
+                - listitem [ref=f102e430]:
+                  - link "AILG Hosts Annual Dinner at MIT Museum - MIT Division of Student Life" [ref=f102e431] [cursor=pointer]:
+                    - /url: https://studentlife.mit.edu/campus-communities/community-stories/ailg-hosts-annual-dinner-at-mit-museum/
+                - listitem [ref=f102e432]:
+                  - link "Fraternities, Sororities, and Independent Living Groups - MIT Division of Student Life" [ref=f102e433] [cursor=pointer]:
+                    - /url: https://studentlife.mit.edu/campus-communities/fraternities-sororities-and-independent-living-groups/
+            - generic "Contains JavaScript" [ref=f102e436]: JS
+          - generic [ref=f102e438]:
+            - generic [ref=f102e439]:
+              - generic [ref=f102e440]:
+                - generic [ref=f102e441]:
+                  - generic "Match density" [ref=f102e442]
+                  - generic [ref=f102e446]:
+                    - heading [level=2] [ref=f102e447]:
+                      - link "Drexel University - Alchetron, The Free Social Encyclopedia" [ref=f102e448] [cursor=pointer]:
+                        - /url: https://alchetron.com/Drexel-University
+                    - link "https://alchetron.com/Drexel-University" [ref=f102e450] [cursor=pointer]:
+                      - /url: https://alchetron.com/Drexel-University
+                - paragraph [ref=f102e452]: Updated on Jan 20, 2026 Edit Like Comment Share Sign in Motto Science, Industry, Art President Acceptance rate 75% (2015) Total enrollment 25,595 (2016) Mascot Mario the Magnificent Established 1891 (1891) Provost M. Brian Blake Phone +1 215-895-2000 Endo
+              - generic [ref=f102e453]:
+                - link "" [ref=f102e454] [cursor=pointer]:
+                  - /url: /site/alchetron.com
+                - link "" [ref=f102e456] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alchetron.com/Drexel-University
+            - generic [ref=f102e458]:
+              - paragraph [ref=f102e459]: "Also from alchetron.com:"
+              - list [ref=f102e460]:
+                - listitem [ref=f102e461]:
+                  - link "Brown University - Alchetron, The Free Social Encyclopedia" [ref=f102e462] [cursor=pointer]:
+                    - /url: https://alchetron.com/Brown-University
+            - generic "Contains JavaScript" [ref=f102e465]: JS
+          - generic [ref=f102e467]:
+            - generic [ref=f102e468]:
+              - generic [ref=f102e469]:
+                - generic [ref=f102e470]:
+                  - generic "Match density" [ref=f102e471]
+                  - generic [ref=f102e475]:
+                    - heading [level=2] [ref=f102e476]:
+                      - link "My Last Beginning at MIT | Slice of MIT by the Alumni Association" [ref=f102e477] [cursor=pointer]:
+                        - /url: https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+                    - generic [ref=f102e478]:
+                      - text: 2009-09-13 ·
+                      - link "https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/" [ref=f102e479] [cursor=pointer]:
+                        - /url: https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+                - paragraph [ref=f102e481]: "For many of us, the start of the semester is synonymous with FRESHMEN. They are MIT’s future (this has become more apparent now that I am almost on my way out) and so we wholeheartedly invite them to join the things that made MIT special for us: our dorms"
+              - generic [ref=f102e482]:
+                - link "" [ref=f102e483] [cursor=pointer]:
+                  - /url: /site/sliceofmit.wordpress.com
+                - link "" [ref=f102e485] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+            - generic [ref=f102e487]:
+              - paragraph [ref=f102e488]: "Also from sliceofmit.wordpress.com:"
+              - list [ref=f102e489]:
+                - listitem [ref=f102e490]:
+                  - link "cbognet | Slice of MIT by the Alumni Association | Page 2" [ref=f102e491] [cursor=pointer]:
+                    - /url: https://sliceofmit.wordpress.com/author/cbognet/page/2/
+                - listitem [ref=f102e492]:
+                  - link "Slice of MIT by the Alumni Association | A blog about MIT ideas, people, and culture | Page 22" [ref=f102e493] [cursor=pointer]:
+                    - /url: https://sliceofmit.wordpress.com/page/22/
+                - listitem [ref=f102e494]:
+                  - link "September | 2009 | Slice of MIT by the Alumni Association | Page 2" [ref=f102e495] [cursor=pointer]:
+                    - /url: https://sliceofmit.wordpress.com/2009/09/page/2/
+            - generic "Contains JavaScript" [ref=f102e498]: JS
+          - generic [ref=f102e500]:
+            - generic [ref=f102e501]:
+              - generic [ref=f102e502]:
+                - generic [ref=f102e503]:
+                  - generic "Match density" [ref=f102e504]
+                  - generic [ref=f102e508]:
+                    - heading [level=2] [ref=f102e509]:
+                      - link "MIT Women Business Leaders" [ref=f102e510] [cursor=pointer]:
+                        - /url: http://wbl.mit.edu/alumnae
+                    - link "http://wbl.mit.edu/alumnae" [ref=f102e512] [cursor=pointer]:
+                      - /url: http://wbl.mit.edu/alumnae
+                - paragraph [ref=f102e514]: Alexis graduated from MIT in 2005 and majored in Brain and Cognitive Sciences with a minor in French. After MIT, she started her career at Morgan Stanley in Debt Capital Markets. Later, she joined Optima Fund Management, an equity fund of hedge funds, whe
+              - generic [ref=f102e515]:
+                - link "" [ref=f102e516] [cursor=pointer]:
+                  - /url: /site/wbl.mit.edu
+                - link "" [ref=f102e518] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://wbl.mit.edu/alumnae
+            - generic "Contains JavaScript" [ref=f102e522]: JS
+          - generic [ref=f102e524]:
+            - generic [ref=f102e525]:
+              - generic [ref=f102e526]:
+                - generic [ref=f102e527]:
+                  - generic "Match density" [ref=f102e528]
+                  - generic [ref=f102e532]:
+                    - heading [level=2] [ref=f102e533]:
+                      - link "Deborah “Debbie” Shnek | Caltech Alumni" [ref=f102e534] [cursor=pointer]:
+                        - /url: https://www.alumni.caltech.edu/deborah-debbie-shnek/
+                    - link "https://www.alumni.caltech.edu/deborah-debbie-shnek/" [ref=f102e536] [cursor=pointer]:
+                      - /url: https://www.alumni.caltech.edu/deborah-debbie-shnek/
+                - paragraph [ref=f102e538]: Deborah (Debbie, Deb) Rebecca Shnek, Ph.D, passed away peacefully at her home in Sammamish, Washington, on Saturday, January 15, 2022 at the premature age of 54, after a long, heroic battle with cancer. At her side was her loving and supportive husband, F
+              - generic [ref=f102e539]:
+                - link "" [ref=f102e540] [cursor=pointer]:
+                  - /url: /site/www.alumni.caltech.edu
+                - link "" [ref=f102e542] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.alumni.caltech.edu/deborah-debbie-shnek/
+            - generic "Contains JavaScript" [ref=f102e546]: JS
+          - generic [ref=f102e548]:
+            - generic [ref=f102e549]:
+              - generic [ref=f102e550]:
+                - generic [ref=f102e551]:
+                  - generic "Match density" [ref=f102e552]
+                  - generic [ref=f102e556]:
+                    - heading [level=2] [ref=f102e557]:
+                      - link "Sororities | Archives & Special Collections" [ref=f102e558] [cursor=pointer]:
+                        - /url: https://archives.dickinson.edu/dickinsonian-organizations/sororities
+                    - link "https://archives.dickinson.edu/dickinsonian-organizations/sororities" [ref=f102e560] [cursor=pointer]:
+                      - /url: https://archives.dickinson.edu/dickinsonian-organizations/sororities
+                - paragraph [ref=f102e562]: Three minority Greek organizations inquire about possibly gaining chapters at Dickinson. These organizations include Kappa Alpha Psi, Sigma Lambda Beta and Delta Sigma Theta. Once again, the applicant pool for admissions reaches a record high and the acce
+              - generic [ref=f102e563]:
+                - link "" [ref=f102e564] [cursor=pointer]:
+                  - /url: /site/archives.dickinson.edu
+                - link "" [ref=f102e566] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://archives.dickinson.edu/dickinsonian-organizations/sororities
+            - generic "Contains JavaScript" [ref=f102e570]: JS
+          - generic [ref=f102e572]:
+            - generic [ref=f102e573]:
+              - generic [ref=f102e574]:
+                - generic [ref=f102e575]:
+                  - generic "Match density" [ref=f102e576]
+                  - generic [ref=f102e580]:
+                    - heading [level=2] [ref=f102e581]:
+                      - link "s2100.txt" [ref=f102e582] [cursor=pointer]:
+                        - /url: https://linas.org/mirrors/cryptome.org/2001.11.13/s2100.txt
+                    - link "https://linas.org/mirrors/cryptome.org/2001.11.13/s2100.txt" [ref=f102e584] [cursor=pointer]:
+                      - /url: https://linas.org/mirrors/cryptome.org/2001.11.13/s2100.txt
+                - paragraph [ref=f102e586]: From the Congressional Record Online via GPO Access [wais.access.gpo.gov] STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTION private college and university housing and dormitories, including fraternity and sorority housing and dormitories; to the Committ
+              - generic [ref=f102e587]:
+                - link "" [ref=f102e588] [cursor=pointer]:
+                  - /url: /site/linas.org
+                - link "" [ref=f102e590] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://linas.org/mirrors/cryptome.org/2001.11.13/s2100.txt
+            - generic [ref=f102e592]: Plain text
+          - generic [ref=f102e596]:
+            - generic [ref=f102e597]:
+              - generic [ref=f102e598]:
+                - generic [ref=f102e599]:
+                  - generic "Match density" [ref=f102e600]
+                  - generic [ref=f102e604]:
+                    - heading [level=2] [ref=f102e605]:
+                      - link "rush chi phi" [ref=f102e606] [cursor=pointer]:
+                        - /url: http://www.senorcafe.com/zfungl/31d118-rush-chi-phi
+                    - link "http://www.senorcafe.com/zfungl/31d118-rush-chi-phi" [ref=f102e608] [cursor=pointer]:
+                      - /url: http://www.senorcafe.com/zfungl/31d118-rush-chi-phi
+                - paragraph [ref=f102e610]: Rush. WHAT IS ALPHA PHI OMEGA? We are very excited to meet the new faces of those interested in rushing our Fraternity. Rush 2015 is Underway With the first week of classes already behind us, Rush is off to a busy start. The University of Minnesota Greek
+              - generic [ref=f102e611]:
+                - link "" [ref=f102e612] [cursor=pointer]:
+                  - /url: /site/www.senorcafe.com
+                - link "" [ref=f102e614] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://www.senorcafe.com/zfungl/31d118-rush-chi-phi
+            - generic [ref=f102e616]:
+              - paragraph [ref=f102e617]: "Also from www.senorcafe.com:"
+              - list [ref=f102e618]:
+                - listitem [ref=f102e619]:
+                  - link "delta sigma phi nc state" [ref=f102e620] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+                - listitem [ref=f102e621]:
+                  - link "rush chi phi" [ref=f102e622] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/ratification-of-jlzk/b525cd-rush-chi-phi
+                - listitem [ref=f102e623]:
+                  - link "alpha kappa lambda hazing" [ref=f102e624] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/e62np1kl/c93270-alpha-kappa-lambda-hazing
+                - listitem [ref=f102e625]:
+                  - link "does bu have sorority houses" [ref=f102e626] [cursor=pointer]:
+                    - /url: http://www.senorcafe.com/e62np1kl/c93270-does-bu-have-sorority-houses
+            - link "1 more" [ref=f102e629] [cursor=pointer]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority+site%3Awww.senorcafe.com&sst=SE-1bc25e84c4c8be68
+          - generic [ref=f102e632]:
+            - generic [ref=f102e633]:
+              - generic [ref=f102e634]:
+                - generic [ref=f102e635]:
+                  - generic "Match density" [ref=f102e636]
+                  - generic [ref=f102e640]:
+                    - heading [level=2] [ref=f102e641]:
+                      - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f102e642] [cursor=pointer]:
+                        - /url: https://www.franbecque.com/page/61/
+                    - link "https://www.franbecque.com/page/61/" [ref=f102e644] [cursor=pointer]:
+                      - /url: https://www.franbecque.com/page/61/
+                - paragraph [ref=f102e646]: I am sitting at the Southwest terminal in Orlando, Florida, waiting for a plane to take me back to St. Louis. My heart breaks for the family and friends of Chi Omega and P.E.O. Jennifer Riordan, who was tragically killed when an engine blew on Southwest f
+              - generic [ref=f102e647]:
+                - link "" [ref=f102e648] [cursor=pointer]:
+                  - /url: /site/www.franbecque.com
+                - link "" [ref=f102e650] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.franbecque.com/page/61/
+            - generic [ref=f102e652]:
+              - paragraph [ref=f102e653]: "Also from www.franbecque.com:"
+              - list [ref=f102e654]:
+                - listitem [ref=f102e655]:
+                  - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f102e656] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/page/33/
+                - listitem [ref=f102e657]:
+                  - link "Park Valentine Perkins on Theta Chi's Founders' Day - Fraternity History & MoreFraternity History & More" [ref=f102e658] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/park-valentine-perkins-on-theta-chis-founders-day/
+                - listitem [ref=f102e659]:
+                  - link "Happy Founders' Day, Theta Chi - Fraternity History & MoreFraternity History & More" [ref=f102e660] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/happy-founders-day-theta-chi/
+            - generic "Contains JavaScript" [ref=f102e663]: JS
+          - generic [ref=f102e665]:
+            - generic [ref=f102e666]:
+              - generic [ref=f102e667]:
+                - generic [ref=f102e668]:
+                  - generic "Match density" [ref=f102e669]
+                  - generic [ref=f102e673]:
+                    - heading [level=2] [ref=f102e674]:
+                      - link "Prominent FSILG Alumni/ae – Association of Independent Living Groups" [ref=f102e675] [cursor=pointer]:
+                        - /url: https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+                    - link "https://ailg.mit.edu/prominent-fsilg-alumni-ae/" [ref=f102e677] [cursor=pointer]:
+                      - /url: https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+                - paragraph [ref=f102e679]: MIT’s Fraternities, Sororities, and Independent Living Groups (FSILGs) number many remarkable alumni and alumnae among their members. Some of the more notable ones are listed below. If you have a suggestion for another to add, please e-mail Name & Class A
+              - generic [ref=f102e680]:
+                - link "" [ref=f102e681] [cursor=pointer]:
+                  - /url: /site/ailg.mit.edu
+                - link "" [ref=f102e683] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+            - generic [ref=f102e685]:
+              - paragraph [ref=f102e686]: "Also from ailg.mit.edu:"
+              - list [ref=f102e687]:
+                - listitem [ref=f102e688]:
+                  - link "Members – Association of Independent Living Groups" [ref=f102e689] [cursor=pointer]:
+                    - /url: https://ailg.mit.edu/members/
+                - listitem [ref=f102e690]:
+                  - link "AILG History – Association of Independent Living Groups" [ref=f102e691] [cursor=pointer]:
+                    - /url: https://ailg.mit.edu/ailg-history/
+            - generic "Contains JavaScript" [ref=f102e694]: JS
+          - generic [ref=f102e696]:
+            - generic [ref=f102e697]:
+              - generic [ref=f102e698]:
+                - generic [ref=f102e699]:
+                  - generic "Match density" [ref=f102e700]
+                  - generic [ref=f102e704]:
+                    - heading [level=2] [ref=f102e705]:
+                      - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f102e706] [cursor=pointer]:
+                        - /url: https://www.aephi.org/foundation-trustees
+                    - link "https://www.aephi.org/foundation-trustees" [ref=f102e708] [cursor=pointer]:
+                      - /url: https://www.aephi.org/foundation-trustees
+                - paragraph [ref=f102e710]: The Alpha Epsilon Phi Foundation is directed by a volunteer board of seventeen trustees, including the sorority national president and the sorority executive director who serves ex officio. The trustees bring a mix of Sorority involvement, non-profit expe
+              - generic [ref=f102e711]:
+                - link "" [ref=f102e712] [cursor=pointer]:
+                  - /url: /site/www.aephi.org
+                - link "" [ref=f102e714] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.aephi.org/foundation-trustees
+            - generic "Contains JavaScript" [ref=f102e718]: JS
+          - generic [ref=f102e720]:
+            - generic [ref=f102e721]:
+              - generic [ref=f102e722]:
+                - generic [ref=f102e723]:
+                  - generic "Match density" [ref=f102e724]
+                  - generic [ref=f102e728]:
+                    - heading [level=2] [ref=f102e729]:
+                      - link "Crime Alerts & Timely Warnings | MIT Police" [ref=f102e730] [cursor=pointer]:
+                        - /url: https://police.mit.edu/timely-warnings
+                    - link "https://police.mit.edu/timely-warnings" [ref=f102e732] [cursor=pointer]:
+                      - /url: https://police.mit.edu/timely-warnings
+                - paragraph [ref=f102e734]: On the morning of June 20, 2026, MIT Police responded to two separate calls at NW86, Sidney-Pacific residence hall at 70 Pacific Street in Cambridge, MA. Two victims on different floors reported property missing from their units. One victim reported the t
+              - generic [ref=f102e735]:
+                - link "" [ref=f102e736] [cursor=pointer]:
+                  - /url: /site/police.mit.edu
+                - link "" [ref=f102e738] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://police.mit.edu/timely-warnings
+            - generic [ref=f102e740]:
+              - paragraph [ref=f102e741]: "Also from police.mit.edu:"
+              - list [ref=f102e742]:
+                - listitem [ref=f102e743]:
+                  - link "Timely Warning Burglary | MIT Police" [ref=f102e744] [cursor=pointer]:
+                    - /url: https://police.mit.edu/crime-alert/timely-warning-burglary-27
+            - generic "Contains JavaScript" [ref=f102e747]: JS
+          - generic [ref=f102e749]:
+            - generic [ref=f102e750]:
+              - generic [ref=f102e751]:
+                - generic [ref=f102e752]:
+                  - generic "Match density" [ref=f102e753]
+                  - generic [ref=f102e757]:
+                    - heading [level=2] [ref=f102e758]:
+                      - link "Announcing the 2017 Class of Razorback Classics | Arkansas News | University of Arkansas" [ref=f102e759] [cursor=pointer]:
+                        - /url: https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+                    - link "https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics" [ref=f102e761] [cursor=pointer]:
+                      - /url: https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+                - paragraph [ref=f102e763]: The Arkansas Alumni Association is proud to announce the 2017 Class of Razorback Classics.
+              - generic [ref=f102e764]:
+                - link "" [ref=f102e765] [cursor=pointer]:
+                  - /url: /site/news.uark.edu
+                - link "" [ref=f102e767] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics
+            - generic "Contains JavaScript" [ref=f102e771]: JS
+          - generic [ref=f102e773]:
+            - generic [ref=f102e774]:
+              - generic [ref=f102e775]:
+                - generic [ref=f102e776]:
+                  - generic "Match density" [ref=f102e777]
+                  - generic [ref=f102e781]:
+                    - heading [level=2] [ref=f102e782]:
+                      - link "William Powers - MacDowell Fellow in Literature - MacDowell" [ref=f102e783] [cursor=pointer]:
+                        - /url: https://www.macdowell.org/artists/william-powers
+                    - link "https://www.macdowell.org/artists/william-powers" [ref=f102e785] [cursor=pointer]:
+                      - /url: https://www.macdowell.org/artists/william-powers
+                - paragraph [ref=f102e787]: "William Powers is a writer and technologist. He spent his early career as a staff writer at The Washington Post and as a media critic for national magazines. He is the author of Hamlet’s BlackBerry: Building a Good Life in the Digital Age (HarperCollins,"
+              - generic [ref=f102e788]:
+                - link "" [ref=f102e789] [cursor=pointer]:
+                  - /url: /site/www.macdowell.org
+                - link "" [ref=f102e791] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.macdowell.org/artists/william-powers
+            - generic [ref=f102e793]:
+              - paragraph [ref=f102e794]: "Also from www.macdowell.org:"
+              - list [ref=f102e795]:
+                - listitem [ref=f102e796]:
+                  - link "Wendy Battin - Artist - MacDowell" [ref=f102e797] [cursor=pointer]:
+                    - /url: https://www.macdowell.org/artists/wendy-battin
+                - listitem [ref=f102e798]:
+                  - link "Herschel Garfein - Artist - MacDowell" [ref=f102e799] [cursor=pointer]:
+                    - /url: https://www.macdowell.org/artists/herschel-garfein
+                - listitem [ref=f102e800]:
+                  - link "Ateya Khorakiwala - MacDowell Fellow in Architecture - MacDowell" [ref=f102e801] [cursor=pointer]:
+                    - /url: https://www.macdowell.org/artists/ateya-khorakiwala
+            - generic "Contains JavaScript" [ref=f102e804]: JS
+      - generic [ref=f102e805]:
+        - link "1" [ref=f102e806] [cursor=pointer]:
+          - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&sst=SE-1bc25e84c4c8be68
+        - link "2" [ref=f102e807] [cursor=pointer]:
+          - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&page=2&sst=SE-1bc25e84c4c8be68
+    - complementary [ref=f102e808]:
+      - text: 
+      - generic [ref=f102e810]:
+        - heading " Search Settings" [level=2] [ref=f102e811]:
+          - generic [ref=f102e812]: 
+          - text: Search Settings
+        - generic [ref=f102e813]:
+          - button [ref=f102e815] [cursor=pointer]:
+            - link " Search In Title" [ref=f102e816]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&searchTitle=title&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e817]: 
+              - generic [ref=f102e818]: Search In Title
+          - button [ref=f102e820] [cursor=pointer]:
+            - link " Recent Results" [ref=f102e821]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&recent=recent&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e822]: 
+              - generic [ref=f102e823]: Recent Results
+          - button [ref=f102e825] [cursor=pointer]:
+            - link " Remove JS" [ref=f102e826]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&js=no-js&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e827]: 
+              - generic [ref=f102e828]: Remove JS
+          - button [ref=f102e830] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f102e831]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&adtech=reduce&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e832]: 
+              - generic [ref=f102e833]: Reduce Adtech
+          - button [ref=f102e835] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f102e836]:
+              - /url: /search?query=Alpha+Chi+Omega+MIT+sorority&nsfw=smut&newfilter=true&sst=SE-1bc25e84c4c8be68
+              - generic [ref=f102e837]: 
+              - generic [ref=f102e838]: Reduce NSFW
+          - button [ref=f102e841] [cursor=pointer]:
+            - generic [ref=f102e842]:
+              - generic [ref=f102e843]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f102e845]:
+    - heading "Search Help" [level=1] [ref=f102e846]
+    - generic [ref=f102e847]:
+      - generic [ref=f102e848]:
+        - heading " Syntax" [level=2] [ref=f102e849]:
+          - generic [ref=f102e850]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f102e851]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f102e852]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f102e853]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f102e854]
+        - heading "Samples" [level=2] [ref=f102e855]
+        - generic [ref=f102e856]:
+          - term [ref=f102e857]: soup -chicken
+          - definition [ref=f102e858]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f102e859]: "\"keyboard\""
+          - definition [ref=f102e860]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f102e861]: "\"steve mcqueen\""
+          - definition [ref=f102e862]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f102e863]: apology (plato)
+          - definition [ref=f102e864]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f102e865]:
+          - generic [ref=f102e866]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f102e867]
+        - generic [ref=f102e868]: This is by the beginning
+        - generic [ref=f102e876]: This is in the middle
+        - generic [ref=f102e884]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f102e890]:
+          - generic [ref=f102e891]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f102e892]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f102e893]
+        - heading " Webmaster Information" [level=2] [ref=f102e894]:
+          - generic [ref=f102e895]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f102e896]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f102e897] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f102e898] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f102e899]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f102e900] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f102e901]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f102e902] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f102e903]:
+        - heading " Special Keywords" [level=2] [ref=f102e904]:
+          - generic [ref=f102e905]: 
+          - text: Special Keywords
+        - table [ref=f102e906]:
+          - rowgroup [ref=f102e907]:
+            - row [ref=f102e908]:
+              - columnheader "Keyword" [ref=f102e909]
+              - columnheader "Meaning" [ref=f102e910]
+          - rowgroup [ref=f102e911]:
+            - row [ref=f102e912]:
+              - cell [ref=f102e913]:
+                - text: "site:"
+                - emphasis [ref=f102e914]: example.com
+              - cell [ref=f102e915]:
+                - text: Display site information about
+                - emphasis [ref=f102e916]: example.com
+            - row [ref=f102e917]:
+              - cell [ref=f102e918]:
+                - text: "site:"
+                - emphasis [ref=f102e919]: example.com
+                - emphasis [ref=f102e920]: keyword
+              - cell [ref=f102e921]:
+                - text: Search
+                - emphasis [ref=f102e922]: example.com
+                - text: for
+                - emphasis [ref=f102e923]: keyword
+            - row [ref=f102e924]:
+              - cell [ref=f102e925]:
+                - text: "site:"
+                - emphasis [ref=f102e926]: "*.example.com"
+                - emphasis [ref=f102e927]: keyword
+              - cell [ref=f102e928]:
+                - text: Search
+                - emphasis [ref=f102e929]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f102e930]: keyword
+            - row [ref=f102e931]:
+              - cell [ref=f102e932]:
+                - text: "browse:"
+                - emphasis [ref=f102e933]: example.com
+              - cell [ref=f102e934]:
+                - text: Show similar websites to
+                - emphasis [ref=f102e935]: example.com
+            - row [ref=f102e936]:
+              - cell [ref=f102e937]:
+                - text: "ip:"
+                - emphasis [ref=f102e938]: 127.0.0.1
+              - cell [ref=f102e939]:
+                - text: Search documents hosted at
+                - emphasis [ref=f102e940]: 127.0.0.1
+            - row [ref=f102e941]:
+              - cell [ref=f102e942]:
+                - text: "links:"
+                - emphasis [ref=f102e943]: example.com
+              - cell [ref=f102e944]:
+                - text: Search documents linking to
+                - emphasis [ref=f102e945]: example.com
+            - row [ref=f102e946]:
+              - cell [ref=f102e947]:
+                - text: "tld:"
+                - emphasis [ref=f102e948]: edu
+                - emphasis [ref=f102e949]: keyword
+              - cell [ref=f102e950]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f102e951]: edu
+                - text: .
+            - row [ref=f102e952]:
+              - cell [ref=f102e953]:
+                - text: "?tld:"
+                - emphasis [ref=f102e954]: edu
+                - emphasis [ref=f102e955]: keyword
+              - cell [ref=f102e956]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f102e957]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f102e958]:
+              - cell "q>5" [ref=f102e959]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f102e960]
+            - row [ref=f102e961]:
+              - cell "q<5" [ref=f102e962]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f102e963]
+            - row [ref=f102e964]:
+              - cell "year>2005" [ref=f102e965]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f102e966]
+            - row [ref=f102e967]:
+              - cell "year=2005" [ref=f102e968]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f102e969]
+            - row [ref=f102e970]:
+              - cell "year<2005" [ref=f102e971]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f102e972]
+            - row [ref=f102e973]:
+              - cell "rank>50" [ref=f102e974]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f102e975]
+            - row [ref=f102e976]:
+              - cell "rank<50" [ref=f102e977]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f102e978]
+            - row [ref=f102e979]:
+              - cell "format:html5" [ref=f102e980]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f102e981]
+            - row [ref=f102e982]:
+              - cell "format:xhtml" [ref=f102e983]
+              - cell "Filter documents using the XHTML standard" [ref=f102e984]
+            - row [ref=f102e985]:
+              - cell "format:html123" [ref=f102e986]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f102e987]
+            - row [ref=f102e988]:
+              - cell "generator:wordpress" [ref=f102e989]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f102e990]
+            - row [ref=f102e991]:
+              - cell "file:zip" [ref=f102e992]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f102e993]
+            - row [ref=f102e994]:
+              - cell "file:audio" [ref=f102e995]
+              - cell "Filter documents containing a link to an audio file" [ref=f102e996]
+            - row [ref=f102e997]:
+              - cell "file:video" [ref=f102e998]
+              - cell "Filter documents containing a link to a video file" [ref=f102e999]
+            - row [ref=f102e1000]:
+              - cell "file:archive" [ref=f102e1001]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f102e1002]
+            - row [ref=f102e1003]:
+              - cell "file:document" [ref=f102e1004]
+              - cell "Filter documents containing a link to a document" [ref=f102e1005]
+            - row [ref=f102e1006]:
+              - cell "-special:media" [ref=f102e1007]
+              - cell "Filter out documents with audio or video tags" [ref=f102e1008]
+            - row [ref=f102e1009]:
+              - cell "-special:scripts" [ref=f102e1010]
+              - cell "Filter out documents with javascript" [ref=f102e1011]
+            - row [ref=f102e1012]:
+              - cell "-special:affiliate" [ref=f102e1013]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f102e1014]
+            - row [ref=f102e1015]:
+              - cell "-special:tracking" [ref=f102e1016]
+              - cell "Filter out documents with analytics or tracking code" [ref=f102e1017]
+            - row [ref=f102e1018]:
+              - cell "-special:cookies" [ref=f102e1019]
+              - cell "Filter out documents with cookies" [ref=f102e1020]
+  - contentinfo [ref=f102e1021]:
+    - heading "Policy Information" [level=1] [ref=f102e1022]
+    - generic [ref=f102e1023]:
+      - generic [ref=f102e1024]:
+        - heading " Policies" [level=2] [ref=f102e1025]:
+          - generic [ref=f102e1026]: 
+          - text: Policies
+        - generic [ref=f102e1027]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f102e1028]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f102e1029]:
+        - heading " Contact" [level=2] [ref=f102e1030]:
+          - generic [ref=f102e1031]: 
+          - text: Contact
+        - generic [ref=f102e1032]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f102e1033] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f102e1034]:
+          - generic [ref=f102e1035]: 
+          - text: Sources
+        - generic [ref=f102e1036]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f102e1037] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f102e1038]:
+        - heading " Data" [level=2] [ref=f102e1039]:
+          - generic [ref=f102e1040]: 
+          - text: Data
+        - generic [ref=f102e1041]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f102e1042] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f102e1043] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

@@ -1,0 +1,55 @@
+{
+  "outputs": [
+    {
+      "id": "pr_screenshots",
+      "kind": "screenshots",
+      "count": {
+        "exact": 10
+      },
+      "mustShow": [
+        "Full page of the pull request on the OpenClaw GitHub repository",
+        "Each screenshot corresponds to one of the last 10 merged pull requests"
+      ]
+    },
+    {
+      "id": "pr_csv",
+      "kind": "table",
+      "filename": "openclaw_merged_prs.csv",
+      "format": "csv",
+      "columns": [
+        {
+          "name": "pr_number",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "committer",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "reviewer",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "merger",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "rules": [
+        {
+          "type": "exact_row_count",
+          "value": 10
+        },
+        {
+          "type": "unique",
+          "columns": [
+            "pr_number"
+          ]
+        }
+      ]
+    }
+  ]
+}

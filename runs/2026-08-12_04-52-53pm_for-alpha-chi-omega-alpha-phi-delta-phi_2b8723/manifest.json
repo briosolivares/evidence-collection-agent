@@ -1,0 +1,151 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-12T23:52:53.548Z",
+  "artifacts": [
+    {
+      "filename": "scratch/official_sites.md",
+      "sha256": "6612e645883f362e1770704724c707ea63a8f303bc6e93a23c3739f6a12e8ef9",
+      "capturedAt": "2026-08-12T23:55:36.891Z"
+    },
+    {
+      "filename": "artifacts/evidence_axo_sisters_page.png",
+      "sha256": "75eff770ff144d0ae3fe25aaeaeaeb435daf512b792135edb1aa8b759760308f",
+      "sourceUrl": "https://axo.mit.edu/sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:55:56.971Z"
+    },
+    {
+      "filename": "artifacts/evidence_aphi_2026.png",
+      "sha256": "bbf98a136f8d26bcd0cf1700d3ca0d03924befab6f5ab8b23fe325b866af50c9",
+      "sourceUrl": "http://aphi.mit.edu/sisterhood/2026",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:56:11.356Z"
+    },
+    {
+      "filename": "artifacts/evidence_aphi_2027.png",
+      "sha256": "ec607f167cd2044db593bce87d59a3578564c4af91f6564787fc83b504d1e4a7",
+      "sourceUrl": "http://aphi.mit.edu/sisterhood/2027",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:56:19.762Z"
+    },
+    {
+      "filename": "scratch/aphi_data.md",
+      "sha256": "62efd33ee1c432128cf2fb5ce62f633477ea4f038c947b564b7cb6a1774373de",
+      "capturedAt": "2026-08-12T23:56:34.537Z"
+    },
+    {
+      "filename": "artifacts/evidence_dphie_full.png",
+      "sha256": "a62ee08891f82e33a35bdbed96f670f20f7c342d5a1ba95923d8cb597f5b58e9",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:56:52.450Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "ab8be2c8885545375769538744e4ab9ea825560d4f7501f1bd9e7cccdda14c4a",
+      "capturedAt": "2026-08-12T23:56:59.182Z"
+    },
+    {
+      "filename": "artifacts/evidence_dphie_scroll2.png",
+      "sha256": "d08a6e2690c95c2ea119504c71a22a4ea94245df3bc1460077c79d72b8df29ff",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:57:05.251Z"
+    },
+    {
+      "filename": "artifacts/evidence_dphie_expanded.png",
+      "sha256": "7b6407b55eddd610aa259ffc326e02a5dea3a4f3c2a0279cb3c202460d4d66a8",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:57:59.020Z"
+    },
+    {
+      "filename": "scratch/dphie_data.md",
+      "sha256": "c4df707fc6cfb032909742dcda08bf44570a6b98c8a40aed3f8fd32dcfd2020f",
+      "capturedAt": "2026-08-12T23:58:03.967Z"
+    },
+    {
+      "filename": "artifacts/evidence_theta_2026.png",
+      "sha256": "fe14ec96da15ee0cbc5db552dab913ecf4d97546201e4e005d60dd9a5440699c",
+      "sourceUrl": "https://www.theta.mit.edu/2026s",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:58:22.029Z"
+    },
+    {
+      "filename": "scratch/theta_2026.md",
+      "sha256": "374373c46e36d2e72f948137abb973b4403e54f14edca1b9281dd9bb63a180e0",
+      "capturedAt": "2026-08-12T23:58:36.373Z"
+    },
+    {
+      "filename": "artifacts/evidence_theta_2027.png",
+      "sha256": "98eed5c2099ea651cc34d87642f0368ee6285743d9daa411825094f7605514da",
+      "sourceUrl": "https://www.theta.mit.edu/2027s",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:58:43.436Z"
+    },
+    {
+      "filename": "scratch/theta_2027.md",
+      "sha256": "fb3f160d6656252509858456d6970b996ce3335f206f0371b25b9592b2c63ef2",
+      "capturedAt": "2026-08-12T23:59:01.053Z"
+    },
+    {
+      "filename": "artifacts/evidence_pibetaphi_members.png",
+      "sha256": "a35ed8b85859211c72fe413e9ed107dee363ab992a8c0e8ace089e9e4ab6fd45",
+      "sourceUrl": "https://mit.pibetaphi.org/members",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:59:21.421Z"
+    },
+    {
+      "filename": "scratch/pibetaphi_data.md",
+      "sha256": "a67c62355ea5c5547b7be388dc6d8b1ce2d4b3723e142518f0ba8bee34b140f4",
+      "capturedAt": "2026-08-12T23:59:26.725Z"
+    },
+    {
+      "filename": "artifacts/evidence_sigmakappa_2026.png",
+      "sha256": "f7e5a0cad7bdb5f23e72712c814aab77c54ecdea2e8296eaec03dbaec797db85",
+      "sourceUrl": "https://www.sigmakappa.mit.edu/class-of-2026",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-12T23:59:45.322Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2026.md",
+      "sha256": "b61dae0ce047952f1e7a105342e2ba84b02961fb758ce7df11b1be1d93379a0b",
+      "capturedAt": "2026-08-12T23:59:55.600Z"
+    },
+    {
+      "filename": "artifacts/evidence_sigmakappa_2027.png",
+      "sha256": "e54dd54cae7a5a6db81a5889b9e808e972c78e5fdac67c75090a275fff5e7094",
+      "sourceUrl": "https://www.sigmakappa.mit.edu/class-of-2027",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:00:03.228Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2027.md",
+      "sha256": "9f9e9e8e8c34cb82a0ac63da151596e8fa8b804b3b112fefeb9ddd33247dd6a5",
+      "capturedAt": "2026-08-13T00:00:15.148Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:04:23.191Z"
+}

@@ -1,0 +1,38 @@
+{
+  "startedAt": "2026-08-20T01:23:23.911Z",
+  "finishedAt": "2026-08-20T01:24:17.069Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "stub",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 53155.6025,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-sherlock-tui/runs/2026-08-19_06-23-26pm_write-your-answer-to-answer-md-in-the_4bc46c",
+          "assertions": [
+            {
+              "name": "artifacts/answer.md exists",
+              "passed": true,
+              "detail": "artifacts/answer.md found in run dir"
+            },
+            {
+              "name": "manifest hash verifies for artifacts/answer.md",
+              "passed": true,
+              "detail": "sha256 68e37a3723b80d34d6da3e4563f0842bff0afd363408c9731c5cc2f40a2dc119 matches manifest"
+            }
+          ],
+          "latencyMs": 53155.6025,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,985 @@
+URL: https://github.com/openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged
+Title: Pull requests · openclaw/openclaw · GitHub
+
+- generic [ref=f3e2]:
+  - generic [ref=f3e3]:
+    - link "Skip to content" [ref=f3e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f3e8]:
+      - heading "Navigation Menu" [level=2] [ref=f3e9]
+      - generic [ref=f3e10]:
+        - link "Homepage" [ref=f3e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f3e15]:
+          - navigation "Global" [ref=f3e16]:
+            - list [ref=f3e17]:
+              - listitem [ref=f3e18]:
+                - button "Platform" [ref=f3e20] [cursor=pointer]
+              - listitem [ref=f3e23]:
+                - button "Solutions" [ref=f3e25] [cursor=pointer]
+              - listitem [ref=f3e28]:
+                - button "Resources" [ref=f3e30] [cursor=pointer]
+              - listitem [ref=f3e33]:
+                - button "Open Source" [ref=f3e35] [cursor=pointer]
+              - listitem [ref=f3e38]:
+                - button "Enterprise" [ref=f3e40] [cursor=pointer]
+              - listitem [ref=f3e43]:
+                - link "Pricing" [ref=f3e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f3e45]:
+            - button "Search or jump to, type / to search" [ref=f3e47] [cursor=pointer]:
+              - generic [ref=f3e50]:
+                - text: Type
+                - generic [ref=f3e51]: /
+                - text: to search
+            - link "Sign in" [ref=f3e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpulls%3Fq%3Dis%253Apr%2Bis%253Amerged
+            - link "Sign up" [ref=f3e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fpull_requests%2Findex&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f3e55] [cursor=pointer]
+  - main [ref=f3e61]:
+    - generic [ref=f3e62]:
+      - generic [ref=f3e63]:
+        - generic [ref=f3e65]:
+          - link "openclaw" [ref=f3e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f3e70]: /
+          - strong [ref=f3e71]:
+            - link "openclaw" [ref=f3e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f3e73]: Public
+        - generic [ref=f3e74]:
+          - list:
+            - listitem [ref=f3e75]:
+              - link "Sponsor @openclaw" [ref=f3e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f3e77]: Sponsor
+            - listitem [ref=f3e81]:
+              - link "You must be signed in to change notification settings" [ref=f3e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f3e85]:
+              - link "Fork 81.2k" [ref=f3e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,150" [ref=f3e89]: 81.2k
+            - listitem [ref=f3e90]:
+              - link "You must be signed in to star a repository" [ref=f3e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386084 users starred this repository" [ref=f3e95]: 386k
+      - navigation "Repository" [ref=f3e96]:
+        - list [ref=f3e97]:
+          - listitem [ref=f3e98]:
+            - link "Code" [ref=f3e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f3e103]:
+            - link "Issues 3.4k" [ref=f3e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f3e108]: Issues
+              - generic "3,414" [ref=f3e109]: 3.4k
+          - listitem [ref=f3e110]:
+            - link "Pull requests 2.1k" [ref=f3e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f3e114]: Pull requests
+              - generic "2,113" [ref=f3e115]: 2.1k
+          - listitem [ref=f3e116]:
+            - link "Actions" [ref=f3e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f3e121]:
+            - link "Projects" [ref=f3e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f3e126]:
+            - link "Security and quality 647" [ref=f3e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f3e130]: Security and quality
+              - generic "647" [ref=f3e131]
+          - listitem [ref=f3e132]:
+            - link "Insights" [ref=f3e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f3e139]:
+      - 'heading "Pull requests: openclaw/openclaw" [level=1] [ref=f3e140]'
+      - generic [ref=f3e141]:
+        - search [ref=f3e142]:
+          - search "Issues" [ref=f3e143]:
+            - textbox "Search all issues" [ref=f3e144]: is:pr is:merged
+          - navigation "Issue" [ref=f3e146]:
+            - link "Labels 339" [ref=f3e147] [cursor=pointer]:
+              - /url: /openclaw/openclaw/labels
+            - link "Milestones 0" [ref=f3e150] [cursor=pointer]:
+              - /url: /openclaw/openclaw/milestones
+        - link "New pull request" [ref=f3e155] [cursor=pointer]:
+          - /url: /openclaw/openclaw/compare
+      - link "Clear current search query, filters, and sorts" [ref=f3e160] [cursor=pointer]:
+        - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Aopen
+      - generic [ref=f3e163]:
+        - generic [ref=f3e165]:
+          - link "10,000 Total" [ref=f3e168] [cursor=pointer]:
+            - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged
+          - generic [ref=f3e171]:
+            - group [ref=f3e172]:
+              - button "Author" [ref=f3e173] [cursor=pointer]
+            - group [ref=f3e175]:
+              - button "Label" [ref=f3e176] [cursor=pointer]
+            - generic [ref=f3e178]:
+              - group [ref=f3e179]:
+                - button "Projects" [ref=f3e180] [cursor=pointer]
+              - group [ref=f3e182]:
+                - button "Milestones" [ref=f3e183] [cursor=pointer]
+              - group [ref=f3e185]:
+                - button "Reviews" [ref=f3e186] [cursor=pointer]
+            - group [ref=f3e188]:
+              - button "Assignee" [ref=f3e189] [cursor=pointer]
+            - group [ref=f3e191]:
+              - button "Sort" [ref=f3e192] [cursor=pointer]
+        - heading "Pull requests list" [level=2] [ref=f3e194]
+        - group "Issues" [ref=f3e195]:
+          - generic [ref=f3e196]:
+            - generic [ref=f3e198]:
+              - generic "Merged Pull Request" [ref=f3e200]
+              - generic [ref=f3e203]:
+                - 'link "refactor(media): remove orphan generation facades" [ref=f3e204] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122874
+                - generic [ref=f3e205]:
+                  - link "dependencies-changed" [ref=f3e206] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Adependencies-changed
+                  - 'link "extensions: image-generation-core" [ref=f3e207] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22extensions%3A+image-generation-core%22
+                  - 'link "extensions: video-generation-core" [ref=f3e208] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22extensions%3A+video-generation-core%22
+                  - link "maintainer" [ref=f3e209] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e210] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🦞 diamond lobster" [ref=f3e211] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%9E+diamond+lobster%22
+                  - 'link "size: S" [ref=f3e212] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e213] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e215]:
+                  - text: "#122874 by"
+                  - link "steipete" [ref=f3e216] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e217]: Contributor
+                  - text: was merged Aug 13, 20263 minutes ago
+              - generic [ref=f3e219]:
+                - generic [ref=f3e222]:
+                  - generic "Assigned to"
+                - link "6 comments" [ref=f3e224] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122874
+                  - text: "6"
+            - generic [ref=f3e228]:
+              - generic "Merged Pull Request" [ref=f3e230]
+              - generic [ref=f3e233]:
+                - 'link "fix: make live updater checkout portable" [ref=f3e234] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122873
+                - generic [ref=f3e235]:
+                  - link "maintainer" [ref=f3e236] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 compatibility" [ref=f3e237] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+compatibility%22
+                  - link "P2" [ref=f3e238] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e239] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XS" [ref=f3e240] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e241] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e243]:
+                  - text: "#122873 by"
+                  - link "jalehman" [ref=f3e244] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Ajalehman
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e245]: Contributor
+                  - text: was merged Aug 13, 20265 minutes ago
+              - generic [ref=f3e247]:
+                - generic [ref=f3e250]:
+                  - generic "Assigned to"
+                - link "2 comments" [ref=f3e252] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122873
+                  - text: "2"
+            - generic [ref=f3e256]:
+              - generic "Merged Pull Request" [ref=f3e258]
+              - generic [ref=f3e261]:
+                - 'link "feat: continue web sessions in the terminal" [ref=f3e262] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122870
+                - generic [ref=f3e263]:
+                  - 'link "app: web-ui" [ref=f3e264] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22app%3A+web-ui%22
+                  - link "cli" [ref=f3e265] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Acli
+                  - link "docs" [ref=f3e266] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Adocs
+                  - link "gateway" [ref=f3e267] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Agateway
+                  - link "maintainer" [ref=f3e268] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 session-state" [ref=f3e269] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+session-state%22
+                  - link "P2" [ref=f3e270] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🦐 gold shrimp" [ref=f3e271] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%90+gold+shrimp%22
+                  - 'link "size: XL" [ref=f3e272] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XL%22
+                  - 'link "status: ⏳ waiting on author" [ref=f3e273] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%E2%8F%B3+waiting+on+author%22
+                - generic [ref=f3e275]:
+                  - text: "#122870 by"
+                  - link "steipete" [ref=f3e276] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e277]: Contributor
+                  - text: was merged Aug 13, 202614 minutes ago
+              - generic [ref=f3e279]:
+                - generic [ref=f3e282]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e284] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122870
+                  - text: "3"
+            - generic [ref=f3e288]:
+              - generic "Merged Pull Request" [ref=f3e290]
+              - generic [ref=f3e293]:
+                - 'link "test(discord): move ready abort proof to lifecycle" [ref=f3e294] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122869
+                - generic [ref=f3e295]:
+                  - 'link "channel: discord" [ref=f3e296] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22channel%3A+discord%22
+                  - link "maintainer" [ref=f3e297] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "size: S" [ref=f3e298] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                - generic [ref=f3e300]:
+                  - text: "#122869 by"
+                  - link "steipete" [ref=f3e301] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e302]: Contributor
+                  - text: was merged Aug 12, 202628 minutes ago
+              - generic [ref=f3e304]:
+                - generic [ref=f3e307]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e309] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122869
+                  - text: "3"
+            - generic [ref=f3e313]:
+              - generic "Merged Pull Request" [ref=f3e315]
+              - generic [ref=f3e318]:
+                - 'link "test(cron): focus runtime config composition" [ref=f3e319] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122867
+                - generic [ref=f3e320]:
+                  - link "maintainer" [ref=f3e321] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e322] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e323] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: S" [ref=f3e324] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e325] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e327]:
+                  - text: "#122867 by"
+                  - link "steipete" [ref=f3e328] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e329]: Contributor
+                  - text: was merged Aug 13, 20269 minutes ago
+              - generic [ref=f3e331]:
+                - generic "Assigned to steipete" [ref=f3e335]:
+                  - link "steipete’s assigned issues" [ref=f3e336] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e337]
+                - link "4 comments" [ref=f3e339] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122867
+                  - text: "4"
+            - generic [ref=f3e343]:
+              - generic "Merged Pull Request" [ref=f3e345]
+              - generic [ref=f3e348]:
+                - 'link "fix(codex): restore promoted approval regression coverage" [ref=f3e349] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122861
+                - generic [ref=f3e350]:
+                  - 'link "extensions: codex" [ref=f3e351] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22extensions%3A+codex%22
+                  - link "maintainer" [ref=f3e352] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P2" [ref=f3e353] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🦐 gold shrimp" [ref=f3e354] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%90+gold+shrimp%22
+                  - 'link "size: S" [ref=f3e355] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: ⏳ waiting on author" [ref=f3e356] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%E2%8F%B3+waiting+on+author%22
+                - generic [ref=f3e358]:
+                  - text: "#122861 by"
+                  - link "steipete" [ref=f3e359] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e360]: Contributor
+                  - text: was merged Aug 12, 202652 minutes ago
+              - generic [ref=f3e362]:
+                - generic [ref=f3e365]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e367] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122861
+                  - text: "3"
+            - generic [ref=f3e371]:
+              - generic "Merged Pull Request" [ref=f3e373]
+              - generic [ref=f3e376]:
+                - 'link "test(ui): remove duplicate stale plugin recovery test" [ref=f3e377] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122860
+                - generic [ref=f3e378]:
+                  - 'link "app: web-ui" [ref=f3e379] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22app%3A+web-ui%22
+                  - link "maintainer" [ref=f3e380] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e381] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e382] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XS" [ref=f3e383] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e384] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e386]:
+                  - text: "#122860 by"
+                  - link "steipete" [ref=f3e387] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e388]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e390]:
+                - generic [ref=f3e393]:
+                  - generic "Assigned to"
+                - link "5 comments" [ref=f3e395] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122860
+                  - text: "5"
+            - generic [ref=f3e399]:
+              - generic "Merged Pull Request" [ref=f3e401]
+              - generic [ref=f3e404]:
+                - 'link "improve: reduce media reply test startup time" [ref=f3e405] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122857
+                - generic [ref=f3e406]:
+                  - link "maintainer" [ref=f3e407] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e408] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e409] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XS" [ref=f3e410] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e411] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e413]:
+                  - text: "#122857 by"
+                  - link "steipete" [ref=f3e414] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e415]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e417]:
+                - generic "Assigned to steipete" [ref=f3e421]:
+                  - link "steipete’s assigned issues" [ref=f3e422] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e423]
+                - link "4 comments" [ref=f3e425] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122857
+                  - text: "4"
+            - generic [ref=f3e429]:
+              - generic "Merged Pull Request" [ref=f3e431]
+              - generic [ref=f3e434]:
+                - 'link "test(macos): remove residual smoke probes" [ref=f3e435] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122856
+                - generic [ref=f3e436]:
+                  - 'link "app: macos" [ref=f3e437] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22app%3A+macos%22
+                  - link "maintainer" [ref=f3e438] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "size: XS" [ref=f3e439] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                - generic [ref=f3e441]:
+                  - text: "#122856 by"
+                  - link "steipete" [ref=f3e442] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e443]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e445]:
+                - generic [ref=f3e448]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e450] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122856
+                  - text: "3"
+            - generic [ref=f3e454]:
+              - generic "Merged Pull Request" [ref=f3e456]
+              - generic [ref=f3e459]:
+                - 'link "refactor(agents): split subagent announce delivery" [ref=f3e460] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122853
+                - generic [ref=f3e461]:
+                  - link "agents" [ref=f3e462] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Aagents
+                  - link "maintainer" [ref=f3e463] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 compatibility" [ref=f3e464] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+compatibility%22
+                  - 'link "merge-risk: 🚨 message-delivery" [ref=f3e465] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+message-delivery%22
+                  - 'link "merge-risk: 🚨 session-state" [ref=f3e466] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+session-state%22
+                  - link "P1" [ref=f3e467] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP1
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e468] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XL" [ref=f3e469] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XL%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e470] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e472]:
+                  - text: "#122853 by"
+                  - link "steipete" [ref=f3e473] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e474]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e476]:
+                - generic [ref=f3e479]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e481] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122853
+                  - text: "3"
+            - generic [ref=f3e485]:
+              - generic "Merged Pull Request" [ref=f3e487]
+              - generic [ref=f3e490]:
+                - 'link "test(core): remove duplicate assertions" [ref=f3e491] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122848
+                - generic [ref=f3e492]:
+                  - link "gateway" [ref=f3e493] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Agateway
+                  - link "maintainer" [ref=f3e494] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e495] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e496] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: S" [ref=f3e497] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e498] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e500]:
+                  - text: "#122848 by"
+                  - link "steipete" [ref=f3e501] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e502]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e504]:
+                - generic [ref=f3e507]:
+                  - generic "Assigned to"
+                - link "5 comments" [ref=f3e509] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122848
+                  - text: "5"
+            - generic [ref=f3e513]:
+              - generic "Merged Pull Request" [ref=f3e515]
+              - generic [ref=f3e518]:
+                - 'link "fix(tooling): fail deadcode report on scan errors" [ref=f3e519] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122847
+                - generic [ref=f3e520]:
+                  - link "maintainer" [ref=f3e521] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e522] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e523] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XS" [ref=f3e524] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e525] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e527]:
+                  - text: "#122847 by"
+                  - link "steipete" [ref=f3e528] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e529]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e531]:
+                - generic [ref=f3e534]:
+                  - generic "Assigned to"
+                - link "4 comments" [ref=f3e536] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122847
+                  - text: "4"
+            - generic [ref=f3e540]:
+              - generic "Merged Pull Request" [ref=f3e542]
+              - generic [ref=f3e545]:
+                - 'link "refactor(plugin-sdk): remove final test-only facades" [ref=f3e546] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122844
+                - generic [ref=f3e547]:
+                  - link "commands" [ref=f3e548] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Acommands
+                  - 'link "extensions: browser" [ref=f3e549] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22extensions%3A+browser%22
+                  - link "gateway" [ref=f3e550] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Agateway
+                  - link "maintainer" [ref=f3e551] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e552] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e553] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: M" [ref=f3e554] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+M%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e555] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e557]:
+                  - text: "#122844 by"
+                  - link "steipete" [ref=f3e558] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e559]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e561]:
+                - generic "Assigned to steipete" [ref=f3e565]:
+                  - link "steipete’s assigned issues" [ref=f3e566] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e567]
+                - link "4 comments" [ref=f3e569] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122844
+                  - text: "4"
+            - generic [ref=f3e573]:
+              - generic "Merged Pull Request" [ref=f3e575]
+              - generic [ref=f3e578]:
+                - 'link "fix: restore Telegram release isolation checks" [ref=f3e579] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122843
+                - generic [ref=f3e580]:
+                  - link "gateway" [ref=f3e581] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Agateway
+                  - link "maintainer" [ref=f3e582] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 automation" [ref=f3e583] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+automation%22
+                  - 'link "merge-risk: 🚨 security-boundary" [ref=f3e584] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+security-boundary%22
+                  - link "P2" [ref=f3e585] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e586] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: S" [ref=f3e587] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e588] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e590]:
+                  - text: "#122843 by"
+                  - link "steipete" [ref=f3e591] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e592]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e594]:
+                - generic "Assigned to steipete" [ref=f3e598]:
+                  - link "steipete’s assigned issues" [ref=f3e599] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e600]
+                - link "4 comments" [ref=f3e602] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122843
+                  - text: "4"
+            - generic [ref=f3e606]:
+              - generic "Merged Pull Request" [ref=f3e608]
+              - generic [ref=f3e611]:
+                - 'link "fix(ui): let read-only operators copy task results" [ref=f3e612] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122841
+                - generic [ref=f3e613]:
+                  - 'link "app: web-ui" [ref=f3e614] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22app%3A+web-ui%22
+                  - link "maintainer" [ref=f3e615] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P2" [ref=f3e616] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e617] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: M" [ref=f3e618] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+M%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e619] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e621]:
+                  - text: "#122841 by"
+                  - link "steipete" [ref=f3e622] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e623]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e625]:
+                - generic "1 linked issue" [ref=f3e627]:
+                  - link "1 issue" [ref=f3e628] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues/122841/linked_closing_reference?reference_location=REPO_ISSUES_INDEX
+                    - generic [ref=f3e629]: "1"
+                - generic [ref=f3e634]:
+                  - generic "Assigned to"
+                - link "5 comments" [ref=f3e636] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122841
+                  - text: "5"
+            - generic [ref=f3e640]:
+              - generic "Merged Pull Request" [ref=f3e642]
+              - generic [ref=f3e645]:
+                - 'link "ci: keep dependency snapshots warm for package metadata" [ref=f3e646] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122839
+                - generic [ref=f3e647]:
+                  - link "docs" [ref=f3e648] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Adocs
+                  - link "maintainer" [ref=f3e649] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P3" [ref=f3e650] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e651] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: XS" [ref=f3e652] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e653] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e655]:
+                  - text: "#122839 by"
+                  - link "steipete" [ref=f3e656] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e657]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e659]:
+                - generic "1 linked issue" [ref=f3e661]:
+                  - link "1 issue" [ref=f3e662] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues/122839/linked_closing_reference?reference_location=REPO_ISSUES_INDEX
+                    - generic [ref=f3e663]: "1"
+                - generic "Assigned to steipete" [ref=f3e669]:
+                  - link "steipete’s assigned issues" [ref=f3e670] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e671]
+                - link "4 comments" [ref=f3e673] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122839
+                  - text: "4"
+            - generic [ref=f3e677]:
+              - generic "Merged Pull Request" [ref=f3e679]
+              - generic [ref=f3e682]:
+                - 'link "fix(build): prevent stale plugin SDK cache outputs" [ref=f3e683] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122837
+                - generic [ref=f3e684]:
+                  - link "maintainer" [ref=f3e685] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P2" [ref=f3e686] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e687] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - link "scripts" [ref=f3e688] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Ascripts
+                  - 'link "size: XS" [ref=f3e689] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XS%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e690] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e692]:
+                  - text: "#122837 by"
+                  - link "steipete" [ref=f3e693] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e694]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e696]:
+                - generic "Assigned to steipete" [ref=f3e700]:
+                  - link "steipete’s assigned issues" [ref=f3e701] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e702]
+                - link "4 comments" [ref=f3e704] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122837
+                  - text: "4"
+            - generic [ref=f3e708]:
+              - generic "Merged Pull Request" [ref=f3e710]
+              - generic [ref=f3e713]:
+                - 'link "improve: speed up BTW tests by avoiding plugin discovery" [ref=f3e714] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122835
+                - generic [ref=f3e715]:
+                  - link "agents" [ref=f3e716] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Aagents
+                  - link "maintainer" [ref=f3e717] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 other" [ref=f3e718] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+other%22
+                  - link "P3" [ref=f3e719] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP3
+                  - 'link "rating: 🦐 gold shrimp" [ref=f3e720] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%90+gold+shrimp%22
+                  - 'link "size: S" [ref=f3e721] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                  - 'link "status: ⏳ waiting on author" [ref=f3e722] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%E2%8F%B3+waiting+on+author%22
+                - generic [ref=f3e724]:
+                  - text: "#122835 by"
+                  - link "steipete" [ref=f3e725] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e726]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e728]:
+                - generic "Assigned to steipete" [ref=f3e732]:
+                  - link "steipete’s assigned issues" [ref=f3e733] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e734]
+                - link "3 comments" [ref=f3e736] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122835
+                  - text: "3"
+            - generic [ref=f3e740]:
+              - generic "Merged Pull Request" [ref=f3e742]
+              - generic [ref=f3e745]:
+                - 'link "[BACKPORT] fix(slack): stop repeated outage notices in active threads" [ref=f3e746] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122832
+                - generic [ref=f3e747]:
+                  - 'link "channel: slack" [ref=f3e748] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22channel%3A+slack%22
+                  - link "maintainer" [ref=f3e749] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 message-delivery" [ref=f3e750] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+message-delivery%22
+                  - link "P1" [ref=f3e751] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP1
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e752] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: L" [ref=f3e753] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+L%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e754] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e756]:
+                  - text: "#122832 by"
+                  - link "Kimiyu-186" [ref=f3e757] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3AKimiyu-186
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e758]: Contributor
+                  - text: was merged Aug 12, 20261 hour ago
+              - generic [ref=f3e760]:
+                - generic [ref=f3e763]:
+                  - generic "Assigned to"
+                - link "1 comment" [ref=f3e765] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122832
+                  - text: "1"
+            - generic [ref=f3e769]:
+              - generic "Merged Pull Request" [ref=f3e771]
+              - generic [ref=f3e774]:
+                - 'link "refactor(worker): streamline live preview delivery" [ref=f3e775] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122830
+                - generic [ref=f3e776]:
+                  - link "maintainer" [ref=f3e777] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P2" [ref=f3e778] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f3e779] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%90%9A+platinum+hermit%22
+                  - 'link "size: L" [ref=f3e780] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+L%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e781] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e783]:
+                  - text: "#122830 by"
+                  - link "steipete" [ref=f3e784] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e785]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e787]:
+                - generic "Assigned to steipete" [ref=f3e791]:
+                  - link "steipete’s assigned issues" [ref=f3e792] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=assignee%3Asteipete+is%3Aopen
+                    - img "@steipete" [ref=f3e793]
+                - link "4 comments" [ref=f3e795] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122830
+                  - text: "4"
+            - generic [ref=f3e799]:
+              - generic "Merged Pull Request" [ref=f3e801]
+              - generic [ref=f3e804]:
+                - 'link "feat(node-host): supervise durable worker launches" [ref=f3e805] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122829
+                - generic [ref=f3e806]:
+                  - link "cli" [ref=f3e807] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Acli
+                  - link "docs" [ref=f3e808] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Adocs
+                  - link "maintainer" [ref=f3e809] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "merge-risk: 🚨 availability" [ref=f3e810] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+availability%22
+                  - 'link "merge-risk: 🚨 security-boundary" [ref=f3e811] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+security-boundary%22
+                  - 'link "merge-risk: 🚨 session-state" [ref=f3e812] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22merge-risk%3A+%F0%9F%9A%A8+session-state%22
+                  - link "P1" [ref=f3e813] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP1
+                  - 'link "rating: 🦐 gold shrimp" [ref=f3e814] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%90+gold+shrimp%22
+                  - 'link "size: XL" [ref=f3e815] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XL%22
+                  - 'link "status: ⏳ waiting on author" [ref=f3e816] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%E2%8F%B3+waiting+on+author%22
+                - generic [ref=f3e818]:
+                  - text: "#122829 by"
+                  - link "steipete" [ref=f3e819] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e820]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e822]:
+                - generic [ref=f3e825]:
+                  - generic "Assigned to"
+                - link "3 comments" [ref=f3e827] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122829
+                  - text: "3"
+            - generic [ref=f3e831]:
+              - generic "Merged Pull Request" [ref=f3e833]
+              - generic [ref=f3e836]:
+                - 'link "[BACKPORT] fix(slack): expose channel reaction events to thread turns" [ref=f3e837] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122828
+                - generic [ref=f3e838]:
+                  - link "backport" [ref=f3e839] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Abackport
+                  - 'link "channel: slack" [ref=f3e840] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22channel%3A+slack%22
+                  - link "maintainer" [ref=f3e841] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "size: M" [ref=f3e842] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+M%22
+                - generic [ref=f3e844]:
+                  - text: "#122828 by"
+                  - link "sjf-oa" [ref=f3e845] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asjf-oa
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e846]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e848]:
+                - generic [ref=f3e851]:
+                  - generic "Assigned to"
+                - link "2 comments" [ref=f3e853] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122828
+                  - text: "2"
+            - generic [ref=f3e857]:
+              - generic "Merged Pull Request" [ref=f3e859]
+              - generic [ref=f3e862]:
+                - 'link "refactor(agents): split subagent run manager into owner modules" [ref=f3e863] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122826
+                - generic [ref=f3e864]:
+                  - link "agents" [ref=f3e865] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Aagents
+                  - link "maintainer" [ref=f3e866] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "size: XL" [ref=f3e867] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+XL%22
+                - generic [ref=f3e869]:
+                  - text: "#122826 by"
+                  - link "steipete" [ref=f3e870] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e871]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e873]:
+                - generic [ref=f3e876]:
+                  - generic "Assigned to"
+                - link "2 comments" [ref=f3e878] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122826
+                  - text: "2"
+            - generic [ref=f3e882]:
+              - generic "Merged Pull Request" [ref=f3e884]
+              - generic [ref=f3e887]:
+                - 'link "test(gateway): move OpenAI usage fallback coverage" [ref=f3e888] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122825
+                - generic [ref=f3e889]:
+                  - link "gateway" [ref=f3e890] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Agateway
+                  - link "maintainer" [ref=f3e891] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - 'link "size: S" [ref=f3e892] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+S%22
+                - generic [ref=f3e894]:
+                  - text: "#122825 by"
+                  - link "steipete" [ref=f3e895] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e896]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e898]:
+                - generic [ref=f3e901]:
+                  - generic "Assigned to"
+                - link "2 comments" [ref=f3e903] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122825
+                  - text: "2"
+            - generic [ref=f3e907]:
+              - generic "Merged Pull Request" [ref=f3e909]
+              - generic [ref=f3e912]:
+                - 'link "fix(ui): recover failed bundled plugin views" [ref=f3e913] [cursor=pointer]':
+                  - /url: /openclaw/openclaw/pull/122823
+                - generic [ref=f3e914]:
+                  - 'link "app: web-ui" [ref=f3e915] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22app%3A+web-ui%22
+                  - link "maintainer" [ref=f3e916] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3Amaintainer
+                  - link "P2" [ref=f3e917] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3AP2
+                  - 'link "proof: 📸 screenshot" [ref=f3e918] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22proof%3A+%F0%9F%93%B8+screenshot%22
+                  - 'link "proof: sufficient" [ref=f3e919] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22proof%3A+sufficient%22
+                  - 'link "rating: 🦞 diamond lobster" [ref=f3e920] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22rating%3A+%F0%9F%A6%9E+diamond+lobster%22
+                  - 'link "size: M" [ref=f3e921] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22size%3A+M%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f3e922] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/pulls?q=is%3Apr+is%3Amerged+label%3A%22status%3A+%F0%9F%91%80+ready+for+maintainer+look%22
+                - generic [ref=f3e924]:
+                  - text: "#122823 by"
+                  - link "steipete" [ref=f3e925] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=is%3Apr+author%3Asteipete
+                  - generic "This user has previously committed to the openclaw repository." [ref=f3e926]: Contributor
+                  - text: was merged Aug 12, 20262 hours ago
+              - generic [ref=f3e928]:
+                - generic [ref=f3e931]:
+                  - generic "Assigned to"
+                - link "4 comments" [ref=f3e933] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/122823
+                  - text: "4"
+      - navigation "Pagination" [ref=f3e937]:
+        - link "Previous page" [disabled] [ref=f3e938]: Previous
+        - link "Page 1" [ref=f3e939] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=1&q=is%3Apr+is%3Amerged
+          - text: "1"
+        - link "Page 2" [ref=f3e940] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=2&q=is%3Apr+is%3Amerged
+          - text: "2"
+        - link "Page 3" [ref=f3e941] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=3&q=is%3Apr+is%3Amerged
+          - text: "3"
+        - link "Page 4" [ref=f3e942] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=4&q=is%3Apr+is%3Amerged
+          - text: "4"
+        - link "Page 5" [ref=f3e943] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=5&q=is%3Apr+is%3Amerged
+          - text: "5"
+        - generic [ref=f3e944]: …
+        - link "Page 399" [ref=f3e945] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=399&q=is%3Apr+is%3Amerged
+          - text: "399"
+        - link "Page 400" [ref=f3e946] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=400&q=is%3Apr+is%3Amerged
+          - text: "400"
+        - link "Next page" [ref=f3e947] [cursor=pointer]:
+          - /url: /openclaw/openclaw/pulls?page=2&q=is%3Apr+is%3Amerged
+          - text: Next
+      - generic [ref=f3e948]:
+        - strong [ref=f3e951]: ProTip!
+        - text: "What’s not been updated in a month:"
+        - link "updated:<2026-07-12" [ref=f3e952] [cursor=pointer]:
+          - /url: /openclaw/openclaw/issues?q=is%3Apr+is%3Amerged+updated%3A%3C2026-07-12
+        - text: .
+  - contentinfo [ref=f3e953]:
+    - heading "Footer" [level=2] [ref=f3e954]
+    - generic [ref=f3e955]:
+      - generic [ref=f3e956]:
+        - link "GitHub Homepage" [ref=f3e957] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f3e960]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f3e961]:
+        - heading "Footer navigation" [level=3] [ref=f3e962]
+        - list "Footer navigation" [ref=f3e963]:
+          - listitem [ref=f3e964]:
+            - link "Terms" [ref=f3e965] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f3e966]:
+            - link "Privacy" [ref=f3e967] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f3e968]:
+            - link "Security" [ref=f3e969] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f3e970]:
+            - link "Status" [ref=f3e971] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f3e972]:
+            - link "Community" [ref=f3e973] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f3e974]:
+            - link "Docs" [ref=f3e975] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f3e976]:
+            - link "Contact" [ref=f3e977] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f3e978]:
+            - button "Manage cookies" [ref=f3e980] [cursor=pointer]
+          - listitem [ref=f3e981]:
+            - button "Do not share my personal information" [ref=f3e983] [cursor=pointer]

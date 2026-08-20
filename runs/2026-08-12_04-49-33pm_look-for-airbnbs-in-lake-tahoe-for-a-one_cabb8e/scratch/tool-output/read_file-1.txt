@@ -1,0 +1,700 @@
+   100→                  - generic:
+   101→                    - generic:
+   102→                      - generic:
+   103→                        - generic:
+   104→                          - generic:
+   105→                            - generic: Guest favorite
+   106→                            - generic: Guest favorite
+   107→                        - 'button "Add to wishlist: Condo in South Lake Tahoe" [ref=e3942] [cursor=pointer]'
+   108→                      - generic:
+   109→                        - button [disabled] [ref=e3946] [cursor=pointer]
+   110→                        - 'button "Next photo: Condo in South Lake Tahoe" [ref=e3951] [cursor=pointer]'
+   111→                      - generic:
+   112→                        - generic:
+   113→                          - img "Photo 1 of 6"
+   114→                  - generic [ref=e3959]:
+   115→                    - link [ref=e3960] [cursor=pointer]:
+   116→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   117→                    - link [ref=e3964] [cursor=pointer]:
+   118→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   119→                    - link [ref=e3965] [cursor=pointer]:
+   120→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   121→                    - link [ref=e3966] [cursor=pointer]:
+   122→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   123→                    - link [ref=e3967] [cursor=pointer]:
+   124→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   125→                    - link [ref=e3968] [cursor=pointer]:
+   126→                      - /url: /rooms/45103407?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3owa6UsDkviurq7&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   127→                - generic [ref=e3969]:
+   128→                  - generic [ref=e3970]: Condo in South Lake Tahoe
+   129→                  - generic [ref=e3971]: Epic Lakefront by Heavenly w/ Hot Tub | PEAK SS14
+   130→                  - generic [ref=e3973]:
+   131→                    - generic [ref=e3974]:
+   132→                      - generic [ref=e3975]: 4 bedrooms
+   133→                      - generic [ref=e3976]: 4 bedrooms
+   134→                    - generic [ref=e3977]:
+   135→                      - generic [ref=e3978]: ","
+   136→                      - generic [ref=e3979]: ·
+   137→                      - generic [ref=e3980]: 6 beds
+   138→                      - generic [ref=e3981]: 6 beds
+   139→                    - generic [ref=e3982]:
+   140→                      - generic [ref=e3983]: ","
+   141→                      - generic [ref=e3984]: ·
+   142→                      - generic [ref=e3985]: 4 baths
+   143→                      - generic [ref=e3986]: 4 baths
+   144→                  - generic [ref=e3990]:
+   145→                    - button [ref=e3995] [cursor=pointer]:
+   146→                      - text: $9,084
+   147→                      - generic [ref=e3996]: Show price breakdown
+   148→                    - generic [ref=e3997]: for 7 nights
+   149→                    - generic [ref=e3999]: $9,084 for 7 nights
+   150→                  - generic [ref=e4000]:
+   151→                    - generic:
+   152→                      - generic: 5.0 out of 5 average rating, 14 reviews
+   153→                      - generic: 5.0 (14)
+   154→            - group [ref=e4004]:
+   155→              - link "Cabin in South Lake Tahoe" [ref=e4005] [cursor=pointer]:
+   156→                - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   157→              - generic [ref=e4006]:
+   158→                - group [ref=e4009]:
+   159→                  - generic:
+   160→                    - generic:
+   161→                      - generic:
+   162→                        - generic:
+   163→                          - generic:
+   164→                            - generic: Superhost
+   165→                            - generic: Superhost
+   166→                        - 'button "Add to wishlist: Cabin in South Lake Tahoe" [ref=e4011] [cursor=pointer]'
+   167→                      - generic:
+   168→                        - button [disabled] [ref=e4015] [cursor=pointer]
+   169→                        - 'button "Next photo: Cabin in South Lake Tahoe" [ref=e4020] [cursor=pointer]'
+   170→                      - generic:
+   171→                        - generic:
+   172→                          - img "Photo 1 of 6"
+   173→                  - generic [ref=e4028]:
+   174→                    - link [ref=e4029] [cursor=pointer]:
+   175→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   176→                    - link [ref=e4033] [cursor=pointer]:
+   177→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   178→                    - link [ref=e4037] [cursor=pointer]:
+   179→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   180→                    - link [ref=e4038] [cursor=pointer]:
+   181→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   182→                    - link [ref=e4039] [cursor=pointer]:
+   183→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   184→                    - link [ref=e4040] [cursor=pointer]:
+   185→                      - /url: /rooms/1532115385910855477?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578669_P3yHLE0O94kEczQ3&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   186→                - generic [ref=e4041]:
+   187→                  - generic [ref=e4042]: Cabin in South Lake Tahoe
+   188→                  - generic [ref=e4043]: Cozy Ski Run Cabin | Classic Fireplace | Sleeps 5
+   189→                  - generic [ref=e4045]:
+   190→                    - generic [ref=e4046]:
+   191→                      - generic [ref=e4047]: 2 bedrooms
+   192→                      - generic [ref=e4048]: 2 bedrooms
+   193→                    - generic [ref=e4049]:
+   194→                      - generic [ref=e4050]: ","
+   195→                      - generic [ref=e4051]: ·
+   196→                      - generic [ref=e4052]: 3 beds
+   197→                      - generic [ref=e4053]: 3 beds
+   198→                    - generic [ref=e4054]:
+   199→                      - generic [ref=e4055]: ","
+   200→                      - generic [ref=e4056]: ·
+   201→                      - generic [ref=e4057]: 1 bath
+   202→                      - generic [ref=e4058]: 1 bath
+   203→                  - generic [ref=e4059]:
+   204→                    - generic "$1,703 for 7 nights, originally $1,913" [ref=e4063]:
+   205→                      - generic [ref=e4064]:
+   206→                        - generic [ref=e4065]:
+   207→                          - generic [ref=e4066]: $1,913
+   208→                          - button [ref=e4069] [cursor=pointer]:
+   209→                            - text: $1,703
+   210→                            - generic [ref=e4070]: Show price breakdown
+   211→                        - generic [ref=e4071]: for 7 nights
+   212→                    - generic [ref=e4074]: Weekly discount
+   213→                  - generic [ref=e4076]:
+   214→                    - generic:
+   215→                      - generic: 4.79 out of 5 average rating, 28 reviews
+   216→                      - generic: 4.79 (28)
+   217→            - group [ref=e4080]:
+   218→              - link "Cabin in Tahoe Vista" [ref=e4081] [cursor=pointer]:
+   219→                - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   220→              - generic [ref=e4082]:
+   221→                - group [ref=e4085]:
+   222→                  - generic:
+   223→                    - generic:
+   224→                      - 'button "Add to wishlist: Cabin in Tahoe Vista" [ref=e4087] [cursor=pointer]'
+   225→                      - generic:
+   226→                        - button [disabled] [ref=e4091] [cursor=pointer]
+   227→                        - 'button "Next photo: Cabin in Tahoe Vista" [ref=e4096] [cursor=pointer]'
+   228→                      - generic:
+   229→                        - generic:
+   230→                          - img "Photo 1 of 6"
+   231→                  - generic [ref=e4104]:
+   232→                    - link [ref=e4105] [cursor=pointer]:
+   233→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   234→                    - link [ref=e4109] [cursor=pointer]:
+   235→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   236→                    - link [ref=e4110] [cursor=pointer]:
+   237→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   238→                    - link [ref=e4111] [cursor=pointer]:
+   239→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   240→                    - link [ref=e4112] [cursor=pointer]:
+   241→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   242→                    - link [ref=e4113] [cursor=pointer]:
+   243→                      - /url: /rooms/1724060201935702444?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RNsBV3JSgazOpn&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   244→                - generic [ref=e4114]:
+   245→                  - generic [ref=e4115]: Cabin in Tahoe Vista
+   246→                  - generic [ref=e4116]: Walk to Beach, Hot Tub, Fire Pit, Family Retreat
+   247→                  - generic [ref=e4118]:
+   248→                    - generic [ref=e4119]:
+   249→                      - generic [ref=e4120]: 3 bedrooms
+   250→                      - generic [ref=e4121]: 3 bedrooms
+   251→                    - generic [ref=e4122]:
+   252→                      - generic [ref=e4123]: ","
+   253→                      - generic [ref=e4124]: ·
+   254→                      - generic [ref=e4125]: 6 beds
+   255→                      - generic [ref=e4126]: 6 beds
+   256→                    - generic [ref=e4127]:
+   257→                      - generic [ref=e4128]: ","
+   258→                      - generic [ref=e4129]: ·
+   259→                      - generic [ref=e4130]: 2 baths
+   260→                      - generic [ref=e4131]: 2 baths
+   261→                  - generic [ref=e4132]:
+   262→                    - generic "$2,873 for 7 nights, originally $3,354" [ref=e4136]:
+   263→                      - generic [ref=e4137]:
+   264→                        - generic [ref=e4138]:
+   265→                          - generic [ref=e4139]: $3,354
+   266→                          - button [ref=e4142] [cursor=pointer]:
+   267→                            - text: $2,873
+   268→                            - generic [ref=e4143]: Show price breakdown
+   269→                        - generic [ref=e4144]: for 7 nights
+   270→                    - generic [ref=e4147]: Weekly discount
+   271→                  - generic [ref=e4149]:
+   272→                    - generic:
+   273→                      - generic: New place to stay
+   274→                      - generic: New
+   275→            - group [ref=e4153]:
+   276→              - link "Cabin in Homewood" [ref=e4154] [cursor=pointer]:
+   277→                - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   278→              - generic [ref=e4155]:
+   279→                - group [ref=e4158]:
+   280→                  - generic:
+   281→                    - generic:
+   282→                      - generic:
+   283→                        - generic:
+   284→                          - generic:
+   285→                            - generic: Top guest favorite
+   286→                            - generic: Guest favorite
+   287→                        - 'button "Add to wishlist: Cabin in Homewood" [ref=e4160] [cursor=pointer]'
+   288→                      - generic:
+   289→                        - button [disabled] [ref=e4164] [cursor=pointer]
+   290→                        - 'button "Next photo: Cabin in Homewood" [ref=e4169] [cursor=pointer]'
+   291→                      - generic:
+   292→                        - generic:
+   293→                          - img "Photo 1 of 6"
+   294→                  - generic [ref=e4177]:
+   295→                    - link [ref=e4178] [cursor=pointer]:
+   296→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   297→                    - link [ref=e4182] [cursor=pointer]:
+   298→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   299→                    - link [ref=e4183] [cursor=pointer]:
+   300→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   301→                    - link [ref=e4184] [cursor=pointer]:
+   302→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   303→                    - link [ref=e4185] [cursor=pointer]:
+   304→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   305→                    - link [ref=e4186] [cursor=pointer]:
+   306→                      - /url: /rooms/42619882?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3H-eNf2d_i23Yl8&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   307→                - generic [ref=e4187]:
+   308→                  - generic [ref=e4188]: Cabin in Homewood
+   309→                  - generic [ref=e4189]: Charming Tahoe Pines Log Cabin at low elevation.
+   310→                  - generic [ref=e4191]:
+   311→                    - generic [ref=e4192]:
+   312→                      - generic [ref=e4193]: 2 bedrooms
+   313→                      - generic [ref=e4194]: 2 bedrooms
+   314→                    - generic [ref=e4195]:
+   315→                      - generic [ref=e4196]: ","
+   316→                      - generic [ref=e4197]: ·
+   317→                      - generic [ref=e4198]: 3 beds
+   318→                      - generic [ref=e4199]: 3 beds
+   319→                    - generic [ref=e4200]:
+   320→                      - generic [ref=e4201]: ","
+   321→                      - generic [ref=e4202]: ·
+   322→                      - generic [ref=e4203]: 1.5 baths
+   323→                      - generic [ref=e4204]: 1.5 baths
+   324→                  - generic [ref=e4205]:
+   325→                    - generic "$2,225 for 7 nights, originally $2,546" [ref=e4209]:
+   326→                      - generic [ref=e4210]:
+   327→                        - generic [ref=e4211]:
+   328→                          - generic [ref=e4212]: $2,546
+   329→                          - button [ref=e4215] [cursor=pointer]:
+   330→                            - text: $2,225
+   331→                            - generic [ref=e4216]: Show price breakdown
+   332→                        - generic [ref=e4217]: for 7 nights
+   333→                    - generic [ref=e4220]: Weekly discount
+   334→                  - generic [ref=e4222]:
+   335→                    - generic:
+   336→                      - generic: 5.0 out of 5 average rating, 12 reviews
+   337→                      - generic: 5.0 (12)
+   338→            - group [ref=e4226]:
+   339→              - link "Home in South Lake Tahoe" [ref=e4227] [cursor=pointer]:
+   340→                - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   341→              - generic [ref=e4228]:
+   342→                - group [ref=e4231]:
+   343→                  - generic:
+   344→                    - generic:
+   345→                      - 'button "Add to wishlist: Home in South Lake Tahoe" [ref=e4233] [cursor=pointer]'
+   346→                      - generic:
+   347→                        - button [disabled] [ref=e4237] [cursor=pointer]
+   348→                        - 'button "Next photo: Home in South Lake Tahoe" [ref=e4242] [cursor=pointer]'
+   349→                      - generic:
+   350→                        - generic:
+   351→                          - img "Photo 1 of 6"
+   352→                  - generic [ref=e4250]:
+   353→                    - link [ref=e4251] [cursor=pointer]:
+   354→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   355→                    - link [ref=e4255] [cursor=pointer]:
+   356→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   357→                    - link [ref=e4256] [cursor=pointer]:
+   358→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   359→                    - link [ref=e4257] [cursor=pointer]:
+   360→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   361→                    - link [ref=e4258] [cursor=pointer]:
+   362→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   363→                    - link [ref=e4259] [cursor=pointer]:
+   364→                      - /url: /rooms/1699322423074934729?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3TkpkvPQTFE_pJa&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   365→                - generic [ref=e4260]:
+   366→                  - generic [ref=e4261]: Home in South Lake Tahoe
+   367→                  - generic [ref=e4262]: South Lake Tahoe Retreat - Pool Table & BBQ Grill
+   368→                  - generic [ref=e4264]:
+   369→                    - generic [ref=e4265]:
+   370→                      - generic [ref=e4266]: 4 bedrooms
+   371→                      - generic [ref=e4267]: 4 bedrooms
+   372→                    - generic [ref=e4268]:
+   373→                      - generic [ref=e4269]: ","
+   374→                      - generic [ref=e4270]: ·
+   375→                      - generic [ref=e4271]: 4 beds
+   376→                      - generic [ref=e4272]: 4 beds
+   377→                    - generic [ref=e4273]:
+   378→                      - generic [ref=e4274]: ","
+   379→                      - generic [ref=e4275]: ·
+   380→                      - generic [ref=e4276]: 3 baths
+   381→                      - generic [ref=e4277]: 3 baths
+   382→                  - generic [ref=e4281]:
+   383→                    - button [ref=e4286] [cursor=pointer]:
+   384→                      - text: $2,987
+   385→                      - generic [ref=e4287]: Show price breakdown
+   386→                    - generic [ref=e4288]: for 7 nights
+   387→                    - generic [ref=e4290]: $2,987 for 7 nights
+   388→                  - generic [ref=e4291]:
+   389→                    - generic:
+   390→                      - generic: 4.6 out of 5 average rating, 5 reviews
+   391→                      - generic: 4.6 (5)
+   392→            - group [ref=e4295]:
+   393→              - link "Home in Truckee" [ref=e4296] [cursor=pointer]:
+   394→                - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   395→              - generic [ref=e4297]:
+   396→                - group [ref=e4300]:
+   397→                  - generic:
+   398→                    - generic:
+   399→                      - generic:
+   400→                        - generic:
+   401→                          - generic:
+   402→                            - generic: Guest favorite
+   403→                            - generic: Guest favorite
+   404→                        - 'button "Add to wishlist: Home in Truckee" [ref=e4302] [cursor=pointer]'
+   405→                      - generic:
+   406→                        - button [disabled] [ref=e4306] [cursor=pointer]
+   407→                        - 'button "Next photo: Home in Truckee" [ref=e4311] [cursor=pointer]'
+   408→                      - generic:
+   409→                        - generic:
+   410→                          - img "Photo 1 of 6"
+   411→                  - generic [ref=e4319]:
+   412→                    - link [ref=e4320] [cursor=pointer]:
+   413→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   414→                    - link [ref=e4324] [cursor=pointer]:
+   415→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   416→                    - link [ref=e4325] [cursor=pointer]:
+   417→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   418→                    - link [ref=e4326] [cursor=pointer]:
+   419→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   420→                    - link [ref=e4327] [cursor=pointer]:
+   421→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   422→                    - link [ref=e4328] [cursor=pointer]:
+   423→                      - /url: /rooms/45736549?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3CypBy5BIUuquex&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   424→                - generic [ref=e4329]:
+   425→                  - generic [ref=e4330]: Home in Truckee
+   426→                  - generic [ref=e4331]: Stunning Modern Retreat, Bike/Ski in/out + hot tub
+   427→                  - generic [ref=e4333]:
+   428→                    - generic [ref=e4334]:
+   429→                      - generic [ref=e4335]: 3 bedrooms
+   430→                      - generic [ref=e4336]: 3 bedrooms
+   431→                    - generic [ref=e4337]:
+   432→                      - generic [ref=e4338]: ","
+   433→                      - generic [ref=e4339]: ·
+   434→                      - generic [ref=e4340]: 7 beds
+   435→                      - generic [ref=e4341]: 7 beds
+   436→                    - generic [ref=e4342]:
+   437→                      - generic [ref=e4343]: ","
+   438→                      - generic [ref=e4344]: ·
+   439→                      - generic [ref=e4345]: 2.5 baths
+   440→                      - generic [ref=e4346]: 2.5 baths
+   441→                  - generic [ref=e4350]:
+   442→                    - button [ref=e4355] [cursor=pointer]:
+   443→                      - text: $3,303
+   444→                      - generic [ref=e4356]: Show price breakdown
+   445→                    - generic [ref=e4357]: for 7 nights
+   446→                    - generic [ref=e4359]: $3,303 for 7 nights
+   447→                  - generic [ref=e4360]:
+   448→                    - generic:
+   449→                      - generic: 4.93 out of 5 average rating, 153 reviews
+   450→                      - generic: 4.93 (153)
+   451→            - group [ref=e4383]:
+   452→              - link "Condo in Incline Village" [ref=e4384] [cursor=pointer]:
+   453→                - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   454→              - generic [ref=e4385]:
+   455→                - group [ref=e4388]:
+   456→                  - generic:
+   457→                    - generic:
+   458→                      - 'button "Add to wishlist: Condo in Incline Village" [ref=e4390] [cursor=pointer]'
+   459→                      - generic:
+   460→                        - button [disabled] [ref=e4394] [cursor=pointer]
+   461→                        - 'button "Next photo: Condo in Incline Village" [ref=e4399] [cursor=pointer]'
+   462→                      - generic:
+   463→                        - generic:
+   464→                          - img "Photo 1 of 6"
+   465→                  - generic [ref=e4407]:
+   466→                    - link [ref=e4408] [cursor=pointer]:
+   467→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   468→                    - link [ref=e4412] [cursor=pointer]:
+   469→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   470→                    - link [ref=e4413] [cursor=pointer]:
+   471→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   472→                    - link [ref=e4414] [cursor=pointer]:
+   473→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   474→                    - link [ref=e4415] [cursor=pointer]:
+   475→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   476→                    - link [ref=e4416] [cursor=pointer]:
+   477→                      - /url: /rooms/26011317?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3odrhaUXM66MfFR&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   478→                - generic [ref=e4417]:
+   479→                  - generic [ref=e4418]: Condo in Incline Village
+   480→                  - generic [ref=e4419]: Ski Lake Lodge | Deck | BBQ
+   481→                  - generic [ref=e4421]:
+   482→                    - generic [ref=e4422]:
+   483→                      - generic [ref=e4423]: 3 bedrooms
+   484→                      - generic [ref=e4424]: 3 bedrooms
+   485→                    - generic [ref=e4425]:
+   486→                      - generic [ref=e4426]: ","
+   487→                      - generic [ref=e4427]: ·
+   488→                      - generic [ref=e4428]: 4 beds
+   489→                      - generic [ref=e4429]: 4 beds
+   490→                    - generic [ref=e4430]:
+   491→                      - generic [ref=e4431]: ","
+   492→                      - generic [ref=e4432]: ·
+   493→                      - generic [ref=e4433]: 2.5 baths
+   494→                      - generic [ref=e4434]: 2.5 baths
+   495→                  - generic [ref=e4435]:
+   496→                    - generic "$1,507 for 7 nights, originally $1,640" [ref=e4439]:
+   497→                      - generic [ref=e4440]:
+   498→                        - generic [ref=e4441]:
+   499→                          - generic [ref=e4442]: $1,640
+   500→                          - button [ref=e4445] [cursor=pointer]:
+   501→                            - text: $1,507
+   502→                            - generic [ref=e4446]: Show price breakdown
+   503→                        - generic [ref=e4447]: for 7 nights
+   504→                    - generic [ref=e4450]: Extended stay discount
+   505→                  - generic [ref=e4452]:
+   506→                    - generic:
+   507→                      - generic: 4.54 out of 5 average rating, 67 reviews
+   508→                      - generic: 4.54 (67)
+   509→            - group [ref=e4456]:
+   510→              - link "Townhouse in Kings Beach" [ref=e4457] [cursor=pointer]:
+   511→                - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   512→              - generic [ref=e4458]:
+   513→                - group [ref=e4461]:
+   514→                  - generic:
+   515→                    - generic:
+   516→                      - generic:
+   517→                        - generic:
+   518→                          - generic:
+   519→                            - generic: Guest favorite
+   520→                            - generic: Guest favorite
+   521→                        - 'button "Add to wishlist: Townhouse in Kings Beach" [ref=e4463] [cursor=pointer]'
+   522→                      - generic:
+   523→                        - button [disabled] [ref=e4467] [cursor=pointer]
+   524→                        - 'button "Next photo: Townhouse in Kings Beach" [ref=e4472] [cursor=pointer]'
+   525→                      - generic:
+   526→                        - generic:
+   527→                          - img "Photo 1 of 6"
+   528→                  - generic [ref=e4480]:
+   529→                    - link [ref=e4481] [cursor=pointer]:
+   530→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   531→                    - link [ref=e4485] [cursor=pointer]:
+   532→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   533→                    - link [ref=e4486] [cursor=pointer]:
+   534→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   535→                    - link [ref=e4487] [cursor=pointer]:
+   536→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   537→                    - link [ref=e4488] [cursor=pointer]:
+   538→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   539→                    - link [ref=e4489] [cursor=pointer]:
+   540→                      - /url: /rooms/1412375251399159076?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3RBRkAAphdn2CbU&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   541→                - generic [ref=e4490]:
+   542→                  - generic [ref=e4491]: Townhouse in Kings Beach
+   543→                  - generic [ref=e4492]: Lake View, Direct Access, AC, Buoy, EV Charger
+   544→                  - generic [ref=e4494]:
+   545→                    - generic [ref=e4495]:
+   546→                      - generic [ref=e4496]: 4 bedrooms
+   547→                      - generic [ref=e4497]: 4 bedrooms
+   548→                    - generic [ref=e4498]:
+   549→                      - generic [ref=e4499]: ","
+   550→                      - generic [ref=e4500]: ·
+   551→                      - generic [ref=e4501]: 5 beds
+   552→                      - generic [ref=e4502]: 5 beds
+   553→                    - generic [ref=e4503]:
+   554→                      - generic [ref=e4504]: ","
+   555→                      - generic [ref=e4505]: ·
+   556→                      - generic [ref=e4506]: 3 baths
+   557→                      - generic [ref=e4507]: 3 baths
+   558→                  - generic [ref=e4508]:
+   559→                    - generic "$9,069 for 7 nights, originally $10,029" [ref=e4512]:
+   560→                      - generic [ref=e4513]:
+   561→                        - generic [ref=e4514]:
+   562→                          - generic [ref=e4515]: $10,029
+   563→                          - button [ref=e4518] [cursor=pointer]:
+   564→                            - text: $9,069
+   565→                            - generic [ref=e4519]: Show price breakdown
+   566→                        - generic [ref=e4520]: for 7 nights
+   567→                    - generic [ref=e4523]: Weekly discount
+   568→                  - generic [ref=e4525]:
+   569→                    - generic:
+   570→                      - generic: 4.92 out of 5 average rating, 13 reviews
+   571→                      - generic: 4.92 (13)
+   572→            - group [ref=e4529]:
+   573→              - link "Cabin in Kings Beach" [ref=e4530] [cursor=pointer]:
+   574→                - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   575→              - generic [ref=e4531]:
+   576→                - group [ref=e4534]:
+   577→                  - generic:
+   578→                    - generic:
+   579→                      - generic:
+   580→                        - generic:
+   581→                          - generic:
+   582→                            - generic: Top guest favorite
+   583→                            - generic: Guest favorite
+   584→                        - 'button "Add to wishlist: Cabin in Kings Beach" [ref=e4536] [cursor=pointer]'
+   585→                      - generic:
+   586→                        - button [disabled] [ref=e4540] [cursor=pointer]
+   587→                        - 'button "Next photo: Cabin in Kings Beach" [ref=e4545] [cursor=pointer]'
+   588→                      - generic:
+   589→                        - generic:
+   590→                          - img "Photo 1 of 6"
+   591→                  - generic [ref=e4553]:
+   592→                    - link [ref=e4554] [cursor=pointer]:
+   593→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   594→                    - link [ref=e4558] [cursor=pointer]:
+   595→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   596→                    - link [ref=e4559] [cursor=pointer]:
+   597→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   598→                    - link [ref=e4560] [cursor=pointer]:
+   599→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   600→                    - link [ref=e4561] [cursor=pointer]:
+   601→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   602→                    - link [ref=e4562] [cursor=pointer]:
+   603→                      - /url: /rooms/16112793?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3UjTmyNq7oP9TQG&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   604→                - generic [ref=e4563]:
+   605→                  - generic [ref=e4564]: Cabin in Kings Beach
+   606→                  - generic [ref=e4565]: The Avilla's Golden Opportunity close to the Lake
+   607→                  - generic [ref=e4567]:
+   608→                    - generic [ref=e4568]:
+   609→                      - generic [ref=e4569]: 2 bedrooms
+   610→                      - generic [ref=e4570]: 2 bedrooms
+   611→                    - generic [ref=e4571]:
+   612→                      - generic [ref=e4572]: ","
+   613→                      - generic [ref=e4573]: ·
+   614→                      - generic [ref=e4574]: 2 beds
+   615→                      - generic [ref=e4575]: 2 beds
+   616→                    - generic [ref=e4576]:
+   617→                      - generic [ref=e4577]: ","
+   618→                      - generic [ref=e4578]: ·
+   619→                      - generic [ref=e4579]: 1 bath
+   620→                      - generic [ref=e4580]: 1 bath
+   621→                  - generic [ref=e4581]:
+   622→                    - generic "$2,133 for 7 nights, originally $2,320" [ref=e4585]:
+   623→                      - generic [ref=e4586]:
+   624→                        - generic [ref=e4587]:
+   625→                          - generic [ref=e4588]: $2,320
+   626→                          - button [ref=e4591] [cursor=pointer]:
+   627→                            - text: $2,133
+   628→                            - generic [ref=e4592]: Show price breakdown
+   629→                        - generic [ref=e4593]: for 7 nights
+   630→                    - generic [ref=e4596]: Weekly discount
+   631→                  - generic [ref=e4598]:
+   632→                    - generic:
+   633→                      - generic: 4.96 out of 5 average rating, 185 reviews
+   634→                      - generic: 4.96 (185)
+   635→            - group [ref=e4602]:
+   636→              - link "Home in Homewood" [ref=e4603] [cursor=pointer]:
+   637→                - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   638→              - generic [ref=e4604]:
+   639→                - group [ref=e4607]:
+   640→                  - generic:
+   641→                    - generic:
+   642→                      - generic:
+   643→                        - generic:
+   644→                          - generic:
+   645→                            - generic: Guest favorite
+   646→                            - generic: Guest favorite
+   647→                        - 'button "Add to wishlist: Home in Homewood" [ref=e4609] [cursor=pointer]'
+   648→                      - generic:
+   649→                        - button [disabled] [ref=e4613] [cursor=pointer]
+   650→                        - 'button "Next photo: Home in Homewood" [ref=e4618] [cursor=pointer]'
+   651→                      - generic:
+   652→                        - generic:
+   653→                          - img "Photo 1 of 6"
+   654→                  - generic [ref=e4626]:
+   655→                    - link [ref=e4627] [cursor=pointer]:
+   656→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   657→                    - link [ref=e4631] [cursor=pointer]:
+   658→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   659→                    - link [ref=e4632] [cursor=pointer]:
+   660→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   661→                    - link [ref=e4633] [cursor=pointer]:
+   662→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   663→                    - link [ref=e4634] [cursor=pointer]:
+   664→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   665→                    - link [ref=e4635] [cursor=pointer]:
+   666→                      - /url: /rooms/7346342?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3NtKNpspwiEGBO4&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   667→                - generic [ref=e4636]:
+   668→                  - generic [ref=e4637]: Home in Homewood
+   669→                  - generic [ref=e4638]: Under Eagle Rock - Hot Tub-Across from Beach
+   670→                  - generic [ref=e4640]:
+   671→                    - generic [ref=e4641]:
+   672→                      - generic [ref=e4642]: 4 bedrooms
+   673→                      - generic [ref=e4643]: 4 bedrooms
+   674→                    - generic [ref=e4644]:
+   675→                      - generic [ref=e4645]: ","
+   676→                      - generic [ref=e4646]: ·
+   677→                      - generic [ref=e4647]: 6 beds
+   678→                      - generic [ref=e4648]: 6 beds
+   679→                    - generic [ref=e4649]:
+   680→                      - generic [ref=e4650]: ","
+   681→                      - generic [ref=e4651]: ·
+   682→                      - generic [ref=e4652]: 2 baths
+   683→                      - generic [ref=e4653]: 2 baths
+   684→                  - generic "$5,464 for 7 nights, originally $7,353" [ref=e4658]:
+   685→                    - generic [ref=e4659]:
+   686→                      - generic [ref=e4660]:
+   687→                        - generic [ref=e4661]: $7,353
+   688→                        - button [ref=e4664] [cursor=pointer]:
+   689→                          - text: $5,464
+   690→                          - generic [ref=e4665]: Show price breakdown
+   691→                      - generic [ref=e4666]: for 7 nights
+   692→                  - generic [ref=e4669]:
+   693→                    - generic:
+   694→                      - generic: 4.93 out of 5 average rating, 193 reviews
+   695→                      - generic: 4.93 (193)
+   696→            - group [ref=e4673]:
+   697→              - link "Home in Tahoe City" [ref=e4674] [cursor=pointer]:
+   698→                - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   699→              - generic [ref=e4675]:
+   700→                - group [ref=e4678]:
+   701→                  - generic:
+   702→                    - generic:
+   703→                      - 'button "Add to wishlist: Home in Tahoe City" [ref=e4680] [cursor=pointer]'
+   704→                      - generic:
+   705→                        - button [disabled] [ref=e4684] [cursor=pointer]
+   706→                        - 'button "Next photo: Home in Tahoe City" [ref=e4689] [cursor=pointer]'
+   707→                      - generic:
+   708→                        - generic:
+   709→                          - img "Photo 1 of 6"
+   710→                  - generic [ref=e4697]:
+   711→                    - link [ref=e4698] [cursor=pointer]:
+   712→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   713→                    - link [ref=e4701] [cursor=pointer]:
+   714→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   715→                    - link [ref=e4702] [cursor=pointer]:
+   716→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   717→                    - link [ref=e4703] [cursor=pointer]:
+   718→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   719→                    - link [ref=e4704] [cursor=pointer]:
+   720→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   721→                    - link [ref=e4705] [cursor=pointer]:
+   722→                      - /url: /rooms/1700880051558873763?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3GTaivbzOW7-MQb&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   723→                - generic [ref=e4706]:
+   724→                  - generic [ref=e4707]: Home in Tahoe City
+   725→                  - generic [ref=e4708]: Tahoe City Cabin | Designer Cabin Near Lake & Ski
+   726→                  - generic [ref=e4710]:
+   727→                    - generic [ref=e4711]:
+   728→                      - generic [ref=e4712]: 3 bedrooms
+   729→                      - generic [ref=e4713]: 3 bedrooms
+   730→                    - generic [ref=e4714]:
+   731→                      - generic [ref=e4715]: ","
+   732→                      - generic [ref=e4716]: ·
+   733→                      - generic [ref=e4717]: 4 beds
+   734→                      - generic [ref=e4718]: 4 beds
+   735→                    - generic [ref=e4719]:
+   736→                      - generic [ref=e4720]: ","
+   737→                      - generic [ref=e4721]: ·
+   738→                      - generic [ref=e4722]: 2 baths
+   739→                      - generic [ref=e4723]: 2 baths
+   740→                  - generic [ref=e4727]:
+   741→                    - button [ref=e4732] [cursor=pointer]:
+   742→                      - text: $3,403
+   743→                      - generic [ref=e4733]: Show price breakdown
+   744→                    - generic [ref=e4734]: for 7 nights
+   745→                    - generic [ref=e4736]: $3,403 for 7 nights
+   746→                  - generic [ref=e4737]:
+   747→                    - generic:
+   748→                      - generic: 5.0 out of 5 average rating, 5 reviews
+   749→                      - generic: 5.0 (5)
+   750→            - group [ref=e4741]:
+   751→              - link "Condo in Tahoe City" [ref=e4742] [cursor=pointer]:
+   752→                - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   753→              - generic [ref=e4743]:
+   754→                - group [ref=e4746]:
+   755→                  - generic:
+   756→                    - generic:
+   757→                      - generic:
+   758→                        - generic:
+   759→                          - generic:
+   760→                            - generic: Guest favorite
+   761→                            - generic: Guest favorite
+   762→                        - 'button "Add to wishlist: Condo in Tahoe City" [ref=e4748] [cursor=pointer]'
+   763→                      - generic:
+   764→                        - button [disabled] [ref=e4752] [cursor=pointer]
+   765→                        - 'button "Next photo: Condo in Tahoe City" [ref=e4757] [cursor=pointer]'
+   766→                      - generic:
+   767→                        - generic:
+   768→                          - img "Photo 1 of 6"
+   769→                  - generic [ref=e4765]:
+   770→                    - link [ref=e4766] [cursor=pointer]:
+   771→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   772→                    - link [ref=e4769] [cursor=pointer]:
+   773→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   774→                    - link [ref=e4770] [cursor=pointer]:
+   775→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   776→                    - link [ref=e4771] [cursor=pointer]:
+   777→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   778→                    - link [ref=e4772] [cursor=pointer]:
+   779→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   780→                    - link [ref=e4773] [cursor=pointer]:
+   781→                      - /url: /rooms/8459964?check_in=2026-08-17&check_out=2026-08-24&search_mode=regular_search&source_impression_id=p3_1786578670_P3-aoL6CsXDYZj6h&previous_page_section_name=1000&federated_search_id=1f8e7c34-d6e6-4885-80fb-37ff5c78ae9a
+   782→                - generic [ref=e4774]:
+   783→                  - generic [ref=e4775]: Condo in Tahoe City
+   784→                  - generic [ref=e4776]: Welcoming & Hip Tahoe Retreat +10% weekly discount
+   785→                  - generic [ref=e4778]:
+   786→                    - generic [ref=e4779]:
+   787→                      - generic [ref=e4780]: 3 bedrooms
+   788→                      - generic [ref=e4781]: 3 bedrooms
+   789→                    - generic [ref=e4782]:
+   790→                      - generic [ref=e4783]: ","
+   791→                      - generic [ref=e4784]: ·
+   792→                      - generic [ref=e4785]: 4 beds
+   793→                      - generic [ref=e4786]: 4 beds
+   794→                    - generic [ref=e4787]:
+   795→                      - generic [ref=e4788]: ","
+   796→                      - generic [ref=e4789]: ·
+   797→                      - generic [ref=e4790]: 2 baths
+   798→                      - generic [ref=e4791]: 2 baths
+   799→                  - generic [ref=e4792]:

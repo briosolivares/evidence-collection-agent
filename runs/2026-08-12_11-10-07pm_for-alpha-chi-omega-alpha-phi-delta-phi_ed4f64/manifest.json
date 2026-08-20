@@ -1,0 +1,100 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-13T06:10:07.512Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "686e95048b0adf139f4ce0435be6abb0b7b17aecf393057c68edd95e1ed847eb",
+      "capturedAt": "2026-08-13T06:11:48.206Z"
+    },
+    {
+      "filename": "scratch/axo_data.md",
+      "sha256": "1ec8f3ee906a2fe39d5a95cc3fd06800b794f7289d23fc13f712a27bfbda07c2",
+      "capturedAt": "2026-08-13T06:11:56.038Z"
+    },
+    {
+      "filename": "scratch/aphi_data.md",
+      "sha256": "c09f62342cb5297346f6ec1bc02073ad0dff1e994be2b061600e65c260cd5807",
+      "capturedAt": "2026-08-13T06:12:31.122Z"
+    },
+    {
+      "filename": "scratch/dphie_data.md",
+      "sha256": "fb54ccc1f43de7ee12135a0c4ccdc1067a1b841a2db2eeac5c64ca5cbc9f0b93",
+      "capturedAt": "2026-08-13T06:16:38.991Z"
+    },
+    {
+      "filename": "scratch/theta_2026.md",
+      "sha256": "336f32bc860313c891fee91bfcf0f51387454cdf90daac2d4d7aeb7125d92070",
+      "capturedAt": "2026-08-13T06:17:12.891Z"
+    },
+    {
+      "filename": "scratch/theta_2027.md",
+      "sha256": "993baa950efc8f85dadd6e75669e7833e10306f0591d28f1850fe6c2e74a65dd",
+      "capturedAt": "2026-08-13T06:17:35.312Z"
+    },
+    {
+      "filename": "scratch/pibetaphi_data.md",
+      "sha256": "08b1c91a15869e21a6b286c9aaa83e37cc920e4e3340e49c7f39a5f46f212c2b",
+      "capturedAt": "2026-08-13T06:18:54.623Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2026.md",
+      "sha256": "d801d4657a72d1197aa81a32c8349925a10b296f159de582b2b9a810af31afcd",
+      "capturedAt": "2026-08-13T06:19:21.210Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2027.md",
+      "sha256": "0ba853b77ed81fd4c32a02d12c44d9260f15ed1901473f0a54c0fd59643b9ea8",
+      "capturedAt": "2026-08-13T06:19:37.403Z"
+    },
+    {
+      "filename": "artifacts/sorority_members.csv",
+      "sha256": "953c3339af89151a446e8f86bcf15e9647d30f5bd715a8a53fb6e33875dac92b",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:22:15.193Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "b7163bd0d807d864e89adbbd2f86c999ffe6f548b6dc73c2fcea3db9f5ef87ac",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:22:57.376Z"
+    },
+    {
+      "filename": "artifacts/google_signin_wall.png",
+      "sha256": "65ad90092d7c48e80e0d99e05d9599356892978b82419635256740d551b055d7",
+      "sourceUrl": "https://accounts.google.com/v3/signin/identifier?continue=https://docs.google.com/spreadsheets/u/0/&followup=https://docs.google.com/spreadsheets/u/0/&ltmpl=sheets&osid=1&passive=1209600&service=wise&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S453433610:1786602155747368",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:23:04.147Z"
+    },
+    {
+      "filename": "artifacts/source_theta_2026s.png",
+      "sha256": "ae1bf4fc08814bc99d413a8da7dfd3419a7f61c2a05d86b4bbe0793ca6951877",
+      "sourceUrl": "https://www.theta.mit.edu/2026s",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:23:09.826Z"
+    },
+    {
+      "filename": "artifacts/source_sigmakappa_2027.png",
+      "sha256": "618506ec2152d92723705fbefa13829003e253ad00c972b072094ff072a4e76b",
+      "sourceUrl": "https://www.sigmakappa.mit.edu/class-of-2027",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:23:14.063Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-2.txt",
+      "sha256": "5b6b992ebf7f3838b9824d2fd26dead21e84bb34c451dac2367904566bb05233",
+      "capturedAt": "2026-08-13T06:23:21.008Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:23:30.952Z"
+}

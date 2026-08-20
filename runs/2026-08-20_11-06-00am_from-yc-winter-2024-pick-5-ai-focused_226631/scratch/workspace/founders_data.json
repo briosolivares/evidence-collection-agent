@@ -1,0 +1,51 @@
+{
+  "companies": [
+    {
+      "name": "Retell AI",
+      "tagline": "Supercharge Your Contact Center Operations with AI Phone Agents",
+      "product": "an API platform for building human-like AI voice agents for contact centers, achieving ~800ms response times",
+      "founders": [
+        {"name": "Bing Wu", "role": "Co-founder & CEO", "linkedin": "https://linkedin.com/in/binw", "detail": "your background as a PM at ByteDance/TikTok leading B2B and consumer products, plus founding two investor-backed startups in college"},
+        {"name": "Todd Li", "role": "Co-Founder & President", "linkedin": "https://www.linkedin.com/in/toddli1/", "detail": "your role driving Retell AI's growth as President and Co-founder"},
+        {"name": "Evie Wang", "role": "Co-founder & CMO", "linkedin": "https://linkedin.com/in/yanwang131415", "detail": "your design background and 3 years as a Product Designer at ByteDance shaping Retell AI's go-to-market"},
+        {"name": "Weijia Yu", "role": "Founder", "linkedin": "https://linkedin.com/in/weijia-y-76b816194", "detail": "your machine learning and product leadership experience at Meta and ObEN building full-stack AI (TTS, computer vision, chatbots)"},
+        {"name": "Zexia Zhang", "role": "Co-founder & CTO", "linkedin": "https://linkedin.com/in/zexia-zhang-171480133", "detail": "your four years at Google leading next-gen speech translation and NLP for call analysis"}
+      ]
+    },
+    {
+      "name": "Marr Labs",
+      "tagline": "AI-voice agents that are indistinguishable from humans",
+      "product": "AI voice agents that handle phone-based jobs like scheduling, sales, and support calls at a fraction of the cost of a human agent",
+      "founders": [
+        {"name": "Dave Grannan", "role": "Co-founder & CEO", "linkedin": "https://linkedin.com/in/grannan", "detail": "your history as founding CEO of Vlingo (acquired for $225M, powered the first Siri) and your work with Maluuba and Light"},
+        {"name": "Han Shu", "role": "Co-founder & CTO", "linkedin": "https://linkedin.com/in/hanshu", "detail": "your work co-founding Vlingo's speech recognition stack for Siri and leading ML/AI groups at Airbnb and DoorDash"}
+      ]
+    },
+    {
+      "name": "Basepilot",
+      "tagline": "AI agents for insurance claims",
+      "product": "line-of-business-specific AI agents that automate claims operations for insurers, TPAs, and MGAs like Old Republic and Zurich",
+      "founders": [
+        {"name": "Ken Hendricks", "role": "Co-founder & CEO", "linkedin": "https://linkedin.com/in/ken-hendricks-96181611a", "detail": "your experience scaling a B2B fintech to 3M users and building a computer vision startup that partnered with Deloitte, KPMG, EY, and BMW"},
+        {"name": "Pascal Wieler", "role": "Co-founder", "linkedin": "https://linkedin.com/in/pascal-wieler", "detail": "your research in robotic manipulation and imitation learning at Carnegie Mellon and self-driving car work at Mercedes-Benz"}
+      ]
+    },
+    {
+      "name": "Magic Hour",
+      "tagline": "Platform for AI video generation",
+      "product": "a platform that packages the best AI video models into one workflow so anyone can create professional-quality videos from a template",
+      "founders": [
+        {"name": "Runbo Li", "role": "Co-founder & CEO", "linkedin": "https://linkedin.com/in/runboli", "detail": "your background as a senior data scientist at Meta's NPE team building zero-to-one consumer social products"},
+        {"name": "David Hu", "role": "Co-founder & CTO", "linkedin": "https://linkedin.com/in/davidhu2000", "detail": "your full-stack engineering work at Skillz across multiple product teams from Series B through IPO"}
+      ]
+    },
+    {
+      "name": "Mathos",
+      "tagline": "Ultimate AI Math Problem Solver to Revolutionize Personalized Learning",
+      "product": "an AI math solver and tutor (formerly MathGPTPro) that has empowered over 1M students across 200+ countries with ~20% higher accuracy than GPT-4o on math problems",
+      "founders": [
+        {"name": "Tianwei Yue", "role": "Founder", "linkedin": "https://linkedin.com/in/tianwei-yue", "detail": "your work building language agents since 2022 and your deep RL/robotics research background"}
+      ]
+    }
+  ]
+}

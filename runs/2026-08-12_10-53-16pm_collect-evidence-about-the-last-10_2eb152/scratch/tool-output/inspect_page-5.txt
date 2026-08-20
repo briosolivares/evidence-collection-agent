@@ -1,0 +1,779 @@
+URL: https://github.com/openclaw/openclaw/pull/123001
+Title: fix(signal): fail probe when RPC verification fails by steipete · Pull Request #123001 · openclaw/openclaw · GitHub
+
+- generic [ref=f13e2]:
+  - generic [ref=f13e3]:
+    - link "Skip to content" [ref=f13e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f13e8]:
+      - heading "Navigation Menu" [level=2] [ref=f13e9]
+      - generic [ref=f13e10]:
+        - link "Homepage" [ref=f13e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f13e15]:
+          - navigation "Global" [ref=f13e16]:
+            - list [ref=f13e17]:
+              - listitem [ref=f13e18]:
+                - button "Platform" [ref=f13e20] [cursor=pointer]
+              - listitem [ref=f13e23]:
+                - button "Solutions" [ref=f13e25] [cursor=pointer]
+              - listitem [ref=f13e28]:
+                - button "Resources" [ref=f13e30] [cursor=pointer]
+              - listitem [ref=f13e33]:
+                - button "Open Source" [ref=f13e35] [cursor=pointer]
+              - listitem [ref=f13e38]:
+                - button "Enterprise" [ref=f13e40] [cursor=pointer]
+              - listitem [ref=f13e43]:
+                - link "Pricing" [ref=f13e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f13e45]:
+            - button "Search or jump to, type / to search" [ref=f13e47] [cursor=pointer]:
+              - generic [ref=f13e50]:
+                - text: Type
+                - generic [ref=f13e51]: /
+                - text: to search
+            - link "Sign in" [ref=f13e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123001
+            - link "Sign up" [ref=f13e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f13e55] [cursor=pointer]
+  - main [ref=f13e61]:
+    - generic [ref=f13e62]:
+      - generic [ref=f13e63]:
+        - generic [ref=f13e65]:
+          - link "openclaw" [ref=f13e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f13e70]: /
+          - strong [ref=f13e71]:
+            - link "openclaw" [ref=f13e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f13e73]: Public
+        - generic [ref=f13e74]:
+          - list:
+            - listitem [ref=f13e75]:
+              - link "Sponsor @openclaw" [ref=f13e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f13e77]: Sponsor
+            - listitem [ref=f13e81]:
+              - link "You must be signed in to change notification settings" [ref=f13e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f13e85]:
+              - link "Fork 81.2k" [ref=f13e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,157" [ref=f13e89]: 81.2k
+            - listitem [ref=f13e90]:
+              - link "You must be signed in to star a repository" [ref=f13e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386110 users starred this repository" [ref=f13e95]: 386k
+      - navigation "Repository" [ref=f13e96]:
+        - list [ref=f13e97]:
+          - listitem [ref=f13e98]:
+            - link "Code" [ref=f13e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f13e103]:
+            - link "Issues 3.4k" [ref=f13e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f13e108]: Issues
+              - generic "3,405" [ref=f13e109]: 3.4k
+          - listitem [ref=f13e110]:
+            - link "Pull requests 2.1k" [ref=f13e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f13e114]: Pull requests
+              - generic "2,102" [ref=f13e115]: 2.1k
+          - listitem [ref=f13e116]:
+            - link "Actions" [ref=f13e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f13e121]:
+            - link "Projects" [ref=f13e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f13e126]:
+            - link "Security and quality 647" [ref=f13e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f13e130]: Security and quality
+              - generic "647" [ref=f13e131]
+          - listitem [ref=f13e132]:
+            - link "Insights" [ref=f13e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f13e143]:
+      - generic [ref=f13e147]:
+        - generic [ref=f13e149]:
+          - 'heading "fix(signal): fail probe when RPC verification fails - #123001" [level=1] [ref=f13e150]':
+            - text: "fix(signal): fail probe when RPC verification fails"
+            - generic [ref=f13e151]: "- #123001"
+          - generic [ref=f13e152]: "#123001"
+        - generic [ref=f13e155]:
+          - generic [ref=f13e157]:
+            - img "Pull request" [ref=f13e158]
+            - text: Merged
+          - generic [ref=f13e161]:
+            - link "steipete" [ref=f13e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 1 commit into
+            - generic [ref=f13e163]:
+              - link "main" [ref=f13e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f13e165]: from
+              - generic [ref=f13e166]:
+                - link "fix/signal-probe-rpc-failure" [ref=f13e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/fix/signal-probe-rpc-failure
+                - button "Copy head branch name to clipboard" [ref=f13e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 10:19 PM PDT" [ref=f13e172]: Aug 13, 202635 minutes ago
+        - generic [ref=f13e173]:
+          - generic [ref=f13e175]:
+            - generic [ref=f13e176]: "+21"
+            - generic [ref=f13e177]: "-1"
+            - generic [ref=f13e178]: "Lines changed: 21 additions & 1 deletion"
+          - navigation "Pull request navigation tabs" [ref=f13e186]:
+            - generic [ref=f13e187]:
+              - link "Conversation (6)" [ref=f13e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123001
+                - text: Conversation
+                - generic [ref=f13e191]: "6"
+                - generic [ref=f13e192]: (6)
+              - link "Commits (1)" [ref=f13e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123001/commits
+                - text: Commits
+                - generic [ref=f13e196]: "1"
+                - generic [ref=f13e197]: (1)
+              - link "Checks (163)" [ref=f13e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123001/checks
+                - text: Checks
+                - generic [ref=f13e201]: "163"
+                - generic [ref=f13e202]: (163)
+              - link "Files changed (2)" [ref=f13e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123001/files
+                - text: Files changed
+                - generic [ref=f13e206]: "2"
+                - generic [ref=f13e207]: (2)
+      - generic [ref=f13e212]:
+        - generic [ref=f13e214]:
+          - heading "Conversation" [level=2] [ref=f13e215]
+          - generic [ref=f13e216]:
+            - generic [ref=f13e217]:
+              - generic [ref=f13e219]:
+                - link [ref=f13e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f13e221]
+                - generic [ref=f13e223]:
+                  - generic [ref=f13e224]:
+                    - heading "steipete commented Aug 13, 20261 hour ago •" [level=3] [ref=f13e225]:
+                      - generic [ref=f13e226]:
+                        - strong [ref=f13e227]:
+                          - link "steipete" [ref=f13e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 13, 20261 hour ago" [ref=f13e229] [cursor=pointer]:
+                          - /url: "#issue-5137867808"
+                        - generic [ref=f13e230]:
+                          - generic [ref=f13e231]: •
+                          - group [ref=f13e232]:
+                            - button "edited" [ref=f13e233] [cursor=pointer]
+                    - generic [ref=f13e237]:
+                      - group [ref=f13e239]:
+                        - button [ref=f13e240] [cursor=pointer]:
+                          - img "Show options" [ref=f13e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f13e246]: Contributor
+                  - generic [ref=f13e251]:
+                    - paragraph [ref=f13e252]:
+                      - text: Closes
+                      - link "#122995" [ref=f13e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/122995
+                    - heading "What Problem This Solves" [level=2] [ref=f13e254]
+                    - paragraph [ref=f13e255]:
+                      - text: Fixes an issue where Signal channel status could report
+                      - code [ref=f13e256]: works
+                      - text: after the external/native JSON-RPC version check failed, as long as the shallow HTTP check succeeded.
+                    - heading "Why This Change Was Made" [level=2] [ref=f13e257]
+                    - paragraph [ref=f13e258]:
+                      - text: The Signal probe now derives its canonical
+                      - code [ref=f13e259]: ok
+                      - text: outcome from the existing recorded RPC error. The plugin continues to preserve the shallow HTTP status, parsed version, error text, timing, transport detection, and container receive checks; Gateway status behavior already handles
+                      - code [ref=f13e260]: ok:false
+                      - text: correctly.
+                    - heading "User Impact" [level=2] [ref=f13e261]
+                    - paragraph [ref=f13e262]:
+                      - text: Operators now see
+                      - code [ref=f13e263]: probe failed
+                      - text: and the real Signal RPC diagnostic instead of a false-green
+                      - code [ref=f13e264]: works
+                      - text: result when the configured send transport is unusable.
+                    - heading "Evidence" [level=2] [ref=f13e265]
+                    - list [ref=f13e266]:
+                      - listitem [ref=f13e267]:
+                        - text: "Tests-first regression failed before the source repair: expected"
+                        - code [ref=f13e268]: ok:false
+                        - text: ", received"
+                        - code [ref=f13e269]: ok:true
+                        - text: ; the status, error, and null version were already preserved.
+                      - listitem [ref=f13e270]: "Focused Signal core suite: 61/61 passed."
+                      - listitem [ref=f13e271]:
+                        - text: "Exact-head CI completed green:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31667635596" [ref=f13e272] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31667635596
+                        - text: .
+                      - listitem [ref=f13e273]:
+                        - text: A standalone Testbox changed-gate attempt (
+                        - code [ref=f13e274]: tbx_01kzwpp15z8pbf1wv4xdaz1kmt
+                        - text: ","
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31667709014" [ref=f13e275] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31667709014
+                        - text: ) stopped before Signal checks on the stale branch base because the env-var ratchet miscounted internal constant
+                        - code [ref=f13e276]: OPENCLAW_STATE_MIGRATION_ASSERTIONS
+                        - text: ; current main already fixed that unrelated false positive in
+                        - code [ref=f13e277]: e4e558df215a
+                        - text: ", and the exact merge-ref CI above is green."
+                      - listitem [ref=f13e278]:
+                        - text: Targeted formatting, extension lint, and
+                        - code [ref=f13e279]: git diff --check
+                        - text: passed.
+                      - listitem [ref=f13e280]: "Final integrated Codex autoreview: clean, no findings, confidence 0.99; TruffleHog clean."
+                      - listitem [ref=f13e281]:
+                        - text: "Exact-head ClawSweeper review reported no findings and named this producer-side repair the best solution:"
+                        - 'link "fix(signal): fail probe when RPC verification fails #123001 (comment)" [ref=f13e285] [cursor=pointer]':
+                          - /url: https://github.com/openclaw/openclaw/pull/123001#issuecomment-5276219455
+                        - text: .
+                    - paragraph [ref=f13e286]: "Production delta: +1/-1, net 0. Tests: +20."
+                  - 'button "eyes (1): steipete, 04:37AM today" [disabled] [ref=f13e291]':
+                    - generic [ref=f13e292]: 👀
+                    - generic [ref=f13e293]: "1"
+              - generic [ref=f13e294]:
+                - generic [ref=f13e305]:
+                  - link [ref=f13e308] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e309]
+                  - code [ref=f13e311]:
+                    - 'link "fix(signal): fail probe when RPC verification fails" [ref=f13e312] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/123001/commits/a80725afc9f2699f2adee963e533088c7f3cba9d
+                  - button "Unverified" [ref=f13e314] [cursor=pointer]
+                  - group [ref=f13e319]:
+                    - img "47 / 90 checks OK" [ref=f13e321] [cursor=pointer]
+                  - code [ref=f13e324]:
+                    - link "a80725a" [ref=f13e325] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/123001/commits/a80725afc9f2699f2adee963e533088c7f3cba9d
+                - generic [ref=f13e327]:
+                  - link [ref=f13e329] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e330]
+                  - generic [ref=f13e332]:
+                    - generic [ref=f13e333]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago" [level=3] [ref=f13e334]:
+                        - generic [ref=f13e335]:
+                          - strong [ref=f13e336]:
+                            - link "clawsweeper" [ref=f13e337] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e338]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f13e339] [cursor=pointer]:
+                            - /url: "#issuecomment-5276027497"
+                      - generic [ref=f13e340]:
+                        - group [ref=f13e342]:
+                          - button [ref=f13e343] [cursor=pointer]:
+                            - img "Show options" [ref=f13e346]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e349]: Contributor
+                    - table [ref=f13e353]:
+                      - rowgroup [ref=f13e354]:
+                        - row [ref=f13e355]:
+                          - cell [ref=f13e356]:
+                            - paragraph [ref=f13e357]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f13e358]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f13e359]:
+                  - generic [ref=f13e365]:
+                    - link [ref=f13e367] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f13e368]
+                    - generic [ref=f13e369]:
+                      - link "steipete" [ref=f13e370] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 04:381 hour ago" [ref=f13e371] [cursor=pointer]:
+                        - /url: "#event-29379858014"
+                  - generic [ref=f13e376]:
+                    - link [ref=f13e377] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f13e378]
+                    - link "openclaw-barnacle" [ref=f13e379] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f13e380]: Bot
+                    - text: added
+                    - 'link "channel: signal" [ref=f13e381] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20signal%22
+                    - 'link "size: XS" [ref=f13e382] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XS%22
+                    - link "maintainer" [ref=f13e383] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f13e384] [cursor=pointer]:
+                      - /url: "#event-29379859232"
+                  - generic [ref=f13e389]:
+                    - generic [ref=f13e390]:
+                      - link [ref=f13e391] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                        - img "@clawsweeper" [ref=f13e392]
+                      - link "clawsweeper" [ref=f13e393] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                      - generic [ref=f13e394]: Bot
+                      - text: mentioned this pull request
+                      - link "Aug 13, 202651 minutes ago" [ref=f13e395] [cursor=pointer]:
+                        - /url: "#ref-issue-5137823322"
+                    - generic [ref=f13e396]:
+                      - 'link "[Bug]: Signal probe reports works after JSON-RPC failure #122995" [ref=f13e398] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/issues/122995
+                      - 'generic "Status: Closed" [ref=f13e400]': Closed
+                - generic [ref=f13e405]:
+                  - link [ref=f13e407] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e408]
+                  - generic [ref=f13e410]:
+                    - generic [ref=f13e411]:
+                      - heading [level=3] [ref=f13e412]:
+                        - generic [ref=f13e413]:
+                          - strong [ref=f13e414]:
+                            - link "steipete" [ref=f13e415] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202650 minutes ago" [ref=f13e416] [cursor=pointer]:
+                            - /url: "#issuecomment-5276192655"
+                      - generic [ref=f13e417]:
+                        - group [ref=f13e419]:
+                          - button [ref=f13e420] [cursor=pointer]:
+                            - img "Show options" [ref=f13e423]
+                        - generic [ref=f13e425]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f13e426]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f13e428]: Author
+                    - table [ref=f13e432]:
+                      - rowgroup [ref=f13e433]:
+                        - row [ref=f13e434]:
+                          - cell [ref=f13e435]:
+                            - paragraph [ref=f13e436]:
+                              - link "@clawsweeper" [ref=f13e437] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f13e439]:
+                  - link [ref=f13e441] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e442]
+                  - generic [ref=f13e444]:
+                    - generic [ref=f13e445]:
+                      - heading "clawsweeper Bot commented Aug 13, 202650 minutes ago •" [level=3] [ref=f13e446]:
+                        - generic [ref=f13e447]:
+                          - strong [ref=f13e448]:
+                            - link "clawsweeper" [ref=f13e449] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e450]: Bot
+                          - text: commented
+                          - link "Aug 13, 202650 minutes ago" [ref=f13e451] [cursor=pointer]:
+                            - /url: "#issuecomment-5276192958"
+                          - generic [ref=f13e452]:
+                            - generic [ref=f13e453]: •
+                            - group [ref=f13e454]:
+                              - button "edited" [ref=f13e455] [cursor=pointer]
+                      - generic [ref=f13e459]:
+                        - group [ref=f13e461]:
+                          - button [ref=f13e462] [cursor=pointer]:
+                            - img "Show options" [ref=f13e465]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e468]: Contributor
+                    - table [ref=f13e472]:
+                      - rowgroup [ref=f13e473]:
+                        - row [ref=f13e474]:
+                          - cell [ref=f13e475]:
+                            - paragraph [ref=f13e476]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f13e477]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f13e478]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f13e479]: exact_review_queue
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                            - paragraph [ref=f13e480]: "Re-review progress:"
+                            - list [ref=f13e481]:
+                              - listitem [ref=f13e482]: "State: Complete"
+                              - listitem [ref=f13e483]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f13e484]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31669366496" [ref=f13e485] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31669366496
+                              - listitem [ref=f13e486]: "Updated: 2026-08-13T05:09:56.636Z"
+                - generic [ref=f13e492]:
+                  - link [ref=f13e493] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e494]
+                  - link "clawsweeper" [ref=f13e495] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f13e496]: Bot
+                  - text: added
+                  - link "P2" [ref=f13e497] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                  - 'link "rating: 🐚 platinum hermit" [ref=f13e498] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f13e499] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                  - text: labels
+                  - link "Aug 13, 202646 minutes ago" [ref=f13e500] [cursor=pointer]:
+                    - /url: "#event-29380762468"
+                - generic [ref=f13e502]:
+                  - link [ref=f13e504] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f13e505]
+                  - generic [ref=f13e507]:
+                    - generic [ref=f13e508]:
+                      - heading "clawsweeper Bot commented Aug 13, 202645 minutes ago •" [level=3] [ref=f13e509]:
+                        - generic [ref=f13e510]:
+                          - strong [ref=f13e511]:
+                            - link "clawsweeper" [ref=f13e512] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f13e513]: Bot
+                          - text: commented
+                          - link "Aug 13, 202645 minutes ago" [ref=f13e514] [cursor=pointer]:
+                            - /url: "#issuecomment-5276219455"
+                          - generic [ref=f13e515]:
+                            - generic [ref=f13e516]: •
+                            - group [ref=f13e517]:
+                              - button "edited" [ref=f13e518] [cursor=pointer]
+                      - generic [ref=f13e522]:
+                        - group [ref=f13e524]:
+                          - button [ref=f13e525] [cursor=pointer]:
+                            - img "Show options" [ref=f13e528]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f13e531]: Contributor
+                    - table [ref=f13e535]:
+                      - rowgroup [ref=f13e536]:
+                        - row [ref=f13e537]:
+                          - cell [ref=f13e538]:
+                            - paragraph [ref=f13e539]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f13e540]: Reviewed August 13, 2026, 1:17 AM ET / 05:17 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f13e541]
+                            - heading "What this changes" [level=2] [ref=f13e542]
+                            - paragraph [ref=f13e543]: The PR makes a Signal probe return failure when JSON-RPC version verification fails after its shallow HTTP check succeeds, while preserving the HTTP status and diagnostic.
+                            - heading "Regression provenance" [level=2] [ref=f13e544]
+                            - paragraph [ref=f13e545]: Possible regression — probable (reproduction; reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f13e546]
+                            - paragraph [ref=f13e547]:
+                              - generic [ref=f13e548]: ⚠️
+                              - strong [ref=f13e549]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f13e550]: "Keep this maintainer PR open: current main still unconditionally reports the Signal probe as successful after a caught RPC error, and the patch repairs that producer-side contradiction with no blocking findings."
+                            - paragraph [ref=f13e551]:
+                              - strong [ref=f13e552]: "Priority:"
+                              - text: P2
+                              - strong [ref=f13e553]: "Reviewed head:"
+                              - code [ref=f13e554]: a80725afc9f2699f2adee963e533088c7f3cba9d
+                            - heading "Review scores" [level=2] [ref=f13e555]
+                            - table [ref=f13e557]:
+                              - rowgroup [ref=f13e558]:
+                                - row [ref=f13e559]:
+                                  - columnheader "Measure" [ref=f13e560]
+                                  - columnheader "Result" [ref=f13e561]
+                                  - columnheader "What it means" [ref=f13e562]
+                              - rowgroup [ref=f13e563]:
+                                - row [ref=f13e564]:
+                                  - cell [ref=f13e565]:
+                                    - strong [ref=f13e566]: Overall readiness
+                                  - cell [ref=f13e567]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f13e568]: (4/6)
+                                  - cell "A focused, net-neutral producer-boundary repair with targeted regression coverage and no blocking defect found." [ref=f13e569]
+                                - row [ref=f13e570]:
+                                  - cell [ref=f13e571]:
+                                    - strong [ref=f13e572]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f13e573]
+                                  - 'cell "Not applicable: This maintainer PR is exempt from the external-contributor real-behavior-proof gate; its body nevertheless supplies focused regression and exact-head CI evidence." [ref=f13e574]'
+                                - row [ref=f13e575]:
+                                  - cell [ref=f13e576]:
+                                    - strong [ref=f13e577]: Patch quality
+                                  - cell [ref=f13e578]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f13e579]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f13e580]
+                            - heading "Verification" [level=2] [ref=f13e581]
+                            - table [ref=f13e583]:
+                              - rowgroup [ref=f13e584]:
+                                - row [ref=f13e585]:
+                                  - columnheader "Check" [ref=f13e586]
+                                  - columnheader "Result" [ref=f13e587]
+                                  - columnheader "Evidence" [ref=f13e588]
+                              - rowgroup [ref=f13e589]:
+                                - row [ref=f13e590]:
+                                  - cell [ref=f13e591]:
+                                    - strong [ref=f13e592]: Real behavior
+                                  - cell "Not applicable" [ref=f13e593]
+                                  - 'cell "Not applicable: This maintainer PR is exempt from the external-contributor real-behavior-proof gate; its body nevertheless supplies focused regression and exact-head CI evidence." [ref=f13e594]'
+                                - row [ref=f13e595]:
+                                  - cell [ref=f13e596]:
+                                    - strong [ref=f13e597]: Evidence reviewed
+                                  - cell "6 items" [ref=f13e598]
+                                  - 'cell "Current-main defect: Current main records a JSON-RPC verification error but then unconditionally returns ok:true, producing the contradictory result this PR addresses. Owner-boundary wiring: The Signal channel status adapter delegates account probes to probeSignalAccount, while the Gateway health collector records the plugin probe result for status summaries. RPC failure contract: The native Signal RPC client throws for malformed JSON and invalid response envelopes, so the probe catch block is an authoritative operational-failure boundary rather than a cosmetic warning." [ref=f13e599]': "Current-main defect: Current main records a JSON-RPC verification error but then unconditionally returns ok:true, producing the contradictory result this PR addresses.Owner-boundary wiring: The Signal channel status adapter delegates account probes to probeSignalAccount, while the Gateway health collector records the plugin probe result for status summaries.RPC failure contract: The native Signal RPC client throws for malformed JSON and invalid response envelopes, so the probe catch block is an authoritative operational-failure boundary rather than a cosmetic warning."
+                                - row [ref=f13e600]:
+                                  - cell [ref=f13e601]:
+                                    - strong [ref=f13e602]: Findings
+                                  - cell "None" [ref=f13e603]
+                                  - cell "None." [ref=f13e604]
+                                - row [ref=f13e605]:
+                                  - cell [ref=f13e606]:
+                                    - strong [ref=f13e607]: Security
+                                  - cell "None" [ref=f13e608]
+                                  - cell "None." [ref=f13e609]
+                            - heading "How this fits together" [level=2] [ref=f13e610]
+                            - paragraph [ref=f13e611]: The Signal plugin probes a configured transport, verifies its operational JSON-RPC endpoint, and passes the result into Gateway channel health status. Operators rely on that result to distinguish a reachable endpoint from a usable Signal transport.
+                            - region "mermaid rendered output container" [ref=f13e612]:
+                              - generic [ref=f13e613]:
+                                - generic [ref=f13e614]:
+                                  - group [ref=f13e615]:
+                                    - button "Open dialog" [ref=f13e616] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f13e619] [cursor=pointer]
+                                - iframe [ref=f13e624]:
+                                  - generic [ref=f14e1]:
+                                    - document [ref=f14e5]:
+                                      - generic [ref=f14e8]:
+                                        - paragraph [ref=f14e15]: Channel status request
+                                        - paragraph [ref=f14e22]: Gateway health collector
+                                        - paragraph [ref=f14e29]: Signal plugin account probe
+                                        - paragraph [ref=f14e36]: Shallow HTTP check
+                                        - paragraph [ref=f14e43]: JSON-RPC version verification
+                                        - paragraph [ref=f14e50]: Probe result and diagnostic
+                                        - paragraph [ref=f14e57]: Operator channel status
+                                    - generic [ref=f14e58]:
+                                      - button "Zoom in" [ref=f14e59]
+                                      - button "Zoom out" [ref=f14e63]
+                                      - button "Reset view" [ref=f14e67]
+                                      - button "Pan up" [ref=f14e70]
+                                      - button "Pan down" [ref=f14e73]
+                                      - button "Pan left" [ref=f14e76]
+                                      - button "Pan right" [ref=f14e79]
+                            - heading "Before merge" [level=2] [ref=f13e625]
+                            - list [ref=f13e626]:
+                              - listitem [ref=f13e627]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e628]
+                                - strong [ref=f13e629]: Resolve merge risk (P1)
+                                - text: "- GitHub reports the branch as behind current main; the changed Signal files are unchanged since its base, but landing should still use the current merge queue or exact merge-head checks."
+                              - listitem [ref=f13e630]:
+                                - checkbox "Incomplete task" [disabled] [ref=f13e631]
+                                - strong [ref=f13e632]: Complete next step (P2)
+                                - text: "- No repair job is needed: this is an active maintainer-authored patch with no actionable review finding."
+                            - group [ref=f13e633]:
+                              - strong [ref=f13e635] [cursor=pointer]: Agent review details
+                - generic [ref=f13e637]:
+                  - link [ref=f13e639] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e640]
+                  - generic [ref=f13e642]:
+                    - generic [ref=f13e643]:
+                      - heading [level=3] [ref=f13e644]:
+                        - generic [ref=f13e645]:
+                          - strong [ref=f13e646]:
+                            - link "steipete" [ref=f13e647] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202636 minutes ago" [ref=f13e648] [cursor=pointer]:
+                            - /url: "#issuecomment-5276284445"
+                      - generic [ref=f13e649]:
+                        - group [ref=f13e651]:
+                          - button [ref=f13e652] [cursor=pointer]:
+                            - img "Show options" [ref=f13e655]
+                        - generic [ref=f13e657]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f13e658]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f13e660]: Author
+                    - table [ref=f13e664]:
+                      - rowgroup [ref=f13e665]:
+                        - row [ref=f13e666]:
+                          - cell [ref=f13e667]:
+                            - paragraph [ref=f13e668]:
+                              - text: Land-ready proof for exact head
+                              - link [ref=f13e669] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/commit/a80725afc9f2699f2adee963e533088c7f3cba9d
+                                - code [ref=f13e670]: a80725afc9f2699f2adee963e533088c7f3cba9d
+                              - text: ": focused Signal core tests 61/61;"
+                              - link "exact-head merge-ref CI" [ref=f13e671] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/actions/runs/31667635596
+                              - text: green; final Codex autoreview clean at 0.99 and TruffleHog clean;
+                              - link "exact-head ClawSweeper" [ref=f13e672] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/pull/123001#issuecomment-5276219455
+                              - text: found no correctness/security issues and confirmed the producer-side
+                              - code [ref=f13e673]: ok
+                              - text: derivation as the best fix; production +1/-1 (net 0), tests +20.
+                            - paragraph [ref=f13e674]:
+                              - text: The standalone Testbox attempt
+                              - code [ref=f13e675]: tbx_01kzwpp15z8pbf1wv4xdaz1kmt
+                              - text: (
+                              - link "run 31667709014" [ref=f13e676] [cursor=pointer]:
+                                - /url: https://github.com/openclaw/openclaw/actions/runs/31667709014
+                              - text: ) stopped before Signal checks on the documented stale-base env-ratchet false positive for internal constant
+                              - code [ref=f13e677]: OPENCLAW_STATE_MIGRATION_ASSERTIONS
+                              - text: ; current main fixed that unrelated ratchet in
+                              - code [ref=f13e678]: e4e558df215a
+                              - text: . Native
+                              - code [ref=f13e679]: OPENCLAW_TESTBOX=1 scripts/pr prepare-run 123001
+                              - text: passed the hosted exact-or-recent-parent gate with prep head = PR head at the exact SHA, no rebase/head change, and no changelog required.
+                - generic [ref=f13e680]:
+                  - generic [ref=f13e685]:
+                    - button "View details" [ref=f13e686] [cursor=pointer]
+                    - generic [ref=f13e687]:
+                      - link [ref=f13e689] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f13e690]
+                      - generic [ref=f13e691]:
+                        - link "steipete" [ref=f13e692] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f13e693] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/009e53d58271684cd81e3e9da30a5ccbbb1a4631
+                          - code [ref=f13e694]: 009e53d
+                        - text: into
+                        - generic [ref=f13e695]: main
+                        - link "Aug 13, 202635 minutes ago" [ref=f13e697] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123001#event-29381070901
+                        - generic [ref=f13e698]: 162 of 163 checks passed
+                  - generic [ref=f13e705]:
+                    - link [ref=f13e707] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f13e708]
+                    - generic [ref=f13e709]:
+                      - link "steipete" [ref=f13e710] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f13e711]: fix/signal-probe-rpc-failure
+                      - text: branch
+                      - link "August 13, 2026 05:1935 minutes ago" [ref=f13e713] [cursor=pointer]:
+                        - /url: "#event-29381071776"
+                - generic [ref=f13e715]:
+                  - link [ref=f13e717] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f13e718]
+                  - generic [ref=f13e720]:
+                    - generic [ref=f13e721]:
+                      - heading [level=3] [ref=f13e722]:
+                        - generic [ref=f13e723]:
+                          - strong [ref=f13e724]:
+                            - link "steipete" [ref=f13e725] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202635 minutes ago" [ref=f13e726] [cursor=pointer]:
+                            - /url: "#issuecomment-5276289729"
+                      - generic [ref=f13e727]:
+                        - group [ref=f13e729]:
+                          - button [ref=f13e730] [cursor=pointer]:
+                            - img "Show options" [ref=f13e733]
+                        - generic [ref=f13e735]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f13e736]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f13e738]: Author
+                    - table [ref=f13e742]:
+                      - rowgroup [ref=f13e743]:
+                        - row [ref=f13e744]:
+                          - cell [ref=f13e745]:
+                            - paragraph [ref=f13e746]: Merged via squash.
+                            - list [ref=f13e747]:
+                              - listitem [ref=f13e748]:
+                                - text: "Prepared head SHA:"
+                                - link "a80725afc9f2699f2adee963e533088c7f3cba9d" [ref=f13e749] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/123001/commits/a80725afc9f2699f2adee963e533088c7f3cba9d
+                              - listitem [ref=f13e750]:
+                                - text: "Landed commit:"
+                                - link "009e53d58271684cd81e3e9da30a5ccbbb1a4631" [ref=f13e751] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/009e53d58271684cd81e3e9da30a5ccbbb1a4631
+                - generic [ref=f13e757]:
+                  - link "fuller-stack-dev" [ref=f13e758] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                  - text: pushed a commit to fuller-stack-dev/openclaw that referenced this pull request
+                  - link "Aug 13, 202616 minutes ago" [ref=f13e759] [cursor=pointer]:
+                    - /url: "#ref-commit-fc3581c"
+                  - generic [ref=f13e763]:
+                    - generic [ref=f13e765]:
+                      - link [ref=f13e766] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f13e767]
+                      - link [ref=f13e768] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f13e769]
+                    - code [ref=f13e771]:
+                      - 'link "fix(signal): fail probe when RPC verification fails (" [ref=f13e772] [cursor=pointer]':
+                        - /url: /fuller-stack-dev/openclaw/commit/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+                      - link "openclaw#123001" [ref=f13e773] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/123001
+                      - link ")" [ref=f13e774] [cursor=pointer]:
+                        - /url: /fuller-stack-dev/openclaw/commit/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+                    - button "Verified" [ref=f13e776] [cursor=pointer]
+                    - code [ref=f13e781]:
+                      - link "fc3581c" [ref=f13e782] [cursor=pointer]:
+                        - /url: /fuller-stack-dev/openclaw/commit/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+            - generic [ref=f13e786]:
+              - link "Sign up for free" [ref=f13e787] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f13e788]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f13e789] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123001
+        - generic [ref=f13e793]:
+          - form "Select reviewers" [ref=f13e795]:
+            - heading "Reviewers" [level=3] [ref=f13e796]
+            - text: No reviews
+          - form "Select assignees" [ref=f13e798]:
+            - heading "Assignees" [level=3] [ref=f13e799]
+            - text: No one assigned
+          - generic [ref=f13e800]:
+            - heading "Labels" [level=3] [ref=f13e801]
+            - generic [ref=f13e802]:
+              - 'link "channel: signal" [ref=f13e803] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20signal%22
+              - link "maintainer" [ref=f13e805] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P2" [ref=f13e807] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "rating: 🐚 platinum hermit" [ref=f13e809] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: XS" [ref=f13e811] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XS%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f13e813] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f13e816]:
+            - heading "Projects" [level=3] [ref=f13e817]
+            - text: None yet
+          - form "Select milestones" [ref=f13e819]:
+            - heading "Milestone" [level=3] [ref=f13e820]
+            - text: No milestone
+          - form "Link issues" [ref=f13e826]:
+            - heading "Development" [level=3] [ref=f13e827]
+            - paragraph [ref=f13e828]: Successfully merging this pull request may close these issues.
+            - link [ref=f13e830] [cursor=pointer]:
+              - /url: https://github.com/openclaw/openclaw/issues/122995
+              - img "Closed issue" [ref=f13e831]
+              - text: "[Bug]: Signal probe reports works after JSON-RPC failure"
+          - generic [ref=f13e835]:
+            - heading "1 participant" [level=3] [ref=f13e836]
+            - link [ref=f13e838] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f13e839]
+  - contentinfo [ref=f13e840]:
+    - heading "Footer" [level=2] [ref=f13e841]
+    - generic [ref=f13e842]:
+      - generic [ref=f13e843]:
+        - link "GitHub Homepage" [ref=f13e844] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f13e847]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f13e848]:
+        - heading "Footer navigation" [level=3] [ref=f13e849]
+        - list "Footer navigation" [ref=f13e850]:
+          - listitem [ref=f13e851]:
+            - link "Terms" [ref=f13e852] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f13e853]:
+            - link "Privacy" [ref=f13e854] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f13e855]:
+            - link "Security" [ref=f13e856] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f13e857]:
+            - link "Status" [ref=f13e858] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f13e859]:
+            - link "Community" [ref=f13e860] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f13e861]:
+            - link "Docs" [ref=f13e862] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f13e863]:
+            - link "Contact" [ref=f13e864] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f13e865]:
+            - button "Manage cookies" [ref=f13e867] [cursor=pointer]
+          - listitem [ref=f13e868]:
+            - button "Do not share my personal information" [ref=f13e870] [cursor=pointer]

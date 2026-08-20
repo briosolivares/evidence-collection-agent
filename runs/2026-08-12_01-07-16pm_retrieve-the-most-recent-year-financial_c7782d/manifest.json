@@ -1,0 +1,105 @@
+{
+  "task": "retrieve the most recent year financial statements, AIF, and annual report for Aritzia",
+  "startedAt": "2026-08-12T20:07:16.943Z",
+  "artifacts": [
+    {
+      "filename": "fy2026_financial_reports_page.png",
+      "sha256": "42d17e6fdf981452125669a6f02ef10261c44bacb1f61d2a625f934714cc8d6e",
+      "sourceUrl": "https://investors.aritzia.com/financial-reports/default.aspx",
+      "capturedAt": "2026-08-12T20:08:01.388Z"
+    },
+    {
+      "filename": "Aritzia-Inc-Q4-2026-FS-AnnualFinancialStatements.pdf",
+      "sha256": "92efe1d42a280c5c121483abff9c587f444d7e0a02cbd5aa9dcd676ad3a06b43",
+      "capturedAt": "2026-08-12T20:11:30.187Z"
+    },
+    {
+      "filename": "Aritzia-Inc-2026-AIF-Final.pdf",
+      "sha256": "b4a762eb3daf8371d14bca35f49ee9fc89b2dce62d54dd9d48fb1d64fbfc5e34",
+      "capturedAt": "2026-08-12T20:11:30.186Z"
+    },
+    {
+      "filename": "Aritzia_Annual_Report_2026.pdf",
+      "sha256": "74777eca14fdda1e146d4cd342a55c1ff828a61b75d59bc90f9200573de4bc34",
+      "capturedAt": "2026-08-12T20:11:30.187Z"
+    },
+    {
+      "filename": "test_pdf_render_check.png",
+      "sha256": "3e1dd9512118ead487bcaf354847c306a65d37fc3c1386815d1a5f43a6d6db37",
+      "sourceUrl": "https://s21.q4cdn.com/489771965/files/doc_financials/2026/ar/Aritzia_Annual_Report_2026.pdf",
+      "capturedAt": "2026-08-12T20:08:50.595Z"
+    },
+    {
+      "filename": "Aritzia_Annual_Report_2026_v2.pdf",
+      "sha256": "1743fc322ab6fbc5131d37295003cb1ff967e52fa0e587dd937c8400dc6a247a",
+      "capturedAt": "2026-08-12T20:11:37.134Z"
+    },
+    {
+      "filename": "Aritzia_Annual_Report_2026_v3.pdf",
+      "sha256": "1743fc322ab6fbc5131d37295003cb1ff967e52fa0e587dd937c8400dc6a247a",
+      "capturedAt": "2026-08-12T20:11:37.135Z"
+    },
+    {
+      "filename": "annual_report_2026_viewer.png",
+      "sha256": "3e1dd9512118ead487bcaf354847c306a65d37fc3c1386815d1a5f43a6d6db37",
+      "sourceUrl": "https://s21.q4cdn.com/489771965/files/doc_financials/2026/ar/Aritzia_Annual_Report_2026.pdf",
+      "capturedAt": "2026-08-12T20:09:23.578Z"
+    },
+    {
+      "filename": "test_aif_fresh.pdf",
+      "sha256": "1743fc322ab6fbc5131d37295003cb1ff967e52fa0e587dd937c8400dc6a247a",
+      "capturedAt": "2026-08-12T20:11:37.129Z"
+    },
+    {
+      "filename": "test_fs_dl1.pdf",
+      "sha256": "1743fc322ab6fbc5131d37295003cb1ff967e52fa0e587dd937c8400dc6a247a",
+      "capturedAt": "2026-08-12T20:11:37.133Z"
+    },
+    {
+      "filename": "test_dummy.pdf",
+      "sha256": "1743fc322ab6fbc5131d37295003cb1ff967e52fa0e587dd937c8400dc6a247a",
+      "capturedAt": "2026-08-12T20:11:37.131Z"
+    },
+    {
+      "filename": "evidence_01_financial_reports_fy2026_page.png",
+      "sha256": "42d17e6fdf981452125669a6f02ef10261c44bacb1f61d2a625f934714cc8d6e",
+      "sourceUrl": "https://investors.aritzia.com/financial-reports/default.aspx",
+      "capturedAt": "2026-08-12T20:10:21.149Z"
+    },
+    {
+      "filename": "evidence_02_annual_financial_statements_FY2026_cover.png",
+      "sha256": "86fb2ffec6c1ca4bcf6a2df6215749ca2d0c0ffe82c26f4494a788d0e951d1da",
+      "sourceUrl": "https://s21.q4cdn.com/489771965/files/doc_financials/2026/q4/Aritzia-Inc-Q4-2026-FS.pdf",
+      "capturedAt": "2026-08-12T20:10:27.362Z"
+    },
+    {
+      "filename": "evidence_03_AIF_FY2026_cover.png",
+      "sha256": "75bbaa3ad715163dc7a1bdd347b84def9d8a4e8da51f2ce4fd5b04d0978eba59",
+      "sourceUrl": "https://s21.q4cdn.com/489771965/files/doc_financials/2026/q4/Aritzia-Inc-2026-AIF-Final.pdf",
+      "capturedAt": "2026-08-12T20:10:33.162Z"
+    },
+    {
+      "filename": "evidence_04_AnnualReport_FY2026_cover.png",
+      "sha256": "3e1dd9512118ead487bcaf354847c306a65d37fc3c1386815d1a5f43a6d6db37",
+      "sourceUrl": "https://s21.q4cdn.com/489771965/files/doc_financials/2026/ar/Aritzia_Annual_Report_2026.pdf",
+      "capturedAt": "2026-08-12T20:10:38.912Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-1.txt",
+      "sha256": "1c0cfabe321ab141122d81f5a7cfc51ee861ff2faec9bdc733aa6f89e1d5d0bd",
+      "capturedAt": "2026-08-12T20:10:45.998Z"
+    },
+    {
+      "filename": "evidence_05_Q4_FY2026_press_release.png",
+      "sha256": "15df6368c8bccdbd0443b3e96ad925846f6d14c21167869d4bae44a3731e917b",
+      "sourceUrl": "https://investors.aritzia.com/investor-news/press-release-details/2026/Aritzia-Reports-Fourth-Quarter-and-Fiscal-2026-Financial-Results/default.aspx",
+      "capturedAt": "2026-08-12T20:10:51.277Z"
+    },
+    {
+      "filename": "answer.md",
+      "sha256": "c257f0cca9d0473a81f39697a12888d179702daf1eaec9a6fbc26d6d8ce6f7fd",
+      "capturedAt": "2026-08-12T20:11:15.968Z"
+    }
+  ],
+  "finishedAt": "2026-08-12T20:11:49.043Z"
+}

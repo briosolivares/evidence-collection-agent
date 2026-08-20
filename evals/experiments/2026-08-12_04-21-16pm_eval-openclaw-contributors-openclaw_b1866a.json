@@ -1,0 +1,294 @@
+{
+  "startedAt": "2026-08-12T22:49:52.234Z",
+  "finishedAt": "2026-08-12T23:21:16.254Z",
+  "k": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "openclaw_contributors",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 362446.01120833337,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_03-49-52pm_create-a-csv-of-the-top-30-contributors_338c4d",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "30 of 30 handles found among the oracle's top 100"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "27 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "24 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 350974.117917,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_03-55-44pm_create-a-csv-of-the-top-30-contributors_f50601",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "28 of 30 handles found among the oracle's top 100; not found: claude, ampagent"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "24 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "20 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 274991.900583,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_04-00-20pm_create-a-csv-of-the-top-30-contributors_879ee1",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "30 of 30 handles found among the oracle's top 100"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "27 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "26 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 461372.01512500015,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "openclaw_merged_prs",
+      "k": 3,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 261626.60690299995,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_04-08-03pm_collect-evidence-about-the-last-10_36bd5f",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_last10_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "1 row(s) checked against submitted reviews"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "17 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 198845.2560419999,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_04-11-24pm_collect-evidence-about-the-last-10_e67882",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_last_10_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "no detail-checked CSV PR has submitted reviews; nothing to contradict"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "24 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 379416.707375,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_04-17-46pm_collect-evidence-about-the-last-10_8d3ef9",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_last10_merged_prs.csv"
+            },
+            {
+              "name": "CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)",
+              "passed": true,
+              "detail": "header: pr_number, committer, reviewer, merger"
+            },
+            {
+              "name": "CSV has 10 data rows with distinct valid PR numbers",
+              "passed": true,
+              "detail": "10 rows, all PR numbers valid and distinct"
+            },
+            {
+              "name": "every CSV PR is in the oracle's recently-merged window",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) are in the window of 30 recently merged"
+            },
+            {
+              "name": "committer and merger match the oracle for every detail-checked row",
+              "passed": true,
+              "detail": "10 row(s) checked against PR details"
+            },
+            {
+              "name": "reviewer cells name an actual reviewer for detail-checked rows with reviews",
+              "passed": true,
+              "detail": "1 row(s) checked against submitted reviews"
+            },
+            {
+              "name": "a valid PNG screenshot of each CSV PR page exists with its URL as provenance",
+              "passed": true,
+              "detail": "all 10 CSV PR(s) have a provenance-matched PNG"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "20 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 206617.85729199997,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

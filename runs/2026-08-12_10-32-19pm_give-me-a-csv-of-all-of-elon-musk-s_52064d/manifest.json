@@ -1,0 +1,11 @@
+{
+  "task": "Give me a CSV of all of Elon Musk's tweets posted today, with exactly these columns: text, likes, time_posted.",
+  "startedAt": "2026-08-13T05:32:19.792Z",
+  "artifacts": [
+    {
+      "filename": "scratch/notes.md",
+      "sha256": "bed63d888ff2965bb4eaab7f2f7cc243b4081e4d6e0cc77d8734aeb4620270a6",
+      "capturedAt": "2026-08-13T05:33:27.292Z"
+    }
+  ]
+}

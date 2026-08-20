@@ -1,0 +1,23 @@
+{
+  "outputs": [
+    {
+      "id": "sec_edgar_filing_download",
+      "kind": "download",
+      "count": {
+        "minimum": 1
+      },
+      "sourceUrlPattern": "https://www.sec.gov/*"
+    },
+    {
+      "id": "filing_page_screenshot",
+      "kind": "screenshots",
+      "count": {
+        "minimum": 1
+      },
+      "mustShow": [
+        "Apple's 8-K filing page on SEC EDGAR",
+        "Filing date of January 29, 2026"
+      ]
+    }
+  ]
+}

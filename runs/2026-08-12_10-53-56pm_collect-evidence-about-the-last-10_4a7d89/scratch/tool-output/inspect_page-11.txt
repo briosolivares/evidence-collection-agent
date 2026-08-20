@@ -1,0 +1,865 @@
+URL: https://github.com/openclaw/openclaw/pull/122945
+Title: fix(state): accept shipped commitments schema by vincentkoc · Pull Request #122945 · openclaw/openclaw · GitHub
+
+- generic [ref=f45e2]:
+  - generic [ref=f45e3]:
+    - link "Skip to content" [ref=f45e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f45e8]:
+      - heading "Navigation Menu" [level=2] [ref=f45e9]
+      - generic [ref=f45e10]:
+        - link "Homepage" [ref=f45e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f45e15]:
+          - navigation "Global" [ref=f45e16]:
+            - list [ref=f45e17]:
+              - listitem [ref=f45e18]:
+                - button "Platform" [ref=f45e20] [cursor=pointer]
+              - listitem [ref=f45e23]:
+                - button "Solutions" [ref=f45e25] [cursor=pointer]
+              - listitem [ref=f45e28]:
+                - button "Resources" [ref=f45e30] [cursor=pointer]
+              - listitem [ref=f45e33]:
+                - button "Open Source" [ref=f45e35] [cursor=pointer]
+              - listitem [ref=f45e38]:
+                - button "Enterprise" [ref=f45e40] [cursor=pointer]
+              - listitem [ref=f45e43]:
+                - link "Pricing" [ref=f45e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f45e45]:
+            - button "Search or jump to, type / to search" [ref=f45e47] [cursor=pointer]:
+              - generic [ref=f45e50]:
+                - text: Type
+                - generic [ref=f45e51]: /
+                - text: to search
+            - link "Sign in" [ref=f45e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122945
+            - link "Sign up" [ref=f45e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fpull_requests%2Fshow&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f45e55] [cursor=pointer]
+  - main [ref=f45e61]:
+    - generic [ref=f45e62]:
+      - generic [ref=f45e63]:
+        - generic [ref=f45e65]:
+          - link "openclaw" [ref=f45e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f45e70]: /
+          - strong [ref=f45e71]:
+            - link "openclaw" [ref=f45e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f45e73]: Public
+        - generic [ref=f45e74]:
+          - list:
+            - listitem [ref=f45e75]:
+              - link "Sponsor @openclaw" [ref=f45e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f45e77]: Sponsor
+            - listitem [ref=f45e81]:
+              - link "You must be signed in to change notification settings" [ref=f45e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f45e85]:
+              - link "Fork 81.2k" [ref=f45e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,157" [ref=f45e89]: 81.2k
+            - listitem [ref=f45e90]:
+              - link "You must be signed in to star a repository" [ref=f45e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386110 users starred this repository" [ref=f45e95]: 386k
+      - navigation "Repository" [ref=f45e96]:
+        - list [ref=f45e97]:
+          - listitem [ref=f45e98]:
+            - link "Code" [ref=f45e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f45e103]:
+            - link "Issues 3.4k" [ref=f45e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f45e108]: Issues
+              - generic "3,405" [ref=f45e109]: 3.4k
+          - listitem [ref=f45e110]:
+            - link "Pull requests 2.1k" [ref=f45e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f45e114]: Pull requests
+              - generic "2,101" [ref=f45e115]: 2.1k
+          - listitem [ref=f45e116]:
+            - link "Actions" [ref=f45e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f45e121]:
+            - link "Projects" [ref=f45e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f45e126]:
+            - link "Security and quality 647" [ref=f45e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f45e130]: Security and quality
+              - generic "647" [ref=f45e131]
+          - listitem [ref=f45e132]:
+            - link "Insights" [ref=f45e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f45e143]:
+      - generic [ref=f45e147]:
+        - generic [ref=f45e149]:
+          - 'heading "fix(state): accept shipped commitments schema - #122945" [level=1] [ref=f45e150]':
+            - text: "fix(state): accept shipped commitments schema"
+            - generic [ref=f45e151]: "- #122945"
+          - generic [ref=f45e152]: "#122945"
+        - generic [ref=f45e155]:
+          - generic [ref=f45e157]:
+            - img "Pull request" [ref=f45e158]
+            - text: Merged
+          - generic [ref=f45e161]:
+            - link "vincentkoc" [ref=f45e162] [cursor=pointer]:
+              - /url: /vincentkoc
+            - text: merged 1 commit into
+            - generic [ref=f45e163]:
+              - link "main" [ref=f45e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f45e165]: from
+              - generic [ref=f45e166]:
+                - link "fix/commitments-upgrade-schema" [ref=f45e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/fix/commitments-upgrade-schema
+                - button "Copy head branch name to clipboard" [ref=f45e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 10:11 PM PDT" [ref=f45e172]: Aug 13, 202648 minutes ago
+        - generic [ref=f45e173]:
+          - generic [ref=f45e175]:
+            - generic [ref=f45e176]: "+163"
+            - generic [ref=f45e177]: "-31"
+            - generic [ref=f45e178]: "Lines changed: 163 additions & 31 deletions"
+          - navigation "Pull request navigation tabs" [ref=f45e186]:
+            - generic [ref=f45e187]:
+              - link "Conversation (5)" [ref=f45e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122945
+                - text: Conversation
+                - generic [ref=f45e191]: "5"
+                - generic [ref=f45e192]: (5)
+              - link "Commits (1)" [ref=f45e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122945/commits
+                - text: Commits
+                - generic [ref=f45e196]: "1"
+                - generic [ref=f45e197]: (1)
+              - link "Checks (192)" [ref=f45e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122945/checks
+                - text: Checks
+                - generic [ref=f45e201]: "192"
+                - generic [ref=f45e202]: (192)
+              - link "Files changed (2)" [ref=f45e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122945/files
+                - text: Files changed
+                - generic [ref=f45e206]: "2"
+                - generic [ref=f45e207]: (2)
+      - generic [ref=f45e212]:
+        - generic [ref=f45e214]:
+          - heading "Conversation" [level=2] [ref=f45e215]
+          - generic [ref=f45e216]:
+            - generic [ref=f45e217]:
+              - generic [ref=f45e219]:
+                - link [ref=f45e220] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f45e221]
+                - generic [ref=f45e223]:
+                  - generic [ref=f45e224]:
+                    - heading "vincentkoc commented Aug 13, 20263 hours ago •" [level=3] [ref=f45e225]:
+                      - generic [ref=f45e226]:
+                        - strong [ref=f45e227]:
+                          - link "vincentkoc" [ref=f45e228] [cursor=pointer]:
+                            - /url: /vincentkoc
+                        - text: commented
+                        - link "Aug 13, 20263 hours ago" [ref=f45e229] [cursor=pointer]:
+                          - /url: "#issue-5137266242"
+                        - generic [ref=f45e230]:
+                          - generic [ref=f45e231]: •
+                          - group [ref=f45e232]:
+                            - button "edited" [ref=f45e233] [cursor=pointer]
+                    - generic [ref=f45e237]:
+                      - group [ref=f45e239]:
+                        - button [ref=f45e240] [cursor=pointer]:
+                          - img "Show options" [ref=f45e243]
+                      - generic "This user is a member of the openclaw organization." [ref=f45e246]: Member
+                  - generic [ref=f45e251]:
+                    - heading "What Problem This Solves" [level=2] [ref=f45e252]
+                    - paragraph [ref=f45e253]:
+                      - text: Fixes an issue where users upgrading from
+                      - code [ref=f45e254]: openclaw@2026.7.1-2
+                      - text: could not complete
+                      - code [ref=f45e255]: openclaw doctor --fix
+                      - text: because the retired commitments migration rejected that released database schema as noncanonical.
+                    - paragraph [ref=f45e256]: "The failure surfaced across packaged-upgrade qualification lanes as:"
+                    - generic [ref=f45e257]:
+                      - code [ref=f45e259]: "SQLite schema is incomplete or noncanonical for retired OpenClaw commitments schema: table options differ for commitments"
+                      - button "Copy code to clipboard" [ref=f45e261] [cursor=pointer]
+                    - heading "Why This Change Was Made" [level=2] [ref=f45e265]
+                    - paragraph [ref=f45e266]:
+                      - text: The retirement owner now recognizes the exact released
+                      - code [ref=f45e267]: v2026.7.1-2
+                      - text: "commitments contract: a non-STRICT table with no column defaults and the three released indexes. Both strict and non-STRICT released layouts reuse the existing narrowly bounded compatibility allowances, while every attached known index is fingerprinted and unknown or drifted indexes, triggers, columns, and dependencies remain rejected."
+                    - paragraph [ref=f45e268]: No SQLite schema version, runtime fallback, or unrelated migration changes.
+                    - paragraph [ref=f45e269]:
+                      - text: "Production LOC:"
+                      - code [ref=f45e270]: +25/-31
+                      - text: (net
+                      - code [ref=f45e271]: "-6"
+                      - text: ") | Tests:"
+                      - code [ref=f45e272]: +138/-0
+                    - heading "User Impact" [level=2] [ref=f45e273]
+                    - paragraph [ref=f45e274]:
+                      - text: Operators can upgrade databases created by
+                      - code [ref=f45e275]: openclaw@2026.7.1-2
+                      - text: ; doctor retires the inert commitments table, advances the database to schema version 7, and preserves unrelated shared state.
+                    - heading "Evidence" [level=2] [ref=f45e276]
+                    - list [ref=f45e277]:
+                      - listitem [ref=f45e278]:
+                        - text: "Before: an exact released-schema fixture failed both runtime-open and doctor paths with"
+                        - code [ref=f45e279]: table options differ for commitments
+                        - text: .
+                      - listitem [ref=f45e280]:
+                        - text: "Focused regression: exact"
+                        - code [ref=f45e281]: v2026.7.1-2
+                        - text: runtime-open and doctor cases pass; a later optional index is rejected and preserved when its definition drifts.
+                      - listitem [ref=f45e282]:
+                        - text: "Final local owner suite:"
+                        - code [ref=f45e283]: src/state/openclaw-state-db.test.ts
+                        - text: —
+                        - code [ref=f45e284]: 145 passed
+                        - text: ","
+                        - code [ref=f45e285]: 1 skipped
+                        - text: .
+                      - listitem [ref=f45e286]:
+                        - text: Exact-head Testbox
+                        - code [ref=f45e287]: tbx_01kzwq8j76gk2d1tsjbrqtyk8n
+                        - text: ": production typecheck, core-test typecheck, and owner suite"
+                        - code [ref=f45e288]: 146 passed
+                        - text: "; run:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31668243812" [ref=f45e289] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31668243812
+                        - text: .
+                      - listitem [ref=f45e290]:
+                        - text: Canonical changed gate
+                        - code [ref=f45e291]: tbx_01kzwnprwjv12p0gbtsjbqng0n
+                        - text: stopped on the current-main env-var ratchet (
+                        - code [ref=f45e292]: "503"
+                        - text: names vs budget
+                        - code [ref=f45e293]: "502"
+                        - text: ); this PR adds no env name and the classified narrow retry above passed.
+                      - listitem [ref=f45e294]:
+                        - text: "Published-package proof: initialized two databases with the npm"
+                        - code [ref=f45e295]: openclaw@2026.7.1-2
+                        - text: bundle and verified schema/meta version 1, non-STRICT commitments, and exactly the three released indexes.
+                      - listitem [ref=f45e296]:
+                        - text: Actual
+                        - code [ref=f45e297]: doctor --fix
+                        - text: on the published-package database reported
+                        - code [ref=f45e298]: Retired shared state commitments table and indexes
+                        - text: ; the repaired database reopened at schema/meta version 7 with commitments absent and an unrelated
+                        - code [ref=f45e299]: state_leases
+                        - text: row preserved.
+                      - listitem [ref=f45e300]:
+                        - text: Exact-head isolated local ClawSweeper on
+                        - code [ref=f45e301]: ac6872262b8
+                        - text: ": no findings; A/A/A."
+                      - listitem [ref=f45e302]:
+                        - code [ref=f45e303]: oxfmt --check
+                        - text: ","
+                        - code [ref=f45e304]: git diff --check
+                        - text: ": passed."
+                  - 'button "eyes (1): vincentkoc, 02:49AM today" [disabled] [ref=f45e309]':
+                    - generic [ref=f45e310]: 👀
+                    - generic [ref=f45e311]: "1"
+              - generic [ref=f45e312]:
+                - generic [ref=f45e314]:
+                  - link [ref=f45e316] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f45e317]
+                  - generic [ref=f45e319]:
+                    - generic [ref=f45e320]:
+                      - heading "clawsweeper Bot commented Aug 13, 20263 hours ago" [level=3] [ref=f45e321]:
+                        - generic [ref=f45e322]:
+                          - strong [ref=f45e323]:
+                            - link "clawsweeper" [ref=f45e324] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f45e325]: Bot
+                          - text: commented
+                          - link "Aug 13, 20263 hours ago" [ref=f45e326] [cursor=pointer]:
+                            - /url: "#issuecomment-5275347840"
+                      - generic [ref=f45e327]:
+                        - group [ref=f45e329]:
+                          - button [ref=f45e330] [cursor=pointer]:
+                            - img "Show options" [ref=f45e333]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f45e336]: Contributor
+                    - table [ref=f45e340]:
+                      - rowgroup [ref=f45e341]:
+                        - row [ref=f45e342]:
+                          - cell [ref=f45e343]:
+                            - paragraph [ref=f45e344]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f45e345]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f45e346]:
+                  - generic [ref=f45e351]:
+                    - link [ref=f45e352] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f45e353]
+                    - link "vincentkoc" [ref=f45e354] [cursor=pointer]:
+                      - /url: /vincentkoc
+                    - text: self-assigned this
+                    - link "Aug 13, 20263 hours ago" [ref=f45e355] [cursor=pointer]:
+                      - /url: "#event-29376785564"
+                  - generic [ref=f45e360]:
+                    - link [ref=f45e361] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f45e362]
+                    - link "openclaw-barnacle" [ref=f45e363] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f45e364]: Bot
+                    - text: added
+                    - 'link "size: S" [ref=f45e365] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                    - link "maintainer" [ref=f45e366] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20263 hours ago" [ref=f45e367] [cursor=pointer]:
+                      - /url: "#event-29376790727"
+                  - generic [ref=f45e373]:
+                    - link [ref=f45e375] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f45e376]
+                    - generic [ref=f45e377]:
+                      - link "vincentkoc" [ref=f45e378] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f45e379] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/d3fd0c8659f75adc5f6be35477ff3e47253f2b28..68b03df8702df88f09b4c380d825a5ab83f89aee
+                      - text: the
+                      - generic [ref=f45e380]: fix/commitments-upgrade-schema
+                      - text: branch 2 times, most recently from
+                      - link [ref=f45e382] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/d3fd0c8659f75adc5f6be35477ff3e47253f2b28
+                        - code [ref=f45e383]: d3fd0c8
+                      - text: to
+                      - link [ref=f45e384] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/68b03df8702df88f09b4c380d825a5ab83f89aee
+                        - code [ref=f45e385]: 68b03df
+                      - link "Compare" [ref=f45e386] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/d3fd0c8659f75adc5f6be35477ff3e47253f2b28..68b03df8702df88f09b4c380d825a5ab83f89aee
+                      - link "August 13, 2026 03:013 hours ago" [ref=f45e389] [cursor=pointer]:
+                        - /url: "#event-29377150169"
+                  - generic [ref=f45e394]:
+                    - link [ref=f45e395] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f45e396]
+                    - link "clawsweeper" [ref=f45e397] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f45e398]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 compatibility" [ref=f45e399] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                    - 'link "merge-risk: 🚨 session-state" [ref=f45e400] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+                    - link "P1" [ref=f45e401] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "proof: sufficient" [ref=f45e402] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                    - 'link "rating: 🐚 platinum hermit" [ref=f45e403] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f45e404] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 13, 20262 hours ago" [ref=f45e405] [cursor=pointer]:
+                      - /url: "#event-29377331692"
+                - generic [ref=f45e407]:
+                  - link [ref=f45e409] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f45e410]
+                  - generic [ref=f45e412]:
+                    - generic [ref=f45e413]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago •" [level=3] [ref=f45e414]:
+                        - generic [ref=f45e415]:
+                          - strong [ref=f45e416]:
+                            - link "clawsweeper" [ref=f45e417] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f45e418]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f45e419] [cursor=pointer]:
+                            - /url: "#issuecomment-5275466918"
+                          - generic [ref=f45e420]:
+                            - generic [ref=f45e421]: •
+                            - group [ref=f45e422]:
+                              - button "edited" [ref=f45e423] [cursor=pointer]
+                      - generic [ref=f45e427]:
+                        - group [ref=f45e429]:
+                          - button [ref=f45e430] [cursor=pointer]:
+                            - img "Show options" [ref=f45e433]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f45e436]: Contributor
+                    - table [ref=f45e440]:
+                      - rowgroup [ref=f45e441]:
+                        - row [ref=f45e442]:
+                          - cell [ref=f45e443]:
+                            - paragraph [ref=f45e444]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f45e445]: Reviewed August 13, 2026, 1:11 AM ET / 05:11 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f45e446]
+                            - heading "What this changes" [level=2] [ref=f45e447]
+                            - paragraph [ref=f45e448]: This PR recognizes the commitments-table layout shipped in v2026.7.1-2 during state-database repair and adds upgrade regression coverage.
+                            - heading "Regression provenance" [level=2] [ref=f45e449]
+                            - paragraph [ref=f45e450]: Possible regression — suspected (reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f45e451]
+                            - paragraph [ref=f45e452]:
+                              - generic [ref=f45e453]: ⚠️
+                              - strong [ref=f45e454]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f45e455]: "This remains necessary: current main still rejects the released non-STRICT, no-default commitments layout. The patch is a narrow owner-boundary repair with strong package-level proof, but this maintainer-owned destructive migration should wait for the remaining exact-head checks and maintainer merge decision."
+                            - paragraph [ref=f45e456]:
+                              - strong [ref=f45e457]: "Priority:"
+                              - text: P1
+                              - strong [ref=f45e458]: "Reviewed head:"
+                              - code [ref=f45e459]: ac6872262b8bd87956576cdd2327b4974569e0f9
+                              - strong [ref=f45e460]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f45e461] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f45e462]
+                            - table [ref=f45e464]:
+                              - rowgroup [ref=f45e465]:
+                                - row [ref=f45e466]:
+                                  - columnheader "Measure" [ref=f45e467]
+                                  - columnheader "Result" [ref=f45e468]
+                                  - columnheader "What it means" [ref=f45e469]
+                              - rowgroup [ref=f45e470]:
+                                - row [ref=f45e471]:
+                                  - cell [ref=f45e472]:
+                                    - strong [ref=f45e473]: Overall readiness
+                                  - cell [ref=f45e474]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f45e475]: (5/6)
+                                  - cell "A narrowly scoped migration repair with direct released-package behavior evidence and focused safety coverage." [ref=f45e476]
+                                - row [ref=f45e477]:
+                                  - cell [ref=f45e478]:
+                                    - strong [ref=f45e479]: Proof confidence
+                                  - cell [ref=f45e480]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f45e481]: (5/6)
+                                  - 'cell "Sufficient (logs): The PR body records published-package v2026.7.1-2 schema inspection, an actual doctor repair, successful reopen at version 7, and preservation of unrelated state." [ref=f45e482]'
+                                - row [ref=f45e483]:
+                                  - cell [ref=f45e484]:
+                                    - strong [ref=f45e485]: Patch quality
+                                  - cell [ref=f45e486]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f45e487]: (5/6)
+                                  - cell "No actionable review findings were identified." [ref=f45e488]
+                            - heading "Verification" [level=2] [ref=f45e489]
+                            - table [ref=f45e491]:
+                              - rowgroup [ref=f45e492]:
+                                - row [ref=f45e493]:
+                                  - columnheader "Check" [ref=f45e494]
+                                  - columnheader "Result" [ref=f45e495]
+                                  - columnheader "Evidence" [ref=f45e496]
+                              - rowgroup [ref=f45e497]:
+                                - row [ref=f45e498]:
+                                  - cell [ref=f45e499]:
+                                    - strong [ref=f45e500]: Real behavior
+                                  - cell "Verified" [ref=f45e501]
+                                  - 'cell "Sufficient (logs): The PR body records published-package v2026.7.1-2 schema inspection, an actual doctor repair, successful reopen at version 7, and preservation of unrelated state." [ref=f45e502]'
+                                - row [ref=f45e503]:
+                                  - cell [ref=f45e504]:
+                                    - strong [ref=f45e505]: Evidence reviewed
+                                  - cell "6 items" [ref=f45e506]
+                                  - 'cell "Current-main gap: The two PR paths are unchanged between the PR base and supplied current main, so current main retains the pre-PR validation that recognizes the strict and default-bearing additive layouts but not the released non-STRICT/no-default layout. Owner-boundary repair: The branch admits the released table definition only through the retirement owner, while index contracts are fingerprinted so extra, renamed, or drifted attached objects remain ineligible for destructive removal. Caller and migration boundary: Both normal database open and doctor repair invoke the same retirement migration before the schema version is marked current, so the fix covers the two operator paths without a runtime compatibility reader." [ref=f45e507]': "Current-main gap: The two PR paths are unchanged between the PR base and supplied current main, so current main retains the pre-PR validation that recognizes the strict and default-bearing additive layouts but not the released non-STRICT/no-default layout.Owner-boundary repair: The branch admits the released table definition only through the retirement owner, while index contracts are fingerprinted so extra, renamed, or drifted attached objects remain ineligible for destructive removal.Caller and migration boundary: Both normal database open and doctor repair invoke the same retirement migration before the schema version is marked current, so the fix covers the two operator paths without a runtime compatibility reader."
+                                - row [ref=f45e508]:
+                                  - cell [ref=f45e509]:
+                                    - strong [ref=f45e510]: Findings
+                                  - cell "None" [ref=f45e511]
+                                  - cell "None." [ref=f45e512]
+                                - row [ref=f45e513]:
+                                  - cell [ref=f45e514]:
+                                    - strong [ref=f45e515]: Security
+                                  - cell "None" [ref=f45e516]
+                                  - cell "None." [ref=f45e517]
+                            - heading "How this fits together" [level=2] [ref=f45e518]
+                            - paragraph [ref=f45e519]:
+                              - text: OpenClaw’s shared SQLite state database is opened at runtime and repaired by
+                              - code [ref=f45e520]: openclaw doctor --fix
+                              - text: during upgrades. Before advancing the database version, the repair path validates that a retired commitments table is an exact recognized legacy layout and then removes only that inert table and its indexes.
+                            - region "mermaid rendered output container" [ref=f45e521]:
+                              - generic [ref=f45e522]:
+                                - generic [ref=f45e523]:
+                                  - group [ref=f45e524]:
+                                    - button "Open dialog" [ref=f45e525] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f45e528] [cursor=pointer]
+                                - iframe [ref=f45e533]:
+                                  - generic [ref=f46e1]:
+                                    - document [ref=f46e5]:
+                                      - generic [ref=f46e7]:
+                                        - generic [ref=f46e11]:
+                                          - paragraph [ref=f46e17]: "yes"
+                                          - paragraph [ref=f46e23]: "no"
+                                        - generic [ref=f46e24]:
+                                          - paragraph [ref=f46e31]: Released state database
+                                          - paragraph [ref=f46e38]: Runtime open or Doctor repair
+                                          - paragraph [ref=f46e45]: Commitments schema fingerprint
+                                          - paragraph [ref=f46e52]: Recognized released layout?
+                                          - paragraph [ref=f46e59]: Retire inert commitments table
+                                          - paragraph [ref=f46e66]: Preserve database and report drift
+                                          - paragraph [ref=f46e73]: Open current state schema
+                                    - generic [ref=f46e74]:
+                                      - button "Zoom in" [ref=f46e75]
+                                      - button "Zoom out" [ref=f46e79]
+                                      - button "Reset view" [ref=f46e83]
+                                      - button "Pan up" [ref=f46e86]
+                                      - button "Pan down" [ref=f46e89]
+                                      - button "Pan left" [ref=f46e92]
+                                      - button "Pan right" [ref=f46e95]
+                            - heading "Decision needed" [level=2] [ref=f45e534]
+                            - table [ref=f45e536]:
+                              - rowgroup [ref=f45e537]:
+                                - row [ref=f45e538]:
+                                  - columnheader "Question" [ref=f45e539]
+                                  - columnheader "Recommendation" [ref=f45e540]
+                              - rowgroup [ref=f45e541]:
+                                - row [ref=f45e542]:
+                                  - cell "Should this maintainer-owned state-database retirement repair merge once the remaining exact-head checks finish green?" [ref=f45e543]
+                                  - cell [ref=f45e544]:
+                                    - strong [ref=f45e545]: "Merge after exact-head checks:"
+                                    - text: Merge the focused repair once all remaining checks are green and the release-layout plus drift-rejection coverage remains present.
+                            - paragraph [ref=f45e546]: "Why: The change expands acceptance for a destructive upgrade migration over persistent shared state, so maintainer approval should confirm the released-schema proof and merge timing."
+                            - heading "Before merge" [level=2] [ref=f45e547]
+                            - list [ref=f45e548]:
+                              - listitem [ref=f45e549]:
+                                - checkbox "Incomplete task" [disabled] [ref=f45e550]
+                                - strong [ref=f45e551]: Resolve merge risk (P1)
+                                - text: "- This changes eligibility for a destructive persistent-state retirement step; merge only with the released-layout and drift-rejection coverage intact and the remaining exact-head checks green."
+                            - group [ref=f45e552]:
+                              - strong [ref=f45e554] [cursor=pointer]: Agent review details
+                - generic [ref=f45e561]:
+                  - link [ref=f45e563] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f45e564]
+                  - generic [ref=f45e565]:
+                    - link "vincentkoc" [ref=f45e566] [cursor=pointer]:
+                      - /url: /vincentkoc
+                    - link "force-pushed" [ref=f45e567] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/7aa99c466ada1f50b3a062b97209c903dec21505..6241f03a4dab94a5795def728794469b945a498c
+                    - text: the
+                    - generic [ref=f45e568]: fix/commitments-upgrade-schema
+                    - text: branch 2 times, most recently from
+                    - link [ref=f45e570] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/7aa99c466ada1f50b3a062b97209c903dec21505
+                      - code [ref=f45e571]: 7aa99c4
+                    - text: to
+                    - link [ref=f45e572] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/6241f03a4dab94a5795def728794469b945a498c
+                      - code [ref=f45e573]: 6241f03
+                    - link "Compare" [ref=f45e574] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/7aa99c466ada1f50b3a062b97209c903dec21505..6241f03a4dab94a5795def728794469b945a498c
+                    - link "August 13, 2026 04:301 hour ago" [ref=f45e577] [cursor=pointer]:
+                      - /url: "#event-29379650804"
+                - generic [ref=f45e588]:
+                  - link [ref=f45e591] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f45e592]
+                  - code [ref=f45e594]:
+                    - 'link "fix(state): accept shipped commitments schema" [ref=f45e595] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122945/commits/ac6872262b8bd87956576cdd2327b4974569e0f9
+                  - button "Verified" [ref=f45e597] [cursor=pointer]
+                  - group [ref=f45e602]:
+                    - img "78 / 122 checks OK" [ref=f45e604] [cursor=pointer]
+                  - code [ref=f45e607]:
+                    - link "ac68722" [ref=f45e608] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122945/commits/ac6872262b8bd87956576cdd2327b4974569e0f9
+                - generic [ref=f45e609]:
+                  - generic [ref=f45e615]:
+                    - link [ref=f45e617] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f45e618]
+                    - generic [ref=f45e619]:
+                      - link "vincentkoc" [ref=f45e620] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f45e621] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/6241f03a4dab94a5795def728794469b945a498c..ac6872262b8bd87956576cdd2327b4974569e0f9
+                      - text: the
+                      - generic [ref=f45e622]: fix/commitments-upgrade-schema
+                      - text: branch from
+                      - link [ref=f45e624] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/6241f03a4dab94a5795def728794469b945a498c
+                        - code [ref=f45e625]: 6241f03
+                      - text: to
+                      - link [ref=f45e626] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/ac6872262b8bd87956576cdd2327b4974569e0f9
+                        - code [ref=f45e627]: ac68722
+                      - link "Compare" [ref=f45e628] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/6241f03a4dab94a5795def728794469b945a498c..ac6872262b8bd87956576cdd2327b4974569e0f9
+                      - link "August 13, 2026 04:491 hour ago" [ref=f45e631] [cursor=pointer]:
+                        - /url: "#event-29380184740"
+                  - generic [ref=f45e637]:
+                    - link [ref=f45e639] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f45e640]
+                    - generic [ref=f45e641]:
+                      - link "vincentkoc" [ref=f45e642] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 05:001 hour ago" [ref=f45e643] [cursor=pointer]:
+                        - /url: "#event-29380520938"
+                - generic [ref=f45e645]:
+                  - link [ref=f45e647] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f45e648]
+                  - generic [ref=f45e650]:
+                    - generic [ref=f45e651]:
+                      - heading [level=3] [ref=f45e652]:
+                        - generic [ref=f45e653]:
+                          - strong [ref=f45e654]:
+                            - link "vincentkoc" [ref=f45e655] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f45e656] [cursor=pointer]:
+                            - /url: "#issuecomment-5276165670"
+                      - generic [ref=f45e657]:
+                        - group [ref=f45e659]:
+                          - button [ref=f45e660] [cursor=pointer]:
+                            - img "Show options" [ref=f45e663]
+                        - generic [ref=f45e665]:
+                          - generic "This user is a member of the openclaw organization." [ref=f45e666]: Member
+                          - generic "This user is the author of this pull request." [ref=f45e668]: Author
+                    - generic [ref=f45e670]:
+                      - table [ref=f45e672]:
+                        - rowgroup [ref=f45e673]:
+                          - row [ref=f45e674]:
+                            - cell [ref=f45e675]:
+                              - paragraph [ref=f45e676]:
+                                - link "@clawsweeper" [ref=f45e677] [cursor=pointer]:
+                                  - /url: https://github.com/clawsweeper
+                                - text: re-review
+                      - button "react with eyes" [disabled] [ref=f45e683]:
+                        - generic [ref=f45e684]: 👀
+                        - generic [ref=f45e685]: "1"
+                - generic [ref=f45e687]:
+                  - link [ref=f45e689] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f45e690]
+                  - generic [ref=f45e692]:
+                    - generic [ref=f45e693]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago •" [level=3] [ref=f45e694]:
+                        - generic [ref=f45e695]:
+                          - strong [ref=f45e696]:
+                            - link "clawsweeper" [ref=f45e697] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f45e698]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f45e699] [cursor=pointer]:
+                            - /url: "#issuecomment-5276166155"
+                          - generic [ref=f45e700]:
+                            - generic [ref=f45e701]: •
+                            - group [ref=f45e702]:
+                              - button "edited" [ref=f45e703] [cursor=pointer]
+                      - generic [ref=f45e707]:
+                        - group [ref=f45e709]:
+                          - button [ref=f45e710] [cursor=pointer]:
+                            - img "Show options" [ref=f45e713]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f45e716]: Contributor
+                    - table [ref=f45e720]:
+                      - rowgroup [ref=f45e721]:
+                        - row [ref=f45e722]:
+                          - cell [ref=f45e723]:
+                            - paragraph [ref=f45e724]: 🦞👀 Exact review queued.
+                            - paragraph [ref=f45e725]: "Re-review progress:"
+                            - list [ref=f45e726]:
+                              - listitem [ref=f45e727]: "State: Complete"
+                              - listitem [ref=f45e728]: "Detail: The durable review result and its route handoff completed."
+                              - listitem [ref=f45e729]:
+                                - text: "Run:"
+                                - link "https://github.com/openclaw/clawsweeper/actions/runs/31669536769" [ref=f45e730] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/clawsweeper/actions/runs/31669536769
+                              - listitem [ref=f45e731]: "Updated: 2026-08-13T05:12:47.696Z"
+                - generic [ref=f45e732]:
+                  - generic [ref=f45e737]:
+                    - link [ref=f45e738] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f45e739]
+                    - link "clawsweeper" [ref=f45e740] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f45e741]: Bot
+                    - text: added
+                    - 'link "rating: 🦞 diamond lobster" [ref=f45e742] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                    - text: and removed
+                    - 'link "rating: 🐚 platinum hermit" [ref=f45e743] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - text: labels
+                    - link "Aug 13, 202654 minutes ago" [ref=f45e744] [cursor=pointer]:
+                      - /url: "#event-29380669558"
+                  - generic [ref=f45e749]:
+                    - button "View details" [ref=f45e750] [cursor=pointer]
+                    - generic [ref=f45e751]:
+                      - link [ref=f45e753] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f45e754]
+                      - generic [ref=f45e755]:
+                        - link "vincentkoc" [ref=f45e756] [cursor=pointer]:
+                          - /url: /vincentkoc
+                        - text: merged commit
+                        - link [ref=f45e757] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/c6530738ee0c2bae5647f70cb07642b239ef9541
+                          - code [ref=f45e758]: c653073
+                        - text: into
+                        - generic [ref=f45e759]: main
+                        - link "Aug 13, 202648 minutes ago" [ref=f45e761] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122945#event-29380839005
+                        - generic [ref=f45e762]: 191 of 192 checks passed
+                  - generic [ref=f45e769]:
+                    - link [ref=f45e771] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f45e772]
+                    - generic [ref=f45e773]:
+                      - link "vincentkoc" [ref=f45e774] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - text: deleted the
+                      - generic [ref=f45e775]: fix/commitments-upgrade-schema
+                      - text: branch
+                      - link "August 13, 2026 05:1148 minutes ago" [ref=f45e777] [cursor=pointer]:
+                        - /url: "#event-29380839902"
+                - generic [ref=f45e779]:
+                  - link [ref=f45e781] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f45e782]
+                  - generic [ref=f45e784]:
+                    - generic [ref=f45e785]:
+                      - heading [level=3] [ref=f45e786]:
+                        - generic [ref=f45e787]:
+                          - strong [ref=f45e788]:
+                            - link "vincentkoc" [ref=f45e789] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202648 minutes ago" [ref=f45e790] [cursor=pointer]:
+                            - /url: "#issuecomment-5276235457"
+                      - generic [ref=f45e791]:
+                        - group [ref=f45e793]:
+                          - button [ref=f45e794] [cursor=pointer]:
+                            - img "Show options" [ref=f45e797]
+                        - generic [ref=f45e799]:
+                          - generic "This user is a member of the openclaw organization." [ref=f45e800]: Member
+                          - generic "This user is the author of this pull request." [ref=f45e802]: Author
+                    - table [ref=f45e806]:
+                      - rowgroup [ref=f45e807]:
+                        - row [ref=f45e808]:
+                          - cell [ref=f45e809]:
+                            - paragraph [ref=f45e810]: Merged via squash.
+                            - list [ref=f45e811]:
+                              - listitem [ref=f45e812]:
+                                - text: "Prepared head SHA:"
+                                - link "ac6872262b8bd87956576cdd2327b4974569e0f9" [ref=f45e813] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122945/commits/ac6872262b8bd87956576cdd2327b4974569e0f9
+                              - listitem [ref=f45e814]:
+                                - text: "Landed commit:"
+                                - link "c6530738ee0c2bae5647f70cb07642b239ef9541" [ref=f45e815] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/c6530738ee0c2bae5647f70cb07642b239ef9541
+                - generic [ref=f45e821]:
+                  - link "fuller-stack-dev" [ref=f45e822] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                  - text: pushed a commit to fuller-stack-dev/openclaw that referenced this pull request
+                  - link "Aug 13, 202621 minutes ago" [ref=f45e823] [cursor=pointer]:
+                    - /url: "#ref-commit-a8fb51a"
+                  - generic [ref=f45e827]:
+                    - generic [ref=f45e829]:
+                      - link [ref=f45e830] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f45e831]
+                      - link [ref=f45e832] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f45e833]
+                    - code [ref=f45e835]:
+                      - 'link "fix(state): accept shipped commitments schema (" [ref=f45e836] [cursor=pointer]':
+                        - /url: /fuller-stack-dev/openclaw/commit/a8fb51a5be98f99164c119dff9a7633c7c645588
+                      - link "openclaw#122945" [ref=f45e837] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/122945
+                      - link ")" [ref=f45e838] [cursor=pointer]:
+                        - /url: /fuller-stack-dev/openclaw/commit/a8fb51a5be98f99164c119dff9a7633c7c645588
+                    - button "Partially verified" [ref=f45e840] [cursor=pointer]
+                    - code [ref=f45e845]:
+                      - link "a8fb51a" [ref=f45e846] [cursor=pointer]:
+                        - /url: /fuller-stack-dev/openclaw/commit/a8fb51a5be98f99164c119dff9a7633c7c645588
+            - generic [ref=f45e850]:
+              - link "Sign up for free" [ref=f45e851] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f45e852]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f45e853] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122945
+        - generic [ref=f45e857]:
+          - form "Select reviewers" [ref=f45e859]:
+            - heading "Reviewers" [level=3] [ref=f45e860]
+            - text: No reviews
+          - form "Select assignees" [ref=f45e862]:
+            - heading "Assignees" [level=3] [ref=f45e863]
+            - paragraph [ref=f45e865]:
+              - generic [ref=f45e866]:
+                - link [ref=f45e867] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f45e868]
+                - link "vincentkoc" [ref=f45e869] [cursor=pointer]:
+                  - /url: /vincentkoc
+          - generic [ref=f45e870]:
+            - heading "Labels" [level=3] [ref=f45e871]
+            - generic [ref=f45e872]:
+              - link "maintainer" [ref=f45e873] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f45e875] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - 'link "merge-risk: 🚨 session-state" [ref=f45e877] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+              - link "P1" [ref=f45e879] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "proof: sufficient" [ref=f45e881] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "rating: 🦞 diamond lobster" [ref=f45e883] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+              - 'link "size: S" [ref=f45e885] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f45e887] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f45e890]:
+            - heading "Projects" [level=3] [ref=f45e891]
+            - text: None yet
+          - form "Select milestones" [ref=f45e893]:
+            - heading "Milestone" [level=3] [ref=f45e894]
+            - text: No milestone
+          - form "Link issues" [ref=f45e900]:
+            - heading "Development" [level=3] [ref=f45e901]
+            - paragraph [ref=f45e902]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f45e904]: None yet
+          - generic [ref=f45e906]:
+            - heading "1 participant" [level=3] [ref=f45e907]
+            - link [ref=f45e909] [cursor=pointer]:
+              - /url: /vincentkoc
+              - img "@vincentkoc" [ref=f45e910]
+  - contentinfo [ref=f45e911]:
+    - heading "Footer" [level=2] [ref=f45e912]
+    - generic [ref=f45e913]:
+      - generic [ref=f45e914]:
+        - link "GitHub Homepage" [ref=f45e915] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f45e918]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f45e919]:
+        - heading "Footer navigation" [level=3] [ref=f45e920]
+        - list "Footer navigation" [ref=f45e921]:
+          - listitem [ref=f45e922]:
+            - link "Terms" [ref=f45e923] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f45e924]:
+            - link "Privacy" [ref=f45e925] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f45e926]:
+            - link "Security" [ref=f45e927] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f45e928]:
+            - link "Status" [ref=f45e929] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f45e930]:
+            - link "Community" [ref=f45e931] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f45e932]:
+            - link "Docs" [ref=f45e933] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f45e934]:
+            - link "Contact" [ref=f45e935] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f45e936]:
+            - button "Manage cookies" [ref=f45e938] [cursor=pointer]
+          - listitem [ref=f45e939]:
+            - button "Do not share my personal information" [ref=f45e941] [cursor=pointer]

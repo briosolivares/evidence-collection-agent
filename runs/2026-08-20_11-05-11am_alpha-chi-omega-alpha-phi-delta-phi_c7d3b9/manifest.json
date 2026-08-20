@@ -1,0 +1,63 @@
+{
+  "task": "\"Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa\r\rFor each of the above sororities at MIT above can you do the following\r1. identify the sorority website by googling 'sorority name MIT' and finding the sorority website \r2. identifying the sisters page in the website\r3. identify the seniors (class of 2026) and juniors (class of 2027)\r4. adding their name + info to a google spreadsheet and filling out the relevant information (name, class, major, affiliation, interests, other)\"",
+  "startedAt": "2026-08-20T18:05:11.087Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/data.json",
+      "sha256": "ebbe9e5a27bb55dad180febc4ad654bb6ec2054f42d8da26d642efd0ab757b7a",
+      "capturedAt": "2026-08-20T18:06:10.653Z"
+    },
+    {
+      "filename": "scratch/workspace/roster.json",
+      "sha256": "88942f866d8e97ec7de10343c8c5cffac911ef5ec258979b200738699e1b3716",
+      "capturedAt": "2026-08-20T18:08:53.150Z"
+    },
+    {
+      "filename": "scratch/workspace/roster.csv",
+      "sha256": "cbc5220e8d6ebaeff22aa2faae671c179567f7dcedaf6350c7ae2f4cb1e4b1c6",
+      "capturedAt": "2026-08-20T18:12:05.745Z"
+    },
+    {
+      "filename": "scratch/workspace/roster.tsv",
+      "sha256": "24fbec574998c810a4d57c4a74070c17e8afc4178f743482c1d6821111a94825",
+      "capturedAt": "2026-08-20T18:17:30.578Z"
+    },
+    {
+      "filename": "scratch/workspace/rows.json",
+      "sha256": "fedb4a75c896f48d260a621af6fe146d6bcf9333008ea8efc4c11fd9759346f4",
+      "capturedAt": "2026-08-20T18:21:17.314Z"
+    },
+    {
+      "filename": "artifacts/mit_sorority_roster_sheet_overview.png",
+      "sha256": "adf64260847f689040fff787f2b6829ca658d530454d184506d5bfaaa1e90b08",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1tY7ptGnYlxX9GyiGxRm6FXNUr7ocSjJMl6J6Srqb6Hc/edit?gid=0#gid=0",
+      "publicationKind": "screenshot",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:31:57.667Z"
+    },
+    {
+      "filename": "artifacts/mit_sorority_roster_sheet_sigma_kappa_section.png",
+      "sha256": "a643a94a8547b8407b84a4fbd4985c6bf7b2aef122f87b4deca8ffffc98fb861",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1tY7ptGnYlxX9GyiGxRm6FXNUr7ocSjJMl6J6Srqb6Hc/edit?gid=0#gid=0",
+      "publicationKind": "screenshot",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:32:17.121Z"
+    },
+    {
+      "filename": "artifacts/mit_sorority_roster_data.csv",
+      "sha256": "cbc5220e8d6ebaeff22aa2faae671c179567f7dcedaf6350c7ae2f4cb1e4b1c6",
+      "publicationKind": "file",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:32:38.126Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T18:35:18.867Z"
+}

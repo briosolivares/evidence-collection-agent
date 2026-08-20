@@ -1,0 +1,813 @@
+URL: https://github.com/openclaw/openclaw/pull/122870
+Title: feat: continue web sessions in the terminal by steipete · Pull Request #122870 · openclaw/openclaw · GitHub
+
+- generic [ref=f8e2]:
+  - generic [ref=f8e3]:
+    - link "Skip to content" [ref=f8e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f8e8]:
+      - heading "Navigation Menu" [level=2] [ref=f8e9]
+      - generic [ref=f8e10]:
+        - link "Homepage" [ref=f8e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f8e15]:
+          - navigation "Global" [ref=f8e16]:
+            - list [ref=f8e17]:
+              - listitem [ref=f8e18]:
+                - button "Platform" [ref=f8e20] [cursor=pointer]
+              - listitem [ref=f8e23]:
+                - button "Solutions" [ref=f8e25] [cursor=pointer]
+              - listitem [ref=f8e28]:
+                - button "Resources" [ref=f8e30] [cursor=pointer]
+              - listitem [ref=f8e33]:
+                - button "Open Source" [ref=f8e35] [cursor=pointer]
+              - listitem [ref=f8e38]:
+                - button "Enterprise" [ref=f8e40] [cursor=pointer]
+              - listitem [ref=f8e43]:
+                - link "Pricing" [ref=f8e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f8e45]:
+            - button "Search or jump to, type / to search" [ref=f8e47] [cursor=pointer]:
+              - generic [ref=f8e50]:
+                - text: Type
+                - generic [ref=f8e51]: /
+                - text: to search
+            - link "Sign in" [ref=f8e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122870
+            - link "Sign up" [ref=f8e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f8e55] [cursor=pointer]
+  - main [ref=f8e61]:
+    - generic [ref=f8e62]:
+      - generic [ref=f8e63]:
+        - generic [ref=f8e65]:
+          - link "openclaw" [ref=f8e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f8e70]: /
+          - strong [ref=f8e71]:
+            - link "openclaw" [ref=f8e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f8e73]: Public
+        - generic [ref=f8e74]:
+          - list:
+            - listitem [ref=f8e75]:
+              - link "Sponsor @openclaw" [ref=f8e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f8e77]: Sponsor
+            - listitem [ref=f8e81]:
+              - link "You must be signed in to change notification settings" [ref=f8e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f8e85]:
+              - link "Fork 81.2k" [ref=f8e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,150" [ref=f8e89]: 81.2k
+            - listitem [ref=f8e90]:
+              - link "You must be signed in to star a repository" [ref=f8e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386084 users starred this repository" [ref=f8e95]: 386k
+      - navigation "Repository" [ref=f8e96]:
+        - list [ref=f8e97]:
+          - listitem [ref=f8e98]:
+            - link "Code" [ref=f8e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f8e103]:
+            - link "Issues 3.4k" [ref=f8e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f8e108]: Issues
+              - generic "3,414" [ref=f8e109]: 3.4k
+          - listitem [ref=f8e110]:
+            - link "Pull requests 2.1k" [ref=f8e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f8e114]: Pull requests
+              - generic "2,113" [ref=f8e115]: 2.1k
+          - listitem [ref=f8e116]:
+            - link "Actions" [ref=f8e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f8e121]:
+            - link "Projects" [ref=f8e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f8e126]:
+            - link "Security and quality 647" [ref=f8e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f8e130]: Security and quality
+              - generic "647" [ref=f8e131]
+          - listitem [ref=f8e132]:
+            - link "Insights" [ref=f8e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f8e143]:
+      - generic [ref=f8e147]:
+        - generic [ref=f8e149]:
+          - 'heading "feat: continue web sessions in the terminal - #122870" [level=1] [ref=f8e150]':
+            - text: "feat: continue web sessions in the terminal"
+            - generic [ref=f8e151]: "- #122870"
+          - generic [ref=f8e152]: "#122870"
+        - generic [ref=f8e155]:
+          - generic [ref=f8e157]:
+            - img "Pull request" [ref=f8e158]
+            - text: Merged
+          - generic [ref=f8e161]:
+            - link "steipete" [ref=f8e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 11 commits into
+            - generic [ref=f8e163]:
+              - link "main" [ref=f8e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f8e165]: from
+              - generic [ref=f8e166]:
+                - link "steipete/resume-terminal-handoff" [ref=f8e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/resume-terminal-handoff
+                - button "Copy head branch name to clipboard" [ref=f8e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 5:07 PM PDT" [ref=f8e172]: Aug 13, 202615 minutes ago
+        - generic [ref=f8e173]:
+          - generic [ref=f8e175]:
+            - generic [ref=f8e176]: +2,084
+            - generic [ref=f8e177]: "-116"
+            - generic [ref=f8e178]: "Lines changed: 2084 additions & 116 deletions"
+          - navigation "Pull request navigation tabs" [ref=f8e186]:
+            - generic [ref=f8e187]:
+              - link "Conversation (3)" [ref=f8e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122870
+                - text: Conversation
+                - generic [ref=f8e191]: "3"
+                - generic [ref=f8e192]: (3)
+              - link "Commits (11)" [ref=f8e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122870/commits
+                - text: Commits
+                - generic [ref=f8e196]: "11"
+                - generic [ref=f8e197]: (11)
+              - link "Checks (131)" [ref=f8e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122870/checks
+                - text: Checks
+                - generic [ref=f8e201]: "131"
+                - generic [ref=f8e202]: (131)
+              - link "Files changed (31)" [ref=f8e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122870/files
+                - text: Files changed
+                - generic [ref=f8e206]: "31"
+                - generic [ref=f8e207]: (31)
+      - generic [ref=f8e212]:
+        - generic [ref=f8e214]:
+          - heading "Conversation" [level=2] [ref=f8e215]
+          - generic [ref=f8e216]:
+            - generic [ref=f8e217]:
+              - generic [ref=f8e219]:
+                - link [ref=f8e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f8e221]
+                - generic [ref=f8e223]:
+                  - generic [ref=f8e224]:
+                    - heading [level=3] [ref=f8e225]:
+                      - generic [ref=f8e226]:
+                        - strong [ref=f8e227]:
+                          - link "steipete" [ref=f8e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 202633 minutes ago" [ref=f8e229] [cursor=pointer]:
+                          - /url: "#issue-5136329704"
+                    - generic [ref=f8e230]:
+                      - group [ref=f8e232]:
+                        - button [ref=f8e233] [cursor=pointer]:
+                          - img "Show options" [ref=f8e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f8e239]: Contributor
+                  - generic [ref=f8e244]:
+                    - heading "What Problem This Solves" [level=2] [ref=f8e245]
+                    - paragraph [ref=f8e246]:
+                      - text: Users can attach the CLI to an existing Gateway session with
+                      - code [ref=f8e247]: openclaw resume
+                      - text: ", but the Control UI did not expose a safe, exact handoff for the session currently open in the browser. Copying a raw session key or guessing a Gateway target could attach to the wrong agent, use the wrong Gateway, leak browser credentials, or create a new session after the original was deleted."
+                    - heading "Why This Change Was Made" [level=2] [ref=f8e248]
+                    - paragraph [ref=f8e249]:
+                      - text: The active session menu now offers
+                      - strong [ref=f8e250]: Continue in terminal…
+                      - text: ". It opens a copy-only dialog containing:"
+                    - generic [ref=f8e251]:
+                      - code [ref=f8e253]: openclaw resume --handoff <base64url>
+                      - button "Copy code to clipboard" [ref=f8e255] [cursor=pointer]
+                    - paragraph [ref=f8e259]:
+                      - text: The bounded handoff contains only the exact agent-qualified session key and selected credential-free Gateway WebSocket URL. It contains no token, password, device credential, bootstrap secret, or transcript data, and its alphabet is inert in POSIX shells, PowerShell, and
+                      - code [ref=f8e260]: cmd.exe
+                      - text: .
+                    - paragraph [ref=f8e261]:
+                      - code [ref=f8e262]: openclaw resume --handoff
+                      - text: "then:"
+                    - list [ref=f8e263]:
+                      - listitem [ref=f8e264]: validates a strict versioned payload with protocol-compatible grapheme bounds;
+                      - listitem [ref=f8e265]: allows configured auth and TLS reuse only when the URL byte-matches the current profile’s eligible local, public-origin, or remote target;
+                      - listitem [ref=f8e266]: keeps local/public targets out of remote-mode credential ownership and suppresses ambient Gateway token/password fallback;
+                      - listitem [ref=f8e267]: preserves explicit auth while retaining the exact target’s configured TLS pin;
+                      - listitem [ref=f8e268]:
+                        - text: resolves the session through
+                        - code [ref=f8e269]: sessions.resolve
+                        - text: ", verifies the returned agent owner and canonical key, and refuses missing, ambiguous, malformed, or failed resolution instead of creating a new session;"
+                      - listitem [ref=f8e270]: binds the TUI to the already authenticated route without rediscovering a different Gateway.
+                    - paragraph [ref=f8e271]: The dialog closes when the session owner, selected Gateway, client, connection generation, or session changes. Query-routed Gateway URLs are disabled with explicit guidance because query data may carry routing or credential material and stored-device auth scope is not query-aware.
+                    - paragraph [ref=f8e272]: No new Gateway RPC, protocol version, stored handoff token, browser credential delegation, or custom URL scheme is introduced.
+                    - heading "User Impact" [level=2] [ref=f8e273]
+                    - paragraph [ref=f8e274]: A user can open the current session’s overflow menu, copy one safe command, and continue the exact same transcript in an already authorized terminal. The browser and terminal authenticate independently, and existing session access controls continue to apply.
+                    - heading "Menu" [level=3] [ref=f8e275]
+                    - paragraph [ref=f8e276]:
+                      - link [ref=f8e277] [cursor=pointer]:
+                        - /url: https://private-user-images.githubusercontent.com/58493/635182418-91615fb7-9498-47c6-ac9f-4aaf154df790.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY1ODA5MDgsIm5iZiI6MTc4NjU4MDYwOCwicGF0aCI6Ii81ODQ5My82MzUxODI0MTgtOTE2MTVmYjctOTQ5OC00N2M2LWFjOWYtNGFhZjE1NGRmNzkwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEzVDAwMjMyOFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTMzY2FiNGRkZWNiYTI2N2MzYmRlMWIwYTA3NzFmZjFmOWVlYTBiZDc3MDYxMWE1ZTRkNTU1MjY4OTJiNjkzNWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.aYVeUT5aQOn8gvd2aTOxpa0sbUU2B5BqdEHls-Pj4c8
+                        - img "Continue in terminal action in the session menu" [ref=f8e278]
+                    - heading "Credential-free handoff" [level=3] [ref=f8e279]
+                    - paragraph [ref=f8e280]:
+                      - link [ref=f8e281] [cursor=pointer]:
+                        - /url: https://private-user-images.githubusercontent.com/58493/635182424-0367c40d-afa9-43c3-9440-983f751d5d6b.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY1ODA5MDgsIm5iZiI6MTc4NjU4MDYwOCwicGF0aCI6Ii81ODQ5My82MzUxODI0MjQtMDM2N2M0MGQtYWZhOS00M2MzLTk0NDAtOTgzZjc1MWQ1ZDZiLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEzVDAwMjMyOFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWU0YzNhMDhjYmNjMTA3MmIzMTkwMjMyYTdjMzllMDk4ZGUzNDI4NDJiYTM3MGVkNTM2N2NjNWU3NTVmNjI2ZDImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.Ay9JnwyBCmMwzFy86Dc8x9xdEU1W7qet3bmdhAwfCkQ
+                        - img "Continue in terminal modal with a shell-inert handoff command" [ref=f8e282]
+                    - heading "Evidence" [level=2] [ref=f8e283]
+                    - list [ref=f8e284]:
+                      - listitem [ref=f8e285]: "Lead-owned focused suite: 178 tests passed across codec, Gateway bootstrap, TUI, CLI, and Control UI owners."
+                      - listitem [ref=f8e286]: "Mocked Chromium continuation E2E: 1 passed with a hostile cross-shell session key; verified decode, clipboard bytes, no credential flags, and dialog retirement on reconnect."
+                      - listitem [ref=f8e287]: "Isolated branch proof: 245 focused tests across 12 files, four core/test/UI TypeScript programs, targeted formatting/oxlint/stylelint, UI i18n, docs list + 772-file MDX validation, and production Control UI build."
+                      - listitem [ref=f8e288]: "Fresh structured autoreview and TruffleHog: clean."
+                    - paragraph [ref=f8e289]:
+                      - text: LOC classification against current
+                      - code [ref=f8e290]: main
+                      - text: ":"
+                    - list [ref=f8e291]:
+                      - listitem [ref=f8e292]: "production: +752/−94, net +658;"
+                      - listitem [ref=f8e293]: "tests/test support: +1,194/−9, net +1,185;"
+                      - listitem [ref=f8e294]: "docs: +137/−12, net +125;"
+                      - listitem [ref=f8e295]: "generated: none."
+                    - paragraph [ref=f8e296]:
+                      - text: The production growth pays for one shared handoff codec, exact Gateway auth/TLS selection, exact session resolution, and the Control UI lifecycle/dialog. Ordinary
+                      - code [ref=f8e297]: openclaw resume [query]
+                      - text: and raw
+                      - code [ref=f8e298]: resume --url
+                      - text: behavior remain unchanged.
+                    - paragraph [ref=f8e299]: AI-assisted; the implementation was repeatedly adversarially reviewed and repaired for cross-origin credentials, TLS ownership, cross-shell safety, deleted sessions, and agent ownership before publication.
+                  - 'button "eyes (1): steipete, 11:49PM yesterday" [disabled] [ref=f8e304]':
+                    - generic [ref=f8e305]: 👀
+                    - generic [ref=f8e306]: "1"
+              - generic [ref=f8e307]:
+                - generic [ref=f8e309]:
+                  - generic [ref=f8e314]:
+                    - link "steipete" [ref=f8e315] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: added 9 commits
+                    - link "August 12, 2026 16:3647 minutes ago" [ref=f8e316] [cursor=pointer]:
+                      - /url: "#commits-pushed-ed943bf"
+                  - generic [ref=f8e317]:
+                    - generic [ref=f8e325]:
+                      - link [ref=f8e328] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e329]
+                      - generic [ref=f8e330]:
+                        - code [ref=f8e331]:
+                          - 'link "feat: continue sessions in terminal" [ref=f8e332] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122870/commits/ed943bf1f6f07807aa901aeeed586c1aa699c0c2
+                        - button "Commit message body" [ref=f8e334] [cursor=pointer]: …
+                      - button "Unverified" [ref=f8e336] [cursor=pointer]
+                      - group [ref=f8e341]:
+                        - img "0 / 1 checks OK" [ref=f8e343] [cursor=pointer]
+                      - code [ref=f8e346]:
+                        - link "ed943bf" [ref=f8e347] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/ed943bf1f6f07807aa901aeeed586c1aa699c0c2
+                    - generic [ref=f8e355]:
+                      - link [ref=f8e358] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e359]
+                      - generic [ref=f8e360]:
+                        - code [ref=f8e361]:
+                          - 'link "fix(gateway): separate public origin TLS ownership" [ref=f8e362] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122870/commits/99407547ae73960cafce7e05055918b51e5f3d37
+                        - button "Commit message body" [ref=f8e364] [cursor=pointer]: …
+                      - button "Unverified" [ref=f8e366] [cursor=pointer]
+                      - group [ref=f8e371]:
+                        - img "0 / 1 checks OK" [ref=f8e373] [cursor=pointer]
+                      - code [ref=f8e376]:
+                        - link "9940754" [ref=f8e377] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/99407547ae73960cafce7e05055918b51e5f3d37
+                    - generic [ref=f8e385]:
+                      - link [ref=f8e388] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e389]
+                      - generic [ref=f8e390]:
+                        - code [ref=f8e391]:
+                          - 'link "fix(gateway): scope exact targets to gateway mode" [ref=f8e392] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122870/commits/8d7b5383daee3a4541aa9cbb29eb837acad7d056
+                        - button "Commit message body" [ref=f8e394] [cursor=pointer]: …
+                      - button "Unverified" [ref=f8e396] [cursor=pointer]
+                      - group [ref=f8e401]:
+                        - img "0 / 1 checks OK" [ref=f8e403] [cursor=pointer]
+                      - code [ref=f8e406]:
+                        - link "8d7b538" [ref=f8e407] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/8d7b5383daee3a4541aa9cbb29eb837acad7d056
+                    - generic [ref=f8e415]:
+                      - link [ref=f8e418] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e419]
+                      - generic [ref=f8e420]:
+                        - code [ref=f8e421]:
+                          - 'link "fix(cli): encode terminal resume handoffs" [ref=f8e422] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122870/commits/a5f31d228f010ac551f0685e6a9cab4aca113141
+                        - button "Commit message body" [ref=f8e424] [cursor=pointer]: …
+                      - button "Unverified" [ref=f8e426] [cursor=pointer]
+                      - group [ref=f8e431]:
+                        - img "0 / 1 checks OK" [ref=f8e433] [cursor=pointer]
+                      - code [ref=f8e436]:
+                        - link "a5f31d2" [ref=f8e437] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/a5f31d228f010ac551f0685e6a9cab4aca113141
+                    - generic [ref=f8e445]:
+                      - link [ref=f8e448] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e449]
+                      - generic [ref=f8e450]:
+                        - code [ref=f8e451]:
+                          - 'link "fix(gateway): isolate handoff auth identity" [ref=f8e452] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122870/commits/7130f4e0127a23404df2d6bd21174350e56d41ca
+                        - button "Commit message body" [ref=f8e454] [cursor=pointer]: …
+                      - button "Unverified" [ref=f8e456] [cursor=pointer]
+                      - group [ref=f8e461]:
+                        - img "0 / 1 checks OK" [ref=f8e463] [cursor=pointer]
+                      - code [ref=f8e466]:
+                        - link "7130f4e" [ref=f8e467] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/7130f4e0127a23404df2d6bd21174350e56d41ca
+                    - generic [ref=f8e475]:
+                      - link [ref=f8e478] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e479]
+                      - code [ref=f8e481]:
+                        - 'link "fix(cli): harden terminal resume handoffs" [ref=f8e482] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122870/commits/fb93397d981d2ad5004d71f1705c6114b4462452
+                      - button "Unverified" [ref=f8e484] [cursor=pointer]
+                      - group [ref=f8e489]:
+                        - img "0 / 1 checks OK" [ref=f8e491] [cursor=pointer]
+                      - code [ref=f8e494]:
+                        - link "fb93397" [ref=f8e495] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/fb93397d981d2ad5004d71f1705c6114b4462452
+                    - generic [ref=f8e503]:
+                      - link [ref=f8e506] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e507]
+                      - code [ref=f8e509]:
+                        - 'link "fix(cli): parse terminal handoff outcomes" [ref=f8e510] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122870/commits/c349208eb19fdd52590930bd740ba710199ed3be
+                      - button "Unverified" [ref=f8e512] [cursor=pointer]
+                      - group [ref=f8e517]:
+                        - img "0 / 1 checks OK" [ref=f8e519] [cursor=pointer]
+                      - code [ref=f8e522]:
+                        - link "c349208" [ref=f8e523] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/c349208eb19fdd52590930bd740ba710199ed3be
+                    - generic [ref=f8e531]:
+                      - link [ref=f8e534] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e535]
+                      - code [ref=f8e537]:
+                        - 'link "fix(cli): bind handoffs to resolved agent" [ref=f8e538] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122870/commits/8cac1bd74d996d383bbe3e0609566a429f79b925
+                      - button "Unverified" [ref=f8e540] [cursor=pointer]
+                      - group [ref=f8e545]:
+                        - img "0 / 1 checks OK" [ref=f8e547] [cursor=pointer]
+                      - code [ref=f8e550]:
+                        - link "8cac1bd" [ref=f8e551] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/8cac1bd74d996d383bbe3e0609566a429f79b925
+                    - generic [ref=f8e559]:
+                      - link [ref=f8e562] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e563]
+                      - code [ref=f8e565]:
+                        - 'link "test(ui): align terminal continuation proof" [ref=f8e566] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122870/commits/d1cfbdf05390c6d4c3ad0455b2b9d2b9af7ce9b3
+                      - button "Unverified" [ref=f8e568] [cursor=pointer]
+                      - group [ref=f8e573]:
+                        - img "6 / 68 checks OK" [ref=f8e575] [cursor=pointer]
+                      - code [ref=f8e578]:
+                        - link "d1cfbdf" [ref=f8e579] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122870/commits/d1cfbdf05390c6d4c3ad0455b2b9d2b9af7ce9b3
+                - generic [ref=f8e581]:
+                  - link [ref=f8e583] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f8e584]
+                  - generic [ref=f8e586]:
+                    - generic [ref=f8e587]:
+                      - heading "clawsweeper Bot commented Aug 12, 202633 minutes ago" [level=3] [ref=f8e588]:
+                        - generic [ref=f8e589]:
+                          - strong [ref=f8e590]:
+                            - link "clawsweeper" [ref=f8e591] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f8e592]: Bot
+                          - text: commented
+                          - link "Aug 12, 202633 minutes ago" [ref=f8e593] [cursor=pointer]:
+                            - /url: "#issuecomment-5274139633"
+                      - generic [ref=f8e594]:
+                        - group [ref=f8e596]:
+                          - button [ref=f8e597] [cursor=pointer]:
+                            - img "Show options" [ref=f8e600]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f8e603]: Contributor
+                    - table [ref=f8e607]:
+                      - rowgroup [ref=f8e608]:
+                        - row [ref=f8e609]:
+                          - cell [ref=f8e610]:
+                            - paragraph [ref=f8e611]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f8e612]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f8e618]:
+                  - link [ref=f8e619] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                    - img "@openclaw-barnacle" [ref=f8e620]
+                  - link "openclaw-barnacle" [ref=f8e621] [cursor=pointer]:
+                    - /url: /apps/openclaw-barnacle
+                  - generic [ref=f8e622]: Bot
+                  - text: added
+                  - link "docs" [ref=f8e623] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+                  - 'link "app: web-ui" [ref=f8e624] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+                  - link "gateway" [ref=f8e625] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+                  - link "cli" [ref=f8e626] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+                  - 'link "size: XL" [ref=f8e627] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+                  - link "maintainer" [ref=f8e628] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                  - text: labels
+                  - link "Aug 12, 202633 minutes ago" [ref=f8e629] [cursor=pointer]:
+                    - /url: "#event-29371643416"
+                - generic [ref=f8e640]:
+                  - link [ref=f8e643] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f8e644]
+                  - code [ref=f8e646]:
+                    - 'link "docs(plan): track terminal continuation" [ref=f8e647] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122870/commits/498d3eaf734ac4a9c9ea8aa1b5073fe4b517df19
+                  - button "Unverified" [ref=f8e649] [cursor=pointer]
+                  - group [ref=f8e654]:
+                    - img "67 / 123 checks OK" [ref=f8e656] [cursor=pointer]
+                  - code [ref=f8e659]:
+                    - link "498d3ea" [ref=f8e660] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122870/commits/498d3eaf734ac4a9c9ea8aa1b5073fe4b517df19
+                - generic [ref=f8e667]:
+                  - link [ref=f8e669] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f8e670]
+                  - generic [ref=f8e671]:
+                    - link "steipete" [ref=f8e672] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: marked this pull request as ready for review
+                    - link "August 12, 2026 23:5132 minutes ago" [ref=f8e673] [cursor=pointer]:
+                      - /url: "#event-29371670182"
+                - generic [ref=f8e684]:
+                  - link [ref=f8e687] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f8e688]
+                  - code [ref=f8e690]:
+                    - 'link "refactor(ui): keep terminal handoff result local" [ref=f8e691] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122870/commits/2d1a9cca739e52a6d880ce4fe8ab44626a055101
+                  - button "Unverified" [ref=f8e693] [cursor=pointer]
+                  - group [ref=f8e698]:
+                    - img "86 / 125 checks OK" [ref=f8e700] [cursor=pointer]
+                  - code [ref=f8e703]:
+                    - link "2d1a9cc" [ref=f8e704] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122870/commits/2d1a9cca739e52a6d880ce4fe8ab44626a055101
+                - generic [ref=f8e710]:
+                  - link [ref=f8e711] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f8e712]
+                  - link "clawsweeper" [ref=f8e713] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f8e714]: Bot
+                  - text: added
+                  - 'link "merge-risk: 🚨 session-state" [ref=f8e715] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+                  - link "P2" [ref=f8e716] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                  - 'link "rating: 🦐 gold shrimp" [ref=f8e717] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                  - 'link "status: ⏳ waiting on author" [ref=f8e718] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                  - text: labels
+                  - link "Aug 13, 202620 minutes ago" [ref=f8e719] [cursor=pointer]:
+                    - /url: "#event-29371995487"
+                - generic [ref=f8e721]:
+                  - link [ref=f8e723] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f8e724]
+                  - generic [ref=f8e726]:
+                    - generic [ref=f8e727]:
+                      - heading "clawsweeper Bot commented Aug 13, 202620 minutes ago" [level=3] [ref=f8e728]:
+                        - generic [ref=f8e729]:
+                          - strong [ref=f8e730]:
+                            - link "clawsweeper" [ref=f8e731] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f8e732]: Bot
+                          - text: commented
+                          - link "Aug 13, 202620 minutes ago" [ref=f8e733] [cursor=pointer]:
+                            - /url: "#issuecomment-5274218246"
+                      - generic [ref=f8e734]:
+                        - group [ref=f8e736]:
+                          - button [ref=f8e737] [cursor=pointer]:
+                            - img "Show options" [ref=f8e740]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f8e743]: Contributor
+                    - table [ref=f8e747]:
+                      - rowgroup [ref=f8e748]:
+                        - row [ref=f8e749]:
+                          - cell [ref=f8e750]:
+                            - paragraph [ref=f8e751]:
+                              - text: "Codex review: needs changes before merge."
+                              - emphasis [ref=f8e752]: Reviewed August 12, 2026, 8:01 PM ET / August 13, 2026, 00:01 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f8e753]
+                            - heading "What this changes" [level=2] [ref=f8e754]
+                            - paragraph [ref=f8e755]: This PR adds a Control UI action that copies a credential-free terminal command for reopening the currently selected Gateway session in the TUI.
+                            - heading "Merge readiness" [level=2] [ref=f8e756]
+                            - paragraph [ref=f8e757]:
+                              - generic [ref=f8e758]: ⚠️
+                              - strong [ref=f8e759]: Ready for maintainer review - 5 items remain
+                            - paragraph [ref=f8e760]: "Keep open: this planned CLI/Web continuation feature has a concrete P1 identity-binding gap before merge. A successful resolver response for another session under the same agent is accepted and launches that other transcript."
+                            - paragraph [ref=f8e761]:
+                              - strong [ref=f8e762]: "Priority:"
+                              - text: P2
+                              - strong [ref=f8e763]: "Reviewed head:"
+                              - code [ref=f8e764]: 2d1a9cca739e52a6d880ce4fe8ab44626a055101
+                            - heading "Review scores" [level=2] [ref=f8e765]
+                            - table [ref=f8e767]:
+                              - rowgroup [ref=f8e768]:
+                                - row [ref=f8e769]:
+                                  - columnheader "Measure" [ref=f8e770]
+                                  - columnheader "Result" [ref=f8e771]
+                                  - columnheader "What it means" [ref=f8e772]
+                              - rowgroup [ref=f8e773]:
+                                - row [ref=f8e774]:
+                                  - cell [ref=f8e775]:
+                                    - strong [ref=f8e776]: Overall readiness
+                                  - cell [ref=f8e777]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f8e778]: (3/6)
+                                  - cell "The implementation has strong focused coverage and a coherent boundary, but one central same-agent identity check remains missing." [ref=f8e779]
+                                - row [ref=f8e780]:
+                                  - cell [ref=f8e781]:
+                                    - strong [ref=f8e782]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f8e783]
+                                  - 'cell "Not applicable: The supplied item state marks this as a maintainer-authored PR, so the external-contributor proof gate does not apply; the body’s UI screenshots and mocked E2E remain supplemental evidence." [ref=f8e784]'
+                                - row [ref=f8e785]:
+                                  - cell [ref=f8e786]:
+                                    - strong [ref=f8e787]: Patch quality
+                                  - cell [ref=f8e788]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f8e789]: (3/6)
+                                  - cell "Security review found an item that needs attention." [ref=f8e790]
+                            - heading "Verification" [level=2] [ref=f8e791]
+                            - table [ref=f8e793]:
+                              - rowgroup [ref=f8e794]:
+                                - row [ref=f8e795]:
+                                  - columnheader "Check" [ref=f8e796]
+                                  - columnheader "Result" [ref=f8e797]
+                                  - columnheader "Evidence" [ref=f8e798]
+                              - rowgroup [ref=f8e799]:
+                                - row [ref=f8e800]:
+                                  - cell [ref=f8e801]:
+                                    - strong [ref=f8e802]: Real behavior
+                                  - cell "Not applicable" [ref=f8e803]
+                                  - 'cell "Not applicable: The supplied item state marks this as a maintainer-authored PR, so the external-contributor proof gate does not apply; the body’s UI screenshots and mocked E2E remain supplemental evidence." [ref=f8e804]'
+                                - row [ref=f8e805]:
+                                  - cell [ref=f8e806]:
+                                    - strong [ref=f8e807]: Evidence reviewed
+                                  - cell "7 items" [ref=f8e808]
+                                  - 'cell "Current owner boundary: Current main already owns terminal session selection in the resume command; the PR extends that owner with the handoff path rather than duplicating a UI-side transport. Gateway exact-key contract: For a key selector, the Gateway resolves a canonical stored key and returns both that key and its agent owner. Missing result-to-request binding: The proposed success path checks only that the returned key belongs to the requested agent, then passes any such returned key to the TUI; it never verifies the canonical session identity matches the handoff request." [ref=f8e809]': "Current owner boundary: Current main already owns terminal session selection in the resume command; the PR extends that owner with the handoff path rather than duplicating a UI-side transport.Gateway exact-key contract: For a key selector, the Gateway resolves a canonical stored key and returns both that key and its agent owner.Missing result-to-request binding: The proposed success path checks only that the returned key belongs to the requested agent, then passes any such returned key to the TUI; it never verifies the canonical session identity matches the handoff request."
+                                - row [ref=f8e810]:
+                                  - cell [ref=f8e811]:
+                                    - strong [ref=f8e812]: Findings
+                                  - cell "1 actionable finding" [ref=f8e813]
+                                  - cell "[P1] Bind the resolved key to the handoff key" [ref=f8e814]
+                                - row [ref=f8e815]:
+                                  - cell [ref=f8e816]:
+                                    - strong [ref=f8e817]: Security
+                                  - cell "Needs attention" [ref=f8e818]
+                                  - 'cell "Same-agent session substitution is accepted: The handoff flow treats the resolver response as strict input but verifies only agent ownership, allowing a different valid session key for that agent to replace the selected transcript." [ref=f8e819]'
+                            - heading "How this fits together" [level=2] [ref=f8e820]
+                            - paragraph [ref=f8e821]: The Control UI turns its selected session and Gateway URL into an opaque handoff command. The CLI authenticates independently, resolves that session through the Gateway, then starts the terminal UI against the resolved transcript.
+                            - region "mermaid rendered output container" [ref=f8e822]:
+                              - generic [ref=f8e823]:
+                                - generic [ref=f8e824]:
+                                  - group [ref=f8e825]:
+                                    - button "Open dialog" [ref=f8e826] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f8e829] [cursor=pointer]
+                                - iframe [ref=f8e834]:
+                                  - generic [ref=f9e1]:
+                                    - document [ref=f9e5]:
+                                      - generic [ref=f9e8]:
+                                        - paragraph [ref=f9e15]: Selected web session
+                                        - paragraph [ref=f9e22]: Credential-free handoff
+                                        - paragraph [ref=f9e29]: Terminal resume command
+                                        - paragraph [ref=f9e36]: Gateway authentication
+                                        - paragraph [ref=f9e43]: Session resolution
+                                        - paragraph [ref=f9e50]: Terminal transcript
+                                    - generic [ref=f9e51]:
+                                      - button "Zoom in" [ref=f9e52]
+                                      - button "Zoom out" [ref=f9e56]
+                                      - button "Reset view" [ref=f9e60]
+                                      - button "Pan up" [ref=f9e63]
+                                      - button "Pan down" [ref=f9e66]
+                                      - button "Pan left" [ref=f9e69]
+                                      - button "Pan right" [ref=f9e72]
+                            - heading "Before merge" [level=2] [ref=f8e835]
+                            - list [ref=f8e836]:
+                              - listitem [ref=f8e837]:
+                                - checkbox "Incomplete task" [disabled] [ref=f8e838]
+                                - strong [ref=f8e839]: Bind the resolved key to the handoff key (P1)
+                                - text: "- A successful response only checks"
+                                - code [ref=f8e840]: agentId
+                                - text: ", so"
+                                - code [ref=f8e841]: "{ ok: true, key: \"agent:main:other\", agentId: \"main\" }"
+                                - text: is accepted for a handoff to
+                                - code [ref=f8e842]: agent:main:alpha
+                                - text: and starts the wrong transcript. Compare canonical parsed key identity, not only ownership, and add the same-agent mismatch regression.
+                              - listitem [ref=f8e843]:
+                                - checkbox "Incomplete task" [disabled] [ref=f8e844]
+                                - strong [ref=f8e845]: "Resolve security concern: Same-agent session substitution is accepted"
+                                - text: "- The handoff flow treats the resolver response as strict input but verifies only agent ownership, allowing a different valid session key for that agent to replace the selected transcript."
+                              - listitem [ref=f8e846]:
+                                - checkbox "Incomplete task" [disabled] [ref=f8e847]
+                                - strong [ref=f8e848]: Resolve merge risk (P1)
+                                - text: "- A same-agent but different canonical key returned by"
+                                - code [ref=f8e849]: sessions.resolve
+                                - text: currently reaches the TUI, which can continue the wrong transcript.
+                              - listitem [ref=f8e850]:
+                                - checkbox "Incomplete task" [disabled] [ref=f8e851]
+                                - strong [ref=f8e852]: Resolve merge risk (P1)
+                                - text: "- The direct TypeBox dependency contract could not be inspected in this read-only, dependency-less environment; this does not affect the identified result-binding defect."
+                              - listitem [ref=f8e853]:
+                                - checkbox "Incomplete task" [disabled] [ref=f8e854]
+                                - strong [ref=f8e855]: Complete next step (P2)
+                                - text: "- A narrow, source-proven P1 repair can make the resolver accept only the session selected by the browser."
+                            - heading "Findings" [level=2] [ref=f8e856]
+                            - list [ref=f8e857]:
+                              - listitem [ref=f8e858]:
+                                - text: "[P1] Bind the resolved key to the handoff key —"
+                                - code [ref=f8e859]: src/cli/resume-cli.runtime.ts:193-198
+                              - listitem [ref=f8e860]:
+                                - text: "[medium] Same-agent session substitution is accepted —"
+                                - code [ref=f8e861]: src/cli/resume-cli.runtime.ts:193
+                            - group [ref=f8e862]:
+                              - strong [ref=f8e864] [cursor=pointer]: Agent review details
+                - generic [ref=f8e865]:
+                  - generic [ref=f8e870]:
+                    - button "View details" [ref=f8e871] [cursor=pointer]
+                    - generic [ref=f8e872]:
+                      - link [ref=f8e874] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f8e875]
+                      - generic [ref=f8e876]:
+                        - link "steipete" [ref=f8e877] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f8e878] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/08b134324f0a79458784c5311c0690211ecbcfd4
+                          - code [ref=f8e879]: 08b1343
+                        - text: into
+                        - generic [ref=f8e880]: main
+                        - link "Aug 13, 202615 minutes ago" [ref=f8e882] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122870#event-29372176413
+                        - generic [ref=f8e883]: 131 checks passed
+                  - generic [ref=f8e890]:
+                    - link [ref=f8e892] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f8e893]
+                    - generic [ref=f8e894]:
+                      - link "steipete" [ref=f8e895] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f8e896]: steipete/resume-terminal-handoff
+                      - text: branch
+                      - link "August 13, 2026 00:0715 minutes ago" [ref=f8e898] [cursor=pointer]:
+                        - /url: "#event-29372177516"
+                - generic [ref=f8e900]:
+                  - link [ref=f8e902] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f8e903]
+                  - generic [ref=f8e905]:
+                    - generic [ref=f8e906]:
+                      - heading [level=3] [ref=f8e907]:
+                        - generic [ref=f8e908]:
+                          - strong [ref=f8e909]:
+                            - link "steipete" [ref=f8e910] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202614 minutes ago" [ref=f8e911] [cursor=pointer]:
+                            - /url: "#issuecomment-5274260676"
+                      - generic [ref=f8e912]:
+                        - group [ref=f8e914]:
+                          - button [ref=f8e915] [cursor=pointer]:
+                            - img "Show options" [ref=f8e918]
+                        - generic [ref=f8e920]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f8e921]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f8e923]: Author
+                    - table [ref=f8e927]:
+                      - rowgroup [ref=f8e928]:
+                        - row [ref=f8e929]:
+                          - cell [ref=f8e930]:
+                            - paragraph [ref=f8e931]: Merged via squash.
+                            - list [ref=f8e932]:
+                              - listitem [ref=f8e933]:
+                                - text: "Prepared head SHA:"
+                                - link "2d1a9cca739e52a6d880ce4fe8ab44626a055101" [ref=f8e934] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122870/commits/2d1a9cca739e52a6d880ce4fe8ab44626a055101
+                              - listitem [ref=f8e935]:
+                                - text: "Landed commit:"
+                                - link "08b134324f0a79458784c5311c0690211ecbcfd4" [ref=f8e936] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/08b134324f0a79458784c5311c0690211ecbcfd4
+                - generic [ref=f8e942]:
+                  - generic [ref=f8e943]:
+                    - link [ref=f8e944] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                      - img "@github-actions" [ref=f8e945]
+                    - link "github-actions" [ref=f8e946] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                    - generic [ref=f8e947]: Bot
+                    - text: mentioned this pull request
+                    - link "Aug 13, 20263 minutes ago" [ref=f8e948] [cursor=pointer]:
+                      - /url: "#ref-issue-5136489668"
+                  - generic [ref=f8e949]:
+                    - link "🦞 OpenClaw 生态日报 2026-08-13 xqicxx/big_model_radar#184" [ref=f8e951] [cursor=pointer]:
+                      - /url: /xqicxx/big_model_radar/issues/184
+                    - 'generic "Status: Open" [ref=f8e953]': Open
+            - generic [ref=f8e960]:
+              - link "Sign up for free" [ref=f8e961] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f8e962]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f8e963] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122870
+        - generic [ref=f8e967]:
+          - form "Select reviewers" [ref=f8e969]:
+            - heading "Reviewers" [level=3] [ref=f8e970]
+            - text: No reviews
+          - form "Select assignees" [ref=f8e972]:
+            - heading "Assignees" [level=3] [ref=f8e973]
+            - text: No one assigned
+          - generic [ref=f8e974]:
+            - heading "Labels" [level=3] [ref=f8e975]
+            - generic [ref=f8e976]:
+              - 'link "app: web-ui" [ref=f8e977] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+              - link "cli" [ref=f8e979] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+              - link "docs" [ref=f8e981] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+              - link "gateway" [ref=f8e983] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+              - link "maintainer" [ref=f8e985] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 session-state" [ref=f8e987] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+              - link "P2" [ref=f8e989] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "rating: 🦐 gold shrimp" [ref=f8e991] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+              - 'link "size: XL" [ref=f8e993] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+              - 'link "status: ⏳ waiting on author" [ref=f8e995] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+          - form "Select projects" [ref=f8e998]:
+            - heading "Projects" [level=3] [ref=f8e999]
+            - text: None yet
+          - form "Select milestones" [ref=f8e1001]:
+            - heading "Milestone" [level=3] [ref=f8e1002]
+            - text: No milestone
+          - form "Link issues" [ref=f8e1008]:
+            - heading "Development" [level=3] [ref=f8e1009]
+            - paragraph [ref=f8e1010]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f8e1012]: None yet
+          - generic [ref=f8e1014]:
+            - heading "1 participant" [level=3] [ref=f8e1015]
+            - link [ref=f8e1017] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f8e1018]
+  - contentinfo [ref=f8e1019]:
+    - heading "Footer" [level=2] [ref=f8e1020]
+    - generic [ref=f8e1021]:
+      - generic [ref=f8e1022]:
+        - link "GitHub Homepage" [ref=f8e1023] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f8e1026]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f8e1027]:
+        - heading "Footer navigation" [level=3] [ref=f8e1028]
+        - list "Footer navigation" [ref=f8e1029]:
+          - listitem [ref=f8e1030]:
+            - link "Terms" [ref=f8e1031] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f8e1032]:
+            - link "Privacy" [ref=f8e1033] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f8e1034]:
+            - link "Security" [ref=f8e1035] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f8e1036]:
+            - link "Status" [ref=f8e1037] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f8e1038]:
+            - link "Community" [ref=f8e1039] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f8e1040]:
+            - link "Docs" [ref=f8e1041] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f8e1042]:
+            - link "Contact" [ref=f8e1043] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f8e1044]:
+            - button "Manage cookies" [ref=f8e1046] [cursor=pointer]
+          - listitem [ref=f8e1047]:
+            - button "Do not share my personal information" [ref=f8e1049] [cursor=pointer]

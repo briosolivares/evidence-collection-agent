@@ -1,0 +1,1607 @@
+scratch/tool-output/inspect_page-1.txt:8:         - heading [level=1] [ref=f53e19]:
+scratch/tool-output/inspect_page-1.txt:9:           - img "Microsoft Logo Image" [ref=f53e20] [cursor=pointer]
+scratch/tool-output/inspect_page-1.txt:13:               - link "Images" [ref=f53e31]:
+scratch/tool-output/inspect_page-1.txt:16:               - link "Videos" [ref=f53e33]:
+scratch/tool-output/inspect_page-1.txt:19:               - link "Shopping" [ref=f53e35]:
+scratch/tool-output/inspect_page-1.txt:22:               - link "Maps" [ref=f53e37]:
+scratch/tool-output/inspect_page-1.txt:25:               - link "News" [ref=f53e39]:
+scratch/tool-output/inspect_page-1.txt:28:               - text: . . .
+scratch/tool-output/inspect_page-1.txt:31:         - link "Sign in Sign in" [ref=f53e45] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:45:         - link "Create wallpaper" [ref=f53e71] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:47:         - link "Text creator" [ref=f53e74] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:57:               - 'link "Answer: A, Tsavo East, 1 of 3" [ref=f53e88] [cursor=pointer]':
+scratch/tool-output/inspect_page-1.txt:60:                 - text: Tsavo East
+scratch/tool-output/inspect_page-1.txt:62:               - 'link "Answer: B, Maasai Mara, 2 of 3" [ref=f53e91] [cursor=pointer]':
+scratch/tool-output/inspect_page-1.txt:65:                 - text: Maasai Mara
+scratch/tool-output/inspect_page-1.txt:67:               - 'link "Answer: C, Amboseli, 3 of 3" [ref=f53e94] [cursor=pointer]':
+scratch/tool-output/inspect_page-1.txt:70:                 - text: Amboseli
+scratch/tool-output/inspect_page-1.txt:74:             - link "Get the Bing Wallpaper app":
+scratch/tool-output/inspect_page-1.txt:76:           - 'heading "Image of the day: A group of elephants, Amboseli National Park, Kenya" [level=3]':
+scratch/tool-output/inspect_page-1.txt:77:             - 'link "Image of the day: A group of elephants, Amboseli National Park, Kenya"':
+scratch/tool-output/inspect_page-1.txt:79:               - text: A group of elephants, Amboseli National Park, Kenya
+scratch/tool-output/inspect_page-1.txt:88:             - heading "Giants worth protecting" [level=2] [ref=f53e104]
+scratch/tool-output/inspect_page-1.txt:108:                     - 'heading "Trump: Leavitt leaving WH" [level=2] [ref=f53e127]'
+scratch/tool-output/inspect_page-1.txt:109:                     - img "© Photo by Jim WATSON / AFP via Getty Images © Photo by SAUL LOEB / AFP via Getty Images" [ref=f53e128]
+scratch/tool-output/inspect_page-1.txt:114:                     - heading "Wins Minnesota gov. primary" [level=2] [ref=f53e132]
+scratch/tool-output/inspect_page-1.txt:115:                     - img "© AP Photo/Ellen Schmidt" [ref=f53e133]
+scratch/tool-output/inspect_page-1.txt:120:                     - heading "Bruce the dog euthanized" [level=2] [ref=f53e137]
+scratch/tool-output/inspect_page-1.txt:121:                     - img "©Jose Luis Magana/AP Photo" [ref=f53e138]
+scratch/tool-output/inspect_page-1.txt:126:                     - heading "Ronaldo, Rodriguez tie knot" [level=2] [ref=f53e142]
+scratch/tool-output/inspect_page-1.txt:127:                     - img "©Photo by Joel C Ryan/Invision/AP" [ref=f53e143]
+scratch/tool-output/inspect_page-1.txt:132:                     - heading "16 inmates hospitalized" [level=2] [ref=f53e147]
+scratch/tool-output/inspect_page-1.txt:133:                     - img "© Nancy Newell/Getty Images" [ref=f53e148]
+scratch/tool-output/inspect_page-1.txt:138:                     - heading "Released from hospital" [level=2] [ref=f53e152]
+scratch/tool-output/inspect_page-1.txt:139:                     - img "© AP Photo/Phelan M. Ebenhack, File" [ref=f53e153]
+scratch/tool-output/inspect_page-1.txt:144:                     - heading "BofA unveils $250B initiative" [level=2] [ref=f53e157]
+scratch/tool-output/inspect_page-1.txt:145:                     - img "© AP Photo/Charles Krupa" [ref=f53e158]
+scratch/tool-output/inspect_page-1.txt:150:                     - heading "NK fires another missile" [level=2] [ref=f53e162]
+scratch/tool-output/inspect_page-1.txt:151:                     - img "© Thomson Reuters" [ref=f53e163]
+scratch/tool-output/inspect_page-1.txt:156:                     - heading "Wins WI Democratic primary" [level=2] [ref=f53e167]
+scratch/tool-output/inspect_page-1.txt:157:                     - 'img "© Credit: Scott Olson / Getty Images" [ref=f53e168]'
+scratch/tool-output/inspect_page-1.txt:162:                     - heading "CA hit-and-run crash" [level=2] [ref=f53e172]
+scratch/tool-output/inspect_page-1.txt:163:                     - img "©NBC Los Angeles" [ref=f53e173]
+scratch/tool-output/inspect_page-1.txt:168:                     - heading "Hilton's mother seeks custody" [level=2] [ref=f53e177]
+scratch/tool-output/inspect_page-1.txt:169:                     - img "© Photo by Presley Ann/Getty Images" [ref=f53e178]
+scratch/tool-output/inspect_page-1.txt:174:                     - heading "Teen held in Acton case" [level=2] [ref=f53e182]
+scratch/tool-output/inspect_page-1.txt:175:                     - img "© CBS Boston" [ref=f53e183]
+scratch/tool-output/inspect_page-1.txt:180:                     - heading "To spend $900M on construction" [level=2] [ref=f53e187]
+scratch/tool-output/inspect_page-1.txt:181:                     - img "© Photo by Alex Wong/Getty Images" [ref=f53e188]
+scratch/tool-output/inspect_page-1.txt:186:                     - heading "Joins Harry Potter TV show" [level=2] [ref=f53e192]
+scratch/tool-output/inspect_page-1.txt:187:                     - img "© Photo by Evan Agostini/Invision/AP" [ref=f53e193]
+scratch/tool-output/inspect_page-1.txt:192:                     - heading "To buy Lakers for $12.5B?" [level=2] [ref=f53e197]
+scratch/tool-output/inspect_page-1.txt:193:                     - img "© Photo by Sarah Stier/Getty Images © Photo by Nic Antaya/Getty Images" [ref=f53e198]
+scratch/tool-output/inspect_page-1.txt:198:                     - heading "To exit ESPN after 15 years" [level=2] [ref=f53e202]
+scratch/tool-output/inspect_page-1.txt:199:                     - img "© Photo by Kevin Carter/Getty Images" [ref=f53e203]
+scratch/tool-output/inspect_page-1.txt:204:                     - heading "Rod Stewart cancels US tour" [level=2] [ref=f53e207]
+scratch/tool-output/inspect_page-1.txt:205:                     - img "©Photo by Kevin Mazur/Getty Images" [ref=f53e208]
+scratch/tool-output/inspect_page-1.txt:210:                     - heading "Indicted on murder charges" [level=2] [ref=f53e212]
+scratch/tool-output/inspect_page-1.txt:211:                     - img "© Photo by Chris Torres-Pool/Getty Images" [ref=f53e213]
+scratch/tool-output/inspect_page-1.txt:216:                     - heading "Bronin wins CT primary" [level=2] [ref=f53e217]
+scratch/tool-output/inspect_page-1.txt:217:                     - img "©AP Photo/Jessica Hill" [ref=f53e218]
+scratch/tool-output/inspect_page-1.txt:222:                     - heading "Zimbabwe ferry capsizes" [level=2] [ref=f53e222]
+scratch/tool-output/inspect_page-1.txt:223:                     - img "© Mid-Day" [ref=f53e223]
+scratch/tool-output/inspect_page-1.txt:258:                           - 'link "''Their daughters were their world'': Aunt speaks after $33M Redwood City crash verdict, NBC Bay Area" [ref=f53e1659]':
+scratch/tool-output/inspect_page-1.txt:260:                             - text: "'Their daughters were their world': Aunt speaks after $33M Redwood City crash verdict"
+scratch/tool-output/inspect_page-1.txt:267:                               - link "Start the conversation" [ref=f53e1676]:
+scratch/tool-output/inspect_page-1.txt:283:                         - link "Adult toy shuts down traffic in DC for nearly 2 hours, USA TODAY" [ref=f53e436]:
+scratch/tool-output/inspect_page-1.txt:285:                           - text: Adult toy shuts down traffic in DC for nearly 2 hours
+scratch/tool-output/inspect_page-1.txt:292:                           - link "View comments 33 Comment" [ref=f53e454]:
+scratch/tool-output/inspect_page-1.txt:302:                       - img "Watchlist suggestions" [ref=f53e474]
+scratch/tool-output/inspect_page-1.txt:305:                         - heading "Watchlist suggestions" [level=2] [ref=f53e476]
+scratch/tool-output/inspect_page-1.txt:308:                       - link "VIX VIX ‎-4.78%‎ 14.55" [ref=f53e485]:
+scratch/tool-output/inspect_page-1.txt:317:                       - link "NVIDIA CORPORATION NVIDIA CORPORATION Rising fast ‎+3.03%‎ 224.09" [ref=f53e505]:
+scratch/tool-output/inspect_page-1.txt:322:                             - img "NVIDIA CORPORATION" [ref=f53e509]
+scratch/tool-output/inspect_page-1.txt:328:                       - link "MICROSOFT CORPORATION MICROSOFT CORPORATION Dropping fast ‎-2.26%‎ 492.43" [ref=f53e526]:
+scratch/tool-output/inspect_page-1.txt:333:                             - img "MICROSOFT CORPORATION" [ref=f53e530]
+scratch/tool-output/inspect_page-1.txt:339:                       - link "TESLA, INC. TESLA, INC. Dropping fast ‎-1.59%‎ 327.51" [ref=f53e547]:
+scratch/tool-output/inspect_page-1.txt:344:                             - img "TESLA, INC." [ref=f53e551]
+scratch/tool-output/inspect_page-1.txt:350:                       - link "AMAZON.COM, INC. AMAZON.COM, INC. Dropping fast ‎-1.83%‎ 267.28" [ref=f53e568]:
+scratch/tool-output/inspect_page-1.txt:355:                             - img "AMAZON.COM, INC." [ref=f53e572]
+scratch/tool-output/inspect_page-1.txt:375:                       - link "See watchlist suggestions" [ref=f53e608]:
+scratch/tool-output/inspect_page-1.txt:382:                         - heading "Top stories" [level=2] [ref=f53e619]
+scratch/tool-output/inspect_page-1.txt:386:                         - link "The Wall Street Journal 57m How Trump’s ruse to evade an Iranian threat unfolded on the tarmac in Turkey" [ref=f53e626]:
+scratch/tool-output/inspect_page-1.txt:392:                         - 'link "The Associated Press 3h The Latest: White House press secretary Karoline Leavitt will leave at the month’s end" [ref=f53e633]':
+scratch/tool-output/inspect_page-1.txt:398:                         - link "The Guardian 3h Wisconsin Democrats chose a middle path – will it lead to victory in November?" [ref=f53e640]:
+scratch/tool-output/inspect_page-1.txt:413:                       - link "See more" [ref=f53e662]:
+scratch/tool-output/inspect_page-1.txt:420:                         - link "#1 Putting Problem, Solved, Performance Golf" [ref=f53e672]:
+scratch/tool-output/inspect_page-1.txt:422:                           - text: "#1 Putting Problem, Solved"
+scratch/tool-output/inspect_page-1.txt:425:                         - link "Ad Choice" [ref=f53e676]:
+scratch/tool-output/inspect_page-1.txt:436:                         - link "Trump administration presses Supreme Court to 'act promptly' on bid to implement mail ballot order, MS NOW" [ref=f53e693]:
+scratch/tool-output/inspect_page-1.txt:438:                           - text: Trump administration presses Supreme Court to 'act promptly' on bid to implement mail ballot order
+scratch/tool-output/inspect_page-1.txt:445:                           - link "View comments 56 Comment" [ref=f53e711]:
+scratch/tool-output/inspect_page-1.txt:460:                         - link "Pat McAfee responds to backlash for attending Patriots games with Donald Trump, ClutchPoints" [ref=f53e733]:
+scratch/tool-output/inspect_page-1.txt:462:                           - text: Pat McAfee responds to backlash for attending Patriots games with Donald Trump
+scratch/tool-output/inspect_page-1.txt:469:                           - link "Start the conversation" [ref=f53e751]:
+scratch/tool-output/inspect_page-1.txt:480:                         - link "Strengthen Identity Security - Black Hat Insights - Black Hat Security Trends, techtarget.com" [ref=f53e769]:
+scratch/tool-output/inspect_page-1.txt:482:                           - text: Strengthen Identity Security - Black Hat Insights - Black Hat Security Trends
+scratch/tool-output/inspect_page-1.txt:485:                         - link "Ad Choice" [ref=f53e773]:
+scratch/tool-output/inspect_page-1.txt:493:                         - heading "San Francisco" [level=2] [ref=f53e789]
+scratch/tool-output/inspect_page-1.txt:501:                             - img "Partly cloudy/Wind" [ref=f53e801]
+scratch/tool-output/inspect_page-1.txt:502:                           - link "59°F" [ref=f53e802]:
+scratch/tool-output/inspect_page-1.txt:509:                             - img "Coastal Flood - Advisory" [ref=f53e811]
+scratch/tool-output/inspect_page-1.txt:510:                             - text: Coastal flood advisory
+scratch/tool-output/inspect_page-1.txt:511:                           - link "See full forecast" [ref=f53e812]:
+scratch/tool-output/inspect_page-1.txt:513:                             - img "arrow" [ref=f53e813]
+scratch/tool-output/inspect_page-1.txt:515:                         - link "Larger map" [ref=f53e819]:
+scratch/tool-output/inspect_page-1.txt:517:                         - link "Check more alert details" [ref=f53e821]:
+scratch/tool-output/inspect_page-1.txt:519:                         - link "Click to see more information" [ref=f53e825]:
+scratch/tool-output/inspect_page-1.txt:531:                         - 'link "Allison Janney, 66, makes frank confession about never getting married or having kids: ''It didn''t happen for me'', Page Six" [ref=f53e843]':
+scratch/tool-output/inspect_page-1.txt:533:                           - text: "Allison Janney, 66, makes frank confession about never getting married or having kids: 'It didn't happen for me'"
+scratch/tool-output/inspect_page-1.txt:540:                           - link "View comments 1 Comment" [ref=f53e861]:
+scratch/tool-output/inspect_page-1.txt:556:                         - link "Men leave workforce by millions, raising alarm, Newsmax" [ref=f53e890]:
+scratch/tool-output/inspect_page-1.txt:558:                           - text: Men leave workforce by millions, raising alarm
+scratch/tool-output/inspect_page-1.txt:565:                           - link "View comments 18 Comment" [ref=f53e908]:
+scratch/tool-output/inspect_page-1.txt:575:                       - img "WNBA" [ref=f53e928]
+scratch/tool-output/inspect_page-1.txt:578:                         - heading "WNBA" [level=2] [ref=f53e930]
+scratch/tool-output/inspect_page-1.txt:585:                       - link "Sky Live Q3 07:28 Valkyries" [ref=f53e941]:
+scratch/tool-output/inspect_page-1.txt:599:                       - link "Lynx Live Q4 09:35 Fire" [ref=f53e956]:
+scratch/tool-output/inspect_page-1.txt:613:                       - link "Tempo Final · Aug 12 88 - 94 View game stats Wings" [ref=f53e971]:
+scratch/tool-output/inspect_page-1.txt:649:                       - link "See more WNBA" [ref=f53e1013]:
+scratch/tool-output/inspect_page-1.txt:656:                         - link "The reason you don't see McDonald's inside Walmart stores anymore, Tasting Table" [ref=f53e1028]:
+scratch/tool-output/inspect_page-1.txt:658:                           - text: The reason you don't see McDonald's inside Walmart stores anymore
+scratch/tool-output/inspect_page-1.txt:665:                           - link "View comments 139 Comment" [ref=f53e1046]:
+scratch/tool-output/inspect_page-1.txt:680:                         - 'link "Tropical storm Cristobal threat grows: Spaghetti models show potential path, Newsweek" [ref=f53e1068]':
+scratch/tool-output/inspect_page-1.txt:682:                           - text: "Tropical storm Cristobal threat grows: Spaghetti models show potential path"
+scratch/tool-output/inspect_page-1.txt:689:                           - link "View comments 2 Comment" [ref=f53e1086]:
+scratch/tool-output/inspect_page-1.txt:705:                         - link "Trump-backed Mike Lindell refuses to concede Minnesota election loss, USA TODAY" [ref=f53e1115]:
+scratch/tool-output/inspect_page-1.txt:707:                           - text: Trump-backed Mike Lindell refuses to concede Minnesota election loss
+scratch/tool-output/inspect_page-1.txt:714:                           - link "View comments 442 Comment" [ref=f53e1133]:
+scratch/tool-output/inspect_page-1.txt:729:                         - link "Chick-fil-A just announced 4 new limited-time menu items—and we tried them first, Southern Living" [ref=f53e1155]:
+scratch/tool-output/inspect_page-1.txt:731:                           - text: Chick-fil-A just announced 4 new limited-time menu items—and we tried them first
+scratch/tool-output/inspect_page-1.txt:738:                           - link "View comments 5 Comment" [ref=f53e1173]:
+scratch/tool-output/inspect_page-1.txt:753:                         - link "Will Smith’s on-screen wife still stands by his Oscars slap, The Daily Beast" [ref=f53e1195]:
+scratch/tool-output/inspect_page-1.txt:755:                           - text: Will Smith’s on-screen wife still stands by his Oscars slap
+scratch/tool-output/inspect_page-1.txt:762:                           - link "View comments 10 Comment" [ref=f53e1213]:
+scratch/tool-output/inspect_page-1.txt:777:                         - link "Luke Bronin on his stunning primary upset of 14-term Rep. John Larson in Connecticut, CBS News - Video" [ref=f53e1239]:
+scratch/tool-output/inspect_page-1.txt:779:                           - text: Luke Bronin on his stunning primary upset of 14-term Rep. John Larson in Connecticut
+scratch/tool-output/inspect_page-1.txt:786:                           - link "Start the conversation" [ref=f53e1257]:
+scratch/tool-output/inspect_page-1.txt:797:                         - link "Riding Africa’s Craziest Transport Scooters Made By Hands, Fluctus - Video" [ref=f53e1280]:
+scratch/tool-output/inspect_page-1.txt:799:                           - text: Riding Africa’s Craziest Transport Scooters Made By Hands
+scratch/tool-output/inspect_page-1.txt:806:                           - link "View comments 49 Comment" [ref=f53e1298]:
+scratch/tool-output/inspect_page-1.txt:820:                           - link "Free online games" [ref=f53e1318]:
+scratch/tool-output/inspect_page-1.txt:822:                           - link "Free online games" [ref=f53e1321]:
+scratch/tool-output/inspect_page-1.txt:824:                         - link "See more" [ref=f53e1323]:
+scratch/tool-output/inspect_page-1.txt:830:                               - link "TapTap Arrow" [ref=f53e1331]:
+scratch/tool-output/inspect_page-1.txt:832:                                 - img "TapTap Arrow" [ref=f53e1333]
+scratch/tool-output/inspect_page-1.txt:836:                                     - img "Puzzle" [ref=f53e1337]
+scratch/tool-output/inspect_page-1.txt:838:                               - link "Wordmeister" [ref=f53e1340]:
+scratch/tool-output/inspect_page-1.txt:840:                                 - img "Wordmeister" [ref=f53e1342]
+scratch/tool-output/inspect_page-1.txt:844:                                     - img "Word" [ref=f53e1346]
+scratch/tool-output/inspect_page-1.txt:846:                               - link "Mergest Kingdom" [ref=f53e1349]:
+scratch/tool-output/inspect_page-1.txt:848:                                 - img "Mergest Kingdom" [ref=f53e1351]
+scratch/tool-output/inspect_page-1.txt:852:                                     - img "Merge" [ref=f53e1355]
+scratch/tool-output/inspect_page-1.txt:854:                               - link "Daily Mahjong" [ref=f53e1358]:
+scratch/tool-output/inspect_page-1.txt:856:                                 - img "Daily Mahjong" [ref=f53e1360]
+scratch/tool-output/inspect_page-1.txt:860:                                     - img "Mahjong" [ref=f53e1364]
+scratch/tool-output/inspect_page-1.txt:862:                               - 'link "Screw Out: Bolts and Nuts" [ref=f53e1367]':
+scratch/tool-output/inspect_page-1.txt:864:                                 - 'img "Screw Out: Bolts and Nuts" [ref=f53e1369]'
+scratch/tool-output/inspect_page-1.txt:868:                                     - img "Puzzle" [ref=f53e1373]
+scratch/tool-output/inspect_page-1.txt:870:                               - link "DesignVille" [ref=f53e1376]:
+scratch/tool-output/inspect_page-1.txt:872:                                 - img "DesignVille" [ref=f53e1378]
+scratch/tool-output/inspect_page-1.txt:876:                                     - img "Puzzle" [ref=f53e1382]
+scratch/tool-output/inspect_page-1.txt:878:                               - link "Hexa Stack" [ref=f53e1385]:
+scratch/tool-output/inspect_page-1.txt:880:                                 - img "Hexa Stack" [ref=f53e1387]
+scratch/tool-output/inspect_page-1.txt:884:                                     - img "Match 3" [ref=f53e1391]
+scratch/tool-output/inspect_page-1.txt:886:                               - link "Cat Disco" [ref=f53e1394]:
+scratch/tool-output/inspect_page-1.txt:888:                                 - img "Cat Disco" [ref=f53e1396]
+scratch/tool-output/inspect_page-1.txt:892:                                     - img "Arcade" [ref=f53e1400]
+scratch/tool-output/inspect_page-1.txt:894:                               - link "+1 Speed Escape Obby" [ref=f53e1403]:
+scratch/tool-output/inspect_page-1.txt:896:                                 - img "+1 Speed Escape Obby" [ref=f53e1405]
+scratch/tool-output/inspect_page-1.txt:900:                                     - img "Arcade" [ref=f53e1409]
+scratch/tool-output/inspect_page-1.txt:902:                               - link "Hidden Objects" [ref=f53e1412]:
+scratch/tool-output/inspect_page-1.txt:904:                                 - img "Hidden Objects" [ref=f53e1414]
+scratch/tool-output/inspect_page-1.txt:908:                                     - img "Hiddenobject" [ref=f53e1418]
+scratch/tool-output/inspect_page-1.txt:910:                               - link "Cross Stitch Masters" [ref=f53e1421]:
+scratch/tool-output/inspect_page-1.txt:912:                                 - img "Cross Stitch Masters" [ref=f53e1423]
+scratch/tool-output/inspect_page-1.txt:916:                                     - img "Family" [ref=f53e1427]
+scratch/tool-output/inspect_page-1.txt:918:                               - link "Solitaire Mahjong Classic" [ref=f53e1430]:
+scratch/tool-output/inspect_page-1.txt:920:                                 - img "Solitaire Mahjong Classic" [ref=f53e1432]
+scratch/tool-output/inspect_page-1.txt:924:                                     - img "Classic" [ref=f53e1436]
+scratch/tool-output/inspect_page-1.txt:926:                               - link "Solitaire Spider Master" [ref=f53e1439]:
+scratch/tool-output/inspect_page-1.txt:928:                                 - img "Solitaire Spider Master" [ref=f53e1441]
+scratch/tool-output/inspect_page-1.txt:932:                                     - img "Card" [ref=f53e1445]
+scratch/tool-output/inspect_page-1.txt:934:                               - link "Jelly Run 2048" [ref=f53e1448]:
+scratch/tool-output/inspect_page-1.txt:936:                                 - img "Jelly Run 2048" [ref=f53e1450]
+scratch/tool-output/inspect_page-1.txt:940:                                     - img "Arcade" [ref=f53e1454]
+scratch/tool-output/inspect_page-1.txt:942:                               - link "Blockbuster Puzzle" [ref=f53e1457]:
+scratch/tool-output/inspect_page-1.txt:944:                                 - img "Blockbuster Puzzle" [ref=f53e1459]
+scratch/tool-output/inspect_page-1.txt:948:                                     - img "Puzzle" [ref=f53e1463]
+scratch/tool-output/inspect_page-1.txt:950:                               - link "Puzzle Blocks Classic" [ref=f53e1466]:
+scratch/tool-output/inspect_page-1.txt:952:                                 - img "Puzzle Blocks Classic" [ref=f53e1468]
+scratch/tool-output/inspect_page-1.txt:956:                                     - img "Puzzle" [ref=f53e1472]
+scratch/tool-output/inspect_page-1.txt:958:                               - link "See more" [ref=f53e1475]:
+scratch/tool-output/inspect_page-1.txt:969:                         - link "The Pennsylvania Chevy dealer who hacked GM's paperwork to force a 427 Camaro, HotCars" [ref=f53e1497]:
+scratch/tool-output/inspect_page-1.txt:971:                           - text: The Pennsylvania Chevy dealer who hacked GM's paperwork to force a 427 Camaro
+scratch/tool-output/inspect_page-1.txt:978:                           - link "View comments 12 Comment" [ref=f53e1515]:
+scratch/tool-output/inspect_page-1.txt:993:                         - link "Accused Charlie Kirk assassin Tyler Robinson asks judge to take potential death penalty off table, FOX News" [ref=f53e1537]:
+scratch/tool-output/inspect_page-1.txt:995:                           - text: Accused Charlie Kirk assassin Tyler Robinson asks judge to take potential death penalty off table
+scratch/tool-output/inspect_page-1.txt:1002:                           - link "View comments 370 Comment" [ref=f53e1555]:
+scratch/tool-output/inspect_page-1.txt:1017:                         - 'link "Voices: The silent shame of fiftysomethings looking for work is a huge problem, The Independent" [ref=f53e1577]':
+scratch/tool-output/inspect_page-1.txt:1019:                           - text: "Voices: The silent shame of fiftysomethings looking for work is a huge problem"
+scratch/tool-output/inspect_page-1.txt:1026:                           - link "View comments 111 Comment" [ref=f53e1595]:
+scratch/tool-output/inspect_page-1.txt:1041:                         - link "Jalen Hurts training camp video goes viral for the wrong reason, Mens Fitness" [ref=f53e1617]:
+scratch/tool-output/inspect_page-1.txt:1043:                           - text: Jalen Hurts training camp video goes viral for the wrong reason
+scratch/tool-output/inspect_page-1.txt:1050:                           - link "View comments 1 Comment" [ref=f53e1635]:
+scratch/tool-output/inspect_page-1.txt:1062:             - link "Privacy and Cookies" [ref=f53e314] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1065:             - link "Legal" [ref=f53e316] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1068:             - link "Advertise" [ref=f53e318] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1071:             - link "About our ads" [ref=f53e320] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1074:             - link "Help" [ref=f53e322] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1077:             - link "Feedback" [ref=f53e324] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1080:             - link "Your Privacy Choices" [ref=f53e326] [cursor=pointer]:
+scratch/tool-output/inspect_page-1.txt:1083:             - link "Consumer Health Privacy" [ref=f53e329] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:5:   - link "Skip To Content" [ref=f91e2] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:10:         - link "Search" [ref=f91e8] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:12:         - link "Sites" [ref=f91e9] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:14:         - link "Explore" [ref=f91e10] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:16:         - link "About" [ref=f91e12] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:20:       - heading [level=1] [ref=f91e17]:
+scratch/tool-output/inspect_page-2.txt:21:         - link "Marginalia Search" [ref=f91e18] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:27:           - text: Search
+scratch/tool-output/inspect_page-2.txt:28:       - text:  
+scratch/tool-output/inspect_page-2.txt:32:         - heading " Filter" [level=2] [ref=f91e29]:
+scratch/tool-output/inspect_page-2.txt:34:           - text: Filter
+scratch/tool-output/inspect_page-2.txt:37:             - link " All" [ref=f91e34]:
+scratch/tool-output/inspect_page-2.txt:40:               - text: All
+scratch/tool-output/inspect_page-2.txt:42:             - link " Blogs" [ref=f91e38]:
+scratch/tool-output/inspect_page-2.txt:45:               - text: Blogs
+scratch/tool-output/inspect_page-2.txt:47:             - link " Academia" [ref=f91e42]:
+scratch/tool-output/inspect_page-2.txt:50:               - text: Academia
+scratch/tool-output/inspect_page-2.txt:52:             - link " Vintage" [ref=f91e46]:
+scratch/tool-output/inspect_page-2.txt:55:               - text: Vintage
+scratch/tool-output/inspect_page-2.txt:57:             - link " Small Web" [ref=f91e50]:
+scratch/tool-output/inspect_page-2.txt:60:               - text: Small Web
+scratch/tool-output/inspect_page-2.txt:62:             - link " Wikis" [ref=f91e55]:
+scratch/tool-output/inspect_page-2.txt:65:               - text: Wikis
+scratch/tool-output/inspect_page-2.txt:67:             - link " Forums" [ref=f91e59]:
+scratch/tool-output/inspect_page-2.txt:70:               - text: Forums
+scratch/tool-output/inspect_page-2.txt:72:             - link " Recipes" [ref=f91e63]:
+scratch/tool-output/inspect_page-2.txt:75:               - text: Recipes
+scratch/tool-output/inspect_page-2.txt:77:             - link " Custom Filter" [ref=f91e68]:
+scratch/tool-output/inspect_page-2.txt:80:               - text: Custom Filter
+scratch/tool-output/inspect_page-2.txt:81:     - text:  
+scratch/tool-output/inspect_page-2.txt:84:         - heading "Results" [level=1] [ref=f91e72]
+scratch/tool-output/inspect_page-2.txt:92:                     - heading [level=2] [ref=f91e84]:
+scratch/tool-output/inspect_page-2.txt:93:                       - link "Alpha Chi Omega" [ref=f91e85] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:95:                     - link "https://axo.mit.edu/faq/" [ref=f91e87] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:99:                 - link "" [ref=f91e91] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:101:                 - link "" [ref=f91e93] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:104:               - link "9 more" [ref=f91e97] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:113:                     - heading [level=2] [ref=f91e110]:
+scratch/tool-output/inspect_page-2.txt:114:                       - link "One In Four USA" [ref=f91e111] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:116:                     - link "https://www.oneinfourusa.org/nationalorganization.html" [ref=f91e113] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:120:                 - link "" [ref=f91e117] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:122:                 - link "" [ref=f91e119] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:131:                     - heading [level=2] [ref=f91e134]:
+scratch/tool-output/inspect_page-2.txt:132:                       - link "The MIT Alpha Chi Omega Alumnae Newsletter" [ref=f91e135] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:134:                     - link "https://doczz.net/doc/1962786/the-mit-alpha-chi-omega-alumnae-newsletter" [ref=f91e137] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:138:                 - link "" [ref=f91e141] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:140:                 - link "" [ref=f91e143] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:143:               - link "Tracking" [ref=f91e147] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:146:               - link "Has Ads" [ref=f91e149] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:154:                     - heading [level=2] [ref=f91e160]:
+scratch/tool-output/inspect_page-2.txt:155:                       - link "Aflfleim9 OflDiraally, URaaimyaiffi IT MunSe Ciasot" [ref=f91e161] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:159:                       - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/29305a41-a7ac-4ded-9add-6ebb95861623/content" [ref=f91e164] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:163:                 - link "" [ref=f91e168] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:165:                 - link "" [ref=f91e170] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:172:                   - link "IFaiurlliifflimm WMH lEmle.May WeeIk.Diidl" [ref=f91e176] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:176:                   - link "D--D sDDom3Era D3e HgghbExs Size Unknown; Willamette Co Prospect Good" [ref=f91e178] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:180:                   - link "Varsity Varieties Searche For W'llameite Co Ileg'ian Nominations Due For s Class Officers Talent This Week" [ref=f91e180] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:184:                   - link "Willamette Calk" [ref=f91e182] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:187:               - link "15 more" [ref=f91e185] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:196:                     - heading [level=2] [ref=f91e198]:
+scratch/tool-output/inspect_page-2.txt:197:                       - link "Janet Hsieh" [ref=f91e199] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:199:                     - link "https://en.wikipedia.org/wiki/Janet_Hsieh" [ref=f91e201] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:203:                 - link "" [ref=f91e205] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:205:                 - link "" [ref=f91e207] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:211:                   - link "Neil Armstrong" [ref=f91e213] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:214:                   - link "Union College" [ref=f91e215] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:217:                   - link "Phi Gamma Delta" [ref=f91e217] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:228:                     - heading [level=2] [ref=f91e232]:
+scratch/tool-output/inspect_page-2.txt:229:                       - link "MIT Spectrum - Lucy Kanias ’26 Savors the Full MIT Experience | MIT for a Better World" [ref=f91e233] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:231:                     - link "https://betterworld.mit.edu/spectrum/issues/fall-2025/lucy-kanias-26-savors-the-full-mit-experience/" [ref=f91e235] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:235:                 - link "" [ref=f91e239] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:237:                 - link "" [ref=f91e241] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:246:                     - heading [level=2] [ref=f91e256]:
+scratch/tool-output/inspect_page-2.txt:247:                       - link "Sororities @ MIT- Become a part of it! | MIT Admissions" [ref=f91e257] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:249:                     - link "https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/" [ref=f91e259] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:253:                 - link "" [ref=f91e263] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:255:                 - link "" [ref=f91e265] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:261:                   - link "Melis and the AXO Chocolate Factory | MIT Admissions" [ref=f91e271] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:264:                   - link "Valentine’s Day Eve Day. What? | MIT Admissions" [ref=f91e273] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:267:                   - 'link "McCormick: Girls Wanted | MIT Admissions" [ref=f91e275] [cursor=pointer]':
+scratch/tool-output/inspect_page-2.txt:270:                   - link "Lip Sync & Toons | MIT Admissions" [ref=f91e277] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:273:               - link "1 more" [ref=f91e280] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:282:                     - heading [level=2] [ref=f91e293]:
+scratch/tool-output/inspect_page-2.txt:283:                       - link "Bonding beyond college | The Tech" [ref=f91e294] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:285:                     - link "https://thetech.com/2013/02/05/sororityalumni-v133-n1" [ref=f91e296] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:289:                 - link "" [ref=f91e300] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:291:                 - link "" [ref=f91e302] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:297:                   - link "Domestic violence awareness | The Tech" [ref=f91e308] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:300:                   - link "Panhel Reports Record Bid Numbers | The Tech" [ref=f91e310] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:303:                   - link "Asian-interest sorority planned | The Tech" [ref=f91e312] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:306:                   - link "Love is... | The Tech" [ref=f91e314] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:309:               - link "2 more" [ref=f91e317] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:318:                     - heading [level=2] [ref=f91e330]:
+scratch/tool-output/inspect_page-2.txt:319:                       - link "Winter 2019 class notes | Ohio Wesleyan University" [ref=f91e331] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:321:                     - link "https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/" [ref=f91e333] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:325:                 - link "" [ref=f91e337] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:327:                 - link "" [ref=f91e339] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:333:                   - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f91e345] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:342:                     - heading [level=2] [ref=f91e359]:
+scratch/tool-output/inspect_page-2.txt:343:                       - link "Alumni Groups | alum.mit.edu" [ref=f91e360] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:345:                     - link "https://alum.mit.edu/communities/alumni-groups" [ref=f91e362] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:349:                 - link "" [ref=f91e366] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:351:                 - link "" [ref=f91e368] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:354:               - link "Tracking" [ref=f91e372] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:357:               - link "Has Ads" [ref=f91e374] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:365:                     - heading [level=2] [ref=f91e385]:
+scratch/tool-output/inspect_page-2.txt:366:                       - link "Deborah “Debbie” Shnek | Caltech Alumni" [ref=f91e386] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:368:                     - link "https://www.alumni.caltech.edu/deborah-debbie-shnek/" [ref=f91e388] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:372:                 - link "" [ref=f91e392] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:374:                 - link "" [ref=f91e394] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:383:                     - heading [level=2] [ref=f91e409]:
+scratch/tool-output/inspect_page-2.txt:384:                       - link "Lucy Kanias ’26 Savors the Full MIT Experience - MIT Division of Student Life" [ref=f91e410] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:386:                     - link "https://studentlife.mit.edu/campus-communities/community-stories/lucy-kanias-26-savors-the-full-mit-experience/" [ref=f91e412] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:390:                 - link "" [ref=f91e416] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:392:                 - link "" [ref=f91e418] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:401:                     - heading [level=2] [ref=f91e433]:
+scratch/tool-output/inspect_page-2.txt:402:                       - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f91e434] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:404:                     - link "https://www.franbecque.com/page/33/" [ref=f91e436] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:408:                 - link "" [ref=f91e440] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:410:                 - link "" [ref=f91e442] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:416:                   - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f91e448] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:425:                     - heading [level=2] [ref=f91e462]:
+scratch/tool-output/inspect_page-2.txt:426:                       - link "Announcing the 2017 Class of Razorback Classics | Arkansas News | University of Arkansas" [ref=f91e463] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:428:                     - link "https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics" [ref=f91e465] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:432:                 - link "" [ref=f91e469] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:434:                 - link "" [ref=f91e471] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:443:                     - heading [level=2] [ref=f91e486]:
+scratch/tool-output/inspect_page-2.txt:444:                       - 'link "TION OFFICERS THE CAMPUS ALUMNI: WILL YOUR CLA" [ref=f91e487] [cursor=pointer]':
+scratch/tool-output/inspect_page-2.txt:448:                       - link "https://dspace.allegheny.edu/server/api/core/bitstreams/e7152591-66a0-4c32-9060-4e42171d7615/content" [ref=f91e490] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:452:                 - link "" [ref=f91e494] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:454:                 - link "" [ref=f91e496] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:461:                   - link "VOL. 103 NO.12 CAMPUS PUBIlISHED SINGE ALLEGHENY COLLEGE 1876 MIT.R.DVILLE, PENNSYLVTINIR WEDNESDF1Y, QTR Nun ICY . 16, 1980 ..." [ref=f91e502] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:470:                     - heading [level=2] [ref=f91e516]:
+scratch/tool-output/inspect_page-2.txt:471:                       - 'link "The 10 Best Fraternities in the US: A Guide for Prospective Members | AdmissionSight" [ref=f91e517] [cursor=pointer]':
+scratch/tool-output/inspect_page-2.txt:474:                       - text: 2026-06-05 ·
+scratch/tool-output/inspect_page-2.txt:475:                       - link "https://admissionsight.com/best-fraternities/" [ref=f91e519] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:479:                 - link "" [ref=f91e523] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:481:                 - link "" [ref=f91e525] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:490:                     - heading [level=2] [ref=f91e540]:
+scratch/tool-output/inspect_page-2.txt:491:                       - link "Class of 1999 | Brown Alumni Magazine" [ref=f91e541] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:493:                     - link "https://www.brownalumnimagazine.com/classes/class-of-1999" [ref=f91e543] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:497:                 - link "" [ref=f91e547] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:499:                 - link "" [ref=f91e549] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:505:                   - link "Class of 1948 | Brown Alumni Magazine" [ref=f91e555] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:508:                   - link "Obituaries | Brown Alumni Magazine" [ref=f91e557] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:511:                   - link "Obituaries | Brown Alumni Magazine" [ref=f91e559] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:514:               - link "1 more" [ref=f91e562] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:523:                     - heading [level=2] [ref=f91e575]:
+scratch/tool-output/inspect_page-2.txt:524:                       - link "Herschel Garfein - Artist - MacDowell" [ref=f91e576] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:526:                     - link "https://www.macdowell.org/artists/herschel-garfein" [ref=f91e578] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:530:                 - link "" [ref=f91e582] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:532:                 - link "" [ref=f91e584] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:541:                     - heading [level=2] [ref=f91e599]:
+scratch/tool-output/inspect_page-2.txt:542:                       - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f91e600] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:544:                     - link "https://www.aephi.org/foundation-trustees" [ref=f91e602] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:548:                 - link "" [ref=f91e606] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:550:                 - link "" [ref=f91e608] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:559:                     - heading [level=2] [ref=f91e623]:
+scratch/tool-output/inspect_page-2.txt:560:                       - link "Employment Opportunities | The Academy of Certified Archivists" [ref=f91e624] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:562:                     - link "https://www.certifiedarchivists.org/employment" [ref=f91e626] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:566:                 - link "" [ref=f91e630] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:568:                 - link "" [ref=f91e632] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:577:                     - heading [level=2] [ref=f91e647]:
+scratch/tool-output/inspect_page-2.txt:578:                       - link "Fall Sorority Recruitment Begins | The Tech" [ref=f91e648] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:580:                     - link "https://www.thetech.com/2007/08/31/panhel-v127-n35" [ref=f91e650] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:584:                 - link "" [ref=f91e654] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:586:                 - link "" [ref=f91e656] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:592:                   - link "173 bids given as recruitment ends | The Tech" [ref=f91e662] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:595:               - link "6 more" [ref=f91e665] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:604:                     - heading [level=2] [ref=f91e678]:
+scratch/tool-output/inspect_page-2.txt:605:                       - link "Terrascope | MIT Alumni Mentors" [ref=f91e679] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:607:                     - link "https://terrascope.mit.edu/community/mentors/" [ref=f91e681] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:611:                 - link "" [ref=f91e685] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:613:                 - link "" [ref=f91e687] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:622:                     - heading [level=2] [ref=f91e702]:
+scratch/tool-output/inspect_page-2.txt:623:                       - link "The 50 Best Colleges For Greek Life | BestCollegeReviews" [ref=f91e703] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:625:                     - link "https://www.bestcollegereviews.org/greek-life/" [ref=f91e705] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:629:                 - link "" [ref=f91e709] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:631:                 - link "" [ref=f91e711] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:634:               - link "Tracking" [ref=f91e715] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:637:               - link "Has Ads" [ref=f91e717] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:645:                     - heading [level=2] [ref=f91e728]:
+scratch/tool-output/inspect_page-2.txt:646:                       - link "E-Solicitations" [ref=f91e729] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:648:                     - link "https://supportingadvancement.com/esolicitations/" [ref=f91e731] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:652:                 - link "" [ref=f91e735] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:654:                 - link "" [ref=f91e737] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:663:                     - heading [level=2] [ref=f91e752]:
+scratch/tool-output/inspect_page-2.txt:664:                       - link "Obituaries - March/April 2001 | STANFORD magazine" [ref=f91e753] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:666:                     - link "https://stanfordmag.org/contents/obituaries-10653" [ref=f91e755] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:670:                 - link "" [ref=f91e759] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:672:                 - link "" [ref=f91e761] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:678:                   - link "Obituaries - March/April 2004 | STANFORD magazine" [ref=f91e767] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:681:                   - link "Obituaries - July/August 2009 | STANFORD magazine" [ref=f91e769] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:684:                   - link "Obituaries - September/October 1998 | STANFORD magazine" [ref=f91e771] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:687:                   - link "Obituaries - January/February 2010 | STANFORD magazine" [ref=f91e773] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:690:               - link "35 more" [ref=f91e776] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:692:               - link "Tracking" [ref=f91e778] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:695:               - link "Has Ads" [ref=f91e780] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:698:         - link "1" [ref=f91e782] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:700:         - link "2" [ref=f91e783] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:702:         - link "3" [ref=f91e784] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:705:       - text: 
+scratch/tool-output/inspect_page-2.txt:707:         - heading " Search Settings" [level=2] [ref=f91e788]:
+scratch/tool-output/inspect_page-2.txt:709:           - text: Search Settings
+scratch/tool-output/inspect_page-2.txt:712:             - link " Search In Title" [ref=f91e793]:
+scratch/tool-output/inspect_page-2.txt:717:             - link " Recent Results" [ref=f91e798]:
+scratch/tool-output/inspect_page-2.txt:722:             - link " Remove JS" [ref=f91e803]:
+scratch/tool-output/inspect_page-2.txt:727:             - link " Reduce Adtech" [ref=f91e808]:
+scratch/tool-output/inspect_page-2.txt:732:             - link " Reduce NSFW" [ref=f91e813]:
+scratch/tool-output/inspect_page-2.txt:739:               - text: Language
+scratch/tool-output/inspect_page-2.txt:740:           - text: 
+scratch/tool-output/inspect_page-2.txt:742:     - heading "Search Help" [level=1] [ref=f91e823]
+scratch/tool-output/inspect_page-2.txt:745:         - heading " Syntax" [level=2] [ref=f91e826]:
+scratch/tool-output/inspect_page-2.txt:747:           - text: Syntax
+scratch/tool-output/inspect_page-2.txt:748:         - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f91e828]
+scratch/tool-output/inspect_page-2.txt:749:         - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f91e829]
+scratch/tool-output/inspect_page-2.txt:750:         - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f91e830]
+scratch/tool-output/inspect_page-2.txt:751:         - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f91e831]
+scratch/tool-output/inspect_page-2.txt:752:         - heading "Samples" [level=2] [ref=f91e832]
+scratch/tool-output/inspect_page-2.txt:762:         - heading " Match Indicator" [level=2] [ref=f91e842]:
+scratch/tool-output/inspect_page-2.txt:764:           - text: Match Indicator
+scratch/tool-output/inspect_page-2.txt:765:         - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f91e844]
+scratch/tool-output/inspect_page-2.txt:769:         - heading " Language Limitations" [level=2] [ref=f91e867]:
+scratch/tool-output/inspect_page-2.txt:771:           - text: Language Limitations
+scratch/tool-output/inspect_page-2.txt:772:         - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f91e869]
+scratch/tool-output/inspect_page-2.txt:773:         - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f91e870]
+scratch/tool-output/inspect_page-2.txt:774:         - heading " Webmaster Information" [level=2] [ref=f91e871]:
+scratch/tool-output/inspect_page-2.txt:776:           - text: Webmaster Information
+scratch/tool-output/inspect_page-2.txt:777:         - heading [level=2] [ref=f91e873]:
+scratch/tool-output/inspect_page-2.txt:778:           - text: If you wish to add your website to the index, follow the instructions in this
+scratch/tool-output/inspect_page-2.txt:779:           - link "git repository" [ref=f91e874] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:781:           - text: ", if you do not want to mess with git, you can also email"
+scratch/tool-output/inspect_page-2.txt:782:           - link "contact@marginalia-search.com" [ref=f91e875] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:784:           - text: with the domain name.
+scratch/tool-output/inspect_page-2.txt:785:         - heading [level=2] [ref=f91e876]:
+scratch/tool-output/inspect_page-2.txt:786:           - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+scratch/tool-output/inspect_page-2.txt:787:           - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f91e877] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:789:           - text: .
+scratch/tool-output/inspect_page-2.txt:790:         - heading [level=2] [ref=f91e878]:
+scratch/tool-output/inspect_page-2.txt:791:           - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+scratch/tool-output/inspect_page-2.txt:792:           - link "contact@marginalia-search.com" [ref=f91e879] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:794:           - text: .
+scratch/tool-output/inspect_page-2.txt:796:         - heading " Special Keywords" [level=2] [ref=f91e881]:
+scratch/tool-output/inspect_page-2.txt:798:           - text: Special Keywords
+scratch/tool-output/inspect_page-2.txt:807:                 - text: "site:"
+scratch/tool-output/inspect_page-2.txt:810:                 - text: Display site information about
+scratch/tool-output/inspect_page-2.txt:814:                 - text: "site:"
+scratch/tool-output/inspect_page-2.txt:818:                 - text: Search
+scratch/tool-output/inspect_page-2.txt:820:                 - text: for
+scratch/tool-output/inspect_page-2.txt:824:                 - text: "site:"
+scratch/tool-output/inspect_page-2.txt:828:                 - text: Search
+scratch/tool-output/inspect_page-2.txt:830:                 - text: and its subdomains for
+scratch/tool-output/inspect_page-2.txt:834:                 - text: "browse:"
+scratch/tool-output/inspect_page-2.txt:837:                 - text: Show similar websites to
+scratch/tool-output/inspect_page-2.txt:841:                 - text: "ip:"
+scratch/tool-output/inspect_page-2.txt:844:                 - text: Search documents hosted at
+scratch/tool-output/inspect_page-2.txt:848:                 - text: "links:"
+scratch/tool-output/inspect_page-2.txt:851:                 - text: Search documents linking to
+scratch/tool-output/inspect_page-2.txt:855:                 - text: "tld:"
+scratch/tool-output/inspect_page-2.txt:859:                 - text: Search documents with the top level domain
+scratch/tool-output/inspect_page-2.txt:861:                 - text: .
+scratch/tool-output/inspect_page-2.txt:864:                 - text: "?tld:"
+scratch/tool-output/inspect_page-2.txt:868:                 - text: Prefer but do not require results with the top level domain
+scratch/tool-output/inspect_page-2.txt:870:                 - text: . This syntax is also possible for links:..., ip:... and site:...
+scratch/tool-output/inspect_page-2.txt:935:     - heading "Policy Information" [level=1] [ref=f91e999]
+scratch/tool-output/inspect_page-2.txt:938:         - heading " Policies" [level=2] [ref=f91e1002]:
+scratch/tool-output/inspect_page-2.txt:940:           - text: Policies
+scratch/tool-output/inspect_page-2.txt:944:         - heading " Contact" [level=2] [ref=f91e1007]:
+scratch/tool-output/inspect_page-2.txt:946:           - text: Contact
+scratch/tool-output/inspect_page-2.txt:948:           - text: You can reach the webmaster of the search engine at
+scratch/tool-output/inspect_page-2.txt:949:           - link "contact@marginalia-search.com" [ref=f91e1010] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:951:           - text: .
+scratch/tool-output/inspect_page-2.txt:954:           - text: Sources
+scratch/tool-output/inspect_page-2.txt:956:           - text: The search engine is open source with an AGPL license. The sources can be perused at
+scratch/tool-output/inspect_page-2.txt:957:           - link "https://git.marginalia.nu/" [ref=f91e1014] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:959:           - text: .
+scratch/tool-output/inspect_page-2.txt:961:         - heading " Data" [level=2] [ref=f91e1016]:
+scratch/tool-output/inspect_page-2.txt:963:           - text: Data
+scratch/tool-output/inspect_page-2.txt:965:           - text: IP geolocation is sourced from the IP2Location LITE data available from
+scratch/tool-output/inspect_page-2.txt:966:           - link "https://lite.ip2location.com/" [ref=f91e1019] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:968:           - text: under
+scratch/tool-output/inspect_page-2.txt:969:           - link "CC-BY-SA 4.0" [ref=f91e1020] [cursor=pointer]:
+scratch/tool-output/inspect_page-2.txt:971:           - text: .
+scratch/tool-output/inspect_page-2.txt:972:   - text:                 
+scratch/tool-output/inspect_page-3.txt:5:   - link "Skip To Content" [ref=f94e2] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:10:         - link "Search" [ref=f94e8] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:12:         - link "Sites" [ref=f94e9] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:14:         - link "Explore" [ref=f94e10] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:16:         - link "About" [ref=f94e12] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:20:       - heading [level=1] [ref=f94e17]:
+scratch/tool-output/inspect_page-3.txt:21:         - link "Marginalia Search" [ref=f94e18] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:27:           - text: Search
+scratch/tool-output/inspect_page-3.txt:28:       - text:  
+scratch/tool-output/inspect_page-3.txt:32:         - heading " Filter" [level=2] [ref=f94e29]:
+scratch/tool-output/inspect_page-3.txt:34:           - text: Filter
+scratch/tool-output/inspect_page-3.txt:37:             - link " All" [ref=f94e34]:
+scratch/tool-output/inspect_page-3.txt:40:               - text: All
+scratch/tool-output/inspect_page-3.txt:42:             - link " Blogs" [ref=f94e38]:
+scratch/tool-output/inspect_page-3.txt:45:               - text: Blogs
+scratch/tool-output/inspect_page-3.txt:47:             - link " Academia" [ref=f94e42]:
+scratch/tool-output/inspect_page-3.txt:50:               - text: Academia
+scratch/tool-output/inspect_page-3.txt:52:             - link " Vintage" [ref=f94e46]:
+scratch/tool-output/inspect_page-3.txt:55:               - text: Vintage
+scratch/tool-output/inspect_page-3.txt:57:             - link " Small Web" [ref=f94e50]:
+scratch/tool-output/inspect_page-3.txt:60:               - text: Small Web
+scratch/tool-output/inspect_page-3.txt:62:             - link " Wikis" [ref=f94e55]:
+scratch/tool-output/inspect_page-3.txt:65:               - text: Wikis
+scratch/tool-output/inspect_page-3.txt:67:             - link " Forums" [ref=f94e59]:
+scratch/tool-output/inspect_page-3.txt:70:               - text: Forums
+scratch/tool-output/inspect_page-3.txt:72:             - link " Recipes" [ref=f94e63]:
+scratch/tool-output/inspect_page-3.txt:75:               - text: Recipes
+scratch/tool-output/inspect_page-3.txt:77:             - link " Custom Filter" [ref=f94e68]:
+scratch/tool-output/inspect_page-3.txt:80:               - text: Custom Filter
+scratch/tool-output/inspect_page-3.txt:81:     - text:  
+scratch/tool-output/inspect_page-3.txt:84:         - heading "Results" [level=1] [ref=f94e72]
+scratch/tool-output/inspect_page-3.txt:92:                     - heading [level=2] [ref=f94e84]:
+scratch/tool-output/inspect_page-3.txt:93:                       - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f94e85] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:95:                     - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f94e87] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:99:                 - link "" [ref=f94e91] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:101:                 - link "" [ref=f94e93] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:107:                   - link "Phi Sigma Kappa" [ref=f94e99] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:110:                   - link "Syracuse University" [ref=f94e101] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:113:                   - link "Union College" [ref=f94e103] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:116:                   - link "Cornell University" [ref=f94e105] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:119:               - link "2 more" [ref=f94e108] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:129:                     - heading [level=2] [ref=f94e122]:
+scratch/tool-output/inspect_page-3.txt:130:                       - link "Alpha Phi Hosts Male Beauty Pageant | Slice of MIT by the Alumni Association" [ref=f94e123] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:133:                       - text: 2009-04-12 ·
+scratch/tool-output/inspect_page-3.txt:134:                       - link "https://sliceofmit.wordpress.com/2009/04/11/alpha-phi-hosts-male-beauty-pageant/" [ref=f94e125] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:138:                 - link "" [ref=f94e129] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:140:                 - link "" [ref=f94e131] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:146:                   - link "cbognet | Slice of MIT by the Alumni Association | Page 3" [ref=f94e137] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:149:                   - link "Slice of MIT by the Alumni Association | A blog about MIT ideas, people, and culture | Page 40" [ref=f94e139] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:152:                   - link "April | 2009 | Slice of MIT by the Alumni Association | Page 3" [ref=f94e141] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:161:                     - heading [level=2] [ref=f94e155]:
+scratch/tool-output/inspect_page-3.txt:162:                       - 'link "1983: MIT’s first sorority rush | The Tech" [ref=f94e156] [cursor=pointer]':
+scratch/tool-output/inspect_page-3.txt:164:                     - link "https://thetech.com/2013/12/03/aphi-v133-n58" [ref=f94e158] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:168:                 - link "" [ref=f94e162] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:170:                 - link "" [ref=f94e164] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:176:                   - link "Sororities Get Forty Fewer Members, Pi Beta Phi Still To Bid | The Tech" [ref=f94e170] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:179:                   - 'link "IT’S ALL GREEK TO ME: Sports and sororities | The Tech" [ref=f94e172] [cursor=pointer]':
+scratch/tool-output/inspect_page-3.txt:182:                   - link "Panhel votes for new sorority | The Tech" [ref=f94e174] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:185:                   - link "Asian-interest sorority planned | The Tech" [ref=f94e176] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:188:               - link "12 more" [ref=f94e179] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:197:                     - heading [level=2] [ref=f94e192]:
+scratch/tool-output/inspect_page-3.txt:198:                       - link "MIT Alpha Phi" [ref=f94e193] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:200:                     - link "http://aphi.mit.edu/philanthropy/" [ref=f94e195] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:204:                 - link "" [ref=f94e199] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:206:                 - link "" [ref=f94e201] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:212:                   - link "MIT Alpha Phi" [ref=f94e207] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:215:                   - link "MIT Alpha Phi" [ref=f94e209] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:224:                     - heading [level=2] [ref=f94e223]:
+scratch/tool-output/inspect_page-3.txt:225:                       - link "Stomp the Yard, MIT style | MIT Admissions" [ref=f94e224] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:227:                     - link "https://mitadmissions.org/blogs/entry/stomp_the_yard_mit_style/" [ref=f94e226] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:231:                 - link "" [ref=f94e230] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:233:                 - link "" [ref=f94e232] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:239:                   - link "a house tour of mit sororities! | MIT Admissions" [ref=f94e238] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:242:                   - link "Sororities @ MIT- Become a part of it! | MIT Admissions" [ref=f94e240] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:245:                   - link "Finals Week…A Different View | MIT Admissions" [ref=f94e242] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:248:                   - link "Repainting the Smoots | MIT Admissions" [ref=f94e244] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:251:               - link "4 more" [ref=f94e247] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:260:                     - heading [level=2] [ref=f94e260]:
+scratch/tool-output/inspect_page-3.txt:261:                       - link "Signatures for the 2020 Petition — MIT BGSA" [ref=f94e261] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:263:                     - link "https://bgsa.mit.edu/2020-signs" [ref=f94e263] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:267:                 - link "" [ref=f94e267] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:269:                 - link "" [ref=f94e269] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:278:                     - heading [level=2] [ref=f94e284]:
+scratch/tool-output/inspect_page-3.txt:279:                       - link "Drexel University - Alchetron, The Free Social Encyclopedia" [ref=f94e285] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:281:                     - link "https://alchetron.com/Drexel-University" [ref=f94e287] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:285:                 - link "" [ref=f94e291] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:287:                 - link "" [ref=f94e293] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:293:                   - link "Boston University - Alchetron, The Free Social Encyclopedia" [ref=f94e299] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:296:                   - link "Illinois Institute of Technology - Alchetron, the free social encyclopedia" [ref=f94e301] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:299:                   - link "DePaul University - Alchetron, The Free Social Encyclopedia" [ref=f94e303] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:308:                     - heading [level=2] [ref=f94e317]:
+scratch/tool-output/inspect_page-3.txt:309:                       - link "NCSU Timelines" [ref=f94e318] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:311:                     - link "https://historicalstate.lib.ncsu.edu/timelines/student-life" [ref=f94e320] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:315:                 - link "" [ref=f94e324] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:317:                 - link "" [ref=f94e326] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:323:                   - link "NCSU Timelines" [ref=f94e332] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:332:                     - heading [level=2] [ref=f94e346]:
+scratch/tool-output/inspect_page-3.txt:333:                       - link "rush chi phi" [ref=f94e347] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:335:                     - link "http://www.senorcafe.com/zfungl/31d118-rush-chi-phi" [ref=f94e349] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:339:                 - link "" [ref=f94e353] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:341:                 - link "" [ref=f94e355] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:347:                   - link "rush chi phi" [ref=f94e361] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:350:                   - link "alpha kappa lambda hazing" [ref=f94e363] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:353:                   - link "delta sigma phi nc state" [ref=f94e365] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:356:                   - link "delta zeta motto" [ref=f94e367] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:358:             - link "4 more" [ref=f94e370] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:366:                     - heading [level=2] [ref=f94e382]:
+scratch/tool-output/inspect_page-3.txt:367:                       - link "Pi Beta Phi finds a home on campus | MIT News | Massachusetts Institute of Technology" [ref=f94e383] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:369:                     - link "https://news.mit.edu/2011/pi-beta-phi-home" [ref=f94e385] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:373:                 - link "" [ref=f94e389] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:375:                 - link "" [ref=f94e391] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:381:                   - 'link "3 Questions with a student leader: Panhel President Denzil Sikka | MIT News | Massachusetts Institute of Technology" [ref=f94e397] [cursor=pointer]':
+scratch/tool-output/inspect_page-3.txt:384:                   - link "The Stephen D. Baker Outstanding Change Initiative Award | MIT News | Massachusetts Institute of Technology" [ref=f94e399] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:387:                   - link "MIT Corporation elects 10 term members, two life members | MIT News | Massachusetts Institute of Technology" [ref=f94e401] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:396:                     - heading [level=2] [ref=f94e415]:
+scratch/tool-output/inspect_page-3.txt:397:                       - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f94e416] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:399:                     - link "https://www.aephi.org/foundation-trustees" [ref=f94e418] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:403:                 - link "" [ref=f94e422] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:405:                 - link "" [ref=f94e424] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:414:                     - heading [level=2] [ref=f94e439]:
+scratch/tool-output/inspect_page-3.txt:415:                       - link "Sororities | Archives & Special Collections" [ref=f94e440] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:417:                     - link "https://archives.dickinson.edu/dickinsonian-organizations/sororities" [ref=f94e442] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:421:                 - link "" [ref=f94e446] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:423:                 - link "" [ref=f94e448] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:432:                     - heading [level=2] [ref=f94e463]:
+scratch/tool-output/inspect_page-3.txt:433:                       - link "Archives | Union College News Archives" [ref=f94e464] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:435:                     - link "https://muse.union.edu/newsarchives/2003/08/page/4/" [ref=f94e466] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:439:                 - link "" [ref=f94e470] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:441:                 - link "" [ref=f94e472] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:450:                     - heading [level=2] [ref=f94e487]:
+scratch/tool-output/inspect_page-3.txt:451:                       - link "FSILG Awards Celebrate FSILG Contributions at MIT - MIT Division of Student Life" [ref=f94e488] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:453:                     - link "https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/" [ref=f94e490] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:457:                 - link "" [ref=f94e494] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:459:                 - link "" [ref=f94e496] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:465:                   - link "MIT’s First Sorority Awarded for Outstanding Residences - MIT Division of Student Life" [ref=f94e502] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:468:                   - link "FSILG Organization Extension Policy - MIT Division of Student Life" [ref=f94e504] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:477:                     - heading [level=2] [ref=f94e518]:
+scratch/tool-output/inspect_page-3.txt:478:                       - link "One In Four USA" [ref=f94e519] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:480:                     - link "https://www.oneinfourusa.org/nationalorganization.html" [ref=f94e521] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:484:                 - link "" [ref=f94e525] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:486:                 - link "" [ref=f94e527] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:495:                     - heading [level=2] [ref=f94e542]:
+scratch/tool-output/inspect_page-3.txt:496:                       - link "Blog – Page 159 – Hank Nuwer, Author; Hazing Deaths Database" [ref=f94e543] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:498:                     - link "https://www.hanknuwer.com/hazing-blog/page/159/" [ref=f94e545] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:502:                 - link "" [ref=f94e549] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:504:                 - link "" [ref=f94e551] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:513:                     - heading [level=2] [ref=f94e566]:
+scratch/tool-output/inspect_page-3.txt:514:                       - link "Philanthropy and Service – Delta Phi Epsilon" [ref=f94e567] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:516:                     - link "http://dphie.mit.edu/events/philanthropy-2/" [ref=f94e569] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:520:                 - link "" [ref=f94e573] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:522:                 - link "" [ref=f94e575] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:531:                     - heading [level=2] [ref=f94e590]:
+scratch/tool-output/inspect_page-3.txt:532:                       - link "Willamette CDol" [ref=f94e591] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:536:                       - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/7cd53ad3-7225-4244-8d0b-164b1b72921f/content" [ref=f94e594] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:540:                 - link "" [ref=f94e598] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:542:                 - link "" [ref=f94e600] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:549:                   - link "Q0KSPU3 liommentator 171 ' tf A--" [ref=f94e606] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:553:                   - link "nnmpus ,n.. Ujotnmentslor wrT'mrt T Willamette CDolleasan" [ref=f94e608] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:557:                   - link "Sports Feature" [ref=f94e610] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:561:                   - link "Betting Days Willamette Collegian On Gambling" [ref=f94e612] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:564:               - link "30 more" [ref=f94e615] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:573:                     - heading [level=2] [ref=f94e628]:
+scratch/tool-output/inspect_page-3.txt:574:                       - link "ENTERTAINMENT SPORTS" [ref=f94e629] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:578:                       - link "https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content" [ref=f94e632] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:582:                 - link "" [ref=f94e636] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:584:                 - link "" [ref=f94e638] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:593:                     - heading [level=2] [ref=f94e653]:
+scratch/tool-output/inspect_page-3.txt:594:                       - link "Services 2 — Kappa Alpha Theta" [ref=f94e654] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:596:                     - link "https://www.theta.mit.edu/about-theta" [ref=f94e656] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:600:                 - link "" [ref=f94e660] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:602:                 - link "" [ref=f94e662] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:611:                     - heading [level=2] [ref=f94e677]:
+scratch/tool-output/inspect_page-3.txt:612:                       - link "Best Party Schools - CampusGrotto" [ref=f94e678] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:614:                     - link "https://www.campusgrotto.com/best-party-schools.html" [ref=f94e680] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:618:                 - link "" [ref=f94e684] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:620:                 - link "" [ref=f94e686] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:631:                     - heading [level=2] [ref=f94e702]:
+scratch/tool-output/inspect_page-3.txt:632:                       - link "‘Cultural’ Fraternities and Sororities Offer Harvard Students Chance at Sanctions-Free Greek Life | News | The Harvard Crimson" [ref=f94e703] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:634:                     - link "https://www.thecrimson.com/article/2018/9/25/cultural-frats-sanctions-unaffected/" [ref=f94e705] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:638:                 - link "" [ref=f94e709] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:640:                 - link "" [ref=f94e711] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:643:               - link "Tracking" [ref=f94e715] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:646:               - link "Has Ads" [ref=f94e717] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:654:                     - heading [level=2] [ref=f94e728]:
+scratch/tool-output/inspect_page-3.txt:655:                       - link "Menu" [ref=f94e729] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:659:                       - link "https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content" [ref=f94e732] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:663:                 - link "" [ref=f94e736] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:665:                 - link "" [ref=f94e738] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:674:                     - heading [level=2] [ref=f94e753]:
+scratch/tool-output/inspect_page-3.txt:675:                       - link "About Us – Phi Sigma Rho" [ref=f94e754] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:677:                     - link "https://psr.mit.edu/about-us/" [ref=f94e756] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:681:                 - link "" [ref=f94e760] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:683:                 - link "" [ref=f94e762] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:692:                     - heading [level=2] [ref=f94e777]:
+scratch/tool-output/inspect_page-3.txt:693:                       - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f94e778] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:695:                     - link "https://www.franbecque.com/page/61/" [ref=f94e780] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:699:                 - link "" [ref=f94e784] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:701:                 - link "" [ref=f94e786] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:707:                   - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f94e792] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:710:                   - link "Park Valentine Perkins on Theta Chi's Founders' Day - Fraternity History & MoreFraternity History & More" [ref=f94e794] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:713:                   - link "Happy Founders' Day, Theta Chi - Fraternity History & MoreFraternity History & More" [ref=f94e796] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:717:         - link "1" [ref=f94e801] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:719:         - link "2" [ref=f94e802] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:721:         - link "3" [ref=f94e803] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:724:       - text: 
+scratch/tool-output/inspect_page-3.txt:726:         - heading " Search Settings" [level=2] [ref=f94e807]:
+scratch/tool-output/inspect_page-3.txt:728:           - text: Search Settings
+scratch/tool-output/inspect_page-3.txt:731:             - link " Search In Title" [ref=f94e812]:
+scratch/tool-output/inspect_page-3.txt:736:             - link " Recent Results" [ref=f94e817]:
+scratch/tool-output/inspect_page-3.txt:741:             - link " Remove JS" [ref=f94e822]:
+scratch/tool-output/inspect_page-3.txt:746:             - link " Reduce Adtech" [ref=f94e827]:
+scratch/tool-output/inspect_page-3.txt:751:             - link " Reduce NSFW" [ref=f94e832]:
+scratch/tool-output/inspect_page-3.txt:758:               - text: Language
+scratch/tool-output/inspect_page-3.txt:759:           - text: 
+scratch/tool-output/inspect_page-3.txt:761:     - heading "Search Help" [level=1] [ref=f94e842]
+scratch/tool-output/inspect_page-3.txt:764:         - heading " Syntax" [level=2] [ref=f94e845]:
+scratch/tool-output/inspect_page-3.txt:766:           - text: Syntax
+scratch/tool-output/inspect_page-3.txt:767:         - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f94e847]
+scratch/tool-output/inspect_page-3.txt:768:         - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f94e848]
+scratch/tool-output/inspect_page-3.txt:769:         - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f94e849]
+scratch/tool-output/inspect_page-3.txt:770:         - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f94e850]
+scratch/tool-output/inspect_page-3.txt:771:         - heading "Samples" [level=2] [ref=f94e851]
+scratch/tool-output/inspect_page-3.txt:781:         - heading " Match Indicator" [level=2] [ref=f94e861]:
+scratch/tool-output/inspect_page-3.txt:783:           - text: Match Indicator
+scratch/tool-output/inspect_page-3.txt:784:         - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f94e863]
+scratch/tool-output/inspect_page-3.txt:788:         - heading " Language Limitations" [level=2] [ref=f94e886]:
+scratch/tool-output/inspect_page-3.txt:790:           - text: Language Limitations
+scratch/tool-output/inspect_page-3.txt:791:         - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f94e888]
+scratch/tool-output/inspect_page-3.txt:792:         - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f94e889]
+scratch/tool-output/inspect_page-3.txt:793:         - heading " Webmaster Information" [level=2] [ref=f94e890]:
+scratch/tool-output/inspect_page-3.txt:795:           - text: Webmaster Information
+scratch/tool-output/inspect_page-3.txt:796:         - heading [level=2] [ref=f94e892]:
+scratch/tool-output/inspect_page-3.txt:797:           - text: If you wish to add your website to the index, follow the instructions in this
+scratch/tool-output/inspect_page-3.txt:798:           - link "git repository" [ref=f94e893] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:800:           - text: ", if you do not want to mess with git, you can also email"
+scratch/tool-output/inspect_page-3.txt:801:           - link "contact@marginalia-search.com" [ref=f94e894] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:803:           - text: with the domain name.
+scratch/tool-output/inspect_page-3.txt:804:         - heading [level=2] [ref=f94e895]:
+scratch/tool-output/inspect_page-3.txt:805:           - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+scratch/tool-output/inspect_page-3.txt:806:           - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f94e896] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:808:           - text: .
+scratch/tool-output/inspect_page-3.txt:809:         - heading [level=2] [ref=f94e897]:
+scratch/tool-output/inspect_page-3.txt:810:           - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+scratch/tool-output/inspect_page-3.txt:811:           - link "contact@marginalia-search.com" [ref=f94e898] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:813:           - text: .
+scratch/tool-output/inspect_page-3.txt:815:         - heading " Special Keywords" [level=2] [ref=f94e900]:
+scratch/tool-output/inspect_page-3.txt:817:           - text: Special Keywords
+scratch/tool-output/inspect_page-3.txt:826:                 - text: "site:"
+scratch/tool-output/inspect_page-3.txt:829:                 - text: Display site information about
+scratch/tool-output/inspect_page-3.txt:833:                 - text: "site:"
+scratch/tool-output/inspect_page-3.txt:837:                 - text: Search
+scratch/tool-output/inspect_page-3.txt:839:                 - text: for
+scratch/tool-output/inspect_page-3.txt:843:                 - text: "site:"
+scratch/tool-output/inspect_page-3.txt:847:                 - text: Search
+scratch/tool-output/inspect_page-3.txt:849:                 - text: and its subdomains for
+scratch/tool-output/inspect_page-3.txt:853:                 - text: "browse:"
+scratch/tool-output/inspect_page-3.txt:856:                 - text: Show similar websites to
+scratch/tool-output/inspect_page-3.txt:860:                 - text: "ip:"
+scratch/tool-output/inspect_page-3.txt:863:                 - text: Search documents hosted at
+scratch/tool-output/inspect_page-3.txt:867:                 - text: "links:"
+scratch/tool-output/inspect_page-3.txt:870:                 - text: Search documents linking to
+scratch/tool-output/inspect_page-3.txt:874:                 - text: "tld:"
+scratch/tool-output/inspect_page-3.txt:878:                 - text: Search documents with the top level domain
+scratch/tool-output/inspect_page-3.txt:880:                 - text: .
+scratch/tool-output/inspect_page-3.txt:883:                 - text: "?tld:"
+scratch/tool-output/inspect_page-3.txt:887:                 - text: Prefer but do not require results with the top level domain
+scratch/tool-output/inspect_page-3.txt:889:                 - text: . This syntax is also possible for links:..., ip:... and site:...
+scratch/tool-output/inspect_page-3.txt:954:     - heading "Policy Information" [level=1] [ref=f94e1018]
+scratch/tool-output/inspect_page-3.txt:957:         - heading " Policies" [level=2] [ref=f94e1021]:
+scratch/tool-output/inspect_page-3.txt:959:           - text: Policies
+scratch/tool-output/inspect_page-3.txt:963:         - heading " Contact" [level=2] [ref=f94e1026]:
+scratch/tool-output/inspect_page-3.txt:965:           - text: Contact
+scratch/tool-output/inspect_page-3.txt:967:           - text: You can reach the webmaster of the search engine at
+scratch/tool-output/inspect_page-3.txt:968:           - link "contact@marginalia-search.com" [ref=f94e1029] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:970:           - text: .
+scratch/tool-output/inspect_page-3.txt:973:           - text: Sources
+scratch/tool-output/inspect_page-3.txt:975:           - text: The search engine is open source with an AGPL license. The sources can be perused at
+scratch/tool-output/inspect_page-3.txt:976:           - link "https://git.marginalia.nu/" [ref=f94e1033] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:978:           - text: .
+scratch/tool-output/inspect_page-3.txt:980:         - heading " Data" [level=2] [ref=f94e1035]:
+scratch/tool-output/inspect_page-3.txt:982:           - text: Data
+scratch/tool-output/inspect_page-3.txt:984:           - text: IP geolocation is sourced from the IP2Location LITE data available from
+scratch/tool-output/inspect_page-3.txt:985:           - link "https://lite.ip2location.com/" [ref=f94e1038] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:987:           - text: under
+scratch/tool-output/inspect_page-3.txt:988:           - link "CC-BY-SA 4.0" [ref=f94e1039] [cursor=pointer]:
+scratch/tool-output/inspect_page-3.txt:990:           - text: .
+scratch/tool-output/inspect_page-3.txt:991:   - text:                 
+scratch/tool-output/inspect_page-4.txt:5:   - link "Skip To Content" [ref=f95e2] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:10:         - link "Search" [ref=f95e8] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:12:         - link "Sites" [ref=f95e9] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:14:         - link "Explore" [ref=f95e10] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:16:         - link "About" [ref=f95e12] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:20:       - heading [level=1] [ref=f95e17]:
+scratch/tool-output/inspect_page-4.txt:21:         - link "Marginalia Search" [ref=f95e18] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:27:           - text: Search
+scratch/tool-output/inspect_page-4.txt:28:       - text:  
+scratch/tool-output/inspect_page-4.txt:32:         - heading " Filter" [level=2] [ref=f95e29]:
+scratch/tool-output/inspect_page-4.txt:34:           - text: Filter
+scratch/tool-output/inspect_page-4.txt:37:             - link " All" [ref=f95e34]:
+scratch/tool-output/inspect_page-4.txt:40:               - text: All
+scratch/tool-output/inspect_page-4.txt:42:             - link " Blogs" [ref=f95e38]:
+scratch/tool-output/inspect_page-4.txt:45:               - text: Blogs
+scratch/tool-output/inspect_page-4.txt:47:             - link " Academia" [ref=f95e42]:
+scratch/tool-output/inspect_page-4.txt:50:               - text: Academia
+scratch/tool-output/inspect_page-4.txt:52:             - link " Vintage" [ref=f95e46]:
+scratch/tool-output/inspect_page-4.txt:55:               - text: Vintage
+scratch/tool-output/inspect_page-4.txt:57:             - link " Small Web" [ref=f95e50]:
+scratch/tool-output/inspect_page-4.txt:60:               - text: Small Web
+scratch/tool-output/inspect_page-4.txt:62:             - link " Wikis" [ref=f95e55]:
+scratch/tool-output/inspect_page-4.txt:65:               - text: Wikis
+scratch/tool-output/inspect_page-4.txt:67:             - link " Forums" [ref=f95e59]:
+scratch/tool-output/inspect_page-4.txt:70:               - text: Forums
+scratch/tool-output/inspect_page-4.txt:72:             - link " Recipes" [ref=f95e63]:
+scratch/tool-output/inspect_page-4.txt:75:               - text: Recipes
+scratch/tool-output/inspect_page-4.txt:77:             - link " Custom Filter" [ref=f95e68]:
+scratch/tool-output/inspect_page-4.txt:80:               - text: Custom Filter
+scratch/tool-output/inspect_page-4.txt:81:     - text:  
+scratch/tool-output/inspect_page-4.txt:84:         - heading "Results" [level=1] [ref=f95e72]
+scratch/tool-output/inspect_page-4.txt:92:                     - heading [level=2] [ref=f95e84]:
+scratch/tool-output/inspect_page-4.txt:93:                       - link "Pi Beta Phi earns residence | The Tech" [ref=f95e85] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:95:                     - link "https://www.thetech.com/2011/09/02/piphi-v131-n33" [ref=f95e87] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:99:                 - link "" [ref=f95e91] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:101:                 - link "" [ref=f95e93] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:107:                   - link "News Briefs | The Tech" [ref=f95e99] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:110:               - link "2 more" [ref=f95e102] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:119:                     - heading [level=2] [ref=f95e115]:
+scratch/tool-output/inspect_page-4.txt:120:                       - 'link "DOOMCom :: View topic - Kallie:" [ref=f95e116] [cursor=pointer]':
+scratch/tool-output/inspect_page-4.txt:122:                     - link "http://doomcom.mit.edu/viewtopic.php?t=550" [ref=f95e118] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:126:                 - link "" [ref=f95e122] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:128:                 - link "" [ref=f95e124] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:137:                     - heading [level=2] [ref=f95e139]:
+scratch/tool-output/inspect_page-4.txt:138:                       - link "Phi Sigma Kappa" [ref=f95e140] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:140:                     - link "https://en.wikipedia.org/wiki/Phi_Sigma_Kappa" [ref=f95e142] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:144:                 - link "" [ref=f95e146] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:146:                 - link "" [ref=f95e148] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:152:                   - link "Syracuse University" [ref=f95e154] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:155:                   - link "Union College" [ref=f95e156] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:166:                     - heading [level=2] [ref=f95e171]:
+scratch/tool-output/inspect_page-4.txt:167:                       - link "Panhel votes for new sorority | The Tech" [ref=f95e172] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:169:                     - link "https://thetech.com/2014/11/04/newsorority-v134-n52" [ref=f95e174] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:173:                 - link "" [ref=f95e178] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:175:                 - link "" [ref=f95e180] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:181:                   - link "Pearle Lipinski | The Tech" [ref=f95e186] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:190:                     - heading [level=2] [ref=f95e200]:
+scratch/tool-output/inspect_page-4.txt:191:                       - link "delta sigma phi nc state" [ref=f95e201] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:193:                     - link "http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1" [ref=f95e203] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:197:                 - link "" [ref=f95e207] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:199:                 - link "" [ref=f95e209] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:205:                   - link "delta zeta motto" [ref=f95e215] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:213:                     - heading [level=2] [ref=f95e226]:
+scratch/tool-output/inspect_page-4.txt:214:                       - link "Menu" [ref=f95e227] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:218:                       - link "https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content" [ref=f95e230] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:222:                 - link "" [ref=f95e234] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:224:                 - link "" [ref=f95e236] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:233:                     - heading [level=2] [ref=f95e251]:
+scratch/tool-output/inspect_page-4.txt:234:                       - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f95e252] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:236:                     - link "https://www.franbecque.com/page/61/" [ref=f95e254] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:240:                 - link "" [ref=f95e258] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:242:                 - link "" [ref=f95e260] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:248:                   - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f95e266] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:251:                   - link "Park Valentine Perkins on Theta Chi's Founders' Day - Fraternity History & MoreFraternity History & More" [ref=f95e268] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:254:                   - link "Happy Founders' Day, Theta Chi - Fraternity History & MoreFraternity History & More" [ref=f95e270] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:263:                     - heading [level=2] [ref=f95e284]:
+scratch/tool-output/inspect_page-4.txt:264:                       - link "Housing | MIT Course Catalog" [ref=f95e285] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:266:                     - link "https://catalog.mit.edu/mit/campus-life/housing/" [ref=f95e287] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:270:                 - link "" [ref=f95e291] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:272:                 - link "" [ref=f95e293] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:281:                     - heading [level=2] [ref=f95e308]:
+scratch/tool-output/inspect_page-4.txt:282:                       - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f95e309] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:284:                     - link "https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/" [ref=f95e311] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:288:                 - link "" [ref=f95e315] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:290:                 - link "" [ref=f95e317] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:299:                     - heading [level=2] [ref=f95e332]:
+scratch/tool-output/inspect_page-4.txt:300:                       - link "WO ILIUM ETC SCH IMl 1 liiMisiiftfi a?'fW wy5 \"o" [ref=f95e333] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:304:                       - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/977ed211-e909-472b-9b1f-cea6e566caa3/content" [ref=f95e336] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:308:                 - link "" [ref=f95e340] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:310:                 - link "" [ref=f95e342] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:317:                   - link "Sports Feature" [ref=f95e348] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:321:                   - link "T H E sce ur7y e WILLAMETTE UNIVERSITY" [ref=f95e350] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:330:                     - heading [level=2] [ref=f95e364]:
+scratch/tool-output/inspect_page-4.txt:331:                       - link "Archives | Union College News Archives" [ref=f95e365] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:333:                     - link "https://muse.union.edu/newsarchives/2003/08/page/4/" [ref=f95e367] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:337:                 - link "" [ref=f95e371] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:339:                 - link "" [ref=f95e373] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:348:                     - heading [level=2] [ref=f95e388]:
+scratch/tool-output/inspect_page-4.txt:349:                       - link "Undergraduate Catalog 2004-2006" [ref=f95e389] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:353:                       - link "https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2004-2006.pdf" [ref=f95e392] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:357:                 - link "" [ref=f95e396] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:359:                 - link "" [ref=f95e398] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:366:                   - link "U N I V E R S I T Y O F N E W H A V E N" [ref=f95e404] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:375:                     - heading [level=2] [ref=f95e418]:
+scratch/tool-output/inspect_page-4.txt:376:                       - link "Obituaries - September 2018 | STANFORD magazine" [ref=f95e419] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:378:                     - link "https://stanfordmag.org/contents/obituaries-15237" [ref=f95e421] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:382:                 - link "" [ref=f95e425] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:384:                 - link "" [ref=f95e427] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:387:               - link "Tracking" [ref=f95e431] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:390:               - link "Has Ads" [ref=f95e433] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:398:                     - heading [level=2] [ref=f95e444]:
+scratch/tool-output/inspect_page-4.txt:399:                       - link "The Bucknellian – Page 113 – Check out our new and improved website at www.bucknellian.net!" [ref=f95e445] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:401:                     - link "https://bucknellian.blogs.bucknell.edu/page/113/" [ref=f95e447] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:405:                 - link "" [ref=f95e451] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:407:                 - link "" [ref=f95e453] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:416:                     - heading [level=2] [ref=f95e468]:
+scratch/tool-output/inspect_page-4.txt:417:                       - link "A N N U A L S E C U R I T Y & F I R E S A F E T Y G U I D E" [ref=f95e469] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:421:                       - link "https://police.ucf.edu/document/2015-annual-security-and-fire-safety-report/" [ref=f95e472] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:425:                 - link "" [ref=f95e476] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:427:                 - link "" [ref=f95e478] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:431:               - link "Tracking" [ref=f95e483] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:433:               - link "Has Ads" [ref=f95e484] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:441:                     - heading [level=2] [ref=f95e495]:
+scratch/tool-output/inspect_page-4.txt:442:                       - link "July / August 2023 - Cornellians | Cornell University" [ref=f95e496] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:444:                     - link "https://alumni.cornell.edu/cornellians/class-notes-july-august-2023/" [ref=f95e498] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:448:                 - link "" [ref=f95e502] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:450:                 - link "" [ref=f95e504] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:456:                   - link "July / August 2021 - Cornellians | Cornell University" [ref=f95e510] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:459:                   - link "January / February 2022 - Cornellians | Cornell University" [ref=f95e512] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:462:                   - link "November / December 2023 - Cornellians | Cornell University" [ref=f95e514] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:465:                   - link "September / October 2023 - Cornellians | Cornell University" [ref=f95e516] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:468:               - link "5 more" [ref=f95e519] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:477:                     - heading [level=2] [ref=f95e532]:
+scratch/tool-output/inspect_page-4.txt:478:                       - link "Boston University - Wikipedia" [ref=f95e533] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:480:                     - link "https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_" [ref=f95e535] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:484:                 - link "" [ref=f95e539] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:486:                 - link "" [ref=f95e541] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:490:               - link "Tracking" [ref=f95e546] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:493:               - link "Has Ads" [ref=f95e548] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:501:                     - heading [level=2] [ref=f95e559]:
+scratch/tool-output/inspect_page-4.txt:502:                       - link "THE BICENTENNIAL STRATEGIC PLAN FOR INDIANA UNIVERSITY" [ref=f95e560] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:506:                       - link "https://institutionalmemory.iu.edu/aimrest/api/core/bitstreams/5d0205cd-a597-473d-bee1-5a75bfa43bb1/content" [ref=f95e563] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:510:                 - link "" [ref=f95e567] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:512:                 - link "" [ref=f95e569] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:521:                     - heading [level=2] [ref=f95e584]:
+scratch/tool-output/inspect_page-4.txt:522:                       - link "2017 Award Winners // Undergraduate Studies" [ref=f95e585] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:524:                     - link "https://undergraduatestudies.missouri.edu/distinction/2017-winners/" [ref=f95e587] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:528:                 - link "" [ref=f95e591] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:530:                 - link "" [ref=f95e593] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:539:                     - heading [level=2] [ref=f95e608]:
+scratch/tool-output/inspect_page-4.txt:540:                       - link "Welcome to the Oakwood Register" [ref=f95e609] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:542:                     - link "https://www.oakwoodregister.com/archives/2008/v17num35_082608/obituaries.html" [ref=f95e611] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:546:                 - link "" [ref=f95e615] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:548:                 - link "" [ref=f95e617] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:554:                   - link "Welcome to the Oakwood Register" [ref=f95e623] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:557:                   - link "Welcome to the Oakwood Register" [ref=f95e625] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:560:                   - link "Welcome to the Oakwood Register" [ref=f95e627] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:563:                   - link "Welcome to the Oakwood Register" [ref=f95e629] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:566:               - link "3 more" [ref=f95e632] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:575:                     - heading [level=2] [ref=f95e645]:
+scratch/tool-output/inspect_page-4.txt:576:                       - link "Truman Today | Features - Vol. 16, No. 27 - April 3, 2012" [ref=f95e646] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:578:                     - link "https://newsletter.truman.edu/issue.asp?id=378" [ref=f95e648] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:582:                 - link "" [ref=f95e652] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:584:                 - link "" [ref=f95e654] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:590:                   - link "Truman Today | Features - Vol. 15, No. 3 - Sept. 14, 2010" [ref=f95e660] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:593:                   - link "Truman Today | Features - Vol. 16, No. 25 - March 20, 2012" [ref=f95e662] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:602:                     - heading [level=2] [ref=f95e676]:
+scratch/tool-output/inspect_page-4.txt:603:                       - link "2014 Session 4 Speakers | Christopher Kelley Leadership Development Program" [ref=f95e677] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:606:                       - text: 2014-08-04 ·
+scratch/tool-output/inspect_page-4.txt:607:                       - link "https://ckldp.wordpress.com/sessions/archive/2013-2014-sessions/2014-session-4-future-of-the-practice/2014-session-4-speakers/" [ref=f95e679] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:611:                 - link "" [ref=f95e683] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:613:                 - link "" [ref=f95e685] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:622:                     - heading [level=2] [ref=f95e700]:
+scratch/tool-output/inspect_page-4.txt:623:                       - link "HEALTH ISSUES IN THE BLACK COMMUNITY" [ref=f95e701] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:627:                       - link "https://rlmc.edu.pk/themes/images/gallery/library/books/Community Medinine/health Issue in the Black Community.pdf" [ref=f95e704] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:631:                 - link "" [ref=f95e708] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:633:                 - link "" [ref=f95e710] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:642:                     - heading [level=2] [ref=f95e725]:
+scratch/tool-output/inspect_page-4.txt:643:                       - link "From Building Model Airplanes to Learning How Viruses and Complex Proteins are Built, at MIT, with Many Partners – MIT Facult..." [ref=f95e726] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:645:                     - link "https://fnl.mit.edu/from-building-model-airplanes-to-learning-how-viruses-and-complex-proteins-are-built-at-mit-with-many-partners/" [ref=f95e728] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:649:                 - link "" [ref=f95e732] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:651:                 - link "" [ref=f95e734] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:660:                     - heading [level=2] [ref=f95e749]:
+scratch/tool-output/inspect_page-4.txt:661:                       - link "Officers and Directors - Fiscal Year 2020 - UNCF" [ref=f95e750] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:663:                     - link "https://uncf.org/annual-report-2020/board-of-directors" [ref=f95e752] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:667:                 - link "" [ref=f95e756] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:669:                 - link "" [ref=f95e758] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:675:                   - link "Officers and Directors - Fiscal Year 2019 - UNCF" [ref=f95e764] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:678:                   - link "Officers and Directors - Fiscal Year 2021 - UNCF" [ref=f95e766] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:681:               - link "Tracking" [ref=f95e769] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:684:               - link "Has Ads" [ref=f95e771] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:687:       - text: 
+scratch/tool-output/inspect_page-4.txt:689:         - heading " Search Settings" [level=2] [ref=f95e775]:
+scratch/tool-output/inspect_page-4.txt:691:           - text: Search Settings
+scratch/tool-output/inspect_page-4.txt:694:             - link " Search In Title" [ref=f95e780]:
+scratch/tool-output/inspect_page-4.txt:699:             - link " Recent Results" [ref=f95e785]:
+scratch/tool-output/inspect_page-4.txt:704:             - link " Remove JS" [ref=f95e790]:
+scratch/tool-output/inspect_page-4.txt:709:             - link " Reduce Adtech" [ref=f95e795]:
+scratch/tool-output/inspect_page-4.txt:714:             - link " Reduce NSFW" [ref=f95e800]:
+scratch/tool-output/inspect_page-4.txt:721:               - text: Language
+scratch/tool-output/inspect_page-4.txt:722:           - text: 
+scratch/tool-output/inspect_page-4.txt:724:     - heading "Search Help" [level=1] [ref=f95e810]
+scratch/tool-output/inspect_page-4.txt:727:         - heading " Syntax" [level=2] [ref=f95e813]:
+scratch/tool-output/inspect_page-4.txt:729:           - text: Syntax
+scratch/tool-output/inspect_page-4.txt:730:         - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f95e815]
+scratch/tool-output/inspect_page-4.txt:731:         - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f95e816]
+scratch/tool-output/inspect_page-4.txt:732:         - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f95e817]
+scratch/tool-output/inspect_page-4.txt:733:         - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f95e818]
+scratch/tool-output/inspect_page-4.txt:734:         - heading "Samples" [level=2] [ref=f95e819]
+scratch/tool-output/inspect_page-4.txt:744:         - heading " Match Indicator" [level=2] [ref=f95e829]:
+scratch/tool-output/inspect_page-4.txt:746:           - text: Match Indicator
+scratch/tool-output/inspect_page-4.txt:747:         - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f95e831]
+scratch/tool-output/inspect_page-4.txt:751:         - heading " Language Limitations" [level=2] [ref=f95e854]:
+scratch/tool-output/inspect_page-4.txt:753:           - text: Language Limitations
+scratch/tool-output/inspect_page-4.txt:754:         - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f95e856]
+scratch/tool-output/inspect_page-4.txt:755:         - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f95e857]
+scratch/tool-output/inspect_page-4.txt:756:         - heading " Webmaster Information" [level=2] [ref=f95e858]:
+scratch/tool-output/inspect_page-4.txt:758:           - text: Webmaster Information
+scratch/tool-output/inspect_page-4.txt:759:         - heading [level=2] [ref=f95e860]:
+scratch/tool-output/inspect_page-4.txt:760:           - text: If you wish to add your website to the index, follow the instructions in this
+scratch/tool-output/inspect_page-4.txt:761:           - link "git repository" [ref=f95e861] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:763:           - text: ", if you do not want to mess with git, you can also email"
+scratch/tool-output/inspect_page-4.txt:764:           - link "contact@marginalia-search.com" [ref=f95e862] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:766:           - text: with the domain name.
+scratch/tool-output/inspect_page-4.txt:767:         - heading [level=2] [ref=f95e863]:
+scratch/tool-output/inspect_page-4.txt:768:           - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+scratch/tool-output/inspect_page-4.txt:769:           - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f95e864] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:771:           - text: .
+scratch/tool-output/inspect_page-4.txt:772:         - heading [level=2] [ref=f95e865]:
+scratch/tool-output/inspect_page-4.txt:773:           - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+scratch/tool-output/inspect_page-4.txt:774:           - link "contact@marginalia-search.com" [ref=f95e866] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:776:           - text: .
+scratch/tool-output/inspect_page-4.txt:778:         - heading " Special Keywords" [level=2] [ref=f95e868]:
+scratch/tool-output/inspect_page-4.txt:780:           - text: Special Keywords
+scratch/tool-output/inspect_page-4.txt:789:                 - text: "site:"
+scratch/tool-output/inspect_page-4.txt:792:                 - text: Display site information about
+scratch/tool-output/inspect_page-4.txt:796:                 - text: "site:"
+scratch/tool-output/inspect_page-4.txt:800:                 - text: Search
+scratch/tool-output/inspect_page-4.txt:802:                 - text: for
+scratch/tool-output/inspect_page-4.txt:806:                 - text: "site:"
+scratch/tool-output/inspect_page-4.txt:810:                 - text: Search
+scratch/tool-output/inspect_page-4.txt:812:                 - text: and its subdomains for
+scratch/tool-output/inspect_page-4.txt:816:                 - text: "browse:"
+scratch/tool-output/inspect_page-4.txt:819:                 - text: Show similar websites to
+scratch/tool-output/inspect_page-4.txt:823:                 - text: "ip:"
+scratch/tool-output/inspect_page-4.txt:826:                 - text: Search documents hosted at
+scratch/tool-output/inspect_page-4.txt:830:                 - text: "links:"
+scratch/tool-output/inspect_page-4.txt:833:                 - text: Search documents linking to
+scratch/tool-output/inspect_page-4.txt:837:                 - text: "tld:"
+scratch/tool-output/inspect_page-4.txt:841:                 - text: Search documents with the top level domain
+scratch/tool-output/inspect_page-4.txt:843:                 - text: .
+scratch/tool-output/inspect_page-4.txt:846:                 - text: "?tld:"
+scratch/tool-output/inspect_page-4.txt:850:                 - text: Prefer but do not require results with the top level domain
+scratch/tool-output/inspect_page-4.txt:852:                 - text: . This syntax is also possible for links:..., ip:... and site:...
+scratch/tool-output/inspect_page-4.txt:917:     - heading "Policy Information" [level=1] [ref=f95e986]
+scratch/tool-output/inspect_page-4.txt:920:         - heading " Policies" [level=2] [ref=f95e989]:
+scratch/tool-output/inspect_page-4.txt:922:           - text: Policies
+scratch/tool-output/inspect_page-4.txt:926:         - heading " Contact" [level=2] [ref=f95e994]:
+scratch/tool-output/inspect_page-4.txt:928:           - text: Contact
+scratch/tool-output/inspect_page-4.txt:930:           - text: You can reach the webmaster of the search engine at
+scratch/tool-output/inspect_page-4.txt:931:           - link "contact@marginalia-search.com" [ref=f95e997] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:933:           - text: .
+scratch/tool-output/inspect_page-4.txt:936:           - text: Sources
+scratch/tool-output/inspect_page-4.txt:938:           - text: The search engine is open source with an AGPL license. The sources can be perused at
+scratch/tool-output/inspect_page-4.txt:939:           - link "https://git.marginalia.nu/" [ref=f95e1001] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:941:           - text: .
+scratch/tool-output/inspect_page-4.txt:943:         - heading " Data" [level=2] [ref=f95e1003]:
+scratch/tool-output/inspect_page-4.txt:945:           - text: Data
+scratch/tool-output/inspect_page-4.txt:947:           - text: IP geolocation is sourced from the IP2Location LITE data available from
+scratch/tool-output/inspect_page-4.txt:948:           - link "https://lite.ip2location.com/" [ref=f95e1006] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:950:           - text: under
+scratch/tool-output/inspect_page-4.txt:951:           - link "CC-BY-SA 4.0" [ref=f95e1007] [cursor=pointer]:
+scratch/tool-output/inspect_page-4.txt:953:           - text: .
+scratch/tool-output/inspect_page-4.txt:954:   - text:                 
+scratch/tool-output/inspect_page-5.txt:5:   - link "Skip To Content" [ref=f99e2] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:10:         - link "Search" [ref=f99e8] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:12:         - link "Sites" [ref=f99e9] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:14:         - link "Explore" [ref=f99e10] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:16:         - link "About" [ref=f99e12] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:20:       - heading [level=1] [ref=f99e17]:
+scratch/tool-output/inspect_page-5.txt:21:         - link "Marginalia Search" [ref=f99e18] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:27:           - text: Search
+scratch/tool-output/inspect_page-5.txt:28:       - text:  
+scratch/tool-output/inspect_page-5.txt:32:         - heading " Filter" [level=2] [ref=f99e29]:
+scratch/tool-output/inspect_page-5.txt:34:           - text: Filter
+scratch/tool-output/inspect_page-5.txt:37:             - link " All" [ref=f99e34]:
+scratch/tool-output/inspect_page-5.txt:40:               - text: All
+scratch/tool-output/inspect_page-5.txt:42:             - link " Blogs" [ref=f99e38]:
+scratch/tool-output/inspect_page-5.txt:45:               - text: Blogs
+scratch/tool-output/inspect_page-5.txt:47:             - link " Academia" [ref=f99e42]:
+scratch/tool-output/inspect_page-5.txt:50:               - text: Academia
+scratch/tool-output/inspect_page-5.txt:52:             - link " Vintage" [ref=f99e46]:
+scratch/tool-output/inspect_page-5.txt:55:               - text: Vintage
+scratch/tool-output/inspect_page-5.txt:57:             - link " Small Web" [ref=f99e50]:
+scratch/tool-output/inspect_page-5.txt:60:               - text: Small Web
+scratch/tool-output/inspect_page-5.txt:62:             - link " Wikis" [ref=f99e55]:
+scratch/tool-output/inspect_page-5.txt:65:               - text: Wikis
+scratch/tool-output/inspect_page-5.txt:67:             - link " Forums" [ref=f99e59]:
+scratch/tool-output/inspect_page-5.txt:70:               - text: Forums
+scratch/tool-output/inspect_page-5.txt:72:             - link " Recipes" [ref=f99e63]:
+scratch/tool-output/inspect_page-5.txt:75:               - text: Recipes
+scratch/tool-output/inspect_page-5.txt:77:             - link " Custom Filter" [ref=f99e68]:
+scratch/tool-output/inspect_page-5.txt:80:               - text: Custom Filter
+scratch/tool-output/inspect_page-5.txt:81:     - text:  
+scratch/tool-output/inspect_page-5.txt:84:         - heading "Results" [level=1] [ref=f99e72]
+scratch/tool-output/inspect_page-5.txt:92:                     - heading [level=2] [ref=f99e84]:
+scratch/tool-output/inspect_page-5.txt:93:                       - link "Drexel University" [ref=f99e85] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:95:                     - link "https://en.wikipedia.org/wiki/Drexel_University" [ref=f99e87] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:99:                 - link "" [ref=f99e91] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:101:                 - link "" [ref=f99e93] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:112:                     - heading [level=2] [ref=f99e109]:
+scratch/tool-output/inspect_page-5.txt:113:                       - link "The history of youth work in Europe Relevance for today’s youth work policy" [ref=f99e110] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:117:                       - link "https://www.youthpolicy.org/uploads/documents/2014_History_of_Youth_Work_in_Europe_Vol4_Eng.pdf" [ref=f99e113] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:121:                 - link "" [ref=f99e117] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:123:                 - link "" [ref=f99e119] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:132:                     - heading [level=2] [ref=f99e134]:
+scratch/tool-output/inspect_page-5.txt:133:                       - link "Letter to students | MIT Organization Chart" [ref=f99e135] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:135:                     - link "https://orgchart.mit.edu/letters/letter-students-0" [ref=f99e137] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:139:                 - link "" [ref=f99e141] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:141:                 - link "" [ref=f99e143] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:150:                     - heading [level=2] [ref=f99e158]:
+scratch/tool-output/inspect_page-5.txt:151:                       - link "Duke University - Alchetron, The Free Social Encyclopedia" [ref=f99e159] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:153:                     - link "https://alchetron.com/Duke-University" [ref=f99e161] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:157:                 - link "" [ref=f99e165] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:159:                 - link "" [ref=f99e167] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:165:                   - link "Florida State University - Alchetron, the free social encyclopedia" [ref=f99e173] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:174:                     - heading [level=2] [ref=f99e187]:
+scratch/tool-output/inspect_page-5.txt:175:                       - link "ENTERTAINMENT SPORTS" [ref=f99e188] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:179:                       - link "https://repository.gatech.edu/server/api/core/bitstreams/bf6db2c2-802c-4379-b716-aa78554c96c1/content" [ref=f99e191] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:183:                 - link "" [ref=f99e195] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:185:                 - link "" [ref=f99e197] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:194:                     - heading [level=2] [ref=f99e212]:
+scratch/tool-output/inspect_page-5.txt:195:                       - link "[ self study document 2012 ]" [ref=f99e213] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:199:                       - link "https://shareok.org/server/api/core/bitstreams/5d057a0b-ed4c-4f91-9930-d08f5e9715b4/content" [ref=f99e216] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:203:                 - link "" [ref=f99e220] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:205:                 - link "" [ref=f99e222] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:214:                     - heading [level=2] [ref=f99e237]:
+scratch/tool-output/inspect_page-5.txt:215:                       - link "The 50 Best Colleges For Greek Life | BestCollegeReviews" [ref=f99e238] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:217:                     - link "https://www.bestcollegereviews.org/greek-life/" [ref=f99e240] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:221:                 - link "" [ref=f99e244] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:223:                 - link "" [ref=f99e246] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:226:               - link "Tracking" [ref=f99e250] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:229:               - link "Has Ads" [ref=f99e252] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:237:                     - heading [level=2] [ref=f99e263]:
+scratch/tool-output/inspect_page-5.txt:238:                       - link "2007-08 Undergraduate Catalogue" [ref=f99e264] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:242:                       - link "https://www.shu.edu/documents/SetonHallUndergraduate0708.pdf" [ref=f99e267] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:246:                 - link "" [ref=f99e271] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:248:                 - link "" [ref=f99e273] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:255:                   - link "Undergraduate Catalogue 2005-07 Seton Hall University" [ref=f99e279] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:259:               - link "Tracking" [ref=f99e283] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:261:               - link "Has Ads" [ref=f99e284] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:268:                   - heading [level=2] [ref=f99e295]:
+scratch/tool-output/inspect_page-5.txt:269:                     - link "delta sigma phi nc state" [ref=f99e296] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:271:                   - link "http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1" [ref=f99e298] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:275:               - link "" [ref=f99e302] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:277:               - link "" [ref=f99e304] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:285:                     - heading [level=2] [ref=f99e316]:
+scratch/tool-output/inspect_page-5.txt:286:                       - link "Contents" [ref=f99e317] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:290:                       - link "https://philarchive.org/archive/OLIAIM" [ref=f99e320] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:294:                 - link "" [ref=f99e324] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:296:                 - link "" [ref=f99e326] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:305:                     - heading [level=2] [ref=f99e341]:
+scratch/tool-output/inspect_page-5.txt:306:                       - link "Strategic Plan Progress Report 2016 - Archive | Montana State University" [ref=f99e342] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:308:                     - link "https://www.montana.edu/archive/strategicplan2012/progress/2016/index.html" [ref=f99e344] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:312:                 - link "" [ref=f99e348] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:314:                 - link "" [ref=f99e350] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:323:                     - heading [level=2] [ref=f99e365]:
+scratch/tool-output/inspect_page-5.txt:324:                       - link "SOUTHERN MODERNISMS Critical Stances through Regional Appropriations" [ref=f99e366] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:328:                       - link "https://livros.fcsh.unl.pt/iha/catalog/download/142/270/922" [ref=f99e369] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:332:                 - link "" [ref=f99e373] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:334:                 - link "" [ref=f99e375] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:343:                     - heading [level=2] [ref=f99e390]:
+scratch/tool-output/inspect_page-5.txt:344:                       - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f99e391] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:346:                     - link "https://www.franbecque.com/page/33/" [ref=f99e393] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:350:                 - link "" [ref=f99e397] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:352:                 - link "" [ref=f99e399] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:361:                     - heading [level=2] [ref=f99e414]:
+scratch/tool-output/inspect_page-5.txt:362:                       - link "February 2018 – digitalscholarshipandscholarlypublication" [ref=f99e415] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:364:                     - link "https://digitalscholarshipandscholarlypublication.wordpress.com/2018/02/" [ref=f99e417] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:368:                 - link "" [ref=f99e421] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:370:                 - link "" [ref=f99e423] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:379:                     - heading [level=2] [ref=f99e438]:
+scratch/tool-output/inspect_page-5.txt:380:                       - link "Local Cities' Schedule of Spooks Colleges Are a \"Hot" [ref=f99e439] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:384:                       - link "https://dspace.allegheny.edu/server/api/core/bitstreams/80979501-6e65-4b99-838d-462e08f6f125/content" [ref=f99e442] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:388:                 - link "" [ref=f99e446] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:390:                 - link "" [ref=f99e448] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:398:                   - heading [level=2] [ref=f99e463]:
+scratch/tool-output/inspect_page-5.txt:399:                     - link "Bilderberg Conference 2005, 5-8 May, Rottach-Egern, Munich, Germany - and this year's Bilderberg news" [ref=f99e464] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:401:                   - link "http://www.bilderberg.org/2005.htm" [ref=f99e466] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:405:               - link "" [ref=f99e470] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:407:               - link "" [ref=f99e472] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:415:                     - heading [level=2] [ref=f99e484]:
+scratch/tool-output/inspect_page-5.txt:416:                       - link "Education and the COVID-19 Pandemic A situational review of five regions" [ref=f99e485] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:420:                       - link "https://france-education-international.fr/document/keep-situational-review" [ref=f99e488] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:424:                 - link "" [ref=f99e492] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:426:                 - link "" [ref=f99e494] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:435:                     - heading [level=2] [ref=f99e509]:
+scratch/tool-output/inspect_page-5.txt:436:                       - link "Boston University - Wikipedia" [ref=f99e510] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:438:                     - link "https://www.satellite-sightseer.com/id/9439/United_States/Massachusetts/Boston/Boston_University_undergraduate_campus_" [ref=f99e512] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:442:                 - link "" [ref=f99e516] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:444:                 - link "" [ref=f99e518] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:450:                   - link "Georgia Institute of Technology - Wikipedia" [ref=f99e524] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:454:               - link "Tracking" [ref=f99e528] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:457:               - link "Has Ads" [ref=f99e530] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:465:                     - heading [level=2] [ref=f99e541]:
+scratch/tool-output/inspect_page-5.txt:466:                       - link "The Bucknellian – Page 113 – Check out our new and improved website at www.bucknellian.net!" [ref=f99e542] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:468:                     - link "https://bucknellian.blogs.bucknell.edu/page/113/" [ref=f99e544] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:472:                 - link "" [ref=f99e548] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:474:                 - link "" [ref=f99e550] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:480:                   - link "Amanda Ayers – Page 4 – The Bucknellian" [ref=f99e556] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:489:                     - heading [level=2] [ref=f99e570]:
+scratch/tool-output/inspect_page-5.txt:490:                       - link "Belle of Liberty's Blog | Letting Freedom Ring | Page 205" [ref=f99e571] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:492:                     - link "https://belleofliberty.wordpress.com/page/205/" [ref=f99e573] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:496:                 - link "" [ref=f99e577] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:498:                 - link "" [ref=f99e579] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:507:                     - heading [level=2] [ref=f99e594]:
+scratch/tool-output/inspect_page-5.txt:508:                       - link "OPEN ACCESS" [ref=f99e595] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:512:                       - link "https://ejcls.adapt.it/index.php/ejcls_adapt/article/download/172/715" [ref=f99e598] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:516:                 - link "" [ref=f99e602] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:518:                 - link "" [ref=f99e604] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:527:                     - heading [level=2] [ref=f99e619]:
+scratch/tool-output/inspect_page-5.txt:528:                       - link "SThe Journal of S Emergent Science" [ref=f99e620] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:532:                       - link "https://pstt.org.uk/download/708/" [ref=f99e623] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:536:                 - link "" [ref=f99e627] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:538:                 - link "" [ref=f99e629] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:547:                     - heading [level=2] [ref=f99e644]:
+scratch/tool-output/inspect_page-5.txt:548:                       - link "Contents" [ref=f99e645] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:552:                       - link "https://www.colorado.edu/registrar/media/262" [ref=f99e648] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:556:                 - link "" [ref=f99e652] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:558:                 - link "" [ref=f99e654] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:565:                   - link "Contents" [ref=f99e660] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:569:                   - link "Catalog" [ref=f99e662] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:573:                   - link "University of Colorado Boulder Catalog, 2011–12 By learning you will teach, by teaching you will learn. —L atin prover b" [ref=f99e664] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:577:                   - link "2008" [ref=f99e666] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:581:               - link "Tracking" [ref=f99e670] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:583:               - link "Has Ads" [ref=f99e671] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:591:                     - heading [level=2] [ref=f99e682]:
+scratch/tool-output/inspect_page-5.txt:592:                       - 'link "CONTENTS EDITORIAL TEAM EUROPEAN MATHEMATICAL SOCIETY EDITOR-IN-CHIEF ASSOCIATE EDITORS COPY EDITOR: 25 years proof of the Kn..." [ref=f99e683] [cursor=pointer]':
+scratch/tool-output/inspect_page-5.txt:596:                       - link "https://ems.press/content/serial-issue-files/13644" [ref=f99e686] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:600:                 - link "" [ref=f99e690] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:602:                 - link "" [ref=f99e692] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:611:                     - heading [level=2] [ref=f99e707]:
+scratch/tool-output/inspect_page-5.txt:612:                       - link "In Memoriam" [ref=f99e708] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:614:                     - link "https://www.fma.org/in-memoriam" [ref=f99e710] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:618:                 - link "" [ref=f99e714] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:620:                 - link "" [ref=f99e716] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:623:               - link "Tracking" [ref=f99e720] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:626:               - link "Has Ads" [ref=f99e722] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:629:       - text: 
+scratch/tool-output/inspect_page-5.txt:631:         - heading " Search Settings" [level=2] [ref=f99e726]:
+scratch/tool-output/inspect_page-5.txt:633:           - text: Search Settings
+scratch/tool-output/inspect_page-5.txt:636:             - link " Search In Title" [ref=f99e731]:
+scratch/tool-output/inspect_page-5.txt:641:             - link " Recent Results" [ref=f99e736]:
+scratch/tool-output/inspect_page-5.txt:646:             - link " Remove JS" [ref=f99e741]:
+scratch/tool-output/inspect_page-5.txt:651:             - link " Reduce Adtech" [ref=f99e746]:
+scratch/tool-output/inspect_page-5.txt:656:             - link " Reduce NSFW" [ref=f99e751]:
+scratch/tool-output/inspect_page-5.txt:663:               - text: Language
+scratch/tool-output/inspect_page-5.txt:664:           - text: 
+scratch/tool-output/inspect_page-5.txt:666:     - heading "Search Help" [level=1] [ref=f99e761]
+scratch/tool-output/inspect_page-5.txt:669:         - heading " Syntax" [level=2] [ref=f99e764]:
+scratch/tool-output/inspect_page-5.txt:671:           - text: Syntax
+scratch/tool-output/inspect_page-5.txt:672:         - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f99e766]
+scratch/tool-output/inspect_page-5.txt:673:         - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f99e767]
+scratch/tool-output/inspect_page-5.txt:674:         - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f99e768]
+scratch/tool-output/inspect_page-5.txt:675:         - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f99e769]
+scratch/tool-output/inspect_page-5.txt:676:         - heading "Samples" [level=2] [ref=f99e770]
+scratch/tool-output/inspect_page-5.txt:686:         - heading " Match Indicator" [level=2] [ref=f99e780]:
+scratch/tool-output/inspect_page-5.txt:688:           - text: Match Indicator
+scratch/tool-output/inspect_page-5.txt:689:         - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f99e782]
+scratch/tool-output/inspect_page-5.txt:693:         - heading " Language Limitations" [level=2] [ref=f99e805]:
+scratch/tool-output/inspect_page-5.txt:695:           - text: Language Limitations
+scratch/tool-output/inspect_page-5.txt:696:         - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f99e807]
+scratch/tool-output/inspect_page-5.txt:697:         - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f99e808]
+scratch/tool-output/inspect_page-5.txt:698:         - heading " Webmaster Information" [level=2] [ref=f99e809]:
+scratch/tool-output/inspect_page-5.txt:700:           - text: Webmaster Information
+scratch/tool-output/inspect_page-5.txt:701:         - heading [level=2] [ref=f99e811]:
+scratch/tool-output/inspect_page-5.txt:702:           - text: If you wish to add your website to the index, follow the instructions in this
+scratch/tool-output/inspect_page-5.txt:703:           - link "git repository" [ref=f99e812] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:705:           - text: ", if you do not want to mess with git, you can also email"
+scratch/tool-output/inspect_page-5.txt:706:           - link "contact@marginalia-search.com" [ref=f99e813] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:708:           - text: with the domain name.
+scratch/tool-output/inspect_page-5.txt:709:         - heading [level=2] [ref=f99e814]:
+scratch/tool-output/inspect_page-5.txt:710:           - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+scratch/tool-output/inspect_page-5.txt:711:           - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f99e815] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:713:           - text: .
+scratch/tool-output/inspect_page-5.txt:714:         - heading [level=2] [ref=f99e816]:
+scratch/tool-output/inspect_page-5.txt:715:           - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+scratch/tool-output/inspect_page-5.txt:716:           - link "contact@marginalia-search.com" [ref=f99e817] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:718:           - text: .
+scratch/tool-output/inspect_page-5.txt:720:         - heading " Special Keywords" [level=2] [ref=f99e819]:
+scratch/tool-output/inspect_page-5.txt:722:           - text: Special Keywords
+scratch/tool-output/inspect_page-5.txt:731:                 - text: "site:"
+scratch/tool-output/inspect_page-5.txt:734:                 - text: Display site information about
+scratch/tool-output/inspect_page-5.txt:738:                 - text: "site:"
+scratch/tool-output/inspect_page-5.txt:742:                 - text: Search
+scratch/tool-output/inspect_page-5.txt:744:                 - text: for
+scratch/tool-output/inspect_page-5.txt:748:                 - text: "site:"
+scratch/tool-output/inspect_page-5.txt:752:                 - text: Search
+scratch/tool-output/inspect_page-5.txt:754:                 - text: and its subdomains for
+scratch/tool-output/inspect_page-5.txt:758:                 - text: "browse:"
+scratch/tool-output/inspect_page-5.txt:761:                 - text: Show similar websites to
+scratch/tool-output/inspect_page-5.txt:765:                 - text: "ip:"
+scratch/tool-output/inspect_page-5.txt:768:                 - text: Search documents hosted at
+scratch/tool-output/inspect_page-5.txt:772:                 - text: "links:"
+scratch/tool-output/inspect_page-5.txt:775:                 - text: Search documents linking to
+scratch/tool-output/inspect_page-5.txt:779:                 - text: "tld:"
+scratch/tool-output/inspect_page-5.txt:783:                 - text: Search documents with the top level domain
+scratch/tool-output/inspect_page-5.txt:785:                 - text: .
+scratch/tool-output/inspect_page-5.txt:788:                 - text: "?tld:"
+scratch/tool-output/inspect_page-5.txt:792:                 - text: Prefer but do not require results with the top level domain
+scratch/tool-output/inspect_page-5.txt:794:                 - text: . This syntax is also possible for links:..., ip:... and site:...
+scratch/tool-output/inspect_page-5.txt:859:     - heading "Policy Information" [level=1] [ref=f99e937]
+scratch/tool-output/inspect_page-5.txt:862:         - heading " Policies" [level=2] [ref=f99e940]:
+scratch/tool-output/inspect_page-5.txt:864:           - text: Policies
+scratch/tool-output/inspect_page-5.txt:868:         - heading " Contact" [level=2] [ref=f99e945]:
+scratch/tool-output/inspect_page-5.txt:870:           - text: Contact
+scratch/tool-output/inspect_page-5.txt:872:           - text: You can reach the webmaster of the search engine at
+scratch/tool-output/inspect_page-5.txt:873:           - link "contact@marginalia-search.com" [ref=f99e948] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:875:           - text: .
+scratch/tool-output/inspect_page-5.txt:878:           - text: Sources
+scratch/tool-output/inspect_page-5.txt:880:           - text: The search engine is open source with an AGPL license. The sources can be perused at
+scratch/tool-output/inspect_page-5.txt:881:           - link "https://git.marginalia.nu/" [ref=f99e952] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:883:           - text: .
+scratch/tool-output/inspect_page-5.txt:885:         - heading " Data" [level=2] [ref=f99e954]:
+scratch/tool-output/inspect_page-5.txt:887:           - text: Data
+scratch/tool-output/inspect_page-5.txt:889:           - text: IP geolocation is sourced from the IP2Location LITE data available from
+scratch/tool-output/inspect_page-5.txt:890:           - link "https://lite.ip2location.com/" [ref=f99e957] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:892:           - text: under
+scratch/tool-output/inspect_page-5.txt:893:           - link "CC-BY-SA 4.0" [ref=f99e958] [cursor=pointer]:
+scratch/tool-output/inspect_page-5.txt:895:           - text: .
+scratch/tool-output/inspect_page-5.txt:896:   - text:                 
+scratch/tool-output/inspect_page-6.txt:5:   - link "Skip To Content" [ref=f112e2] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:10:         - link "Search" [ref=f112e8] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:12:         - link "Sites" [ref=f112e9] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:14:         - link "Explore" [ref=f112e10] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:16:         - link "About" [ref=f112e12] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:20:       - heading [level=1] [ref=f112e17]:
+scratch/tool-output/inspect_page-6.txt:21:         - link "Marginalia Search" [ref=f112e18] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:27:           - text: Search
+scratch/tool-output/inspect_page-6.txt:28:       - text:  
+scratch/tool-output/inspect_page-6.txt:32:         - heading " Filter" [level=2] [ref=f112e29]:
+scratch/tool-output/inspect_page-6.txt:34:           - text: Filter
+scratch/tool-output/inspect_page-6.txt:37:             - link " All" [ref=f112e34]:
+scratch/tool-output/inspect_page-6.txt:40:               - text: All
+scratch/tool-output/inspect_page-6.txt:42:             - link " Blogs" [ref=f112e38]:
+scratch/tool-output/inspect_page-6.txt:45:               - text: Blogs
+scratch/tool-output/inspect_page-6.txt:47:             - link " Academia" [ref=f112e42]:
+scratch/tool-output/inspect_page-6.txt:50:               - text: Academia
+scratch/tool-output/inspect_page-6.txt:52:             - link " Vintage" [ref=f112e46]:
+scratch/tool-output/inspect_page-6.txt:55:               - text: Vintage
+scratch/tool-output/inspect_page-6.txt:57:             - link " Small Web" [ref=f112e50]:
+scratch/tool-output/inspect_page-6.txt:60:               - text: Small Web
+scratch/tool-output/inspect_page-6.txt:62:             - link " Wikis" [ref=f112e55]:
+scratch/tool-output/inspect_page-6.txt:65:               - text: Wikis
+scratch/tool-output/inspect_page-6.txt:67:             - link " Forums" [ref=f112e59]:
+scratch/tool-output/inspect_page-6.txt:70:               - text: Forums
+scratch/tool-output/inspect_page-6.txt:72:             - link " Recipes" [ref=f112e63]:
+scratch/tool-output/inspect_page-6.txt:75:               - text: Recipes
+scratch/tool-output/inspect_page-6.txt:77:             - link " Custom Filter" [ref=f112e68]:
+scratch/tool-output/inspect_page-6.txt:80:               - text: Custom Filter
+scratch/tool-output/inspect_page-6.txt:81:     - text:  
+scratch/tool-output/inspect_page-6.txt:84:         - heading "Results" [level=1] [ref=f112e72]
+scratch/tool-output/inspect_page-6.txt:92:                     - heading [level=2] [ref=f112e84]:
+scratch/tool-output/inspect_page-6.txt:93:                       - link "Philip Gale" [ref=f112e85] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:95:                     - link "https://en.wikipedia.org/wiki/Philip_Gale" [ref=f112e87] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:99:                 - link "" [ref=f112e91] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:101:                 - link "" [ref=f112e93] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:107:                   - link "Marie Jakus" [ref=f112e99] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:110:                   - link "Lynda Marie Jordan" [ref=f112e101] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:113:                   - link "Mildred Allen (physicist)" [ref=f112e103] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:116:                   - link "Union College" [ref=f112e105] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:119:               - link "7 more" [ref=f112e108] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:129:                     - heading [level=2] [ref=f112e122]:
+scratch/tool-output/inspect_page-6.txt:130:                       - link "How to MC Hammer | MIT Admissions" [ref=f112e123] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:132:                     - link "https://mitadmissions.org/blogs/entry/how-to-mc-hammer/" [ref=f112e125] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:136:                 - link "" [ref=f112e129] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:138:                 - link "" [ref=f112e131] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:144:                   - link "Stepping Up | MIT Admissions" [ref=f112e137] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:147:                   - link "Incentive to Drop Out | MIT Admissions" [ref=f112e139] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:150:                   - link "Stomp the Yard, MIT style | MIT Admissions" [ref=f112e141] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:153:                   - link "MIT and Black Greek Letter Organizations | MIT Admissions" [ref=f112e143] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:156:               - link "7 more" [ref=f112e146] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:165:                     - heading [level=2] [ref=f112e159]:
+scratch/tool-output/inspect_page-6.txt:166:                       - link "Brothers of Phi Beta Epsilon win first annual FSILG&D Community Service Challenge Photo Contest | MIT News | Massachusetts In..." [ref=f112e160] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:168:                     - link "https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest" [ref=f112e162] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:172:                 - link "" [ref=f112e166] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:174:                 - link "" [ref=f112e168] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:180:                   - link "Rising to the Challenge | MIT News | Massachusetts Institute of Technology" [ref=f112e174] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:183:                   - link "MIT Professor Peter Elias dies at 78; Was computer science pioneer | MIT News | Massachusetts Institute of Technology" [ref=f112e176] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:186:                   - link "Discovering community and cultural connections | MIT News | Massachusetts Institute of Technology" [ref=f112e178] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:189:                   - link "Four from MIT awarded 2018 Schwarzman Scholarships | MIT News | Massachusetts Institute of Technology" [ref=f112e180] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:192:               - link "1 more" [ref=f112e183] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:201:                     - heading [level=2] [ref=f112e196]:
+scratch/tool-output/inspect_page-6.txt:202:                       - link "Sorority women prohibited at frat rush | The Tech" [ref=f112e197] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:204:                     - link "https://thetech.com/2012/09/18/rushpolicy-v132-n38" [ref=f112e199] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:208:                 - link "" [ref=f112e203] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:210:                 - link "" [ref=f112e205] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:216:                   - link "LETTERS TO THE EDITOR | The Tech" [ref=f112e211] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:219:                   - link "Trump blocks student’s return to MIT | The Tech" [ref=f112e213] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:222:                   - link "Remembering Kate Hunter | The Tech" [ref=f112e215] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:225:                   - link "Letters to the Editor | The Tech" [ref=f112e217] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:228:               - link "2 more" [ref=f112e220] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:237:                     - heading [level=2] [ref=f112e233]:
+scratch/tool-output/inspect_page-6.txt:238:                       - link "Francis Amasa Walker - Alchetron, The Free Social Encyclopedia" [ref=f112e234] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:240:                     - link "https://alchetron.com/Francis-Amasa-Walker" [ref=f112e236] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:244:                 - link "" [ref=f112e240] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:246:                 - link "" [ref=f112e242] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:255:                     - heading [level=2] [ref=f112e257]:
+scratch/tool-output/inspect_page-6.txt:256:                       - link "sororities podcasts | Ivy.fm" [ref=f112e258] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:258:                     - link "https://ivy.fm/tag/sororities" [ref=f112e260] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:262:                 - link "" [ref=f112e264] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:264:                 - link "" [ref=f112e266] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:270:                   - link "Boromir podcasts | Ivy.fm" [ref=f112e272] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:279:                     - heading [level=2] [ref=f112e286]:
+scratch/tool-output/inspect_page-6.txt:280:                       - link "Total Sorority Move | Sigma Kappa Nationals Steps Up When Sister Can’t Travel Home From Iran" [ref=f112e287] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:283:                       - text: 2017-01-31 ·
+scratch/tool-output/inspect_page-6.txt:284:                       - link "https://totalsororitymove.com/sigma-kappa-nationals-steps-up-when-sister-cant-travel-home-from-iran/" [ref=f112e289] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:288:                 - link "" [ref=f112e293] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:290:                 - link "" [ref=f112e295] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:293:               - link "Tracking" [ref=f112e299] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:296:               - link "Has Ads" [ref=f112e301] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:304:                   - heading [level=2] [ref=f112e313]:
+scratch/tool-output/inspect_page-6.txt:305:                     - link "Women Who Made a Difference" [ref=f112e314] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:307:                   - link "https://historicexhibits.lib.iastate.edu/Seeds/women.htm" [ref=f112e316] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:311:               - link "" [ref=f112e320] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:313:               - link "" [ref=f112e322] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:321:                     - heading [level=2] [ref=f112e334]:
+scratch/tool-output/inspect_page-6.txt:322:                       - link "NCSU Timelines" [ref=f112e335] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:324:                     - link "https://historicalstate.lib.ncsu.edu/timelines/women" [ref=f112e337] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:328:                 - link "" [ref=f112e341] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:330:                 - link "" [ref=f112e343] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:336:                   - link "NCSU Timelines" [ref=f112e349] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:345:                     - heading [level=2] [ref=f112e363]:
+scratch/tool-output/inspect_page-6.txt:346:                       - link "David White, founding director of the MIT Energy Laboratory, dies at 89 | MIT Energy Initiative" [ref=f112e364] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:348:                     - link "https://energy.mit.edu/news/david-white-founding-director-of-the-mit-energy-laboratory-dies-at-89/" [ref=f112e366] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:352:                 - link "" [ref=f112e370] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:354:                 - link "" [ref=f112e372] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:363:                     - heading [level=2] [ref=f112e387]:
+scratch/tool-output/inspect_page-6.txt:364:                       - link "Class of 1967 | Brown Alumni Magazine" [ref=f112e388] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:366:                     - link "https://www.brownalumnimagazine.com/classes/class-of-1967" [ref=f112e390] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:370:                 - link "" [ref=f112e394] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:372:                 - link "" [ref=f112e396] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:378:                   - link "Obituaries | Brown Alumni Magazine" [ref=f112e402] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:381:                   - link "Obituaries | Brown Alumni Magazine" [ref=f112e404] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:384:                   - link "Obituaries | Brown Alumni Magazine" [ref=f112e406] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:387:                   - link "Obituaries | Brown Alumni Magazine" [ref=f112e408] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:390:               - link "39 more" [ref=f112e411] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:399:                     - heading [level=2] [ref=f112e424]:
+scratch/tool-output/inspect_page-6.txt:400:                       - link "Winter 2019 class notes | Ohio Wesleyan University" [ref=f112e425] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:402:                     - link "https://www.owu.edu/alumni-family-friends/owu-magazine/winter-2019/winter-2019-class-notes/" [ref=f112e427] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:406:                 - link "" [ref=f112e431] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:408:                 - link "" [ref=f112e433] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:414:                   - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f112e439] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:423:                     - heading [level=2] [ref=f112e453]:
+scratch/tool-output/inspect_page-6.txt:424:                       - link "List of AMSA Peer Advisors" [ref=f112e454] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:426:                     - link "http://amsa.mit.edu/list_of_peer_advisors/" [ref=f112e456] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:430:                 - link "" [ref=f112e460] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:432:                 - link "" [ref=f112e462] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:441:                     - heading [level=2] [ref=f112e477]:
+scratch/tool-output/inspect_page-6.txt:442:                       - 'link "The 10 Best Fraternities in the US: A Guide for Prospective Members | AdmissionSight" [ref=f112e478] [cursor=pointer]':
+scratch/tool-output/inspect_page-6.txt:445:                       - text: 2026-06-05 ·
+scratch/tool-output/inspect_page-6.txt:446:                       - link "https://admissionsight.com/best-fraternities/" [ref=f112e480] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:450:                 - link "" [ref=f112e484] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:452:                 - link "" [ref=f112e486] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:461:                     - heading [level=2] [ref=f112e501]:
+scratch/tool-output/inspect_page-6.txt:462:                       - link "<title>Congratulations to Mechanical Engineering’s 2020 Honors and Awards Recipients" [ref=f112e502] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:464:                     - link "http://www.aml.umd.edu/news/news_story.php?id=13078" [ref=f112e504] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:468:                 - link "" [ref=f112e508] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:470:                 - link "" [ref=f112e510] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:479:                     - heading [level=2] [ref=f112e525]:
+scratch/tool-output/inspect_page-6.txt:480:                       - link "www.TownTopics.com — Obituaries" [ref=f112e526] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:482:                     - link "https://www.towntopics.com/backissues/feb2509/obits.php" [ref=f112e528] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:486:                 - link "" [ref=f112e532] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:488:                 - link "" [ref=f112e534] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:494:                   - link "Obituaries 3/19/14 – Town Topics" [ref=f112e540] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:503:                     - heading [level=2] [ref=f112e554]:
+scratch/tool-output/inspect_page-6.txt:504:                       - link "PCAD - Paul Raymond Dermanis" [ref=f112e555] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:506:                     - link "https://pcad.lib.washington.edu/person/3130/" [ref=f112e557] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:510:                 - link "" [ref=f112e561] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:512:                 - link "" [ref=f112e563] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:515:               - link "1 more" [ref=f112e567] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:524:                     - heading [level=2] [ref=f112e580]:
+scratch/tool-output/inspect_page-6.txt:525:                       - link "MIT Alpha Phi" [ref=f112e581] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:527:                     - link "http://aphi.mit.edu/philanthropy/" [ref=f112e583] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:531:                 - link "" [ref=f112e587] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:533:                 - link "" [ref=f112e589] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:542:                     - heading [level=2] [ref=f112e604]:
+scratch/tool-output/inspect_page-6.txt:543:                       - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f112e605] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:545:                     - link "https://theta.scripts.mit.edu/aboutzmhouseandhistory.php" [ref=f112e607] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:549:                 - link "" [ref=f112e611] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:551:                 - link "" [ref=f112e613] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:560:                     - heading [level=2] [ref=f112e628]:
+scratch/tool-output/inspect_page-6.txt:561:                       - link "Announcing the 2017 Class of Razorback Classics | Arkansas News | University of Arkansas" [ref=f112e629] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:563:                     - link "https://news.uark.edu/articles/38475/announcing-the-2017-class-of-razorback-classics" [ref=f112e631] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:567:                 - link "" [ref=f112e635] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:569:                 - link "" [ref=f112e637] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:578:                     - heading [level=2] [ref=f112e652]:
+scratch/tool-output/inspect_page-6.txt:579:                       - link "09/04/12, Deaths - Almanac, Vol. 59, No. 02" [ref=f112e653] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:581:                     - link "https://almanac.upenn.edu/archive/volumes/v59/n02/obit.html" [ref=f112e655] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:585:                 - link "" [ref=f112e659] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:587:                 - link "" [ref=f112e661] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:590:               - link "3 more" [ref=f112e665] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:599:                     - heading [level=2] [ref=f112e678]:
+scratch/tool-output/inspect_page-6.txt:600:                       - link "Obituaries - March/April 2001 | STANFORD magazine" [ref=f112e679] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:602:                     - link "https://stanfordmag.org/contents/obituaries-10653" [ref=f112e681] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:606:                 - link "" [ref=f112e685] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:608:                 - link "" [ref=f112e687] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:614:                   - link "Obituaries - January/February 2010 | STANFORD magazine" [ref=f112e693] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:617:                   - link "Obituaries - May/June 2008 | STANFORD magazine" [ref=f112e695] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:620:                   - link "Obituaries - May 2018 | STANFORD magazine" [ref=f112e697] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:623:                   - link "Obituaries - March/April 2011 | STANFORD magazine" [ref=f112e699] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:626:               - link "53 more" [ref=f112e702] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:628:               - link "Tracking" [ref=f112e704] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:631:               - link "Has Ads" [ref=f112e706] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:639:                     - heading [level=2] [ref=f112e717]:
+scratch/tool-output/inspect_page-6.txt:640:                       - link "517 Beacon | Back Bay Houses" [ref=f112e718] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:642:                     - link "https://backbayhouses.org/517-beacon/" [ref=f112e720] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:646:                 - link "" [ref=f112e724] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:648:                 - link "" [ref=f112e726] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:654:                   - link "16 Exeter (196 Marlborough) | Back Bay Houses" [ref=f112e732] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:657:               - link "1 more" [ref=f112e735] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:666:                     - heading [level=2] [ref=f112e748]:
+scratch/tool-output/inspect_page-6.txt:667:                       - link "Jack Kerrebrock, professor emeritus of aeronautics and astronautics, dies at 91 - MIT AeroAstro" [ref=f112e749] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:669:                     - link "https://aeroastro.mit.edu/news-impact/jack-kerrebrock-professor-emeritus-of-aeronautics-and-astronautics-dies-at-91/" [ref=f112e751] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:673:                 - link "" [ref=f112e755] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:675:                 - link "" [ref=f112e757] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:684:                     - heading [level=2] [ref=f112e772]:
+scratch/tool-output/inspect_page-6.txt:685:                       - link "nnmpus ,n.. Ujotnmentslor wrT'mrt T Willamette CDolleasan" [ref=f112e773] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:689:                       - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/c2bfeb85-10c3-4b4e-ad19-c02182ddf486/content" [ref=f112e776] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:693:                 - link "" [ref=f112e780] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:695:                 - link "" [ref=f112e782] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:702:                   - link "Student Leader Federation Picks Willamette For 1940 Annual Conference Meet Willamette Collegian" [ref=f112e788] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:706:                   - link "-The Student Handbook- -Willamette University- -1991-1992-" [ref=f112e790] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:710:                   - link "Q0KSPU3 liommentator 171 ' tf A--" [ref=f112e792] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:714:                   - link "Beginning With MITH SPIKE Reported Presidential Bids \"All Rumor\"? fi o HENOVATED No Collegian Next BRUCE BAXTER" [ref=f112e794] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:717:               - link "24 more" [ref=f112e797] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:721:         - link "1" [ref=f112e801] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:723:         - link "2" [ref=f112e802] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:725:         - link "3" [ref=f112e803] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:727:         - link "4" [ref=f112e804] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:729:         - link "5" [ref=f112e805] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:732:       - text: 
+scratch/tool-output/inspect_page-6.txt:734:         - heading " Search Settings" [level=2] [ref=f112e809]:
+scratch/tool-output/inspect_page-6.txt:736:           - text: Search Settings
+scratch/tool-output/inspect_page-6.txt:739:             - link " Search In Title" [ref=f112e814]:
+scratch/tool-output/inspect_page-6.txt:744:             - link " Recent Results" [ref=f112e819]:
+scratch/tool-output/inspect_page-6.txt:749:             - link " Remove JS" [ref=f112e824]:
+scratch/tool-output/inspect_page-6.txt:754:             - link " Reduce Adtech" [ref=f112e829]:
+scratch/tool-output/inspect_page-6.txt:759:             - link " Reduce NSFW" [ref=f112e834]:
+scratch/tool-output/inspect_page-6.txt:766:               - text: Language
+scratch/tool-output/inspect_page-6.txt:767:           - text: 
+scratch/tool-output/inspect_page-6.txt:769:     - heading "Search Help" [level=1] [ref=f112e844]
+scratch/tool-output/inspect_page-6.txt:772:         - heading " Syntax" [level=2] [ref=f112e847]:
+scratch/tool-output/inspect_page-6.txt:774:           - text: Syntax
+scratch/tool-output/inspect_page-6.txt:775:         - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f112e849]
+scratch/tool-output/inspect_page-6.txt:776:         - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f112e850]
+scratch/tool-output/inspect_page-6.txt:777:         - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f112e851]
+scratch/tool-output/inspect_page-6.txt:778:         - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f112e852]
+scratch/tool-output/inspect_page-6.txt:779:         - heading "Samples" [level=2] [ref=f112e853]
+scratch/tool-output/inspect_page-6.txt:789:         - heading " Match Indicator" [level=2] [ref=f112e863]:
+scratch/tool-output/inspect_page-6.txt:791:           - text: Match Indicator
+scratch/tool-output/inspect_page-6.txt:792:         - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f112e865]
+scratch/tool-output/inspect_page-6.txt:796:         - heading " Language Limitations" [level=2] [ref=f112e888]:
+scratch/tool-output/inspect_page-6.txt:798:           - text: Language Limitations
+scratch/tool-output/inspect_page-6.txt:799:         - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f112e890]
+scratch/tool-output/inspect_page-6.txt:800:         - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f112e891]
+scratch/tool-output/inspect_page-6.txt:801:         - heading " Webmaster Information" [level=2] [ref=f112e892]:
+scratch/tool-output/inspect_page-6.txt:803:           - text: Webmaster Information
+scratch/tool-output/inspect_page-6.txt:804:         - heading [level=2] [ref=f112e894]:
+scratch/tool-output/inspect_page-6.txt:805:           - text: If you wish to add your website to the index, follow the instructions in this
+scratch/tool-output/inspect_page-6.txt:806:           - link "git repository" [ref=f112e895] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:808:           - text: ", if you do not want to mess with git, you can also email"
+scratch/tool-output/inspect_page-6.txt:809:           - link "contact@marginalia-search.com" [ref=f112e896] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:811:           - text: with the domain name.
+scratch/tool-output/inspect_page-6.txt:812:         - heading [level=2] [ref=f112e897]:
+scratch/tool-output/inspect_page-6.txt:813:           - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+scratch/tool-output/inspect_page-6.txt:814:           - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f112e898] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:816:           - text: .
+scratch/tool-output/inspect_page-6.txt:817:         - heading [level=2] [ref=f112e899]:
+scratch/tool-output/inspect_page-6.txt:818:           - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+scratch/tool-output/inspect_page-6.txt:819:           - link "contact@marginalia-search.com" [ref=f112e900] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:821:           - text: .
+scratch/tool-output/inspect_page-6.txt:823:         - heading " Special Keywords" [level=2] [ref=f112e902]:
+scratch/tool-output/inspect_page-6.txt:825:           - text: Special Keywords
+scratch/tool-output/inspect_page-6.txt:834:                 - text: "site:"
+scratch/tool-output/inspect_page-6.txt:837:                 - text: Display site information about
+scratch/tool-output/inspect_page-6.txt:841:                 - text: "site:"
+scratch/tool-output/inspect_page-6.txt:845:                 - text: Search
+scratch/tool-output/inspect_page-6.txt:847:                 - text: for
+scratch/tool-output/inspect_page-6.txt:851:                 - text: "site:"
+scratch/tool-output/inspect_page-6.txt:855:                 - text: Search
+scratch/tool-output/inspect_page-6.txt:857:                 - text: and its subdomains for
+scratch/tool-output/inspect_page-6.txt:861:                 - text: "browse:"
+scratch/tool-output/inspect_page-6.txt:864:                 - text: Show similar websites to
+scratch/tool-output/inspect_page-6.txt:868:                 - text: "ip:"
+scratch/tool-output/inspect_page-6.txt:871:                 - text: Search documents hosted at
+scratch/tool-output/inspect_page-6.txt:875:                 - text: "links:"
+scratch/tool-output/inspect_page-6.txt:878:                 - text: Search documents linking to
+scratch/tool-output/inspect_page-6.txt:882:                 - text: "tld:"
+scratch/tool-output/inspect_page-6.txt:886:                 - text: Search documents with the top level domain
+scratch/tool-output/inspect_page-6.txt:888:                 - text: .
+scratch/tool-output/inspect_page-6.txt:891:                 - text: "?tld:"
+scratch/tool-output/inspect_page-6.txt:895:                 - text: Prefer but do not require results with the top level domain
+scratch/tool-output/inspect_page-6.txt:897:                 - text: . This syntax is also possible for links:..., ip:... and site:...
+scratch/tool-output/inspect_page-6.txt:962:     - heading "Policy Information" [level=1] [ref=f112e1020]
+scratch/tool-output/inspect_page-6.txt:965:         - heading " Policies" [level=2] [ref=f112e1023]:
+scratch/tool-output/inspect_page-6.txt:967:           - text: Policies
+scratch/tool-output/inspect_page-6.txt:971:         - heading " Contact" [level=2] [ref=f112e1028]:
+scratch/tool-output/inspect_page-6.txt:973:           - text: Contact
+scratch/tool-output/inspect_page-6.txt:975:           - text: You can reach the webmaster of the search engine at
+scratch/tool-output/inspect_page-6.txt:976:           - link "contact@marginalia-search.com" [ref=f112e1031] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:978:           - text: .
+scratch/tool-output/inspect_page-6.txt:981:           - text: Sources
+scratch/tool-output/inspect_page-6.txt:983:           - text: The search engine is open source with an AGPL license. The sources can be perused at
+scratch/tool-output/inspect_page-6.txt:984:           - link "https://git.marginalia.nu/" [ref=f112e1035] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:986:           - text: .
+scratch/tool-output/inspect_page-6.txt:988:         - heading " Data" [level=2] [ref=f112e1037]:
+scratch/tool-output/inspect_page-6.txt:990:           - text: Data
+scratch/tool-output/inspect_page-6.txt:992:           - text: IP geolocation is sourced from the IP2Location LITE data available from
+scratch/tool-output/inspect_page-6.txt:993:           - link "https://lite.ip2location.com/" [ref=f112e1040] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:995:           - text: under
+scratch/tool-output/inspect_page-6.txt:996:           - link "CC-BY-SA 4.0" [ref=f112e1041] [cursor=pointer]:
+scratch/tool-output/inspect_page-6.txt:998:           - text: .
+scratch/tool-output/inspect_page-6.txt:999:   - text:                 

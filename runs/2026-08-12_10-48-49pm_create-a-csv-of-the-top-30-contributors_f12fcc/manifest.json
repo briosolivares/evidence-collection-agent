@@ -1,0 +1,142 @@
+{
+  "task": "Create a CSV of the top 30 contributors to the OpenClaw GitHub repository, with columns github_handle, name, linkedin_url.",
+  "startedAt": "2026-08-13T05:48:49.337Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "c434e90173e979cae4cee3e834d793551202a9c437984cea85d34b652956382d",
+      "capturedAt": "2026-08-13T05:48:54.532Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "e7dea8f22431effa57333dc251d6b81fcbbc09285a6880f5fcaf1132a82cbe4e",
+      "capturedAt": "2026-08-13T05:49:06.624Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "4b379e7d7fc29f76e6e04bf75f2b6157c50d68d9cd3151f3cd49a93fff7ab0fe",
+      "capturedAt": "2026-08-13T05:49:14.496Z"
+    },
+    {
+      "filename": "scratch/contributors_ranked.txt",
+      "sha256": "2bd10b1f6909b2e2577693fada9a36f0e0e44aa3d894ab1152edd60129b83dc1",
+      "capturedAt": "2026-08-13T05:49:22.906Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-4.txt",
+      "sha256": "d0af99f722469b9e87651804c3f64b637997036359d41996da59adfbb6ee53df",
+      "capturedAt": "2026-08-13T05:49:29.447Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-5.txt",
+      "sha256": "49a4394ae30a62214d8e2a76f2d663c2aad7001ee2cc0a20b05e9460b8f3a5b9",
+      "capturedAt": "2026-08-13T05:49:41.723Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-6.txt",
+      "sha256": "4d7b93e7a92af47f6fe3cd18129c0f312bd623e3d01de978a3692c3922f70b8a",
+      "capturedAt": "2026-08-13T05:49:47.105Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-7.txt",
+      "sha256": "909c6b38c001d98f3b6998dbe315f87ca97941b4a06dc6d42a94fc7bb9e8ff8f",
+      "capturedAt": "2026-08-13T05:49:54.797Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-8.txt",
+      "sha256": "5a032470b546c77a152960df485f3b57baa23ed29b8805147db3f9b1b229e742",
+      "capturedAt": "2026-08-13T05:50:05.122Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-9.txt",
+      "sha256": "8b646a0605c769144ef18fba5f4c095458fa0af1024bb4902300bfc233530635",
+      "capturedAt": "2026-08-13T05:50:20.554Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-10.txt",
+      "sha256": "02dc3e2c337346a53fe9dd54345fbeb9243e73725b535197a8be58d10d5f09bc",
+      "capturedAt": "2026-08-13T05:50:28.427Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-11.txt",
+      "sha256": "3bf05c01bdffe0d92e76bc35152b6b9ca99820e15d3b66e6c54e57a66c2c58bf",
+      "capturedAt": "2026-08-13T05:50:35.185Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-12.txt",
+      "sha256": "493ac4639199d903647e836d1c6a9d406998cbc942952bc1236b2eb4a14ca763",
+      "capturedAt": "2026-08-13T05:50:47.764Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-13.txt",
+      "sha256": "79cd27829bac4d9a6ad8b6cfa0a7235296ac5c4750f223d8446060f7ff35929e",
+      "capturedAt": "2026-08-13T05:51:08.864Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-14.txt",
+      "sha256": "728b451bd7937870fc5c6545104100366f2db237d9895ba612a5bd5f8fe9a3df",
+      "capturedAt": "2026-08-13T05:51:15.599Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-15.txt",
+      "sha256": "ce9666e71106a1b51bbb7500b5b1f0d34a95474bd21df6946336c40baa979f05",
+      "capturedAt": "2026-08-13T05:51:22.696Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-16.txt",
+      "sha256": "b1e3ad57b0bc2da96dcb8c4d3c37940def8e2f9d085e56fad2496a48c4db7ec6",
+      "capturedAt": "2026-08-13T05:51:34.170Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-17.txt",
+      "sha256": "0736709012d102869d7ff68974ef8d72ab2f407c711d4048b6ea0cc28d72c432",
+      "capturedAt": "2026-08-13T05:51:44.965Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-18.txt",
+      "sha256": "dac57476b0aade17c994ceff839365c45a603ec17acd1fce4eff224214a44593",
+      "capturedAt": "2026-08-13T05:51:50.761Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-19.txt",
+      "sha256": "5ef7e5b73c90a372136c72062ac69f26c64866988c96bf533b7061f797811c45",
+      "capturedAt": "2026-08-13T05:52:07.003Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-20.txt",
+      "sha256": "722250c0c3ee935cb2a5f9ed21f3ef3377e2554b3262b7cb03a6b1277215baa3",
+      "capturedAt": "2026-08-13T05:52:17.763Z"
+    },
+    {
+      "filename": "scratch/data_notes.md",
+      "sha256": "2c4f8e021b040cfec546a19dfac3d14e339220321df9c0e6b9954542319fb7b6",
+      "capturedAt": "2026-08-13T05:52:34.794Z"
+    },
+    {
+      "filename": "artifacts/openclaw_top30_contributors.csv",
+      "sha256": "8a1718033b8b5cfc98f3c4e882208cbd24edf7a25419ddf4561b0228df18907e",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:52:47.279Z"
+    },
+    {
+      "filename": "artifacts/contributors_page_evidence.png",
+      "sha256": "16f3314723a5d295cf81bbea7a42e6ad92499668016570cabc2e83a173c72cc6",
+      "sourceUrl": "https://github.com/openclaw/openclaw/graphs/contributors?from=5%2F9%2F2026",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:52:56.383Z"
+    },
+    {
+      "filename": "artifacts/methodology_notes.md",
+      "sha256": "444002a410e91daf2bf77a166ec03b1bfb6d8a0c0b3fd5308df49e9304b88e94",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:53:05.416Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T05:53:11.847Z"
+}

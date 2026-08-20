@@ -1,0 +1,47 @@
+METHODOLOGY NOTE — superseded screenshots from iterative research process
+===========================================================================
+
+The OpenClaw repository merges pull requests very frequently (observed:
+multiple merges per few minutes). While determining the true "last 10 merged
+pull requests," this collection process took several passes to converge on
+an exhaustive, correctly-ranked answer using PR merged_at timestamps (verified
+via the GitHub REST/search API), rather than approximate proxies like PR
+number or "updated" sort order.
+
+During this iterative process the following PR numbers were captured as
+screenshots but were later confirmed NOT to be among the final, correct
+top-10 most-recently-merged pull requests (each was superseded by a PR with
+a later merged_at timestamp discovered in a subsequent, more exhaustive query):
+
+  - PR #123021 (merged_at 2026-08-13T06:14:35Z) — superseded by #121170
+  - PR #123024 (merged_at 2026-08-13T06:25:41Z) — superseded by newer merges
+  - PR #122992 (merged_at 2026-08-13T06:24:28Z) — superseded by newer merges
+  - PR #121170 (merged_at 2026-08-13T06:17:33Z) — superseded by newer merges
+    (121170 was itself briefly in the top 10 before #122706, #117305, and
+    #123038 were discovered as more recently merged)
+
+Screenshot files for these PR numbers (pr_123021.png, pr_123024.png,
+pr_122992.png, pr_121170.png) remain published in artifacts/ purely as an
+audit trail of the research process. They are NOT part of the final
+requested deliverable set.
+
+THE FINAL, VERIFIED LAST 10 MERGED PULL REQUESTS (as of collection time,
+confirmed via GitHub search API query for merged:>2026-08-13T07:03:20 
+returning total_count: 0, i.e. no newer merges existed at verification time)
+are, in descending order of merged_at:
+
+  1. #122706  merged_at 2026-08-13T07:03:20Z
+  2. #117305  merged_at 2026-08-13T07:03:10Z
+  3. #123038  merged_at 2026-08-13T07:00:59Z
+  4. #123005  merged_at 2026-08-13T06:47:29Z
+  5. #123027  merged_at 2026-08-13T06:45:59Z
+  6. #122871  merged_at 2026-08-13T06:39:18Z
+  7. #123034  merged_at 2026-08-13T06:37:22Z
+  8. #122878  merged_at 2026-08-13T06:34:06Z
+  9. #123019  merged_at 2026-08-13T06:30:28Z
+ 10. #123033  merged_at 2026-08-13T06:29:30Z
+
+These 10 PR numbers, with their full-page screenshots (pr_122706.png,
+pr_117305.png, pr_123038.png, pr_123005.png, pr_123027.png, pr_122871.png,
+pr_123034.png, pr_122878.png, pr_123019.png, pr_123033.png) and the CSV
+(openclaw_merged_prs.csv), constitute the final deliverable.

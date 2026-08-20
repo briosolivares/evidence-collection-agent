@@ -1,0 +1,875 @@
+URL: https://github.com/Patrick-Erichsen
+Title: Patrick-Erichsen (Patrick Erichsen) · GitHub
+
+- generic [ref=f20e2]:
+  - generic [ref=f20e3]:
+    - link "Skip to content" [ref=f20e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f20e8]:
+      - heading "Navigation Menu" [level=2] [ref=f20e9]
+      - generic [ref=f20e10]:
+        - link "Homepage" [ref=f20e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f20e15]:
+          - navigation "Global" [ref=f20e16]:
+            - list [ref=f20e17]:
+              - listitem [ref=f20e18]:
+                - button "Platform" [ref=f20e20] [cursor=pointer]
+              - listitem [ref=f20e23]:
+                - button "Solutions" [ref=f20e25] [cursor=pointer]
+              - listitem [ref=f20e28]:
+                - button "Resources" [ref=f20e30] [cursor=pointer]
+              - listitem [ref=f20e33]:
+                - button "Open Source" [ref=f20e35] [cursor=pointer]
+              - listitem [ref=f20e38]:
+                - button "Enterprise" [ref=f20e40] [cursor=pointer]
+              - listitem [ref=f20e43]:
+                - link "Pricing" [ref=f20e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f20e45]:
+            - button "Search or jump to, type / to search" [ref=f20e47] [cursor=pointer]:
+              - generic [ref=f20e50]:
+                - text: Type
+                - generic [ref=f20e51]: /
+                - text: to search
+            - link "Sign in" [ref=f20e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FPatrick-Erichsen
+            - link "Sign up" [ref=f20e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f20e55] [cursor=pointer]
+  - main [ref=f20e60]:
+    - generic [ref=f20e63]:
+      - generic [ref=f20e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@Patrick-Erichsen"
+            - generic:
+              - strong: Patrick-Erichsen
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FPatrick-Erichsen
+      - navigation "User profile" [ref=f20e67]:
+        - link "Overview" [ref=f20e68] [cursor=pointer]:
+          - /url: /Patrick-Erichsen
+        - link "Repositories 53" [ref=f20e71] [cursor=pointer]:
+          - /url: /Patrick-Erichsen?tab=repositories
+          - text: Repositories
+          - generic "53" [ref=f20e74]
+        - link "Projects" [ref=f20e75] [cursor=pointer]:
+          - /url: /Patrick-Erichsen?tab=projects
+        - link "Packages" [ref=f20e78] [cursor=pointer]:
+          - /url: /Patrick-Erichsen?tab=packages
+        - link "Stars 40" [ref=f20e81] [cursor=pointer]:
+          - /url: /Patrick-Erichsen?tab=stars
+          - text: Stars
+          - generic "40" [ref=f20e84]
+    - generic [ref=f20e86]:
+      - generic [ref=f20e88]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@Patrick-Erichsen"
+            - generic:
+              - generic:
+                - strong: Patrick-Erichsen
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FPatrick-Erichsen
+        - generic [ref=f20e89]:
+          - generic [ref=f20e90]:
+            - link [ref=f20e92] [cursor=pointer]:
+              - /url: https://avatars.githubusercontent.com/u/20157849?v=4
+              - img "View Patrick-Erichsen's full-sized avatar" [ref=f20e93]
+            - heading "Patrick Erichsen Patrick-Erichsen" [level=1] [ref=f20e95]:
+              - generic [ref=f20e96]: Patrick Erichsen
+              - generic [ref=f20e97]: Patrick-Erichsen
+          - generic [ref=f20e98]:
+            - link "Follow" [ref=f20e105] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FPatrick-Erichsen
+            - generic [ref=f20e106]:
+              - generic [ref=f20e107]: Member of Technical Staff @ OpenClaw 🦞 Former Founding Eng @ Continue (acq by Cursor)
+              - generic [ref=f20e110]:
+                - link "137 followers" [ref=f20e111] [cursor=pointer]:
+                  - /url: https://github.com/Patrick-Erichsen?tab=followers
+                - text: ·
+                - link "5 following" [ref=f20e114] [cursor=pointer]:
+                  - /url: https://github.com/Patrick-Erichsen?tab=following
+              - list [ref=f20e115]:
+                - 'listitem "Organization: Continue" [ref=f20e116]':
+                  - generic [ref=f20e119]: Continue
+                - 'listitem "Home location: San Francisco, CA" [ref=f20e121]':
+                  - generic [ref=f20e124]: San Francisco, CA
+                - listitem [ref=f20e125]:
+                  - link "patrickerichsen.com" [ref=f20e128] [cursor=pointer]:
+                    - /url: https://patrickerichsen.com
+                - listitem [ref=f20e129]:
+                  - img "LinkedIn" [ref=f20e130]
+                  - link "in/patrick-erichsen" [ref=f20e133] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/patrick-erichsen/
+          - generic [ref=f20e134]:
+            - heading [level=2] [ref=f20e135]:
+              - link "Achievements" [ref=f20e136] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=achievements
+            - generic [ref=f20e137]:
+              - 'link "Achievement: Pull Shark x4" [ref=f20e138] [cursor=pointer]':
+                - /url: /Patrick-Erichsen?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f20e139]'
+                - generic [ref=f20e140]: x4
+              - 'link "Achievement: Pair Extraordinaire x4" [ref=f20e141] [cursor=pointer]':
+                - /url: /Patrick-Erichsen?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f20e142]'
+                - generic [ref=f20e143]: x4
+              - link [ref=f20e144] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?achievement=galaxy-brain&tab=achievements
+                - 'img "Achievement: Galaxy Brain" [ref=f20e145]'
+              - link [ref=f20e146] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?achievement=starstruck&tab=achievements
+                - 'img "Achievement: Starstruck" [ref=f20e147]'
+              - link [ref=f20e148] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f20e149]'
+              - link [ref=f20e150] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f20e151]'
+              - link [ref=f20e152] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?achievement=arctic-code-vault-contributor&tab=achievements
+                - 'img "Achievement: Arctic Code Vault Contributor" [ref=f20e153]'
+          - button "Block or report user" [ref=f20e155] [cursor=pointer]
+      - generic [ref=f20e160]:
+        - generic [ref=f20e162]:
+          - heading "Pinned Loading" [level=2] [ref=f20e163]:
+            - text: Pinned
+            - generic: Loading
+            - status
+          - list [ref=f20e165]:
+            - listitem [ref=f20e166]:
+              - generic [ref=f20e168]:
+                - generic [ref=f20e170]:
+                  - link "openclaw/openclaw" [ref=f20e174] [cursor=pointer]:
+                    - /url: /openclaw/openclaw
+                  - text: Public
+                - paragraph [ref=f20e175]: Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞
+                - paragraph [ref=f20e176]:
+                  - generic [ref=f20e177]: TypeScript
+                  - link [ref=f20e179] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/stargazers
+                    - img "stars" [ref=f20e180]
+                    - text: 386k
+                  - link [ref=f20e182] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/forks
+                    - img "forks" [ref=f20e183]
+                    - text: 81.2k
+            - listitem [ref=f20e185]:
+              - generic [ref=f20e187]:
+                - generic [ref=f20e189]:
+                  - link "continuedev/continue" [ref=f20e193] [cursor=pointer]:
+                    - /url: /continuedev/continue
+                  - text: Public
+                - paragraph [ref=f20e194]: open-source coding agent
+                - paragraph [ref=f20e195]:
+                  - generic [ref=f20e196]: TypeScript
+                  - link [ref=f20e198] [cursor=pointer]:
+                    - /url: /continuedev/continue/stargazers
+                    - img "stars" [ref=f20e199]
+                    - text: 35.5k
+                  - link [ref=f20e201] [cursor=pointer]:
+                    - /url: /continuedev/continue/forks
+                    - img "forks" [ref=f20e202]
+                    - text: 5.2k
+        - generic [ref=f20e205]:
+          - generic [ref=f20e206]:
+            - generic [ref=f20e207]:
+              - generic [ref=f20e208]:
+                - heading "3,637 contributions in the last year" [level=2] [ref=f20e209]
+                - link "Skip to contributions year list" [ref=f20e210] [cursor=pointer]:
+                  - /url: "#year-link-2026"
+                - generic [ref=f20e212]:
+                  - grid [ref=f20e214]:
+                    - caption [ref=f20e215]: Contribution Graph
+                    - rowgroup [ref=f20e216]:
+                      - row [ref=f20e217]:
+                        - gridcell "Day of Week" [ref=f20e218]
+                        - gridcell "August" [ref=f20e220]:
+                          - generic [ref=f20e222]: Aug
+                        - gridcell "September" [ref=f20e223]:
+                          - generic [ref=f20e225]: Sep
+                        - gridcell "October" [ref=f20e226]:
+                          - generic [ref=f20e228]: Oct
+                        - gridcell "November" [ref=f20e229]:
+                          - generic [ref=f20e231]: Nov
+                        - gridcell "December" [ref=f20e232]:
+                          - generic [ref=f20e234]: Dec
+                        - gridcell "January" [ref=f20e235]:
+                          - generic [ref=f20e237]: Jan
+                        - gridcell "February" [ref=f20e238]:
+                          - generic [ref=f20e240]: Feb
+                        - gridcell "March" [ref=f20e241]:
+                          - generic [ref=f20e243]: Mar
+                        - gridcell "April" [ref=f20e244]:
+                          - generic [ref=f20e246]: Apr
+                        - gridcell "May" [ref=f20e247]
+                        - gridcell "June" [ref=f20e250]:
+                          - generic [ref=f20e252]: Jun
+                        - gridcell "July" [ref=f20e253]:
+                          - generic [ref=f20e255]: Jul
+                        - gridcell "August" [ref=f20e256]:
+                          - generic [ref=f20e258]: Aug
+                    - rowgroup [ref=f20e259]:
+                      - row [ref=f20e260]:
+                        - gridcell "Sunday" [ref=f20e261]:
+                          - generic [ref=f20e263]: Sun
+                        - gridcell "2 contributions on August 10th." [ref=f20e264]
+                        - gridcell "1 contribution on August 17th." [ref=f20e265]
+                        - gridcell "No contributions on August 24th." [ref=f20e266]
+                        - gridcell "No contributions on August 31st." [ref=f20e267]
+                        - gridcell "No contributions on September 7th." [ref=f20e268]
+                        - gridcell "2 contributions on September 14th." [ref=f20e269]
+                        - gridcell "1 contribution on September 21st." [ref=f20e270]
+                        - gridcell "5 contributions on September 28th." [ref=f20e271]
+                        - gridcell "3 contributions on October 5th." [ref=f20e272]
+                        - gridcell "1 contribution on October 12th." [ref=f20e273]
+                        - gridcell "9 contributions on October 19th." [ref=f20e274]
+                        - gridcell "No contributions on October 26th." [ref=f20e275]
+                        - gridcell "6 contributions on November 2nd." [ref=f20e276]
+                        - gridcell "3 contributions on November 9th." [ref=f20e277]
+                        - gridcell "7 contributions on November 16th." [ref=f20e278]
+                        - gridcell "No contributions on November 23rd." [ref=f20e279]
+                        - gridcell "No contributions on November 30th." [ref=f20e280]
+                        - gridcell "2 contributions on December 7th." [ref=f20e281]
+                        - gridcell "1 contribution on December 14th." [ref=f20e282]
+                        - gridcell "No contributions on December 21st." [ref=f20e283]
+                        - gridcell "No contributions on December 28th." [ref=f20e284]
+                        - gridcell "No contributions on January 4th." [ref=f20e285]
+                        - gridcell "No contributions on January 11th." [ref=f20e286]
+                        - gridcell "No contributions on January 18th." [ref=f20e287]
+                        - gridcell "7 contributions on January 25th." [ref=f20e288]
+                        - gridcell "No contributions on February 1st." [ref=f20e289]
+                        - gridcell "14 contributions on February 8th." [ref=f20e290]
+                        - gridcell "13 contributions on February 15th." [ref=f20e291]
+                        - gridcell "1 contribution on February 22nd." [ref=f20e292]
+                        - gridcell "2 contributions on March 1st." [ref=f20e293]
+                        - gridcell "No contributions on March 8th." [ref=f20e294]
+                        - gridcell "No contributions on March 15th." [ref=f20e295]
+                        - gridcell "2 contributions on March 22nd." [ref=f20e296]
+                        - gridcell "1 contribution on March 29th." [ref=f20e297]
+                        - gridcell "No contributions on April 5th." [ref=f20e298]
+                        - gridcell "6 contributions on April 12th." [ref=f20e299]
+                        - gridcell "2 contributions on April 19th." [ref=f20e300]
+                        - gridcell "2 contributions on April 26th." [ref=f20e301]
+                        - gridcell "No contributions on May 3rd." [ref=f20e302]
+                        - gridcell "13 contributions on May 10th." [ref=f20e303]
+                        - gridcell "6 contributions on May 17th." [ref=f20e304]
+                        - gridcell "No contributions on May 24th." [ref=f20e305]
+                        - gridcell "7 contributions on May 31st." [ref=f20e306]
+                        - gridcell "21 contributions on June 7th." [ref=f20e307]
+                        - gridcell "37 contributions on June 14th." [ref=f20e308]
+                        - gridcell "No contributions on June 21st." [ref=f20e309]
+                        - gridcell "5 contributions on June 28th." [ref=f20e310]
+                        - gridcell "No contributions on July 5th." [ref=f20e311]
+                        - gridcell "2 contributions on July 12th." [ref=f20e312]
+                        - gridcell "15 contributions on July 19th." [ref=f20e313]
+                        - gridcell "11 contributions on July 26th." [ref=f20e314]
+                        - gridcell "6 contributions on August 2nd." [ref=f20e315]
+                        - gridcell "14 contributions on August 9th." [ref=f20e316]
+                      - row [ref=f20e317]:
+                        - gridcell "Monday" [ref=f20e318]:
+                          - generic [ref=f20e320]: Mon
+                        - gridcell "9 contributions on August 11th." [ref=f20e321]
+                        - gridcell "12 contributions on August 18th." [ref=f20e322]
+                        - gridcell "11 contributions on August 25th." [ref=f20e323]
+                        - gridcell "2 contributions on September 1st." [ref=f20e324]
+                        - gridcell "5 contributions on September 8th." [ref=f20e325]
+                        - gridcell "19 contributions on September 15th." [ref=f20e326]
+                        - gridcell "13 contributions on September 22nd." [ref=f20e327]
+                        - gridcell "No contributions on September 29th." [ref=f20e328]
+                        - gridcell "10 contributions on October 6th." [ref=f20e329]
+                        - gridcell "9 contributions on October 13th." [ref=f20e330]
+                        - gridcell "14 contributions on October 20th." [ref=f20e331]
+                        - gridcell "No contributions on October 27th." [ref=f20e332]
+                        - gridcell "2 contributions on November 3rd." [ref=f20e333]
+                        - gridcell "2 contributions on November 10th." [ref=f20e334]
+                        - gridcell "4 contributions on November 17th." [ref=f20e335]
+                        - gridcell "No contributions on November 24th." [ref=f20e336]
+                        - gridcell "11 contributions on December 1st." [ref=f20e337]
+                        - gridcell "3 contributions on December 8th." [ref=f20e338]
+                        - gridcell "7 contributions on December 15th." [ref=f20e339]
+                        - gridcell "No contributions on December 22nd." [ref=f20e340]
+                        - gridcell "No contributions on December 29th." [ref=f20e341]
+                        - gridcell "No contributions on January 5th." [ref=f20e342]
+                        - gridcell "22 contributions on January 12th." [ref=f20e343]
+                        - gridcell "2 contributions on January 19th." [ref=f20e344]
+                        - gridcell "3 contributions on January 26th." [ref=f20e345]
+                        - gridcell "3 contributions on February 2nd." [ref=f20e346]
+                        - gridcell "3 contributions on February 9th." [ref=f20e347]
+                        - gridcell "13 contributions on February 16th." [ref=f20e348]
+                        - gridcell "4 contributions on February 23rd." [ref=f20e349]
+                        - gridcell "9 contributions on March 2nd." [ref=f20e350]
+                        - gridcell "No contributions on March 9th." [ref=f20e351]
+                        - gridcell "No contributions on March 16th." [ref=f20e352]
+                        - gridcell "1 contribution on March 23rd." [ref=f20e353]
+                        - gridcell "No contributions on March 30th." [ref=f20e354]
+                        - gridcell "1 contribution on April 6th." [ref=f20e355]
+                        - gridcell "2 contributions on April 13th." [ref=f20e356]
+                        - gridcell "4 contributions on April 20th." [ref=f20e357]
+                        - gridcell "22 contributions on April 27th." [ref=f20e358]
+                        - gridcell "14 contributions on May 4th." [ref=f20e359]
+                        - gridcell "39 contributions on May 11th." [ref=f20e360]
+                        - gridcell "31 contributions on May 18th." [ref=f20e361]
+                        - gridcell "17 contributions on May 25th." [ref=f20e362]
+                        - gridcell "2 contributions on June 1st." [ref=f20e363]
+                        - gridcell "24 contributions on June 8th." [ref=f20e364]
+                        - gridcell "50 contributions on June 15th." [ref=f20e365]
+                        - gridcell "43 contributions on June 22nd." [ref=f20e366]
+                        - gridcell "29 contributions on June 29th." [ref=f20e367]
+                        - gridcell "23 contributions on July 6th." [ref=f20e368]
+                        - gridcell "12 contributions on July 13th." [ref=f20e369]
+                        - gridcell "62 contributions on July 20th." [ref=f20e370]
+                        - gridcell "5 contributions on July 27th." [ref=f20e371]
+                        - gridcell "14 contributions on August 3rd." [ref=f20e372]
+                        - gridcell "15 contributions on August 10th." [ref=f20e373]
+                      - row [ref=f20e374]:
+                        - gridcell "Tuesday" [ref=f20e375]:
+                          - generic [ref=f20e377]: Tue
+                        - gridcell "28 contributions on August 12th." [ref=f20e378]
+                        - gridcell "9 contributions on August 19th." [ref=f20e379]
+                        - gridcell "1 contribution on August 26th." [ref=f20e380]
+                        - gridcell "11 contributions on September 2nd." [ref=f20e381]
+                        - gridcell "17 contributions on September 9th." [ref=f20e382]
+                        - gridcell "11 contributions on September 16th." [ref=f20e383]
+                        - gridcell "8 contributions on September 23rd." [ref=f20e384]
+                        - gridcell "7 contributions on September 30th." [ref=f20e385]
+                        - gridcell "6 contributions on October 7th." [ref=f20e386]
+                        - gridcell "11 contributions on October 14th." [ref=f20e387]
+                        - gridcell "5 contributions on October 21st." [ref=f20e388]
+                        - gridcell "7 contributions on October 28th." [ref=f20e389]
+                        - gridcell "2 contributions on November 4th." [ref=f20e390]
+                        - gridcell "5 contributions on November 11th." [ref=f20e391]
+                        - gridcell "11 contributions on November 18th." [ref=f20e392]
+                        - gridcell "2 contributions on November 25th." [ref=f20e393]
+                        - gridcell "6 contributions on December 2nd." [ref=f20e394]
+                        - gridcell "3 contributions on December 9th." [ref=f20e395]
+                        - gridcell "No contributions on December 16th." [ref=f20e396]
+                        - gridcell "4 contributions on December 23rd." [ref=f20e397]
+                        - gridcell "No contributions on December 30th." [ref=f20e398]
+                        - gridcell "No contributions on January 6th." [ref=f20e399]
+                        - gridcell "4 contributions on January 13th." [ref=f20e400]
+                        - gridcell "5 contributions on January 20th." [ref=f20e401]
+                        - gridcell "1 contribution on January 27th." [ref=f20e402]
+                        - gridcell "3 contributions on February 3rd." [ref=f20e403]
+                        - gridcell "4 contributions on February 10th." [ref=f20e404]
+                        - gridcell "2 contributions on February 17th." [ref=f20e405]
+                        - gridcell "8 contributions on February 24th." [ref=f20e406]
+                        - gridcell "6 contributions on March 3rd." [ref=f20e407]
+                        - gridcell "4 contributions on March 10th." [ref=f20e408]
+                        - gridcell "2 contributions on March 17th." [ref=f20e409]
+                        - gridcell "18 contributions on March 24th." [ref=f20e410]
+                        - gridcell "1 contribution on March 31st." [ref=f20e411]
+                        - gridcell "No contributions on April 7th." [ref=f20e412]
+                        - gridcell "No contributions on April 14th." [ref=f20e413]
+                        - gridcell "8 contributions on April 21st." [ref=f20e414]
+                        - gridcell "74 contributions on April 28th." [ref=f20e415]
+                        - gridcell "33 contributions on May 5th." [ref=f20e416]
+                        - gridcell "15 contributions on May 12th." [ref=f20e417]
+                        - gridcell "24 contributions on May 19th." [ref=f20e418]
+                        - gridcell "5 contributions on May 26th." [ref=f20e419]
+                        - gridcell "10 contributions on June 2nd." [ref=f20e420]
+                        - gridcell "35 contributions on June 9th." [ref=f20e421]
+                        - gridcell "18 contributions on June 16th." [ref=f20e422]
+                        - gridcell "64 contributions on June 23rd." [ref=f20e423]
+                        - gridcell "6 contributions on June 30th." [ref=f20e424]
+                        - gridcell "29 contributions on July 7th." [ref=f20e425]
+                        - gridcell "60 contributions on July 14th." [ref=f20e426]
+                        - gridcell "32 contributions on July 21st." [ref=f20e427]
+                        - gridcell "39 contributions on July 28th." [ref=f20e428]
+                        - gridcell "16 contributions on August 4th." [ref=f20e429]
+                        - gridcell "17 contributions on August 11th." [ref=f20e430]
+                      - row [ref=f20e431]:
+                        - gridcell "Wednesday" [ref=f20e432]:
+                          - generic [ref=f20e434]: Wed
+                        - gridcell "17 contributions on August 13th." [ref=f20e435]
+                        - gridcell "4 contributions on August 20th." [ref=f20e436]
+                        - gridcell "9 contributions on August 27th." [ref=f20e437]
+                        - gridcell "10 contributions on September 3rd." [ref=f20e438]
+                        - gridcell "No contributions on September 10th." [ref=f20e439]
+                        - gridcell "10 contributions on September 17th." [ref=f20e440]
+                        - gridcell "8 contributions on September 24th." [ref=f20e441]
+                        - gridcell "14 contributions on October 1st." [ref=f20e442]
+                        - gridcell "14 contributions on October 8th." [ref=f20e443]
+                        - gridcell "2 contributions on October 15th." [ref=f20e444]
+                        - gridcell "6 contributions on October 22nd." [ref=f20e445]
+                        - gridcell "4 contributions on October 29th." [ref=f20e446]
+                        - gridcell "7 contributions on November 5th." [ref=f20e447]
+                        - gridcell "6 contributions on November 12th." [ref=f20e448]
+                        - gridcell "8 contributions on November 19th." [ref=f20e449]
+                        - gridcell "5 contributions on November 26th." [ref=f20e450]
+                        - gridcell "4 contributions on December 3rd." [ref=f20e451]
+                        - gridcell "5 contributions on December 10th." [ref=f20e452]
+                        - gridcell "1 contribution on December 17th." [ref=f20e453]
+                        - gridcell "1 contribution on December 24th." [ref=f20e454]
+                        - gridcell "No contributions on December 31st." [ref=f20e455]
+                        - gridcell "3 contributions on January 7th." [ref=f20e456]
+                        - gridcell "6 contributions on January 14th." [ref=f20e457]
+                        - gridcell "12 contributions on January 21st." [ref=f20e458]
+                        - gridcell "No contributions on January 28th." [ref=f20e459]
+                        - gridcell "1 contribution on February 4th." [ref=f20e460]
+                        - gridcell "4 contributions on February 11th." [ref=f20e461]
+                        - gridcell "2 contributions on February 18th." [ref=f20e462]
+                        - gridcell "5 contributions on February 25th." [ref=f20e463]
+                        - gridcell "7 contributions on March 4th." [ref=f20e464]
+                        - gridcell "3 contributions on March 11th." [ref=f20e465]
+                        - gridcell "No contributions on March 18th." [ref=f20e466]
+                        - gridcell "38 contributions on March 25th." [ref=f20e467]
+                        - gridcell "No contributions on April 1st." [ref=f20e468]
+                        - gridcell "2 contributions on April 8th." [ref=f20e469]
+                        - gridcell "No contributions on April 15th." [ref=f20e470]
+                        - gridcell "16 contributions on April 22nd." [ref=f20e471]
+                        - gridcell "14 contributions on April 29th." [ref=f20e472]
+                        - gridcell "40 contributions on May 6th." [ref=f20e473]
+                        - gridcell "13 contributions on May 13th." [ref=f20e474]
+                        - gridcell "16 contributions on May 20th." [ref=f20e475]
+                        - gridcell "50 contributions on May 27th." [ref=f20e476]
+                        - gridcell "14 contributions on June 3rd." [ref=f20e477]
+                        - gridcell "4 contributions on June 10th." [ref=f20e478]
+                        - gridcell "43 contributions on June 17th." [ref=f20e479]
+                        - gridcell "18 contributions on June 24th." [ref=f20e480]
+                        - gridcell "3 contributions on July 1st." [ref=f20e481]
+                        - gridcell "62 contributions on July 8th." [ref=f20e482]
+                        - gridcell "47 contributions on July 15th." [ref=f20e483]
+                        - gridcell "39 contributions on July 22nd." [ref=f20e484]
+                        - gridcell "20 contributions on July 29th." [ref=f20e485]
+                        - gridcell "83 contributions on August 5th." [ref=f20e486]
+                        - gridcell "11 contributions on August 12th." [ref=f20e487]
+                      - row [ref=f20e488]:
+                        - gridcell "Thursday" [ref=f20e489]:
+                          - generic [ref=f20e491]: Thu
+                        - gridcell "14 contributions on August 14th." [ref=f20e492]
+                        - gridcell "3 contributions on August 21st." [ref=f20e493]
+                        - gridcell "3 contributions on August 28th." [ref=f20e494]
+                        - gridcell "17 contributions on September 4th." [ref=f20e495]
+                        - gridcell "No contributions on September 11th." [ref=f20e496]
+                        - gridcell "13 contributions on September 18th." [ref=f20e497]
+                        - gridcell "19 contributions on September 25th." [ref=f20e498]
+                        - gridcell "5 contributions on October 2nd." [ref=f20e499]
+                        - gridcell "2 contributions on October 9th." [ref=f20e500]
+                        - gridcell "28 contributions on October 16th." [ref=f20e501]
+                        - gridcell "11 contributions on October 23rd." [ref=f20e502]
+                        - gridcell "3 contributions on October 30th." [ref=f20e503]
+                        - gridcell "10 contributions on November 6th." [ref=f20e504]
+                        - gridcell "7 contributions on November 13th." [ref=f20e505]
+                        - gridcell "10 contributions on November 20th." [ref=f20e506]
+                        - gridcell "No contributions on November 27th." [ref=f20e507]
+                        - gridcell "6 contributions on December 4th." [ref=f20e508]
+                        - gridcell "6 contributions on December 11th." [ref=f20e509]
+                        - gridcell "No contributions on December 18th." [ref=f20e510]
+                        - gridcell "No contributions on December 25th." [ref=f20e511]
+                        - gridcell "No contributions on January 1st." [ref=f20e512]
+                        - gridcell "4 contributions on January 8th." [ref=f20e513]
+                        - gridcell "No contributions on January 15th." [ref=f20e514]
+                        - gridcell "3 contributions on January 22nd." [ref=f20e515]
+                        - gridcell "No contributions on January 29th." [ref=f20e516]
+                        - gridcell "1 contribution on February 5th." [ref=f20e517]
+                        - gridcell "3 contributions on February 12th." [ref=f20e518]
+                        - gridcell "6 contributions on February 19th." [ref=f20e519]
+                        - gridcell "10 contributions on February 26th." [ref=f20e520]
+                        - gridcell "11 contributions on March 5th." [ref=f20e521]
+                        - gridcell "No contributions on March 12th." [ref=f20e522]
+                        - gridcell "14 contributions on March 19th." [ref=f20e523]
+                        - gridcell "35 contributions on March 26th." [ref=f20e524]
+                        - gridcell "2 contributions on April 2nd." [ref=f20e525]
+                        - gridcell "4 contributions on April 9th." [ref=f20e526]
+                        - gridcell "4 contributions on April 16th." [ref=f20e527]
+                        - gridcell "19 contributions on April 23rd." [ref=f20e528]
+                        - gridcell "33 contributions on April 30th." [ref=f20e529]
+                        - gridcell "25 contributions on May 7th." [ref=f20e530]
+                        - gridcell "9 contributions on May 14th." [ref=f20e531]
+                        - gridcell "25 contributions on May 21st." [ref=f20e532]
+                        - gridcell "13 contributions on May 28th." [ref=f20e533]
+                        - gridcell "42 contributions on June 4th." [ref=f20e534]
+                        - gridcell "35 contributions on June 11th." [ref=f20e535]
+                        - gridcell "30 contributions on June 18th." [ref=f20e536]
+                        - gridcell "No contributions on June 25th." [ref=f20e537]
+                        - gridcell "2 contributions on July 2nd." [ref=f20e538]
+                        - gridcell "41 contributions on July 9th." [ref=f20e539]
+                        - gridcell "70 contributions on July 16th." [ref=f20e540]
+                        - gridcell "26 contributions on July 23rd." [ref=f20e541]
+                        - gridcell "84 contributions on July 30th." [ref=f20e542]
+                        - gridcell "21 contributions on August 6th." [ref=f20e543]
+                        - gridcell "3 contributions on August 13th." [ref=f20e544]
+                      - row [ref=f20e545]:
+                        - gridcell "Friday" [ref=f20e546]:
+                          - generic [ref=f20e548]: Fri
+                        - gridcell "17 contributions on August 15th." [ref=f20e549]
+                        - gridcell "4 contributions on August 22nd." [ref=f20e550]
+                        - gridcell "7 contributions on August 29th." [ref=f20e551]
+                        - gridcell "14 contributions on September 5th." [ref=f20e552]
+                        - gridcell "No contributions on September 12th." [ref=f20e553]
+                        - gridcell "17 contributions on September 19th." [ref=f20e554]
+                        - gridcell "5 contributions on September 26th." [ref=f20e555]
+                        - gridcell "5 contributions on October 3rd." [ref=f20e556]
+                        - gridcell "1 contribution on October 10th." [ref=f20e557]
+                        - gridcell "15 contributions on October 17th." [ref=f20e558]
+                        - gridcell "3 contributions on October 24th." [ref=f20e559]
+                        - gridcell "6 contributions on October 31st." [ref=f20e560]
+                        - gridcell "No contributions on November 7th." [ref=f20e561]
+                        - gridcell "2 contributions on November 14th." [ref=f20e562]
+                        - gridcell "14 contributions on November 21st." [ref=f20e563]
+                        - gridcell "No contributions on November 28th." [ref=f20e564]
+                        - gridcell "4 contributions on December 5th." [ref=f20e565]
+                        - gridcell "9 contributions on December 12th." [ref=f20e566]
+                        - gridcell "No contributions on December 19th." [ref=f20e567]
+                        - gridcell "No contributions on December 26th." [ref=f20e568]
+                        - gridcell "No contributions on January 2nd." [ref=f20e569]
+                        - gridcell "8 contributions on January 9th." [ref=f20e570]
+                        - gridcell "18 contributions on January 16th." [ref=f20e571]
+                        - gridcell "8 contributions on January 23rd." [ref=f20e572]
+                        - gridcell "No contributions on January 30th." [ref=f20e573]
+                        - gridcell "2 contributions on February 6th." [ref=f20e574]
+                        - gridcell "4 contributions on February 13th." [ref=f20e575]
+                        - gridcell "3 contributions on February 20th." [ref=f20e576]
+                        - gridcell "5 contributions on February 27th." [ref=f20e577]
+                        - gridcell "23 contributions on March 6th." [ref=f20e578]
+                        - gridcell "No contributions on March 13th." [ref=f20e579]
+                        - gridcell "No contributions on March 20th." [ref=f20e580]
+                        - gridcell "3 contributions on March 27th." [ref=f20e581]
+                        - gridcell "2 contributions on April 3rd." [ref=f20e582]
+                        - gridcell "5 contributions on April 10th." [ref=f20e583]
+                        - gridcell "No contributions on April 17th." [ref=f20e584]
+                        - gridcell "8 contributions on April 24th." [ref=f20e585]
+                        - gridcell "9 contributions on May 1st." [ref=f20e586]
+                        - gridcell "2 contributions on May 8th." [ref=f20e587]
+                        - gridcell "No contributions on May 15th." [ref=f20e588]
+                        - gridcell "7 contributions on May 22nd." [ref=f20e589]
+                        - gridcell "7 contributions on May 29th." [ref=f20e590]
+                        - gridcell "24 contributions on June 5th." [ref=f20e591]
+                        - gridcell "51 contributions on June 12th." [ref=f20e592]
+                        - gridcell "14 contributions on June 19th." [ref=f20e593]
+                        - gridcell "53 contributions on June 26th." [ref=f20e594]
+                        - gridcell "No contributions on July 3rd." [ref=f20e595]
+                        - gridcell "3 contributions on July 10th." [ref=f20e596]
+                        - gridcell "41 contributions on July 17th." [ref=f20e597]
+                        - gridcell "26 contributions on July 24th." [ref=f20e598]
+                        - gridcell "40 contributions on July 31st." [ref=f20e599]
+                        - gridcell "15 contributions on August 7th." [ref=f20e600]
+                        - gridcell [ref=f20e601]
+                      - row [ref=f20e602]:
+                        - gridcell "Saturday" [ref=f20e603]:
+                          - generic [ref=f20e605]: Sat
+                        - gridcell "2 contributions on August 16th." [ref=f20e606]
+                        - gridcell "No contributions on August 23rd." [ref=f20e607]
+                        - gridcell "No contributions on August 30th." [ref=f20e608]
+                        - gridcell "2 contributions on September 6th." [ref=f20e609]
+                        - gridcell "No contributions on September 13th." [ref=f20e610]
+                        - gridcell "3 contributions on September 20th." [ref=f20e611]
+                        - gridcell "4 contributions on September 27th." [ref=f20e612]
+                        - gridcell "16 contributions on October 4th." [ref=f20e613]
+                        - gridcell "1 contribution on October 11th." [ref=f20e614]
+                        - gridcell "3 contributions on October 18th." [ref=f20e615]
+                        - gridcell "No contributions on October 25th." [ref=f20e616]
+                        - gridcell "3 contributions on November 1st." [ref=f20e617]
+                        - gridcell "No contributions on November 8th." [ref=f20e618]
+                        - gridcell "No contributions on November 15th." [ref=f20e619]
+                        - gridcell "3 contributions on November 22nd." [ref=f20e620]
+                        - gridcell "No contributions on November 29th." [ref=f20e621]
+                        - gridcell "2 contributions on December 6th." [ref=f20e622]
+                        - gridcell "No contributions on December 13th." [ref=f20e623]
+                        - gridcell "No contributions on December 20th." [ref=f20e624]
+                        - gridcell "No contributions on December 27th." [ref=f20e625]
+                        - gridcell "No contributions on January 3rd." [ref=f20e626]
+                        - gridcell "1 contribution on January 10th." [ref=f20e627]
+                        - gridcell "5 contributions on January 17th." [ref=f20e628]
+                        - gridcell "1 contribution on January 24th." [ref=f20e629]
+                        - gridcell "No contributions on January 31st." [ref=f20e630]
+                        - gridcell "No contributions on February 7th." [ref=f20e631]
+                        - gridcell "2 contributions on February 14th." [ref=f20e632]
+                        - gridcell "4 contributions on February 21st." [ref=f20e633]
+                        - gridcell "3 contributions on February 28th." [ref=f20e634]
+                        - gridcell "2 contributions on March 7th." [ref=f20e635]
+                        - gridcell "No contributions on March 14th." [ref=f20e636]
+                        - gridcell "No contributions on March 21st." [ref=f20e637]
+                        - gridcell "No contributions on March 28th." [ref=f20e638]
+                        - gridcell "No contributions on April 4th." [ref=f20e639]
+                        - gridcell "1 contribution on April 11th." [ref=f20e640]
+                        - gridcell "No contributions on April 18th." [ref=f20e641]
+                        - gridcell "No contributions on April 25th." [ref=f20e642]
+                        - gridcell "No contributions on May 2nd." [ref=f20e643]
+                        - gridcell "No contributions on May 9th." [ref=f20e644]
+                        - gridcell "No contributions on May 16th." [ref=f20e645]
+                        - gridcell "17 contributions on May 23rd." [ref=f20e646]
+                        - gridcell "18 contributions on May 30th." [ref=f20e647]
+                        - gridcell "16 contributions on June 6th." [ref=f20e648]
+                        - gridcell "No contributions on June 13th." [ref=f20e649]
+                        - gridcell "No contributions on June 20th." [ref=f20e650]
+                        - gridcell "No contributions on June 27th." [ref=f20e651]
+                        - gridcell "No contributions on July 4th." [ref=f20e652]
+                        - gridcell "No contributions on July 11th." [ref=f20e653]
+                        - gridcell "15 contributions on July 18th." [ref=f20e654]
+                        - gridcell "9 contributions on July 25th." [ref=f20e655]
+                        - gridcell "27 contributions on August 1st." [ref=f20e656]
+                        - gridcell "1 contribution on August 8th." [ref=f20e657]
+                        - gridcell [ref=f20e658]
+                  - generic [ref=f20e659]:
+                    - link "Learn how we count contributions" [ref=f20e661] [cursor=pointer]:
+                      - /url: https://docs.github.com/articles/why-are-my-contributions-not-showing-up-on-my-profile
+                    - generic [ref=f20e662]:
+                      - generic [ref=f20e663]: Less
+                      - generic [ref=f20e664]: No contributions.
+                      - generic [ref=f20e666]: Low contributions.
+                      - generic [ref=f20e668]: Medium-low contributions.
+                      - generic [ref=f20e670]: Medium-high contributions.
+                      - generic [ref=f20e672]: High contributions.
+                      - generic [ref=f20e674]: More
+              - generic [ref=f20e676]:
+                - navigation "Organizations" [ref=f20e678]:
+                  - link "@openclaw" [ref=f20e679] [cursor=pointer]:
+                    - /url: /Patrick-Erichsen?tab=overview&org=openclaw
+                  - link "@continuedev" [ref=f20e680] [cursor=pointer]:
+                    - /url: /Patrick-Erichsen?tab=overview&org=continuedev
+                  - link "@vercel-labs" [ref=f20e681] [cursor=pointer]:
+                    - /url: /Patrick-Erichsen?tab=overview&org=vercel-labs
+                  - group [ref=f20e682]:
+                    - button "More" [ref=f20e683] [cursor=pointer]
+                - generic [ref=f20e684]:
+                  - generic [ref=f20e685]:
+                    - heading "Activity overview" [level=3] [ref=f20e686]
+                    - generic [ref=f20e690]:
+                      - text: Contributed to
+                      - link "openclaw/clawhub" [ref=f20e691] [cursor=pointer]:
+                        - /url: /openclaw/clawhub
+                      - text: ","
+                      - link "continuedev/continue" [ref=f20e692] [cursor=pointer]:
+                        - /url: /continuedev/continue
+                      - text: ","
+                      - link "openclaw/openclaw" [ref=f20e693] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: and 74 other repositories
+                  - generic [ref=f20e695]:
+                    - generic: Loading
+                    - img "A graph representing Patrick-Erichsen's contributions from August 10, 2025 to August 13, 2026. The contributions are 51% commits, 35% pull requests, 13% code review, 1% issues." [ref=f20e697]:
+                      - generic [ref=f20e698]:
+                        - generic [ref=f20e704]: 13%
+                        - generic [ref=f20e705]: Code review
+                        - generic [ref=f20e706]: 1%
+                        - generic [ref=f20e707]: Issues
+                        - generic [ref=f20e708]: 35%
+                        - generic [ref=f20e709]: Pull requests
+                        - generic [ref=f20e710]: 51%
+                        - generic [ref=f20e711]: Commits
+            - generic [ref=f20e712]:
+              - heading "Contribution activity" [level=2] [ref=f20e713]
+              - generic [ref=f20e715]:
+                - heading "August 2026" [level=3] [ref=f20e716]
+                - group [ref=f20e724]:
+                  - button [ref=f20e725] [cursor=pointer]
+                - group [ref=f20e736]:
+                  - button "Created 5 repositories" [expanded] [ref=f20e737] [cursor=pointer]
+                  - list [ref=f20e744]:
+                    - listitem [ref=f20e745]:
+                      - link "Patrick-Erichsen/spiceclaw" [ref=f20e750] [cursor=pointer]:
+                        - /url: /Patrick-Erichsen/spiceclaw
+                      - generic [ref=f20e751]: TypeScript
+                      - generic [ref=f20e754]:
+                        - generic [ref=f20e755]: This contribution was made on Aug 12
+                        - time [ref=f20e756]: Aug 12
+                    - listitem [ref=f20e757]:
+                      - link "Patrick-Erichsen/vercel-openclaw" [ref=f20e762] [cursor=pointer]:
+                        - /url: /Patrick-Erichsen/vercel-openclaw
+                      - generic [ref=f20e763]: TypeScript
+                      - generic [ref=f20e766]:
+                        - generic [ref=f20e767]: This contribution was made on Aug 12
+                        - time [ref=f20e768]: Aug 12
+                    - listitem [ref=f20e769]:
+                      - link "Patrick-Erichsen/agentskills" [ref=f20e774] [cursor=pointer]:
+                        - /url: /Patrick-Erichsen/agentskills
+                      - generic [ref=f20e775]: Python
+                      - generic [ref=f20e778]:
+                        - generic [ref=f20e779]: This contribution was made on Aug 9
+                        - time [ref=f20e780]: Aug 9
+                    - listitem [ref=f20e781]:
+                      - link "Patrick-Erichsen/agent-plugins-site" [ref=f20e786] [cursor=pointer]:
+                        - /url: /Patrick-Erichsen/agent-plugins-site
+                      - generic [ref=f20e787]: TypeScript
+                      - generic [ref=f20e790]:
+                        - generic [ref=f20e791]: This contribution was made on Aug 9
+                        - time [ref=f20e792]: Aug 9
+                    - listitem [ref=f20e793]:
+                      - link "Patrick-Erichsen/lossless-claw" [ref=f20e798] [cursor=pointer]:
+                        - /url: /Patrick-Erichsen/lossless-claw
+                      - generic [ref=f20e799]: TypeScript
+                      - generic [ref=f20e802]:
+                        - generic [ref=f20e803]: This contribution was made on Aug 1
+                        - time [ref=f20e804]: Aug 1
+                - generic [ref=f20e809]:
+                  - generic [ref=f20e810]:
+                    - heading [level=4] [ref=f20e811]:
+                      - text: Created a pull request in
+                      - link "openclaw/openclaw" [ref=f20e812] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 26 comments
+                    - link [ref=f20e813] [cursor=pointer]:
+                      - /url: /Patrick-Erichsen?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f20e814]: Aug 6
+                  - generic [ref=f20e818]:
+                    - heading [level=3] [ref=f20e819]:
+                      - 'link "ci: mirror Docker release images to Vercel registry" [ref=f20e820] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/120058
+                    - paragraph [ref=f20e822]: Summary mirror the exact Docker release image set to Vercel Container Registry for stable, extended-stable, and beta releases publish default, sli…
+                    - generic [ref=f20e823]:
+                      - generic [ref=f20e824]: +5,842 −0 lines changed •
+                      - text: 26 comments
+                - group [ref=f20e836]:
+                  - button "Opened 53 other pull requests in 11 repositories" [ref=f20e837] [cursor=pointer]
+                - group [ref=f20e849]:
+                  - button "Reviewed 42 pull requests in 2 repositories" [expanded] [ref=f20e850] [cursor=pointer]
+                  - generic [ref=f20e857]:
+                    - group [ref=f20e859]:
+                      - button "openclaw/openclaw 23 pull requests" [ref=f20e860] [cursor=pointer]:
+                        - generic [ref=f20e861]:
+                          - generic [ref=f20e862]: openclaw/openclaw
+                          - generic [ref=f20e863]: 23 pull requests
+                    - group [ref=f20e869]:
+                      - button "openclaw/clawhub 19 pull requests" [ref=f20e870] [cursor=pointer]:
+                        - generic [ref=f20e871]:
+                          - generic [ref=f20e872]: openclaw/clawhub
+                          - generic [ref=f20e873]: 19 pull requests
+                - generic [ref=f20e882]:
+                  - generic [ref=f20e883]:
+                    - heading [level=4] [ref=f20e884]:
+                      - text: Created an issue in
+                      - link "openclaw/openclaw" [ref=f20e885] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 2 comments
+                    - link [ref=f20e886] [cursor=pointer]:
+                      - /url: /Patrick-Erichsen?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f20e887]: Aug 13
+                  - generic [ref=f20e892]:
+                    - heading [level=3] [ref=f20e893]:
+                      - link "Expose invocation correlation to Skill Workshop apply evaluators" [ref=f20e894] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/issues/122880
+                    - paragraph [ref=f20e896]:
+                      - text: Problem
+                      - code [ref=f20e897]: before_tool_call
+                      - text: exposes host-authoritative
+                      - code [ref=f20e898]: runId
+                      - text: /
+                      - code [ref=f20e899]: toolCallId
+                      - text: ", and the Skill Workshop tool accepts"
+                      - code [ref=f20e900]: correlation_id
+                      - text: ", but"
+                      - code [ref=f20e901]: PluginHookSkillProp…
+                    - generic [ref=f20e902]: 2 comments
+                - group [ref=f20e910]:
+                  - button "Opened 4 other issues in 3 repositories" [expanded] [ref=f20e911] [cursor=pointer]
+                  - generic [ref=f20e917]:
+                    - group [ref=f20e919]:
+                      - button "NVIDIA/SkillEvaluator 1 closed 1 open" [ref=f20e920] [cursor=pointer]:
+                        - generic [ref=f20e921]:
+                          - generic [ref=f20e922]: NVIDIA/SkillEvaluator
+                          - generic [ref=f20e923]:
+                            - generic [ref=f20e924]: "1"
+                            - text: closed
+                            - generic [ref=f20e925]: "1"
+                            - text: open
+                    - group [ref=f20e931]:
+                      - button "authzed/spiceclaw 1 open" [ref=f20e932] [cursor=pointer]:
+                        - generic [ref=f20e933]:
+                          - generic [ref=f20e934]: authzed/spiceclaw
+                          - generic [ref=f20e935]:
+                            - generic [ref=f20e936]: "1"
+                            - text: open
+                    - group [ref=f20e942]:
+                      - button "block/buzz 1 open" [ref=f20e943] [cursor=pointer]:
+                        - generic [ref=f20e944]:
+                          - generic [ref=f20e945]: block/buzz
+                          - generic [ref=f20e946]:
+                            - generic [ref=f20e947]: "1"
+                            - text: open
+                - generic [ref=f20e956]:
+                  - text: 54 contributions in private repositories
+                  - generic [ref=f20e957]: Aug 1 – Aug 12
+              - generic [ref=f20e958]:
+                - generic: Loading
+                - button "Show more activity" [ref=f20e960] [cursor=pointer]
+          - list [ref=f20e963]:
+            - listitem [ref=f20e964]:
+              - link "Contribution activity in 2026, 1 of 11" [ref=f20e965] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2026-08-01&to=2026-08-13
+                - text: "2026"
+            - listitem [ref=f20e966]:
+              - link "Contribution activity in 2025, 2 of 11" [ref=f20e967] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2025-12-01&to=2025-12-31
+                - text: "2025"
+            - listitem [ref=f20e968]:
+              - link "Contribution activity in 2024, 3 of 11" [ref=f20e969] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2024-12-01&to=2024-12-31
+                - text: "2024"
+            - listitem [ref=f20e970]:
+              - link "Contribution activity in 2023, 4 of 11" [ref=f20e971] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2023-12-01&to=2023-12-31
+                - text: "2023"
+            - listitem [ref=f20e972]:
+              - link "Contribution activity in 2022, 5 of 11" [ref=f20e973] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2022-12-01&to=2022-12-31
+                - text: "2022"
+            - listitem [ref=f20e974]:
+              - link "Contribution activity in 2021, 6 of 11" [ref=f20e975] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2021-12-01&to=2021-12-31
+                - text: "2021"
+            - listitem [ref=f20e976]:
+              - link "Contribution activity in 2020, 7 of 11" [ref=f20e977] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2020-12-01&to=2020-12-31
+                - text: "2020"
+            - listitem [ref=f20e978]:
+              - link "Contribution activity in 2019, 8 of 11" [ref=f20e979] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2019-12-01&to=2019-12-31
+                - text: "2019"
+            - listitem [ref=f20e980]:
+              - link "Contribution activity in 2018, 9 of 11" [ref=f20e981] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2018-12-01&to=2018-12-31
+                - text: "2018"
+            - listitem [ref=f20e982]:
+              - link "Contribution activity in 2017, 10 of 11" [ref=f20e983] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2017-12-01&to=2017-12-31
+                - text: "2017"
+            - listitem [ref=f20e984]:
+              - link "Contribution activity in 2016, 11 of 11" [ref=f20e985] [cursor=pointer]:
+                - /url: /Patrick-Erichsen?tab=overview&from=2016-12-01&to=2016-12-31
+                - text: "2016"
+  - contentinfo [ref=f20e986]:
+    - heading "Footer" [level=2] [ref=f20e987]
+    - generic [ref=f20e988]:
+      - generic [ref=f20e989]:
+        - link "GitHub Homepage" [ref=f20e990] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f20e993]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f20e994]:
+        - heading "Footer navigation" [level=3] [ref=f20e995]
+        - list "Footer navigation" [ref=f20e996]:
+          - listitem [ref=f20e997]:
+            - link "Terms" [ref=f20e998] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f20e999]:
+            - link "Privacy" [ref=f20e1000] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f20e1001]:
+            - link "Security" [ref=f20e1002] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f20e1003]:
+            - link "Status" [ref=f20e1004] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f20e1005]:
+            - link "Community" [ref=f20e1006] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f20e1007]:
+            - link "Docs" [ref=f20e1008] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f20e1009]:
+            - link "Contact" [ref=f20e1010] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f20e1011]:
+            - button "Manage cookies" [ref=f20e1013] [cursor=pointer]
+          - listitem [ref=f20e1014]:
+            - button "Do not share my personal information" [ref=f20e1016] [cursor=pointer]

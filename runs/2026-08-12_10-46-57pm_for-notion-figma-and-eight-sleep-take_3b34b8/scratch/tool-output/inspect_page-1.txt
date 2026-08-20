@@ -1,0 +1,1295 @@
+URL: https://www.figma.com/blog/
+Title: Figma Blog | Shortcut
+
+- generic [active] [ref=f17e1]:
+  - generic [ref=f17e2]:
+    - alertdialog "Cookie Consent" [ref=f17e3]:
+      - paragraph [ref=f17e5]:
+        - text: This website uses cookies, pixel tags, and local storage for performance, personalization, and marketing purposes. Our use of some cookies may be considered a sale, sharing for behavioral advertising, or targeted advertising. For more, see our
+        - link "privacy policy." [ref=f17e6] [cursor=pointer]:
+          - /url: https://www.figma.com/privacy/
+        - strong [ref=f17e7]: "California Residents:"
+        - text: learn how personal information is
+        - link "collected" [ref=f17e8] [cursor=pointer]:
+          - /url: https://www.figma.com/privacy/#ca-notice
+        - text: ", including how it is"
+        - link "used" [ref=f17e9] [cursor=pointer]:
+          - /url: https://www.figma.com/privacy/#purpose
+        - text: ", whether it is"
+        - link "“sold” or “shared”" [ref=f17e10] [cursor=pointer]:
+          - /url: https://www.figma.com/privacy/#ca-notice
+        - text: ", and how long it is"
+        - link "retained" [ref=f17e11] [cursor=pointer]:
+          - /url: https://www.figma.com/privacy/#retention
+        - text: .
+      - button "Opt-Out" [ref=f17e12] [cursor=pointer]
+      - button "Dismiss" [ref=f17e14] [cursor=pointer]
+    - link [ref=f17e17] [cursor=pointer]:
+      - /url: "#main"
+      - paragraph [ref=f17e18]: Skip to main content
+    - generic [ref=f17e20]:
+      - banner [ref=f17e21]:
+        - navigation "Main" [ref=f17e22]:
+          - generic [ref=f17e23]:
+            - generic [ref=f17e24]:
+              - link "Subscribe to Figma’s editorial newsletter" [ref=f17e26] [cursor=pointer]:
+                - /url: https://www.figma.com/
+              - link "Homepage" [ref=f17e29] [cursor=pointer]:
+                - /url: https://www.figma.com/
+              - link "Shortcut" [ref=f17e40] [cursor=pointer]:
+                - /url: https://www.figma.com/blog/
+            - generic [ref=f17e44]:
+              - generic [ref=f17e45]:
+                - list [ref=f17e46]:
+                  - listitem [ref=f17e47]:
+                    - link "Maker Stories" [ref=f17e48] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/maker-stories/
+                  - listitem [ref=f17e49]:
+                    - link "Working Well" [ref=f17e50] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/working-well/
+                  - listitem [ref=f17e51]:
+                    - link "Inside Figma" [ref=f17e52] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/inside-figma/
+                  - listitem [ref=f17e53]:
+                    - link "Insights" [ref=f17e54] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/insights/
+                  - listitem [ref=f17e55]:
+                    - link "Latest" [ref=f17e56] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/everything/
+                - button "Toggle topics section" [ref=f17e57] [cursor=pointer]: Topics
+              - button "Search" [ref=f17e60] [cursor=pointer]
+      - main [ref=f17e65]:
+        - generic [ref=f17e67]:
+          - heading "Shortcut | Figma Blog" [level=1] [ref=f17e68]
+          - link [ref=f17e69] [cursor=pointer]:
+            - /url: https://www.figma.com/blog/code-craft-and-the-making-of-nested-folders/
+            - img "Abstract digital illustration featuring vivid gradients of neon green, electric blue, purple, pink, orange, and yellow. Five stacked geometric shapes resembling stylized windows or cards ascend diagonally from the lower left to the upper right, each paired with a large curved white arch. A small iridescent sphere floats above the top shape. Soft, sweeping bands of color and subtle grain create a luminous, futuristic atmosphere with no text or people." [ref=f17e72]
+          - generic [ref=f17e73]:
+            - article "Code, craft, and the making of nested folders" [ref=f17e74]:
+              - link "Code, craft, and the making of nested folders August 3, 2026 By Ethan Adams, Cai Charniga, Sachi Shah From treating code as a proposal to turning handoffs into conversations, here's how we shaped a new way of working to ship nested folders." [ref=f17e75] [cursor=pointer]:
+                - /url: https://www.figma.com/blog/code-craft-and-the-making-of-nested-folders/
+                - heading "Code, craft, and the making of nested folders" [level=2] [ref=f17e76]
+                - time [ref=f17e77]: August 3, 2026
+                - generic [ref=f17e78]: By Ethan Adams, Cai Charniga, Sachi Shah
+                - paragraph [ref=f17e81]: From treating code as a proposal to turning handoffs into conversations, here's how we shaped a new way of working to ship nested folders.
+              - list "Tags" [ref=f17e83]:
+                - listitem [ref=f17e84]:
+                  - link "Inside Figma" [ref=f17e85] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/inside-figma/
+                - listitem [ref=f17e86]:
+                  - link "Product updates" [ref=f17e87] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/product-updates/
+                - listitem [ref=f17e88]:
+                  - link "Behind the scenes" [ref=f17e89] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/behind-the-scenes/
+                - listitem [ref=f17e90]:
+                  - button "Show more tags" [ref=f17e91] [cursor=pointer]
+            - generic [ref=f17e97]:
+              - article "A properties panel and annotations, now in Figma Make" [ref=f17e98]:
+                - generic [ref=f17e100]:
+                  - link "Figma Make properties panel and annotations A properties panel and annotations, now in Figma Make July 30, 2026 By Phillip Wang With visual editing and annotations, Figma Make is bridging the gap between design and code. Select any element you want to change, adjust it directly in the properties panel, or write in-context prompts with annotations." [ref=f17e101] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/properties-panel-and-annotations-now-in-figma-make/
+                    - iframe [ref=f17e107]:
+                      - generic [ref=f25e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f25e12] [cursor=pointer]
+                    - heading "A properties panel and annotations, now in Figma Make" [level=3] [ref=f17e108]
+                    - generic [ref=f17e109]:
+                      - time [ref=f17e110]: July 30, 2026
+                      - generic [ref=f17e111]: By Phillip Wang
+                      - paragraph [ref=f17e114]: With visual editing and annotations, Figma Make is bridging the gap between design and code. Select any element you want to change, adjust it directly in the properties panel, or write in-context prompts with annotations.
+                  - list "Tags" [ref=f17e116]:
+                    - listitem [ref=f17e117]:
+                      - link "Inside Figma" [ref=f17e118] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e119]:
+                      - link "Product updates" [ref=f17e120] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/product-updates/
+                    - listitem [ref=f17e121]:
+                      - link "Figma Make" [ref=f17e122] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-make/
+                    - listitem [ref=f17e123]:
+                      - button "Show more tags" [ref=f17e124] [cursor=pointer]
+              - 'article "Better code, fewer tokens: The benefits of Code Connect in MCP" [ref=f17e130]':
+                - generic [ref=f17e132]:
+                  - 'link "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape. An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape. Better code, fewer tokens: The benefits of Code Connect in MCP August 5, 2026 By Tom Weightman When going from design to code, agents lack the context of your production components. With Code Connect in Figma’s MCP, they get that context. We measured its impact on token usage, task duration, and code quality." [ref=f17e133] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/the-benefits-of-code-connect-in-mcp/
+                    - generic [ref=f17e135]:
+                      - img "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape." [ref=f17e136]
+                      - img "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape."
+                    - 'heading "Better code, fewer tokens: The benefits of Code Connect in MCP" [level=3] [ref=f17e137]'
+                    - generic [ref=f17e138]:
+                      - time [ref=f17e139]: August 5, 2026
+                      - generic [ref=f17e140]: By Tom Weightman
+                      - paragraph [ref=f17e143]: When going from design to code, agents lack the context of your production components. With Code Connect in Figma’s MCP, they get that context. We measured its impact on token usage, task duration, and code quality.
+                  - list "Tags" [ref=f17e145]:
+                    - listitem [ref=f17e146]:
+                      - link "Inside Figma" [ref=f17e147] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e148]:
+                      - link "Engineering" [ref=f17e149] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/engineering/
+                    - listitem [ref=f17e150]:
+                      - link "Figma MCP" [ref=f17e151] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-mcp/
+                    - listitem [ref=f17e152]:
+                      - button "Show more tags" [ref=f17e153] [cursor=pointer]
+        - generic [ref=f17e160]:
+          - generic [ref=f17e161]:
+            - heading "Catch up on Config 2026" [level=2] [ref=f17e163]
+            - region [ref=f17e164]:
+              - generic [ref=f17e165]:
+                - generic [ref=f17e166]:
+                  - status [ref=f17e167]: Slide 1 of 8
+                  - text: 1 of 8
+                - group "Slide controls" [ref=f17e168]:
+                  - button "Previous slide" [ref=f17e169] [cursor=pointer]
+                  - button "Next slide" [ref=f17e172] [cursor=pointer]
+              - generic [ref=f17e177]:
+                - group [ref=f17e178]:
+                  - 'article "Config 2026: New materials, new tools and a more expressive canvas" [ref=f17e179]':
+                    - generic [ref=f17e180]:
+                      - 'link "Collage-style product graphic showcasing AI-assisted design and development workflows, with plugin creation prompts, visual effect controls, code generation tools, and interactive UI components arranged across a creative workspace. Config 2026: New materials, new tools and a more expressive canvas June 24, 2026 By Dylan Field Push past what you thought was possible with code layers, Figma Motion, shaders, generative plugins and Weave tools, all on the canvas." [ref=f17e181] [cursor=pointer]':
+                        - /url: https://www.figma.com/blog/config-2026-recap/
+                        - img "Collage-style product graphic showcasing AI-assisted design and development workflows, with plugin creation prompts, visual effect controls, code generation tools, and interactive UI components arranged across a creative workspace." [ref=f17e184]
+                        - 'heading "Config 2026: New materials, new tools and a more expressive canvas" [level=3] [ref=f17e185]'
+                        - generic [ref=f17e186]:
+                          - time [ref=f17e187]: June 24, 2026
+                          - generic [ref=f17e188]: By Dylan Field
+                          - paragraph [ref=f17e191]: Push past what you thought was possible with code layers, Figma Motion, shaders, generative plugins and Weave tools, all on the canvas.
+                      - list "Tags" [ref=f17e193]:
+                        - listitem [ref=f17e194]:
+                          - link "Inside Figma" [ref=f17e195] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                        - listitem [ref=f17e196]:
+                          - link "Product updates" [ref=f17e197] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/product-updates/
+                        - listitem [ref=f17e198]:
+                          - link "Config" [ref=f17e199] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/config/
+                        - listitem [ref=f17e200]:
+                          - button "Show more tags" [ref=f17e201] [cursor=pointer]
+                - group [ref=f17e207]:
+                  - article [ref=f17e208]:
+                    - generic [ref=f17e209]:
+                      - link [ref=f17e210] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/introducing-figma-motion/
+                        - iframe [ref=f17e216]:
+                          - generic [ref=f28e4]:
+                            - generic: Playing in picture-in-picture
+                            - button "Play" [ref=f28e12] [cursor=pointer]
+                        - heading [level=3] [ref=f17e217]: "Introducing Figma Motion: Your canvas now has a timeline"
+                        - generic [ref=f17e218]:
+                          - time [ref=f17e219]: June 24, 2026
+                          - generic [ref=f17e220]: By David Hornsby
+                          - paragraph [ref=f17e223]: Motion now lives on the canvas—in the same file as your components, your variables, and your team—so your designs can come to life from day one.
+                      - list [ref=f17e225]:
+                        - listitem [ref=f17e226]:
+                          - link [ref=f17e227] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e228]:
+                          - link [ref=f17e229] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/product-updates/
+                            - text: Product updates
+                        - listitem [ref=f17e230]:
+                          - link [ref=f17e231] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-design/
+                            - text: Figma Design
+                        - listitem [ref=f17e232]:
+                          - button [ref=f17e233] [cursor=pointer]
+                - group [ref=f17e239]:
+                  - article [ref=f17e240]:
+                    - generic [ref=f17e241]:
+                      - link [ref=f17e242] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/agent-custom-tools-context-skills/
+                        - heading [level=3] [ref=f17e246]: Figma’s design agent, now with custom tools and greater context
+                        - generic [ref=f17e247]:
+                          - time [ref=f17e248]: June 24, 2026
+                          - generic [ref=f17e249]: By Georgia Rust, Rodrigo Davies
+                          - paragraph [ref=f17e252]: Prompting gets you started. Custom tools, real context, and skills take the design agent further—so what ends up on the canvas actually looks like you.
+                      - list [ref=f17e254]:
+                        - listitem [ref=f17e255]:
+                          - link [ref=f17e256] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e257]:
+                          - link [ref=f17e258] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/product-updates/
+                            - text: Product updates
+                        - listitem [ref=f17e259]:
+                          - link [ref=f17e260] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-agent/
+                            - text: Figma agent
+                        - listitem [ref=f17e261]:
+                          - button [ref=f17e262] [cursor=pointer]
+                - group [ref=f17e268]:
+                  - article [ref=f17e269]:
+                    - generic [ref=f17e270]:
+                      - link [ref=f17e271] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/code-on-the-figma-canvas/
+                        - heading [level=3] [ref=f17e275]: Code on the Figma canvas
+                        - generic [ref=f17e276]:
+                          - time [ref=f17e277]: June 24, 2026
+                          - generic [ref=f17e278]: By Nikolas Klein
+                          - paragraph [ref=f17e281]: With code layers in Figma Design, you can explore multiple directions with code, side by side with your team.
+                      - list [ref=f17e283]:
+                        - listitem [ref=f17e284]:
+                          - link [ref=f17e285] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e286]:
+                          - link [ref=f17e287] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/product-updates/
+                            - text: Product updates
+                        - listitem [ref=f17e288]:
+                          - link [ref=f17e289] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-design/
+                            - text: Figma Design
+                        - listitem [ref=f17e290]:
+                          - button [ref=f17e291] [cursor=pointer]
+                - group [ref=f17e297]:
+                  - article [ref=f17e298]:
+                    - generic [ref=f17e299]:
+                      - link [ref=f17e300] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/connecting-figma-and-weave/
+                        - heading [level=3] [ref=f17e304]: Connecting Figma and Weave
+                        - generic [ref=f17e305]:
+                          - time [ref=f17e306]: June 24, 2026
+                          - generic [ref=f17e307]: By Itay Schiff
+                          - paragraph [ref=f17e310]: Today, we’re announcing new ways your Weave creative workflows can live alongside your Figma frames.
+                      - list [ref=f17e312]:
+                        - listitem [ref=f17e313]:
+                          - link [ref=f17e314] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e315]:
+                          - link [ref=f17e316] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/product-updates/
+                            - text: Product updates
+                        - listitem [ref=f17e317]:
+                          - link [ref=f17e318] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-weave/
+                            - text: Figma Weave
+                        - listitem [ref=f17e319]:
+                          - button [ref=f17e320] [cursor=pointer]
+                - group [ref=f17e326]:
+                  - article [ref=f17e327]:
+                    - generic [ref=f17e328]:
+                      - link [ref=f17e329] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/got-skills-make-the-figma-agent-a-better-collaborator/
+                        - heading [level=3] [ref=f17e333]: Got skills? Make the Figma agent a better collaborator
+                        - generic [ref=f17e334]:
+                          - time [ref=f17e335]: July 1, 2026
+                          - generic [ref=f17e336]: By Sachi Shah, Sean Lee
+                          - paragraph [ref=f17e339]: From sharing your best thinking to learning from your team’s go-to prompts, here’s what skills unlock in the Figma agent.
+                      - list [ref=f17e341]:
+                        - listitem [ref=f17e342]:
+                          - link [ref=f17e343] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/working-well/
+                            - text: Working Well
+                        - listitem [ref=f17e344]:
+                          - link [ref=f17e345] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-agent/
+                            - text: Figma agent
+                        - listitem [ref=f17e346]:
+                          - link [ref=f17e347] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/figma-design/
+                            - text: Figma Design
+                        - listitem [ref=f17e348]:
+                          - button [ref=f17e349] [cursor=pointer]
+                - group [ref=f17e355]:
+                  - article [ref=f17e356]:
+                    - generic [ref=f17e357]:
+                      - link [ref=f17e358] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/how-season-5-merch-came-to-life/
+                        - iframe [ref=f17e364]:
+                          - generic [ref=f24e4]:
+                            - generic: Playing in picture-in-picture
+                            - button "Play" [ref=f24e12] [cursor=pointer]
+                        - heading [level=3] [ref=f17e365]: Meet the artists behind Figma’s Season 5 collection
+                        - generic [ref=f17e366]:
+                          - time [ref=f17e367]: June 29, 2026
+                          - generic [ref=f17e368]: By Emma Webster
+                          - paragraph [ref=f17e371]: Figma's Season 5 merch is full of surprises—smiling cubes, a tomato with arms, wooden shapes painted in gouache. We asked the eight artists behind the collection how they work, what inspires them, and what they created.
+                      - list [ref=f17e373]:
+                        - listitem [ref=f17e374]:
+                          - link [ref=f17e375] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e376]:
+                          - link [ref=f17e377] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/behind-the-scenes/
+                            - text: Behind the scenes
+                        - listitem [ref=f17e378]:
+                          - link [ref=f17e379] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/culture/
+                            - text: Culture
+                        - listitem [ref=f17e380]:
+                          - button [ref=f17e381] [cursor=pointer]
+                - group [ref=f17e387]:
+                  - article [ref=f17e388]:
+                    - generic [ref=f17e389]:
+                      - link [ref=f17e390] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/the-visual-identity-behind-config-2026/
+                        - iframe [ref=f17e396]:
+                          - generic [ref=f26e4]:
+                            - generic: Playing in picture-in-picture
+                            - button "Play" [ref=f26e12] [cursor=pointer]
+                        - heading [level=3] [ref=f17e397]: "Digital tools, human expression: The visual identity behind Config 2026"
+                        - generic [ref=f17e398]:
+                          - time [ref=f17e399]: July 27, 2026
+                          - generic [ref=f17e400]: By Matt Alagiah
+                          - paragraph [ref=f17e403]: Here’s how Figma’s Brand Studio designed a conference that captured the very human ways we remix and reinvent when working with AI tools.
+                      - list [ref=f17e405]:
+                        - listitem [ref=f17e406]:
+                          - link [ref=f17e407] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/inside-figma/
+                            - text: Inside Figma
+                        - listitem [ref=f17e408]:
+                          - link [ref=f17e409] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/config/
+                            - text: Config
+                        - listitem [ref=f17e410]:
+                          - link [ref=f17e411] [cursor=pointer]:
+                            - /url: https://www.figma.com/blog/branding/
+                            - text: Branding
+                        - listitem [ref=f17e412]:
+                          - button [ref=f17e413] [cursor=pointer]
+          - generic [ref=f17e420]:
+            - generic [ref=f17e422]:
+              - paragraph [ref=f17e423]: "Config 2026: New materials, new tools, and a more expressive canvas"
+              - figure "Dylan Field, Co-founder and CEO, Figma" [ref=f17e424]:
+                - blockquote [ref=f17e425]:
+                  - generic [ref=f17e426]: "AI has lowered the floor, it has not raised the ceiling. Designers, creatives, builders: You will raise the ceiling."
+                  - generic [ref=f17e427]:
+                    - text: “
+                    - generic [ref=f17e428]: AI
+                    - generic [ref=f17e429]: has
+                    - generic [ref=f17e430]: lowered
+                    - generic [ref=f17e431]: the
+                    - generic [ref=f17e432]: floor,
+                    - generic [ref=f17e433]: it
+                    - generic [ref=f17e434]: has
+                    - generic [ref=f17e435]: not
+                    - generic [ref=f17e436]: raised
+                    - generic [ref=f17e437]: the
+                    - generic [ref=f17e438]: ceiling.
+                    - generic [ref=f17e439]: Designers,
+                    - generic [ref=f17e440]: creatives,
+                    - generic [ref=f17e441]: "builders:"
+                    - generic [ref=f17e442]: You
+                    - generic [ref=f17e443]: will
+                    - generic [ref=f17e444]: raise
+                    - generic [ref=f17e445]: the
+                    - text: ceiling.”
+            - link "Read the article" [ref=f17e448] [cursor=pointer]:
+              - /url: https://www.figma.com/blog/config-2026-recap/
+          - article "Start Anywhere, a magazine by Figma" [ref=f17e452]:
+            - button "play" [ref=f17e457] [cursor=pointer]
+            - generic [ref=f17e461]:
+              - link "Start Anywhere, a magazine by Figma June 29, 2026 By Amber Bravo New tools and materials make it easier to build anything and start anywhere. The question now is, where do you want to go?" [ref=f17e463] [cursor=pointer]:
+                - /url: https://www.figma.com/blog/start-anywhere/
+                - heading "Start Anywhere, a magazine by Figma" [level=3] [ref=f17e464]
+                - generic [ref=f17e465]:
+                  - time [ref=f17e466]: June 29, 2026
+                  - generic [ref=f17e467]: By Amber Bravo
+                  - paragraph [ref=f17e470]: New tools and materials make it easier to build anything and start anywhere. The question now is, where do you want to go?
+              - list "Tags" [ref=f17e473]:
+                - listitem [ref=f17e474]:
+                  - link "Inside Figma" [ref=f17e475] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/inside-figma/
+                - listitem [ref=f17e476]:
+                  - link "Config" [ref=f17e477] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/config/
+                - listitem [ref=f17e478]:
+                  - link "Design" [ref=f17e479] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/design/
+                - listitem [ref=f17e480]:
+                  - button "Show more tags" [ref=f17e481] [cursor=pointer]
+          - region [ref=f17e488]:
+            - generic [ref=f17e489]:
+              - generic [ref=f17e490]:
+                - status [ref=f17e491]: Slide 1 of 8
+                - text: 1 of 8
+              - group "Slide controls" [ref=f17e492]:
+                - button "Previous slide" [ref=f17e493] [cursor=pointer]
+                - button "Next slide" [ref=f17e496] [cursor=pointer]
+            - generic [ref=f17e501]:
+              - group [ref=f17e502]:
+                - article "You never stop cultivating taste" [ref=f17e503]:
+                  - generic [ref=f17e504]:
+                    - link "Illustration of a gardener on a ladder trimming a tree Illustration of a gardener on a ladder trimming a tree You never stop cultivating taste June 8, 2026 By Loredana Crisan Having the right tools can only take you so far. To become a master of your craft, you need to hone a point of view." [ref=f17e505] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/you-never-stop-cultivating-taste/
+                      - generic [ref=f17e507]:
+                        - img "Illustration of a gardener on a ladder trimming a tree" [ref=f17e508]
+                        - img "Illustration of a gardener on a ladder trimming a tree"
+                      - heading "You never stop cultivating taste" [level=3] [ref=f17e509]
+                      - generic [ref=f17e510]:
+                        - time [ref=f17e511]: June 8, 2026
+                        - generic [ref=f17e512]: By Loredana Crisan
+                        - paragraph [ref=f17e515]: Having the right tools can only take you so far. To become a master of your craft, you need to hone a point of view.
+                    - list "Tags" [ref=f17e517]:
+                      - listitem [ref=f17e518]:
+                        - link "Insights" [ref=f17e519] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/insights/
+                      - listitem [ref=f17e520]:
+                        - link "Thought leadership" [ref=f17e521] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/thought-leadership/
+                      - listitem [ref=f17e522]:
+                        - link "Tips & inspiration" [ref=f17e523] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/tips-and-inspiration/
+                      - listitem [ref=f17e524]:
+                        - button "Show more tags" [ref=f17e525] [cursor=pointer]
+              - group [ref=f17e531]:
+                - article [ref=f17e532]:
+                  - generic [ref=f17e533]:
+                    - link [ref=f17e534] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/what-matters-when-anyone-can-build/
+                      - heading [level=3] [ref=f17e538]: What matters when anyone can build
+                      - generic [ref=f17e539]:
+                        - time [ref=f17e540]: May 22, 2026
+                        - generic [ref=f17e541]: By Yuhki Yamashita
+                        - paragraph [ref=f17e544]: If AI can make anyone a product builder, the real edge is knowing what’s worth shipping.
+                    - list [ref=f17e546]:
+                      - listitem [ref=f17e547]:
+                        - link [ref=f17e548] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/insights/
+                          - text: Insights
+                      - listitem [ref=f17e549]:
+                        - link [ref=f17e550] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/product-management/
+                          - text: Product management
+                      - listitem [ref=f17e551]:
+                        - link [ref=f17e552] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/thought-leadership/
+                          - text: Thought leadership
+              - group [ref=f17e553]:
+                - article [ref=f17e554]:
+                  - generic [ref=f17e555]:
+                    - link [ref=f17e556] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/principles-in-motion/
+                      - iframe [ref=f17e562]:
+                        - generic [ref=f23e4]:
+                          - generic: Playing in picture-in-picture
+                          - button "Play" [ref=f23e12] [cursor=pointer]
+                      - heading [level=3] [ref=f17e563]: Principles in motion
+                      - generic [ref=f17e564]:
+                        - time [ref=f17e565]: June 24, 2026
+                        - generic [ref=f17e566]: By Anja Laubscher
+                        - paragraph [ref=f17e569]: When you’re designing motion, you’re designing with time. Understanding the mechanics turns movement into meaning.
+                    - list [ref=f17e571]:
+                      - listitem [ref=f17e572]:
+                        - link [ref=f17e573] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/working-well/
+                          - text: Working Well
+                      - listitem [ref=f17e574]:
+                        - link [ref=f17e575] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/motion/
+                          - text: Motion
+                      - listitem [ref=f17e576]:
+                        - link [ref=f17e577] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/profiles-and-interviews/
+                          - text: Profiles & interviews
+                      - listitem [ref=f17e578]:
+                        - button [ref=f17e579] [cursor=pointer]
+              - group [ref=f17e585]:
+                - article [ref=f17e586]:
+                  - generic [ref=f17e587]:
+                    - link [ref=f17e588] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/pantone-speaking-the-language-of-color/
+                      - heading [level=3] [ref=f17e592]: Speaking the language of color
+                      - generic [ref=f17e593]:
+                        - time [ref=f17e594]: June 17, 2026
+                        - generic [ref=f17e595]: By Jenny Xie
+                        - paragraph [ref=f17e598]: The Pantone Color Institute explains how brands can use color to shape meaning and drive trends.
+                    - list [ref=f17e600]:
+                      - listitem [ref=f17e601]:
+                        - link [ref=f17e602] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/maker-stories/
+                          - text: Maker Stories
+                      - listitem [ref=f17e603]:
+                        - link [ref=f17e604] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/branding/
+                          - text: Branding
+                      - listitem [ref=f17e605]:
+                        - link [ref=f17e606] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/culture/
+                          - text: Culture
+                      - listitem [ref=f17e607]:
+                        - button [ref=f17e608] [cursor=pointer]
+              - group [ref=f17e614]:
+                - article [ref=f17e615]:
+                  - generic [ref=f17e616]:
+                    - link [ref=f17e617] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/what-the-design-to-code-loop-unlocks/
+                      - iframe [ref=f17e623]:
+                        - generic [ref=f19e4]:
+                          - generic: Playing in picture-in-picture
+                          - button "Play" [ref=f19e12] [cursor=pointer]
+                      - heading [level=3] [ref=f17e624]: What the design-to-code loop unlocks
+                      - generic [ref=f17e625]:
+                        - time [ref=f17e626]: May 12, 2026
+                        - generic [ref=f17e627]: By Anja Laubscher
+                        - paragraph [ref=f17e630]: With work moving more fluidly between code and canvas, workflows aren’t just changing—they’re converging.
+                    - list [ref=f17e632]:
+                      - listitem [ref=f17e633]:
+                        - link [ref=f17e634] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/working-well/
+                          - text: Working Well
+                      - listitem [ref=f17e635]:
+                        - link [ref=f17e636] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/ai/
+                          - text: AI
+                      - listitem [ref=f17e637]:
+                        - link [ref=f17e638] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/design/
+                          - text: Design
+                      - listitem [ref=f17e639]:
+                        - button [ref=f17e640] [cursor=pointer]
+              - group [ref=f17e646]:
+                - article [ref=f17e647]:
+                  - generic [ref=f17e648]:
+                    - link [ref=f17e649] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/how-to-design-agentic-tools-for-work/
+                      - heading [level=3] [ref=f17e652]: How to design agentic tools for work
+                      - generic [ref=f17e653]:
+                        - time [ref=f17e654]: April 29, 2026
+                        - generic [ref=f17e655]: By Jenny Xie
+                        - paragraph [ref=f17e658]: The Gemini Enterprise team shares their approach to making complex, multi-agent workflows feel simple, intuitive, and trustworthy.
+                    - list [ref=f17e660]:
+                      - listitem [ref=f17e661]:
+                        - link [ref=f17e662] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/maker-stories/
+                          - text: Maker Stories
+                      - listitem [ref=f17e663]:
+                        - link [ref=f17e664] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/ai/
+                          - text: AI
+                      - listitem [ref=f17e665]:
+                        - link [ref=f17e666] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/design/
+                          - text: Design
+                      - listitem [ref=f17e667]:
+                        - button [ref=f17e668] [cursor=pointer]
+              - group [ref=f17e674]:
+                - article [ref=f17e675]:
+                  - generic [ref=f17e676]:
+                    - link [ref=f17e677] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/4-new-ways-to-go-from-idea-to-product-with-ai-tools/
+                      - heading [level=3] [ref=f17e681]: 4 new ways to go from idea to product with AI tools
+                      - generic [ref=f17e682]:
+                        - time [ref=f17e683]: May 28, 2026
+                        - generic [ref=f17e684]: By Emma Webster
+                        - paragraph [ref=f17e687]: AI tools are changing how teams build products—from where they start to what carries through to production. Here's what that shift looks like across four organizations.
+                    - list [ref=f17e689]:
+                      - listitem [ref=f17e690]:
+                        - link [ref=f17e691] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/working-well/
+                          - text: Working Well
+                      - listitem [ref=f17e692]:
+                        - link [ref=f17e693] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/ai/
+                          - text: AI
+                      - listitem [ref=f17e694]:
+                        - link [ref=f17e695] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/design/
+                          - text: Design
+                      - listitem [ref=f17e696]:
+                        - button [ref=f17e697] [cursor=pointer]
+              - group [ref=f17e703]:
+                - article [ref=f17e704]:
+                  - generic [ref=f17e705]:
+                    - link [ref=f17e706] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/future-states/
+                      - heading [level=3] [ref=f17e710]: What does the future of software look like?
+                      - generic [ref=f17e711]:
+                        - time [ref=f17e712]: June 24, 2026
+                        - generic [ref=f17e713]: By Jenny Xie
+                        - paragraph [ref=f17e716]: Our community imagines how AI might bring about more human ways to interact with software.
+                    - list [ref=f17e718]:
+                      - listitem [ref=f17e719]:
+                        - link [ref=f17e720] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/insights/
+                          - text: Insights
+                      - listitem [ref=f17e721]:
+                        - link [ref=f17e722] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/ai/
+                          - text: AI
+                      - listitem [ref=f17e723]:
+                        - link [ref=f17e724] [cursor=pointer]:
+                          - /url: https://www.figma.com/blog/ui-ux/
+                          - text: UI/UX
+                      - listitem [ref=f17e725]:
+                        - button [ref=f17e726] [cursor=pointer]
+          - generic [ref=f17e732]:
+            - heading "Insights on software" [level=2] [ref=f17e734]
+            - 'article "Figma''s 2026 AI report: Can AI help us collaborate better?" [ref=f17e735]':
+              - iframe [ref=f17e741]:
+                - generic [ref=f20e4]:
+                  - generic: Playing in picture-in-picture
+                  - button "Play" [ref=f20e12] [cursor=pointer]
+              - generic [ref=f17e743]:
+                - 'link "Figma''s 2026 AI report: Can AI help us collaborate better? June 24, 2026 By Madeline Stafford, Shane Johnston AI used to be a solo act. According to our research, it’s not anymore." [ref=f17e745] [cursor=pointer]':
+                  - /url: https://www.figma.com/blog/2026-ai-report/
+                  - 'heading "Figma''s 2026 AI report: Can AI help us collaborate better?" [level=3] [ref=f17e746]'
+                  - generic [ref=f17e747]:
+                    - time [ref=f17e748]: June 24, 2026
+                    - generic [ref=f17e749]: By Madeline Stafford, Shane Johnston
+                    - paragraph [ref=f17e752]: AI used to be a solo act. According to our research, it’s not anymore.
+                - list "Tags" [ref=f17e755]:
+                  - listitem [ref=f17e756]:
+                    - link "Insights" [ref=f17e757] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/insights/
+                  - listitem [ref=f17e758]:
+                    - link "AI" [ref=f17e759] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/ai/
+                  - listitem [ref=f17e760]:
+                    - link "Collaboration" [ref=f17e761] [cursor=pointer]:
+                      - /url: https://www.figma.com/blog/collaboration/
+                  - listitem [ref=f17e762]:
+                    - button "Show more tags" [ref=f17e763] [cursor=pointer]
+            - link "Read the report" [ref=f17e770] [cursor=pointer]:
+              - /url: https://www.figma.com/reports/2026-ai-report/
+          - list [ref=f17e774]:
+            - listitem [ref=f17e775]:
+              - 'article "State of the Designer 2026: Designers are leaning into the messy middle" [ref=f17e776]':
+                - generic [ref=f17e778]:
+                  - 'link "Illustration of a globe on a green background with paths linking framed icons—magnet shoe, thinking head, loop arrow, raised finger, tunnel eye, scissors. Illustration of a globe on a green background with paths linking framed icons—magnet shoe, thinking head, loop arrow, raised finger, tunnel eye, scissors. State of the Designer 2026: Designers are leaning into the messy middle February 12, 2026 By Madeline Stafford Our State of the Designer report explores how designers around the world are upleveling their skills, keeping craft high, and turning new pressures into creative momentum." [ref=f17e779] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/state-of-the-designer-2026/
+                    - generic [ref=f17e781]:
+                      - img "Illustration of a globe on a green background with paths linking framed icons—magnet shoe, thinking head, loop arrow, raised finger, tunnel eye, scissors." [ref=f17e782]
+                      - img "Illustration of a globe on a green background with paths linking framed icons—magnet shoe, thinking head, loop arrow, raised finger, tunnel eye, scissors."
+                    - 'heading "State of the Designer 2026: Designers are leaning into the messy middle" [level=3] [ref=f17e783]'
+                    - generic [ref=f17e784]:
+                      - time [ref=f17e785]: February 12, 2026
+                      - generic [ref=f17e786]: By Madeline Stafford
+                      - paragraph [ref=f17e789]: Our State of the Designer report explores how designers around the world are upleveling their skills, keeping craft high, and turning new pressures into creative momentum.
+                  - list "Tags" [ref=f17e791]:
+                    - listitem [ref=f17e792]:
+                      - link "Insights" [ref=f17e793] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e794]:
+                      - link "Research" [ref=f17e795] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/research/
+                    - listitem [ref=f17e796]:
+                      - link "Report" [ref=f17e797] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/report/
+                    - listitem [ref=f17e798]:
+                      - button "Show more tags" [ref=f17e799] [cursor=pointer]
+            - listitem [ref=f17e805]:
+              - article "Design’s influence is expanding, and here’s why that feels hard" [ref=f17e806]:
+                - generic [ref=f17e808]:
+                  - link "Cartoon designer floating and juggling UI cubes with chart, avatar, and pencil icons, surrounded by springs and shapes. Cartoon designer floating and juggling UI cubes with chart, avatar, and pencil icons, surrounded by springs and shapes. Design’s influence is expanding, and here’s why that feels hard March 17, 2026 By Andrew Hogan As AI accelerates creation and raises expectations, designers are navigating a field that’s bigger, faster, and more demanding than ever." [ref=f17e809] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/designs-influence-is-expanding-and-heres-why-that-feels-hard/
+                    - generic [ref=f17e811]:
+                      - img "Cartoon designer floating and juggling UI cubes with chart, avatar, and pencil icons, surrounded by springs and shapes." [ref=f17e812]
+                      - img "Cartoon designer floating and juggling UI cubes with chart, avatar, and pencil icons, surrounded by springs and shapes."
+                    - heading "Design’s influence is expanding, and here’s why that feels hard" [level=3] [ref=f17e813]
+                    - generic [ref=f17e814]:
+                      - time [ref=f17e815]: March 17, 2026
+                      - generic [ref=f17e816]: By Andrew Hogan
+                      - paragraph [ref=f17e819]: As AI accelerates creation and raises expectations, designers are navigating a field that’s bigger, faster, and more demanding than ever.
+                  - list "Tags" [ref=f17e821]:
+                    - listitem [ref=f17e822]:
+                      - link "Insights" [ref=f17e823] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e824]:
+                      - link "Thought leadership" [ref=f17e825] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/thought-leadership/
+                    - listitem [ref=f17e826]:
+                      - link "Research" [ref=f17e827] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/research/
+                    - listitem [ref=f17e828]:
+                      - button "Show more tags" [ref=f17e829] [cursor=pointer]
+            - listitem [ref=f17e835]:
+              - article "5 design skills to sharpen in the AI era" [ref=f17e836]:
+                - generic [ref=f17e838]:
+                  - link "Illustrated letter T being built with hands using paint, drill, hammer, tape measure, and chisel on a purple background. Illustrated letter T being built with hands using paint, drill, hammer, tape measure, and chisel on a purple background. 5 design skills to sharpen in the AI era March 10, 2026 By Madeline Stafford Our latest research highlights the skills designers need to meet the moment." [ref=f17e839] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/skills-for-the-ai-era/
+                    - generic [ref=f17e841]:
+                      - img "Illustrated letter T being built with hands using paint, drill, hammer, tape measure, and chisel on a purple background." [ref=f17e842]
+                      - img "Illustrated letter T being built with hands using paint, drill, hammer, tape measure, and chisel on a purple background."
+                    - heading "5 design skills to sharpen in the AI era" [level=3] [ref=f17e843]
+                    - generic [ref=f17e844]:
+                      - time [ref=f17e845]: March 10, 2026
+                      - generic [ref=f17e846]: By Madeline Stafford
+                      - paragraph [ref=f17e849]: Our latest research highlights the skills designers need to meet the moment.
+                  - list "Tags" [ref=f17e851]:
+                    - listitem [ref=f17e852]:
+                      - link "Insights" [ref=f17e853] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e854]:
+                      - link "AI" [ref=f17e855] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/ai/
+                    - listitem [ref=f17e856]:
+                      - link "Career & education" [ref=f17e857] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/career-and-education/
+                    - listitem [ref=f17e858]:
+                      - button "Show more tags" [ref=f17e859] [cursor=pointer]
+          - generic [ref=f17e865]:
+            - heading "Explore Start Anywhere, a magazine by Figma" [level=2] [ref=f17e866]
+            - link "Read more" [ref=f17e867] [cursor=pointer]:
+              - /url: https://www.figma.com/blog/start-anywhere/
+          - generic [ref=f17e873]:
+            - heading "Subscribe to Shortcut for an instantly better inbox" [level=2] [ref=f17e874]
+            - generic [ref=f17e875]:
+              - generic [ref=f17e876]:
+                - generic [ref=f17e877]:
+                  - generic [ref=f17e878]: Enter email*
+                  - textbox "Enter email*" [ref=f17e879]:
+                    - /placeholder: Enter email
+                - button "Submit" [ref=f17e880] [cursor=pointer]
+              - generic [ref=f17e883]:
+                - generic [ref=f17e884]:
+                  - generic [ref=f17e885] [cursor=pointer]: I agree to opt-in to Figma's mailing list.*
+                  - checkbox "I agree to opt-in to Figma's mailing list.*" [ref=f17e886] [cursor=pointer]
+                - paragraph [ref=f17e889]:
+                  - text: By clicking “Submit” you agree to our
+                  - link "TOS" [ref=f17e890] [cursor=pointer]:
+                    - /url: https://www.figma.com/tos/
+                  - text: and
+                  - link "Privacy Policy" [ref=f17e891] [cursor=pointer]:
+                    - /url: https://www.figma.com/privacy/
+                  - text: .
+        - generic [ref=f17e894]:
+          - heading "The latest" [level=2] [ref=f17e895]
+          - status [ref=f17e896]: 12 results
+          - list [ref=f17e897]:
+            - listitem [ref=f17e898]:
+              - article "Measuring time savings from Figma Make" [ref=f17e899]:
+                - generic [ref=f17e901]:
+                  - link "AI Time Savings Study Measuring time savings from Figma Make August 11, 2026 By Remy Stewart The Figma Data Science team assumed that AI saves users time—but quantifying it required a new approach to research design." [ref=f17e902] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/measuring-time-savings-from-figma-make/
+                    - iframe [ref=f17e908]:
+                      - generic [ref=f27e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f27e12] [cursor=pointer]
+                    - heading "Measuring time savings from Figma Make" [level=3] [ref=f17e909]
+                    - generic [ref=f17e910]:
+                      - time [ref=f17e911]: August 11, 2026
+                      - generic [ref=f17e912]: By Remy Stewart
+                      - paragraph [ref=f17e915]: The Figma Data Science team assumed that AI saves users time—but quantifying it required a new approach to research design.
+                  - list "Tags" [ref=f17e917]:
+                    - listitem [ref=f17e918]:
+                      - link "Inside Figma" [ref=f17e919] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e920]:
+                      - link "Engineering" [ref=f17e921] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/engineering/
+                    - listitem [ref=f17e922]:
+                      - link "Figma Make" [ref=f17e923] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-make/
+                    - listitem [ref=f17e924]:
+                      - button "Show more tags" [ref=f17e925] [cursor=pointer]
+            - listitem [ref=f17e931]:
+              - 'article "Better code, fewer tokens: The benefits of Code Connect in MCP" [ref=f17e932]':
+                - generic [ref=f17e934]:
+                  - 'link "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape. An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape. Better code, fewer tokens: The benefits of Code Connect in MCP August 5, 2026 By Tom Weightman When going from design to code, agents lack the context of your production components. With Code Connect in Figma’s MCP, they get that context. We measured its impact on token usage, task duration, and code quality." [ref=f17e935] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/the-benefits-of-code-connect-in-mcp/
+                    - generic [ref=f17e937]:
+                      - img "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape." [ref=f17e938]
+                      - img "An abstract illustration of a central hub with tube-like connections stretching between city buildings, symbolizing a network linking systems across an urban landscape."
+                    - 'heading "Better code, fewer tokens: The benefits of Code Connect in MCP" [level=3] [ref=f17e939]'
+                    - generic [ref=f17e940]:
+                      - time [ref=f17e941]: August 5, 2026
+                      - generic [ref=f17e942]: By Tom Weightman
+                      - paragraph [ref=f17e945]: When going from design to code, agents lack the context of your production components. With Code Connect in Figma’s MCP, they get that context. We measured its impact on token usage, task duration, and code quality.
+                  - list "Tags" [ref=f17e947]:
+                    - listitem [ref=f17e948]:
+                      - link "Inside Figma" [ref=f17e949] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e950]:
+                      - link "Engineering" [ref=f17e951] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/engineering/
+                    - listitem [ref=f17e952]:
+                      - link "Figma MCP" [ref=f17e953] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-mcp/
+                    - listitem [ref=f17e954]:
+                      - button "Show more tags" [ref=f17e955] [cursor=pointer]
+            - listitem [ref=f17e961]:
+              - article "Code, craft, and the making of nested folders" [ref=f17e962]:
+                - generic [ref=f17e964]:
+                  - link [ref=f17e965] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/code-craft-and-the-making-of-nested-folders/
+                    - generic [ref=f17e967]:
+                      - img "Abstract digital illustration featuring vivid gradients of neon green, electric blue, purple, pink, orange, and yellow. Five stacked geometric shapes resembling stylized windows or cards ascend diagonally from the lower left to the upper right, each paired with a large curved white arch. A small iridescent sphere floats above the top shape. Soft, sweeping bands of color and subtle grain create a luminous, futuristic atmosphere with no text or people." [ref=f17e968]
+                      - img "Abstract digital illustration featuring vivid gradients of neon green, electric blue, purple, pink, orange, and yellow. Five stacked geometric shapes resembling stylized windows or cards ascend diagonally from the lower left to the upper right, each paired with a large curved white arch. A small iridescent sphere floats above the top shape. Soft, sweeping bands of color and subtle grain create a luminous, futuristic atmosphere with no text or people."
+                    - heading "Code, craft, and the making of nested folders" [level=3] [ref=f17e969]
+                    - generic [ref=f17e970]:
+                      - time [ref=f17e971]: August 3, 2026
+                      - generic [ref=f17e972]: By Ethan Adams, Cai Charniga, Sachi Shah
+                      - paragraph [ref=f17e975]: From treating code as a proposal to turning handoffs into conversations, here's how we shaped a new way of working to ship nested folders.
+                  - list "Tags" [ref=f17e977]:
+                    - listitem [ref=f17e978]:
+                      - link "Inside Figma" [ref=f17e979] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e980]:
+                      - link "Product updates" [ref=f17e981] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/product-updates/
+                    - listitem [ref=f17e982]:
+                      - link "Behind the scenes" [ref=f17e983] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/behind-the-scenes/
+                    - listitem [ref=f17e984]:
+                      - button "Show more tags" [ref=f17e985] [cursor=pointer]
+            - listitem [ref=f17e991]:
+              - article "AI fluency isn't the finish line" [ref=f17e992]:
+                - generic [ref=f17e994]:
+                  - link "AI report op-ed - 16x9_2x_zoé-maghamès-peters AI fluency isn't the finish line July 31, 2026 By Andrew Hogan More than 90% of product builders say AI skills are essential to their future success. But what if we’re focused on the wrong ones?" [ref=f17e995] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/ai-fluency-isnt-the-finish-line/
+                    - iframe [ref=f17e1001]:
+                      - generic [ref=f22e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f22e12] [cursor=pointer]
+                    - heading "AI fluency isn't the finish line" [level=3] [ref=f17e1002]
+                    - generic [ref=f17e1003]:
+                      - time [ref=f17e1004]: July 31, 2026
+                      - generic [ref=f17e1005]: By Andrew Hogan
+                      - paragraph [ref=f17e1008]: More than 90% of product builders say AI skills are essential to their future success. But what if we’re focused on the wrong ones?
+                  - list "Tags" [ref=f17e1010]:
+                    - listitem [ref=f17e1011]:
+                      - link "Insights" [ref=f17e1012] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e1013]:
+                      - link "Thought leadership" [ref=f17e1014] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/thought-leadership/
+                    - listitem [ref=f17e1015]:
+                      - link "AI" [ref=f17e1016] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/ai/
+                    - listitem [ref=f17e1017]:
+                      - button "Show more tags" [ref=f17e1018] [cursor=pointer]
+            - listitem [ref=f17e1024]:
+              - article "A properties panel and annotations, now in Figma Make" [ref=f17e1025]:
+                - generic [ref=f17e1027]:
+                  - link "Figma Make properties panel and annotations A properties panel and annotations, now in Figma Make July 30, 2026 By Phillip Wang With visual editing and annotations, Figma Make is bridging the gap between design and code. Select any element you want to change, adjust it directly in the properties panel, or write in-context prompts with annotations." [ref=f17e1028] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/properties-panel-and-annotations-now-in-figma-make/
+                    - iframe [ref=f17e1034]:
+                      - generic [ref=f29e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f29e12] [cursor=pointer]
+                    - heading "A properties panel and annotations, now in Figma Make" [level=3] [ref=f17e1035]
+                    - generic [ref=f17e1036]:
+                      - time [ref=f17e1037]: July 30, 2026
+                      - generic [ref=f17e1038]: By Phillip Wang
+                      - paragraph [ref=f17e1041]: With visual editing and annotations, Figma Make is bridging the gap between design and code. Select any element you want to change, adjust it directly in the properties panel, or write in-context prompts with annotations.
+                  - list "Tags" [ref=f17e1043]:
+                    - listitem [ref=f17e1044]:
+                      - link "Inside Figma" [ref=f17e1045] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e1046]:
+                      - link "Product updates" [ref=f17e1047] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/product-updates/
+                    - listitem [ref=f17e1048]:
+                      - link "Figma Make" [ref=f17e1049] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-make/
+                    - listitem [ref=f17e1050]:
+                      - button "Show more tags" [ref=f17e1051] [cursor=pointer]
+            - listitem [ref=f17e1057]:
+              - article "How we secure Figma’s internal systems with agents" [ref=f17e1058]:
+                - generic [ref=f17e1060]:
+                  - link "How we secure Figma’s internal systems with agents How we secure Figma’s internal systems with agents July 29, 2026 By Matthew Sullivan, Brad Girardeau Our security team built an AI agent that triages alerts, conducts forensic investigations, queries our security data lake, writes code to fix issues—and remembers what it learns. Here's how we cut alert time-to-resolution by 71% and fundamentally changed how our on-call engineers work." [ref=f17e1061] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/how-we-secure-figmas-internal-systems-with-agents/
+                    - iframe [ref=f17e1067]:
+                      - generic [ref=f18e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f18e12] [cursor=pointer]
+                    - heading "How we secure Figma’s internal systems with agents" [level=3] [ref=f17e1068]
+                    - generic [ref=f17e1069]:
+                      - time [ref=f17e1070]: July 29, 2026
+                      - generic [ref=f17e1071]: By Matthew Sullivan, Brad Girardeau
+                      - paragraph [ref=f17e1074]: Our security team built an AI agent that triages alerts, conducts forensic investigations, queries our security data lake, writes code to fix issues—and remembers what it learns. Here's how we cut alert time-to-resolution by 71% and fundamentally changed how our on-call engineers work.
+                  - list "Tags" [ref=f17e1076]:
+                    - listitem [ref=f17e1077]:
+                      - link "Inside Figma" [ref=f17e1078] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e1079]:
+                      - link "Engineering" [ref=f17e1080] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/engineering/
+                    - listitem [ref=f17e1081]:
+                      - link "Security" [ref=f17e1082] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/security/
+            - listitem [ref=f17e1083]:
+              - 'article "Digital tools, human expression: The visual identity behind Config 2026" [ref=f17e1084]':
+                - generic [ref=f17e1086]:
+                  - 'link "C26_Blog_Header_02 Digital tools, human expression: The visual identity behind Config 2026 July 27, 2026 By Matt Alagiah Here’s how Figma’s Brand Studio designed a conference that captured the very human ways we remix and reinvent when working with AI tools." [ref=f17e1087] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/the-visual-identity-behind-config-2026/
+                    - iframe [ref=f17e1093]:
+                      - generic [ref=f30e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f30e12] [cursor=pointer]
+                    - 'heading "Digital tools, human expression: The visual identity behind Config 2026" [level=3] [ref=f17e1094]'
+                    - generic [ref=f17e1095]:
+                      - time [ref=f17e1096]: July 27, 2026
+                      - generic [ref=f17e1097]: By Matt Alagiah
+                      - paragraph [ref=f17e1100]: Here’s how Figma’s Brand Studio designed a conference that captured the very human ways we remix and reinvent when working with AI tools.
+                  - list "Tags" [ref=f17e1102]:
+                    - listitem [ref=f17e1103]:
+                      - link "Inside Figma" [ref=f17e1104] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e1105]:
+                      - link "Config" [ref=f17e1106] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/config/
+                    - listitem [ref=f17e1107]:
+                      - link "Branding" [ref=f17e1108] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/branding/
+                    - listitem [ref=f17e1109]:
+                      - button "Show more tags" [ref=f17e1110] [cursor=pointer]
+            - listitem [ref=f17e1116]:
+              - article "How Figma stays ahead of vulnerabilities with agents" [ref=f17e1117]:
+                - generic [ref=f17e1119]:
+                  - link "Friendly AI workers assemble and defend a castle-like software repository, symbolizing an AI-assisted secure software development pipeline. Friendly AI workers assemble and defend a castle-like software repository, symbolizing an AI-assisted secure software development pipeline. How Figma stays ahead of vulnerabilities with agents July 23, 2026 By Rohan Sharma, Liam Buchan, Dave Martin For the past year, agents at Figma have guarded code as it's written, reviewed every pull request, and audited a decade-old monorepo, all on one policy." [ref=f17e1120] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/how-figma-stays-ahead-of-vulnerabilities-with-agents/
+                    - generic [ref=f17e1122]:
+                      - img "Friendly AI workers assemble and defend a castle-like software repository, symbolizing an AI-assisted secure software development pipeline." [ref=f17e1123]
+                      - img "Friendly AI workers assemble and defend a castle-like software repository, symbolizing an AI-assisted secure software development pipeline."
+                    - heading "How Figma stays ahead of vulnerabilities with agents" [level=3] [ref=f17e1124]
+                    - generic [ref=f17e1125]:
+                      - time [ref=f17e1126]: July 23, 2026
+                      - generic [ref=f17e1127]: By Rohan Sharma, Liam Buchan, Dave Martin
+                      - paragraph [ref=f17e1130]: For the past year, agents at Figma have guarded code as it's written, reviewed every pull request, and audited a decade-old monorepo, all on one policy.
+                  - list "Tags" [ref=f17e1132]:
+                    - listitem [ref=f17e1133]:
+                      - link "Inside Figma" [ref=f17e1134] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/inside-figma/
+                    - listitem [ref=f17e1135]:
+                      - link "Engineering" [ref=f17e1136] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/engineering/
+                    - listitem [ref=f17e1137]:
+                      - link "Security" [ref=f17e1138] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/security/
+            - listitem [ref=f17e1139]:
+              - 'article "Sightlines issue no.1: Insights from Config" [ref=f17e1140]':
+                - generic [ref=f17e1142]:
+                  - 'link "Rachel Been, Charlie Sutton, and Yuhki Yamashita sit in gray armchairs on a stage in front of a bright green patterned screen, mid-conversation. Rachel Been, Charlie Sutton, and Yuhki Yamashita sit in gray armchairs on a stage in front of a bright green patterned screen, mid-conversation. Sightlines issue no.1: Insights from Config July 16, 2026 By Figma The conversations we’re still replaying from Config’s Leadership Collective." [ref=f17e1143] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/sightlines-issue-no1/
+                    - generic [ref=f17e1145]:
+                      - img "Rachel Been, Charlie Sutton, and Yuhki Yamashita sit in gray armchairs on a stage in front of a bright green patterned screen, mid-conversation." [ref=f17e1146]
+                      - img "Rachel Been, Charlie Sutton, and Yuhki Yamashita sit in gray armchairs on a stage in front of a bright green patterned screen, mid-conversation."
+                    - 'heading "Sightlines issue no.1: Insights from Config" [level=3] [ref=f17e1147]'
+                    - generic [ref=f17e1148]:
+                      - time [ref=f17e1149]: July 16, 2026
+                      - generic [ref=f17e1150]: By Figma
+                      - paragraph [ref=f17e1153]: The conversations we’re still replaying from Config’s Leadership Collective.
+                  - list "Tags" [ref=f17e1155]:
+                    - listitem [ref=f17e1156]:
+                      - link "Insights" [ref=f17e1157] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e1158]:
+                      - link "Sightlines" [ref=f17e1159] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/sightlines/
+                    - listitem [ref=f17e1160]:
+                      - link "Thought leadership" [ref=f17e1161] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/thought-leadership/
+                    - listitem [ref=f17e1162]:
+                      - button "Show more tags" [ref=f17e1163] [cursor=pointer]
+            - listitem [ref=f17e1169]:
+              - 'article "Workflow lab: Deploying designs directly with Figma Make" [ref=f17e1170]':
+                - generic [ref=f17e1172]:
+                  - 'link "Workflow lab: Shipping craft from canvas to code Workflow lab: Deploying designs directly with Figma Make July 16, 2026 By Laura Fehre The handoff from design to code doesn''t have to be a one-way street. This workflow shows how a designer can connect a codebase to Figma Make, make the changes directly, and bring the whole team into review—right up to the PR." [ref=f17e1173] [cursor=pointer]':
+                    - /url: https://www.figma.com/blog/workflow-lab-deploying-designs-directly-with-figma-make/
+                    - iframe [ref=f17e1179]:
+                      - generic [ref=f21e4]:
+                        - generic: Playing in picture-in-picture
+                        - button "Play" [ref=f21e12] [cursor=pointer]
+                    - 'heading "Workflow lab: Deploying designs directly with Figma Make" [level=3] [ref=f17e1180]'
+                    - generic [ref=f17e1181]:
+                      - time [ref=f17e1182]: July 16, 2026
+                      - generic [ref=f17e1183]: By Laura Fehre
+                      - paragraph [ref=f17e1186]: The handoff from design to code doesn't have to be a one-way street. This workflow shows how a designer can connect a codebase to Figma Make, make the changes directly, and bring the whole team into review—right up to the PR.
+                  - list "Tags" [ref=f17e1188]:
+                    - listitem [ref=f17e1189]:
+                      - link "Working Well" [ref=f17e1190] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/working-well/
+                    - listitem [ref=f17e1191]:
+                      - link "Figma Make" [ref=f17e1192] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-make/
+                    - listitem [ref=f17e1193]:
+                      - link "Figma agent" [ref=f17e1194] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/figma-agent/
+                    - listitem [ref=f17e1195]:
+                      - button "Show more tags" [ref=f17e1196] [cursor=pointer]
+            - listitem [ref=f17e1202]:
+              - article "How Decagon uses AI for design system saturation" [ref=f17e1203]:
+                - generic [ref=f17e1205]:
+                  - link "Hero image showing an AI analytics prompt interface with workflow tabs and suggested customer analytics questions. Hero image showing an AI analytics prompt interface with workflow tabs and suggested customer analytics questions. How Decagon uses AI for design system saturation July 10, 2026 By Jenny Xie The fast-growing customer experience platform explains how Figma MCP and Figma Make helped them scale a new design system and keep pace with customer requests." [ref=f17e1206] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/how-decagon-uses-ai-for-design-system-saturation/
+                    - generic [ref=f17e1208]:
+                      - img "Hero image showing an AI analytics prompt interface with workflow tabs and suggested customer analytics questions." [ref=f17e1209]
+                      - img "Hero image showing an AI analytics prompt interface with workflow tabs and suggested customer analytics questions."
+                    - heading "How Decagon uses AI for design system saturation" [level=3] [ref=f17e1210]
+                    - generic [ref=f17e1211]:
+                      - time [ref=f17e1212]: July 10, 2026
+                      - generic [ref=f17e1213]: By Jenny Xie
+                      - paragraph [ref=f17e1216]: The fast-growing customer experience platform explains how Figma MCP and Figma Make helped them scale a new design system and keep pace with customer requests.
+                  - list "Tags" [ref=f17e1218]:
+                    - listitem [ref=f17e1219]:
+                      - link "Maker Stories" [ref=f17e1220] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/maker-stories/
+                    - listitem [ref=f17e1221]:
+                      - link "AI" [ref=f17e1222] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/ai/
+                    - listitem [ref=f17e1223]:
+                      - link "Case study" [ref=f17e1224] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/case-study/
+                    - listitem [ref=f17e1225]:
+                      - button "Show more tags" [ref=f17e1226] [cursor=pointer]
+            - listitem [ref=f17e1232]:
+              - article "How to keep design teams steady through constant change" [ref=f17e1233]:
+                - generic [ref=f17e1235]:
+                  - link "A speaker gestures from a stool beside a slide titled \"Design leadership in the age of acceleration,\" addressing a seated audience. A speaker gestures from a stool beside a slide titled \"Design leadership in the age of acceleration,\" addressing a seated audience. How to keep design teams steady through constant change July 9, 2026 By Emma Webster Drawing on her time at Patreon and Shopify, design leader Jen Dunnam offers her advice for this new age of AI—from building a strong team to how to think about speed." [ref=f17e1236] [cursor=pointer]:
+                    - /url: https://www.figma.com/blog/jen-dunnam-lead-design-teams/
+                    - generic [ref=f17e1238]:
+                      - img "A speaker gestures from a stool beside a slide titled \"Design leadership in the age of acceleration,\" addressing a seated audience." [ref=f17e1239]
+                      - img "A speaker gestures from a stool beside a slide titled \"Design leadership in the age of acceleration,\" addressing a seated audience."
+                    - heading "How to keep design teams steady through constant change" [level=3] [ref=f17e1240]
+                    - generic [ref=f17e1241]:
+                      - time [ref=f17e1242]: July 9, 2026
+                      - generic [ref=f17e1243]: By Emma Webster
+                      - paragraph [ref=f17e1246]: Drawing on her time at Patreon and Shopify, design leader Jen Dunnam offers her advice for this new age of AI—from building a strong team to how to think about speed.
+                  - list "Tags" [ref=f17e1248]:
+                    - listitem [ref=f17e1249]:
+                      - link "Insights" [ref=f17e1250] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/insights/
+                    - listitem [ref=f17e1251]:
+                      - link "Config" [ref=f17e1252] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/config/
+                    - listitem [ref=f17e1253]:
+                      - link "Thought leadership" [ref=f17e1254] [cursor=pointer]:
+                        - /url: https://www.figma.com/blog/thought-leadership/
+                    - listitem [ref=f17e1255]:
+                      - button "Show more tags" [ref=f17e1256] [cursor=pointer]
+          - link "See everything" [ref=f17e1263] [cursor=pointer]:
+            - /url: https://www.figma.com/blog/everything/
+        - generic [ref=f17e1269]:
+          - heading "Subscribe to Figma’s editorial newsletter" [level=2] [ref=f17e1270]
+          - generic [ref=f17e1271]:
+            - generic [ref=f17e1272]:
+              - generic [ref=f17e1273]:
+                - generic [ref=f17e1274]: Enter email*
+                - textbox "Enter email*" [ref=f17e1275]:
+                  - /placeholder: Enter email
+              - button "Submit" [ref=f17e1276] [cursor=pointer]
+            - generic [ref=f17e1279]:
+              - generic [ref=f17e1280]:
+                - generic [ref=f17e1281] [cursor=pointer]: I agree to opt-in to Figma's mailing list.*
+                - checkbox "I agree to opt-in to Figma's mailing list.*" [ref=f17e1282] [cursor=pointer]
+              - paragraph [ref=f17e1285]:
+                - text: By clicking “Subscribe” you agree to our
+                - link "TOS" [ref=f17e1286] [cursor=pointer]:
+                  - /url: https://www.figma.com/tos/
+                - text: and
+                - link "Privacy Policy" [ref=f17e1287] [cursor=pointer]:
+                  - /url: https://www.figma.com/privacy/
+                - text: .
+    - contentinfo [ref=f17e1288]:
+      - generic [ref=f17e1289]:
+        - generic [ref=f17e1290]:
+          - link "Homepage" [ref=f17e1291] [cursor=pointer]:
+            - /url: https://www.figma.com/
+          - generic [ref=f17e1294]:
+            - heading "Figma Socials" [level=2] [ref=f17e1295]
+            - list [ref=f17e1296]:
+              - listitem [ref=f17e1297]:
+                - link "X" [ref=f17e1298] [cursor=pointer]:
+                  - /url: https://x.com/figma
+              - listitem [ref=f17e1301]:
+                - link "YouTube" [ref=f17e1302] [cursor=pointer]:
+                  - /url: https://www.youtube.com/figmadesign
+              - listitem [ref=f17e1305]:
+                - link "Instagram" [ref=f17e1306] [cursor=pointer]:
+                  - /url: https://www.instagram.com/figma
+              - listitem [ref=f17e1309]:
+                - link "Facebook" [ref=f17e1310] [cursor=pointer]:
+                  - /url: https://www.facebook.com/figmadesign
+        - generic [ref=f17e1313]:
+          - generic [ref=f17e1314]:
+            - heading "Product" [level=2] [ref=f17e1315]
+            - list "Product" [ref=f17e1316]:
+              - listitem [ref=f17e1317]:
+                - link "Figma Design" [ref=f17e1318] [cursor=pointer]:
+                  - /url: https://www.figma.com/design/
+              - listitem [ref=f17e1319]:
+                - link "Figma Make" [ref=f17e1320] [cursor=pointer]:
+                  - /url: https://www.figma.com/make/
+              - listitem [ref=f17e1321]:
+                - link "Figma Weave New" [ref=f17e1322] [cursor=pointer]:
+                  - /url: https://weave.figma.com/
+                  - text: Figma Weave
+                  - generic [ref=f17e1323]: New
+              - listitem [ref=f17e1324]:
+                - link "Dev Mode" [ref=f17e1325] [cursor=pointer]:
+                  - /url: https://www.figma.com/dev-mode/
+              - listitem [ref=f17e1326]:
+                - link "Figma Motion New" [ref=f17e1327] [cursor=pointer]:
+                  - /url: https://www.figma.com/motion/
+                  - text: Figma Motion
+                  - generic [ref=f17e1328]: New
+              - listitem [ref=f17e1329]:
+                - link "FigJam" [ref=f17e1330] [cursor=pointer]:
+                  - /url: https://www.figma.com/figjam/
+              - listitem [ref=f17e1331]:
+                - link "Figma Slides" [ref=f17e1332] [cursor=pointer]:
+                  - /url: https://www.figma.com/slides/
+              - listitem [ref=f17e1333]:
+                - link "Figma Draw" [ref=f17e1334] [cursor=pointer]:
+                  - /url: https://www.figma.com/draw/
+              - listitem [ref=f17e1335]:
+                - link "Figma Sites Beta" [ref=f17e1336] [cursor=pointer]:
+                  - /url: https://www.figma.com/sites/
+                  - text: Figma Sites
+                  - generic [ref=f17e1337]: Beta
+              - listitem [ref=f17e1338]:
+                - link "Figma Buzz Beta" [ref=f17e1339] [cursor=pointer]:
+                  - /url: https://www.figma.com/buzz/
+                  - text: Figma Buzz
+                  - generic [ref=f17e1340]: Beta
+              - listitem [ref=f17e1341]:
+                - link "Design and explore" [ref=f17e1342] [cursor=pointer]:
+                  - /url: https://www.figma.com/design-explore/
+              - listitem [ref=f17e1343]:
+                - link "Build and ship products" [ref=f17e1344] [cursor=pointer]:
+                  - /url: https://www.figma.com/build-ship/
+              - listitem [ref=f17e1345]:
+                - link "AI workflows" [ref=f17e1346] [cursor=pointer]:
+                  - /url: https://www.figma.com/ai/
+              - listitem [ref=f17e1347]:
+                - link "Release notes" [ref=f17e1348] [cursor=pointer]:
+                  - /url: https://www.figma.com/release-notes/
+              - listitem [ref=f17e1349]:
+                - link "Downloads" [ref=f17e1350] [cursor=pointer]:
+                  - /url: https://www.figma.com/downloads/
+          - generic [ref=f17e1351]:
+            - heading "Plans" [level=2] [ref=f17e1352]
+            - list "Plans" [ref=f17e1353]:
+              - listitem [ref=f17e1354]:
+                - link "Pricing" [ref=f17e1355] [cursor=pointer]:
+                  - /url: https://www.figma.com/pricing/
+              - listitem [ref=f17e1356]:
+                - link "Enterprise" [ref=f17e1357] [cursor=pointer]:
+                  - /url: https://www.figma.com/enterprise/
+              - listitem [ref=f17e1358]:
+                - link "Organization" [ref=f17e1359] [cursor=pointer]:
+                  - /url: https://www.figma.com/organization/
+              - listitem [ref=f17e1360]:
+                - link "Professional" [ref=f17e1361] [cursor=pointer]:
+                  - /url: https://www.figma.com/professional/
+        - generic [ref=f17e1363]:
+          - heading "Use cases" [level=2] [ref=f17e1364]
+          - list "Use cases" [ref=f17e1365]:
+            - listitem [ref=f17e1366]:
+              - link "UI design" [ref=f17e1367] [cursor=pointer]:
+                - /url: https://www.figma.com/ui-design-tool/
+            - listitem [ref=f17e1368]:
+              - link "UX design" [ref=f17e1369] [cursor=pointer]:
+                - /url: https://www.figma.com/ux-design-tool/
+            - listitem [ref=f17e1370]:
+              - link "Wireframing" [ref=f17e1371] [cursor=pointer]:
+                - /url: https://www.figma.com/wireframe-tool/
+            - listitem [ref=f17e1372]:
+              - link "Diagramming" [ref=f17e1373] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/diagramming-tool/
+            - listitem [ref=f17e1374]:
+              - link "Prototyping" [ref=f17e1375] [cursor=pointer]:
+                - /url: https://www.figma.com/prototyping/
+            - listitem [ref=f17e1376]:
+              - link "Brainstorming" [ref=f17e1377] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/brainstorming-tool/
+            - listitem [ref=f17e1378]:
+              - link "Presentation Maker" [ref=f17e1379] [cursor=pointer]:
+                - /url: https://www.figma.com/presentation-maker/
+            - listitem [ref=f17e1380]:
+              - link "Online whiteboard" [ref=f17e1381] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/online-whiteboard/
+            - listitem [ref=f17e1382]:
+              - link "Agile" [ref=f17e1383] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/agile-workflows/
+            - listitem [ref=f17e1384]:
+              - link "Strategic planning" [ref=f17e1385] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/strategic-planning/
+            - listitem [ref=f17e1386]:
+              - link "Mind mapping" [ref=f17e1387] [cursor=pointer]:
+                - /url: https://www.figma.com/figjam/mind-map/
+        - generic [ref=f17e1389]:
+          - heading "Resources" [level=2] [ref=f17e1390]
+          - list "Resources" [ref=f17e1391]:
+            - listitem [ref=f17e1392]:
+              - link "Blog" [ref=f17e1393] [cursor=pointer]:
+                - /url: https://www.figma.com/blog/
+            - listitem [ref=f17e1394]:
+              - link "Best practices" [ref=f17e1395] [cursor=pointer]:
+                - /url: https://www.figma.com/best-practices/
+            - listitem [ref=f17e1396]:
+              - link "Gradient Library" [ref=f17e1397] [cursor=pointer]:
+                - /url: https://www.figma.com/gradients/
+            - listitem [ref=f17e1398]:
+              - link "Gradient Generator" [ref=f17e1399] [cursor=pointer]:
+                - /url: https://www.figma.com/gradient-generator/
+            - listitem [ref=f17e1400]:
+              - link "GIF maker" [ref=f17e1401] [cursor=pointer]:
+                - /url: https://www.figma.com/gif-maker/
+            - listitem [ref=f17e1402]:
+              - link "Color wheel" [ref=f17e1403] [cursor=pointer]:
+                - /url: https://www.figma.com/color-wheel/
+            - listitem [ref=f17e1404]:
+              - link "Colors" [ref=f17e1405] [cursor=pointer]:
+                - /url: https://www.figma.com/colors/
+            - listitem [ref=f17e1406]:
+              - link "Color picker" [ref=f17e1407] [cursor=pointer]:
+                - /url: https://www.figma.com/color-picker/
+            - listitem [ref=f17e1408]:
+              - link "Font Library" [ref=f17e1409] [cursor=pointer]:
+                - /url: https://www.figma.com/fonts/
+            - listitem [ref=f17e1410]:
+              - link "Templates" [ref=f17e1411] [cursor=pointer]:
+                - /url: https://www.figma.com/templates/
+            - listitem [ref=f17e1412]:
+              - link "Developers" [ref=f17e1413] [cursor=pointer]:
+                - /url: https://www.figma.com/developers
+            - listitem [ref=f17e1414]:
+              - link "Integrations" [ref=f17e1415] [cursor=pointer]:
+                - /url: https://www.figma.com/product-integrations/
+            - listitem [ref=f17e1416]:
+              - link "Affiliate program" [ref=f17e1417] [cursor=pointer]:
+                - /url: https://www.figma.com/affiliate-program/
+            - listitem [ref=f17e1418]:
+              - link "Resource library" [ref=f17e1419] [cursor=pointer]:
+                - /url: https://www.figma.com/resource-library/
+            - listitem [ref=f17e1420]:
+              - link "Reports and insights" [ref=f17e1421] [cursor=pointer]:
+                - /url: https://www.figma.com/reports/
+            - listitem [ref=f17e1422]:
+              - link "Support" [ref=f17e1423] [cursor=pointer]:
+                - /url: https://help.figma.com/hc/en-us
+            - listitem [ref=f17e1424]:
+              - link "Status" [ref=f17e1425] [cursor=pointer]:
+                - /url: https://status.figma.com/
+            - listitem [ref=f17e1426]:
+              - link "Legal and privacy" [ref=f17e1427] [cursor=pointer]:
+                - /url: https://www.figma.com/legal/
+            - listitem [ref=f17e1428]:
+              - link "Modern slavery statement" [ref=f17e1429] [cursor=pointer]:
+                - /url: https://static.figma.com/uploads/160c9cb21d6020c9eacaff67ac1450eb05d48c3b
+            - listitem [ref=f17e1430]:
+              - link "Climate disclosure statement" [ref=f17e1431] [cursor=pointer]:
+                - /url: https://static.figma.com/uploads/d2a204b5cc4d64ff539fcd445d0ddedab7dc00f6
+        - generic [ref=f17e1433]:
+          - heading "Company" [level=2] [ref=f17e1434]
+          - list "Company" [ref=f17e1435]:
+            - listitem [ref=f17e1436]:
+              - link "Events" [ref=f17e1437] [cursor=pointer]:
+                - /url: https://www.figma.com/events/
+            - listitem [ref=f17e1438]:
+              - link "Customers" [ref=f17e1439] [cursor=pointer]:
+                - /url: https://www.figma.com/customers/
+            - listitem [ref=f17e1440]:
+              - link "Careers" [ref=f17e1441] [cursor=pointer]:
+                - /url: https://www.figma.com/careers/
+            - listitem [ref=f17e1442]:
+              - link "Newsroom" [ref=f17e1443] [cursor=pointer]:
+                - /url: https://www.figma.com/newsroom/
+        - generic [ref=f17e1445]:
+          - button "Do Not Sell/Share My Personal Info + Opt-Out" [ref=f17e1446] [cursor=pointer]
+          - separator [ref=f17e1447]
+          - navigation "Choose a language" [ref=f17e1448]:
+            - button "English" [ref=f17e1449] [cursor=pointer]
+  - alert [ref=f17e1455]

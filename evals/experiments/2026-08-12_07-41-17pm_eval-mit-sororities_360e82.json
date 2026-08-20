@@ -1,0 +1,25 @@
+{
+  "startedAt": "2026-08-13T02:27:13.030Z",
+  "finishedAt": "2026-08-13T02:41:17.987Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "mit_sororities",
+      "k": 1,
+      "accuracy": 0,
+      "taskPassed": false,
+      "meanLatencyMs": 844903.125208,
+      "trials": [
+        {
+          "assertions": [],
+          "latencyMs": 844903.125208,
+          "error": "model stream ended with unterminated content blocks — response is truncated (stream age 59.0s, first event +2.5s, last event message_stop +59.0s, 19 events, ~245 output chars, open: write_file[46 chars json])",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

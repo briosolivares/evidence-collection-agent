@@ -1,0 +1,66 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-13T06:02:25.017Z",
+  "artifacts": [
+    {
+      "filename": "scratch/notes.md",
+      "sha256": "06d6939c0a54326a9a8f084fcf3a60f2a02218eb2f55bb2e0d94c80da60a104b",
+      "capturedAt": "2026-08-13T06:04:52.111Z"
+    },
+    {
+      "filename": "artifacts/dphie_2026_2027.png",
+      "sha256": "96542e4edb401bfb1f9f488763d0928927eca364122560cea80bccf0fb01efb5",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:04:32.608Z"
+    },
+    {
+      "filename": "artifacts/dphie_page.html",
+      "sha256": "ad99cf16fe6b5d08f56a2cec187451bd941ad7cacec5ad6e3e6d578322ad6866",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:04:40.553Z"
+    },
+    {
+      "filename": "scratch/notes_theta.md",
+      "sha256": "7564e920214875153bed1fac82750f635bd1d7bda748c5214c01ec1d3026604c",
+      "capturedAt": "2026-08-13T06:05:49.885Z"
+    },
+    {
+      "filename": "scratch/notes_pibetaphi.md",
+      "sha256": "ddc4e09daea20f2db5d7cddf2f9f609d06831c3c5b8707fb0c2bf7e0ce9ea12e",
+      "capturedAt": "2026-08-13T06:06:07.979Z"
+    },
+    {
+      "filename": "scratch/notes_sigmakappa.md",
+      "sha256": "8e063a5b37e33ae0790cd2f2ab0237d066b416542d9f469c2abf1efd00d30276",
+      "capturedAt": "2026-08-13T06:06:48.223Z"
+    },
+    {
+      "filename": "artifacts/sorority_members.csv",
+      "sha256": "c15f1b7ae2c64a98996739f83e9725e9e30ee08a7dd4a307a4fb770ba1901b37",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:09:03.816Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "8f24db8901a679242a5779f04654d44149799921ec2da7be842dbbf2394fc35d",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:09:42.014Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "ff0804923e444854bb97f4fb8f9d573b6b9fbd8a0335a6e452eb8ec86408f346",
+      "capturedAt": "2026-08-13T06:09:58.203Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:10:07.249Z"
+}

@@ -1,0 +1,24 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T00:31:58.237Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/piramidal_page.png",
+      "sha256": "209a54bb7cce13e64d8046991e1f3b6cd055447458b40230b00447e093a6021f",
+      "sourceUrl": "https://www.ycombinator.com/companies/piramidal",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:32:43.377Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "e8dfe8c4d94643c0181fbb77fd8390f3c810d5b67d481f27b5e7175171aa1941",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:33:09.035Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:33:20.772Z"
+}

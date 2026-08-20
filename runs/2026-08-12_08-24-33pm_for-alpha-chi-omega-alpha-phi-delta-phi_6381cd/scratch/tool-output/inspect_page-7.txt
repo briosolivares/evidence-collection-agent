@@ -1,0 +1,2808 @@
+URL: https://pibetaphi.org/join/find-a-chapter/
+Title: Find a Pi Beta Phi Chapter
+
+- generic [ref=f161e1]:
+  - banner [ref=f161e2]:
+    - generic [ref=f161e4]:
+      - list [ref=f161e5]:
+        - listitem [ref=f161e6]:
+          - link "BetaBase" [ref=f161e7] [cursor=pointer]:
+            - /url: https://betabase.pibetaphi.org/
+        - listitem [ref=f161e8]:
+          - link "Shop" [ref=f161e9] [cursor=pointer]:
+            - /url: https://shoppiphi.com/
+        - listitem [ref=f161e10]:
+          - link "Member Resources" [ref=f161e11] [cursor=pointer]:
+            - /url: https://pibetaphi.org/member-resources/
+        - listitem [ref=f161e12]:
+          - link "Contact" [ref=f161e13] [cursor=pointer]:
+            - /url: https://pibetaphi.org/contact-us/
+      - link [ref=f161e14] [cursor=pointer]:
+        - /url: https://pibetaphi.org/?s=
+        - img "Search" [ref=f161e15]
+    - navigation [ref=f161e18]:
+      - generic [ref=f161e19]:
+        - link "Pi Beta Phi Home" [ref=f161e21] [cursor=pointer]:
+          - /url: https://pibetaphi.org
+          - img "Find a Pi Beta Phi Chapter Image 1" [ref=f161e22]
+        - list [ref=f161e25]:
+          - listitem [ref=f161e26]:
+            - link "About" [ref=f161e27] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f161e30]:
+            - link "Our Sisterhood" [ref=f161e31] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f161e34]:
+            - link "Join Pi Beta Phi" [ref=f161e35] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f161e38]:
+            - link "Alumnae" [ref=f161e39] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f161e42]:
+            - link "Give" [ref=f161e43] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=f161e46]:
+            - link "News + Events" [ref=f161e47] [cursor=pointer]:
+              - /url: "#"
+  - main [ref=f161e50]:
+    - generic [ref=f161e51]:
+      - generic [ref=f161e52]:
+        - generic:
+          - region "Map" [ref=f161e53]
+          - link "Map marker" [ref=f161e171] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e186] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e201] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e216] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e231] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e246] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e261] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e276] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e291] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e306] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e321] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e336] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e351] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e366] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e381] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e396] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e411] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e426] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e441] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e456] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e471] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e486] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e501] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e516] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e531] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e546] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e561] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e576] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e591] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e606] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e621] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e636] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e651] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e666] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e681] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e696] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e711] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e726] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e741] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e756] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e771] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e786] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e801] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e816] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e831] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e846] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e861] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e876] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e891] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e906] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e921] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e936] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e951] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e966] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e981] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e996] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1011] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1026] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1041] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1056] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1071] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1086] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1101] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1116] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1131] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1146] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1161] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1176] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1191] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1206] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1221] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1236] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1251] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1266] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1281] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1296] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1311] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1326] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1341] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1356] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1371] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1386] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1401] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1416] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1431] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1446] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1461] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1476] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1491] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1506] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1521] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1536] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1551] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1566] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1581] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1596] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1611] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1626] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1641] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1656] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1671] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1686] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1701] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1716] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1731] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1746] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1761] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1776] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1791] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1806] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1821] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1836] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1851] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1866] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1881] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1896] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1911] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1926] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1941] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1956] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1971] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e1986] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2001] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2016] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2031] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2046] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2061] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2076] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2091] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2106] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2121] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2136] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2151] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2166] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2181] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2196] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2211] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2226] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2241] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2256] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2271] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2286] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2301] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2316] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2331] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2346] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2361] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2376] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2391] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2406] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2421] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2436] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2451] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2466] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2481] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2496] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2511] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2526] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2541] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2556] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2571] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2586] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2601] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2616] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2631] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2646] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2661] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2676] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2691] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2706] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2721] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2736] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2751] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2766] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2781] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2796] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2811] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2826] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2841] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2856] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2871] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2886] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2901] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2916] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2931] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2946] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2961] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2976] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e2991] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3006] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3021] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3036] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3051] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3066] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3081] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3096] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3111] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3126] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3141] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3156] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3171] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3186] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3201] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3216] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3231] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3246] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3261] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3276] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3291] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3306] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3321] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3336] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3351] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3366] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3381] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3396] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3411] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3426] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3441] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3456] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3471] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3486] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3501] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3516] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3531] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3546] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3561] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3576] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3591] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3606] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3621] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3636] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3651] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3666] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3681] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3696] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3711] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3726] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3741] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3756] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3771] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3786] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3801] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3816] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3831] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3846] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3861] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3876] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3891] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3906] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3921] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3936] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3951] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3966] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3981] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e3996] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4011] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4026] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4041] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4056] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4071] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4086] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4101] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4116] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4131] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4146] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4161] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4176] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4191] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4206] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4221] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4236] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4251] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4266] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4281] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4296] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4311] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4326] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4341] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4356] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4371] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4386] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4401] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4416] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4431] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4446] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4461] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4476] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4491] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4506] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4521] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4536] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4551] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4566] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4581] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4596] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4611] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4626] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4641] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4656] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4671] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4686] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4701] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4716] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4731] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4746] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4761] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4776] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4791] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4806] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4821] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4836] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4851] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4866] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4881] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4896] [cursor=pointer]:
+            - /url: javascript:void(0);
+          - link "Map marker" [ref=f161e4911] [cursor=pointer]:
+            - /url: javascript:void(0);
+        - generic:
+          - generic:
+            - generic [ref=f161e54]:
+              - button "Zoom in" [ref=f161e55] [cursor=pointer]
+              - button "Zoom out" [ref=f161e57] [cursor=pointer]
+            - generic:
+              - paragraph: Collegiate Chapters
+              - paragraph: Alumnae Clubs
+          - link "Mapbox logo" [ref=f161e60] [cursor=pointer]:
+            - /url: https://www.mapbox.com/
+          - list [ref=f161e62]:
+            - link "Mapbox" [ref=f161e63] [cursor=pointer]:
+              - /url: https://www.mapbox.com/about/maps
+              - text: © Mapbox
+            - link "OpenStreetMap" [ref=f161e64] [cursor=pointer]:
+              - /url: https://www.openstreetmap.org/copyright/
+              - text: © OpenStreetMap
+            - link "Map feedback" [ref=f161e65] [cursor=pointer]:
+              - /url: https://apps.mapbox.com/feedback/?owner=pibetaphi1&id=cmpfjeh2w004o01s6533ofe6c&access_token=pk.eyJ1IjoicGliZXRhcGhpMSIsImEiOiJjbW1rdGFwajExdXpkMnFvZTgxNDZweGd6In0.KoP0vstuB6Q9zAEtbzSXgw
+              - text: Improve this map
+        - generic: Use two fingers to move the map
+        - generic: Use ⌘ + scroll to zoom the map
+      - generic [ref=f161e67]:
+        - heading "Find a Chapter or Club" [level=1] [ref=f161e68]
+        - generic [ref=f161e69]:
+          - generic [ref=f161e72]:
+            - generic [ref=f161e73] [cursor=pointer]: Search
+            - generic [ref=f161e74]:
+              - textbox "Search" [active] [ref=f161e75]:
+                - /placeholder: Enter Keyword
+                - text: Massachusetts Institute of Technology
+              - button [ref=f161e76] [cursor=pointer]
+          - generic [ref=f161e81]:
+            - generic [ref=f161e82] [cursor=pointer]: Filter By State / Province
+            - combobox [ref=f161e83] [cursor=pointer]
+            - combobox [ref=f161e86] [cursor=pointer]:
+              - textbox "Choose State / Province" [ref=f161e87]
+          - generic [ref=f161e90]:
+            - generic [ref=f161e91] [cursor=pointer]: Filter By Type
+            - combobox [ref=f161e92] [cursor=pointer]
+            - combobox [ref=f161e95] [cursor=pointer]:
+              - textbox "All Chapters and Alumnae Clubs" [ref=f161e96]
+        - generic [ref=f161e98]:
+          - list [ref=f161e4926]:
+            - generic [ref=f161e4928]:
+              - generic [ref=f161e4929]: Collegiate Chapter
+              - heading "Alabama Beta" [level=2] [ref=f161e4930]
+              - paragraph [ref=f161e4931]: Tuscaloosa, Alabama | University of Alabama
+              - link "View Chapter Profile" [ref=f161e4932] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/alabama-beta/
+            - generic [ref=f161e4934]:
+              - generic [ref=f161e4935]: Collegiate Chapter
+              - heading "Alabama Gamma" [level=2] [ref=f161e4936]
+              - paragraph [ref=f161e4937]: Auburn, Alabama | Auburn University
+              - link "View Chapter Profile" [ref=f161e4938] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/alabama-gamma/
+            - generic [ref=f161e4940]:
+              - generic [ref=f161e4941]: Collegiate Chapter
+              - heading "Alberta Alpha" [level=2] [ref=f161e4942]
+              - paragraph [ref=f161e4943]: Edmonton, Alberta | University of Alberta
+              - link "View Chapter Profile" [ref=f161e4944] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/alberta-alpha/
+            - generic [ref=f161e4946]:
+              - generic [ref=f161e4947]: Alumnae Club
+              - heading "Albuquerque, NM Alumnae Club" [level=2] [ref=f161e4948]
+              - paragraph [ref=f161e4949]: Albuquerque, New Mexico
+              - link "View Club Profile" [ref=f161e4950] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/albuquerque-nm-alumnae-club/
+            - generic [ref=f161e4952]:
+              - generic [ref=f161e4953]: Alumnae Club
+              - heading "Alpharetta, GA Alumnae Club" [level=2] [ref=f161e4954]
+              - paragraph [ref=f161e4955]: Milton, Georgia
+              - link "View Club Profile" [ref=f161e4956] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/alpharetta-ga-alumnae-club/
+            - generic [ref=f161e4958]:
+              - generic [ref=f161e4959]: Alumnae Club
+              - heading "Amarillo, TX Alumnae Club" [level=2] [ref=f161e4960]
+              - paragraph [ref=f161e4961]: Amarillo, Texas
+              - link "View Club Profile" [ref=f161e4962] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/amarillo-tx-alumnae-club/
+            - generic [ref=f161e4964]:
+              - generic [ref=f161e4965]: Alumnae Club
+              - heading "Amelia Island, FL Alumnae Club" [level=2] [ref=f161e4966]
+              - paragraph [ref=f161e4967]: Fernandina Beach, Florida
+              - link "View Club Profile" [ref=f161e4968] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/amelia-island-fl-alumnae-club/
+            - generic [ref=f161e4970]:
+              - generic [ref=f161e4971]: Alumnae Club
+              - heading "Ann Arbor, MI Alumnae Club" [level=2] [ref=f161e4972]
+              - paragraph [ref=f161e4973]: Ann Arbor, Michigan
+              - link "View Club Profile" [ref=f161e4974] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ann-arbor-mi-alumnae-club/
+            - generic [ref=f161e4976]:
+              - generic [ref=f161e4977]: Collegiate Chapter
+              - heading "Arizona Alpha" [level=2] [ref=f161e4978]
+              - paragraph [ref=f161e4979]: Tucson, Arizona | University of Arizona
+              - link "View Chapter Profile" [ref=f161e4980] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arizona-alpha/
+            - generic [ref=f161e4982]:
+              - generic [ref=f161e4983]: Collegiate Chapter
+              - heading "Arizona Beta" [level=2] [ref=f161e4984]
+              - paragraph [ref=f161e4985]: Tempe, Arizona | Arizona State University
+              - link "View Chapter Profile" [ref=f161e4986] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arizona-beta/
+            - generic [ref=f161e4988]:
+              - generic [ref=f161e4989]: Collegiate Chapter
+              - heading "Arizona Gamma" [level=2] [ref=f161e4990]
+              - paragraph [ref=f161e4991]: Flagstaff, Arizona | Northern Arizona University
+              - link "View Chapter Profile" [ref=f161e4992] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arizona-gamma/
+            - generic [ref=f161e4994]:
+              - generic [ref=f161e4995]: Collegiate Chapter
+              - heading "Arkansas Alpha" [level=2] [ref=f161e4996]
+              - paragraph [ref=f161e4997]: Fayetteville, Arkansas | University of Arkansas
+              - link "View Chapter Profile" [ref=f161e4998] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arkansas-alpha/
+            - generic [ref=f161e5000]:
+              - generic [ref=f161e5001]: Alumnae Club
+              - heading "Arlington Heights, IL Alumnae Club" [level=2] [ref=f161e5002]
+              - paragraph [ref=f161e5003]: Elmhurst, Illinois
+              - link "View Club Profile" [ref=f161e5004] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arlington-heights-il-alumnae-club/
+            - generic [ref=f161e5006]:
+              - generic [ref=f161e5007]: Alumnae Club
+              - heading "Arrowhead-West Phoenix, AZ A. C." [level=2] [ref=f161e5008]
+              - paragraph [ref=f161e5009]: Sun City, Arizona
+              - link "View Club Profile" [ref=f161e5010] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/arrowhead-west-phoenix-az-a-c/
+            - generic [ref=f161e5012]:
+              - generic [ref=f161e5013]: Alumnae Club
+              - heading "Athens Area Alumnae Club" [level=2] [ref=f161e5014]
+              - paragraph [ref=f161e5015]: Greensboro, Georgia
+              - link "View Club Profile" [ref=f161e5016] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/athens-area-alumnae-club/
+            - generic [ref=f161e5018]:
+              - generic [ref=f161e5019]: Alumnae Club
+              - heading "Atlanta, GA Alumnae Club" [level=2] [ref=f161e5020]
+              - paragraph [ref=f161e5021]: Atlanta, Georgia
+              - link "View Club Profile" [ref=f161e5022] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/atlanta-ga-alumnae-club/
+            - generic [ref=f161e5024]:
+              - generic [ref=f161e5025]: Alumnae Club
+              - heading "Austin, TX Alumnae Club" [level=2] [ref=f161e5026]
+              - paragraph [ref=f161e5027]: Austin, Texas
+              - link "View Club Profile" [ref=f161e5028] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/austin-tx-alumnae-club/
+            - generic [ref=f161e5030]:
+              - generic [ref=f161e5031]: Alumnae Club
+              - heading "Bakersfield, CA Alumnae Club" [level=2] [ref=f161e5032]
+              - paragraph [ref=f161e5033]: Bakersfield, California
+              - link "View Club Profile" [ref=f161e5034] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bakersfield-ca-alumnae-club/
+            - generic [ref=f161e5036]:
+              - generic [ref=f161e5037]: Alumnae Club
+              - heading "Baltimore, MD Alumnae Club" [level=2] [ref=f161e5038]
+              - paragraph [ref=f161e5039]: Towson, Maryland
+              - link "View Club Profile" [ref=f161e5040] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/baltimore-md-alumnae-club/
+            - generic [ref=f161e5042]:
+              - generic [ref=f161e5043]: Alumnae Club
+              - heading "Bartlesville, OK Alumnae Club" [level=2] [ref=f161e5044]
+              - paragraph [ref=f161e5045]: Bartlesville, Oklahoma
+              - link "View Club Profile" [ref=f161e5046] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bartlesville-ok-alumnae-club/
+            - generic [ref=f161e5048]:
+              - generic [ref=f161e5049]: Alumnae Club
+              - heading "Baton Rouge, LA Alumnae Club" [level=2] [ref=f161e5050]
+              - paragraph [ref=f161e5051]: Baton Rouge, Louisiana
+              - link "View Club Profile" [ref=f161e5052] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/baton-rouge-la-alumnae-club/
+            - generic [ref=f161e5054]:
+              - generic [ref=f161e5055]: Alumnae Club
+              - heading "Beaumont, TX Alumnae Club" [level=2] [ref=f161e5056]
+              - paragraph [ref=f161e5057]: Beaumont, Texas
+              - link "View Club Profile" [ref=f161e5058] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/beaumont-tx-alumnae-club/
+            - generic [ref=f161e5060]:
+              - generic [ref=f161e5061]: Alumnae Club
+              - heading "Birmingham, AL Alumnae Club" [level=2] [ref=f161e5062]
+              - paragraph [ref=f161e5063]: Birmingham, Alabama
+              - link "View Club Profile" [ref=f161e5064] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/birmingham-al-alumnae-club/
+            - generic [ref=f161e5066]:
+              - generic [ref=f161e5067]: Alumnae Club
+              - heading "Bloomfield Hills, MI Alumnae Club" [level=2] [ref=f161e5068]
+              - paragraph [ref=f161e5069]: Birmingham, Michigan
+              - link "View Club Profile" [ref=f161e5070] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bloomfield-hills-mi-alumnae-club/
+            - generic [ref=f161e5072]:
+              - generic [ref=f161e5073]: Alumnae Club
+              - heading "Bloomington-Normal, IL Alumnae Club" [level=2] [ref=f161e5074]
+              - paragraph [ref=f161e5075]: Bloomington, Illinois
+              - link "View Club Profile" [ref=f161e5076] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bloomington-normal-il-alumnae-club/
+            - generic [ref=f161e5078]:
+              - generic [ref=f161e5079]: Alumnae Club
+              - heading "Bloomington, IN Alumnae Club" [level=2] [ref=f161e5080]
+              - paragraph [ref=f161e5081]: Bloomington, Indiana
+              - link "View Club Profile" [ref=f161e5082] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bloomington-in-alumnae-club/
+            - generic [ref=f161e5084]:
+              - generic [ref=f161e5085]: Alumnae Club
+              - heading "Boise, ID Alumnae Club" [level=2] [ref=f161e5086]
+              - paragraph [ref=f161e5087]: Meridian, Idaho
+              - link "View Club Profile" [ref=f161e5088] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/boise-id-alumnae-club/
+            - generic [ref=f161e5090]:
+              - generic [ref=f161e5091]: Alumnae Club
+              - heading "Bostonian, MA Alumnae Club" [level=2] [ref=f161e5092]
+              - paragraph [ref=f161e5093]: North Andover, Massachusetts
+              - link "View Club Profile" [ref=f161e5094] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/bostonian-ma-alumnae-club/
+            - generic [ref=f161e5096]:
+              - generic [ref=f161e5097]: Alumnae Club
+              - heading "Boulder, CO Alumnae Club" [level=2] [ref=f161e5098]
+              - paragraph [ref=f161e5099]: Boulder, Colorado
+              - link "View Club Profile" [ref=f161e5100] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/boulder-co-alumnae-club/
+            - generic [ref=f161e5102]:
+              - generic [ref=f161e5103]: Alumnae Club
+              - heading "Brazos Valley, TX Alumnae Club" [level=2] [ref=f161e5104]
+              - paragraph [ref=f161e5105]: Bryan, Texas
+              - link "View Club Profile" [ref=f161e5106] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/brazos-valley-tx-alumnae-club/
+            - generic [ref=f161e5108]:
+              - generic [ref=f161e5109]: Alumnae Club
+              - heading "Brevard County, FL Alumnae Club" [level=2] [ref=f161e5110]
+              - paragraph [ref=f161e5111]: Cape Canaveral, Florida
+              - link "View Club Profile" [ref=f161e5112] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/brevard-county-fl-alumnae-club/
+            - generic [ref=f161e5114]:
+              - generic [ref=f161e5115]: Alumnae Club
+              - heading "Broward County, FL Alum Club" [level=2] [ref=f161e5116]
+              - paragraph [ref=f161e5117]: Hollywood, Florida
+              - link "View Club Profile" [ref=f161e5118] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/broward-county-fl-alum-club/
+            - generic [ref=f161e5120]:
+              - generic [ref=f161e5121]: Alumnae Club
+              - heading "Buffalo, NY Alumnae Club" [level=2] [ref=f161e5122]
+              - paragraph [ref=f161e5123]: Irving, New York
+              - link "View Club Profile" [ref=f161e5124] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/buffalo-ny-alumnae-club/
+            - generic [ref=f161e5126]:
+              - generic [ref=f161e5127]: Alumnae Club
+              - heading "Calgary, AB Alumnae Club" [level=2] [ref=f161e5128]
+              - paragraph [ref=f161e5129]: Calgary, Alberta
+              - link "View Club Profile" [ref=f161e5130] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/calgary-ab-alumnae-club/
+            - generic [ref=f161e5132]:
+              - generic [ref=f161e5133]: Collegiate Chapter
+              - heading "California Alpha" [level=2] [ref=f161e5134]
+              - paragraph [ref=f161e5135]: Stanford, California | Stanford University
+              - link "View Chapter Profile" [ref=f161e5136] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-alpha/
+            - generic [ref=f161e5138]:
+              - generic [ref=f161e5139]: Collegiate Chapter
+              - heading "California Beta" [level=2] [ref=f161e5140]
+              - paragraph [ref=f161e5141]: Berkeley, California | University of California, Berkeley
+              - link "View Chapter Profile" [ref=f161e5142] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-beta/
+            - generic [ref=f161e5144]:
+              - generic [ref=f161e5145]: Collegiate Chapter
+              - heading "California Delta" [level=2] [ref=f161e5146]
+              - paragraph [ref=f161e5147]: Los Angeles, California | University of California, Los Angeles
+              - link "View Chapter Profile" [ref=f161e5148] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-delta/
+            - generic [ref=f161e5150]:
+              - generic [ref=f161e5151]: Collegiate Chapter
+              - heading "California Epsilon" [level=2] [ref=f161e5152]
+              - paragraph [ref=f161e5153]: San Diego, California | San Diego State University
+              - link "View Chapter Profile" [ref=f161e5154] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-epsilon/
+            - generic [ref=f161e5156]:
+              - generic [ref=f161e5157]: Collegiate Chapter
+              - heading "California Eta" [level=2] [ref=f161e5158]
+              - paragraph [ref=f161e5159]: Irvine, California | University of California, Irvine
+              - link "View Chapter Profile" [ref=f161e5160] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-eta/
+            - generic [ref=f161e5162]:
+              - generic [ref=f161e5163]: Collegiate Chapter
+              - heading "California Gamma" [level=2] [ref=f161e5164]
+              - paragraph [ref=f161e5165]: Los Angeles, California | University of Southern California
+              - link "View Chapter Profile" [ref=f161e5166] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-gamma/
+            - generic [ref=f161e5168]:
+              - generic [ref=f161e5169]: Collegiate Chapter
+              - heading "California Kappa" [level=2] [ref=f161e5170]
+              - paragraph [ref=f161e5171]: San Diego, California | University of California, San Diego
+              - link "View Chapter Profile" [ref=f161e5172] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-kappa/
+            - generic [ref=f161e5174]:
+              - generic [ref=f161e5175]: Collegiate Chapter
+              - heading "California Lambda" [level=2] [ref=f161e5176]
+              - paragraph [ref=f161e5177]: Riverside, California | University of California, Riverside
+              - link "View Chapter Profile" [ref=f161e5178] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-lambda/
+            - generic [ref=f161e5180]:
+              - generic [ref=f161e5181]: Collegiate Chapter
+              - heading "California Mu" [level=2] [ref=f161e5182]
+              - paragraph [ref=f161e5183]: Malibu, California | Pepperdine University
+              - link "View Chapter Profile" [ref=f161e5184] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-mu/
+            - generic [ref=f161e5186]:
+              - generic [ref=f161e5187]: Collegiate Chapter
+              - heading "California Nu" [level=2] [ref=f161e5188]
+              - paragraph [ref=f161e5189]: Los Angeles, California | Loyola Marymount University
+              - link "View Chapter Profile" [ref=f161e5190] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-nu/
+            - generic [ref=f161e5192]:
+              - generic [ref=f161e5193]: Collegiate Chapter
+              - heading "California Omicron" [level=2] [ref=f161e5194]
+              - paragraph [ref=f161e5195]: Orange, California | Chapman University
+              - link "View Chapter Profile" [ref=f161e5196] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-omicron/
+            - generic [ref=f161e5198]:
+              - generic [ref=f161e5199]: Collegiate Chapter
+              - heading "California Pi" [level=2] [ref=f161e5200]
+              - paragraph
+              - link "View Chapter Profile" [ref=f161e5201] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-pi/
+            - generic [ref=f161e5203]:
+              - generic [ref=f161e5204]: Collegiate Chapter
+              - heading "California Theta" [level=2] [ref=f161e5205]
+              - paragraph [ref=f161e5206]: Davis, California | University of California, Davis
+              - link "View Chapter Profile" [ref=f161e5207] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-theta/
+            - generic [ref=f161e5209]:
+              - generic [ref=f161e5210]: Collegiate Chapter
+              - heading "California Xi" [level=2] [ref=f161e5211]
+              - paragraph [ref=f161e5212]: San Diego, California | University of San Diego
+              - link "View Chapter Profile" [ref=f161e5213] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-xi/
+            - generic [ref=f161e5215]:
+              - generic [ref=f161e5216]: Collegiate Chapter
+              - heading "California Zeta" [level=2] [ref=f161e5217]
+              - paragraph [ref=f161e5218]: Goleta, California | University of California, Santa Barbara
+              - link "View Chapter Profile" [ref=f161e5219] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/california-zeta/
+            - generic [ref=f161e5221]:
+              - generic [ref=f161e5222]: Alumnae Club
+              - heading "Cape Cod, MA Alumnae Club" [level=2] [ref=f161e5223]
+              - paragraph [ref=f161e5224]: Needham, Massachusetts
+              - link "View Club Profile" [ref=f161e5225] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/cape-cod-ma-alumnae-club/
+            - generic [ref=f161e5227]:
+              - generic [ref=f161e5228]: Alumnae Club
+              - heading "Capital Region, NY Alumnae Club" [level=2] [ref=f161e5229]
+              - paragraph
+              - link "View Club Profile" [ref=f161e5230] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/capital-region-ny-alumnae-club/
+            - generic [ref=f161e5232]:
+              - generic [ref=f161e5233]: Alumnae Club
+              - heading "Casper, WY Alumnae Club" [level=2] [ref=f161e5234]
+              - paragraph [ref=f161e5235]: Casper, Wyoming
+              - link "View Club Profile" [ref=f161e5236] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/casper-wy-alumnae-club/
+            - generic [ref=f161e5238]:
+              - generic [ref=f161e5239]: Alumnae Club
+              - heading "Cedar Rapids, IA Alumnae Club" [level=2] [ref=f161e5240]
+              - paragraph [ref=f161e5241]: Cedar Rapids, Iowa
+              - link "View Club Profile" [ref=f161e5242] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/cedar-rapids-ia-alumnae-club/
+            - generic [ref=f161e5244]:
+              - generic [ref=f161e5245]: Alumnae Club
+              - heading "Central Orange County, CA A. C." [level=2] [ref=f161e5246]
+              - paragraph [ref=f161e5247]: Tustin, California
+              - link "View Club Profile" [ref=f161e5248] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/central-orange-county-ca-a-c/
+            - generic [ref=f161e5250]:
+              - generic [ref=f161e5251]: Alumnae Club
+              - heading "Champaign-Urbana, IL Alumnae Club" [level=2] [ref=f161e5252]
+              - paragraph [ref=f161e5253]: Champaign, Illinois
+              - link "View Club Profile" [ref=f161e5254] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/champaign-urbana-il-alumnae-club/
+            - generic [ref=f161e5256]:
+              - generic [ref=f161e5257]: Alumnae Club
+              - heading "Charlotte, NC Alumnae Club" [level=2] [ref=f161e5258]
+              - paragraph [ref=f161e5259]: Charlotte, North Carolina
+              - link "View Club Profile" [ref=f161e5260] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/charlotte-nc-alumnae-club/
+            - generic [ref=f161e5262]:
+              - generic [ref=f161e5263]: Alumnae Club
+              - heading "Chattanooga, TN Alumnae Club" [level=2] [ref=f161e5264]
+              - paragraph [ref=f161e5265]: Chattanooga, Tennessee
+              - link "View Club Profile" [ref=f161e5266] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/chattanooga-tn-alumnae-club/
+            - generic [ref=f161e5268]:
+              - generic [ref=f161e5269]: Alumnae Club
+              - heading "Chesapeake, MD Alumnae Club" [level=2] [ref=f161e5270]
+              - paragraph [ref=f161e5271]: Glen Rock, Pennsylvania
+              - link "View Club Profile" [ref=f161e5272] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/chesapeake-md-alumnae-club/
+            - generic [ref=f161e5274]:
+              - generic [ref=f161e5275]: Alumnae Club
+              - heading "Chicago West Suburban, IL Alumnae Club" [level=2] [ref=f161e5276]
+              - paragraph [ref=f161e5277]: La Grange, Illinois
+              - link "View Club Profile" [ref=f161e5278] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/chicago-west-suburban-il-alumnae-club/
+            - generic [ref=f161e5280]:
+              - generic [ref=f161e5281]: Alumnae Club
+              - heading "Chicago Windy City, IL Alumnae Club" [level=2] [ref=f161e5282]
+              - paragraph [ref=f161e5283]: Chicago, Illinois
+              - link "View Club Profile" [ref=f161e5284] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/chicago-windy-city-il-alumnae-club/
+            - generic [ref=f161e5286]:
+              - generic [ref=f161e5287]: Alumnae Club
+              - heading "Cincinnati, OH Alumnae Club" [level=2] [ref=f161e5288]
+              - paragraph [ref=f161e5289]: Cincinnati, Ohio
+              - link "View Club Profile" [ref=f161e5290] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/cincinnati-oh-alumnae-club/
+            - generic [ref=f161e5292]:
+              - generic [ref=f161e5293]: Alumnae Club
+              - heading "Clearwater, FL Alumnae Club" [level=2] [ref=f161e5294]
+              - paragraph [ref=f161e5295]: Tarpon Springs, Florida
+              - link "View Club Profile" [ref=f161e5296] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/clearwater-fl-alumnae-club/
+            - generic [ref=f161e5298]:
+              - generic [ref=f161e5299]: Alumnae Club
+              - heading "Cleveland West, OH Alumnae Club" [level=2] [ref=f161e5300]
+              - paragraph [ref=f161e5301]: Berea, Ohio
+              - link "View Club Profile" [ref=f161e5302] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/cleveland-west-oh-alumnae-club/
+            - generic [ref=f161e5304]:
+              - generic [ref=f161e5305]: Collegiate Chapter
+              - heading "Colorado Alpha" [level=2] [ref=f161e5306]
+              - paragraph [ref=f161e5307]: Boulder, Colorado | University of Colorado
+              - link "View Chapter Profile" [ref=f161e5308] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/colorado-alpha/
+            - generic [ref=f161e5310]:
+              - generic [ref=f161e5311]: Collegiate Chapter
+              - heading "Colorado Delta" [level=2] [ref=f161e5312]
+              - paragraph [ref=f161e5313]: Golden, Colorado | Colorado School of Mines
+              - link "View Chapter Profile" [ref=f161e5314] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/colorado-delta/
+            - generic [ref=f161e5316]:
+              - generic [ref=f161e5317]: Collegiate Chapter
+              - heading "Colorado Epsilon" [level=2] [ref=f161e5318]
+              - paragraph [ref=f161e5319]: Colorado Springs, Colorado | University of Colorado, Colorado Springs
+              - link "View Chapter Profile" [ref=f161e5320] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/colorado-epsilon/
+            - generic [ref=f161e5322]:
+              - generic [ref=f161e5323]: Collegiate Chapter
+              - heading "Colorado Gamma" [level=2] [ref=f161e5324]
+              - paragraph [ref=f161e5325]: Fort Collins, Colorado | Colorado State University
+              - link "View Chapter Profile" [ref=f161e5326] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/colorado-gamma/
+            - generic [ref=f161e5328]:
+              - generic [ref=f161e5329]: Alumnae Club
+              - heading "Colorado Springs, CO Alumnae Club" [level=2] [ref=f161e5330]
+              - paragraph [ref=f161e5331]: Colorado Springs, Colorado
+              - link "View Club Profile" [ref=f161e5332] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/colorado-springs-co-alumnae-club/
+            - generic [ref=f161e5334]:
+              - generic [ref=f161e5335]: Alumnae Club
+              - heading "Columbia, MO Alumnae Club" [level=2] [ref=f161e5336]
+              - paragraph [ref=f161e5337]: Columbia, Missouri
+              - link "View Club Profile" [ref=f161e5338] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/columbia-mo-alumnae-club/
+            - generic [ref=f161e5340]:
+              - generic [ref=f161e5341]: Alumnae Club
+              - heading "Columbia, SC Alumnae Club" [level=2] [ref=f161e5342]
+              - paragraph [ref=f161e5343]: Gilbert, South Carolina
+              - link "View Club Profile" [ref=f161e5344] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/columbia-sc-alumnae-club/
+            - generic [ref=f161e5346]:
+              - generic [ref=f161e5347]: Alumnae Club
+              - heading "Columbus, OH Alumnae Club" [level=2] [ref=f161e5348]
+              - paragraph [ref=f161e5349]: Columbus, Ohio
+              - link "View Club Profile" [ref=f161e5350] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/columbus-oh-alumnae-club/
+            - generic [ref=f161e5352]:
+              - generic [ref=f161e5353]: Alumnae Club
+              - heading "Conejo Valley, CA Alumnae Club" [level=2] [ref=f161e5354]
+              - paragraph [ref=f161e5355]: Thousand Oaks, California
+              - link "View Club Profile" [ref=f161e5356] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/conejo-valley-ca-alumnae-club/
+            - generic [ref=f161e5358]:
+              - generic [ref=f161e5359]: Collegiate Chapter
+              - heading "Connecticut Alpha" [level=2] [ref=f161e5360]
+              - paragraph [ref=f161e5361]: Storrs, Connecticut | University of Connecticut
+              - link "View Chapter Profile" [ref=f161e5362] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/connecticut-alpha/
+            - generic [ref=f161e5364]:
+              - generic [ref=f161e5365]: Collegiate Chapter
+              - heading "Connecticut Gamma" [level=2] [ref=f161e5366]
+              - paragraph [ref=f161e5367]: Hamden, Connecticut | Quinnipiac University
+              - link "View Chapter Profile" [ref=f161e5368] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/connecticut-gamma/
+            - generic [ref=f161e5370]:
+              - generic [ref=f161e5371]: Alumnae Club
+              - heading "Conroe-The Woodlands, TX Alumnae Club" [level=2] [ref=f161e5372]
+              - paragraph [ref=f161e5373]: the woodlands, Texas
+              - link "View Club Profile" [ref=f161e5374] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/conroe-the-woodlands-tx-alumnae-club/
+            - generic [ref=f161e5376]:
+              - generic [ref=f161e5377]: Alumnae Club
+              - heading "Contra Costa, CA Alumnae Club" [level=2] [ref=f161e5378]
+              - paragraph [ref=f161e5379]: Walnut Creek, California
+              - link "View Club Profile" [ref=f161e5380] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/contra-costa-ca-alumnae-club/
+            - generic [ref=f161e5382]:
+              - generic [ref=f161e5383]: Alumnae Club
+              - heading "Corpus Christi, TX Alumnae Club" [level=2] [ref=f161e5384]
+              - paragraph
+              - link "View Club Profile" [ref=f161e5385] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/corpus-christi-tx-alumnae-club/
+            - generic [ref=f161e5387]:
+              - generic [ref=f161e5388]: Alumnae Club
+              - heading "Corvallis, OR Alumnae Club" [level=2] [ref=f161e5389]
+              - paragraph [ref=f161e5390]: Corvallis, Oregon
+              - link "View Club Profile" [ref=f161e5391] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/corvallis-or-alumnae-club/
+            - generic [ref=f161e5393]:
+              - generic [ref=f161e5394]: Alumnae Club
+              - heading "Cypress Creek-NW Houston, TX A.C." [level=2] [ref=f161e5395]
+              - paragraph [ref=f161e5396]: Klein, Texas
+              - link "View Club Profile" [ref=f161e5397] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/cypress-creek-nw-houston-tx-a-c/
+            - generic [ref=f161e5399]:
+              - generic [ref=f161e5400]: Collegiate Chapter
+              - heading "D.C. Alpha" [level=2] [ref=f161e5401]
+              - paragraph [ref=f161e5402]: Washington, District of Columbia | George Washington University
+              - link "View Chapter Profile" [ref=f161e5403] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/dc-alpha/
+            - generic [ref=f161e5405]:
+              - generic [ref=f161e5406]: Alumnae Club
+              - heading "Dallas, TX Alumnae Club" [level=2] [ref=f161e5407]
+              - paragraph [ref=f161e5408]: Dallas, Texas
+              - link "View Club Profile" [ref=f161e5409] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/dallas-tx-alumnae-club/
+            - generic [ref=f161e5411]:
+              - generic [ref=f161e5412]: Alumnae Club
+              - heading "Dayton, OH Alumnae Club" [level=2] [ref=f161e5413]
+              - paragraph [ref=f161e5414]: Dayton, Ohio
+              - link "View Club Profile" [ref=f161e5415] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/dayton-oh-alumnae-club/
+            - generic [ref=f161e5417]:
+              - generic [ref=f161e5418]: Alumnae Club
+              - heading "Decatur, IL Alumnae Club" [level=2] [ref=f161e5419]
+              - paragraph [ref=f161e5420]: Illiopolis, Illinois
+              - link "View Club Profile" [ref=f161e5421] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/decatur-il-alumnae-club/
+            - generic [ref=f161e5423]:
+              - generic [ref=f161e5424]: Alumnae Club
+              - heading "DeLand, FL Alumnae Club" [level=2] [ref=f161e5425]
+              - paragraph [ref=f161e5426]: New Smyrna Beach, Florida
+              - link "View Club Profile" [ref=f161e5427] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/deland-fl-alumnae-club/
+            - generic [ref=f161e5429]:
+              - generic [ref=f161e5430]: Collegiate Chapter
+              - heading "Delaware Alpha" [level=2] [ref=f161e5431]
+              - paragraph [ref=f161e5432]: Newark, Delaware | University of Delaware
+              - link "View Chapter Profile" [ref=f161e5433] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/delaware-alpha/
+            - generic [ref=f161e5435]:
+              - generic [ref=f161e5436]: Alumnae Club
+              - heading "Denver, CO Alumnae Club" [level=2] [ref=f161e5437]
+              - paragraph [ref=f161e5438]: Thornton, Colorado
+              - link "View Club Profile" [ref=f161e5439] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/denver-co-alumnae-club/
+            - generic [ref=f161e5441]:
+              - generic [ref=f161e5442]: Alumnae Club
+              - heading "Des Moines, IA Alumnae Club" [level=2] [ref=f161e5443]
+              - paragraph [ref=f161e5444]: Ames, Iowa
+              - link "View Club Profile" [ref=f161e5445] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/des-moines-ia-alumnae-club/
+            - generic [ref=f161e5447]:
+              - generic [ref=f161e5448]: Alumnae Club
+              - heading "Duncan, OK Alumnae Club" [level=2] [ref=f161e5449]
+              - paragraph [ref=f161e5450]: Duncan, Oklahoma
+              - link "View Club Profile" [ref=f161e5451] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/duncan-ok-alumnae-club/
+            - generic [ref=f161e5453]:
+              - generic [ref=f161e5454]: Alumnae Club
+              - heading "East Texas Alumnae Club" [level=2] [ref=f161e5455]
+              - paragraph [ref=f161e5456]: Longview, Texas
+              - link "View Club Profile" [ref=f161e5457] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/east-texas-alumnae-club/
+            - generic [ref=f161e5459]:
+              - generic [ref=f161e5460]: Alumnae Club
+              - heading "Edmond, OK Alumnae Club" [level=2] [ref=f161e5461]
+              - paragraph [ref=f161e5462]: Oklahoma City, Oklahoma
+              - link "View Club Profile" [ref=f161e5463] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/edmond-ok-alumnae-club/
+            - generic [ref=f161e5465]:
+              - generic [ref=f161e5466]: Alumnae Club
+              - heading "Edmonton, AB Alumnae Club" [level=2] [ref=f161e5467]
+              - paragraph [ref=f161e5468]: Fort Saskatchewan, Alberta
+              - link "View Club Profile" [ref=f161e5469] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/edmonton-ab-alumnae-club/
+            - generic [ref=f161e5471]:
+              - generic [ref=f161e5472]: Alumnae Club
+              - heading "El Paso, TX Alumnae Club" [level=2] [ref=f161e5473]
+              - paragraph [ref=f161e5474]: El Paso, Texas
+              - link "View Club Profile" [ref=f161e5475] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/el-paso-tx-alumnae-club/
+            - generic [ref=f161e5477]:
+              - generic [ref=f161e5478]: Alumnae Club
+              - heading "Flathead Valley, MT Alumnae Club" [level=2] [ref=f161e5479]
+              - paragraph [ref=f161e5480]: Whitefish, Montana
+              - link "View Club Profile" [ref=f161e5481] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/flathead-valley-mt-alumnae-club/
+            - generic [ref=f161e5483]:
+              - generic [ref=f161e5484]: Collegiate Chapter
+              - heading "Florida Alpha" [level=2] [ref=f161e5485]
+              - paragraph [ref=f161e5486]: Deland, Florida | Stetson University
+              - link "View Chapter Profile" [ref=f161e5487] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/florida-alpha/
+            - generic [ref=f161e5489]:
+              - generic [ref=f161e5490]: Collegiate Chapter
+              - heading "Florida Beta" [level=2] [ref=f161e5491]
+              - paragraph [ref=f161e5492]: Tallahassee, Florida | Florida State University
+              - link "View Chapter Profile" [ref=f161e5493] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/florida-beta/
+            - generic [ref=f161e5495]:
+              - generic [ref=f161e5496]: Collegiate Chapter
+              - heading "Florida Delta" [level=2] [ref=f161e5497]
+              - paragraph [ref=f161e5498]: Gainesville, Florida | University of Florida
+              - link "View Chapter Profile" [ref=f161e5499] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/florida-delta/
+            - generic [ref=f161e5501]:
+              - generic [ref=f161e5502]: Collegiate Chapter
+              - heading "Florida Epsilon" [level=2] [ref=f161e5503]
+              - paragraph [ref=f161e5504]: Orlando, Florida | University of Central Florida
+              - link "View Chapter Profile" [ref=f161e5505] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/florida-epsilon/
+            - generic [ref=f161e5507]:
+              - generic [ref=f161e5508]: Collegiate Chapter
+              - heading "Florida Eta" [level=2] [ref=f161e5509]
+              - paragraph [ref=f161e5510]: Coral Gables, Florida | University of Miami
+              - link "View Chapter Profile" [ref=f161e5511] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/florida-eta/
+            - generic [ref=f161e5513]:
+              - generic [ref=f161e5514]: Alumnae Club
+              - heading "Fort Collins, CO Alumnae Club" [level=2] [ref=f161e5515]
+              - paragraph [ref=f161e5516]: Windsor, Colorado
+              - link "View Club Profile" [ref=f161e5517] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fort-collins-co-alumnae-club/
+            - generic [ref=f161e5519]:
+              - generic [ref=f161e5520]: Alumnae Club
+              - heading "Fort Myers Area, FL Alumnae Club" [level=2] [ref=f161e5521]
+              - paragraph [ref=f161e5522]: Fort Myers, Florida
+              - link "View Club Profile" [ref=f161e5523] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fort-myers-area-fl-alumnae-club/
+            - generic [ref=f161e5525]:
+              - generic [ref=f161e5526]: Alumnae Club
+              - heading "Fort Smith, AR Alumnae Club" [level=2] [ref=f161e5527]
+              - paragraph [ref=f161e5528]: Fort Smith, Arkansas
+              - link "View Club Profile" [ref=f161e5529] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fort-smith-ar-alumnae-club/
+            - generic [ref=f161e5531]:
+              - generic [ref=f161e5532]: Alumnae Club
+              - heading "Fort Wayne, IN Alumnae Club" [level=2] [ref=f161e5533]
+              - paragraph [ref=f161e5534]: Fort Wayne, Indiana
+              - link "View Club Profile" [ref=f161e5535] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fort-wayne-in-alumnae-club/
+            - generic [ref=f161e5537]:
+              - generic [ref=f161e5538]: Alumnae Club
+              - heading "Fort Worth, TX Alumnae Club" [level=2] [ref=f161e5539]
+              - paragraph [ref=f161e5540]: Fort Worth, Texas
+              - link "View Club Profile" [ref=f161e5541] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fort-worth-tx-alumnae-club/
+            - generic [ref=f161e5543]:
+              - generic [ref=f161e5544]: Alumnae Club
+              - heading "Fox River Valley, IL Alumnae Club" [level=2] [ref=f161e5545]
+              - paragraph [ref=f161e5546]: Sugar Grove, Illinois
+              - link "View Club Profile" [ref=f161e5547] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/fox-river-valley-il-alumnae-club/
+            - generic [ref=f161e5549]:
+              - generic [ref=f161e5550]: Alumnae Club
+              - heading "Franklin, IN Alumnae Club" [level=2] [ref=f161e5551]
+              - paragraph [ref=f161e5552]: North Salem, Indiana
+              - link "View Club Profile" [ref=f161e5553] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/franklin-in-alumnae-club/
+            - generic [ref=f161e5555]:
+              - generic [ref=f161e5556]: Alumnae Club
+              - heading "Galesburg, IL Alumnae Club" [level=2] [ref=f161e5557]
+              - paragraph [ref=f161e5558]: Galesburg, Illinois
+              - link "View Club Profile" [ref=f161e5559] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/galesburg-il-alumnae-club/
+            - generic [ref=f161e5561]:
+              - generic [ref=f161e5562]: Collegiate Chapter
+              - heading "Georgia Alpha" [level=2] [ref=f161e5563]
+              - paragraph [ref=f161e5564]: Athens, Georgia | University of Georgia
+              - link "View Chapter Profile" [ref=f161e5565] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/georgia-alpha/
+            - generic [ref=f161e5567]:
+              - generic [ref=f161e5568]: Collegiate Chapter
+              - heading "Georgia Beta" [level=2] [ref=f161e5569]
+              - paragraph [ref=f161e5570]: Atlanta, Georgia | Emory University
+              - link "View Chapter Profile" [ref=f161e5571] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/georgia-beta/
+            - generic [ref=f161e5573]:
+              - generic [ref=f161e5574]: Alumnae Club
+              - heading "Glen Ellyn-Wheaton, IL Alumnae Club" [level=2] [ref=f161e5575]
+              - paragraph [ref=f161e5576]: Wheaton, Illinois
+              - link "View Club Profile" [ref=f161e5577] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/glen-ellyn-wheaton-il-alumnae-club/
+            - generic [ref=f161e5579]:
+              - generic [ref=f161e5580]: Alumnae Club
+              - heading "Grand Junction, CO Alumnae Club" [level=2] [ref=f161e5581]
+              - paragraph [ref=f161e5582]: Fruita, Colorado
+              - link "View Club Profile" [ref=f161e5583] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/grand-junction-co-alumnae-club/
+            - generic [ref=f161e5585]:
+              - generic [ref=f161e5586]: Alumnae Club
+              - heading "Greater Charleston Area, SC A. C." [level=2] [ref=f161e5587]
+              - paragraph [ref=f161e5588]: Goose Creek, South Carolina
+              - link "View Club Profile" [ref=f161e5589] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/greater-charleston-area-sc-a-c/
+            - generic [ref=f161e5591]:
+              - generic [ref=f161e5592]: Alumnae Club
+              - heading "Greater Kansas City Alumnae Club" [level=2] [ref=f161e5593]
+              - paragraph [ref=f161e5594]: Leawood, Kansas
+              - link "View Club Profile" [ref=f161e5595] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/greater-kansas-city-alumnae-club/
+            - generic [ref=f161e5597]:
+              - generic [ref=f161e5598]: Alumnae Club
+              - heading "Greater Orlando Area, FL Alumnae Club" [level=2] [ref=f161e5599]
+              - paragraph [ref=f161e5600]: Orlando, Florida
+              - link "View Club Profile" [ref=f161e5601] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/greater-orlando-area-fl-alumnae-club/
+            - generic [ref=f161e5603]:
+              - generic [ref=f161e5604]: Alumnae Club
+              - heading "Greater Princeton Area, NJ A. C." [level=2] [ref=f161e5605]
+              - paragraph [ref=f161e5606]: Montgomery, New Jersey
+              - link "View Club Profile" [ref=f161e5607] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/greater-princeton-area-nj-a-c/
+            - generic [ref=f161e5609]:
+              - generic [ref=f161e5610]: Alumnae Club
+              - heading "Greenville, SC Alumnae Club" [level=2] [ref=f161e5611]
+              - paragraph [ref=f161e5612]: Anderson SC, South Carolina
+              - link "View Club Profile" [ref=f161e5613] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/greenville-sc-alumnae-club/
+            - generic [ref=f161e5615]:
+              - generic [ref=f161e5616]: Alumnae Club
+              - heading "Harrisburg-Carlisle, PA Alumnae Club" [level=2] [ref=f161e5617]
+              - paragraph [ref=f161e5618]: Dillsburg, Pennsylvania
+              - link "View Club Profile" [ref=f161e5619] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/harrisburg-carlisle-pa-alumnae-club/
+            - generic [ref=f161e5621]:
+              - generic [ref=f161e5622]: Alumnae Club
+              - heading "Highland Lakes, TX Alumnae Club" [level=2] [ref=f161e5623]
+              - paragraph [ref=f161e5624]: Horseshoe Bay, Texas
+              - link "View Club Profile" [ref=f161e5625] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/highland-lakes-tx-alumnae-club/
+            - generic [ref=f161e5627]:
+              - generic [ref=f161e5628]: Alumnae Club
+              - heading "Highlands Ranch, CO Alumnae Club" [level=2] [ref=f161e5629]
+              - paragraph [ref=f161e5630]: Highlands Ranch, Colorado
+              - link "View Club Profile" [ref=f161e5631] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/highlands-ranch-co-alumnae-club/
+            - generic [ref=f161e5633]:
+              - generic [ref=f161e5634]: Alumnae Club
+              - heading "Hill Country, TX Alumnae Club" [level=2] [ref=f161e5635]
+              - paragraph [ref=f161e5636]: Kerrville, Texas
+              - link "View Club Profile" [ref=f161e5637] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/hill-country-tx-alumnae-club/
+            - generic [ref=f161e5639]:
+              - generic [ref=f161e5640]: Alumnae Club
+              - heading "Hilton Head Island, SC Alumnae Club" [level=2] [ref=f161e5641]
+              - paragraph [ref=f161e5642]: Hilton Head, South Carolina
+              - link "View Club Profile" [ref=f161e5643] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/hilton-head-island-sc-alumnae-club/
+            - generic [ref=f161e5645]:
+              - generic [ref=f161e5646]: Alumnae Club
+              - heading "Honolulu, HI Alumnae Club" [level=2] [ref=f161e5647]
+              - paragraph [ref=f161e5648]: Haiku, Hawaii
+              - link "View Club Profile" [ref=f161e5649] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/honolulu-hi-alumnae-club/
+            - generic [ref=f161e5651]:
+              - generic [ref=f161e5652]: Alumnae Club
+              - heading "Hot Springs, AR Alumnae Club" [level=2] [ref=f161e5653]
+              - paragraph [ref=f161e5654]: Hot Springs, Arkansas
+              - link "View Club Profile" [ref=f161e5655] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/hot-springs-ar-alumnae-club/
+            - generic [ref=f161e5657]:
+              - generic [ref=f161e5658]: Alumnae Club
+              - heading "Houston, TX Alumnae Club" [level=2] [ref=f161e5659]
+              - paragraph [ref=f161e5660]: Houston, Texas
+              - link "View Club Profile" [ref=f161e5661] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/houston-tx-alumnae-club/
+            - generic [ref=f161e5663]:
+              - generic [ref=f161e5664]: Alumnae Club
+              - heading "Huntsville, AL Alumnae Club" [level=2] [ref=f161e5665]
+              - paragraph [ref=f161e5666]: Arab, Alabama
+              - link "View Club Profile" [ref=f161e5667] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/huntsville-al-alumnae-club/
+            - generic [ref=f161e5669]:
+              - generic [ref=f161e5670]: Collegiate Chapter
+              - heading "Idaho Alpha" [level=2] [ref=f161e5671]
+              - paragraph [ref=f161e5672]: Moscow, Idaho | University of Idaho
+              - link "View Chapter Profile" [ref=f161e5673] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/idaho-alpha/
+            - generic [ref=f161e5675]:
+              - generic [ref=f161e5676]: Collegiate Chapter
+              - heading "Illinois Alpha" [level=2] [ref=f161e5677]
+              - paragraph [ref=f161e5678]: Monmouth, Illinois | Monmouth College
+              - link "View Chapter Profile" [ref=f161e5679] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-alpha/
+            - generic [ref=f161e5681]:
+              - generic [ref=f161e5682]: Collegiate Chapter
+              - heading "Illinois Beta-Delta" [level=2] [ref=f161e5683]
+              - paragraph [ref=f161e5684]: Galesburg, Illinois | Knox College
+              - link "View Chapter Profile" [ref=f161e5685] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-beta-delta/
+            - generic [ref=f161e5687]:
+              - generic [ref=f161e5688]: Collegiate Chapter
+              - heading "Illinois Eta" [level=2] [ref=f161e5689]
+              - paragraph [ref=f161e5690]: Decatur, Illinois | Millikin University
+              - link "View Chapter Profile" [ref=f161e5691] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-eta/
+            - generic [ref=f161e5693]:
+              - generic [ref=f161e5694]: Collegiate Chapter
+              - heading "Illinois Kappa" [level=2] [ref=f161e5695]
+              - paragraph [ref=f161e5696]: Chicago, Illinois | University of Chicago
+              - link "View Chapter Profile" [ref=f161e5697] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-kappa/
+            - generic [ref=f161e5699]:
+              - generic [ref=f161e5700]: Collegiate Chapter
+              - heading "Illinois Theta" [level=2] [ref=f161e5701]
+              - paragraph [ref=f161e5702]: Peoria, Illinois | Bradley University
+              - link "View Chapter Profile" [ref=f161e5703] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-theta/
+            - generic [ref=f161e5705]:
+              - generic [ref=f161e5706]: Collegiate Chapter
+              - heading "Illinois Zeta" [level=2] [ref=f161e5707]
+              - paragraph [ref=f161e5708]: Champaign, Illinois | University of Illinois
+              - link "View Chapter Profile" [ref=f161e5709] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/illinois-zeta/
+            - generic [ref=f161e5711]:
+              - generic [ref=f161e5712]: Collegiate Chapter
+              - heading "Indiana Alpha" [level=2] [ref=f161e5713]
+              - paragraph [ref=f161e5714]: Franklin, Indiana | Franklin College
+              - link "View Chapter Profile" [ref=f161e5715] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-alpha/
+            - generic [ref=f161e5717]:
+              - generic [ref=f161e5718]: Collegiate Chapter
+              - heading "Indiana Beta" [level=2] [ref=f161e5719]
+              - paragraph [ref=f161e5720]: Bloomington, Indiana | Indiana University
+              - link "View Chapter Profile" [ref=f161e5721] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-beta/
+            - generic [ref=f161e5723]:
+              - generic [ref=f161e5724]: Collegiate Chapter
+              - heading "Indiana Delta" [level=2] [ref=f161e5725]
+              - paragraph [ref=f161e5726]: West Lafayette, Indiana | Purdue University
+              - link "View Chapter Profile" [ref=f161e5727] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-delta/
+            - generic [ref=f161e5729]:
+              - generic [ref=f161e5730]: Collegiate Chapter
+              - heading "Indiana Epsilon" [level=2] [ref=f161e5731]
+              - paragraph [ref=f161e5732]: Greencastle, Indiana | DePauw University
+              - link "View Chapter Profile" [ref=f161e5733] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-epsilon/
+            - generic [ref=f161e5735]:
+              - generic [ref=f161e5736]: Collegiate Chapter
+              - heading "Indiana Gamma" [level=2] [ref=f161e5737]
+              - paragraph [ref=f161e5738]: Indianapolis, Indiana | Butler University
+              - link "View Chapter Profile" [ref=f161e5739] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-gamma/
+            - generic [ref=f161e5741]:
+              - generic [ref=f161e5742]: Collegiate Chapter
+              - heading "Indiana Theta" [level=2] [ref=f161e5743]
+              - paragraph [ref=f161e5744]: Valparaiso, Indiana | Valparaiso University
+              - link "View Chapter Profile" [ref=f161e5745] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indiana-theta/
+            - generic [ref=f161e5747]:
+              - generic [ref=f161e5748]: Alumnae Club
+              - heading "Indianapolis, IN Alumnae Club" [level=2] [ref=f161e5749]
+              - paragraph [ref=f161e5750]: Indianapolis, Indiana
+              - link "View Club Profile" [ref=f161e5751] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indianapolis-in-alumnae-club/
+            - generic [ref=f161e5753]:
+              - generic [ref=f161e5754]: Alumnae Club
+              - heading "Indianola, IA Alumnae Club" [level=2] [ref=f161e5755]
+              - paragraph [ref=f161e5756]: Prairie City, Iowa
+              - link "View Club Profile" [ref=f161e5757] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/indianola-ia-alumnae-club/
+            - generic [ref=f161e5759]:
+              - generic [ref=f161e5760]: Alumnae Club
+              - heading "Inland Empire, CA Alumnae Club" [level=2] [ref=f161e5761]
+              - paragraph [ref=f161e5762]: Chino Hills, California
+              - link "View Club Profile" [ref=f161e5763] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/inland-empire-ca-alumnae-club/
+            - generic [ref=f161e5765]:
+              - generic [ref=f161e5766]: Collegiate Chapter
+              - heading "Iowa Beta" [level=2] [ref=f161e5767]
+              - paragraph [ref=f161e5768]: Indianola, Iowa | Simpson College
+              - link "View Chapter Profile" [ref=f161e5769] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/iowa-beta/
+            - generic [ref=f161e5771]:
+              - generic [ref=f161e5772]: Collegiate Chapter
+              - heading "Iowa Gamma" [level=2] [ref=f161e5773]
+              - paragraph [ref=f161e5774]: Ames, Iowa | Iowa State University
+              - link "View Chapter Profile" [ref=f161e5775] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/iowa-gamma/
+            - generic [ref=f161e5777]:
+              - generic [ref=f161e5778]: Collegiate Chapter
+              - heading "Iowa Zeta" [level=2] [ref=f161e5779]
+              - paragraph [ref=f161e5780]: Iowa City, Iowa | University of Iowa
+              - link "View Chapter Profile" [ref=f161e5781] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/iowa-zeta/
+            - generic [ref=f161e5783]:
+              - generic [ref=f161e5784]: Alumnae Club
+              - heading "Jackson Metro, MS Alumnae Club" [level=2] [ref=f161e5785]
+              - paragraph [ref=f161e5786]: Brandon, Mississippi
+              - link "View Club Profile" [ref=f161e5787] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/jackson-metro-ms-alumnae-club/
+            - generic [ref=f161e5789]:
+              - generic [ref=f161e5790]: Alumnae Club
+              - heading "Jefferson County, CO Alumnae Club" [level=2] [ref=f161e5791]
+              - paragraph [ref=f161e5792]: Golden, Colorado
+              - link "View Club Profile" [ref=f161e5793] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/jefferson-county-co-alumnae-club/
+            - generic [ref=f161e5795]:
+              - generic [ref=f161e5796]: Collegiate Chapter
+              - heading "Kansas Alpha" [level=2] [ref=f161e5797]
+              - paragraph [ref=f161e5798]: Lawrence, Kansas | University of Kansas
+              - link "View Chapter Profile" [ref=f161e5799] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/kansas-alpha/
+            - generic [ref=f161e5801]:
+              - generic [ref=f161e5802]: Collegiate Chapter
+              - heading "Kansas Beta" [level=2] [ref=f161e5803]
+              - paragraph [ref=f161e5804]: Manhattan, Kansas | Kansas State University
+              - link "View Chapter Profile" [ref=f161e5805] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/kansas-beta/
+            - generic [ref=f161e5807]:
+              - generic [ref=f161e5808]: Alumnae Club
+              - heading "Katy-West Houston, TX Alumnae Club" [level=2] [ref=f161e5809]
+              - paragraph [ref=f161e5810]: Missouri City, Texas
+              - link "View Club Profile" [ref=f161e5811] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/katy-west-houston-tx-alumnae-club/
+            - generic [ref=f161e5813]:
+              - generic [ref=f161e5814]: Collegiate Chapter
+              - heading "Kentucky Alpha" [level=2] [ref=f161e5815]
+              - paragraph [ref=f161e5816]: Louisville, Kentucky | University of Louisville
+              - link "View Chapter Profile" [ref=f161e5817] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/kentucky-alpha/
+            - generic [ref=f161e5819]:
+              - generic [ref=f161e5820]: Collegiate Chapter
+              - heading "Kentucky Beta" [level=2] [ref=f161e5821]
+              - paragraph [ref=f161e5822]: Lexington, Kentucky | University of Kentucky
+              - link "View Chapter Profile" [ref=f161e5823] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/kentucky-beta/
+            - generic [ref=f161e5825]:
+              - generic [ref=f161e5826]: Alumnae Club
+              - heading "Knoxville, TN Alumnae Club" [level=2] [ref=f161e5827]
+              - paragraph [ref=f161e5828]: Knoxville, Tennessee
+              - link "View Club Profile" [ref=f161e5829] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/knoxville-tn-alumnae-club/
+            - generic [ref=f161e5831]:
+              - generic [ref=f161e5832]: Alumnae Club
+              - heading "L.A.-Santa Monica, CA Alumnae Club" [level=2] [ref=f161e5833]
+              - paragraph [ref=f161e5834]: Calabasas, California
+              - link "View Club Profile" [ref=f161e5835] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/l-a-santa-monica-ca-alumnae-club/
+            - generic [ref=f161e5837]:
+              - generic [ref=f161e5838]: Alumnae Club
+              - heading "La Jolla, CA Alumnae Club" [level=2] [ref=f161e5839]
+              - paragraph [ref=f161e5840]: San Diego, California
+              - link "View Club Profile" [ref=f161e5841] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/la-jolla-ca-alumnae-club/
+            - generic [ref=f161e5843]:
+              - generic [ref=f161e5844]: Alumnae Club
+              - heading "Lake Charles, LA Alumnae Club" [level=2] [ref=f161e5845]
+              - paragraph [ref=f161e5846]: Lake Charles, Louisiana
+              - link "View Club Profile" [ref=f161e5847] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lake-charles-la-alumnae-club/
+            - generic [ref=f161e5849]:
+              - generic [ref=f161e5850]: Alumnae Club
+              - heading "Lake County, IL Alumnae Club" [level=2] [ref=f161e5851]
+              - paragraph [ref=f161e5852]: Libertyville, Illinois
+              - link "View Club Profile" [ref=f161e5853] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lake-county-il-alumnae-club/
+            - generic [ref=f161e5855]:
+              - generic [ref=f161e5856]: Alumnae Club
+              - heading "Lake Oswego-Dunthorpe, OR Alum Club" [level=2] [ref=f161e5857]
+              - paragraph [ref=f161e5858]: West Linn, Oregon
+              - link "View Club Profile" [ref=f161e5859] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lake-oswego-dunthorpe-or-alum-club/
+            - generic [ref=f161e5861]:
+              - generic [ref=f161e5862]: Alumnae Club
+              - heading "Lake Shore, IL Alumnae Club" [level=2] [ref=f161e5863]
+              - paragraph [ref=f161e5864]: Northbrook, Illinois
+              - link "View Club Profile" [ref=f161e5865] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lake-shore-il-alumnae-club/
+            - generic [ref=f161e5867]:
+              - generic [ref=f161e5868]: Alumnae Club
+              - heading "Las Vegas, NV Alumnae Club" [level=2] [ref=f161e5869]
+              - paragraph [ref=f161e5870]: Henderson, Nevada
+              - link "View Club Profile" [ref=f161e5871] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/las-vegas-nv-alumnae-club/
+            - generic [ref=f161e5873]:
+              - generic [ref=f161e5874]: Alumnae Club
+              - heading "Lawrence, KS Alumnae Club" [level=2] [ref=f161e5875]
+              - paragraph [ref=f161e5876]: Lawrence, Kansas
+              - link "View Club Profile" [ref=f161e5877] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lawrence-ks-alumnae-club/
+            - generic [ref=f161e5879]:
+              - generic [ref=f161e5880]: Alumnae Club
+              - heading "Lexington, KY Alumnae Club" [level=2] [ref=f161e5881]
+              - paragraph [ref=f161e5882]: Lexington, Kentucky
+              - link "View Club Profile" [ref=f161e5883] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lexington-ky-alumnae-club/
+            - generic [ref=f161e5885]:
+              - generic [ref=f161e5886]: Alumnae Club
+              - heading "Little Rock, AR Alumnae Club" [level=2] [ref=f161e5887]
+              - paragraph [ref=f161e5888]: Little Rock, Arkansas
+              - link "View Club Profile" [ref=f161e5889] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/little-rock-ar-alumnae-club/
+            - generic [ref=f161e5891]:
+              - generic [ref=f161e5892]: Alumnae Club
+              - heading "Long Beach, CA Alumnae Club" [level=2] [ref=f161e5893]
+              - paragraph [ref=f161e5894]: Long Beach, California
+              - link "View Club Profile" [ref=f161e5895] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/long-beach-ca-alumnae-club/
+            - generic [ref=f161e5897]:
+              - generic [ref=f161e5898]: Collegiate Chapter
+              - heading "Louisiana Alpha" [level=2] [ref=f161e5899]
+              - paragraph [ref=f161e5900]: New Orleans, Louisiana | Tulane University-Newcomb College
+              - link "View Chapter Profile" [ref=f161e5901] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/louisiana-alpha/
+            - generic [ref=f161e5903]:
+              - generic [ref=f161e5904]: Collegiate Chapter
+              - heading "Louisiana Beta" [level=2] [ref=f161e5905]
+              - paragraph [ref=f161e5906]: Baton Rouge, Louisiana | Louisiana State University
+              - link "View Chapter Profile" [ref=f161e5907] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/louisiana-beta/
+            - generic [ref=f161e5909]:
+              - generic [ref=f161e5910]: Alumnae Club
+              - heading "Louisiana Northshore Alumnae Club" [level=2] [ref=f161e5911]
+              - paragraph [ref=f161e5912]: Covington, Louisiana
+              - link "View Club Profile" [ref=f161e5913] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/louisiana-northshore-alumnae-club/
+            - generic [ref=f161e5915]:
+              - generic [ref=f161e5916]: Alumnae Club
+              - heading "Louisville, KY Alumnae Club" [level=2] [ref=f161e5917]
+              - paragraph [ref=f161e5918]: Sheperdsville, Kentucky
+              - link "View Club Profile" [ref=f161e5919] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/louisville-ky-alumnae-club/
+            - generic [ref=f161e5921]:
+              - generic [ref=f161e5922]: Alumnae Club
+              - heading "Lowcountry, SC Alumnae Club" [level=2] [ref=f161e5923]
+              - paragraph [ref=f161e5924]: Beaufort, South Carolina
+              - link "View Club Profile" [ref=f161e5925] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lowcountry-sc-alumnae-club/
+            - generic [ref=f161e5927]:
+              - generic [ref=f161e5928]: Alumnae Club
+              - heading "Lubbock, TX Alumnae Club" [level=2] [ref=f161e5929]
+              - paragraph [ref=f161e5930]: Lubbock, Texas
+              - link "View Club Profile" [ref=f161e5931] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lubbock-tx-alumnae-club/
+            - generic [ref=f161e5933]:
+              - generic [ref=f161e5934]: Alumnae Club
+              - heading "Lufkin, TX Alumnae Club" [level=2] [ref=f161e5935]
+              - paragraph
+              - link "View Club Profile" [ref=f161e5936] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/lufkin-tx-alumnae-club/
+            - generic [ref=f161e5938]:
+              - generic [ref=f161e5939]: Alumnae Club
+              - heading "Madison, WI Alumnae Club" [level=2] [ref=f161e5940]
+              - paragraph [ref=f161e5941]: Madison, Wisconsin
+              - link "View Club Profile" [ref=f161e5942] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/madison-wi-alumnae-club/
+            - generic [ref=f161e5944]:
+              - generic [ref=f161e5945]: Collegiate Chapter
+              - heading "Maine Alpha" [level=2] [ref=f161e5946]
+              - paragraph [ref=f161e5947]: Orono, Maine | University of Maine
+              - link "View Chapter Profile" [ref=f161e5948] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/maine-alpha/
+            - generic [ref=f161e5950]:
+              - generic [ref=f161e5951]: Alumnae Club
+              - heading "Manchester Area, CT Alumnae Club" [level=2] [ref=f161e5952]
+              - paragraph [ref=f161e5953]: East Hartford, Connecticut
+              - link "View Club Profile" [ref=f161e5954] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/manchester-area-ct-alumnae-club/
+            - generic [ref=f161e5956]:
+              - generic [ref=f161e5957]: Alumnae Club
+              - heading "Manhattan, KS Alumnae Club" [level=2] [ref=f161e5958]
+              - paragraph [ref=f161e5959]: Manhattan, Kansas
+              - link "View Club Profile" [ref=f161e5960] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/manhattan-ks-alumnae-club/
+            - generic [ref=f161e5962]:
+              - generic [ref=f161e5963]: Alumnae Club
+              - heading "Marin County, CA Alumnae Club" [level=2] [ref=f161e5964]
+              - paragraph [ref=f161e5965]: Novato, California
+              - link "View Club Profile" [ref=f161e5966] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/marin-county-ca-alumnae-club/
+            - generic [ref=f161e5968]:
+              - generic [ref=f161e5969]: Collegiate Chapter
+              - heading "Maryland Gamma" [level=2] [ref=f161e5970]
+              - paragraph [ref=f161e5971]: Baltimore, Maryland | Johns Hopkins University
+              - link "View Chapter Profile" [ref=f161e5972] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/maryland-gamma/
+            - generic [ref=f161e5974]:
+              - generic [ref=f161e5975]: Alumnae Club
+              - heading "Maryland-DC Suburban Alumnae Club" [level=2] [ref=f161e5976]
+              - paragraph [ref=f161e5977]: Rockville, Maryland
+              - link "View Club Profile" [ref=f161e5978] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/maryland-dc-suburban-alumnae-club/
+            - generic [ref=f161e5980]:
+              - generic [ref=f161e5981]: Collegiate Chapter
+              - heading "Massachusetts Gamma" [level=2] [ref=f161e5982]
+              - paragraph [ref=f161e5983]: Cambridge, Massachusetts | Massachusetts Institute of Technology
+              - link "View Chapter Profile" [ref=f161e5984] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/massachusetts-gamma/
+            - generic [ref=f161e5986]:
+              - generic [ref=f161e5987]: Alumnae Club
+              - heading "Memphis, TN Alumnae Club" [level=2] [ref=f161e5988]
+              - paragraph [ref=f161e5989]: Munford, Tennessee
+              - link "View Club Profile" [ref=f161e5990] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/memphis-tn-alumnae-club/
+            - generic [ref=f161e5992]:
+              - generic [ref=f161e5993]: Alumnae Club
+              - heading "Meridian, MS Alumnae Club" [level=2] [ref=f161e5994]
+              - paragraph [ref=f161e5995]: Quitman, Mississippi
+              - link "View Club Profile" [ref=f161e5996] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/meridian-ms-alumnae-club/
+            - generic [ref=f161e5998]:
+              - generic [ref=f161e5999]: Collegiate Chapter
+              - heading "Michigan Alpha" [level=2] [ref=f161e6000]
+              - paragraph [ref=f161e6001]: Hillsdale, Michigan | Hillsdale College
+              - link "View Chapter Profile" [ref=f161e6002] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/michigan-alpha/
+            - generic [ref=f161e6004]:
+              - generic [ref=f161e6005]: Collegiate Chapter
+              - heading "Michigan Beta" [level=2] [ref=f161e6006]
+              - paragraph [ref=f161e6007]: Ann Arbor, Michigan | University of Michigan
+              - link "View Chapter Profile" [ref=f161e6008] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/michigan-beta/
+            - generic [ref=f161e6010]:
+              - generic [ref=f161e6011]: Collegiate Chapter
+              - heading "Michigan Gamma" [level=2] [ref=f161e6012]
+              - paragraph [ref=f161e6013]: East Lansing, Michigan | Michigan State University
+              - link "View Chapter Profile" [ref=f161e6014] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/michigan-gamma/
+            - generic [ref=f161e6016]:
+              - generic [ref=f161e6017]: Alumnae Club
+              - heading "Midland, TX Alumnae Club" [level=2] [ref=f161e6018]
+              - paragraph [ref=f161e6019]: Midland, Texas
+              - link "View Club Profile" [ref=f161e6020] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/midland-tx-alumnae-club/
+            - generic [ref=f161e6022]:
+              - generic [ref=f161e6023]: Alumnae Club
+              - heading "Milwaukee, WI Alumnae Club" [level=2] [ref=f161e6024]
+              - paragraph [ref=f161e6025]: Milwaukee, Wisconsin
+              - link "View Club Profile" [ref=f161e6026] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/milwaukee-wi-alumnae-club/
+            - generic [ref=f161e6028]:
+              - generic [ref=f161e6029]: Alumnae Club
+              - heading "Minneapolis, MN Alumnae Club" [level=2] [ref=f161e6030]
+              - paragraph [ref=f161e6031]: Shakopee, Minnesota
+              - link "View Club Profile" [ref=f161e6032] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/minneapolis-mn-alumnae-club/
+            - generic [ref=f161e6034]:
+              - generic [ref=f161e6035]: Collegiate Chapter
+              - heading "Minnesota Alpha" [level=2] [ref=f161e6036]
+              - paragraph [ref=f161e6037]: Minneapolis, Minnesota | University of Minnesota
+              - link "View Chapter Profile" [ref=f161e6038] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/minnesota-alpha/
+            - generic [ref=f161e6040]:
+              - generic [ref=f161e6041]: Collegiate Chapter
+              - heading "Mississippi Alpha" [level=2] [ref=f161e6042]
+              - paragraph [ref=f161e6043]: Hattiesburg, Mississippi | University of Southern Mississippi
+              - link "View Chapter Profile" [ref=f161e6044] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/mississippi-alpha/
+            - generic [ref=f161e6046]:
+              - generic [ref=f161e6047]: Collegiate Chapter
+              - heading "Mississippi Beta" [level=2] [ref=f161e6048]
+              - paragraph [ref=f161e6049]: University, Mississippi | University of Mississippi
+              - link "View Chapter Profile" [ref=f161e6050] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/mississippi-beta/
+            - generic [ref=f161e6052]:
+              - generic [ref=f161e6053]: Collegiate Chapter
+              - heading "Mississippi Gamma" [level=2] [ref=f161e6054]
+              - paragraph [ref=f161e6055]: Starkville, Mississippi | Mississippi State University
+              - link "View Chapter Profile" [ref=f161e6056] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/mississippi-gamma/
+            - generic [ref=f161e6058]:
+              - generic [ref=f161e6059]: Alumnae Club
+              - heading "Mississippi Gulf Coast Alumnae Club" [level=2] [ref=f161e6060]
+              - paragraph [ref=f161e6061]: Biloxi, Mississippi
+              - link "View Club Profile" [ref=f161e6062] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/mississippi-gulf-coast-alumnae-club/
+            - generic [ref=f161e6064]:
+              - generic [ref=f161e6065]: Collegiate Chapter
+              - heading "Missouri Alpha" [level=2] [ref=f161e6066]
+              - paragraph [ref=f161e6067]: Columbia, Missouri | University of Missouri
+              - link "View Chapter Profile" [ref=f161e6068] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/missouri-alpha/
+            - generic [ref=f161e6070]:
+              - generic [ref=f161e6071]: Collegiate Chapter
+              - heading "Missouri Gamma" [level=2] [ref=f161e6072]
+              - paragraph [ref=f161e6073]: Springfield, Missouri | Drury University
+              - link "View Chapter Profile" [ref=f161e6074] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/missouri-gamma/
+            - generic [ref=f161e6076]:
+              - generic [ref=f161e6077]: Alumnae Club
+              - heading "Mobile, AL Alumnae Club" [level=2] [ref=f161e6078]
+              - paragraph [ref=f161e6079]: Mobile, Alabama
+              - link "View Club Profile" [ref=f161e6080] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/mobile-al-alumnae-club/
+            - generic [ref=f161e6082]:
+              - generic [ref=f161e6083]: Alumnae Club
+              - heading "Monmouth, IL Alumnae Club" [level=2] [ref=f161e6084]
+              - paragraph [ref=f161e6085]: Kirkwood, Illinois
+              - link "View Club Profile" [ref=f161e6086] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/monmouth-il-alumnae-club/
+            - generic [ref=f161e6088]:
+              - generic [ref=f161e6089]: Collegiate Chapter
+              - heading "Montana Alpha" [level=2] [ref=f161e6090]
+              - paragraph [ref=f161e6091]: Bozeman, Montana | Montana State University
+              - link "View Chapter Profile" [ref=f161e6092] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/montana-alpha/
+            - generic [ref=f161e6094]:
+              - generic [ref=f161e6095]: Alumnae Club
+              - heading "Montgomery, AL Alumnae Club" [level=2] [ref=f161e6096]
+              - paragraph [ref=f161e6097]: Wetumpka, Alabama
+              - link "View Club Profile" [ref=f161e6098] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/montgomery-al-alumnae-club/
+            - generic [ref=f161e6100]:
+              - generic [ref=f161e6101]: Alumnae Club
+              - heading "Morgantown, WV Alumnae Club" [level=2] [ref=f161e6102]
+              - paragraph [ref=f161e6103]: Morgantown, West Virginia
+              - link "View Club Profile" [ref=f161e6104] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/morgantown-wv-alumnae-club/
+            - generic [ref=f161e6106]:
+              - generic [ref=f161e6107]: Alumnae Club
+              - heading "Muncie, IN Alumnae Club" [level=2] [ref=f161e6108]
+              - paragraph [ref=f161e6109]: Albany, Indiana
+              - link "View Club Profile" [ref=f161e6110] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/muncie-in-alumnae-club/
+            - generic [ref=f161e6112]:
+              - generic [ref=f161e6113]: Alumnae Club
+              - heading "Naples, FL Alumnae Club" [level=2] [ref=f161e6114]
+              - paragraph [ref=f161e6115]: Naples, Florida
+              - link "View Club Profile" [ref=f161e6116] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/naples-fl-alumnae-club/
+            - generic [ref=f161e6118]:
+              - generic [ref=f161e6119]: Alumnae Club
+              - heading "Nashville, TN Alumnae Club" [level=2] [ref=f161e6120]
+              - paragraph [ref=f161e6121]: Nashville, Tennessee
+              - link "View Club Profile" [ref=f161e6122] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/nashville-tn-alumnae-club/
+            - generic [ref=f161e6124]:
+              - generic [ref=f161e6125]: Alumnae Club
+              - heading "Nations Capital-DC Alumnae Club" [level=2] [ref=f161e6126]
+              - paragraph [ref=f161e6127]: Washington, District of Columbia
+              - link "View Club Profile" [ref=f161e6128] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/nations-capital-dc-alumnae-club/
+            - generic [ref=f161e6130]:
+              - generic [ref=f161e6131]: Collegiate Chapter
+              - heading "Nebraska Beta" [level=2] [ref=f161e6132]
+              - paragraph [ref=f161e6133]: Lincoln, Nebraska | University of Nebraska
+              - link "View Chapter Profile" [ref=f161e6134] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/nebraska-beta/
+            - generic [ref=f161e6136]:
+              - generic [ref=f161e6137]: Collegiate Chapter
+              - heading "Nebraska Gamma" [level=2] [ref=f161e6138]
+              - paragraph [ref=f161e6139]: Omaha, Nebraska | Creighton University
+              - link "View Chapter Profile" [ref=f161e6140] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/nebraska-gamma/
+            - generic [ref=f161e6142]:
+              - generic [ref=f161e6143]: Collegiate Chapter
+              - heading "Nevada Alpha" [level=2] [ref=f161e6144]
+              - paragraph [ref=f161e6145]: Reno, Nevada | University of Nevada
+              - link "View Chapter Profile" [ref=f161e6146] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/nevada-alpha/
+            - generic [ref=f161e6148]:
+              - generic [ref=f161e6149]: Alumnae Club
+              - heading "New Haven, CT Alumnae Club" [level=2] [ref=f161e6150]
+              - paragraph [ref=f161e6151]: Middletown, Connecticut
+              - link "View Club Profile" [ref=f161e6152] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-haven-ct-alumnae-club/
+            - generic [ref=f161e6154]:
+              - generic [ref=f161e6155]: Collegiate Chapter
+              - heading "New Jersey Alpha" [level=2] [ref=f161e6156]
+              - paragraph [ref=f161e6157]: Princeton, New Jersey | Princeton University
+              - link "View Chapter Profile" [ref=f161e6158] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-jersey-alpha/
+            - generic [ref=f161e6160]:
+              - generic [ref=f161e6161]: Collegiate Chapter
+              - heading "New Mexico Alpha" [level=2] [ref=f161e6162]
+              - paragraph [ref=f161e6163]: Albuquerque, New Mexico | University of New Mexico
+              - link "View Chapter Profile" [ref=f161e6164] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-mexico-alpha/
+            - generic [ref=f161e6166]:
+              - generic [ref=f161e6167]: Alumnae Club
+              - heading "New Orleans, LA Alumnae Club" [level=2] [ref=f161e6168]
+              - paragraph [ref=f161e6169]: New Orleans, Louisiana
+              - link "View Club Profile" [ref=f161e6170] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-orleans-la-alumnae-club/
+            - generic [ref=f161e6172]:
+              - generic [ref=f161e6173]: Collegiate Chapter
+              - heading "New York Delta" [level=2] [ref=f161e6174]
+              - paragraph [ref=f161e6175]: Ithaca, New York | Cornell University
+              - link "View Chapter Profile" [ref=f161e6176] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-york-delta/
+            - generic [ref=f161e6178]:
+              - generic [ref=f161e6179]: Collegiate Chapter
+              - heading "New York Epsilon" [level=2] [ref=f161e6180]
+              - paragraph [ref=f161e6181]: Troy, New York | Rensselaer Polytechnic Institute
+              - link "View Chapter Profile" [ref=f161e6182] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-york-epsilon/
+            - generic [ref=f161e6184]:
+              - generic [ref=f161e6185]: Collegiate Chapter
+              - heading "New York Eta" [level=2] [ref=f161e6186]
+              - paragraph [ref=f161e6187]: New York, New York | New York University
+              - link "View Chapter Profile" [ref=f161e6188] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/new-york-eta/
+            - generic [ref=f161e6190]:
+              - generic [ref=f161e6191]: Alumnae Club
+              - heading "Norman, OK Alumnae Club" [level=2] [ref=f161e6192]
+              - paragraph [ref=f161e6193]: Norman, Oklahoma
+              - link "View Club Profile" [ref=f161e6194] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/norman-ok-alumnae-club/
+            - generic [ref=f161e6196]:
+              - generic [ref=f161e6197]: Collegiate Chapter
+              - heading "North Carolina Alpha" [level=2] [ref=f161e6198]
+              - paragraph [ref=f161e6199]: Chapel Hill, North Carolina | University of North Carolina
+              - link "View Chapter Profile" [ref=f161e6200] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-carolina-alpha/
+            - generic [ref=f161e6202]:
+              - generic [ref=f161e6203]: Collegiate Chapter
+              - heading "North Carolina Beta" [level=2] [ref=f161e6204]
+              - paragraph [ref=f161e6205]: Durham, North Carolina | Duke University
+              - link "View Chapter Profile" [ref=f161e6206] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-carolina-beta/
+            - generic [ref=f161e6208]:
+              - generic [ref=f161e6209]: Collegiate Chapter
+              - heading "North Carolina Delta" [level=2] [ref=f161e6210]
+              - paragraph [ref=f161e6211]: Raleigh, North Carolina | North Carolina State University
+              - link "View Chapter Profile" [ref=f161e6212] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-carolina-delta/
+            - generic [ref=f161e6214]:
+              - generic [ref=f161e6215]: Alumnae Club
+              - heading "North Carolina Triangle Alumnae Club" [level=2] [ref=f161e6216]
+              - paragraph [ref=f161e6217]: Raleigh, North Carolina | Changed name from Greater Raleigh, NC Alumnae Club
+              - link "View Club Profile" [ref=f161e6218] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-carolina-triangle-alumnae-club/
+            - generic [ref=f161e6220]:
+              - generic [ref=f161e6221]: Alumnae Club
+              - heading "North Mississippi, MS Alumnae Club" [level=2] [ref=f161e6222]
+              - paragraph [ref=f161e6223]: Oxford, Mississippi
+              - link "View Club Profile" [ref=f161e6224] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-mississippi-ms-alumnae-club/
+            - generic [ref=f161e6226]:
+              - generic [ref=f161e6227]: Alumnae Club
+              - heading "North San Diego County, CA Alumnae Club" [level=2] [ref=f161e6228]
+              - paragraph [ref=f161e6229]: San Diego, California
+              - link "View Club Profile" [ref=f161e6230] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/north-san-diego-ca-alumnae-club/
+            - generic [ref=f161e6232]:
+              - generic [ref=f161e6233]: Alumnae Club
+              - heading "Northeast, AR Alumnae Club" [level=2] [ref=f161e6234]
+              - paragraph
+              - link "View Club Profile" [ref=f161e6235] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northeast-ar-alumnae-club/
+            - generic [ref=f161e6237]:
+              - generic [ref=f161e6238]: Alumnae Club
+              - heading "Northern Colorado Alumnae Club" [level=2] [ref=f161e6239]
+              - paragraph [ref=f161e6240]: La Salle, Colorado
+              - link "View Club Profile" [ref=f161e6241] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northern-colorado-alumnae-club/
+            - generic [ref=f161e6243]:
+              - generic [ref=f161e6244]: Alumnae Club
+              - heading "Northern New Jersey Alumnae Club" [level=2] [ref=f161e6245]
+              - paragraph [ref=f161e6246]: Basking Ridge, New Jersey
+              - link "View Club Profile" [ref=f161e6247] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northern-new-jersey-alumnae-club/
+            - generic [ref=f161e6249]:
+              - generic [ref=f161e6250]: Alumnae Club
+              - heading "Northern Virginia Alumnae Club" [level=2] [ref=f161e6251]
+              - paragraph [ref=f161e6252]: Vienna, Virginia
+              - link "View Club Profile" [ref=f161e6253] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northern-virginia-alumnae-club/
+            - generic [ref=f161e6255]:
+              - generic [ref=f161e6256]: Alumnae Club
+              - heading "Northwest Arkansas Alumnae Club" [level=2] [ref=f161e6257]
+              - paragraph [ref=f161e6258]: Fayetteville, Arkansas
+              - link "View Club Profile" [ref=f161e6259] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northwest-arkansas-alumnae-club/
+            - generic [ref=f161e6261]:
+              - generic [ref=f161e6262]: Alumnae Club
+              - heading "Northwest Indiana Alumnae Club" [level=2] [ref=f161e6263]
+              - paragraph [ref=f161e6264]: Valparaiso, Indiana
+              - link "View Club Profile" [ref=f161e6265] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/northwest-indiana-alumnae-club/
+            - generic [ref=f161e6267]:
+              - generic [ref=f161e6268]: Alumnae Club
+              - heading "NY City-Manhattan, NY Alumnae Club" [level=2] [ref=f161e6269]
+              - paragraph [ref=f161e6270]: Jackson Heights, New York
+              - link "View Club Profile" [ref=f161e6271] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ny-city-manhattan-ny-alumnae-club/
+            - generic [ref=f161e6273]:
+              - generic [ref=f161e6274]: Collegiate Chapter
+              - heading "Ohio Alpha" [level=2] [ref=f161e6275]
+              - paragraph [ref=f161e6276]: Athens, Ohio | Ohio University
+              - link "View Chapter Profile" [ref=f161e6277] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-alpha/
+            - generic [ref=f161e6279]:
+              - generic [ref=f161e6280]: Collegiate Chapter
+              - heading "Ohio Beta" [level=2] [ref=f161e6281]
+              - paragraph [ref=f161e6282]: Columbus, Ohio | The Ohio State University
+              - link "View Chapter Profile" [ref=f161e6283] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-beta/
+            - generic [ref=f161e6285]:
+              - generic [ref=f161e6286]: Collegiate Chapter
+              - heading "Ohio Epsilon" [level=2] [ref=f161e6287]
+              - paragraph [ref=f161e6288]: Toledo, Ohio | University of Toledo
+              - link "View Chapter Profile" [ref=f161e6289] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-epsilon/
+            - generic [ref=f161e6291]:
+              - generic [ref=f161e6292]: Collegiate Chapter
+              - heading "Ohio Eta" [level=2] [ref=f161e6293]
+              - paragraph [ref=f161e6294]: Granville, Ohio | Denison University
+              - link "View Chapter Profile" [ref=f161e6295] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-eta/
+            - generic [ref=f161e6297]:
+              - generic [ref=f161e6298]: Collegiate Chapter
+              - heading "Ohio Iota" [level=2] [ref=f161e6299]
+              - paragraph [ref=f161e6300]: Dayton, Ohio | University of Dayton
+              - link "View Chapter Profile" [ref=f161e6301] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-iota/
+            - generic [ref=f161e6303]:
+              - generic [ref=f161e6304]: Collegiate Chapter
+              - heading "Ohio Kappa" [level=2] [ref=f161e6305]
+              - paragraph [ref=f161e6306]: Cincinnati, Ohio | University of Cincinnati
+              - link "View Chapter Profile" [ref=f161e6307] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-kappa/
+            - generic [ref=f161e6309]:
+              - generic [ref=f161e6310]: Collegiate Chapter
+              - heading "Ohio Lambda" [level=2] [ref=f161e6311]
+              - paragraph [ref=f161e6312]: Cleveland, Ohio | Case Western Reserve University
+              - link "View Chapter Profile" [ref=f161e6313] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-lambda/
+            - generic [ref=f161e6315]:
+              - generic [ref=f161e6316]: Collegiate Chapter
+              - heading "Ohio Theta" [level=2] [ref=f161e6317]
+              - paragraph [ref=f161e6318]: Bowling Green, Ohio | Bowling Green State University
+              - link "View Chapter Profile" [ref=f161e6319] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-theta/
+            - generic [ref=f161e6321]:
+              - generic [ref=f161e6322]: Collegiate Chapter
+              - heading "Ohio Zeta" [level=2] [ref=f161e6323]
+              - paragraph [ref=f161e6324]: Oxford, Ohio | Miami University
+              - link "View Chapter Profile" [ref=f161e6325] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ohio-zeta/
+            - generic [ref=f161e6327]:
+              - generic [ref=f161e6328]: Collegiate Chapter
+              - heading "Oklahoma Alpha" [level=2] [ref=f161e6329]
+              - paragraph [ref=f161e6330]: Norman, Oklahoma | University of Oklahoma
+              - link "View Chapter Profile" [ref=f161e6331] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/oklahoma-alpha/
+            - generic [ref=f161e6333]:
+              - generic [ref=f161e6334]: Collegiate Chapter
+              - heading "Oklahoma Beta" [level=2] [ref=f161e6335]
+              - paragraph [ref=f161e6336]: Stillwater, Oklahoma | Oklahoma State University
+              - link "View Chapter Profile" [ref=f161e6337] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/oklahoma-beta/
+            - generic [ref=f161e6339]:
+              - generic [ref=f161e6340]: Alumnae Club
+              - heading "Oklahoma City, OK Alumnae Club" [level=2] [ref=f161e6341]
+              - paragraph [ref=f161e6342]: Oklahoma City, Oklahoma
+              - link "View Club Profile" [ref=f161e6343] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/oklahoma-city-ok-alumnae-club/
+            - generic [ref=f161e6345]:
+              - generic [ref=f161e6346]: Alumnae Club
+              - heading "Omaha, NE Alumnae Club" [level=2] [ref=f161e6347]
+              - paragraph [ref=f161e6348]: Omaha, Nebraska
+              - link "View Club Profile" [ref=f161e6349] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/omaha-ne-alumnae-club/
+            - generic [ref=f161e6351]:
+              - generic [ref=f161e6352]: Collegiate Chapter
+              - heading "Ontario Alpha" [level=2] [ref=f161e6353]
+              - paragraph [ref=f161e6354]: Toronto, Ontario | University of Toronto
+              - link "View Chapter Profile" [ref=f161e6355] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ontario-alpha/
+            - generic [ref=f161e6357]:
+              - generic [ref=f161e6358]: Collegiate Chapter
+              - heading "Ontario Beta" [level=2] [ref=f161e6359]
+              - paragraph [ref=f161e6360]: London, Ontario | Western University
+              - link "View Chapter Profile" [ref=f161e6361] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ontario-beta/
+            - generic [ref=f161e6363]:
+              - generic [ref=f161e6364]: Collegiate Chapter
+              - heading "Ontario Gamma" [level=2] [ref=f161e6365]
+              - paragraph [ref=f161e6366]: Guelph, Ontario | University of Guelph
+              - link "View Chapter Profile" [ref=f161e6367] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/ontario-gamma/
+            - generic [ref=f161e6369]:
+              - generic [ref=f161e6370]: Collegiate Chapter
+              - heading "Oregon Alpha" [level=2] [ref=f161e6371]
+              - paragraph [ref=f161e6372]: Eugene, Oregon | University of Oregon
+              - link "View Chapter Profile" [ref=f161e6373] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/oregon-alpha/
+            - generic [ref=f161e6375]:
+              - generic [ref=f161e6376]: Alumnae Club
+              - heading "Palm Springs-Desert Cities, CA A. C." [level=2] [ref=f161e6377]
+              - paragraph [ref=f161e6378]: Rancho Mirage, California
+              - link "View Club Profile" [ref=f161e6379] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/palm-springs-desert-cities-ca-a-c/
+            - generic [ref=f161e6381]:
+              - generic [ref=f161e6382]: Alumnae Club
+              - heading "Palo Alto, CA Alumnae Club" [level=2] [ref=f161e6383]
+              - paragraph [ref=f161e6384]: Los Altos, California
+              - link "View Club Profile" [ref=f161e6385] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/palo-alto-ca-alumnae-club/
+            - generic [ref=f161e6387]:
+              - generic [ref=f161e6388]: Alumnae Club
+              - heading "Pasadena, CA Alumnae Club" [level=2] [ref=f161e6389]
+              - paragraph [ref=f161e6390]: Pasadena, California
+              - link "View Club Profile" [ref=f161e6391] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pasadena-ca-alumnae-club/
+            - generic [ref=f161e6393]:
+              - generic [ref=f161e6394]: Collegiate Chapter
+              - heading "Pennsylvania Epsilon" [level=2] [ref=f161e6395]
+              - paragraph [ref=f161e6396]: University Park, Pennsylvania | Pennsylvania State University
+              - link "View Chapter Profile" [ref=f161e6397] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pennsylvania-epsilon/
+            - generic [ref=f161e6399]:
+              - generic [ref=f161e6400]: Collegiate Chapter
+              - heading "Pennsylvania Eta" [level=2] [ref=f161e6401]
+              - paragraph [ref=f161e6402]: Easton, Pennsylvania | Lafayette College
+              - link "View Chapter Profile" [ref=f161e6403] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pennsylvania-eta/
+            - generic [ref=f161e6405]:
+              - generic [ref=f161e6406]: Collegiate Chapter
+              - heading "Pennsylvania Gamma" [level=2] [ref=f161e6407]
+              - paragraph [ref=f161e6408]: Carlisle, Pennsylvania | Dickinson College
+              - link "View Chapter Profile" [ref=f161e6409] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pennsylvania-gamma/
+            - generic [ref=f161e6411]:
+              - generic [ref=f161e6412]: Collegiate Chapter
+              - heading "Pennsylvania Kappa" [level=2] [ref=f161e6413]
+              - paragraph [ref=f161e6414]: Bethlehem, Pennsylvania | Lehigh University
+              - link "View Chapter Profile" [ref=f161e6415] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pennsylvania-kappa/
+            - generic [ref=f161e6417]:
+              - generic [ref=f161e6418]: Collegiate Chapter
+              - heading "Pennsylvania Zeta" [level=2] [ref=f161e6419]
+              - paragraph [ref=f161e6420]: Washington, Pennsylvania | Washington & Jefferson College
+              - link "View Chapter Profile" [ref=f161e6421] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pennsylvania-zeta/
+            - generic [ref=f161e6423]:
+              - generic [ref=f161e6424]: Alumnae Club
+              - heading "Pensacola, FL Alumnae Club" [level=2] [ref=f161e6425]
+              - paragraph [ref=f161e6426]: Navarre, Florida
+              - link "View Club Profile" [ref=f161e6427] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pensacola-fl-alumnae-club/
+            - generic [ref=f161e6429]:
+              - generic [ref=f161e6430]: Alumnae Club
+              - heading "Peoria, IL Alumnae Club" [level=2] [ref=f161e6431]
+              - paragraph [ref=f161e6432]: Morton, Illinois
+              - link "View Club Profile" [ref=f161e6433] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/peoria-il-alumnae-club/
+            - generic [ref=f161e6435]:
+              - generic [ref=f161e6436]: Alumnae Club
+              - heading "Philadelphia-Main Line, PA A.C." [level=2] [ref=f161e6437]
+              - paragraph [ref=f161e6438]: West Chester, Pennsylvania
+              - link "View Club Profile" [ref=f161e6439] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/philadelphia-main-line-pa-a-c/
+            - generic [ref=f161e6441]:
+              - generic [ref=f161e6442]: Alumnae Club
+              - heading "Phoenix, AZ Alumnae Club" [level=2] [ref=f161e6443]
+              - paragraph [ref=f161e6444]: Phoenix, Arizona
+              - link "View Club Profile" [ref=f161e6445] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/phoenix-az-alumnae-club/
+            - generic [ref=f161e6447]:
+              - generic [ref=f161e6448]: Alumnae Club
+              - heading "Pioneer Valley, MA Alumnae Club" [level=2] [ref=f161e6449]
+              - paragraph [ref=f161e6450]: Easthampton, Massachusetts
+              - link "View Club Profile" [ref=f161e6451] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pioneer-valley-ma-alumnae-club/
+            - generic [ref=f161e6453]:
+              - generic [ref=f161e6454]: Alumnae Club
+              - heading "Pittsburgh, PA Alumnae Club" [level=2] [ref=f161e6455]
+              - paragraph [ref=f161e6456]: Pittsburgh, Pennsylvania
+              - link "View Club Profile" [ref=f161e6457] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/pittsburgh-pa-alumnae-club/
+            - generic [ref=f161e6459]:
+              - generic [ref=f161e6460]: Alumnae Club
+              - heading "Portland, OR Alumnae Club" [level=2] [ref=f161e6461]
+              - paragraph [ref=f161e6462]: Wilsonville, Oregon
+              - link "View Club Profile" [ref=f161e6463] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/portland-or-alumnae-club/
+            - generic [ref=f161e6465]:
+              - generic [ref=f161e6466]: Alumnae Club
+              - heading "Quad Cities, IA-IL Alumnae Club" [level=2] [ref=f161e6467]
+              - paragraph
+              - link "View Club Profile" [ref=f161e6468] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/quad-cities-ia-il-alumnae-club/
+            - generic [ref=f161e6470]:
+              - generic [ref=f161e6471]: Alumnae Club
+              - heading "Quincy Area, IL Alumnae Club" [level=2] [ref=f161e6472]
+              - paragraph [ref=f161e6473]: Quincy, Illinois
+              - link "View Club Profile" [ref=f161e6474] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/quincy-area-il-alumnae-club/
+            - generic [ref=f161e6476]:
+              - generic [ref=f161e6477]: Alumnae Club
+              - heading "Red River Valley Alumnae Club" [level=2] [ref=f161e6478]
+              - paragraph [ref=f161e6479]: Grand Forks, North Dakota
+              - link "View Club Profile" [ref=f161e6480] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/red-river-valley-alumnae-club/
+            - generic [ref=f161e6482]:
+              - generic [ref=f161e6483]: Alumnae Club
+              - heading "Reno, NV Alumnae Club" [level=2] [ref=f161e6484]
+              - paragraph [ref=f161e6485]: Sparks, Nevada
+              - link "View Club Profile" [ref=f161e6486] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/reno-nv-alumnae-club/
+            - generic [ref=f161e6488]:
+              - generic [ref=f161e6489]: Alumnae Club
+              - heading "Richardson-Plano, TX Alumnae Club" [level=2] [ref=f161e6490]
+              - paragraph [ref=f161e6491]: Plano, Texas
+              - link "View Club Profile" [ref=f161e6492] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/richardson-plano-tx-alumnae-club/
+            - generic [ref=f161e6494]:
+              - generic [ref=f161e6495]: Alumnae Club
+              - heading "Richmond, VA Alumnae Club" [level=2] [ref=f161e6496]
+              - paragraph [ref=f161e6497]: Richmond, Virginia
+              - link "View Club Profile" [ref=f161e6498] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/richmond-va-alumnae-club/
+            - generic [ref=f161e6500]:
+              - generic [ref=f161e6501]: Alumnae Club
+              - heading "Rochester, NY Alumnae Club" [level=2] [ref=f161e6502]
+              - paragraph [ref=f161e6503]: East Rochester, New York
+              - link "View Club Profile" [ref=f161e6504] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/rochester-ny-alumnae-club/
+            - generic [ref=f161e6506]:
+              - generic [ref=f161e6507]: Alumnae Club
+              - heading "Sacramento, CA Alumnae Club" [level=2] [ref=f161e6508]
+              - paragraph [ref=f161e6509]: Cameron Park, California
+              - link "View Club Profile" [ref=f161e6510] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/sacramento-ca-alumnae-club/
+            - generic [ref=f161e6512]:
+              - generic [ref=f161e6513]: Alumnae Club
+              - heading "Salt Lake City, UT Alumnae Club" [level=2] [ref=f161e6514]
+              - paragraph [ref=f161e6515]: Sandy, Utah
+              - link "View Club Profile" [ref=f161e6516] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/salt-lake-city-ut-alumnae-club/
+            - generic [ref=f161e6518]:
+              - generic [ref=f161e6519]: Alumnae Club
+              - heading "San Angelo, TX Alumnae Club" [level=2] [ref=f161e6520]
+              - paragraph [ref=f161e6521]: San Angelo, Texas
+              - link "View Club Profile" [ref=f161e6522] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-angelo-tx-alumnae-club/
+            - generic [ref=f161e6524]:
+              - generic [ref=f161e6525]: Alumnae Club
+              - heading "San Antonio, TX Alumnae Club" [level=2] [ref=f161e6526]
+              - paragraph [ref=f161e6527]: San Antonio, Texas
+              - link "View Club Profile" [ref=f161e6528] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-antonio-tx-alumnae-club/
+            - generic [ref=f161e6530]:
+              - generic [ref=f161e6531]: Alumnae Club
+              - heading "San Diego, CA Alumnae Club" [level=2] [ref=f161e6532]
+              - paragraph [ref=f161e6533]: Santee, California
+              - link "View Club Profile" [ref=f161e6534] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-diego-ca-alumnae-club/
+            - generic [ref=f161e6536]:
+              - generic [ref=f161e6537]: Alumnae Club
+              - heading "San Francisco, CA Alumnae Club" [level=2] [ref=f161e6538]
+              - paragraph [ref=f161e6539]: Walnut Creek, California
+              - link "View Club Profile" [ref=f161e6540] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-francisco-ca-alumnae-club/
+            - generic [ref=f161e6542]:
+              - generic [ref=f161e6543]: Alumnae Club
+              - heading "San Jose, CA Alumnae Club" [level=2] [ref=f161e6544]
+              - paragraph [ref=f161e6545]: Cupertino, California
+              - link "View Club Profile" [ref=f161e6546] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-jose-ca-alumnae-club/
+            - generic [ref=f161e6548]:
+              - generic [ref=f161e6549]: Alumnae Club
+              - heading "San Juan, CO Alumnae Club" [level=2] [ref=f161e6550]
+              - paragraph [ref=f161e6551]: Pagosa Springs, Colorado
+              - link "View Club Profile" [ref=f161e6552] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-juan-co-alumnae-club/
+            - generic [ref=f161e6554]:
+              - generic [ref=f161e6555]: Alumnae Club
+              - heading "San Mateo County, CA Alumnae Club" [level=2] [ref=f161e6556]
+              - paragraph [ref=f161e6557]: San Mateo, California
+              - link "View Club Profile" [ref=f161e6558] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/san-mateo-county-ca-alumnae-club/
+            - generic [ref=f161e6560]:
+              - generic [ref=f161e6561]: Alumnae Club
+              - heading "Sandhills, NC Alumnae Club" [level=2] [ref=f161e6562]
+              - paragraph [ref=f161e6563]: Pinehurst, North Carolina
+              - link "View Club Profile" [ref=f161e6564] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/sandhills-nc-alumnae-club/
+            - generic [ref=f161e6566]:
+              - generic [ref=f161e6567]: Alumnae Club
+              - heading "Sarasota-Manatee, FL Alumnae Club" [level=2] [ref=f161e6568]
+              - paragraph [ref=f161e6569]: Lakewood Ranch, Florida
+              - link "View Club Profile" [ref=f161e6570] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/sarasota-manatee-fl-alumnae-club/
+            - generic [ref=f161e6572]:
+              - generic [ref=f161e6573]: Alumnae Club
+              - heading "Savannah, Georgia Alumnae Club" [level=2] [ref=f161e6574]
+              - paragraph [ref=f161e6575]: Savannah, Georgia
+              - link "View Club Profile" [ref=f161e6576] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/savannah-georgia-alumnae-club/
+            - generic [ref=f161e6578]:
+              - generic [ref=f161e6579]: Alumnae Club
+              - heading "Seattle, WA Alumnae Club" [level=2] [ref=f161e6580]
+              - paragraph [ref=f161e6581]: Lynnwood, Washington
+              - link "View Club Profile" [ref=f161e6582] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/seattle-wa-alumnae-club/
+            - generic [ref=f161e6584]:
+              - generic [ref=f161e6585]: Alumnae Club
+              - heading "Skagit-Camano, WA Alumnae Club" [level=2] [ref=f161e6586]
+              - paragraph [ref=f161e6587]: Camano Island, Washington
+              - link "View Club Profile" [ref=f161e6588] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/skagit-camano-wa-alumnae-club/
+            - generic [ref=f161e6590]:
+              - generic [ref=f161e6591]: Alumnae Club
+              - heading "South Bay, CA Alumnae Club" [level=2] [ref=f161e6592]
+              - paragraph [ref=f161e6593]: San Pedro, California
+              - link "View Club Profile" [ref=f161e6594] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-bay-ca-alumnae-club/
+            - generic [ref=f161e6596]:
+              - generic [ref=f161e6597]: Collegiate Chapter
+              - heading "South Carolina Alpha" [level=2] [ref=f161e6598]
+              - paragraph [ref=f161e6599]: Columbia, South Carolina | University of South Carolina
+              - link "View Chapter Profile" [ref=f161e6600] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-carolina-alpha/
+            - generic [ref=f161e6602]:
+              - generic [ref=f161e6603]: Collegiate Chapter
+              - heading "South Carolina Beta" [level=2] [ref=f161e6604]
+              - paragraph [ref=f161e6605]: Clemson, South Carolina | Clemson University
+              - link "View Chapter Profile" [ref=f161e6606] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-carolina-beta/
+            - generic [ref=f161e6608]:
+              - generic [ref=f161e6609]: Alumnae Club
+              - heading "South Coast, CA Alumnae Club" [level=2] [ref=f161e6610]
+              - paragraph [ref=f161e6611]: Corona Del Mar, California
+              - link "View Club Profile" [ref=f161e6612] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-coast-ca-alumnae-club/
+            - generic [ref=f161e6614]:
+              - generic [ref=f161e6615]: Collegiate Chapter
+              - heading "South Dakota Alpha" [level=2] [ref=f161e6616]
+              - paragraph [ref=f161e6617]: Vermillion, South Dakota | University of South Dakota
+              - link "View Chapter Profile" [ref=f161e6618] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-dakota-alpha/
+            - generic [ref=f161e6620]:
+              - generic [ref=f161e6621]: Alumnae Club
+              - heading "South Orange County, CA Alumnae Club" [level=2] [ref=f161e6622]
+              - paragraph [ref=f161e6623]: Trabuco Canyon, California
+              - link "View Club Profile" [ref=f161e6624] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/south-orange-county-ca-alumnae-club/
+            - generic [ref=f161e6626]:
+              - generic [ref=f161e6627]: Alumnae Club
+              - heading "Southern Illinois Alumnae Club" [level=2] [ref=f161e6628]
+              - paragraph [ref=f161e6629]: Carbondale, Illinois
+              - link "View Club Profile" [ref=f161e6630] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/southern-illinois-alumnae-club/
+            - generic [ref=f161e6632]:
+              - generic [ref=f161e6633]: Alumnae Club
+              - heading "Southlake Area, TX Alumnae Club" [level=2] [ref=f161e6634]
+              - paragraph [ref=f161e6635]: Trophy Club, Texas
+              - link "View Club Profile" [ref=f161e6636] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/southlake-area-tx-alumnae-club/
+            - generic [ref=f161e6638]:
+              - generic [ref=f161e6639]: Alumnae Club
+              - heading "Spokane, WA Alumnae Club" [level=2] [ref=f161e6640]
+              - paragraph [ref=f161e6641]: Spokane, Washington
+              - link "View Club Profile" [ref=f161e6642] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/spokane-wa-alumnae-club/
+            - generic [ref=f161e6644]:
+              - generic [ref=f161e6645]: Alumnae Club
+              - heading "Springfield, MO Alumnae Club" [level=2] [ref=f161e6646]
+              - paragraph [ref=f161e6647]: Springfield, Missouri
+              - link "View Club Profile" [ref=f161e6648] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/springfield-mo-alumnae-club/
+            - generic [ref=f161e6650]:
+              - generic [ref=f161e6651]: Alumnae Club
+              - heading "St. Louis, MO Alumnae Club" [level=2] [ref=f161e6652]
+              - paragraph [ref=f161e6653]: Wildwood, Missouri
+              - link "View Club Profile" [ref=f161e6654] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/st-louis-mo-alumnae-club/
+            - generic [ref=f161e6656]:
+              - generic [ref=f161e6657]: Alumnae Club
+              - heading "St. Paul, MN Alumnae Club" [level=2] [ref=f161e6658]
+              - paragraph [ref=f161e6659]: Saint Paul, Minnesota
+              - link "View Club Profile" [ref=f161e6660] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/st-paul-mn-alumnae-club/
+            - generic [ref=f161e6662]:
+              - generic [ref=f161e6663]: Alumnae Club
+              - heading "St. Petersburg, FL Alumnae Club" [level=2] [ref=f161e6664]
+              - paragraph [ref=f161e6665]: St Petersburg, Florida
+              - link "View Club Profile" [ref=f161e6666] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/st-petersburg-fl-alumnae-club/
+            - generic [ref=f161e6668]:
+              - generic [ref=f161e6669]: Alumnae Club
+              - heading "Stanislaus County, CA Alumnae Club" [level=2] [ref=f161e6670]
+              - paragraph [ref=f161e6671]: Modesto, California
+              - link "View Club Profile" [ref=f161e6672] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/stanislaus-county-ca-alumnae-club/
+            - generic [ref=f161e6674]:
+              - generic [ref=f161e6675]: Alumnae Club
+              - heading "Stillwater, OK Alumnae Club" [level=2] [ref=f161e6676]
+              - paragraph [ref=f161e6677]: Stillwater, Oklahoma
+              - link "View Club Profile" [ref=f161e6678] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/stillwater-ok-alumnae-club/
+            - generic [ref=f161e6680]:
+              - generic [ref=f161e6681]: Alumnae Club
+              - heading "Syracuse, NY Alumnae Club" [level=2] [ref=f161e6682]
+              - paragraph [ref=f161e6683]: Skaneateles, New York
+              - link "View Club Profile" [ref=f161e6684] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/syracuse-ny-alumnae-club/
+            - generic [ref=f161e6686]:
+              - generic [ref=f161e6687]: Alumnae Club
+              - heading "Tacoma, WA Alumnae Club" [level=2] [ref=f161e6688]
+              - paragraph
+              - link "View Club Profile" [ref=f161e6689] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tacoma-wa-alumnae-club/
+            - generic [ref=f161e6691]:
+              - generic [ref=f161e6692]: Alumnae Club
+              - heading "Tampa, FL Alumnae Club" [level=2] [ref=f161e6693]
+              - paragraph [ref=f161e6694]: Tampa, Florida
+              - link "View Club Profile" [ref=f161e6695] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tampa-fl-alumnae-club/
+            - generic [ref=f161e6697]:
+              - generic [ref=f161e6698]: Collegiate Chapter
+              - heading "Tennessee Beta" [level=2] [ref=f161e6699]
+              - paragraph [ref=f161e6700]: Nashville, Tennessee | Vanderbilt University
+              - link "View Chapter Profile" [ref=f161e6701] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tennessee-beta/
+            - generic [ref=f161e6703]:
+              - generic [ref=f161e6704]: Collegiate Chapter
+              - heading "Tennessee Delta" [level=2] [ref=f161e6705]
+              - paragraph [ref=f161e6706]: Memphis, Tennessee | University of Memphis
+              - link "View Chapter Profile" [ref=f161e6707] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tennessee-delta/
+            - generic [ref=f161e6709]:
+              - generic [ref=f161e6710]: Collegiate Chapter
+              - heading "Tennessee Gamma" [level=2] [ref=f161e6711]
+              - paragraph [ref=f161e6712]: Knoxville, Tennessee | University of Tennessee
+              - link "View Chapter Profile" [ref=f161e6713] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tennessee-gamma/
+            - generic [ref=f161e6715]:
+              - generic [ref=f161e6716]: Alumnae Club
+              - heading "Texarkana, AR-TX Alumnae Club" [level=2] [ref=f161e6717]
+              - paragraph [ref=f161e6718]: Texarkana, Texas
+              - link "View Club Profile" [ref=f161e6719] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texarkana-ar-tx-alumnae-club/
+            - generic [ref=f161e6721]:
+              - generic [ref=f161e6722]: Collegiate Chapter
+              - heading "Texas Alpha" [level=2] [ref=f161e6723]
+              - paragraph [ref=f161e6724]: Austin, Texas | University of Texas
+              - link "View Chapter Profile" [ref=f161e6725] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-alpha/
+            - generic [ref=f161e6727]:
+              - generic [ref=f161e6728]: Collegiate Chapter
+              - heading "Texas Beta" [level=2] [ref=f161e6729]
+              - paragraph [ref=f161e6730]: Dallas, Texas | Southern Methodist University
+              - link "View Chapter Profile" [ref=f161e6731] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-beta/
+            - generic [ref=f161e6733]:
+              - generic [ref=f161e6734]: Collegiate Chapter
+              - heading "Texas Delta" [level=2] [ref=f161e6735]
+              - paragraph [ref=f161e6736]: Fort Worth, Texas | Texas Christian University
+              - link "View Chapter Profile" [ref=f161e6737] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-delta/
+            - generic [ref=f161e6739]:
+              - generic [ref=f161e6740]: Collegiate Chapter
+              - heading "Texas Epsilon" [level=2] [ref=f161e6741]
+              - paragraph [ref=f161e6742]: Denton, Texas | University of North Texas
+              - link "View Chapter Profile" [ref=f161e6743] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-epsilon/
+            - generic [ref=f161e6745]:
+              - generic [ref=f161e6746]: Collegiate Chapter
+              - heading "Texas Eta" [level=2] [ref=f161e6747]
+              - paragraph [ref=f161e6748]: College Station, Texas | Texas A&M University
+              - link "View Chapter Profile" [ref=f161e6749] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-eta/
+            - generic [ref=f161e6751]:
+              - generic [ref=f161e6752]: Collegiate Chapter
+              - heading "Texas Gamma" [level=2] [ref=f161e6753]
+              - paragraph [ref=f161e6754]: Lubbock, Texas | Texas Tech University
+              - link "View Chapter Profile" [ref=f161e6755] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-gamma/
+            - generic [ref=f161e6757]:
+              - generic [ref=f161e6758]: Collegiate Chapter
+              - heading "Texas Zeta" [level=2] [ref=f161e6759]
+              - paragraph [ref=f161e6760]: Waco, Texas | Baylor University
+              - link "View Chapter Profile" [ref=f161e6761] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/texas-zeta/
+            - generic [ref=f161e6763]:
+              - generic [ref=f161e6764]: Alumnae Club
+              - heading "Tidewater of Virginia Alumnae Club" [level=2] [ref=f161e6765]
+              - paragraph [ref=f161e6766]: Virginia Beach, Virginia
+              - link "View Club Profile" [ref=f161e6767] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tidewater-of-virginia-alumnae-club/
+            - generic [ref=f161e6769]:
+              - generic [ref=f161e6770]: Alumnae Club
+              - heading "Toledo, OH Alumnae Club" [level=2] [ref=f161e6771]
+              - paragraph [ref=f161e6772]: Toledo, Ohio
+              - link "View Club Profile" [ref=f161e6773] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/toledo-oh-alumnae-club/
+            - generic [ref=f161e6775]:
+              - generic [ref=f161e6776]: Alumnae Club
+              - heading "Toronto, ON Alumnae Club" [level=2] [ref=f161e6777]
+              - paragraph [ref=f161e6778]: Hamilton, Ontario
+              - link "View Club Profile" [ref=f161e6779] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/toronto-on-alumnae-club/
+            - generic [ref=f161e6781]:
+              - generic [ref=f161e6782]: Alumnae Club
+              - heading "Tucson, AZ Alumnae Club" [level=2] [ref=f161e6783]
+              - paragraph [ref=f161e6784]: Tucson, Arizona
+              - link "View Club Profile" [ref=f161e6785] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tucson-az-alumnae-club/
+            - generic [ref=f161e6787]:
+              - generic [ref=f161e6788]: Alumnae Club
+              - heading "Tulsa, OK Alumnae Club" [level=2] [ref=f161e6789]
+              - paragraph [ref=f161e6790]: Tulsa, Oklahoma
+              - link "View Club Profile" [ref=f161e6791] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tulsa-ok-alumnae-club/
+            - generic [ref=f161e6793]:
+              - generic [ref=f161e6794]: Alumnae Club
+              - heading "Tuscaloosa, AL Alumnae Club" [level=2] [ref=f161e6795]
+              - paragraph [ref=f161e6796]: Tuscaloosa, Alabama
+              - link "View Club Profile" [ref=f161e6797] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tuscaloosa-al-alumnae-club/
+            - generic [ref=f161e6799]:
+              - generic [ref=f161e6800]: Alumnae Club
+              - heading "Tyler, TX Alumnae Club" [level=2] [ref=f161e6801]
+              - paragraph [ref=f161e6802]: Tyler, Texas
+              - link "View Club Profile" [ref=f161e6803] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/tyler-tx-alumnae-club/
+            - generic [ref=f161e6805]:
+              - generic [ref=f161e6806]: Collegiate Chapter
+              - heading "Utah Alpha" [level=2] [ref=f161e6807]
+              - paragraph [ref=f161e6808]: Salt Lake City, Utah | University of Utah
+              - link "View Chapter Profile" [ref=f161e6809] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/utah-alpha/
+            - generic [ref=f161e6811]:
+              - generic [ref=f161e6812]: Alumnae Club
+              - heading "Valley of the Moon, CA Alumnae Club" [level=2] [ref=f161e6813]
+              - paragraph [ref=f161e6814]: Santa Rosa, California
+              - link "View Club Profile" [ref=f161e6815] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/valley-of-the-moon-ca-alumnae-club/
+            - generic [ref=f161e6817]:
+              - generic [ref=f161e6818]: Alumnae Club
+              - heading "Vancouver, BC Alumnae Club" [level=2] [ref=f161e6819]
+              - paragraph [ref=f161e6820]: West Vancouver, British Columbia
+              - link "View Club Profile" [ref=f161e6821] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/vancouver-bc-alumnae-club/
+            - generic [ref=f161e6823]:
+              - generic [ref=f161e6824]: Collegiate Chapter
+              - heading "Vermont Beta" [level=2] [ref=f161e6825]
+              - paragraph [ref=f161e6826]: Burlington, Vermont | University of Vermont
+              - link "View Chapter Profile" [ref=f161e6827] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/vermont-beta/
+            - generic [ref=f161e6829]:
+              - generic [ref=f161e6830]: Collegiate Chapter
+              - heading "Virginia Delta" [level=2] [ref=f161e6831]
+              - paragraph [ref=f161e6832]: Norfolk, Virginia | Old Dominion University
+              - link "View Chapter Profile" [ref=f161e6833] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/virginia-delta/
+            - generic [ref=f161e6835]:
+              - generic [ref=f161e6836]: Collegiate Chapter
+              - heading "Virginia Epsilon" [level=2] [ref=f161e6837]
+              - paragraph [ref=f161e6838]: Charlottesville, Virginia | University of Virginia
+              - link "View Chapter Profile" [ref=f161e6839] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/virginia-epsilon/
+            - generic [ref=f161e6841]:
+              - generic [ref=f161e6842]: Collegiate Chapter
+              - heading "Virginia Gamma" [level=2] [ref=f161e6843]
+              - paragraph [ref=f161e6844]: Williamsburg, Virginia | College of William & Mary
+              - link "View Chapter Profile" [ref=f161e6845] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/virginia-gamma/
+            - generic [ref=f161e6847]:
+              - generic [ref=f161e6848]: Collegiate Chapter
+              - heading "Virginia Theta" [level=2] [ref=f161e6849]
+              - paragraph [ref=f161e6850]: Lexington, Virginia | Washington & Lee University
+              - link "View Chapter Profile" [ref=f161e6851] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/virginia-theta/
+            - generic [ref=f161e6853]:
+              - generic [ref=f161e6854]: Collegiate Chapter
+              - heading "Virginia Zeta" [level=2] [ref=f161e6855]
+              - paragraph [ref=f161e6856]: Blacksburg, Virginia | Virginia Polytechnic Institute & State University
+              - link "View Chapter Profile" [ref=f161e6857] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/virginia-zeta/
+            - generic [ref=f161e6859]:
+              - generic [ref=f161e6860]: Alumnae Club
+              - heading "Waco, TX Alumnae Club" [level=2] [ref=f161e6861]
+              - paragraph [ref=f161e6862]: Waco, Texas
+              - link "View Club Profile" [ref=f161e6863] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/waco-tx-alumnae-club/
+            - generic [ref=f161e6865]:
+              - generic [ref=f161e6866]: Collegiate Chapter
+              - heading "Washington Alpha" [level=2] [ref=f161e6867]
+              - paragraph [ref=f161e6868]: Seattle, Washington | University of Washington
+              - link "View Chapter Profile" [ref=f161e6869] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/washington-alpha/
+            - generic [ref=f161e6871]:
+              - generic [ref=f161e6872]: Collegiate Chapter
+              - heading "Washington Beta" [level=2] [ref=f161e6873]
+              - paragraph [ref=f161e6874]: Pullman, Washington | Washington State University
+              - link "View Chapter Profile" [ref=f161e6875] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/washington-beta/
+            - generic [ref=f161e6877]:
+              - generic [ref=f161e6878]: Collegiate Chapter
+              - heading "Washington Gamma" [level=2] [ref=f161e6879]
+              - paragraph [ref=f161e6880]: Tacoma, Washington | University of Puget Sound
+              - link "View Chapter Profile" [ref=f161e6881] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/washington-gamma/
+            - generic [ref=f161e6883]:
+              - generic [ref=f161e6884]: Alumnae Club
+              - heading "Wenatchee, WA Alumnae Club" [level=2] [ref=f161e6885]
+              - paragraph [ref=f161e6886]: East Wenatchee, Washington
+              - link "View Club Profile" [ref=f161e6887] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/wenatchee-wa-alumnae-club/
+            - generic [ref=f161e6889]:
+              - generic [ref=f161e6890]: Collegiate Chapter
+              - heading "West Virginia Alpha" [level=2] [ref=f161e6891]
+              - paragraph [ref=f161e6892]: Morgantown, West Virginia | West Virginia University
+              - link "View Chapter Profile" [ref=f161e6893] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/west-virginia-alpha/
+            - generic [ref=f161e6895]:
+              - generic [ref=f161e6896]: Alumnae Club
+              - heading "Western North Carolina Alumnae Club" [level=2] [ref=f161e6897]
+              - paragraph [ref=f161e6898]: Hendersonville, North Carolina
+              - link "View Club Profile" [ref=f161e6899] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/western-north-carolina-alumnae-club/
+            - generic [ref=f161e6901]:
+              - generic [ref=f161e6902]: Alumnae Club
+              - heading "Wichita Falls, TX Alumnae Club" [level=2] [ref=f161e6903]
+              - paragraph [ref=f161e6904]: Wichita Falls, Texas
+              - link "View Club Profile" [ref=f161e6905] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/wichita-falls-tx-alumnae-club/
+            - generic [ref=f161e6907]:
+              - generic [ref=f161e6908]: Alumnae Club
+              - heading "Wichita, KS Alumnae Club" [level=2] [ref=f161e6909]
+              - paragraph [ref=f161e6910]: Wichita, Kansas
+              - link "View Club Profile" [ref=f161e6911] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/wichita-ks-alumnae-club/
+            - generic [ref=f161e6913]:
+              - generic [ref=f161e6914]: Alumnae Club
+              - heading "Winnipeg Area, MB Alumnae Club" [level=2] [ref=f161e6915]
+              - paragraph [ref=f161e6916]: Winnipeg, Manitoba
+              - link "View Club Profile" [ref=f161e6917] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/winnipeg-area-mb-alumnae-club/
+            - generic [ref=f161e6919]:
+              - generic [ref=f161e6920]: Collegiate Chapter
+              - heading "Wisconsin Alpha" [level=2] [ref=f161e6921]
+              - paragraph [ref=f161e6922]: Madison, Wisconsin | University of Wisconsin
+              - link "View Chapter Profile" [ref=f161e6923] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/wisconsin-alpha/
+            - generic [ref=f161e6925]:
+              - generic [ref=f161e6926]: Collegiate Chapter
+              - heading "Wisconsin Epsilon" [level=2] [ref=f161e6927]
+              - paragraph [ref=f161e6928]: Green Bay, Wisconsin | University of Wisconsin-Green Bay
+              - link "View Chapter Profile" [ref=f161e6929] [cursor=pointer]:
+                - /url: https://pibetaphi.org/find-a-chapter/wisconsin-epsilon/
+          - generic [ref=f161e99]:
+            - button "Load More" [disabled]
+  - contentinfo [ref=f161e101]:
+    - generic [ref=f161e103]:
+      - list [ref=f161e105]:
+        - listitem [ref=f161e106]:
+          - link "Three members sitting on a couch BetaBase" [ref=f161e107] [cursor=pointer]:
+            - /url: https://betabase.pibetaphi.org/?_gl=1*1tai38o*_ga*MjEyMjQzMzgwNS4xNzcwMTUzMTY1*_ga_3EEKLMGHYL*czE3NzI0ODUxMzMkbzYkZzEkdDE3NzI0ODUzMjQkajUyJGwwJGgw
+            - img "Three members sitting on a couch" [ref=f161e108]
+            - generic [ref=f161e109]: BetaBase
+        - listitem [ref=f161e110]:
+          - link "Four members wearing matching sweat sets that say Pi Phi Shop" [ref=f161e111] [cursor=pointer]:
+            - /url: https://shoppiphi.com
+            - img "Four members wearing matching sweat sets that say Pi Phi" [ref=f161e112]
+            - generic [ref=f161e113]: Shop
+        - listitem [ref=f161e114]:
+          - link "Several members sitting on a balcony wearing silver blue dresses Policies & Positions" [ref=f161e115] [cursor=pointer]:
+            - /url: https://pibetaphi.org/policies-positions/
+            - img "Several members sitting on a balcony wearing silver blue dresses" [ref=f161e116]
+            - generic [ref=f161e117]: Policies & Positions
+        - listitem [ref=f161e118]:
+          - link "One individual holding a paper and explaining something to another individual Careers at Pi Phi" [ref=f161e119] [cursor=pointer]:
+            - /url: https://pibetaphi.org/careers-at-pi-phi/
+            - img "One individual holding a paper and explaining something to another individual" [ref=f161e120]
+            - generic [ref=f161e121]: Careers at Pi Phi
+        - listitem [ref=f161e122]:
+          - link "Five members wearing white dresses and holding wine carnations in front of a door Find a Chapter or Club" [ref=f161e123] [cursor=pointer]:
+            - /url: https://pibetaphi.org/join/find-a-chapter/
+            - img "Five members wearing white dresses and holding wine carnations in front of a door" [ref=f161e124]
+            - generic [ref=f161e125]: Find a Chapter or Club
+        - listitem [ref=f161e126]:
+          - link "Two members wearing white dresses and holding wine carnations Brand Assets and Guidelines" [ref=f161e127] [cursor=pointer]:
+            - /url: https://pibetaphi.org/brand-assets-and-guidelines/
+            - img "Two members wearing white dresses and holding wine carnations" [ref=f161e128]
+            - generic [ref=f161e129]: Brand Assets and Guidelines
+        - listitem [ref=f161e130]:
+          - link "Three members standing indoors hugging Contact Us" [ref=f161e131] [cursor=pointer]:
+            - /url: https://pibetaphi.org/contact-us/
+            - img "Three members standing indoors hugging" [ref=f161e132]
+            - generic [ref=f161e133]: Contact Us
+      - generic [ref=f161e134]:
+        - heading "Connect. Serve. Shine." [level=2] [ref=f161e136]
+        - generic [ref=f161e137]:
+          - list [ref=f161e138]:
+            - listitem [ref=f161e139]:
+              - link "Facebook - Opens in new tab" [ref=f161e140] [cursor=pointer]:
+                - /url: https://www.facebook.com/pibetaphi
+            - listitem [ref=f161e143]:
+              - link "Instagram - Opens in new tab" [ref=f161e144] [cursor=pointer]:
+                - /url: https://www.instagram.com/pibetaphihq
+            - listitem [ref=f161e149]:
+              - link "Vimeo - Opens in new tab" [ref=f161e150] [cursor=pointer]:
+                - /url: https://vimeo.com/pibetaphi
+            - listitem [ref=f161e153]:
+              - link "LinkedIn - Opens in new tab" [ref=f161e154] [cursor=pointer]:
+                - /url: http://www.linkedin.com/groups?about=&gid=102907
+          - paragraph [ref=f161e157]: 1154 Town and Country Commons Drive Town and Country, Missouri 63017 (636) 256-0680
+        - generic [ref=f161e158]:
+          - generic [ref=f161e159]:
+            - text: ©2026 Pi Beta Phi. All Rights Reserved.
+            - link "Web Design - Opens Push10 in a new tab." [ref=f161e160] [cursor=pointer]:
+              - /url: https://www.push10.com/greek-organizations/
+              - text: Web Design for Greek Organizations
+            - text: by Push10.
+          - paragraph [ref=f161e161]:
+            - link "Privacy Policy" [ref=f161e162] [cursor=pointer]:
+              - /url: https://pibetaphi.org/privacy-policy/
+            - link "Terms" [ref=f161e163] [cursor=pointer]:
+              - /url: https://pibetaphi.org/terms-conditions/

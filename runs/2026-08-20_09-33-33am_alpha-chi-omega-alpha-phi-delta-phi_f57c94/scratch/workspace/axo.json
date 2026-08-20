@@ -1,0 +1,28 @@
+{
+  "sorority": "Alpha Chi Omega",
+  "website": "https://axo.mit.edu/",
+  "sistersPage": "https://axo.mit.edu/sisters/",
+  "note": "Sisters page lists Class of 2027 through 2030 only (names only, no major/interests). No Class of 2026 (seniors) section found on the sisters page. Exec Officers page (https://axo.mit.edu/exec/) lists names/roles but no class years, so seniors could not be confidently identified there either.",
+  "members": [
+    {"name":"Stuti Agarwal","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Stephanie Chang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Fatima Hernandez","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Sharona Huang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Elizabeth Jackson","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Anna Kim","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Maddy Laws","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Priscilla Leang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Nicole Li","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Minnie Liang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Molly McCormick","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Qingqing Ouyang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Anisha Parsan","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Lidia Prokopovych","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Ruoxi Qian","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Pria Sawhney","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Fiona Shangguan","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Ridhima Singh","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Jessie Wang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""},
+    {"name":"Emily Zhang","class":"2027","major":"","affiliation":"Alpha Chi Omega","interests":"","other":""}
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "task": "Create a CSV of the top 30 contributors to the OpenClaw GitHub repository, with columns github_handle, name, linkedin_url.",
+  "startedAt": "2026-08-12T06:47:07.568Z",
+  "artifacts": [
+    {
+      "filename": "tool-output/inspect_page-1.txt",
+      "sha256": "c3f1978cf299a75b2655e237c82708842abffe285964edbce851adb54191a19b",
+      "capturedAt": "2026-08-12T06:47:16.839Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-2.txt",
+      "sha256": "03fc31c9df7a5f4bcf8d25ba13332ec8526f15e07a7f9137d27cc58a05b15c43",
+      "capturedAt": "2026-08-12T06:47:42.222Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-3.txt",
+      "sha256": "49c2ca2aa5ff739d074ba8eea68027424be0bd2b84581861e26a78f56dc8dec6",
+      "capturedAt": "2026-08-12T06:47:51.559Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-4.txt",
+      "sha256": "7652b8a166b322e428fc33c4962ae13c9daeee652a44cce5ed1530b3a929b4aa",
+      "capturedAt": "2026-08-12T06:48:00.989Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-5.txt",
+      "sha256": "7af6c157c88fd59e1707e9d22ad2229d0a459d6de459899bd7e19c47439407eb",
+      "capturedAt": "2026-08-12T06:48:10.425Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-6.txt",
+      "sha256": "8d9495e207d0defbd66f9d0f8bc7fb0c099c83d1a07f419695d6228212f6af06",
+      "capturedAt": "2026-08-12T06:48:27.554Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-7.txt",
+      "sha256": "aea0add1c65707c05d576e6f3a3191c4c73787397755f4dc6fa3355ca0d0377e",
+      "capturedAt": "2026-08-12T06:48:43.271Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-8.txt",
+      "sha256": "66f3291b904f900399d48d4308d1e996a3b5752610a48ac561813cbc5a0664d8",
+      "capturedAt": "2026-08-12T06:48:56.114Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-9.txt",
+      "sha256": "eda7f872481f4d22b6dd81a53262615a7b9a08e8856c72612a11efeb023cf842",
+      "capturedAt": "2026-08-12T06:49:09.658Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-10.txt",
+      "sha256": "2ad0bf8848e3f4645b4eec8bc74da4d32b99b44d722b409a3f566f0049126acc",
+      "capturedAt": "2026-08-12T06:49:18.323Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-11.txt",
+      "sha256": "8ca7e25457d2ad131b72152960c97a0979b1ce3820ad219a90ba7a7b4bae829f",
+      "capturedAt": "2026-08-12T06:49:43.796Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-12.txt",
+      "sha256": "24882acd5c23094ecc489f57b5bfac4653c667aab7bb4fa6e6aeb9efe1d65b12",
+      "capturedAt": "2026-08-12T06:49:53.388Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-13.txt",
+      "sha256": "061d277462c47405d08ec501f33133467204049b3cea8f47a60f72f29094c594",
+      "capturedAt": "2026-08-12T06:50:04.032Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-14.txt",
+      "sha256": "769f090bca7f8aaed9bbfba8970d5feb9d931c55219c45ae0e9ab7a7ca0eb84a",
+      "capturedAt": "2026-08-12T06:50:23.197Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-15.txt",
+      "sha256": "25ffddf72803b4b6cb7ab5a023d10c8eb2060eb381dc14f2dcf392f96598f990",
+      "capturedAt": "2026-08-12T06:50:34.000Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-16.txt",
+      "sha256": "6fbd30aa401b76e15e02de953bae6f24160b3fa7c784a19131ea16c434f60250",
+      "capturedAt": "2026-08-12T06:50:49.693Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-17.txt",
+      "sha256": "6c74f9cd97272404839db5a2973914fe0545d1b0748c4b80c63be88804d25100",
+      "capturedAt": "2026-08-12T06:51:00.130Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-18.txt",
+      "sha256": "fbebc9e077db0c95c05c8c586c343b30351a570f196f1511304a5b2b015a8a9a",
+      "capturedAt": "2026-08-12T06:51:09.060Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-19.txt",
+      "sha256": "377d36c10dc638f84a19d34577221ef2950975f49b203c0a08a48cdb8b4bdefa",
+      "capturedAt": "2026-08-12T06:51:28.669Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-20.txt",
+      "sha256": "df46f9421c6e0d560b7684f70f98febdc666e18ce5049add0b373c7cbeacf298",
+      "capturedAt": "2026-08-12T06:51:44.389Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-21.txt",
+      "sha256": "0ce9f26cc7e96528aa20c18a13ae8eb62edbb859213c7632239bd6dce1727dbd",
+      "capturedAt": "2026-08-12T06:51:53.583Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-22.txt",
+      "sha256": "811edad5f39485b1d5b6a17b7ecf05a5621c51a20c900fe28af931ac335add4b",
+      "capturedAt": "2026-08-12T06:52:11.655Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-23.txt",
+      "sha256": "2108e5703a7ee8fefa5583fd26377279509bf82ae3c5b088f93952bd61f3fe17",
+      "capturedAt": "2026-08-12T06:52:22.164Z"
+    },
+    {
+      "filename": "top30_contributors.csv",
+      "sha256": "6e852f5e712bafc10ab143950852e7a492dfc20730c879bb7f6ea3115b07d5ed",
+      "capturedAt": "2026-08-12T06:52:48.918Z"
+    },
+    {
+      "filename": "answer.md",
+      "sha256": "6b822a897c59cd63a8c46fccb87e387adb725467be953c91870313c04b1c952f",
+      "capturedAt": "2026-08-12T06:53:01.399Z"
+    }
+  ],
+  "finishedAt": "2026-08-12T06:53:09.836Z"
+}

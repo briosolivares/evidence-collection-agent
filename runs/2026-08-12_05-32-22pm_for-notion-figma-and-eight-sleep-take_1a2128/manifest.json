@@ -1,0 +1,90 @@
+{
+  "task": "For Notion, Figma, and Eight Sleep, take one screenshot of each company's website homepage and one screenshot of the most recent official blog/content item released by each company to show that it is still active. Produce all six screenshots as PNG evidence artifacts.",
+  "startedAt": "2026-08-13T00:32:22.611Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/notion_homepage.png",
+      "sha256": "4efe88013d1ea996101506fea6891edcebb409b1709d173285b95f2d3db7f574",
+      "sourceUrl": "https://www.notion.com/",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:32:31.242Z"
+    },
+    {
+      "filename": "artifacts/notion_blog_latest.png",
+      "sha256": "2d960a019d9a9b7e4a005c3904cf22dcb96f6494c07701edbd361cebea7946a5",
+      "sourceUrl": "https://www.notion.com/blog/rebuilding-notions-lexical-search-reindexer",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:32:41.879Z"
+    },
+    {
+      "filename": "artifacts/figma_homepage.png",
+      "sha256": "0a64c52821de3a280be27451f4b215a34c33ddac57ac440d14211ab16d87be97",
+      "sourceUrl": "https://www.figma.com/",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:32:50.040Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "7b738de04ef3d3b8d4f3f943013664da18cfb67e2e9eb59ce601f3e7d2465403",
+      "capturedAt": "2026-08-13T00:32:56.437Z"
+    },
+    {
+      "filename": "artifacts/figma_blog_latest.png",
+      "sha256": "0832c5160c45a9122af804b464d1106d6391c52cc369908a8d05d6d23eac1c8e",
+      "sourceUrl": "https://www.figma.com/blog/measuring-time-savings-from-figma-make/",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:33:08.060Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "34460194a44866927ddac02d8e9295db76d989b9a99c1b8ced307380baa51d7e",
+      "capturedAt": "2026-08-13T00:33:12.186Z"
+    },
+    {
+      "filename": "artifacts/eightsleep_homepage.png",
+      "sha256": "ae4c8f9edef82535a47a2532854525da7dce1a7cb1826f4a1e6a921e841417f6",
+      "sourceUrl": "https://www.eightsleep.com/",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:33:14.470Z"
+    },
+    {
+      "filename": "artifacts/eightsleep_blog_latest.png",
+      "sha256": "4917ac5b82ce1317496997a3413fa79c697a62a8f986a96303e422a695ab1e4a",
+      "sourceUrl": "https://www.eightsleep.com/blog/federico-chingotto-8-things-you-didnt-know-padel",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:33:34.723Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "f2d8cfec5d317cba2be396d16fcdf140fb890dfa60a956bc8025405f3287e48a",
+      "capturedAt": "2026-08-13T00:33:39.453Z"
+    },
+    {
+      "filename": "artifacts/summary.md",
+      "sha256": "58c47221688389412a2aca255a717057c27677633ccf962769a4f9a50b321329",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:33:47.447Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:33:53.135Z"
+}

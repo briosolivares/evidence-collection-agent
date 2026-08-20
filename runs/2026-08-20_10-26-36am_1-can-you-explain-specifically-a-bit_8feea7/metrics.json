@@ -1,0 +1,14 @@
+{
+  "status": "cancelled",
+  "turns": 0,
+  "protocolCorrections": 0,
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cacheReadInputTokens": 0,
+  "cacheCreationInputTokens": 0,
+  "toolCalls": 0,
+  "toolResultBytes": 0,
+  "peakContextTokens": 0,
+  "wallClockMs": 2841,
+  "roles": {}
+}

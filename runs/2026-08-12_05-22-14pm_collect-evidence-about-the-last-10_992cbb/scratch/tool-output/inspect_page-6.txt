@@ -1,0 +1,805 @@
+URL: https://github.com/openclaw/openclaw/pull/122874
+Title: refactor(media): remove orphan generation facades by steipete · Pull Request #122874 · openclaw/openclaw · GitHub
+
+- generic [ref=f4e2]:
+  - generic [ref=f4e3]:
+    - link "Skip to content" [ref=f4e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f4e8]:
+      - heading "Navigation Menu" [level=2] [ref=f4e9]
+      - generic [ref=f4e10]:
+        - link "Homepage" [ref=f4e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f4e15]:
+          - navigation "Global" [ref=f4e16]:
+            - list [ref=f4e17]:
+              - listitem [ref=f4e18]:
+                - button "Platform" [ref=f4e20] [cursor=pointer]
+              - listitem [ref=f4e23]:
+                - button "Solutions" [ref=f4e25] [cursor=pointer]
+              - listitem [ref=f4e28]:
+                - button "Resources" [ref=f4e30] [cursor=pointer]
+              - listitem [ref=f4e33]:
+                - button "Open Source" [ref=f4e35] [cursor=pointer]
+              - listitem [ref=f4e38]:
+                - button "Enterprise" [ref=f4e40] [cursor=pointer]
+              - listitem [ref=f4e43]:
+                - link "Pricing" [ref=f4e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f4e45]:
+            - button "Search or jump to, type / to search" [ref=f4e47] [cursor=pointer]:
+              - generic [ref=f4e50]:
+                - text: Type
+                - generic [ref=f4e51]: /
+                - text: to search
+            - link "Sign in" [ref=f4e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122874
+            - link "Sign up" [ref=f4e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f4e55] [cursor=pointer]
+  - main [ref=f4e61]:
+    - generic [ref=f4e62]:
+      - generic [ref=f4e63]:
+        - generic [ref=f4e65]:
+          - link "openclaw" [ref=f4e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f4e70]: /
+          - strong [ref=f4e71]:
+            - link "openclaw" [ref=f4e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f4e73]: Public
+        - generic [ref=f4e74]:
+          - list:
+            - listitem [ref=f4e75]:
+              - link "Sponsor @openclaw" [ref=f4e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f4e77]: Sponsor
+            - listitem [ref=f4e81]:
+              - link "You must be signed in to change notification settings" [ref=f4e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f4e85]:
+              - link "Fork 81.2k" [ref=f4e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,150" [ref=f4e89]: 81.2k
+            - listitem [ref=f4e90]:
+              - link "You must be signed in to star a repository" [ref=f4e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386084 users starred this repository" [ref=f4e95]: 386k
+      - navigation "Repository" [ref=f4e96]:
+        - list [ref=f4e97]:
+          - listitem [ref=f4e98]:
+            - link "Code" [ref=f4e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f4e103]:
+            - link "Issues 3.4k" [ref=f4e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f4e108]: Issues
+              - generic "3,414" [ref=f4e109]: 3.4k
+          - listitem [ref=f4e110]:
+            - link "Pull requests 2.1k" [ref=f4e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f4e114]: Pull requests
+              - generic "2,113" [ref=f4e115]: 2.1k
+          - listitem [ref=f4e116]:
+            - link "Actions" [ref=f4e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f4e121]:
+            - link "Projects" [ref=f4e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f4e126]:
+            - link "Security and quality 647" [ref=f4e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f4e130]: Security and quality
+              - generic "647" [ref=f4e131]
+          - listitem [ref=f4e132]:
+            - link "Insights" [ref=f4e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f4e143]:
+      - generic [ref=f4e147]:
+        - generic [ref=f4e149]:
+          - 'heading "refactor(media): remove orphan generation facades - #122874" [level=1] [ref=f4e150]':
+            - text: "refactor(media): remove orphan generation facades"
+            - generic [ref=f4e151]: "- #122874"
+          - generic [ref=f4e152]: "#122874"
+        - generic [ref=f4e155]:
+          - generic [ref=f4e157]:
+            - img "Pull request" [ref=f4e158]
+            - text: Merged
+          - generic [ref=f4e161]:
+            - link "steipete" [ref=f4e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 1 commit into
+            - generic [ref=f4e163]:
+              - link "main" [ref=f4e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f4e165]: from
+              - generic [ref=f4e166]:
+                - link "test/audit-orphan-media-facades" [ref=f4e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/test/audit-orphan-media-facades
+                - button "Copy head branch name to clipboard" [ref=f4e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 5:19 PM PDT" [ref=f4e172]: Aug 13, 20263 minutes ago
+        - generic [ref=f4e173]:
+          - generic [ref=f4e175]:
+            - generic [ref=f4e176]: "+1"
+            - generic [ref=f4e177]: "-157"
+            - generic [ref=f4e178]: "Lines changed: 1 addition & 157 deletions"
+          - navigation "Pull request navigation tabs" [ref=f4e186]:
+            - generic [ref=f4e187]:
+              - link "Conversation (6)" [ref=f4e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122874
+                - text: Conversation
+                - generic [ref=f4e191]: "6"
+                - generic [ref=f4e192]: (6)
+              - link "Commits (1)" [ref=f4e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122874/commits
+                - text: Commits
+                - generic [ref=f4e196]: "1"
+                - generic [ref=f4e197]: (1)
+              - link "Checks (185)" [ref=f4e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122874/checks
+                - text: Checks
+                - generic [ref=f4e201]: "185"
+                - generic [ref=f4e202]: (185)
+              - link "Files changed (12)" [ref=f4e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122874/files
+                - text: Files changed
+                - generic [ref=f4e206]: "12"
+                - generic [ref=f4e207]: (12)
+      - generic [ref=f4e212]:
+        - generic [ref=f4e214]:
+          - heading "Conversation" [level=2] [ref=f4e215]
+          - generic [ref=f4e216]:
+            - generic [ref=f4e217]:
+              - generic [ref=f4e219]:
+                - link [ref=f4e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f4e221]
+                - generic [ref=f4e223]:
+                  - generic [ref=f4e224]:
+                    - heading [level=3] [ref=f4e225]:
+                      - generic [ref=f4e226]:
+                        - strong [ref=f4e227]:
+                          - link "steipete" [ref=f4e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 13, 202614 minutes ago" [ref=f4e229] [cursor=pointer]:
+                          - /url: "#issue-5136432394"
+                    - generic [ref=f4e230]:
+                      - group [ref=f4e232]:
+                        - button [ref=f4e233] [cursor=pointer]:
+                          - img "Show options" [ref=f4e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f4e239]: Contributor
+                  - generic [ref=f4e244]:
+                    - heading "What Problem This Solves" [level=2] [ref=f4e245]
+                    - paragraph [ref=f4e246]:
+                      - code [ref=f4e247]: extensions/video-generation-core
+                      - text: remained as a private manifest-less facade after runtime ownership moved back into core. It has no production caller, plugin manifest, catalog entry, activation allowlist, supported package export, or explicit release contract; its only tests mocked the SDK functions that production directly re-exported.
+                    - paragraph [ref=f4e248]:
+                      - code [ref=f4e249]: extensions/image-generation-core
+                      - text: still has a real packaged runtime-sidecar contract, but its unit test asserted exact function identity and kept a one-use
+                      - code [ref=f4e250]: src/runtime.ts
+                      - text: wrapper alive.
+                    - heading "Why This Change Was Made" [level=2] [ref=f4e251]
+                    - paragraph [ref=f4e252]: Delete the complete orphan video facade package and its stale labeler, test-routing, and lockfile entries. Preserve the canonical video runtime, tool, CLI, Plugin SDK, and QA coverage in core.
+                    - paragraph [ref=f4e253]:
+                      - text: Keep the image facade package and its explicitly enforced
+                      - code [ref=f4e254]: runtime-api.js
+                      - text: sidecar, but re-export the canonical SDK runtime directly from
+                      - code [ref=f4e255]: runtime-api.ts
+                      - text: ; delete the one-use wrapper and function-identity test.
+                    - heading "User Impact" [level=2] [ref=f4e256]
+                    - paragraph [ref=f4e257]: No user-visible behavior changes. Supported image and video generation paths remain owned and tested in core. The package artifact set is smaller and no longer ships an unused private video facade.
+                    - paragraph [ref=f4e258]: Production/package metadata is -67 lines; tests are -78 lines; config/lock/test-routing is -11 lines. Total net change is -156 lines.
+                    - heading "Evidence" [level=2] [ref=f4e259]
+                    - list [ref=f4e260]:
+                      - listitem [ref=f4e261]:
+                        - text: Repository search found no caller or supported import route for
+                        - code [ref=f4e262]: "@openclaw/video-generation-core"
+                        - text: ; only its labeler, test-routing entry, and lockfile importer referenced the package.
+                      - listitem [ref=f4e263]:
+                        - code [ref=f4e264]: node scripts/run-vitest.mjs src/image-generation/runtime.test.ts src/video-generation/runtime.test.ts src/plugin-sdk/facade-runtime.test.ts src/plugins/copy-bundled-plugin-metadata.test.ts test/scripts/bundled-plugin-build-entries.test.ts test/openclaw-npm-postpublish-verify.test.ts test/release-check.test.ts test/scripts/labeler-extension-coverage.test.ts test/extension-test-boundary.test.ts
+                        - text: — 246 tests passed across five shards.
+                      - listitem [ref=f4e265]:
+                        - code [ref=f4e266]: pnpm install --lockfile-only --frozen-lockfile --ignore-scripts
+                        - text: — lockfile validated against 179 workspace packages and supply-chain policy.
+                      - listitem [ref=f4e267]:
+                        - text: Explicit build-entry/pack-artifact inventory asserted no video facade entries and retained
+                        - code [ref=f4e268]: extensions/image-generation-core/runtime-api
+                        - text: plus
+                        - code [ref=f4e269]: dist/extensions/image-generation-core/runtime-api.js
+                        - text: .
+                      - listitem [ref=f4e270]:
+                        - code [ref=f4e271]: pnpm build
+                        - text: — passed locally; the built tree contains the image runtime sidecar and no video facade directory.
+                      - listitem [ref=f4e272]:
+                        - code [ref=f4e273]: node scripts/check-changed.mjs -- <changed paths>
+                        - text: — all-lanes gate passed, including 94 npm lock validations, bundled metadata, Plugin SDK API baseline, plugin boundaries, dead exports, full typecheck, full lint, runtime guards, and import cycles. The configured remote backend was unavailable because the
+                        - code [ref=f4e274]: blacksmith
+                        - text: executable is not installed on this host, so heavy proof used the documented trusted-source local fallback.
+                      - listitem [ref=f4e275]:
+                        - code [ref=f4e276]: git diff --check HEAD
+                        - text: — passed.
+                      - listitem [ref=f4e277]: Structured uncommitted and committed branch autoreviews — no accepted or actionable findings.
+                  - 'button "eyes (1): steipete, 12:08AM today" [disabled] [ref=f4e282]':
+                    - generic [ref=f4e283]: 👀
+                    - generic [ref=f4e284]: "1"
+              - generic [ref=f4e285]:
+                - generic [ref=f4e296]:
+                  - link [ref=f4e299] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f4e300]
+                  - code [ref=f4e302]:
+                    - 'link "refactor(media): remove orphan generation facades" [ref=f4e303] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122874/commits/c382fd31a174d43c3f064303078e91f74c39fb34
+                  - button "Unverified" [ref=f4e305] [cursor=pointer]
+                  - group [ref=f4e310]:
+                    - img "74 / 115 checks OK" [ref=f4e312] [cursor=pointer]
+                  - code [ref=f4e315]:
+                    - link "c382fd3" [ref=f4e316] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122874/commits/c382fd31a174d43c3f064303078e91f74c39fb34
+                - generic [ref=f4e318]:
+                  - link [ref=f4e320] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f4e321]
+                  - generic [ref=f4e323]:
+                    - generic [ref=f4e324]:
+                      - heading "clawsweeper Bot commented Aug 13, 202614 minutes ago" [level=3] [ref=f4e325]:
+                        - generic [ref=f4e326]:
+                          - strong [ref=f4e327]:
+                            - link "clawsweeper" [ref=f4e328] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f4e329]: Bot
+                          - text: commented
+                          - link "Aug 13, 202614 minutes ago" [ref=f4e330] [cursor=pointer]:
+                            - /url: "#issuecomment-5274258503"
+                      - generic [ref=f4e331]:
+                        - group [ref=f4e333]:
+                          - button [ref=f4e334] [cursor=pointer]:
+                            - img "Show options" [ref=f4e337]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f4e340]: Contributor
+                    - table [ref=f4e344]:
+                      - rowgroup [ref=f4e345]:
+                        - row [ref=f4e346]:
+                          - cell [ref=f4e347]:
+                            - paragraph [ref=f4e348]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f4e349]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f4e350]:
+                  - generic [ref=f4e355]:
+                    - link [ref=f4e356] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f4e357]
+                    - link "openclaw-barnacle" [ref=f4e358] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f4e359]: Bot
+                    - text: added
+                    - 'link "extensions: image-generation-core" [ref=f4e360] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20image-generation-core%22
+                    - 'link "extensions: video-generation-core" [ref=f4e361] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20video-generation-core%22
+                    - text: labels
+                    - link "Aug 13, 202614 minutes ago" [ref=f4e362] [cursor=pointer]:
+                      - /url: "#event-29372209966"
+                  - generic [ref=f4e368]:
+                    - link [ref=f4e370] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f4e371]
+                    - generic [ref=f4e372]:
+                      - link "steipete" [ref=f4e373] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 00:0914 minutes ago" [ref=f4e374] [cursor=pointer]:
+                        - /url: "#event-29372210492"
+                  - generic [ref=f4e380]:
+                    - link [ref=f4e382] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f4e383]
+                    - generic [ref=f4e384]:
+                      - link "steipete" [ref=f4e385] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: requested a review from a team as a
+                      - link "code owner" [ref=f4e386] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/blob/08b134324f0a79458784c5311c0690211ecbcfd4/.github/CODEOWNERS#L25
+                      - link "August 13, 2026 00:0914 minutes ago" [ref=f4e387] [cursor=pointer]:
+                        - /url: "#event-29372210857"
+                  - generic [ref=f4e392]:
+                    - link [ref=f4e393] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f4e394]
+                    - link "openclaw-barnacle" [ref=f4e395] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f4e396]: Bot
+                    - text: added
+                    - 'link "size: S" [ref=f4e397] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+                    - link "maintainer" [ref=f4e398] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 202614 minutes ago" [ref=f4e399] [cursor=pointer]:
+                      - /url: "#event-29372211062"
+                  - generic [ref=f4e404]:
+                    - link [ref=f4e405] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                      - img "@github-actions" [ref=f4e406]
+                    - link "github-actions" [ref=f4e407] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                    - generic [ref=f4e408]: Bot
+                    - text: added the
+                    - link "dependencies-changed" [ref=f4e409] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adependencies-changed
+                    - text: label
+                    - link "Aug 13, 202613 minutes ago" [ref=f4e410] [cursor=pointer]:
+                      - /url: "#event-29372217832"
+                - generic [ref=f4e412]:
+                  - link [ref=f4e414] [cursor=pointer]:
+                    - /url: /apps/github-actions
+                    - img "@github-actions" [ref=f4e415]
+                  - generic [ref=f4e417]:
+                    - generic [ref=f4e418]:
+                      - heading "github-actions Bot commented Aug 13, 202613 minutes ago" [level=3] [ref=f4e419]:
+                        - generic [ref=f4e420]:
+                          - strong [ref=f4e421]:
+                            - link "github-actions" [ref=f4e422] [cursor=pointer]:
+                              - /url: /apps/github-actions
+                            - generic [ref=f4e423]: Bot
+                          - text: commented
+                          - link "Aug 13, 202613 minutes ago" [ref=f4e424] [cursor=pointer]:
+                            - /url: "#issuecomment-5274261514"
+                      - generic [ref=f4e425]:
+                        - group [ref=f4e427]:
+                          - button [ref=f4e428] [cursor=pointer]:
+                            - img "Show options" [ref=f4e431]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f4e434]: Contributor
+                    - table [ref=f4e438]:
+                      - rowgroup [ref=f4e439]:
+                        - row [ref=f4e440]:
+                          - cell [ref=f4e441]:
+                            - heading "Dependency Guard" [level=3] [ref=f4e442]
+                            - paragraph [ref=f4e443]: This PR changes dependency-related files. Maintainers should confirm these changes are intentional.
+                            - paragraph [ref=f4e444]: "Changed files:"
+                            - list [ref=f4e445]:
+                              - listitem [ref=f4e446]:
+                                - code [ref=f4e447]: extensions/video-generation-core/package.json
+                              - listitem [ref=f4e448]:
+                                - code [ref=f4e449]: pnpm-lock.yaml
+                            - paragraph [ref=f4e450]: "Maintainer follow-up:"
+                            - list [ref=f4e451]:
+                              - listitem [ref=f4e452]: Review whether the dependency changes are intentional.
+                              - listitem [ref=f4e453]: Inspect resolved package deltas when lockfiles or workspace dependency policy changes are present.
+                              - listitem [ref=f4e454]:
+                                - text: Treat
+                                - code [ref=f4e455]: pnpm-lock.yaml
+                                - text: and
+                                - code [ref=f4e456]: package-lock.json
+                                - text: diffs as dependency security-review surfaces.
+                              - listitem [ref=f4e457]:
+                                - text: Run
+                                - code [ref=f4e458]: pnpm deps:changes:report -- --base-ref origin/main --markdown /tmp/dependency-changes.md --json /tmp/dependency-changes.json
+                                - text: locally for detailed release-style evidence.
+                - generic [ref=f4e460]:
+                  - link [ref=f4e462] [cursor=pointer]:
+                    - /url: /apps/github-actions
+                    - img "@github-actions" [ref=f4e463]
+                  - generic [ref=f4e465]:
+                    - generic [ref=f4e466]:
+                      - heading "github-actions Bot commented Aug 13, 202613 minutes ago" [level=3] [ref=f4e467]:
+                        - generic [ref=f4e468]:
+                          - strong [ref=f4e469]:
+                            - link "github-actions" [ref=f4e470] [cursor=pointer]:
+                              - /url: /apps/github-actions
+                            - generic [ref=f4e471]: Bot
+                          - text: commented
+                          - link "Aug 13, 202613 minutes ago" [ref=f4e472] [cursor=pointer]:
+                            - /url: "#issuecomment-5274261783"
+                      - generic [ref=f4e473]:
+                        - group [ref=f4e475]:
+                          - button [ref=f4e476] [cursor=pointer]:
+                            - img "Show options" [ref=f4e479]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f4e482]: Contributor
+                    - table [ref=f4e486]:
+                      - rowgroup [ref=f4e487]:
+                        - row [ref=f4e488]:
+                          - cell [ref=f4e489]:
+                            - heading "Dependency removals noted" [level=3] [ref=f4e490]
+                            - paragraph [ref=f4e491]:
+                              - text: This PR only removes dependencies from the dependency graph, so the dependency guard is informational and does not require
+                              - code [ref=f4e492]: /allow-dependencies-change
+                              - text: .
+                            - list [ref=f4e493]:
+                              - listitem [ref=f4e494]:
+                                - paragraph [ref=f4e495]:
+                                  - text: Removed
+                                  - code [ref=f4e496]: "@openclaw/plugin-sdk"
+                                  - text: from
+                                  - code [ref=f4e497]: extensions/video-generation-core/package.json
+                                  - text: .
+                              - listitem [ref=f4e498]:
+                                - paragraph [ref=f4e499]:
+                                  - text: "Current SHA:"
+                                  - code [ref=f4e500]: c382fd31a174d43c3f064303078e91f74c39fb34
+                            - paragraph [ref=f4e501]: A later push that adds or changes dependency graph entries will require a fresh security approval.
+                - generic [ref=f4e507]:
+                  - link [ref=f4e508] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f4e509]
+                  - link "clawsweeper" [ref=f4e510] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                  - generic [ref=f4e511]: Bot
+                  - text: added
+                  - link "P3" [ref=f4e512] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP3
+                  - 'link "rating: 🦞 diamond lobster" [ref=f4e513] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+                  - 'link "status: 👀 ready for maintainer look" [ref=f4e514] [cursor=pointer]':
+                    - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                  - text: labels
+                  - link "Aug 13, 20266 minutes ago" [ref=f4e515] [cursor=pointer]:
+                    - /url: "#event-29372432672"
+                - generic [ref=f4e517]:
+                  - link [ref=f4e519] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f4e520]
+                  - generic [ref=f4e522]:
+                    - generic [ref=f4e523]:
+                      - heading "clawsweeper Bot commented Aug 13, 20266 minutes ago" [level=3] [ref=f4e524]:
+                        - generic [ref=f4e525]:
+                          - strong [ref=f4e526]:
+                            - link "clawsweeper" [ref=f4e527] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f4e528]: Bot
+                          - text: commented
+                          - link "Aug 13, 20266 minutes ago" [ref=f4e529] [cursor=pointer]:
+                            - /url: "#issuecomment-5274310806"
+                      - generic [ref=f4e530]:
+                        - group [ref=f4e532]:
+                          - button [ref=f4e533] [cursor=pointer]:
+                            - img "Show options" [ref=f4e536]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f4e539]: Contributor
+                    - table [ref=f4e543]:
+                      - rowgroup [ref=f4e544]:
+                        - row [ref=f4e545]:
+                          - cell [ref=f4e546]:
+                            - paragraph [ref=f4e547]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f4e548]: Reviewed August 12, 2026, 8:15 PM ET / August 13, 2026, 00:15 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f4e549]
+                            - heading "What this changes" [level=2] [ref=f4e550]
+                            - paragraph [ref=f4e551]: This PR deletes the unused private video-generation facade and changes the retained image-generation sidecar to re-export the canonical SDK runtime directly.
+                            - heading "Merge readiness" [level=2] [ref=f4e552]
+                            - paragraph [ref=f4e553]:
+                              - generic [ref=f4e554]: ⚠️
+                              - strong [ref=f4e555]: Ready for maintainer review - 1 item remains
+                            - paragraph [ref=f4e556]: No blocking findings. The video facade is private and unreferenced, while the image sidecar’s shipped artifact contract remains intact; this PR is still needed because current main retains the obsolete wrappers.
+                            - paragraph [ref=f4e557]:
+                              - strong [ref=f4e558]: "Priority:"
+                              - text: P3
+                              - strong [ref=f4e559]: "Reviewed head:"
+                              - code [ref=f4e560]: c382fd31a174d43c3f064303078e91f74c39fb34
+                              - strong [ref=f4e561]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f4e562] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f4e563]
+                            - table [ref=f4e565]:
+                              - rowgroup [ref=f4e566]:
+                                - row [ref=f4e567]:
+                                  - columnheader "Measure" [ref=f4e568]
+                                  - columnheader "Result" [ref=f4e569]
+                                  - columnheader "What it means" [ref=f4e570]
+                              - rowgroup [ref=f4e571]:
+                                - row [ref=f4e572]:
+                                  - cell [ref=f4e573]:
+                                    - strong [ref=f4e574]: Overall readiness
+                                  - cell [ref=f4e575]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f4e576]: (5/6)
+                                  - cell "A focused, net-negative cleanup that preserves the canonical runtime and the only required media sidecar contract." [ref=f4e577]
+                                - row [ref=f4e578]:
+                                  - cell [ref=f4e579]:
+                                    - strong [ref=f4e580]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f4e581]
+                                  - 'cell "Not applicable: This maintainer-authored internal cleanup has a source-and-artifact invariant rather than a user-visible flow; the PR body also records focused build and package validation." [ref=f4e582]'
+                                - row [ref=f4e583]:
+                                  - cell [ref=f4e584]:
+                                    - strong [ref=f4e585]: Patch quality
+                                  - cell [ref=f4e586]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f4e587]: (5/6)
+                                  - cell "No actionable review findings were identified." [ref=f4e588]
+                            - heading "Verification" [level=2] [ref=f4e589]
+                            - table [ref=f4e591]:
+                              - rowgroup [ref=f4e592]:
+                                - row [ref=f4e593]:
+                                  - columnheader "Check" [ref=f4e594]
+                                  - columnheader "Result" [ref=f4e595]
+                                  - columnheader "Evidence" [ref=f4e596]
+                              - rowgroup [ref=f4e597]:
+                                - row [ref=f4e598]:
+                                  - cell [ref=f4e599]:
+                                    - strong [ref=f4e600]: Real behavior
+                                  - cell "Not applicable" [ref=f4e601]
+                                  - 'cell "Not applicable: This maintainer-authored internal cleanup has a source-and-artifact invariant rather than a user-visible flow; the PR body also records focused build and package validation." [ref=f4e602]'
+                                - row [ref=f4e603]:
+                                  - cell [ref=f4e604]:
+                                    - strong [ref=f4e605]: Evidence reviewed
+                                  - cell "8 items" [ref=f4e606]
+                                  - 'cell "Canonical runtime owners: Current runtime assembly imports image and video generation directly from their core runtime owners, not either facade package. SDK contract: The retained SDK subpaths directly re-export the canonical image and video runtime functions, so the image sidecar can import the SDK without behavior change. Packaged sidecar remains required: Only image-generation-core and media-understanding-core are always-allowed manifest-less facades; package verification derives required sidecars from this list." [ref=f4e607]': "Canonical runtime owners: Current runtime assembly imports image and video generation directly from their core runtime owners, not either facade package.SDK contract: The retained SDK subpaths directly re-export the canonical image and video runtime functions, so the image sidecar can import the SDK without behavior change.Packaged sidecar remains required: Only image-generation-core and media-understanding-core are always-allowed manifest-less facades; package verification derives required sidecars from this list."
+                                - row [ref=f4e608]:
+                                  - cell [ref=f4e609]:
+                                    - strong [ref=f4e610]: Findings
+                                  - cell "None" [ref=f4e611]
+                                  - cell "None." [ref=f4e612]
+                                - row [ref=f4e613]:
+                                  - cell [ref=f4e614]:
+                                    - strong [ref=f4e615]: Security
+                                  - cell "None" [ref=f4e616]
+                                  - cell "None." [ref=f4e617]
+                            - heading "How this fits together" [level=2] [ref=f4e618]
+                            - paragraph [ref=f4e619]: Media tools and plugin runtime helpers call the core image/video runtimes directly. The Plugin SDK exposes those same runtimes, while the image sidecar remains a packaged artifact for manifest-less runtime loading.
+                            - region "mermaid rendered output container" [ref=f4e620]:
+                              - generic [ref=f4e621]:
+                                - generic [ref=f4e622]:
+                                  - group [ref=f4e623]:
+                                    - button "Open dialog" [ref=f4e624] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f4e627] [cursor=pointer]
+                                - iframe [ref=f4e632]:
+                                  - generic [ref=f5e1]:
+                                    - document [ref=f5e5]:
+                                      - generic [ref=f5e9]:
+                                        - paragraph [ref=f5e16]: Agent and CLI media tools
+                                        - paragraph [ref=f5e23]: Core image and video runtimes
+                                        - paragraph [ref=f5e30]: Plugin SDK runtime subpaths
+                                        - paragraph [ref=f5e37]: Image runtime sidecar
+                                        - paragraph [ref=f5e44]: Installed package artifact
+                                        - paragraph [ref=f5e51]: Retired video facade
+                                        - paragraph [ref=f5e58]: Removed unused package
+                                        - paragraph [ref=f5e65]: Plugin runtime loading
+                                    - generic [ref=f5e66]:
+                                      - button "Zoom in" [ref=f5e67]
+                                      - button "Zoom out" [ref=f5e71]
+                                      - button "Reset view" [ref=f5e75]
+                                      - button "Pan up" [ref=f5e78]
+                                      - button "Pan down" [ref=f5e81]
+                                      - button "Pan left" [ref=f5e84]
+                                      - button "Pan right" [ref=f5e87]
+                            - heading "Decision needed" [level=2] [ref=f4e633]
+                            - table [ref=f4e635]:
+                              - rowgroup [ref=f4e636]:
+                                - row [ref=f4e637]:
+                                  - columnheader "Question" [ref=f4e638]
+                                  - columnheader "Recommendation" [ref=f4e639]
+                              - rowgroup [ref=f4e640]:
+                                - row [ref=f4e641]:
+                                  - cell "After exact-head CI completes, should this maintainer-owned cleanup merge?" [ref=f4e642]
+                                  - cell [ref=f4e643]:
+                                    - strong [ref=f4e644]: "Merge after CI:"
+                                    - text: Merge once the current head is green, retaining the canonical SDK/runtime owners and the image sidecar artifact.
+                            - paragraph [ref=f4e645]: "Why: The maintainer label requires explicit maintainer handling even though source and artifact contracts support the cleanup."
+                            - heading "Before merge" [level=2] [ref=f4e646]
+                            - paragraph [ref=f4e647]: None.
+                            - group [ref=f4e648]:
+                              - strong [ref=f4e650] [cursor=pointer]: Agent review details
+                - generic [ref=f4e652]:
+                  - link [ref=f4e654] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f4e655]
+                  - generic [ref=f4e657]:
+                    - generic [ref=f4e658]:
+                      - heading [level=3] [ref=f4e659]:
+                        - generic [ref=f4e660]:
+                          - strong [ref=f4e661]:
+                            - link "steipete" [ref=f4e662] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 20264 minutes ago" [ref=f4e663] [cursor=pointer]:
+                            - /url: "#issuecomment-5274325955"
+                      - generic [ref=f4e664]:
+                        - group [ref=f4e666]:
+                          - button [ref=f4e667] [cursor=pointer]:
+                            - img "Show options" [ref=f4e670]
+                        - generic [ref=f4e672]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f4e673]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f4e675]: Author
+                    - table [ref=f4e679]:
+                      - rowgroup [ref=f4e680]:
+                        - row [ref=f4e681]:
+                          - cell [ref=f4e682]:
+                            - paragraph [ref=f4e683]:
+                              - text: Land-ready proof for
+                              - code [ref=f4e684]: c382fd31a174d43c3f064303078e91f74c39fb34
+                              - text: ":"
+                            - list [ref=f4e685]:
+                              - listitem [ref=f4e686]:
+                                - text: Repository search found no caller or supported import route for
+                                - code [ref=f4e687]: "@openclaw/video-generation-core"
+                                - text: ; only its own package plus stale labeler, test-routing, and lockfile entries referenced it.
+                              - listitem [ref=f4e688]: 246 retained media owner, packaging, release-integrity, labeler, boundary, bundled-plugin, and sidecar tests passed across five shards.
+                              - listitem [ref=f4e689]:
+                                - code [ref=f4e690]: pnpm install --lockfile-only --frozen-lockfile --ignore-scripts
+                                - text: validated the lockfile against 179 workspace packages and supply-chain policy.
+                              - listitem [ref=f4e691]:
+                                - text: Explicit build-entry/pack-artifact inventory excludes every video facade entry while retaining the image
+                                - code [ref=f4e692]: runtime-api
+                                - text: entry and packaged sidecar.
+                              - listitem [ref=f4e693]:
+                                - code [ref=f4e694]: pnpm build
+                                - text: passed locally; the built tree contains
+                                - code [ref=f4e695]: dist/extensions/image-generation-core/runtime-api.js
+                                - text: and no video facade directory.
+                              - listitem [ref=f4e696]:
+                                - text: The all-lanes
+                                - code [ref=f4e697]: node scripts/check-changed.mjs -- <changed paths>
+                                - text: gate passed, including 94 npm lock validations, bundled metadata, Plugin SDK API baseline, plugin boundaries, dead exports, full typecheck, full lint, runtime guards, and import cycles. The configured remote backend was unavailable because the
+                                - code [ref=f4e698]: blacksmith
+                                - text: executable is not installed on this host, so heavy proof used the documented trusted-source local fallback.
+                              - listitem [ref=f4e699]:
+                                - code [ref=f4e700]: git diff --check origin/main...HEAD
+                                - text: passed.
+                              - listitem [ref=f4e701]: Structured uncommitted and branch autoreviews found no accepted or actionable findings.
+                              - listitem [ref=f4e702]:
+                                - text: Native review artifacts validated as
+                                - code [ref=f4e703]: READY FOR /prepare-pr
+                                - text: with zero findings.
+                              - listitem [ref=f4e704]:
+                                - text: "Exact-head hosted CI:"
+                                - link "run 31653443691" [ref=f4e705] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31653443691
+                                - text: — green, including Windows and build artifacts.
+                              - listitem [ref=f4e706]:
+                                - text: Native
+                                - code [ref=f4e707]: OPENCLAW_TESTBOX=1 scripts/pr prepare-run 122874
+                                - text: passed by reusing exact-head hosted CI.
+                            - paragraph [ref=f4e708]: ClawSweeper found no actionable defect, rated the patch 5/6, and recommended merging after exact-head CI. That condition is complete.
+                            - paragraph [ref=f4e709]: Production/package metadata is -67 lines; tests are -78 lines; config/lock/test-routing is -11 lines. Total net change is -156 lines.
+                - generic [ref=f4e710]:
+                  - generic [ref=f4e715]:
+                    - button "View details" [ref=f4e716] [cursor=pointer]
+                    - generic [ref=f4e717]:
+                      - link [ref=f4e719] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f4e720]
+                      - generic [ref=f4e721]:
+                        - link "steipete" [ref=f4e722] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f4e723] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/abe0cd691dfab5c7c906c79a790fb77416902258
+                          - code [ref=f4e724]: abe0cd6
+                        - text: into
+                        - generic [ref=f4e725]: main
+                        - link "Aug 13, 20263 minutes ago" [ref=f4e727] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122874#event-29372509084
+                        - generic [ref=f4e728]: 185 checks passed
+                  - generic [ref=f4e735]:
+                    - link [ref=f4e737] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f4e738]
+                    - generic [ref=f4e739]:
+                      - link "steipete" [ref=f4e740] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f4e741]: test/audit-orphan-media-facades
+                      - text: branch
+                      - link "August 13, 2026 00:193 minutes ago" [ref=f4e743] [cursor=pointer]:
+                        - /url: "#event-29372510297"
+                - generic [ref=f4e745]:
+                  - link [ref=f4e747] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f4e748]
+                  - generic [ref=f4e750]:
+                    - generic [ref=f4e751]:
+                      - heading [level=3] [ref=f4e752]:
+                        - generic [ref=f4e753]:
+                          - strong [ref=f4e754]:
+                            - link "steipete" [ref=f4e755] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 20262 minutes ago" [ref=f4e756] [cursor=pointer]:
+                            - /url: "#issuecomment-5274336853"
+                      - generic [ref=f4e757]:
+                        - group [ref=f4e759]:
+                          - button [ref=f4e760] [cursor=pointer]:
+                            - img "Show options" [ref=f4e763]
+                        - generic [ref=f4e765]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f4e766]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f4e768]: Author
+                    - table [ref=f4e772]:
+                      - rowgroup [ref=f4e773]:
+                        - row [ref=f4e774]:
+                          - cell [ref=f4e775]:
+                            - paragraph [ref=f4e776]: Merged via squash.
+                            - list [ref=f4e777]:
+                              - listitem [ref=f4e778]:
+                                - text: "Prepared head SHA:"
+                                - link "c382fd31a174d43c3f064303078e91f74c39fb34" [ref=f4e779] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122874/commits/c382fd31a174d43c3f064303078e91f74c39fb34
+                              - listitem [ref=f4e780]:
+                                - text: "Landed commit:"
+                                - link "abe0cd691dfab5c7c906c79a790fb77416902258" [ref=f4e781] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/abe0cd691dfab5c7c906c79a790fb77416902258
+            - generic [ref=f4e785]:
+              - link "Sign up for free" [ref=f4e786] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f4e787]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f4e788] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122874
+        - generic [ref=f4e792]:
+          - form "Select reviewers" [ref=f4e794]:
+            - heading "Reviewers" [level=3] [ref=f4e795]
+            - text: No reviews
+          - form "Select assignees" [ref=f4e797]:
+            - heading "Assignees" [level=3] [ref=f4e798]
+            - text: No one assigned
+          - generic [ref=f4e799]:
+            - heading "Labels" [level=3] [ref=f4e800]
+            - generic [ref=f4e801]:
+              - link "dependencies-changed" [ref=f4e802] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adependencies-changed
+              - 'link "extensions: image-generation-core" [ref=f4e804] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20image-generation-core%22
+              - 'link "extensions: video-generation-core" [ref=f4e806] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20video-generation-core%22
+              - link "maintainer" [ref=f4e808] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P3" [ref=f4e810] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP3
+              - 'link "rating: 🦞 diamond lobster" [ref=f4e812] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%9E%20diamond%20lobster%22
+              - 'link "size: S" [ref=f4e814] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20S%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f4e816] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f4e819]:
+            - heading "Projects" [level=3] [ref=f4e820]
+            - text: None yet
+          - form "Select milestones" [ref=f4e822]:
+            - heading "Milestone" [level=3] [ref=f4e823]
+            - text: No milestone
+          - form "Link issues" [ref=f4e829]:
+            - heading "Development" [level=3] [ref=f4e830]
+            - paragraph [ref=f4e831]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f4e833]: None yet
+          - generic [ref=f4e835]:
+            - heading "1 participant" [level=3] [ref=f4e836]
+            - link [ref=f4e838] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f4e839]
+  - contentinfo [ref=f4e840]:
+    - heading "Footer" [level=2] [ref=f4e841]
+    - generic [ref=f4e842]:
+      - generic [ref=f4e843]:
+        - link "GitHub Homepage" [ref=f4e844] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f4e847]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f4e848]:
+        - heading "Footer navigation" [level=3] [ref=f4e849]
+        - list "Footer navigation" [ref=f4e850]:
+          - listitem [ref=f4e851]:
+            - link "Terms" [ref=f4e852] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f4e853]:
+            - link "Privacy" [ref=f4e854] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f4e855]:
+            - link "Security" [ref=f4e856] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f4e857]:
+            - link "Status" [ref=f4e858] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f4e859]:
+            - link "Community" [ref=f4e860] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f4e861]:
+            - link "Docs" [ref=f4e862] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f4e863]:
+            - link "Contact" [ref=f4e864] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f4e865]:
+            - button "Manage cookies" [ref=f4e867] [cursor=pointer]
+          - listitem [ref=f4e868]:
+            - button "Do not share my personal information" [ref=f4e870] [cursor=pointer]

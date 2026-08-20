@@ -1,0 +1,105 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-13T03:46:53.631Z",
+  "artifacts": [
+    {
+      "filename": "scratch/search_notes.md",
+      "sha256": "986e32b2fc860c8c401da2d042bb8becf49ad0c4d530f91ee0b0f2af5ba1b71c",
+      "capturedAt": "2026-08-13T03:49:04.664Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "c76835758c3bc0ca692fd67ccef5cf920c0bf83d5926dc9cab0955e3d8615804",
+      "capturedAt": "2026-08-13T03:51:22.668Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "640e2a97433ab7b7aa3f369d50b4d489c707e34a4fc553431d2d7919a67d1a9c",
+      "capturedAt": "2026-08-13T03:51:24.464Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "f7bb311b260f7351fe5e9725031e826a1d9340b2d26ae7a2e61872d09f5268c0",
+      "capturedAt": "2026-08-13T03:51:30.277Z"
+    },
+    {
+      "filename": "scratch/alpha_phi.md",
+      "sha256": "637f5d1a4c3a0cc603d2b5433b0db8993d3c2b29cf25ee6f4221e78a9d846be3",
+      "capturedAt": "2026-08-13T03:52:25.107Z"
+    },
+    {
+      "filename": "scratch/alpha_phi_2027.md",
+      "sha256": "48eae48cf09419b330a632debc87bfa934043d2146944bccc4dbdbec319cfe49",
+      "capturedAt": "2026-08-13T03:52:42.188Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "9447013df43b38a72b6ab370c70c9551ef78f3bc46d65e18bd9a87421a9460f5",
+      "capturedAt": "2026-08-13T03:52:59.073Z"
+    },
+    {
+      "filename": "scratch/alpha_chi_omega.md",
+      "sha256": "a8d846f08f456483f01a6cb2fbb92f9670665c2359bc355ce7bf5aedaf5da8cb",
+      "capturedAt": "2026-08-13T03:53:28.239Z"
+    },
+    {
+      "filename": "artifacts/dphie_members_screenshot.png",
+      "sha256": "0d1dc2912ebdb48a01af5e26dd1dcd6fa4114afc2498b6cf89d5099036305c87",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:54:00.166Z"
+    },
+    {
+      "filename": "artifacts/dphie_members.html",
+      "sha256": "ad99cf16fe6b5d08f56a2cec187451bd941ad7cacec5ad6e3e6d578322ad6866",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:54:07.230Z"
+    },
+    {
+      "filename": "scratch/delta_phi_epsilon.md",
+      "sha256": "434cd747098d0fbd37bf2f04c96ec2acececd10610e0071c860cb5fc26f498c9",
+      "capturedAt": "2026-08-13T03:54:17.288Z"
+    },
+    {
+      "filename": "scratch/kat_2026.md",
+      "sha256": "f1ce19f8d1c6e1c2d92f035e6bf7c4a899e78c68e6342df4ba4a2be4a97755da",
+      "capturedAt": "2026-08-13T03:54:40.607Z"
+    },
+    {
+      "filename": "scratch/kat_2027.md",
+      "sha256": "314314b29930e252c2b0653a27c1c20f59fab3d41a66b2a43618774614fe5bf1",
+      "capturedAt": "2026-08-13T03:54:57.279Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-4.txt",
+      "sha256": "3d918a08bc2be416ed21001c55bc3aa425715e2a6bda5594ccf8cd60577d41ed",
+      "capturedAt": "2026-08-13T03:55:12.207Z"
+    },
+    {
+      "filename": "scratch/sigma_kappa_2026.md",
+      "sha256": "0c1a01acdfff8312a0f3651c03d551d70a58fd9ddfe4b1fa9c44f15fb0e0dc92",
+      "capturedAt": "2026-08-13T03:56:01.626Z"
+    },
+    {
+      "filename": "scratch/sigma_kappa_2027.md",
+      "sha256": "c357fb2a5fa9b07eccc85eee7c774345e4e757681f8354d1ab24e51af949796f",
+      "capturedAt": "2026-08-13T03:56:17.266Z"
+    },
+    {
+      "filename": "scratch/pi_beta_phi.md",
+      "sha256": "18fa1b63c75b4ea473a0a2f075f6d761e7441dfd5fb776ed1c3bde8c84e17b87",
+      "capturedAt": "2026-08-13T03:58:34.725Z"
+    },
+    {
+      "filename": "scratch/all_data_summary.md",
+      "sha256": "0db6d3a215f18665bc50b69afa4a9b45501f9d1c123aa2b6437e2facaf8f58e7",
+      "capturedAt": "2026-08-13T03:58:45.172Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T03:59:45.370Z"
+}

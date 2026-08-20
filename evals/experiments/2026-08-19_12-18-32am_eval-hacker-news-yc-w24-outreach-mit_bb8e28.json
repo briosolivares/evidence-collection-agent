@@ -1,0 +1,160 @@
+{
+  "startedAt": "2026-08-19T07:04:00.628Z",
+  "finishedAt": "2026-08-19T07:18:32.914Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "hacker_news",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 46886.514167,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-19_12-04-06am_create-a-csv-of-the-top-5-stories-on_74631e",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/hacker_news_top5.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, URL, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 46886.514167,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "yc_w24_outreach",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 191104.15641599998,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-19_12-04-04am_from-yc-winter-2024-pick-5-ai-focused_1fdefe",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/founders_outreach.csv"
+            },
+            {
+              "name": "CSV has exactly the columns founder_name, linkedin_url, cold_outreach_email (no more, no fewer)",
+              "passed": true,
+              "detail": "header: founder_name, linkedin_url, cold_outreach_email"
+            },
+            {
+              "name": "CSV has a plausible number of distinct, non-empty founder rows",
+              "passed": true,
+              "detail": "13 distinct complete row(s)"
+            },
+            {
+              "name": "every founder belongs to an oracle-listed YC W24 AI company",
+              "passed": true,
+              "detail": "13 founder(s) matched"
+            },
+            {
+              "name": "rows represent exactly five companies and include every oracle-listed founder for each",
+              "passed": true,
+              "detail": "5 distinct companies; all public founders represented"
+            },
+            {
+              "name": "every LinkedIn URL is a distinct personal profile URL",
+              "passed": true,
+              "detail": "13 distinct personal linkedin.com/in URLs (profile ownership is human-reviewed)"
+            },
+            {
+              "name": "every outreach email is founder/company personalized and asks for a 15-minute call",
+              "passed": true,
+              "detail": "13 personalized call requests passed structural checks (prose quality is human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "6 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 191104.15641599998,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "mit_sororities_csv",
+      "k": 1,
+      "accuracy": 0.8333333333333334,
+      "taskPassed": false,
+      "meanLatencyMs": 872236.993958,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-19_12-04-06am_for-alpha-chi-omega-alpha-phi-delta-phi_5d4cc6",
+          "assertions": [
+            {
+              "name": "sorority_members.csv exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/sorority_members.csv found and manifested"
+            },
+            {
+              "name": "CSV has exactly the columns name, class, major, affiliation, interests, other (no more, no fewer)",
+              "passed": true,
+              "detail": "header: name, class, major, affiliation, interests, other"
+            },
+            {
+              "name": "CSV has plausible rows and every sorority/class cohort is represented",
+              "passed": true,
+              "detail": "204 rows cover all 10 required cohorts; absent but optional (unsourced on the live web): Pi Beta Phi 2026"
+            },
+            {
+              "name": "member names are plausible and unique within each affiliation",
+              "passed": true,
+              "detail": "204 plausible, affiliation-unique names"
+            },
+            {
+              "name": "major and interests/other fields meet minimum information coverage",
+              "passed": false,
+              "detail": "major 50% (min 50%); interests/other 50% (min 25%)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "14 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 872236.993958,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

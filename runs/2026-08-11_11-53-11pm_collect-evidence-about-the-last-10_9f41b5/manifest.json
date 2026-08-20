@@ -1,0 +1,102 @@
+{
+  "task": "Collect evidence about the last 10 merged pull requests on the OpenClaw GitHub repository. Take a full-page screenshot of each pull request's page, and create a CSV describing the 10 pull requests with columns pr_number, committer, reviewer, merger.",
+  "startedAt": "2026-08-12T06:53:11.550Z",
+  "artifacts": [
+    {
+      "filename": "tool-output/inspect_page-1.txt",
+      "sha256": "dcd030a555cb73507a40acc4788f7acaa57b220fe0d796d2daee70e42fb5173c",
+      "capturedAt": "2026-08-12T06:53:18.238Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-2.txt",
+      "sha256": "db2da95eb74b76e739435ad8a54a77c3fd738c1b2e837def98c1ba947a889786",
+      "capturedAt": "2026-08-12T06:53:25.572Z"
+    },
+    {
+      "filename": "screenshots/pr_122491.png",
+      "sha256": "feb41ed52dae51d2371df16d52f818c74014bbd0fd63378ba39cf4341120f405",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122491",
+      "capturedAt": "2026-08-12T06:53:48.001Z"
+    },
+    {
+      "filename": "screenshots/pr_122490.png",
+      "sha256": "f131629f797b56501441e4152a98b432001cb35a978b9639a24475f870ef1b50",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122490",
+      "capturedAt": "2026-08-12T06:54:03.731Z"
+    },
+    {
+      "filename": "screenshots/pr_122487.png",
+      "sha256": "4da17984208c3bae697771e15557f60a077db72df4ee59d5eac6d2c43df13a56",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122487",
+      "capturedAt": "2026-08-12T06:54:16.328Z"
+    },
+    {
+      "filename": "screenshots/pr_122483.png",
+      "sha256": "fcce5ab9a83669a4d0f048a8d4b95a5b6c7a2079f7ff1be5fd65382efa0496b8",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122483",
+      "capturedAt": "2026-08-12T06:54:30.717Z"
+    },
+    {
+      "filename": "screenshots/pr_122480.png",
+      "sha256": "08027e73590265991d55d4c69b66bb6818a96d99a5adb88c9c4e874e91d81efc",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122480",
+      "capturedAt": "2026-08-12T06:54:40.247Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-3.txt",
+      "sha256": "41c5f3630b3542eb66aad56b1b75a691fd38c187ad5a2df6369b54c215729705",
+      "capturedAt": "2026-08-12T06:54:47.634Z"
+    },
+    {
+      "filename": "screenshots/pr_122479.png",
+      "sha256": "8da1f6d8e4a8bc1f25c86f2279a639822ee44c8b2a0885c6d8c4387d8e96e3b9",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122479",
+      "capturedAt": "2026-08-12T06:54:57.296Z"
+    },
+    {
+      "filename": "screenshots/pr_122478.png",
+      "sha256": "5e921be33acba771a6a71bcbe1bb1e0ab8846a5ce689dddaeb2a62b237bd49e2",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122478",
+      "capturedAt": "2026-08-12T06:55:08.397Z"
+    },
+    {
+      "filename": "tool-output/inspect_page-4.txt",
+      "sha256": "3de66db0717788fc47ca0bedfd18d615622912fc88b4fe44a9b94b08ee936e0f",
+      "capturedAt": "2026-08-12T06:55:16.701Z"
+    },
+    {
+      "filename": "screenshots/pr_122477.png",
+      "sha256": "8a5bd4349dfe3f1f8fe4ba3f6448e822a16b300525f4ff7f98fd23a65b2a04d9",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122477",
+      "capturedAt": "2026-08-12T06:55:26.274Z"
+    },
+    {
+      "filename": "screenshots/pr_122474.png",
+      "sha256": "62ec60a93055417394bdaab3edc300d34f527765be8212bded858e6d9139f19c",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122474",
+      "capturedAt": "2026-08-12T06:55:35.712Z"
+    },
+    {
+      "filename": "screenshots/pr_122468.png",
+      "sha256": "934631c35d4b4971c8821755e967afece4ef2a00b2608a5febdca24d15adac54",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122468",
+      "capturedAt": "2026-08-12T06:55:45.063Z"
+    },
+    {
+      "filename": "pull_requests.csv",
+      "sha256": "a6f739d8094f8bf3f1a3cc4960baa3cf10b530b64e3de8c5c1db997a2fe1d4ed",
+      "capturedAt": "2026-08-12T06:55:49.381Z"
+    },
+    {
+      "filename": "tool-output/read_file-1.txt",
+      "sha256": "83eb489dee3b8187f2f67e26570c2995a473a067b51d561017313c13fee4fddd",
+      "capturedAt": "2026-08-12T06:55:59.009Z"
+    },
+    {
+      "filename": "answer.md",
+      "sha256": "fda1e9b68f1cb58382b9d3791b266481fe0e8c2b63539a0448a028ebfa39407a",
+      "capturedAt": "2026-08-12T06:56:11.826Z"
+    }
+  ],
+  "finishedAt": "2026-08-12T06:56:19.118Z"
+}

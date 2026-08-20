@@ -1,0 +1,100 @@
+{
+  "startedAt": "2026-08-13T12:26:34.840Z",
+  "finishedAt": "2026-08-13T12:36:18.227Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "wikipedia_reference",
+      "k": 3,
+      "accuracy": 0.9166666666666666,
+      "taskPassed": false,
+      "meanLatencyMs": 318259.4621943333,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_05-26-40am_find-the-275th-reference-in-the_d74425",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "full normalized text of CITEREFBeevor2012 not found; reference text was \"Beevor 2012 , pp. 555–560.\""
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "153 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "8 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 130366.10079200001,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_05-26-39am_find-the-275th-reference-in-the_c7d58c",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": true,
+              "detail": "full normalized text of CITEREFBeevor2012 found (91 source characters)"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "14 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "12 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 241725.354708,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-harness/runs/2026-08-13_05-26-40am_find-the-275th-reference-in-the_6f6058",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": true,
+              "detail": "full normalized text of CITEREFBeevor2012 found (91 source characters)"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "16 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "33 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 582686.9310829999,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

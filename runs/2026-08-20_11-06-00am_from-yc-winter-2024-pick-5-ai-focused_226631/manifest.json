@@ -1,0 +1,48 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-20T18:06:00.899Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/company_pages.json",
+      "sha256": "16a35d9505a8dae549b25b1653b2b56a243f5527e64a3290736f8b5d8f9337aa",
+      "capturedAt": "2026-08-20T18:06:59.352Z"
+    },
+    {
+      "filename": "scratch/workspace/linkedin_links.json",
+      "sha256": "23da34af8cf1ffee110fdc9c68f0d505f5dd7b2db4dacc1aed1ea41070bb2de6",
+      "capturedAt": "2026-08-20T18:07:19.904Z"
+    },
+    {
+      "filename": "scratch/workspace/founders_data.json",
+      "sha256": "916afc7f7355083d84fa090b541010d494e63fdfb874c1266000d9140800ae5c",
+      "capturedAt": "2026-08-20T18:07:38.041Z"
+    },
+    {
+      "filename": "scratch/workspace/gen_csv.py",
+      "sha256": "6d5a917ad32c619aeb367457c289306307d5202b7f674231a7fc0698956c2954",
+      "capturedAt": "2026-08-20T18:07:53.159Z"
+    },
+    {
+      "filename": "scratch/workspace/cold_outreach.csv",
+      "sha256": "89c2bcceb4c3d053dbac4c4c457c0a052e561097f2ad9ec2f2d7d3629059c6a9",
+      "capturedAt": "2026-08-20T18:08:10.440Z"
+    },
+    {
+      "filename": "scratch/workspace/gen_csv2.py",
+      "sha256": "251e8b9d233b0d4302deecccc42dd2c309e8f29142efe69f9082bef8670879c3",
+      "capturedAt": "2026-08-20T18:08:10.480Z"
+    },
+    {
+      "filename": "artifacts/cold_outreach.csv",
+      "sha256": "89c2bcceb4c3d053dbac4c4c457c0a052e561097f2ad9ec2f2d7d3629059c6a9",
+      "sourceUrl": "https://www.ycombinator.com/companies?batch=Winter%202024",
+      "publicationKind": "file",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-20T18:08:16.724Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T18:08:54.230Z"
+}

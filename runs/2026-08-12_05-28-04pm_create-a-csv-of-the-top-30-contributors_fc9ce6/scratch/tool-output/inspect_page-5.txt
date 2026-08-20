@@ -1,0 +1,1402 @@
+URL: https://github.com/vincentkoc
+Title: vincentkoc (Vincent Koc) · GitHub
+
+- generic [ref=f3e2]:
+  - generic [ref=f3e3]:
+    - link "Skip to content" [ref=f3e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f3e8]:
+      - heading "Navigation Menu" [level=2] [ref=f3e9]
+      - generic [ref=f3e10]:
+        - link "Homepage" [ref=f3e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f3e15]:
+          - navigation "Global" [ref=f3e16]:
+            - list [ref=f3e17]:
+              - listitem [ref=f3e18]:
+                - button "Platform" [ref=f3e20] [cursor=pointer]
+              - listitem [ref=f3e23]:
+                - button "Solutions" [ref=f3e25] [cursor=pointer]
+              - listitem [ref=f3e28]:
+                - button "Resources" [ref=f3e30] [cursor=pointer]
+              - listitem [ref=f3e33]:
+                - button "Open Source" [ref=f3e35] [cursor=pointer]
+              - listitem [ref=f3e38]:
+                - button "Enterprise" [ref=f3e40] [cursor=pointer]
+              - listitem [ref=f3e43]:
+                - link "Pricing" [ref=f3e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f3e45]:
+            - button "Search or jump to, type / to search" [ref=f3e47] [cursor=pointer]:
+              - generic [ref=f3e50]:
+                - text: Type
+                - generic [ref=f3e51]: /
+                - text: to search
+            - link "Sign in" [ref=f3e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fvincentkoc
+            - link "Sign up" [ref=f3e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f3e55] [cursor=pointer]
+  - main [ref=f3e60]:
+    - generic [ref=f3e63]:
+      - generic [ref=f3e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@vincentkoc"
+            - generic:
+              - strong: vincentkoc
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fvincentkoc
+      - navigation "User profile" [ref=f3e67]:
+        - link "Overview" [ref=f3e68] [cursor=pointer]:
+          - /url: /vincentkoc
+        - link "Repositories 227" [ref=f3e71] [cursor=pointer]:
+          - /url: /vincentkoc?tab=repositories
+          - text: Repositories
+          - generic "227" [ref=f3e74]
+        - link "Projects" [ref=f3e75] [cursor=pointer]:
+          - /url: /vincentkoc?tab=projects
+        - link "Packages" [ref=f3e78] [cursor=pointer]:
+          - /url: /vincentkoc?tab=packages
+        - link "Stars 902" [ref=f3e81] [cursor=pointer]:
+          - /url: /vincentkoc?tab=stars
+          - text: Stars
+          - generic "902" [ref=f3e84]
+        - link "Sponsoring 4" [ref=f3e85] [cursor=pointer]:
+          - /url: /vincentkoc?tab=sponsoring
+          - generic [ref=f3e88]: Sponsoring
+          - generic "4" [ref=f3e89]
+    - generic [ref=f3e91]:
+      - generic [ref=f3e93]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@vincentkoc"
+            - generic:
+              - generic:
+                - strong: vincentkoc
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fvincentkoc
+        - generic [ref=f3e94]:
+          - generic [ref=f3e95]:
+            - link [ref=f3e97] [cursor=pointer]:
+              - /url: https://avatars.githubusercontent.com/u/25068?v=4
+              - img "View vincentkoc's full-sized avatar" [ref=f3e98]
+            - heading "Vincent Koc vincentkoc" [level=1] [ref=f3e100]:
+              - generic [ref=f3e101]: Vincent Koc
+              - generic [ref=f3e102]: vincentkoc
+          - generic [ref=f3e103]:
+            - generic [ref=f3e105]:
+              - link "Follow" [ref=f3e110] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fvincentkoc
+              - link "Sponsor @vincentkoc" [ref=f3e112] [cursor=pointer]:
+                - /url: /sponsors/vincentkoc
+                - generic [ref=f3e113]: Sponsor
+            - generic [ref=f3e117]:
+              - generic [ref=f3e119]:
+                - text: Chief Architect 🦞
+                - link "@openclaw" [ref=f3e120] [cursor=pointer]:
+                  - /url: https://github.com/openclaw
+                - text: Ex
+                - link "@qantasairways" [ref=f3e121] [cursor=pointer]:
+                  - /url: https://github.com/qantasairways
+                - link "@airbytehq" [ref=f3e122] [cursor=pointer]:
+                  - /url: https://github.com/airbytehq
+                - link "@microsoft" [ref=f3e123] [cursor=pointer]:
+                  - /url: https://github.com/microsoft
+                - text: "| Lecturer"
+                - link "@mit" [ref=f3e124] [cursor=pointer]:
+                  - /url: https://github.com/mit
+                - text: "| Ethical Hacker | FIrst Responder"
+              - generic [ref=f3e126]:
+                - link "2.1k followers" [ref=f3e127] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc?tab=followers
+                - text: ·
+                - link "221 following" [ref=f3e130] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc?tab=following
+              - list [ref=f3e131]:
+                - 'listitem "Organization: @openclaw" [ref=f3e132]':
+                  - link "@openclaw" [ref=f3e137] [cursor=pointer]:
+                    - /url: https://github.com/openclaw
+                - 'listitem "Home location: San Francisco, CA" [ref=f3e138]':
+                  - generic [ref=f3e141]: San Francisco, CA
+                - listitem [ref=f3e142]:
+                  - link "https://linktr.ee/vincentkoc" [ref=f3e145] [cursor=pointer]:
+                    - /url: https://linktr.ee/vincentkoc
+                - listitem [ref=f3e146]:
+                  - link "https://orcid.org/0000-0002-7830-0017" [ref=f3e149] [cursor=pointer]:
+                    - /url: https://orcid.org/0000-0002-7830-0017
+                - listitem [ref=f3e150]:
+                  - img "X" [ref=f3e151]
+                  - link "@vincent_koc" [ref=f3e153] [cursor=pointer]:
+                    - /url: https://twitter.com/vincent_koc
+                - listitem [ref=f3e154]:
+                  - img "LinkedIn" [ref=f3e155]
+                  - link "in/koconder" [ref=f3e158] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/koconder/
+                - listitem [ref=f3e159]:
+                  - link "https://medium.com/@vincentkoc" [ref=f3e162] [cursor=pointer]:
+                    - /url: https://medium.com/@vincentkoc
+          - generic [ref=f3e163]:
+            - generic [ref=f3e164]:
+              - heading "Sponsors" [level=2] [ref=f3e165]
+              - generic [ref=f3e166]:
+                - link [ref=f3e168] [cursor=pointer]:
+                  - /url: https://docs.github.com/sponsors/sponsoring-open-source-contributors/managing-your-sponsorship#managing-the-privacy-setting-for-your-sponsorship
+                  - img "Private Sponsor" [ref=f3e169]
+                - link [ref=f3e172] [cursor=pointer]:
+                  - /url: /gladkos
+                  - img "@gladkos" [ref=f3e173]
+                - link [ref=f3e175] [cursor=pointer]:
+                  - /url: /mrdanielcasper
+                  - img "@mrdanielcasper" [ref=f3e176]
+                - link [ref=f3e178] [cursor=pointer]:
+                  - /url: /pacocartones
+                  - img "@pacocartones" [ref=f3e179]
+                - link [ref=f3e181] [cursor=pointer]:
+                  - /url: /openclaw
+                  - img "@openclaw" [ref=f3e182]
+            - generic [ref=f3e183]:
+              - heading "Sponsoring" [level=2] [ref=f3e185]
+              - generic [ref=f3e186]:
+                - link [ref=f3e188] [cursor=pointer]:
+                  - /url: /t3dotgg
+                  - img "@t3dotgg" [ref=f3e189]
+                - link [ref=f3e191] [cursor=pointer]:
+                  - /url: /BerriAI
+                  - img "@BerriAI" [ref=f3e192]
+                - link [ref=f3e194] [cursor=pointer]:
+                  - /url: /xiaohk
+                  - img "@xiaohk" [ref=f3e195]
+                - link [ref=f3e197] [cursor=pointer]:
+                  - /url: /alii
+                  - img "@alii" [ref=f3e198]
+          - generic [ref=f3e199]:
+            - heading [level=2] [ref=f3e200]:
+              - link "Achievements" [ref=f3e201] [cursor=pointer]:
+                - /url: /vincentkoc?tab=achievements
+            - generic [ref=f3e202]:
+              - 'link "Achievement: Starstruck x3" [ref=f3e203] [cursor=pointer]':
+                - /url: /vincentkoc?achievement=starstruck&tab=achievements
+                - 'img "Achievement: Starstruck" [ref=f3e204]'
+                - generic [ref=f3e205]: x3
+              - 'link "Achievement: Pull Shark x4" [ref=f3e206] [cursor=pointer]':
+                - /url: /vincentkoc?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f3e207]'
+                - generic [ref=f3e208]: x4
+              - 'link "Achievement: Pair Extraordinaire x4" [ref=f3e209] [cursor=pointer]':
+                - /url: /vincentkoc?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f3e210]'
+                - generic [ref=f3e211]: x4
+              - link [ref=f3e212] [cursor=pointer]:
+                - /url: /vincentkoc?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f3e213]'
+              - link [ref=f3e214] [cursor=pointer]:
+                - /url: /vincentkoc?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f3e215]'
+              - link [ref=f3e216] [cursor=pointer]:
+                - /url: /vincentkoc?achievement=public-sponsor&tab=achievements
+                - 'img "Achievement: Public Sponsor" [ref=f3e217]'
+              - link [ref=f3e218] [cursor=pointer]:
+                - /url: /vincentkoc?achievement=arctic-code-vault-contributor&tab=achievements
+                - 'img "Achievement: Arctic Code Vault Contributor" [ref=f3e219]'
+          - generic [ref=f3e220]:
+            - heading "Highlights" [level=2] [ref=f3e221]
+            - list [ref=f3e222]:
+              - listitem [ref=f3e223]:
+                - link "Developer Program Member" [ref=f3e224] [cursor=pointer]:
+                  - /url: https://docs.github.com/developers/overview/github-developer-program
+              - listitem [ref=f3e227]:
+                - 'generic "Label: Pro" [ref=f3e230]': Pro
+              - listitem [ref=f3e231]:
+                - link "9 security advisory credits" [ref=f3e232] [cursor=pointer]:
+                  - /url: /advisories?query=credit%3Avincentkoc
+          - generic [ref=f3e235]:
+            - heading "Organizations" [level=2] [ref=f3e236]
+            - link "Orange-Submarine" [ref=f3e237] [cursor=pointer]:
+              - /url: /Orange-Submarine
+              - img "@Orange-Submarine" [ref=f3e238]
+            - link "kontology" [ref=f3e239] [cursor=pointer]:
+              - /url: /kontology
+              - img "@kontology" [ref=f3e240]
+            - link "Locomotive-Ventures" [ref=f3e241] [cursor=pointer]:
+              - /url: /Locomotive-Ventures
+              - img "@Locomotive-Ventures" [ref=f3e242]
+            - link "openclaw" [ref=f3e243] [cursor=pointer]:
+              - /url: /openclaw
+              - img "@openclaw" [ref=f3e244]
+            - link "ShellBench" [ref=f3e245] [cursor=pointer]:
+              - /url: /ShellBench
+              - img "@ShellBench" [ref=f3e246]
+            - link "agentprofiles" [ref=f3e247] [cursor=pointer]:
+              - /url: /agentprofiles
+              - img "@agentprofiles" [ref=f3e248]
+          - button "Block or report user" [ref=f3e250] [cursor=pointer]
+      - generic [ref=f3e255]:
+        - generic [ref=f3e257]:
+          - generic [ref=f3e259]:
+            - link "vincentkoc" [ref=f3e260] [cursor=pointer]:
+              - /url: /vincentkoc/vincentkoc
+            - generic [ref=f3e261]: /
+            - text: README.md
+          - article [ref=f3e262]:
+            - generic [ref=f3e263]:
+              - heading "Hi 👋, I'm Vincent" [level=3] [ref=f3e264]
+              - 'link "Permalink: Hi 👋, I''m Vincent" [ref=f3e265] [cursor=pointer]':
+                - /url: "#hi--im-vincent"
+            - paragraph [ref=f3e268]:
+              - text: I'm an engineer and technologist with nearly two decades of experience across top companies in the Asia Pacific and US. I've contributed to leading repositories from
+              - link "Airbyte" [ref=f3e269] [cursor=pointer]:
+                - /url: https://github.com/airbytehq
+              - text: ","
+              - link "Apache Foundation" [ref=f3e270] [cursor=pointer]:
+                - /url: https://github.com/apache
+              - text: ","
+              - link "Cohere" [ref=f3e271] [cursor=pointer]:
+                - /url: https://github.com/cohere-ai
+              - text: ","
+              - link "Databricks" [ref=f3e272] [cursor=pointer]:
+                - /url: https://github.com/databricks
+              - text: ","
+              - link "Facebook" [ref=f3e273] [cursor=pointer]:
+                - /url: https://github.com/facebook
+              - text: ","
+              - link "Google" [ref=f3e274] [cursor=pointer]:
+                - /url: https://github.com/google
+              - text: ","
+              - link "Hasura" [ref=f3e275] [cursor=pointer]:
+                - /url: https://github.com/hasura
+              - text: ","
+              - link "Microsoft" [ref=f3e276] [cursor=pointer]:
+                - /url: https://github.com/microsoft
+              - text: ", and many others!"
+            - list [ref=f3e277]:
+              - listitem [ref=f3e278]: 🇺🇳 I'm currently a totally remote work from anywhere guy, but most time in SF. (Previously 🇦🇺🇪🇺🇸🇬🇹🇷🇵🇹🇸🇬🇺🇸🇬🇧)
+              - listitem [ref=f3e279]: 🎓 Teaching applied data science, no-code AI, and generative AI at top universities such as MIT, UT Austin and UNSW.
+              - listitem [ref=f3e280]: ✍️ Writing regularly on Medium, X and few other places.
+              - listitem [ref=f3e281]: ✨ Passionate about cooking, hiking, cycling and travel when im not on a screen.
+              - listitem [ref=f3e282]: 🌱 Obsessing on self-optimizing agents, design patterns, AI in precision health and behavioral psychology.
+              - listitem [ref=f3e283]:
+                - text: 🔭 Giving back by
+                - link "sponsoring other developers" [ref=f3e284] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc?tab=sponsoring
+                - text: ", and you can also"
+                - link "sponsor me" [ref=f3e285] [cursor=pointer]:
+                  - /url: https://github.com/sponsors/vincentkoc
+                - text: .
+              - listitem [ref=f3e286]:
+                - text: 💬 Ask me about
+                - strong [ref=f3e287]: artificial intelligence, automous agents, startups, biohacking
+                - text: .
+              - listitem [ref=f3e288]:
+                - text: ☕ Feel free to
+                - link "buy me a coffee" [ref=f3e289] [cursor=pointer]:
+                  - /url: https://www.buymeacoffee.com/vincentkoc
+                - text: to show support.
+              - listitem [ref=f3e290]:
+                - text: 🍜
+                - link "Ramen and noodles are my kryptonite" [ref=f3e291] [cursor=pointer]:
+                  - /url: https://www.instagram.com/p/Bo3_XWpAzoJ/
+                - text: .
+            - paragraph [ref=f3e292]: "Some of my projects I have published or repositories I have been a maintainer for:"
+            - list [ref=f3e293]:
+              - listitem [ref=f3e294]:
+                - text: 🫧
+                - link "agentrinse" [ref=f3e295] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/agentrinse
+                - text: "- Safe, local-first cleanup planning for agentic development."
+              - listitem [ref=f3e296]:
+                - text: 🧱
+                - link "libterminal" [ref=f3e297] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/libterminal
+                - text: "- Shared TypeScript terminal protocol, streaming, browser, Node, and Worker primitives."
+              - listitem [ref=f3e298]:
+                - text: 🌊
+                - link "tideglass" [ref=f3e299] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/tideglass
+                - text: "- Portable intent and preference profiles for local-first agents."
+              - listitem [ref=f3e300]:
+                - text: 🧭
+                - link "clawrouter" [ref=f3e301] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clawrouter
+                - text: "- ClawRouter API gateway and provider router for OpenClaw services."
+              - listitem [ref=f3e302]:
+                - text: 🩹
+                - link "clawpatch" [ref=f3e303] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clawpatch
+                - text: "- Maintainer tool to review code, patch bugs, and land PRs."
+              - listitem [ref=f3e304]:
+                - text: 📊
+                - link "ReleaseBar" [ref=f3e305] [cursor=pointer]:
+                  - /url: https://github.com/steipete/ReleaseBar
+                - text: "- Release freshness dashboard for open source maintainers."
+              - listitem [ref=f3e306]:
+                - text: 🌾
+                - link "graincrawl" [ref=f3e307] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/graincrawl
+                - text: "- Local-first Granola notes archive with SQLite, Markdown export, snapshots, and TUI browsing."
+              - listitem [ref=f3e308]:
+                - text: 🧭
+                - link "crawlbar" [ref=f3e309] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/crawlbar
+                - text: "- Menu bar control plane for local-first crawl apps."
+              - listitem [ref=f3e310]:
+                - text: 🧰
+                - link "crawlkit" [ref=f3e311] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/crawlkit
+                - text: "- Shared Go archive toolkit powering local-first crawl apps with config, SQLite, snapshots, and TUI surfaces."
+              - listitem [ref=f3e312]:
+                - text: ⏱️
+                - link "openclaw-rtt" [ref=f3e313] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/openclaw-rtt
+                - text: "- RTT timing measurements across OpenClaw npm releases."
+              - listitem [ref=f3e314]:
+                - text: 📦
+                - link "crabbox" [ref=f3e315] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/crabbox
+                - text: "- Warm a box, sync the diff, and run targeted OpenClaw suites remotely."
+              - listitem [ref=f3e316]:
+                - text: 🧭
+                - link "gitcrawl" [ref=f3e317] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/gitcrawl
+                - text: "- Local-first GitHub issue and PR crawler for maintainer triage."
+              - listitem [ref=f3e318]:
+                - text: 🧽
+                - link "kitchen-sink" [ref=f3e319] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/kitchen-sink
+                - text: "- Credential-free OpenClaw plugin fixture covering the public plugin API surface."
+              - listitem [ref=f3e320]:
+                - text: 💊
+                - link "plugin-inspector" [ref=f3e321] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/plugin-inspector
+                - text: "- Offline compatibility inspector for OpenClaw plugin packages and fixtures."
+              - listitem [ref=f3e322]:
+                - text: 🦀
+                - link "crabpot" [ref=f3e323] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/crabpot
+                - text: "- Compatibility testbed for OpenClaw community plugins and plugin seams."
+              - listitem [ref=f3e324]:
+                - text: 🐠
+                - link "clownfish" [ref=f3e325] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clownfish
+                - text: "- OpenClaw maintainer harness for bulk issue and PR cluster cleanup."
+              - listitem [ref=f3e326]:
+                - text: 🧹
+                - link "clawsweeper" [ref=f3e327] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clawsweeper
+                - text: "- Weekly OpenClaw issue and PR scanner that suggests what can close, and why."
+              - listitem [ref=f3e328]:
+                - text: 🗞️
+                - link "notcrawl" [ref=f3e329] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/notcrawl
+                - text: "- Local-first Notion crawler into SQLite and normalized Markdown."
+              - listitem [ref=f3e330]:
+                - text: 🧃
+                - link "tokenjuice" [ref=f3e331] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/tokenjuice
+                - text: "- Lean output compaction for terminal-heavy agent workflows."
+              - listitem [ref=f3e332]:
+                - text: 🧪
+                - link "clawbench" [ref=f3e333] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/clawbench
+                - text: "- Agent benchmark that scores the harness, config, and model behavior with trace-based metrics."
+              - listitem [ref=f3e334]:
+                - text: 🌀
+                - link "NemoClaw" [ref=f3e335] [cursor=pointer]:
+                  - /url: https://github.com/NVIDIA/NemoClaw
+                - text: "- NVIDIA plugin for secure installation of OpenClaw with OpenShell."
+              - listitem [ref=f3e336]:
+                - text: 💾
+                - link "slacrawl" [ref=f3e337] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/slacrawl
+                - text: "- Command-line terminal app for Slack with SQLite backend and key-less wiretapping."
+              - listitem [ref=f3e338]:
+                - text: 🛰️
+                - link "discrawl" [ref=f3e339] [cursor=pointer]:
+                  - /url: https://github.com/steipete/discrawl
+                - text: "- Mirror Discord into SQLite and search server history locally."
+              - listitem [ref=f3e340]:
+                - text: 🦞
+                - link "opik-openclaw" [ref=f3e341] [cursor=pointer]:
+                  - /url: https://github.com/comet-ml/opik-openclaw
+                - text: "- Native Opik observability in OpenClaw to help with agent evaluation."
+              - listitem [ref=f3e342]:
+                - text: 🧩
+                - link "acpx" [ref=f3e343] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/acpx
+                - text: "- Headless CLI client for stateful Agent Client Protocol sessions."
+              - listitem [ref=f3e344]:
+                - text: 📁
+                - link ".skills" [ref=f3e345] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/dotskills
+                - text: "- Curated skills and skill registry, akin to dotfiles, for coding agents and OpenClaw."
+              - listitem [ref=f3e346]:
+                - text: 🦞
+                - link "awesome-openclaw" [ref=f3e347] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/awesome-openclaw
+                - text: "- Curated awesome list for OpenClaw (formerly Moltbot/Clawdbot)."
+              - listitem [ref=f3e348]:
+                - text: 🐦
+                - link "finagotchi" [ref=f3e349] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/finagotchi
+                - text: "- Tamagotchi‑inspired AI agent that evolves with financial data, using SLMs and local graph."
+              - listitem [ref=f3e350]:
+                - text: 🧠
+                - link "openamnesia" [ref=f3e351] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/openamnesia
+                - text: "- Backfill"
+                - code [ref=f3e352]: .md
+                - text: memory files for agents locally from iMessage to Cursor logs with no APIs.
+              - listitem [ref=f3e353]:
+                - text: 🦞
+                - link "openclaw" [ref=f3e354] [cursor=pointer]:
+                  - /url: https://github.com/openclaw/openclaw/
+                - text: "- Personal AI assistant, contributing with CVEs and OTel to make lobsters safe."
+              - listitem [ref=f3e355]:
+                - text: 🧬
+                - link "GEPA" [ref=f3e356] [cursor=pointer]:
+                  - /url: https://github.com/gepa-ai/gepa
+                - text: "- AI-powered reflective text evolution for optimizing prompts, code, and agent behavior."
+              - listitem [ref=f3e357]:
+                - text: 🧪
+                - link "tinyqa" [ref=f3e358] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/tiny_qa_benchmark_pp
+                - text: "- Ultra-lightweight LLM evaluation benchmark and synthetic generator for CI smoke tests."
+              - listitem [ref=f3e359]:
+                - text: 🔭
+                - link "opik-mcp" [ref=f3e360] [cursor=pointer]:
+                  - /url: https://github.com/comet-ml/opik-mcp
+                - text: "- Developed an Anthropic-endorsed MCP server for Comet Opik."
+              - listitem [ref=f3e361]:
+                - text: 👻
+                - link "dexscraper" [ref=f3e362] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/dexscraper
+                - text: "- Real-time DexScreener scraper for multi-chain token discovery, filtering, and feed for bots."
+              - listitem [ref=f3e363]:
+                - text: 🧑‍🚀
+                - link "airgapped-offline-rag" [ref=f3e364] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/airgapped-offfline-rag
+                - text: "- 100% offline dockerized RAG with quantized model inference."
+              - listitem [ref=f3e365]:
+                - text: ✨
+                - link "synthetic research" [ref=f3e366] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/synthetic-user-research
+                - text: "- Autonomous agents powering research studies and panels with persona prompting."
+              - listitem [ref=f3e367]:
+                - text: 🎙️
+                - link "omi" [ref=f3e368] [cursor=pointer]:
+                  - /url: https://github.com/BasedHardware/omi
+                - text: "- omi.me ("
+                - emphasis [ref=f3e369]: YC, prev. Friend AI
+                - text: ) developing AI wearable firmware and live speech analysis.
+              - listitem [ref=f3e370]:
+                - text: 🔭
+                - link "opik-optimizer" [ref=f3e371] [cursor=pointer]:
+                  - /url: https://github.com/comet-ml/opik/tree/main/sdks/opik_optimizer
+                - text: "- Lead developer and project maintainer for agent optimization SDK."
+              - listitem [ref=f3e372]:
+                - text: 🔭
+                - link "opik" [ref=f3e373] [cursor=pointer]:
+                  - /url: https://github.com/comet-ml/opik
+                - text: "- Debug, evaluate, and monitor your LLM applications. Leading open-source LLM evaluation toolkit."
+              - listitem [ref=f3e374]:
+                - text: ⏰
+                - link "no-out-of-hours-merge" [ref=f3e375] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/no-out-of-hours-merge
+                - text: "- GitHub Action that blocks PR merges outside business hours, weekends and holidays."
+              - listitem [ref=f3e376]:
+                - text: 🐚
+                - link "natilius" [ref=f3e377] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/natilius
+                - text: "- One-click macOS developer environment bootstrap using Terraform and dotfiles."
+              - listitem [ref=f3e378]:
+                - text: 📁
+                - link "dotfiles" [ref=f3e379] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/dotfiles
+                - text: "- A very opinionated and well-maintained personal dotfiles repo."
+              - listitem [ref=f3e380]:
+                - text: 🗄️
+                - link "Airbyte" [ref=f3e381] [cursor=pointer]:
+                  - /url: https://github.com/airbytehq/airbyte
+                - text: "- Core contributor to open-source data movement for ELT pipelines and AI agents."
+              - listitem [ref=f3e382]:
+                - text: 🔑
+                - link "autosecure" [ref=f3e383] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/autosecure
+                - text: "- Public threat-feed and blocklists to automatic IP blocking for Linux and macOS firewalls."
+              - listitem [ref=f3e384]:
+                - text: 📱
+                - link "android-market-api-php" [ref=f3e385] [cursor=pointer]:
+                  - /url: https://github.com/vincentkoc/android-market-api-php
+                - text: "- PHP implementation of the Java Android Market API."
+            - paragraph [ref=f3e386]:
+              - text: I'm always open to building, contributing, collaborating, and chatting. Feel free to
+              - link "📫 reach out" [ref=f3e387] [cursor=pointer]:
+                - /url: https://linktr.ee/vincentkoc
+              - text: .
+            - generic [ref=f3e388]:
+              - heading "Recent Articles, Journal Papers and Blog Posts" [level=3] [ref=f3e389]
+              - 'link "Permalink: Recent Articles, Journal Papers and Blog Posts" [ref=f3e390] [cursor=pointer]':
+                - /url: "#recent-articles-journal-papers-and-blog-posts"
+            - list [ref=f3e393]:
+              - listitem [ref=f3e394]:
+                - 'link "ClawHub Security Signals: When VirusTotal, Static Analysis, and SkillSpector Disagree" [ref=f3e395] [cursor=pointer]':
+                  - /url: http://arxiv.org/abs/2606.01494v1
+              - listitem [ref=f3e396]:
+                - link "Native Observability & Alerts for Your OpenClaw with Opik" [ref=f3e397] [cursor=pointer]:
+                  - /url: https://live-comet-marketing-site.pantheonsite.io/blog/openclaw-observability/
+              - listitem [ref=f3e398]:
+                - link "The Dawn of Self-Optimizing AI Agents" [ref=f3e399] [cursor=pointer]:
+                  - /url: https://www.forbes.com/councils/forbestechcouncil/2026/01/22/the-dawn-of-self-optimizing-ai-agents/
+              - listitem [ref=f3e400]:
+                - 'link "From Observability to Optimization: Announcing the Opik Agent Optimizer Public Beta" [ref=f3e401] [cursor=pointer]':
+                  - /url: https://live-comet-marketing-site.pantheonsite.io/blog/automated-prompt-engineering/
+              - listitem [ref=f3e402]:
+                - 'link "Tiny QA Benchmark++: Ultra-Lightweight, Synthetic Multilingual Dataset Generation & Smoke-Tests for Continuous LLM Evaluation" [ref=f3e403] [cursor=pointer]':
+                  - /url: http://arxiv.org/abs/2505.12058v1
+              - listitem [ref=f3e404]:
+                - 'link "Mind the Metrics: Patterns for Telemetry-Aware In-IDE AI Application Development using the Model Context Protocol (MCP)" [ref=f3e405] [cursor=pointer]':
+                  - /url: http://arxiv.org/abs/2506.11019v1
+              - listitem [ref=f3e406]:
+                - link "LLM Evaluation Complexities for Non-Latin Languages" [ref=f3e407] [cursor=pointer]:
+                  - /url: https://live-comet-marketing-site.pantheonsite.io/blog/complexities-for-non-latin-languages-llm-evaluations/
+              - listitem [ref=f3e408]:
+                - 'link "Generative AI and Large Language Models in Language Preservation: Opportunities and Challenges" [ref=f3e409] [cursor=pointer]':
+                  - /url: http://arxiv.org/abs/2501.11496v2
+              - listitem [ref=f3e410]:
+                - 'link "The GenAI Compass: a UX framework to design generative AI experiences" [ref=f3e411] [cursor=pointer]':
+                  - /url: https://uxdesign.cc/the-genai-compass-a-ux-framework-to-design-generative-ai-experiences-49a7d797c114?source=rss-79191c4a8149------2
+              - listitem [ref=f3e412]:
+                - 'link "Creating Synthetic User Research: Using Persona Prompting and Autonomous Agents" [ref=f3e413] [cursor=pointer]':
+                  - /url: https://medium.com/data-science/creating-synthetic-user-research-using-persona-prompting-and-autonomous-agents-b521e0a80ab6?source=rss-79191c4a8149------2
+        - generic [ref=f3e415]:
+          - heading "Pinned Loading" [level=2] [ref=f3e416]:
+            - text: Pinned
+            - generic: Loading
+            - status
+          - list [ref=f3e418]:
+            - listitem [ref=f3e419]:
+              - generic [ref=f3e421]:
+                - generic [ref=f3e423]:
+                  - link "openclaw/openclaw" [ref=f3e427] [cursor=pointer]:
+                    - /url: /openclaw/openclaw
+                  - text: Public
+                - paragraph [ref=f3e428]: Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞
+                - paragraph [ref=f3e429]:
+                  - generic [ref=f3e430]: TypeScript
+                  - link [ref=f3e432] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/stargazers
+                    - img "stars" [ref=f3e433]
+                    - text: 386k
+                  - link [ref=f3e435] [cursor=pointer]:
+                    - /url: /openclaw/openclaw/forks
+                    - img "forks" [ref=f3e436]
+                    - text: 81.2k
+            - listitem [ref=f3e438]:
+              - generic [ref=f3e440]:
+                - generic [ref=f3e442]:
+                  - link "openai/codex" [ref=f3e446] [cursor=pointer]:
+                    - /url: /openai/codex
+                  - text: Public
+                - paragraph [ref=f3e447]: Lightweight coding agent that runs in your terminal
+                - paragraph [ref=f3e448]:
+                  - generic [ref=f3e449]: Rust
+                  - link [ref=f3e451] [cursor=pointer]:
+                    - /url: /openai/codex/stargazers
+                    - img "stars" [ref=f3e452]
+                    - text: 106k
+                  - link [ref=f3e454] [cursor=pointer]:
+                    - /url: /openai/codex/forks
+                    - img "forks" [ref=f3e455]
+                    - text: 16k
+            - listitem [ref=f3e457]:
+              - generic [ref=f3e459]:
+                - generic [ref=f3e461]:
+                  - link "ollama/ollama" [ref=f3e465] [cursor=pointer]:
+                    - /url: /ollama/ollama
+                  - text: Public
+                - paragraph [ref=f3e466]: Get up and running with Kimi-K2.6, GLM-5.2, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.
+                - paragraph [ref=f3e467]:
+                  - generic [ref=f3e468]: Go
+                  - link [ref=f3e470] [cursor=pointer]:
+                    - /url: /ollama/ollama/stargazers
+                    - img "stars" [ref=f3e471]
+                    - text: 178k
+                  - link [ref=f3e473] [cursor=pointer]:
+                    - /url: /ollama/ollama/forks
+                    - img "forks" [ref=f3e474]
+                    - text: 17.4k
+            - listitem [ref=f3e476]:
+              - generic [ref=f3e478]:
+                - generic [ref=f3e480]:
+                  - link "langchain-ai/langchain" [ref=f3e484] [cursor=pointer]:
+                    - /url: /langchain-ai/langchain
+                  - text: Public
+                - paragraph [ref=f3e485]: The agent engineering platform.
+                - paragraph [ref=f3e486]:
+                  - generic [ref=f3e487]: Python
+                  - link [ref=f3e489] [cursor=pointer]:
+                    - /url: /langchain-ai/langchain/stargazers
+                    - img "stars" [ref=f3e490]
+                    - text: 144k
+                  - link [ref=f3e492] [cursor=pointer]:
+                    - /url: /langchain-ai/langchain/forks
+                    - img "forks" [ref=f3e493]
+                    - text: 24k
+            - listitem [ref=f3e495]:
+              - generic [ref=f3e497]:
+                - generic [ref=f3e499]:
+                  - link "apache/airflow" [ref=f3e503] [cursor=pointer]:
+                    - /url: /apache/airflow
+                  - text: Public
+                - paragraph [ref=f3e504]: Apache Airflow - A platform to programmatically author, schedule, and monitor workflows
+                - paragraph [ref=f3e505]:
+                  - generic [ref=f3e506]: Python
+                  - link [ref=f3e508] [cursor=pointer]:
+                    - /url: /apache/airflow/stargazers
+                    - img "stars" [ref=f3e509]
+                    - text: 46.5k
+                  - link [ref=f3e511] [cursor=pointer]:
+                    - /url: /apache/airflow/forks
+                    - img "forks" [ref=f3e512]
+                    - text: 17.6k
+            - listitem [ref=f3e514]:
+              - generic [ref=f3e516]:
+                - generic [ref=f3e518]:
+                  - link "airbytehq/airbyte" [ref=f3e522] [cursor=pointer]:
+                    - /url: /airbytehq/airbyte
+                  - text: Public
+                - paragraph [ref=f3e523]: Open-source data movement for ELT pipelines and AI agents — from APIs, databases & files to warehouses, lakes, and AI applications. Both self-hosted and Cloud.
+                - paragraph [ref=f3e524]:
+                  - generic [ref=f3e525]: Python
+                  - link [ref=f3e527] [cursor=pointer]:
+                    - /url: /airbytehq/airbyte/stargazers
+                    - img "stars" [ref=f3e528]
+                    - text: 21.9k
+                  - link [ref=f3e530] [cursor=pointer]:
+                    - /url: /airbytehq/airbyte/forks
+                    - img "forks" [ref=f3e531]
+                    - text: 5.3k
+        - generic [ref=f3e534]:
+          - generic [ref=f3e535]:
+            - generic [ref=f3e536]:
+              - generic [ref=f3e537]:
+                - heading "92,110 contributions in the last year" [level=2] [ref=f3e538]
+                - link "Skip to contributions year list" [ref=f3e539] [cursor=pointer]:
+                  - /url: "#year-link-2026"
+                - generic [ref=f3e541]:
+                  - grid [ref=f3e543]:
+                    - caption [ref=f3e544]: Contribution Graph
+                    - rowgroup [ref=f3e545]:
+                      - row [ref=f3e546]:
+                        - gridcell "Day of Week" [ref=f3e547]
+                        - gridcell "August" [ref=f3e549]:
+                          - generic [ref=f3e551]: Aug
+                        - gridcell "September" [ref=f3e552]:
+                          - generic [ref=f3e554]: Sep
+                        - gridcell "October" [ref=f3e555]:
+                          - generic [ref=f3e557]: Oct
+                        - gridcell "November" [ref=f3e558]:
+                          - generic [ref=f3e560]: Nov
+                        - gridcell "December" [ref=f3e561]:
+                          - generic [ref=f3e563]: Dec
+                        - gridcell "January" [ref=f3e564]:
+                          - generic [ref=f3e566]: Jan
+                        - gridcell "February" [ref=f3e567]:
+                          - generic [ref=f3e569]: Feb
+                        - gridcell "March" [ref=f3e570]:
+                          - generic [ref=f3e572]: Mar
+                        - gridcell "April" [ref=f3e573]:
+                          - generic [ref=f3e575]: Apr
+                        - gridcell "May" [ref=f3e576]
+                        - gridcell "June" [ref=f3e579]:
+                          - generic [ref=f3e581]: Jun
+                        - gridcell "July" [ref=f3e582]:
+                          - generic [ref=f3e584]: Jul
+                        - gridcell "August" [ref=f3e585]:
+                          - generic [ref=f3e587]: Aug
+                    - rowgroup [ref=f3e588]:
+                      - row [ref=f3e589]:
+                        - gridcell "Sunday" [ref=f3e590]:
+                          - generic [ref=f3e592]: Sun
+                        - gridcell "4 contributions on August 10th." [ref=f3e593]
+                        - gridcell "2 contributions on August 17th." [ref=f3e594]
+                        - gridcell "2 contributions on August 24th." [ref=f3e595]
+                        - gridcell "17 contributions on August 31st." [ref=f3e596]
+                        - gridcell "3 contributions on September 7th." [ref=f3e597]
+                        - gridcell "1 contribution on September 14th." [ref=f3e598]
+                        - gridcell "1 contribution on September 21st." [ref=f3e599]
+                        - gridcell "2 contributions on September 28th." [ref=f3e600]
+                        - gridcell "2 contributions on October 5th." [ref=f3e601]
+                        - gridcell "2 contributions on October 12th." [ref=f3e602]
+                        - gridcell "2 contributions on October 19th." [ref=f3e603]
+                        - gridcell "2 contributions on October 26th." [ref=f3e604]
+                        - gridcell "No contributions on November 2nd." [ref=f3e605]
+                        - gridcell "3 contributions on November 9th." [ref=f3e606]
+                        - gridcell "3 contributions on November 16th." [ref=f3e607]
+                        - gridcell "9 contributions on November 23rd." [ref=f3e608]
+                        - gridcell "2 contributions on November 30th." [ref=f3e609]
+                        - gridcell "13 contributions on December 7th." [ref=f3e610]
+                        - gridcell "3 contributions on December 14th." [ref=f3e611]
+                        - gridcell "3 contributions on December 21st." [ref=f3e612]
+                        - gridcell "1 contribution on December 28th." [ref=f3e613]
+                        - gridcell "No contributions on January 4th." [ref=f3e614]
+                        - gridcell "No contributions on January 11th." [ref=f3e615]
+                        - gridcell "No contributions on January 18th." [ref=f3e616]
+                        - gridcell "No contributions on January 25th." [ref=f3e617]
+                        - gridcell "8 contributions on February 1st." [ref=f3e618]
+                        - gridcell "97 contributions on February 8th." [ref=f3e619]
+                        - gridcell "154 contributions on February 15th." [ref=f3e620]
+                        - gridcell "216 contributions on February 22nd." [ref=f3e621]
+                        - gridcell "385 contributions on March 1st." [ref=f3e622]
+                        - gridcell "215 contributions on March 8th." [ref=f3e623]
+                        - gridcell "1148 contributions on March 15th." [ref=f3e624]
+                        - gridcell "1334 contributions on March 22nd." [ref=f3e625]
+                        - gridcell "272 contributions on March 29th." [ref=f3e626]
+                        - gridcell "1037 contributions on April 5th." [ref=f3e627]
+                        - gridcell "1769 contributions on April 12th." [ref=f3e628]
+                        - gridcell "5 contributions on April 19th." [ref=f3e629]
+                        - gridcell "1512 contributions on April 26th." [ref=f3e630]
+                        - gridcell "1477 contributions on May 3rd." [ref=f3e631]
+                        - gridcell "189 contributions on May 10th." [ref=f3e632]
+                        - gridcell "667 contributions on May 17th." [ref=f3e633]
+                        - gridcell "286 contributions on May 24th." [ref=f3e634]
+                        - gridcell "357 contributions on May 31st." [ref=f3e635]
+                        - gridcell "850 contributions on June 7th." [ref=f3e636]
+                        - gridcell "388 contributions on June 14th." [ref=f3e637]
+                        - gridcell "1747 contributions on June 21st." [ref=f3e638]
+                        - gridcell "74 contributions on June 28th." [ref=f3e639]
+                        - gridcell "322 contributions on July 5th." [ref=f3e640]
+                        - gridcell "3625 contributions on July 12th." [ref=f3e641]
+                        - gridcell "No contributions on July 19th." [ref=f3e642]
+                        - gridcell "No contributions on July 26th." [ref=f3e643]
+                        - gridcell "617 contributions on August 2nd." [ref=f3e644]
+                        - gridcell "88 contributions on August 9th." [ref=f3e645]
+                      - row [ref=f3e646]:
+                        - gridcell "Monday" [ref=f3e647]:
+                          - generic [ref=f3e649]: Mon
+                        - gridcell "4 contributions on August 11th." [ref=f3e650]
+                        - gridcell "14 contributions on August 18th." [ref=f3e651]
+                        - gridcell "2 contributions on August 25th." [ref=f3e652]
+                        - gridcell "32 contributions on September 1st." [ref=f3e653]
+                        - gridcell "4 contributions on September 8th." [ref=f3e654]
+                        - gridcell "1 contribution on September 15th." [ref=f3e655]
+                        - gridcell "1 contribution on September 22nd." [ref=f3e656]
+                        - gridcell "6 contributions on September 29th." [ref=f3e657]
+                        - gridcell "1 contribution on October 6th." [ref=f3e658]
+                        - gridcell "14 contributions on October 13th." [ref=f3e659]
+                        - gridcell "3 contributions on October 20th." [ref=f3e660]
+                        - gridcell "3 contributions on October 27th." [ref=f3e661]
+                        - gridcell "8 contributions on November 3rd." [ref=f3e662]
+                        - gridcell "11 contributions on November 10th." [ref=f3e663]
+                        - gridcell "12 contributions on November 17th." [ref=f3e664]
+                        - gridcell "13 contributions on November 24th." [ref=f3e665]
+                        - gridcell "5 contributions on December 1st." [ref=f3e666]
+                        - gridcell "6 contributions on December 8th." [ref=f3e667]
+                        - gridcell "12 contributions on December 15th." [ref=f3e668]
+                        - gridcell "4 contributions on December 22nd." [ref=f3e669]
+                        - gridcell "8 contributions on December 29th." [ref=f3e670]
+                        - gridcell "No contributions on January 5th." [ref=f3e671]
+                        - gridcell "2 contributions on January 12th." [ref=f3e672]
+                        - gridcell "No contributions on January 19th." [ref=f3e673]
+                        - gridcell "4 contributions on January 26th." [ref=f3e674]
+                        - gridcell "No contributions on February 2nd." [ref=f3e675]
+                        - gridcell "129 contributions on February 9th." [ref=f3e676]
+                        - gridcell "120 contributions on February 16th." [ref=f3e677]
+                        - gridcell "249 contributions on February 23rd." [ref=f3e678]
+                        - gridcell "425 contributions on March 2nd." [ref=f3e679]
+                        - gridcell "81 contributions on March 9th." [ref=f3e680]
+                        - gridcell "593 contributions on March 16th." [ref=f3e681]
+                        - gridcell "408 contributions on March 23rd." [ref=f3e682]
+                        - gridcell "741 contributions on March 30th." [ref=f3e683]
+                        - gridcell "1523 contributions on April 6th." [ref=f3e684]
+                        - gridcell "955 contributions on April 13th." [ref=f3e685]
+                        - gridcell "8 contributions on April 20th." [ref=f3e686]
+                        - gridcell "918 contributions on April 27th." [ref=f3e687]
+                        - gridcell "821 contributions on May 4th." [ref=f3e688]
+                        - gridcell "36 contributions on May 11th." [ref=f3e689]
+                        - gridcell "326 contributions on May 18th." [ref=f3e690]
+                        - gridcell "361 contributions on May 25th." [ref=f3e691]
+                        - gridcell "1348 contributions on June 1st." [ref=f3e692]
+                        - gridcell "380 contributions on June 8th." [ref=f3e693]
+                        - gridcell "516 contributions on June 15th." [ref=f3e694]
+                        - gridcell "1427 contributions on June 22nd." [ref=f3e695]
+                        - gridcell "82 contributions on June 29th." [ref=f3e696]
+                        - gridcell "737 contributions on July 6th." [ref=f3e697]
+                        - gridcell "1247 contributions on July 13th." [ref=f3e698]
+                        - gridcell "No contributions on July 20th." [ref=f3e699]
+                        - gridcell "1009 contributions on July 27th." [ref=f3e700]
+                        - gridcell "372 contributions on August 3rd." [ref=f3e701]
+                        - gridcell "32 contributions on August 10th." [ref=f3e702]
+                      - row [ref=f3e703]:
+                        - gridcell "Tuesday" [ref=f3e704]:
+                          - generic [ref=f3e706]: Tue
+                        - gridcell "5 contributions on August 12th." [ref=f3e707]
+                        - gridcell "3 contributions on August 19th." [ref=f3e708]
+                        - gridcell "6 contributions on August 26th." [ref=f3e709]
+                        - gridcell "26 contributions on September 2nd." [ref=f3e710]
+                        - gridcell "7 contributions on September 9th." [ref=f3e711]
+                        - gridcell "1 contribution on September 16th." [ref=f3e712]
+                        - gridcell "30 contributions on September 23rd." [ref=f3e713]
+                        - gridcell "8 contributions on September 30th." [ref=f3e714]
+                        - gridcell "5 contributions on October 7th." [ref=f3e715]
+                        - gridcell "9 contributions on October 14th." [ref=f3e716]
+                        - gridcell "3 contributions on October 21st." [ref=f3e717]
+                        - gridcell "14 contributions on October 28th." [ref=f3e718]
+                        - gridcell "8 contributions on November 4th." [ref=f3e719]
+                        - gridcell "11 contributions on November 11th." [ref=f3e720]
+                        - gridcell "15 contributions on November 18th." [ref=f3e721]
+                        - gridcell "13 contributions on November 25th." [ref=f3e722]
+                        - gridcell "9 contributions on December 2nd." [ref=f3e723]
+                        - gridcell "7 contributions on December 9th." [ref=f3e724]
+                        - gridcell "7 contributions on December 16th." [ref=f3e725]
+                        - gridcell "7 contributions on December 23rd." [ref=f3e726]
+                        - gridcell "7 contributions on December 30th." [ref=f3e727]
+                        - gridcell "No contributions on January 6th." [ref=f3e728]
+                        - gridcell "1 contribution on January 13th." [ref=f3e729]
+                        - gridcell "1 contribution on January 20th." [ref=f3e730]
+                        - gridcell "10 contributions on January 27th." [ref=f3e731]
+                        - gridcell "6 contributions on February 3rd." [ref=f3e732]
+                        - gridcell "40 contributions on February 10th." [ref=f3e733]
+                        - gridcell "45 contributions on February 17th." [ref=f3e734]
+                        - gridcell "201 contributions on February 24th." [ref=f3e735]
+                        - gridcell "81 contributions on March 3rd." [ref=f3e736]
+                        - gridcell "73 contributions on March 10th." [ref=f3e737]
+                        - gridcell "629 contributions on March 17th." [ref=f3e738]
+                        - gridcell "329 contributions on March 24th." [ref=f3e739]
+                        - gridcell "787 contributions on March 31st." [ref=f3e740]
+                        - gridcell "903 contributions on April 7th." [ref=f3e741]
+                        - gridcell "897 contributions on April 14th." [ref=f3e742]
+                        - gridcell "219 contributions on April 21st." [ref=f3e743]
+                        - gridcell "840 contributions on April 28th." [ref=f3e744]
+                        - gridcell "684 contributions on May 5th." [ref=f3e745]
+                        - gridcell "6 contributions on May 12th." [ref=f3e746]
+                        - gridcell "32 contributions on May 19th." [ref=f3e747]
+                        - gridcell "652 contributions on May 26th." [ref=f3e748]
+                        - gridcell "832 contributions on June 2nd." [ref=f3e749]
+                        - gridcell "463 contributions on June 9th." [ref=f3e750]
+                        - gridcell "1507 contributions on June 16th." [ref=f3e751]
+                        - gridcell "1312 contributions on June 23rd." [ref=f3e752]
+                        - gridcell "58 contributions on June 30th." [ref=f3e753]
+                        - gridcell "526 contributions on July 7th." [ref=f3e754]
+                        - gridcell "1007 contributions on July 14th." [ref=f3e755]
+                        - gridcell "1083 contributions on July 21st." [ref=f3e756]
+                        - gridcell "243 contributions on July 28th." [ref=f3e757]
+                        - gridcell "559 contributions on August 4th." [ref=f3e758]
+                        - gridcell "51 contributions on August 11th." [ref=f3e759]
+                      - row [ref=f3e760]:
+                        - gridcell "Wednesday" [ref=f3e761]:
+                          - generic [ref=f3e763]: Wed
+                        - gridcell "8 contributions on August 13th." [ref=f3e764]
+                        - gridcell "2 contributions on August 20th." [ref=f3e765]
+                        - gridcell "6 contributions on August 27th." [ref=f3e766]
+                        - gridcell "16 contributions on September 3rd." [ref=f3e767]
+                        - gridcell "14 contributions on September 10th." [ref=f3e768]
+                        - gridcell "8 contributions on September 17th." [ref=f3e769]
+                        - gridcell "37 contributions on September 24th." [ref=f3e770]
+                        - gridcell "46 contributions on October 1st." [ref=f3e771]
+                        - gridcell "13 contributions on October 8th." [ref=f3e772]
+                        - gridcell "7 contributions on October 15th." [ref=f3e773]
+                        - gridcell "9 contributions on October 22nd." [ref=f3e774]
+                        - gridcell "13 contributions on October 29th." [ref=f3e775]
+                        - gridcell "9 contributions on November 5th." [ref=f3e776]
+                        - gridcell "26 contributions on November 12th." [ref=f3e777]
+                        - gridcell "10 contributions on November 19th." [ref=f3e778]
+                        - gridcell "17 contributions on November 26th." [ref=f3e779]
+                        - gridcell "9 contributions on December 3rd." [ref=f3e780]
+                        - gridcell "11 contributions on December 10th." [ref=f3e781]
+                        - gridcell "8 contributions on December 17th." [ref=f3e782]
+                        - gridcell "15 contributions on December 24th." [ref=f3e783]
+                        - gridcell "8 contributions on December 31st." [ref=f3e784]
+                        - gridcell "No contributions on January 7th." [ref=f3e785]
+                        - gridcell "2 contributions on January 14th." [ref=f3e786]
+                        - gridcell "1 contribution on January 21st." [ref=f3e787]
+                        - gridcell "15 contributions on January 28th." [ref=f3e788]
+                        - gridcell "2 contributions on February 4th." [ref=f3e789]
+                        - gridcell "60 contributions on February 11th." [ref=f3e790]
+                        - gridcell "22 contributions on February 18th." [ref=f3e791]
+                        - gridcell "1 contribution on February 25th." [ref=f3e792]
+                        - gridcell "95 contributions on March 4th." [ref=f3e793]
+                        - gridcell "91 contributions on March 11th." [ref=f3e794]
+                        - gridcell "560 contributions on March 18th." [ref=f3e795]
+                        - gridcell "1 contribution on March 25th." [ref=f3e796]
+                        - gridcell "615 contributions on April 1st." [ref=f3e797]
+                        - gridcell "227 contributions on April 8th." [ref=f3e798]
+                        - gridcell "268 contributions on April 15th." [ref=f3e799]
+                        - gridcell "571 contributions on April 22nd." [ref=f3e800]
+                        - gridcell "843 contributions on April 29th." [ref=f3e801]
+                        - gridcell "693 contributions on May 6th." [ref=f3e802]
+                        - gridcell "29 contributions on May 13th." [ref=f3e803]
+                        - gridcell "16 contributions on May 20th." [ref=f3e804]
+                        - gridcell "835 contributions on May 27th." [ref=f3e805]
+                        - gridcell "607 contributions on June 3rd." [ref=f3e806]
+                        - gridcell "440 contributions on June 10th." [ref=f3e807]
+                        - gridcell "2248 contributions on June 17th." [ref=f3e808]
+                        - gridcell "391 contributions on June 24th." [ref=f3e809]
+                        - gridcell "349 contributions on July 1st." [ref=f3e810]
+                        - gridcell "108 contributions on July 8th." [ref=f3e811]
+                        - gridcell "46 contributions on July 15th." [ref=f3e812]
+                        - gridcell "8 contributions on July 22nd." [ref=f3e813]
+                        - gridcell "866 contributions on July 29th." [ref=f3e814]
+                        - gridcell "149 contributions on August 5th." [ref=f3e815]
+                        - gridcell "100 contributions on August 12th." [ref=f3e816]
+                      - row [ref=f3e817]:
+                        - gridcell "Thursday" [ref=f3e818]:
+                          - generic [ref=f3e820]: Thu
+                        - gridcell "5 contributions on August 14th." [ref=f3e821]
+                        - gridcell "6 contributions on August 21st." [ref=f3e822]
+                        - gridcell "18 contributions on August 28th." [ref=f3e823]
+                        - gridcell "8 contributions on September 4th." [ref=f3e824]
+                        - gridcell "7 contributions on September 11th." [ref=f3e825]
+                        - gridcell "7 contributions on September 18th." [ref=f3e826]
+                        - gridcell "15 contributions on September 25th." [ref=f3e827]
+                        - gridcell "33 contributions on October 2nd." [ref=f3e828]
+                        - gridcell "9 contributions on October 9th." [ref=f3e829]
+                        - gridcell "6 contributions on October 16th." [ref=f3e830]
+                        - gridcell "9 contributions on October 23rd." [ref=f3e831]
+                        - gridcell "13 contributions on October 30th." [ref=f3e832]
+                        - gridcell "9 contributions on November 6th." [ref=f3e833]
+                        - gridcell "16 contributions on November 13th." [ref=f3e834]
+                        - gridcell "18 contributions on November 20th." [ref=f3e835]
+                        - gridcell "12 contributions on November 27th." [ref=f3e836]
+                        - gridcell "7 contributions on December 4th." [ref=f3e837]
+                        - gridcell "9 contributions on December 11th." [ref=f3e838]
+                        - gridcell "9 contributions on December 18th." [ref=f3e839]
+                        - gridcell "7 contributions on December 25th." [ref=f3e840]
+                        - gridcell "No contributions on January 1st." [ref=f3e841]
+                        - gridcell "4 contributions on January 8th." [ref=f3e842]
+                        - gridcell "1 contribution on January 15th." [ref=f3e843]
+                        - gridcell "5 contributions on January 22nd." [ref=f3e844]
+                        - gridcell "99 contributions on January 29th." [ref=f3e845]
+                        - gridcell "21 contributions on February 5th." [ref=f3e846]
+                        - gridcell "14 contributions on February 12th." [ref=f3e847]
+                        - gridcell "183 contributions on February 19th." [ref=f3e848]
+                        - gridcell "116 contributions on February 26th." [ref=f3e849]
+                        - gridcell "158 contributions on March 5th." [ref=f3e850]
+                        - gridcell "414 contributions on March 12th." [ref=f3e851]
+                        - gridcell "708 contributions on March 19th." [ref=f3e852]
+                        - gridcell "8 contributions on March 26th." [ref=f3e853]
+                        - gridcell "696 contributions on April 2nd." [ref=f3e854]
+                        - gridcell "196 contributions on April 9th." [ref=f3e855]
+                        - gridcell "123 contributions on April 16th." [ref=f3e856]
+                        - gridcell "909 contributions on April 23rd." [ref=f3e857]
+                        - gridcell "400 contributions on April 30th." [ref=f3e858]
+                        - gridcell "210 contributions on May 7th." [ref=f3e859]
+                        - gridcell "571 contributions on May 14th." [ref=f3e860]
+                        - gridcell "120 contributions on May 21st." [ref=f3e861]
+                        - gridcell "889 contributions on May 28th." [ref=f3e862]
+                        - gridcell "338 contributions on June 4th." [ref=f3e863]
+                        - gridcell "515 contributions on June 11th." [ref=f3e864]
+                        - gridcell "1271 contributions on June 18th." [ref=f3e865]
+                        - gridcell "188 contributions on June 25th." [ref=f3e866]
+                        - gridcell "25 contributions on July 2nd." [ref=f3e867]
+                        - gridcell "176 contributions on July 9th." [ref=f3e868]
+                        - gridcell "No contributions on July 16th." [ref=f3e869]
+                        - gridcell "227 contributions on July 23rd." [ref=f3e870]
+                        - gridcell "485 contributions on July 30th." [ref=f3e871]
+                        - gridcell "148 contributions on August 6th." [ref=f3e872]
+                        - gridcell "16 contributions on August 13th." [ref=f3e873]
+                      - row [ref=f3e874]:
+                        - gridcell "Friday" [ref=f3e875]:
+                          - generic [ref=f3e877]: Fri
+                        - gridcell "7 contributions on August 15th." [ref=f3e878]
+                        - gridcell "7 contributions on August 22nd." [ref=f3e879]
+                        - gridcell "20 contributions on August 29th." [ref=f3e880]
+                        - gridcell "9 contributions on September 5th." [ref=f3e881]
+                        - gridcell "9 contributions on September 12th." [ref=f3e882]
+                        - gridcell "10 contributions on September 19th." [ref=f3e883]
+                        - gridcell "12 contributions on September 26th." [ref=f3e884]
+                        - gridcell "15 contributions on October 3rd." [ref=f3e885]
+                        - gridcell "25 contributions on October 10th." [ref=f3e886]
+                        - gridcell "9 contributions on October 17th." [ref=f3e887]
+                        - gridcell "11 contributions on October 24th." [ref=f3e888]
+                        - gridcell "15 contributions on October 31st." [ref=f3e889]
+                        - gridcell "15 contributions on November 7th." [ref=f3e890]
+                        - gridcell "11 contributions on November 14th." [ref=f3e891]
+                        - gridcell "16 contributions on November 21st." [ref=f3e892]
+                        - gridcell "6 contributions on November 28th." [ref=f3e893]
+                        - gridcell "9 contributions on December 5th." [ref=f3e894]
+                        - gridcell "5 contributions on December 12th." [ref=f3e895]
+                        - gridcell "5 contributions on December 19th." [ref=f3e896]
+                        - gridcell "8 contributions on December 26th." [ref=f3e897]
+                        - gridcell "No contributions on January 2nd." [ref=f3e898]
+                        - gridcell "No contributions on January 9th." [ref=f3e899]
+                        - gridcell "1 contribution on January 16th." [ref=f3e900]
+                        - gridcell "1 contribution on January 23rd." [ref=f3e901]
+                        - gridcell "9 contributions on January 30th." [ref=f3e902]
+                        - gridcell "98 contributions on February 6th." [ref=f3e903]
+                        - gridcell "26 contributions on February 13th." [ref=f3e904]
+                        - gridcell "90 contributions on February 20th." [ref=f3e905]
+                        - gridcell "156 contributions on February 27th." [ref=f3e906]
+                        - gridcell "507 contributions on March 6th." [ref=f3e907]
+                        - gridcell "150 contributions on March 13th." [ref=f3e908]
+                        - gridcell "376 contributions on March 20th." [ref=f3e909]
+                        - gridcell "19 contributions on March 27th." [ref=f3e910]
+                        - gridcell "1214 contributions on April 3rd." [ref=f3e911]
+                        - gridcell "256 contributions on April 10th." [ref=f3e912]
+                        - gridcell "234 contributions on April 17th." [ref=f3e913]
+                        - gridcell "626 contributions on April 24th." [ref=f3e914]
+                        - gridcell "655 contributions on May 1st." [ref=f3e915]
+                        - gridcell "No contributions on May 8th." [ref=f3e916]
+                        - gridcell "159 contributions on May 15th." [ref=f3e917]
+                        - gridcell "339 contributions on May 22nd." [ref=f3e918]
+                        - gridcell "751 contributions on May 29th." [ref=f3e919]
+                        - gridcell "261 contributions on June 5th." [ref=f3e920]
+                        - gridcell "15 contributions on June 12th." [ref=f3e921]
+                        - gridcell "1765 contributions on June 19th." [ref=f3e922]
+                        - gridcell "175 contributions on June 26th." [ref=f3e923]
+                        - gridcell "34 contributions on July 3rd." [ref=f3e924]
+                        - gridcell "491 contributions on July 10th." [ref=f3e925]
+                        - gridcell "2 contributions on July 17th." [ref=f3e926]
+                        - gridcell "272 contributions on July 24th." [ref=f3e927]
+                        - gridcell "731 contributions on July 31st." [ref=f3e928]
+                        - gridcell "109 contributions on August 7th." [ref=f3e929]
+                        - gridcell [ref=f3e930]
+                      - row [ref=f3e931]:
+                        - gridcell "Saturday" [ref=f3e932]:
+                          - generic [ref=f3e934]: Sat
+                        - gridcell "5 contributions on August 16th." [ref=f3e935]
+                        - gridcell "4 contributions on August 23rd." [ref=f3e936]
+                        - gridcell "25 contributions on August 30th." [ref=f3e937]
+                        - gridcell "6 contributions on September 6th." [ref=f3e938]
+                        - gridcell "5 contributions on September 13th." [ref=f3e939]
+                        - gridcell "5 contributions on September 20th." [ref=f3e940]
+                        - gridcell "6 contributions on September 27th." [ref=f3e941]
+                        - gridcell "4 contributions on October 4th." [ref=f3e942]
+                        - gridcell "5 contributions on October 11th." [ref=f3e943]
+                        - gridcell "4 contributions on October 18th." [ref=f3e944]
+                        - gridcell "5 contributions on October 25th." [ref=f3e945]
+                        - gridcell "5 contributions on November 1st." [ref=f3e946]
+                        - gridcell "7 contributions on November 8th." [ref=f3e947]
+                        - gridcell "26 contributions on November 15th." [ref=f3e948]
+                        - gridcell "7 contributions on November 22nd." [ref=f3e949]
+                        - gridcell "2 contributions on November 29th." [ref=f3e950]
+                        - gridcell "4 contributions on December 6th." [ref=f3e951]
+                        - gridcell "6 contributions on December 13th." [ref=f3e952]
+                        - gridcell "6 contributions on December 20th." [ref=f3e953]
+                        - gridcell "6 contributions on December 27th." [ref=f3e954]
+                        - gridcell "No contributions on January 3rd." [ref=f3e955]
+                        - gridcell "No contributions on January 10th." [ref=f3e956]
+                        - gridcell "No contributions on January 17th." [ref=f3e957]
+                        - gridcell "No contributions on January 24th." [ref=f3e958]
+                        - gridcell "36 contributions on January 31st." [ref=f3e959]
+                        - gridcell "81 contributions on February 7th." [ref=f3e960]
+                        - gridcell "46 contributions on February 14th." [ref=f3e961]
+                        - gridcell "324 contributions on February 21st." [ref=f3e962]
+                        - gridcell "67 contributions on February 28th." [ref=f3e963]
+                        - gridcell "668 contributions on March 7th." [ref=f3e964]
+                        - gridcell "121 contributions on March 14th." [ref=f3e965]
+                        - gridcell "368 contributions on March 21st." [ref=f3e966]
+                        - gridcell "No contributions on March 28th." [ref=f3e967]
+                        - gridcell "1532 contributions on April 4th." [ref=f3e968]
+                        - gridcell "688 contributions on April 11th." [ref=f3e969]
+                        - gridcell "161 contributions on April 18th." [ref=f3e970]
+                        - gridcell "1520 contributions on April 25th." [ref=f3e971]
+                        - gridcell "1113 contributions on May 2nd." [ref=f3e972]
+                        - gridcell "127 contributions on May 9th." [ref=f3e973]
+                        - gridcell "771 contributions on May 16th." [ref=f3e974]
+                        - gridcell "334 contributions on May 23rd." [ref=f3e975]
+                        - gridcell "1009 contributions on May 30th." [ref=f3e976]
+                        - gridcell "964 contributions on June 6th." [ref=f3e977]
+                        - gridcell "242 contributions on June 13th." [ref=f3e978]
+                        - gridcell "1667 contributions on June 20th." [ref=f3e979]
+                        - gridcell "97 contributions on June 27th." [ref=f3e980]
+                        - gridcell "219 contributions on July 4th." [ref=f3e981]
+                        - gridcell "1085 contributions on July 11th." [ref=f3e982]
+                        - gridcell "6 contributions on July 18th." [ref=f3e983]
+                        - gridcell "242 contributions on July 25th." [ref=f3e984]
+                        - gridcell "441 contributions on August 1st." [ref=f3e985]
+                        - gridcell "76 contributions on August 8th." [ref=f3e986]
+                        - gridcell [ref=f3e987]
+                  - generic [ref=f3e988]:
+                    - link "Learn how we count contributions" [ref=f3e990] [cursor=pointer]:
+                      - /url: https://docs.github.com/articles/why-are-my-contributions-not-showing-up-on-my-profile
+                    - generic [ref=f3e991]:
+                      - generic [ref=f3e992]: Less
+                      - generic [ref=f3e993]: No contributions.
+                      - generic [ref=f3e995]: Low contributions.
+                      - generic [ref=f3e997]: Medium-low contributions.
+                      - generic [ref=f3e999]: Medium-high contributions.
+                      - generic [ref=f3e1001]: High contributions.
+                      - generic [ref=f3e1003]: More
+              - generic [ref=f3e1005]:
+                - navigation "Organizations" [ref=f3e1007]:
+                  - link "@openclaw" [ref=f3e1008] [cursor=pointer]:
+                    - /url: /vincentkoc?tab=overview&org=openclaw
+                  - link "@comet-ml" [ref=f3e1009] [cursor=pointer]:
+                    - /url: /vincentkoc?tab=overview&org=comet-ml
+                  - link "@BerriAI" [ref=f3e1010] [cursor=pointer]:
+                    - /url: /vincentkoc?tab=overview&org=BerriAI
+                  - group [ref=f3e1011]:
+                    - button "More" [ref=f3e1012] [cursor=pointer]
+                - generic [ref=f3e1013]:
+                  - generic [ref=f3e1014]:
+                    - heading "Activity overview" [level=3] [ref=f3e1015]
+                    - generic [ref=f3e1019]:
+                      - text: Contributed to
+                      - link "openclaw/openclaw" [ref=f3e1020] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: ","
+                      - link "openclaw/clownfish" [ref=f3e1021] [cursor=pointer]:
+                        - /url: /openclaw/clownfish
+                      - text: ","
+                      - link "openclaw/crabline" [ref=f3e1022] [cursor=pointer]:
+                        - /url: /openclaw/crabline
+                      - text: and 286 other repositories
+                  - generic [ref=f3e1024]:
+                    - generic: Loading
+                    - img "A graph representing vincentkoc's contributions from August 10, 2025 to August 13, 2026. The contributions are 94% commits, 6% pull requests, 0% code review, 0% issues." [ref=f3e1026]:
+                      - generic [ref=f3e1027]:
+                        - generic [ref=f3e1032]: Code review
+                        - generic [ref=f3e1034]: Issues
+                        - generic [ref=f3e1035]: 6%
+                        - generic [ref=f3e1036]: Pull requests
+                        - generic [ref=f3e1037]: 94%
+                        - generic [ref=f3e1038]: Commits
+            - generic [ref=f3e1039]:
+              - heading "Contribution activity" [level=2] [ref=f3e1040]
+              - generic [ref=f3e1042]:
+                - heading "August 2026" [level=3] [ref=f3e1043]
+                - group [ref=f3e1051]:
+                  - button [ref=f3e1052] [cursor=pointer]
+                - group [ref=f3e1063]:
+                  - button "Created 1 repository" [expanded] [ref=f3e1064] [cursor=pointer]
+                  - list [ref=f3e1071]:
+                    - listitem [ref=f3e1072]:
+                      - link "vincentkoc/opentelemetry-js" [ref=f3e1077] [cursor=pointer]:
+                        - /url: /vincentkoc/opentelemetry-js
+                      - generic [ref=f3e1078]: TypeScript
+                      - generic [ref=f3e1081]:
+                        - generic [ref=f3e1082]: This contribution was made on Aug 6
+                        - time [ref=f3e1083]: Aug 6
+                - generic [ref=f3e1088]:
+                  - generic [ref=f3e1089]:
+                    - heading [level=4] [ref=f3e1090]:
+                      - text: Created a pull request in
+                      - link "openclaw/openclaw" [ref=f3e1091] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 37 comments
+                    - link [ref=f3e1092] [cursor=pointer]:
+                      - /url: /vincentkoc?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f3e1093]: Aug 4
+                  - generic [ref=f3e1097]:
+                    - heading [level=3] [ref=f3e1098]:
+                      - 'link "fix(llama-cpp): release model memory on plugin stop" [ref=f3e1099] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/119238
+                    - paragraph [ref=f3e1101]:
+                      - text: Fixes
+                      - link "#119144" [ref=f3e1102] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/119144
+                      - text: What Problem This Solves Fixes an issue where operators using the in-process llama.cpp provider could keep a GGUF model and its nativ…
+                    - generic [ref=f3e1103]:
+                      - generic [ref=f3e1104]: +871 −218 lines changed •
+                      - text: 37 comments
+                - group [ref=f3e1116]:
+                  - button "Opened 694 other pull requests in 26 repositories" [ref=f3e1117] [cursor=pointer]
+                - group [ref=f3e1129]:
+                  - button "Reviewed 8 pull requests in 4 repositories" [expanded] [ref=f3e1130] [cursor=pointer]
+                  - generic [ref=f3e1137]:
+                    - group [ref=f3e1139]:
+                      - button "openclaw/openclaw 5 pull requests" [ref=f3e1140] [cursor=pointer]:
+                        - generic [ref=f3e1141]:
+                          - generic [ref=f3e1142]: openclaw/openclaw
+                          - generic [ref=f3e1143]: 5 pull requests
+                    - group [ref=f3e1149]:
+                      - button "openclaw/crabbox 1 pull request" [ref=f3e1150] [cursor=pointer]:
+                        - generic [ref=f3e1151]:
+                          - generic [ref=f3e1152]: openclaw/crabbox
+                          - generic [ref=f3e1153]: 1 pull request
+                    - group [ref=f3e1159]:
+                      - button "openclaw/discrawl 1 pull request" [ref=f3e1160] [cursor=pointer]:
+                        - generic [ref=f3e1161]:
+                          - generic [ref=f3e1162]: openclaw/discrawl
+                          - generic [ref=f3e1163]: 1 pull request
+                    - group [ref=f3e1169]:
+                      - button "openclaw/slacrawl 1 pull request" [ref=f3e1170] [cursor=pointer]:
+                        - generic [ref=f3e1171]:
+                          - generic [ref=f3e1172]: openclaw/slacrawl
+                          - generic [ref=f3e1173]: 1 pull request
+                - generic [ref=f3e1182]:
+                  - generic [ref=f3e1183]:
+                    - heading [level=4] [ref=f3e1184]:
+                      - text: Created an issue in
+                      - link "openclaw/openclaw" [ref=f3e1185] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 8 comments
+                    - link [ref=f3e1186] [cursor=pointer]:
+                      - /url: /vincentkoc?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f3e1187]: Aug 3
+                  - generic [ref=f3e1192]:
+                    - heading [level=3] [ref=f3e1193]:
+                      - 'link "QA: primary proof for containers and external app SDK" [ref=f3e1194] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/issues/118785
+                    - paragraph [ref=f3e1196]:
+                      - text: Scope Track primary QA proof for the 23 freshly eligible container IDs and 31 external app SDK IDs audited at
+                      - code [ref=f3e1197]: 3fa9cc209bc24fa523c4f6b476834c80ac47f0a9
+                    - generic [ref=f3e1198]: 8 comments
+                - group [ref=f3e1206]:
+                  - button "Opened 34 other issues in 5 repositories" [expanded] [ref=f3e1207] [cursor=pointer]
+                  - generic [ref=f3e1213]:
+                    - group [ref=f3e1215]:
+                      - button "openclaw/openclaw 6 open 19 closed" [ref=f3e1216] [cursor=pointer]:
+                        - generic [ref=f3e1217]:
+                          - generic [ref=f3e1218]: openclaw/openclaw
+                          - generic [ref=f3e1219]:
+                            - generic [ref=f3e1220]: "6"
+                            - text: open
+                            - generic [ref=f3e1221]: "19"
+                            - text: closed
+                    - group [ref=f3e1227]:
+                      - button "openclaw/crabbox 5 closed 1 open" [ref=f3e1228] [cursor=pointer]:
+                        - generic [ref=f3e1229]:
+                          - generic [ref=f3e1230]: openclaw/crabbox
+                          - generic [ref=f3e1231]:
+                            - generic [ref=f3e1232]: "5"
+                            - text: closed
+                            - generic [ref=f3e1233]: "1"
+                            - text: open
+                    - group [ref=f3e1239]:
+                      - button "shakkernerd/ocm 1 closed" [ref=f3e1240] [cursor=pointer]:
+                        - generic [ref=f3e1241]:
+                          - generic [ref=f3e1242]: shakkernerd/ocm
+                          - generic [ref=f3e1243]:
+                            - generic [ref=f3e1244]: "1"
+                            - text: closed
+                    - group [ref=f3e1250]:
+                      - button "openclaw/Kova 1 closed" [ref=f3e1251] [cursor=pointer]:
+                        - generic [ref=f3e1252]:
+                          - generic [ref=f3e1253]: openclaw/Kova
+                          - generic [ref=f3e1254]:
+                            - generic [ref=f3e1255]: "1"
+                            - text: closed
+                    - group [ref=f3e1261]:
+                      - button "openclaw/imsg 1 closed" [ref=f3e1262] [cursor=pointer]:
+                        - generic [ref=f3e1263]:
+                          - generic [ref=f3e1264]: openclaw/imsg
+                          - generic [ref=f3e1265]:
+                            - generic [ref=f3e1266]: "1"
+                            - text: closed
+                - generic [ref=f3e1275]:
+                  - text: 846 contributions in private repositories
+                  - generic [ref=f3e1276]: Aug 1 – Aug 12
+              - generic [ref=f3e1277]:
+                - generic: Loading
+                - button "Show more activity" [ref=f3e1279] [cursor=pointer]
+          - list [ref=f3e1282]:
+            - listitem [ref=f3e1283]:
+              - link "Contribution activity in 2026, 1 of 19" [ref=f3e1284] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2026-08-01&to=2026-08-13
+                - text: "2026"
+            - listitem [ref=f3e1285]:
+              - link "Contribution activity in 2025, 2 of 19" [ref=f3e1286] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2025-12-01&to=2025-12-31
+                - text: "2025"
+            - listitem [ref=f3e1287]:
+              - link "Contribution activity in 2024, 3 of 19" [ref=f3e1288] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2024-12-01&to=2024-12-31
+                - text: "2024"
+            - listitem [ref=f3e1289]:
+              - link "Contribution activity in 2023, 4 of 19" [ref=f3e1290] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2023-12-01&to=2023-12-31
+                - text: "2023"
+            - listitem [ref=f3e1291]:
+              - link "Contribution activity in 2022, 5 of 19" [ref=f3e1292] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2022-12-01&to=2022-12-31
+                - text: "2022"
+            - listitem [ref=f3e1293]:
+              - link "Contribution activity in 2021, 6 of 19" [ref=f3e1294] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2021-12-01&to=2021-12-31
+                - text: "2021"
+            - listitem [ref=f3e1295]:
+              - link "Contribution activity in 2020, 7 of 19" [ref=f3e1296] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2020-12-01&to=2020-12-31
+                - text: "2020"
+            - listitem [ref=f3e1297]:
+              - link "Contribution activity in 2019, 8 of 19" [ref=f3e1298] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2019-12-01&to=2019-12-31
+                - text: "2019"
+            - listitem [ref=f3e1299]:
+              - link "Contribution activity in 2018, 9 of 19" [ref=f3e1300] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2018-12-01&to=2018-12-31
+                - text: "2018"
+            - listitem [ref=f3e1301]:
+              - link "Contribution activity in 2017, 10 of 19" [ref=f3e1302] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2017-12-01&to=2017-12-31
+                - text: "2017"
+            - listitem [ref=f3e1303]:
+              - link "Contribution activity in 2016, 11 of 19" [ref=f3e1304] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2016-12-01&to=2016-12-31
+                - text: "2016"
+            - listitem [ref=f3e1305]:
+              - link "Contribution activity in 2015, 12 of 19" [ref=f3e1306] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2015-12-01&to=2015-12-31
+                - text: "2015"
+            - listitem [ref=f3e1307]:
+              - link "Contribution activity in 2014, 13 of 19" [ref=f3e1308] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2014-12-01&to=2014-12-31
+                - text: "2014"
+            - listitem [ref=f3e1309]:
+              - link "Contribution activity in 2013, 14 of 19" [ref=f3e1310] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2013-12-01&to=2013-12-31
+                - text: "2013"
+            - listitem [ref=f3e1311]:
+              - link "Contribution activity in 2012, 15 of 19" [ref=f3e1312] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2012-12-01&to=2012-12-31
+                - text: "2012"
+            - listitem [ref=f3e1313]:
+              - link "Contribution activity in 2011, 16 of 19" [ref=f3e1314] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2011-12-01&to=2011-12-31
+                - text: "2011"
+            - listitem [ref=f3e1315]:
+              - link "Contribution activity in 2010, 17 of 19" [ref=f3e1316] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2010-12-01&to=2010-12-31
+                - text: "2010"
+            - listitem [ref=f3e1317]:
+              - link "Contribution activity in 2009, 18 of 19" [ref=f3e1318] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2009-12-01&to=2009-12-31
+                - text: "2009"
+            - listitem [ref=f3e1319]:
+              - link "Contribution activity in 2008, 19 of 19" [ref=f3e1320] [cursor=pointer]:
+                - /url: /vincentkoc?tab=overview&from=2008-12-01&to=2008-12-31
+                - text: "2008"
+  - contentinfo [ref=f3e1321]:
+    - heading "Footer" [level=2] [ref=f3e1322]
+    - generic [ref=f3e1323]:
+      - generic [ref=f3e1324]:
+        - link "GitHub Homepage" [ref=f3e1325] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f3e1328]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f3e1329]:
+        - heading "Footer navigation" [level=3] [ref=f3e1330]
+        - list "Footer navigation" [ref=f3e1331]:
+          - listitem [ref=f3e1332]:
+            - link "Terms" [ref=f3e1333] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f3e1334]:
+            - link "Privacy" [ref=f3e1335] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f3e1336]:
+            - link "Security" [ref=f3e1337] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f3e1338]:
+            - link "Status" [ref=f3e1339] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f3e1340]:
+            - link "Community" [ref=f3e1341] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f3e1342]:
+            - link "Docs" [ref=f3e1343] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f3e1344]:
+            - link "Contact" [ref=f3e1345] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f3e1346]:
+            - button "Manage cookies" [ref=f3e1348] [cursor=pointer]
+          - listitem [ref=f3e1349]:
+            - button "Do not share my personal information" [ref=f3e1351] [cursor=pointer]

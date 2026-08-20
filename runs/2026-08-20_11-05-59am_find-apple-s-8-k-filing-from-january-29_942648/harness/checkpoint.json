@@ -1,0 +1,52 @@
+{
+  "version": 3,
+  "revision": 8,
+  "updatedAt": "2026-08-20T18:06:08.746Z",
+  "configuration": {
+    "taskText": "Find Apple's 8-K filing from January 29, 2026 on SEC EDGAR, download the filing document, and take a screenshot of the filing page.",
+    "model": "claude-sonnet-5",
+    "maxOutputTokens": 8192,
+    "maxContextTokens": 900000,
+    "browserProvider": "local",
+    "authenticated": true,
+    "javascriptPolicy": "allow",
+    "startUrl": "https://www.sec.gov/edgar/search/",
+    "maxInitializerAttempts": 2,
+    "maxCompletionCheckFailures": 5,
+    "budgetLimits": {
+      "maxWorkerTurns": "unbounded",
+      "maxToolCalls": "unbounded",
+      "maxModelTokens": "unbounded",
+      "maxWallTimeMs": 3600000
+    }
+  },
+  "budget": {
+    "elapsedWallTimeMs": 8498,
+    "roles": {
+      "initializer": {
+        "turns": 2,
+        "inputTokens": 40,
+        "outputTokens": 657,
+        "cacheReadInputTokens": 10298,
+        "cacheCreationInputTokens": 712,
+        "wallClockMs": 8177
+      }
+    },
+    "toolCalls": 2,
+    "toolResultBytes": 180,
+    "corrections": 0
+  },
+  "progress": {
+    "verifierCycles": 0,
+    "completionCheckFailures": 0
+  },
+  "phase": "terminal",
+  "outcome": {
+    "status": "incomplete",
+    "during": "initializing",
+    "reason": "initializer_unavailable",
+    "detail": "The contract was rejected and was not stored. Fix all of these:\n- output \"apple_8k_filing_download\" filenamePattern \"*\" matches every filename and is not a constraint; omit it or use a pattern stated by the request",
+    "finalText": "",
+    "unresolved": []
+  }
+}

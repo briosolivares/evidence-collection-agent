@@ -1,0 +1,141 @@
+founder_name,linkedin_url,cold_outreach_email
+Bing Wu,https://linkedin.com/in/binw,"Subject: Quick question about Retell AI's voice agent stack
+
+Hi Bing,
+
+I've been following Retell AI since your TechCrunch feature and I'm impressed by the sub-second response times you've achieved for human-like voice agents — going from ByteDance/TikTok product work to building infrastructure other AI voice teams rely on is a great arc.
+
+I work with companies building on top of conversational AI infrastructure and think there could be a valuable connection between what we're doing and where Retell AI is headed with contact center automation.
+
+Would you be open to a 15-minute call in the next week or two? I'd love to learn more about your roadmap and see if there's a fit.
+
+Best,
+[Your Name]"
+Todd Li,https://www.linkedin.com/in/toddli1/,"Subject: 15 minutes re: Retell AI's growth as President
+
+Hi Todd,
+
+Congrats on Retell AI's traction — building an API that lets any developer create human-like voice agents is exactly the kind of infrastructure the AI voice space needs right now. Your role steering the business side alongside Bing's product vision stood out to me.
+
+I'd love to share a bit about what we're working on and hear how you're thinking about scaling contact center partnerships this year.
+
+Could we grab 15 minutes on a call sometime this week or next?
+
+Best,
+[Your Name]"
+Evie Wang,https://linkedin.com/in/yanwang131415,"Subject: Loved Retell AI's design-led approach — 15 min call?
+
+Hi Evie,
+
+Your background as a product designer at ByteDance clearly shows in Retell AI's polish — the demo experience is one of the cleanest I've seen in the voice AI space. As CMO, I imagine you're also thinking hard about how to position Retell AI as the category matures.
+
+I'd love to connect briefly to share what we're building and explore whether there's a way to collaborate or support your growth story.
+
+Do you have 15 minutes for a quick call this week?
+
+Best,
+[Your Name]"
+Weijia Yu,https://linkedin.com/in/weijia-y-76b816194,"Subject: Question about Retell AI's ML/speech stack
+
+Hi Weijia,
+
+Your path from Meta to ObEN to Retell AI is a great fit for the hard problems you're solving in real-time speech and TTS pipelines. I'm reaching out because I think there's a relevant overlap with what we're building on the applied ML side.
+
+Would you be open to a 15-minute call to trade notes on the technical challenges of low-latency voice agents and see if there's a way we could help each other?
+
+Best,
+[Your Name]"
+Zexia Zhang,https://linkedin.com/in/zexia-zhang-171480133,"Subject: Retell AI's speech tech — quick 15-min chat?
+
+Hi Zexia,
+
+Four years leading speech translation and NLP for call analysis at Google is exactly the kind of deep expertise that makes Retell AI's low-latency voice agents possible. I'd love to learn more about the architecture decisions behind your 800ms response times.
+
+I think there could be a good reason for us to connect given the work we're doing in adjacent AI infrastructure.
+
+Would you have 15 minutes for a call in the next week or so?
+
+Best,
+[Your Name]"
+Daksh Gupta,https://linkedin.com/in/dakshg,"Subject: Greptile's approach to codebase-aware AI — 15 min?
+
+Hi Daksh,
+
+Congrats on Greptile's Series A and the v3 launch — the idea of giving LLMs full context of a codebase to catch more bugs and speed up PR reviews is a problem every engineering team feels. I liked your line about the Amazon locker, by the way.
+
+I'm reaching out because I think there's a natural connection between what we're working on and Greptile's mission to make AI code review genuinely useful at scale.
+
+Could we set up a quick 15-minute call to explore this?
+
+Best,
+[Your Name]"
+Soohoon Choi,https://linkedin.com/in/soohoonchoi,"Subject: Quick 15 min re: Greptile's CTO roadmap
+
+Hi Soohoon,
+
+As CTO of Greptile, you're tackling one of the trickiest problems in applied AI — indexing and reasoning over huge, messy codebases so LLMs can actually help. That's a hard technical bar, and it shows in the results you're getting for teams like PostHog and Raycast.
+
+I'd love to share what we're building and hear more about the technical direction of Greptile's context engine.
+
+Would you be free for a 15-minute call sometime this week?
+
+Best,
+[Your Name]"
+Vaishant Kameswaran,https://linkedin.com/in/vaishant,"Subject: Greptile + a quick 15-minute intro call
+
+Hi Vaishant,
+
+Your CS and linguistics background at Georgia Tech seems like a great combination for the natural-language-meets-code problem Greptile is solving. Millions of PR changes reviewed weekly is a serious scale milestone.
+
+I think there's a good reason for us to connect given the space we're both operating in — would you be open to a short 15-minute call to compare notes?
+
+Best,
+[Your Name]"
+Jaspar Carmichael-Jack,https://linkedin.com/in/jaspar-carmichael-jack,"Subject: Artisan's AI BDR Ava — 15-minute call?
+
+Hi Jaspar,
+
+Artisan's growth from a $2.3M pre-seed to a $35M+ raised, thousand-plus-AE enterprise deployment story is genuinely impressive — Ava sounds like one of the most complete 'AI employee' products out there for outbound sales.
+
+I'd love to learn more about how you're scaling Artisan's GTM platform and share a bit about what we're building that could be relevant to your roadmap.
+
+Do you have 15 minutes for a call in the next week or two?
+
+Best,
+[Your Name]"
+Daniel Chalef,https://linkedin.com/in/danielchalef,"Subject: Zep AI's Graphiti and temporal memory — 15 min?
+
+Hi Daniel,
+
+Graphiti hitting 20k GitHub stars in under a year says a lot about how badly the market needed a real solution for temporal knowledge graphs and agent memory. Your path from KnowledgeTree through the SparkPost/MessageBird world into Zep AI is a great founder story.
+
+I'm reaching out because I think there's a strong connection between what we're building and Zep's memory layer for LLM applications.
+
+Would you be open to a quick 15-minute call to explore this further?
+
+Best,
+[Your Name]"
+Michael Rosenfield,https://linkedin.com/in/rosenfieldmichael,"Subject: Decipher AI's QA agents — quick 15-min call?
+
+Hi Michael,
+
+Going from leading Google Maps ad formats and Pixel's premium product line to building QA agents that write and maintain E2E tests 10x faster is a compelling pivot — especially now that coding agents are shipping code faster than traditional QA can keep up.
+
+I'd love to hear more about how Decipher AI is thinking about the agentic QA space and share what we're working on.
+
+Could we find 15 minutes for a call this week or next?
+
+Best,
+[Your Name]"
+Rohan Das,https://linkedin.com/in/rohan-d,"Subject: Decipher AI's vision-based bug detection — 15 min?
+
+Hi Rohan,
+
+Rebuilding the YouTube homepage service to handle billions of daily requests is serious infrastructure experience, and it clearly informs how Decipher AI approaches reliability — using vision AI to catch bugs in live user sessions is a smart, practical approach to QA.
+
+I think there's a good fit between what we're building and Decipher's mission to keep QA in step with AI-accelerated shipping.
+
+Would you have 15 minutes for a call sometime soon?
+
+Best,
+[Your Name]"

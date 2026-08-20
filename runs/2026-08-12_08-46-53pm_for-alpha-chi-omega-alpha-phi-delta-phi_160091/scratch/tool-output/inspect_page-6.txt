@@ -1,0 +1,955 @@
+URL: https://marginalia-search.com/search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT
+Title: Massachusetts Delta Pi Beta Phi MIT - Marginalia Search
+
+- generic [active] [ref=f146e1]:
+  - link "Skip To Content" [ref=f146e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f146e3]:
+    - navigation [ref=f146e5]:
+      - generic [ref=f146e7]:
+        - link "Search" [ref=f146e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f146e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f146e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f146e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f146e13]:
+    - generic [ref=f146e15]:
+      - heading [level=1] [ref=f146e17]:
+        - link "Marginalia Search" [ref=f146e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f146e21]:
+        - textbox "Search the web!" [ref=f146e22]: Massachusetts Delta Pi Beta Phi MIT
+        - button " Search" [ref=f146e23] [cursor=pointer]:
+          - generic [ref=f146e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f146e25]:
+    - complementary [ref=f146e26]:
+      - generic [ref=f146e28]:
+        - heading " Filter" [level=2] [ref=f146e29]:
+          - generic [ref=f146e30]: 
+          - text: Filter
+        - generic [ref=f146e31]:
+          - button [ref=f146e33] [cursor=pointer]:
+            - link " All" [ref=f146e34]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e35]: 
+              - text: All
+          - button [ref=f146e37] [cursor=pointer]:
+            - link " Blogs" [ref=f146e38]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=blogosphere&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e39]: 
+              - text: Blogs
+          - button [ref=f146e41] [cursor=pointer]:
+            - link " Academia" [ref=f146e42]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=academia&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e43]: 
+              - text: Academia
+          - button [ref=f146e45] [cursor=pointer]:
+            - link " Vintage" [ref=f146e46]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=vintage&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e47]: 
+              - text: Vintage
+          - button [ref=f146e49] [cursor=pointer]:
+            - link " Small Web" [ref=f146e50]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=modern&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e51]: 
+              - text: Small Web
+          - button [ref=f146e54] [cursor=pointer]:
+            - link " Wikis" [ref=f146e55]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=wiki&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e56]: 
+              - text: Wikis
+          - button [ref=f146e58] [cursor=pointer]:
+            - link " Forums" [ref=f146e59]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=forum&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e60]: 
+              - text: Forums
+          - button [ref=f146e62] [cursor=pointer]:
+            - link " Recipes" [ref=f146e63]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=food&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e64]: 
+              - text: Recipes
+          - button [ref=f146e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f146e68]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&profile=custom&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f146e70]:
+      - generic [ref=f146e71]:
+        - heading "Results" [level=1] [ref=f146e72]
+        - generic [ref=f146e73]:
+          - generic [ref=f146e75]:
+            - generic [ref=f146e76]:
+              - generic [ref=f146e77]:
+                - generic [ref=f146e78]:
+                  - generic "Match density" [ref=f146e79]
+                  - generic [ref=f146e83]:
+                    - heading [level=2] [ref=f146e84]:
+                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f146e85] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f146e87] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                - paragraph [ref=f146e89]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+              - generic [ref=f146e90]:
+                - link "" [ref=f146e91] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f146e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+            - generic [ref=f146e95]:
+              - paragraph [ref=f146e96]: "Also from en.wikipedia.org:"
+              - list [ref=f146e97]:
+                - listitem [ref=f146e98]:
+                  - link "Phi Sigma Kappa" [ref=f146e99] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Sigma_Kappa
+                - listitem [ref=f146e100]:
+                  - link "Phi Gamma Delta" [ref=f146e101] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Gamma_Delta
+                - listitem [ref=f146e102]:
+                  - link "Phi Sigma Alpha" [ref=f146e103] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Sigma_Alpha
+                - listitem [ref=f146e104]:
+                  - link "Phi Iota Alpha" [ref=f146e105] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Iota_Alpha
+            - generic [ref=f146e106]:
+              - link "3 more" [ref=f146e108] [cursor=pointer]:
+                - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT+site%3Aen.wikipedia.org&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e110]: Wiki
+              - generic "Contains JavaScript" [ref=f146e111]: JS
+          - generic [ref=f146e113]:
+            - generic [ref=f146e114]:
+              - generic [ref=f146e115]:
+                - generic [ref=f146e116]:
+                  - generic "Match density" [ref=f146e117]
+                  - generic [ref=f146e121]:
+                    - heading [level=2] [ref=f146e122]:
+                      - link "Chapter Histories | Pi Beta Phi Fraternity For Women" [ref=f146e123] [cursor=pointer]:
+                        - /url: https://www.pibetaphi.org/history/chapter-histories
+                    - link "https://www.pibetaphi.org/history/chapter-histories" [ref=f146e125] [cursor=pointer]:
+                      - /url: https://www.pibetaphi.org/history/chapter-histories
+                - paragraph [ref=f146e127]: "Arizona Beta Arizona State University Founding Date: February 14, 1965 Arizona State University Founding Date: February 14, 1965 Installing Officers Grand President Alice Weber Mansfield (Johnson), Missouri Beta Installation of Arizona Beta The chapter wa"
+              - generic [ref=f146e128]:
+                - link "" [ref=f146e129] [cursor=pointer]:
+                  - /url: /site/www.pibetaphi.org
+                - link "" [ref=f146e131] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.pibetaphi.org/history/chapter-histories
+            - generic "Contains JavaScript" [ref=f146e135]: JS
+          - generic [ref=f146e137]:
+            - generic [ref=f146e138]:
+              - generic [ref=f146e139]:
+                - generic [ref=f146e140]:
+                  - generic "Match density" [ref=f146e141]
+                  - generic [ref=f146e145]:
+                    - heading [level=2] [ref=f146e146]:
+                      - link "Speaking in MITese | MIT Admissions" [ref=f146e147] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+                    - link "https://mitadmissions.org/blogs/entry/speaking_mitese/" [ref=f146e149] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+                - paragraph [ref=f146e151]: A language all our own. August 19, 2008 Almost every time I return home from MIT, I find myself mentally translating certain MIT concepts or words or course numbers when I’m talking to my parents or friends. Things like “I just got back from my 5.112 lect
+              - generic [ref=f146e152]:
+                - link "" [ref=f146e153] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f146e155] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/speaking_mitese/
+            - generic "Contains JavaScript" [ref=f146e159]: JS
+          - generic [ref=f146e161]:
+            - generic [ref=f146e162]:
+              - generic [ref=f146e163]:
+                - generic [ref=f146e164]:
+                  - generic "Match density" [ref=f146e165]
+                  - generic [ref=f146e169]:
+                    - heading [level=2] [ref=f146e170]:
+                      - link "B I O G R A P H I C A L D I R E C T O R Y O F T H E U N I T E D S T A T E S C O N G R E S S 1 7 7 4 – 2 0 0 5 T H E C O N T I..." [ref=f146e171] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                    - generic [ref=f146e172]:
+                      - generic "PDF" [ref=f146e173]: 
+                      - link "https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf" [ref=f146e174] [cursor=pointer]:
+                        - /url: https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+                - paragraph [ref=f146e176]: ington as President; reelected in 1792 and served from April ADAMS, Parmenio, a Representative from New York; 21, 1789, to March 3, 1797; elected President of the United born in Hartford, Conn., September 9, 1776; attended the States and served from March
+              - generic [ref=f146e177]:
+                - link "" [ref=f146e178] [cursor=pointer]:
+                  - /url: /site/www.govinfo.gov
+                - link "" [ref=f146e180] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.govinfo.gov/content/pkg/GPO-CDOC-108hdoc222/pdf/GPO-CDOC-108hdoc222.pdf
+            - generic [ref=f146e182]: PDF File
+          - generic [ref=f146e186]:
+            - generic [ref=f146e187]:
+              - generic [ref=f146e188]:
+                - generic [ref=f146e189]:
+                  - generic "Match density" [ref=f146e190]
+                  - generic [ref=f146e194]:
+                    - heading [level=2] [ref=f146e195]:
+                      - link "Sep./Oct. '08 Obituaries – Cornell Alumni Magazine" [ref=f146e196] [cursor=pointer]:
+                        - /url: https://cornellalumnimagazine.com/alumni-deaths-6-2/
+                    - link "https://cornellalumnimagazine.com/alumni-deaths-6-2/" [ref=f146e198] [cursor=pointer]:
+                      - /url: https://cornellalumnimagazine.com/alumni-deaths-6-2/
+                - paragraph [ref=f146e200]: "'25 BA—Arthur E. Kern of Caledonia, MI, January 8, 1998. '26 BA—Catherine Whitehill Fischer of Cupertino, CA, March 28, 2008; active in alumni affairs. Kappa Alpha Theta. '30—Ruth Burnside Schmelzer of Coral Gables, FL, February 3, 2002. '31 BCE—Albert J."
+              - generic [ref=f146e201]:
+                - link "" [ref=f146e202] [cursor=pointer]:
+                  - /url: /site/cornellalumnimagazine.com
+                - link "" [ref=f146e204] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://cornellalumnimagazine.com/alumni-deaths-6-2/
+            - generic "Contains JavaScript" [ref=f146e208]: JS
+          - generic [ref=f146e210]:
+            - generic [ref=f146e211]:
+              - generic [ref=f146e212]:
+                - generic [ref=f146e213]:
+                  - generic "Match density" [ref=f146e214]
+                  - generic [ref=f146e218]:
+                    - heading [level=2] [ref=f146e219]:
+                      - link "December 2021 - Cornellians | Cornell University" [ref=f146e220] [cursor=pointer]:
+                        - /url: https://alumni.cornell.edu/cornellians/memoriam-december-2021/
+                    - link "https://alumni.cornell.edu/cornellians/memoriam-december-2021/" [ref=f146e222] [cursor=pointer]:
+                      - /url: https://alumni.cornell.edu/cornellians/memoriam-december-2021/
+                - paragraph [ref=f146e224]: The University recently learned of the passing of these Cornellians ’37 BEE—Wesley J. Gilson Jr. of Niskayuna, NY, June 15, 2004; manager, General Electric; veteran; member, Lions Club; active in community, professional, and alumni affairs. Phi Sigma Kapp
+              - generic [ref=f146e225]:
+                - link "" [ref=f146e226] [cursor=pointer]:
+                  - /url: /site/alumni.cornell.edu
+                - link "" [ref=f146e228] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alumni.cornell.edu/cornellians/memoriam-december-2021/
+            - generic [ref=f146e230]:
+              - paragraph [ref=f146e231]: "Also from alumni.cornell.edu:"
+              - list [ref=f146e232]:
+                - listitem [ref=f146e233]:
+                  - link "September 2022 - Cornellians | Cornell University" [ref=f146e234] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-september-2022/
+                - listitem [ref=f146e235]:
+                  - link "May 2025 - Cornellians | Cornell University" [ref=f146e236] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-may-2025/
+                - listitem [ref=f146e237]:
+                  - link "February 2024 - Cornellians | Cornell University" [ref=f146e238] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-february-2024/
+                - listitem [ref=f146e239]:
+                  - link "July 2022 - Cornellians | Cornell University" [ref=f146e240] [cursor=pointer]:
+                    - /url: https://alumni.cornell.edu/cornellians/memoriam-july-2022/
+            - generic [ref=f146e241]:
+              - link "18 more" [ref=f146e243] [cursor=pointer]:
+                - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT+site%3Aalumni.cornell.edu&sst=SE-4ab19034a19c98b8
+              - generic "Contains JavaScript" [ref=f146e245]: JS
+          - generic [ref=f146e247]:
+            - generic [ref=f146e248]:
+              - generic [ref=f146e249]:
+                - generic [ref=f146e250]:
+                  - generic "Match density" [ref=f146e251]
+                  - generic [ref=f146e255]:
+                    - heading [level=2] [ref=f146e256]:
+                      - link "Fraternity History & More - Page 33 of 167 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f146e257] [cursor=pointer]:
+                        - /url: https://www.franbecque.com/page/33/
+                    - link "https://www.franbecque.com/page/33/" [ref=f146e259] [cursor=pointer]:
+                      - /url: https://www.franbecque.com/page/33/
+                - paragraph [ref=f146e261]: Posted onby Phi Gamma Delta was founded on May 1, 1848. John Templeton McCarty, Samuel Beatty Wilson, James Elliott, Daniel Webster Crofts, Ellis Bailey Gregg and Naaman Fletcher – the Immortal Six – were students at Jefferson College in Canonsburg, Penns
+              - generic [ref=f146e262]:
+                - link "" [ref=f146e263] [cursor=pointer]:
+                  - /url: /site/www.franbecque.com
+                - link "" [ref=f146e265] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.franbecque.com/page/33/
+            - generic [ref=f146e267]:
+              - paragraph [ref=f146e268]: "Also from www.franbecque.com:"
+              - list [ref=f146e269]:
+                - listitem [ref=f146e270]:
+                  - link "Fraternity History & More - Page 61 of 166 - Fraternity/Sorority Historian Fran Becque, Ph.D., shares stories connecting the ..." [ref=f146e271] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/page/61/
+                - listitem [ref=f146e272]:
+                  - link "Park Valentine Perkins on Theta Chi's Founders' Day - Fraternity History & MoreFraternity History & More" [ref=f146e273] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/park-valentine-perkins-on-theta-chis-founders-day/
+                - listitem [ref=f146e274]:
+                  - link "Happy Founders' Day, Theta Chi - Fraternity History & MoreFraternity History & More" [ref=f146e275] [cursor=pointer]:
+                    - /url: https://www.franbecque.com/happy-founders-day-theta-chi/
+            - generic "Contains JavaScript" [ref=f146e278]: JS
+          - generic [ref=f146e280]:
+            - generic [ref=f146e281]:
+              - generic [ref=f146e282]:
+                - generic [ref=f146e283]:
+                  - generic "Match density" [ref=f146e284]
+                  - generic [ref=f146e288]:
+                    - heading [level=2] [ref=f146e289]:
+                      - link "Hazing Death Statistics 2026" [ref=f146e290] [cursor=pointer]:
+                        - /url: https://zipdo.co/hazing-death-statistics/
+                    - generic [ref=f146e291]:
+                      - text: 2026-02-27 ·
+                      - link "https://zipdo.co/hazing-death-statistics/" [ref=f146e292] [cursor=pointer]:
+                        - /url: https://zipdo.co/hazing-death-statistics/
+                - paragraph [ref=f146e294]: Hazing deaths produce an average of two to three fatalities in the US every year. Nearly every documented case involves alcohol. These grim statistics are drawn from a vast pool of underreported and often concealed incidents.
+              - generic [ref=f146e295]:
+                - link "" [ref=f146e296] [cursor=pointer]:
+                  - /url: /site/zipdo.co
+                - link "" [ref=f146e298] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://zipdo.co/hazing-death-statistics/
+            - generic "Contains JavaScript" [ref=f146e302]: JS
+          - generic [ref=f146e304]:
+            - generic [ref=f146e305]:
+              - generic [ref=f146e306]:
+                - generic [ref=f146e307]:
+                  - generic "Match density" [ref=f146e308]
+                  - generic [ref=f146e312]:
+                    - heading [level=2] [ref=f146e313]:
+                      - link "Menu" [ref=f146e314] [cursor=pointer]:
+                        - /url: https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+                    - generic [ref=f146e315]:
+                      - generic "PDF" [ref=f146e316]: 
+                      - link "https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content" [ref=f146e317] [cursor=pointer]:
+                        - /url: https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+                - paragraph [ref=f146e319]: University Honors, and Italian that may count toward Curriculum for Liberal Education and major requirements. Students may participate in semester-long programs in the fall and spring or short-term programs in the summer. Virginia Tech also has a growing
+              - generic [ref=f146e320]:
+                - link "" [ref=f146e321] [cursor=pointer]:
+                  - /url: /site/vtechworks.lib.vt.edu
+                - link "" [ref=f146e323] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://vtechworks.lib.vt.edu/server/api/core/bitstreams/e078bb6e-18fd-42c9-9241-6b13a90ca9ec/content
+            - generic [ref=f146e325]: PDF File
+          - generic [ref=f146e329]:
+            - generic [ref=f146e330]:
+              - generic [ref=f146e331]:
+                - generic [ref=f146e332]:
+                  - generic "Match density" [ref=f146e333]
+                  - generic [ref=f146e337]:
+                    - heading [level=2] [ref=f146e338]:
+                      - link "VINCI 2017 - InfoVis:Wiki" [ref=f146e339] [cursor=pointer]:
+                        - /url: https://infovis-wiki.net/wiki/VINCI_2017
+                    - link "https://infovis-wiki.net/wiki/VINCI_2017" [ref=f146e341] [cursor=pointer]:
+                      - /url: https://infovis-wiki.net/wiki/VINCI_2017
+                - paragraph [ref=f146e343]: ================================================ VINCI 2017 The 10th International Symposium on Visual Information Communication and Interaction Bangkok, Thailand, 14-16 August 2017 Paper submission deadline 28 April 2017 vinci-conf.org ==================
+              - generic [ref=f146e344]:
+                - link "" [ref=f146e345] [cursor=pointer]:
+                  - /url: /site/infovis-wiki.net
+                - link "" [ref=f146e347] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://infovis-wiki.net/wiki/VINCI_2017
+            - generic [ref=f146e349]:
+              - generic [ref=f146e351]: Wiki
+              - generic "Contains JavaScript" [ref=f146e352]: JS
+          - generic [ref=f146e354]:
+            - generic [ref=f146e355]:
+              - generic [ref=f146e356]:
+                - generic [ref=f146e357]:
+                  - generic "Match density" [ref=f146e358]
+                  - generic [ref=f146e362]:
+                    - heading [level=2] [ref=f146e363]:
+                      - link "Nick Bushak | The Tech" [ref=f146e364] [cursor=pointer]:
+                        - /url: https://thetech.com/authors/nick-bushak
+                    - link "https://thetech.com/authors/nick-bushak" [ref=f146e366] [cursor=pointer]:
+                      - /url: https://thetech.com/authors/nick-bushak
+                - paragraph [ref=f146e368]: By Jun. 4, 2010 An investigation by the Interfraternity Council has implicated Delta Tau Delta in the incident of a prospective student who became unconscious after consuming too much alcohol during Campus Preview Weekend. The IFC’s ruling imposes a numbe
+              - generic [ref=f146e369]:
+                - link "" [ref=f146e370] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f146e372] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/authors/nick-bushak
+            - generic "Contains JavaScript" [ref=f146e376]: JS
+          - generic [ref=f146e378]:
+            - generic [ref=f146e379]:
+              - generic [ref=f146e380]:
+                - generic [ref=f146e381]:
+                  - generic "Match density" [ref=f146e382]
+                  - generic [ref=f146e386]:
+                    - heading [level=2] [ref=f146e387]:
+                      - link "Boston University - Alchetron, The Free Social Encyclopedia" [ref=f146e388] [cursor=pointer]:
+                        - /url: https://alchetron.com/Boston-University
+                    - link "https://alchetron.com/Boston-University" [ref=f146e390] [cursor=pointer]:
+                      - /url: https://alchetron.com/Boston-University
+                - paragraph [ref=f146e392]: Updated on Jan 24, 2024 Edit Like Comment Share Sign in Type Private – Research President Robert A. Brown Academic staff 3,884 (2015) Acceptance rate 29% (2016) Total enrollment 32,551 (2015) Mascot Rhett the Boston Terrier Established 1839 Provost Jean M
+              - generic [ref=f146e393]:
+                - link "" [ref=f146e394] [cursor=pointer]:
+                  - /url: /site/alchetron.com
+                - link "" [ref=f146e396] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://alchetron.com/Boston-University
+            - generic [ref=f146e398]:
+              - paragraph [ref=f146e399]: "Also from alchetron.com:"
+              - list [ref=f146e400]:
+                - listitem [ref=f146e401]:
+                  - link "Brown University - Alchetron, The Free Social Encyclopedia" [ref=f146e402] [cursor=pointer]:
+                    - /url: https://alchetron.com/Brown-University
+            - generic "Contains JavaScript" [ref=f146e405]: JS
+          - generic [ref=f146e407]:
+            - generic [ref=f146e408]:
+              - generic [ref=f146e409]:
+                - generic [ref=f146e410]:
+                  - generic "Match density" [ref=f146e411]
+                  - generic [ref=f146e415]:
+                    - heading [level=2] [ref=f146e416]:
+                      - 'link "The 10 Best Fraternities in the US: A Guide for Prospective Members | AdmissionSight" [ref=f146e417] [cursor=pointer]':
+                        - /url: https://admissionsight.com/best-fraternities/
+                    - generic [ref=f146e418]:
+                      - text: 2026-06-05 ·
+                      - link "https://admissionsight.com/best-fraternities/" [ref=f146e419] [cursor=pointer]:
+                        - /url: https://admissionsight.com/best-fraternities/
+                - paragraph [ref=f146e421]: Fraternities have been part of American college life for nearly two centuries. Today, operate through 6,100 chapters on 800 campuses, with 380,000 undergraduate members and 4.2 million alumni. Each year, hundreds of thousands of college men go through rus
+              - generic [ref=f146e422]:
+                - link "" [ref=f146e423] [cursor=pointer]:
+                  - /url: /site/admissionsight.com
+                - link "" [ref=f146e425] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://admissionsight.com/best-fraternities/
+            - generic "Contains JavaScript" [ref=f146e429]: JS
+          - generic [ref=f146e431]:
+            - generic [ref=f146e432]:
+              - generic [ref=f146e433]:
+                - generic [ref=f146e434]:
+                  - generic "Match density" [ref=f146e435]
+                  - generic [ref=f146e439]:
+                    - heading [level=2] [ref=f146e440]:
+                      - link "yfl 11 S 0mmMl" [ref=f146e441] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/c6f6632c-396f-4eba-8647-ffa43fa0f63f/content
+                    - generic [ref=f146e442]:
+                      - generic "PDF" [ref=f146e443]: 
+                      - link "https://digitalcollections.willamette.edu/server/api/core/bitstreams/c6f6632c-396f-4eba-8647-ffa43fa0f63f/content" [ref=f146e444] [cursor=pointer]:
+                        - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/c6f6632c-396f-4eba-8647-ffa43fa0f63f/content
+                - paragraph [ref=f146e446]: Vol. LXXI Salem, Oregon September 20, 1963 No. 3 ( In Tuesday's election the Treasurer. The Sergeant at for a compromise. The com- K Freshman class voted against Arms for the two top classes promise was chosen. the present system of rooking. are Senior We
+              - generic [ref=f146e447]:
+                - link "" [ref=f146e448] [cursor=pointer]:
+                  - /url: /site/digitalcollections.willamette.edu
+                - link "" [ref=f146e450] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://digitalcollections.willamette.edu/server/api/core/bitstreams/c6f6632c-396f-4eba-8647-ffa43fa0f63f/content
+            - generic [ref=f146e452]:
+              - paragraph [ref=f146e453]: "Also from digitalcollections.willamette.edu:"
+              - list [ref=f146e454]:
+                - listitem [ref=f146e455]:
+                  - generic "PDF": 
+                  - link "Polly IPoBfloek Wilms May (Ijpe.eim ISleeitlim Queen Polly Will Reign Next Weekend" [ref=f146e456] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/a1d7fc6b-9700-4f59-b426-049ba0a7a036/content
+                - listitem [ref=f146e457]:
+                  - generic "PDF": 
+                  - link "Rules Electi sis unvoiio" [ref=f146e458] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/0312ebaa-f7f0-4bc1-8728-6eb11516d292/content
+                - listitem [ref=f146e459]:
+                  - generic "PDF": 
+                  - link "- IT" [ref=f146e460] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/021857b9-fb45-4e1b-b98b-605e1931f833/content
+                - listitem [ref=f146e461]:
+                  - generic "PDF": 
+                  - link "Cole" [ref=f146e462] [cursor=pointer]:
+                    - /url: https://digitalcollections.willamette.edu/server/api/core/bitstreams/ad959c71-f222-41ed-ab3a-11b2ce81d0c9/content
+            - generic [ref=f146e463]:
+              - link "4 more" [ref=f146e465] [cursor=pointer]:
+                - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT+site%3Adigitalcollections.willamette.edu&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e467]: PDF File
+          - generic [ref=f146e469]:
+            - generic [ref=f146e470]:
+              - generic [ref=f146e471]:
+                - generic [ref=f146e472]:
+                  - generic "Match density" [ref=f146e473]
+                  - generic [ref=f146e477]:
+                    - heading [level=2] [ref=f146e478]:
+                      - link "VINCI' 2017 Call for Paper - Paper submission deadline extended to - Infovis - infovis.org" [ref=f146e479] [cursor=pointer]:
+                        - /url: https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+                    - link "https://www.infovis.org/archives/list/infovis@infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/" [ref=f146e481] [cursor=pointer]:
+                      - /url: https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+                - paragraph [ref=f146e483]: 15 Mar 2017 15 Mar '17 8:51 p.m. VINCI 2017 The 10th International Symposium on Visual Information Communication and Interaction Bangkok, Thailand, 14-16 August 2017 Paper submission deadline extended to 9 April 2017 vinci-conf.org Visual communication th
+              - generic [ref=f146e484]:
+                - link "" [ref=f146e485] [cursor=pointer]:
+                  - /url: /site/www.infovis.org
+                - link "" [ref=f146e487] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.infovis.org/archives/list/infovis%40infovis.org/thread/UONKAY5L43XORA7ILCVCVXRKGT4IAAK4/
+            - generic [ref=f146e489]:
+              - paragraph [ref=f146e490]: "Also from www.infovis.org:"
+              - list [ref=f146e491]:
+                - listitem [ref=f146e492]:
+                  - link "March 2017 - Infovis - infovis.org" [ref=f146e493] [cursor=pointer]:
+                    - /url: https://www.infovis.org/archives/list/infovis%40infovis.org/2017/3/
+            - generic "Contains JavaScript" [ref=f146e496]: JS
+          - generic [ref=f146e498]:
+            - generic [ref=f146e499]:
+              - generic [ref=f146e500]:
+                - generic [ref=f146e501]:
+                  - generic "Match density" [ref=f146e502]
+                  - generic [ref=f146e506]:
+                    - heading [level=2] [ref=f146e507]:
+                      - link "Spring 2018 Class Notes | Ohio Wesleyan University" [ref=f146e508] [cursor=pointer]:
+                        - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+                    - link "https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/" [ref=f146e510] [cursor=pointer]:
+                      - /url: https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+                - paragraph [ref=f146e512]: Mary Laning Stewart ’39, of Norwalk, Ohio, turned 100 on Dec. 21, a day that the mayor of Norwalk proclaimed “Mary Laning Stewart Day.” William Farragher ’49, a steel industry expert, gave a presentation in January at the library in Boardman, Ohio, about
+              - generic [ref=f146e513]:
+                - link "" [ref=f146e514] [cursor=pointer]:
+                  - /url: /site/www.owu.edu
+                - link "" [ref=f146e516] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.owu.edu/alumni-family-friends/owu-magazine/spring-2018/spring-2018-class-notes/
+            - generic "Contains JavaScript" [ref=f146e520]: JS
+          - generic [ref=f146e522]:
+            - generic [ref=f146e523]:
+              - generic [ref=f146e524]:
+                - generic [ref=f146e525]:
+                  - generic "Match density" [ref=f146e526]
+                  - generic [ref=f146e530]:
+                    - heading [level=2] [ref=f146e531]:
+                      - link "Fraternities | Archives & Special Collections" [ref=f146e532] [cursor=pointer]:
+                        - /url: https://archives.dickinson.edu/dickinsonian-organizations/fraternities
+                    - link "https://archives.dickinson.edu/dickinsonian-organizations/fraternities" [ref=f146e534] [cursor=pointer]:
+                      - /url: https://archives.dickinson.edu/dickinsonian-organizations/fraternities
+                - paragraph [ref=f146e536]: Professor Marvin Minsky of the Massachusetts Institute of Technology (MIT) receives the Priestley Award and gives a lecture on artificial intelligence. Dickinson moves to improve its financial aid program with the newly conceived Grant Guarantee Plan. Art
+              - generic [ref=f146e537]:
+                - link "" [ref=f146e538] [cursor=pointer]:
+                  - /url: /site/archives.dickinson.edu
+                - link "" [ref=f146e540] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://archives.dickinson.edu/dickinsonian-organizations/fraternities
+            - generic [ref=f146e542]:
+              - paragraph [ref=f146e543]: "Also from archives.dickinson.edu:"
+              - list [ref=f146e544]:
+                - listitem [ref=f146e545]:
+                  - link "Sororities | Archives & Special Collections" [ref=f146e546] [cursor=pointer]:
+                    - /url: https://archives.dickinson.edu/dickinsonian-organizations/sororities
+            - generic "Contains JavaScript" [ref=f146e549]: JS
+          - generic [ref=f146e551]:
+            - generic [ref=f146e552]:
+              - generic [ref=f146e553]:
+                - generic [ref=f146e554]:
+                  - generic "Match density" [ref=f146e555]
+                  - generic [ref=f146e559]:
+                    - heading [level=2] [ref=f146e560]:
+                      - link "PROCEEDINGS OF" [ref=f146e561] [cursor=pointer]:
+                        - /url: https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+                    - generic [ref=f146e562]:
+                      - generic "PDF" [ref=f146e563]: 
+                      - link "https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25" [ref=f146e564] [cursor=pointer]:
+                        - /url: https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+                - paragraph [ref=f146e566]: shown in relation to the reference system simulations with compressor capacity control is a purposeful with the R-744-based air conditioning systems without solution. For this reason a detailed model of an R-744 the refrigerant compressor capacity control
+              - generic [ref=f146e567]:
+                - link "" [ref=f146e568] [cursor=pointer]:
+                  - /url: /site/ecp.ep.liu.se
+                - link "" [ref=f146e570] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ecp.ep.liu.se/index.php/modelica/issue/download/28/25
+            - generic [ref=f146e572]:
+              - paragraph [ref=f146e573]: "Also from ecp.ep.liu.se:"
+              - list [ref=f146e574]:
+                - listitem [ref=f146e575]:
+                  - generic "PDF": 
+                  - link "THE AMERICAN MODELICA CONFERENCE 2020 MARCH 23–25 | UNIVERSITY OF COLORADO BOULDER | WWW.MODELICA.ORG" [ref=f146e576] [cursor=pointer]:
+                    - /url: https://ecp.ep.liu.se/index.php/modelica/issue/download/30/27
+            - generic [ref=f146e577]: PDF File
+          - generic [ref=f146e581]:
+            - generic [ref=f146e582]:
+              - generic [ref=f146e583]:
+                - generic [ref=f146e584]:
+                  - generic "Match density" [ref=f146e585]
+                  - generic [ref=f146e589]:
+                    - heading [level=2] [ref=f146e590]:
+                      - link "Notable Brothers - Zeta Beta Tau" [ref=f146e591] [cursor=pointer]:
+                        - /url: https://zbt.org/about-zbt/notable-brothers/
+                    - link "https://zbt.org/about-zbt/notable-brothers/" [ref=f146e593] [cursor=pointer]:
+                      - /url: https://zbt.org/about-zbt/notable-brothers/
+                - paragraph [ref=f146e595]: Walter Annenberg, Zeta of Phi Sigma Delta (University of Pennsylvania) 1928 Founder/Publisher, TV Guide; Former Ambassador to Great Britain Armand “Army” Archerd, Alpha Rho (University of California – Los Angeles) 1941 Columnist, Daily Variety Lawrence S.
+              - generic [ref=f146e596]:
+                - link "" [ref=f146e597] [cursor=pointer]:
+                  - /url: /site/zbt.org
+                - link "" [ref=f146e599] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://zbt.org/about-zbt/notable-brothers/
+            - generic [ref=f146e601]:
+              - paragraph [ref=f146e602]: "Also from zbt.org:"
+              - list [ref=f146e603]:
+                - listitem [ref=f146e604]:
+                  - link "Announcing 2021 ZBT Special Awards - Zeta Beta Tau" [ref=f146e605] [cursor=pointer]:
+                    - /url: https://zbt.org/zbttoday/announcing-2021-zbt-awards/
+            - generic "Contains JavaScript" [ref=f146e608]: JS
+          - generic [ref=f146e610]:
+            - generic [ref=f146e611]:
+              - generic [ref=f146e612]:
+                - generic [ref=f146e613]:
+                  - generic "Match density" [ref=f146e614]
+                  - generic [ref=f146e618]:
+                    - heading [level=2] [ref=f146e619]:
+                      - link "Crime Alerts & Timely Warnings | MIT Police" [ref=f146e620] [cursor=pointer]:
+                        - /url: https://police.mit.edu/timely-warnings
+                    - link "https://police.mit.edu/timely-warnings" [ref=f146e622] [cursor=pointer]:
+                      - /url: https://police.mit.edu/timely-warnings
+                - paragraph [ref=f146e624]: On the morning of June 20, 2026, MIT Police responded to two separate calls at NW86, Sidney-Pacific residence hall at 70 Pacific Street in Cambridge, MA. Two victims on different floors reported property missing from their units. One victim reported the t
+              - generic [ref=f146e625]:
+                - link "" [ref=f146e626] [cursor=pointer]:
+                  - /url: /site/police.mit.edu
+                - link "" [ref=f146e628] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://police.mit.edu/timely-warnings
+            - generic "Contains JavaScript" [ref=f146e632]: JS
+          - generic [ref=f146e634]:
+            - generic [ref=f146e635]:
+              - generic [ref=f146e636]:
+                - generic [ref=f146e637]:
+                  - generic "Match density" [ref=f146e638]
+                  - generic [ref=f146e642]:
+                    - heading [level=2] [ref=f146e643]:
+                      - link "Joseph Bordogna - Engineering and Technology History Wiki" [ref=f146e644] [cursor=pointer]:
+                        - /url: https://ethw.org/Joseph_Bordogna
+                    - generic [ref=f146e645]:
+                      - text: 2025-03-03 ·
+                      - link "https://ethw.org/Joseph_Bordogna" [ref=f146e646] [cursor=pointer]:
+                        - /url: https://ethw.org/Joseph_Bordogna
+                - paragraph [ref=f146e648]: Joseph Bordogna Joseph Bordogna Birthdate 1933/03/22 Birthplace Scranton, Pennsylvania Death date 2019/11/25 Associated organizations National Science Foundation Awards IEEE James H. Mulligan, Jr. Education Medal President of IEEE 1998 Joseph Bordogna, IE
+              - generic [ref=f146e649]:
+                - link "" [ref=f146e650] [cursor=pointer]:
+                  - /url: /site/ethw.org
+                - link "" [ref=f146e652] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ethw.org/Joseph_Bordogna
+            - generic [ref=f146e654]:
+              - generic [ref=f146e656]: Wiki
+              - generic "Contains JavaScript" [ref=f146e657]: JS
+          - generic [ref=f146e659]:
+            - generic [ref=f146e660]:
+              - generic [ref=f146e661]:
+                - generic [ref=f146e662]:
+                  - generic "Match density" [ref=f146e663]
+                  - generic [ref=f146e667]:
+                    - heading [level=2] [ref=f146e668]:
+                      - link "Seita's Place" [ref=f146e669] [cursor=pointer]:
+                        - /url: https://danieltakeshi.github.io/page2/
+                    - link "https://danieltakeshi.github.io/page2/" [ref=f146e671] [cursor=pointer]:
+                      - /url: https://danieltakeshi.github.io/page2/
+                - paragraph [ref=f146e673]: subscribe or by Aug 15, 2021 Back in May, I gave , which is the second-to-last major milestone in getting a PhD. The last one is actually writing it. I think most EECS PhD students give their talk and then file in the written dissertation a few days after
+              - generic [ref=f146e674]:
+                - link "" [ref=f146e675] [cursor=pointer]:
+                  - /url: /site/danieltakeshi.github.io
+                - link "" [ref=f146e677] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://danieltakeshi.github.io/page2/
+            - generic "Contains JavaScript" [ref=f146e681]: JS
+          - generic [ref=f146e683]:
+            - generic [ref=f146e684]:
+              - generic [ref=f146e685]:
+                - generic [ref=f146e686]:
+                  - generic "Match density" [ref=f146e687]
+                  - generic [ref=f146e691]:
+                    - heading [level=2] [ref=f146e692]:
+                      - link "Graduate School" [ref=f146e693] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+                    - generic [ref=f146e694]:
+                      - generic "PDF" [ref=f146e695]: 
+                      - link "https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf" [ref=f146e696] [cursor=pointer]:
+                        - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+                - paragraph [ref=f146e698]: 136 Accounting and income tax provisions regarding tributable net income and income the definition of corporation vs. in respect of a decedent. Taxation association and limited liability company issues and how they A 610 Estate Planning affect corporation
+              - generic [ref=f146e699]:
+                - link "" [ref=f146e700] [cursor=pointer]:
+                  - /url: /site/www.newhaven.edu
+                - link "" [ref=f146e702] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2003-2005.pdf
+            - generic [ref=f146e704]:
+              - paragraph [ref=f146e705]: "Also from www.newhaven.edu:"
+              - list [ref=f146e706]:
+                - listitem [ref=f146e707]:
+                  - generic "PDF": 
+                  - link "Undergraduate Catalog 2004-2006" [ref=f146e708] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2004-2006.pdf
+                - listitem [ref=f146e709]:
+                  - generic "PDF": 
+                  - link "University of New Haven Graduate School Catalog 2009–2011" [ref=f146e710] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2009-2011.pdf
+                - listitem [ref=f146e711]:
+                  - generic "PDF": 
+                  - link "university of new haven Graduate School" [ref=f146e712] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/graduate-catalog_2005-2007.pdf
+                - listitem [ref=f146e713]:
+                  - generic "PDF": 
+                  - link "U N I V E R S I T Y O F N E W H A V E N" [ref=f146e714] [cursor=pointer]:
+                    - /url: https://www.newhaven.edu/_resources/documents/academics/catalog/undergraduate-catalog_2006-2008.pdf
+            - generic [ref=f146e715]:
+              - link "1 more" [ref=f146e717] [cursor=pointer]:
+                - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT+site%3Awww.newhaven.edu&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e719]: PDF File
+          - generic [ref=f146e722]:
+            - generic [ref=f146e723]:
+              - generic [ref=f146e724]:
+                - generic "Match density" [ref=f146e725]
+                - generic [ref=f146e729]:
+                  - heading [level=2] [ref=f146e730]:
+                    - link "Computer Pioneers - Grace Brewster Murray Hopper" [ref=f146e731] [cursor=pointer]:
+                      - /url: https://history.computer.org/pioneers/hopper.html
+                  - link "https://history.computer.org/pioneers/hopper.html" [ref=f146e733] [cursor=pointer]:
+                    - /url: https://history.computer.org/pioneers/hopper.html
+              - paragraph [ref=f146e735]: Born December 17, 1906, New York City; died January 1, 1992, Arlington, Va.; Rear Admiral, US Navy; developer of programming technology for the Harvard Mark I [Known within IBM as the Automatic Sequence Controlled Calculator (ASCC).] and the Univac I, ear
+            - generic [ref=f146e736]:
+              - link "" [ref=f146e737] [cursor=pointer]:
+                - /url: /site/history.computer.org
+              - link "" [ref=f146e739] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/https://history.computer.org/pioneers/hopper.html
+          - generic [ref=f146e742]:
+            - generic [ref=f146e743]:
+              - generic [ref=f146e744]:
+                - generic [ref=f146e745]:
+                  - generic "Match density" [ref=f146e746]
+                  - generic [ref=f146e750]:
+                    - heading [level=2] [ref=f146e751]:
+                      - link "Inessential LATEX ∗" [ref=f146e752] [cursor=pointer]:
+                        - /url: https://stuff.mit.edu/sipb/ilatex
+                    - generic [ref=f146e753]:
+                      - generic "PDF" [ref=f146e754]: 
+                      - link "https://stuff.mit.edu/sipb/ilatex" [ref=f146e755] [cursor=pointer]:
+                        - /url: https://stuff.mit.edu/sipb/ilatex
+                - paragraph [ref=f146e757]: Inessential LATEX 1 Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 1.1 What is LATEX ? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1 1.2 LATEX on Athena . . . . . . . . . . . . . .
+              - generic [ref=f146e758]:
+                - link "" [ref=f146e759] [cursor=pointer]:
+                  - /url: /site/stuff.mit.edu
+                - link "" [ref=f146e761] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://stuff.mit.edu/sipb/ilatex
+            - generic [ref=f146e763]: PDF File
+      - generic [ref=f146e766]:
+        - link "1" [ref=f146e767] [cursor=pointer]:
+          - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&sst=SE-4ab19034a19c98b8
+        - link "2" [ref=f146e768] [cursor=pointer]:
+          - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&page=2&sst=SE-4ab19034a19c98b8
+        - link "3" [ref=f146e769] [cursor=pointer]:
+          - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&page=3&sst=SE-4ab19034a19c98b8
+    - complementary [ref=f146e770]:
+      - text: 
+      - generic [ref=f146e772]:
+        - heading " Search Settings" [level=2] [ref=f146e773]:
+          - generic [ref=f146e774]: 
+          - text: Search Settings
+        - generic [ref=f146e775]:
+          - button [ref=f146e777] [cursor=pointer]:
+            - link " Search In Title" [ref=f146e778]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&searchTitle=title&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e779]: 
+              - generic [ref=f146e780]: Search In Title
+          - button [ref=f146e782] [cursor=pointer]:
+            - link " Recent Results" [ref=f146e783]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&recent=recent&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e784]: 
+              - generic [ref=f146e785]: Recent Results
+          - button [ref=f146e787] [cursor=pointer]:
+            - link " Remove JS" [ref=f146e788]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&js=no-js&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e789]: 
+              - generic [ref=f146e790]: Remove JS
+          - button [ref=f146e792] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f146e793]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&adtech=reduce&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e794]: 
+              - generic [ref=f146e795]: Reduce Adtech
+          - button [ref=f146e797] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f146e798]:
+              - /url: /search?query=Massachusetts+Delta+Pi+Beta+Phi+MIT&nsfw=smut&newfilter=true&sst=SE-4ab19034a19c98b8
+              - generic [ref=f146e799]: 
+              - generic [ref=f146e800]: Reduce NSFW
+          - button [ref=f146e803] [cursor=pointer]:
+            - generic [ref=f146e804]:
+              - generic [ref=f146e805]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f146e807]:
+    - heading "Search Help" [level=1] [ref=f146e808]
+    - generic [ref=f146e809]:
+      - generic [ref=f146e810]:
+        - heading " Syntax" [level=2] [ref=f146e811]:
+          - generic [ref=f146e812]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f146e813]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f146e814]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f146e815]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f146e816]
+        - heading "Samples" [level=2] [ref=f146e817]
+        - generic [ref=f146e818]:
+          - term [ref=f146e819]: soup -chicken
+          - definition [ref=f146e820]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f146e821]: "\"keyboard\""
+          - definition [ref=f146e822]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f146e823]: "\"steve mcqueen\""
+          - definition [ref=f146e824]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f146e825]: apology (plato)
+          - definition [ref=f146e826]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f146e827]:
+          - generic [ref=f146e828]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f146e829]
+        - generic [ref=f146e830]: This is by the beginning
+        - generic [ref=f146e838]: This is in the middle
+        - generic [ref=f146e846]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f146e852]:
+          - generic [ref=f146e853]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f146e854]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f146e855]
+        - heading " Webmaster Information" [level=2] [ref=f146e856]:
+          - generic [ref=f146e857]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f146e858]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f146e859] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f146e860] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f146e861]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f146e862] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f146e863]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f146e864] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f146e865]:
+        - heading " Special Keywords" [level=2] [ref=f146e866]:
+          - generic [ref=f146e867]: 
+          - text: Special Keywords
+        - table [ref=f146e868]:
+          - rowgroup [ref=f146e869]:
+            - row [ref=f146e870]:
+              - columnheader "Keyword" [ref=f146e871]
+              - columnheader "Meaning" [ref=f146e872]
+          - rowgroup [ref=f146e873]:
+            - row [ref=f146e874]:
+              - cell [ref=f146e875]:
+                - text: "site:"
+                - emphasis [ref=f146e876]: example.com
+              - cell [ref=f146e877]:
+                - text: Display site information about
+                - emphasis [ref=f146e878]: example.com
+            - row [ref=f146e879]:
+              - cell [ref=f146e880]:
+                - text: "site:"
+                - emphasis [ref=f146e881]: example.com
+                - emphasis [ref=f146e882]: keyword
+              - cell [ref=f146e883]:
+                - text: Search
+                - emphasis [ref=f146e884]: example.com
+                - text: for
+                - emphasis [ref=f146e885]: keyword
+            - row [ref=f146e886]:
+              - cell [ref=f146e887]:
+                - text: "site:"
+                - emphasis [ref=f146e888]: "*.example.com"
+                - emphasis [ref=f146e889]: keyword
+              - cell [ref=f146e890]:
+                - text: Search
+                - emphasis [ref=f146e891]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f146e892]: keyword
+            - row [ref=f146e893]:
+              - cell [ref=f146e894]:
+                - text: "browse:"
+                - emphasis [ref=f146e895]: example.com
+              - cell [ref=f146e896]:
+                - text: Show similar websites to
+                - emphasis [ref=f146e897]: example.com
+            - row [ref=f146e898]:
+              - cell [ref=f146e899]:
+                - text: "ip:"
+                - emphasis [ref=f146e900]: 127.0.0.1
+              - cell [ref=f146e901]:
+                - text: Search documents hosted at
+                - emphasis [ref=f146e902]: 127.0.0.1
+            - row [ref=f146e903]:
+              - cell [ref=f146e904]:
+                - text: "links:"
+                - emphasis [ref=f146e905]: example.com
+              - cell [ref=f146e906]:
+                - text: Search documents linking to
+                - emphasis [ref=f146e907]: example.com
+            - row [ref=f146e908]:
+              - cell [ref=f146e909]:
+                - text: "tld:"
+                - emphasis [ref=f146e910]: edu
+                - emphasis [ref=f146e911]: keyword
+              - cell [ref=f146e912]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f146e913]: edu
+                - text: .
+            - row [ref=f146e914]:
+              - cell [ref=f146e915]:
+                - text: "?tld:"
+                - emphasis [ref=f146e916]: edu
+                - emphasis [ref=f146e917]: keyword
+              - cell [ref=f146e918]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f146e919]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f146e920]:
+              - cell "q>5" [ref=f146e921]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f146e922]
+            - row [ref=f146e923]:
+              - cell "q<5" [ref=f146e924]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f146e925]
+            - row [ref=f146e926]:
+              - cell "year>2005" [ref=f146e927]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f146e928]
+            - row [ref=f146e929]:
+              - cell "year=2005" [ref=f146e930]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f146e931]
+            - row [ref=f146e932]:
+              - cell "year<2005" [ref=f146e933]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f146e934]
+            - row [ref=f146e935]:
+              - cell "rank>50" [ref=f146e936]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f146e937]
+            - row [ref=f146e938]:
+              - cell "rank<50" [ref=f146e939]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f146e940]
+            - row [ref=f146e941]:
+              - cell "format:html5" [ref=f146e942]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f146e943]
+            - row [ref=f146e944]:
+              - cell "format:xhtml" [ref=f146e945]
+              - cell "Filter documents using the XHTML standard" [ref=f146e946]
+            - row [ref=f146e947]:
+              - cell "format:html123" [ref=f146e948]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f146e949]
+            - row [ref=f146e950]:
+              - cell "generator:wordpress" [ref=f146e951]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f146e952]
+            - row [ref=f146e953]:
+              - cell "file:zip" [ref=f146e954]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f146e955]
+            - row [ref=f146e956]:
+              - cell "file:audio" [ref=f146e957]
+              - cell "Filter documents containing a link to an audio file" [ref=f146e958]
+            - row [ref=f146e959]:
+              - cell "file:video" [ref=f146e960]
+              - cell "Filter documents containing a link to a video file" [ref=f146e961]
+            - row [ref=f146e962]:
+              - cell "file:archive" [ref=f146e963]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f146e964]
+            - row [ref=f146e965]:
+              - cell "file:document" [ref=f146e966]
+              - cell "Filter documents containing a link to a document" [ref=f146e967]
+            - row [ref=f146e968]:
+              - cell "-special:media" [ref=f146e969]
+              - cell "Filter out documents with audio or video tags" [ref=f146e970]
+            - row [ref=f146e971]:
+              - cell "-special:scripts" [ref=f146e972]
+              - cell "Filter out documents with javascript" [ref=f146e973]
+            - row [ref=f146e974]:
+              - cell "-special:affiliate" [ref=f146e975]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f146e976]
+            - row [ref=f146e977]:
+              - cell "-special:tracking" [ref=f146e978]
+              - cell "Filter out documents with analytics or tracking code" [ref=f146e979]
+            - row [ref=f146e980]:
+              - cell "-special:cookies" [ref=f146e981]
+              - cell "Filter out documents with cookies" [ref=f146e982]
+  - contentinfo [ref=f146e983]:
+    - heading "Policy Information" [level=1] [ref=f146e984]
+    - generic [ref=f146e985]:
+      - generic [ref=f146e986]:
+        - heading " Policies" [level=2] [ref=f146e987]:
+          - generic [ref=f146e988]: 
+          - text: Policies
+        - generic [ref=f146e989]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f146e990]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f146e991]:
+        - heading " Contact" [level=2] [ref=f146e992]:
+          - generic [ref=f146e993]: 
+          - text: Contact
+        - generic [ref=f146e994]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f146e995] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f146e996]:
+          - generic [ref=f146e997]: 
+          - text: Sources
+        - generic [ref=f146e998]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f146e999] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f146e1000]:
+        - heading " Data" [level=2] [ref=f146e1001]:
+          - generic [ref=f146e1002]: 
+          - text: Data
+        - generic [ref=f146e1003]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f146e1004] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f146e1005] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

@@ -1,0 +1,48 @@
+{
+  "startedAt": "2026-08-19T21:49:46.839Z",
+  "finishedAt": "2026-08-19T21:49:56.162Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "wikipedia_reference",
+      "k": 1,
+      "accuracy": 0.25,
+      "taskPassed": false,
+      "meanLatencyMs": 8834.052875,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-sherlock-tui/runs/2026-08-19_02-49-48pm_find-the-275th-reference-in-the_acbded",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": false,
+              "detail": "answer.md missing or not published as a requested output"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": false,
+              "detail": "answer.md unavailable"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": false,
+              "detail": "answer.md unavailable"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "0 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 8834.052875,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

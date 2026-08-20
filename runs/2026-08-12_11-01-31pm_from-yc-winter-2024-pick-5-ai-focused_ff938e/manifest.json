@@ -1,0 +1,73 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T06:01:31.603Z",
+  "artifacts": [
+    {
+      "filename": "scratch/founders_data.md",
+      "sha256": "1615b5fddec9014082c0f980daaa7f53d7ef4255f5c3b393a8335c4513a65e89",
+      "capturedAt": "2026-08-13T06:03:01.217Z"
+    },
+    {
+      "filename": "artifacts/evidence_retell_ai.png",
+      "sha256": "591b541069b37e80f60afb898700dec0ed88546ac8fc440719ae1f9748f72459",
+      "sourceUrl": "https://www.ycombinator.com/companies/retell-ai",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:03:09.092Z"
+    },
+    {
+      "filename": "artifacts/evidence_greptile.png",
+      "sha256": "e48a19c300fd5e4c6068ce819a74667286b5259a51142d66faf8102785d5c6a1",
+      "sourceUrl": "https://www.ycombinator.com/companies/greptile",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:03:14.430Z"
+    },
+    {
+      "filename": "artifacts/evidence_zep_ai.png",
+      "sha256": "33ad54e2632b9373baa4ad4ef59bf5ef01aabda808b31aa5fad53ecc1fd0ec58",
+      "sourceUrl": "https://www.ycombinator.com/companies/zep-ai",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:03:18.025Z"
+    },
+    {
+      "filename": "artifacts/evidence_artisan.png",
+      "sha256": "a8ebfa0e83b6cb63549e56be79916f14dba8ea425a7e57cd145d9c0ebd540026",
+      "sourceUrl": "https://www.ycombinator.com/companies/artisan",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:03:22.412Z"
+    },
+    {
+      "filename": "artifacts/evidence_decipher_ai.png",
+      "sha256": "4fdbe1180aef10c9a68483d6f6c6c7f4f6e3f6dce486de77d272a281c06c6b93",
+      "sourceUrl": "https://www.ycombinator.com/companies/decipher-ai",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:03:32.543Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "83343e0976261db2a14245d4fce042176ca4618bda46d62db75cac3e03a597da",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:04:02.918Z"
+    },
+    {
+      "filename": "artifacts/selection_summary.md",
+      "sha256": "56b27cf424c9e3428bfc047690c72a54f47c8687220d0237c5e5817178d471a0",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:04:16.779Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:04:22.971Z"
+}

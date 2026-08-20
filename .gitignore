@@ -7,7 +7,7 @@ docs/research/claude-code-harness.md
 node_modules/
 runs/
 chrome-profile/
-# Experiment records are local working data, not tracked history
-# (user ruling 2026-08-19, reversing the earlier tracked-deliberately policy).
+# Historical runs and experiment records may be force-added deliberately for sharing.
+# New local records remain ignored unless explicitly staged.
 evals/experiments/*
 !evals/experiments/.gitkeep

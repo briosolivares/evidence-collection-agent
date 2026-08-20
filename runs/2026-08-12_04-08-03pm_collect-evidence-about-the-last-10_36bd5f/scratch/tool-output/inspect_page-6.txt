@@ -1,0 +1,763 @@
+URL: https://github.com/openclaw/openclaw/pull/122844
+Title: refactor(plugin-sdk): remove final test-only facades by steipete · Pull Request #122844 · openclaw/openclaw · GitHub
+
+- generic [ref=f20e2]:
+  - generic [ref=f20e3]:
+    - link "Skip to content" [ref=f20e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f20e8]:
+      - heading "Navigation Menu" [level=2] [ref=f20e9]
+      - generic [ref=f20e10]:
+        - link "Homepage" [ref=f20e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f20e15]:
+          - navigation "Global" [ref=f20e16]:
+            - list [ref=f20e17]:
+              - listitem [ref=f20e18]:
+                - button "Platform" [ref=f20e20] [cursor=pointer]
+              - listitem [ref=f20e23]:
+                - button "Solutions" [ref=f20e25] [cursor=pointer]
+              - listitem [ref=f20e28]:
+                - button "Resources" [ref=f20e30] [cursor=pointer]
+              - listitem [ref=f20e33]:
+                - button "Open Source" [ref=f20e35] [cursor=pointer]
+              - listitem [ref=f20e38]:
+                - button "Enterprise" [ref=f20e40] [cursor=pointer]
+              - listitem [ref=f20e43]:
+                - link "Pricing" [ref=f20e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f20e45]:
+            - button "Search or jump to, type / to search" [ref=f20e47] [cursor=pointer]:
+              - generic [ref=f20e50]:
+                - text: Type
+                - generic [ref=f20e51]: /
+                - text: to search
+            - link "Sign in" [ref=f20e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122844
+            - link "Sign up" [ref=f20e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f20e55] [cursor=pointer]
+  - main [ref=f20e61]:
+    - generic [ref=f20e62]:
+      - generic [ref=f20e63]:
+        - generic [ref=f20e65]:
+          - link "openclaw" [ref=f20e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f20e70]: /
+          - strong [ref=f20e71]:
+            - link "openclaw" [ref=f20e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f20e73]: Public
+        - generic [ref=f20e74]:
+          - list:
+            - listitem [ref=f20e75]:
+              - link "Sponsor @openclaw" [ref=f20e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f20e77]: Sponsor
+            - listitem [ref=f20e81]:
+              - link "You must be signed in to change notification settings" [ref=f20e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f20e85]:
+              - link "Fork 81.1k" [ref=f20e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,147" [ref=f20e89]: 81.1k
+            - listitem [ref=f20e90]:
+              - link "You must be signed in to star a repository" [ref=f20e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386076 users starred this repository" [ref=f20e95]: 386k
+      - navigation "Repository" [ref=f20e96]:
+        - list [ref=f20e97]:
+          - listitem [ref=f20e98]:
+            - link "Code" [ref=f20e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f20e103]:
+            - link "Issues 3.4k" [ref=f20e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f20e108]: Issues
+              - generic "3,414" [ref=f20e109]: 3.4k
+          - listitem [ref=f20e110]:
+            - link "Pull requests 2.1k" [ref=f20e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f20e114]: Pull requests
+              - generic "2,113" [ref=f20e115]: 2.1k
+          - listitem [ref=f20e116]:
+            - link "Actions" [ref=f20e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f20e121]:
+            - link "Projects" [ref=f20e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f20e126]:
+            - link "Security and quality 647" [ref=f20e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f20e130]: Security and quality
+              - generic "647" [ref=f20e131]
+          - listitem [ref=f20e132]:
+            - link "Insights" [ref=f20e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f20e143]:
+      - generic [ref=f20e147]:
+        - generic [ref=f20e149]:
+          - 'heading "refactor(plugin-sdk): remove final test-only facades - #122844" [level=1] [ref=f20e150]':
+            - text: "refactor(plugin-sdk): remove final test-only facades"
+            - generic [ref=f20e151]: "- #122844"
+          - generic [ref=f20e152]: "#122844"
+        - generic [ref=f20e155]:
+          - generic [ref=f20e157]:
+            - img "Pull request" [ref=f20e158]
+            - text: Merged
+          - generic [ref=f20e161]:
+            - link "steipete" [ref=f20e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 1 commit into
+            - generic [ref=f20e163]:
+              - link "main" [ref=f20e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f20e165]: from
+              - generic [ref=f20e166]:
+                - link "steipete/coercion-helper-consolidation-round6-final" [ref=f20e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/coercion-helper-consolidation-round6-final
+                - button "Copy head branch name to clipboard" [ref=f20e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 3:28 PM PDT" [ref=f20e172]: Aug 12, 202642 minutes ago
+        - generic [ref=f20e173]:
+          - generic [ref=f20e175]:
+            - generic [ref=f20e176]: "+76"
+            - generic [ref=f20e177]: "-390"
+            - generic [ref=f20e178]: "Lines changed: 76 additions & 390 deletions"
+          - navigation "Pull request navigation tabs" [ref=f20e186]:
+            - generic [ref=f20e187]:
+              - link "Conversation (4)" [ref=f20e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122844
+                - text: Conversation
+                - generic [ref=f20e191]: "4"
+                - generic [ref=f20e192]: (4)
+              - link "Commits (1)" [ref=f20e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122844/commits
+                - text: Commits
+                - generic [ref=f20e196]: "1"
+                - generic [ref=f20e197]: (1)
+              - link "Checks (194)" [ref=f20e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122844/checks
+                - text: Checks
+                - generic [ref=f20e201]: "194"
+                - generic [ref=f20e202]: (194)
+              - link "Files changed (14)" [ref=f20e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122844/files
+                - text: Files changed
+                - generic [ref=f20e206]: "14"
+                - generic [ref=f20e207]: (14)
+      - generic [ref=f20e212]:
+        - generic [ref=f20e214]:
+          - heading "Conversation" [level=2] [ref=f20e215]
+          - generic [ref=f20e216]:
+            - generic [ref=f20e217]:
+              - generic [ref=f20e219]:
+                - link [ref=f20e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f20e221]
+                - generic [ref=f20e223]:
+                  - generic [ref=f20e224]:
+                    - heading [level=3] [ref=f20e225]:
+                      - generic [ref=f20e226]:
+                        - strong [ref=f20e227]:
+                          - link "steipete" [ref=f20e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 202653 minutes ago" [ref=f20e229] [cursor=pointer]:
+                          - /url: "#issue-5135777013"
+                    - generic [ref=f20e230]:
+                      - group [ref=f20e232]:
+                        - button [ref=f20e233] [cursor=pointer]:
+                          - img "Show options" [ref=f20e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f20e239]: Contributor
+                  - generic [ref=f20e244]:
+                    - paragraph [ref=f20e245]:
+                      - text: "Related:"
+                      - link "#122745" [ref=f20e246] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/122745
+                      - text: ","
+                      - link "#122807" [ref=f20e247] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/122807
+                    - heading "What Problem This Solves" [level=2] [ref=f20e248]
+                    - paragraph [ref=f20e249]: Leftover unregistered Plugin SDK source files and tests still modeled dead facade ownership after their real callers and package exports were removed. That stale structure made test-only seams look like supported SDK surfaces and kept obsolete source-shape assertions alive.
+                    - heading "Why This Change Was Made" [level=2] [ref=f20e250]
+                    - paragraph [ref=f20e251]:
+                      - text: Delete the browser basename facade and barrel, the retired OpenCode facade, and the Google model-id alias. Move the retained shipped OpenCode onboarding behavior coverage to its canonical
+                      - code [ref=f20e252]: provider-onboard
+                      - text: owner, point test-only Google preview normalization at the canonical shared owner, and remove stale structural and Knip artifact assertions.
+                    - paragraph [ref=f20e253]:
+                      - text: The public provider-onboard exports
+                      - code [ref=f20e254]: OPENCODE_ZEN_DEFAULT_MODEL
+                      - text: and
+                      - code [ref=f20e255]: applyOpencodeZenModelDefault
+                      - text: remain implemented and tested. The architectural denylist for
+                      - code [ref=f20e256]: ../plugin-sdk/opencode.js
+                      - text: also remains in place.
+                    - heading "User Impact" [level=2] [ref=f20e257]
+                    - paragraph [ref=f20e258]: No runtime or plugin-author behavior changes. The current exported Plugin SDK surface remains unchanged; this is an internal ownership cleanup only.
+                    - heading "Evidence" [level=2] [ref=f20e259]
+                    - list [ref=f20e260]:
+                      - listitem [ref=f20e261]: "Diff: 14 paths, +76/-390, net -314. Production/tooling: +0/-120. Tests/test-support: +76/-270, net -194."
+                      - listitem [ref=f20e262]: "Focused post-rebase proof: 132/132 tests passed across 8 Vitest shards."
+                      - listitem [ref=f20e263]:
+                        - text: Plugin SDK API baseline, export synchronization, surface budget, and
+                        - code [ref=f20e264]: git diff --check
+                        - text: passed on the rebased head.
+                      - listitem [ref=f20e265]:
+                        - text: "Full changed gate passed:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31642751358" [ref=f20e266] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31642751358
+                        - text: (
+                        - code [ref=f20e267]: tbx_01kzvy2enrh5j3crd7t73y9qgk
+                        - text: ). This covered types, lint, boundaries, coercion guard, zero production/full-tree/script unused exports, cycles, formatting, and SDK checks.
+                      - listitem [ref=f20e268]:
+                        - text: "Full build passed:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31645600853" [ref=f20e269] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31645600853
+                        - text: (
+                        - code [ref=f20e270]: tbx_01kzw085z3j4rpysarhbjcmh2f
+                        - text: ). It verified 35 built plugin modules and all 144 public Plugin SDK subpaths.
+                      - listitem [ref=f20e271]: One initial build reuse attempt exited 255 only because its previously kept Testbox had already completed; a fresh one-shot build passed with no source changes.
+                      - listitem [ref=f20e272]: "Fresh P2 autoreview after rebase: clean, no accepted/actionable findings, confidence 0.99."
+                      - listitem [ref=f20e273]:
+                        - text: Current
+                        - code [ref=f20e274]: package.json
+                        - text: and
+                        - code [ref=f20e275]: scripts/lib/plugin-sdk-entrypoints.json
+                        - text: do not export or register
+                        - code [ref=f20e276]: browser-host-inspection
+                        - text: ","
+                        - code [ref=f20e277]: google-model-id
+                        - text: ", or"
+                        - code [ref=f20e278]: opencode
+                        - text: .
+                      - listitem [ref=f20e279]:
+                        - text: Across all 319 local
+                        - code [ref=f20e280]: v*
+                        - text: tags,
+                        - code [ref=f20e281]: browser-host-inspection
+                        - text: and
+                        - code [ref=f20e282]: google-model-id
+                        - text: were exported by zero release tags.
+                        - code [ref=f20e283]: opencode
+                        - text: was exported by 46 tags from
+                        - code [ref=f20e284]: v2026.3.28
+                        - text: through
+                        - code [ref=f20e285]: v2026.4.26-beta.1
+                        - text: ", then its package/registry export was deliberately retired by"
+                        - code [ref=f20e286]: 1e3ce10e2782a4d2876a31132fbf8b56798b8c0f
+                        - text: before this patch. This deletion therefore introduces no new package-resolution break.
+                    - paragraph [ref=f20e287]: AI-assisted and maintainer reviewed. No transcript included.
+                    - paragraph [ref=f20e288]: "Release-note context: internal refactor only; no user-facing release note."
+                  - 'button "eyes (1): steipete, 10:17PM today" [disabled] [ref=f20e293]':
+                    - generic [ref=f20e294]: 👀
+                    - generic [ref=f20e295]: "1"
+              - generic [ref=f20e296]:
+                - generic [ref=f20e307]:
+                  - link [ref=f20e310] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f20e311]
+                  - code [ref=f20e313]:
+                    - 'link "refactor(plugin-sdk): remove final test-only facades" [ref=f20e314] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122844/commits/025567a283ccc729d9e2d175b5e8091c641da0d6
+                  - button "Verified" [ref=f20e316] [cursor=pointer]
+                  - group [ref=f20e321]:
+                    - img "79 / 121 checks OK" [ref=f20e323] [cursor=pointer]
+                  - code [ref=f20e326]:
+                    - link "025567a" [ref=f20e327] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122844/commits/025567a283ccc729d9e2d175b5e8091c641da0d6
+                - generic [ref=f20e329]:
+                  - link [ref=f20e331] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f20e332]
+                  - generic [ref=f20e334]:
+                    - generic [ref=f20e335]:
+                      - heading "clawsweeper Bot commented Aug 12, 202653 minutes ago" [level=3] [ref=f20e336]:
+                        - generic [ref=f20e337]:
+                          - strong [ref=f20e338]:
+                            - link "clawsweeper" [ref=f20e339] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f20e340]: Bot
+                          - text: commented
+                          - link "Aug 12, 202653 minutes ago" [ref=f20e341] [cursor=pointer]:
+                            - /url: "#issuecomment-5273418040"
+                      - generic [ref=f20e342]:
+                        - group [ref=f20e344]:
+                          - button [ref=f20e345] [cursor=pointer]:
+                            - img "Show options" [ref=f20e348]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f20e351]: Contributor
+                    - table [ref=f20e355]:
+                      - rowgroup [ref=f20e356]:
+                        - row [ref=f20e357]:
+                          - cell [ref=f20e358]:
+                            - paragraph [ref=f20e359]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f20e360]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f20e361]:
+                  - generic [ref=f20e366]:
+                    - link [ref=f20e367] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f20e368]
+                    - link "openclaw-barnacle" [ref=f20e369] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f20e370]: Bot
+                    - text: added
+                    - link "gateway" [ref=f20e371] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+                    - link "commands" [ref=f20e372] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+                    - 'link "extensions: browser" [ref=f20e373] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20browser%22
+                    - text: labels
+                    - link "Aug 12, 202653 minutes ago" [ref=f20e374] [cursor=pointer]:
+                      - /url: "#event-29368644096"
+                  - generic [ref=f20e379]:
+                    - link [ref=f20e380] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e381]
+                    - link "steipete" [ref=f20e382] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: self-assigned this
+                    - link "Aug 12, 202653 minutes ago" [ref=f20e383] [cursor=pointer]:
+                      - /url: "#event-29368644700"
+                  - generic [ref=f20e389]:
+                    - link [ref=f20e391] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e392]
+                    - generic [ref=f20e393]:
+                      - link "steipete" [ref=f20e394] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 12, 2026 22:1753 minutes ago" [ref=f20e395] [cursor=pointer]:
+                        - /url: "#event-29368645268"
+                  - generic [ref=f20e400]:
+                    - link [ref=f20e401] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f20e402]
+                    - link "openclaw-barnacle" [ref=f20e403] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f20e404]: Bot
+                    - text: added
+                    - 'link "size: M" [ref=f20e405] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f20e406] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 202653 minutes ago" [ref=f20e407] [cursor=pointer]:
+                      - /url: "#event-29368645499"
+                  - generic [ref=f20e412]:
+                    - link [ref=f20e413] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f20e414]
+                    - link "clawsweeper" [ref=f20e415] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f20e416]: Bot
+                    - text: added
+                    - link "P3" [ref=f20e417] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP3
+                    - 'link "rating: 🐚 platinum hermit" [ref=f20e418] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f20e419] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 12, 202646 minutes ago" [ref=f20e420] [cursor=pointer]:
+                      - /url: "#event-29368868813"
+                - generic [ref=f20e422]:
+                  - link [ref=f20e424] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f20e425]
+                  - generic [ref=f20e427]:
+                    - generic [ref=f20e428]:
+                      - heading "clawsweeper Bot commented Aug 12, 202646 minutes ago" [level=3] [ref=f20e429]:
+                        - generic [ref=f20e430]:
+                          - strong [ref=f20e431]:
+                            - link "clawsweeper" [ref=f20e432] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f20e433]: Bot
+                          - text: commented
+                          - link "Aug 12, 202646 minutes ago" [ref=f20e434] [cursor=pointer]:
+                            - /url: "#issuecomment-5273483810"
+                      - generic [ref=f20e435]:
+                        - group [ref=f20e437]:
+                          - button [ref=f20e438] [cursor=pointer]:
+                            - img "Show options" [ref=f20e441]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f20e444]: Contributor
+                    - table [ref=f20e448]:
+                      - rowgroup [ref=f20e449]:
+                        - row [ref=f20e450]:
+                          - cell [ref=f20e451]:
+                            - paragraph [ref=f20e452]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f20e453]: Reviewed August 12, 2026, 6:23 PM ET / 22:23 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f20e454]
+                            - heading "What this changes" [level=2] [ref=f20e455]
+                            - paragraph [ref=f20e456]: The PR deletes three unregistered Plugin SDK facade paths and stale structural tests, while retaining OpenCode onboarding coverage and Google model normalization through canonical shared modules.
+                            - heading "Merge readiness" [level=2] [ref=f20e457]
+                            - paragraph [ref=f20e458]:
+                              - generic [ref=f20e459]: ⚠️
+                              - strong [ref=f20e460]: Ready for maintainer review - 3 items remain
+                            - paragraph [ref=f20e461]: "This maintainer-owned cleanup remains open for normal approval. No blocking correctness or security finding was identified: the removed facades are absent from the registered/package SDK surface, and retained behavior remains at its canonical owners."
+                            - paragraph [ref=f20e462]:
+                              - strong [ref=f20e463]: "Priority:"
+                              - text: P3
+                              - strong [ref=f20e464]: "Reviewed head:"
+                              - code [ref=f20e465]: 025567a283ccc729d9e2d175b5e8091c641da0d6
+                              - strong [ref=f20e466]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f20e467] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f20e468]
+                            - table [ref=f20e470]:
+                              - rowgroup [ref=f20e471]:
+                                - row [ref=f20e472]:
+                                  - columnheader "Measure" [ref=f20e473]
+                                  - columnheader "Result" [ref=f20e474]
+                                  - columnheader "What it means" [ref=f20e475]
+                              - rowgroup [ref=f20e476]:
+                                - row [ref=f20e477]:
+                                  - cell [ref=f20e478]:
+                                    - strong [ref=f20e479]: Overall readiness
+                                  - cell [ref=f20e480]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f20e481]: (4/6)
+                                  - cell "A focused net-negative cleanup with retained owner-level coverage and package-contract evidence." [ref=f20e482]
+                                - row [ref=f20e483]:
+                                  - cell [ref=f20e484]:
+                                    - strong [ref=f20e485]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f20e486]
+                                  - 'cell "Not applicable: This maintainer-authored internal cleanup is supported by package-boundary and focused test evidence; no external contributor proof gate applies." [ref=f20e487]'
+                                - row [ref=f20e488]:
+                                  - cell [ref=f20e489]:
+                                    - strong [ref=f20e490]: Patch quality
+                                  - cell [ref=f20e491]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f20e492]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f20e493]
+                            - heading "Verification" [level=2] [ref=f20e494]
+                            - table [ref=f20e496]:
+                              - rowgroup [ref=f20e497]:
+                                - row [ref=f20e498]:
+                                  - columnheader "Check" [ref=f20e499]
+                                  - columnheader "Result" [ref=f20e500]
+                                  - columnheader "Evidence" [ref=f20e501]
+                              - rowgroup [ref=f20e502]:
+                                - row [ref=f20e503]:
+                                  - cell [ref=f20e504]:
+                                    - strong [ref=f20e505]: Real behavior
+                                  - cell "Not applicable" [ref=f20e506]
+                                  - 'cell "Not applicable: This maintainer-authored internal cleanup is supported by package-boundary and focused test evidence; no external contributor proof gate applies." [ref=f20e507]'
+                                - row [ref=f20e508]:
+                                  - cell [ref=f20e509]:
+                                    - strong [ref=f20e510]: Evidence reviewed
+                                  - cell "5 items" [ref=f20e511]
+                                  - 'cell "Package and registry boundary: Current package exports and the SDK entrypoint registry include provider-onboard and provider-model-shared, but not browser-host-inspection, google-model-id, or opencode; the deleted paths were therefore not current package entrypoints. Retained browser behavior has a canonical owner: The browser runtime API still exposes the Chrome helpers, and browser-owned tests retain direct parsing coverage; the removed top-level barrel was not the runtime owner. Normalization behavior is unchanged: The new gateway-test import calls the same canonical Google preview normalizer; that helper delegates directly to the model-catalog implementation." [ref=f20e512]': "Package and registry boundary: Current package exports and the SDK entrypoint registry include provider-onboard and provider-model-shared, but not browser-host-inspection, google-model-id, or opencode; the deleted paths were therefore not current package entrypoints.Retained browser behavior has a canonical owner: The browser runtime API still exposes the Chrome helpers, and browser-owned tests retain direct parsing coverage; the removed top-level barrel was not the runtime owner.Normalization behavior is unchanged: The new gateway-test import calls the same canonical Google preview normalizer; that helper delegates directly to the model-catalog implementation."
+                                - row [ref=f20e513]:
+                                  - cell [ref=f20e514]:
+                                    - strong [ref=f20e515]: Findings
+                                  - cell "None" [ref=f20e516]
+                                  - cell "None." [ref=f20e517]
+                                - row [ref=f20e518]:
+                                  - cell [ref=f20e519]:
+                                    - strong [ref=f20e520]: Security
+                                  - cell "None" [ref=f20e521]
+                                  - cell "None." [ref=f20e522]
+                            - heading "How this fits together" [level=2] [ref=f20e523]
+                            - paragraph [ref=f20e524]: The Plugin SDK registry determines which core helpers are built and exported for plugins. Browser and provider code consume owner-local or registered shared helpers, while package-contract tests prevent unsupported source files from becoming public SDK surfaces.
+                            - region "mermaid rendered output container" [ref=f20e525]:
+                              - generic [ref=f20e526]:
+                                - generic [ref=f20e527]:
+                                  - group [ref=f20e528]:
+                                    - button "Open dialog" [ref=f20e529] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f20e532] [cursor=pointer]
+                                - iframe [ref=f20e537]:
+                                  - generic [ref=f21e1]:
+                                    - document [ref=f21e5]:
+                                      - generic [ref=f21e9]:
+                                        - paragraph [ref=f21e16]: Plugin SDK source files
+                                        - paragraph [ref=f21e23]: Entrypoint registry
+                                        - paragraph [ref=f21e30]: Package exports
+                                        - paragraph [ref=f21e37]: Plugin consumers
+                                        - paragraph [ref=f21e44]: Browser runtime API
+                                        - paragraph [ref=f21e51]: Chrome helper implementation
+                                        - paragraph [ref=f21e58]: Provider onboarding
+                                        - paragraph [ref=f21e65]: Model setup behavior
+                                        - paragraph [ref=f21e72]: Gateway model tests
+                                    - generic [ref=f21e73]:
+                                      - button "Zoom in" [ref=f21e74]
+                                      - button "Zoom out" [ref=f21e78]
+                                      - button "Reset view" [ref=f21e82]
+                                      - button "Pan up" [ref=f21e85]
+                                      - button "Pan down" [ref=f21e88]
+                                      - button "Pan left" [ref=f21e91]
+                                      - button "Pan right" [ref=f21e94]
+                            - heading "Decision needed" [level=2] [ref=f20e538]
+                            - table [ref=f20e540]:
+                              - rowgroup [ref=f20e541]:
+                                - row [ref=f20e542]:
+                                  - columnheader "Question" [ref=f20e543]
+                                  - columnheader "Recommendation" [ref=f20e544]
+                              - rowgroup [ref=f20e545]:
+                                - row [ref=f20e546]:
+                                  - cell "After current-head checks finish, should the SDK owner approve deletion of these remaining unregistered facade files?" [ref=f20e547]
+                                  - cell [ref=f20e548]:
+                                    - strong [ref=f20e549]: "Approve after checks:"
+                                    - text: Merge once the in-progress exact-head checks are green, preserving the canonical browser and provider owners.
+                            - paragraph [ref=f20e550]: "Why: The PR is maintainer-authored and carries the maintainer label, so this workflow must leave the final merge decision to an explicit maintainer judgment."
+                            - heading "Before merge" [level=2] [ref=f20e551]
+                            - list [ref=f20e552]:
+                              - listitem [ref=f20e553]:
+                                - checkbox "Incomplete task" [disabled] [ref=f20e554]
+                                - strong [ref=f20e555]: Resolve merge risk (P1)
+                                - text: "- GitHub reports the branch as mergeable but behind main, and several exact-head checks are still running; land only after the required current-head checks complete."
+                              - listitem [ref=f20e556]:
+                                - checkbox "Incomplete task" [disabled] [ref=f20e557]
+                                - strong [ref=f20e558]: Complete next step (P2)
+                                - text: "- No mechanical repair is needed; this maintainer-labeled PR needs normal exact-head CI completion and explicit merge approval."
+                            - group [ref=f20e559]:
+                              - strong [ref=f20e561] [cursor=pointer]: Agent review details
+                - generic [ref=f20e563]:
+                  - link [ref=f20e565] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f20e566]
+                  - generic [ref=f20e568]:
+                    - generic [ref=f20e569]:
+                      - heading [level=3] [ref=f20e570]:
+                        - generic [ref=f20e571]:
+                          - strong [ref=f20e572]:
+                            - link "steipete" [ref=f20e573] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202644 minutes ago" [ref=f20e574] [cursor=pointer]:
+                            - /url: "#issuecomment-5273501171"
+                      - generic [ref=f20e575]:
+                        - group [ref=f20e577]:
+                          - button [ref=f20e578] [cursor=pointer]:
+                            - img "Show options" [ref=f20e581]
+                        - generic [ref=f20e583]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f20e584]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f20e586]: Author
+                    - table [ref=f20e590]:
+                      - rowgroup [ref=f20e591]:
+                        - row [ref=f20e592]:
+                          - cell [ref=f20e593]:
+                            - paragraph [ref=f20e594]:
+                              - text: Land-ready proof for exact head
+                              - code [ref=f20e595]: 025567a283ccc729d9e2d175b5e8091c641da0d6
+                              - text: ":"
+                            - list [ref=f20e596]:
+                              - listitem [ref=f20e597]:
+                                - text: "Focused post-rebase command:"
+                                - code [ref=f20e598]: node scripts/run-vitest.mjs src/plugin-sdk/provider-onboard.test.ts src/plugin-activation-boundary.test.ts src/plugins/contracts/plugin-sdk-subpaths.test.ts test/scripts/check-deadcode-exports.test.ts test/extension-test-boundary.test.ts packages/model-catalog-core/src/provider-model-id-normalize.test.ts extensions/browser/src/browser/chrome.test.ts extensions/browser/src/browser/chrome.version.test.ts extensions/opencode/index.test.ts
+                                - text: — 132/132 tests passed across 8 shards.
+                              - listitem [ref=f20e599]:
+                                - text: Plugin SDK API baseline, export synchronization, surface budget, and
+                                - code [ref=f20e600]: git diff --check origin/main...HEAD
+                                - text: passed.
+                              - listitem [ref=f20e601]:
+                                - text: "Full changed gate:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31642751358" [ref=f20e602] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31642751358
+                                - text: ", Testbox"
+                                - code [ref=f20e603]: tbx_01kzvy2enrh5j3crd7t73y9qgk
+                                - text: "— passed. Full build:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31645600853" [ref=f20e604] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31645600853
+                                - text: ", Testbox"
+                                - code [ref=f20e605]: tbx_01kzw085z3j4rpysarhbjcmh2f
+                                - text: — passed, including all 144 public Plugin SDK subpaths. The earlier build reuse exit 255 was infrastructure-only because the kept box had completed; the fresh one-shot build passed without source changes.
+                              - listitem [ref=f20e606]:
+                                - text: "Exact-head PR CI:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31646309553" [ref=f20e607] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31646309553
+                                - text: — green with zero pending checks.
+                              - listitem [ref=f20e608]: "Fresh P2 autoreview: clean, no accepted/actionable findings, confidence 0.99."
+                              - listitem [ref=f20e609]:
+                                - text: "Compatibility: current package exports and the entrypoint registry do not expose the three deleted basenames."
+                                - code [ref=f20e610]: browser-host-inspection
+                                - text: and
+                                - code [ref=f20e611]: google-model-id
+                                - text: appeared in zero of 319 local release tags. The former
+                                - code [ref=f20e612]: opencode
+                                - text: export was intentionally retired before this patch by
+                                - code [ref=f20e613]: 1e3ce10e2782a4d2876a31132fbf8b56798b8c0f
+                                - text: ; the shipped provider-onboard exports and the architectural denylist remain.
+                              - listitem [ref=f20e614]: "LOC: production +0/-119, tooling +0/-1; tests/test-support +76/-270. Total +76/-390, net -314."
+                            - paragraph [ref=f20e615]:
+                              - text: "ClawSweeper disposition: its exact-head review reports no correctness or security finding and no literal"
+                              - code [ref=f20e616]: "Rank-up moves:"
+                              - text: list. The P1 check-completion item is resolved by the green exact-head run; the P2/owner-decision item is resolved by explicit maintainer authorization and the native landing flow. The detected “vector/embedding metadata” is a filename-only false positive on deletion of
+                              - code [ref=f20e617]: src/plugin-sdk/opencode.test.ts
+                              - text: ; no persistent data model, config, migration, schema, or runtime store changed. Behind-main drift is advisory while the PR remains mergeable; the native guard will verify current-main compatibility.
+                            - paragraph [ref=f20e618]: "Known proof gap: no live behavior run. This is a behavior-neutral internal deletion with unchanged registered/package SDK surface, so focused owner tests, package-contract checks, full changed/build gates, exact-head CI, and independent review are the proportional proof."
+                - generic [ref=f20e619]:
+                  - generic [ref=f20e624]:
+                    - button "View details" [ref=f20e625] [cursor=pointer]
+                    - generic [ref=f20e626]:
+                      - link [ref=f20e628] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f20e629]
+                      - generic [ref=f20e630]:
+                        - link "steipete" [ref=f20e631] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f20e632] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/d003e08756420b2798e35699700cf8d649d142fc
+                          - code [ref=f20e633]: d003e08
+                        - text: into
+                        - generic [ref=f20e634]: main
+                        - link "Aug 12, 202642 minutes ago" [ref=f20e636] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122844#event-29369013627
+                        - generic [ref=f20e637]: 194 checks passed
+                  - generic [ref=f20e644]:
+                    - link [ref=f20e646] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f20e647]
+                    - generic [ref=f20e648]:
+                      - link "steipete" [ref=f20e649] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f20e650]: steipete/coercion-helper-consolidation-round6-final
+                      - text: branch
+                      - link "August 12, 2026 22:2842 minutes ago" [ref=f20e652] [cursor=pointer]:
+                        - /url: "#event-29369014714"
+                - generic [ref=f20e654]:
+                  - link [ref=f20e656] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f20e657]
+                  - generic [ref=f20e659]:
+                    - generic [ref=f20e660]:
+                      - heading [level=3] [ref=f20e661]:
+                        - generic [ref=f20e662]:
+                          - strong [ref=f20e663]:
+                            - link "steipete" [ref=f20e664] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202642 minutes ago" [ref=f20e665] [cursor=pointer]:
+                            - /url: "#issuecomment-5273524376"
+                      - generic [ref=f20e666]:
+                        - group [ref=f20e668]:
+                          - button [ref=f20e669] [cursor=pointer]:
+                            - img "Show options" [ref=f20e672]
+                        - generic [ref=f20e674]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f20e675]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f20e677]: Author
+                    - table [ref=f20e681]:
+                      - rowgroup [ref=f20e682]:
+                        - row [ref=f20e683]:
+                          - cell [ref=f20e684]:
+                            - paragraph [ref=f20e685]: Merged via squash.
+                            - list [ref=f20e686]:
+                              - listitem [ref=f20e687]:
+                                - text: "Prepared head SHA:"
+                                - link "025567a283ccc729d9e2d175b5e8091c641da0d6" [ref=f20e688] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122844/commits/025567a283ccc729d9e2d175b5e8091c641da0d6
+                              - listitem [ref=f20e689]:
+                                - text: "Landed commit:"
+                                - link "d003e08756420b2798e35699700cf8d649d142fc" [ref=f20e690] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/d003e08756420b2798e35699700cf8d649d142fc
+                - generic [ref=f20e696]:
+                  - generic [ref=f20e697]:
+                    - link [ref=f20e698] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                      - img "@github-actions" [ref=f20e699]
+                    - link "github-actions" [ref=f20e700] [cursor=pointer]:
+                      - /url: /apps/github-actions
+                    - generic [ref=f20e701]: Bot
+                    - text: mentioned this pull request
+                    - link "Aug 12, 202639 minutes ago" [ref=f20e702] [cursor=pointer]:
+                      - /url: "#ref-issue-5135863902"
+                  - generic [ref=f20e703]:
+                    - link "📡 Upstream Digest — 2026-08-12 22:31 UTC curtismercier/openclaw-mods#1583" [ref=f20e705] [cursor=pointer]:
+                      - /url: /curtismercier/openclaw-mods/issues/1583
+                    - 'generic "Status: Open" [ref=f20e707]': Open
+            - generic [ref=f20e714]:
+              - link "Sign up for free" [ref=f20e715] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f20e716]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f20e717] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122844
+        - generic [ref=f20e721]:
+          - form "Select reviewers" [ref=f20e723]:
+            - heading "Reviewers" [level=3] [ref=f20e724]
+            - text: No reviews
+          - form "Select assignees" [ref=f20e726]:
+            - heading "Assignees" [level=3] [ref=f20e727]
+            - paragraph [ref=f20e729]:
+              - generic [ref=f20e730]:
+                - link [ref=f20e731] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f20e732]
+                - link "steipete" [ref=f20e733] [cursor=pointer]:
+                  - /url: /steipete
+          - generic [ref=f20e734]:
+            - heading "Labels" [level=3] [ref=f20e735]
+            - generic [ref=f20e736]:
+              - link "commands" [ref=f20e737] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+              - 'link "extensions: browser" [ref=f20e739] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20browser%22
+              - link "gateway" [ref=f20e741] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+              - link "maintainer" [ref=f20e743] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P3" [ref=f20e745] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP3
+              - 'link "rating: 🐚 platinum hermit" [ref=f20e747] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: M" [ref=f20e749] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f20e751] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f20e754]:
+            - heading "Projects" [level=3] [ref=f20e755]
+            - text: None yet
+          - form "Select milestones" [ref=f20e757]:
+            - heading "Milestone" [level=3] [ref=f20e758]
+            - text: No milestone
+          - form "Link issues" [ref=f20e764]:
+            - heading "Development" [level=3] [ref=f20e765]
+            - paragraph [ref=f20e766]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f20e768]: None yet
+          - generic [ref=f20e770]:
+            - heading "1 participant" [level=3] [ref=f20e771]
+            - link [ref=f20e773] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f20e774]
+  - contentinfo [ref=f20e775]:
+    - heading "Footer" [level=2] [ref=f20e776]
+    - generic [ref=f20e777]:
+      - generic [ref=f20e778]:
+        - link "GitHub Homepage" [ref=f20e779] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f20e782]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f20e783]:
+        - heading "Footer navigation" [level=3] [ref=f20e784]
+        - list "Footer navigation" [ref=f20e785]:
+          - listitem [ref=f20e786]:
+            - link "Terms" [ref=f20e787] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f20e788]:
+            - link "Privacy" [ref=f20e789] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f20e790]:
+            - link "Security" [ref=f20e791] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f20e792]:
+            - link "Status" [ref=f20e793] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f20e794]:
+            - link "Community" [ref=f20e795] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f20e796]:
+            - link "Docs" [ref=f20e797] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f20e798]:
+            - link "Contact" [ref=f20e799] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f20e800]:
+            - button "Manage cookies" [ref=f20e802] [cursor=pointer]
+          - listitem [ref=f20e803]:
+            - button "Do not share my personal information" [ref=f20e805] [cursor=pointer]

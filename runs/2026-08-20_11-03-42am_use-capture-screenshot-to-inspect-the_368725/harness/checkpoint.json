@@ -1,0 +1,185 @@
+{
+  "version": 3,
+  "revision": 24,
+  "updatedAt": "2026-08-20T18:04:04.905Z",
+  "configuration": {
+    "taskText": "Use capture_screenshot to inspect the\r  current viewport before continuing.",
+    "model": "claude-sonnet-5",
+    "maxOutputTokens": 8192,
+    "maxContextTokens": 900000,
+    "browserProvider": "local",
+    "authenticated": true,
+    "javascriptPolicy": "allow",
+    "maxInitializerAttempts": 2,
+    "maxCompletionCheckFailures": 5,
+    "budgetLimits": {
+      "maxWorkerTurns": "unbounded",
+      "maxToolCalls": "unbounded",
+      "maxModelTokens": "unbounded",
+      "maxWallTimeMs": 3600000
+    }
+  },
+  "budget": {
+    "elapsedWallTimeMs": 22441,
+    "roles": {
+      "initializer": {
+        "turns": 1,
+        "inputTokens": 20,
+        "outputTokens": 95,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 5239,
+        "wallClockMs": 2942
+      },
+      "worker": {
+        "turns": 3,
+        "inputTokens": 6,
+        "outputTokens": 391,
+        "cacheReadInputTokens": 13626,
+        "cacheCreationInputTokens": 8014,
+        "wallClockMs": 9893
+      },
+      "verifier": {
+        "turns": 2,
+        "inputTokens": 2528,
+        "outputTokens": 452,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 4152,
+        "wallClockMs": 5967
+      }
+    },
+    "toolCalls": 6,
+    "toolResultBytes": 16814,
+    "corrections": 0
+  },
+  "progress": {
+    "verifierCycles": 1,
+    "completionCheckFailures": 0
+  },
+  "phase": "terminal",
+  "contract": {
+    "outputs": [
+      {
+        "id": "viewport_screenshot",
+        "kind": "screenshots",
+        "count": {
+          "minimum": 1
+        },
+        "mustShow": [
+          "the current viewport as currently rendered"
+        ]
+      }
+    ]
+  },
+  "worker": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Use capture_screenshot to inspect the\r  current viewport before continuing."
+          },
+          {
+            "type": "text",
+            "text": "# Immutable output contract\nThe initializer produced this immutable projection of the user request.\nThe original user request is authoritative if this projection omits or conflicts with it.\nPreserve its explicitly requested filenames, shapes, counts, scope, and evidence requirements.\n```json\n{\n  \"outputs\": [\n    {\n      \"id\": \"viewport_screenshot\",\n      \"kind\": \"screenshots\",\n      \"count\": {\n        \"minimum\": 1\n      },\n      \"mustShow\": [\n        \"the current viewport as currently rendered\"\n      ]\n    }\n  ]\n}\n```"
+          },
+          {
+            "type": "text",
+            "text": "Run capabilities: provider=local; authenticated browser state. JavaScript policy is allow for this run."
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_0171KzhpondzSFwEXjnBnoPs",
+            "name": "capture_screenshot",
+            "input": {}
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_0171KzhpondzSFwEXjnBnoPs",
+            "content": [
+              {
+                "type": "text",
+                "text": "Captured the live viewport from about:blank. This is a private visual observation, not a published artifact.\nImage metadata: {\"media_type\":\"image/png\",\"width\":922,\"height\":442,\"bytes\":2514}"
+              },
+              {
+                "type": "image",
+                "source": {
+                  "type": "base64",
+                  "media_type": "image/png",
+                  "data": "iVBORw0KGgoAAAANSUhEUgAAA5oAAAG6CAIAAADmpK7DAAABLGlDQ1BfAAB4nJWQPUsDQRCGH0NA1DSiooXFlWnUJGI+UAsTNWiZKES7y+UIYhKPy4n2af0R1naCjQipbawEKxEbe0Gwje/dFReQFJlhdp59d9jdGYgtIYunoN3x3Eq5aNROTo3JTybkgZlW12G0qer3Lax9XWF8m2rYXUv5W+G5elxXNsTzzZCvfa6HfOPzled44luf3aNKSfwgTjaHuD7EluP69e/irXbr0or+TcLuHFeVa4plylzIm7SwWaPKOWeYohR7FMizrrwj31CkyUgpkNUuRYkiOa059qXkdZZmN2BV+PMMn+x9wHZ/MBg8RdphH+6zMP0YaclNmE3A80ukRTN2TNcMpLgiZhfhZ0Gt3MHcF8z0pC76xyN6Nf71anBAB4tVUUbdpMn+AQyUTdocuQPoAAAIT0lEQVR4nOzWAQkAMAzAsHGuYP7FTkchUZG/uwMAAE1vAAAgS2cBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAYKBLZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCdBYAgDCdBQAgTGcBAAjTWQAAwnQWAIAwnQUAIExnAQAI01kAAMJ0FgCAMJ0FACBMZwEACNNZAADCDgAA//8EH7dCAAAABklEQVQDAP2YA62yJMDKAAAAAElFTkSuQmCC"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "The current viewport shows a blank page (about:blank) rendered as a solid dark/black background, with no visible content, text, or UI elements. Now I'll publish this as the requested screenshot artifact."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01AP4N8dBcDb4yfL8HYKhQpi",
+            "name": "publish_artifact",
+            "input": {
+              "kind": "screenshot",
+              "artifact_path": "artifacts/viewport_screenshot.png",
+              "roles": [
+                "requested_output"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_01AP4N8dBcDb4yfL8HYKhQpi",
+            "content": "{\"filename\":\"artifacts/viewport_screenshot.png\",\"sha256\":\"3a7d8c9610b6dc0bcb0fef13309dd896237db352e67db517e8b0e06790711a5e\",\"sourceUrl\":\"about:blank\",\"publicationKind\":\"screenshot\",\"roles\":[\"requested_output\"],\"capturedAt\":\"2026-08-20T18:03:54.426Z\"}"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_01N9SX8p1NnBpdPEiv6eBoqo",
+            "name": "finish",
+            "input": {
+              "summary": "Captured the current viewport via capture_screenshot and published it as the requested output artifact (artifacts/viewport_screenshot.png). The live browser session's active page was about:blank at the time of capture, so the screenshot shows an empty/blank viewport — this is an accurate representation of \"the current viewport as currently rendered.\"",
+              "unresolved": []
+            }
+          }
+        ]
+      }
+    ],
+    "turnCount": 3,
+    "peakContextTokens": 7650,
+    "protocolCorrections": 0,
+    "startedMs": 1787249025649
+  },
+  "finish": {
+    "summary": "Captured the current viewport via capture_screenshot and published it as the requested output artifact (artifacts/viewport_screenshot.png). The live browser session's active page was about:blank at the time of capture, so the screenshot shows an empty/blank viewport — this is an accurate representation of \"the current viewport as currently rendered.\"",
+    "unresolved": []
+  },
+  "outcome": {
+    "status": "verified",
+    "finalText": "Captured the current viewport via capture_screenshot and published it as the requested output artifact (artifacts/viewport_screenshot.png). The live browser session's active page was about:blank at the time of capture, so the screenshot shows an empty/blank viewport — this is an accurate representation of \"the current viewport as currently rendered.\""
+  }
+}

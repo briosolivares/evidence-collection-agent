@@ -1,0 +1,17 @@
+{
+  "outputs": [
+    {
+      "id": "answer",
+      "kind": "document",
+      "filename": "answer.md",
+      "format": "markdown",
+      "evidenceRequirement": "at_least_one",
+      "evidencePresentation": "hidden"
+    }
+  ],
+  "contentExpectations": [
+    "Identify the 275th reference (citation) listed in the References section of the Wikipedia 'World War II' article.",
+    "Follow that reference's link to the corresponding highlighted entry in the article's Sources section.",
+    "Return the full text of that highlighted source entry from the Sources section, reproduced completely in answer.md."
+  ]
+}

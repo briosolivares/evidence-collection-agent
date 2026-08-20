@@ -1,0 +1,1067 @@
+URL: https://github.com/openclaw/openclaw/graphs/contributors?from=5%2F9%2F2026
+Title: Contributors to openclaw/openclaw · GitHub
+
+- generic [ref=f1e2]:
+  - generic [ref=f1e3]:
+    - link "Skip to content" [ref=f1e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f1e8]:
+      - heading "Navigation Menu" [level=2] [ref=f1e9]
+      - generic [ref=f1e10]:
+        - link "Homepage" [ref=f1e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e15]:
+          - navigation "Global" [ref=f1e16]:
+            - list [ref=f1e17]:
+              - listitem [ref=f1e18]:
+                - button "Platform" [ref=f1e20] [cursor=pointer]
+              - listitem [ref=f1e23]:
+                - button "Solutions" [ref=f1e25] [cursor=pointer]
+              - listitem [ref=f1e28]:
+                - button "Resources" [ref=f1e30] [cursor=pointer]
+              - listitem [ref=f1e33]:
+                - button "Open Source" [ref=f1e35] [cursor=pointer]
+              - listitem [ref=f1e38]:
+                - button "Enterprise" [ref=f1e40] [cursor=pointer]
+              - listitem [ref=f1e43]:
+                - link "Pricing" [ref=f1e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f1e45]:
+            - button "Search or jump to, type / to search" [ref=f1e47] [cursor=pointer]:
+              - generic [ref=f1e50]:
+                - text: Type
+                - generic [ref=f1e51]: /
+                - text: to search
+            - link "Sign in" [ref=f1e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fgraphs%2Fcontributors
+            - link "Sign up" [ref=f1e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Frepos%2Finsights%2Fcontributors%2Findex&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f1e55] [cursor=pointer]
+  - main [ref=f1e61]:
+    - generic [ref=f1e62]:
+      - generic [ref=f1e63]:
+        - generic [ref=f1e65]:
+          - link "openclaw" [ref=f1e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f1e70]: /
+          - strong [ref=f1e71]:
+            - link "openclaw" [ref=f1e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f1e73]: Public
+        - generic [ref=f1e74]:
+          - list:
+            - listitem [ref=f1e75]:
+              - link "Sponsor @openclaw" [ref=f1e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f1e77]: Sponsor
+            - listitem [ref=f1e81]:
+              - link "You must be signed in to change notification settings" [ref=f1e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f1e85]:
+              - link "Fork 81.2k" [ref=f1e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,157" [ref=f1e89]: 81.2k
+            - listitem [ref=f1e90]:
+              - link "You must be signed in to star a repository" [ref=f1e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386110 users starred this repository" [ref=f1e95]: 386k
+      - navigation "Repository" [ref=f1e96]:
+        - list [ref=f1e97]:
+          - listitem [ref=f1e98]:
+            - link "Code" [ref=f1e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f1e103]:
+            - link "Issues 3.4k" [ref=f1e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f1e108]: Issues
+              - generic "3,405" [ref=f1e109]: 3.4k
+          - listitem [ref=f1e110]:
+            - link "Pull requests 2.1k" [ref=f1e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f1e114]: Pull requests
+              - generic "2,102" [ref=f1e115]: 2.1k
+          - listitem [ref=f1e116]:
+            - link "Actions" [ref=f1e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f1e121]:
+            - link "Projects" [ref=f1e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f1e126]:
+            - link "Security and quality 647" [ref=f1e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f1e130]: Security and quality
+              - generic "647" [ref=f1e131]
+          - listitem [ref=f1e132]:
+            - link "Insights" [ref=f1e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f1e138]:
+      - 'heading "Insights: openclaw/openclaw" [level=1] [ref=f1e139]'
+      - generic [ref=f1e141]:
+        - navigation "Insights" [ref=f1e143]:
+          - link "Pulse" [ref=f1e144] [cursor=pointer]:
+            - /url: /openclaw/openclaw/pulse
+          - link "Contributors" [ref=f1e145]:
+            - /url: /openclaw/openclaw/graphs/contributors
+          - link "Community standards" [ref=f1e146] [cursor=pointer]:
+            - /url: /openclaw/openclaw/community
+          - link "Commits" [ref=f1e147] [cursor=pointer]:
+            - /url: /openclaw/openclaw/graphs/commit-activity
+          - link "Code frequency" [ref=f1e148] [cursor=pointer]:
+            - /url: /openclaw/openclaw/graphs/code-frequency
+          - link "Dependency graph" [ref=f1e149] [cursor=pointer]:
+            - /url: /openclaw/openclaw/network/dependencies
+          - link "Network" [ref=f1e150] [cursor=pointer]:
+            - /url: /openclaw/openclaw/network
+          - link "Forks" [ref=f1e151] [cursor=pointer]:
+            - /url: /openclaw/openclaw/forks
+        - generic [ref=f1e155]:
+          - generic [ref=f1e156]:
+            - generic [ref=f1e157]:
+              - heading "Contributors" [level=1] [ref=f1e158]
+              - paragraph [ref=f1e159]: Contributions per week to main, line counts have been omitted because commit count exceeds 10,000.
+            - 'button "Period: Last 3 months" [ref=f1e161] [cursor=pointer]'
+          - generic [ref=f1e164]:
+            - generic [ref=f1e166]:
+              - generic [ref=f1e167]:
+                - generic [ref=f1e169]:
+                  - heading "Commits over time" [level=2] [ref=f1e170]
+                  - generic [ref=f1e172]: Weekly from May 9, 2026 to Aug 8, 2026
+                - generic [ref=f1e174]:
+                  - button "Chart options" [ref=f1e175] [cursor=pointer]
+                  - button "Customization settings" [ref=f1e178] [cursor=pointer]
+              - region "Commits over time. Interactive chart." [ref=f1e181]:
+                - generic [ref=f1e182]:
+                  - generic [ref=f1e183]: Combination chart with 2 data series.
+                  - button "View as data table, Chart" [ref=f1e185] [cursor=pointer]
+                  - generic [ref=f1e186]: The chart has 2 X axes displaying Time, and navigator-x-axis.
+                  - generic [ref=f1e187]: The chart has 2 Y axes displaying Contributions, and navigator-y-axis.
+                - application [ref=f1e188]:
+                  - img "Interactive chart" [ref=f1e189]:
+                    - generic [ref=f1e197]: Contributions
+                    - generic [ref=f1e199]:
+                      - region "Commits, series 1 of 2. Bar series with 15 bars. Y axis, Contributions. X axis, Time." [ref=f1e200]:
+                        - img "Sunday, 3 May 2026, 4,064. Commits." [ref=f1e201]
+                        - img "Sunday, 10 May 2026, 4,937. Commits." [ref=f1e202]
+                        - img "Sunday, 17 May 2026, 1,863. Commits." [ref=f1e203]
+                        - img "Sunday, 24 May 2026, 3,272. Commits." [ref=f1e204]
+                        - img "Sunday, 31 May 2026, 2,616. Commits." [ref=f1e205]
+                        - img "Sunday, 7 Jun 2026, 1,002. Commits." [ref=f1e206]
+                        - img "Sunday, 14 Jun 2026, 2,316. Commits." [ref=f1e207]
+                        - img "Sunday, 21 Jun 2026, 1,634. Commits." [ref=f1e208]
+                        - img "Sunday, 28 Jun 2026, 1,742. Commits." [ref=f1e209]
+                        - img "Sunday, 5 Jul 2026, 3,366. Commits." [ref=f1e210]
+                        - img "Sunday, 12 Jul 2026, 4,617. Commits." [ref=f1e211]
+                        - img "Sunday, 19 Jul 2026, 1,923. Commits." [ref=f1e212]
+                        - img "Sunday, 26 Jul 2026, 3,114. Commits." [ref=f1e213]
+                        - img "Sunday, 2 Aug 2026, 2,231. Commits." [ref=f1e214]
+                        - img "Sunday, 9 Aug 2026, 1,711. Commits." [ref=f1e215]
+                      - region "Navigator 1, series 2 of 2 with 38 data points. Y axis, navigator-y-axis. X axis, navigator-x-axis." [ref=f1e219]:
+                        - img "Sunday, 23 Nov 2025, 284. Navigator 1." [ref=f1e220]
+                        - img "Sunday, 30 Nov 2025, 247. Navigator 1." [ref=f1e221]
+                        - img "Sunday, 7 Dec 2025, 815. Navigator 1." [ref=f1e222]
+                        - img "Sunday, 14 Dec 2025, 630. Navigator 1." [ref=f1e223]
+                        - img "Sunday, 21 Dec 2025, 362. Navigator 1." [ref=f1e224]
+                        - img "Sunday, 28 Dec 2025, 549. Navigator 1." [ref=f1e225]
+                        - img "Sunday, 4 Jan 2026, 1,791. Navigator 1." [ref=f1e226]
+                        - img "Sunday, 11 Jan 2026, 1,547. Navigator 1." [ref=f1e227]
+                        - img "Sunday, 18 Jan 2026, 1,441. Navigator 1." [ref=f1e228]
+                        - img "Sunday, 25 Jan 2026, 668. Navigator 1." [ref=f1e229]
+                        - img "Sunday, 1 Feb 2026, 563. Navigator 1." [ref=f1e230]
+                        - img "Sunday, 8 Feb 2026, 1,353. Navigator 1." [ref=f1e231]
+                        - img "Sunday, 15 Feb 2026, 2,904. Navigator 1." [ref=f1e232]
+                        - img "Sunday, 22 Feb 2026, 2,118. Navigator 1." [ref=f1e233]
+                        - img "Sunday, 1 Mar 2026, 2,132. Navigator 1." [ref=f1e234]
+                        - img "Sunday, 8 Mar 2026, 1,646. Navigator 1." [ref=f1e235]
+                        - img "Sunday, 15 Mar 2026, 1,820. Navigator 1." [ref=f1e236]
+                        - img "Sunday, 22 Mar 2026, 2,541. Navigator 1." [ref=f1e237]
+                        - img "Sunday, 29 Mar 2026, 3,151. Navigator 1." [ref=f1e238]
+                        - img "Sunday, 5 Apr 2026, 3,916. Navigator 1." [ref=f1e239]
+                        - img "Sunday, 12 Apr 2026, 1,758. Navigator 1." [ref=f1e240]
+                        - img "Sunday, 19 Apr 2026, 3,418. Navigator 1." [ref=f1e241]
+                        - img "Sunday, 26 Apr 2026, 4,524. Navigator 1." [ref=f1e242]
+                        - img "Sunday, 3 May 2026, 4,064. Navigator 1." [ref=f1e243]
+                        - img "Sunday, 10 May 2026, 4,937. Navigator 1." [ref=f1e244]
+                        - img "Sunday, 17 May 2026, 1,863. Navigator 1." [ref=f1e245]
+                        - img "Sunday, 24 May 2026, 3,272. Navigator 1." [ref=f1e246]
+                        - img "Sunday, 31 May 2026, 2,616. Navigator 1." [ref=f1e247]
+                        - img "Sunday, 7 Jun 2026, 1,002. Navigator 1." [ref=f1e248]
+                        - img "Sunday, 14 Jun 2026, 2,316. Navigator 1." [ref=f1e249]
+                        - img "Sunday, 21 Jun 2026, 1,634. Navigator 1." [ref=f1e250]
+                        - img "Sunday, 28 Jun 2026, 1,742. Navigator 1." [ref=f1e251]
+                        - img "Sunday, 5 Jul 2026, 3,366. Navigator 1." [ref=f1e252]
+                        - img "Sunday, 12 Jul 2026, 4,617. Navigator 1." [ref=f1e253]
+                        - img "Sunday, 19 Jul 2026, 1,923. Navigator 1." [ref=f1e254]
+                        - img "Sunday, 26 Jul 2026, 3,114. Navigator 1." [ref=f1e255]
+                        - img "Sunday, 2 Aug 2026, 2,231. Navigator 1." [ref=f1e256]
+                        - img "Sunday, 9 Aug 2026, 1,711. Navigator 1." [ref=f1e257]
+                    - generic [ref=f1e263]:
+                      - generic [ref=f1e264]: 18 May
+                      - generic [ref=f1e265]: 1 Jun
+                      - generic [ref=f1e266]: 15 Jun
+                      - generic [ref=f1e267]: 29 Jun
+                      - generic [ref=f1e268]: 13 Jul
+                      - generic [ref=f1e269]: 27 Jul
+                      - generic [ref=f1e270]: 10 Aug
+                    - generic [ref=f1e271]:
+                      - generic [ref=f1e272]:
+                        - generic [ref=f1e273]: Jan '26
+                        - text: Jan '26
+                      - generic [ref=f1e274]:
+                        - generic [ref=f1e275]: Mar '26
+                        - text: Mar '26
+                      - generic [ref=f1e276]:
+                        - generic [ref=f1e277]: May '26
+                        - text: May '26
+                      - generic [ref=f1e278]:
+                        - generic [ref=f1e279]: Jul '26
+                        - text: Jul '26
+                    - generic [ref=f1e280]:
+                      - generic [ref=f1e281]: "0"
+                      - generic [ref=f1e282]: 1k
+                      - generic [ref=f1e283]: 2k
+                      - generic [ref=f1e284]: 3k
+                      - generic [ref=f1e285]: 4k
+                  - generic:
+                    - region "Commits over time Axis zoom":
+                      - slider "Start of selected range": "65"
+                      - slider "End of selected range": "100"
+                - generic: End of interactive chart.
+            - list [ref=f1e294]:
+              - listitem [ref=f1e295]:
+                - generic [ref=f1e297]:
+                  - generic [ref=f1e298]:
+                    - generic [ref=f1e299]:
+                      - link "steipete" [ref=f1e301] [cursor=pointer]:
+                        - /url: /steipete
+                      - generic [ref=f1e303]:
+                        - heading "steipete 's Commits" [level=2] [ref=f1e304]:
+                          - generic [ref=f1e305]:
+                            - link "steipete" [ref=f1e306] [cursor=pointer]:
+                              - /url: /steipete
+                            - generic [ref=f1e307]: "'s Commits"
+                        - link "15,386 commits" [ref=f1e310] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=steipete
+                    - generic [ref=f1e311]:
+                      - generic [ref=f1e312]: "#1"
+                      - button "Chart options" [ref=f1e314] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e317] [cursor=pointer]
+                  - region "steipete's Commits. Interactive chart." [ref=f1e320]:
+                    - generic [ref=f1e652]:
+                      - generic [ref=f1e653]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e655] [cursor=pointer]
+                      - generic [ref=f1e656]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e657]: The chart has 1 Y axis displaying Contributions. Data ranges from 34 to 2873.
+                    - application [ref=f1e327]:
+                      - img "Interactive chart" [ref=f1e328]:
+                        - generic [ref=f1e660]: Contributions
+                        - generic [ref=f1e336]:
+                          - img "Sunday, 10 May 2026, 2,751. Commits." [ref=f1e337]
+                          - img "Sunday, 17 May 2026, 584. Commits." [ref=f1e338]
+                          - img "Sunday, 24 May 2026, 1,574. Commits." [ref=f1e339]
+                          - img "Sunday, 31 May 2026, 1,195. Commits." [ref=f1e340]
+                          - img "Sunday, 7 Jun 2026, 34. Commits." [ref=f1e341]
+                          - img "Sunday, 14 Jun 2026, 44. Commits." [ref=f1e342]
+                          - img "Sunday, 21 Jun 2026, 41. Commits." [ref=f1e343]
+                          - img "Sunday, 28 Jun 2026, 199. Commits." [ref=f1e344]
+                          - img "Sunday, 5 Jul 2026, 1,628. Commits." [ref=f1e345]
+                          - img "Sunday, 12 Jul 2026, 2,873. Commits." [ref=f1e346]
+                          - img "Sunday, 19 Jul 2026, 1,132. Commits." [ref=f1e347]
+                          - img "Sunday, 26 Jul 2026, 1,465. Commits." [ref=f1e348]
+                          - img "Sunday, 2 Aug 2026, 934. Commits." [ref=f1e349]
+                          - img "Sunday, 9 Aug 2026, 932. Commits." [ref=f1e350]
+                        - generic [ref=f1e662]:
+                          - generic [ref=f1e663]: Jun '26
+                          - generic [ref=f1e664]: Jul '26
+                          - generic [ref=f1e665]: Aug '26
+                        - generic [ref=f1e666]:
+                          - generic [ref=f1e667]: "0"
+                          - generic [ref=f1e668]: 1k
+                          - generic [ref=f1e669]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e359]:
+                - generic [ref=f1e361]:
+                  - generic [ref=f1e362]:
+                    - generic [ref=f1e363]:
+                      - link "vincentkoc" [ref=f1e365] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - generic [ref=f1e367]:
+                        - heading "vincentkoc 's Commits" [level=2] [ref=f1e368]:
+                          - generic [ref=f1e369]:
+                            - link "vincentkoc" [ref=f1e370] [cursor=pointer]:
+                              - /url: /vincentkoc
+                            - generic [ref=f1e371]: "'s Commits"
+                        - link "7,828 commits" [ref=f1e374] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=vincentkoc
+                    - generic [ref=f1e375]:
+                      - generic [ref=f1e376]: "#2"
+                      - button "Chart options" [ref=f1e378] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e381] [cursor=pointer]
+                  - region "vincentkoc's Commits. Interactive chart." [ref=f1e384]:
+                    - generic [ref=f1e672]:
+                      - generic [ref=f1e673]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e675] [cursor=pointer]
+                      - generic [ref=f1e676]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e677]: The chart has 1 Y axis displaying Contributions. Data ranges from 123 to 1590.
+                    - application [ref=f1e391]:
+                      - img "Interactive chart" [ref=f1e392]:
+                        - generic [ref=f1e680]: Contributions
+                        - generic [ref=f1e400]:
+                          - img "Sunday, 10 May 2026, 280. Commits." [ref=f1e401]
+                          - img "Sunday, 17 May 2026, 241. Commits." [ref=f1e402]
+                          - img "Sunday, 24 May 2026, 817. Commits." [ref=f1e403]
+                          - img "Sunday, 31 May 2026, 672. Commits." [ref=f1e404]
+                          - img "Sunday, 7 Jun 2026, 418. Commits." [ref=f1e405]
+                          - img "Sunday, 14 Jun 2026, 1,590. Commits." [ref=f1e406]
+                          - img "Sunday, 21 Jun 2026, 936. Commits." [ref=f1e407]
+                          - img "Sunday, 28 Jun 2026, 160. Commits." [ref=f1e408]
+                          - img "Sunday, 5 Jul 2026, 532. Commits." [ref=f1e409]
+                          - img "Sunday, 12 Jul 2026, 453. Commits." [ref=f1e410]
+                          - img "Sunday, 19 Jul 2026, 123. Commits." [ref=f1e411]
+                          - img "Sunday, 26 Jul 2026, 795. Commits." [ref=f1e412]
+                          - img "Sunday, 2 Aug 2026, 680. Commits." [ref=f1e413]
+                          - img "Sunday, 9 Aug 2026, 131. Commits." [ref=f1e414]
+                        - generic [ref=f1e682]:
+                          - generic [ref=f1e683]: Jun '26
+                          - generic [ref=f1e684]: Jul '26
+                          - generic [ref=f1e685]: Aug '26
+                        - generic [ref=f1e686]:
+                          - generic [ref=f1e687]: "0"
+                          - generic [ref=f1e688]: 1k
+                          - generic [ref=f1e689]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e423]:
+                - generic [ref=f1e692]:
+                  - generic [ref=f1e693]:
+                    - generic [ref=f1e694]:
+                      - link "shakkernerd" [ref=f1e696] [cursor=pointer]:
+                        - /url: /shakkernerd
+                      - generic [ref=f1e698]:
+                        - heading "shakkernerd 's Commits" [level=2] [ref=f1e699]:
+                          - generic [ref=f1e700]:
+                            - link "shakkernerd" [ref=f1e701] [cursor=pointer]:
+                              - /url: /shakkernerd
+                            - generic [ref=f1e702]: "'s Commits"
+                        - link "2,369 commits" [ref=f1e705] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=shakkernerd
+                    - generic [ref=f1e706]:
+                      - generic [ref=f1e707]: "#3"
+                      - button "Chart options" [ref=f1e709] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e712] [cursor=pointer]
+                  - region "shakkernerd's Commits. Interactive chart." [ref=f1e715]:
+                    - generic [ref=f1e716]:
+                      - generic [ref=f1e717]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e719] [cursor=pointer]
+                      - generic [ref=f1e720]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e721]: The chart has 1 Y axis displaying Contributions. Data ranges from 10 to 1193.
+                    - application [ref=f1e722]:
+                      - img "Interactive chart" [ref=f1e723]:
+                        - generic [ref=f1e729]: Contributions
+                        - generic [ref=f1e732]:
+                          - img "Sunday, 10 May 2026, 1,193. Commits." [ref=f1e733]
+                          - img "Sunday, 17 May 2026, 27. Commits." [ref=f1e734]
+                          - img "Sunday, 24 May 2026, 170. Commits." [ref=f1e735]
+                          - img "Sunday, 31 May 2026, 177. Commits." [ref=f1e736]
+                          - img "Sunday, 7 Jun 2026, 99. Commits." [ref=f1e737]
+                          - img "Sunday, 14 Jun 2026, 106. Commits." [ref=f1e738]
+                          - img "Sunday, 21 Jun 2026, 76. Commits." [ref=f1e739]
+                          - img "Sunday, 28 Jun 2026, 10. Commits." [ref=f1e740]
+                          - img "Sunday, 5 Jul 2026, 39. Commits." [ref=f1e741]
+                          - img "Sunday, 12 Jul 2026, 125. Commits." [ref=f1e742]
+                          - img "Sunday, 19 Jul 2026, 16. Commits." [ref=f1e743]
+                          - img "Sunday, 26 Jul 2026, 131. Commits." [ref=f1e744]
+                          - img "Sunday, 2 Aug 2026, 137. Commits." [ref=f1e745]
+                          - img "Sunday, 9 Aug 2026, 63. Commits." [ref=f1e746]
+                        - generic [ref=f1e747]:
+                          - generic [ref=f1e748]: Jun '26
+                          - generic [ref=f1e749]: Jul '26
+                          - generic [ref=f1e750]: Aug '26
+                        - generic [ref=f1e751]:
+                          - generic [ref=f1e752]: "0"
+                          - generic [ref=f1e753]: 1k
+                          - generic [ref=f1e754]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e425]:
+                - generic [ref=f1e757]:
+                  - generic [ref=f1e758]:
+                    - generic [ref=f1e759]:
+                      - link "obviyus" [ref=f1e761] [cursor=pointer]:
+                        - /url: /obviyus
+                      - generic [ref=f1e763]:
+                        - heading "obviyus 's Commits" [level=2] [ref=f1e764]:
+                          - generic [ref=f1e765]:
+                            - link "obviyus" [ref=f1e766] [cursor=pointer]:
+                              - /url: /obviyus
+                            - generic [ref=f1e767]: "'s Commits"
+                        - link "805 commits" [ref=f1e770] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=obviyus
+                    - generic [ref=f1e771]:
+                      - generic [ref=f1e772]: "#4"
+                      - button "Chart options" [ref=f1e774] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e777] [cursor=pointer]
+                  - region "obviyus's Commits. Interactive chart." [ref=f1e780]:
+                    - generic [ref=f1e781]:
+                      - generic [ref=f1e782]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e784] [cursor=pointer]
+                      - generic [ref=f1e785]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e786]: The chart has 1 Y axis displaying Contributions. Data ranges from 1 to 138.
+                    - application [ref=f1e787]:
+                      - img "Interactive chart" [ref=f1e788]:
+                        - generic [ref=f1e794]: Contributions
+                        - generic [ref=f1e797]:
+                          - img "Sunday, 10 May 2026, 138. Commits." [ref=f1e798]
+                          - img "Sunday, 17 May 2026, 121. Commits." [ref=f1e799]
+                          - img "Sunday, 24 May 2026, 72. Commits." [ref=f1e800]
+                          - img "Sunday, 31 May 2026, 42. Commits." [ref=f1e801]
+                          - img "Sunday, 7 Jun 2026, 64. Commits." [ref=f1e802]
+                          - img "Sunday, 14 Jun 2026, 21. Commits." [ref=f1e803]
+                          - img "Sunday, 21 Jun 2026, 25. Commits." [ref=f1e804]
+                          - img "Sunday, 28 Jun 2026, 83. Commits." [ref=f1e805]
+                          - img "Sunday, 5 Jul 2026, 77. Commits." [ref=f1e806]
+                          - img "Sunday, 12 Jul 2026, 44. Commits." [ref=f1e807]
+                          - img "Sunday, 19 Jul 2026, 1. Commits." [ref=f1e808]
+                          - img "Sunday, 26 Jul 2026, 49. Commits." [ref=f1e809]
+                          - img "Sunday, 2 Aug 2026, 11. Commits." [ref=f1e810]
+                          - img "Sunday, 9 Aug 2026, 57. Commits." [ref=f1e811]
+                        - generic [ref=f1e812]:
+                          - generic [ref=f1e813]: Jun '26
+                          - generic [ref=f1e814]: Jul '26
+                          - generic [ref=f1e815]: Aug '26
+                        - generic [ref=f1e816]:
+                          - generic [ref=f1e817]: "0"
+                          - generic [ref=f1e818]: 1k
+                          - generic [ref=f1e819]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e427]:
+                - generic [ref=f1e822]:
+                  - generic [ref=f1e823]:
+                    - generic [ref=f1e824]:
+                      - link "github-actions[bot]" [ref=f1e826] [cursor=pointer]:
+                        - /url: /apps/github-actions
+                      - generic [ref=f1e828]:
+                        - heading "github-actions[bot] 's Commits" [level=2] [ref=f1e829]:
+                          - generic [ref=f1e830]:
+                            - link "github-actions[bot]" [ref=f1e831] [cursor=pointer]:
+                              - /url: /apps/github-actions
+                            - generic [ref=f1e832]: "'s Commits"
+                        - link "769 commits" [ref=f1e835] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=github-actions%5Bbot%5D
+                    - generic [ref=f1e836]:
+                      - generic [ref=f1e837]: "#5"
+                      - button "Chart options" [ref=f1e839] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e842] [cursor=pointer]
+                  - region "github-actions[bot]'s Commits. Interactive chart." [ref=f1e845]:
+                    - generic [ref=f1e846]:
+                      - generic [ref=f1e847]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e849] [cursor=pointer]
+                      - generic [ref=f1e850]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e851]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 472.
+                    - application [ref=f1e852]:
+                      - img "Interactive chart" [ref=f1e853]:
+                        - generic [ref=f1e859]: Contributions
+                        - generic [ref=f1e862]:
+                          - img "Sunday, 10 May 2026, 36. Commits." [ref=f1e863]
+                          - img "Sunday, 17 May 2026, 67. Commits." [ref=f1e864]
+                          - img "Sunday, 24 May 2026, 18. Commits." [ref=f1e865]
+                          - img "Sunday, 31 May 2026, 72. Commits." [ref=f1e866]
+                          - img "Sunday, 7 Jun 2026, 0. Commits."
+                          - img "Sunday, 14 Jun 2026, 2. Commits." [ref=f1e867]
+                          - img "Sunday, 21 Jun 2026, 36. Commits." [ref=f1e868]
+                          - img "Sunday, 28 Jun 2026, 472. Commits." [ref=f1e869]
+                          - img "Sunday, 5 Jul 2026, 30. Commits." [ref=f1e870]
+                          - img "Sunday, 12 Jul 2026, 10. Commits." [ref=f1e871]
+                          - img "Sunday, 19 Jul 2026, 7. Commits." [ref=f1e872]
+                          - img "Sunday, 26 Jul 2026, 5. Commits." [ref=f1e873]
+                          - img "Sunday, 2 Aug 2026, 7. Commits." [ref=f1e874]
+                          - img "Sunday, 9 Aug 2026, 7. Commits." [ref=f1e875]
+                        - generic [ref=f1e876]:
+                          - generic [ref=f1e877]: Jun '26
+                          - generic [ref=f1e878]: Jul '26
+                          - generic [ref=f1e879]: Aug '26
+                        - generic [ref=f1e880]:
+                          - generic [ref=f1e881]: "0"
+                          - generic [ref=f1e882]: 1k
+                          - generic [ref=f1e883]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e429]:
+                - generic [ref=f1e886]:
+                  - generic [ref=f1e887]:
+                    - generic [ref=f1e888]:
+                      - link "joshavant" [ref=f1e890] [cursor=pointer]:
+                        - /url: /joshavant
+                      - generic [ref=f1e892]:
+                        - heading "joshavant 's Commits" [level=2] [ref=f1e893]:
+                          - generic [ref=f1e894]:
+                            - link "joshavant" [ref=f1e895] [cursor=pointer]:
+                              - /url: /joshavant
+                            - generic [ref=f1e896]: "'s Commits"
+                        - link "719 commits" [ref=f1e899] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=joshavant
+                    - generic [ref=f1e900]:
+                      - generic [ref=f1e901]: "#6"
+                      - button "Chart options" [ref=f1e903] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e906] [cursor=pointer]
+                  - region "joshavant's Commits. Interactive chart." [ref=f1e909]:
+                    - generic [ref=f1e910]:
+                      - generic [ref=f1e911]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e913] [cursor=pointer]
+                      - generic [ref=f1e914]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e915]: The chart has 1 Y axis displaying Contributions. Data ranges from 20 to 96.
+                    - application [ref=f1e916]:
+                      - img "Interactive chart" [ref=f1e917]:
+                        - generic [ref=f1e923]: Contributions
+                        - generic [ref=f1e926]:
+                          - img "Sunday, 10 May 2026, 44. Commits." [ref=f1e927]
+                          - img "Sunday, 17 May 2026, 48. Commits." [ref=f1e928]
+                          - img "Sunday, 24 May 2026, 37. Commits." [ref=f1e929]
+                          - img "Sunday, 31 May 2026, 56. Commits." [ref=f1e930]
+                          - img "Sunday, 7 Jun 2026, 26. Commits." [ref=f1e931]
+                          - img "Sunday, 14 Jun 2026, 39. Commits." [ref=f1e932]
+                          - img "Sunday, 21 Jun 2026, 45. Commits." [ref=f1e933]
+                          - img "Sunday, 28 Jun 2026, 55. Commits." [ref=f1e934]
+                          - img "Sunday, 5 Jul 2026, 20. Commits." [ref=f1e935]
+                          - img "Sunday, 12 Jul 2026, 24. Commits." [ref=f1e936]
+                          - img "Sunday, 19 Jul 2026, 96. Commits." [ref=f1e937]
+                          - img "Sunday, 26 Jul 2026, 69. Commits." [ref=f1e938]
+                          - img "Sunday, 2 Aug 2026, 94. Commits." [ref=f1e939]
+                          - img "Sunday, 9 Aug 2026, 66. Commits." [ref=f1e940]
+                        - generic [ref=f1e941]:
+                          - generic [ref=f1e942]: Jun '26
+                          - generic [ref=f1e943]: Jul '26
+                          - generic [ref=f1e944]: Aug '26
+                        - generic [ref=f1e945]:
+                          - generic [ref=f1e946]: "0"
+                          - generic [ref=f1e947]: 1k
+                          - generic [ref=f1e948]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e431]:
+                - generic [ref=f1e951]:
+                  - generic [ref=f1e952]:
+                    - generic [ref=f1e953]:
+                      - link "RomneyDa" [ref=f1e955] [cursor=pointer]:
+                        - /url: /RomneyDa
+                      - generic [ref=f1e957]:
+                        - heading "RomneyDa 's Commits" [level=2] [ref=f1e958]:
+                          - generic [ref=f1e959]:
+                            - link "RomneyDa" [ref=f1e960] [cursor=pointer]:
+                              - /url: /RomneyDa
+                            - generic [ref=f1e961]: "'s Commits"
+                        - link "492 commits" [ref=f1e964] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=RomneyDa
+                    - generic [ref=f1e965]:
+                      - generic [ref=f1e966]: "#7"
+                      - button "Chart options" [ref=f1e968] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e971] [cursor=pointer]
+                  - region "RomneyDa's Commits. Interactive chart." [ref=f1e974]:
+                    - generic [ref=f1e975]:
+                      - generic [ref=f1e976]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e978] [cursor=pointer]
+                      - generic [ref=f1e979]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e980]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 97.
+                    - application [ref=f1e981]:
+                      - img "Interactive chart" [ref=f1e982]:
+                        - generic [ref=f1e988]: Contributions
+                        - generic [ref=f1e991]:
+                          - img "Sunday, 10 May 2026, 0. Commits."
+                          - img "Sunday, 17 May 2026, 23. Commits." [ref=f1e992]
+                          - img "Sunday, 24 May 2026, 46. Commits." [ref=f1e993]
+                          - img "Sunday, 31 May 2026, 21. Commits." [ref=f1e994]
+                          - img "Sunday, 7 Jun 2026, 15. Commits." [ref=f1e995]
+                          - img "Sunday, 14 Jun 2026, 27. Commits." [ref=f1e996]
+                          - img "Sunday, 21 Jun 2026, 38. Commits." [ref=f1e997]
+                          - img "Sunday, 28 Jun 2026, 97. Commits." [ref=f1e998]
+                          - img "Sunday, 5 Jul 2026, 20. Commits." [ref=f1e999]
+                          - img "Sunday, 12 Jul 2026, 45. Commits." [ref=f1e1000]
+                          - img "Sunday, 19 Jul 2026, 39. Commits." [ref=f1e1001]
+                          - img "Sunday, 26 Jul 2026, 63. Commits." [ref=f1e1002]
+                          - img "Sunday, 2 Aug 2026, 35. Commits." [ref=f1e1003]
+                          - img "Sunday, 9 Aug 2026, 23. Commits." [ref=f1e1004]
+                        - generic [ref=f1e1005]:
+                          - generic [ref=f1e1006]: Jun '26
+                          - generic [ref=f1e1007]: Jul '26
+                          - generic [ref=f1e1008]: Aug '26
+                        - generic [ref=f1e1009]:
+                          - generic [ref=f1e1010]: "0"
+                          - generic [ref=f1e1011]: 1k
+                          - generic [ref=f1e1012]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e433]:
+                - generic [ref=f1e1015]:
+                  - generic [ref=f1e1016]:
+                    - generic [ref=f1e1017]:
+                      - link "claude" [ref=f1e1019] [cursor=pointer]:
+                        - /url: /claude
+                      - generic [ref=f1e1021]:
+                        - heading "claude 's Commits" [level=2] [ref=f1e1022]:
+                          - generic [ref=f1e1023]:
+                            - link "claude" [ref=f1e1024] [cursor=pointer]:
+                              - /url: /claude
+                            - generic [ref=f1e1025]: "'s Commits"
+                        - link "452 commits" [ref=f1e1028] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=claude
+                    - generic [ref=f1e1029]:
+                      - generic [ref=f1e1030]: "#8"
+                      - button "Chart options" [ref=f1e1032] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1035] [cursor=pointer]
+                  - region "claude's Commits. Interactive chart." [ref=f1e1038]:
+                    - generic [ref=f1e1039]:
+                      - generic [ref=f1e1040]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1042] [cursor=pointer]
+                      - generic [ref=f1e1043]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1044]: The chart has 1 Y axis displaying Contributions. Data ranges from 5 to 92.
+                    - application [ref=f1e1045]:
+                      - img "Interactive chart" [ref=f1e1046]:
+                        - generic [ref=f1e1052]: Contributions
+                        - generic [ref=f1e1055]:
+                          - img "Sunday, 10 May 2026, 5. Commits." [ref=f1e1056]
+                          - img "Sunday, 17 May 2026, 9. Commits." [ref=f1e1057]
+                          - img "Sunday, 24 May 2026, 14. Commits." [ref=f1e1058]
+                          - img "Sunday, 31 May 2026, 20. Commits." [ref=f1e1059]
+                          - img "Sunday, 7 Jun 2026, 13. Commits." [ref=f1e1060]
+                          - img "Sunday, 14 Jun 2026, 20. Commits." [ref=f1e1061]
+                          - img "Sunday, 21 Jun 2026, 42. Commits." [ref=f1e1062]
+                          - img "Sunday, 28 Jun 2026, 76. Commits." [ref=f1e1063]
+                          - img "Sunday, 5 Jul 2026, 92. Commits." [ref=f1e1064]
+                          - img "Sunday, 12 Jul 2026, 53. Commits." [ref=f1e1065]
+                          - img "Sunday, 19 Jul 2026, 36. Commits." [ref=f1e1066]
+                          - img "Sunday, 26 Jul 2026, 31. Commits." [ref=f1e1067]
+                          - img "Sunday, 2 Aug 2026, 20. Commits." [ref=f1e1068]
+                          - img "Sunday, 9 Aug 2026, 21. Commits." [ref=f1e1069]
+                        - generic [ref=f1e1070]:
+                          - generic [ref=f1e1071]: Jun '26
+                          - generic [ref=f1e1072]: Jul '26
+                          - generic [ref=f1e1073]: Aug '26
+                        - generic [ref=f1e1074]:
+                          - generic [ref=f1e1075]: "0"
+                          - generic [ref=f1e1076]: 1k
+                          - generic [ref=f1e1077]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e435]:
+                - generic [ref=f1e1080]:
+                  - generic [ref=f1e1081]:
+                    - generic [ref=f1e1082]:
+                      - link "clawsweeper[bot]" [ref=f1e1084] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                      - generic [ref=f1e1086]:
+                        - heading "clawsweeper[bot] 's Commits" [level=2] [ref=f1e1087]:
+                          - generic [ref=f1e1088]:
+                            - link "clawsweeper[bot]" [ref=f1e1089] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f1e1090]: "'s Commits"
+                        - link "288 commits" [ref=f1e1093] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=clawsweeper%5Bbot%5D
+                    - generic [ref=f1e1094]:
+                      - generic [ref=f1e1095]: "#9"
+                      - button "Chart options" [ref=f1e1097] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1100] [cursor=pointer]
+                  - region "clawsweeper[bot]'s Commits. Interactive chart." [ref=f1e1103]:
+                    - generic [ref=f1e1104]:
+                      - generic [ref=f1e1105]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1107] [cursor=pointer]
+                      - generic [ref=f1e1108]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1109]: The chart has 1 Y axis displaying Contributions. Data ranges from 2 to 130.
+                    - application [ref=f1e1110]:
+                      - img "Interactive chart" [ref=f1e1111]:
+                        - generic [ref=f1e1117]: Contributions
+                        - generic [ref=f1e1120]:
+                          - img "Sunday, 10 May 2026, 5. Commits." [ref=f1e1121]
+                          - img "Sunday, 17 May 2026, 130. Commits." [ref=f1e1122]
+                          - img "Sunday, 24 May 2026, 47. Commits." [ref=f1e1123]
+                          - img "Sunday, 31 May 2026, 19. Commits." [ref=f1e1124]
+                          - img "Sunday, 7 Jun 2026, 21. Commits." [ref=f1e1125]
+                          - img "Sunday, 14 Jun 2026, 15. Commits." [ref=f1e1126]
+                          - img "Sunday, 21 Jun 2026, 4. Commits." [ref=f1e1127]
+                          - img "Sunday, 28 Jun 2026, 2. Commits." [ref=f1e1128]
+                          - img "Sunday, 5 Jul 2026, 6. Commits." [ref=f1e1129]
+                          - img "Sunday, 12 Jul 2026, 11. Commits." [ref=f1e1130]
+                          - img "Sunday, 19 Jul 2026, 2. Commits." [ref=f1e1131]
+                          - img "Sunday, 26 Jul 2026, 3. Commits." [ref=f1e1132]
+                          - img "Sunday, 2 Aug 2026, 18. Commits." [ref=f1e1133]
+                          - img "Sunday, 9 Aug 2026, 5. Commits." [ref=f1e1134]
+                        - generic [ref=f1e1135]:
+                          - generic [ref=f1e1136]: Jun '26
+                          - generic [ref=f1e1137]: Jul '26
+                          - generic [ref=f1e1138]: Aug '26
+                        - generic [ref=f1e1139]:
+                          - generic [ref=f1e1140]: "0"
+                          - generic [ref=f1e1141]: 1k
+                          - generic [ref=f1e1142]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e437]:
+                - generic [ref=f1e1145]:
+                  - generic [ref=f1e1146]:
+                    - generic [ref=f1e1147]:
+                      - link "Alix-007" [ref=f1e1149] [cursor=pointer]:
+                        - /url: /Alix-007
+                      - generic [ref=f1e1151]:
+                        - heading "Alix-007 's Commits" [level=2] [ref=f1e1152]:
+                          - generic [ref=f1e1153]:
+                            - link "Alix-007" [ref=f1e1154] [cursor=pointer]:
+                              - /url: /Alix-007
+                            - generic [ref=f1e1155]: "'s Commits"
+                        - link "255 commits" [ref=f1e1158] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=Alix-007
+                    - generic [ref=f1e1159]:
+                      - generic [ref=f1e1160]: "#10"
+                      - button "Chart options" [ref=f1e1162] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1165] [cursor=pointer]
+                  - region "Alix-007's Commits. Interactive chart." [ref=f1e1168]:
+                    - generic [ref=f1e1169]:
+                      - generic [ref=f1e1170]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1172] [cursor=pointer]
+                      - generic [ref=f1e1173]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1174]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 96.
+                    - application [ref=f1e1175]:
+                      - img "Interactive chart" [ref=f1e1176]:
+                        - generic [ref=f1e1182]: Contributions
+                        - generic [ref=f1e1185]:
+                          - img "Sunday, 10 May 2026, 0. Commits."
+                          - img "Sunday, 17 May 2026, 0. Commits."
+                          - img "Sunday, 24 May 2026, 7. Commits." [ref=f1e1186]
+                          - img "Sunday, 31 May 2026, 8. Commits." [ref=f1e1187]
+                          - img "Sunday, 7 Jun 2026, 3. Commits." [ref=f1e1188]
+                          - img "Sunday, 14 Jun 2026, 32. Commits." [ref=f1e1189]
+                          - img "Sunday, 21 Jun 2026, 17. Commits." [ref=f1e1190]
+                          - img "Sunday, 28 Jun 2026, 26. Commits." [ref=f1e1191]
+                          - img "Sunday, 5 Jul 2026, 36. Commits." [ref=f1e1192]
+                          - img "Sunday, 12 Jul 2026, 96. Commits." [ref=f1e1193]
+                          - img "Sunday, 19 Jul 2026, 12. Commits." [ref=f1e1194]
+                          - img "Sunday, 26 Jul 2026, 4. Commits." [ref=f1e1195]
+                          - img "Sunday, 2 Aug 2026, 10. Commits." [ref=f1e1196]
+                          - img "Sunday, 9 Aug 2026, 4. Commits." [ref=f1e1197]
+                        - generic [ref=f1e1198]:
+                          - generic [ref=f1e1199]: Jun '26
+                          - generic [ref=f1e1200]: Jul '26
+                          - generic [ref=f1e1201]: Aug '26
+                        - generic [ref=f1e1202]:
+                          - generic [ref=f1e1203]: "0"
+                          - generic [ref=f1e1204]: 1k
+                          - generic [ref=f1e1205]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e439]:
+                - generic [ref=f1e1208]:
+                  - generic [ref=f1e1209]:
+                    - generic [ref=f1e1210]:
+                      - link "fuller-stack-dev" [ref=f1e1212] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                      - generic [ref=f1e1214]:
+                        - heading "fuller-stack-dev 's Commits" [level=2] [ref=f1e1215]:
+                          - generic [ref=f1e1216]:
+                            - link "fuller-stack-dev" [ref=f1e1217] [cursor=pointer]:
+                              - /url: /fuller-stack-dev
+                            - generic [ref=f1e1218]: "'s Commits"
+                        - link "248 commits" [ref=f1e1221] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=fuller-stack-dev
+                    - generic [ref=f1e1222]:
+                      - generic [ref=f1e1223]: "#11"
+                      - button "Chart options" [ref=f1e1225] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1228] [cursor=pointer]
+                  - region "fuller-stack-dev's Commits. Interactive chart." [ref=f1e1231]:
+                    - generic [ref=f1e1232]:
+                      - generic [ref=f1e1233]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1235] [cursor=pointer]
+                      - generic [ref=f1e1236]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1237]: The chart has 1 Y axis displaying Contributions. Data ranges from 4 to 43.
+                    - application [ref=f1e1238]:
+                      - img "Interactive chart" [ref=f1e1239]:
+                        - generic [ref=f1e1245]: Contributions
+                        - generic [ref=f1e1248]:
+                          - img "Sunday, 10 May 2026, 5. Commits." [ref=f1e1249]
+                          - img "Sunday, 17 May 2026, 28. Commits." [ref=f1e1250]
+                          - img "Sunday, 24 May 2026, 19. Commits." [ref=f1e1251]
+                          - img "Sunday, 31 May 2026, 8. Commits." [ref=f1e1252]
+                          - img "Sunday, 7 Jun 2026, 14. Commits." [ref=f1e1253]
+                          - img "Sunday, 14 Jun 2026, 7. Commits." [ref=f1e1254]
+                          - img "Sunday, 21 Jun 2026, 4. Commits." [ref=f1e1255]
+                          - img "Sunday, 28 Jun 2026, 6. Commits." [ref=f1e1256]
+                          - img "Sunday, 5 Jul 2026, 10. Commits." [ref=f1e1257]
+                          - img "Sunday, 12 Jul 2026, 33. Commits." [ref=f1e1258]
+                          - img "Sunday, 19 Jul 2026, 43. Commits." [ref=f1e1259]
+                          - img "Sunday, 26 Jul 2026, 27. Commits." [ref=f1e1260]
+                          - img "Sunday, 2 Aug 2026, 32. Commits." [ref=f1e1261]
+                          - img "Sunday, 9 Aug 2026, 12. Commits." [ref=f1e1262]
+                        - generic [ref=f1e1263]:
+                          - generic [ref=f1e1264]: Jun '26
+                          - generic [ref=f1e1265]: Jul '26
+                          - generic [ref=f1e1266]: Aug '26
+                        - generic [ref=f1e1267]:
+                          - generic [ref=f1e1268]: "0"
+                          - generic [ref=f1e1269]: 1k
+                          - generic [ref=f1e1270]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e441]:
+                - generic [ref=f1e1273]:
+                  - generic [ref=f1e1274]:
+                    - generic [ref=f1e1275]:
+                      - link "giodl73-repo" [ref=f1e1277] [cursor=pointer]:
+                        - /url: /giodl73-repo
+                      - generic [ref=f1e1279]:
+                        - heading "giodl73-repo 's Commits" [level=2] [ref=f1e1280]:
+                          - generic [ref=f1e1281]:
+                            - link "giodl73-repo" [ref=f1e1282] [cursor=pointer]:
+                              - /url: /giodl73-repo
+                            - generic [ref=f1e1283]: "'s Commits"
+                        - link "220 commits" [ref=f1e1286] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=giodl73-repo
+                    - generic [ref=f1e1287]:
+                      - generic [ref=f1e1288]: "#12"
+                      - button "Chart options" [ref=f1e1290] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1293] [cursor=pointer]
+                  - region "giodl73-repo's Commits. Interactive chart." [ref=f1e1296]:
+                    - generic [ref=f1e1297]:
+                      - generic [ref=f1e1298]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1300] [cursor=pointer]
+                      - generic [ref=f1e1301]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1302]: The chart has 1 Y axis displaying Contributions. Data ranges from 1 to 51.
+                    - application [ref=f1e1303]:
+                      - img "Interactive chart" [ref=f1e1304]:
+                        - generic [ref=f1e1310]: Contributions
+                        - generic [ref=f1e1313]:
+                          - img "Sunday, 10 May 2026, 39. Commits." [ref=f1e1314]
+                          - img "Sunday, 17 May 2026, 51. Commits." [ref=f1e1315]
+                          - img "Sunday, 24 May 2026, 20. Commits." [ref=f1e1316]
+                          - img "Sunday, 31 May 2026, 8. Commits." [ref=f1e1317]
+                          - img "Sunday, 7 Jun 2026, 1. Commits." [ref=f1e1318]
+                          - img "Sunday, 14 Jun 2026, 6. Commits." [ref=f1e1319]
+                          - img "Sunday, 21 Jun 2026, 17. Commits." [ref=f1e1320]
+                          - img "Sunday, 28 Jun 2026, 33. Commits." [ref=f1e1321]
+                          - img "Sunday, 5 Jul 2026, 13. Commits." [ref=f1e1322]
+                          - img "Sunday, 12 Jul 2026, 5. Commits." [ref=f1e1323]
+                          - img "Sunday, 19 Jul 2026, 17. Commits." [ref=f1e1324]
+                          - img "Sunday, 26 Jul 2026, 5. Commits." [ref=f1e1325]
+                          - img "Sunday, 2 Aug 2026, 3. Commits." [ref=f1e1326]
+                          - img "Sunday, 9 Aug 2026, 2. Commits." [ref=f1e1327]
+                        - generic [ref=f1e1328]:
+                          - generic [ref=f1e1329]: Jun '26
+                          - generic [ref=f1e1330]: Jul '26
+                          - generic [ref=f1e1331]: Aug '26
+                        - generic [ref=f1e1332]:
+                          - generic [ref=f1e1333]: "0"
+                          - generic [ref=f1e1334]: 1k
+                          - generic [ref=f1e1335]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e443]:
+                - generic [ref=f1e1338]:
+                  - generic [ref=f1e1339]:
+                    - generic [ref=f1e1340]:
+                      - link "zhangguiping-xydt" [ref=f1e1342] [cursor=pointer]:
+                        - /url: /zhangguiping-xydt
+                      - generic [ref=f1e1344]:
+                        - heading "zhangguiping-xydt 's Commits" [level=2] [ref=f1e1345]:
+                          - generic [ref=f1e1346]:
+                            - link "zhangguiping-xydt" [ref=f1e1347] [cursor=pointer]:
+                              - /url: /zhangguiping-xydt
+                            - generic [ref=f1e1348]: "'s Commits"
+                        - link "206 commits" [ref=f1e1351] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=zhangguiping-xydt
+                    - generic [ref=f1e1352]:
+                      - generic [ref=f1e1353]: "#13"
+                      - button "Chart options" [ref=f1e1355] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1358] [cursor=pointer]
+                  - region "zhangguiping-xydt's Commits. Interactive chart." [ref=f1e1361]:
+                    - generic [ref=f1e1362]:
+                      - generic [ref=f1e1363]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1365] [cursor=pointer]
+                      - generic [ref=f1e1366]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1367]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 59.
+                    - application [ref=f1e1368]:
+                      - img "Interactive chart" [ref=f1e1369]:
+                        - generic [ref=f1e1375]: Contributions
+                        - generic [ref=f1e1378]:
+                          - img "Sunday, 10 May 2026, 0. Commits."
+                          - img "Sunday, 17 May 2026, 3. Commits." [ref=f1e1379]
+                          - img "Sunday, 24 May 2026, 7. Commits." [ref=f1e1380]
+                          - img "Sunday, 31 May 2026, 15. Commits." [ref=f1e1381]
+                          - img "Sunday, 7 Jun 2026, 4. Commits." [ref=f1e1382]
+                          - img "Sunday, 14 Jun 2026, 24. Commits." [ref=f1e1383]
+                          - img "Sunday, 21 Jun 2026, 16. Commits." [ref=f1e1384]
+                          - img "Sunday, 28 Jun 2026, 12. Commits." [ref=f1e1385]
+                          - img "Sunday, 5 Jul 2026, 37. Commits." [ref=f1e1386]
+                          - img "Sunday, 12 Jul 2026, 59. Commits." [ref=f1e1387]
+                          - img "Sunday, 19 Jul 2026, 17. Commits." [ref=f1e1388]
+                          - img "Sunday, 26 Jul 2026, 10. Commits." [ref=f1e1389]
+                          - img "Sunday, 2 Aug 2026, 1. Commits." [ref=f1e1390]
+                          - img "Sunday, 9 Aug 2026, 1. Commits." [ref=f1e1391]
+                        - generic [ref=f1e1392]:
+                          - generic [ref=f1e1393]: Jun '26
+                          - generic [ref=f1e1394]: Jul '26
+                          - generic [ref=f1e1395]: Aug '26
+                        - generic [ref=f1e1396]:
+                          - generic [ref=f1e1397]: "0"
+                          - generic [ref=f1e1398]: 1k
+                          - generic [ref=f1e1399]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e445]:
+                - generic [ref=f1e1402]:
+                  - generic [ref=f1e1403]:
+                    - generic [ref=f1e1404]:
+                      - link "Takhoffman" [ref=f1e1406] [cursor=pointer]:
+                        - /url: /Takhoffman
+                      - generic [ref=f1e1408]:
+                        - heading "Takhoffman 's Commits" [level=2] [ref=f1e1409]:
+                          - generic [ref=f1e1410]:
+                            - link "Takhoffman" [ref=f1e1411] [cursor=pointer]:
+                              - /url: /Takhoffman
+                            - generic [ref=f1e1412]: "'s Commits"
+                        - link "200 commits" [ref=f1e1415] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=Takhoffman
+                    - generic [ref=f1e1416]:
+                      - generic [ref=f1e1417]: "#14"
+                      - button "Chart options" [ref=f1e1419] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1422] [cursor=pointer]
+                  - region "Takhoffman's Commits. Interactive chart." [ref=f1e1425]:
+                    - generic [ref=f1e1426]:
+                      - generic [ref=f1e1427]: Bar chart with 14 bars.
+                      - button "View as data table, Chart" [ref=f1e1429] [cursor=pointer]
+                      - generic [ref=f1e1430]: The chart has 1 X axis displaying Time. Data ranges from 2026-05-10 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1431]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 112.
+                    - application [ref=f1e1432]:
+                      - img "Interactive chart" [ref=f1e1433]:
+                        - generic [ref=f1e1439]: Contributions
+                        - generic [ref=f1e1442]:
+                          - img "Sunday, 10 May 2026, 0. Commits."
+                          - img "Sunday, 17 May 2026, 112. Commits." [ref=f1e1443]
+                          - img "Sunday, 24 May 2026, 34. Commits." [ref=f1e1444]
+                          - img "Sunday, 31 May 2026, 15. Commits." [ref=f1e1445]
+                          - img "Sunday, 7 Jun 2026, 12. Commits." [ref=f1e1446]
+                          - img "Sunday, 14 Jun 2026, 2. Commits." [ref=f1e1447]
+                          - img "Sunday, 21 Jun 2026, 0. Commits."
+                          - img "Sunday, 28 Jun 2026, 0. Commits."
+                          - img "Sunday, 5 Jul 2026, 1. Commits." [ref=f1e1448]
+                          - img "Sunday, 12 Jul 2026, 0. Commits."
+                          - img "Sunday, 19 Jul 2026, 0. Commits."
+                          - img "Sunday, 26 Jul 2026, 3. Commits." [ref=f1e1449]
+                          - img "Sunday, 2 Aug 2026, 14. Commits." [ref=f1e1450]
+                          - img "Sunday, 9 Aug 2026, 7. Commits." [ref=f1e1451]
+                        - generic [ref=f1e1452]:
+                          - generic [ref=f1e1453]: Jun '26
+                          - generic [ref=f1e1454]: Jul '26
+                          - generic [ref=f1e1455]: Aug '26
+                        - generic [ref=f1e1456]:
+                          - generic [ref=f1e1457]: "0"
+                          - generic [ref=f1e1458]: 1k
+                          - generic [ref=f1e1459]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e447]
+              - listitem [ref=f1e449]
+              - listitem [ref=f1e451]
+              - listitem [ref=f1e453]
+              - listitem [ref=f1e455]
+              - listitem [ref=f1e457]
+              - listitem [ref=f1e459]
+              - listitem [ref=f1e461]
+              - listitem [ref=f1e463]
+              - listitem [ref=f1e465]
+              - listitem [ref=f1e467]
+              - listitem [ref=f1e469]
+              - listitem [ref=f1e471]
+              - listitem [ref=f1e473]
+              - listitem [ref=f1e475]
+              - listitem [ref=f1e477]
+              - listitem [ref=f1e479]
+              - listitem [ref=f1e481]
+              - listitem [ref=f1e483]
+              - listitem [ref=f1e485]
+              - listitem [ref=f1e487]
+              - listitem [ref=f1e489]
+              - listitem [ref=f1e491]
+              - listitem [ref=f1e493]
+              - listitem [ref=f1e495]
+              - listitem [ref=f1e497]
+              - listitem [ref=f1e499]
+              - listitem [ref=f1e501]
+              - listitem [ref=f1e503]
+              - listitem [ref=f1e505]
+              - listitem [ref=f1e507]
+              - listitem [ref=f1e509]
+              - listitem [ref=f1e511]
+              - listitem [ref=f1e513]
+              - listitem [ref=f1e515]
+              - listitem [ref=f1e517]
+              - listitem [ref=f1e519]
+              - listitem [ref=f1e521]
+              - listitem [ref=f1e523]
+              - listitem [ref=f1e525]
+              - listitem [ref=f1e527]
+              - listitem [ref=f1e529]
+              - listitem [ref=f1e531]
+              - listitem [ref=f1e533]
+              - listitem [ref=f1e535]
+              - listitem [ref=f1e537]
+              - listitem [ref=f1e539]
+              - listitem [ref=f1e541]
+              - listitem [ref=f1e543]
+              - listitem [ref=f1e545]
+              - listitem [ref=f1e547]
+              - listitem [ref=f1e549]
+              - listitem [ref=f1e551]
+              - listitem [ref=f1e553]
+              - listitem [ref=f1e555]
+              - listitem [ref=f1e557]
+              - listitem [ref=f1e559]
+              - listitem [ref=f1e561]
+              - listitem [ref=f1e563]
+              - listitem [ref=f1e565]
+              - listitem [ref=f1e567]
+              - listitem [ref=f1e569]
+              - listitem [ref=f1e571]
+              - listitem [ref=f1e573]
+              - listitem [ref=f1e575]
+              - listitem [ref=f1e577]
+              - listitem [ref=f1e579]
+              - listitem [ref=f1e581]
+              - listitem [ref=f1e583]
+              - listitem [ref=f1e585]
+              - listitem [ref=f1e587]
+              - listitem [ref=f1e589]
+              - listitem [ref=f1e591]
+              - listitem [ref=f1e593]
+              - listitem [ref=f1e595]
+              - listitem [ref=f1e597]
+              - listitem [ref=f1e599]
+              - listitem [ref=f1e601]
+              - listitem [ref=f1e603]
+              - listitem [ref=f1e605]
+              - listitem [ref=f1e607]
+              - listitem [ref=f1e609]
+              - listitem [ref=f1e611]
+              - listitem [ref=f1e613]
+              - listitem [ref=f1e615]
+              - listitem [ref=f1e617]
+  - contentinfo [ref=f1e619]:
+    - heading "Footer" [level=2] [ref=f1e620]
+    - generic [ref=f1e621]:
+      - generic [ref=f1e622]:
+        - link "GitHub Homepage" [ref=f1e623] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f1e626]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f1e627]:
+        - heading "Footer navigation" [level=3] [ref=f1e628]
+        - list "Footer navigation" [ref=f1e629]:
+          - listitem [ref=f1e630]:
+            - link "Terms" [ref=f1e631] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f1e632]:
+            - link "Privacy" [ref=f1e633] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f1e634]:
+            - link "Security" [ref=f1e635] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f1e636]:
+            - link "Status" [ref=f1e637] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f1e638]:
+            - link "Community" [ref=f1e639] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f1e640]:
+            - link "Docs" [ref=f1e641] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f1e642]:
+            - link "Contact" [ref=f1e643] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f1e644]:
+            - button "Manage cookies" [ref=f1e646] [cursor=pointer]
+          - listitem [ref=f1e647]:
+            - button "Do not share my personal information" [ref=f1e649] [cursor=pointer]

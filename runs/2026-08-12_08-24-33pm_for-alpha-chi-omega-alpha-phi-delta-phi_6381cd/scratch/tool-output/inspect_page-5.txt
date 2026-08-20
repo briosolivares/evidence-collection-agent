@@ -1,0 +1,868 @@
+URL: https://marginalia-search.com/search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT
+Title: "Beta Epsilon" Alpha Phi MIT - Marginalia Search
+
+- generic [active] [ref=f140e1]:
+  - link "Skip To Content" [ref=f140e2] [cursor=pointer]:
+    - /url: skipnav
+  - banner [ref=f140e3]:
+    - navigation [ref=f140e5]:
+      - generic [ref=f140e7]:
+        - link "Search" [ref=f140e8] [cursor=pointer]:
+          - /url: /
+        - link "Sites" [ref=f140e9] [cursor=pointer]:
+          - /url: /site
+        - link "Explore" [ref=f140e10] [cursor=pointer]:
+          - /url: /explore
+        - link "About" [ref=f140e12] [cursor=pointer]:
+          - /url: https://about.marginalia-search.com/
+  - banner [ref=f140e13]:
+    - generic [ref=f140e15]:
+      - heading [level=1] [ref=f140e17]:
+        - link "Marginalia Search" [ref=f140e18] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f140e21]:
+        - textbox "Search the web!" [ref=f140e22]: "\"Beta Epsilon\" Alpha Phi MIT"
+        - button " Search" [ref=f140e23] [cursor=pointer]:
+          - generic [ref=f140e24]: 
+          - text: Search
+      - text:  
+  - generic [ref=f140e25]:
+    - complementary [ref=f140e26]:
+      - generic [ref=f140e28]:
+        - heading " Filter" [level=2] [ref=f140e29]:
+          - generic [ref=f140e30]: 
+          - text: Filter
+        - generic [ref=f140e31]:
+          - button [ref=f140e33] [cursor=pointer]:
+            - link " All" [ref=f140e34]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e35]: 
+              - text: All
+          - button [ref=f140e37] [cursor=pointer]:
+            - link " Blogs" [ref=f140e38]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=blogosphere&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e39]: 
+              - text: Blogs
+          - button [ref=f140e41] [cursor=pointer]:
+            - link " Academia" [ref=f140e42]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=academia&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e43]: 
+              - text: Academia
+          - button [ref=f140e45] [cursor=pointer]:
+            - link " Vintage" [ref=f140e46]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=vintage&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e47]: 
+              - text: Vintage
+          - button [ref=f140e49] [cursor=pointer]:
+            - link " Small Web" [ref=f140e50]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=modern&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e51]: 
+              - text: Small Web
+          - button [ref=f140e54] [cursor=pointer]:
+            - link " Wikis" [ref=f140e55]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=wiki&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e56]: 
+              - text: Wikis
+          - button [ref=f140e58] [cursor=pointer]:
+            - link " Forums" [ref=f140e59]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=forum&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e60]: 
+              - text: Forums
+          - button [ref=f140e62] [cursor=pointer]:
+            - link " Recipes" [ref=f140e63]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=food&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e64]: 
+              - text: Recipes
+          - button [ref=f140e67] [cursor=pointer]:
+            - link " Custom Filter" [ref=f140e68]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&profile=custom&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e69]: 
+              - text: Custom Filter
+    - text:  
+    - main [ref=f140e70]:
+      - generic [ref=f140e71]:
+        - heading "Results" [level=1] [ref=f140e72]
+        - generic [ref=f140e73]:
+          - generic [ref=f140e75]:
+            - generic [ref=f140e76]:
+              - generic [ref=f140e77]:
+                - generic [ref=f140e78]:
+                  - generic "Match density" [ref=f140e79]
+                  - generic [ref=f140e83]:
+                    - heading [level=2] [ref=f140e84]:
+                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f140e85] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f140e87] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+                - paragraph [ref=f140e89]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+              - generic [ref=f140e90]:
+                - link "" [ref=f140e91] [cursor=pointer]:
+                  - /url: /site/en.wikipedia.org
+                - link "" [ref=f140e93] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+            - generic [ref=f140e95]:
+              - paragraph [ref=f140e96]: "Also from en.wikipedia.org:"
+              - list [ref=f140e97]:
+                - listitem [ref=f140e98]:
+                  - link "Phi Sigma Kappa" [ref=f140e99] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Phi_Sigma_Kappa
+            - generic [ref=f140e100]:
+              - generic [ref=f140e102]: Wiki
+              - generic "Contains JavaScript" [ref=f140e103]: JS
+          - generic [ref=f140e105]:
+            - generic [ref=f140e106]:
+              - generic [ref=f140e107]:
+                - generic [ref=f140e108]:
+                  - generic "Match density" [ref=f140e109]
+                  - generic [ref=f140e113]:
+                    - heading [level=2] [ref=f140e114]:
+                      - link "Brothers of Phi Beta Epsilon win first annual FSILG&D Community Service Challenge Photo Contest | MIT News | Massachusetts In..." [ref=f140e115] [cursor=pointer]:
+                        - /url: https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+                    - link "https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest" [ref=f140e117] [cursor=pointer]:
+                      - /url: https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+                - paragraph [ref=f140e119]: The MIT fraternity Phi Beta Epsilon (PBE) won the community vote for the first annual Fraternities, Sororities, Independent Living Groups and Dorms (FSILG&D) Community Service Challenge Photo Contest. The contest encouraged students to submit photos of th
+              - generic [ref=f140e120]:
+                - link "" [ref=f140e121] [cursor=pointer]:
+                  - /url: /site/news.mit.edu
+                - link "" [ref=f140e123] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2011/phi-beta-epsilon-win-photo-contest
+            - generic [ref=f140e125]:
+              - paragraph [ref=f140e126]: "Also from news.mit.edu:"
+              - list [ref=f140e127]:
+                - listitem [ref=f140e128]:
+                  - link "Rising to the Challenge | MIT News | Massachusetts Institute of Technology" [ref=f140e129] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2012/rising-to-the-challenge
+                - listitem [ref=f140e130]:
+                  - link "Eleven from MIT awarded 2020 Fulbright Fellowships | MIT News | Massachusetts Institute of Technology" [ref=f140e131] [cursor=pointer]:
+                    - /url: https://news.mit.edu/2020/ten-mit-awarded-2020-fulbright-fellowships-0522
+            - generic "Contains JavaScript" [ref=f140e134]: JS
+          - generic [ref=f140e136]:
+            - generic [ref=f140e137]:
+              - generic [ref=f140e138]:
+                - generic [ref=f140e139]:
+                  - generic "Match density" [ref=f140e140]
+                  - generic [ref=f140e144]:
+                    - heading [level=2] [ref=f140e145]:
+                      - link "Acronyms - P - MIT Acronyms - MIT Wiki Service" [ref=f140e146] [cursor=pointer]:
+                        - /url: https://wikis.mit.edu/confluence/display/ACRONYMS/Acronyms+-+P
+                    - link "https://wikis.mit.edu/confluence/display/ACRONYMS/Acronyms+-+P" [ref=f140e148] [cursor=pointer]:
+                      - /url: https://wikis.mit.edu/confluence/display/ACRONYMS/Acronyms+-+P
+                - paragraph [ref=f140e150]: The U.S. Environmental Protection Agency's student design competition for sustainability focusing on People, Prosperity, and the OP
+              - generic [ref=f140e151]:
+                - link "" [ref=f140e152] [cursor=pointer]:
+                  - /url: /site/wikis.mit.edu
+                - link "" [ref=f140e154] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://wikis.mit.edu/confluence/display/ACRONYMS/Acronyms+-+P
+            - generic "Contains JavaScript" [ref=f140e158]: JS
+          - generic [ref=f140e160]:
+            - generic [ref=f140e161]:
+              - generic [ref=f140e162]:
+                - generic [ref=f140e163]:
+                  - generic "Match density" [ref=f140e164]
+                  - generic [ref=f140e168]:
+                    - heading [level=2] [ref=f140e169]:
+                      - link "MIT Alpha Phi" [ref=f140e170] [cursor=pointer]:
+                        - /url: http://aphi.mit.edu/philanthropy/
+                    - link "http://aphi.mit.edu/philanthropy/" [ref=f140e172] [cursor=pointer]:
+                      - /url: http://aphi.mit.edu/philanthropy/
+                - paragraph [ref=f140e174]: Women's heart health is at the core of Alpha Phi's national philanthropy — cardiovascular disease is responsible for nearly one in five deaths in American women, yet remains widely under-researched. Through the Alpha Phi Foundation's Heart to Heart Grant,
+              - generic [ref=f140e175]:
+                - link "" [ref=f140e176] [cursor=pointer]:
+                  - /url: /site/aphi.mit.edu
+                - link "" [ref=f140e178] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://aphi.mit.edu/philanthropy/
+            - generic "Contains JavaScript" [ref=f140e182]: JS
+          - generic [ref=f140e184]:
+            - generic [ref=f140e185]:
+              - generic [ref=f140e186]:
+                - generic [ref=f140e187]:
+                  - generic "Match density" [ref=f140e188]
+                  - generic [ref=f140e192]:
+                    - heading [level=2] [ref=f140e193]:
+                      - link "Of Dancing and T-Shirts (Guest Entry) | MIT Admissions" [ref=f140e194] [cursor=pointer]:
+                        - /url: https://mitadmissions.org/blogs/entry/post_14/
+                    - link "https://mitadmissions.org/blogs/entry/post_14/" [ref=f140e196] [cursor=pointer]:
+                      - /url: https://mitadmissions.org/blogs/entry/post_14/
+                - paragraph [ref=f140e198]: Who had fun at CPW? I did! April 22, 2008 By Emily Zhao ’12 Hey, my name is Emily. Sorry this guest entry is coming late! I had a great time at CPW, really. But my SD card corrupted, dumping the gajillions of photos I shot before 3:30pm on Saturday. I can
+              - generic [ref=f140e199]:
+                - link "" [ref=f140e200] [cursor=pointer]:
+                  - /url: /site/mitadmissions.org
+                - link "" [ref=f140e202] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/post_14/
+            - generic [ref=f140e204]:
+              - paragraph [ref=f140e205]: "Also from mitadmissions.org:"
+              - list [ref=f140e206]:
+                - listitem [ref=f140e207]:
+                  - link "Speaking in MITese | MIT Admissions" [ref=f140e208] [cursor=pointer]:
+                    - /url: https://mitadmissions.org/blogs/entry/speaking_mitese/
+            - generic "Contains JavaScript" [ref=f140e211]: JS
+          - generic [ref=f140e213]:
+            - generic [ref=f140e214]:
+              - generic [ref=f140e215]:
+                - generic [ref=f140e216]:
+                  - generic "Match density" [ref=f140e217]
+                  - generic [ref=f140e221]:
+                    - heading [level=2] [ref=f140e222]:
+                      - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f140e223] [cursor=pointer]:
+                        - /url: https://www.aephi.org/foundation-trustees
+                    - link "https://www.aephi.org/foundation-trustees" [ref=f140e225] [cursor=pointer]:
+                      - /url: https://www.aephi.org/foundation-trustees
+                - paragraph [ref=f140e227]: The Alpha Epsilon Phi Foundation is directed by a volunteer board of seventeen trustees, including the sorority national president and the sorority executive director who serves ex officio. The trustees bring a mix of Sorority involvement, non-profit expe
+              - generic [ref=f140e228]:
+                - link "" [ref=f140e229] [cursor=pointer]:
+                  - /url: /site/www.aephi.org
+                - link "" [ref=f140e231] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.aephi.org/foundation-trustees
+            - generic "Contains JavaScript" [ref=f140e235]: JS
+          - generic [ref=f140e237]:
+            - generic [ref=f140e238]:
+              - generic [ref=f140e239]:
+                - generic [ref=f140e240]:
+                  - generic "Match density" [ref=f140e241]
+                  - generic [ref=f140e245]:
+                    - heading [level=2] [ref=f140e246]:
+                      - link "AILG Hosts Annual Dinner at MIT Museum - MIT Division of Student Life" [ref=f140e247] [cursor=pointer]:
+                        - /url: https://studentlife.mit.edu/campus-communities/community-stories/ailg-hosts-annual-dinner-at-mit-museum/
+                    - link "https://studentlife.mit.edu/campus-communities/community-stories/ailg-hosts-annual-dinner-at-mit-museum/" [ref=f140e249] [cursor=pointer]:
+                      - /url: https://studentlife.mit.edu/campus-communities/community-stories/ailg-hosts-annual-dinner-at-mit-museum/
+                - paragraph [ref=f140e251]: On May 31, the Association of Independent Living Groups (AILG) held their annual dinner and business meeting at the MIT Museum. The AILG membership consists of the alumni and advisory boards involved with MIT’s Fraternities, Sororities, and Independent Li
+              - generic [ref=f140e252]:
+                - link "" [ref=f140e253] [cursor=pointer]:
+                  - /url: /site/studentlife.mit.edu
+                - link "" [ref=f140e255] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://studentlife.mit.edu/campus-communities/community-stories/ailg-hosts-annual-dinner-at-mit-museum/
+            - generic [ref=f140e257]:
+              - paragraph [ref=f140e258]: "Also from studentlife.mit.edu:"
+              - list [ref=f140e259]:
+                - listitem [ref=f140e260]:
+                  - link "FSILG Awards Celebrate FSILG Contributions at MIT - MIT Division of Student Life" [ref=f140e261] [cursor=pointer]:
+                    - /url: https://studentlife.mit.edu/campus-communities/community-stories/fsilg-awards-celebrate-fsilg-contributions-at-mit/
+            - generic "Contains JavaScript" [ref=f140e264]: JS
+          - generic [ref=f140e266]:
+            - generic [ref=f140e267]:
+              - generic [ref=f140e268]:
+                - generic [ref=f140e269]:
+                  - generic "Match density" [ref=f140e270]
+                  - generic [ref=f140e274]:
+                    - heading [level=2] [ref=f140e275]:
+                      - link "Three fraternities join rush | The Tech" [ref=f140e276] [cursor=pointer]:
+                        - /url: https://thetech.com/2012/09/07/newfrats-v132-n35
+                    - link "https://thetech.com/2012/09/07/newfrats-v132-n35" [ref=f140e278] [cursor=pointer]:
+                      - /url: https://thetech.com/2012/09/07/newfrats-v132-n35
+                - paragraph [ref=f140e280]: By After a two-year rush suspension, PBE is rushing for the first time this year since 2010. Two other fraternities, Alpha Sig and Beta, have also started recruitment this year. Fraternity rush was busier than ever this year, with three additional fratern
+              - generic [ref=f140e281]:
+                - link "" [ref=f140e282] [cursor=pointer]:
+                  - /url: /site/thetech.com
+                - link "" [ref=f140e284] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://thetech.com/2012/09/07/newfrats-v132-n35
+            - generic [ref=f140e286]:
+              - paragraph [ref=f140e287]: "Also from thetech.com:"
+              - list [ref=f140e288]:
+                - listitem [ref=f140e289]:
+                  - link "LETTERS TO THE EDITOR | The Tech" [ref=f140e290] [cursor=pointer]:
+                    - /url: https://thetech.com/2014/12/09/letters60-v134-n60
+                - listitem [ref=f140e291]:
+                  - link "440 bids offered this Rush | The Tech" [ref=f140e292] [cursor=pointer]:
+                    - /url: https://thetech.com/2012/09/25/rush-v132-n40
+                - listitem [ref=f140e293]:
+                  - link "MIT fraternities and sanctions | The Tech" [ref=f140e294] [cursor=pointer]:
+                    - /url: https://thetech.com/2014/12/02/du-frats-v134-n58
+                - listitem [ref=f140e295]:
+                  - link "PBE hazing details still undisclosed | The Tech" [ref=f140e296] [cursor=pointer]:
+                    - /url: https://thetech.com/2010/09/28/pbe-v130-n40
+            - generic [ref=f140e297]:
+              - link "5 more" [ref=f140e299] [cursor=pointer]:
+                - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT+site%3Athetech.com&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f140e301]: JS
+          - generic [ref=f140e303]:
+            - generic [ref=f140e304]:
+              - generic [ref=f140e305]:
+                - generic [ref=f140e306]:
+                  - generic "Match density" [ref=f140e307]
+                  - generic [ref=f140e311]:
+                    - heading [level=2] [ref=f140e312]:
+                      - link "Sigma Chi Fraternity, Alpha Theta Chapter" [ref=f140e313] [cursor=pointer]:
+                        - /url: https://sigmachi.mit.edu/chapter/mitfrats.php
+                    - link "https://sigmachi.mit.edu/chapter/mitfrats.php" [ref=f140e315] [cursor=pointer]:
+                      - /url: https://sigmachi.mit.edu/chapter/mitfrats.php
+                - paragraph [ref=f140e317]: This site has been optimized for 1024x768 resolution. Despite the fact that fraternities have played an important role in housing MIT students for 100 years, I was unable to find historical data gathered from this point of view, although there appears to
+              - generic [ref=f140e318]:
+                - link "" [ref=f140e319] [cursor=pointer]:
+                  - /url: /site/sigmachi.mit.edu
+                - link "" [ref=f140e321] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://sigmachi.mit.edu/chapter/mitfrats.php
+            - generic "Contains JavaScript" [ref=f140e325]: JS
+          - generic [ref=f140e328]:
+            - generic [ref=f140e329]:
+              - generic [ref=f140e330]:
+                - generic "Match density" [ref=f140e331]
+                - generic [ref=f140e335]:
+                  - heading [level=2] [ref=f140e336]:
+                    - link "K-12 Programs Link Institute, Cambridge" [ref=f140e337] [cursor=pointer]:
+                      - /url: http://esp.scripts.mit.edu/browser/Archived/Old_Green_Website/www/History/1993_01_29_education_tech_article.html
+                  - link "http://esp.scripts.mit.edu/browser/Archived/Old_Green_Website/www/History/1993_01_29_education_tech_article.html" [ref=f140e339] [cursor=pointer]:
+                    - /url: http://esp.scripts.mit.edu/browser/Archived/Old_Green_Website/www/History/1993_01_29_education_tech_article.html
+              - paragraph [ref=f140e341]: A year ago, Latanision noted that these efforts had not been coordinated by MIT as a whole, and that the committee hoped MIT would take these initiatives as an institution, going "beyond the mission of higher education and research."
+            - generic [ref=f140e342]:
+              - link "" [ref=f140e343] [cursor=pointer]:
+                - /url: /site/esp.scripts.mit.edu
+              - link "" [ref=f140e345] [cursor=pointer]:
+                - /url: https://web.archive.org/web/*/http://esp.scripts.mit.edu/browser/Archived/Old_Green_Website/www/History/1993_01_29_education_tech_article.html
+          - generic [ref=f140e348]:
+            - generic [ref=f140e349]:
+              - generic [ref=f140e350]:
+                - generic [ref=f140e351]:
+                  - generic "Match density" [ref=f140e352]
+                  - generic [ref=f140e356]:
+                    - heading [level=2] [ref=f140e357]:
+                      - link "Technology Building Corporation of the Alpha Tau Omega Fraternity Alumni 1927 ( MIT ) - Massachusettes - Scripophily.com | Co..." [ref=f140e358] [cursor=pointer]:
+                        - /url: https://scripophily.net/technology-building-corporation-of-the-alpha-tau-omega-fraternity-alumni-1927-mit-massachusettes/
+                    - link "https://scripophily.net/technology-building-corporation-of-the-alpha-tau-omega-fraternity-alumni-1927-mit-massachusettes/" [ref=f140e360] [cursor=pointer]:
+                      - /url: https://scripophily.net/technology-building-corporation-of-the-alpha-tau-omega-fraternity-alumni-1927-mit-massachusettes/
+                - paragraph [ref=f140e362]: Technology Building Corporation of the Alpha Tau Omega Fraternity Alumni 1927 ( MIT ) - Massachusettes
+              - generic [ref=f140e363]:
+                - link "" [ref=f140e364] [cursor=pointer]:
+                  - /url: /site/scripophily.net
+                - link "" [ref=f140e366] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://scripophily.net/technology-building-corporation-of-the-alpha-tau-omega-fraternity-alumni-1927-mit-massachusettes/
+            - generic "Contains JavaScript" [ref=f140e370]: JS
+          - generic [ref=f140e372]:
+            - generic [ref=f140e373]:
+              - generic [ref=f140e374]:
+                - generic [ref=f140e375]:
+                  - generic "Match density" [ref=f140e376]
+                  - generic [ref=f140e380]:
+                    - heading [level=2] [ref=f140e381]:
+                      - link "AILG Awards – Association of Independent Living Groups" [ref=f140e382] [cursor=pointer]:
+                        - /url: https://ailg.mit.edu/ailg-awards/
+                    - link "https://ailg.mit.edu/ailg-awards/" [ref=f140e384] [cursor=pointer]:
+                      - /url: https://ailg.mit.edu/ailg-awards/
+                - paragraph [ref=f140e386]: At the conclusion of each academic year there are typically several award ceremonies that provide an opportunity for the FSILG Community to express appreciation to students, alums, and organizations and to recognize their support of the mission and values
+              - generic [ref=f140e387]:
+                - link "" [ref=f140e388] [cursor=pointer]:
+                  - /url: /site/ailg.mit.edu
+                - link "" [ref=f140e390] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://ailg.mit.edu/ailg-awards/
+            - generic [ref=f140e392]:
+              - paragraph [ref=f140e393]: "Also from ailg.mit.edu:"
+              - list [ref=f140e394]:
+                - listitem [ref=f140e395]:
+                  - link "Members – Association of Independent Living Groups" [ref=f140e396] [cursor=pointer]:
+                    - /url: https://ailg.mit.edu/members/
+                - listitem [ref=f140e397]:
+                  - link "Archived Outstanding Alum Volunteer Awards (2015-2026) – Association of Independent Living Groups" [ref=f140e398] [cursor=pointer]:
+                    - /url: https://ailg.mit.edu/ailg-awards/archived-awards/
+                - listitem [ref=f140e399]:
+                  - link "Board – Association of Independent Living Groups" [ref=f140e400] [cursor=pointer]:
+                    - /url: https://ailg.mit.edu/committees/board/
+            - generic "Contains JavaScript" [ref=f140e403]: JS
+          - generic [ref=f140e405]:
+            - generic [ref=f140e406]:
+              - generic [ref=f140e407]:
+                - generic [ref=f140e408]:
+                  - generic "Match density" [ref=f140e409]
+                  - generic [ref=f140e413]:
+                    - heading [level=2] [ref=f140e414]:
+                      - link "2009 MIT Brass Rat" [ref=f140e415] [cursor=pointer]:
+                        - /url: https://web.mit.edu/2009/ring/about.shtml
+                    - link "https://web.mit.edu/2009/ring/about.shtml" [ref=f140e417] [cursor=pointer]:
+                      - /url: https://web.mit.edu/2009/ring/about.shtml
+                - paragraph [ref=f140e419]: In the spring of 1929, class president C. Brigham Allen appointed representatives from the classes of 1930, 1931, and 1932 to the first MIT Ring Committee. Charged with designing the first Standard Technology Ring, the committee appointed the Institute ma
+              - generic [ref=f140e420]:
+                - link "" [ref=f140e421] [cursor=pointer]:
+                  - /url: /site/web.mit.edu
+                - link "" [ref=f140e423] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://web.mit.edu/2009/ring/about.shtml
+            - generic "Contains JavaScript" [ref=f140e427]: JS
+          - generic [ref=f140e429]:
+            - generic [ref=f140e430]:
+              - generic [ref=f140e431]:
+                - generic [ref=f140e432]:
+                  - generic "Match density" [ref=f140e433]
+                  - generic [ref=f140e437]:
+                    - heading [level=2] [ref=f140e438]:
+                      - link "Fraternities | The Tech" [ref=f140e439] [cursor=pointer]:
+                        - /url: https://www.thetech.com/2010/09/03/dc-fraternity-v130-n33
+                    - link "https://www.thetech.com/2010/09/03/dc-fraternity-v130-n33" [ref=f140e441] [cursor=pointer]:
+                      - /url: https://www.thetech.com/2010/09/03/dc-fraternity-v130-n33
+                - paragraph [ref=f140e443]: SaturdaySeptember 4 12:00 12:00—Theta Delta Chi Ice Cream Truck 12:00—Phi Delta Theta House Tours 12:00—Theta Delta Chi Dunk Booth 12:00—Theta Delta Chi Barbecue 12:00—Sigma Phi Epsilon Best BBQ on Beacon 12:00—Phi Beta Epsilon Alley Rally—Amherst Alley h
+              - generic [ref=f140e444]:
+                - link "" [ref=f140e445] [cursor=pointer]:
+                  - /url: /site/www.thetech.com
+                - link "" [ref=f140e447] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.thetech.com/2010/09/03/dc-fraternity-v130-n33
+            - generic [ref=f140e449]:
+              - paragraph [ref=f140e450]: "Also from www.thetech.com:"
+              - list [ref=f140e451]:
+                - listitem [ref=f140e452]:
+                  - link "Daily Confusion | The Tech" [ref=f140e453] [cursor=pointer]:
+                    - /url: https://www.thetech.com/2007/08/31/confusion-v127-n35
+            - generic [ref=f140e454]:
+              - link "12 more" [ref=f140e456] [cursor=pointer]:
+                - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT+site%3Awww.thetech.com&sst=SE-083ccf5e7a7ae2cb
+              - generic "Contains JavaScript" [ref=f140e458]: JS
+          - generic [ref=f140e460]:
+            - generic [ref=f140e461]:
+              - generic [ref=f140e462]:
+                - generic [ref=f140e463]:
+                  - generic "Match density" [ref=f140e464]
+                  - generic [ref=f140e468]:
+                    - heading [level=2] [ref=f140e469]:
+                      - 'link "DOOMCom :: View topic - Weiner Wednesday" [ref=f140e470] [cursor=pointer]':
+                        - /url: http://doomcom.mit.edu/viewtopic.php?t=185
+                    - link "http://doomcom.mit.edu/viewtopic.php?t=185" [ref=f140e472] [cursor=pointer]:
+                      - /url: http://doomcom.mit.edu/viewtopic.php?t=185
+                - paragraph [ref=f140e474]: "Quote: Tired of the high prices of food on campus? Then come to Weiner Wednesday, this Wednesday afternoon, 12/5, in the *Hillel Center* (building W)! The lovely sisters of Alpha Epsilon Phi, Beta Epsilon chapter, will be selling hot dogs for $1 apiece fr"
+              - generic [ref=f140e475]:
+                - link "" [ref=f140e476] [cursor=pointer]:
+                  - /url: /site/doomcom.mit.edu
+                - link "" [ref=f140e478] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://doomcom.mit.edu/viewtopic.php?t=185
+            - generic "Contains JavaScript" [ref=f140e482]: JS
+          - generic [ref=f140e484]:
+            - generic [ref=f140e485]:
+              - generic [ref=f140e486]:
+                - generic [ref=f140e487]:
+                  - generic "Match density" [ref=f140e488]
+                  - generic [ref=f140e492]:
+                    - heading [level=2] [ref=f140e493]:
+                      - link "Eleven from MIT awarded 2020 Fulbright Fellowships – Career Advising & Professional Development | MIT" [ref=f140e494] [cursor=pointer]:
+                        - /url: https://capd.mit.edu/blog/2020/05/22/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                    - link "https://capd.mit.edu/blog/2020/05/22/eleven-from-mit-awarded-2020-fulbright-fellowships/" [ref=f140e496] [cursor=pointer]:
+                      - /url: https://capd.mit.edu/blog/2020/05/22/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                - paragraph [ref=f140e498]: Julia Mongo | Office of Distinguished FellowshipsPublished by This story was updated on 12/17/2020 to reflect Christian Cardozo’s decision to accept a Fulbright fellowship. Eleven MIT students and recent alumni are recipients of awards from the Fulbright
+              - generic [ref=f140e499]:
+                - link "" [ref=f140e500] [cursor=pointer]:
+                  - /url: /site/capd.mit.edu
+                - link "" [ref=f140e502] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://capd.mit.edu/blog/2020/05/22/eleven-from-mit-awarded-2020-fulbright-fellowships/
+            - generic "Contains JavaScript" [ref=f140e506]: JS
+          - generic [ref=f140e508]:
+            - generic [ref=f140e509]:
+              - generic [ref=f140e510]:
+                - generic [ref=f140e511]:
+                  - generic "Match density" [ref=f140e512]
+                  - generic [ref=f140e516]:
+                    - heading [level=2] [ref=f140e517]:
+                      - link "Eleven from MIT awarded 2020 Fulbright Fellowships » MIT Physics" [ref=f140e518] [cursor=pointer]:
+                        - /url: https://physics.mit.edu/news/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                    - link "https://physics.mit.edu/news/eleven-from-mit-awarded-2020-fulbright-fellowships/" [ref=f140e520] [cursor=pointer]:
+                      - /url: https://physics.mit.edu/news/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                - paragraph [ref=f140e522]: "Courtesy of The Fulbright Program Courtesy of The Fulbright Program Julia Mongo | Office of Distinguished Fellowships // MIT News // May 21, 2020 Categories: This story was updated on 12/17/2020 to reflect Christian Cardozo’s decision to accept a Fulbrigh"
+              - generic [ref=f140e523]:
+                - link "" [ref=f140e524] [cursor=pointer]:
+                  - /url: /site/physics.mit.edu
+                - link "" [ref=f140e526] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://physics.mit.edu/news/eleven-from-mit-awarded-2020-fulbright-fellowships/
+            - generic "Contains JavaScript" [ref=f140e530]: JS
+          - generic [ref=f140e532]:
+            - generic [ref=f140e533]:
+              - generic [ref=f140e534]:
+                - generic [ref=f140e535]:
+                  - generic "Match density" [ref=f140e536]
+                  - generic [ref=f140e540]:
+                    - heading [level=2] [ref=f140e541]:
+                      - link "Kapow! – Maverick Studios" [ref=f140e542] [cursor=pointer]:
+                        - /url: https://maverickstudios.net/2022/06/29/kapow/
+                    - link "https://maverickstudios.net/2022/06/29/kapow/" [ref=f140e544] [cursor=pointer]:
+                      - /url: https://maverickstudios.net/2022/06/29/kapow/
+                - paragraph [ref=f140e546]: Secreted beneath MIT’s Killian Court and accessible only through a subterranean labyrinth of tunnels, a clandestine lab conducts boundary-pushing research, fed by money siphoned from a Department of Defense grant. In these shadowed, high-tech halls, astro
+              - generic [ref=f140e547]:
+                - link "" [ref=f140e548] [cursor=pointer]:
+                  - /url: /site/maverickstudios.net
+                - link "" [ref=f140e550] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://maverickstudios.net/2022/06/29/kapow/
+            - generic "Contains JavaScript" [ref=f140e554]: JS
+          - generic [ref=f140e556]:
+            - generic [ref=f140e557]:
+              - generic [ref=f140e558]:
+                - generic [ref=f140e559]:
+                  - generic "Match density" [ref=f140e560]
+                  - generic [ref=f140e564]:
+                    - heading [level=2] [ref=f140e565]:
+                      - link "Kapow! | MIT Technology Review" [ref=f140e566] [cursor=pointer]:
+                        - /url: https://www.technologyreview.com/2022/06/29/1053298/kapow/
+                    - link "https://www.technologyreview.com/2022/06/29/1053298/kapow/" [ref=f140e568] [cursor=pointer]:
+                      - /url: https://www.technologyreview.com/2022/06/29/1053298/kapow/
+                - paragraph [ref=f140e570]: Secreted beneath MIT’s Killian Court and accessible only through a subterranean labyrinth of tunnels, a clandestine lab conducts boundary-pushing research, fed by money siphoned from a Department of Defense grant. In these shadowed, high-tech halls, astro
+              - generic [ref=f140e571]:
+                - link "" [ref=f140e572] [cursor=pointer]:
+                  - /url: /site/www.technologyreview.com
+                - link "" [ref=f140e574] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.technologyreview.com/2022/06/29/1053298/kapow/
+            - generic [ref=f140e576]:
+              - link "Tracking" [ref=f140e578] [cursor=pointer]:
+                - /url: /site/www.technologyreview.com?view=traffic
+              - generic "Contains JavaScript" [ref=f140e579]: JS
+              - link "Has Ads" [ref=f140e580] [cursor=pointer]:
+                - /url: /site/www.technologyreview.com?view=traffic
+          - generic [ref=f140e582]:
+            - generic [ref=f140e583]:
+              - generic [ref=f140e584]:
+                - generic [ref=f140e585]:
+                  - generic "Match density" [ref=f140e586]
+                  - generic [ref=f140e590]:
+                    - heading [level=2] [ref=f140e591]:
+                      - link "wj X Cec" [ref=f140e592] [cursor=pointer]:
+                        - /url: http://tech.mit.edu/V77/PDF/V77-N30.pdf
+                    - generic [ref=f140e593]:
+                      - generic "PDF" [ref=f140e594]: 
+                      - link "http://tech.mit.edu/V77/PDF/V77-N30.pdf" [ref=f140e595] [cursor=pointer]:
+                        - /url: http://tech.mit.edu/V77/PDF/V77-N30.pdf
+                - paragraph [ref=f140e597]: "T I D~~al Xn A si| F j D en~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Iw OFSICIAL NEWSPAPER OF THE UNDERGRADUATES OF THE MASSACHUSETTS INSTITUTE OF TECHNOLOGY _ I_ __ ___ _\x03 __ __q _ __I_ _ __ _ rOLX.V'i1l NO. 30 CAMBRIDGE, MASSACHUSETTS, TUESDAY, OCTOBER 8, 1957 5 CE"
+              - generic [ref=f140e598]:
+                - link "" [ref=f140e599] [cursor=pointer]:
+                  - /url: /site/tech.mit.edu
+                - link "" [ref=f140e601] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/http://tech.mit.edu/V77/PDF/V77-N30.pdf
+            - generic [ref=f140e603]:
+              - paragraph [ref=f140e604]: "Also from tech.mit.edu:"
+              - list [ref=f140e605]:
+                - listitem [ref=f140e606]:
+                  - generic "PDF": 
+                  - link "ester Lanin Is New JP Orchestra Insufficien Data For 704 Good an - .odma J7SeonarcOhr bi Keeps On I -]# ]1t ()n n- -71-1lI" [ref=f140e607] [cursor=pointer]:
+                    - /url: http://tech.mit.edu/V77/PDF/V77-N31.pdf
+            - generic [ref=f140e608]: PDF File
+          - generic [ref=f140e612]:
+            - generic [ref=f140e613]:
+              - generic [ref=f140e614]:
+                - generic [ref=f140e615]:
+                  - generic "Match density" [ref=f140e616]
+                  - generic [ref=f140e620]:
+                    - heading [level=2] [ref=f140e621]:
+                      - link "Eleven from MIT awarded 2020 Fulbright Fellowships - Global MIT" [ref=f140e622] [cursor=pointer]:
+                        - /url: https://global.mit.edu/news-stories/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                    - link "https://global.mit.edu/news-stories/eleven-from-mit-awarded-2020-fulbright-fellowships/" [ref=f140e624] [cursor=pointer]:
+                      - /url: https://global.mit.edu/news-stories/eleven-from-mit-awarded-2020-fulbright-fellowships/
+                - paragraph [ref=f140e626]: Share on 2020 MIT Fulbright scholars include Sandra Walter, Srimayi Tenali, William Pinney, Talia Khan, Anshula Gandhi, Booker Schelhaas, Christien Williams, Ivy Li, Kedi Hu, and Max Kessler. by Julia Mongo | Office of Distinguished Fellowships | May 22,
+              - generic [ref=f140e627]:
+                - link "" [ref=f140e628] [cursor=pointer]:
+                  - /url: /site/global.mit.edu
+                - link "" [ref=f140e630] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://global.mit.edu/news-stories/eleven-from-mit-awarded-2020-fulbright-fellowships/
+            - generic [ref=f140e632]:
+              - link "Tracking" [ref=f140e634] [cursor=pointer]:
+                - /url: /site/global.mit.edu?view=traffic
+              - generic "Contains JavaScript" [ref=f140e635]: JS
+              - link "Has Ads" [ref=f140e636] [cursor=pointer]:
+                - /url: /site/global.mit.edu?view=traffic
+          - generic [ref=f140e638]:
+            - generic [ref=f140e639]:
+              - generic [ref=f140e640]:
+                - generic [ref=f140e641]:
+                  - generic "Match density" [ref=f140e642]
+                  - generic [ref=f140e646]:
+                    - heading [level=2] [ref=f140e647]:
+                      - link "In Memoriam - Moorestown Friends School" [ref=f140e648] [cursor=pointer]:
+                        - /url: https://www.mfriends.org/alumni/among-friends-magazine/in-memoriam/page/4/
+                    - link "https://www.mfriends.org/alumni/among-friends-magazine/in-memoriam/page/4/" [ref=f140e650] [cursor=pointer]:
+                      - /url: https://www.mfriends.org/alumni/among-friends-magazine/in-memoriam/page/4/
+                - paragraph [ref=f140e652]: Obituaries are gathered from online and print sources as a courtesy to the MFS community. Please email to bring errors or inaccuracies to our attention, or to submit a more complete obituary. Thank you. Fall 2025 Alumni 1951 Shirley Swift Gallahan 1952 H.
+              - generic [ref=f140e653]:
+                - link "" [ref=f140e654] [cursor=pointer]:
+                  - /url: /site/www.mfriends.org
+                - link "" [ref=f140e656] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.mfriends.org/alumni/among-friends-magazine/in-memoriam/page/4/
+            - generic [ref=f140e658]:
+              - paragraph [ref=f140e659]: "Also from www.mfriends.org:"
+              - list [ref=f140e660]:
+                - listitem [ref=f140e661]:
+                  - link "In Memoriam - Moorestown Friends School" [ref=f140e662] [cursor=pointer]:
+                    - /url: https://www.mfriends.org/alumni/among-friends-magazine/in-memoriam/page/2/
+            - generic [ref=f140e663]:
+              - link "Tracking" [ref=f140e665] [cursor=pointer]:
+                - /url: /site/www.mfriends.org?view=traffic
+              - generic "Contains JavaScript" [ref=f140e666]: JS
+              - link "Has Ads" [ref=f140e667] [cursor=pointer]:
+                - /url: /site/www.mfriends.org?view=traffic
+          - generic [ref=f140e669]:
+            - generic [ref=f140e670]:
+              - generic [ref=f140e671]:
+                - generic [ref=f140e672]:
+                  - generic "Match density" [ref=f140e673]
+                  - generic [ref=f140e677]:
+                    - heading [level=2] [ref=f140e678]:
+                      - link "Information Theory, Inference, and Learning Algorithms David J.C. MacKay" [ref=f140e679] [cursor=pointer]:
+                        - /url: https://www.inference.org.uk/itprnn/book.pdf
+                    - generic [ref=f140e680]:
+                      - generic "PDF" [ref=f140e681]: 
+                      - link "https://www.inference.org.uk/itprnn/book.pdf" [ref=f140e682] [cursor=pointer]:
+                        - /url: https://www.inference.org.uk/itprnn/book.pdf
+                - paragraph [ref=f140e684]: Copyright Cambridge University Press 2003. On-screen viewing permitted. Printing not permitted. http://www.cambridge.org/0521642981 You can buy this book for 30 pounds or $50. See http://www.inference.phy.cam.ac.uk/mackay/itila/ for links. 20 1 — Introduc
+              - generic [ref=f140e685]:
+                - link "" [ref=f140e686] [cursor=pointer]:
+                  - /url: /site/www.inference.org.uk
+                - link "" [ref=f140e688] [cursor=pointer]:
+                  - /url: https://web.archive.org/web/*/https://www.inference.org.uk/itprnn/book.pdf
+            - generic [ref=f140e690]:
+              - generic [ref=f140e692]: PDF File
+              - generic "Contains Affiliate Link" [ref=f140e693]: Has Affiliate
+    - complementary [ref=f140e694]:
+      - text: 
+      - generic [ref=f140e696]:
+        - heading " Search Settings" [level=2] [ref=f140e697]:
+          - generic [ref=f140e698]: 
+          - text: Search Settings
+        - generic [ref=f140e699]:
+          - button [ref=f140e701] [cursor=pointer]:
+            - link " Search In Title" [ref=f140e702]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&searchTitle=title&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e703]: 
+              - generic [ref=f140e704]: Search In Title
+          - button [ref=f140e706] [cursor=pointer]:
+            - link " Recent Results" [ref=f140e707]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&recent=recent&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e708]: 
+              - generic [ref=f140e709]: Recent Results
+          - button [ref=f140e711] [cursor=pointer]:
+            - link " Remove JS" [ref=f140e712]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&js=no-js&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e713]: 
+              - generic [ref=f140e714]: Remove JS
+          - button [ref=f140e716] [cursor=pointer]:
+            - link " Reduce Adtech" [ref=f140e717]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&adtech=reduce&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e718]: 
+              - generic [ref=f140e719]: Reduce Adtech
+          - button [ref=f140e721] [cursor=pointer]:
+            - link " Reduce NSFW" [ref=f140e722]:
+              - /url: /search?query=%22Beta+Epsilon%22+Alpha+Phi+MIT&nsfw=smut&newfilter=true&sst=SE-083ccf5e7a7ae2cb
+              - generic [ref=f140e723]: 
+              - generic [ref=f140e724]: Reduce NSFW
+          - button [ref=f140e727] [cursor=pointer]:
+            - generic [ref=f140e728]:
+              - generic [ref=f140e729]: 
+              - text: Language
+          - text: 
+  - contentinfo [ref=f140e731]:
+    - heading "Search Help" [level=1] [ref=f140e732]
+    - generic [ref=f140e733]:
+      - generic [ref=f140e734]:
+        - heading " Syntax" [level=2] [ref=f140e735]:
+          - generic [ref=f140e736]: 
+          - text: Syntax
+        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f140e737]
+        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f140e738]
+        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f140e739]
+        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f140e740]
+        - heading "Samples" [level=2] [ref=f140e741]
+        - generic [ref=f140e742]:
+          - term [ref=f140e743]: soup -chicken
+          - definition [ref=f140e744]: Look for keywords that contain soup, but not chicken.
+          - term [ref=f140e745]: "\"keyboard\""
+          - definition [ref=f140e746]: Look for pages containing the exact word keyboard, not keyboards or the like.
+          - term [ref=f140e747]: "\"steve mcqueen\""
+          - definition [ref=f140e748]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+          - term [ref=f140e749]: apology (plato)
+          - definition [ref=f140e750]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+        - heading " Match Indicator" [level=2] [ref=f140e751]:
+          - generic [ref=f140e752]: 
+          - text: Match Indicator
+        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f140e753]
+        - generic [ref=f140e754]: This is by the beginning
+        - generic [ref=f140e762]: This is in the middle
+        - generic [ref=f140e770]: This is toward the end
+        - heading " Language Limitations" [level=2] [ref=f140e776]:
+          - generic [ref=f140e777]: 
+          - text: Language Limitations
+        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f140e778]
+        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f140e779]
+        - heading " Webmaster Information" [level=2] [ref=f140e780]:
+          - generic [ref=f140e781]: 
+          - text: Webmaster Information
+        - heading [level=2] [ref=f140e782]:
+          - text: If you wish to add your website to the index, follow the instructions in this
+          - link "git repository" [ref=f140e783] [cursor=pointer]:
+            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+          - text: ", if you do not want to mess with git, you can also email"
+          - link "contact@marginalia-search.com" [ref=f140e784] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: with the domain name.
+        - heading [level=2] [ref=f140e785]:
+          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f140e786] [cursor=pointer]:
+            - /url: https://search.marginalia.nu/crawler-ips.txt
+          - text: .
+        - heading [level=2] [ref=f140e787]:
+          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+          - link "contact@marginalia-search.com" [ref=f140e788] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+      - generic [ref=f140e789]:
+        - heading " Special Keywords" [level=2] [ref=f140e790]:
+          - generic [ref=f140e791]: 
+          - text: Special Keywords
+        - table [ref=f140e792]:
+          - rowgroup [ref=f140e793]:
+            - row [ref=f140e794]:
+              - columnheader "Keyword" [ref=f140e795]
+              - columnheader "Meaning" [ref=f140e796]
+          - rowgroup [ref=f140e797]:
+            - row [ref=f140e798]:
+              - cell [ref=f140e799]:
+                - text: "site:"
+                - emphasis [ref=f140e800]: example.com
+              - cell [ref=f140e801]:
+                - text: Display site information about
+                - emphasis [ref=f140e802]: example.com
+            - row [ref=f140e803]:
+              - cell [ref=f140e804]:
+                - text: "site:"
+                - emphasis [ref=f140e805]: example.com
+                - emphasis [ref=f140e806]: keyword
+              - cell [ref=f140e807]:
+                - text: Search
+                - emphasis [ref=f140e808]: example.com
+                - text: for
+                - emphasis [ref=f140e809]: keyword
+            - row [ref=f140e810]:
+              - cell [ref=f140e811]:
+                - text: "site:"
+                - emphasis [ref=f140e812]: "*.example.com"
+                - emphasis [ref=f140e813]: keyword
+              - cell [ref=f140e814]:
+                - text: Search
+                - emphasis [ref=f140e815]: example.com
+                - text: and its subdomains for
+                - emphasis [ref=f140e816]: keyword
+            - row [ref=f140e817]:
+              - cell [ref=f140e818]:
+                - text: "browse:"
+                - emphasis [ref=f140e819]: example.com
+              - cell [ref=f140e820]:
+                - text: Show similar websites to
+                - emphasis [ref=f140e821]: example.com
+            - row [ref=f140e822]:
+              - cell [ref=f140e823]:
+                - text: "ip:"
+                - emphasis [ref=f140e824]: 127.0.0.1
+              - cell [ref=f140e825]:
+                - text: Search documents hosted at
+                - emphasis [ref=f140e826]: 127.0.0.1
+            - row [ref=f140e827]:
+              - cell [ref=f140e828]:
+                - text: "links:"
+                - emphasis [ref=f140e829]: example.com
+              - cell [ref=f140e830]:
+                - text: Search documents linking to
+                - emphasis [ref=f140e831]: example.com
+            - row [ref=f140e832]:
+              - cell [ref=f140e833]:
+                - text: "tld:"
+                - emphasis [ref=f140e834]: edu
+                - emphasis [ref=f140e835]: keyword
+              - cell [ref=f140e836]:
+                - text: Search documents with the top level domain
+                - emphasis [ref=f140e837]: edu
+                - text: .
+            - row [ref=f140e838]:
+              - cell [ref=f140e839]:
+                - text: "?tld:"
+                - emphasis [ref=f140e840]: edu
+                - emphasis [ref=f140e841]: keyword
+              - cell [ref=f140e842]:
+                - text: Prefer but do not require results with the top level domain
+                - emphasis [ref=f140e843]: edu
+                - text: . This syntax is also possible for links:..., ip:... and site:...
+            - row [ref=f140e844]:
+              - cell "q>5" [ref=f140e845]
+              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f140e846]
+            - row [ref=f140e847]:
+              - cell "q<5" [ref=f140e848]
+              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f140e849]
+            - row [ref=f140e850]:
+              - cell "year>2005" [ref=f140e851]
+              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f140e852]
+            - row [ref=f140e853]:
+              - cell "year=2005" [ref=f140e854]
+              - cell "(beta) The document was ostensibly published in 2005" [ref=f140e855]
+            - row [ref=f140e856]:
+              - cell "year<2005" [ref=f140e857]
+              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f140e858]
+            - row [ref=f140e859]:
+              - cell "rank>50" [ref=f140e860]
+              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f140e861]
+            - row [ref=f140e862]:
+              - cell "rank<50" [ref=f140e863]
+              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f140e864]
+            - row [ref=f140e865]:
+              - cell "format:html5" [ref=f140e866]
+              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f140e867]
+            - row [ref=f140e868]:
+              - cell "format:xhtml" [ref=f140e869]
+              - cell "Filter documents using the XHTML standard" [ref=f140e870]
+            - row [ref=f140e871]:
+              - cell "format:html123" [ref=f140e872]
+              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f140e873]
+            - row [ref=f140e874]:
+              - cell "generator:wordpress" [ref=f140e875]
+              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f140e876]
+            - row [ref=f140e877]:
+              - cell "file:zip" [ref=f140e878]
+              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f140e879]
+            - row [ref=f140e880]:
+              - cell "file:audio" [ref=f140e881]
+              - cell "Filter documents containing a link to an audio file" [ref=f140e882]
+            - row [ref=f140e883]:
+              - cell "file:video" [ref=f140e884]
+              - cell "Filter documents containing a link to a video file" [ref=f140e885]
+            - row [ref=f140e886]:
+              - cell "file:archive" [ref=f140e887]
+              - cell "Filter documents containing a link to a compressed archive" [ref=f140e888]
+            - row [ref=f140e889]:
+              - cell "file:document" [ref=f140e890]
+              - cell "Filter documents containing a link to a document" [ref=f140e891]
+            - row [ref=f140e892]:
+              - cell "-special:media" [ref=f140e893]
+              - cell "Filter out documents with audio or video tags" [ref=f140e894]
+            - row [ref=f140e895]:
+              - cell "-special:scripts" [ref=f140e896]
+              - cell "Filter out documents with javascript" [ref=f140e897]
+            - row [ref=f140e898]:
+              - cell "-special:affiliate" [ref=f140e899]
+              - cell "Filter out documents with likely Amazon affiliate links" [ref=f140e900]
+            - row [ref=f140e901]:
+              - cell "-special:tracking" [ref=f140e902]
+              - cell "Filter out documents with analytics or tracking code" [ref=f140e903]
+            - row [ref=f140e904]:
+              - cell "-special:cookies" [ref=f140e905]
+              - cell "Filter out documents with cookies" [ref=f140e906]
+  - contentinfo [ref=f140e907]:
+    - heading "Policy Information" [level=1] [ref=f140e908]
+    - generic [ref=f140e909]:
+      - generic [ref=f140e910]:
+        - heading " Policies" [level=2] [ref=f140e911]:
+          - generic [ref=f140e912]: 
+          - text: Policies
+        - generic [ref=f140e913]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+        - generic [ref=f140e914]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+      - generic [ref=f140e915]:
+        - heading " Contact" [level=2] [ref=f140e916]:
+          - generic [ref=f140e917]: 
+          - text: Contact
+        - generic [ref=f140e918]:
+          - text: You can reach the webmaster of the search engine at
+          - link "contact@marginalia-search.com" [ref=f140e919] [cursor=pointer]:
+            - /url: mailto:contact@marginalia-search.com
+          - text: .
+        - generic [ref=f140e920]:
+          - generic [ref=f140e921]: 
+          - text: Sources
+        - generic [ref=f140e922]:
+          - text: The search engine is open source with an AGPL license. The sources can be perused at
+          - link "https://git.marginalia.nu/" [ref=f140e923] [cursor=pointer]:
+            - /url: https://git.marginalia.nu/
+          - text: .
+      - generic [ref=f140e924]:
+        - heading " Data" [level=2] [ref=f140e925]:
+          - generic [ref=f140e926]: 
+          - text: Data
+        - generic [ref=f140e927]:
+          - text: IP geolocation is sourced from the IP2Location LITE data available from
+          - link "https://lite.ip2location.com/" [ref=f140e928] [cursor=pointer]:
+            - /url: https://lite.ip2location.com/
+          - text: under
+          - link "CC-BY-SA 4.0" [ref=f140e929] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+          - text: .
+  - text:                 

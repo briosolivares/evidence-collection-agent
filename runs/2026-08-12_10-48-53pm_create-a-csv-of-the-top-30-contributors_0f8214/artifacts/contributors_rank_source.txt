@@ -1,0 +1,39 @@
+Source: https://github.com/openclaw/openclaw/graphs/contributors
+Ranking by total commit count as displayed by GitHub's contributors graph (all-time), retrieved by scrolling through the page.
+
+Rank Handle Commits
+1 steipete 15,386
+2 vincentkoc 7,828
+3 shakkernerd 2,369
+4 obviyus 805
+5 github-actions[bot] 769
+6 joshavant 719
+7 RomneyDa 492
+8 claude 452
+9 clawsweeper[bot] 288
+10 Alix-007 255
+11 fuller-stack-dev 248
+12 giodl73-repo 220
+13 zhangguiping-xydt 206
+14 Takhoffman 200
+15 jalehman 151
+16 ampagent 133
+17 mushuiyu886 128
+18 Patrick-Erichsen 126
+19 pgondhi987 120
+20 yetval 114
+21 ZengWen-DT 113
+22 openclaw-clownfish[bot] 108
+23 IWhatsskill 102
+24 qingminglong 96
+25 vyctorbrzezowski 88
+26 TurboTheTurtle 87
+27 hugenshen 84
+28 jesse-merhi 80
+29 masatohoshino 80
+30 zenglingbiao 78
+
+Notes:
+- Names were taken from each contributor's public GitHub profile display name (title tag "handle (Display Name) · GitHub"). Where GitHub shows no distinct display name, the name field is left blank.
+- LinkedIn URLs were taken only where a contributor explicitly listed a linkedin.com link on their public GitHub profile (profile sidebar link or profile README "Connect" section). Left blank where no LinkedIn link was found on the profile.
+- Several top entries are automation/bot or AI-agent accounts as ranked by GitHub itself (github-actions[bot], clawsweeper[bot], claude, ampagent, openclaw-clownfish[bot]); they are included because they appear in GitHub's official contributors ranking.

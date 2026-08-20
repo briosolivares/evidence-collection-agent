@@ -1,0 +1,1263 @@
+URL: https://www.eightsleep.com/
+Title: Eight Sleep | The Intelligent Bed Cooling System
+
+- generic [ref=f42e1]:
+  - generic [ref=f42e2]:
+    - banner:
+      - link "Anchor link to Main Content" [ref=f42e3] [cursor=pointer]:
+        - /url: "#main"
+        - text: Main Content
+      - link "Anchor link to Footer" [ref=f42e4] [cursor=pointer]:
+        - /url: "#footer"
+        - text: Footer
+      - link "Link to Accessibility" [ref=f42e5] [cursor=pointer]:
+        - /url: /accessibility
+        - text: Accessibility Statement
+      - generic [ref=f42e6]:
+        - button "SIGN UP FOR $100 OFF THE POD →" [ref=f42e10] [cursor=pointer]
+        - generic [ref=f42e13]:
+          - list [ref=f42e15]:
+            - listitem [ref=f42e16]:
+              - link "How the Pod works" [ref=f42e17] [cursor=pointer]:
+                - /url: /pod-cover
+            - listitem [ref=f42e18]:
+              - link "Accessories" [ref=f42e19] [cursor=pointer]:
+                - /url: /accessories
+            - listitem [ref=f42e20]:
+              - link "Reviews" [ref=f42e21] [cursor=pointer]:
+                - /url: /wall-of-love
+          - link [ref=f42e22] [cursor=pointer]:
+            - /url: /
+            - img "Eight Sleep Logo" [ref=f42e25]
+          - generic [ref=f42e26]:
+            - button "Pod Owner Login" [ref=f42e27] [cursor=pointer]
+            - button "Change region" [ref=f42e29] [cursor=pointer]:
+              - img "United States flag" [ref=f42e30]
+            - button "Open cart" [ref=f42e35] [cursor=pointer]
+            - link "Shop the Pod" [ref=f42e39] [cursor=pointer]:
+              - /url: /product/pod-cover/
+    - generic [ref=f42e41]:
+      - generic [ref=f42e43]:
+        - heading "Designed for deep sleep. Personalized to you." [level=1] [ref=f42e44]
+        - generic [ref=f42e45]:
+          - link "Discover the Pod" [ref=f42e46] [cursor=pointer]:
+            - /url: /product/pod-cover/
+          - paragraph [ref=f42e51]: HSA/FSA Eligible
+      - list [ref=f42e57]:
+        - listitem [ref=f42e58]:
+          - heading "Try risk-free for 30 nights" [level=4] [ref=f42e61]
+          - paragraph [ref=f42e62]: Enjoy the Pod at home, and return it for a full refund if you don’t love it
+        - listitem [ref=f42e63]:
+          - heading "Free shipping & returns" [level=4] [ref=f42e66]
+          - paragraph [ref=f42e67]: Free shipping in 30+ countries with no-cost, hassle-free returns
+        - listitem [ref=f42e68]:
+          - heading "Financing at 0% APR" [level=4] [ref=f42e71]
+          - paragraph [ref=f42e72]:
+            - text: Enjoy better sleep now and pay interest-free over 36 months, with Affirm
+            - superscript [ref=f42e73]: †
+      - generic [ref=f42e76]:
+        - heading "A sleep system designed for deeper recovery, on any bed" [level=2] [ref=f42e77]
+        - paragraph [ref=f42e78]: From the Cover that adapts to your body, to the Blanket and Pillow Cover that extend comfort head-to-toe, to the Base that elevates you for zero-gravity rest — the Pod transforms every layer of your sleep.
+      - generic [ref=f42e82]:
+        - generic [ref=f42e83]:
+          - navigation [ref=f42e84]:
+            - list [ref=f42e85]:
+              - listitem [ref=f42e86]:
+                - button "Jump to Temperature" [ref=f42e87] [cursor=pointer]:
+                  - heading "Temperature" [level=2] [ref=f42e89]
+              - listitem [ref=f42e90]:
+                - button "Jump to Elevation" [ref=f42e91] [cursor=pointer]:
+                  - heading "Elevation" [level=2] [ref=f42e93]
+              - listitem [ref=f42e94]:
+                - button "Jump to Sound" [ref=f42e95] [cursor=pointer]:
+                  - heading "Sound" [level=2] [ref=f42e97]
+          - generic [ref=f42e98]:
+            - paragraph [ref=f42e99]: Fully immersive cooling and heating comfort ranging from 55° to 110°F, and adapting in real time to keep you and your partner in deep sleep longer
+            - paragraph [ref=f42e100]: Elevation through an intelligent adjustable Base that relieves back pressure and automatically reduces snoring, all while you sleep
+            - paragraph [ref=f42e101]: Integrated immersive sound built into the Base helps you unwind, drown out background noise, and stabilize your sleep environment all night
+        - generic [ref=f42e102]:
+          - article [ref=f42e103]
+          - article [ref=f42e105]
+          - article [ref=f42e107]
+      - generic [ref=f42e113]:
+        - heading "Whatever your sleep challenge, the Pod meets you there" [level=4] [ref=f42e114]
+        - paragraph [ref=f42e115]: The Pod expertly adapts to every type of sleeper, creating the perfect conditions for optimal rest.
+      - generic [ref=f42e117]:
+        - generic [ref=f42e119]:
+          - generic [ref=f42e121]:
+            - img "Sleep in perfect harmony" [ref=f42e125]
+            - paragraph [ref=f42e127]: Couples
+            - paragraph [ref=f42e128]: Sleep in perfect harmony
+            - paragraph [ref=f42e129]: Dual-zone technology keeps each partner at their ideal temperature, ending thermostat battles and helping you both rest better together.
+          - generic [ref=f42e131]:
+            - img "Relief from hot flashes, every night" [ref=f42e135]
+            - paragraph [ref=f42e137]: Menopausal Women
+            - paragraph [ref=f42e138]: Relief from hot flashes, every night
+            - paragraph [ref=f42e139]: The Pod keeps your side of the bed cool all night to help prevent overheating. If a hot flash wakes you, you can hit a button to cool down fast, then it slowly returns to your normal sleep temperature.
+          - generic [ref=f42e141]:
+            - img "Optimize every night" [ref=f42e145]
+            - paragraph [ref=f42e147]: Wellness Seekers
+            - paragraph [ref=f42e148]: Optimize every night
+            - paragraph [ref=f42e149]: Continuous monitoring of heart rate, HRV, and temperature gives you actionable insights to optimize recovery, focus, and longevity.
+          - generic [ref=f42e151]:
+            - img "Finally sleep through the heat" [ref=f42e155]
+            - paragraph [ref=f42e157]: Hot Sleepers
+            - paragraph [ref=f42e158]: Finally sleep through the heat
+            - paragraph [ref=f42e159]: If you overheat at night, the Pod cools your side of the bed before it even happens. It keeps your temperature steady so you stay asleep instead of flipping your pillow or kicking off the covers.
+          - generic [ref=f42e161]:
+            - img "Recover after training" [ref=f42e165]
+            - paragraph [ref=f42e167]: Everyday Athletes
+            - paragraph [ref=f42e168]: Recover after training
+            - paragraph [ref=f42e169]: Your muscles recover while you sleep. The Pod cools your body to reduce strain and tracks things like heart rate and how deeply you sleep, so you wake up actually recovered, not just rested.
+          - generic [ref=f42e171]:
+            - img "Less snoring, more sleep" [ref=f42e175]
+            - paragraph [ref=f42e177]: Snorers
+            - paragraph [ref=f42e178]: Less snoring, more sleep
+            - paragraph [ref=f42e179]: The Pod gently lifts your upper body when snoring is detected, which can help keep your airway open. No elbows, no waking each other up.
+        - generic [ref=f42e181]:
+          - button "Previous Card" [disabled] [ref=f42e182]
+          - button "Next Card" [ref=f42e186] [cursor=pointer]
+      - generic [ref=f42e190]:
+        - generic [ref=f42e191]:
+          - heading "The best sleep you've ever had" [level=2] [ref=f42e192]
+          - paragraph [ref=f42e193]: The Pod is clinically proven to deliver real results for your sleep, every night
+        - generic [ref=f42e195]:
+          - generic [ref=f42e197]:
+            - heading "Less time to fall asleep" [level=4] [ref=f42e198]
+            - paragraph [ref=f42e199]: Up to 44%
+          - generic [ref=f42e213]:
+            - heading "More deep sleep" [level=4] [ref=f42e214]
+            - paragraph [ref=f42e215]: Up to 34%
+          - generic [ref=f42e229]:
+            - heading "Reduction in snoring" [level=4] [ref=f42e230]
+            - paragraph [ref=f42e231]: Up to 45%
+          - generic [ref=f42e245]:
+            - heading "Fewer night wake ups" [level=4] [ref=f42e246]
+            - paragraph [ref=f42e247]: Up to 23%
+      - generic [ref=f42e260]:
+        - banner [ref=f42e261]:
+          - heading "Driven by ambition. Validated by science." [level=2] [ref=f42e262]
+          - paragraph [ref=f42e263]: We're radically committed to sleep fitness, grounded in science, fueled by data, and supported by over 50 clinical studies. Our goal is optimal rest for peak health and performance. Because sleep is your edge.
+          - link "Why Eight Sleep - learn how our technology improves your sleep" [ref=f42e264] [cursor=pointer]:
+            - /url: /why-eight-sleep/
+            - generic [ref=f42e265]:
+              - text: Why Eight Sleep
+              - generic [ref=f42e266]: "- learn how our technology improves your sleep"
+        - generic [ref=f42e267]:
+          - generic [ref=f42e268]:
+            - generic [ref=f42e269]:
+              - img "Sleeping Card" [ref=f42e271]
+              - generic [ref=f42e625]:
+                - generic [ref=f42e626]:
+                  - generic [ref=f42e627]:
+                    - generic:
+                      - generic: "545"
+                      - generic: "546"
+                      - generic: "547"
+                      - generic: "548"
+                      - generic: "549"
+                      - generic: "550"
+                      - generic: "551"
+                      - generic: "552"
+                      - generic: "553"
+                      - generic: "554"
+                    - generic [ref=f42e628]: "600"
+                  - text: M
+                - text: Hours of sleep analyzed
+            - generic [ref=f42e629]:
+              - img "Sleeping Card" [ref=f42e631]
+              - generic [ref=f42e643]:
+                - generic [ref=f42e645]:
+                  - generic:
+                    - generic: "0"
+                    - generic: "1"
+                    - generic: "2"
+                    - generic: "3"
+                    - generic: "4"
+                    - generic: "5"
+                    - generic: "6"
+                    - generic: "7"
+                    - generic: "8"
+                    - generic: "9"
+                  - generic [ref=f42e646]: "14"
+                - text: Patented technologies
+          - generic [ref=f42e648]:
+            - img "Sleeping Card" [ref=f42e650]
+            - generic [ref=f42e658]:
+              - generic [ref=f42e659]:
+                - generic [ref=f42e660]:
+                  - generic:
+                    - generic: "15"
+                    - generic: "16"
+                    - generic: "17"
+                    - generic: "18"
+                    - generic: "19"
+                    - generic: "20"
+                    - generic: "21"
+                    - generic: "22"
+                    - generic: "23"
+                    - generic: "24"
+                  - generic [ref=f42e661]: "50"
+                - text: +
+              - text: Clinical studies conducted
+      - generic [ref=f42e663]:
+        - generic [ref=f42e665]:
+          - heading "Real people. Real results." [level=2] [ref=f42e666]: Real people.Real results.
+          - paragraph [ref=f42e667]: How the Pod helps people sleep deeper, feel better, and get more out of every day
+        - generic [ref=f42e668]:
+          - button [ref=f42e670] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Uday a critical care physician"
+              - button "Play video from Uday" [ref=f42e671]
+            - generic [ref=f42e680]:
+              - paragraph [ref=f42e681]: Uday
+              - paragraph [ref=f42e682]: "\"Within 3 weeks I started to have big improvements in REM and deep sleep\""
+          - button [ref=f42e684] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Kate, a finance professional and new mom"
+              - button "Play video from Kate" [ref=f42e685]
+            - generic [ref=f42e694]:
+              - paragraph [ref=f42e695]: Kate
+              - paragraph [ref=f42e696]: "\"It really helped during pregnancy to tune to the exact temperature\""
+          - button [ref=f42e698] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portraits of Austin & Brianna a cardiovascular nurse and marketing professional"
+              - button "Play video from Austin & Brianna" [ref=f42e699]
+            - generic [ref=f42e708]:
+              - paragraph [ref=f42e709]: Austin & Brianna
+              - paragraph [ref=f42e710]: "\"I can be comfortable on my cool side of the bed and she can have her warm side\""
+          - button [ref=f42e712] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Marni a founder, entrepreneur, and triathlete"
+              - button "Play video from Marni" [ref=f42e713]
+            - generic [ref=f42e722]:
+              - paragraph [ref=f42e723]: Marni
+              - paragraph [ref=f42e724]: "\"The Pod has been a huge asset to my work, my training, and my performance\""
+          - button [ref=f42e726] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Hashem"
+              - button "Play video from Hashem" [ref=f42e727]
+            - generic [ref=f42e736]:
+              - paragraph [ref=f42e737]: Hashem
+              - paragraph [ref=f42e738]: "\"It’s helped so much to not wake up drenched in sleep or freezing\""
+          - button [ref=f42e740] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Lydia"
+              - button "Play video from Lydia" [ref=f42e741]
+            - generic [ref=f42e750]:
+              - paragraph [ref=f42e751]: Lydia
+              - paragraph [ref=f42e752]: "\"I no longer consistently wake up in the middle of night and stay asleep longer\""
+          - button [ref=f42e754] [cursor=pointer]:
+            - generic:
+              - generic:
+                - img "Portrait of Martin"
+              - button "Play video from Martin" [ref=f42e755]
+            - generic [ref=f42e764]:
+              - paragraph [ref=f42e765]: Martin
+              - paragraph [ref=f42e766]: "\"With the Pod, it’s a very comfortable sleep through the night\""
+      - generic [ref=f42e768]:
+        - heading "Thousands of trusted reviews from extraordinary people like you" [level=2] [ref=f42e769]: Thousands of trusted reviewsfrom extraordinary people like you
+        - generic [ref=f42e771]:
+          - list [ref=f42e772]:
+            - listitem [ref=f42e773]:
+              - generic [ref=f42e774]:
+                - button "Unmute" [ref=f42e775] [cursor=pointer]
+                - generic [ref=f42e779]:
+                  - button "Play video" [ref=f42e781]
+                  - img "Charles Leclerc portrait" [ref=f42e785]
+                - generic [ref=f42e786]:
+                  - heading "Charles Leclerc" [level=2] [ref=f42e787]
+                  - paragraph [ref=f42e788]: Racing driver
+            - listitem [ref=f42e789]:
+              - link [ref=f42e790] [cursor=pointer]:
+                - /url: https://twitter.com/paulg/status/1562684073365057537
+                - generic [ref=f42e794]:
+                  - generic [ref=f42e795]:
+                    - img "Paul Graham twitter profile avatar" [ref=f42e797]
+                    - generic [ref=f42e798]:
+                      - paragraph [ref=f42e799]:
+                        - strong [ref=f42e800]: Paul Graham
+                      - paragraph [ref=f42e804]: "@paulg"
+                  - paragraph [ref=f42e805]: Jessica and I met Matteo Franceschetti of Eight Sleep today, and 5 minutes into the conversation we ordered one.
+                  - paragraph [ref=f42e807]: 11:11 PM · Aug 24, 2022
+          - list [ref=f42e808]:
+            - listitem [ref=f42e809]:
+              - generic [ref=f42e814]:
+                - generic [ref=f42e815]:
+                  - img "Mark Zuckerberg threads profile avatar" [ref=f42e817]
+                  - generic [ref=f42e818]:
+                    - paragraph [ref=f42e819]:
+                      - strong [ref=f42e820]: Mark Zuckerberg
+                    - paragraph [ref=f42e821]: "@zuck"
+                - paragraph [ref=f42e822]: 7-8 hours usually. Really dialed in my sleep with Eight Sleep and Oura.
+                - paragraph [ref=f42e824]: 12:10 PM · Jul 10, 2023
+            - listitem [ref=f42e825]:
+              - generic [ref=f42e826]:
+                - button "Unmute" [ref=f42e827] [cursor=pointer]
+                - generic [ref=f42e831]:
+                  - button "Play video" [ref=f42e833]
+                  - img "Joe Rogan portrait" [ref=f42e837]
+                - generic [ref=f42e838]:
+                  - heading "Joe Rogan" [level=2] [ref=f42e839]
+                  - paragraph [ref=f42e840]: Podcaster & entertainer
+          - list [ref=f42e841]:
+            - listitem [ref=f42e842]:
+              - link [ref=f42e843] [cursor=pointer]:
+                - /url: https://twitter.com/bryan_johnson/status/1683879265740394496
+                - generic [ref=f42e847]:
+                  - generic [ref=f42e848]:
+                    - img "Bryan Johnson twitter profile avatar" [ref=f42e850]
+                    - generic [ref=f42e851]:
+                      - paragraph [ref=f42e852]:
+                        - strong [ref=f42e853]: Bryan Johnson
+                      - paragraph [ref=f42e857]: "@bryan_johnson"
+                  - paragraph [ref=f42e858]:
+                    - generic [ref=f42e859]:
+                      - strong [ref=f42e860]: "@eightsleep"
+                      - text: ", it's listed on the blueprint website 🤝"
+                  - paragraph [ref=f42e862]: 09:37 AM · Jul 25, 2023
+            - listitem [ref=f42e863]:
+              - generic [ref=f42e864]:
+                - generic:
+                  - img "Trevor Whyte"
+                - paragraph [ref=f42e865]: I dedicate more focus to my sleep when I notice a sudden unexpected drop in my heart rate variability (HRV) from the Eight Sleep App. I believe this has helped me avoid illnesses like colds that the rest of my family sometimes experiences.
+                - paragraph [ref=f42e866]: Trevor Whyte, Member since 2022
+          - list [ref=f42e867]:
+            - listitem [ref=f42e868]:
+              - generic [ref=f42e869]:
+                - button "Unmute" [ref=f42e870] [cursor=pointer]
+                - generic [ref=f42e874]:
+                  - button "Play video" [ref=f42e876]
+                  - img "Peyton Stearns portrait" [ref=f42e880]
+                - generic [ref=f42e881]:
+                  - heading "Peyton Stearns" [level=2] [ref=f42e882]
+                  - paragraph [ref=f42e883]: American tennis player
+            - listitem [ref=f42e884]:
+              - link [ref=f42e885] [cursor=pointer]:
+                - /url: https://twitter.com/elonmusk/status/1630467288720719873
+                - generic [ref=f42e889]:
+                  - generic [ref=f42e890]:
+                    - img "Elon Musk twitter profile avatar" [ref=f42e892]
+                    - generic [ref=f42e893]:
+                      - paragraph [ref=f42e894]:
+                        - strong [ref=f42e895]: Elon Musk
+                      - paragraph [ref=f42e899]: "@elonmusk"
+                  - paragraph [ref=f42e900]:
+                    - generic [ref=f42e901]:
+                      - strong [ref=f42e902]: "@eightsleep"
+                      - text: It’s good
+                  - paragraph [ref=f42e904]: 11:17 PM · Feb 27, 2023
+        - link "View more reviews" [ref=f42e906] [cursor=pointer]:
+          - /url: /wall-of-love/
+      - generic [ref=f42e910]:
+        - generic [ref=f42e911]:
+          - tablist "Customer Reviews" [ref=f42e913]:
+            - tab "Hot sleepers" [selected] [ref=f42e914] [cursor=pointer]
+            - tab "Couples" [ref=f42e915] [cursor=pointer]
+            - tab "Fitness enthusiasts" [ref=f42e916] [cursor=pointer]
+            - tab "Troubled sleepers" [ref=f42e917] [cursor=pointer]
+          - tabpanel "Hot sleepers" [ref=f42e918]:
+            - generic [ref=f42e921]:
+              - group "49 / 50" [ref=f42e922]:
+                - generic [ref=f42e923]:
+                  - paragraph [ref=f42e925]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e926]:
+                    - generic [ref=f42e927]:
+                      - generic [ref=f42e928]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e929]:
+                        - generic [ref=f42e941]: Martin
+                        - generic [ref=f42e942]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e944] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "50 / 50" [ref=f42e947]:
+                - generic [ref=f42e948]:
+                  - paragraph [ref=f42e950]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e951]:
+                    - generic [ref=f42e952]:
+                      - generic [ref=f42e953]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e954]:
+                        - generic [ref=f42e966]: Rowan
+                        - generic [ref=f42e967]: April 2025
+                    - link "Read review by Rowan" [ref=f42e969] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "1 / 50" [ref=f42e972]:
+                - generic [ref=f42e973]:
+                  - paragraph [ref=f42e975]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e976]:
+                    - generic [ref=f42e977]:
+                      - generic [ref=f42e978]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e979]:
+                        - generic [ref=f42e991]: Jason
+                        - generic [ref=f42e992]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e994] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "2 / 50" [ref=f42e997]:
+                - generic [ref=f42e998]:
+                  - paragraph [ref=f42e1000]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1001]:
+                    - generic [ref=f42e1002]:
+                      - generic [ref=f42e1003]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1004]:
+                        - generic [ref=f42e1016]: Jillian
+                        - generic [ref=f42e1017]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1019] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "3 / 50" [ref=f42e1022]:
+                - generic [ref=f42e1023]:
+                  - paragraph [ref=f42e1025]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1026]:
+                    - generic [ref=f42e1027]:
+                      - generic [ref=f42e1028]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1029]:
+                        - generic [ref=f42e1041]: Chase
+                        - generic [ref=f42e1042]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1044] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "4 / 50" [ref=f42e1047]:
+                - generic [ref=f42e1048]:
+                  - paragraph [ref=f42e1050]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1051]:
+                    - generic [ref=f42e1052]:
+                      - generic [ref=f42e1053]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1054]:
+                        - generic [ref=f42e1066]: Martin
+                        - generic [ref=f42e1067]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1069] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "5 / 50" [ref=f42e1072]:
+                - generic [ref=f42e1073]:
+                  - paragraph [ref=f42e1075]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1076]:
+                    - generic [ref=f42e1077]:
+                      - generic [ref=f42e1078]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1079]:
+                        - generic [ref=f42e1091]: Rowan
+                        - generic [ref=f42e1092]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1094] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "6 / 50" [ref=f42e1097]:
+                - generic [ref=f42e1098]:
+                  - paragraph [ref=f42e1100]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1101]:
+                    - generic [ref=f42e1102]:
+                      - generic [ref=f42e1103]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1104]:
+                        - generic [ref=f42e1116]: Jason
+                        - generic [ref=f42e1117]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1119] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "7 / 50" [ref=f42e1122]:
+                - generic [ref=f42e1123]:
+                  - paragraph [ref=f42e1125]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1126]:
+                    - generic [ref=f42e1127]:
+                      - generic [ref=f42e1128]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1129]:
+                        - generic [ref=f42e1141]: Jillian
+                        - generic [ref=f42e1142]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1144] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "8 / 50" [ref=f42e1147]:
+                - generic [ref=f42e1148]:
+                  - paragraph [ref=f42e1150]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1151]:
+                    - generic [ref=f42e1152]:
+                      - generic [ref=f42e1153]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1154]:
+                        - generic [ref=f42e1166]: Chase
+                        - generic [ref=f42e1167]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1169] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "9 / 50" [ref=f42e1172]:
+                - generic [ref=f42e1173]:
+                  - paragraph [ref=f42e1175]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1176]:
+                    - generic [ref=f42e1177]:
+                      - generic [ref=f42e1178]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1179]:
+                        - generic [ref=f42e1191]: Martin
+                        - generic [ref=f42e1192]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1194] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "10 / 50" [ref=f42e1197]:
+                - generic [ref=f42e1198]:
+                  - paragraph [ref=f42e1200]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1201]:
+                    - generic [ref=f42e1202]:
+                      - generic [ref=f42e1203]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1204]:
+                        - generic [ref=f42e1216]: Rowan
+                        - generic [ref=f42e1217]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1219] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "11 / 50" [ref=f42e1222]:
+                - generic [ref=f42e1223]:
+                  - paragraph [ref=f42e1225]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1226]:
+                    - generic [ref=f42e1227]:
+                      - generic [ref=f42e1228]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1229]:
+                        - generic [ref=f42e1241]: Jason
+                        - generic [ref=f42e1242]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1244] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "12 / 50" [ref=f42e1247]:
+                - generic [ref=f42e1248]:
+                  - paragraph [ref=f42e1250]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1251]:
+                    - generic [ref=f42e1252]:
+                      - generic [ref=f42e1253]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1254]:
+                        - generic [ref=f42e1266]: Jillian
+                        - generic [ref=f42e1267]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1269] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "13 / 50" [ref=f42e1272]:
+                - generic [ref=f42e1273]:
+                  - paragraph [ref=f42e1275]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1276]:
+                    - generic [ref=f42e1277]:
+                      - generic [ref=f42e1278]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1279]:
+                        - generic [ref=f42e1291]: Chase
+                        - generic [ref=f42e1292]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1294] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "14 / 50" [ref=f42e1297]:
+                - generic [ref=f42e1298]:
+                  - paragraph [ref=f42e1300]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1301]:
+                    - generic [ref=f42e1302]:
+                      - generic [ref=f42e1303]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1304]:
+                        - generic [ref=f42e1316]: Martin
+                        - generic [ref=f42e1317]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1319] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "15 / 50" [ref=f42e1322]:
+                - generic [ref=f42e1323]:
+                  - paragraph [ref=f42e1325]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1326]:
+                    - generic [ref=f42e1327]:
+                      - generic [ref=f42e1328]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1329]:
+                        - generic [ref=f42e1341]: Rowan
+                        - generic [ref=f42e1342]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1344] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "16 / 50" [ref=f42e1347]:
+                - generic [ref=f42e1348]:
+                  - paragraph [ref=f42e1350]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1351]:
+                    - generic [ref=f42e1352]:
+                      - generic [ref=f42e1353]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1354]:
+                        - generic [ref=f42e1366]: Jason
+                        - generic [ref=f42e1367]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1369] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "17 / 50" [ref=f42e1372]:
+                - generic [ref=f42e1373]:
+                  - paragraph [ref=f42e1375]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1376]:
+                    - generic [ref=f42e1377]:
+                      - generic [ref=f42e1378]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1379]:
+                        - generic [ref=f42e1391]: Jillian
+                        - generic [ref=f42e1392]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1394] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "18 / 50" [ref=f42e1397]:
+                - generic [ref=f42e1398]:
+                  - paragraph [ref=f42e1400]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1401]:
+                    - generic [ref=f42e1402]:
+                      - generic [ref=f42e1403]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1404]:
+                        - generic [ref=f42e1416]: Chase
+                        - generic [ref=f42e1417]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1419] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "19 / 50" [ref=f42e1422]:
+                - generic [ref=f42e1423]:
+                  - paragraph [ref=f42e1425]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1426]:
+                    - generic [ref=f42e1427]:
+                      - generic [ref=f42e1428]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1429]:
+                        - generic [ref=f42e1441]: Martin
+                        - generic [ref=f42e1442]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1444] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "20 / 50" [ref=f42e1447]:
+                - generic [ref=f42e1448]:
+                  - paragraph [ref=f42e1450]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1451]:
+                    - generic [ref=f42e1452]:
+                      - generic [ref=f42e1453]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1454]:
+                        - generic [ref=f42e1466]: Rowan
+                        - generic [ref=f42e1467]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1469] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "21 / 50" [ref=f42e1472]:
+                - generic [ref=f42e1473]:
+                  - paragraph [ref=f42e1475]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1476]:
+                    - generic [ref=f42e1477]:
+                      - generic [ref=f42e1478]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1479]:
+                        - generic [ref=f42e1491]: Jason
+                        - generic [ref=f42e1492]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1494] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "22 / 50" [ref=f42e1497]:
+                - generic [ref=f42e1498]:
+                  - paragraph [ref=f42e1500]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1501]:
+                    - generic [ref=f42e1502]:
+                      - generic [ref=f42e1503]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1504]:
+                        - generic [ref=f42e1516]: Jillian
+                        - generic [ref=f42e1517]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1519] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "23 / 50" [ref=f42e1522]:
+                - generic [ref=f42e1523]:
+                  - paragraph [ref=f42e1525]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1526]:
+                    - generic [ref=f42e1527]:
+                      - generic [ref=f42e1528]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1529]:
+                        - generic [ref=f42e1541]: Chase
+                        - generic [ref=f42e1542]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1544] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "24 / 50" [ref=f42e1547]:
+                - generic [ref=f42e1548]:
+                  - paragraph [ref=f42e1550]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1551]:
+                    - generic [ref=f42e1552]:
+                      - generic [ref=f42e1553]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1554]:
+                        - generic [ref=f42e1566]: Martin
+                        - generic [ref=f42e1567]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1569] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "25 / 50" [ref=f42e1572]:
+                - generic [ref=f42e1573]:
+                  - paragraph [ref=f42e1575]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1576]:
+                    - generic [ref=f42e1577]:
+                      - generic [ref=f42e1578]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1579]:
+                        - generic [ref=f42e1591]: Rowan
+                        - generic [ref=f42e1592]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1594] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "26 / 50" [ref=f42e1597]:
+                - generic [ref=f42e1598]:
+                  - paragraph [ref=f42e1600]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1601]:
+                    - generic [ref=f42e1602]:
+                      - generic [ref=f42e1603]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1604]:
+                        - generic [ref=f42e1616]: Jason
+                        - generic [ref=f42e1617]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1619] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "27 / 50" [ref=f42e1622]:
+                - generic [ref=f42e1623]:
+                  - paragraph [ref=f42e1625]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1626]:
+                    - generic [ref=f42e1627]:
+                      - generic [ref=f42e1628]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1629]:
+                        - generic [ref=f42e1641]: Jillian
+                        - generic [ref=f42e1642]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1644] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "28 / 50" [ref=f42e1647]:
+                - generic [ref=f42e1648]:
+                  - paragraph [ref=f42e1650]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1651]:
+                    - generic [ref=f42e1652]:
+                      - generic [ref=f42e1653]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1654]:
+                        - generic [ref=f42e1666]: Chase
+                        - generic [ref=f42e1667]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1669] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "29 / 50" [ref=f42e1672]:
+                - generic [ref=f42e1673]:
+                  - paragraph [ref=f42e1675]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1676]:
+                    - generic [ref=f42e1677]:
+                      - generic [ref=f42e1678]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1679]:
+                        - generic [ref=f42e1691]: Martin
+                        - generic [ref=f42e1692]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1694] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "30 / 50" [ref=f42e1697]:
+                - generic [ref=f42e1698]:
+                  - paragraph [ref=f42e1700]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1701]:
+                    - generic [ref=f42e1702]:
+                      - generic [ref=f42e1703]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1704]:
+                        - generic [ref=f42e1716]: Rowan
+                        - generic [ref=f42e1717]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1719] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "31 / 50" [ref=f42e1722]:
+                - generic [ref=f42e1723]:
+                  - paragraph [ref=f42e1725]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1726]:
+                    - generic [ref=f42e1727]:
+                      - generic [ref=f42e1728]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1729]:
+                        - generic [ref=f42e1741]: Jason
+                        - generic [ref=f42e1742]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1744] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "32 / 50" [ref=f42e1747]:
+                - generic [ref=f42e1748]:
+                  - paragraph [ref=f42e1750]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1751]:
+                    - generic [ref=f42e1752]:
+                      - generic [ref=f42e1753]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1754]:
+                        - generic [ref=f42e1766]: Jillian
+                        - generic [ref=f42e1767]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1769] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "33 / 50" [ref=f42e1772]:
+                - generic [ref=f42e1773]:
+                  - paragraph [ref=f42e1775]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1776]:
+                    - generic [ref=f42e1777]:
+                      - generic [ref=f42e1778]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1779]:
+                        - generic [ref=f42e1791]: Chase
+                        - generic [ref=f42e1792]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1794] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "34 / 50" [ref=f42e1797]:
+                - generic [ref=f42e1798]:
+                  - paragraph [ref=f42e1800]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1801]:
+                    - generic [ref=f42e1802]:
+                      - generic [ref=f42e1803]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1804]:
+                        - generic [ref=f42e1816]: Martin
+                        - generic [ref=f42e1817]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1819] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "35 / 50" [ref=f42e1822]:
+                - generic [ref=f42e1823]:
+                  - paragraph [ref=f42e1825]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1826]:
+                    - generic [ref=f42e1827]:
+                      - generic [ref=f42e1828]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1829]:
+                        - generic [ref=f42e1841]: Rowan
+                        - generic [ref=f42e1842]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1844] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "36 / 50" [ref=f42e1847]:
+                - generic [ref=f42e1848]:
+                  - paragraph [ref=f42e1850]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1851]:
+                    - generic [ref=f42e1852]:
+                      - generic [ref=f42e1853]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1854]:
+                        - generic [ref=f42e1866]: Jason
+                        - generic [ref=f42e1867]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1869] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "37 / 50" [ref=f42e1872]:
+                - generic [ref=f42e1873]:
+                  - paragraph [ref=f42e1875]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e1876]:
+                    - generic [ref=f42e1877]:
+                      - generic [ref=f42e1878]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e1879]:
+                        - generic [ref=f42e1891]: Jillian
+                        - generic [ref=f42e1892]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e1894] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "38 / 50" [ref=f42e1897]:
+                - generic [ref=f42e1898]:
+                  - paragraph [ref=f42e1900]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e1901]:
+                    - generic [ref=f42e1902]:
+                      - generic [ref=f42e1903]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e1904]:
+                        - generic [ref=f42e1916]: Chase
+                        - generic [ref=f42e1917]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e1919] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "39 / 50" [ref=f42e1922]:
+                - generic [ref=f42e1923]:
+                  - paragraph [ref=f42e1925]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e1926]:
+                    - generic [ref=f42e1927]:
+                      - generic [ref=f42e1928]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e1929]:
+                        - generic [ref=f42e1941]: Martin
+                        - generic [ref=f42e1942]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e1944] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "40 / 50" [ref=f42e1947]:
+                - generic [ref=f42e1948]:
+                  - paragraph [ref=f42e1950]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e1951]:
+                    - generic [ref=f42e1952]:
+                      - generic [ref=f42e1953]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e1954]:
+                        - generic [ref=f42e1966]: Rowan
+                        - generic [ref=f42e1967]: April 2025
+                    - link "Read review by Rowan" [ref=f42e1969] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "41 / 50" [ref=f42e1972]:
+                - generic [ref=f42e1973]:
+                  - paragraph [ref=f42e1975]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e1976]:
+                    - generic [ref=f42e1977]:
+                      - generic [ref=f42e1978]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e1979]:
+                        - generic [ref=f42e1991]: Jason
+                        - generic [ref=f42e1992]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e1994] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "42 / 50" [ref=f42e1997]:
+                - generic [ref=f42e1998]:
+                  - paragraph [ref=f42e2000]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e2001]:
+                    - generic [ref=f42e2002]:
+                      - generic [ref=f42e2003]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e2004]:
+                        - generic [ref=f42e2016]: Jillian
+                        - generic [ref=f42e2017]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e2019] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "43 / 50" [ref=f42e2022]:
+                - generic [ref=f42e2023]:
+                  - paragraph [ref=f42e2025]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e2026]:
+                    - generic [ref=f42e2027]:
+                      - generic [ref=f42e2028]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e2029]:
+                        - generic [ref=f42e2041]: Chase
+                        - generic [ref=f42e2042]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e2044] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+              - group "44 / 50" [ref=f42e2047]:
+                - generic [ref=f42e2048]:
+                  - paragraph [ref=f42e2050]: "\"Had one for over 3 years. Yes - amazing especially if one partner runs hot, the other cold. recently upgraded - you can now tap the side of the cover to adjust temp up or down without an app. It's a game changer especially when your legs are hot from a hard workout.\""
+                  - generic [ref=f42e2051]:
+                    - generic [ref=f42e2052]:
+                      - generic [ref=f42e2053]:
+                        - generic:
+                          - img "Martin"
+                      - generic [ref=f42e2054]:
+                        - generic [ref=f42e2066]: Martin
+                        - generic [ref=f42e2067]: Feb 2025
+                    - link "Read review by Martin" [ref=f42e2069] [cursor=pointer]:
+                      - /url: https://x.com/marting/status/1886869102188511487
+              - group "45 / 50" [ref=f42e2072]:
+                - generic [ref=f42e2073]:
+                  - paragraph [ref=f42e2075]: "\"Add an @eightsleep to keep the bed just right during hot summer and cold winter nights. Game changer.\""
+                  - generic [ref=f42e2076]:
+                    - generic [ref=f42e2077]:
+                      - generic [ref=f42e2078]:
+                        - generic:
+                          - img "Rowan"
+                      - generic [ref=f42e2079]:
+                        - generic [ref=f42e2091]: Rowan
+                        - generic [ref=f42e2092]: April 2025
+                    - link "Read review by Rowan" [ref=f42e2094] [cursor=pointer]:
+                      - /url: https://x.com/RowanRK6/status/1910677662961447268
+              - group "46 / 50" [ref=f42e2097]:
+                - generic [ref=f42e2098]:
+                  - paragraph [ref=f42e2100]: "\"I was a hot sleeper that'd wake up 2-3 times a night, so yes one of the best investments I ever made. Basically eliminates temperature-based wakeups.\""
+                  - generic [ref=f42e2101]:
+                    - generic [ref=f42e2102]:
+                      - generic [ref=f42e2103]:
+                        - generic:
+                          - img "Jason"
+                      - generic [ref=f42e2104]:
+                        - generic [ref=f42e2116]: Jason
+                        - generic [ref=f42e2117]: Aug 2024
+                    - link "Read review by Jason" [ref=f42e2119] [cursor=pointer]:
+                      - /url: https://x.com/tryjasononline/status/1825864812980552098
+              - group "47 / 50" [ref=f42e2122]:
+                - generic [ref=f42e2123]:
+                  - paragraph [ref=f42e2125]: "\"Biggest difference for me is how I feel...I'm a hot sleeper & it has changed how i feel and limits middle of the night waking up bc of it\""
+                  - generic [ref=f42e2126]:
+                    - generic [ref=f42e2127]:
+                      - generic [ref=f42e2128]:
+                        - generic:
+                          - img "Jillian"
+                      - generic [ref=f42e2129]:
+                        - generic [ref=f42e2141]: Jillian
+                        - generic [ref=f42e2142]: Aug 2024
+                    - link "Read review by Jillian" [ref=f42e2144] [cursor=pointer]:
+                      - /url: https://x.com/Jillwillnyc/status/1826630695655288878
+              - group "48 / 50" [ref=f42e2147]:
+                - generic [ref=f42e2148]:
+                  - paragraph [ref=f42e2150]: "\"Personally, I’m too hot of a sleeper to sleep without it. I try to plan not to travel to avoid the poor sleep…It’s one of those life upgrades that you didn’t know you needed until you had it\""
+                  - generic [ref=f42e2151]:
+                    - generic [ref=f42e2152]:
+                      - generic [ref=f42e2153]:
+                        - generic:
+                          - img "Chase"
+                      - generic [ref=f42e2154]:
+                        - generic [ref=f42e2166]: Chase
+                        - generic [ref=f42e2167]: Nov 2024
+                    - link "Read review by Chase" [ref=f42e2169] [cursor=pointer]:
+                      - /url: https://x.com/chase_flanery/status/1858027617909424358
+            - generic [ref=f42e2173]:
+              - button "Navigate left" [ref=f42e2174] [cursor=pointer]
+              - button "Navigate right" [ref=f42e2178] [cursor=pointer]
+        - img "Customer Reviews" [ref=f42e2184]
+      - generic [ref=f42e2186]:
+        - banner [ref=f42e2187]:
+          - heading "Scientific Advisory Board" [level=2] [ref=f42e2188]
+          - heading "Backed by industry leaders" [level=2] [ref=f42e2189]
+        - list [ref=f42e2190]:
+          - listitem [ref=f42e2191]:
+            - generic [ref=f42e2192]:
+              - generic [ref=f42e2194]:
+                - img "Portrait of Andrew Huberman, Ph.D." [ref=f42e2196]
+                - button "View bio for Andrew Huberman, Ph.D." [ref=f42e2197] [cursor=pointer]
+              - generic [ref=f42e2200]:
+                - heading "Andrew Huberman, Ph.D." [level=3] [ref=f42e2201]
+                - paragraph [ref=f42e2202]: Neuroscientist, Stanford professor, and host of the top-ranked Huberman Lab podcast
+          - listitem [ref=f42e2203]:
+            - generic [ref=f42e2204]:
+              - generic [ref=f42e2206]:
+                - img "Portrait of Matthew Walker, Ph.D." [ref=f42e2208]
+                - button "View bio for Matthew Walker, Ph.D." [ref=f42e2209] [cursor=pointer]
+              - generic [ref=f42e2212]:
+                - heading "Matthew Walker, Ph.D." [level=3] [ref=f42e2213]
+                - paragraph [ref=f42e2214]: "Neuroscientist, UC Berkeley professor, and author of the #1 bestseller Why We Sleep"
+      - generic [ref=f42e2217]:
+        - banner [ref=f42e2218]:
+          - heading "Sleep changed." [level=1] [ref=f42e2219]
+          - heading "Life changed." [level=1] [ref=f42e2220]
+        - link "Shop now" [ref=f42e2223] [cursor=pointer]:
+          - /url: /product/pod-cover/
+    - contentinfo [ref=f42e2227]:
+      - link "Anchor link to Header" [ref=f42e2228] [cursor=pointer]:
+        - /url: "#header"
+        - text: Header
+      - link "Anchor link to Main Content" [ref=f42e2229] [cursor=pointer]:
+        - /url: "#main"
+        - text: Main Content
+      - generic [ref=f42e2230]:
+        - heading "Eight Sleep" [level=2]
+        - generic [ref=f42e2234]:
+          - generic:
+            - img "HSA/FSA"
+          - generic:
+            - img "Affirm"
+          - generic:
+            - img "Apple Pay"
+          - generic:
+            - img "Google Pay"
+          - generic:
+            - img "Visa"
+          - generic:
+            - img "Mastercard"
+          - generic:
+            - img "Amex"
+      - button "Change region" [ref=f42e2236] [cursor=pointer]:
+        - img "United States flag" [ref=f42e2237]
+      - generic [ref=f42e2241]:
+        - generic [ref=f42e2242]:
+          - heading "Join the sleep fitness movement Sign up to stay updated on the newest in sleep technology" [level=3] [ref=f42e2243]:
+            - text: Join the sleep fitness movement
+            - generic [ref=f42e2244]: Sign up to stay updated on the newest in sleep technology
+          - generic [ref=f42e2245]:
+            - generic [ref=f42e2246]:
+              - textbox "Email" [ref=f42e2247]:
+                - /placeholder: Email address
+              - button "Submit" [ref=f42e2248] [cursor=pointer]
+            - paragraph [ref=f42e2252]: By signing up here I agree to receive Eight Sleep's email newsletter and special promotional offers.
+        - list [ref=f42e2253]:
+          - listitem [ref=f42e2254]:
+            - heading "Blog" [level=3] [ref=f42e2255]
+            - list [ref=f42e2256]:
+              - listitem [ref=f42e2257]:
+                - link [ref=f42e2258] [cursor=pointer]:
+                  - /url: https://www.eightsleep.com/blog/sleep/
+                  - paragraph [ref=f42e2259]: Sleep
+              - listitem [ref=f42e2260]:
+                - link [ref=f42e2261] [cursor=pointer]:
+                  - /url: https://www.eightsleep.com/blog/fitness/
+                  - paragraph [ref=f42e2262]: Fitness
+              - listitem [ref=f42e2263]:
+                - link [ref=f42e2264] [cursor=pointer]:
+                  - /url: https://www.eightsleep.com/blog/wellness/
+                  - paragraph [ref=f42e2265]: Wellness
+              - listitem [ref=f42e2266]:
+                - link [ref=f42e2267] [cursor=pointer]:
+                  - /url: https://www.eightsleep.com/blog/science/
+                  - paragraph [ref=f42e2268]: Science
+          - listitem [ref=f42e2269]:
+            - heading "Company" [level=3] [ref=f42e2270]
+            - list [ref=f42e2271]:
+              - listitem [ref=f42e2272]:
+                - link [ref=f42e2273] [cursor=pointer]:
+                  - /url: /careers/
+                  - paragraph [ref=f42e2274]: Careers
+              - listitem [ref=f42e2275]:
+                - link [ref=f42e2276] [cursor=pointer]:
+                  - /url: /press
+                  - paragraph [ref=f42e2277]: Press
+              - listitem [ref=f42e2278]:
+                - link [ref=f42e2279] [cursor=pointer]:
+                  - /url: /athletes
+                  - paragraph [ref=f42e2280]: Athletes
+              - listitem [ref=f42e2281]:
+                - link [ref=f42e2282] [cursor=pointer]:
+                  - /url: /hot-flash
+                  - paragraph [ref=f42e2283]: Women's Health
+              - listitem [ref=f42e2284]:
+                - link [ref=f42e2285] [cursor=pointer]:
+                  - /url: /science
+                  - paragraph [ref=f42e2286]: Our Research
+              - listitem [ref=f42e2287]:
+                - link [ref=f42e2288] [cursor=pointer]:
+                  - /url: /accessories
+                  - paragraph [ref=f42e2289]: Sleep Accessories
+              - listitem [ref=f42e2290]:
+                - link [ref=f42e2291] [cursor=pointer]:
+                  - /url: /speak-with-a-specialist/
+                  - paragraph [ref=f42e2292]: Need help purchasing?
+          - listitem [ref=f42e2293]:
+            - heading "Support" [level=3] [ref=f42e2294]
+            - list [ref=f42e2295]:
+              - listitem [ref=f42e2296]:
+                - button [ref=f42e2297] [cursor=pointer]:
+                  - paragraph [ref=f42e2299]: Member Login
+              - listitem [ref=f42e2300]:
+                - link [ref=f42e2301] [cursor=pointer]:
+                  - /url: /sleep-elixir-management
+                  - paragraph [ref=f42e2302]: Sleep Elixir Login
+              - listitem [ref=f42e2303]:
+                - link [ref=f42e2304] [cursor=pointer]:
+                  - /url: https://help.eightsleep.com/
+                  - paragraph [ref=f42e2305]: FAQ
+              - listitem [ref=f42e2306]:
+                - link [ref=f42e2307] [cursor=pointer]:
+                  - /url: /autopilot
+                  - paragraph [ref=f42e2308]: Autopilot
+              - listitem [ref=f42e2309]:
+                - link [ref=f42e2310] [cursor=pointer]:
+                  - /url: /warranty/
+                  - paragraph [ref=f42e2311]: Warranty
+              - listitem [ref=f42e2312]:
+                - link [ref=f42e2313] [cursor=pointer]:
+                  - /url: /return-policy/
+                  - paragraph [ref=f42e2314]: Return Policy
+              - listitem [ref=f42e2315]:
+                - link [ref=f42e2316] [cursor=pointer]:
+                  - /url: /accessibility/
+                  - paragraph [ref=f42e2317]: Accessibility
+          - listitem [ref=f42e2318]:
+            - heading "Legal" [level=3] [ref=f42e2319]
+            - list [ref=f42e2320]:
+              - listitem [ref=f42e2321]:
+                - link [ref=f42e2322] [cursor=pointer]:
+                  - /url: /financing
+                  - paragraph [ref=f42e2323]: Financing Policy*
+              - listitem [ref=f42e2324]:
+                - link [ref=f42e2325] [cursor=pointer]:
+                  - /url: /legal/privacy
+                  - paragraph [ref=f42e2326]: Privacy Policy
+              - listitem [ref=f42e2327]:
+                - link [ref=f42e2328] [cursor=pointer]:
+                  - /url: /terms-and-conditions
+                  - paragraph [ref=f42e2329]: Sale Terms and Conditions
+              - listitem [ref=f42e2330]:
+                - link [ref=f42e2331] [cursor=pointer]:
+                  - /url: /legal/consumer-health-data-privacy-policy
+                  - paragraph [ref=f42e2332]: Consumer Health Data Privacy Policy
+              - listitem [ref=f42e2333]:
+                - link [ref=f42e2334] [cursor=pointer]:
+                  - /url: /intellectual-property
+                  - paragraph [ref=f42e2335]: Intellectual Property
+              - listitem [ref=f42e2336]:
+                - link [ref=f42e2337] [cursor=pointer]:
+                  - /url: /tradein-terms
+                  - paragraph [ref=f42e2338]: Trade-In Terms
+      - generic [ref=f42e2340]:
+        - heading "Social Links" [level=3]
+        - list [ref=f42e2341]:
+          - listitem [ref=f42e2342]:
+            - link "YouTube social media" [ref=f42e2343] [cursor=pointer]:
+              - /url: https://www.youtube.com/@eight_sleep
+          - listitem [ref=f42e2346]:
+            - link "Instagram social media" [ref=f42e2347] [cursor=pointer]:
+              - /url: https://www.instagram.com/eightsleep
+          - listitem [ref=f42e2350]:
+            - link "X social media" [ref=f42e2351] [cursor=pointer]:
+              - /url: https://www.x.com/eightsleep
+      - paragraph [ref=f42e2355]: © 2026 Eight Sleep. All rights reserved.
+      - generic [ref=f42e2356]:
+        - paragraph [ref=f42e2357]:
+          - text: "*Sale terms and conditions apply. Offer valid only on select products. Discounts apply automatically at checkout and cannot be combined with other promotions. See full"
+          - link "Terms & Conditions" [ref=f42e2358] [cursor=pointer]:
+            - /url: /holiday-terms2025
+          - text: .
+        - paragraph [ref=f42e2359]:
+          - text: "**Autopilot Enhanced or Autopilot Elite required for 5-year warranty. See full"
+          - link "Warranty Terms here" [ref=f42e2360] [cursor=pointer]:
+            - /url: /warranty
+          - text: .
+        - paragraph [ref=f42e2361]:
+          - superscript [ref=f42e2362]: †
+          - text: "Rates from 0-36% APR. Payment options through Affirm are subject to an eligibility check and are provided by these lending partners:"
+          - link "affirm.com/lenders" [ref=f42e2363] [cursor=pointer]:
+            - /url: https://www.affirm.com/lenders
+          - text: ". Options depend on your purchase amount, and a down payment may be required. CA residents: Loans by Affirm Loan Services, LLC are made or arranged pursuant to a California Finance Lenders Law license. For licenses and disclosures, see"
+          - link "affirm.com/licenses" [ref=f42e2364] [cursor=pointer]:
+            - /url: https://www.affirm.com/licenses
+          - text: . For example, a $800 purchase might cost $72.21/mo over 12 months at 15% APR.
+        - paragraph [ref=f42e2365]:
+          - superscript [ref=f42e2366]: "1"
+          - text: Individual results may vary.
+        - paragraph [ref=f42e2367]:
+          - superscript [ref=f42e2368]: "2"
+          - text: Klarna’s Pay in 3/Pay in 30 days are unregulated credit agreements. Payment options through Klarna are subject to an eligibility check, may not be available everywhere, are subject to order totals. Klarna Financing is regulated if it charges interest or lasts over 12 months. It is not regulated if it’s 0% interest and 12 months or less. Borrowing more than you can afford or paying late may negatively impact your financial status and ability to obtain credit. Klarna’s Regulated Financing has a representative APR of 21.9% (fixed).
+  - alert [ref=f42e2369]
+  - button "Pod Owner Login" [ref=f42e2370] [cursor=pointer]
+  - generic:
+    - generic:
+      - generic:
+        - button "Close modal button"
+        - generic:
+          - generic:
+            - img "Eight Sleep branding message"
+        - generic:
+          - generic:
+            - heading "Unlock a surprise" [level=2]
+            - paragraph: What’s your main sleep challenge?
+            - generic:
+              - generic:
+                - button "I feel hot or cold"
+                - button "I can't fall asleep"
+                - button "I wake up often"
+                - button "I snore"
+              - generic:
+                - button "Skip"
+  - button "Open chat" [ref=f42e2372] [cursor=pointer]:
+    - img "Chat with Eight Sleep" [ref=f42e2375]
+  - iframe
+  - region "Cookie banner" [active] [ref=f42e2376]:
+    - dialog "Privacy" [ref=f42e2377]:
+      - generic [ref=f42e2378]:
+        - generic [ref=f42e2379]: This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners.
+        - generic [ref=f42e2382]:
+          - button "Accept Cookies" [ref=f42e2384] [cursor=pointer]
+          - button "Cookie Settings" [ref=f42e2385] [cursor=pointer]
+        - button "Close" [ref=f42e2387] [cursor=pointer]

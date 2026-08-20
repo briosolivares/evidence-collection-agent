@@ -1,0 +1,48 @@
+{
+  "startedAt": "2026-08-19T22:08:12.312Z",
+  "finishedAt": "2026-08-19T22:09:44.865Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "wikipedia_reference",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 91887.64716699999,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent-sherlock-tui/runs/2026-08-19_03-08-15pm_find-the-275th-reference-in-the_e8eee5",
+          "assertions": [
+            {
+              "name": "answer.md exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/answer.md found and manifested"
+            },
+            {
+              "name": "answer contains the complete source text reached from reference 275",
+              "passed": true,
+              "detail": "full normalized text of CITEREFBeevor2012 found (91 source characters)"
+            },
+            {
+              "name": "answer has no truncation marker and is long enough for the full source",
+              "passed": true,
+              "detail": "145 answer token(s), 14 source token(s); truncation markers: none (rendering fidelity remains human-reviewed)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 91887.64716699999,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-13T03:46:53.798Z",
+  "artifacts": [
+    {
+      "filename": "artifacts/captcha_challenge.png",
+      "sha256": "e207e5111d6c1ddf6b19acbc86c9c4d9229375ea53676779eb72b9969f1e4249",
+      "sourceUrl": "https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DAlpha%2BChi%2BOmega%2BMIT%2Bsisters%26sei%3Djj59atDjIriU0PEPjZHG-AU&q=EgRs7oEBGI799NMGIjAvliSYK_VX3_yT6_ILV4L0Qy48qTiO30GA_51zowg9-SZnVEhiFjF94oBHEqXwyz4yAVJaAUM",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:48:48.418Z"
+    },
+    {
+      "filename": "artifacts/captcha_cars.png",
+      "sha256": "235c97232e40080bc6e128f6d8a43e107a07110e54ab0b78640868bfcb0b2e9f",
+      "sourceUrl": "https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DAlpha%2BChi%2BOmega%2BMIT%2Bchapter%2Bwebsite%26sei%3DqD59aoftKda-0PEPucqwmQg&q=EgRs7oEBGKj99NMGIjBo-FoQTYAsroLwPh-sJQ_5hZVNXcrquubaKJemc5Q-YhfnIBrGrgla6uoWsn6PuSkyAVJaAUM",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:49:07.810Z"
+    },
+    {
+      "filename": "artifacts/captcha_traffic.png",
+      "sha256": "72a0ff84045712a68e233a86ea270e2b06b9a6d7f3e73a26ecc78b445f90d3eb",
+      "sourceUrl": "https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3Dfsilg%2Bmit%2Bpanhellenic%2Bsorority%2Bchapters%26sei%3D4T59avC3FfOg0PEP57OyoQk&q=EgRs7oEBGOH99NMGIjCAuA3H2feXe7ipUVP6APelbfPAwAVJHi0cAh6u1-GMwiH5x8A2S8pAxDH09lZuFuYyAVJaAUM",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:50:06.231Z"
+    },
+    {
+      "filename": "artifacts/evidence_google_captcha_blocked.png",
+      "sha256": "b66e802b7d23778433bff5a75b122c0fa81493ab2c9729b215b310a69c5335d7",
+      "sourceUrl": "https://www.google.com/sorry/index?continue=https://www.google.com/search%3Fq%3DMIT%2Bsorority%2Brecruitment%2Bpanhellenic%2Bchapters%2B2024%26sei%3DKD99at3fO87B0PEPj6i1wQY&q=EgRs7oEBGKn-9NMGIjDVZ-CxjY3-3nQWMGZKhdlg56nm9sHTEZDCEuh92lrp9EPYu3cEdC7m8_9VOOUkRgoyAVJaAUM",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T03:51:14.492Z"
+    },
+    {
+      "filename": "scratch/search_attempts_log.md",
+      "sha256": "a9c1c1ece32b70cc4f788e86616caca186c6e3139375faba5480f92b9cdf0fb6",
+      "capturedAt": "2026-08-13T03:51:41.633Z"
+    },
+    {
+      "filename": "artifacts/sorority_members.csv",
+      "sha256": "468ea6ddcccf2fccc5d1e618b70308642130c1b1c6cf2ef661bdb36491fc9e2a",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T03:52:14.307Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "fc975d3d202d08c3c8a8ede765b614aac4d9d8a29c8ab3abf1fe6ae38d125a76",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T03:52:31.502Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "cdd361ec1861e9ea9057ebf06c5858741403e9b1e38eb8cba2d1c3791eed71d8",
+      "capturedAt": "2026-08-13T03:52:46.736Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T03:52:55.485Z"
+}

@@ -1,0 +1,50 @@
+{
+  "startedAt": "2026-08-11T10:12:31.663Z",
+  "finishedAt": "2026-08-11T10:12:54.284Z",
+  "k": 2,
+  "tasks": [
+    {
+      "task": "stub",
+      "k": 2,
+      "accuracy": 0.5,
+      "taskPassed": false,
+      "meanLatencyMs": 11298,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/.claude/worktrees/evidence-agent-tui/runs/2026-08-11T10-12-31-684Z-4775723460bf",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": false,
+              "detail": "answer.md missing from run dir"
+            },
+            {
+              "name": "manifest hash verifies for answer.md",
+              "passed": false,
+              "detail": "no manifest entry for answer.md"
+            }
+          ],
+          "latencyMs": 4283,
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/.claude/worktrees/evidence-agent-tui/runs/2026-08-11T10-12-35-963Z-7de54eb7354a",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "answer.md found in run dir"
+            },
+            {
+              "name": "manifest hash verifies for answer.md",
+              "passed": true,
+              "detail": "sha256 61d4619e7cca60c4303fdae805196fd48f2ce3776e126c259c17e8003b646fad matches manifest"
+            }
+          ],
+          "latencyMs": 18313,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

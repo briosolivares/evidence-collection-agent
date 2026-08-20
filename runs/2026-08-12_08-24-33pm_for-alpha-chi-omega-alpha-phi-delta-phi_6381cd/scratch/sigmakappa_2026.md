@@ -1,0 +1,23 @@
+# Sigma Kappa (MIT) Theta Lambda Chapter - Class of 2026 (Seniors)
+Source: https://www.sigmakappa.mit.edu/class-of-2026
+
+Tessa Baker | Hometown: Newport Beach, CA & Reno, NV | Major: 16 | Activities: Varsity Track & Field, Global Languages Ambassador, UA Education
+Shealy Callahan | Hometown: Oak Park, IL | Major: 2A | Activities: Varsity Field Hockey, Little Beavers, UROP, MISTI Africa
+Bea Casartelli | Hometown: Milan, IT | Major: 18 & 15-1 | Activities: Metropolis Mentor, PLEASURE@MIT
+Nannette Chatman | Hometown: Boston, MA | Major: 3 | Activities: E33, MissBehavior, Mocha Moves
+Minyi Chen | Hometown: Albany, NY | Major: 6-9 & 7 | Activities: UROP, MIT MedLinks, MIT Associate Advising, MIT Running Club
+Sabine Chu | Hometown: New York, NY | Major: 18 and 21L | Activities: The Tech
+Nicole Doering | Hometown: Minneapolis, MN | Major: 10 | Activities: Varsity Softball
+Shrika Eddula | Hometown: Dallas, TX | Major: 6-14 & 15-2 | Activities: WBL, MIT Entrepreneurship Club, MIT Sandbox
+Zandra Feland | Hometown: Los Gatos, CA | Major: 2 | Activities: Varsity Fencing, MISTI, UROP
+Kelly Heo | Hometown: Lexington, MA | Major: 20 | Activities: MIT EMS, MedLinks, Chamber music society, UROP
+Connie Jiang | Hometown: Palo Alto, CA | Major: 6-3 & 18 | Activities: UROP
+Annabelle Liefke | Hometown: Green Bay, WI | Major: 6-3 | Activities: FLI Exec, PLEASURE, Wellbeing Lab, UROP
+Bailey McIntyre | Hometown: Concord, MA | Major: 18C | Activities: Varsity Field Hockey
+Mari Montione | Hometown: Charlotte, NC | Major: 9 | Activities: Varsity Field Hockey, Camp Kesem, Hayden Library Student Librarian, UROP
+Kira Pospeshil | Hometown: Los Angeles, CA | Major: 6-3 | Activities: Mocha Moves
+Leah Prizant | Hometown: Boston, MA | Major: 20 | Activities: UROP, MIT Health Volunteer, MIT Biotech Group
+Delphine Protopapas | Hometown: New York, NY | Major: 1 | Activities: Muses, UROP
+Saph Shi | Hometown: Bay Area, CA | Major: 6-4 & 15-1 | Activities: MINCE, Club Golf
+Katherine Xie | Hometown: Watchung, NJ | Major: 9 | Activities: SWE, UROP, Medlinks, THINK, DT
+Emily Zhou | Hometown: San Jose, CA | Major: 6-3 & 15-2 | Activities: SBC, StartLabs, MITCap, AIM Labs, UROP

@@ -1,0 +1,56 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-13T05:29:16.663Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "24f7ab86904179a67e8bef379d5db87dbe86ce64a6823c729357699aa3e5e799",
+      "capturedAt": "2026-08-13T05:29:51.384Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "1ec7903fc340421e2631977cc95fcdc830e3dc512cab2b8a59b385d492d6850a",
+      "capturedAt": "2026-08-13T05:29:53.429Z"
+    },
+    {
+      "filename": "scratch/listings.md",
+      "sha256": "9d0db500635e03c54722aef23f1542f7e2ad444722f0c2af1d438d438d586ca9",
+      "capturedAt": "2026-08-13T05:33:38.315Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:30:56.813Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:31:23.960Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-4.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:31:46.032Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-5.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:31:53.418Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-6.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:32:01.263Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-7.txt",
+      "sha256": "bd407b9ce7205e8e934f29a7b2b2dc982ed680ea786a4f3a4c74770225e9cc38",
+      "capturedAt": "2026-08-13T05:32:39.569Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-8.txt",
+      "sha256": "1a7e3bd13b2e177da87af878ff30228a8cd6d348f69fc765e1a537718b1d1316",
+      "capturedAt": "2026-08-13T05:33:19.212Z"
+    }
+  ]
+}

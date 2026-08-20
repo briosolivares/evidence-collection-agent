@@ -1,0 +1,43 @@
+{
+  "startedAt": "2026-08-20T18:20:32.116Z",
+  "finishedAt": "2026-08-20T18:22:01.702Z",
+  "k": 1,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "protocol": {
+    "completion": "output-contract"
+  },
+  "tasks": [
+    {
+      "task": "edgar",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 89412.068375,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-20_11-20-35am_find-apple-s-8-k-filing-from-january-29_382551",
+          "assertions": [
+            {
+              "name": "downloaded document hash-matches the accession's document",
+              "passed": true,
+              "detail": "artifacts/aapl-20260129_8-K.htm matches sha256 301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a (accession 0000320193-26-000005)"
+            },
+            {
+              "name": "screenshot artifact exists with a manifest entry",
+              "passed": true,
+              "detail": "found artifacts/filing_page_screenshot.png"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 89412.068375,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

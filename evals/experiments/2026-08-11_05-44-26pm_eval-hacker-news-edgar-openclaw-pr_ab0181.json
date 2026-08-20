@@ -1,0 +1,117 @@
+{
+  "startedAt": "2026-08-12T00:42:26.290Z",
+  "finishedAt": "2026-08-12T00:44:26.779Z",
+  "k": 1,
+  "model": "claude-sonnet-5",
+  "toolProfile": "batch-enabled",
+  "tasks": [
+    {
+      "task": "hacker_news",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 21379.4365,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-11_05-42-26pm_create-a-csv-of-the-top-5-stories-on_efabe1",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found hn_top5_stories.csv"
+            },
+            {
+              "name": "CSV has exactly the columns title, url, points (no more, no fewer)",
+              "passed": true,
+              "detail": "header: title, url, points"
+            },
+            {
+              "name": "CSV has 5 data rows",
+              "passed": true,
+              "detail": "found 5 data row(s)"
+            },
+            {
+              "name": "at least 4 of 5 oracle titles appear in the CSV",
+              "passed": true,
+              "detail": "5 of 5 oracle titles found in the CSV"
+            },
+            {
+              "name": "url column entries are well-formed URLs",
+              "passed": true,
+              "detail": "all 5 url cells are well-formed"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "2 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 21379.4365,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "edgar",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 48144.856458,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-11_05-42-48pm_find-apple-s-8-k-filing-from-january-29_1d6add",
+          "assertions": [
+            {
+              "name": "downloaded document hash-matches the accession's document",
+              "passed": true,
+              "detail": "aapl-20260129_8-K.htm matches sha256 301f942f215a4d3a4f1cafa2d0149942a15b79ee87abbf6a63e661038a660a9a (accession 0000320193-26-000005)"
+            },
+            {
+              "name": "screenshot artifact exists with a manifest entry",
+              "passed": true,
+              "detail": "found apple_8k_2026-01-29_filing_page.png"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "3 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 48144.856458,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "openclaw_pr",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 48794.643333,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-11_05-43-37pm_what-is-the-most-recent-pull-request-on_055ef7",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "answer.md found in run dir"
+            },
+            {
+              "name": "answer.md mentions the number and title of a most-recent-in-window PR",
+              "passed": true,
+              "detail": "mentions #122359 \"fix(ui): prevent duplicate initial log loads\""
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "4 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 48794.643333,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

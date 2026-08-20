@@ -1,0 +1,1365 @@
+URL: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=8-K&dateb=&owner=include&count=100&search_text=
+Title: EDGAR Search Results
+
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - navigation [ref=f1e3]:
+      - list [ref=f1e4]:
+        - listitem [ref=f1e5]:
+          - link [ref=f1e6] [cursor=pointer]:
+            - /url: https://www.sec.gov
+        - listitem [ref=f1e7]:
+          - link "SEC.gov" [ref=f1e8] [cursor=pointer]:
+            - /url: https://www.sec.gov
+        - listitem [ref=f1e9]:
+          - link "EDGAR" [ref=f1e10] [cursor=pointer]:
+            - /url: //www.sec.gov/submit-filings/about-edgar
+      - list [ref=f1e11]:
+        - listitem [ref=f1e12]:
+          - link "Latest Filings" [ref=f1e13] [cursor=pointer]:
+            - /url: /cgi-bin/browse-edgar?action=getcurrent
+        - listitem [ref=f1e14]:
+          - link "Filings search tools" [ref=f1e15] [cursor=pointer]:
+            - /url: https://www.sec.gov/edgar/search-and-access
+    - heading "EDGAR Company Search Results" [level=1] [ref=f1e16]
+  - list [ref=f1e18]:
+    - listitem [ref=f1e19]:
+      - link "SEC Home" [ref=f1e20] [cursor=pointer]:
+        - /url: /index.htm
+      - text: »
+    - listitem [ref=f1e21]:
+      - link "Company Search" [ref=f1e22] [cursor=pointer]:
+        - /url: /edgar/searchedgar/companysearch.html
+      - text: »
+    - listitem [ref=f1e23]: Current Page
+  - generic [ref=f1e24]:
+    - generic [ref=f1e25]:
+      - generic [ref=f1e26]:
+        - text: Mailing Address
+        - generic [ref=f1e27]: ONE APPLE PARK WAY
+        - generic [ref=f1e28]: CUPERTINO CA 95014
+      - generic [ref=f1e29]:
+        - text: Business Address
+        - generic [ref=f1e30]: ONE APPLE PARK WAY
+        - generic [ref=f1e31]: CUPERTINO CA 95014
+        - generic [ref=f1e32]: (408) 996-1010
+      - generic [ref=f1e33]:
+        - generic [ref=f1e34]:
+          - text: "Apple Inc. CIK#:"
+          - link "0000320193 (see all company filings)" [ref=f1e35] [cursor=pointer]:
+            - /url: /cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&owner=include&count=100
+        - paragraph [ref=f1e36]:
+          - text: "SIC:"
+          - link "3571" [ref=f1e37] [cursor=pointer]:
+            - /url: /cgi-bin/browse-edgar?action=getcompany&SIC=3571&owner=include&count=100
+          - text: "- ELECTRONIC COMPUTERSState location:"
+          - link "CA" [ref=f1e38] [cursor=pointer]:
+            - /url: /cgi-bin/browse-edgar?action=getcompany&State=CA&owner=include&count=100
+          - text: "| State of Inc.:"
+          - strong [ref=f1e39]: CA
+          - text: "| Fiscal Year End: 0926formerly: APPLE COMPUTER INC (filings through 2007-01-04)formerly: APPLE COMPUTER INC/ FA (filings through 1997-07-28)formerly: APPLE INC (filings through 2019-08-05)"
+          - generic [ref=f1e40]:
+            - text: "(CF Office: 06 Technology)"
+            - generic [ref=f1e41]:
+              - text: Get
+              - link "insider transactions" [ref=f1e42] [cursor=pointer]:
+                - /url: /cgi-bin/own-disp?action=getissuer&CIK=0000320193
+              - text: for this issuer.
+    - table [ref=f1e45]:
+      - rowgroup [ref=f1e46]:
+        - row
+        - row [ref=f1e47]:
+          - cell [ref=f1e48]:
+            - strong [ref=f1e49]: Filter Results
+          - cell [ref=f1e50]
+          - cell [ref=f1e52]:
+            - strong [ref=f1e53]: Search Within Files
+        - row [ref=f1e55]:
+          - cell [ref=f1e56]:
+            - generic [ref=f1e57]: "Filing Type:"
+            - textbox "Filing Type:" [ref=f1e58]: 8-K
+          - cell [ref=f1e59]:
+            - generic [ref=f1e60]: "Prior to:"
+            - text: (YYYYMMDD)
+            - textbox "Prior to:" [ref=f1e61]
+          - cell "Ownership? include exclude only" [ref=f1e62]:
+            - text: Ownership?
+            - radio "include" [checked] [ref=f1e63]
+            - generic [ref=f1e64]: include
+            - radio "exclude" [ref=f1e65]
+            - generic [ref=f1e66]: exclude
+            - radio "only" [ref=f1e67]
+            - generic [ref=f1e68]: only
+          - cell [ref=f1e69]:
+            - generic [ref=f1e70]: Limit Results Per Page
+            - combobox "Limit Results Per Page" [ref=f1e71]:
+              - option "10 Entries"
+              - option "20 Entries"
+              - option "40 Entries"
+              - option "80 Entries"
+              - option "100 Entries" [selected]
+          - cell [ref=f1e72]:
+            - button "Search" [ref=f1e73] [cursor=pointer]
+            - button "Show All" [ref=f1e74] [cursor=pointer]
+          - cell [ref=f1e75]:
+            - text: Enter keywords
+            - textbox [ref=f1e76]
+            - button "Search" [ref=f1e77] [cursor=pointer]
+    - table [ref=f1e80]:
+      - rowgroup [ref=f1e81]:
+        - row [ref=f1e82]:
+          - cell [ref=f1e83]:
+            - text: Items 1 - 100
+            - link [ref=f1e84] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=8-K%25&dateb=&owner=include&start=0&count=100&output=atom
+              - img "0000320193 Filings" [ref=f1e85]
+              - text: RSS Feed
+          - cell [ref=f1e86]:
+            - button "Next100" [ref=f1e87] [cursor=pointer]
+    - table "Results" [ref=f1e89]:
+      - rowgroup [ref=f1e90]:
+        - row [ref=f1e91]:
+          - columnheader "Filings" [ref=f1e92]
+          - columnheader "Format" [ref=f1e93]
+          - columnheader "Description" [ref=f1e94]
+          - columnheader "Filing Date" [ref=f1e95]
+          - columnheader "File/Film Number" [ref=f1e96]
+        - row [ref=f1e97]:
+          - cell "8-K" [ref=f1e98]
+          - cell [ref=f1e99]:
+            - link "Documents" [ref=f1e100] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019326000018/0000320193-26-000018-index.htm
+            - link "Interactive Data" [ref=f1e101] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-26-000018&amp;xbrl_type=f
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-26-000018 (34 Act) Size: 417 KB" [ref=f1e102]'
+          - cell "2026-07-30" [ref=f1e103]
+          - cell [ref=f1e104]:
+            - link "001-36743" [ref=f1e105] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "261223821"
+        - row [ref=f1e106]:
+          - cell "8-K" [ref=f1e107]
+          - cell [ref=f1e108]:
+            - link "Documents" [ref=f1e109] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019326000011/0000320193-26-000011-index.htm
+            - link "Interactive Data" [ref=f1e110] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-26-000011&amp;xbrl_type=f
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-26-000011 (34 Act) Size: 412 KB" [ref=f1e111]'
+          - cell "2026-04-30" [ref=f1e112]
+          - cell [ref=f1e113]:
+            - link "001-36743" [ref=f1e114] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "26926130"
+        - row [ref=f1e115]:
+          - cell "8-K" [ref=f1e116]
+          - cell [ref=f1e117]:
+            - link "Documents" [ref=f1e118] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036126015711/0001140361-26-015711-index.htm
+            - link "Interactive Data" [ref=f1e119] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-26-015711&amp;xbrl_type=f
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-26-015711 (34 Act) Size: 239 KB" [ref=f1e120]'
+          - cell "2026-04-20" [ref=f1e121]
+          - cell [ref=f1e122]:
+            - link "001-36743" [ref=f1e123] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "26876142"
+        - row [ref=f1e124]:
+          - cell "8-K" [ref=f1e125]
+          - cell [ref=f1e126]:
+            - link "Documents" [ref=f1e127] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036126006577/0001140361-26-006577-index.htm
+            - link "Interactive Data" [ref=f1e128] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-26-006577&amp;xbrl_type=f
+          - 'cell "Current report, items 5.07 and 9.01 Acc-no: 0001140361-26-006577 (34 Act) Size: 415 KB" [ref=f1e129]'
+          - cell "2026-02-24" [ref=f1e130]
+          - cell [ref=f1e131]:
+            - link "001-36743" [ref=f1e132] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "26672649"
+        - row [ref=f1e133]:
+          - cell "8-K" [ref=f1e134]
+          - cell [ref=f1e135]:
+            - link "Documents" [ref=f1e136] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019326000005/0000320193-26-000005-index.htm
+            - link "Interactive Data" [ref=f1e137] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-26-000005&amp;xbrl_type=f
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-26-000005 (34 Act) Size: 384 KB" [ref=f1e138]'
+          - cell "2026-01-29" [ref=f1e139]
+          - cell [ref=f1e140]:
+            - link "001-36743" [ref=f1e141] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "26578546"
+        - row [ref=f1e142]:
+          - cell "8-K" [ref=f1e143]
+          - cell [ref=f1e144]:
+            - link "Documents" [ref=f1e145] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036126000199/0001140361-26-000199-index.htm
+            - link "Interactive Data" [ref=f1e146] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-26-000199&amp;xbrl_type=f
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-26-000199 (34 Act) Size: 240 KB" [ref=f1e147]'
+          - cell "2026-01-02" [ref=f1e148]
+          - cell [ref=f1e149]:
+            - link "001-36743" [ref=f1e150] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "26502807"
+        - row [ref=f1e151]:
+          - cell "8-K" [ref=f1e152]
+          - cell [ref=f1e153]:
+            - link "Documents" [ref=f1e154] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125044561/0001140361-25-044561-index.htm
+            - link "Interactive Data" [ref=f1e155] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-044561&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-25-044561 (34 Act) Size: 238 KB" [ref=f1e156]'
+          - cell "2025-12-05" [ref=f1e157]
+          - cell [ref=f1e158]:
+            - link "001-36743" [ref=f1e159] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "251553428"
+        - row [ref=f1e160]:
+          - cell "8-K" [ref=f1e161]
+          - cell [ref=f1e162]:
+            - link "Documents" [ref=f1e163] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019325000077/0000320193-25-000077-index.htm
+            - link "Interactive Data" [ref=f1e164] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-25-000077&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-25-000077 (34 Act) Size: 453 KB" [ref=f1e165]'
+          - cell "2025-10-30" [ref=f1e166]
+          - cell [ref=f1e167]:
+            - link "001-36743" [ref=f1e168] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "251436166"
+        - row [ref=f1e169]:
+          - cell "8-K" [ref=f1e170]
+          - cell [ref=f1e171]:
+            - link "Documents" [ref=f1e172] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019325000071/0000320193-25-000071-index.htm
+            - link "Interactive Data" [ref=f1e173] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-25-000071&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-25-000071 (34 Act) Size: 420 KB" [ref=f1e174]'
+          - cell "2025-07-31" [ref=f1e175]
+          - cell [ref=f1e176]:
+            - link "001-36743" [ref=f1e177] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "251172116"
+        - row [ref=f1e178]:
+          - cell "8-K" [ref=f1e179]
+          - cell [ref=f1e180]:
+            - link "Documents" [ref=f1e181] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125027340/0001140361-25-027340-index.htm
+            - link "Interactive Data" [ref=f1e182] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-027340&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-25-027340 (34 Act) Size: 245 KB" [ref=f1e183]'
+          - cell "2025-07-25" [ref=f1e184]
+          - cell [ref=f1e185]:
+            - link "001-36743" [ref=f1e186] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "251152047"
+        - row [ref=f1e187]:
+          - cell "8-K" [ref=f1e188]
+          - cell [ref=f1e189]:
+            - link "Documents" [ref=f1e190] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125025275/0001140361-25-025275-index.htm
+            - link "Interactive Data" [ref=f1e191] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-025275&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-25-025275 (34 Act) Size: 243 KB" [ref=f1e192]'
+          - cell "2025-07-09" [ref=f1e193]
+          - cell [ref=f1e194]:
+            - link "001-36743" [ref=f1e195] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "251112173"
+        - row [ref=f1e196]:
+          - cell "8-K" [ref=f1e197]
+          - cell [ref=f1e198]:
+            - link "Documents" [ref=f1e199] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125018400/0001140361-25-018400-index.htm
+            - link "Interactive Data" [ref=f1e200] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-018400&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001140361-25-018400 (34 Act) Size: 887 KB" [ref=f1e201]'
+          - cell "2025-05-12" [ref=f1e202]
+          - cell [ref=f1e203]:
+            - link "001-36743" [ref=f1e204] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "25935352"
+        - row [ref=f1e205]:
+          - cell "8-K" [ref=f1e206]
+          - cell [ref=f1e207]:
+            - link "Documents" [ref=f1e208] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019325000055/0000320193-25-000055-index.htm
+            - link "Interactive Data" [ref=f1e209] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-25-000055&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-25-000055 (34 Act) Size: 436 KB" [ref=f1e210]'
+          - cell "2025-05-01" [ref=f1e211]
+          - cell [ref=f1e212]:
+            - link "001-36743" [ref=f1e213] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "25903731"
+        - row [ref=f1e214]:
+          - cell "8-K" [ref=f1e215]
+          - cell [ref=f1e216]:
+            - link "Documents" [ref=f1e217] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125005876/0001140361-25-005876-index.htm
+            - link "Interactive Data" [ref=f1e218] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-005876&amp;xbrl_type=v
+          - 'cell "Current report, item 5.07 Acc-no: 0001140361-25-005876 (34 Act) Size: 291 KB" [ref=f1e219]'
+          - cell "2025-02-25" [ref=f1e220]
+          - cell [ref=f1e221]:
+            - link "001-36743" [ref=f1e222] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "25664289"
+        - row [ref=f1e223]:
+          - cell "8-K" [ref=f1e224]
+          - cell [ref=f1e225]:
+            - link "Documents" [ref=f1e226] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019325000007/0000320193-25-000007-index.htm
+            - link "Interactive Data" [ref=f1e227] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-25-000007&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-25-000007 (34 Act) Size: 407 KB" [ref=f1e228]'
+          - cell "2025-01-30" [ref=f1e229]
+          - cell [ref=f1e230]:
+            - link "001-36743" [ref=f1e231] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "25574180"
+        - row [ref=f1e232]:
+          - cell "8-K" [ref=f1e233]
+          - cell [ref=f1e234]:
+            - link "Documents" [ref=f1e235] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036125000228/0001140361-25-000228-index.htm
+            - link "Interactive Data" [ref=f1e236] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-25-000228&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-25-000228 (34 Act) Size: 263 KB" [ref=f1e237]'
+          - cell "2025-01-03" [ref=f1e238]
+          - cell [ref=f1e239]:
+            - link "001-36743" [ref=f1e240] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "25506883"
+        - row [ref=f1e241]:
+          - cell "8-K" [ref=f1e242]
+          - cell [ref=f1e243]:
+            - link "Documents" [ref=f1e244] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019324000120/0000320193-24-000120-index.htm
+            - link "Interactive Data" [ref=f1e245] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-24-000120&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-24-000120 (34 Act) Size: 469 KB" [ref=f1e246]'
+          - cell "2024-10-31" [ref=f1e247]
+          - cell [ref=f1e248]:
+            - link "001-36743" [ref=f1e249] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "241415685"
+        - row [ref=f1e250]:
+          - cell "8-K" [ref=f1e251]
+          - cell [ref=f1e252]:
+            - link "Documents" [ref=f1e253] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036124040659/0001140361-24-040659-index.htm
+            - link "Interactive Data" [ref=f1e254] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-24-040659&amp;xbrl_type=v
+          - 'cell "Current report, item 7.01 Acc-no: 0001140361-24-040659 (34 Act) Size: 1 MB" [ref=f1e255]'
+          - cell "2024-09-10" [ref=f1e256]
+          - cell [ref=f1e257]:
+            - link "001-36743" [ref=f1e258] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "241288853"
+        - row [ref=f1e259]:
+          - cell "8-K" [ref=f1e260]
+          - cell [ref=f1e261]:
+            - link "Documents" [ref=f1e262] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036124038601/0001140361-24-038601-index.htm
+            - link "Interactive Data" [ref=f1e263] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-24-038601&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001140361-24-038601 (34 Act) Size: 1 MB" [ref=f1e264]'
+          - cell "2024-08-26" [ref=f1e265]
+          - cell [ref=f1e266]:
+            - link "001-36743" [ref=f1e267] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "241242410"
+        - row [ref=f1e268]:
+          - cell "8-K" [ref=f1e269]
+          - cell [ref=f1e270]:
+            - link "Documents" [ref=f1e271] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036124038403/0001140361-24-038403-index.htm
+            - link "Interactive Data" [ref=f1e272] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-24-038403&amp;xbrl_type=v
+          - 'cell "Current report, items 5.03 and 9.01 Acc-no: 0001140361-24-038403 (34 Act) Size: 1 MB" [ref=f1e273]'
+          - cell "2024-08-23" [ref=f1e274]
+          - cell [ref=f1e275]:
+            - link "001-36743" [ref=f1e276] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "241236709"
+        - row [ref=f1e277]:
+          - cell "8-K" [ref=f1e278]
+          - cell [ref=f1e279]:
+            - link "Documents" [ref=f1e280] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019324000080/0000320193-24-000080-index.htm
+            - link "Interactive Data" [ref=f1e281] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-24-000080&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-24-000080 (34 Act) Size: 437 KB" [ref=f1e282]'
+          - cell "2024-08-01" [ref=f1e283]
+          - cell [ref=f1e284]:
+            - link "001-36743" [ref=f1e285] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "241167232"
+        - row [ref=f1e286]:
+          - cell "8-K" [ref=f1e287]
+          - cell [ref=f1e288]:
+            - link "Documents" [ref=f1e289] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036124024352/0001140361-24-024352-index.htm
+            - link "Interactive Data" [ref=f1e290] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-24-024352&amp;xbrl_type=v
+          - 'cell "Current report, items 7.01 and 9.01 Acc-no: 0001140361-24-024352 (34 Act) Size: 1 MB" [ref=f1e291]'
+          - cell "2024-05-03" [ref=f1e292]
+          - cell [ref=f1e293]:
+            - link "001-36743" [ref=f1e294] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "24913807"
+        - row [ref=f1e295]:
+          - cell "8-K" [ref=f1e296]
+          - cell [ref=f1e297]:
+            - link "Documents" [ref=f1e298] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019324000067/0000320193-24-000067-index.htm
+            - link "Interactive Data" [ref=f1e299] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-24-000067&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-24-000067 (34 Act) Size: 436 KB" [ref=f1e300]'
+          - cell "2024-05-02" [ref=f1e301]
+          - cell [ref=f1e302]:
+            - link "001-36743" [ref=f1e303] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "24908945"
+        - row [ref=f1e304]:
+          - cell "8-K" [ref=f1e305]
+          - cell [ref=f1e306]:
+            - link "Documents" [ref=f1e307] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036124010155/0001140361-24-010155-index.htm
+            - link "Interactive Data" [ref=f1e308] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-24-010155&amp;xbrl_type=v
+          - 'cell "Current report, item 5.07 Acc-no: 0001140361-24-010155 (34 Act) Size: 859 KB" [ref=f1e309]'
+          - cell "2024-02-28" [ref=f1e310]
+          - cell [ref=f1e311]:
+            - link "001-36743" [ref=f1e312] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "24696744"
+        - row [ref=f1e313]:
+          - cell "8-K" [ref=f1e314]
+          - cell [ref=f1e315]:
+            - link "Documents" [ref=f1e316] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019324000005/0000320193-24-000005-index.htm
+            - link "Interactive Data" [ref=f1e317] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-24-000005&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-24-000005 (34 Act) Size: 412 KB" [ref=f1e318]'
+          - cell "2024-02-01" [ref=f1e319]
+          - cell [ref=f1e320]:
+            - link "001-36743" [ref=f1e321] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "24587382"
+        - row [ref=f1e322]:
+          - cell "8-K" [ref=f1e323]
+          - cell [ref=f1e324]:
+            - link "Documents" [ref=f1e325] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019323000104/0000320193-23-000104-index.htm
+            - link "Interactive Data" [ref=f1e326] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-23-000104&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-23-000104 (34 Act) Size: 450 KB" [ref=f1e327]'
+          - cell "2023-11-02" [ref=f1e328]
+          - cell [ref=f1e329]:
+            - link "001-36743" [ref=f1e330] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "231372885"
+        - row [ref=f1e331]:
+          - cell "8-K" [ref=f1e332]
+          - cell [ref=f1e333]:
+            - link "Documents" [ref=f1e334] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019323000075/0000320193-23-000075-index.htm
+            - link "Interactive Data" [ref=f1e335] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-23-000075&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-23-000075 (34 Act) Size: 452 KB" [ref=f1e336]'
+          - cell "2023-08-03" [ref=f1e337]
+          - cell [ref=f1e338]:
+            - link "001-36743" [ref=f1e339] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "231140568"
+        - row [ref=f1e340]:
+          - cell "8-K" [ref=f1e341]
+          - cell [ref=f1e342]:
+            - link "Documents" [ref=f1e343] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036123023909/0001140361-23-023909-index.htm
+            - link "Interactive Data" [ref=f1e344] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-23-023909&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001140361-23-023909 (34 Act) Size: 932 KB" [ref=f1e345]'
+          - cell "2023-05-10" [ref=f1e346]
+          - cell [ref=f1e347]:
+            - link "001-36743" [ref=f1e348] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "23907040"
+        - row [ref=f1e349]:
+          - cell "8-K" [ref=f1e350]
+          - cell [ref=f1e351]:
+            - link "Documents" [ref=f1e352] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019323000063/0000320193-23-000063-index.htm
+            - link "Interactive Data" [ref=f1e353] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-23-000063&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-23-000063 (34 Act) Size: 493 KB" [ref=f1e354]'
+          - cell "2023-05-04" [ref=f1e355]
+          - cell [ref=f1e356]:
+            - link "001-36743" [ref=f1e357] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "23889274"
+        - row [ref=f1e358]:
+          - cell "8-K" [ref=f1e359]
+          - cell [ref=f1e360]:
+            - link "Documents" [ref=f1e361] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000114036123011192/0001140361-23-011192-index.htm
+            - link "Interactive Data" [ref=f1e362] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001140361-23-011192&amp;xbrl_type=v
+          - 'cell "Current report, item 5.07 Acc-no: 0001140361-23-011192 (34 Act) Size: 312 KB" [ref=f1e363]'
+          - cell "2023-03-10" [ref=f1e364]
+          - cell [ref=f1e365]:
+            - link "001-36743" [ref=f1e366] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "23724135"
+        - row [ref=f1e367]:
+          - cell "8-K" [ref=f1e368]
+          - cell [ref=f1e369]:
+            - link "Documents" [ref=f1e370] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019323000005/0000320193-23-000005-index.htm
+            - link "Interactive Data" [ref=f1e371] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-23-000005&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-23-000005 (34 Act) Size: 464 KB" [ref=f1e372]'
+          - cell "2023-02-02" [ref=f1e373]
+          - cell [ref=f1e374]:
+            - link "001-36743" [ref=f1e375] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "23581333"
+        - row [ref=f1e376]:
+          - cell "8-K" [ref=f1e377]
+          - cell [ref=f1e378]:
+            - link "Documents" [ref=f1e379] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312522278435/0001193125-22-278435-index.htm
+            - link "Interactive Data" [ref=f1e380] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-22-278435&amp;xbrl_type=v
+          - 'cell "Current report, items 7.01 and 9.01 Acc-no: 0001193125-22-278435 (34 Act) Size: 299 KB" [ref=f1e381]'
+          - cell "2022-11-07" [ref=f1e382]
+          - cell [ref=f1e383]:
+            - link "001-36743" [ref=f1e384] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "221363624"
+        - row [ref=f1e385]:
+          - cell "8-K" [ref=f1e386]
+          - cell [ref=f1e387]:
+            - link "Documents" [ref=f1e388] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019322000107/0000320193-22-000107-index.htm
+            - link "Interactive Data" [ref=f1e389] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-22-000107&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-22-000107 (34 Act) Size: 506 KB" [ref=f1e390]'
+          - cell "2022-10-27" [ref=f1e391]
+          - cell [ref=f1e392]:
+            - link "001-36743" [ref=f1e393] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "221337696"
+        - row [ref=f1e394]:
+          - cell "8-K" [ref=f1e395]
+          - cell [ref=f1e396]:
+            - link "Documents" [ref=f1e397] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312522225365/0001193125-22-225365-index.htm
+            - link "Interactive Data" [ref=f1e398] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-22-225365&amp;xbrl_type=v
+          - 'cell "Current report, items 5.02, 5.03, and 9.01 Acc-no: 0001193125-22-225365 (34 Act) Size: 600 KB" [ref=f1e399]'
+          - cell "2022-08-19" [ref=f1e400]
+          - cell [ref=f1e401]:
+            - link "001-36743" [ref=f1e402] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "221181249"
+        - row [ref=f1e403]:
+          - cell "8-K" [ref=f1e404]
+          - cell [ref=f1e405]:
+            - link "Documents" [ref=f1e406] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312522214914/0001193125-22-214914-index.htm
+            - link "Interactive Data" [ref=f1e407] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-22-214914&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-22-214914 (34 Act) Size: 729 KB" [ref=f1e408]'
+          - cell "2022-08-08" [ref=f1e409]
+          - cell [ref=f1e410]:
+            - link "001-36743" [ref=f1e411] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "221144879"
+        - row [ref=f1e412]:
+          - cell "8-K" [ref=f1e413]
+          - cell [ref=f1e414]:
+            - link "Documents" [ref=f1e415] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019322000069/0000320193-22-000069-index.htm
+            - link "Interactive Data" [ref=f1e416] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-22-000069&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-22-000069 (34 Act) Size: 506 KB" [ref=f1e417]'
+          - cell "2022-07-28" [ref=f1e418]
+          - cell [ref=f1e419]:
+            - link "001-36743" [ref=f1e420] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "221115643"
+        - row [ref=f1e421]:
+          - cell "8-K" [ref=f1e422]
+          - cell [ref=f1e423]:
+            - link "Documents" [ref=f1e424] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019322000058/0000320193-22-000058-index.htm
+            - link "Interactive Data" [ref=f1e425] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-22-000058&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-22-000058 (34 Act) Size: 512 KB" [ref=f1e426]'
+          - cell "2022-04-28" [ref=f1e427]
+          - cell [ref=f1e428]:
+            - link "001-36743" [ref=f1e429] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "22867217"
+        - row [ref=f1e430]:
+          - cell "8-K" [ref=f1e431]
+          - cell [ref=f1e432]:
+            - link "Documents" [ref=f1e433] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312522066169/0001193125-22-066169-index.htm
+            - link "Interactive Data" [ref=f1e434] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-22-066169&amp;xbrl_type=v
+          - 'cell "Current report, items 5.02, 5.07, and 9.01 Acc-no: 0001193125-22-066169 (34 Act) Size: 583 KB" [ref=f1e435]'
+          - cell "2022-03-04" [ref=f1e436]
+          - cell [ref=f1e437]:
+            - link "001-36743" [ref=f1e438] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "22714604"
+        - row [ref=f1e439]:
+          - cell "8-K" [ref=f1e440]
+          - cell [ref=f1e441]:
+            - link "Documents" [ref=f1e442] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019322000006/0000320193-22-000006-index.htm
+            - link "Interactive Data" [ref=f1e443] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-22-000006&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-22-000006 (34 Act) Size: 482 KB" [ref=f1e444]'
+          - cell "2022-01-27" [ref=f1e445]
+          - cell [ref=f1e446]:
+            - link "001-36743" [ref=f1e447] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "22563572"
+        - row [ref=f1e448]:
+          - cell "8-K" [ref=f1e449]
+          - cell [ref=f1e450]:
+            - link "Documents" [ref=f1e451] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312521328151/0001193125-21-328151-index.htm
+            - link "Interactive Data" [ref=f1e452] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-21-328151&amp;xbrl_type=v
+          - 'cell "Current report, items 5.02, 5.03, and 9.01 Acc-no: 0001193125-21-328151 (34 Act) Size: 492 KB" [ref=f1e453]'
+          - cell "2021-11-12" [ref=f1e454]
+          - cell [ref=f1e455]:
+            - link "001-36743" [ref=f1e456] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "211404083"
+        - row [ref=f1e457]:
+          - cell "8-K" [ref=f1e458]
+          - cell [ref=f1e459]:
+            - link "Documents" [ref=f1e460] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019321000104/0000320193-21-000104-index.htm
+            - link "Interactive Data" [ref=f1e461] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-21-000104&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-21-000104 (34 Act) Size: 513 KB" [ref=f1e462]'
+          - cell "2021-10-28" [ref=f1e463]
+          - cell [ref=f1e464]:
+            - link "001-36743" [ref=f1e465] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "211358748"
+        - row [ref=f1e466]:
+          - cell "8-K" [ref=f1e467]
+          - cell [ref=f1e468]:
+            - link "Documents" [ref=f1e469] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312521237787/0001193125-21-237787-index.htm
+            - link "Interactive Data" [ref=f1e470] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-21-237787&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-21-237787 (34 Act) Size: 740 KB" [ref=f1e471]'
+          - cell "2021-08-05" [ref=f1e472]
+          - cell [ref=f1e473]:
+            - link "001-36743" [ref=f1e474] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "211148832"
+        - row [ref=f1e475]:
+          - cell "8-K" [ref=f1e476]
+          - cell [ref=f1e477]:
+            - link "Documents" [ref=f1e478] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019321000063/0000320193-21-000063-index.htm
+            - link "Interactive Data" [ref=f1e479] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-21-000063&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-21-000063 (34 Act) Size: 513 KB" [ref=f1e480]'
+          - cell "2021-07-27" [ref=f1e481]
+          - cell [ref=f1e482]:
+            - link "001-36743" [ref=f1e483] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "211117989"
+        - row [ref=f1e484]:
+          - cell "8-K" [ref=f1e485]
+          - cell [ref=f1e486]:
+            - link "Documents" [ref=f1e487] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019321000055/0000320193-21-000055-index.htm
+            - link "Interactive Data" [ref=f1e488] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-21-000055&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-21-000055 (34 Act) Size: 517 KB" [ref=f1e489]'
+          - cell "2021-04-28" [ref=f1e490]
+          - cell [ref=f1e491]:
+            - link "001-36743" [ref=f1e492] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "21864681"
+        - row [ref=f1e493]:
+          - cell "8-K" [ref=f1e494]
+          - cell [ref=f1e495]:
+            - link "Documents" [ref=f1e496] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312521054710/0001193125-21-054710-index.htm
+            - link "Interactive Data" [ref=f1e497] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-21-054710&amp;xbrl_type=v
+          - 'cell "Current report, item 5.07 Acc-no: 0001193125-21-054710 (34 Act) Size: 314 KB" [ref=f1e498]'
+          - cell "2021-02-24" [ref=f1e499]
+          - cell [ref=f1e500]:
+            - link "001-36743" [ref=f1e501] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "21673802"
+        - row [ref=f1e502]:
+          - cell "8-K" [ref=f1e503]
+          - cell [ref=f1e504]:
+            - link "Documents" [ref=f1e505] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312521032394/0001193125-21-032394-index.htm
+            - link "Interactive Data" [ref=f1e506] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-21-032394&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-21-032394 (34 Act) Size: 875 KB" [ref=f1e507]'
+          - cell "2021-02-08" [ref=f1e508]
+          - cell [ref=f1e509]:
+            - link "001-36743" [ref=f1e510] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "21601830"
+        - row [ref=f1e511]:
+          - cell "8-K" [ref=f1e512]
+          - cell [ref=f1e513]:
+            - link "Documents" [ref=f1e514] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019321000009/0000320193-21-000009-index.htm
+            - link "Interactive Data" [ref=f1e515] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-21-000009&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-21-000009 (34 Act) Size: 486 KB" [ref=f1e516]'
+          - cell "2021-01-27" [ref=f1e517]
+          - cell [ref=f1e518]:
+            - link "001-36743" [ref=f1e519] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "21560158"
+        - row [ref=f1e520]:
+          - cell "8-K" [ref=f1e521]
+          - cell [ref=f1e522]:
+            - link "Documents" [ref=f1e523] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312521001982/0001193125-21-001982-index.htm
+            - link "Interactive Data" [ref=f1e524] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-21-001982&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0001193125-21-001982 (34 Act) Size: 290 KB" [ref=f1e525]'
+          - cell "2021-01-05" [ref=f1e526]
+          - cell [ref=f1e527]:
+            - link "001-36743" [ref=f1e528] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "21506117"
+        - row [ref=f1e529]:
+          - cell "8-K" [ref=f1e530]
+          - cell [ref=f1e531]:
+            - link "Documents" [ref=f1e532] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019320000094/0000320193-20-000094-index.htm
+            - link "Interactive Data" [ref=f1e533] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-20-000094&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-20-000094 (34 Act) Size: 516 KB" [ref=f1e534]'
+          - cell "2020-10-29" [ref=f1e535]
+          - cell [ref=f1e536]:
+            - link "001-36743" [ref=f1e537] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "201273047"
+        - row [ref=f1e538]:
+          - cell "8-K" [ref=f1e539]
+          - cell [ref=f1e540]:
+            - link "Documents" [ref=f1e541] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312520225672/0001193125-20-225672-index.htm
+            - link "Interactive Data" [ref=f1e542] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-20-225672&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-20-225672 (34 Act) Size: 776 KB" [ref=f1e543]'
+          - cell "2020-08-20" [ref=f1e544]
+          - cell [ref=f1e545]:
+            - link "001-36743" [ref=f1e546] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "201120370"
+        - row [ref=f1e547]:
+          - cell "8-K" [ref=f1e548]
+          - cell [ref=f1e549]:
+            - link "Documents" [ref=f1e550] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312520213158/0001193125-20-213158-index.htm
+            - link "Interactive Data" [ref=f1e551] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-20-213158&amp;xbrl_type=v
+          - 'cell "Current report, items 5.03 and 9.01 Acc-no: 0001193125-20-213158 (34 Act) Size: 303 KB" [ref=f1e552]'
+          - cell "2020-08-07" [ref=f1e553]
+          - cell [ref=f1e554]:
+            - link "001-36743" [ref=f1e555] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "201085556"
+        - row [ref=f1e556]:
+          - cell "8-K" [ref=f1e557]
+          - cell [ref=f1e558]:
+            - link "Documents" [ref=f1e559] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019320000060/0000320193-20-000060-index.htm
+            - link "Interactive Data" [ref=f1e560] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-20-000060&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-20-000060 (34 Act) Size: 628 KB" [ref=f1e561]'
+          - cell "2020-07-30" [ref=f1e562]
+          - cell [ref=f1e563]:
+            - link "001-36743" [ref=f1e564] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "201061591"
+        - row [ref=f1e565]:
+          - cell "8-K" [ref=f1e566]
+          - cell [ref=f1e567]:
+            - link "Documents" [ref=f1e568] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312520139112/0001193125-20-139112-index.htm
+            - link "Interactive Data" [ref=f1e569] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-20-139112&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-20-139112 (34 Act) Size: 771 KB" [ref=f1e570]'
+          - cell "2020-05-11" [ref=f1e571]
+          - cell [ref=f1e572]:
+            - link "001-36743" [ref=f1e573] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "20865313"
+        - row [ref=f1e574]:
+          - cell "8-K" [ref=f1e575]
+          - cell [ref=f1e576]:
+            - link "Documents" [ref=f1e577] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019320000050/0000320193-20-000050-index.htm
+            - link "Interactive Data" [ref=f1e578] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-20-000050&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-20-000050 (34 Act) Size: 593 KB" [ref=f1e579]'
+          - cell "2020-04-30" [ref=f1e580]
+          - cell [ref=f1e581]:
+            - link "001-36743" [ref=f1e582] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "20836131"
+        - row [ref=f1e583]:
+          - cell "8-K" [ref=f1e584]
+          - cell [ref=f1e585]:
+            - link "Documents" [ref=f1e586] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312520050884/0001193125-20-050884-index.htm
+            - link "Interactive Data" [ref=f1e587] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-20-050884&amp;xbrl_type=v
+          - 'cell "Current report, item 5.07 Acc-no: 0001193125-20-050884 (34 Act) Size: 329 KB" [ref=f1e588]'
+          - cell "2020-02-27" [ref=f1e589]
+          - cell [ref=f1e590]:
+            - link "001-36743" [ref=f1e591] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "20658351"
+        - row [ref=f1e592]:
+          - cell "8-K" [ref=f1e593]
+          - cell [ref=f1e594]:
+            - link "Documents" [ref=f1e595] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312520039203/0001193125-20-039203-index.htm
+            - link "Interactive Data" [ref=f1e596] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-20-039203&amp;xbrl_type=v
+          - 'cell "Current report, items 7.01 and 9.01 Acc-no: 0001193125-20-039203 (34 Act) Size: 310 KB" [ref=f1e597]'
+          - cell "2020-02-18" [ref=f1e598]
+          - cell [ref=f1e599]:
+            - link "001-36743" [ref=f1e600] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "20623292"
+        - row [ref=f1e601]:
+          - cell "8-K" [ref=f1e602]
+          - cell [ref=f1e603]:
+            - link "Documents" [ref=f1e604] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019320000008/0000320193-20-000008-index.htm
+            - link "Interactive Data" [ref=f1e605] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-20-000008&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-20-000008 (34 Act) Size: 531 KB" [ref=f1e606]'
+          - cell "2020-01-28" [ref=f1e607]
+          - cell [ref=f1e608]:
+            - link "001-36743" [ref=f1e609] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "20554729"
+        - row [ref=f1e610]:
+          - cell "8-K" [ref=f1e611]
+          - cell [ref=f1e612]:
+            - link "Documents" [ref=f1e613] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312519292676/0001193125-19-292676-index.htm
+            - link "Interactive Data" [ref=f1e614] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-19-292676&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-19-292676 (34 Act) Size: 645 KB" [ref=f1e615]'
+          - cell "2019-11-15" [ref=f1e616]
+          - cell [ref=f1e617]:
+            - link "001-36743" [ref=f1e618] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "191222355"
+        - row [ref=f1e619]:
+          - cell "8-K" [ref=f1e620]
+          - cell [ref=f1e621]:
+            - link "Documents" [ref=f1e622] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000117/0000320193-19-000117-index.htm
+            - link "Interactive Data" [ref=f1e623] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-19-000117&amp;xbrl_type=v
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-19-000117 (34 Act) Size: 576 KB" [ref=f1e624]'
+          - cell "2019-10-30" [ref=f1e625]
+          - cell [ref=f1e626]:
+            - link "001-36743" [ref=f1e627] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "191180631"
+        - row [ref=f1e628]:
+          - cell "8-K" [ref=f1e629]
+          - cell [ref=f1e630]:
+            - link "Documents" [ref=f1e631] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000093/0000320193-19-000093-index.htm
+            - link "Interactive Data" [ref=f1e632] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0000320193-19-000093&amp;xbrl_type=v
+          - 'cell "Current report, item 5.02 Acc-no: 0000320193-19-000093 (34 Act) Size: 295 KB" [ref=f1e633]'
+          - cell "2019-09-13" [ref=f1e634]
+          - cell [ref=f1e635]:
+            - link "001-36743" [ref=f1e636] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "191093220"
+        - row [ref=f1e637]:
+          - cell "8-K" [ref=f1e638]
+          - cell [ref=f1e639]:
+            - link "Documents" [ref=f1e640] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312519242975/0001193125-19-242975-index.htm
+            - link "Interactive Data" [ref=f1e641] [cursor=pointer]:
+              - /url: /cgi-bin/viewer?action=view&amp;cik=320193&amp;accession_number=0001193125-19-242975&amp;xbrl_type=v
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-19-242975 (34 Act) Size: 777 KB" [ref=f1e642]'
+          - cell "2019-09-11" [ref=f1e643]
+          - cell [ref=f1e644]:
+            - link "001-36743" [ref=f1e645] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "191088535"
+        - row [ref=f1e646]:
+          - cell "8-K" [ref=f1e647]
+          - cell [ref=f1e648]:
+            - link "Documents" [ref=f1e649] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000073/0000320193-19-000073-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-19-000073 (34 Act) Size: 303 KB" [ref=f1e650]'
+          - cell "2019-07-30" [ref=f1e651]
+          - cell [ref=f1e652]:
+            - link "001-36743" [ref=f1e653] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19985848"
+        - row [ref=f1e654]:
+          - cell "8-K" [ref=f1e655]
+          - cell [ref=f1e656]:
+            - link "Documents" [ref=f1e657] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000063/0000320193-19-000063-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-19-000063 (34 Act) Size: 289 KB" [ref=f1e658]'
+          - cell "2019-04-30" [ref=f1e659]
+          - cell [ref=f1e660]:
+            - link "001-36743" [ref=f1e661] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19782221"
+        - row [ref=f1e662]:
+          - cell "8-K" [ref=f1e663]
+          - cell [ref=f1e664]:
+            - link "Documents" [ref=f1e665] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000032/0000320193-19-000032-index.htm
+          - 'cell "Current report, item 5.07 Acc-no: 0000320193-19-000032 (34 Act) Size: 66 KB" [ref=f1e666]'
+          - cell "2019-03-04" [ref=f1e667]
+          - cell [ref=f1e668]:
+            - link "001-36743" [ref=f1e669] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19654221"
+        - row [ref=f1e670]:
+          - cell "8-K" [ref=f1e671]
+          - cell [ref=f1e672]:
+            - link "Documents" [ref=f1e673] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000026/0000320193-19-000026-index.htm
+          - 'cell "Current report, item 5.02 Acc-no: 0000320193-19-000026 (34 Act) Size: 29 KB" [ref=f1e674]'
+          - cell "2019-02-06" [ref=f1e675]
+          - cell [ref=f1e676]:
+            - link "001-36743" [ref=f1e677] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19569878"
+        - row [ref=f1e678]:
+          - cell "8-K" [ref=f1e679]
+          - cell [ref=f1e680]:
+            - link "Documents" [ref=f1e681] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000007/0000320193-19-000007-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-19-000007 (34 Act) Size: 228 KB" [ref=f1e682]'
+          - cell "2019-01-29" [ref=f1e683]
+          - cell [ref=f1e684]:
+            - link "001-36743" [ref=f1e685] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19549017"
+        - row [ref=f1e686]:
+          - cell "8-K" [ref=f1e687]
+          - cell [ref=f1e688]:
+            - link "Documents" [ref=f1e689] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019319000002/0000320193-19-000002-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-19-000002 (34 Act) Size: 66 KB" [ref=f1e690]'
+          - cell "2019-01-02" [ref=f1e691]
+          - cell [ref=f1e692]:
+            - link "001-36743" [ref=f1e693] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "19502044"
+        - row [ref=f1e694]:
+          - cell "8-K" [ref=f1e695]
+          - cell [ref=f1e696]:
+            - link "Documents" [ref=f1e697] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019318000142/0000320193-18-000142-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-18-000142 (34 Act) Size: 406 KB" [ref=f1e698]'
+          - cell "2018-11-01" [ref=f1e699]
+          - cell [ref=f1e700]:
+            - link "001-36743" [ref=f1e701] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "181154184"
+        - row [ref=f1e702]:
+          - cell "8-K" [ref=f1e703]
+          - cell [ref=f1e704]:
+            - link "Documents" [ref=f1e705] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019318000098/0000320193-18-000098-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-18-000098 (34 Act) Size: 401 KB" [ref=f1e706]'
+          - cell "2018-07-31" [ref=f1e707]
+          - cell [ref=f1e708]:
+            - link "001-36743" [ref=f1e709] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18981493"
+        - row [ref=f1e710]:
+          - cell "8-K/A" [ref=f1e711]
+          - cell [ref=f1e712]:
+            - link "Documents" [ref=f1e713] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312518154948/0001193125-18-154948-index.htm
+          - 'cell "[Amend] Current report, item 8.01 Acc-no: 0001193125-18-154948 (34 Act) Size: 15 KB" [ref=f1e714]'
+          - cell "2018-05-08" [ref=f1e715]
+          - cell [ref=f1e716]:
+            - link "001-36743" [ref=f1e717] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18812776"
+        - row [ref=f1e718]:
+          - cell "8-K" [ref=f1e719]
+          - cell [ref=f1e720]:
+            - link "Documents" [ref=f1e721] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312518154515/0001193125-18-154515-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-18-154515 (34 Act) Size: 113 KB" [ref=f1e722]'
+          - cell "2018-05-07" [ref=f1e723]
+          - cell [ref=f1e724]:
+            - link "001-36743" [ref=f1e725] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18811649"
+        - row [ref=f1e726]:
+          - cell "8-K" [ref=f1e727]
+          - cell [ref=f1e728]:
+            - link "Documents" [ref=f1e729] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019318000067/0000320193-18-000067-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-18-000067 (34 Act) Size: 401 KB" [ref=f1e730]'
+          - cell "2018-05-01" [ref=f1e731]
+          - cell [ref=f1e732]:
+            - link "001-36743" [ref=f1e733] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18795935"
+        - row [ref=f1e734]:
+          - cell "8-K" [ref=f1e735]
+          - cell [ref=f1e736]:
+            - link "Documents" [ref=f1e737] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312518045761/0001193125-18-045761-index.htm
+          - 'cell "Current report, items 5.07 and 9.01 Acc-no: 0001193125-18-045761 (34 Act) Size: 115 KB" [ref=f1e738]'
+          - cell "2018-02-14" [ref=f1e739]
+          - cell [ref=f1e740]:
+            - link "001-36743" [ref=f1e741] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18613111"
+        - row [ref=f1e742]:
+          - cell "8-K" [ref=f1e743]
+          - cell [ref=f1e744]:
+            - link "Documents" [ref=f1e745] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019318000005/0000320193-18-000005-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-18-000005 (34 Act) Size: 363 KB" [ref=f1e746]'
+          - cell "2018-02-01" [ref=f1e747]
+          - cell [ref=f1e748]:
+            - link "001-36743" [ref=f1e749] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "18567220"
+        - row [ref=f1e750]:
+          - cell "8-K" [ref=f1e751]
+          - cell [ref=f1e752]:
+            - link "Documents" [ref=f1e753] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517341015/0001193125-17-341015-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-341015 (34 Act) Size: 521 KB" [ref=f1e754]'
+          - cell "2017-11-13" [ref=f1e755]
+          - cell [ref=f1e756]:
+            - link "001-36743" [ref=f1e757] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "171196609"
+        - row [ref=f1e758]:
+          - cell "8-K" [ref=f1e759]
+          - cell [ref=f1e760]:
+            - link "Documents" [ref=f1e761] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019317000067/0000320193-17-000067-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-17-000067 (34 Act) Size: 408 KB" [ref=f1e762]'
+          - cell "2017-11-02" [ref=f1e763]
+          - cell [ref=f1e764]:
+            - link "001-36743" [ref=f1e765] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "171172828"
+        - row [ref=f1e766]:
+          - cell "8-K" [ref=f1e767]
+          - cell [ref=f1e768]:
+            - link "Documents" [ref=f1e769] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517308859/0001193125-17-308859-index.htm
+          - 'cell "Current report, item 5.02 Acc-no: 0001193125-17-308859 (34 Act) Size: 15 KB" [ref=f1e770]'
+          - cell "2017-10-12" [ref=f1e771]
+          - cell [ref=f1e772]:
+            - link "001-36743" [ref=f1e773] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "171134765"
+        - row [ref=f1e774]:
+          - cell "8-K" [ref=f1e775]
+          - cell [ref=f1e776]:
+            - link "Documents" [ref=f1e777] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517282809/0001193125-17-282809-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-282809 (34 Act) Size: 394 KB" [ref=f1e778]'
+          - cell "2017-09-12" [ref=f1e779]
+          - cell [ref=f1e780]:
+            - link "001-36743" [ref=f1e781] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "171081538"
+        - row [ref=f1e782]:
+          - cell "8-K" [ref=f1e783]
+          - cell [ref=f1e784]:
+            - link "Documents" [ref=f1e785] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517262261/0001193125-17-262261-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-262261 (34 Act) Size: 317 KB" [ref=f1e786]'
+          - cell "2017-08-18" [ref=f1e787]
+          - cell [ref=f1e788]:
+            - link "001-36743" [ref=f1e789] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "171041380"
+        - row [ref=f1e790]:
+          - cell "8-K" [ref=f1e791]
+          - cell [ref=f1e792]:
+            - link "Documents" [ref=f1e793] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000032019317000006/0000320193-17-000006-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0000320193-17-000006 (34 Act) Size: 406 KB" [ref=f1e794]'
+          - cell "2017-08-01" [ref=f1e795]
+          - cell [ref=f1e796]:
+            - link "001-36743" [ref=f1e797] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17997093"
+        - row [ref=f1e798]:
+          - cell "8-K" [ref=f1e799]
+          - cell [ref=f1e800]:
+            - link "Documents" [ref=f1e801] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517208226/0001193125-17-208226-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-208226 (34 Act) Size: 217 KB" [ref=f1e802]'
+          - cell "2017-06-20" [ref=f1e803]
+          - cell [ref=f1e804]:
+            - link "001-36743" [ref=f1e805] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17921171"
+        - row [ref=f1e806]:
+          - cell "8-K" [ref=f1e807]
+          - cell [ref=f1e808]:
+            - link "Documents" [ref=f1e809] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517181867/0001193125-17-181867-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-181867 (34 Act) Size: 309 KB" [ref=f1e810]'
+          - cell "2017-05-24" [ref=f1e811]
+          - cell [ref=f1e812]:
+            - link "001-36743" [ref=f1e813] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17867578"
+        - row [ref=f1e814]:
+          - cell "8-K" [ref=f1e815]
+          - cell [ref=f1e816]:
+            - link "Documents" [ref=f1e817] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517167400/0001193125-17-167400-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-167400 (34 Act) Size: 514 KB" [ref=f1e818]'
+          - cell "2017-05-11" [ref=f1e819]
+          - cell [ref=f1e820]:
+            - link "001-36743" [ref=f1e821] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17835158"
+        - row [ref=f1e822]:
+          - cell "8-K" [ref=f1e823]
+          - cell [ref=f1e824]:
+            - link "Documents" [ref=f1e825] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000162828017004663/0001628280-17-004663-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001628280-17-004663 (34 Act) Size: 430 KB" [ref=f1e826]'
+          - cell "2017-05-02" [ref=f1e827]
+          - cell [ref=f1e828]:
+            - link "001-36743" [ref=f1e829] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17805508"
+        - row [ref=f1e830]:
+          - cell "8-K" [ref=f1e831]
+          - cell [ref=f1e832]:
+            - link "Documents" [ref=f1e833] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517069853/0001193125-17-069853-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-069853 (34 Act) Size: 234 KB" [ref=f1e834]'
+          - cell "2017-03-03" [ref=f1e835]
+          - cell [ref=f1e836]:
+            - link "001-36743" [ref=f1e837] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17664239"
+        - row [ref=f1e838]:
+          - cell "8-K" [ref=f1e839]
+          - cell [ref=f1e840]:
+            - link "Documents" [ref=f1e841] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517064019/0001193125-17-064019-index.htm
+          - 'cell "Current report, item 5.07 Acc-no: 0001193125-17-064019 (34 Act) Size: 49 KB" [ref=f1e842]'
+          - cell "2017-03-01" [ref=f1e843]
+          - cell [ref=f1e844]:
+            - link "001-36743" [ref=f1e845] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17651574"
+        - row [ref=f1e846]:
+          - cell "8-K" [ref=f1e847]
+          - cell [ref=f1e848]:
+            - link "Documents" [ref=f1e849] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312517036283/0001193125-17-036283-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-17-036283 (34 Act) Size: 675 KB" [ref=f1e850]'
+          - cell "2017-02-09" [ref=f1e851]
+          - cell [ref=f1e852]:
+            - link "001-36743" [ref=f1e853] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17588362"
+        - row [ref=f1e854]:
+          - cell "8-K" [ref=f1e855]
+          - cell [ref=f1e856]:
+            - link "Documents" [ref=f1e857] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000162828017000663/0001628280-17-000663-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001628280-17-000663 (34 Act) Size: 390 KB" [ref=f1e858]'
+          - cell "2017-01-31" [ref=f1e859]
+          - cell [ref=f1e860]:
+            - link "001-36743" [ref=f1e861] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "17561519"
+        - row [ref=f1e862]:
+          - cell "8-K" [ref=f1e863]
+          - cell [ref=f1e864]:
+            - link "Documents" [ref=f1e865] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000162828016022047/0001628280-16-022047-index.htm
+          - 'cell "Current report, items 5.03 and 9.01 Acc-no: 0001628280-16-022047 (34 Act) Size: 248 KB" [ref=f1e866]'
+          - cell "2016-12-15" [ref=f1e867]
+          - cell [ref=f1e868]:
+            - link "001-36743" [ref=f1e869] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "162054250"
+        - row [ref=f1e870]:
+          - cell "8-K" [ref=f1e871]
+          - cell [ref=f1e872]:
+            - link "Documents" [ref=f1e873] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000162828016020258/0001628280-16-020258-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001628280-16-020258 (34 Act) Size: 430 KB" [ref=f1e874]'
+          - cell "2016-10-25" [ref=f1e875]
+          - cell [ref=f1e876]:
+            - link "001-36743" [ref=f1e877] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161950726"
+        - row [ref=f1e878]:
+          - cell "8-K" [ref=f1e879]
+          - cell [ref=f1e880]:
+            - link "Documents" [ref=f1e881] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516672044/0001193125-16-672044-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-16-672044 (34 Act) Size: 447 KB" [ref=f1e882]'
+          - cell "2016-08-04" [ref=f1e883]
+          - cell [ref=f1e884]:
+            - link "001-36743" [ref=f1e885] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161808515"
+        - row [ref=f1e886]:
+          - cell "8-K" [ref=f1e887]
+          - cell [ref=f1e888]:
+            - link "Documents" [ref=f1e889] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000162828016017762/0001628280-16-017762-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001628280-16-017762 (34 Act) Size: 424 KB" [ref=f1e890]'
+          - cell "2016-07-26" [ref=f1e891]
+          - cell [ref=f1e892]:
+            - link "001-36743" [ref=f1e893] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161784653"
+        - row [ref=f1e894]:
+          - cell "8-K" [ref=f1e895]
+          - cell [ref=f1e896]:
+            - link "Documents" [ref=f1e897] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516628957/0001193125-16-628957-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-16-628957 (34 Act) Size: 242 KB" [ref=f1e898]'
+          - cell "2016-06-22" [ref=f1e899]
+          - cell [ref=f1e900]:
+            - link "001-36743" [ref=f1e901] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161726856"
+        - row [ref=f1e902]:
+          - cell "8-K" [ref=f1e903]
+          - cell [ref=f1e904]:
+            - link "Documents" [ref=f1e905] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516556520/0001193125-16-556520-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001193125-16-556520 (34 Act) Size: 162 KB" [ref=f1e906]'
+          - cell "2016-04-26" [ref=f1e907]
+          - cell [ref=f1e908]:
+            - link "001-36743" [ref=f1e909] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161592349"
+        - row [ref=f1e910]:
+          - cell "8-K" [ref=f1e911]
+          - cell [ref=f1e912]:
+            - link "Documents" [ref=f1e913] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516516891/0001193125-16-516891-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-16-516891 (34 Act) Size: 324 KB" [ref=f1e914]'
+          - cell "2016-03-24" [ref=f1e915]
+          - cell [ref=f1e916]:
+            - link "001-36743" [ref=f1e917] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161527208"
+        - row [ref=f1e918]:
+          - cell "8-K" [ref=f1e919]
+          - cell [ref=f1e920]:
+            - link "Documents" [ref=f1e921] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516488223/0001193125-16-488223-index.htm
+          - 'cell "Current report, items 5.02, 5.07, and 9.01 Acc-no: 0001193125-16-488223 (34 Act) Size: 156 KB" [ref=f1e922]'
+          - cell "2016-03-01" [ref=f1e923]
+          - cell [ref=f1e924]:
+            - link "001-36743" [ref=f1e925] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161473818"
+        - row [ref=f1e926]:
+          - cell "8-K" [ref=f1e927]
+          - cell [ref=f1e928]:
+            - link "Documents" [ref=f1e929] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516473562/0001193125-16-473562-index.htm
+          - 'cell "Current report, items 8.01 and 9.01 Acc-no: 0001193125-16-473562 (34 Act) Size: 618 KB" [ref=f1e930]'
+          - cell "2016-02-23" [ref=f1e931]
+          - cell [ref=f1e932]:
+            - link "001-36743" [ref=f1e933] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161448489"
+        - row [ref=f1e934]:
+          - cell "8-K" [ref=f1e935]
+          - cell [ref=f1e936]:
+            - link "Documents" [ref=f1e937] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312516438421/0001193125-16-438421-index.htm
+          - 'cell "Current report, items 2.02 and 9.01 Acc-no: 0001193125-16-438421 (34 Act) Size: 693 KB" [ref=f1e938]'
+          - cell "2016-01-26" [ref=f1e939]
+          - cell [ref=f1e940]:
+            - link "001-36743" [ref=f1e941] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "161361839"
+        - row [ref=f1e942]:
+          - cell "8-K" [ref=f1e943]
+          - cell [ref=f1e944]:
+            - link "Documents" [ref=f1e945] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312515410853/0001193125-15-410853-index.htm
+          - 'cell "Current report, items 5.03 and 9.01 Acc-no: 0001193125-15-410853 (34 Act) Size: 193 KB" [ref=f1e946]'
+          - cell "2015-12-22" [ref=f1e947]
+          - cell [ref=f1e948]:
+            - link "001-36743" [ref=f1e949] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "151302514"
+        - row [ref=f1e950]:
+          - cell "8-K" [ref=f1e951]
+          - cell [ref=f1e952]:
+            - link "Documents" [ref=f1e953] [cursor=pointer]:
+              - /url: /Archives/edgar/data/320193/000119312515406279/0001193125-15-406279-index.htm
+          - 'cell "Current report, item 5.02 Acc-no: 0001193125-15-406279 (34 Act) Size: 14 KB" [ref=f1e954]'
+          - cell "2015-12-17" [ref=f1e955]
+          - cell [ref=f1e956]:
+            - link "001-36743" [ref=f1e957] [cursor=pointer]:
+              - /url: /cgi-bin/browse-edgar?action=getcompany&filenum=001-36743&owner=include&count=100
+            - text: "151294008"
+    - table [ref=f1e960]:
+      - rowgroup [ref=f1e961]:
+        - row [ref=f1e962]:
+          - cell [ref=f1e963]:
+            - button "Next100" [ref=f1e964] [cursor=pointer]
+  - generic [ref=f1e965]:
+    - generic [ref=f1e966]: https://www.sec.gov/cgi-bin/browse-edgar
+    - generic [ref=f1e967]:
+      - link "Home" [ref=f1e968] [cursor=pointer]:
+        - /url: /index.htm
+      - text: "|"
+      - link "Search the Next-Generation EDGAR System" [ref=f1e969] [cursor=pointer]:
+        - /url: /edgar/searchedgar/webusers.htm
+      - text: "|"
+      - link "Previous Page" [ref=f1e970] [cursor=pointer]:
+        - /url: javascript:history.back()
+    - generic [ref=f1e971]: Modified 07/18/2014

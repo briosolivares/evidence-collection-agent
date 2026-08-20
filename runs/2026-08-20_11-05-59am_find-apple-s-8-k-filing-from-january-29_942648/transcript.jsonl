@@ -1,0 +1,1 @@
+{"type":"v3_run_terminal","outcome":{"status":"incomplete","during":"initializing","reason":"initializer_unavailable","detail":"The contract was rejected and was not stored. Fix all of these:\n- output \"apple_8k_filing_download\" filenamePattern \"*\" matches every filename and is not a constraint; omit it or use a pattern stated by the request","finalText":"","unresolved":[]}}

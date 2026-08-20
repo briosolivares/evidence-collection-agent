@@ -1,0 +1,877 @@
+URL: https://github.com/jesse-merhi
+Title: jesse-merhi (Jesse Merhi) · GitHub
+
+- generic [ref=f29e2]:
+  - generic [ref=f29e3]:
+    - link "Skip to content" [ref=f29e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f29e8]:
+      - heading "Navigation Menu" [level=2] [ref=f29e9]
+      - generic [ref=f29e10]:
+        - link "Homepage" [ref=f29e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f29e15]:
+          - navigation "Global" [ref=f29e16]:
+            - list [ref=f29e17]:
+              - listitem [ref=f29e18]:
+                - button "Platform" [ref=f29e20] [cursor=pointer]
+              - listitem [ref=f29e23]:
+                - button "Solutions" [ref=f29e25] [cursor=pointer]
+              - listitem [ref=f29e28]:
+                - button "Resources" [ref=f29e30] [cursor=pointer]
+              - listitem [ref=f29e33]:
+                - button "Open Source" [ref=f29e35] [cursor=pointer]
+              - listitem [ref=f29e38]:
+                - button "Enterprise" [ref=f29e40] [cursor=pointer]
+              - listitem [ref=f29e43]:
+                - link "Pricing" [ref=f29e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f29e45]:
+            - button "Search or jump to, type / to search" [ref=f29e47] [cursor=pointer]:
+              - generic [ref=f29e50]:
+                - text: Type
+                - generic [ref=f29e51]: /
+                - text: to search
+            - link "Sign in" [ref=f29e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fjesse-merhi
+            - link "Sign up" [ref=f29e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f29e55] [cursor=pointer]
+  - main [ref=f29e60]:
+    - generic [ref=f29e63]:
+      - generic [ref=f29e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@jesse-merhi"
+            - generic:
+              - strong: jesse-merhi
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fjesse-merhi
+      - navigation "User profile" [ref=f29e67]:
+        - link "Overview" [ref=f29e68] [cursor=pointer]:
+          - /url: /jesse-merhi
+        - link "Repositories 32" [ref=f29e71] [cursor=pointer]:
+          - /url: /jesse-merhi?tab=repositories
+          - text: Repositories
+          - generic "32" [ref=f29e74]
+        - link "Projects" [ref=f29e75] [cursor=pointer]:
+          - /url: /jesse-merhi?tab=projects
+        - link "Packages" [ref=f29e78] [cursor=pointer]:
+          - /url: /jesse-merhi?tab=packages
+        - link "Stars 11" [ref=f29e81] [cursor=pointer]:
+          - /url: /jesse-merhi?tab=stars
+          - text: Stars
+          - generic "11" [ref=f29e84]
+    - generic [ref=f29e86]:
+      - generic [ref=f29e88]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@jesse-merhi"
+            - generic:
+              - generic:
+                - strong: jesse-merhi
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fjesse-merhi
+        - generic [ref=f29e89]:
+          - generic [ref=f29e90]:
+            - link [ref=f29e92] [cursor=pointer]:
+              - /url: https://avatars.githubusercontent.com/u/79823012?v=4
+              - img "View jesse-merhi's full-sized avatar" [ref=f29e93]
+            - heading "Jesse Merhi jesse-merhi" [level=1] [ref=f29e95]:
+              - generic [ref=f29e96]: Jesse Merhi
+              - generic [ref=f29e97]: jesse-merhi
+          - generic [ref=f29e98]:
+            - link "Follow" [ref=f29e105] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fjesse-merhi
+            - generic [ref=f29e106]:
+              - generic [ref=f29e107]: Product Security Engineer @ Atlassian
+              - generic [ref=f29e110]:
+                - link "111 followers" [ref=f29e111] [cursor=pointer]:
+                  - /url: https://github.com/jesse-merhi?tab=followers
+                - text: ·
+                - link "5 following" [ref=f29e114] [cursor=pointer]:
+                  - /url: https://github.com/jesse-merhi?tab=following
+              - list [ref=f29e115]:
+                - 'listitem "Organization: Atlassian" [ref=f29e116]':
+                  - generic [ref=f29e119]: Atlassian
+                - 'listitem "Home location: Sydney" [ref=f29e121]':
+                  - generic [ref=f29e124]: Sydney
+                - listitem [ref=f29e125]:
+                  - link "https://jmerhi.mov/" [ref=f29e128] [cursor=pointer]:
+                    - /url: https://jmerhi.mov/
+                - listitem [ref=f29e129]:
+                  - img "LinkedIn" [ref=f29e130]
+                  - link "in/jesse-merhi" [ref=f29e133] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/jesse-merhi/
+          - generic [ref=f29e134]:
+            - heading [level=2] [ref=f29e135]:
+              - link "Achievements" [ref=f29e136] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=achievements
+            - generic [ref=f29e137]:
+              - 'link "Achievement: Pair Extraordinaire x3" [ref=f29e138] [cursor=pointer]':
+                - /url: /jesse-merhi?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f29e139]'
+                - generic [ref=f29e140]: x3
+              - 'link "Achievement: Pull Shark x3" [ref=f29e141] [cursor=pointer]':
+                - /url: /jesse-merhi?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f29e142]'
+                - generic [ref=f29e143]: x3
+              - link [ref=f29e144] [cursor=pointer]:
+                - /url: /jesse-merhi?achievement=starstruck&tab=achievements
+                - 'img "Achievement: Starstruck" [ref=f29e145]'
+              - link [ref=f29e146] [cursor=pointer]:
+                - /url: /jesse-merhi?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f29e147]'
+              - link [ref=f29e148] [cursor=pointer]:
+                - /url: /jesse-merhi?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f29e149]'
+          - generic [ref=f29e150]:
+            - heading "Highlights" [level=2] [ref=f29e151]
+            - list [ref=f29e152]:
+              - listitem [ref=f29e153]:
+                - 'generic "Label: Pro" [ref=f29e156]': Pro
+          - generic [ref=f29e157]:
+            - heading "Organizations" [level=2] [ref=f29e158]
+            - link "openclaw" [ref=f29e159] [cursor=pointer]:
+              - /url: /openclaw
+              - img "@openclaw" [ref=f29e160]
+          - button "Block or report user" [ref=f29e162] [cursor=pointer]
+      - generic [ref=f29e167]:
+        - generic [ref=f29e169]:
+          - heading "Popular repositories Loading" [level=2] [ref=f29e170]:
+            - text: Popular repositories
+            - generic: Loading
+            - status
+          - list [ref=f29e172]:
+            - listitem [ref=f29e173]:
+              - generic [ref=f29e175]:
+                - generic [ref=f29e176]:
+                  - link "rag-anything-mcp" [ref=f29e178] [cursor=pointer]:
+                    - /url: /jesse-merhi/rag-anything-mcp
+                  - generic [ref=f29e179]: Public
+                - paragraph [ref=f29e181]: An MCP server for rag-anything (A multi-modal RAG system)
+                - paragraph [ref=f29e182]:
+                  - generic [ref=f29e183]: Python
+                  - link [ref=f29e185] [cursor=pointer]:
+                    - /url: /jesse-merhi/rag-anything-mcp/stargazers
+                    - img "stars" [ref=f29e186]
+                    - text: "35"
+                  - link [ref=f29e188] [cursor=pointer]:
+                    - /url: /jesse-merhi/rag-anything-mcp/forks
+                    - img "forks" [ref=f29e189]
+                    - text: "14"
+            - listitem [ref=f29e191]:
+              - generic [ref=f29e193]:
+                - generic [ref=f29e194]:
+                  - link "CNN-TRAJGAN" [ref=f29e196] [cursor=pointer]:
+                    - /url: /jesse-merhi/CNN-TRAJGAN
+                  - generic [ref=f29e197]: Public
+                - paragraph [ref=f29e199]
+                - paragraph [ref=f29e200]:
+                  - generic [ref=f29e201]: Python
+                  - link [ref=f29e203] [cursor=pointer]:
+                    - /url: /jesse-merhi/CNN-TRAJGAN/stargazers
+                    - img "stars" [ref=f29e204]
+                    - text: "6"
+                  - link [ref=f29e206] [cursor=pointer]:
+                    - /url: /jesse-merhi/CNN-TRAJGAN/forks
+                    - img "fork" [ref=f29e207]
+                    - text: "1"
+            - listitem [ref=f29e209]:
+              - generic [ref=f29e211]:
+                - generic [ref=f29e212]:
+                  - link "COMP2041-TUTORIAL-CODE" [ref=f29e214] [cursor=pointer]:
+                    - /url: /jesse-merhi/COMP2041-TUTORIAL-CODE
+                  - generic [ref=f29e215]: Public
+                - paragraph
+                - paragraph [ref=f29e217]:
+                  - generic [ref=f29e218]: Python
+                  - link [ref=f29e220] [cursor=pointer]:
+                    - /url: /jesse-merhi/COMP2041-TUTORIAL-CODE/stargazers
+                    - img "star" [ref=f29e221]
+                    - text: "1"
+            - listitem [ref=f29e223]:
+              - generic [ref=f29e225]:
+                - generic [ref=f29e226]:
+                  - link "LOLScrimExporter" [ref=f29e228] [cursor=pointer]:
+                    - /url: /jesse-merhi/LOLScrimExporter
+                  - generic [ref=f29e229]: Public
+                - paragraph
+                - paragraph [ref=f29e231]:
+                  - generic [ref=f29e232]: TypeScript
+                  - link [ref=f29e234] [cursor=pointer]:
+                    - /url: /jesse-merhi/LOLScrimExporter/stargazers
+                    - img "star" [ref=f29e235]
+                    - text: "1"
+            - listitem [ref=f29e237]:
+              - generic [ref=f29e239]:
+                - generic [ref=f29e240]:
+                  - link "skills" [ref=f29e242] [cursor=pointer]:
+                    - /url: /jesse-merhi/skills
+                  - generic [ref=f29e243]: Public
+                - paragraph [ref=f29e245]: Reusable agent skills
+                - paragraph [ref=f29e246]:
+                  - generic [ref=f29e247]: Python
+                  - link [ref=f29e249] [cursor=pointer]:
+                    - /url: /jesse-merhi/skills/stargazers
+                    - img "star" [ref=f29e250]
+                    - text: "1"
+            - listitem [ref=f29e252]:
+              - generic [ref=f29e254]:
+                - generic [ref=f29e255]:
+                  - link "jessemerhi1" [ref=f29e257] [cursor=pointer]:
+                    - /url: /jesse-merhi/jessemerhi1
+                  - generic [ref=f29e258]: Public
+                - paragraph [ref=f29e260]: Config files for my GitHub profile.
+                - paragraph
+        - generic [ref=f29e262]:
+          - generic [ref=f29e263]:
+            - generic [ref=f29e264]:
+              - generic [ref=f29e265]:
+                - heading "4,020 contributions in the last year" [level=2] [ref=f29e266]
+                - link "Skip to contributions year list" [ref=f29e267] [cursor=pointer]:
+                  - /url: "#year-link-2026"
+                - generic [ref=f29e269]:
+                  - grid [ref=f29e271]:
+                    - caption [ref=f29e272]: Contribution Graph
+                    - rowgroup [ref=f29e273]:
+                      - row [ref=f29e274]:
+                        - gridcell "Day of Week" [ref=f29e275]
+                        - gridcell "August" [ref=f29e277]:
+                          - generic [ref=f29e279]: Aug
+                        - gridcell "September" [ref=f29e280]:
+                          - generic [ref=f29e282]: Sep
+                        - gridcell "October" [ref=f29e283]:
+                          - generic [ref=f29e285]: Oct
+                        - gridcell "November" [ref=f29e286]:
+                          - generic [ref=f29e288]: Nov
+                        - gridcell "December" [ref=f29e289]:
+                          - generic [ref=f29e291]: Dec
+                        - gridcell "January" [ref=f29e292]:
+                          - generic [ref=f29e294]: Jan
+                        - gridcell "February" [ref=f29e295]:
+                          - generic [ref=f29e297]: Feb
+                        - gridcell "March" [ref=f29e298]:
+                          - generic [ref=f29e300]: Mar
+                        - gridcell "April" [ref=f29e301]:
+                          - generic [ref=f29e303]: Apr
+                        - gridcell "May" [ref=f29e304]
+                        - gridcell "June" [ref=f29e307]:
+                          - generic [ref=f29e309]: Jun
+                        - gridcell "July" [ref=f29e310]:
+                          - generic [ref=f29e312]: Jul
+                        - gridcell "August" [ref=f29e313]:
+                          - generic [ref=f29e315]: Aug
+                    - rowgroup [ref=f29e316]:
+                      - row [ref=f29e317]:
+                        - gridcell "Sunday" [ref=f29e318]:
+                          - generic [ref=f29e320]: Sun
+                        - gridcell "4 contributions on August 10th." [ref=f29e321]
+                        - gridcell "No contributions on August 17th." [ref=f29e322]
+                        - gridcell "2 contributions on August 24th." [ref=f29e323]
+                        - gridcell "1 contribution on August 31st." [ref=f29e324]
+                        - gridcell "No contributions on September 7th." [ref=f29e325]
+                        - gridcell "No contributions on September 14th." [ref=f29e326]
+                        - gridcell "No contributions on September 21st." [ref=f29e327]
+                        - gridcell "No contributions on September 28th." [ref=f29e328]
+                        - gridcell "2 contributions on October 5th." [ref=f29e329]
+                        - gridcell "2 contributions on October 12th." [ref=f29e330]
+                        - gridcell "6 contributions on October 19th." [ref=f29e331]
+                        - gridcell "No contributions on October 26th." [ref=f29e332]
+                        - gridcell "No contributions on November 2nd." [ref=f29e333]
+                        - gridcell "No contributions on November 9th." [ref=f29e334]
+                        - gridcell "No contributions on November 16th." [ref=f29e335]
+                        - gridcell "4 contributions on November 23rd." [ref=f29e336]
+                        - gridcell "2 contributions on November 30th." [ref=f29e337]
+                        - gridcell "No contributions on December 7th." [ref=f29e338]
+                        - gridcell "No contributions on December 14th." [ref=f29e339]
+                        - gridcell "No contributions on December 21st." [ref=f29e340]
+                        - gridcell "No contributions on December 28th." [ref=f29e341]
+                        - gridcell "No contributions on January 4th." [ref=f29e342]
+                        - gridcell "No contributions on January 11th." [ref=f29e343]
+                        - gridcell "40 contributions on January 18th." [ref=f29e344]
+                        - gridcell "3 contributions on January 25th." [ref=f29e345]
+                        - gridcell "No contributions on February 1st." [ref=f29e346]
+                        - gridcell "4 contributions on February 8th." [ref=f29e347]
+                        - gridcell "12 contributions on February 15th." [ref=f29e348]
+                        - gridcell "31 contributions on February 22nd." [ref=f29e349]
+                        - gridcell "5 contributions on March 1st." [ref=f29e350]
+                        - gridcell "No contributions on March 8th." [ref=f29e351]
+                        - gridcell "64 contributions on March 15th." [ref=f29e352]
+                        - gridcell "No contributions on March 22nd." [ref=f29e353]
+                        - gridcell "9 contributions on March 29th." [ref=f29e354]
+                        - gridcell "21 contributions on April 5th." [ref=f29e355]
+                        - gridcell "18 contributions on April 12th." [ref=f29e356]
+                        - gridcell "No contributions on April 19th." [ref=f29e357]
+                        - gridcell "28 contributions on April 26th." [ref=f29e358]
+                        - gridcell "13 contributions on May 3rd." [ref=f29e359]
+                        - gridcell "18 contributions on May 10th." [ref=f29e360]
+                        - gridcell "55 contributions on May 17th." [ref=f29e361]
+                        - gridcell "38 contributions on May 24th." [ref=f29e362]
+                        - gridcell "1 contribution on May 31st." [ref=f29e363]
+                        - gridcell "8 contributions on June 7th." [ref=f29e364]
+                        - gridcell "No contributions on June 14th." [ref=f29e365]
+                        - gridcell "38 contributions on June 21st." [ref=f29e366]
+                        - gridcell "41 contributions on June 28th." [ref=f29e367]
+                        - gridcell "7 contributions on July 5th." [ref=f29e368]
+                        - gridcell "13 contributions on July 12th." [ref=f29e369]
+                        - gridcell "No contributions on July 19th." [ref=f29e370]
+                        - gridcell "19 contributions on July 26th." [ref=f29e371]
+                        - gridcell "68 contributions on August 2nd." [ref=f29e372]
+                        - gridcell "20 contributions on August 9th." [ref=f29e373]
+                      - row [ref=f29e374]:
+                        - gridcell "Monday" [ref=f29e375]:
+                          - generic [ref=f29e377]: Mon
+                        - gridcell "No contributions on August 11th." [ref=f29e378]
+                        - gridcell "2 contributions on August 18th." [ref=f29e379]
+                        - gridcell "9 contributions on August 25th." [ref=f29e380]
+                        - gridcell "No contributions on September 1st." [ref=f29e381]
+                        - gridcell "No contributions on September 8th." [ref=f29e382]
+                        - gridcell "No contributions on September 15th." [ref=f29e383]
+                        - gridcell "1 contribution on September 22nd." [ref=f29e384]
+                        - gridcell "2 contributions on September 29th." [ref=f29e385]
+                        - gridcell "6 contributions on October 6th." [ref=f29e386]
+                        - gridcell "10 contributions on October 13th." [ref=f29e387]
+                        - gridcell "No contributions on October 20th." [ref=f29e388]
+                        - gridcell "No contributions on October 27th." [ref=f29e389]
+                        - gridcell "No contributions on November 3rd." [ref=f29e390]
+                        - gridcell "No contributions on November 10th." [ref=f29e391]
+                        - gridcell "No contributions on November 17th." [ref=f29e392]
+                        - gridcell "8 contributions on November 24th." [ref=f29e393]
+                        - gridcell "2 contributions on December 1st." [ref=f29e394]
+                        - gridcell "No contributions on December 8th." [ref=f29e395]
+                        - gridcell "No contributions on December 15th." [ref=f29e396]
+                        - gridcell "No contributions on December 22nd." [ref=f29e397]
+                        - gridcell "No contributions on December 29th." [ref=f29e398]
+                        - gridcell "No contributions on January 5th." [ref=f29e399]
+                        - gridcell "No contributions on January 12th." [ref=f29e400]
+                        - gridcell "2 contributions on January 19th." [ref=f29e401]
+                        - gridcell "49 contributions on January 26th." [ref=f29e402]
+                        - gridcell "No contributions on February 2nd." [ref=f29e403]
+                        - gridcell "5 contributions on February 9th." [ref=f29e404]
+                        - gridcell "16 contributions on February 16th." [ref=f29e405]
+                        - gridcell "17 contributions on February 23rd." [ref=f29e406]
+                        - gridcell "34 contributions on March 2nd." [ref=f29e407]
+                        - gridcell "1 contribution on March 9th." [ref=f29e408]
+                        - gridcell "52 contributions on March 16th." [ref=f29e409]
+                        - gridcell "7 contributions on March 23rd." [ref=f29e410]
+                        - gridcell "1 contribution on March 30th." [ref=f29e411]
+                        - gridcell "12 contributions on April 6th." [ref=f29e412]
+                        - gridcell "33 contributions on April 13th." [ref=f29e413]
+                        - gridcell "23 contributions on April 20th." [ref=f29e414]
+                        - gridcell "No contributions on April 27th." [ref=f29e415]
+                        - gridcell "27 contributions on May 4th." [ref=f29e416]
+                        - gridcell "46 contributions on May 11th." [ref=f29e417]
+                        - gridcell "55 contributions on May 18th." [ref=f29e418]
+                        - gridcell "113 contributions on May 25th." [ref=f29e419]
+                        - gridcell "4 contributions on June 1st." [ref=f29e420]
+                        - gridcell "4 contributions on June 8th." [ref=f29e421]
+                        - gridcell "20 contributions on June 15th." [ref=f29e422]
+                        - gridcell "39 contributions on June 22nd." [ref=f29e423]
+                        - gridcell "13 contributions on June 29th." [ref=f29e424]
+                        - gridcell "20 contributions on July 6th." [ref=f29e425]
+                        - gridcell "68 contributions on July 13th." [ref=f29e426]
+                        - gridcell "30 contributions on July 20th." [ref=f29e427]
+                        - gridcell "12 contributions on July 27th." [ref=f29e428]
+                        - gridcell "45 contributions on August 3rd." [ref=f29e429]
+                        - gridcell "40 contributions on August 10th." [ref=f29e430]
+                      - row [ref=f29e431]:
+                        - gridcell "Tuesday" [ref=f29e432]:
+                          - generic [ref=f29e434]: Tue
+                        - gridcell "2 contributions on August 12th." [ref=f29e435]
+                        - gridcell "No contributions on August 19th." [ref=f29e436]
+                        - gridcell "3 contributions on August 26th." [ref=f29e437]
+                        - gridcell "No contributions on September 2nd." [ref=f29e438]
+                        - gridcell "No contributions on September 9th." [ref=f29e439]
+                        - gridcell "No contributions on September 16th." [ref=f29e440]
+                        - gridcell "3 contributions on September 23rd." [ref=f29e441]
+                        - gridcell "11 contributions on September 30th." [ref=f29e442]
+                        - gridcell "4 contributions on October 7th." [ref=f29e443]
+                        - gridcell "No contributions on October 14th." [ref=f29e444]
+                        - gridcell "No contributions on October 21st." [ref=f29e445]
+                        - gridcell "No contributions on October 28th." [ref=f29e446]
+                        - gridcell "7 contributions on November 4th." [ref=f29e447]
+                        - gridcell "No contributions on November 11th." [ref=f29e448]
+                        - gridcell "No contributions on November 18th." [ref=f29e449]
+                        - gridcell "No contributions on November 25th." [ref=f29e450]
+                        - gridcell "No contributions on December 2nd." [ref=f29e451]
+                        - gridcell "No contributions on December 9th." [ref=f29e452]
+                        - gridcell "No contributions on December 16th." [ref=f29e453]
+                        - gridcell "No contributions on December 23rd." [ref=f29e454]
+                        - gridcell "12 contributions on December 30th." [ref=f29e455]
+                        - gridcell "No contributions on January 6th." [ref=f29e456]
+                        - gridcell "3 contributions on January 13th." [ref=f29e457]
+                        - gridcell "10 contributions on January 20th." [ref=f29e458]
+                        - gridcell "37 contributions on January 27th." [ref=f29e459]
+                        - gridcell "No contributions on February 3rd." [ref=f29e460]
+                        - gridcell "16 contributions on February 10th." [ref=f29e461]
+                        - gridcell "4 contributions on February 17th." [ref=f29e462]
+                        - gridcell "8 contributions on February 24th." [ref=f29e463]
+                        - gridcell "60 contributions on March 3rd." [ref=f29e464]
+                        - gridcell "4 contributions on March 10th." [ref=f29e465]
+                        - gridcell "22 contributions on March 17th." [ref=f29e466]
+                        - gridcell "7 contributions on March 24th." [ref=f29e467]
+                        - gridcell "No contributions on March 31st." [ref=f29e468]
+                        - gridcell "25 contributions on April 7th." [ref=f29e469]
+                        - gridcell "29 contributions on April 14th." [ref=f29e470]
+                        - gridcell "1 contribution on April 21st." [ref=f29e471]
+                        - gridcell "14 contributions on April 28th." [ref=f29e472]
+                        - gridcell "4 contributions on May 5th." [ref=f29e473]
+                        - gridcell "67 contributions on May 12th." [ref=f29e474]
+                        - gridcell "21 contributions on May 19th." [ref=f29e475]
+                        - gridcell "78 contributions on May 26th." [ref=f29e476]
+                        - gridcell "8 contributions on June 2nd." [ref=f29e477]
+                        - gridcell "24 contributions on June 9th." [ref=f29e478]
+                        - gridcell "16 contributions on June 16th." [ref=f29e479]
+                        - gridcell "14 contributions on June 23rd." [ref=f29e480]
+                        - gridcell "10 contributions on June 30th." [ref=f29e481]
+                        - gridcell "5 contributions on July 7th." [ref=f29e482]
+                        - gridcell "24 contributions on July 14th." [ref=f29e483]
+                        - gridcell "22 contributions on July 21st." [ref=f29e484]
+                        - gridcell "15 contributions on July 28th." [ref=f29e485]
+                        - gridcell "24 contributions on August 4th." [ref=f29e486]
+                        - gridcell "24 contributions on August 11th." [ref=f29e487]
+                      - row [ref=f29e488]:
+                        - gridcell "Wednesday" [ref=f29e489]:
+                          - generic [ref=f29e491]: Wed
+                        - gridcell "1 contribution on August 13th." [ref=f29e492]
+                        - gridcell "3 contributions on August 20th." [ref=f29e493]
+                        - gridcell "No contributions on August 27th." [ref=f29e494]
+                        - gridcell "No contributions on September 3rd." [ref=f29e495]
+                        - gridcell "No contributions on September 10th." [ref=f29e496]
+                        - gridcell "No contributions on September 17th." [ref=f29e497]
+                        - gridcell "No contributions on September 24th." [ref=f29e498]
+                        - gridcell "No contributions on October 1st." [ref=f29e499]
+                        - gridcell "9 contributions on October 8th." [ref=f29e500]
+                        - gridcell "5 contributions on October 15th." [ref=f29e501]
+                        - gridcell "No contributions on October 22nd." [ref=f29e502]
+                        - gridcell "No contributions on October 29th." [ref=f29e503]
+                        - gridcell "No contributions on November 5th." [ref=f29e504]
+                        - gridcell "No contributions on November 12th." [ref=f29e505]
+                        - gridcell "No contributions on November 19th." [ref=f29e506]
+                        - gridcell "2 contributions on November 26th." [ref=f29e507]
+                        - gridcell "No contributions on December 3rd." [ref=f29e508]
+                        - gridcell "No contributions on December 10th." [ref=f29e509]
+                        - gridcell "No contributions on December 17th." [ref=f29e510]
+                        - gridcell "No contributions on December 24th." [ref=f29e511]
+                        - gridcell "No contributions on December 31st." [ref=f29e512]
+                        - gridcell "No contributions on January 7th." [ref=f29e513]
+                        - gridcell "34 contributions on January 14th." [ref=f29e514]
+                        - gridcell "No contributions on January 21st." [ref=f29e515]
+                        - gridcell "16 contributions on January 28th." [ref=f29e516]
+                        - gridcell "7 contributions on February 4th." [ref=f29e517]
+                        - gridcell "29 contributions on February 11th." [ref=f29e518]
+                        - gridcell "11 contributions on February 18th." [ref=f29e519]
+                        - gridcell "No contributions on February 25th." [ref=f29e520]
+                        - gridcell "18 contributions on March 4th." [ref=f29e521]
+                        - gridcell "4 contributions on March 11th." [ref=f29e522]
+                        - gridcell "44 contributions on March 18th." [ref=f29e523]
+                        - gridcell "5 contributions on March 25th." [ref=f29e524]
+                        - gridcell "2 contributions on April 1st." [ref=f29e525]
+                        - gridcell "8 contributions on April 8th." [ref=f29e526]
+                        - gridcell "11 contributions on April 15th." [ref=f29e527]
+                        - gridcell "17 contributions on April 22nd." [ref=f29e528]
+                        - gridcell "43 contributions on April 29th." [ref=f29e529]
+                        - gridcell "23 contributions on May 6th." [ref=f29e530]
+                        - gridcell "30 contributions on May 13th." [ref=f29e531]
+                        - gridcell "10 contributions on May 20th." [ref=f29e532]
+                        - gridcell "25 contributions on May 27th." [ref=f29e533]
+                        - gridcell "2 contributions on June 3rd." [ref=f29e534]
+                        - gridcell "47 contributions on June 10th." [ref=f29e535]
+                        - gridcell "12 contributions on June 17th." [ref=f29e536]
+                        - gridcell "17 contributions on June 24th." [ref=f29e537]
+                        - gridcell "5 contributions on July 1st." [ref=f29e538]
+                        - gridcell "7 contributions on July 8th." [ref=f29e539]
+                        - gridcell "12 contributions on July 15th." [ref=f29e540]
+                        - gridcell "16 contributions on July 22nd." [ref=f29e541]
+                        - gridcell "15 contributions on July 29th." [ref=f29e542]
+                        - gridcell "24 contributions on August 5th." [ref=f29e543]
+                        - gridcell "31 contributions on August 12th." [ref=f29e544]
+                      - row [ref=f29e545]:
+                        - gridcell "Thursday" [ref=f29e546]:
+                          - generic [ref=f29e548]: Thu
+                        - gridcell "5 contributions on August 14th." [ref=f29e549]
+                        - gridcell "No contributions on August 21st." [ref=f29e550]
+                        - gridcell "No contributions on August 28th." [ref=f29e551]
+                        - gridcell "3 contributions on September 4th." [ref=f29e552]
+                        - gridcell "1 contribution on September 11th." [ref=f29e553]
+                        - gridcell "No contributions on September 18th." [ref=f29e554]
+                        - gridcell "No contributions on September 25th." [ref=f29e555]
+                        - gridcell "No contributions on October 2nd." [ref=f29e556]
+                        - gridcell "1 contribution on October 9th." [ref=f29e557]
+                        - gridcell "No contributions on October 16th." [ref=f29e558]
+                        - gridcell "No contributions on October 23rd." [ref=f29e559]
+                        - gridcell "2 contributions on October 30th." [ref=f29e560]
+                        - gridcell "No contributions on November 6th." [ref=f29e561]
+                        - gridcell "No contributions on November 13th." [ref=f29e562]
+                        - gridcell "No contributions on November 20th." [ref=f29e563]
+                        - gridcell "2 contributions on November 27th." [ref=f29e564]
+                        - gridcell "No contributions on December 4th." [ref=f29e565]
+                        - gridcell "No contributions on December 11th." [ref=f29e566]
+                        - gridcell "No contributions on December 18th." [ref=f29e567]
+                        - gridcell "No contributions on December 25th." [ref=f29e568]
+                        - gridcell "7 contributions on January 1st." [ref=f29e569]
+                        - gridcell "No contributions on January 8th." [ref=f29e570]
+                        - gridcell "1 contribution on January 15th." [ref=f29e571]
+                        - gridcell "21 contributions on January 22nd." [ref=f29e572]
+                        - gridcell "15 contributions on January 29th." [ref=f29e573]
+                        - gridcell "14 contributions on February 5th." [ref=f29e574]
+                        - gridcell "42 contributions on February 12th." [ref=f29e575]
+                        - gridcell "4 contributions on February 19th." [ref=f29e576]
+                        - gridcell "No contributions on February 26th." [ref=f29e577]
+                        - gridcell "25 contributions on March 5th." [ref=f29e578]
+                        - gridcell "14 contributions on March 12th." [ref=f29e579]
+                        - gridcell "6 contributions on March 19th." [ref=f29e580]
+                        - gridcell "2 contributions on March 26th." [ref=f29e581]
+                        - gridcell "5 contributions on April 2nd." [ref=f29e582]
+                        - gridcell "12 contributions on April 9th." [ref=f29e583]
+                        - gridcell "5 contributions on April 16th." [ref=f29e584]
+                        - gridcell "3 contributions on April 23rd." [ref=f29e585]
+                        - gridcell "17 contributions on April 30th." [ref=f29e586]
+                        - gridcell "54 contributions on May 7th." [ref=f29e587]
+                        - gridcell "5 contributions on May 14th." [ref=f29e588]
+                        - gridcell "16 contributions on May 21st." [ref=f29e589]
+                        - gridcell "72 contributions on May 28th." [ref=f29e590]
+                        - gridcell "4 contributions on June 4th." [ref=f29e591]
+                        - gridcell "21 contributions on June 11th." [ref=f29e592]
+                        - gridcell "27 contributions on June 18th." [ref=f29e593]
+                        - gridcell "13 contributions on June 25th." [ref=f29e594]
+                        - gridcell "10 contributions on July 2nd." [ref=f29e595]
+                        - gridcell "15 contributions on July 9th." [ref=f29e596]
+                        - gridcell "4 contributions on July 16th." [ref=f29e597]
+                        - gridcell "30 contributions on July 23rd." [ref=f29e598]
+                        - gridcell "13 contributions on July 30th." [ref=f29e599]
+                        - gridcell "33 contributions on August 6th." [ref=f29e600]
+                        - gridcell [ref=f29e601]
+                      - row [ref=f29e602]:
+                        - gridcell "Friday" [ref=f29e603]:
+                          - generic [ref=f29e605]: Fri
+                        - gridcell "2 contributions on August 15th." [ref=f29e606]
+                        - gridcell "No contributions on August 22nd." [ref=f29e607]
+                        - gridcell "No contributions on August 29th." [ref=f29e608]
+                        - gridcell "No contributions on September 5th." [ref=f29e609]
+                        - gridcell "No contributions on September 12th." [ref=f29e610]
+                        - gridcell "No contributions on September 19th." [ref=f29e611]
+                        - gridcell "No contributions on September 26th." [ref=f29e612]
+                        - gridcell "No contributions on October 3rd." [ref=f29e613]
+                        - gridcell "2 contributions on October 10th." [ref=f29e614]
+                        - gridcell "No contributions on October 17th." [ref=f29e615]
+                        - gridcell "No contributions on October 24th." [ref=f29e616]
+                        - gridcell "2 contributions on October 31st." [ref=f29e617]
+                        - gridcell "No contributions on November 7th." [ref=f29e618]
+                        - gridcell "No contributions on November 14th." [ref=f29e619]
+                        - gridcell "No contributions on November 21st." [ref=f29e620]
+                        - gridcell "No contributions on November 28th." [ref=f29e621]
+                        - gridcell "No contributions on December 5th." [ref=f29e622]
+                        - gridcell "No contributions on December 12th." [ref=f29e623]
+                        - gridcell "No contributions on December 19th." [ref=f29e624]
+                        - gridcell "No contributions on December 26th." [ref=f29e625]
+                        - gridcell "No contributions on January 2nd." [ref=f29e626]
+                        - gridcell "No contributions on January 9th." [ref=f29e627]
+                        - gridcell "10 contributions on January 16th." [ref=f29e628]
+                        - gridcell "19 contributions on January 23rd." [ref=f29e629]
+                        - gridcell "60 contributions on January 30th." [ref=f29e630]
+                        - gridcell "4 contributions on February 6th." [ref=f29e631]
+                        - gridcell "4 contributions on February 13th." [ref=f29e632]
+                        - gridcell "No contributions on February 20th." [ref=f29e633]
+                        - gridcell "No contributions on February 27th." [ref=f29e634]
+                        - gridcell "14 contributions on March 6th." [ref=f29e635]
+                        - gridcell "47 contributions on March 13th." [ref=f29e636]
+                        - gridcell "No contributions on March 20th." [ref=f29e637]
+                        - gridcell "2 contributions on March 27th." [ref=f29e638]
+                        - gridcell "8 contributions on April 3rd." [ref=f29e639]
+                        - gridcell "No contributions on April 10th." [ref=f29e640]
+                        - gridcell "27 contributions on April 17th." [ref=f29e641]
+                        - gridcell "7 contributions on April 24th." [ref=f29e642]
+                        - gridcell "5 contributions on May 1st." [ref=f29e643]
+                        - gridcell "24 contributions on May 8th." [ref=f29e644]
+                        - gridcell "33 contributions on May 15th." [ref=f29e645]
+                        - gridcell "13 contributions on May 22nd." [ref=f29e646]
+                        - gridcell "20 contributions on May 29th." [ref=f29e647]
+                        - gridcell "2 contributions on June 5th." [ref=f29e648]
+                        - gridcell "23 contributions on June 12th." [ref=f29e649]
+                        - gridcell "21 contributions on June 19th." [ref=f29e650]
+                        - gridcell "44 contributions on June 26th." [ref=f29e651]
+                        - gridcell "33 contributions on July 3rd." [ref=f29e652]
+                        - gridcell "36 contributions on July 10th." [ref=f29e653]
+                        - gridcell "No contributions on July 17th." [ref=f29e654]
+                        - gridcell "8 contributions on July 24th." [ref=f29e655]
+                        - gridcell "16 contributions on July 31st." [ref=f29e656]
+                        - gridcell "3 contributions on August 7th." [ref=f29e657]
+                        - gridcell [ref=f29e658]
+                      - row [ref=f29e659]:
+                        - gridcell "Saturday" [ref=f29e660]:
+                          - generic [ref=f29e662]: Sat
+                        - gridcell "No contributions on August 16th." [ref=f29e663]
+                        - gridcell "4 contributions on August 23rd." [ref=f29e664]
+                        - gridcell "No contributions on August 30th." [ref=f29e665]
+                        - gridcell "No contributions on September 6th." [ref=f29e666]
+                        - gridcell "No contributions on September 13th." [ref=f29e667]
+                        - gridcell "2 contributions on September 20th." [ref=f29e668]
+                        - gridcell "No contributions on September 27th." [ref=f29e669]
+                        - gridcell "17 contributions on October 4th." [ref=f29e670]
+                        - gridcell "3 contributions on October 11th." [ref=f29e671]
+                        - gridcell "7 contributions on October 18th." [ref=f29e672]
+                        - gridcell "No contributions on October 25th." [ref=f29e673]
+                        - gridcell "No contributions on November 1st." [ref=f29e674]
+                        - gridcell "No contributions on November 8th." [ref=f29e675]
+                        - gridcell "No contributions on November 15th." [ref=f29e676]
+                        - gridcell "No contributions on November 22nd." [ref=f29e677]
+                        - gridcell "2 contributions on November 29th." [ref=f29e678]
+                        - gridcell "No contributions on December 6th." [ref=f29e679]
+                        - gridcell "No contributions on December 13th." [ref=f29e680]
+                        - gridcell "No contributions on December 20th." [ref=f29e681]
+                        - gridcell "No contributions on December 27th." [ref=f29e682]
+                        - gridcell "No contributions on January 3rd." [ref=f29e683]
+                        - gridcell "No contributions on January 10th." [ref=f29e684]
+                        - gridcell "7 contributions on January 17th." [ref=f29e685]
+                        - gridcell "4 contributions on January 24th." [ref=f29e686]
+                        - gridcell "23 contributions on January 31st." [ref=f29e687]
+                        - gridcell "35 contributions on February 7th." [ref=f29e688]
+                        - gridcell "6 contributions on February 14th." [ref=f29e689]
+                        - gridcell "12 contributions on February 21st." [ref=f29e690]
+                        - gridcell "8 contributions on February 28th." [ref=f29e691]
+                        - gridcell "22 contributions on March 7th." [ref=f29e692]
+                        - gridcell "38 contributions on March 14th." [ref=f29e693]
+                        - gridcell "2 contributions on March 21st." [ref=f29e694]
+                        - gridcell "1 contribution on March 28th." [ref=f29e695]
+                        - gridcell "15 contributions on April 4th." [ref=f29e696]
+                        - gridcell "8 contributions on April 11th." [ref=f29e697]
+                        - gridcell "6 contributions on April 18th." [ref=f29e698]
+                        - gridcell "41 contributions on April 25th." [ref=f29e699]
+                        - gridcell "9 contributions on May 2nd." [ref=f29e700]
+                        - gridcell "5 contributions on May 9th." [ref=f29e701]
+                        - gridcell "26 contributions on May 16th." [ref=f29e702]
+                        - gridcell "10 contributions on May 23rd." [ref=f29e703]
+                        - gridcell "No contributions on May 30th." [ref=f29e704]
+                        - gridcell "1 contribution on June 6th." [ref=f29e705]
+                        - gridcell "1 contribution on June 13th." [ref=f29e706]
+                        - gridcell "32 contributions on June 20th." [ref=f29e707]
+                        - gridcell "12 contributions on June 27th." [ref=f29e708]
+                        - gridcell "4 contributions on July 4th." [ref=f29e709]
+                        - gridcell "13 contributions on July 11th." [ref=f29e710]
+                        - gridcell "No contributions on July 18th." [ref=f29e711]
+                        - gridcell "10 contributions on July 25th." [ref=f29e712]
+                        - gridcell "8 contributions on August 1st." [ref=f29e713]
+                        - gridcell "5 contributions on August 8th." [ref=f29e714]
+                        - gridcell [ref=f29e715]
+                  - generic [ref=f29e716]:
+                    - link "Learn how we count contributions" [ref=f29e718] [cursor=pointer]:
+                      - /url: https://docs.github.com/articles/why-are-my-contributions-not-showing-up-on-my-profile
+                    - generic [ref=f29e719]:
+                      - generic [ref=f29e720]: Less
+                      - generic [ref=f29e721]: No contributions.
+                      - generic [ref=f29e723]: Low contributions.
+                      - generic [ref=f29e725]: Medium-low contributions.
+                      - generic [ref=f29e727]: Medium-high contributions.
+                      - generic [ref=f29e729]: High contributions.
+                      - generic [ref=f29e731]: More
+              - generic [ref=f29e733]:
+                - navigation "Organizations" [ref=f29e735]:
+                  - link "@openclaw" [ref=f29e736] [cursor=pointer]:
+                    - /url: /jesse-merhi?tab=overview&org=openclaw
+                - generic [ref=f29e737]:
+                  - generic [ref=f29e738]:
+                    - heading "Activity overview" [level=3] [ref=f29e739]
+                    - generic [ref=f29e743]:
+                      - text: Contributed to
+                      - link "openclaw/openclaw" [ref=f29e744] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: ","
+                      - link "jesse-merhi/skills" [ref=f29e745] [cursor=pointer]:
+                        - /url: /jesse-merhi/skills
+                      - text: ","
+                      - link "openclaw/clawhub" [ref=f29e746] [cursor=pointer]:
+                        - /url: /openclaw/clawhub
+                      - text: and 20 other repositories
+                  - generic [ref=f29e748]:
+                    - generic: Loading
+                    - img "A graph representing jesse-merhi's contributions from August 10, 2025 to August 12, 2026. The contributions are 75% commits, 24% pull requests, 1% code review, 0% issues." [ref=f29e750]:
+                      - generic [ref=f29e751]:
+                        - generic [ref=f29e756]: 1%
+                        - generic [ref=f29e757]: Code review
+                        - generic [ref=f29e759]: Issues
+                        - generic [ref=f29e760]: 24%
+                        - generic [ref=f29e761]: Pull requests
+                        - generic [ref=f29e762]: 75%
+                        - generic [ref=f29e763]: Commits
+            - generic [ref=f29e764]:
+              - heading "Contribution activity" [level=2] [ref=f29e765]
+              - generic [ref=f29e767]:
+                - heading "August 2026" [level=3] [ref=f29e768]
+                - group [ref=f29e776]:
+                  - button [expanded] [ref=f29e777] [cursor=pointer]
+                  - list [ref=f29e783]:
+                    - listitem [ref=f29e784]:
+                      - generic [ref=f29e785]:
+                        - link "openclaw/openclaw" [ref=f29e786] [cursor=pointer]:
+                          - /url: /openclaw/openclaw
+                        - link "29 commits" [ref=f29e787] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "47% of commits in August were made to openclaw/openclaw" [ref=f29e789]
+                    - listitem [ref=f29e791]:
+                      - generic [ref=f29e792]:
+                        - link "jesse-merhi/skills" [ref=f29e793] [cursor=pointer]:
+                          - /url: /jesse-merhi/skills
+                        - link "26 commits" [ref=f29e794] [cursor=pointer]:
+                          - /url: /jesse-merhi/skills/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "42% of commits in August were made to jesse-merhi/skills" [ref=f29e796]
+                    - listitem [ref=f29e798]:
+                      - generic [ref=f29e799]:
+                        - link "jesse-merhi/tmux-agent-status" [ref=f29e800] [cursor=pointer]:
+                          - /url: /jesse-merhi/tmux-agent-status
+                        - link "4 commits" [ref=f29e801] [cursor=pointer]:
+                          - /url: /jesse-merhi/tmux-agent-status/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "7% of commits in August were made to jesse-merhi/tmux-agent-status" [ref=f29e803]
+                    - listitem [ref=f29e805]:
+                      - generic [ref=f29e806]:
+                        - link "jesse-merhi/agent-session-finder" [ref=f29e807] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-session-finder
+                        - link "2 commits" [ref=f29e808] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-session-finder/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "4% of commits in August were made to jesse-merhi/agent-session-finder" [ref=f29e810]
+                    - listitem [ref=f29e812]:
+                      - generic [ref=f29e813]:
+                        - link "jesse-merhi/agent-session-namer" [ref=f29e814] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-session-namer
+                        - link "1 commit" [ref=f29e815] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-session-namer/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "2% of commits in August were made to jesse-merhi/agent-session-namer" [ref=f29e817]
+                    - listitem [ref=f29e819]:
+                      - generic [ref=f29e820]:
+                        - link "jesse-merhi/agent-trees" [ref=f29e821] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-trees
+                        - link "1 commit" [ref=f29e822] [cursor=pointer]:
+                          - /url: /jesse-merhi/agent-trees/commits?author=jesse-merhi&since=2026-08-01&until=2026-08-13
+                      - img "2% of commits in August were made to jesse-merhi/agent-trees" [ref=f29e824]
+                - group [ref=f29e832]:
+                  - button "Created 1 repository" [expanded] [ref=f29e833] [cursor=pointer]
+                  - list [ref=f29e840]:
+                    - listitem [ref=f29e841]:
+                      - link "jesse-merhi/tmux-agent-status" [ref=f29e846] [cursor=pointer]:
+                        - /url: /jesse-merhi/tmux-agent-status
+                      - generic [ref=f29e847]: Shell
+                      - generic [ref=f29e850]:
+                        - generic [ref=f29e851]: This contribution was made on Aug 11
+                        - time [ref=f29e852]: Aug 11
+                - generic [ref=f29e857]:
+                  - generic [ref=f29e858]:
+                    - heading [level=4] [ref=f29e859]:
+                      - text: Created a pull request in
+                      - link "openclaw/openclaw" [ref=f29e860] [cursor=pointer]:
+                        - /url: /openclaw/openclaw
+                      - text: that received 56 comments
+                    - link [ref=f29e861] [cursor=pointer]:
+                      - /url: /jesse-merhi?tab=overview&from=2026-08-01&to=2026-08-31
+                      - time [ref=f29e862]: Aug 2
+                  - generic [ref=f29e866]:
+                    - heading [level=3] [ref=f29e867]:
+                      - 'link "feat(signal): link accounts from setup QR" [ref=f29e868] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/118169
+                    - paragraph [ref=f29e870]: Status Preserved draft follow-up; do not merge or rebase yet. This PR contains the Signal setup integration that combines two independent prerequis…
+                    - generic [ref=f29e871]:
+                      - generic [ref=f29e872]: +697 −25 lines changed •
+                      - text: 56 comments
+                - group [ref=f29e884]:
+                  - button "Opened 42 other pull requests in 3 repositories" [expanded] [ref=f29e885] [cursor=pointer]
+                  - generic [ref=f29e891]:
+                    - group [ref=f29e893]:
+                      - button "openclaw/openclaw 16 open 4 merged" [ref=f29e894] [cursor=pointer]:
+                        - generic [ref=f29e895]:
+                          - generic [ref=f29e896]: openclaw/openclaw
+                          - generic [ref=f29e897]:
+                            - generic [ref=f29e898]: "16"
+                            - text: open
+                            - generic [ref=f29e899]: "4"
+                            - text: merged
+                    - group [ref=f29e905]:
+                      - button "jesse-merhi/skills 16 merged 2 closed 1 open" [ref=f29e906] [cursor=pointer]:
+                        - generic [ref=f29e907]:
+                          - generic [ref=f29e908]: jesse-merhi/skills
+                          - generic [ref=f29e909]:
+                            - generic [ref=f29e910]: "16"
+                            - text: merged
+                            - generic [ref=f29e911]: "2"
+                            - text: closed
+                            - generic [ref=f29e912]: "1"
+                            - text: open
+                    - group [ref=f29e918]:
+                      - button "jesse-merhi/tmux-agent-status 3 merged" [ref=f29e919] [cursor=pointer]:
+                        - generic [ref=f29e920]:
+                          - generic [ref=f29e921]: jesse-merhi/tmux-agent-status
+                          - generic [ref=f29e922]:
+                            - generic [ref=f29e923]: "3"
+                            - text: merged
+                - generic [ref=f29e932]:
+                  - text: 218 contributions in private repositories
+                  - generic [ref=f29e933]: Aug 1 – Aug 12
+              - generic [ref=f29e934]:
+                - generic: Loading
+                - button "Show more activity" [ref=f29e936] [cursor=pointer]
+          - list [ref=f29e939]:
+            - listitem [ref=f29e940]:
+              - link "Contribution activity in 2026, 1 of 6" [ref=f29e941] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2026-08-01&to=2026-08-12
+                - text: "2026"
+            - listitem [ref=f29e942]:
+              - link "Contribution activity in 2025, 2 of 6" [ref=f29e943] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2025-12-01&to=2025-12-31
+                - text: "2025"
+            - listitem [ref=f29e944]:
+              - link "Contribution activity in 2024, 3 of 6" [ref=f29e945] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2024-12-01&to=2024-12-31
+                - text: "2024"
+            - listitem [ref=f29e946]:
+              - link "Contribution activity in 2023, 4 of 6" [ref=f29e947] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2023-12-01&to=2023-12-31
+                - text: "2023"
+            - listitem [ref=f29e948]:
+              - link "Contribution activity in 2022, 5 of 6" [ref=f29e949] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2022-12-01&to=2022-12-31
+                - text: "2022"
+            - listitem [ref=f29e950]:
+              - link "Contribution activity in 2021, 6 of 6" [ref=f29e951] [cursor=pointer]:
+                - /url: /jesse-merhi?tab=overview&from=2021-12-01&to=2021-12-31
+                - text: "2021"
+  - contentinfo [ref=f29e952]:
+    - heading "Footer" [level=2] [ref=f29e953]
+    - generic [ref=f29e954]:
+      - generic [ref=f29e955]:
+        - link "GitHub Homepage" [ref=f29e956] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f29e959]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f29e960]:
+        - heading "Footer navigation" [level=3] [ref=f29e961]
+        - list "Footer navigation" [ref=f29e962]:
+          - listitem [ref=f29e963]:
+            - link "Terms" [ref=f29e964] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f29e965]:
+            - link "Privacy" [ref=f29e966] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f29e967]:
+            - link "Security" [ref=f29e968] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f29e969]:
+            - link "Status" [ref=f29e970] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f29e971]:
+            - link "Community" [ref=f29e972] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f29e973]:
+            - link "Docs" [ref=f29e974] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f29e975]:
+            - link "Contact" [ref=f29e976] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f29e977]:
+            - button "Manage cookies" [ref=f29e979] [cursor=pointer]
+          - listitem [ref=f29e980]:
+            - button "Do not share my personal information" [ref=f29e982] [cursor=pointer]

@@ -1,0 +1,61 @@
+{
+  "startedAt": "2026-08-13T17:54:14.463Z",
+  "finishedAt": "2026-08-13T18:07:43.811Z",
+  "k": 1,
+  "concurrency": 1,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "mit_sororities",
+      "k": 1,
+      "accuracy": 0.5714285714285714,
+      "taskPassed": false,
+      "meanLatencyMs": 809301.472916,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-13_10-54-17am_for-alpha-chi-omega-alpha-phi-delta-phi_0994e2",
+          "assertions": [
+            {
+              "name": "sorority_members.csv exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/sorority_members.csv found and manifested"
+            },
+            {
+              "name": "answer.md contains a plausible Google Sheets URL",
+              "passed": false,
+              "detail": "no docs.google.com/spreadsheets/d/<id> URL found (private sheet contents remain human-reviewed)"
+            },
+            {
+              "name": "CSV has exactly the columns name, class, major, affiliation, interests, other (no more, no fewer)",
+              "passed": true,
+              "detail": "header: name, class, major, affiliation, interests, other"
+            },
+            {
+              "name": "CSV has plausible rows and every sorority/class cohort is represented",
+              "passed": false,
+              "detail": "missing cohort(s): Pi Beta Phi 2026"
+            },
+            {
+              "name": "member names are plausible and unique within each affiliation",
+              "passed": true,
+              "detail": "206 plausible, affiliation-unique names"
+            },
+            {
+              "name": "major and interests/other fields meet minimum information coverage",
+              "passed": false,
+              "detail": "major 49% (min 50%); interests/other 44% (min 25%)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "25 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 809301.472916,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

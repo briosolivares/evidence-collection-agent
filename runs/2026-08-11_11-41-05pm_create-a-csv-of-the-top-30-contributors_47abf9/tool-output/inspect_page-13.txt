@@ -1,0 +1,998 @@
+URL: https://github.com/giodl73-repo
+Title: giodl73-repo (Gio Della-Libera) · GitHub
+
+- generic [ref=f12e2]:
+  - generic [ref=f12e3]:
+    - link "Skip to content" [ref=f12e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f12e8]:
+      - heading "Navigation Menu" [level=2] [ref=f12e9]
+      - generic [ref=f12e10]:
+        - link "Homepage" [ref=f12e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f12e15]:
+          - navigation "Global" [ref=f12e16]:
+            - list [ref=f12e17]:
+              - listitem [ref=f12e18]:
+                - button "Platform" [ref=f12e20] [cursor=pointer]
+              - listitem [ref=f12e23]:
+                - button "Solutions" [ref=f12e25] [cursor=pointer]
+              - listitem [ref=f12e28]:
+                - button "Resources" [ref=f12e30] [cursor=pointer]
+              - listitem [ref=f12e33]:
+                - button "Open Source" [ref=f12e35] [cursor=pointer]
+              - listitem [ref=f12e38]:
+                - button "Enterprise" [ref=f12e40] [cursor=pointer]
+              - listitem [ref=f12e43]:
+                - link "Pricing" [ref=f12e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f12e45]:
+            - button "Search or jump to, type / to search" [ref=f12e47] [cursor=pointer]:
+              - generic [ref=f12e50]:
+                - text: Type
+                - generic [ref=f12e51]: /
+                - text: to search
+            - link "Sign in" [ref=f12e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fgiodl73-repo
+            - link "Sign up" [ref=f12e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E&source=header
+            - button "Appearance settings" [ref=f12e55] [cursor=pointer]
+  - main [ref=f12e60]:
+    - generic [ref=f12e63]:
+      - generic [ref=f12e64]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@giodl73-repo"
+            - generic:
+              - strong: giodl73-repo
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fgiodl73-repo
+      - navigation "User profile" [ref=f12e67]:
+        - link "Overview" [ref=f12e68] [cursor=pointer]:
+          - /url: /giodl73-repo
+        - link "Repositories 90" [ref=f12e71] [cursor=pointer]:
+          - /url: /giodl73-repo?tab=repositories
+          - text: Repositories
+          - generic "90" [ref=f12e74]
+        - link "Projects" [ref=f12e75] [cursor=pointer]:
+          - /url: /giodl73-repo?tab=projects
+        - link "Packages" [ref=f12e78] [cursor=pointer]:
+          - /url: /giodl73-repo?tab=packages
+        - link "Stars" [ref=f12e81] [cursor=pointer]:
+          - /url: /giodl73-repo?tab=stars
+    - generic [ref=f12e85]:
+      - generic [ref=f12e87]:
+        - generic:
+          - generic:
+            - generic:
+              - img "@giodl73-repo"
+            - generic:
+              - generic:
+                - strong: giodl73-repo
+            - generic:
+              - generic:
+                - generic:
+                  - link "Follow":
+                    - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fgiodl73-repo
+        - generic [ref=f12e88]:
+          - generic [ref=f12e89]:
+            - link [ref=f12e91] [cursor=pointer]:
+              - /url: https://avatars.githubusercontent.com/u/235387111?v=4
+              - img "View giodl73-repo's full-sized avatar" [ref=f12e92]
+            - heading "Gio Della-Libera giodl73-repo" [level=1] [ref=f12e94]:
+              - generic [ref=f12e95]: Gio Della-Libera
+              - generic [ref=f12e96]: giodl73-repo
+          - generic [ref=f12e97]:
+            - link "Follow" [ref=f12e104] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fgiodl73-repo
+            - generic [ref=f12e105]:
+              - generic [ref=f12e106]: VP Engineering, Agents 365 & Skills Designer
+              - generic [ref=f12e109]:
+                - link "19 followers" [ref=f12e110] [cursor=pointer]:
+                  - /url: https://github.com/giodl73-repo?tab=followers
+                - text: ·
+                - link "1 following" [ref=f12e113] [cursor=pointer]:
+                  - /url: https://github.com/giodl73-repo?tab=following
+              - list [ref=f12e114]:
+                - 'listitem "Organization: Microsoft" [ref=f12e115]':
+                  - generic [ref=f12e118]: Microsoft
+                - 'listitem "Home location: Snohomish, WA" [ref=f12e120]':
+                  - generic [ref=f12e123]: Snohomish, WA
+                - listitem [ref=f12e124]:
+                  - generic [ref=f12e127]: 23:43 - same time
+                - listitem [ref=f12e128]:
+                  - img "LinkedIn" [ref=f12e129]
+                  - link "in/giodl" [ref=f12e132] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/in/giodl/
+          - generic [ref=f12e133]:
+            - heading [level=2] [ref=f12e134]:
+              - link "Achievements" [ref=f12e135] [cursor=pointer]:
+                - /url: /giodl73-repo?tab=achievements
+            - generic [ref=f12e136]:
+              - 'link "Achievement: Pull Shark x3" [ref=f12e137] [cursor=pointer]':
+                - /url: /giodl73-repo?achievement=pull-shark&tab=achievements
+                - 'img "Achievement: Pull Shark" [ref=f12e138]'
+                - generic [ref=f12e139]: x3
+              - 'link "Achievement: Pair Extraordinaire x3" [ref=f12e140] [cursor=pointer]':
+                - /url: /giodl73-repo?achievement=pair-extraordinaire&tab=achievements
+                - 'img "Achievement: Pair Extraordinaire" [ref=f12e141]'
+                - generic [ref=f12e142]: x3
+              - link [ref=f12e143] [cursor=pointer]:
+                - /url: /giodl73-repo?achievement=quickdraw&tab=achievements
+                - 'img "Achievement: Quickdraw" [ref=f12e144]'
+              - link [ref=f12e145] [cursor=pointer]:
+                - /url: /giodl73-repo?achievement=yolo&tab=achievements
+                - 'img "Achievement: YOLO" [ref=f12e146]'
+          - generic [ref=f12e147]:
+            - heading "Highlights" [level=2] [ref=f12e148]
+            - list [ref=f12e149]:
+              - listitem [ref=f12e150]:
+                - 'generic "Label: Pro" [ref=f12e153]': Pro
+          - button "Block or report user" [ref=f12e155] [cursor=pointer]
+      - generic [ref=f12e160]:
+        - generic [ref=f12e162]:
+          - generic [ref=f12e164]:
+            - link "giodl73-repo" [ref=f12e165] [cursor=pointer]:
+              - /url: /giodl73-repo/giodl73-repo
+            - generic [ref=f12e166]: /
+            - text: README.md
+          - article [ref=f12e167]:
+            - generic [ref=f12e168]:
+              - heading "Gio Della-Libera" [level=1] [ref=f12e169]
+              - 'link "Permalink: Gio Della-Libera" [ref=f12e170] [cursor=pointer]':
+                - /url: "#gio-della-libera"
+            - paragraph [ref=f12e173]: "I build public systems in series: each repo is a concrete artifact, and each series is the story that explains why those artifacts belong together. The implementation through-line is Rust: even when the artifact is a paper, corpus, game, or design lab, the durable machinery tends to become a Rust CLI, library, or verifier."
+            - paragraph [ref=f12e174]:
+              - text: Public repos in this portfolio use
+              - link "ROLES" [ref=f12e175] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/ROLES
+              - text: ", the"
+              - code [ref=f12e176]: .roles
+              - text: convention for repository-local review panels.
+            - paragraph [ref=f12e177]:
+              - text: "Day job: VP of Engineering at Microsoft on"
+              - strong [ref=f12e178]: Agents 365
+              - text: . Everything here is built outside that.
+            - generic [ref=f12e179]:
+              - heading "AI-first development" [level=2] [ref=f12e180]
+              - 'link "Permalink: AI-first development" [ref=f12e181] [cursor=pointer]':
+                - /url: "#ai-first-development"
+            - paragraph [ref=f12e184]: "AI-first development is not about coding faster. It is about making the parts of engineering that usually get skipped actually happen: research, simulation, review, validation, critique, and rework before the wrong design hardens."
+            - paragraph [ref=f12e185]: "The pattern is consistent across the portfolio:"
+            - list [ref=f12e186]:
+              - listitem [ref=f12e187]: "A repo produces artifacts: code, papers, games, chapters, scorecards, maps, or packages."
+              - listitem [ref=f12e188]: Skills and reviewers evaluate those artifacts against an explicit rubric.
+              - listitem [ref=f12e189]: Findings become evidence.
+              - listitem [ref=f12e190]: Repeated evidence becomes a stronger process, a new skill, or a new repo.
+            - paragraph [ref=f12e191]: The series below are the public map.
+            - generic [ref=f12e192]:
+              - 'heading "New portfolio highlight: TAXLANE" [level=2] [ref=f12e193]'
+              - 'link "Permalink: New portfolio highlight: TAXLANE" [ref=f12e194] [cursor=pointer]':
+                - /url: "#new-portfolio-highlight-taxlane"
+            - paragraph [ref=f12e197]:
+              - link "TAXLANE" [ref=f12e198] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/TAXLANE
+              - text: "asks a deceptively simple question:"
+              - strong [ref=f12e199]: what should income-tax rates be if government spending claims have to prove themselves first?
+            - paragraph [ref=f12e200]: Instead of beginning with a desired rate or headline savings number, TAXLANE examines fifteen public-purpose and accounting tracks through one evidence spine. It tests the fiscal object, source currency, net cost, overlap, beneficiary and service-continuity effects, implementation burden, and distribution boundary before admitting a spending reduction. Payment integrity stays non-additive, interest follows the debt path, dedicated old-age solvency stays separate, and revenue finances only the scoped remainder.
+            - paragraph [ref=f12e201]:
+              - text: The completed internal analysis admits
+              - strong [ref=f12e202]: $0.000 billion
+              - text: in FY2026 primary spending reductions, retains a scoped
+              - strong [ref=f12e203]: $813.727 billion
+              - text: ordinary-income target, and recommends
+              - strong [ref=f12e204]: 21/23/33/35/43/46/48
+              - text: "as its preferred analytical marginal bracket schedule, with distinct behavior-contingency and severe-stress rails. Zero is a result: unsupported savings are excluded rather than guessed."
+            - paragraph [ref=f12e205]: The repository includes a 21-deliverable explanation corpus, ten research papers, three presentations, an accessible six-page local website, machine-readable closure records, twelve eight-lens review rounds, and 388 passing tests.
+            - paragraph [ref=f12e206]:
+              - text: Start with the
+              - link "new TAXLANE README" [ref=f12e207] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/TAXLANE
+              - text: ", the"
+              - link "final briefing bundle" [ref=f12e208] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/TAXLANE/blob/main/docs/explanation/final/briefing-bundle-index.md
+              - text: ", or the"
+              - link "local website source" [ref=f12e209] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/TAXLANE/tree/main/docs/explanation/site
+              - text: .
+            - paragraph [ref=f12e210]: TAXLANE is an internal analytical recommendation, not enacted law, personal tax advice, an official score, formal proof of balance, or an authorized public deployment.
+            - generic [ref=f12e211]:
+              - heading "Series" [level=2] [ref=f12e212]
+              - 'link "Permalink: Series" [ref=f12e213] [cursor=pointer]':
+                - /url: "#series"
+            - table [ref=f12e217]:
+              - rowgroup [ref=f12e218]:
+                - row [ref=f12e219]:
+                  - columnheader "Series" [ref=f12e220]
+                  - columnheader "What it contains" [ref=f12e221]
+                  - columnheader "Start here" [ref=f12e222]
+              - rowgroup [ref=f12e223]:
+                - row [ref=f12e224]:
+                  - cell "AI Methodology" [ref=f12e225]
+                  - cell "decision intelligence and simulated expert review" [ref=f12e226]
+                  - cell [ref=f12e227]:
+                    - link "series/ai-methodology.md" [ref=f12e228] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/ai-methodology.md
+                - row [ref=f12e229]:
+                  - cell "Games Design" [ref=f12e230]
+                  - cell "puzzle hunts, D&D, board games, escape rooms, and world-building simulators — with shared simulation and UX infrastructure" [ref=f12e231]
+                  - cell [ref=f12e232]:
+                    - link "series/games-design.md" [ref=f12e233] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/games-design.md
+                - row [ref=f12e234]:
+                  - cell "Knowledge Systems" [ref=f12e235]
+                  - cell "civilization, reference, local-production, and evidence-gated fiscal corpora" [ref=f12e236]
+                  - cell [ref=f12e237]:
+                    - link "series/knowledge-systems.md" [ref=f12e238] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/knowledge-systems.md
+                - row [ref=f12e239]:
+                  - cell "Design Labs" [ref=f12e240]
+                  - cell "visualization, writing, and music scoring labs" [ref=f12e241]
+                  - cell [ref=f12e242]:
+                    - link "series/design-labs.md" [ref=f12e243] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/design-labs.md
+                - row [ref=f12e244]:
+                  - cell "Election Systems" [ref=f12e245]
+                  - cell "redistricting, district plans, count evidence, and audit packages" [ref=f12e246]
+                  - cell [ref=f12e247]:
+                    - link "series/election-systems.md" [ref=f12e248] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/election-systems.md
+                - row [ref=f12e249]:
+                  - cell "Standards & Protocols" [ref=f12e250]
+                  - cell "portable conventions, identifiers, context-transfer formats, and review-panel specs" [ref=f12e251]
+                  - cell [ref=f12e252]:
+                    - link "series/standards-protocols.md" [ref=f12e253] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/standards-protocols.md
+                - row [ref=f12e254]:
+                  - cell "Tools & Infrastructure" [ref=f12e255]
+                  - cell "markdown, context selection and algebra, harness replay, fetch/cache, graph kernels, and partitioning" [ref=f12e256]
+                  - cell [ref=f12e257]:
+                    - link "series/tools-infrastructure.md" [ref=f12e258] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/tools-infrastructure.md
+                - row [ref=f12e259]:
+                  - cell "Applied Systems" [ref=f12e260]
+                  - 'cell "evidence-gated public-system design: highways, rail, grid, ports, water, aviation, connectivity, and applied analytics" [ref=f12e261]'
+                  - cell [ref=f12e262]:
+                    - link "series/applied-systems.md" [ref=f12e263] [cursor=pointer]:
+                      - /url: /giodl73-repo/giodl73-repo/blob/main/series/applied-systems.md
+            - generic [ref=f12e264]:
+              - heading "The MD family" [level=2] [ref=f12e265]
+              - 'link "Permalink: The MD family" [ref=f12e266] [cursor=pointer]':
+                - /url: "#the-md-family"
+            - paragraph [ref=f12e269]: "The MD family is a four-stage Markdown toolchain. Each repository owns one boundary, so the stack is easy to adopt one layer at a time:"
+            - generic [ref=f12e270]:
+              - code [ref=f12e272]: Markdown → MDPATH → MDCROP → MDLOOM → MDPORT address select build transfer
+              - button "Copy code to clipboard" [ref=f12e274] [cursor=pointer]
+            - table [ref=f12e279]:
+              - rowgroup [ref=f12e280]:
+                - row [ref=f12e281]:
+                  - columnheader "Repo" [ref=f12e282]
+                  - columnheader "Responsibility" [ref=f12e283]
+              - rowgroup [ref=f12e284]:
+                - row [ref=f12e285]:
+                  - cell [ref=f12e286]:
+                    - link "MDPATH" [ref=f12e287] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/MDPATH
+                  - cell [ref=f12e288]:
+                    - text: Give headings, figures, tables, and sections stable
+                    - code [ref=f12e289]: md://
+                    - text: addresses.
+                - row [ref=f12e290]:
+                  - cell [ref=f12e291]:
+                    - link "MDCROP" [ref=f12e292] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/MDCROP
+                  - cell "Index, graph, filter, and select bounded Markdown corpus context." [ref=f12e293]
+                - row [ref=f12e294]:
+                  - cell [ref=f12e295]:
+                    - link "MDLOOM" [ref=f12e296] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/MDLOOM
+                  - cell "Validate, compile, render, and publish Markdown into human-facing formats." [ref=f12e297]
+                - row [ref=f12e298]:
+                  - cell [ref=f12e299]:
+                    - link "MDPORT" [ref=f12e300] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/MDPORT
+                  - cell [ref=f12e301]:
+                    - text: Carry compact
+                    - code [ref=f12e302]: mdport.v1
+                    - text: document and corpus-slice records between tools.
+            - generic [ref=f12e303]:
+              - heading "Start with" [level=2] [ref=f12e304]
+              - 'link "Permalink: Start with" [ref=f12e305] [cursor=pointer]':
+                - /url: "#start-with"
+            - paragraph [ref=f12e308]: "These five repos show the portfolio's artifact-to-context through-line: TAXLANE is the new evidence-to-rate knowledge-system highlight; ROUTE is the public-systems flagship; MDCROP selects relevant source context; LATTICE closes and explains that context; FLETCHER records and replays how an AI harness used it."
+            - table [ref=f12e310]:
+              - rowgroup [ref=f12e311]:
+                - row [ref=f12e312]:
+                  - columnheader "Repo" [ref=f12e313]
+                  - columnheader "What it demonstrates" [ref=f12e314]
+              - rowgroup [ref=f12e315]:
+                - row [ref=f12e316]:
+                  - cell [ref=f12e317]:
+                    - link "TAXLANE" [ref=f12e318] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/TAXLANE
+                  - cell "Fifteen evidence-gated fiscal tracks, disciplined zero admission, one accounting spine, and an adaptive analytical rate result." [ref=f12e319]
+                - row [ref=f12e320]:
+                  - cell [ref=f12e321]:
+                    - link "ROUTE" [ref=f12e322] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/ROUTE
+                  - cell "Evidence-gated Interstate 2.0 research, simulation, maps, design doctrine, and reviewed papers." [ref=f12e323]
+                - row [ref=f12e324]:
+                  - cell [ref=f12e325]:
+                    - link "MDCROP" [ref=f12e326] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/MDCROP
+                  - cell "Graph-cut context selection and provenance-aware corpus tooling." [ref=f12e327]
+                - row [ref=f12e328]:
+                  - cell [ref=f12e329]:
+                    - link "LATTICE" [ref=f12e330] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/LATTICE
+                  - cell "Deterministic context closure, meet/join, budgets, frontiers, and receipts." [ref=f12e331]
+                - row [ref=f12e332]:
+                  - cell [ref=f12e333]:
+                    - link "FLETCHER" [ref=f12e334] [cursor=pointer]:
+                      - /url: https://github.com/giodl73-repo/FLETCHER
+                  - cell "Replayable AI harness events, checkpoints, and LATTICE handoffs." [ref=f12e335]
+            - paragraph [ref=f12e336]:
+              - text: ROUTE is open for reference, review, and local adaptation; start with the
+              - link "open adoption guide" [ref=f12e337] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/ROUTE/blob/master/docs/adoption/README.md
+              - text: .
+            - paragraph [ref=f12e338]:
+              - text: The public infrastructure family now extends from highways into
+              - link "rail" [ref=f12e339] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/GAUGE
+              - text: ","
+              - link "connectivity" [ref=f12e340] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/PACKET
+              - text: ","
+              - link "ports" [ref=f12e341] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/HARBOR
+              - text: ","
+              - link "water" [ref=f12e342] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/BASIN
+              - text: ", and"
+              - link "aviation" [ref=f12e343] [cursor=pointer]:
+                - /url: https://github.com/giodl73-repo/TARMAC
+              - text: . See
+              - link "Applied Systems" [ref=f12e344] [cursor=pointer]:
+                - /url: /giodl73-repo/giodl73-repo/blob/main/series/applied-systems.md
+              - text: for the full map and evidence boundaries.
+            - generic [ref=f12e345]:
+              - heading "How to read the portfolio" [level=2] [ref=f12e346]
+              - 'link "Permalink: How to read the portfolio" [ref=f12e347] [cursor=pointer]':
+                - /url: "#how-to-read-the-portfolio"
+            - paragraph [ref=f12e350]: "The repos are not isolated experiments. They form layers:"
+            - list [ref=f12e351]:
+              - listitem [ref=f12e352]:
+                - strong [ref=f12e353]: Methodology
+                - text: repos define how decisions are researched and reviewed.
+              - listitem [ref=f12e354]:
+                - strong [ref=f12e355]: Artifact
+                - text: repos produce serious work in games, knowledge, civic systems, and design.
+              - listitem [ref=f12e356]:
+                - strong [ref=f12e357]: Infrastructure
+                - text: "repos make those artifacts reproducible: stable markdown addresses, compact context-transfer formats, repo-local review panels, corpus compilers, context packs, context algebra, replayable harness events, finished shared fetch/cache substrate for ROUTE, BISECT, and ICELINES, graph kernels, plan packages, audit ledgers, and shared game simulation and UX engines (MUDDLE, RALLY, COURT, RACKET)."
+            - paragraph [ref=f12e358]: "That is the through-line: build the artifact, build the evaluator, then promote the reusable Rust substrate when more than one system needs it."
+            - generic [ref=f12e359]:
+              - heading "Reach me" [level=2] [ref=f12e360]
+              - 'link "Permalink: Reach me" [ref=f12e361] [cursor=pointer]':
+                - /url: "#reach-me"
+            - list [ref=f12e364]:
+              - listitem [ref=f12e365]:
+                - strong [ref=f12e366]: "Email:"
+                - link "giodl73@gmail.com" [ref=f12e367] [cursor=pointer]:
+                  - /url: mailto:giodl73@gmail.com
+              - listitem [ref=f12e368]:
+                - strong [ref=f12e369]: "GitHub:"
+                - link "@giodl73-repo" [ref=f12e370] [cursor=pointer]:
+                  - /url: https://github.com/giodl73-repo
+        - generic [ref=f12e372]:
+          - heading "Pinned Loading" [level=2] [ref=f12e373]:
+            - text: Pinned
+            - generic: Loading
+            - status
+          - list [ref=f12e375]:
+            - listitem [ref=f12e376]:
+              - generic [ref=f12e378]:
+                - generic [ref=f12e380]:
+                  - link "REDIST-OLD" [ref=f12e384] [cursor=pointer]:
+                    - /url: /giodl73-repo/REDIST-OLD
+                  - text: Public
+                - paragraph [ref=f12e385]: Apportionment
+                - paragraph [ref=f12e386]:
+                  - generic [ref=f12e387]: TeX
+            - listitem [ref=f12e389]:
+              - generic [ref=f12e391]:
+                - generic [ref=f12e393]:
+                  - link "PANEL" [ref=f12e397] [cursor=pointer]:
+                    - /url: /giodl73-repo/PANEL
+                  - text: Public
+                - paragraph [ref=f12e398]: Research plugin
+                - paragraph [ref=f12e399]:
+                  - generic [ref=f12e400]: TeX
+            - listitem [ref=f12e402]:
+              - generic [ref=f12e404]:
+                - generic [ref=f12e406]:
+                  - link "SIGNALS" [ref=f12e410] [cursor=pointer]:
+                    - /url: /giodl73-repo/SIGNALS
+                  - text: Public
+                - paragraph [ref=f12e411]: Simulation Skills
+                - paragraph [ref=f12e412]:
+                  - generic [ref=f12e413]: Python
+            - listitem [ref=f12e415]:
+              - generic [ref=f12e417]:
+                - generic [ref=f12e419]:
+                  - link "QUEST" [ref=f12e423] [cursor=pointer]:
+                    - /url: /giodl73-repo/QUEST
+                  - text: Public
+                - paragraph [ref=f12e424]: D&D Factory
+                - paragraph [ref=f12e425]:
+                  - generic [ref=f12e426]: TeX
+            - listitem [ref=f12e428]:
+              - generic [ref=f12e430]:
+                - generic [ref=f12e432]:
+                  - link "TIGRIS" [ref=f12e436] [cursor=pointer]:
+                    - /url: /giodl73-repo/TIGRIS
+                  - text: Public
+                - paragraph [ref=f12e437]: Board Game Factory
+                - paragraph [ref=f12e438]:
+                  - generic [ref=f12e439]: HTML
+        - generic [ref=f12e441]:
+          - generic [ref=f12e443]:
+            - heading "9,960 contributions in the last year" [level=2] [ref=f12e444]
+            - link "Skip to contributions year list" [ref=f12e445] [cursor=pointer]:
+              - /url: "#year-link-2026"
+            - generic [ref=f12e447]:
+              - grid [ref=f12e449]:
+                - caption [ref=f12e450]: Contribution Graph
+                - rowgroup [ref=f12e451]:
+                  - row [ref=f12e452]:
+                    - gridcell "Day of Week" [ref=f12e453]
+                    - gridcell "August" [ref=f12e455]:
+                      - generic [ref=f12e457]: Aug
+                    - gridcell "September" [ref=f12e458]:
+                      - generic [ref=f12e460]: Sep
+                    - gridcell "October" [ref=f12e461]:
+                      - generic [ref=f12e463]: Oct
+                    - gridcell "November" [ref=f12e464]:
+                      - generic [ref=f12e466]: Nov
+                    - gridcell "December" [ref=f12e467]:
+                      - generic [ref=f12e469]: Dec
+                    - gridcell "January" [ref=f12e470]:
+                      - generic [ref=f12e472]: Jan
+                    - gridcell "February" [ref=f12e473]:
+                      - generic [ref=f12e475]: Feb
+                    - gridcell "March" [ref=f12e476]:
+                      - generic [ref=f12e478]: Mar
+                    - gridcell "April" [ref=f12e479]:
+                      - generic [ref=f12e481]: Apr
+                    - gridcell "May" [ref=f12e482]
+                    - gridcell "June" [ref=f12e485]:
+                      - generic [ref=f12e487]: Jun
+                    - gridcell "July" [ref=f12e488]:
+                      - generic [ref=f12e490]: Jul
+                    - gridcell "August" [ref=f12e491]:
+                      - generic [ref=f12e493]: Aug
+                - rowgroup [ref=f12e494]:
+                  - row [ref=f12e495]:
+                    - gridcell "Sunday" [ref=f12e496]:
+                      - generic [ref=f12e498]: Sun
+                    - gridcell "No contributions on August 10th." [ref=f12e499]
+                    - gridcell "No contributions on August 17th." [ref=f12e500]
+                    - gridcell "No contributions on August 24th." [ref=f12e501]
+                    - gridcell "No contributions on August 31st." [ref=f12e502]
+                    - gridcell "No contributions on September 7th." [ref=f12e503]
+                    - gridcell "No contributions on September 14th." [ref=f12e504]
+                    - gridcell "No contributions on September 21st." [ref=f12e505]
+                    - gridcell "No contributions on September 28th." [ref=f12e506]
+                    - gridcell "No contributions on October 5th." [ref=f12e507]
+                    - gridcell "No contributions on October 12th." [ref=f12e508]
+                    - gridcell "No contributions on October 19th." [ref=f12e509]
+                    - gridcell "No contributions on October 26th." [ref=f12e510]
+                    - gridcell "No contributions on November 2nd." [ref=f12e511]
+                    - gridcell "No contributions on November 9th." [ref=f12e512]
+                    - gridcell "No contributions on November 16th." [ref=f12e513]
+                    - gridcell "No contributions on November 23rd." [ref=f12e514]
+                    - gridcell "No contributions on November 30th." [ref=f12e515]
+                    - gridcell "No contributions on December 7th." [ref=f12e516]
+                    - gridcell "No contributions on December 14th." [ref=f12e517]
+                    - gridcell "No contributions on December 21st." [ref=f12e518]
+                    - gridcell "No contributions on December 28th." [ref=f12e519]
+                    - gridcell "No contributions on January 4th." [ref=f12e520]
+                    - gridcell "No contributions on January 11th." [ref=f12e521]
+                    - gridcell "No contributions on January 18th." [ref=f12e522]
+                    - gridcell "No contributions on January 25th." [ref=f12e523]
+                    - gridcell "No contributions on February 1st." [ref=f12e524]
+                    - gridcell "No contributions on February 8th." [ref=f12e525]
+                    - gridcell "No contributions on February 15th." [ref=f12e526]
+                    - gridcell "61 contributions on February 22nd." [ref=f12e527]
+                    - gridcell "No contributions on March 1st." [ref=f12e528]
+                    - gridcell "No contributions on March 8th." [ref=f12e529]
+                    - gridcell "No contributions on March 15th." [ref=f12e530]
+                    - gridcell "No contributions on March 22nd." [ref=f12e531]
+                    - gridcell "No contributions on March 29th." [ref=f12e532]
+                    - gridcell "No contributions on April 5th." [ref=f12e533]
+                    - gridcell "No contributions on April 12th." [ref=f12e534]
+                    - gridcell "201 contributions on April 19th." [ref=f12e535]
+                    - gridcell "185 contributions on April 26th." [ref=f12e536]
+                    - gridcell "210 contributions on May 3rd." [ref=f12e537]
+                    - gridcell "150 contributions on May 10th." [ref=f12e538]
+                    - gridcell "297 contributions on May 17th." [ref=f12e539]
+                    - gridcell "11 contributions on May 24th." [ref=f12e540]
+                    - gridcell "39 contributions on May 31st." [ref=f12e541]
+                    - gridcell "No contributions on June 7th." [ref=f12e542]
+                    - gridcell "No contributions on June 14th." [ref=f12e543]
+                    - gridcell "323 contributions on June 21st." [ref=f12e544]
+                    - gridcell "38 contributions on June 28th." [ref=f12e545]
+                    - gridcell "35 contributions on July 5th." [ref=f12e546]
+                    - gridcell "72 contributions on July 12th." [ref=f12e547]
+                    - gridcell "63 contributions on July 19th." [ref=f12e548]
+                    - gridcell "85 contributions on July 26th." [ref=f12e549]
+                    - gridcell "10 contributions on August 2nd." [ref=f12e550]
+                    - gridcell "25 contributions on August 9th." [ref=f12e551]
+                  - row [ref=f12e552]:
+                    - gridcell "Monday" [ref=f12e553]:
+                      - generic [ref=f12e555]: Mon
+                    - gridcell "No contributions on August 11th." [ref=f12e556]
+                    - gridcell "No contributions on August 18th." [ref=f12e557]
+                    - gridcell "No contributions on August 25th." [ref=f12e558]
+                    - gridcell "No contributions on September 1st." [ref=f12e559]
+                    - gridcell "No contributions on September 8th." [ref=f12e560]
+                    - gridcell "No contributions on September 15th." [ref=f12e561]
+                    - gridcell "No contributions on September 22nd." [ref=f12e562]
+                    - gridcell "No contributions on September 29th." [ref=f12e563]
+                    - gridcell "No contributions on October 6th." [ref=f12e564]
+                    - gridcell "No contributions on October 13th." [ref=f12e565]
+                    - gridcell "No contributions on October 20th." [ref=f12e566]
+                    - gridcell "No contributions on October 27th." [ref=f12e567]
+                    - gridcell "No contributions on November 3rd." [ref=f12e568]
+                    - gridcell "No contributions on November 10th." [ref=f12e569]
+                    - gridcell "No contributions on November 17th." [ref=f12e570]
+                    - gridcell "No contributions on November 24th." [ref=f12e571]
+                    - gridcell "No contributions on December 1st." [ref=f12e572]
+                    - gridcell "No contributions on December 8th." [ref=f12e573]
+                    - gridcell "No contributions on December 15th." [ref=f12e574]
+                    - gridcell "No contributions on December 22nd." [ref=f12e575]
+                    - gridcell "No contributions on December 29th." [ref=f12e576]
+                    - gridcell "No contributions on January 5th." [ref=f12e577]
+                    - gridcell "No contributions on January 12th." [ref=f12e578]
+                    - gridcell "No contributions on January 19th." [ref=f12e579]
+                    - gridcell "No contributions on January 26th." [ref=f12e580]
+                    - gridcell "No contributions on February 2nd." [ref=f12e581]
+                    - gridcell "No contributions on February 9th." [ref=f12e582]
+                    - gridcell "No contributions on February 16th." [ref=f12e583]
+                    - gridcell "15 contributions on February 23rd." [ref=f12e584]
+                    - gridcell "No contributions on March 2nd." [ref=f12e585]
+                    - gridcell "No contributions on March 9th." [ref=f12e586]
+                    - gridcell "No contributions on March 16th." [ref=f12e587]
+                    - gridcell "No contributions on March 23rd." [ref=f12e588]
+                    - gridcell "No contributions on March 30th." [ref=f12e589]
+                    - gridcell "No contributions on April 6th." [ref=f12e590]
+                    - gridcell "No contributions on April 13th." [ref=f12e591]
+                    - gridcell "63 contributions on April 20th." [ref=f12e592]
+                    - gridcell "166 contributions on April 27th." [ref=f12e593]
+                    - gridcell "129 contributions on May 4th." [ref=f12e594]
+                    - gridcell "145 contributions on May 11th." [ref=f12e595]
+                    - gridcell "493 contributions on May 18th." [ref=f12e596]
+                    - gridcell "14 contributions on May 25th." [ref=f12e597]
+                    - gridcell "115 contributions on June 1st." [ref=f12e598]
+                    - gridcell "No contributions on June 8th." [ref=f12e599]
+                    - gridcell "2 contributions on June 15th." [ref=f12e600]
+                    - gridcell "197 contributions on June 22nd." [ref=f12e601]
+                    - gridcell "1 contribution on June 29th." [ref=f12e602]
+                    - gridcell "48 contributions on July 6th." [ref=f12e603]
+                    - gridcell "42 contributions on July 13th." [ref=f12e604]
+                    - gridcell "85 contributions on July 20th." [ref=f12e605]
+                    - gridcell "60 contributions on July 27th." [ref=f12e606]
+                    - gridcell "12 contributions on August 3rd." [ref=f12e607]
+                    - gridcell "35 contributions on August 10th." [ref=f12e608]
+                  - row [ref=f12e609]:
+                    - gridcell "Tuesday" [ref=f12e610]:
+                      - generic [ref=f12e612]: Tue
+                    - gridcell "No contributions on August 12th." [ref=f12e613]
+                    - gridcell "No contributions on August 19th." [ref=f12e614]
+                    - gridcell "No contributions on August 26th." [ref=f12e615]
+                    - gridcell "No contributions on September 2nd." [ref=f12e616]
+                    - gridcell "No contributions on September 9th." [ref=f12e617]
+                    - gridcell "No contributions on September 16th." [ref=f12e618]
+                    - gridcell "No contributions on September 23rd." [ref=f12e619]
+                    - gridcell "1 contribution on September 30th." [ref=f12e620]
+                    - gridcell "No contributions on October 7th." [ref=f12e621]
+                    - gridcell "No contributions on October 14th." [ref=f12e622]
+                    - gridcell "No contributions on October 21st." [ref=f12e623]
+                    - gridcell "No contributions on October 28th." [ref=f12e624]
+                    - gridcell "No contributions on November 4th." [ref=f12e625]
+                    - gridcell "No contributions on November 11th." [ref=f12e626]
+                    - gridcell "No contributions on November 18th." [ref=f12e627]
+                    - gridcell "No contributions on November 25th." [ref=f12e628]
+                    - gridcell "No contributions on December 2nd." [ref=f12e629]
+                    - gridcell "No contributions on December 9th." [ref=f12e630]
+                    - gridcell "No contributions on December 16th." [ref=f12e631]
+                    - gridcell "No contributions on December 23rd." [ref=f12e632]
+                    - gridcell "No contributions on December 30th." [ref=f12e633]
+                    - gridcell "No contributions on January 6th." [ref=f12e634]
+                    - gridcell "No contributions on January 13th." [ref=f12e635]
+                    - gridcell "No contributions on January 20th." [ref=f12e636]
+                    - gridcell "No contributions on January 27th." [ref=f12e637]
+                    - gridcell "No contributions on February 3rd." [ref=f12e638]
+                    - gridcell "No contributions on February 10th." [ref=f12e639]
+                    - gridcell "No contributions on February 17th." [ref=f12e640]
+                    - gridcell "6 contributions on February 24th." [ref=f12e641]
+                    - gridcell "No contributions on March 3rd." [ref=f12e642]
+                    - gridcell "No contributions on March 10th." [ref=f12e643]
+                    - gridcell "No contributions on March 17th." [ref=f12e644]
+                    - gridcell "No contributions on March 24th." [ref=f12e645]
+                    - gridcell "No contributions on March 31st." [ref=f12e646]
+                    - gridcell "No contributions on April 7th." [ref=f12e647]
+                    - gridcell "2 contributions on April 14th." [ref=f12e648]
+                    - gridcell "13 contributions on April 21st." [ref=f12e649]
+                    - gridcell "81 contributions on April 28th." [ref=f12e650]
+                    - gridcell "122 contributions on May 5th." [ref=f12e651]
+                    - gridcell "241 contributions on May 12th." [ref=f12e652]
+                    - gridcell "110 contributions on May 19th." [ref=f12e653]
+                    - gridcell "49 contributions on May 26th." [ref=f12e654]
+                    - gridcell "40 contributions on June 2nd." [ref=f12e655]
+                    - gridcell "No contributions on June 9th." [ref=f12e656]
+                    - gridcell "21 contributions on June 16th." [ref=f12e657]
+                    - gridcell "232 contributions on June 23rd." [ref=f12e658]
+                    - gridcell "11 contributions on June 30th." [ref=f12e659]
+                    - gridcell "33 contributions on July 7th." [ref=f12e660]
+                    - gridcell "56 contributions on July 14th." [ref=f12e661]
+                    - gridcell "23 contributions on July 21st." [ref=f12e662]
+                    - gridcell "69 contributions on July 28th." [ref=f12e663]
+                    - gridcell "21 contributions on August 4th." [ref=f12e664]
+                    - gridcell "80 contributions on August 11th." [ref=f12e665]
+                  - row [ref=f12e666]:
+                    - gridcell "Wednesday" [ref=f12e667]:
+                      - generic [ref=f12e669]: Wed
+                    - gridcell "No contributions on August 13th." [ref=f12e670]
+                    - gridcell "No contributions on August 20th." [ref=f12e671]
+                    - gridcell "No contributions on August 27th." [ref=f12e672]
+                    - gridcell "No contributions on September 3rd." [ref=f12e673]
+                    - gridcell "No contributions on September 10th." [ref=f12e674]
+                    - gridcell "No contributions on September 17th." [ref=f12e675]
+                    - gridcell "No contributions on September 24th." [ref=f12e676]
+                    - gridcell "No contributions on October 1st." [ref=f12e677]
+                    - gridcell "No contributions on October 8th." [ref=f12e678]
+                    - gridcell "No contributions on October 15th." [ref=f12e679]
+                    - gridcell "No contributions on October 22nd." [ref=f12e680]
+                    - gridcell "No contributions on October 29th." [ref=f12e681]
+                    - gridcell "No contributions on November 5th." [ref=f12e682]
+                    - gridcell "No contributions on November 12th." [ref=f12e683]
+                    - gridcell "No contributions on November 19th." [ref=f12e684]
+                    - gridcell "No contributions on November 26th." [ref=f12e685]
+                    - gridcell "No contributions on December 3rd." [ref=f12e686]
+                    - gridcell "No contributions on December 10th." [ref=f12e687]
+                    - gridcell "No contributions on December 17th." [ref=f12e688]
+                    - gridcell "No contributions on December 24th." [ref=f12e689]
+                    - gridcell "No contributions on December 31st." [ref=f12e690]
+                    - gridcell "No contributions on January 7th." [ref=f12e691]
+                    - gridcell "No contributions on January 14th." [ref=f12e692]
+                    - gridcell "No contributions on January 21st." [ref=f12e693]
+                    - gridcell "No contributions on January 28th." [ref=f12e694]
+                    - gridcell "No contributions on February 4th." [ref=f12e695]
+                    - gridcell "No contributions on February 11th." [ref=f12e696]
+                    - gridcell "No contributions on February 18th." [ref=f12e697]
+                    - gridcell "45 contributions on February 25th." [ref=f12e698]
+                    - gridcell "No contributions on March 4th." [ref=f12e699]
+                    - gridcell "No contributions on March 11th." [ref=f12e700]
+                    - gridcell "No contributions on March 18th." [ref=f12e701]
+                    - gridcell "No contributions on March 25th." [ref=f12e702]
+                    - gridcell "No contributions on April 1st." [ref=f12e703]
+                    - gridcell "No contributions on April 8th." [ref=f12e704]
+                    - gridcell "61 contributions on April 15th." [ref=f12e705]
+                    - gridcell "27 contributions on April 22nd." [ref=f12e706]
+                    - gridcell "94 contributions on April 29th." [ref=f12e707]
+                    - gridcell "198 contributions on May 6th." [ref=f12e708]
+                    - gridcell "173 contributions on May 13th." [ref=f12e709]
+                    - gridcell "56 contributions on May 20th." [ref=f12e710]
+                    - gridcell "32 contributions on May 27th." [ref=f12e711]
+                    - gridcell "19 contributions on June 3rd." [ref=f12e712]
+                    - gridcell "No contributions on June 10th." [ref=f12e713]
+                    - gridcell "33 contributions on June 17th." [ref=f12e714]
+                    - gridcell "124 contributions on June 24th." [ref=f12e715]
+                    - gridcell "13 contributions on July 1st." [ref=f12e716]
+                    - gridcell "36 contributions on July 8th." [ref=f12e717]
+                    - gridcell "70 contributions on July 15th." [ref=f12e718]
+                    - gridcell "47 contributions on July 22nd." [ref=f12e719]
+                    - gridcell "127 contributions on July 29th." [ref=f12e720]
+                    - gridcell "65 contributions on August 5th." [ref=f12e721]
+                    - gridcell "No contributions on August 12th." [ref=f12e722]
+                  - row [ref=f12e723]:
+                    - gridcell "Thursday" [ref=f12e724]:
+                      - generic [ref=f12e726]: Thu
+                    - gridcell "No contributions on August 14th." [ref=f12e727]
+                    - gridcell "No contributions on August 21st." [ref=f12e728]
+                    - gridcell "No contributions on August 28th." [ref=f12e729]
+                    - gridcell "No contributions on September 4th." [ref=f12e730]
+                    - gridcell "No contributions on September 11th." [ref=f12e731]
+                    - gridcell "No contributions on September 18th." [ref=f12e732]
+                    - gridcell "No contributions on September 25th." [ref=f12e733]
+                    - gridcell "No contributions on October 2nd." [ref=f12e734]
+                    - gridcell "No contributions on October 9th." [ref=f12e735]
+                    - gridcell "No contributions on October 16th." [ref=f12e736]
+                    - gridcell "No contributions on October 23rd." [ref=f12e737]
+                    - gridcell "No contributions on October 30th." [ref=f12e738]
+                    - gridcell "No contributions on November 6th." [ref=f12e739]
+                    - gridcell "No contributions on November 13th." [ref=f12e740]
+                    - gridcell "No contributions on November 20th." [ref=f12e741]
+                    - gridcell "No contributions on November 27th." [ref=f12e742]
+                    - gridcell "No contributions on December 4th." [ref=f12e743]
+                    - gridcell "No contributions on December 11th." [ref=f12e744]
+                    - gridcell "No contributions on December 18th." [ref=f12e745]
+                    - gridcell "No contributions on December 25th." [ref=f12e746]
+                    - gridcell "No contributions on January 1st." [ref=f12e747]
+                    - gridcell "No contributions on January 8th." [ref=f12e748]
+                    - gridcell "No contributions on January 15th." [ref=f12e749]
+                    - gridcell "No contributions on January 22nd." [ref=f12e750]
+                    - gridcell "No contributions on January 29th." [ref=f12e751]
+                    - gridcell "No contributions on February 5th." [ref=f12e752]
+                    - gridcell "No contributions on February 12th." [ref=f12e753]
+                    - gridcell "No contributions on February 19th." [ref=f12e754]
+                    - gridcell "167 contributions on February 26th." [ref=f12e755]
+                    - gridcell "No contributions on March 5th." [ref=f12e756]
+                    - gridcell "No contributions on March 12th." [ref=f12e757]
+                    - gridcell "No contributions on March 19th." [ref=f12e758]
+                    - gridcell "No contributions on March 26th." [ref=f12e759]
+                    - gridcell "No contributions on April 2nd." [ref=f12e760]
+                    - gridcell "No contributions on April 9th." [ref=f12e761]
+                    - gridcell "30 contributions on April 16th." [ref=f12e762]
+                    - gridcell "38 contributions on April 23rd." [ref=f12e763]
+                    - gridcell "55 contributions on April 30th." [ref=f12e764]
+                    - gridcell "149 contributions on May 7th." [ref=f12e765]
+                    - gridcell "208 contributions on May 14th." [ref=f12e766]
+                    - gridcell "22 contributions on May 21st." [ref=f12e767]
+                    - gridcell "25 contributions on May 28th." [ref=f12e768]
+                    - gridcell "2 contributions on June 4th." [ref=f12e769]
+                    - gridcell "No contributions on June 11th." [ref=f12e770]
+                    - gridcell "29 contributions on June 18th." [ref=f12e771]
+                    - gridcell "45 contributions on June 25th." [ref=f12e772]
+                    - gridcell "45 contributions on July 2nd." [ref=f12e773]
+                    - gridcell "17 contributions on July 9th." [ref=f12e774]
+                    - gridcell "15 contributions on July 16th." [ref=f12e775]
+                    - gridcell "24 contributions on July 23rd." [ref=f12e776]
+                    - gridcell "93 contributions on July 30th." [ref=f12e777]
+                    - gridcell "76 contributions on August 6th." [ref=f12e778]
+                    - gridcell [ref=f12e779]
+                  - row [ref=f12e780]:
+                    - gridcell "Friday" [ref=f12e781]:
+                      - generic [ref=f12e783]: Fri
+                    - gridcell "No contributions on August 15th." [ref=f12e784]
+                    - gridcell "No contributions on August 22nd." [ref=f12e785]
+                    - gridcell "No contributions on August 29th." [ref=f12e786]
+                    - gridcell "No contributions on September 5th." [ref=f12e787]
+                    - gridcell "No contributions on September 12th." [ref=f12e788]
+                    - gridcell "No contributions on September 19th." [ref=f12e789]
+                    - gridcell "No contributions on September 26th." [ref=f12e790]
+                    - gridcell "No contributions on October 3rd." [ref=f12e791]
+                    - gridcell "No contributions on October 10th." [ref=f12e792]
+                    - gridcell "No contributions on October 17th." [ref=f12e793]
+                    - gridcell "No contributions on October 24th." [ref=f12e794]
+                    - gridcell "No contributions on October 31st." [ref=f12e795]
+                    - gridcell "No contributions on November 7th." [ref=f12e796]
+                    - gridcell "No contributions on November 14th." [ref=f12e797]
+                    - gridcell "No contributions on November 21st." [ref=f12e798]
+                    - gridcell "No contributions on November 28th." [ref=f12e799]
+                    - gridcell "No contributions on December 5th." [ref=f12e800]
+                    - gridcell "No contributions on December 12th." [ref=f12e801]
+                    - gridcell "No contributions on December 19th." [ref=f12e802]
+                    - gridcell "No contributions on December 26th." [ref=f12e803]
+                    - gridcell "No contributions on January 2nd." [ref=f12e804]
+                    - gridcell "No contributions on January 9th." [ref=f12e805]
+                    - gridcell "No contributions on January 16th." [ref=f12e806]
+                    - gridcell "No contributions on January 23rd." [ref=f12e807]
+                    - gridcell "No contributions on January 30th." [ref=f12e808]
+                    - gridcell "No contributions on February 6th." [ref=f12e809]
+                    - gridcell "No contributions on February 13th." [ref=f12e810]
+                    - gridcell "No contributions on February 20th." [ref=f12e811]
+                    - gridcell "144 contributions on February 27th." [ref=f12e812]
+                    - gridcell "No contributions on March 6th." [ref=f12e813]
+                    - gridcell "No contributions on March 13th." [ref=f12e814]
+                    - gridcell "No contributions on March 20th." [ref=f12e815]
+                    - gridcell "No contributions on March 27th." [ref=f12e816]
+                    - gridcell "No contributions on April 3rd." [ref=f12e817]
+                    - gridcell "No contributions on April 10th." [ref=f12e818]
+                    - gridcell "2 contributions on April 17th." [ref=f12e819]
+                    - gridcell "190 contributions on April 24th." [ref=f12e820]
+                    - gridcell "156 contributions on May 1st." [ref=f12e821]
+                    - gridcell "107 contributions on May 8th." [ref=f12e822]
+                    - gridcell "461 contributions on May 15th." [ref=f12e823]
+                    - gridcell "24 contributions on May 22nd." [ref=f12e824]
+                    - gridcell "3 contributions on May 29th." [ref=f12e825]
+                    - gridcell "3 contributions on June 5th." [ref=f12e826]
+                    - gridcell "No contributions on June 12th." [ref=f12e827]
+                    - gridcell "110 contributions on June 19th." [ref=f12e828]
+                    - gridcell "26 contributions on June 26th." [ref=f12e829]
+                    - gridcell "31 contributions on July 3rd." [ref=f12e830]
+                    - gridcell "20 contributions on July 10th." [ref=f12e831]
+                    - gridcell "29 contributions on July 17th." [ref=f12e832]
+                    - gridcell "36 contributions on July 24th." [ref=f12e833]
+                    - gridcell "45 contributions on July 31st." [ref=f12e834]
+                    - gridcell "51 contributions on August 7th." [ref=f12e835]
+                    - gridcell [ref=f12e836]
+                  - row [ref=f12e837]:
+                    - gridcell "Saturday" [ref=f12e838]:
+                      - generic [ref=f12e840]: Sat
+                    - gridcell "No contributions on August 16th." [ref=f12e841]
+                    - gridcell "No contributions on August 23rd." [ref=f12e842]
+                    - gridcell "No contributions on August 30th." [ref=f12e843]
+                    - gridcell "No contributions on September 6th." [ref=f12e844]
+                    - gridcell "No contributions on September 13th." [ref=f12e845]
+                    - gridcell "No contributions on September 20th." [ref=f12e846]
+                    - gridcell "No contributions on September 27th." [ref=f12e847]
+                    - gridcell "No contributions on October 4th." [ref=f12e848]
+                    - gridcell "No contributions on October 11th." [ref=f12e849]
+                    - gridcell "No contributions on October 18th." [ref=f12e850]
+                    - gridcell "No contributions on October 25th." [ref=f12e851]
+                    - gridcell "No contributions on November 1st." [ref=f12e852]
+                    - gridcell "No contributions on November 8th." [ref=f12e853]
+                    - gridcell "No contributions on November 15th." [ref=f12e854]
+                    - gridcell "No contributions on November 22nd." [ref=f12e855]
+                    - gridcell "No contributions on November 29th." [ref=f12e856]
+                    - gridcell "No contributions on December 6th." [ref=f12e857]
+                    - gridcell "No contributions on December 13th." [ref=f12e858]
+                    - gridcell "No contributions on December 20th." [ref=f12e859]
+                    - gridcell "No contributions on December 27th." [ref=f12e860]
+                    - gridcell "No contributions on January 3rd." [ref=f12e861]
+                    - gridcell "No contributions on January 10th." [ref=f12e862]
+                    - gridcell "No contributions on January 17th." [ref=f12e863]
+                    - gridcell "No contributions on January 24th." [ref=f12e864]
+                    - gridcell "No contributions on January 31st." [ref=f12e865]
+                    - gridcell "No contributions on February 7th." [ref=f12e866]
+                    - gridcell "No contributions on February 14th." [ref=f12e867]
+                    - gridcell "No contributions on February 21st." [ref=f12e868]
+                    - gridcell "49 contributions on February 28th." [ref=f12e869]
+                    - gridcell "No contributions on March 7th." [ref=f12e870]
+                    - gridcell "2 contributions on March 14th." [ref=f12e871]
+                    - gridcell "No contributions on March 21st." [ref=f12e872]
+                    - gridcell "No contributions on March 28th." [ref=f12e873]
+                    - gridcell "No contributions on April 4th." [ref=f12e874]
+                    - gridcell "No contributions on April 11th." [ref=f12e875]
+                    - gridcell "26 contributions on April 18th." [ref=f12e876]
+                    - gridcell "217 contributions on April 25th." [ref=f12e877]
+                    - gridcell "95 contributions on May 2nd." [ref=f12e878]
+                    - gridcell "257 contributions on May 9th." [ref=f12e879]
+                    - gridcell "515 contributions on May 16th." [ref=f12e880]
+                    - gridcell "34 contributions on May 23rd." [ref=f12e881]
+                    - gridcell "4 contributions on May 30th." [ref=f12e882]
+                    - gridcell "No contributions on June 6th." [ref=f12e883]
+                    - gridcell "1 contribution on June 13th." [ref=f12e884]
+                    - gridcell "163 contributions on June 20th." [ref=f12e885]
+                    - gridcell "23 contributions on June 27th." [ref=f12e886]
+                    - gridcell "71 contributions on July 4th." [ref=f12e887]
+                    - gridcell "44 contributions on July 11th." [ref=f12e888]
+                    - gridcell "47 contributions on July 18th." [ref=f12e889]
+                    - gridcell "28 contributions on July 25th." [ref=f12e890]
+                    - gridcell "9 contributions on August 1st." [ref=f12e891]
+                    - gridcell "39 contributions on August 8th." [ref=f12e892]
+                    - gridcell [ref=f12e893]
+              - generic [ref=f12e894]:
+                - link "Learn how we count contributions" [ref=f12e896] [cursor=pointer]:
+                  - /url: https://docs.github.com/articles/why-are-my-contributions-not-showing-up-on-my-profile
+                - generic [ref=f12e897]:
+                  - generic [ref=f12e898]: Less
+                  - generic [ref=f12e899]: No contributions.
+                  - generic [ref=f12e901]: Low contributions.
+                  - generic [ref=f12e903]: Medium-low contributions.
+                  - generic [ref=f12e905]: Medium-high contributions.
+                  - generic [ref=f12e907]: High contributions.
+                  - generic [ref=f12e909]: More
+          - generic [ref=f12e910]:
+            - list [ref=f12e912]:
+              - listitem [ref=f12e913]:
+                - link "Contribution activity in 2026, 1 of 2" [ref=f12e914] [cursor=pointer]:
+                  - /url: /giodl73-repo?tab=overview&from=2026-08-01&to=2026-08-12
+                  - text: "2026"
+              - listitem [ref=f12e915]:
+                - link "Contribution activity in 2025, 2 of 2" [ref=f12e916] [cursor=pointer]:
+                  - /url: /giodl73-repo?tab=overview&from=2025-12-01&to=2025-12-31
+                  - text: "2025"
+            - heading "Contribution activity" [level=2] [ref=f12e917]
+            - generic [ref=f12e919]:
+              - heading "August 2026" [level=3] [ref=f12e920]
+              - group [ref=f12e928]:
+                - button [ref=f12e929] [cursor=pointer]
+              - group [ref=f12e940]:
+                - button "Created 4 repositories" [expanded] [ref=f12e941] [cursor=pointer]
+                - list [ref=f12e948]:
+                  - listitem [ref=f12e949]:
+                    - link "giodl73-repo/TURF" [ref=f12e954] [cursor=pointer]:
+                      - /url: /giodl73-repo/TURF
+                    - generic [ref=f12e955]: Rust
+                    - generic [ref=f12e958]:
+                      - generic [ref=f12e959]: This contribution was made on Aug 10
+                      - time [ref=f12e960]: Aug 10
+                  - listitem [ref=f12e961]:
+                    - link "giodl73-repo/LIFT" [ref=f12e966] [cursor=pointer]:
+                      - /url: /giodl73-repo/LIFT
+                    - generic [ref=f12e967]:
+                      - text: Built by
+                      - link [ref=f12e968] [cursor=pointer]:
+                        - /url: /giodl73-repo
+                        - img "@giodl73-repo" [ref=f12e969]
+                      - link [ref=f12e970] [cursor=pointer]:
+                        - /url: /apps/github-copilot-cli
+                        - img "@Copilot" [ref=f12e971]
+                    - generic [ref=f12e972]:
+                      - generic [ref=f12e973]: This contribution was made on Aug 7
+                      - time [ref=f12e974]: Aug 7
+                  - listitem [ref=f12e975]:
+                    - link "giodl73-repo/clawsweeper" [ref=f12e980] [cursor=pointer]:
+                      - /url: /giodl73-repo/clawsweeper
+                    - generic [ref=f12e981]: TypeScript
+                    - generic [ref=f12e984]:
+                      - generic [ref=f12e985]: This contribution was made on Aug 7
+                      - time [ref=f12e986]: Aug 7
+                  - listitem [ref=f12e987]:
+                    - link "giodl73-repo/STACK-AND-TRACK" [ref=f12e992] [cursor=pointer]:
+                      - /url: /giodl73-repo/STACK-AND-TRACK
+                    - generic [ref=f12e994]:
+                      - generic [ref=f12e995]: This contribution was made on Aug 7
+                      - time [ref=f12e996]: Aug 7
+              - generic [ref=f12e1001]:
+                - generic [ref=f12e1002]:
+                  - heading [level=4] [ref=f12e1003]:
+                    - text: Created a pull request in
+                    - link "openclaw/openclaw" [ref=f12e1004] [cursor=pointer]:
+                      - /url: /openclaw/openclaw
+                    - text: that received 24 comments
+                  - link [ref=f12e1005] [cursor=pointer]:
+                    - /url: /giodl73-repo?tab=overview&from=2026-08-01&to=2026-08-31
+                    - time [ref=f12e1006]: Aug 10
+                - generic [ref=f12e1010]:
+                  - heading [level=3] [ref=f12e1011]:
+                    - 'link "fix(claws): freeze installed tool profile authority" [ref=f12e1012] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/121327
+                  - paragraph [ref=f12e1014]:
+                    - text: "Related:"
+                    - link "openclaw/rfcs#48" [ref=f12e1015] [cursor=pointer]:
+                      - /url: https://github.com/openclaw/rfcs/pull/48
+                    - text: Status
+                    - strong [ref=f12e1016]: Ready for exact-head maintainer review; merge after required checks are green.
+                    - text: "Exact head:"
+                    - code [ref=f12e1017]: 2aaa35db20ed2f438374de…
+                  - generic [ref=f12e1018]:
+                    - generic [ref=f12e1019]: +2,450 −227 lines changed •
+                    - text: 24 comments
+              - group [ref=f12e1031]:
+                - button "Opened 79 other pull requests in 11 repositories" [ref=f12e1032] [cursor=pointer]
+            - generic [ref=f12e1038]:
+              - generic: Loading
+              - button "Show more activity" [ref=f12e1040] [cursor=pointer]
+  - contentinfo [ref=f12e1041]:
+    - heading "Footer" [level=2] [ref=f12e1042]
+    - generic [ref=f12e1043]:
+      - generic [ref=f12e1044]:
+        - link "GitHub Homepage" [ref=f12e1045] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f12e1048]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f12e1049]:
+        - heading "Footer navigation" [level=3] [ref=f12e1050]
+        - list "Footer navigation" [ref=f12e1051]:
+          - listitem [ref=f12e1052]:
+            - link "Terms" [ref=f12e1053] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f12e1054]:
+            - link "Privacy" [ref=f12e1055] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f12e1056]:
+            - link "Security" [ref=f12e1057] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f12e1058]:
+            - link "Status" [ref=f12e1059] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f12e1060]:
+            - link "Community" [ref=f12e1061] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f12e1062]:
+            - link "Docs" [ref=f12e1063] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f12e1064]:
+            - link "Contact" [ref=f12e1065] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f12e1066]:
+            - button "Manage cookies" [ref=f12e1068] [cursor=pointer]
+          - listitem [ref=f12e1069]:
+            - button "Do not share my personal information" [ref=f12e1071] [cursor=pointer]

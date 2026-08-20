@@ -1,0 +1,62 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-20T16:48:39.465Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/listings_raw.json",
+      "sha256": "49c6d53a835877b6699eefcdc74a22541194e126fcd9c952c465ed1b66cd9133",
+      "capturedAt": "2026-08-20T16:49:25.959Z"
+    },
+    {
+      "filename": "scratch/workspace/listings_page2.json",
+      "sha256": "b4b7dd6b4ced3aaf61b08e770e1abbbe7b9fbd681e8cd50bdee796c4327b51aa",
+      "capturedAt": "2026-08-20T16:49:48.391Z"
+    },
+    {
+      "filename": "scratch/workspace/combined_30.json",
+      "sha256": "2fa41cfc0811546443a503c85a680547960bf3eccf438ea6a1f5eb45421f49db",
+      "capturedAt": "2026-08-20T16:50:04.381Z"
+    },
+    {
+      "filename": "scratch/workspace/parsed_30.json",
+      "sha256": "96c4421129c9a21c5744aedb9698944a7fa0104eb3f72808e5f7da7d42a4c8aa",
+      "capturedAt": "2026-08-20T16:50:33.638Z"
+    },
+    {
+      "filename": "scratch/workspace/listings_section.md",
+      "sha256": "7c4f9fe360c6290862472a3f5487e2a706342b802dc97ed60684d480de5c3fa4",
+      "capturedAt": "2026-08-20T16:50:46.970Z"
+    },
+    {
+      "filename": "scratch/workspace/listings_full.md",
+      "sha256": "1c724fd12c2da7caa6b91185817c98156afc54189220be001245fe966210905a",
+      "capturedAt": "2026-08-20T16:51:03.016Z"
+    },
+    {
+      "filename": "scratch/workspace/header.md",
+      "sha256": "bc5c231ace40675aa2d1e5ab1f1920b5988514c921cf88d7f7129018fc9c9ce2",
+      "capturedAt": "2026-08-20T16:51:03.049Z"
+    },
+    {
+      "filename": "scratch/workspace/answer.md",
+      "sha256": "c094faf6e91e89bbb305cc8ed195627a13931b1710d8618d4b3f69903d744465",
+      "capturedAt": "2026-08-20T16:51:19.411Z"
+    },
+    {
+      "filename": "scratch/workspace/overall_summary.md",
+      "sha256": "cd9793cae0ba671e77c949bf5223485510b8723d5b232489e75e5b24dd8abe93",
+      "capturedAt": "2026-08-20T16:51:19.440Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "c094faf6e91e89bbb305cc8ed195627a13931b1710d8618d4b3f69903d744465",
+      "sourceUrl": "https://www.airbnb.com/s/Lake-Tahoe/homes?checkin=2026-08-24&checkout=2026-08-31&adults=2",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-20T16:51:30.125Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T16:51:56.253Z"
+}

@@ -1,0 +1,10 @@
+{
+  "status": "failed",
+  "turns": 166,
+  "inputTokens": 330,
+  "outputTokens": 20095,
+  "cacheReadInputTokens": 4923959,
+  "cacheCreationInputTokens": 2345805,
+  "peakContextTokens": 87002,
+  "wallClockMs": 737085
+}

@@ -1,0 +1,61 @@
+{
+  "startedAt": "2026-08-13T03:24:37.224Z",
+  "finishedAt": "2026-08-13T03:30:34.347Z",
+  "k": 1,
+  "concurrency": 1,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "openclaw_contributors",
+      "k": 1,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 354675.492583,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_08-24-44pm_create-a-csv-of-the-top-30-contributors_0241de",
+          "assertions": [
+            {
+              "name": "CSV artifact exists",
+              "passed": true,
+              "detail": "found artifacts/openclaw_top30_contributors.csv"
+            },
+            {
+              "name": "CSV has exactly the columns github_handle, name, linkedin_url (no more, no fewer)",
+              "passed": true,
+              "detail": "header: github_handle, name, linkedin_url"
+            },
+            {
+              "name": "CSV has 30 data rows with distinct non-empty handles",
+              "passed": true,
+              "detail": "30 rows, all handles non-empty and distinct"
+            },
+            {
+              "name": "at least 25 of the 30 handles are oracle top contributors",
+              "passed": true,
+              "detail": "28 of 30 handles found among the oracle's top 100; not found: claude, ampagent"
+            },
+            {
+              "name": "name cells agree with GitHub profile names wherever both sides have one",
+              "passed": true,
+              "detail": "23 name(s) checked against profiles"
+            },
+            {
+              "name": "linkedin_url cells are empty or well-formed linkedin.com URLs",
+              "passed": true,
+              "detail": "30 cell(s) checked (shape only; content is Tier C)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "21 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 354675.492583,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

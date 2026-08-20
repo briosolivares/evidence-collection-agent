@@ -1,0 +1,778 @@
+URL: https://github.com/openclaw/openclaw/pull/122479
+Title: refactor(discord): split voice lifecycle ownership by steipete · Pull Request #122479 · openclaw/openclaw · GitHub
+
+- generic [ref=f9e2]:
+  - generic [ref=f9e3]:
+    - link "Skip to content" [ref=f9e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f9e8]:
+      - heading "Navigation Menu" [level=2] [ref=f9e9]
+      - generic [ref=f9e10]:
+        - link "Homepage" [ref=f9e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f9e15]:
+          - navigation "Global" [ref=f9e16]:
+            - list [ref=f9e17]:
+              - listitem [ref=f9e18]:
+                - button "Platform" [ref=f9e20] [cursor=pointer]
+              - listitem [ref=f9e23]:
+                - button "Solutions" [ref=f9e25] [cursor=pointer]
+              - listitem [ref=f9e28]:
+                - button "Resources" [ref=f9e30] [cursor=pointer]
+              - listitem [ref=f9e33]:
+                - button "Open Source" [ref=f9e35] [cursor=pointer]
+              - listitem [ref=f9e38]:
+                - button "Enterprise" [ref=f9e40] [cursor=pointer]
+              - listitem [ref=f9e43]:
+                - link "Pricing" [ref=f9e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f9e45]:
+            - button "Search or jump to, type / to search" [ref=f9e47] [cursor=pointer]:
+              - generic [ref=f9e50]:
+                - text: Type
+                - generic [ref=f9e51]: /
+                - text: to search
+            - link "Sign in" [ref=f9e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122479
+            - link "Sign up" [ref=f9e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f9e55] [cursor=pointer]
+  - main [ref=f9e61]:
+    - generic [ref=f9e62]:
+      - generic [ref=f9e63]:
+        - generic [ref=f9e65]:
+          - link "openclaw" [ref=f9e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f9e70]: /
+          - strong [ref=f9e71]:
+            - link "openclaw" [ref=f9e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f9e73]: Public
+        - generic [ref=f9e74]:
+          - list:
+            - listitem [ref=f9e75]:
+              - link "Sponsor @openclaw" [ref=f9e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f9e77]: Sponsor
+            - listitem [ref=f9e81]:
+              - link "You must be signed in to change notification settings" [ref=f9e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f9e85]:
+              - link "Fork 81.1k" [ref=f9e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,127" [ref=f9e89]: 81.1k
+            - listitem [ref=f9e90]:
+              - link "You must be signed in to star a repository" [ref=f9e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386011 users starred this repository" [ref=f9e95]: 386k
+      - navigation "Repository" [ref=f9e96]:
+        - list [ref=f9e97]:
+          - listitem [ref=f9e98]:
+            - link "Code" [ref=f9e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f9e103]:
+            - link "Issues 3.5k" [ref=f9e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f9e108]: Issues
+              - generic "3,482" [ref=f9e109]: 3.5k
+          - listitem [ref=f9e110]:
+            - link "Pull requests 2.1k" [ref=f9e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f9e114]: Pull requests
+              - generic "2,139" [ref=f9e115]: 2.1k
+          - listitem [ref=f9e116]:
+            - link "Actions" [ref=f9e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f9e121]:
+            - link "Projects" [ref=f9e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f9e126]:
+            - link "Security and quality 647" [ref=f9e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f9e130]: Security and quality
+              - generic "647" [ref=f9e131]
+          - listitem [ref=f9e132]:
+            - link "Insights" [ref=f9e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f9e143]:
+      - generic [ref=f9e147]:
+        - generic [ref=f9e149]:
+          - 'heading "refactor(discord): split voice lifecycle ownership - #122479" [level=1] [ref=f9e150]':
+            - text: "refactor(discord): split voice lifecycle ownership"
+            - generic [ref=f9e151]: "- #122479"
+          - generic [ref=f9e152]: "#122479"
+        - generic [ref=f9e155]:
+          - generic [ref=f9e157]:
+            - img "Pull request" [ref=f9e158]
+            - text: Merged
+          - generic [ref=f9e161]:
+            - link "steipete" [ref=f9e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 12 commits into
+            - generic [ref=f9e163]:
+              - link "main" [ref=f9e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f9e165]: from
+              - generic [ref=f9e166]:
+                - link "steipete/discord-voice-split-0811" [ref=f9e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/discord-voice-split-0811
+                - button "Copy head branch name to clipboard" [ref=f9e168] [cursor=pointer]
+            - generic "Aug 11, 2026, 11:23 PM PDT" [ref=f9e172]: Aug 12, 202631 minutes ago
+        - generic [ref=f9e173]:
+          - generic [ref=f9e175]:
+            - generic [ref=f9e176]: +11,534
+            - generic [ref=f9e177]: "-10,121"
+            - generic [ref=f9e178]: "Lines changed: 11534 additions & 10121 deletions"
+          - navigation "Pull request navigation tabs" [ref=f9e186]:
+            - generic [ref=f9e187]:
+              - link "Conversation (3)" [ref=f9e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122479
+                - text: Conversation
+                - generic [ref=f9e191]: "3"
+                - generic [ref=f9e192]: (3)
+              - link "Commits (12)" [ref=f9e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122479/commits
+                - text: Commits
+                - generic [ref=f9e196]: "12"
+                - generic [ref=f9e197]: (12)
+              - link "Checks (179)" [ref=f9e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122479/checks
+                - text: Checks
+                - generic [ref=f9e201]: "179"
+                - generic [ref=f9e202]: (179)
+              - link "Files changed (37)" [ref=f9e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122479/files
+                - text: Files changed
+                - generic [ref=f9e206]: "37"
+                - generic [ref=f9e207]: (37)
+      - generic [ref=f9e212]:
+        - generic [ref=f9e214]:
+          - heading "Conversation" [level=2] [ref=f9e215]
+          - generic [ref=f9e216]:
+            - generic [ref=f9e217]:
+              - generic [ref=f9e219]:
+                - link [ref=f9e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f9e221]
+                - generic [ref=f9e223]:
+                  - generic [ref=f9e224]:
+                    - heading [level=3] [ref=f9e225]:
+                      - generic [ref=f9e226]:
+                        - strong [ref=f9e227]:
+                          - link "steipete" [ref=f9e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 12, 202647 minutes ago" [ref=f9e229] [cursor=pointer]:
+                          - /url: "#issue-5127772487"
+                    - generic [ref=f9e230]:
+                      - group [ref=f9e232]:
+                        - button [ref=f9e233] [cursor=pointer]:
+                          - img "Show options" [ref=f9e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f9e239]: Contributor
+                  - generic [ref=f9e244]:
+                    - heading "What Problem This Solves" [level=2] [ref=f9e245]
+                    - paragraph [ref=f9e246]: Fixes Discord voice races where leaving during a pending join could reconnect later, a stopped session could subscribe after authorization, decoded STT work could outlive leave, followed-user state could resurrect an older move, realtime connect could report ready after close, and provider-reset completions could leak into a newer voice generation.
+                    - paragraph [ref=f9e247]: The previous voice implementation also concentrated connection, follow, receive, realtime, playback, turn, and consult ownership in two files over 4,000 lines, making these lifecycle invariants difficult to express and verify.
+                    - heading "Why This Change Was Made" [level=2] [ref=f9e248]
+                    - paragraph [ref=f9e249]: The voice subsystem is split by lifecycle owner into runtime, guild session, following, receive, realtime session, playback, turns, and consult modules. One per-guild generation now authorizes connection publication, capture, realtime state, transcripts, and playback; provider continuity retains its own epoch. Playback and exact-speech state are closed unions rather than parallel booleans.
+                    - paragraph [ref=f9e250]:
+                      - text: "Discord startup keeps its existing outer lazy boundary, while STT/TTS no longer loads realtime provider and consult machinery:"
+                      - code [ref=f9e251]: voice-session.ts
+                      - text: dynamically imports
+                      - code [ref=f9e252]: realtime-session.runtime.ts
+                      - text: only for agent-proxy and bidi modes. Generic policy text and the exact-speech scraper remain byte-identical and are explicitly marked for a separate owner-reviewed realtime-voice follow-up.
+                    - heading "User Impact" [level=2] [ref=f9e253]
+                    - paragraph [ref=f9e254]: Discord voice leave, follow, capture, and realtime operations are last-event-wins. Stale async work can no longer reconnect, subscribe, transcribe, play, publish readiness, or deliver provider completions after its voice generation has closed.
+                    - paragraph [ref=f9e255]: There is no configuration or Plugin SDK change. Existing voice instructions, consult/control tool schemas, transcript-source behavior, and STT/TTS behavior are preserved.
+                    - heading "Evidence" [level=2] [ref=f9e256]
+                    - paragraph [ref=f9e257]: "Regression provenance and before/after proof:"
+                    - list [ref=f9e258]:
+                      - listitem [ref=f9e259]: "All six new order-sensitive regressions were run against the mechanical split commit and failed for the intended reason: pending leave (leave returned false), late receiver subscription, post-leave STT execution, stale followed-user publication, ready-after-close, and stale provider transcript delivery."
+                      - listitem [ref=f9e260]: The same six tests pass after the lifecycle-authority commit.
+                      - listitem [ref=f9e261]:
+                        - text: Exact source comparison against pre-split
+                        - code [ref=f9e262]: realtime.ts
+                        - text: confirms the assembled instruction builder and consult/control tool assembly are byte-identical.
+                    - paragraph [ref=f9e263]:
+                      - text: Validation on head
+                      - code [ref=f9e264]: 4119d4a90a416efa0ed2e2d70d62fc4849f88875
+                      - text: ":"
+                    - list [ref=f9e265]:
+                      - listitem [ref=f9e266]: "Focused lifecycle/follow/receive batch: 3 files, 100 tests passed."
+                      - listitem [ref=f9e267]: "Focused playback/turns/consults batch: 3 files, 76 tests passed."
+                      - listitem [ref=f9e268]: "Runtime composition E2E: join → audio ingress → agent dispatch → playback → leave passed."
+                      - listitem [ref=f9e269]: "Full Discord batch: 220 files, 2,754 tests passed."
+                      - listitem [ref=f9e270]: "Extension package boundary compile: 124 plugins passed."
+                      - listitem [ref=f9e271]:
+                        - code [ref=f9e272]: node scripts/check-changed.mjs --base <frozen-merge-base>
+                        - text: ": green, including dead-code scans, production/test typechecks, extension lint, database-first guard, and zero runtime import cycles."
+                      - listitem [ref=f9e273]:
+                        - code [ref=f9e274]: pnpm build
+                        - text: ": green; no"
+                        - code [ref=f9e275]: "[INEFFECTIVE_DYNAMIC_IMPORT]"
+                        - text: warning.
+                      - listitem [ref=f9e276]:
+                        - code [ref=f9e277]: pnpm lint:tmp:export-name-collisions
+                        - text: ": green."
+                      - listitem [ref=f9e278]:
+                        - code [ref=f9e279]: pnpm check:wrapper-shadowing
+                        - text: ": green."
+                      - listitem [ref=f9e280]:
+                        - code [ref=f9e281]: pnpm plugin-sdk:surface:check
+                        - text: ": green."
+                      - listitem [ref=f9e282]:
+                        - code [ref=f9e283]: pnpm lint:plugins:no-extension-test-core-imports
+                        - text: ": green."
+                      - listitem [ref=f9e284]:
+                        - code [ref=f9e285]: pnpm check:max-lines-ratchet
+                        - text: ": green against the rebased branch base; the three superseded Discord voice entries were removed."
+                      - listitem [ref=f9e286]: "Final branch autoreview: clean, no accepted/actionable findings; TruffleHog clean."
+                    - paragraph [ref=f9e287]:
+                      - text: "Remote-proof note: Blacksmith Testbox was unavailable because the host lacks the"
+                      - code [ref=f9e288]: blacksmith
+                      - text: executable, and direct AWS Crabbox had no configured broker login. Repository policy therefore routed trusted-source proof to the local fallback above. Hosted exact-head PR CI remains the authoritative merge-tree proof.
+                    - paragraph [ref=f9e289]:
+                      - text: LOC classification from
+                      - code [ref=f9e290]: git diff --numstat
+                      - text: "(moves are not discounted):"
+                    - list [ref=f9e291]:
+                      - listitem [ref=f9e292]: "Production: +4,760 / -4,040, net +720."
+                      - listitem [ref=f9e293]: "Tests and test support: +6,774 / -6,078, net +696, including one new composition E2E and six regressions."
+                      - listitem [ref=f9e294]: "Tooling baseline: +0 / -3, net -3."
+                    - paragraph [ref=f9e295]: "The positive production delta is the concrete ownership boundary: eight bounded concept modules, their closed lifecycle states, and narrow injected ports replace the two monoliths. No compatibility alias, fallback stack, new config, or new public API remains."
+                  - 'button "eyes (1): steipete, 06:07AM today" [disabled] [ref=f9e300]':
+                    - generic [ref=f9e301]: 👀
+                    - generic [ref=f9e302]: "1"
+              - generic [ref=f9e303]:
+                - generic [ref=f9e305]:
+                  - generic [ref=f9e310]:
+                    - link "steipete" [ref=f9e311] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: added 12 commits
+                    - link "August 11, 2026 22:021 hour ago" [ref=f9e312] [cursor=pointer]:
+                      - /url: "#commits-pushed-930e0b7"
+                  - generic [ref=f9e313]:
+                    - generic [ref=f9e321]:
+                      - link [ref=f9e324] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e325]
+                      - code [ref=f9e327]:
+                        - 'link "refactor(discord): split voice subsystem by lifecycle owner" [ref=f9e328] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/930e0b7d7a36c3d2923d64510497805c41478075
+                      - button "Unverified" [ref=f9e330] [cursor=pointer]
+                      - group [ref=f9e335]:
+                        - img "0 / 1 checks OK" [ref=f9e337] [cursor=pointer]
+                      - code [ref=f9e340]:
+                        - link "930e0b7" [ref=f9e341] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/930e0b7d7a36c3d2923d64510497805c41478075
+                    - generic [ref=f9e349]:
+                      - link [ref=f9e352] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e353]
+                      - code [ref=f9e355]:
+                        - 'link "fix(discord): make one generation the voice lifecycle authority" [ref=f9e356] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/b66e0179981123190b64b6876956b6868e9077e7
+                      - button "Unverified" [ref=f9e358] [cursor=pointer]
+                      - group [ref=f9e363]:
+                        - img "0 / 1 checks OK" [ref=f9e365] [cursor=pointer]
+                      - code [ref=f9e368]:
+                        - link "b66e017" [ref=f9e369] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/b66e0179981123190b64b6876956b6868e9077e7
+                    - generic [ref=f9e377]:
+                      - link [ref=f9e380] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e381]
+                      - code [ref=f9e383]:
+                        - 'link "refactor(discord): delete superseded voice plumbing" [ref=f9e384] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/0e7d6d153ecb2865ecec67256d733dd3355cef84
+                      - button "Unverified" [ref=f9e386] [cursor=pointer]
+                      - group [ref=f9e391]:
+                        - img "0 / 1 checks OK" [ref=f9e393] [cursor=pointer]
+                      - code [ref=f9e396]:
+                        - link "0e7d6d1" [ref=f9e397] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/0e7d6d153ecb2865ecec67256d733dd3355cef84
+                    - generic [ref=f9e405]:
+                      - link [ref=f9e408] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e409]
+                      - code [ref=f9e411]:
+                        - 'link "test(discord): split voice coverage by lifecycle owner" [ref=f9e412] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/66ced032cbc67b4fcfbd45260450ec0b7a73062d
+                      - button "Unverified" [ref=f9e414] [cursor=pointer]
+                      - group [ref=f9e419]:
+                        - img "0 / 1 checks OK" [ref=f9e421] [cursor=pointer]
+                      - code [ref=f9e424]:
+                        - link "66ced03" [ref=f9e425] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/66ced032cbc67b4fcfbd45260450ec0b7a73062d
+                    - generic [ref=f9e433]:
+                      - link [ref=f9e436] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e437]
+                      - code [ref=f9e439]:
+                        - 'link "chore(lint): ratchet max-lines baseline after voice split" [ref=f9e440] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/d14aa9f056d8480b1e9c091ed425820b47aa22da
+                      - button "Unverified" [ref=f9e442] [cursor=pointer]
+                      - group [ref=f9e447]:
+                        - img "0 / 1 checks OK" [ref=f9e449] [cursor=pointer]
+                      - code [ref=f9e452]:
+                        - link "d14aa9f" [ref=f9e453] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/d14aa9f056d8480b1e9c091ed425820b47aa22da
+                    - generic [ref=f9e461]:
+                      - link [ref=f9e464] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e465]
+                      - code [ref=f9e467]:
+                        - 'link "fix(discord): re-read voice lifecycle after realtime connect" [ref=f9e468] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/f7e457a2537cd5c948220ec921db2241f9a38285
+                      - button "Unverified" [ref=f9e470] [cursor=pointer]
+                      - group [ref=f9e475]:
+                        - img "0 / 1 checks OK" [ref=f9e477] [cursor=pointer]
+                      - code [ref=f9e480]:
+                        - link "f7e457a" [ref=f9e481] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/f7e457a2537cd5c948220ec921db2241f9a38285
+                    - generic [ref=f9e489]:
+                      - link [ref=f9e492] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e493]
+                      - code [ref=f9e495]:
+                        - 'link "test(discord): move wake follow-up coverage to turns owner" [ref=f9e496] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/5853b759c596ffa6f0675b5f47088cfdf30d3877
+                      - button "Unverified" [ref=f9e498] [cursor=pointer]
+                      - group [ref=f9e503]:
+                        - img "0 / 1 checks OK" [ref=f9e505] [cursor=pointer]
+                      - code [ref=f9e508]:
+                        - link "5853b75" [ref=f9e509] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/5853b759c596ffa6f0675b5f47088cfdf30d3877
+                    - generic [ref=f9e517]:
+                      - link [ref=f9e520] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e521]
+                      - code [ref=f9e523]:
+                        - 'link "refactor(discord): keep realtime lifecycle state private" [ref=f9e524] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/055f237e38e7ee29e19a7d04f0804b58ab6e7efe
+                      - button "Unverified" [ref=f9e526] [cursor=pointer]
+                      - group [ref=f9e531]:
+                        - img "0 / 1 checks OK" [ref=f9e533] [cursor=pointer]
+                      - code [ref=f9e536]:
+                        - link "055f237" [ref=f9e537] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/055f237e38e7ee29e19a7d04f0804b58ab6e7efe
+                    - generic [ref=f9e545]:
+                      - link [ref=f9e548] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e549]
+                      - code [ref=f9e551]:
+                        - 'link "refactor(discord): keep voice test harness type private" [ref=f9e552] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/75fc0a17933db9e9d0f5d79b13539895f94246e1
+                      - button "Unverified" [ref=f9e554] [cursor=pointer]
+                      - group [ref=f9e559]:
+                        - img "0 / 1 checks OK" [ref=f9e561] [cursor=pointer]
+                      - code [ref=f9e564]:
+                        - link "75fc0a1" [ref=f9e565] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/75fc0a17933db9e9d0f5d79b13539895f94246e1
+                    - generic [ref=f9e573]:
+                      - link [ref=f9e576] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e577]
+                      - code [ref=f9e579]:
+                        - 'link "refactor(discord): remove split voice test accessors" [ref=f9e580] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/a7e7243b10297168f637bc73216550f69089b4e5
+                      - button "Unverified" [ref=f9e582] [cursor=pointer]
+                      - group [ref=f9e587]:
+                        - img "0 / 1 checks OK" [ref=f9e589] [cursor=pointer]
+                      - code [ref=f9e592]:
+                        - link "a7e7243" [ref=f9e593] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/a7e7243b10297168f637bc73216550f69089b4e5
+                    - generic [ref=f9e601]:
+                      - link [ref=f9e604] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e605]
+                      - code [ref=f9e607]:
+                        - 'link "test(discord): type split voice fixtures at owners" [ref=f9e608] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/d1b37c684e632ba1d0c799d38e784241c4576d19
+                      - button "Unverified" [ref=f9e610] [cursor=pointer]
+                      - group [ref=f9e615]:
+                        - img "0 / 1 checks OK" [ref=f9e617] [cursor=pointer]
+                      - code [ref=f9e620]:
+                        - link "d1b37c6" [ref=f9e621] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/d1b37c684e632ba1d0c799d38e784241c4576d19
+                    - generic [ref=f9e629]:
+                      - link [ref=f9e632] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e633]
+                      - code [ref=f9e635]:
+                        - 'link "test(discord): trim split voice test imports" [ref=f9e636] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122479/commits/4119d4a90a416efa0ed2e2d70d62fc4849f88875
+                      - button "Unverified" [ref=f9e638] [cursor=pointer]
+                      - group [ref=f9e643]:
+                        - img "66 / 109 checks OK" [ref=f9e645] [cursor=pointer]
+                      - code [ref=f9e648]:
+                        - link "4119d4a" [ref=f9e649] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122479/commits/4119d4a90a416efa0ed2e2d70d62fc4849f88875
+                - generic [ref=f9e651]:
+                  - link [ref=f9e653] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e654]
+                  - generic [ref=f9e656]:
+                    - generic [ref=f9e657]:
+                      - heading "clawsweeper Bot commented Aug 12, 202647 minutes ago" [level=3] [ref=f9e658]:
+                        - generic [ref=f9e659]:
+                          - strong [ref=f9e660]:
+                            - link "clawsweeper" [ref=f9e661] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e662]: Bot
+                          - text: commented
+                          - link "Aug 12, 202647 minutes ago" [ref=f9e663] [cursor=pointer]:
+                            - /url: "#issuecomment-5263012907"
+                      - generic [ref=f9e664]:
+                        - group [ref=f9e666]:
+                          - button [ref=f9e667] [cursor=pointer]:
+                            - img "Show options" [ref=f9e670]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e673]: Contributor
+                    - table [ref=f9e677]:
+                      - rowgroup [ref=f9e678]:
+                        - row [ref=f9e679]:
+                          - cell [ref=f9e680]:
+                            - paragraph [ref=f9e681]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f9e682]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f9e683]:
+                  - generic [ref=f9e688]:
+                    - link [ref=f9e689] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f9e690]
+                    - link "openclaw-barnacle" [ref=f9e691] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f9e692]: Bot
+                    - text: added
+                    - 'link "channel: discord" [ref=f9e693] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+                    - 'link "size: XL" [ref=f9e694] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+                    - link "maintainer" [ref=f9e695] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 202647 minutes ago" [ref=f9e696] [cursor=pointer]:
+                      - /url: "#event-29322054958"
+                  - generic [ref=f9e702]:
+                    - link [ref=f9e704] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f9e705]
+                    - generic [ref=f9e706]:
+                      - link "steipete" [ref=f9e707] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "August 12, 2026 06:0746 minutes ago" [ref=f9e708] [cursor=pointer]:
+                        - /url: "#event-29322061355"
+                  - generic [ref=f9e713]:
+                    - link [ref=f9e714] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f9e715]
+                    - link "clawsweeper" [ref=f9e716] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f9e717]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 message-delivery" [ref=f9e718] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+                    - 'link "merge-risk: 🚨 session-state" [ref=f9e719] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+                    - link "P1" [ref=f9e720] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "rating: 🐚 platinum hermit" [ref=f9e721] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f9e722] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 12, 202639 minutes ago" [ref=f9e723] [cursor=pointer]:
+                      - /url: "#event-29322308197"
+                - generic [ref=f9e725]:
+                  - link [ref=f9e727] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e728]
+                  - generic [ref=f9e730]:
+                    - generic [ref=f9e731]:
+                      - heading "clawsweeper Bot commented Aug 12, 202639 minutes ago" [level=3] [ref=f9e732]:
+                        - generic [ref=f9e733]:
+                          - strong [ref=f9e734]:
+                            - link "clawsweeper" [ref=f9e735] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e736]: Bot
+                          - text: commented
+                          - link "Aug 12, 202639 minutes ago" [ref=f9e737] [cursor=pointer]:
+                            - /url: "#issuecomment-5263068316"
+                      - generic [ref=f9e738]:
+                        - group [ref=f9e740]:
+                          - button [ref=f9e741] [cursor=pointer]:
+                            - img "Show options" [ref=f9e744]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e747]: Contributor
+                    - table [ref=f9e751]:
+                      - rowgroup [ref=f9e752]:
+                        - row [ref=f9e753]:
+                          - cell [ref=f9e754]:
+                            - paragraph [ref=f9e755]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f9e756]: Reviewed August 12, 2026, 2:14 AM ET / 06:14 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f9e757]
+                            - heading "What this changes" [level=2] [ref=f9e758]
+                            - paragraph [ref=f9e759]: The PR splits Discord voice lifecycle behavior into focused session, receive, following, realtime, playback, turn, and consult modules, using a per-guild generation to reject stale async work.
+                            - heading "Regression provenance" [level=2] [ref=f9e760]
+                            - paragraph [ref=f9e761]: Possible regression — suspected (reviewed change). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f9e762]
+                            - paragraph [ref=f9e763]:
+                              - generic [ref=f9e764]: ⚠️
+                              - strong [ref=f9e765]: Ready for maintainer review - 3 items remain
+                            - paragraph [ref=f9e766]: Keep open. This active maintainer PR replaces current main’s monolithic Discord voice owner with generation-fenced lifecycle owners; no introduced correctness defect was found, but exact-head CI is still running.
+                            - paragraph [ref=f9e767]:
+                              - strong [ref=f9e768]: "Priority:"
+                              - text: P1
+                              - strong [ref=f9e769]: "Reviewed head:"
+                              - code [ref=f9e770]: 4119d4a90a416efa0ed2e2d70d62fc4849f88875
+                            - heading "Review scores" [level=2] [ref=f9e771]
+                            - table [ref=f9e773]:
+                              - rowgroup [ref=f9e774]:
+                                - row [ref=f9e775]:
+                                  - columnheader "Measure" [ref=f9e776]
+                                  - columnheader "Result" [ref=f9e777]
+                                  - columnheader "What it means" [ref=f9e778]
+                              - rowgroup [ref=f9e779]:
+                                - row [ref=f9e780]:
+                                  - cell [ref=f9e781]:
+                                    - strong [ref=f9e782]: Overall readiness
+                                  - cell [ref=f9e783]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f9e784]: (4/6)
+                                  - cell "The patch is a coherent owner-boundary repair with targeted order-sensitive coverage; remaining confidence depends on exact-head CI." [ref=f9e785]
+                                - row [ref=f9e786]:
+                                  - cell [ref=f9e787]:
+                                    - strong [ref=f9e788]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f9e789]
+                                  - 'cell "Not applicable: This maintainer-authored PR is outside the external-contributor proof gate; its body nevertheless records focused lifecycle and composition validation." [ref=f9e790]'
+                                - row [ref=f9e791]:
+                                  - cell [ref=f9e792]:
+                                    - strong [ref=f9e793]: Patch quality
+                                  - cell [ref=f9e794]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f9e795]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f9e796]
+                            - heading "Verification" [level=2] [ref=f9e797]
+                            - table [ref=f9e799]:
+                              - rowgroup [ref=f9e800]:
+                                - row [ref=f9e801]:
+                                  - columnheader "Check" [ref=f9e802]
+                                  - columnheader "Result" [ref=f9e803]
+                                  - columnheader "Evidence" [ref=f9e804]
+                              - rowgroup [ref=f9e805]:
+                                - row [ref=f9e806]:
+                                  - cell [ref=f9e807]:
+                                    - strong [ref=f9e808]: Real behavior
+                                  - cell "Not applicable" [ref=f9e809]
+                                  - 'cell "Not applicable: This maintainer-authored PR is outside the external-contributor proof gate; its body nevertheless records focused lifecycle and composition validation." [ref=f9e810]'
+                                - row [ref=f9e811]:
+                                  - cell [ref=f9e812]:
+                                    - strong [ref=f9e813]: Evidence reviewed
+                                  - cell "6 items" [ref=f9e814]
+                                  - 'cell "Current-main async race boundary: Current main awaits realtime authorization before subscribing to a receiver, leaving a window for a stopped session to subscribe later. Generation lifecycle owner: The branch assigns a generation before joining, publishes only a still-current generation, and marks a pending join stopped when leave wins. Realtime post-connect fence: The branch verifies entry lifecycle, generation, and session identity after realtime connect before marking the session active." [ref=f9e815]': "Current-main async race boundary: Current main awaits realtime authorization before subscribing to a receiver, leaving a window for a stopped session to subscribe later.Generation lifecycle owner: The branch assigns a generation before joining, publishes only a still-current generation, and marks a pending join stopped when leave wins.Realtime post-connect fence: The branch verifies entry lifecycle, generation, and session identity after realtime connect before marking the session active."
+                                - row [ref=f9e816]:
+                                  - cell [ref=f9e817]:
+                                    - strong [ref=f9e818]: Findings
+                                  - cell "None" [ref=f9e819]
+                                  - cell "None." [ref=f9e820]
+                                - row [ref=f9e821]:
+                                  - cell [ref=f9e822]:
+                                    - strong [ref=f9e823]: Security
+                                  - cell "None" [ref=f9e824]
+                                  - cell "None." [ref=f9e825]
+                            - heading "How this fits together" [level=2] [ref=f9e826]
+                            - paragraph [ref=f9e827]: Discord voice turns gateway voice state and audio into a guild-scoped session, then dispatches agent work and playback. The changed lifecycle layer controls whether delayed joins, receives, follows, transcripts, and realtime callbacks may still publish after a session changes.
+                            - region "mermaid rendered output container" [ref=f9e828]:
+                              - generic [ref=f9e829]:
+                                - generic [ref=f9e830]:
+                                  - group [ref=f9e831]:
+                                    - button "Open dialog" [ref=f9e832] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f9e835] [cursor=pointer]
+                                - iframe [ref=f9e840]:
+                                  - generic [ref=f10e1]:
+                                    - document [ref=f10e5]:
+                                      - generic [ref=f10e11]:
+                                        - paragraph [ref=f10e18]: Discord gateway and audio
+                                        - paragraph [ref=f10e25]: Voice runtime
+                                        - paragraph [ref=f10e32]: Guild voice session
+                                        - paragraph [ref=f10e39]: Generation authority
+                                        - paragraph [ref=f10e46]: Receive and realtime work
+                                        - paragraph [ref=f10e53]: Agent dispatch
+                                        - paragraph [ref=f10e60]: Voice playback
+                                        - paragraph [ref=f10e67]: Leave and follow events
+                                    - generic [ref=f10e68]:
+                                      - button "Zoom in" [ref=f10e69]
+                                      - button "Zoom out" [ref=f10e73]
+                                      - button "Reset view" [ref=f10e77]
+                                      - button "Pan up" [ref=f10e80]
+                                      - button "Pan down" [ref=f10e83]
+                                      - button "Pan left" [ref=f10e86]
+                                      - button "Pan right" [ref=f10e89]
+                            - heading "Before merge" [level=2] [ref=f9e841]
+                            - list [ref=f9e842]:
+                              - listitem [ref=f9e843]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e844]
+                                - strong [ref=f9e845]: Resolve merge risk (P1)
+                                - text: "- Exact-head Discord/runtime CI is still in progress, so the reported focused and full-suite results are not yet independently confirmed by current PR checks."
+                              - listitem [ref=f9e846]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e847]
+                                - strong [ref=f9e848]: Resolve merge risk (P1)
+                                - text: "- Production code is reported as net +720 lines; the lifecycle-owner split should remain only if these closed state boundaries cannot be expressed without recreating the deleted monoliths."
+                              - listitem [ref=f9e849]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e850]
+                                - strong [ref=f9e851]: Complete next step (P2)
+                                - text: "- This protected maintainer PR needs routine exact-head CI completion and maintainer merge handling, not a repair job or cleanup close."
+                            - group [ref=f9e852]:
+                              - strong [ref=f9e854] [cursor=pointer]: Agent review details
+                - generic [ref=f9e855]:
+                  - generic [ref=f9e860]:
+                    - button "View details" [ref=f9e861] [cursor=pointer]
+                    - generic [ref=f9e862]:
+                      - link [ref=f9e864] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f9e865]
+                      - generic [ref=f9e866]:
+                        - link "steipete" [ref=f9e867] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f9e868] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/90beb639e7e8c0e03fc5ce9b48f3c089a6d827bd
+                          - code [ref=f9e869]: 90beb63
+                        - text: into
+                        - generic [ref=f9e870]: main
+                        - link "Aug 12, 202631 minutes ago" [ref=f9e872] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122479#event-29322586191
+                        - generic [ref=f9e873]: 179 checks passed
+                  - generic [ref=f9e880]:
+                    - link [ref=f9e882] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f9e883]
+                    - generic [ref=f9e884]:
+                      - link "steipete" [ref=f9e885] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f9e886]: steipete/discord-voice-split-0811
+                      - text: branch
+                      - link "August 12, 2026 06:2331 minutes ago" [ref=f9e888] [cursor=pointer]:
+                        - /url: "#event-29322587096"
+                - generic [ref=f9e890]:
+                  - link [ref=f9e892] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f9e893]
+                  - generic [ref=f9e895]:
+                    - generic [ref=f9e896]:
+                      - heading [level=3] [ref=f9e897]:
+                        - generic [ref=f9e898]:
+                          - strong [ref=f9e899]:
+                            - link "steipete" [ref=f9e900] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202630 minutes ago" [ref=f9e901] [cursor=pointer]:
+                            - /url: "#issuecomment-5263130221"
+                      - generic [ref=f9e902]:
+                        - group [ref=f9e904]:
+                          - button [ref=f9e905] [cursor=pointer]:
+                            - img "Show options" [ref=f9e908]
+                        - generic [ref=f9e910]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f9e911]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f9e913]: Author
+                    - table [ref=f9e917]:
+                      - rowgroup [ref=f9e918]:
+                        - row [ref=f9e919]:
+                          - cell [ref=f9e920]:
+                            - paragraph [ref=f9e921]: Merged via squash.
+                            - list [ref=f9e922]:
+                              - listitem [ref=f9e923]:
+                                - text: "Prepared head SHA:"
+                                - link "4119d4a90a416efa0ed2e2d70d62fc4849f88875" [ref=f9e924] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122479/commits/4119d4a90a416efa0ed2e2d70d62fc4849f88875
+                              - listitem [ref=f9e925]:
+                                - text: "Landed commit:"
+                                - link "90beb639e7e8c0e03fc5ce9b48f3c089a6d827bd" [ref=f9e926] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/90beb639e7e8c0e03fc5ce9b48f3c089a6d827bd
+            - generic [ref=f9e930]:
+              - link "Sign up for free" [ref=f9e931] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f9e932]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f9e933] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122479
+        - generic [ref=f9e937]:
+          - form "Select reviewers" [ref=f9e939]:
+            - heading "Reviewers" [level=3] [ref=f9e940]
+            - text: No reviews
+          - form "Select assignees" [ref=f9e942]:
+            - heading "Assignees" [level=3] [ref=f9e943]
+            - text: No one assigned
+          - generic [ref=f9e944]:
+            - heading "Labels" [level=3] [ref=f9e945]
+            - generic [ref=f9e946]:
+              - 'link "channel: discord" [ref=f9e947] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+              - link "maintainer" [ref=f9e949] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 message-delivery" [ref=f9e951] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+              - 'link "merge-risk: 🚨 session-state" [ref=f9e953] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+              - link "P1" [ref=f9e955] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🐚 platinum hermit" [ref=f9e957] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: XL" [ref=f9e959] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f9e961] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f9e964]:
+            - heading "Projects" [level=3] [ref=f9e965]
+            - text: None yet
+          - form "Select milestones" [ref=f9e967]:
+            - heading "Milestone" [level=3] [ref=f9e968]
+            - text: No milestone
+          - form "Link issues" [ref=f9e974]:
+            - heading "Development" [level=3] [ref=f9e975]
+            - paragraph [ref=f9e976]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f9e978]: None yet
+          - generic [ref=f9e980]:
+            - heading "1 participant" [level=3] [ref=f9e981]
+            - link [ref=f9e983] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f9e984]
+  - contentinfo [ref=f9e985]:
+    - heading "Footer" [level=2] [ref=f9e986]
+    - generic [ref=f9e987]:
+      - generic [ref=f9e988]:
+        - link "GitHub Homepage" [ref=f9e989] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f9e992]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f9e993]:
+        - heading "Footer navigation" [level=3] [ref=f9e994]
+        - list "Footer navigation" [ref=f9e995]:
+          - listitem [ref=f9e996]:
+            - link "Terms" [ref=f9e997] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f9e998]:
+            - link "Privacy" [ref=f9e999] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f9e1000]:
+            - link "Security" [ref=f9e1001] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f9e1002]:
+            - link "Status" [ref=f9e1003] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f9e1004]:
+            - link "Community" [ref=f9e1005] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f9e1006]:
+            - link "Docs" [ref=f9e1007] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f9e1008]:
+            - link "Contact" [ref=f9e1009] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f9e1010]:
+            - button "Manage cookies" [ref=f9e1012] [cursor=pointer]
+          - listitem [ref=f9e1013]:
+            - button "Do not share my personal information" [ref=f9e1015] [cursor=pointer]

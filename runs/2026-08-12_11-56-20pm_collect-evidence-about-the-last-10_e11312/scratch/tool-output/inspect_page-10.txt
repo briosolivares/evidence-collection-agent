@@ -1,0 +1,834 @@
+URL: https://github.com/openclaw/openclaw/pull/123019
+Title: fix(ci): accept large npm pack receipts by vincentkoc · Pull Request #123019 · openclaw/openclaw · GitHub
+
+- generic [ref=f14e2]:
+  - generic [ref=f14e3]:
+    - link "Skip to content" [ref=f14e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f14e8]:
+      - heading "Navigation Menu" [level=2] [ref=f14e9]
+      - generic [ref=f14e10]:
+        - link "Homepage" [ref=f14e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f14e15]:
+          - navigation "Global" [ref=f14e16]:
+            - list [ref=f14e17]:
+              - listitem [ref=f14e18]:
+                - button "Platform" [ref=f14e20] [cursor=pointer]
+              - listitem [ref=f14e23]:
+                - button "Solutions" [ref=f14e25] [cursor=pointer]
+              - listitem [ref=f14e28]:
+                - button "Resources" [ref=f14e30] [cursor=pointer]
+              - listitem [ref=f14e33]:
+                - button "Open Source" [ref=f14e35] [cursor=pointer]
+              - listitem [ref=f14e38]:
+                - button "Enterprise" [ref=f14e40] [cursor=pointer]
+              - listitem [ref=f14e43]:
+                - link "Pricing" [ref=f14e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f14e45]:
+            - button "Search or jump to, type / to search" [ref=f14e47] [cursor=pointer]:
+              - generic [ref=f14e50]:
+                - text: Type
+                - generic [ref=f14e51]: /
+                - text: to search
+            - link "Sign in" [ref=f14e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123019
+            - link "Sign up" [ref=f14e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f14e55] [cursor=pointer]
+  - main [ref=f14e61]:
+    - generic [ref=f14e62]:
+      - generic [ref=f14e63]:
+        - generic [ref=f14e65]:
+          - link "openclaw" [ref=f14e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f14e70]: /
+          - strong [ref=f14e71]:
+            - link "openclaw" [ref=f14e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f14e73]: Public
+        - generic [ref=f14e74]:
+          - list:
+            - listitem [ref=f14e75]:
+              - link "Sponsor @openclaw" [ref=f14e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f14e77]: Sponsor
+            - listitem [ref=f14e81]:
+              - link "You must be signed in to change notification settings" [ref=f14e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f14e85]:
+              - link "Fork 81.2k" [ref=f14e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f14e89]: 81.2k
+            - listitem [ref=f14e90]:
+              - link "You must be signed in to star a repository" [ref=f14e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386123 users starred this repository" [ref=f14e95]: 386k
+      - navigation "Repository" [ref=f14e96]:
+        - list [ref=f14e97]:
+          - listitem [ref=f14e98]:
+            - link "Code" [ref=f14e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f14e103]:
+            - link "Issues 3.4k" [ref=f14e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f14e108]: Issues
+              - generic "3,402" [ref=f14e109]: 3.4k
+          - listitem [ref=f14e110]:
+            - link "Pull requests 2.1k" [ref=f14e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f14e114]: Pull requests
+              - generic "2,089" [ref=f14e115]: 2.1k
+          - listitem [ref=f14e116]:
+            - link "Actions" [ref=f14e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f14e121]:
+            - link "Projects" [ref=f14e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f14e126]:
+            - link "Security and quality 647" [ref=f14e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f14e130]: Security and quality
+              - generic "647" [ref=f14e131]
+          - listitem [ref=f14e132]:
+            - link "Insights" [ref=f14e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f14e143]:
+      - generic [ref=f14e147]:
+        - generic [ref=f14e149]:
+          - 'heading "fix(ci): accept large npm pack receipts - #123019" [level=1] [ref=f14e150]':
+            - text: "fix(ci): accept large npm pack receipts"
+            - generic [ref=f14e151]: "- #123019"
+          - generic [ref=f14e152]: "#123019"
+        - generic [ref=f14e155]:
+          - generic [ref=f14e157]:
+            - img "Pull request" [ref=f14e158]
+            - text: Merged
+          - generic [ref=f14e161]:
+            - link "vincentkoc" [ref=f14e162] [cursor=pointer]:
+              - /url: /vincentkoc
+            - text: merged 1 commit into
+            - generic [ref=f14e163]:
+              - link "main" [ref=f14e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f14e165]: from
+              - generic [ref=f14e166]:
+                - link "fix/installer-pack-stdout-receipt" [ref=f14e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/fix/installer-pack-stdout-receipt
+                - button "Copy head branch name to clipboard" [ref=f14e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 11:30 PM PDT" [ref=f14e172]: Aug 13, 202628 minutes ago
+        - generic [ref=f14e173]:
+          - generic [ref=f14e175]:
+            - generic [ref=f14e176]: "+258"
+            - generic [ref=f14e177]: "-123"
+            - generic [ref=f14e178]: "Lines changed: 258 additions & 123 deletions"
+          - navigation "Pull request navigation tabs" [ref=f14e186]:
+            - generic [ref=f14e187]:
+              - link "Conversation (6)" [ref=f14e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123019
+                - text: Conversation
+                - generic [ref=f14e191]: "6"
+                - generic [ref=f14e192]: (6)
+              - link "Commits (1)" [ref=f14e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123019/commits
+                - text: Commits
+                - generic [ref=f14e196]: "1"
+                - generic [ref=f14e197]: (1)
+              - link "Checks (110)" [ref=f14e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123019/checks
+                - text: Checks
+                - generic [ref=f14e201]: "110"
+                - generic [ref=f14e202]: (110)
+              - link "Files changed (2)" [ref=f14e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/123019/files
+                - text: Files changed
+                - generic [ref=f14e206]: "2"
+                - generic [ref=f14e207]: (2)
+      - generic [ref=f14e212]:
+        - generic [ref=f14e214]:
+          - heading "Conversation" [level=2] [ref=f14e215]
+          - generic [ref=f14e216]:
+            - generic [ref=f14e217]:
+              - generic [ref=f14e219]:
+                - link [ref=f14e220] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f14e221]
+                - generic [ref=f14e223]:
+                  - generic [ref=f14e224]:
+                    - heading "vincentkoc commented Aug 13, 20261 hour ago •" [level=3] [ref=f14e225]:
+                      - generic [ref=f14e226]:
+                        - strong [ref=f14e227]:
+                          - link "vincentkoc" [ref=f14e228] [cursor=pointer]:
+                            - /url: /vincentkoc
+                        - text: commented
+                        - link "Aug 13, 20261 hour ago" [ref=f14e229] [cursor=pointer]:
+                          - /url: "#issue-5138127575"
+                        - generic [ref=f14e230]:
+                          - generic [ref=f14e231]: •
+                          - group [ref=f14e232]:
+                            - button "edited" [ref=f14e233] [cursor=pointer]
+                    - generic [ref=f14e237]:
+                      - group [ref=f14e239]:
+                        - button [ref=f14e240] [cursor=pointer]:
+                          - img "Show options" [ref=f14e243]
+                      - generic "This user is a member of the openclaw organization." [ref=f14e246]: Member
+                  - generic [ref=f14e251]:
+                    - heading "What Problem This Solves" [level=2] [ref=f14e252]
+                    - paragraph [ref=f14e253]:
+                      - text: Fixes an issue where installer smoke packaging could fail after successfully packing the nested AI runtime because npm 12 emitted an outer
+                      - code [ref=f14e254]: npm pack --json
+                      - text: receipt larger than the package runner's 1 MiB captured-stdout limit. The generic capture guard terminated the pack command before the existing receipt parser could consume valid metadata.
+                    - heading "Why This Change Was Made" [level=2] [ref=f14e255]
+                    - paragraph [ref=f14e256]:
+                      - text: The package runner now supports a mutually exclusive file-backed stdout mode while preserving its
+                      - code [ref=f14e257]: Promise<string>
+                      - text: contract. Only the outer npm JSON pack writes to a unique temporary receipt; the packager reads those bytes into the existing tarball and metadata flow, removes the receipt on success or failure, and leaves the 1 MiB capture limit unchanged for every other command.
+                    - heading "User Impact" [level=2] [ref=f14e258]
+                    - paragraph [ref=f14e259]: Installer and release validation can package source candidates with large npm 12 metadata receipts without weakening output bounds for other tooling commands.
+                    - heading "Evidence" [level=2] [ref=f14e260]
+                    - list [ref=f14e261]:
+                      - listitem [ref=f14e262]:
+                        - text: "Original follow-on failure: Blacksmith Testbox run"
+                        - code [ref=f14e263]: "31661901465"
+                        - text: crossed the nested AI pack failure fixed by
+                        - 'link "fix(ci): sanitize AI manifest during installer pack #122952" [ref=f14e267] [cursor=pointer]':
+                          - /url: https://github.com/openclaw/openclaw/pull/122952
+                        - text: ", then failed when the outer"
+                        - code [ref=f14e268]: npm pack --json
+                        - text: output exceeded the 1 MiB capture limit.
+                      - listitem [ref=f14e269]:
+                        - text: "Focused package-Docker suite:"
+                        - code [ref=f14e270]: 35 passed
+                        - text: ","
+                        - code [ref=f14e271]: 3 skipped
+                        - text: .
+                      - listitem [ref=f14e272]: Regression coverage includes a name-keyed npm 12 receipt larger than 1 MiB, exact file-mode stdout bytes, capture/file conflict rejection, receipt cleanup after runner and parse failures, combined primary/cleanup error preservation, and signal-time source restoration.
+                      - listitem [ref=f14e273]:
+                        - text: The single reviewed installer-smoke retry passed end to end on Blacksmith Testbox
+                        - code [ref=f14e274]: tbx_01kzwsem5jhttymnjyjrx1v4hw
+                        - text: / Actions run
+                        - code [ref=f14e275]: "31670400595"
+                        - text: ": candidate pack and tarball audit completed, fresh install passed, and update"
+                        - code [ref=f14e276]: 2026.7.1-2 -> 2026.8.1
+                        - text: passed.
+                      - listitem [ref=f14e277]:
+                        - text: Changed-gate Testbox runs
+                        - code [ref=f14e278]: "31669896942"
+                        - text: and
+                        - code [ref=f14e279]: "31670086534"
+                        - text: passed both script and root-test typecheck lanes and isolated two new lint findings; the final classified narrow script-lint retry passed.
+                      - listitem [ref=f14e280]:
+                        - text: Exact-head isolated local ClawSweeper review of
+                        - code [ref=f14e281]: b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                        - text: ":"
+                        - code [ref=f14e282]: nothing_found
+                        - text: ", high confidence, best-fix judgment yes."
+                      - listitem [ref=f14e283]:
+                        - code [ref=f14e284]: git diff --check
+                        - text: ", targeted oxlint, and targeted formatting passed."
+                      - listitem [ref=f14e285]:
+                        - text: "Production delta:"
+                        - code [ref=f14e286]: "+45"
+                        - text: "lines net. Test delta:"
+                        - code [ref=f14e287]: "+90"
+                        - text: lines net.
+                  - 'button "eyes (1): vincentkoc, 05:27AM today" [disabled] [ref=f14e292]':
+                    - generic [ref=f14e293]: 👀
+                    - generic [ref=f14e294]: "1"
+              - generic [ref=f14e295]:
+                - generic [ref=f14e297]:
+                  - link [ref=f14e299] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f14e300]
+                  - generic [ref=f14e302]:
+                    - generic [ref=f14e303]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago" [level=3] [ref=f14e304]:
+                        - generic [ref=f14e305]:
+                          - strong [ref=f14e306]:
+                            - link "clawsweeper" [ref=f14e307] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f14e308]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f14e309] [cursor=pointer]:
+                            - /url: "#issuecomment-5276336446"
+                      - generic [ref=f14e310]:
+                        - group [ref=f14e312]:
+                          - button [ref=f14e313] [cursor=pointer]:
+                            - img "Show options" [ref=f14e316]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f14e319]: Contributor
+                    - table [ref=f14e323]:
+                      - rowgroup [ref=f14e324]:
+                        - row [ref=f14e325]:
+                          - cell [ref=f14e326]:
+                            - paragraph [ref=f14e327]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f14e328]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f14e329]:
+                  - generic [ref=f14e334]:
+                    - link [ref=f14e335] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f14e336]
+                    - link "vincentkoc" [ref=f14e337] [cursor=pointer]:
+                      - /url: /vincentkoc
+                    - text: self-assigned this
+                    - link "Aug 13, 20261 hour ago" [ref=f14e338] [cursor=pointer]:
+                      - /url: "#event-29381280868"
+                  - generic [ref=f14e343]:
+                    - link [ref=f14e344] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f14e345]
+                    - link "openclaw-barnacle" [ref=f14e346] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f14e347]: Bot
+                    - text: added
+                    - link "scripts" [ref=f14e348] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+                    - link "docker" [ref=f14e349] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocker
+                    - 'link "size: M" [ref=f14e350] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f14e351] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f14e352] [cursor=pointer]:
+                      - /url: "#event-29381284389"
+                  - generic [ref=f14e358]:
+                    - link [ref=f14e360] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f14e361]
+                    - generic [ref=f14e362]:
+                      - link "vincentkoc" [ref=f14e363] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f14e364] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/49d1786bf2e526bf7a8109dc3090b8a746ab8394..b3830df6a9c3d1d0be3b882227b6685c674fcbe4
+                      - text: the
+                      - generic [ref=f14e365]: fix/installer-pack-stdout-receipt
+                      - text: branch from
+                      - link [ref=f14e367] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/49d1786bf2e526bf7a8109dc3090b8a746ab8394
+                        - code [ref=f14e368]: 49d1786
+                      - text: to
+                      - link [ref=f14e369] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/b3830df6a9c3d1d0be3b882227b6685c674fcbe4
+                        - code [ref=f14e370]: b3830df
+                      - link "Compare" [ref=f14e371] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/49d1786bf2e526bf7a8109dc3090b8a746ab8394..b3830df6a9c3d1d0be3b882227b6685c674fcbe4
+                      - link "August 13, 2026 05:381 hour ago" [ref=f14e374] [cursor=pointer]:
+                        - /url: "#event-29381598714"
+                  - generic [ref=f14e380]:
+                    - link [ref=f14e382] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f14e383]
+                    - generic [ref=f14e384]:
+                      - link "vincentkoc" [ref=f14e385] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 05:381 hour ago" [ref=f14e386] [cursor=pointer]:
+                        - /url: "#event-29381606732"
+                  - generic [ref=f14e392]:
+                    - link [ref=f14e394] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f14e395]
+                    - generic [ref=f14e396]:
+                      - link "vincentkoc" [ref=f14e397] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - link "force-pushed" [ref=f14e398] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/22fbef0543dc0d1e9a2dd77bb2c7dedc757fcbb2..19d4985d4cd4de27e539669f62c7e506b841429c
+                      - text: the
+                      - generic [ref=f14e399]: fix/installer-pack-stdout-receipt
+                      - text: branch 4 times, most recently from
+                      - link [ref=f14e401] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/22fbef0543dc0d1e9a2dd77bb2c7dedc757fcbb2
+                        - code [ref=f14e402]: 22fbef0
+                      - text: to
+                      - link [ref=f14e403] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/19d4985d4cd4de27e539669f62c7e506b841429c
+                        - code [ref=f14e404]: 19d4985
+                      - link "Compare" [ref=f14e405] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/22fbef0543dc0d1e9a2dd77bb2c7dedc757fcbb2..19d4985d4cd4de27e539669f62c7e506b841429c
+                      - link "August 13, 2026 06:0652 minutes ago" [ref=f14e408] [cursor=pointer]:
+                        - /url: "#event-29382512231"
+                  - generic [ref=f14e413]:
+                    - link [ref=f14e414] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f14e415]
+                    - link "clawsweeper" [ref=f14e416] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f14e417]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 automation" [ref=f14e418] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20automation%22
+                    - link "P2" [ref=f14e419] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                    - 'link "proof: sufficient" [ref=f14e420] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                    - 'link "rating: 🐚 platinum hermit" [ref=f14e421] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f14e422] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 13, 202645 minutes ago" [ref=f14e423] [cursor=pointer]:
+                      - /url: "#event-29382733206"
+                - generic [ref=f14e425]:
+                  - link [ref=f14e427] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f14e428]
+                  - generic [ref=f14e430]:
+                    - generic [ref=f14e431]:
+                      - heading "clawsweeper Bot commented Aug 13, 202645 minutes ago" [level=3] [ref=f14e432]:
+                        - generic [ref=f14e433]:
+                          - strong [ref=f14e434]:
+                            - link "clawsweeper" [ref=f14e435] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f14e436]: Bot
+                          - text: commented
+                          - link "Aug 13, 202645 minutes ago" [ref=f14e437] [cursor=pointer]:
+                            - /url: "#issuecomment-5276645612"
+                      - generic [ref=f14e438]:
+                        - group [ref=f14e440]:
+                          - button [ref=f14e441] [cursor=pointer]:
+                            - img "Show options" [ref=f14e444]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f14e447]: Contributor
+                    - table [ref=f14e451]:
+                      - rowgroup [ref=f14e452]:
+                        - row [ref=f14e453]:
+                          - cell [ref=f14e454]:
+                            - paragraph [ref=f14e455]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f14e456]: Reviewed August 13, 2026, 2:12 AM ET / 06:12 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f14e457]
+                            - heading "What this changes" [level=2] [ref=f14e458]
+                            - paragraph [ref=f14e459]:
+                              - text: This PR lets Docker installer packaging write the outer
+                              - code [ref=f14e460]: npm pack --json
+                              - text: receipt to a temporary file so large npm 12 metadata can be parsed without exceeding the 1 MiB stdout capture limit.
+                            - heading "Merge readiness" [level=2] [ref=f14e461]
+                            - paragraph [ref=f14e462]:
+                              - generic [ref=f14e463]: ⚠️
+                              - strong [ref=f14e464]: Ready for maintainer review - 4 items remain
+                            - paragraph [ref=f14e465]: Keep open for maintainer review. Current main still captures the outer npm JSON receipt in memory, while this PR narrowly streams that one receipt to a temporary file and preserves the existing bound for all other commands.
+                            - paragraph [ref=f14e466]:
+                              - strong [ref=f14e467]: "Priority:"
+                              - text: P2
+                              - strong [ref=f14e468]: "Reviewed head:"
+                              - code [ref=f14e469]: 19d4985d4cd4de27e539669f62c7e506b841429c
+                              - strong [ref=f14e470]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f14e471] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f14e472]
+                            - table [ref=f14e474]:
+                              - rowgroup [ref=f14e475]:
+                                - row [ref=f14e476]:
+                                  - columnheader "Measure" [ref=f14e477]
+                                  - columnheader "Result" [ref=f14e478]
+                                  - columnheader "What it means" [ref=f14e479]
+                              - rowgroup [ref=f14e480]:
+                                - row [ref=f14e481]:
+                                  - cell [ref=f14e482]:
+                                    - strong [ref=f14e483]: Overall readiness
+                                  - cell [ref=f14e484]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f14e485]: (4/6)
+                                  - cell "The patch is a coherent bounded repair with focused regression coverage and reported end-to-end installer proof." [ref=f14e486]
+                                - row [ref=f14e487]:
+                                  - cell [ref=f14e488]:
+                                    - strong [ref=f14e489]: Proof confidence
+                                  - cell [ref=f14e490]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f14e491]: (4/6)
+                                  - 'cell "Sufficient (live_output): The PR body provides after-fix Testbox installer-smoke evidence covering candidate packing, tarball audit, fresh installation, and update behavior." [ref=f14e492]'
+                                - row [ref=f14e493]:
+                                  - cell [ref=f14e494]:
+                                    - strong [ref=f14e495]: Patch quality
+                                  - cell [ref=f14e496]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f14e497]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f14e498]
+                            - heading "Verification" [level=2] [ref=f14e499]
+                            - table [ref=f14e501]:
+                              - rowgroup [ref=f14e502]:
+                                - row [ref=f14e503]:
+                                  - columnheader "Check" [ref=f14e504]
+                                  - columnheader "Result" [ref=f14e505]
+                                  - columnheader "Evidence" [ref=f14e506]
+                              - rowgroup [ref=f14e507]:
+                                - row [ref=f14e508]:
+                                  - cell [ref=f14e509]:
+                                    - strong [ref=f14e510]: Real behavior
+                                  - cell "Verified" [ref=f14e511]
+                                  - 'cell "Sufficient (live_output): The PR body provides after-fix Testbox installer-smoke evidence covering candidate packing, tarball audit, fresh installation, and update behavior." [ref=f14e512]'
+                                - row [ref=f14e513]:
+                                  - cell [ref=f14e514]:
+                                    - strong [ref=f14e515]: Evidence reviewed
+                                  - cell "6 items" [ref=f14e516]
+                                  - cell [ref=f14e517]:
+                                    - text: "Current-main failure boundary: Current main routes"
+                                    - code [ref=f14e518]: runCapture
+                                    - text: "through bounded in-memory stdout capture; the 1 MiB guard therefore applies before the npm receipt parser can read a large receipt.Narrow PR owner-boundary change: The proposed package owner allocates a receipt only for npm with"
+                                    - code [ref=f14e519]: "--pack-json"
+                                    - text: ", reads it after packaging, and removes its temporary directory in the enclosing cleanup path.Focused regression coverage: The updated package-Docker test constructs a 15,000-entry npm 12-style receipt larger than 1 MiB, exercises file-backed output, and verifies parsed renamed metadata."
+                                - row [ref=f14e520]:
+                                  - cell [ref=f14e521]:
+                                    - strong [ref=f14e522]: Findings
+                                  - cell "None" [ref=f14e523]
+                                  - cell "None." [ref=f14e524]
+                                - row [ref=f14e525]:
+                                  - cell [ref=f14e526]:
+                                    - strong [ref=f14e527]: Security
+                                  - cell "None" [ref=f14e528]
+                                  - cell "None." [ref=f14e529]
+                            - heading "How this fits together" [level=2] [ref=f14e530]
+                            - paragraph [ref=f14e531]: The Docker package builder creates candidate tarballs for installer smoke and release validation. Its npm receipt identifies the tarball and feeds audit, fresh-install, and update checks.
+                            - region "mermaid rendered output container" [ref=f14e532]:
+                              - generic [ref=f14e533]:
+                                - generic [ref=f14e534]:
+                                  - group [ref=f14e535]:
+                                    - button "Open dialog" [ref=f14e536] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f14e539] [cursor=pointer]
+                                - iframe [ref=f14e544]:
+                                  - generic [ref=f15e1]:
+                                    - document [ref=f15e5]:
+                                      - generic [ref=f15e8]:
+                                        - paragraph [ref=f15e15]: Source candidate
+                                        - paragraph [ref=f15e22]: Docker package builder
+                                        - paragraph [ref=f15e29]: npm pack JSON receipt
+                                        - paragraph [ref=f15e36]: Temporary receipt file
+                                        - paragraph [ref=f15e43]: Receipt parser
+                                        - paragraph [ref=f15e50]: Candidate tarball
+                                        - paragraph [ref=f15e57]: Install and update smoke checks
+                                    - generic [ref=f15e58]:
+                                      - button "Zoom in" [ref=f15e59]
+                                      - button "Zoom out" [ref=f15e63]
+                                      - button "Reset view" [ref=f15e67]
+                                      - button "Pan up" [ref=f15e70]
+                                      - button "Pan down" [ref=f15e73]
+                                      - button "Pan left" [ref=f15e76]
+                                      - button "Pan right" [ref=f15e79]
+                            - heading "Decision needed" [level=2] [ref=f14e545]
+                            - table [ref=f14e547]:
+                              - rowgroup [ref=f14e548]:
+                                - row [ref=f14e549]:
+                                  - columnheader "Question" [ref=f14e550]
+                                  - columnheader "Recommendation" [ref=f14e551]
+                              - rowgroup [ref=f14e552]:
+                                - row [ref=f14e553]:
+                                  - cell "Should the package runner accept this narrowly scoped file-backed stdout mode for the outer npm JSON receipt after exact-head CI completes?" [ref=f14e554]
+                                  - cell [ref=f14e555]:
+                                    - strong [ref=f14e556]: "Accept after exact-head smoke passes:"
+                                    - text: Merge once the current head completes the required package and installer smoke checks with the bounded-capture behavior unchanged elsewhere.
+                            - paragraph [ref=f14e557]:
+                              - text: "Why: The author is a repository member and the PR carries the protected"
+                              - code [ref=f14e558]: maintainer
+                              - text: label, so the acceptance of this CI automation behavior requires an explicit maintainer decision.
+                            - heading "Before merge" [level=2] [ref=f14e559]
+                            - list [ref=f14e560]:
+                              - listitem [ref=f14e561]:
+                                - checkbox "Incomplete task" [disabled] [ref=f14e562]
+                                - strong [ref=f14e563]: Resolve merge risk (P1)
+                                - text: "- This changes stdout routing in installer and release packaging automation; exact-head CI should complete the package, audit, fresh-install, and update path before merge."
+                              - listitem [ref=f14e564]:
+                                - checkbox "Incomplete task" [disabled] [ref=f14e565]
+                                - strong [ref=f14e566]: Resolve merge risk (P1)
+                                - text: "- Production code is net +44 lines; the growth is justified only if the existing package runner remains the single owner of the file-backed subprocess behavior rather than gaining a parallel pack-specific runner."
+                              - listitem [ref=f14e567]:
+                                - checkbox "Incomplete task" [disabled] [ref=f14e568]
+                                - strong [ref=f14e569]: Complete next step (P2)
+                                - text: "- This member-authored, maintainer-labeled PR needs normal maintainer acceptance and exact-head automation completion rather than an automated repair or cleanup lane."
+                            - group [ref=f14e570]:
+                              - strong [ref=f14e572] [cursor=pointer]: Agent review details
+                - generic [ref=f14e583]:
+                  - link [ref=f14e586] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f14e587]
+                  - code [ref=f14e589]:
+                    - 'link "fix(ci): stream npm pack receipt to disk" [ref=f14e590] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/123019/commits/b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                  - button "Verified" [ref=f14e592] [cursor=pointer]
+                  - group [ref=f14e597]:
+                    - img "76 / 104 checks OK" [ref=f14e599] [cursor=pointer]
+                  - code [ref=f14e602]:
+                    - link "b8cbfdd" [ref=f14e603] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/123019/commits/b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                - generic [ref=f14e610]:
+                  - link [ref=f14e612] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f14e613]
+                  - generic [ref=f14e614]:
+                    - link "vincentkoc" [ref=f14e615] [cursor=pointer]:
+                      - /url: /vincentkoc
+                    - link "force-pushed" [ref=f14e616] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/19d4985d4cd4de27e539669f62c7e506b841429c..b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                    - text: the
+                    - generic [ref=f14e617]: fix/installer-pack-stdout-receipt
+                    - text: branch from
+                    - link [ref=f14e619] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/19d4985d4cd4de27e539669f62c7e506b841429c
+                      - code [ref=f14e620]: 19d4985
+                    - text: to
+                    - link [ref=f14e621] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/commit/b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                      - code [ref=f14e622]: b8cbfdd
+                    - link "Compare" [ref=f14e623] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/compare/19d4985d4cd4de27e539669f62c7e506b841429c..b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                    - link "August 13, 2026 06:1444 minutes ago" [ref=f14e626] [cursor=pointer]:
+                      - /url: "#event-29382780771"
+                - generic [ref=f14e628]:
+                  - link [ref=f14e630] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f14e631]
+                  - generic [ref=f14e633]:
+                    - generic [ref=f14e634]:
+                      - heading "clawsweeper Bot commented Aug 13, 202636 minutes ago" [level=3] [ref=f14e635]:
+                        - generic [ref=f14e636]:
+                          - strong [ref=f14e637]:
+                            - link "clawsweeper" [ref=f14e638] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f14e639]: Bot
+                          - text: commented
+                          - link "Aug 13, 202636 minutes ago" [ref=f14e640] [cursor=pointer]:
+                            - /url: "#issuecomment-5276727654"
+                      - generic [ref=f14e641]:
+                        - group [ref=f14e643]:
+                          - button [ref=f14e644] [cursor=pointer]:
+                            - img "Show options" [ref=f14e647]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f14e650]: Contributor
+                    - table [ref=f14e654]:
+                      - rowgroup [ref=f14e655]:
+                        - row [ref=f14e656]:
+                          - cell [ref=f14e657]:
+                            - paragraph [ref=f14e658]: "ClawSweeper status: review started."
+                            - paragraph [ref=f14e659]: "I am starting a fresh review of this pull request: fix(ci): accept large npm pack receipts This is item 1/1 in the current shard. Shard 0/1."
+                            - paragraph [ref=f14e660]: This placeholder means the worker is alive and reading the current context. I will edit this same comment with the actual review when the claws are done clicking.
+                            - paragraph [ref=f14e661]: "Crustacean status: shell secured, claws on keyboard, evidence pebbles being sorted."
+                - generic [ref=f14e663]:
+                  - link [ref=f14e665] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f14e666]
+                  - generic [ref=f14e668]:
+                    - generic [ref=f14e669]:
+                      - heading [level=3] [ref=f14e670]:
+                        - generic [ref=f14e671]:
+                          - strong [ref=f14e672]:
+                            - link "vincentkoc" [ref=f14e673] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202636 minutes ago" [ref=f14e674] [cursor=pointer]:
+                            - /url: "#issuecomment-5276730170"
+                      - generic [ref=f14e675]:
+                        - group [ref=f14e677]:
+                          - button [ref=f14e678] [cursor=pointer]:
+                            - img "Show options" [ref=f14e681]
+                        - generic [ref=f14e683]:
+                          - generic "This user is a member of the openclaw organization." [ref=f14e684]: Member
+                          - generic "This user is the author of this pull request." [ref=f14e686]: Author
+                    - table [ref=f14e690]:
+                      - rowgroup [ref=f14e691]:
+                        - row [ref=f14e692]:
+                          - cell [ref=f14e693]:
+                            - paragraph [ref=f14e694]:
+                              - link "@clawsweeper" [ref=f14e695] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                            - paragraph [ref=f14e696]:
+                              - text: "Exact head:"
+                              - code [ref=f14e697]: b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                              - text: . Exact-head CI
+                              - code [ref=f14e698]: "31673146699"
+                              - text: is green. The PR body now contains the final focused, Testbox, local ClawSweeper, and LOC evidence.
+                - generic [ref=f14e700]:
+                  - link [ref=f14e702] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f14e703]
+                  - generic [ref=f14e705]:
+                    - generic [ref=f14e706]:
+                      - heading "clawsweeper Bot commented Aug 13, 202636 minutes ago •" [level=3] [ref=f14e707]:
+                        - generic [ref=f14e708]:
+                          - strong [ref=f14e709]:
+                            - link "clawsweeper" [ref=f14e710] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f14e711]: Bot
+                          - text: commented
+                          - link "Aug 13, 202636 minutes ago" [ref=f14e712] [cursor=pointer]:
+                            - /url: "#issuecomment-5276730716"
+                          - generic [ref=f14e713]:
+                            - generic [ref=f14e714]: •
+                            - group [ref=f14e715]:
+                              - button "edited" [ref=f14e716] [cursor=pointer]
+                      - generic [ref=f14e720]:
+                        - group [ref=f14e722]:
+                          - button [ref=f14e723] [cursor=pointer]:
+                            - img "Show options" [ref=f14e726]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f14e729]: Contributor
+                    - table [ref=f14e733]:
+                      - rowgroup [ref=f14e734]:
+                        - row [ref=f14e735]:
+                          - cell [ref=f14e736]:
+                            - paragraph [ref=f14e737]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f14e738]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f14e739]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f14e740]: exact_review_queue
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                - generic [ref=f14e741]:
+                  - generic [ref=f14e746]:
+                    - button "View details" [ref=f14e747] [cursor=pointer]
+                    - generic [ref=f14e748]:
+                      - link [ref=f14e750] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f14e751]
+                      - generic [ref=f14e752]:
+                        - link "vincentkoc" [ref=f14e753] [cursor=pointer]:
+                          - /url: /vincentkoc
+                        - text: merged commit
+                        - link [ref=f14e754] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/ac110917e1356833f65e1536768cbfbe7c1938d0
+                          - code [ref=f14e755]: ac11091
+                        - text: into
+                        - generic [ref=f14e756]: main
+                        - link "Aug 13, 202628 minutes ago" [ref=f14e758] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123019#event-29383383305
+                        - generic [ref=f14e759]: 110 checks passed
+                  - generic [ref=f14e766]:
+                    - link [ref=f14e768] [cursor=pointer]:
+                      - /url: /vincentkoc
+                      - img "@vincentkoc" [ref=f14e769]
+                    - generic [ref=f14e770]:
+                      - link "vincentkoc" [ref=f14e771] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - text: deleted the
+                      - generic [ref=f14e772]: fix/installer-pack-stdout-receipt
+                      - text: branch
+                      - link "August 13, 2026 06:3028 minutes ago" [ref=f14e774] [cursor=pointer]:
+                        - /url: "#event-29383385142"
+                - generic [ref=f14e776]:
+                  - link [ref=f14e778] [cursor=pointer]:
+                    - /url: /vincentkoc
+                    - img "@vincentkoc" [ref=f14e779]
+                  - generic [ref=f14e781]:
+                    - generic [ref=f14e782]:
+                      - heading [level=3] [ref=f14e783]:
+                        - generic [ref=f14e784]:
+                          - strong [ref=f14e785]:
+                            - link "vincentkoc" [ref=f14e786] [cursor=pointer]:
+                              - /url: /vincentkoc
+                          - text: commented
+                          - link "Aug 13, 202628 minutes ago" [ref=f14e787] [cursor=pointer]:
+                            - /url: "#issuecomment-5276813069"
+                      - generic [ref=f14e788]:
+                        - group [ref=f14e790]:
+                          - button [ref=f14e791] [cursor=pointer]:
+                            - img "Show options" [ref=f14e794]
+                        - generic [ref=f14e796]:
+                          - generic "This user is a member of the openclaw organization." [ref=f14e797]: Member
+                          - generic "This user is the author of this pull request." [ref=f14e799]: Author
+                    - table [ref=f14e803]:
+                      - rowgroup [ref=f14e804]:
+                        - row [ref=f14e805]:
+                          - cell [ref=f14e806]:
+                            - paragraph [ref=f14e807]: Merged via squash.
+                            - list [ref=f14e808]:
+                              - listitem [ref=f14e809]:
+                                - text: "Prepared head SHA:"
+                                - link "b8cbfdd02bd2b51d35ae9baa9880e334e3c96445" [ref=f14e810] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/123019/commits/b8cbfdd02bd2b51d35ae9baa9880e334e3c96445
+                              - listitem [ref=f14e811]:
+                                - text: "Landed commit:"
+                                - link "ac110917e1356833f65e1536768cbfbe7c1938d0" [ref=f14e812] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/ac110917e1356833f65e1536768cbfbe7c1938d0
+            - generic [ref=f14e816]:
+              - link "Sign up for free" [ref=f14e817] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f14e818]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f14e819] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F123019
+        - generic [ref=f14e823]:
+          - form "Select reviewers" [ref=f14e825]:
+            - heading "Reviewers" [level=3] [ref=f14e826]
+            - text: No reviews
+          - form "Select assignees" [ref=f14e828]:
+            - heading "Assignees" [level=3] [ref=f14e829]
+            - paragraph [ref=f14e831]:
+              - generic [ref=f14e832]:
+                - link [ref=f14e833] [cursor=pointer]:
+                  - /url: /vincentkoc
+                  - img "@vincentkoc" [ref=f14e834]
+                - link "vincentkoc" [ref=f14e835] [cursor=pointer]:
+                  - /url: /vincentkoc
+          - generic [ref=f14e836]:
+            - heading "Labels" [level=3] [ref=f14e837]
+            - generic [ref=f14e838]:
+              - link "docker" [ref=f14e839] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocker
+              - link "maintainer" [ref=f14e841] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 automation" [ref=f14e843] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20automation%22
+              - link "P2" [ref=f14e845] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "proof: sufficient" [ref=f14e847] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "rating: 🐚 platinum hermit" [ref=f14e849] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - link "scripts" [ref=f14e851] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+              - 'link "size: M" [ref=f14e853] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f14e855] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f14e858]:
+            - heading "Projects" [level=3] [ref=f14e859]
+            - text: None yet
+          - form "Select milestones" [ref=f14e861]:
+            - heading "Milestone" [level=3] [ref=f14e862]
+            - text: No milestone
+          - form "Link issues" [ref=f14e868]:
+            - heading "Development" [level=3] [ref=f14e869]
+            - paragraph [ref=f14e870]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f14e872]: None yet
+          - generic [ref=f14e874]:
+            - heading "1 participant" [level=3] [ref=f14e875]
+            - link [ref=f14e877] [cursor=pointer]:
+              - /url: /vincentkoc
+              - img "@vincentkoc" [ref=f14e878]
+  - contentinfo [ref=f14e879]:
+    - heading "Footer" [level=2] [ref=f14e880]
+    - generic [ref=f14e881]:
+      - generic [ref=f14e882]:
+        - link "GitHub Homepage" [ref=f14e883] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f14e886]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f14e887]:
+        - heading "Footer navigation" [level=3] [ref=f14e888]
+        - list "Footer navigation" [ref=f14e889]:
+          - listitem [ref=f14e890]:
+            - link "Terms" [ref=f14e891] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f14e892]:
+            - link "Privacy" [ref=f14e893] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f14e894]:
+            - link "Security" [ref=f14e895] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f14e896]:
+            - link "Status" [ref=f14e897] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f14e898]:
+            - link "Community" [ref=f14e899] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f14e900]:
+            - link "Docs" [ref=f14e901] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f14e902]:
+            - link "Contact" [ref=f14e903] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f14e904]:
+            - button "Manage cookies" [ref=f14e906] [cursor=pointer]
+          - listitem [ref=f14e907]:
+            - button "Do not share my personal information" [ref=f14e909] [cursor=pointer]

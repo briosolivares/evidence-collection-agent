@@ -1,0 +1,19 @@
+{
+  "sorority": "Delta Phi Epsilon",
+  "website": "http://dphie.mit.edu/",
+  "sistersPage": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+  "members": [
+    {"name":"Angela Zhang","class":"2026","major":"Course 6-3","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Bellevue, WA; VP of Recruitment"},
+    {"name":"Catherine Kung","class":"2026","major":"Courses 20 and 6-9","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Birmingham, AL"},
+    {"name":"Emma Shi","class":"2026","major":"Course 6-14","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Sammamish, WA; VP of Membership Development"},
+    {"name":"Kaylee Ji","class":"2026","major":"Courses 6-9 and 18","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Lexington, MA; VP of Programming"},
+    {"name":"Melinda Liu","class":"2026","major":"Courses 6-14 and 15-3","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Tampa, FL"},
+    {"name":"Michelle Xiang","class":"2026","major":"Course 18C","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Austin, TX"},
+    {"name":"Radia Wong","class":"2026","major":"Course 6-3","affiliation":"Delta Phi Epsilon","interests":"","other":"From: San Jose, CA"},
+    {"name":"Reina Wang","class":"2026","major":"Course 6-4","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Shanghai, China"},
+    {"name":"Kaitlyn Li","class":"2027","major":"Course 6-4","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Rockville, MD"},
+    {"name":"Rita Braun","class":"2027","major":"Course 12","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Bismarck, ND; VP of Equity and Belonging"},
+    {"name":"Stephanie Han","class":"2027","major":"Course 15-3","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Okemos, MI"},
+    {"name":"Lillian Zhu","class":"2027","major":"HST Medical Student","affiliation":"Delta Phi Epsilon","interests":"","other":"From: Gainesville, FL"}
+  ]
+}

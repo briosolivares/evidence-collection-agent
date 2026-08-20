@@ -1,0 +1,134 @@
+founder_name,linkedin_url,cold_outreach_email
+Dave Grannan,https://linkedin.com/in/grannan,"Subject: Quick question about Marr Labs' voice AI approach
+
+Hi Dave,
+
+I came across Marr Labs through YC's Winter 2024 batch and was struck by how far you've pushed conversational latency and naturalness with your voice agents -- ""indistinguishable from humans"" is a bold claim that most vendors can't back up, and it sounds like you're actually delivering on it for sales and support calls.
+
+I'm reaching out because I'd love to learn more about the architecture decisions behind that realism (turn-taking, interruption handling, etc.) and share a bit about what we're working on in case there's a fit or useful exchange of notes.
+
+Would you have 15 minutes this week or next for a quick call? Happy to work around your schedule.
+
+Best,
+[Your Name]"
+Han Shu,https://linkedin.com/in/hanshu,"Subject: Curious about the engineering behind Marr Labs' voice agents
+
+Hi Han,
+
+I've been following Marr Labs since seeing you in YC's Winter 2024 batch, and as the technical co-founder behind ""AI voice agents indistinguishable from humans,"" I imagine you've solved some genuinely hard real-time speech and latency problems most teams shy away from.
+
+I'd love to hear how you approached the tech stack and get your take on where voice AI is heading, and share a little about what I'm building in case it's relevant to you.
+
+Would you be open to a 15-minute call sometime this week or next?
+
+Best,
+[Your Name]"
+Elle Smyth,https://linkedin.com/in/ellesmyth,"Subject: RetailReady's approach to warehouse compliance
+
+Hi Elle,
+
+I saw RetailReady in YC's Winter 2024 batch and your AI-powered supply chain compliance engine really stood out -- chargebacks from failed retailer compliance are such a costly, under-addressed problem for warehouse teams, and it's great to see someone tackling it with AI directly at the operational level.
+
+I'd love to learn more about how you're modeling compliance rules across retailers and hear about your traction so far, and share a bit about what I'm working on in case there's a useful connection.
+
+Do you have 15 minutes for a quick call this week or next?
+
+Best,
+[Your Name]"
+Sarah Hamer,https://linkedin.com/in/sarah-hamer-881bb6126,"Subject: Question about RetailReady's compliance engine
+
+Hi Sarah,
+
+I came across RetailReady through YC's Winter 2024 batch and was impressed by the AI-powered supply chain compliance engine you've built -- turning retailer compliance requirements into something warehouse teams can actually act on in real time is a genuinely hard technical problem.
+
+As the technical co-founder, I'd love to hear more about how the system ingests and applies compliance rules, and share a bit about what I'm building in case it's useful to compare notes.
+
+Would you have 15 minutes this week or next for a short call?
+
+Best,
+[Your Name]"
+Lukas Martinelli,https://linkedin.com/in/lukas-martinelli,"Subject: Reprompt's AI agents for location data
+
+Hi Lukas,
+
+I saw Reprompt in YC's Winter 2024 batch and, given your background leading search at Mapbox, it makes total sense that you're now building AI agents for location -- that's exactly the kind of problem that needs both deep mapping expertise and modern AI tooling.
+
+I'd love to learn more about how your agents are being used by teams like Foursquare and TomTom, and share a bit about what I'm working on in case there's a fit.
+
+Would you have 15 minutes for a call this week or next?
+
+Best,
+[Your Name]"
+Rob Balian,https://linkedin.com/in/robbalian,"Subject: Curious about Reprompt's growth and product
+
+Hi Rob,
+
+I came across Reprompt through YC's Winter 2024 batch, and with your growth background from Robinhood and Facebook, I'd guess you're bringing a sharp go-to-market lens to AI agents for location data -- a space that feels early but full of real demand.
+
+I'd love to hear more about how you're thinking about growth and positioning for Reprompt, and share a bit about what I'm working on in case it's useful to connect.
+
+Do you have 15 minutes for a quick call this week or next?
+
+Best,
+[Your Name]"
+Himank Jain,https://linkedin.com/in/himank1,"Subject: GetCrux's AI Creative Strategist
+
+Hi Himank,
+
+I saw GetCrux in YC's Winter 2024 batch and loved the framing of an ""AI Creative Strategist"" -- performance marketers guessing at why an ad works (and burning CAC in the process) is such a widespread, expensive problem, and using AI to surface patterns across 100+ creative parameters is a smart way to attack it.
+
+I'd love to hear more about how you built the pattern-recognition engine and what's resonating most with your marketing teams, and share a bit about what I'm working on in case there's a fit.
+
+Would you have 15 minutes for a call this week or next?
+
+Best,
+[Your Name]"
+Atharva Padhye,https://linkedin.com/in/atharvapadhyecrux,"Subject: Question about GetCrux's creative insights engine
+
+Hi Atharva,
+
+I came across GetCrux through YC's Winter 2024 batch and think the idea of an AI Creative Strategist that learns from competitor ads and your own creative history to recommend what to launch next is a really compelling wedge into performance marketing.
+
+I'd love to hear more about how the recommendation engine works under the hood and what you've learned building it, and share a bit about what I'm working on in case it's useful to connect.
+
+Do you have 15 minutes for a quick call this week or next?
+
+Best,
+[Your Name]"
+Prabhat Singh,https://linkedin.com/in/prabhat7758,"Subject: GetCrux and AI-driven ad creative strategy
+
+Hi Prabhat,
+
+I saw GetCrux in YC's Winter 2024 batch and was impressed by how you're using AI to help performance marketers understand why certain ad creatives win instead of just guessing and replicating -- that's a real pain point for growth teams.
+
+I'd love to learn more about your approach to analyzing creative patterns across hooks, messaging, and pacing, and share a bit about what I'm building in case there's a good fit.
+
+Would you have 15 minutes for a call this week or next?
+
+Best,
+[Your Name]"
+Yvonne Chou,https://linkedin.com/in/yvonne-chou,"Subject: Kater.ai and the future of self-serve analytics
+
+Hi Yvonne,
+
+I came across kater.ai through YC's Winter 2024 batch, and given your background building the data stack at Crexi, it's clear you understand firsthand why companies are ""data-rich but insight-poor."" Turning a single business question into a full contextualized analysis is a compelling way to cut out the analyst bottleneck.
+
+I'd love to hear more about how Kater's classification engine works and what's resonating with early customers, and share a bit about what I'm working on in case it's useful to connect.
+
+Do you have 15 minutes for a quick call this week or next?
+
+Best,
+[Your Name]"
+Robin Seitz,https://linkedin.com/in/robin-seitz-12029970,"Subject: Curious about Kater's data agent architecture
+
+Hi Robin,
+
+I saw kater.ai in YC's Winter 2024 batch and, given your engineering background at Microsoft, I imagine you brought serious rigor to building Kater's continuous classification engine that turns plain-English questions into contextualized analysis.
+
+I'd love to learn more about the technical approach behind Butler and how you're handling data trust and context across personas, and share a bit about what I'm working on in case there's a fit.
+
+Would you have 15 minutes for a call this week or next?
+
+Best,
+[Your Name]"
+</content>

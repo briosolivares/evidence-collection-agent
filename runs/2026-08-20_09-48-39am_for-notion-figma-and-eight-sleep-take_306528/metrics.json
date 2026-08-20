@@ -1,0 +1,39 @@
+{
+  "status": "verified",
+  "turns": 39,
+  "protocolCorrections": 0,
+  "inputTokens": 4146,
+  "outputTokens": 15033,
+  "cacheReadInputTokens": 553773,
+  "cacheCreationInputTokens": 94997,
+  "toolCalls": 58,
+  "toolResultBytes": 5312852,
+  "peakContextTokens": 25546,
+  "wallClockMs": 265857,
+  "roles": {
+    "initializer": {
+      "turns": 2,
+      "inputTokens": 40,
+      "outputTokens": 896,
+      "cacheReadInputTokens": 5247,
+      "cacheCreationInputTokens": 5838,
+      "wallClockMs": 8216
+    },
+    "worker": {
+      "turns": 39,
+      "inputTokens": 78,
+      "outputTokens": 11615,
+      "cacheReadInputTokens": 531790,
+      "cacheCreationInputTokens": 63559,
+      "wallClockMs": 177579
+    },
+    "verifier": {
+      "turns": 5,
+      "inputTokens": 4028,
+      "outputTokens": 2522,
+      "cacheReadInputTokens": 16736,
+      "cacheCreationInputTokens": 25600,
+      "wallClockMs": 25117
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "startedAt": "2026-08-11T03:04:09.875Z",
+  "finishedAt": "2026-08-11T03:04:09.893Z",
+  "k": 2,
+  "model": "claude-sonnet-5",
+  "tasks": [
+    {
+      "task": "stub",
+      "k": 2,
+      "accuracy": 1,
+      "taskPassed": true,
+      "meanLatencyMs": 4.898291499999971,
+      "trials": [
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-10_08-04-09pm_write-your-answer-to-answer-md-in-the_ce0045",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "answer.md found in run dir"
+            },
+            {
+              "name": "manifest hash verifies for answer.md",
+              "passed": true,
+              "detail": "sha256 5379dcedc5b21c97e91790439495b7179698797f74f40c455a735f88b4bb1182 matches manifest"
+            }
+          ],
+          "latencyMs": 6.016624999999976,
+          "completed": true
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-10_08-04-09pm_write-your-answer-to-answer-md-in-the_5c8d6b",
+          "assertions": [
+            {
+              "name": "answer.md exists",
+              "passed": true,
+              "detail": "answer.md found in run dir"
+            },
+            {
+              "name": "manifest hash verifies for answer.md",
+              "passed": true,
+              "detail": "sha256 5379dcedc5b21c97e91790439495b7179698797f74f40c455a735f88b4bb1182 matches manifest"
+            }
+          ],
+          "latencyMs": 3.779957999999965,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}

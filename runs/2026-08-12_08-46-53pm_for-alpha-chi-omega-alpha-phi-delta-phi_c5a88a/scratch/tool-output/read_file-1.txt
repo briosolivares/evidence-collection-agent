@@ -1,0 +1,978 @@
+     1→URL: https://marginalia-search.com/search?query=MIT+Panhellenic+sororities&sst=SE-1bc25e84c4c8be68
+     2→Title: MIT Panhellenic sororities - Marginalia Search
+     3→
+     4→- generic [active] [ref=f119e1]:
+     5→  - link "Skip To Content" [ref=f119e2] [cursor=pointer]:
+     6→    - /url: skipnav
+     7→  - banner [ref=f119e3]:
+     8→    - navigation [ref=f119e5]:
+     9→      - generic [ref=f119e7]:
+    10→        - link "Search" [ref=f119e8] [cursor=pointer]:
+    11→          - /url: /
+    12→        - link "Sites" [ref=f119e9] [cursor=pointer]:
+    13→          - /url: /site
+    14→        - link "Explore" [ref=f119e10] [cursor=pointer]:
+    15→          - /url: /explore
+    16→        - link "About" [ref=f119e12] [cursor=pointer]:
+    17→          - /url: https://about.marginalia-search.com/
+    18→  - banner [ref=f119e13]:
+    19→    - generic [ref=f119e15]:
+    20→      - heading [level=1] [ref=f119e17]:
+    21→        - link "Marginalia Search" [ref=f119e18] [cursor=pointer]:
+    22→          - /url: /
+    23→      - generic [ref=f119e21]:
+    24→        - textbox "Search the web!" [ref=f119e22]: MIT Panhellenic sororities
+    25→        - button " Search" [ref=f119e23] [cursor=pointer]:
+    26→          - generic [ref=f119e24]: 
+    27→          - text: Search
+    28→      - text:  
+    29→  - generic [ref=f119e25]:
+    30→    - complementary [ref=f119e26]:
+    31→      - generic [ref=f119e28]:
+    32→        - heading " Filter" [level=2] [ref=f119e29]:
+    33→          - generic [ref=f119e30]: 
+    34→          - text: Filter
+    35→        - generic [ref=f119e31]:
+    36→          - button [ref=f119e33] [cursor=pointer]:
+    37→            - link " All" [ref=f119e34]:
+    38→              - /url: /search?query=MIT+Panhellenic+sororities&newfilter=true&sst=SE-1bc25e84c4c8be68
+    39→              - generic [ref=f119e35]: 
+    40→              - text: All
+    41→          - button [ref=f119e37] [cursor=pointer]:
+    42→            - link " Blogs" [ref=f119e38]:
+    43→              - /url: /search?query=MIT+Panhellenic+sororities&profile=blogosphere&newfilter=true&sst=SE-1bc25e84c4c8be68
+    44→              - generic [ref=f119e39]: 
+    45→              - text: Blogs
+    46→          - button [ref=f119e41] [cursor=pointer]:
+    47→            - link " Academia" [ref=f119e42]:
+    48→              - /url: /search?query=MIT+Panhellenic+sororities&profile=academia&newfilter=true&sst=SE-1bc25e84c4c8be68
+    49→              - generic [ref=f119e43]: 
+    50→              - text: Academia
+    51→          - button [ref=f119e45] [cursor=pointer]:
+    52→            - link " Vintage" [ref=f119e46]:
+    53→              - /url: /search?query=MIT+Panhellenic+sororities&profile=vintage&newfilter=true&sst=SE-1bc25e84c4c8be68
+    54→              - generic [ref=f119e47]: 
+    55→              - text: Vintage
+    56→          - button [ref=f119e49] [cursor=pointer]:
+    57→            - link " Small Web" [ref=f119e50]:
+    58→              - /url: /search?query=MIT+Panhellenic+sororities&profile=modern&newfilter=true&sst=SE-1bc25e84c4c8be68
+    59→              - generic [ref=f119e51]: 
+    60→              - text: Small Web
+    61→          - button [ref=f119e54] [cursor=pointer]:
+    62→            - link " Wikis" [ref=f119e55]:
+    63→              - /url: /search?query=MIT+Panhellenic+sororities&profile=wiki&newfilter=true&sst=SE-1bc25e84c4c8be68
+    64→              - generic [ref=f119e56]: 
+    65→              - text: Wikis
+    66→          - button [ref=f119e58] [cursor=pointer]:
+    67→            - link " Forums" [ref=f119e59]:
+    68→              - /url: /search?query=MIT+Panhellenic+sororities&profile=forum&newfilter=true&sst=SE-1bc25e84c4c8be68
+    69→              - generic [ref=f119e60]: 
+    70→              - text: Forums
+    71→          - button [ref=f119e62] [cursor=pointer]:
+    72→            - link " Recipes" [ref=f119e63]:
+    73→              - /url: /search?query=MIT+Panhellenic+sororities&profile=food&newfilter=true&sst=SE-1bc25e84c4c8be68
+    74→              - generic [ref=f119e64]: 
+    75→              - text: Recipes
+    76→          - button [ref=f119e67] [cursor=pointer]:
+    77→            - link " Custom Filter" [ref=f119e68]:
+    78→              - /url: /search?query=MIT+Panhellenic+sororities&profile=custom&newfilter=true&sst=SE-1bc25e84c4c8be68
+    79→              - generic [ref=f119e69]: 
+    80→              - text: Custom Filter
+    81→    - text:  
+    82→    - main [ref=f119e70]:
+    83→      - generic [ref=f119e71]:
+    84→        - heading "Results" [level=1] [ref=f119e72]
+    85→        - generic [ref=f119e73]:
+    86→          - generic [ref=f119e75]:
+    87→            - generic [ref=f119e76]:
+    88→              - generic [ref=f119e77]:
+    89→                - generic [ref=f119e78]:
+    90→                  - generic "Match density" [ref=f119e79]
+    91→                  - generic [ref=f119e83]:
+    92→                    - heading [level=2] [ref=f119e84]:
+    93→                      - link "List of Massachusetts Institute of Technology fraternities and sororities" [ref=f119e85] [cursor=pointer]:
+    94→                        - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+    95→                    - link "https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities" [ref=f119e87] [cursor=pointer]:
+    96→                      - /url: https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+    97→                - paragraph [ref=f119e89]: The first fraternity at Massachusetts Institute of Technology (MIT) was Chi Phi, established in 1873. In the fall of 2023, 43 percent of MIT's male students belonged to a fraternity, while 23 percent of female students belonged to a sorority. As of 2025,
+    98→              - generic [ref=f119e90]:
+    99→                - link "" [ref=f119e91] [cursor=pointer]:
+   100→                  - /url: /site/en.wikipedia.org
+   101→                - link "" [ref=f119e93] [cursor=pointer]:
+   102→                  - /url: https://web.archive.org/web/*/https://en.wikipedia.org/wiki/List_of_Massachusetts_Institute_of_Technology_fraternities_and_sororities
+   103→            - generic [ref=f119e95]:
+   104→              - paragraph [ref=f119e96]: "Also from en.wikipedia.org:"
+   105→              - list [ref=f119e97]:
+   106→                - listitem [ref=f119e98]:
+   107→                  - link "Traditions and student activities at MIT" [ref=f119e99] [cursor=pointer]:
+   108→                    - /url: https://en.wikipedia.org/wiki/Traditions_and_student_activities_at_MIT
+   109→                - listitem [ref=f119e100]:
+   110→                  - link "Union College" [ref=f119e101] [cursor=pointer]:
+   111→                    - /url: https://en.wikipedia.org/wiki/Union_College
+   112→                - listitem [ref=f119e102]:
+   113→                  - link "Florida State University" [ref=f119e103] [cursor=pointer]:
+   114→                    - /url: https://en.wikipedia.org/wiki/Florida_State_University
+   115→                - listitem [ref=f119e104]:
+   116→                  - link "American University" [ref=f119e105] [cursor=pointer]:
+   117→                    - /url: https://en.wikipedia.org/wiki/American_University
+   118→            - generic [ref=f119e106]:
+   119→              - link "4 more" [ref=f119e108] [cursor=pointer]:
+   120→                - /url: /search?query=MIT+Panhellenic+sororities+site%3Aen.wikipedia.org&sst=SE-1bc25e84c4c8be68
+   121→              - generic [ref=f119e110]: Wiki
+   122→              - generic "Contains JavaScript" [ref=f119e111]: JS
+   123→          - generic [ref=f119e113]:
+   124→            - generic [ref=f119e114]:
+   125→              - generic [ref=f119e115]:
+   126→                - generic [ref=f119e116]:
+   127→                  - generic "Match density" [ref=f119e117]
+   128→                  - generic [ref=f119e121]:
+   129→                    - heading [level=2] [ref=f119e122]:
+   130→                      - link "Awards — Kappa Alpha Theta" [ref=f119e123] [cursor=pointer]:
+   131→                        - /url: https://www.theta.mit.edu/awards
+   132→                    - link "https://www.theta.mit.edu/awards" [ref=f119e125] [cursor=pointer]:
+   133→                      - /url: https://www.theta.mit.edu/awards
+   134→                - paragraph [ref=f119e127]: Our chapter's accomplishments are recognized by both the MIT administration and our international headquarters. Kappa Alpha Theta at MIT consistently makes the FSILG Academic Honor Roll, given to the top 1/3 of FSILGs at MIT.
+   135→              - generic [ref=f119e128]:
+   136→                - link "" [ref=f119e129] [cursor=pointer]:
+   137→                  - /url: /site/www.theta.mit.edu
+   138→                - link "" [ref=f119e131] [cursor=pointer]:
+   139→                  - /url: https://web.archive.org/web/*/https://www.theta.mit.edu/awards
+   140→            - generic "Contains JavaScript" [ref=f119e135]: JS
+   141→          - generic [ref=f119e137]:
+   142→            - generic [ref=f119e138]:
+   143→              - generic [ref=f119e139]:
+   144→                - generic [ref=f119e140]:
+   145→                  - generic "Match density" [ref=f119e141]
+   146→                  - generic [ref=f119e145]:
+   147→                    - heading [level=2] [ref=f119e146]:
+   148→                      - link "Sororities @ MIT- Become a part of it! | MIT Admissions" [ref=f119e147] [cursor=pointer]:
+   149→                        - /url: https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/
+   150→                    - link "https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/" [ref=f119e149] [cursor=pointer]:
+   151→                      - /url: https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/
+   152→                - paragraph [ref=f119e151]: Come to the first day of recruitment on September 1st to learn more about what it means to be in a sorority at MIT. August 20, 2007 Times are a changin’ around the Institvte. This year, sorority recruitment has been moved from the last weekend of IAP to t
+   153→              - generic [ref=f119e152]:
+   154→                - link "" [ref=f119e153] [cursor=pointer]:
+   155→                  - /url: /site/mitadmissions.org
+   156→                - link "" [ref=f119e155] [cursor=pointer]:
+   157→                  - /url: https://web.archive.org/web/*/https://mitadmissions.org/blogs/entry/sororities_mit_become_a_part_o/
+   158→            - generic [ref=f119e157]:
+   159→              - paragraph [ref=f119e158]: "Also from mitadmissions.org:"
+   160→              - list [ref=f119e159]:
+   161→                - listitem [ref=f119e160]:
+   162→                  - link "[Guest Post] All About the MIT Panhellenic Association | MIT Admissions" [ref=f119e161] [cursor=pointer]:
+   163→                    - /url: https://mitadmissions.org/blogs/entry/guest-post-find-your-home-under-the-dome/
+   164→                - listitem [ref=f119e162]:
+   165→                  - link "Home Under the Dome | MIT Admissions" [ref=f119e163] [cursor=pointer]:
+   166→                    - /url: https://mitadmissions.org/blogs/entry/home-under-the-dome/
+   167→                - listitem [ref=f119e164]:
+   168→                  - link "Let the Rush Begin | MIT Admissions" [ref=f119e165] [cursor=pointer]:
+   169→                    - /url: https://mitadmissions.org/blogs/entry/let_the_rush_begin/
+   170→                - listitem [ref=f119e166]:
+   171→                  - link "I Never Thought I Would Join a Sorority | MIT Admissions" [ref=f119e167] [cursor=pointer]:
+   172→                    - /url: https://mitadmissions.org/blogs/entry/i-never-thought-i-would-join-a-sorority/
+   173→            - generic [ref=f119e168]:
+   174→              - link "4 more" [ref=f119e170] [cursor=pointer]:
+   175→                - /url: /search?query=MIT+Panhellenic+sororities+site%3Amitadmissions.org&sst=SE-1bc25e84c4c8be68
+   176→              - generic "Contains JavaScript" [ref=f119e172]: JS
+   177→          - generic [ref=f119e174]:
+   178→            - generic [ref=f119e175]:
+   179→              - generic [ref=f119e176]:
+   180→                - generic [ref=f119e177]:
+   181→                  - generic "Match density" [ref=f119e178]
+   182→                  - generic [ref=f119e182]:
+   183→                    - heading [level=2] [ref=f119e183]:
+   184→                      - link "Panhel Selects Three Finalists In Search for Extra Sorority at MIT | The Tech" [ref=f119e184] [cursor=pointer]:
+   185→                        - /url: https://thetech.com/2008/03/18/sorority-v128-n13
+   186→                    - link "https://thetech.com/2008/03/18/sorority-v128-n13" [ref=f119e186] [cursor=pointer]:
+   187→                      - /url: https://thetech.com/2008/03/18/sorority-v128-n13
+   188→                - paragraph [ref=f119e188]: By The MIT Panhellenic Association chose three sororities out of eleven that applied as finalists in the selection process for a sixth sorority at MIT. National representatives of Delta Delta Delta, Kappa Kappa Gamma, and Pi Beta Phi were invited to prese
+   189→              - generic [ref=f119e189]:
+   190→                - link "" [ref=f119e190] [cursor=pointer]:
+   191→                  - /url: /site/thetech.com
+   192→                - link "" [ref=f119e192] [cursor=pointer]:
+   193→                  - /url: https://web.archive.org/web/*/https://thetech.com/2008/03/18/sorority-v128-n13
+   194→            - generic [ref=f119e194]:
+   195→              - paragraph [ref=f119e195]: "Also from thetech.com:"
+   196→              - list [ref=f119e196]:
+   197→                - listitem [ref=f119e197]:
+   198→                  - link "Panhel votes for new sorority | The Tech" [ref=f119e198] [cursor=pointer]:
+   199→                    - /url: https://thetech.com/2014/11/04/newsorority-v134-n52
+   200→                - listitem [ref=f119e199]:
+   201→                  - link "Sorority women prohibited at frat rush | The Tech" [ref=f119e200] [cursor=pointer]:
+   202→                    - /url: https://thetech.com/2012/09/18/rushpolicy-v132-n38
+   203→                - listitem [ref=f119e201]:
+   204→                  - link "Asian-interest sorority planned | The Tech" [ref=f119e202] [cursor=pointer]:
+   205→                    - /url: https://thetech.com/2011/02/11/asiansorority-v131-n4
+   206→                - listitem [ref=f119e203]:
+   207→                  - link "Phi Sigma Rho sorority inducts new members | The Tech" [ref=f119e204] [cursor=pointer]:
+   208→                    - /url: https://thetech.com/2019/03/21/sorority-in-ifc
+   209→            - generic [ref=f119e205]:
+   210→              - link "53 more" [ref=f119e207] [cursor=pointer]:
+   211→                - /url: /search?query=MIT+Panhellenic+sororities+site%3Athetech.com&sst=SE-1bc25e84c4c8be68
+   212→              - generic "Contains JavaScript" [ref=f119e209]: JS
+   213→          - generic [ref=f119e211]:
+   214→            - generic [ref=f119e212]:
+   215→              - generic [ref=f119e213]:
+   216→                - generic [ref=f119e214]:
+   217→                  - generic "Match density" [ref=f119e215]
+   218→                  - generic [ref=f119e219]:
+   219→                    - heading [level=2] [ref=f119e220]:
+   220→                      - 'link "DOOMCom :: View topic - Kallie:" [ref=f119e221] [cursor=pointer]':
+   221→                        - /url: http://doomcom.mit.edu/viewtopic.php?t=550
+   222→                    - link "http://doomcom.mit.edu/viewtopic.php?t=550" [ref=f119e223] [cursor=pointer]:
+   223→                      - /url: http://doomcom.mit.edu/viewtopic.php?t=550
+   224→                - paragraph [ref=f119e225]: "Posted: Fri Sep 19, 2008 4:36 pm Post subject: Kallie: Quote: MIT's newest sorority, Pi Beta Phi, needs undergraduate students in all classes to build the first new member class. Pi Phi is looking for women who want to be leaders in the local community an"
+   225→              - generic [ref=f119e226]:
+   226→                - link "" [ref=f119e227] [cursor=pointer]:
+   227→                  - /url: /site/doomcom.mit.edu
+   228→                - link "" [ref=f119e229] [cursor=pointer]:
+   229→                  - /url: https://web.archive.org/web/*/http://doomcom.mit.edu/viewtopic.php?t=550
+   230→            - generic "Contains JavaScript" [ref=f119e233]: JS
+   231→          - generic [ref=f119e235]:
+   232→            - generic [ref=f119e236]:
+   233→              - generic [ref=f119e237]:
+   234→                - generic [ref=f119e238]:
+   235→                  - generic "Match density" [ref=f119e239]
+   236→                  - generic [ref=f119e243]:
+   237→                    - heading [level=2] [ref=f119e244]:
+   238→                      - link "FSILG Good Standing Policy - MIT Division of Student Life" [ref=f119e245] [cursor=pointer]:
+   239→                        - /url: https://studentlife.mit.edu/policies-and-resources/fsilg-good-standing-policy/
+   240→                    - link "https://studentlife.mit.edu/policies-and-resources/fsilg-good-standing-policy/" [ref=f119e247] [cursor=pointer]:
+   241→                      - /url: https://studentlife.mit.edu/policies-and-resources/fsilg-good-standing-policy/
+   242→                - paragraph [ref=f119e249]: MIT Division of Student Life (DSL) requires that as a condition for MIT Institute recognition, all FSILGs are in compliance, and where applicable, make every reasonable effort to ensure that each of their members shall be in compliance, with the following
+   243→              - generic [ref=f119e250]:
+   244→                - link "" [ref=f119e251] [cursor=pointer]:
+   245→                  - /url: /site/studentlife.mit.edu
+   246→                - link "" [ref=f119e253] [cursor=pointer]:
+   247→                  - /url: https://web.archive.org/web/*/https://studentlife.mit.edu/policies-and-resources/fsilg-good-standing-policy/
+   248→            - generic [ref=f119e255]:
+   249→              - paragraph [ref=f119e256]: "Also from studentlife.mit.edu:"
+   250→              - list [ref=f119e257]:
+   251→                - listitem [ref=f119e258]:
+   252→                  - link "MIT’s Panhel wins three awards at 2019 NGLA - MIT Division of Student Life" [ref=f119e259] [cursor=pointer]:
+   253→                    - /url: https://studentlife.mit.edu/campus-communities/community-stories/mits-panhel-wins-three-awards-at-2019-ngla/
+   254→                - listitem [ref=f119e260]:
+   255→                  - link "Fraternities, Sororities, and Independent Living Groups - MIT Division of Student Life" [ref=f119e261] [cursor=pointer]:
+   256→                    - /url: https://studentlife.mit.edu/campus-communities/fraternities-sororities-and-independent-living-groups/
+   257→                - listitem [ref=f119e262]:
+   258→                  - link "Join an FSILG - MIT Division of Student Life" [ref=f119e263] [cursor=pointer]:
+   259→                    - /url: https://studentlife.mit.edu/campus-communities/fraternities-sororities-and-independent-living-groups/join-a-fsilg/
+   260→                - listitem [ref=f119e264]:
+   261→                  - link "FSILG Organization Extension Policy - MIT Division of Student Life" [ref=f119e265] [cursor=pointer]:
+   262→                    - /url: https://studentlife.mit.edu/policies-and-resources/fsilg-recognition-and-extension-policy/
+   263→            - generic [ref=f119e266]:
+   264→              - link "8 more" [ref=f119e268] [cursor=pointer]:
+   265→                - /url: /search?query=MIT+Panhellenic+sororities+site%3Astudentlife.mit.edu&sst=SE-1bc25e84c4c8be68
+   266→              - generic "Contains JavaScript" [ref=f119e270]: JS
+   267→          - generic [ref=f119e272]:
+   268→            - generic [ref=f119e273]:
+   269→              - generic [ref=f119e274]:
+   270→                - generic [ref=f119e275]:
+   271→                  - generic "Match density" [ref=f119e276]
+   272→                  - generic [ref=f119e280]:
+   273→                    - heading [level=2] [ref=f119e281]:
+   274→                      - link "Awards – Delta Phi Epsilon" [ref=f119e282] [cursor=pointer]:
+   275→                        - /url: http://dphie.mit.edu/about-us/awards/
+   276→                    - link "http://dphie.mit.edu/about-us/awards/" [ref=f119e284] [cursor=pointer]:
+   277→                      - /url: http://dphie.mit.edu/about-us/awards/
+   278→                - paragraph [ref=f119e286]: "2018 Libby Saperstein Schwartz Scholarship Cup Awarded to the collegiate chapter of Delta Phi Epsilon with the highest average GPA over the previous two years. 2019 Amy Vojta Impact Award: Academic Achievement – Honorable Mention Awarded to the chapter, c"
+   279→              - generic [ref=f119e287]:
+   280→                - link "" [ref=f119e288] [cursor=pointer]:
+   281→                  - /url: /site/dphie.mit.edu
+   282→                - link "" [ref=f119e290] [cursor=pointer]:
+   283→                  - /url: https://web.archive.org/web/*/http://dphie.mit.edu/about-us/awards/
+   284→            - generic [ref=f119e292]:
+   285→              - paragraph [ref=f119e293]: "Also from dphie.mit.edu:"
+   286→              - list [ref=f119e294]:
+   287→                - listitem [ref=f119e295]:
+   288→                  - link "FAQ – Delta Phi Epsilon" [ref=f119e296] [cursor=pointer]:
+   289→                    - /url: http://dphie.mit.edu/about/faq/
+   290→            - generic "Contains JavaScript" [ref=f119e299]: JS
+   291→          - generic [ref=f119e301]:
+   292→            - generic [ref=f119e302]:
+   293→              - generic [ref=f119e303]:
+   294→                - generic [ref=f119e304]:
+   295→                  - generic "Match density" [ref=f119e305]
+   296→                  - generic [ref=f119e309]:
+   297→                    - heading [level=2] [ref=f119e310]:
+   298→                      - 'link "3 Questions with a student leader: Panhel President Denzil Sikka | MIT News | Massachusetts Institute of Technology" [ref=f119e311] [cursor=pointer]':
+   299→                        - /url: https://news.mit.edu/2012/3-questions-panhel-president-denzil-sikka
+   300→                    - link "https://news.mit.edu/2012/3-questions-panhel-president-denzil-sikka" [ref=f119e313] [cursor=pointer]:
+   301→                      - /url: https://news.mit.edu/2012/3-questions-panhel-president-denzil-sikka
+   302→                - paragraph [ref=f119e315]: Student leadership has long been an integral part of the out-of-classroom experience at MIT. In this series, we hear from some of the students in leadership roles in the MIT community.In December, the (Panhel), the governing council for sororities on camp
+   303→              - generic [ref=f119e316]:
+   304→                - link "" [ref=f119e317] [cursor=pointer]:
+   305→                  - /url: /site/news.mit.edu
+   306→                - link "" [ref=f119e319] [cursor=pointer]:
+   307→                  - /url: https://web.archive.org/web/*/https://news.mit.edu/2012/3-questions-panhel-president-denzil-sikka
+   308→            - generic [ref=f119e321]:
+   309→              - paragraph [ref=f119e322]: "Also from news.mit.edu:"
+   310→              - list [ref=f119e323]:
+   311→                - listitem [ref=f119e324]:
+   312→                  - link "Awards convocation | MIT News | Massachusetts Institute of Technology" [ref=f119e325] [cursor=pointer]:
+   313→                    - /url: https://news.mit.edu/2005/awards-convo-0601
+   314→                - listitem [ref=f119e326]:
+   315→                  - link "Four from MIT awarded 2018 Schwarzman Scholarships | MIT News | Massachusetts Institute of Technology" [ref=f119e327] [cursor=pointer]:
+   316→                    - /url: https://news.mit.edu/2017/four-from-mit-awarded-2018-schwarzman-scholarships-1204
+   317→                - listitem [ref=f119e328]:
+   318→                  - link "MIT announces steps intended to minimize unwanted sexual behavior | MIT News | Massachusetts Institute of Technology" [ref=f119e329] [cursor=pointer]:
+   319→                    - /url: https://news.mit.edu/2014/mit-takes-steps-to-minimize-unwanted-sexual-behavior-1027
+   320→                - listitem [ref=f119e330]:
+   321→                  - link "Town halls let students “Solve for Fall” | MIT News | Massachusetts Institute of Technology" [ref=f119e331] [cursor=pointer]:
+   322→                    - /url: https://news.mit.edu/2020/town-halls-graduate-undergraduate-students-explore-ways-solve-for-fall-0603
+   323→            - generic [ref=f119e332]:
+   324→              - link "1 more" [ref=f119e334] [cursor=pointer]:
+   325→                - /url: /search?query=MIT+Panhellenic+sororities+site%3Anews.mit.edu&sst=SE-1bc25e84c4c8be68
+   326→              - generic "Contains JavaScript" [ref=f119e336]: JS
+   327→          - generic [ref=f119e338]:
+   328→            - generic [ref=f119e339]:
+   329→              - generic [ref=f119e340]:
+   330→                - generic [ref=f119e341]:
+   331→                  - generic "Match density" [ref=f119e342]
+   332→                  - generic [ref=f119e346]:
+   333→                    - heading [level=2] [ref=f119e347]:
+   334→                      - link "Fraternities, Sororities, and Independent Living Groups < MIT" [ref=f119e348] [cursor=pointer]:
+   335→                        - /url: https://catalog.mit.edu/mit/campus-life/fraternities-sororities-independent-living-groups/
+   336→                    - link "https://catalog.mit.edu/mit/campus-life/fraternities-sororities-independent-living-groups/" [ref=f119e350] [cursor=pointer]:
+   337→                      - /url: https://catalog.mit.edu/mit/campus-life/fraternities-sororities-independent-living-groups/
+   338→                - paragraph [ref=f119e352]: Search CatalogSubmit search Catalog Navigation MIT recognizes 43 fraternities, sororities, and independent living groups (FSILGs). Of these, 27 are nationally affiliated fraternities and two are local. There are five independent living groups, four of whi
+   339→              - generic [ref=f119e353]:
+   340→                - link "" [ref=f119e354] [cursor=pointer]:
+   341→                  - /url: /site/catalog.mit.edu
+   342→                - link "" [ref=f119e356] [cursor=pointer]:
+   343→                  - /url: https://web.archive.org/web/*/https://catalog.mit.edu/mit/campus-life/fraternities-sororities-independent-living-groups/
+   344→            - generic "Contains JavaScript" [ref=f119e360]: JS
+   345→          - generic [ref=f119e362]:
+   346→            - generic [ref=f119e363]:
+   347→              - generic [ref=f119e364]:
+   348→                - generic [ref=f119e365]:
+   349→                  - generic "Match density" [ref=f119e366]
+   350→                  - generic [ref=f119e370]:
+   351→                    - heading [level=2] [ref=f119e371]:
+   352→                      - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f119e372] [cursor=pointer]:
+   353→                        - /url: https://theta.scripts.mit.edu/aboutawards.php
+   354→                    - link "https://theta.scripts.mit.edu/aboutawards.php" [ref=f119e374] [cursor=pointer]:
+   355→                      - /url: https://theta.scripts.mit.edu/aboutawards.php
+   356→                - paragraph [ref=f119e376]: "We are proud to say that our chapter's accomplishments have been recognized by both the MIT administration and our international headquarters. Copyright 2012-2013: Kappa Alpha Theta Zeta Mu: Contact webmaster: theta-webmaster at mit.edu"
+   357→              - generic [ref=f119e377]:
+   358→                - link "" [ref=f119e378] [cursor=pointer]:
+   359→                  - /url: /site/theta.scripts.mit.edu
+   360→                - link "" [ref=f119e380] [cursor=pointer]:
+   361→                  - /url: https://web.archive.org/web/*/https://theta.scripts.mit.edu/aboutawards.php
+   362→            - generic [ref=f119e382]:
+   363→              - paragraph [ref=f119e383]: "Also from theta.scripts.mit.edu:"
+   364→              - list [ref=f119e384]:
+   365→                - listitem [ref=f119e385]:
+   366→                  - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f119e386] [cursor=pointer]:
+   367→                    - /url: https://theta.scripts.mit.edu/aboutnews.php
+   368→                - listitem [ref=f119e387]:
+   369→                  - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f119e388] [cursor=pointer]:
+   370→                    - /url: https://theta.scripts.mit.edu/aboutzmhouseandhistory.php
+   371→                - listitem [ref=f119e389]:
+   372→                  - link "Kappa Alpha Theta Zeta Mu at MIT" [ref=f119e390] [cursor=pointer]:
+   373→                    - /url: https://theta.scripts.mit.edu/
+   374→            - generic "Contains JavaScript" [ref=f119e393]: JS
+   375→          - generic [ref=f119e395]:
+   376→            - generic [ref=f119e396]:
+   377→              - generic [ref=f119e397]:
+   378→                - generic [ref=f119e398]:
+   379→                  - generic "Match density" [ref=f119e399]
+   380→                  - generic [ref=f119e403]:
+   381→                    - heading [level=2] [ref=f119e404]:
+   382→                      - link "Sororities | Archives & Special Collections" [ref=f119e405] [cursor=pointer]:
+   383→                        - /url: https://archives.dickinson.edu/dickinsonian-organizations/sororities
+   384→                    - link "https://archives.dickinson.edu/dickinsonian-organizations/sororities" [ref=f119e407] [cursor=pointer]:
+   385→                      - /url: https://archives.dickinson.edu/dickinsonian-organizations/sororities
+   386→                - paragraph [ref=f119e409]: Three minority Greek organizations inquire about possibly gaining chapters at Dickinson. These organizations include Kappa Alpha Psi, Sigma Lambda Beta and Delta Sigma Theta. Once again, the applicant pool for admissions reaches a record high and the acce
+   387→              - generic [ref=f119e410]:
+   388→                - link "" [ref=f119e411] [cursor=pointer]:
+   389→                  - /url: /site/archives.dickinson.edu
+   390→                - link "" [ref=f119e413] [cursor=pointer]:
+   391→                  - /url: https://web.archive.org/web/*/https://archives.dickinson.edu/dickinsonian-organizations/sororities
+   392→            - generic "Contains JavaScript" [ref=f119e417]: JS
+   393→          - generic [ref=f119e419]:
+   394→            - generic [ref=f119e420]:
+   395→              - generic [ref=f119e421]:
+   396→                - generic [ref=f119e422]:
+   397→                  - generic "Match density" [ref=f119e423]
+   398→                  - generic [ref=f119e427]:
+   399→                    - heading [level=2] [ref=f119e428]:
+   400→                      - link "One In Four USA" [ref=f119e429] [cursor=pointer]:
+   401→                        - /url: https://www.oneinfourusa.org/nationalorganization.html
+   402→                    - link "https://www.oneinfourusa.org/nationalorganization.html" [ref=f119e431] [cursor=pointer]:
+   403→                      - /url: https://www.oneinfourusa.org/nationalorganization.html
+   404→                - paragraph [ref=f119e433]: John D. Foubert, Ph.D. is the National President of One in Four and Professor of Higher Education and Student Affairs at Oklahoma State University. He earned his undergraduate degree in Psychology from the College of William and Mary, his Masterï¿½s in Ps
+   405→              - generic [ref=f119e434]:
+   406→                - link "" [ref=f119e435] [cursor=pointer]:
+   407→                  - /url: /site/www.oneinfourusa.org
+   408→                - link "" [ref=f119e437] [cursor=pointer]:
+   409→                  - /url: https://web.archive.org/web/*/https://www.oneinfourusa.org/nationalorganization.html
+   410→            - generic "Contains JavaScript" [ref=f119e441]: JS
+   411→          - generic [ref=f119e443]:
+   412→            - generic [ref=f119e444]:
+   413→              - generic [ref=f119e445]:
+   414→                - generic [ref=f119e446]:
+   415→                  - generic "Match density" [ref=f119e447]
+   416→                  - generic [ref=f119e451]:
+   417→                    - heading [level=2] [ref=f119e452]:
+   418→                      - link "Foundation Trustees — Alpha Epsilon Phi" [ref=f119e453] [cursor=pointer]:
+   419→                        - /url: https://www.aephi.org/foundation-trustees
+   420→                    - link "https://www.aephi.org/foundation-trustees" [ref=f119e455] [cursor=pointer]:
+   421→                      - /url: https://www.aephi.org/foundation-trustees
+   422→                - paragraph [ref=f119e457]: The Alpha Epsilon Phi Foundation is directed by a volunteer board of seventeen trustees, including the sorority national president and the sorority executive director who serves ex officio. The trustees bring a mix of Sorority involvement, non-profit expe
+   423→              - generic [ref=f119e458]:
+   424→                - link "" [ref=f119e459] [cursor=pointer]:
+   425→                  - /url: /site/www.aephi.org
+   426→                - link "" [ref=f119e461] [cursor=pointer]:
+   427→                  - /url: https://web.archive.org/web/*/https://www.aephi.org/foundation-trustees
+   428→            - generic "Contains JavaScript" [ref=f119e465]: JS
+   429→          - generic [ref=f119e467]:
+   430→            - generic [ref=f119e468]:
+   431→              - generic [ref=f119e469]:
+   432→                - generic [ref=f119e470]:
+   433→                  - generic "Match density" [ref=f119e471]
+   434→                  - generic [ref=f119e475]:
+   435→                    - heading [level=2] [ref=f119e476]:
+   436→                      - link "MIT Women Business Leaders" [ref=f119e477] [cursor=pointer]:
+   437→                        - /url: http://wbl.mit.edu/alumnae
+   438→                    - link "http://wbl.mit.edu/alumnae" [ref=f119e479] [cursor=pointer]:
+   439→                      - /url: http://wbl.mit.edu/alumnae
+   440→                - paragraph [ref=f119e481]: Alexis graduated from MIT in 2005 and majored in Brain and Cognitive Sciences with a minor in French. After MIT, she started her career at Morgan Stanley in Debt Capital Markets. Later, she joined Optima Fund Management, an equity fund of hedge funds, whe
+   441→              - generic [ref=f119e482]:
+   442→                - link "" [ref=f119e483] [cursor=pointer]:
+   443→                  - /url: /site/wbl.mit.edu
+   444→                - link "" [ref=f119e485] [cursor=pointer]:
+   445→                  - /url: https://web.archive.org/web/*/http://wbl.mit.edu/alumnae
+   446→            - generic "Contains JavaScript" [ref=f119e489]: JS
+   447→          - generic [ref=f119e491]:
+   448→            - generic [ref=f119e492]:
+   449→              - generic [ref=f119e493]:
+   450→                - generic [ref=f119e494]:
+   451→                  - generic "Match density" [ref=f119e495]
+   452→                  - generic [ref=f119e499]:
+   453→                    - heading [level=2] [ref=f119e500]:
+   454→                      - link "My Last Beginning at MIT | Slice of MIT by the Alumni Association" [ref=f119e501] [cursor=pointer]:
+   455→                        - /url: https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+   456→                    - generic [ref=f119e502]:
+   457→                      - text: 2009-09-13 ·
+   458→                      - link "https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/" [ref=f119e503] [cursor=pointer]:
+   459→                        - /url: https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+   460→                - paragraph [ref=f119e505]: "For many of us, the start of the semester is synonymous with FRESHMEN. They are MIT’s future (this has become more apparent now that I am almost on my way out) and so we wholeheartedly invite them to join the things that made MIT special for us: our dorms"
+   461→              - generic [ref=f119e506]:
+   462→                - link "" [ref=f119e507] [cursor=pointer]:
+   463→                  - /url: /site/sliceofmit.wordpress.com
+   464→                - link "" [ref=f119e509] [cursor=pointer]:
+   465→                  - /url: https://web.archive.org/web/*/https://sliceofmit.wordpress.com/2009/09/13/my-last-beginning-at-mit/
+   466→            - generic [ref=f119e511]:
+   467→              - paragraph [ref=f119e512]: "Also from sliceofmit.wordpress.com:"
+   468→              - list [ref=f119e513]:
+   469→                - listitem [ref=f119e514]:
+   470→                  - link "cbognet | Slice of MIT by the Alumni Association | Page 2" [ref=f119e515] [cursor=pointer]:
+   471→                    - /url: https://sliceofmit.wordpress.com/author/cbognet/page/2/
+   472→                - listitem [ref=f119e516]:
+   473→                  - link "Slice of MIT by the Alumni Association | A blog about MIT ideas, people, and culture | Page 22" [ref=f119e517] [cursor=pointer]:
+   474→                    - /url: https://sliceofmit.wordpress.com/page/22/
+   475→                - listitem [ref=f119e518]:
+   476→                  - link "September | 2009 | Slice of MIT by the Alumni Association | Page 2" [ref=f119e519] [cursor=pointer]:
+   477→                    - /url: https://sliceofmit.wordpress.com/2009/09/page/2/
+   478→            - generic "Contains JavaScript" [ref=f119e522]: JS
+   479→          - generic [ref=f119e524]:
+   480→            - generic [ref=f119e525]:
+   481→              - generic [ref=f119e526]:
+   482→                - generic [ref=f119e527]:
+   483→                  - generic "Match density" [ref=f119e528]
+   484→                  - generic [ref=f119e532]:
+   485→                    - heading [level=2] [ref=f119e533]:
+   486→                      - link "MIT Alpha Phi" [ref=f119e534] [cursor=pointer]:
+   487→                        - /url: http://aphi.mit.edu/about/
+   488→                    - link "http://aphi.mit.edu/about/" [ref=f119e536] [cursor=pointer]:
+   489→                      - /url: http://aphi.mit.edu/about/
+   490→                - paragraph [ref=f119e538]: Alpha Phi was founded on October 10, 1872, at a time when women's access to higher education in the United States was rare and hard-won. Among the first women admitted to Syracuse University, ten came together to build something that would push against th
+   491→              - generic [ref=f119e539]:
+   492→                - link "" [ref=f119e540] [cursor=pointer]:
+   493→                  - /url: /site/aphi.mit.edu
+   494→                - link "" [ref=f119e542] [cursor=pointer]:
+   495→                  - /url: https://web.archive.org/web/*/http://aphi.mit.edu/about/
+   496→            - generic "Contains JavaScript" [ref=f119e546]: JS
+   497→          - generic [ref=f119e548]:
+   498→            - generic [ref=f119e549]:
+   499→              - generic [ref=f119e550]:
+   500→                - generic [ref=f119e551]:
+   501→                  - generic "Match density" [ref=f119e552]
+   502→                  - generic [ref=f119e556]:
+   503→                    - heading [level=2] [ref=f119e557]:
+   504→                      - link "First Muslim sorority hopes to form chapters across USA | Moderate Observer" [ref=f119e558] [cursor=pointer]:
+   505→                        - /url: https://moderate.wordpress.com/2006/04/12/first-muslim-sorority-hopes-to-form-chapters-across-usa/
+   506→                    - generic [ref=f119e559]:
+   507→                      - text: 2006-04-12 ·
+   508→                      - link "https://moderate.wordpress.com/2006/04/12/first-muslim-sorority-hopes-to-form-chapters-across-usa/" [ref=f119e560] [cursor=pointer]:
+   509→                        - /url: https://moderate.wordpress.com/2006/04/12/first-muslim-sorority-hopes-to-form-chapters-across-usa/
+   510→                - paragraph [ref=f119e562]: First Muslim sorority hopes to form chapters across USA Posted on by By Donna Leinwand, USA TODAYMon Apr 10, 7:17 AM ET Christine Ortiz slips quietly from the Muslim prayer room on the campus of the Massachusetts Institute of Technology and into a group o
+   511→              - generic [ref=f119e563]:
+   512→                - link "" [ref=f119e564] [cursor=pointer]:
+   513→                  - /url: /site/moderate.wordpress.com
+   514→                - link "" [ref=f119e566] [cursor=pointer]:
+   515→                  - /url: https://web.archive.org/web/*/https://moderate.wordpress.com/2006/04/12/first-muslim-sorority-hopes-to-form-chapters-across-usa/
+   516→            - generic [ref=f119e568]:
+   517→              - paragraph [ref=f119e569]: "Also from moderate.wordpress.com:"
+   518→              - list [ref=f119e570]:
+   519→                - listitem [ref=f119e571]:
+   520→                  - link "Moderate Observer | A briefing on Global Affairs, Business, Geopolitics, Security and Culture. | Page 183" [ref=f119e572] [cursor=pointer]:
+   521→                    - /url: https://moderate.wordpress.com/page/183/
+   522→            - generic [ref=f119e573]:
+   523→              - generic "Contains JavaScript" [ref=f119e575]: JS
+   524→              - generic "Contains Affiliate Link" [ref=f119e576]: Has Affiliate
+   525→          - generic [ref=f119e578]:
+   526→            - generic [ref=f119e579]:
+   527→              - generic [ref=f119e580]:
+   528→                - generic [ref=f119e581]:
+   529→                  - generic "Match density" [ref=f119e582]
+   530→                  - generic [ref=f119e586]:
+   531→                    - heading [level=2] [ref=f119e587]:
+   532→                      - link "does bu have sorority houses" [ref=f119e588] [cursor=pointer]:
+   533→                        - /url: http://www.senorcafe.com/e62np1kl/c93270-does-bu-have-sorority-houses
+   534→                    - link "http://www.senorcafe.com/e62np1kl/c93270-does-bu-have-sorority-houses" [ref=f119e590] [cursor=pointer]:
+   535→                      - /url: http://www.senorcafe.com/e62np1kl/c93270-does-bu-have-sorority-houses
+   536→                - paragraph [ref=f119e592]: Currently 25 chapters have facilities on campus. Members. 24. BU is big, no doubt. Sorority Life We have eight sororities at the University of Richmond whose membership represents roughly 54 percent of the undergraduate women on campus. The Worth Hills Vi
+   537→              - generic [ref=f119e593]:
+   538→                - link "" [ref=f119e594] [cursor=pointer]:
+   539→                  - /url: /site/www.senorcafe.com
+   540→                - link "" [ref=f119e596] [cursor=pointer]:
+   541→                  - /url: https://web.archive.org/web/*/http://www.senorcafe.com/e62np1kl/c93270-does-bu-have-sorority-houses
+   542→            - generic [ref=f119e598]:
+   543→              - paragraph [ref=f119e599]: "Also from www.senorcafe.com:"
+   544→              - list [ref=f119e600]:
+   545→                - listitem [ref=f119e601]:
+   546→                  - link "delta zeta motto" [ref=f119e602] [cursor=pointer]:
+   547→                    - /url: http://www.senorcafe.com/e62np1kl/c93270-delta-zeta-motto
+   548→                - listitem [ref=f119e603]:
+   549→                  - link "alpha sigma alpha wellness chairman" [ref=f119e604] [cursor=pointer]:
+   550→                    - /url: http://www.senorcafe.com/e62np1kl/c93270-alpha-sigma-alpha-wellness-chairman
+   551→                - listitem [ref=f119e605]:
+   552→                  - link "alpha sigma alpha wellness chairman" [ref=f119e606] [cursor=pointer]:
+   553→                    - /url: http://www.senorcafe.com/city-of-zkdbwtm/alpha-sigma-alpha-wellness-chairman-e8f0a1
+   554→                - listitem [ref=f119e607]:
+   555→                  - link "delta sigma phi nc state" [ref=f119e608] [cursor=pointer]:
+   556→                    - /url: http://www.senorcafe.com/city-of-zkdbwtm/delta-sigma-phi-nc-state-e8f0a1
+   557→            - link "1 more" [ref=f119e611] [cursor=pointer]:
+   558→              - /url: /search?query=MIT+Panhellenic+sororities+site%3Awww.senorcafe.com&sst=SE-1bc25e84c4c8be68
+   559→          - generic [ref=f119e614]:
+   560→            - generic [ref=f119e615]:
+   561→              - generic [ref=f119e616]:
+   562→                - generic [ref=f119e617]:
+   563→                  - generic "Match density" [ref=f119e618]
+   564→                  - generic [ref=f119e622]:
+   565→                    - heading [level=2] [ref=f119e623]:
+   566→                      - link "Sororities Could Soon Welcome Gender-Nonbinary Students" [ref=f119e624] [cursor=pointer]:
+   567→                        - /url: https://www.chronicle.com/article/sororities-could-soon-welcome-gender-nonbinary-students
+   568→                    - link "https://www.chronicle.com/article/sororities-could-soon-welcome-gender-nonbinary-students" [ref=f119e626] [cursor=pointer]:
+   569→                      - /url: https://www.chronicle.com/article/sororities-could-soon-welcome-gender-nonbinary-students
+   570→                - paragraph [ref=f119e628]: Delta Phi Epsilon, historically a Jewish sorority, opened the way to nonbinary membership.Courtesy of Delta Phi Epsilon Two-dozen national sororities will soon vote on a policy change that would open the door for more gender-nonbinary students to join — a
+   571→              - generic [ref=f119e629]:
+   572→                - link "" [ref=f119e630] [cursor=pointer]:
+   573→                  - /url: /site/www.chronicle.com
+   574→                - link "" [ref=f119e632] [cursor=pointer]:
+   575→                  - /url: https://web.archive.org/web/*/https://www.chronicle.com/article/sororities-could-soon-welcome-gender-nonbinary-students
+   576→            - generic [ref=f119e634]:
+   577→              - link "Tracking" [ref=f119e636] [cursor=pointer]:
+   578→                - /url: /site/www.chronicle.com?view=traffic
+   579→              - generic "Contains JavaScript" [ref=f119e637]: JS
+   580→              - link "Has Ads" [ref=f119e638] [cursor=pointer]:
+   581→                - /url: /site/www.chronicle.com?view=traffic
+   582→          - generic [ref=f119e640]:
+   583→            - generic [ref=f119e641]:
+   584→              - generic [ref=f119e642]:
+   585→                - generic [ref=f119e643]:
+   586→                  - generic "Match density" [ref=f119e644]
+   587→                  - generic [ref=f119e648]:
+   588→                    - heading [level=2] [ref=f119e649]:
+   589→                      - link "Hazing Prevention & Education Committee – Haze Free MIT" [ref=f119e650] [cursor=pointer]:
+   590→                        - /url: https://hazefree.mit.edu/hpec/
+   591→                    - link "https://hazefree.mit.edu/hpec/" [ref=f119e652] [cursor=pointer]:
+   592→                      - /url: https://hazefree.mit.edu/hpec/
+   593→                - paragraph [ref=f119e654]: The Division of Student Life’s Hazing Prevention and Education Committee (HPEC) was convened in the spring of 2013. HPEC brings together students and administrators to prevent hazing, educate the campus community, and promote resources for supporting vict
+   594→              - generic [ref=f119e655]:
+   595→                - link "" [ref=f119e656] [cursor=pointer]:
+   596→                  - /url: /site/hazefree.mit.edu
+   597→                - link "" [ref=f119e658] [cursor=pointer]:
+   598→                  - /url: https://web.archive.org/web/*/https://hazefree.mit.edu/hpec/
+   599→            - generic "Contains JavaScript" [ref=f119e662]: JS
+   600→          - generic [ref=f119e664]:
+   601→            - generic [ref=f119e665]:
+   602→              - generic [ref=f119e666]:
+   603→                - generic [ref=f119e667]:
+   604→                  - generic "Match density" [ref=f119e668]
+   605→                  - generic [ref=f119e672]:
+   606→                    - heading [level=2] [ref=f119e673]:
+   607→                      - link "Learning from our survey on sexual assault | MIT Organization Chart" [ref=f119e674] [cursor=pointer]:
+   608→                        - /url: https://orgchart.mit.edu/letters/learning-our-survey-sexual-assault
+   609→                    - link "https://orgchart.mit.edu/letters/learning-our-survey-sexual-assault" [ref=f119e676] [cursor=pointer]:
+   610→                      - /url: https://orgchart.mit.edu/letters/learning-our-survey-sexual-assault
+   611→                - paragraph [ref=f119e678]: October 27, 2014 Cynthia Barnhart, Chancellor, 2014–2021 To the members of the MIT community, In response to President Reif's that we take action to combat sexual assault at MIT, last spring my office conducted an online survey to understand the extent an
+   612→              - generic [ref=f119e679]:
+   613→                - link "" [ref=f119e680] [cursor=pointer]:
+   614→                  - /url: /site/orgchart.mit.edu
+   615→                - link "" [ref=f119e682] [cursor=pointer]:
+   616→                  - /url: https://web.archive.org/web/*/https://orgchart.mit.edu/letters/learning-our-survey-sexual-assault
+   617→            - generic [ref=f119e684]:
+   618→              - paragraph [ref=f119e685]: "Also from orgchart.mit.edu:"
+   619→              - list [ref=f119e686]:
+   620→                - listitem [ref=f119e687]:
+   621→                  - link "Letter to students | MIT Organization Chart" [ref=f119e688] [cursor=pointer]:
+   622→                    - /url: https://orgchart.mit.edu/letters/letter-students-0
+   623→            - generic "Contains JavaScript" [ref=f119e691]: JS
+   624→          - generic [ref=f119e693]:
+   625→            - generic [ref=f119e694]:
+   626→              - generic [ref=f119e695]:
+   627→                - generic [ref=f119e696]:
+   628→                  - generic "Match density" [ref=f119e697]
+   629→                  - generic [ref=f119e701]:
+   630→                    - heading [level=2] [ref=f119e702]:
+   631→                      - link "About Us – Phi Sigma Rho" [ref=f119e703] [cursor=pointer]:
+   632→                        - /url: https://psr.mit.edu/about-us/
+   633→                    - link "https://psr.mit.edu/about-us/" [ref=f119e705] [cursor=pointer]:
+   634→                      - /url: https://psr.mit.edu/about-us/
+   635→                - paragraph [ref=f119e707]: National History and Heritage Phi Sigma Rho was founded in 1984 by Abby McDonald and Rashmi Khanna at Purdue University. Abby and Rashmi were unable to participate in traditional sorority rushes due to the demands of their engineering program, so they dec
+   636→              - generic [ref=f119e708]:
+   637→                - link "" [ref=f119e709] [cursor=pointer]:
+   638→                  - /url: /site/psr.mit.edu
+   639→                - link "" [ref=f119e711] [cursor=pointer]:
+   640→                  - /url: https://web.archive.org/web/*/https://psr.mit.edu/about-us/
+   641→            - generic "Contains JavaScript" [ref=f119e715]: JS
+   642→          - generic [ref=f119e717]:
+   643→            - generic [ref=f119e718]:
+   644→              - generic [ref=f119e719]:
+   645→                - generic [ref=f119e720]:
+   646→                  - generic "Match density" [ref=f119e721]
+   647→                  - generic [ref=f119e725]:
+   648→                    - heading [level=2] [ref=f119e726]:
+   649→                      - link "UAC Staff – MIT Undergraduate Advising Center" [ref=f119e727] [cursor=pointer]:
+   650→                        - /url: https://advising.mit.edu/staff-category/uac-staff/
+   651→                    - link "https://advising.mit.edu/staff-category/uac-staff/" [ref=f119e729] [cursor=pointer]:
+   652→                      - /url: https://advising.mit.edu/staff-category/uac-staff/
+   653→                - generic [ref=f119e730]:
+   654→                  - paragraph
+   655→              - generic [ref=f119e731]:
+   656→                - link "" [ref=f119e732] [cursor=pointer]:
+   657→                  - /url: /site/advising.mit.edu
+   658→                - link "" [ref=f119e734] [cursor=pointer]:
+   659→                  - /url: https://web.archive.org/web/*/https://advising.mit.edu/staff-category/uac-staff/
+   660→            - generic "Contains JavaScript" [ref=f119e738]: JS
+   661→          - generic [ref=f119e740]:
+   662→            - generic [ref=f119e741]:
+   663→              - generic [ref=f119e742]:
+   664→                - generic [ref=f119e743]:
+   665→                  - generic "Match density" [ref=f119e744]
+   666→                  - generic [ref=f119e748]:
+   667→                    - heading [level=2] [ref=f119e749]:
+   668→                      - link "Stanford/Ministry News - Page 8 - Glen Davis" [ref=f119e750] [cursor=pointer]:
+   669→                        - /url: https://glenandpaula.com/wordpress/category/stanfordministry-news/page/8
+   670→                    - link "https://glenandpaula.com/wordpress/category/stanfordministry-news/page/8" [ref=f119e752] [cursor=pointer]:
+   671→                      - /url: https://glenandpaula.com/wordpress/category/stanfordministry-news/page/8
+   672→                - paragraph [ref=f119e754]: "I thought this was kind of cool: Stanford is one of the four key universities sponsoring a new open source course management system (the other three are MIT, University of Michigan, and Indiana University). The new project is called and will go live on ca"
+   673→              - generic [ref=f119e755]:
+   674→                - link "" [ref=f119e756] [cursor=pointer]:
+   675→                  - /url: /site/glenandpaula.com
+   676→                - link "" [ref=f119e758] [cursor=pointer]:
+   677→                  - /url: https://web.archive.org/web/*/https://glenandpaula.com/wordpress/category/stanfordministry-news/page/8
+   678→            - generic [ref=f119e760]:
+   679→              - generic "Contains JavaScript" [ref=f119e762]: JS
+   680→              - generic "Contains Affiliate Link" [ref=f119e763]: Has Affiliate
+   681→          - generic [ref=f119e765]:
+   682→            - generic [ref=f119e766]:
+   683→              - generic [ref=f119e767]:
+   684→                - generic [ref=f119e768]:
+   685→                  - generic "Match density" [ref=f119e769]
+   686→                  - generic [ref=f119e773]:
+   687→                    - heading [level=2] [ref=f119e774]:
+   688→                      - link "Prominent FSILG Alumni/ae – Association of Independent Living Groups" [ref=f119e775] [cursor=pointer]:
+   689→                        - /url: https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+   690→                    - link "https://ailg.mit.edu/prominent-fsilg-alumni-ae/" [ref=f119e777] [cursor=pointer]:
+   691→                      - /url: https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+   692→                - paragraph [ref=f119e779]: MIT’s Fraternities, Sororities, and Independent Living Groups (FSILGs) number many remarkable alumni and alumnae among their members. Some of the more notable ones are listed below. If you have a suggestion for another to add, please e-mail Name & Class A
+   693→              - generic [ref=f119e780]:
+   694→                - link "" [ref=f119e781] [cursor=pointer]:
+   695→                  - /url: /site/ailg.mit.edu
+   696→                - link "" [ref=f119e783] [cursor=pointer]:
+   697→                  - /url: https://web.archive.org/web/*/https://ailg.mit.edu/prominent-fsilg-alumni-ae/
+   698→            - generic [ref=f119e785]:
+   699→              - paragraph [ref=f119e786]: "Also from ailg.mit.edu:"
+   700→              - list [ref=f119e787]:
+   701→                - listitem [ref=f119e788]:
+   702→                  - link "Common Acronyms – Association of Independent Living Groups" [ref=f119e789] [cursor=pointer]:
+   703→                    - /url: https://ailg.mit.edu/sample-page/common-acronyms/
+   704→            - generic "Contains JavaScript" [ref=f119e792]: JS
+   705→      - generic [ref=f119e793]:
+   706→        - link "1" [ref=f119e794] [cursor=pointer]:
+   707→          - /url: /search?query=MIT+Panhellenic+sororities&sst=SE-1bc25e84c4c8be68
+   708→        - link "2" [ref=f119e795] [cursor=pointer]:
+   709→          - /url: /search?query=MIT+Panhellenic+sororities&page=2&sst=SE-1bc25e84c4c8be68
+   710→    - complementary [ref=f119e796]:
+   711→      - text: 
+   712→      - generic [ref=f119e798]:
+   713→        - heading " Search Settings" [level=2] [ref=f119e799]:
+   714→          - generic [ref=f119e800]: 
+   715→          - text: Search Settings
+   716→        - generic [ref=f119e801]:
+   717→          - button [ref=f119e803] [cursor=pointer]:
+   718→            - link " Search In Title" [ref=f119e804]:
+   719→              - /url: /search?query=MIT+Panhellenic+sororities&searchTitle=title&newfilter=true&sst=SE-1bc25e84c4c8be68
+   720→              - generic [ref=f119e805]: 
+   721→              - generic [ref=f119e806]: Search In Title
+   722→          - button [ref=f119e808] [cursor=pointer]:
+   723→            - link " Recent Results" [ref=f119e809]:
+   724→              - /url: /search?query=MIT+Panhellenic+sororities&recent=recent&newfilter=true&sst=SE-1bc25e84c4c8be68
+   725→              - generic [ref=f119e810]: 
+   726→              - generic [ref=f119e811]: Recent Results
+   727→          - button [ref=f119e813] [cursor=pointer]:
+   728→            - link " Remove JS" [ref=f119e814]:
+   729→              - /url: /search?query=MIT+Panhellenic+sororities&js=no-js&newfilter=true&sst=SE-1bc25e84c4c8be68
+   730→              - generic [ref=f119e815]: 
+   731→              - generic [ref=f119e816]: Remove JS
+   732→          - button [ref=f119e818] [cursor=pointer]:
+   733→            - link " Reduce Adtech" [ref=f119e819]:
+   734→              - /url: /search?query=MIT+Panhellenic+sororities&adtech=reduce&newfilter=true&sst=SE-1bc25e84c4c8be68
+   735→              - generic [ref=f119e820]: 
+   736→              - generic [ref=f119e821]: Reduce Adtech
+   737→          - button [ref=f119e823] [cursor=pointer]:
+   738→            - link " Reduce NSFW" [ref=f119e824]:
+   739→              - /url: /search?query=MIT+Panhellenic+sororities&nsfw=smut&newfilter=true&sst=SE-1bc25e84c4c8be68
+   740→              - generic [ref=f119e825]: 
+   741→              - generic [ref=f119e826]: Reduce NSFW
+   742→          - button [ref=f119e829] [cursor=pointer]:
+   743→            - generic [ref=f119e830]:
+   744→              - generic [ref=f119e831]: 
+   745→              - text: Language
+   746→          - text: 
+   747→  - contentinfo [ref=f119e833]:
+   748→    - heading "Search Help" [level=1] [ref=f119e834]
+   749→    - generic [ref=f119e835]:
+   750→      - generic [ref=f119e836]:
+   751→        - heading " Syntax" [level=2] [ref=f119e837]:
+   752→          - generic [ref=f119e838]: 
+   753→          - text: Syntax
+   754→        - heading "This is a keyword-based search engine. When entering multiple search terms, the search engine will attempt to match them against documents where the terms occur in close proximity." [level=2] [ref=f119e839]
+   755→        - heading "Search terms can be excluded with a hyphen." [level=2] [ref=f119e840]
+   756→        - heading "While the search engine at present does not allow full text search, quotes can be used to specifically search for names or terms in the title. Using quotes will also cause the search engine to be as literal as possible in interpreting the query." [level=2] [ref=f119e841]
+   757→        - heading "Parentheses can be used to add terms to the query without giving weight to the terms when ranking the search results." [level=2] [ref=f119e842]
+   758→        - heading "Samples" [level=2] [ref=f119e843]
+   759→        - generic [ref=f119e844]:
+   760→          - term [ref=f119e845]: soup -chicken
+   761→          - definition [ref=f119e846]: Look for keywords that contain soup, but not chicken.
+   762→          - term [ref=f119e847]: "\"keyboard\""
+   763→          - definition [ref=f119e848]: Look for pages containing the exact word keyboard, not keyboards or the like.
+   764→          - term [ref=f119e849]: "\"steve mcqueen\""
+   765→          - definition [ref=f119e850]: Look for pages containing the exact words steve mcqueen in that order, with no words in between.
+   766→          - term [ref=f119e851]: apology (plato)
+   767→          - definition [ref=f119e852]: Look for pages containing apology and plato, but only rank them based on their relevance to apology
+   768→        - heading " Match Indicator" [level=2] [ref=f119e853]:
+   769→          - generic [ref=f119e854]: 
+   770→          - text: Match Indicator
+   771→        - heading "The \"coffee stain\" indicator next to the search results illustrates the locations in a document the keywords appear. It operates a bit like a clock, starting at the top and working its way around clockwise." [level=2] [ref=f119e855]
+   772→        - generic [ref=f119e856]: This is by the beginning
+   773→        - generic [ref=f119e864]: This is in the middle
+   774→        - generic [ref=f119e872]: This is toward the end
+   775→        - heading " Language Limitations" [level=2] [ref=f119e878]:
+   776→          - generic [ref=f119e879]: 
+   777→          - text: Language Limitations
+   778→        - heading "The search engine currently does not support any languages other than English." [level=2] [ref=f119e880]
+   779→        - heading "Support for other languages is planned, but not available right now. Adding support for additional languages and making it work well is somewhat time-consuming, meanwhile having bad support for a language won't make anyone happy." [level=2] [ref=f119e881]
+   780→        - heading " Webmaster Information" [level=2] [ref=f119e882]:
+   781→          - generic [ref=f119e883]: 
+   782→          - text: Webmaster Information
+   783→        - heading [level=2] [ref=f119e884]:
+   784→          - text: If you wish to add your website to the index, follow the instructions in this
+   785→          - link "git repository" [ref=f119e885] [cursor=pointer]:
+   786→            - /url: https://github.com/MarginaliaSearch/submit-site-to-marginalia-search
+   787→          - text: ", if you do not want to mess with git, you can also email"
+   788→          - link "contact@marginalia-search.com" [ref=f119e886] [cursor=pointer]:
+   789→            - /url: mailto:contact@marginalia-search.com
+   790→          - text: with the domain name.
+   791→        - heading [level=2] [ref=f119e887]:
+   792→          - text: The search engine's crawler uses the user-agent string search.marginalia.nu, and requests come from the IPs indicated in
+   793→          - link "https://search.marginalia.nu/crawler-ips.txt" [ref=f119e888] [cursor=pointer]:
+   794→            - /url: https://search.marginalia.nu/crawler-ips.txt
+   795→          - text: .
+   796→        - heading [level=2] [ref=f119e889]:
+   797→          - text: If you do not want your website to be crawled, the search engine respects robots.txt. In case of questions, bug reports or concerns, email
+   798→          - link "contact@marginalia-search.com" [ref=f119e890] [cursor=pointer]:
+   799→            - /url: mailto:contact@marginalia-search.com
+   800→          - text: .
+   801→      - generic [ref=f119e891]:
+   802→        - heading " Special Keywords" [level=2] [ref=f119e892]:
+   803→          - generic [ref=f119e893]: 
+   804→          - text: Special Keywords
+   805→        - table [ref=f119e894]:
+   806→          - rowgroup [ref=f119e895]:
+   807→            - row [ref=f119e896]:
+   808→              - columnheader "Keyword" [ref=f119e897]
+   809→              - columnheader "Meaning" [ref=f119e898]
+   810→          - rowgroup [ref=f119e899]:
+   811→            - row [ref=f119e900]:
+   812→              - cell [ref=f119e901]:
+   813→                - text: "site:"
+   814→                - emphasis [ref=f119e902]: example.com
+   815→              - cell [ref=f119e903]:
+   816→                - text: Display site information about
+   817→                - emphasis [ref=f119e904]: example.com
+   818→            - row [ref=f119e905]:
+   819→              - cell [ref=f119e906]:
+   820→                - text: "site:"
+   821→                - emphasis [ref=f119e907]: example.com
+   822→                - emphasis [ref=f119e908]: keyword
+   823→              - cell [ref=f119e909]:
+   824→                - text: Search
+   825→                - emphasis [ref=f119e910]: example.com
+   826→                - text: for
+   827→                - emphasis [ref=f119e911]: keyword
+   828→            - row [ref=f119e912]:
+   829→              - cell [ref=f119e913]:
+   830→                - text: "site:"
+   831→                - emphasis [ref=f119e914]: "*.example.com"
+   832→                - emphasis [ref=f119e915]: keyword
+   833→              - cell [ref=f119e916]:
+   834→                - text: Search
+   835→                - emphasis [ref=f119e917]: example.com
+   836→                - text: and its subdomains for
+   837→                - emphasis [ref=f119e918]: keyword
+   838→            - row [ref=f119e919]:
+   839→              - cell [ref=f119e920]:
+   840→                - text: "browse:"
+   841→                - emphasis [ref=f119e921]: example.com
+   842→              - cell [ref=f119e922]:
+   843→                - text: Show similar websites to
+   844→                - emphasis [ref=f119e923]: example.com
+   845→            - row [ref=f119e924]:
+   846→              - cell [ref=f119e925]:
+   847→                - text: "ip:"
+   848→                - emphasis [ref=f119e926]: 127.0.0.1
+   849→              - cell [ref=f119e927]:
+   850→                - text: Search documents hosted at
+   851→                - emphasis [ref=f119e928]: 127.0.0.1
+   852→            - row [ref=f119e929]:
+   853→              - cell [ref=f119e930]:
+   854→                - text: "links:"
+   855→                - emphasis [ref=f119e931]: example.com
+   856→              - cell [ref=f119e932]:
+   857→                - text: Search documents linking to
+   858→                - emphasis [ref=f119e933]: example.com
+   859→            - row [ref=f119e934]:
+   860→              - cell [ref=f119e935]:
+   861→                - text: "tld:"
+   862→                - emphasis [ref=f119e936]: edu
+   863→                - emphasis [ref=f119e937]: keyword
+   864→              - cell [ref=f119e938]:
+   865→                - text: Search documents with the top level domain
+   866→                - emphasis [ref=f119e939]: edu
+   867→                - text: .
+   868→            - row [ref=f119e940]:
+   869→              - cell [ref=f119e941]:
+   870→                - text: "?tld:"
+   871→                - emphasis [ref=f119e942]: edu
+   872→                - emphasis [ref=f119e943]: keyword
+   873→              - cell [ref=f119e944]:
+   874→                - text: Prefer but do not require results with the top level domain
+   875→                - emphasis [ref=f119e945]: edu
+   876→                - text: . This syntax is also possible for links:..., ip:... and site:...
+   877→            - row [ref=f119e946]:
+   878→              - cell "q>5" [ref=f119e947]
+   879→              - cell "The amount of javascript and modern features is at least 5 (on a scale 0 to 25)" [ref=f119e948]
+   880→            - row [ref=f119e949]:
+   881→              - cell "q<5" [ref=f119e950]
+   882→              - cell "The amount of javascript and modern features is at most 5 (on a scale 0 to 25)" [ref=f119e951]
+   883→            - row [ref=f119e952]:
+   884→              - cell "year>2005" [ref=f119e953]
+   885→              - cell "(beta) The document was ostensibly published in or after 2005" [ref=f119e954]
+   886→            - row [ref=f119e955]:
+   887→              - cell "year=2005" [ref=f119e956]
+   888→              - cell "(beta) The document was ostensibly published in 2005" [ref=f119e957]
+   889→            - row [ref=f119e958]:
+   890→              - cell "year<2005" [ref=f119e959]
+   891→              - cell "(beta) The document was ostensibly published in or before 2005" [ref=f119e960]
+   892→            - row [ref=f119e961]:
+   893→              - cell "rank>50" [ref=f119e962]
+   894→              - cell "The ranking of the website is at least 50 in a span of 1 - 255" [ref=f119e963]
+   895→            - row [ref=f119e964]:
+   896→              - cell "rank<50" [ref=f119e965]
+   897→              - cell "The ranking of the website is at most 50 in a span of 1 - 255" [ref=f119e966]
+   898→            - row [ref=f119e967]:
+   899→              - cell "format:html5" [ref=f119e968]
+   900→              - cell "Filter documents using the HTML5 standard. This is typically modern websites." [ref=f119e969]
+   901→            - row [ref=f119e970]:
+   902→              - cell "format:xhtml" [ref=f119e971]
+   903→              - cell "Filter documents using the XHTML standard" [ref=f119e972]
+   904→            - row [ref=f119e973]:
+   905→              - cell "format:html123" [ref=f119e974]
+   906→              - cell "Filter documents using the HTML standards 1, 2, and 3. This is typically very old websites." [ref=f119e975]
+   907→            - row [ref=f119e976]:
+   908→              - cell "generator:wordpress" [ref=f119e977]
+   909→              - cell "Filter documents with the specified generator, in this case wordpress" [ref=f119e978]
+   910→            - row [ref=f119e979]:
+   911→              - cell "file:zip" [ref=f119e980]
+   912→              - cell "Filter documents containing a link to a zip file (most file-endings work)" [ref=f119e981]
+   913→            - row [ref=f119e982]:
+   914→              - cell "file:audio" [ref=f119e983]
+   915→              - cell "Filter documents containing a link to an audio file" [ref=f119e984]
+   916→            - row [ref=f119e985]:
+   917→              - cell "file:video" [ref=f119e986]
+   918→              - cell "Filter documents containing a link to a video file" [ref=f119e987]
+   919→            - row [ref=f119e988]:
+   920→              - cell "file:archive" [ref=f119e989]
+   921→              - cell "Filter documents containing a link to a compressed archive" [ref=f119e990]
+   922→            - row [ref=f119e991]:
+   923→              - cell "file:document" [ref=f119e992]
+   924→              - cell "Filter documents containing a link to a document" [ref=f119e993]
+   925→            - row [ref=f119e994]:
+   926→              - cell "-special:media" [ref=f119e995]
+   927→              - cell "Filter out documents with audio or video tags" [ref=f119e996]
+   928→            - row [ref=f119e997]:
+   929→              - cell "-special:scripts" [ref=f119e998]
+   930→              - cell "Filter out documents with javascript" [ref=f119e999]
+   931→            - row [ref=f119e1000]:
+   932→              - cell "-special:affiliate" [ref=f119e1001]
+   933→              - cell "Filter out documents with likely Amazon affiliate links" [ref=f119e1002]
+   934→            - row [ref=f119e1003]:
+   935→              - cell "-special:tracking" [ref=f119e1004]
+   936→              - cell "Filter out documents with analytics or tracking code" [ref=f119e1005]
+   937→            - row [ref=f119e1006]:
+   938→              - cell "-special:cookies" [ref=f119e1007]
+   939→              - cell "Filter out documents with cookies" [ref=f119e1008]
+   940→  - contentinfo [ref=f119e1009]:
+   941→    - heading "Policy Information" [level=1] [ref=f119e1010]
+   942→    - generic [ref=f119e1011]:
+   943→      - generic [ref=f119e1012]:
+   944→        - heading " Policies" [level=2] [ref=f119e1013]:
+   945→          - generic [ref=f119e1014]: 
+   946→          - text: Policies
+   947→        - generic [ref=f119e1015]: This website complies with the GDPR by not collecting any personal information, and with the EU Cookie Directive by not using cookies for any purpose other than to provide service functionality.
+   948→        - generic [ref=f119e1016]: Access logs containing IP-addresses are retained for up to 24 hours; anonymized logs with source addresses removed are sometimes kept longer to help diagnose bugs.
+   949→      - generic [ref=f119e1017]:
+   950→        - heading " Contact" [level=2] [ref=f119e1018]:
+   951→          - generic [ref=f119e1019]: 
+   952→          - text: Contact
+   953→        - generic [ref=f119e1020]:
+   954→          - text: You can reach the webmaster of the search engine at
+   955→          - link "contact@marginalia-search.com" [ref=f119e1021] [cursor=pointer]:
+   956→            - /url: mailto:contact@marginalia-search.com
+   957→          - text: .
+   958→        - generic [ref=f119e1022]:
+   959→          - generic [ref=f119e1023]: 
+   960→          - text: Sources
+   961→        - generic [ref=f119e1024]:
+   962→          - text: The search engine is open source with an AGPL license. The sources can be perused at
+   963→          - link "https://git.marginalia.nu/" [ref=f119e1025] [cursor=pointer]:
+   964→            - /url: https://git.marginalia.nu/
+   965→          - text: .
+   966→      - generic [ref=f119e1026]:
+   967→        - heading " Data" [level=2] [ref=f119e1027]:
+   968→          - generic [ref=f119e1028]: 
+   969→          - text: Data
+   970→        - generic [ref=f119e1029]:
+   971→          - text: IP geolocation is sourced from the IP2Location LITE data available from
+   972→          - link "https://lite.ip2location.com/" [ref=f119e1030] [cursor=pointer]:
+   973→            - /url: https://lite.ip2location.com/
+   974→          - text: under
+   975→          - link "CC-BY-SA 4.0" [ref=f119e1031] [cursor=pointer]:
+   976→            - /url: https://creativecommons.org/licenses/by-sa/4.0/
+   977→          - text: .
+   978→  - text:                 

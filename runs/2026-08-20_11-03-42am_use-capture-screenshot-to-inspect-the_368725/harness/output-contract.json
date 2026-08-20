@@ -1,0 +1,14 @@
+{
+  "outputs": [
+    {
+      "id": "viewport_screenshot",
+      "kind": "screenshots",
+      "count": {
+        "minimum": 1
+      },
+      "mustShow": [
+        "the current viewport as currently rendered"
+      ]
+    }
+  ]
+}

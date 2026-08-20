@@ -1,0 +1,93 @@
+{
+  "task": "\"Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa\r\rFor each of the above sororities at MIT above can you do the following\r1. identify the sorority website by googling 'sorority name MIT' and finding the sorority website \r2. identifying the sisters page in the website\r3. identify the seniors (class of 2026) and juniors (class of 2027)\r4. adding their name + info to a google spreadsheet and filling out the relevant information (name, class, major, affiliation, interests, other)\"",
+  "startedAt": "2026-08-20T18:42:39.245Z",
+  "browserProvider": "local",
+  "artifacts": [
+    {
+      "filename": "scratch/workspace/raw_data.json",
+      "sha256": "bccbe71534bb855b9b390111ed383d7dc6768acd534661edd8e83b63836f53b2",
+      "capturedAt": "2026-08-20T18:44:13.876Z"
+    },
+    {
+      "filename": "scratch/workspace/theta_2026.txt",
+      "sha256": "569f994d0bd967bb663a565677b1e2be2dc0743e80c867b12fe01471d21b10dc",
+      "capturedAt": "2026-08-20T18:44:36.254Z"
+    },
+    {
+      "filename": "scratch/workspace/theta_2027.txt",
+      "sha256": "c472e461482c9142566428c91f751025ac0361e5f63ba74831f9a95526a54a82",
+      "capturedAt": "2026-08-20T18:44:49.380Z"
+    },
+    {
+      "filename": "scratch/workspace/sigmakappa.json",
+      "sha256": "9e8a5524ca42c913c38c77c7477e354a0905e0d6f07bee0a5f56ce767704338f",
+      "capturedAt": "2026-08-20T18:45:09.607Z"
+    },
+    {
+      "filename": "scratch/workspace/sigmakappa_2026.txt",
+      "sha256": "1ceaf2fed8a508bf93fc71a44f5d432068b828178c708995acc832dcc2071748",
+      "capturedAt": "2026-08-20T18:45:20.836Z"
+    },
+    {
+      "filename": "scratch/workspace/sigmakappa_2027.txt",
+      "sha256": "6412257a35c0065229ff11932bfd84c4e05ab2934d64b8484ca91ee00a5cae2b",
+      "capturedAt": "2026-08-20T18:45:34.166Z"
+    },
+    {
+      "filename": "scratch/workspace/alphaphi_2026.txt",
+      "sha256": "ceac60580a54cdce5752ec65623fc00ca7588c96f60caa0a096e031eb0dddee8",
+      "capturedAt": "2026-08-20T18:45:45.316Z"
+    },
+    {
+      "filename": "scratch/workspace/alphaphi_2027.txt",
+      "sha256": "6fb26b46e9e74490665582c9a929ae51f000a73d5bac8b7d53e9fd97bf477ee1",
+      "capturedAt": "2026-08-20T18:45:55.740Z"
+    },
+    {
+      "filename": "scratch/workspace/master_data.csv",
+      "sha256": "91fb17c409d2a2ab74f603c3327f353886bacf606b0371e4896baa84f9618e58",
+      "capturedAt": "2026-08-20T18:47:45.787Z"
+    },
+    {
+      "filename": "scratch/workspace/build_csv.py",
+      "sha256": "372ded1b07b3b800b9b5781ce02c301f6016aca85b696c04e62f1a247d930dc4",
+      "capturedAt": "2026-08-20T18:47:02.135Z"
+    },
+    {
+      "filename": "scratch/workspace/build_csv2.py",
+      "sha256": "9936fbb43571ee6b4f148d212a102cac6d9b3357b45d7b3d93cd9237f13b15a9",
+      "capturedAt": "2026-08-20T18:47:42.312Z"
+    },
+    {
+      "filename": "artifacts/google_sheet_populated.png",
+      "sha256": "0f1358a5b764317fd180e25d6ed1c3e135a78b4095106c1b42e0e314eabc9954",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1a7ZkBjXZkg6YrjL7-aa3tQDPkDrdyHlB2zevCiHc6qU/edit?gid=0#gid=0",
+      "publicationKind": "screenshot",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:50:29.482Z"
+    },
+    {
+      "filename": "artifacts/mit_sorority_sisters_data.csv",
+      "sha256": "91fb17c409d2a2ab74f603c3327f353886bacf606b0371e4896baa84f9618e58",
+      "publicationKind": "file",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:50:33.462Z"
+    },
+    {
+      "filename": "artifacts/google_sheet_populated_middle_rows.png",
+      "sha256": "c47e5747fcf3c4834675ee7b66236418097542f3008974bf07bb9fd7784b8b4e",
+      "sourceUrl": "https://docs.google.com/spreadsheets/d/1a7ZkBjXZkg6YrjL7-aa3tQDPkDrdyHlB2zevCiHc6qU/edit?gid=0#gid=0",
+      "publicationKind": "screenshot",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-20T18:50:50.490Z"
+    }
+  ],
+  "finishedAt": "2026-08-20T18:51:43.107Z"
+}

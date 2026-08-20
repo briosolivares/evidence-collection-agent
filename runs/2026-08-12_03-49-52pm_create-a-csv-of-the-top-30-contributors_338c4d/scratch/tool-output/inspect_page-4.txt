@@ -1,0 +1,1872 @@
+URL: https://github.com/openclaw/openclaw/graphs/contributors?all=1
+Title: Contributors to openclaw/openclaw · GitHub
+
+- generic [ref=f1e2]:
+  - generic [ref=f1e3]:
+    - link "Skip to content" [ref=f1e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f1e8]:
+      - heading "Navigation Menu" [level=2] [ref=f1e9]
+      - generic [ref=f1e10]:
+        - link "Homepage" [ref=f1e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e15]:
+          - navigation "Global" [ref=f1e16]:
+            - list [ref=f1e17]:
+              - listitem [ref=f1e18]:
+                - button "Platform" [ref=f1e20] [cursor=pointer]
+              - listitem [ref=f1e23]:
+                - button "Solutions" [ref=f1e25] [cursor=pointer]
+              - listitem [ref=f1e28]:
+                - button "Resources" [ref=f1e30] [cursor=pointer]
+              - listitem [ref=f1e33]:
+                - button "Open Source" [ref=f1e35] [cursor=pointer]
+              - listitem [ref=f1e38]:
+                - button "Enterprise" [ref=f1e40] [cursor=pointer]
+              - listitem [ref=f1e43]:
+                - link "Pricing" [ref=f1e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f1e45]:
+            - button "Search or jump to, type / to search" [ref=f1e47] [cursor=pointer]:
+              - generic [ref=f1e50]:
+                - text: Type
+                - generic [ref=f1e51]: /
+                - text: to search
+            - link "Sign in" [ref=f1e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fgraphs%2Fcontributors
+            - link "Sign up" [ref=f1e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Frepos%2Finsights%2Fcontributors%2Findex&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f1e55] [cursor=pointer]
+  - main [ref=f1e61]:
+    - generic [ref=f1e62]:
+      - generic [ref=f1e63]:
+        - generic [ref=f1e65]:
+          - link "openclaw" [ref=f1e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f1e70]: /
+          - strong [ref=f1e71]:
+            - link "openclaw" [ref=f1e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f1e73]: Public
+        - generic [ref=f1e74]:
+          - list:
+            - listitem [ref=f1e75]:
+              - link "Sponsor @openclaw" [ref=f1e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f1e77]: Sponsor
+            - listitem [ref=f1e81]:
+              - link "You must be signed in to change notification settings" [ref=f1e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f1e85]:
+              - link "Fork 81.1k" [ref=f1e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,146" [ref=f1e89]: 81.1k
+            - listitem [ref=f1e90]:
+              - link "You must be signed in to star a repository" [ref=f1e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386074 users starred this repository" [ref=f1e95]: 386k
+      - navigation "Repository" [ref=f1e96]:
+        - list [ref=f1e97]:
+          - listitem [ref=f1e98]:
+            - link "Code" [ref=f1e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f1e103]:
+            - link "Issues 3.4k" [ref=f1e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f1e108]: Issues
+              - generic "3,414" [ref=f1e109]: 3.4k
+          - listitem [ref=f1e110]:
+            - link "Pull requests 2.1k" [ref=f1e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f1e114]: Pull requests
+              - generic "2,114" [ref=f1e115]: 2.1k
+          - listitem [ref=f1e116]:
+            - link "Actions" [ref=f1e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f1e121]:
+            - link "Projects" [ref=f1e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f1e126]:
+            - link "Security and quality 647" [ref=f1e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f1e130]: Security and quality
+              - generic "647" [ref=f1e131]
+          - listitem [ref=f1e132]:
+            - link "Insights" [ref=f1e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f1e138]:
+      - 'heading "Insights: openclaw/openclaw" [level=1] [ref=f1e139]'
+      - generic [ref=f1e141]:
+        - navigation "Insights" [ref=f1e143]:
+          - link "Pulse" [ref=f1e144] [cursor=pointer]:
+            - /url: /openclaw/openclaw/pulse
+          - link "Contributors" [ref=f1e145]:
+            - /url: /openclaw/openclaw/graphs/contributors
+          - link "Community standards" [ref=f1e146] [cursor=pointer]:
+            - /url: /openclaw/openclaw/community
+          - link "Commits" [ref=f1e147] [cursor=pointer]:
+            - /url: /openclaw/openclaw/graphs/commit-activity
+          - link "Code frequency" [ref=f1e148] [cursor=pointer]:
+            - /url: /openclaw/openclaw/graphs/code-frequency
+          - link "Dependency graph" [ref=f1e149] [cursor=pointer]:
+            - /url: /openclaw/openclaw/network/dependencies
+          - link "Network" [ref=f1e150] [cursor=pointer]:
+            - /url: /openclaw/openclaw/network
+          - link "Forks" [ref=f1e151] [cursor=pointer]:
+            - /url: /openclaw/openclaw/forks
+        - generic [ref=f1e155]:
+          - generic [ref=f1e156]:
+            - generic [ref=f1e157]:
+              - heading "Contributors" [level=1] [ref=f1e158]
+              - paragraph [ref=f1e159]: Contributions per week to main, line counts have been omitted because commit count exceeds 10,000.
+            - 'button "Period: All" [active] [ref=f1e1451] [cursor=pointer]'
+          - generic [ref=f1e164]:
+            - generic [ref=f1e1453]:
+              - generic [ref=f1e1454]:
+                - generic [ref=f1e1456]:
+                  - heading "Commits over time" [level=2] [ref=f1e1457]
+                  - generic [ref=f1e1459]: Weekly from Nov 22, 2025 to Aug 8, 2026
+                - generic [ref=f1e1461]:
+                  - button "Chart options" [ref=f1e1462] [cursor=pointer]
+                  - button "Customization settings" [ref=f1e1465] [cursor=pointer]
+              - region "Commits over time. Interactive chart." [ref=f1e1468]:
+                - generic [ref=f1e1469]:
+                  - generic [ref=f1e1470]: Combination chart with 2 data series.
+                  - button "View as data table, Chart" [ref=f1e1472] [cursor=pointer]
+                  - generic [ref=f1e1473]: The chart has 2 X axes displaying Time, and navigator-x-axis.
+                  - generic [ref=f1e1474]: The chart has 2 Y axes displaying Contributions, and navigator-y-axis.
+                - application [ref=f1e1475]:
+                  - img "Interactive chart" [ref=f1e1476]:
+                    - generic [ref=f1e1484]: Contributions
+                    - generic [ref=f1e1486]:
+                      - region "Commits, series 1 of 2. Bar series with 38 bars. Y axis, Contributions. X axis, Time." [ref=f1e1487]:
+                        - img "Sunday, 23 Nov 2025, 284. Commits." [ref=f1e1488]
+                        - img "Sunday, 30 Nov 2025, 247. Commits." [ref=f1e1489]
+                        - img "Sunday, 7 Dec 2025, 815. Commits." [ref=f1e1490]
+                        - img "Sunday, 14 Dec 2025, 630. Commits." [ref=f1e1491]
+                        - img "Sunday, 21 Dec 2025, 362. Commits." [ref=f1e1492]
+                        - img "Sunday, 28 Dec 2025, 549. Commits." [ref=f1e1493]
+                        - img "Sunday, 4 Jan 2026, 1,791. Commits." [ref=f1e1494]
+                        - img "Sunday, 11 Jan 2026, 1,547. Commits." [ref=f1e1495]
+                        - img "Sunday, 18 Jan 2026, 1,441. Commits." [ref=f1e1496]
+                        - img "Sunday, 25 Jan 2026, 668. Commits." [ref=f1e1497]
+                        - img "Sunday, 1 Feb 2026, 563. Commits." [ref=f1e1498]
+                        - img "Sunday, 8 Feb 2026, 1,353. Commits." [ref=f1e1499]
+                        - img "Sunday, 15 Feb 2026, 2,904. Commits." [ref=f1e1500]
+                        - img "Sunday, 22 Feb 2026, 2,118. Commits." [ref=f1e1501]
+                        - img "Sunday, 1 Mar 2026, 2,132. Commits." [ref=f1e1502]
+                        - img "Sunday, 8 Mar 2026, 1,646. Commits." [ref=f1e1503]
+                        - img "Sunday, 15 Mar 2026, 1,820. Commits." [ref=f1e1504]
+                        - img "Sunday, 22 Mar 2026, 2,541. Commits." [ref=f1e1505]
+                        - img "Sunday, 29 Mar 2026, 3,151. Commits." [ref=f1e1506]
+                        - img "Sunday, 5 Apr 2026, 3,916. Commits." [ref=f1e1507]
+                        - img "Sunday, 12 Apr 2026, 1,758. Commits." [ref=f1e1508]
+                        - img "Sunday, 19 Apr 2026, 3,418. Commits." [ref=f1e1509]
+                        - img "Sunday, 26 Apr 2026, 4,524. Commits." [ref=f1e1510]
+                        - img "Sunday, 3 May 2026, 4,064. Commits." [ref=f1e1511]
+                        - img "Sunday, 10 May 2026, 4,937. Commits." [ref=f1e1512]
+                        - img "Sunday, 17 May 2026, 1,863. Commits." [ref=f1e1513]
+                        - img "Sunday, 24 May 2026, 3,272. Commits." [ref=f1e1514]
+                        - img "Sunday, 31 May 2026, 2,616. Commits." [ref=f1e1515]
+                        - img "Sunday, 7 Jun 2026, 1,002. Commits." [ref=f1e1516]
+                        - img "Sunday, 14 Jun 2026, 2,316. Commits." [ref=f1e1517]
+                        - img "Sunday, 21 Jun 2026, 1,634. Commits." [ref=f1e1518]
+                        - img "Sunday, 28 Jun 2026, 1,742. Commits." [ref=f1e1519]
+                        - img "Sunday, 5 Jul 2026, 3,366. Commits." [ref=f1e1520]
+                        - img "Sunday, 12 Jul 2026, 4,617. Commits." [ref=f1e1521]
+                        - img "Sunday, 19 Jul 2026, 1,923. Commits." [ref=f1e1522]
+                        - img "Sunday, 26 Jul 2026, 3,114. Commits." [ref=f1e1523]
+                        - img "Sunday, 2 Aug 2026, 2,231. Commits." [ref=f1e1524]
+                        - img "Sunday, 9 Aug 2026, 1,562. Commits." [ref=f1e1525]
+                      - region "Navigator 1, series 2 of 2 with 38 data points. Y axis, navigator-y-axis. X axis, navigator-x-axis." [ref=f1e1529]:
+                        - img "Sunday, 23 Nov 2025, 284. Navigator 1." [ref=f1e1530]
+                        - img "Sunday, 30 Nov 2025, 247. Navigator 1." [ref=f1e1531]
+                        - img "Sunday, 7 Dec 2025, 815. Navigator 1." [ref=f1e1532]
+                        - img "Sunday, 14 Dec 2025, 630. Navigator 1." [ref=f1e1533]
+                        - img "Sunday, 21 Dec 2025, 362. Navigator 1." [ref=f1e1534]
+                        - img "Sunday, 28 Dec 2025, 549. Navigator 1." [ref=f1e1535]
+                        - img "Sunday, 4 Jan 2026, 1,791. Navigator 1." [ref=f1e1536]
+                        - img "Sunday, 11 Jan 2026, 1,547. Navigator 1." [ref=f1e1537]
+                        - img "Sunday, 18 Jan 2026, 1,441. Navigator 1." [ref=f1e1538]
+                        - img "Sunday, 25 Jan 2026, 668. Navigator 1." [ref=f1e1539]
+                        - img "Sunday, 1 Feb 2026, 563. Navigator 1." [ref=f1e1540]
+                        - img "Sunday, 8 Feb 2026, 1,353. Navigator 1." [ref=f1e1541]
+                        - img "Sunday, 15 Feb 2026, 2,904. Navigator 1." [ref=f1e1542]
+                        - img "Sunday, 22 Feb 2026, 2,118. Navigator 1." [ref=f1e1543]
+                        - img "Sunday, 1 Mar 2026, 2,132. Navigator 1." [ref=f1e1544]
+                        - img "Sunday, 8 Mar 2026, 1,646. Navigator 1." [ref=f1e1545]
+                        - img "Sunday, 15 Mar 2026, 1,820. Navigator 1." [ref=f1e1546]
+                        - img "Sunday, 22 Mar 2026, 2,541. Navigator 1." [ref=f1e1547]
+                        - img "Sunday, 29 Mar 2026, 3,151. Navigator 1." [ref=f1e1548]
+                        - img "Sunday, 5 Apr 2026, 3,916. Navigator 1." [ref=f1e1549]
+                        - img "Sunday, 12 Apr 2026, 1,758. Navigator 1." [ref=f1e1550]
+                        - img "Sunday, 19 Apr 2026, 3,418. Navigator 1." [ref=f1e1551]
+                        - img "Sunday, 26 Apr 2026, 4,524. Navigator 1." [ref=f1e1552]
+                        - img "Sunday, 3 May 2026, 4,064. Navigator 1." [ref=f1e1553]
+                        - img "Sunday, 10 May 2026, 4,937. Navigator 1." [ref=f1e1554]
+                        - img "Sunday, 17 May 2026, 1,863. Navigator 1." [ref=f1e1555]
+                        - img "Sunday, 24 May 2026, 3,272. Navigator 1." [ref=f1e1556]
+                        - img "Sunday, 31 May 2026, 2,616. Navigator 1." [ref=f1e1557]
+                        - img "Sunday, 7 Jun 2026, 1,002. Navigator 1." [ref=f1e1558]
+                        - img "Sunday, 14 Jun 2026, 2,316. Navigator 1." [ref=f1e1559]
+                        - img "Sunday, 21 Jun 2026, 1,634. Navigator 1." [ref=f1e1560]
+                        - img "Sunday, 28 Jun 2026, 1,742. Navigator 1." [ref=f1e1561]
+                        - img "Sunday, 5 Jul 2026, 3,366. Navigator 1." [ref=f1e1562]
+                        - img "Sunday, 12 Jul 2026, 4,617. Navigator 1." [ref=f1e1563]
+                        - img "Sunday, 19 Jul 2026, 1,923. Navigator 1." [ref=f1e1564]
+                        - img "Sunday, 26 Jul 2026, 3,114. Navigator 1." [ref=f1e1565]
+                        - img "Sunday, 2 Aug 2026, 2,231. Navigator 1." [ref=f1e1566]
+                        - img "Sunday, 9 Aug 2026, 1,562. Navigator 1." [ref=f1e1567]
+                    - generic [ref=f1e1573]:
+                      - generic [ref=f1e1574]: Dec '25
+                      - generic [ref=f1e1575]: Jan '26
+                      - generic [ref=f1e1576]: Feb '26
+                      - generic [ref=f1e1577]: Mar '26
+                      - generic [ref=f1e1578]: Apr '26
+                      - generic [ref=f1e1579]: May '26
+                      - generic [ref=f1e1580]: Jun '26
+                      - generic [ref=f1e1581]: Jul '26
+                      - generic [ref=f1e1582]: Aug '26
+                    - generic [ref=f1e1583]:
+                      - generic [ref=f1e1584]:
+                        - generic [ref=f1e1585]: Jan '26
+                        - text: Jan '26
+                      - generic [ref=f1e1586]:
+                        - generic [ref=f1e1587]: Mar '26
+                        - text: Mar '26
+                      - generic [ref=f1e1588]:
+                        - generic [ref=f1e1589]: May '26
+                        - text: May '26
+                      - generic [ref=f1e1590]:
+                        - generic [ref=f1e1591]: Jul '26
+                        - text: Jul '26
+                    - generic [ref=f1e1592]:
+                      - generic [ref=f1e1593]: "0"
+                      - generic [ref=f1e1594]: 1k
+                      - generic [ref=f1e1595]: 2k
+                      - generic [ref=f1e1596]: 3k
+                      - generic [ref=f1e1597]: 4k
+                  - generic:
+                    - region "Commits over time Axis zoom":
+                      - slider "Start of selected range": "0"
+                      - slider "End of selected range": "100"
+                - generic: End of interactive chart.
+            - list [ref=f1e1605]:
+              - listitem [ref=f1e1606]:
+                - generic [ref=f1e1608]:
+                  - generic [ref=f1e1609]:
+                    - generic [ref=f1e1610]:
+                      - link "steipete" [ref=f1e1612] [cursor=pointer]:
+                        - /url: /steipete
+                      - generic [ref=f1e1614]:
+                        - heading "steipete 's Commits" [level=2] [ref=f1e1615]:
+                          - generic [ref=f1e1616]:
+                            - link "steipete" [ref=f1e1617] [cursor=pointer]:
+                              - /url: /steipete
+                            - generic [ref=f1e1618]: "'s Commits"
+                        - link "41,280 commits" [ref=f1e1621] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=steipete
+                    - generic [ref=f1e1622]:
+                      - generic [ref=f1e1623]: "#1"
+                      - button "Chart options" [ref=f1e1625] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1628] [cursor=pointer]
+                  - region "steipete's Commits. Interactive chart." [ref=f1e1631]:
+                    - generic [ref=f1e1632]:
+                      - generic [ref=f1e1633]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e1635] [cursor=pointer]
+                      - generic [ref=f1e1636]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1637]: The chart has 1 Y axis displaying Contributions. Data ranges from 34 to 2873.
+                    - application [ref=f1e1638]:
+                      - img "Interactive chart" [ref=f1e1639]:
+                        - generic [ref=f1e1645]: Contributions
+                        - generic [ref=f1e1648]:
+                          - img "Week from Monday, 17 Nov 2025, 284. Commits." [ref=f1e1649]
+                          - img "Week from Monday, 24 Nov 2025, 232. Commits." [ref=f1e1650]
+                          - img "Week from Monday, 1 Dec 2025, 815. Commits." [ref=f1e1651]
+                          - img "Week from Monday, 8 Dec 2025, 622. Commits." [ref=f1e1652]
+                          - img "Week from Monday, 15 Dec 2025, 357. Commits." [ref=f1e1653]
+                          - img "Week from Monday, 22 Dec 2025, 494. Commits." [ref=f1e1654]
+                          - img "Week from Monday, 29 Dec 2025, 1,487. Commits." [ref=f1e1655]
+                          - img "Week from Monday, 5 Jan 2026, 1,290. Commits." [ref=f1e1656]
+                          - img "Week from Monday, 12 Jan 2026, 1,169. Commits." [ref=f1e1657]
+                          - img "Week from Monday, 19 Jan 2026, 222. Commits." [ref=f1e1658]
+                          - img "Week from Monday, 26 Jan 2026, 128. Commits." [ref=f1e1659]
+                          - img "Week from Monday, 2 Feb 2026, 660. Commits." [ref=f1e1660]
+                          - img "Week from Monday, 9 Feb 2026, 1,917. Commits." [ref=f1e1661]
+                          - img "Week from Monday, 16 Feb 2026, 1,170. Commits." [ref=f1e1662]
+                          - img "Week from Monday, 23 Feb 2026, 879. Commits." [ref=f1e1663]
+                          - img "Week from Monday, 2 Mar 2026, 1,016. Commits." [ref=f1e1664]
+                          - img "Week from Monday, 9 Mar 2026, 605. Commits." [ref=f1e1665]
+                          - img "Week from Monday, 16 Mar 2026, 1,253. Commits." [ref=f1e1666]
+                          - img "Week from Monday, 23 Mar 2026, 1,317. Commits." [ref=f1e1667]
+                          - img "Week from Monday, 30 Mar 2026, 2,339. Commits." [ref=f1e1668]
+                          - img "Week from Monday, 6 Apr 2026, 570. Commits." [ref=f1e1669]
+                          - img "Week from Monday, 13 Apr 2026, 2,238. Commits." [ref=f1e1670]
+                          - img "Week from Monday, 20 Apr 2026, 2,777. Commits." [ref=f1e1671]
+                          - img "Week from Monday, 27 Apr 2026, 2,136. Commits." [ref=f1e1672]
+                          - img "Week from Monday, 4 May 2026, 2,751. Commits." [ref=f1e1673]
+                          - img "Week from Monday, 11 May 2026, 584. Commits." [ref=f1e1674]
+                          - img "Week from Monday, 18 May 2026, 1,574. Commits." [ref=f1e1675]
+                          - img "Week from Monday, 25 May 2026, 1,195. Commits." [ref=f1e1676]
+                          - img "Week from Monday, 1 Jun 2026, 34. Commits." [ref=f1e1677]
+                          - img "Week from Monday, 8 Jun 2026, 44. Commits." [ref=f1e1678]
+                          - img "Week from Monday, 15 Jun 2026, 41. Commits." [ref=f1e1679]
+                          - img "Week from Monday, 22 Jun 2026, 199. Commits." [ref=f1e1680]
+                          - img "Week from Monday, 29 Jun 2026, 1,628. Commits." [ref=f1e1681]
+                          - img "Week from Monday, 6 Jul 2026, 2,873. Commits." [ref=f1e1682]
+                          - img "Week from Monday, 13 Jul 2026, 1,132. Commits." [ref=f1e1683]
+                          - img "Week from Monday, 20 Jul 2026, 1,465. Commits." [ref=f1e1684]
+                          - img "Week from Monday, 27 Jul 2026, 934. Commits." [ref=f1e1685]
+                          - img "Week from Monday, 3 Aug 2026, 849. Commits." [ref=f1e1686]
+                        - generic [ref=f1e1687]:
+                          - generic [ref=f1e1688]: Jan '26
+                          - generic [ref=f1e1689]: Apr '26
+                          - generic [ref=f1e1690]: Jul '26
+                        - generic [ref=f1e1691]:
+                          - generic [ref=f1e1692]: "0"
+                          - generic [ref=f1e1693]: 1k
+                          - generic [ref=f1e1694]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1697]:
+                - generic [ref=f1e1699]:
+                  - generic [ref=f1e1700]:
+                    - generic [ref=f1e1701]:
+                      - link "vincentkoc" [ref=f1e1703] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - generic [ref=f1e1705]:
+                        - heading "vincentkoc 's Commits" [level=2] [ref=f1e1706]:
+                          - generic [ref=f1e1707]:
+                            - link "vincentkoc" [ref=f1e1708] [cursor=pointer]:
+                              - /url: /vincentkoc
+                            - generic [ref=f1e1709]: "'s Commits"
+                        - link "13,133 commits" [ref=f1e1712] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=vincentkoc
+                    - generic [ref=f1e1713]:
+                      - generic [ref=f1e1714]: "#2"
+                      - button "Chart options" [ref=f1e1716] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1719] [cursor=pointer]
+                  - region "vincentkoc's Commits. Interactive chart." [ref=f1e1722]:
+                    - generic [ref=f1e1723]:
+                      - generic [ref=f1e1724]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e1726] [cursor=pointer]
+                      - generic [ref=f1e1727]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e1728]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 1590.
+                    - application [ref=f1e1729]:
+                      - img "Interactive chart" [ref=f1e1730]:
+                        - generic [ref=f1e1736]: Contributions
+                        - generic [ref=f1e1739]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 1. Commits." [ref=f1e1740]
+                          - img "Week from Monday, 2 Feb 2026, 2. Commits." [ref=f1e1741]
+                          - img "Week from Monday, 9 Feb 2026, 66. Commits." [ref=f1e1742]
+                          - img "Week from Monday, 16 Feb 2026, 119. Commits." [ref=f1e1743]
+                          - img "Week from Monday, 23 Feb 2026, 281. Commits." [ref=f1e1744]
+                          - img "Week from Monday, 2 Mar 2026, 132. Commits." [ref=f1e1745]
+                          - img "Week from Monday, 9 Mar 2026, 610. Commits." [ref=f1e1746]
+                          - img "Week from Monday, 16 Mar 2026, 288. Commits." [ref=f1e1747]
+                          - img "Week from Monday, 23 Mar 2026, 795. Commits." [ref=f1e1748]
+                          - img "Week from Monday, 30 Mar 2026, 681. Commits." [ref=f1e1749]
+                          - img "Week from Monday, 6 Apr 2026, 596. Commits." [ref=f1e1750]
+                          - img "Week from Monday, 13 Apr 2026, 466. Commits." [ref=f1e1751]
+                          - img "Week from Monday, 20 Apr 2026, 719. Commits." [ref=f1e1752]
+                          - img "Week from Monday, 27 Apr 2026, 561. Commits." [ref=f1e1753]
+                          - img "Week from Monday, 4 May 2026, 280. Commits." [ref=f1e1754]
+                          - img "Week from Monday, 11 May 2026, 241. Commits." [ref=f1e1755]
+                          - img "Week from Monday, 18 May 2026, 817. Commits." [ref=f1e1756]
+                          - img "Week from Monday, 25 May 2026, 672. Commits." [ref=f1e1757]
+                          - img "Week from Monday, 1 Jun 2026, 418. Commits." [ref=f1e1758]
+                          - img "Week from Monday, 8 Jun 2026, 1,590. Commits." [ref=f1e1759]
+                          - img "Week from Monday, 15 Jun 2026, 936. Commits." [ref=f1e1760]
+                          - img "Week from Monday, 22 Jun 2026, 160. Commits." [ref=f1e1761]
+                          - img "Week from Monday, 29 Jun 2026, 532. Commits." [ref=f1e1762]
+                          - img "Week from Monday, 6 Jul 2026, 453. Commits." [ref=f1e1763]
+                          - img "Week from Monday, 13 Jul 2026, 123. Commits." [ref=f1e1764]
+                          - img "Week from Monday, 20 Jul 2026, 795. Commits." [ref=f1e1765]
+                          - img "Week from Monday, 27 Jul 2026, 680. Commits." [ref=f1e1766]
+                          - img "Week from Monday, 3 Aug 2026, 119. Commits." [ref=f1e1767]
+                        - generic [ref=f1e1768]:
+                          - generic [ref=f1e1769]: Jan '26
+                          - generic [ref=f1e1770]: Apr '26
+                          - generic [ref=f1e1771]: Jul '26
+                        - generic [ref=f1e1772]:
+                          - generic [ref=f1e1773]: "0"
+                          - generic [ref=f1e1774]: 1k
+                          - generic [ref=f1e1775]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1778]:
+                - generic [ref=f1e1974]:
+                  - generic [ref=f1e1975]:
+                    - generic [ref=f1e1976]:
+                      - link "shakkernerd" [ref=f1e1978] [cursor=pointer]:
+                        - /url: /shakkernerd
+                      - generic [ref=f1e1980]:
+                        - heading "shakkernerd 's Commits" [level=2] [ref=f1e1981]:
+                          - generic [ref=f1e1982]:
+                            - link "shakkernerd" [ref=f1e1983] [cursor=pointer]:
+                              - /url: /shakkernerd
+                            - generic [ref=f1e1984]: "'s Commits"
+                        - link "3,815 commits" [ref=f1e1987] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=shakkernerd
+                    - generic [ref=f1e1988]:
+                      - generic [ref=f1e1989]: "#3"
+                      - button "Chart options" [ref=f1e1991] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e1994] [cursor=pointer]
+                  - region "shakkernerd's Commits. Interactive chart." [ref=f1e1997]:
+                    - generic [ref=f1e1998]:
+                      - generic [ref=f1e1999]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2001] [cursor=pointer]
+                      - generic [ref=f1e2002]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2003]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 1193.
+                    - application [ref=f1e2004]:
+                      - img "Interactive chart" [ref=f1e2005]:
+                        - generic [ref=f1e2011]: Contributions
+                        - generic [ref=f1e2014]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 30. Commits." [ref=f1e2015]
+                          - img "Week from Monday, 26 Jan 2026, 32. Commits." [ref=f1e2016]
+                          - img "Week from Monday, 2 Feb 2026, 2. Commits." [ref=f1e2017]
+                          - img "Week from Monday, 9 Feb 2026, 18. Commits." [ref=f1e2018]
+                          - img "Week from Monday, 16 Feb 2026, 29. Commits." [ref=f1e2019]
+                          - img "Week from Monday, 23 Feb 2026, 28. Commits." [ref=f1e2020]
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 28. Commits." [ref=f1e2021]
+                          - img "Week from Monday, 16 Mar 2026, 12. Commits." [ref=f1e2022]
+                          - img "Week from Monday, 23 Mar 2026, 173. Commits." [ref=f1e2023]
+                          - img "Week from Monday, 30 Mar 2026, 18. Commits." [ref=f1e2024]
+                          - img "Week from Monday, 6 Apr 2026, 27. Commits." [ref=f1e2025]
+                          - img "Week from Monday, 13 Apr 2026, 94. Commits." [ref=f1e2026]
+                          - img "Week from Monday, 20 Apr 2026, 295. Commits." [ref=f1e2027]
+                          - img "Week from Monday, 27 Apr 2026, 660. Commits." [ref=f1e2028]
+                          - img "Week from Monday, 4 May 2026, 1,193. Commits." [ref=f1e2029]
+                          - img "Week from Monday, 11 May 2026, 27. Commits." [ref=f1e2030]
+                          - img "Week from Monday, 18 May 2026, 170. Commits." [ref=f1e2031]
+                          - img "Week from Monday, 25 May 2026, 177. Commits." [ref=f1e2032]
+                          - img "Week from Monday, 1 Jun 2026, 99. Commits." [ref=f1e2033]
+                          - img "Week from Monday, 8 Jun 2026, 106. Commits." [ref=f1e2034]
+                          - img "Week from Monday, 15 Jun 2026, 76. Commits." [ref=f1e2035]
+                          - img "Week from Monday, 22 Jun 2026, 10. Commits." [ref=f1e2036]
+                          - img "Week from Monday, 29 Jun 2026, 39. Commits." [ref=f1e2037]
+                          - img "Week from Monday, 6 Jul 2026, 125. Commits." [ref=f1e2038]
+                          - img "Week from Monday, 13 Jul 2026, 16. Commits." [ref=f1e2039]
+                          - img "Week from Monday, 20 Jul 2026, 131. Commits." [ref=f1e2040]
+                          - img "Week from Monday, 27 Jul 2026, 137. Commits." [ref=f1e2041]
+                          - img "Week from Monday, 3 Aug 2026, 63. Commits." [ref=f1e2042]
+                        - generic [ref=f1e2043]:
+                          - generic [ref=f1e2044]: Jan '26
+                          - generic [ref=f1e2045]: Apr '26
+                          - generic [ref=f1e2046]: Jul '26
+                        - generic [ref=f1e2047]:
+                          - generic [ref=f1e2048]: "0"
+                          - generic [ref=f1e2049]: 1k
+                          - generic [ref=f1e2050]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1780]:
+                - generic [ref=f1e2053]:
+                  - generic [ref=f1e2054]:
+                    - generic [ref=f1e2055]:
+                      - link "obviyus" [ref=f1e2057] [cursor=pointer]:
+                        - /url: /obviyus
+                      - generic [ref=f1e2059]:
+                        - heading "obviyus 's Commits" [level=2] [ref=f1e2060]:
+                          - generic [ref=f1e2061]:
+                            - link "obviyus" [ref=f1e2062] [cursor=pointer]:
+                              - /url: /obviyus
+                            - generic [ref=f1e2063]: "'s Commits"
+                        - link "2,145 commits" [ref=f1e2066] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=obviyus
+                    - generic [ref=f1e2067]:
+                      - generic [ref=f1e2068]: "#4"
+                      - button "Chart options" [ref=f1e2070] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2073] [cursor=pointer]
+                  - region "obviyus's Commits. Interactive chart." [ref=f1e2076]:
+                    - generic [ref=f1e2077]:
+                      - generic [ref=f1e2078]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2080] [cursor=pointer]
+                      - generic [ref=f1e2081]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2082]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 208.
+                    - application [ref=f1e2083]:
+                      - img "Interactive chart" [ref=f1e2084]:
+                        - generic [ref=f1e2090]: Contributions
+                        - generic [ref=f1e2093]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 6. Commits." [ref=f1e2094]
+                          - img "Week from Monday, 5 Jan 2026, 10. Commits." [ref=f1e2095]
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 30. Commits." [ref=f1e2096]
+                          - img "Week from Monday, 26 Jan 2026, 18. Commits." [ref=f1e2097]
+                          - img "Week from Monday, 2 Feb 2026, 5. Commits." [ref=f1e2098]
+                          - img "Week from Monday, 9 Feb 2026, 45. Commits." [ref=f1e2099]
+                          - img "Week from Monday, 16 Feb 2026, 208. Commits." [ref=f1e2100]
+                          - img "Week from Monday, 23 Feb 2026, 54. Commits." [ref=f1e2101]
+                          - img "Week from Monday, 2 Mar 2026, 72. Commits." [ref=f1e2102]
+                          - img "Week from Monday, 9 Mar 2026, 88. Commits." [ref=f1e2103]
+                          - img "Week from Monday, 16 Mar 2026, 146. Commits." [ref=f1e2104]
+                          - img "Week from Monday, 23 Mar 2026, 136. Commits." [ref=f1e2105]
+                          - img "Week from Monday, 30 Mar 2026, 105. Commits." [ref=f1e2106]
+                          - img "Week from Monday, 6 Apr 2026, 95. Commits." [ref=f1e2107]
+                          - img "Week from Monday, 13 Apr 2026, 151. Commits." [ref=f1e2108]
+                          - img "Week from Monday, 20 Apr 2026, 99. Commits." [ref=f1e2109]
+                          - img "Week from Monday, 27 Apr 2026, 73. Commits." [ref=f1e2110]
+                          - img "Week from Monday, 4 May 2026, 138. Commits." [ref=f1e2111]
+                          - img "Week from Monday, 11 May 2026, 121. Commits." [ref=f1e2112]
+                          - img "Week from Monday, 18 May 2026, 72. Commits." [ref=f1e2113]
+                          - img "Week from Monday, 25 May 2026, 42. Commits." [ref=f1e2114]
+                          - img "Week from Monday, 1 Jun 2026, 64. Commits." [ref=f1e2115]
+                          - img "Week from Monday, 8 Jun 2026, 21. Commits." [ref=f1e2116]
+                          - img "Week from Monday, 15 Jun 2026, 25. Commits." [ref=f1e2117]
+                          - img "Week from Monday, 22 Jun 2026, 83. Commits." [ref=f1e2118]
+                          - img "Week from Monday, 29 Jun 2026, 77. Commits." [ref=f1e2119]
+                          - img "Week from Monday, 6 Jul 2026, 44. Commits." [ref=f1e2120]
+                          - img "Week from Monday, 13 Jul 2026, 1. Commits." [ref=f1e2121]
+                          - img "Week from Monday, 20 Jul 2026, 49. Commits." [ref=f1e2122]
+                          - img "Week from Monday, 27 Jul 2026, 11. Commits." [ref=f1e2123]
+                          - img "Week from Monday, 3 Aug 2026, 56. Commits." [ref=f1e2124]
+                        - generic [ref=f1e2125]:
+                          - generic [ref=f1e2126]: Jan '26
+                          - generic [ref=f1e2127]: Apr '26
+                          - generic [ref=f1e2128]: Jul '26
+                        - generic [ref=f1e2129]:
+                          - generic [ref=f1e2130]: "0"
+                          - generic [ref=f1e2131]: 1k
+                          - generic [ref=f1e2132]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1782]:
+                - generic [ref=f1e2135]:
+                  - generic [ref=f1e2136]:
+                    - generic [ref=f1e2137]:
+                      - link "Takhoffman" [ref=f1e2139] [cursor=pointer]:
+                        - /url: /Takhoffman
+                      - generic [ref=f1e2141]:
+                        - heading "Takhoffman 's Commits" [level=2] [ref=f1e2142]:
+                          - generic [ref=f1e2143]:
+                            - link "Takhoffman" [ref=f1e2144] [cursor=pointer]:
+                              - /url: /Takhoffman
+                            - generic [ref=f1e2145]: "'s Commits"
+                        - link "1,278 commits" [ref=f1e2148] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=Takhoffman
+                    - generic [ref=f1e2149]:
+                      - generic [ref=f1e2150]: "#5"
+                      - button "Chart options" [ref=f1e2152] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2155] [cursor=pointer]
+                  - region "Takhoffman's Commits. Interactive chart." [ref=f1e2158]:
+                    - generic [ref=f1e2159]:
+                      - generic [ref=f1e2160]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2162] [cursor=pointer]
+                      - generic [ref=f1e2163]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2164]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 342.
+                    - application [ref=f1e2165]:
+                      - img "Interactive chart" [ref=f1e2166]:
+                        - generic [ref=f1e2172]: Contributions
+                        - generic [ref=f1e2175]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 1. Commits." [ref=f1e2176]
+                          - img "Week from Monday, 19 Jan 2026, 6. Commits." [ref=f1e2177]
+                          - img "Week from Monday, 26 Jan 2026, 23. Commits." [ref=f1e2178]
+                          - img "Week from Monday, 2 Feb 2026, 70. Commits." [ref=f1e2179]
+                          - img "Week from Monday, 9 Feb 2026, 40. Commits." [ref=f1e2180]
+                          - img "Week from Monday, 16 Feb 2026, 59. Commits." [ref=f1e2181]
+                          - img "Week from Monday, 23 Feb 2026, 141. Commits." [ref=f1e2182]
+                          - img "Week from Monday, 2 Mar 2026, 29. Commits." [ref=f1e2183]
+                          - img "Week from Monday, 9 Mar 2026, 76. Commits." [ref=f1e2184]
+                          - img "Week from Monday, 16 Mar 2026, 342. Commits." [ref=f1e2185]
+                          - img "Week from Monday, 23 Mar 2026, 135. Commits." [ref=f1e2186]
+                          - img "Week from Monday, 30 Mar 2026, 115. Commits." [ref=f1e2187]
+                          - img "Week from Monday, 6 Apr 2026, 11. Commits." [ref=f1e2188]
+                          - img "Week from Monday, 13 Apr 2026, 22. Commits." [ref=f1e2189]
+                          - img "Week from Monday, 20 Apr 2026, 4. Commits." [ref=f1e2190]
+                          - img "Week from Monday, 27 Apr 2026, 4. Commits." [ref=f1e2191]
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 112. Commits." [ref=f1e2192]
+                          - img "Week from Monday, 18 May 2026, 34. Commits." [ref=f1e2193]
+                          - img "Week from Monday, 25 May 2026, 15. Commits." [ref=f1e2194]
+                          - img "Week from Monday, 1 Jun 2026, 12. Commits." [ref=f1e2195]
+                          - img "Week from Monday, 8 Jun 2026, 2. Commits." [ref=f1e2196]
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 1. Commits." [ref=f1e2197]
+                          - img "Week from Monday, 6 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 3. Commits." [ref=f1e2198]
+                          - img "Week from Monday, 27 Jul 2026, 14. Commits." [ref=f1e2199]
+                          - img "Week from Monday, 3 Aug 2026, 7. Commits." [ref=f1e2200]
+                        - generic [ref=f1e2201]:
+                          - generic [ref=f1e2202]: Jan '26
+                          - generic [ref=f1e2203]: Apr '26
+                          - generic [ref=f1e2204]: Jul '26
+                        - generic [ref=f1e2205]:
+                          - generic [ref=f1e2206]: "0"
+                          - generic [ref=f1e2207]: 1k
+                          - generic [ref=f1e2208]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1784]:
+                - generic [ref=f1e2211]:
+                  - generic [ref=f1e2212]:
+                    - generic [ref=f1e2213]:
+                      - link "github-actions[bot]" [ref=f1e2215] [cursor=pointer]:
+                        - /url: /apps/github-actions
+                      - generic [ref=f1e2217]:
+                        - heading "github-actions[bot] 's Commits" [level=2] [ref=f1e2218]:
+                          - generic [ref=f1e2219]:
+                            - link "github-actions[bot]" [ref=f1e2220] [cursor=pointer]:
+                              - /url: /apps/github-actions
+                            - generic [ref=f1e2221]: "'s Commits"
+                        - link "1,028 commits" [ref=f1e2224] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=github-actions%5Bbot%5D
+                    - generic [ref=f1e2225]:
+                      - generic [ref=f1e2226]: "#6"
+                      - button "Chart options" [ref=f1e2228] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2231] [cursor=pointer]
+                  - region "github-actions[bot]'s Commits. Interactive chart." [ref=f1e2234]:
+                    - generic [ref=f1e2235]:
+                      - generic [ref=f1e2236]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2238] [cursor=pointer]
+                      - generic [ref=f1e2239]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2240]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 472.
+                    - application [ref=f1e2241]:
+                      - img "Interactive chart" [ref=f1e2242]:
+                        - generic [ref=f1e2248]: Contributions
+                        - generic [ref=f1e2251]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 1. Commits." [ref=f1e2252]
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 65. Commits." [ref=f1e2253]
+                          - img "Week from Monday, 6 Apr 2026, 24. Commits." [ref=f1e2254]
+                          - img "Week from Monday, 13 Apr 2026, 36. Commits." [ref=f1e2255]
+                          - img "Week from Monday, 20 Apr 2026, 63. Commits." [ref=f1e2256]
+                          - img "Week from Monday, 27 Apr 2026, 70. Commits." [ref=f1e2257]
+                          - img "Week from Monday, 4 May 2026, 36. Commits." [ref=f1e2258]
+                          - img "Week from Monday, 11 May 2026, 67. Commits." [ref=f1e2259]
+                          - img "Week from Monday, 18 May 2026, 18. Commits." [ref=f1e2260]
+                          - img "Week from Monday, 25 May 2026, 72. Commits." [ref=f1e2261]
+                          - img "Week from Monday, 1 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 8 Jun 2026, 2. Commits." [ref=f1e2262]
+                          - img "Week from Monday, 15 Jun 2026, 36. Commits." [ref=f1e2263]
+                          - img "Week from Monday, 22 Jun 2026, 472. Commits." [ref=f1e2264]
+                          - img "Week from Monday, 29 Jun 2026, 30. Commits." [ref=f1e2265]
+                          - img "Week from Monday, 6 Jul 2026, 10. Commits." [ref=f1e2266]
+                          - img "Week from Monday, 13 Jul 2026, 7. Commits." [ref=f1e2267]
+                          - img "Week from Monday, 20 Jul 2026, 5. Commits." [ref=f1e2268]
+                          - img "Week from Monday, 27 Jul 2026, 7. Commits." [ref=f1e2269]
+                          - img "Week from Monday, 3 Aug 2026, 7. Commits." [ref=f1e2270]
+                        - generic [ref=f1e2271]:
+                          - generic [ref=f1e2272]: Jan '26
+                          - generic [ref=f1e2273]: Apr '26
+                          - generic [ref=f1e2274]: Jul '26
+                        - generic [ref=f1e2275]:
+                          - generic [ref=f1e2276]: "0"
+                          - generic [ref=f1e2277]: 1k
+                          - generic [ref=f1e2278]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1786]:
+                - generic [ref=f1e2281]:
+                  - generic [ref=f1e2282]:
+                    - generic [ref=f1e2283]:
+                      - link "gumadeiras" [ref=f1e2285] [cursor=pointer]:
+                        - /url: /gumadeiras
+                      - generic [ref=f1e2287]:
+                        - heading "gumadeiras 's Commits" [level=2] [ref=f1e2288]:
+                          - generic [ref=f1e2289]:
+                            - link "gumadeiras" [ref=f1e2290] [cursor=pointer]:
+                              - /url: /gumadeiras
+                            - generic [ref=f1e2291]: "'s Commits"
+                        - link "961 commits" [ref=f1e2294] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=gumadeiras
+                    - generic [ref=f1e2295]:
+                      - generic [ref=f1e2296]: "#7"
+                      - button "Chart options" [ref=f1e2298] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2301] [cursor=pointer]
+                  - region "gumadeiras's Commits. Interactive chart." [ref=f1e2304]:
+                    - generic [ref=f1e2305]:
+                      - generic [ref=f1e2306]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2308] [cursor=pointer]
+                      - generic [ref=f1e2309]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2310]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 156.
+                    - application [ref=f1e2311]:
+                      - img "Interactive chart" [ref=f1e2312]:
+                        - generic [ref=f1e2318]: Contributions
+                        - generic [ref=f1e2321]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 4. Commits." [ref=f1e2322]
+                          - img "Week from Monday, 12 Jan 2026, 9. Commits." [ref=f1e2323]
+                          - img "Week from Monday, 19 Jan 2026, 38. Commits." [ref=f1e2324]
+                          - img "Week from Monday, 26 Jan 2026, 38. Commits." [ref=f1e2325]
+                          - img "Week from Monday, 2 Feb 2026, 62. Commits." [ref=f1e2326]
+                          - img "Week from Monday, 9 Feb 2026, 56. Commits." [ref=f1e2327]
+                          - img "Week from Monday, 16 Feb 2026, 39. Commits." [ref=f1e2328]
+                          - img "Week from Monday, 23 Feb 2026, 104. Commits." [ref=f1e2329]
+                          - img "Week from Monday, 2 Mar 2026, 13. Commits." [ref=f1e2330]
+                          - img "Week from Monday, 9 Mar 2026, 156. Commits." [ref=f1e2331]
+                          - img "Week from Monday, 16 Mar 2026, 46. Commits." [ref=f1e2332]
+                          - img "Week from Monday, 23 Mar 2026, 141. Commits." [ref=f1e2333]
+                          - img "Week from Monday, 30 Mar 2026, 72. Commits." [ref=f1e2334]
+                          - img "Week from Monday, 6 Apr 2026, 127. Commits." [ref=f1e2335]
+                          - img "Week from Monday, 13 Apr 2026, 40. Commits." [ref=f1e2336]
+                          - img "Week from Monday, 20 Apr 2026, 16. Commits." [ref=f1e2337]
+                          - img "Week from Monday, 27 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 0. Commits."
+                          - img "Week from Monday, 18 May 2026, 0. Commits."
+                          - img "Week from Monday, 25 May 2026, 0. Commits."
+                          - img "Week from Monday, 1 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 6 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 27 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 3 Aug 2026, 0. Commits."
+                        - generic [ref=f1e2338]:
+                          - generic [ref=f1e2339]: Jan '26
+                          - generic [ref=f1e2340]: Apr '26
+                          - generic [ref=f1e2341]: Jul '26
+                        - generic [ref=f1e2342]:
+                          - generic [ref=f1e2343]: "0"
+                          - generic [ref=f1e2344]: 1k
+                          - generic [ref=f1e2345]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1788]:
+                - generic [ref=f1e2348]:
+                  - generic [ref=f1e2349]:
+                    - generic [ref=f1e2350]:
+                      - link "claude" [ref=f1e2352] [cursor=pointer]:
+                        - /url: /claude
+                      - generic [ref=f1e2354]:
+                        - heading "claude 's Commits" [level=2] [ref=f1e2355]:
+                          - generic [ref=f1e2356]:
+                            - link "claude" [ref=f1e2357] [cursor=pointer]:
+                              - /url: /claude
+                            - generic [ref=f1e2358]: "'s Commits"
+                        - link "951 commits" [ref=f1e2361] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=claude
+                    - generic [ref=f1e2362]:
+                      - generic [ref=f1e2363]: "#8"
+                      - button "Chart options" [ref=f1e2365] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2368] [cursor=pointer]
+                  - region "claude's Commits. Interactive chart." [ref=f1e2371]:
+                    - generic [ref=f1e2372]:
+                      - generic [ref=f1e2373]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2375] [cursor=pointer]
+                      - generic [ref=f1e2376]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2377]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 92.
+                    - application [ref=f1e2378]:
+                      - img "Interactive chart" [ref=f1e2379]:
+                        - generic [ref=f1e2385]: Contributions
+                        - generic [ref=f1e2388]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 6. Commits." [ref=f1e2389]
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 1. Commits." [ref=f1e2390]
+                          - img "Week from Monday, 15 Dec 2025, 1. Commits." [ref=f1e2391]
+                          - img "Week from Monday, 22 Dec 2025, 6. Commits." [ref=f1e2392]
+                          - img "Week from Monday, 29 Dec 2025, 33. Commits." [ref=f1e2393]
+                          - img "Week from Monday, 5 Jan 2026, 14. Commits." [ref=f1e2394]
+                          - img "Week from Monday, 12 Jan 2026, 27. Commits." [ref=f1e2395]
+                          - img "Week from Monday, 19 Jan 2026, 32. Commits." [ref=f1e2396]
+                          - img "Week from Monday, 26 Jan 2026, 19. Commits." [ref=f1e2397]
+                          - img "Week from Monday, 2 Feb 2026, 21. Commits." [ref=f1e2398]
+                          - img "Week from Monday, 9 Feb 2026, 53. Commits." [ref=f1e2399]
+                          - img "Week from Monday, 16 Feb 2026, 54. Commits." [ref=f1e2400]
+                          - img "Week from Monday, 23 Feb 2026, 72. Commits." [ref=f1e2401]
+                          - img "Week from Monday, 2 Mar 2026, 17. Commits." [ref=f1e2402]
+                          - img "Week from Monday, 9 Mar 2026, 38. Commits." [ref=f1e2403]
+                          - img "Week from Monday, 16 Mar 2026, 33. Commits." [ref=f1e2404]
+                          - img "Week from Monday, 23 Mar 2026, 12. Commits." [ref=f1e2405]
+                          - img "Week from Monday, 30 Mar 2026, 10. Commits." [ref=f1e2406]
+                          - img "Week from Monday, 6 Apr 2026, 10. Commits." [ref=f1e2407]
+                          - img "Week from Monday, 13 Apr 2026, 10. Commits." [ref=f1e2408]
+                          - img "Week from Monday, 20 Apr 2026, 14. Commits." [ref=f1e2409]
+                          - img "Week from Monday, 27 Apr 2026, 17. Commits." [ref=f1e2410]
+                          - img "Week from Monday, 4 May 2026, 5. Commits." [ref=f1e2411]
+                          - img "Week from Monday, 11 May 2026, 9. Commits." [ref=f1e2412]
+                          - img "Week from Monday, 18 May 2026, 14. Commits." [ref=f1e2413]
+                          - img "Week from Monday, 25 May 2026, 20. Commits." [ref=f1e2414]
+                          - img "Week from Monday, 1 Jun 2026, 13. Commits." [ref=f1e2415]
+                          - img "Week from Monday, 8 Jun 2026, 20. Commits." [ref=f1e2416]
+                          - img "Week from Monday, 15 Jun 2026, 42. Commits." [ref=f1e2417]
+                          - img "Week from Monday, 22 Jun 2026, 76. Commits." [ref=f1e2418]
+                          - img "Week from Monday, 29 Jun 2026, 92. Commits." [ref=f1e2419]
+                          - img "Week from Monday, 6 Jul 2026, 53. Commits." [ref=f1e2420]
+                          - img "Week from Monday, 13 Jul 2026, 36. Commits." [ref=f1e2421]
+                          - img "Week from Monday, 20 Jul 2026, 31. Commits." [ref=f1e2422]
+                          - img "Week from Monday, 27 Jul 2026, 20. Commits." [ref=f1e2423]
+                          - img "Week from Monday, 3 Aug 2026, 20. Commits." [ref=f1e2424]
+                        - generic [ref=f1e2425]:
+                          - generic [ref=f1e2426]: Jan '26
+                          - generic [ref=f1e2427]: Apr '26
+                          - generic [ref=f1e2428]: Jul '26
+                        - generic [ref=f1e2429]:
+                          - generic [ref=f1e2430]: "0"
+                          - generic [ref=f1e2431]: 1k
+                          - generic [ref=f1e2432]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1790]:
+                - generic [ref=f1e2435]:
+                  - generic [ref=f1e2436]:
+                    - generic [ref=f1e2437]:
+                      - link "joshavant" [ref=f1e2439] [cursor=pointer]:
+                        - /url: /joshavant
+                      - generic [ref=f1e2441]:
+                        - heading "joshavant 's Commits" [level=2] [ref=f1e2442]:
+                          - generic [ref=f1e2443]:
+                            - link "joshavant" [ref=f1e2444] [cursor=pointer]:
+                              - /url: /joshavant
+                            - generic [ref=f1e2445]: "'s Commits"
+                        - link "926 commits" [ref=f1e2448] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=joshavant
+                    - generic [ref=f1e2449]:
+                      - generic [ref=f1e2450]: "#9"
+                      - button "Chart options" [ref=f1e2452] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2455] [cursor=pointer]
+                  - region "joshavant's Commits. Interactive chart." [ref=f1e2458]:
+                    - generic [ref=f1e2459]:
+                      - generic [ref=f1e2460]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2462] [cursor=pointer]
+                      - generic [ref=f1e2463]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2464]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 96.
+                    - application [ref=f1e2465]:
+                      - img "Interactive chart" [ref=f1e2466]:
+                        - generic [ref=f1e2472]: Contributions
+                        - generic [ref=f1e2475]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 22. Commits." [ref=f1e2476]
+                          - img "Week from Monday, 16 Feb 2026, 49. Commits." [ref=f1e2477]
+                          - img "Week from Monday, 23 Feb 2026, 16. Commits." [ref=f1e2478]
+                          - img "Week from Monday, 2 Mar 2026, 11. Commits." [ref=f1e2479]
+                          - img "Week from Monday, 9 Mar 2026, 22. Commits." [ref=f1e2480]
+                          - img "Week from Monday, 16 Mar 2026, 3. Commits." [ref=f1e2481]
+                          - img "Week from Monday, 23 Mar 2026, 8. Commits." [ref=f1e2482]
+                          - img "Week from Monday, 30 Mar 2026, 54. Commits." [ref=f1e2483]
+                          - img "Week from Monday, 6 Apr 2026, 4. Commits." [ref=f1e2484]
+                          - img "Week from Monday, 13 Apr 2026, 6. Commits." [ref=f1e2485]
+                          - img "Week from Monday, 20 Apr 2026, 12. Commits." [ref=f1e2486]
+                          - img "Week from Monday, 27 Apr 2026, 11. Commits." [ref=f1e2487]
+                          - img "Week from Monday, 4 May 2026, 44. Commits." [ref=f1e2488]
+                          - img "Week from Monday, 11 May 2026, 48. Commits." [ref=f1e2489]
+                          - img "Week from Monday, 18 May 2026, 37. Commits." [ref=f1e2490]
+                          - img "Week from Monday, 25 May 2026, 56. Commits." [ref=f1e2491]
+                          - img "Week from Monday, 1 Jun 2026, 26. Commits." [ref=f1e2492]
+                          - img "Week from Monday, 8 Jun 2026, 39. Commits." [ref=f1e2493]
+                          - img "Week from Monday, 15 Jun 2026, 45. Commits." [ref=f1e2494]
+                          - img "Week from Monday, 22 Jun 2026, 55. Commits." [ref=f1e2495]
+                          - img "Week from Monday, 29 Jun 2026, 20. Commits." [ref=f1e2496]
+                          - img "Week from Monday, 6 Jul 2026, 24. Commits." [ref=f1e2497]
+                          - img "Week from Monday, 13 Jul 2026, 96. Commits." [ref=f1e2498]
+                          - img "Week from Monday, 20 Jul 2026, 69. Commits." [ref=f1e2499]
+                          - img "Week from Monday, 27 Jul 2026, 94. Commits." [ref=f1e2500]
+                          - img "Week from Monday, 3 Aug 2026, 55. Commits." [ref=f1e2501]
+                        - generic [ref=f1e2502]:
+                          - generic [ref=f1e2503]: Jan '26
+                          - generic [ref=f1e2504]: Apr '26
+                          - generic [ref=f1e2505]: Jul '26
+                        - generic [ref=f1e2506]:
+                          - generic [ref=f1e2507]: "0"
+                          - generic [ref=f1e2508]: 1k
+                          - generic [ref=f1e2509]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1792]:
+                - generic [ref=f1e2512]:
+                  - generic [ref=f1e2513]:
+                    - generic [ref=f1e2514]:
+                      - link "vignesh07" [ref=f1e2516] [cursor=pointer]:
+                        - /url: /vignesh07
+                      - generic [ref=f1e2518]:
+                        - heading "vignesh07 's Commits" [level=2] [ref=f1e2519]:
+                          - generic [ref=f1e2520]:
+                            - link "vignesh07" [ref=f1e2521] [cursor=pointer]:
+                              - /url: /vignesh07
+                            - generic [ref=f1e2522]: "'s Commits"
+                        - link "505 commits" [ref=f1e2525] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=vignesh07
+                    - generic [ref=f1e2526]:
+                      - generic [ref=f1e2527]: "#10"
+                      - button "Chart options" [ref=f1e2529] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2532] [cursor=pointer]
+                  - region "vignesh07's Commits. Interactive chart." [ref=f1e2535]:
+                    - generic [ref=f1e2536]:
+                      - generic [ref=f1e2537]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2539] [cursor=pointer]
+                      - generic [ref=f1e2540]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2541]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 163.
+                    - application [ref=f1e2542]:
+                      - img "Interactive chart" [ref=f1e2543]:
+                        - generic [ref=f1e2549]: Contributions
+                        - generic [ref=f1e2552]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 3. Commits." [ref=f1e2553]
+                          - img "Week from Monday, 12 Jan 2026, 35. Commits." [ref=f1e2554]
+                          - img "Week from Monday, 19 Jan 2026, 52. Commits." [ref=f1e2555]
+                          - img "Week from Monday, 26 Jan 2026, 31. Commits." [ref=f1e2556]
+                          - img "Week from Monday, 2 Feb 2026, 163. Commits." [ref=f1e2557]
+                          - img "Week from Monday, 9 Feb 2026, 94. Commits." [ref=f1e2558]
+                          - img "Week from Monday, 16 Feb 2026, 32. Commits." [ref=f1e2559]
+                          - img "Week from Monday, 23 Feb 2026, 32. Commits." [ref=f1e2560]
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 1. Commits." [ref=f1e2561]
+                          - img "Week from Monday, 16 Mar 2026, 19. Commits." [ref=f1e2562]
+                          - img "Week from Monday, 23 Mar 2026, 11. Commits." [ref=f1e2563]
+                          - img "Week from Monday, 30 Mar 2026, 21. Commits." [ref=f1e2564]
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 11. Commits." [ref=f1e2565]
+                          - img "Week from Monday, 27 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 0. Commits."
+                          - img "Week from Monday, 18 May 2026, 0. Commits."
+                          - img "Week from Monday, 25 May 2026, 0. Commits."
+                          - img "Week from Monday, 1 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 6 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 27 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 3 Aug 2026, 0. Commits."
+                        - generic [ref=f1e2566]:
+                          - generic [ref=f1e2567]: Jan '26
+                          - generic [ref=f1e2568]: Apr '26
+                          - generic [ref=f1e2569]: Jul '26
+                        - generic [ref=f1e2570]:
+                          - generic [ref=f1e2571]: "0"
+                          - generic [ref=f1e2572]: 1k
+                          - generic [ref=f1e2573]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1794]:
+                - generic [ref=f1e2576]:
+                  - generic [ref=f1e2577]:
+                    - generic [ref=f1e2578]:
+                      - link "RomneyDa" [ref=f1e2580] [cursor=pointer]:
+                        - /url: /RomneyDa
+                      - generic [ref=f1e2582]:
+                        - heading "RomneyDa 's Commits" [level=2] [ref=f1e2583]:
+                          - generic [ref=f1e2584]:
+                            - link "RomneyDa" [ref=f1e2585] [cursor=pointer]:
+                              - /url: /RomneyDa
+                            - generic [ref=f1e2586]: "'s Commits"
+                        - link "498 commits" [ref=f1e2589] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=RomneyDa
+                    - generic [ref=f1e2590]:
+                      - generic [ref=f1e2591]: "#11"
+                      - button "Chart options" [ref=f1e2593] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2596] [cursor=pointer]
+                  - region "RomneyDa's Commits. Interactive chart." [ref=f1e2599]:
+                    - generic [ref=f1e2600]:
+                      - generic [ref=f1e2601]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2603] [cursor=pointer]
+                      - generic [ref=f1e2604]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2605]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 97.
+                    - application [ref=f1e2606]:
+                      - img "Interactive chart" [ref=f1e2607]:
+                        - generic [ref=f1e2613]: Contributions
+                        - generic [ref=f1e2616]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 2. Commits." [ref=f1e2617]
+                          - img "Week from Monday, 27 Apr 2026, 7. Commits." [ref=f1e2618]
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 23. Commits." [ref=f1e2619]
+                          - img "Week from Monday, 18 May 2026, 46. Commits." [ref=f1e2620]
+                          - img "Week from Monday, 25 May 2026, 21. Commits." [ref=f1e2621]
+                          - img "Week from Monday, 1 Jun 2026, 15. Commits." [ref=f1e2622]
+                          - img "Week from Monday, 8 Jun 2026, 27. Commits." [ref=f1e2623]
+                          - img "Week from Monday, 15 Jun 2026, 38. Commits." [ref=f1e2624]
+                          - img "Week from Monday, 22 Jun 2026, 97. Commits." [ref=f1e2625]
+                          - img "Week from Monday, 29 Jun 2026, 20. Commits." [ref=f1e2626]
+                          - img "Week from Monday, 6 Jul 2026, 45. Commits." [ref=f1e2627]
+                          - img "Week from Monday, 13 Jul 2026, 39. Commits." [ref=f1e2628]
+                          - img "Week from Monday, 20 Jul 2026, 63. Commits." [ref=f1e2629]
+                          - img "Week from Monday, 27 Jul 2026, 35. Commits." [ref=f1e2630]
+                          - img "Week from Monday, 3 Aug 2026, 20. Commits." [ref=f1e2631]
+                        - generic [ref=f1e2632]:
+                          - generic [ref=f1e2633]: Jan '26
+                          - generic [ref=f1e2634]: Apr '26
+                          - generic [ref=f1e2635]: Jul '26
+                        - generic [ref=f1e2636]:
+                          - generic [ref=f1e2637]: "0"
+                          - generic [ref=f1e2638]: 1k
+                          - generic [ref=f1e2639]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1796]:
+                - generic [ref=f1e2642]:
+                  - generic [ref=f1e2643]:
+                    - generic [ref=f1e2644]:
+                      - link "clawsweeper[bot]" [ref=f1e2646] [cursor=pointer]:
+                        - /url: /apps/clawsweeper
+                      - generic [ref=f1e2648]:
+                        - heading "clawsweeper[bot] 's Commits" [level=2] [ref=f1e2649]:
+                          - generic [ref=f1e2650]:
+                            - link "clawsweeper[bot]" [ref=f1e2651] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f1e2652]: "'s Commits"
+                        - link "401 commits" [ref=f1e2655] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=clawsweeper%5Bbot%5D
+                    - generic [ref=f1e2656]:
+                      - generic [ref=f1e2657]: "#12"
+                      - button "Chart options" [ref=f1e2659] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2662] [cursor=pointer]
+                  - region "clawsweeper[bot]'s Commits. Interactive chart." [ref=f1e2665]:
+                    - generic [ref=f1e2666]:
+                      - generic [ref=f1e2667]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2669] [cursor=pointer]
+                      - generic [ref=f1e2670]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2671]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 130.
+                    - application [ref=f1e2672]:
+                      - img "Interactive chart" [ref=f1e2673]:
+                        - generic [ref=f1e2679]: Contributions
+                        - generic [ref=f1e2682]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 82. Commits." [ref=f1e2683]
+                          - img "Week from Monday, 27 Apr 2026, 31. Commits." [ref=f1e2684]
+                          - img "Week from Monday, 4 May 2026, 5. Commits." [ref=f1e2685]
+                          - img "Week from Monday, 11 May 2026, 130. Commits." [ref=f1e2686]
+                          - img "Week from Monday, 18 May 2026, 47. Commits." [ref=f1e2687]
+                          - img "Week from Monday, 25 May 2026, 19. Commits." [ref=f1e2688]
+                          - img "Week from Monday, 1 Jun 2026, 21. Commits." [ref=f1e2689]
+                          - img "Week from Monday, 8 Jun 2026, 15. Commits." [ref=f1e2690]
+                          - img "Week from Monday, 15 Jun 2026, 4. Commits." [ref=f1e2691]
+                          - img "Week from Monday, 22 Jun 2026, 2. Commits." [ref=f1e2692]
+                          - img "Week from Monday, 29 Jun 2026, 6. Commits." [ref=f1e2693]
+                          - img "Week from Monday, 6 Jul 2026, 11. Commits." [ref=f1e2694]
+                          - img "Week from Monday, 13 Jul 2026, 2. Commits." [ref=f1e2695]
+                          - img "Week from Monday, 20 Jul 2026, 3. Commits." [ref=f1e2696]
+                          - img "Week from Monday, 27 Jul 2026, 18. Commits." [ref=f1e2697]
+                          - img "Week from Monday, 3 Aug 2026, 5. Commits." [ref=f1e2698]
+                        - generic [ref=f1e2699]:
+                          - generic [ref=f1e2700]: Jan '26
+                          - generic [ref=f1e2701]: Apr '26
+                          - generic [ref=f1e2702]: Jul '26
+                        - generic [ref=f1e2703]:
+                          - generic [ref=f1e2704]: "0"
+                          - generic [ref=f1e2705]: 1k
+                          - generic [ref=f1e2706]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1798]:
+                - generic [ref=f1e2709]:
+                  - generic [ref=f1e2710]:
+                    - generic [ref=f1e2711]:
+                      - link "thewilloftheshadow" [ref=f1e2713] [cursor=pointer]:
+                        - /url: /thewilloftheshadow
+                      - generic [ref=f1e2715]:
+                        - heading "thewilloftheshadow 's Commits" [level=2] [ref=f1e2716]:
+                          - generic [ref=f1e2717]:
+                            - link "thewilloftheshadow" [ref=f1e2718] [cursor=pointer]:
+                              - /url: /thewilloftheshadow
+                            - generic [ref=f1e2719]: "'s Commits"
+                        - link "375 commits" [ref=f1e2722] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=thewilloftheshadow
+                    - generic [ref=f1e2723]:
+                      - generic [ref=f1e2724]: "#13"
+                      - button "Chart options" [ref=f1e2726] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2729] [cursor=pointer]
+                  - region "thewilloftheshadow's Commits. Interactive chart." [ref=f1e2732]:
+                    - generic [ref=f1e2733]:
+                      - generic [ref=f1e2734]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2736] [cursor=pointer]
+                      - generic [ref=f1e2737]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2738]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 87.
+                    - application [ref=f1e2739]:
+                      - img "Interactive chart" [ref=f1e2740]:
+                        - generic [ref=f1e2746]: Contributions
+                        - generic [ref=f1e2749]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 1. Commits." [ref=f1e2750]
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 26. Commits." [ref=f1e2751]
+                          - img "Week from Monday, 29 Dec 2025, 37. Commits." [ref=f1e2752]
+                          - img "Week from Monday, 5 Jan 2026, 30. Commits." [ref=f1e2753]
+                          - img "Week from Monday, 12 Jan 2026, 11. Commits." [ref=f1e2754]
+                          - img "Week from Monday, 19 Jan 2026, 87. Commits." [ref=f1e2755]
+                          - img "Week from Monday, 26 Jan 2026, 5. Commits." [ref=f1e2756]
+                          - img "Week from Monday, 2 Feb 2026, 57. Commits." [ref=f1e2757]
+                          - img "Week from Monday, 9 Feb 2026, 59. Commits." [ref=f1e2758]
+                          - img "Week from Monday, 16 Feb 2026, 6. Commits." [ref=f1e2759]
+                          - img "Week from Monday, 23 Feb 2026, 31. Commits." [ref=f1e2760]
+                          - img "Week from Monday, 2 Mar 2026, 7. Commits." [ref=f1e2761]
+                          - img "Week from Monday, 9 Mar 2026, 1. Commits." [ref=f1e2762]
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 3. Commits." [ref=f1e2763]
+                          - img "Week from Monday, 30 Mar 2026, 3. Commits." [ref=f1e2764]
+                          - img "Week from Monday, 6 Apr 2026, 1. Commits." [ref=f1e2765]
+                          - img "Week from Monday, 13 Apr 2026, 1. Commits." [ref=f1e2766]
+                          - img "Week from Monday, 20 Apr 2026, 2. Commits." [ref=f1e2767]
+                          - img "Week from Monday, 27 Apr 2026, 1. Commits." [ref=f1e2768]
+                          - img "Week from Monday, 4 May 2026, 1. Commits." [ref=f1e2769]
+                          - img "Week from Monday, 11 May 2026, 1. Commits." [ref=f1e2770]
+                          - img "Week from Monday, 18 May 2026, 3. Commits." [ref=f1e2771]
+                          - img "Week from Monday, 25 May 2026, 0. Commits."
+                          - img "Week from Monday, 1 Jun 2026, 1. Commits." [ref=f1e2772]
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 6 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 27 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 3 Aug 2026, 0. Commits."
+                        - generic [ref=f1e2773]:
+                          - generic [ref=f1e2774]: Jan '26
+                          - generic [ref=f1e2775]: Apr '26
+                          - generic [ref=f1e2776]: Jul '26
+                        - generic [ref=f1e2777]:
+                          - generic [ref=f1e2778]: "0"
+                          - generic [ref=f1e2779]: 1k
+                          - generic [ref=f1e2780]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1800]:
+                - generic [ref=f1e2783]:
+                  - generic [ref=f1e2784]:
+                    - generic [ref=f1e2785]:
+                      - link "jalehman" [ref=f1e2787] [cursor=pointer]:
+                        - /url: /jalehman
+                      - generic [ref=f1e2789]:
+                        - heading "jalehman 's Commits" [level=2] [ref=f1e2790]:
+                          - generic [ref=f1e2791]:
+                            - link "jalehman" [ref=f1e2792] [cursor=pointer]:
+                              - /url: /jalehman
+                            - generic [ref=f1e2793]: "'s Commits"
+                        - link "360 commits" [ref=f1e2796] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=jalehman
+                    - generic [ref=f1e2797]:
+                      - generic [ref=f1e2798]: "#14"
+                      - button "Chart options" [ref=f1e2800] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2803] [cursor=pointer]
+                  - region "jalehman's Commits. Interactive chart." [ref=f1e2806]:
+                    - generic [ref=f1e2807]:
+                      - generic [ref=f1e2808]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2810] [cursor=pointer]
+                      - generic [ref=f1e2811]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2812]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 33.
+                    - application [ref=f1e2813]:
+                      - img "Interactive chart" [ref=f1e2814]:
+                        - generic [ref=f1e2820]: Contributions
+                        - generic [ref=f1e2823]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 6. Commits." [ref=f1e2824]
+                          - img "Week from Monday, 5 Jan 2026, 2. Commits." [ref=f1e2825]
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 1. Commits." [ref=f1e2826]
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 2. Commits." [ref=f1e2827]
+                          - img "Week from Monday, 23 Feb 2026, 28. Commits." [ref=f1e2828]
+                          - img "Week from Monday, 2 Mar 2026, 33. Commits." [ref=f1e2829]
+                          - img "Week from Monday, 9 Mar 2026, 28. Commits." [ref=f1e2830]
+                          - img "Week from Monday, 16 Mar 2026, 11. Commits." [ref=f1e2831]
+                          - img "Week from Monday, 23 Mar 2026, 21. Commits." [ref=f1e2832]
+                          - img "Week from Monday, 30 Mar 2026, 27. Commits." [ref=f1e2833]
+                          - img "Week from Monday, 6 Apr 2026, 17. Commits." [ref=f1e2834]
+                          - img "Week from Monday, 13 Apr 2026, 12. Commits." [ref=f1e2835]
+                          - img "Week from Monday, 20 Apr 2026, 11. Commits." [ref=f1e2836]
+                          - img "Week from Monday, 27 Apr 2026, 15. Commits." [ref=f1e2837]
+                          - img "Week from Monday, 4 May 2026, 15. Commits." [ref=f1e2838]
+                          - img "Week from Monday, 11 May 2026, 7. Commits." [ref=f1e2839]
+                          - img "Week from Monday, 18 May 2026, 2. Commits." [ref=f1e2840]
+                          - img "Week from Monday, 25 May 2026, 7. Commits." [ref=f1e2841]
+                          - img "Week from Monday, 1 Jun 2026, 2. Commits." [ref=f1e2842]
+                          - img "Week from Monday, 8 Jun 2026, 29. Commits." [ref=f1e2843]
+                          - img "Week from Monday, 15 Jun 2026, 32. Commits." [ref=f1e2844]
+                          - img "Week from Monday, 22 Jun 2026, 6. Commits." [ref=f1e2845]
+                          - img "Week from Monday, 29 Jun 2026, 12. Commits." [ref=f1e2846]
+                          - img "Week from Monday, 6 Jul 2026, 9. Commits." [ref=f1e2847]
+                          - img "Week from Monday, 13 Jul 2026, 8. Commits." [ref=f1e2848]
+                          - img "Week from Monday, 20 Jul 2026, 5. Commits." [ref=f1e2849]
+                          - img "Week from Monday, 27 Jul 2026, 2. Commits." [ref=f1e2850]
+                          - img "Week from Monday, 3 Aug 2026, 10. Commits." [ref=f1e2851]
+                        - generic [ref=f1e2852]:
+                          - generic [ref=f1e2853]: Jan '26
+                          - generic [ref=f1e2854]: Apr '26
+                          - generic [ref=f1e2855]: Jul '26
+                        - generic [ref=f1e2856]:
+                          - generic [ref=f1e2857]: "0"
+                          - generic [ref=f1e2858]: 1k
+                          - generic [ref=f1e2859]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1802]:
+                - generic [ref=f1e2862]:
+                  - generic [ref=f1e2863]:
+                    - generic [ref=f1e2864]:
+                      - link "fuller-stack-dev" [ref=f1e2866] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                      - generic [ref=f1e2868]:
+                        - heading "fuller-stack-dev 's Commits" [level=2] [ref=f1e2869]:
+                          - generic [ref=f1e2870]:
+                            - link "fuller-stack-dev" [ref=f1e2871] [cursor=pointer]:
+                              - /url: /fuller-stack-dev
+                            - generic [ref=f1e2872]: "'s Commits"
+                        - link "259 commits" [ref=f1e2875] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=fuller-stack-dev
+                    - generic [ref=f1e2876]:
+                      - generic [ref=f1e2877]: "#15"
+                      - button "Chart options" [ref=f1e2879] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2882] [cursor=pointer]
+                  - region "fuller-stack-dev's Commits. Interactive chart." [ref=f1e2885]:
+                    - generic [ref=f1e2886]:
+                      - generic [ref=f1e2887]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2889] [cursor=pointer]
+                      - generic [ref=f1e2890]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2891]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 43.
+                    - application [ref=f1e2892]:
+                      - img "Interactive chart" [ref=f1e2893]:
+                        - generic [ref=f1e2899]: Contributions
+                        - generic [ref=f1e2902]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 1. Commits." [ref=f1e2903]
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 3. Commits." [ref=f1e2904]
+                          - img "Week from Monday, 16 Mar 2026, 1. Commits." [ref=f1e2905]
+                          - img "Week from Monday, 23 Mar 2026, 1. Commits." [ref=f1e2906]
+                          - img "Week from Monday, 30 Mar 2026, 2. Commits." [ref=f1e2907]
+                          - img "Week from Monday, 6 Apr 2026, 1. Commits." [ref=f1e2908]
+                          - img "Week from Monday, 13 Apr 2026, 7. Commits." [ref=f1e2909]
+                          - img "Week from Monday, 20 Apr 2026, 1. Commits." [ref=f1e2910]
+                          - img "Week from Monday, 27 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 4 May 2026, 5. Commits." [ref=f1e2911]
+                          - img "Week from Monday, 11 May 2026, 28. Commits." [ref=f1e2912]
+                          - img "Week from Monday, 18 May 2026, 19. Commits." [ref=f1e2913]
+                          - img "Week from Monday, 25 May 2026, 8. Commits." [ref=f1e2914]
+                          - img "Week from Monday, 1 Jun 2026, 14. Commits." [ref=f1e2915]
+                          - img "Week from Monday, 8 Jun 2026, 7. Commits." [ref=f1e2916]
+                          - img "Week from Monday, 15 Jun 2026, 4. Commits." [ref=f1e2917]
+                          - img "Week from Monday, 22 Jun 2026, 6. Commits." [ref=f1e2918]
+                          - img "Week from Monday, 29 Jun 2026, 10. Commits." [ref=f1e2919]
+                          - img "Week from Monday, 6 Jul 2026, 33. Commits." [ref=f1e2920]
+                          - img "Week from Monday, 13 Jul 2026, 43. Commits." [ref=f1e2921]
+                          - img "Week from Monday, 20 Jul 2026, 27. Commits." [ref=f1e2922]
+                          - img "Week from Monday, 27 Jul 2026, 32. Commits." [ref=f1e2923]
+                          - img "Week from Monday, 3 Aug 2026, 6. Commits." [ref=f1e2924]
+                        - generic [ref=f1e2925]:
+                          - generic [ref=f1e2926]: Jan '26
+                          - generic [ref=f1e2927]: Apr '26
+                          - generic [ref=f1e2928]: Jul '26
+                        - generic [ref=f1e2929]:
+                          - generic [ref=f1e2930]: "0"
+                          - generic [ref=f1e2931]: 1k
+                          - generic [ref=f1e2932]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1804]:
+                - generic [ref=f1e2935]:
+                  - generic [ref=f1e2936]:
+                    - generic [ref=f1e2937]:
+                      - link "Alix-007" [ref=f1e2939] [cursor=pointer]:
+                        - /url: /Alix-007
+                      - generic [ref=f1e2941]:
+                        - heading "Alix-007 's Commits" [level=2] [ref=f1e2942]:
+                          - generic [ref=f1e2943]:
+                            - link "Alix-007" [ref=f1e2944] [cursor=pointer]:
+                              - /url: /Alix-007
+                            - generic [ref=f1e2945]: "'s Commits"
+                        - link "255 commits" [ref=f1e2948] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=Alix-007
+                    - generic [ref=f1e2949]:
+                      - generic [ref=f1e2950]: "#16"
+                      - button "Chart options" [ref=f1e2952] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e2955] [cursor=pointer]
+                  - region "Alix-007's Commits. Interactive chart." [ref=f1e2958]:
+                    - generic [ref=f1e2959]:
+                      - generic [ref=f1e2960]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e2962] [cursor=pointer]
+                      - generic [ref=f1e2963]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e2964]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 96.
+                    - application [ref=f1e2965]:
+                      - img "Interactive chart" [ref=f1e2966]:
+                        - generic [ref=f1e2972]: Contributions
+                        - generic [ref=f1e2975]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 1. Commits." [ref=f1e2976]
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 27 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 0. Commits."
+                          - img "Week from Monday, 18 May 2026, 7. Commits." [ref=f1e2977]
+                          - img "Week from Monday, 25 May 2026, 8. Commits." [ref=f1e2978]
+                          - img "Week from Monday, 1 Jun 2026, 3. Commits." [ref=f1e2979]
+                          - img "Week from Monday, 8 Jun 2026, 32. Commits." [ref=f1e2980]
+                          - img "Week from Monday, 15 Jun 2026, 17. Commits." [ref=f1e2981]
+                          - img "Week from Monday, 22 Jun 2026, 26. Commits." [ref=f1e2982]
+                          - img "Week from Monday, 29 Jun 2026, 36. Commits." [ref=f1e2983]
+                          - img "Week from Monday, 6 Jul 2026, 96. Commits." [ref=f1e2984]
+                          - img "Week from Monday, 13 Jul 2026, 12. Commits." [ref=f1e2985]
+                          - img "Week from Monday, 20 Jul 2026, 4. Commits." [ref=f1e2986]
+                          - img "Week from Monday, 27 Jul 2026, 10. Commits." [ref=f1e2987]
+                          - img "Week from Monday, 3 Aug 2026, 3. Commits." [ref=f1e2988]
+                        - generic [ref=f1e2989]:
+                          - generic [ref=f1e2990]: Jan '26
+                          - generic [ref=f1e2991]: Apr '26
+                          - generic [ref=f1e2992]: Jul '26
+                        - generic [ref=f1e2993]:
+                          - generic [ref=f1e2994]: "0"
+                          - generic [ref=f1e2995]: 1k
+                          - generic [ref=f1e2996]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1806]:
+                - generic [ref=f1e2999]:
+                  - generic [ref=f1e3000]:
+                    - generic [ref=f1e3001]:
+                      - link "BunsDev" [ref=f1e3003] [cursor=pointer]:
+                        - /url: /BunsDev
+                      - generic [ref=f1e3005]:
+                        - heading "BunsDev 's Commits" [level=2] [ref=f1e3006]:
+                          - generic [ref=f1e3007]:
+                            - link "BunsDev" [ref=f1e3008] [cursor=pointer]:
+                              - /url: /BunsDev
+                            - generic [ref=f1e3009]: "'s Commits"
+                        - link "247 commits" [ref=f1e3012] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=BunsDev
+                    - generic [ref=f1e3013]:
+                      - generic [ref=f1e3014]: "#17"
+                      - button "Chart options" [ref=f1e3016] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e3019] [cursor=pointer]
+                  - region "BunsDev's Commits. Interactive chart." [ref=f1e3022]:
+                    - generic [ref=f1e3023]:
+                      - generic [ref=f1e3024]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e3026] [cursor=pointer]
+                      - generic [ref=f1e3027]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e3028]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 43.
+                    - application [ref=f1e3029]:
+                      - img "Interactive chart" [ref=f1e3030]:
+                        - generic [ref=f1e3036]: Contributions
+                        - generic [ref=f1e3039]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 2. Commits." [ref=f1e3040]
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 4. Commits." [ref=f1e3041]
+                          - img "Week from Monday, 16 Feb 2026, 21. Commits." [ref=f1e3042]
+                          - img "Week from Monday, 23 Feb 2026, 3. Commits." [ref=f1e3043]
+                          - img "Week from Monday, 2 Mar 2026, 21. Commits." [ref=f1e3044]
+                          - img "Week from Monday, 9 Mar 2026, 19. Commits." [ref=f1e3045]
+                          - img "Week from Monday, 16 Mar 2026, 18. Commits." [ref=f1e3046]
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 2. Commits." [ref=f1e3047]
+                          - img "Week from Monday, 6 Apr 2026, 8. Commits." [ref=f1e3048]
+                          - img "Week from Monday, 13 Apr 2026, 22. Commits." [ref=f1e3049]
+                          - img "Week from Monday, 20 Apr 2026, 43. Commits." [ref=f1e3050]
+                          - img "Week from Monday, 27 Apr 2026, 41. Commits." [ref=f1e3051]
+                          - img "Week from Monday, 4 May 2026, 24. Commits." [ref=f1e3052]
+                          - img "Week from Monday, 11 May 2026, 1. Commits." [ref=f1e3053]
+                          - img "Week from Monday, 18 May 2026, 5. Commits." [ref=f1e3054]
+                          - img "Week from Monday, 25 May 2026, 4. Commits." [ref=f1e3055]
+                          - img "Week from Monday, 1 Jun 2026, 5. Commits." [ref=f1e3056]
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 1. Commits." [ref=f1e3057]
+                          - img "Week from Monday, 6 Jul 2026, 2. Commits." [ref=f1e3058]
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 27 Jul 2026, 1. Commits." [ref=f1e3059]
+                          - img "Week from Monday, 3 Aug 2026, 0. Commits."
+                        - generic [ref=f1e3060]:
+                          - generic [ref=f1e3061]: Jan '26
+                          - generic [ref=f1e3062]: Apr '26
+                          - generic [ref=f1e3063]: Jul '26
+                        - generic [ref=f1e3064]:
+                          - generic [ref=f1e3065]: "0"
+                          - generic [ref=f1e3066]: 1k
+                          - generic [ref=f1e3067]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1808]:
+                - generic [ref=f1e3070]:
+                  - generic [ref=f1e3071]:
+                    - generic [ref=f1e3072]:
+                      - link "giodl73-repo" [ref=f1e3074] [cursor=pointer]:
+                        - /url: /giodl73-repo
+                      - generic [ref=f1e3076]:
+                        - heading "giodl73-repo 's Commits" [level=2] [ref=f1e3077]:
+                          - generic [ref=f1e3078]:
+                            - link "giodl73-repo" [ref=f1e3079] [cursor=pointer]:
+                              - /url: /giodl73-repo
+                            - generic [ref=f1e3080]: "'s Commits"
+                        - link "231 commits" [ref=f1e3083] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=giodl73-repo
+                    - generic [ref=f1e3084]:
+                      - generic [ref=f1e3085]: "#18"
+                      - button "Chart options" [ref=f1e3087] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e3090] [cursor=pointer]
+                  - region "giodl73-repo's Commits. Interactive chart." [ref=f1e3093]:
+                    - generic [ref=f1e3094]:
+                      - generic [ref=f1e3095]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e3097] [cursor=pointer]
+                      - generic [ref=f1e3098]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e3099]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 51.
+                    - application [ref=f1e3100]:
+                      - img "Interactive chart" [ref=f1e3101]:
+                        - generic [ref=f1e3107]: Contributions
+                        - generic [ref=f1e3110]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 27 Apr 2026, 11. Commits." [ref=f1e3111]
+                          - img "Week from Monday, 4 May 2026, 39. Commits." [ref=f1e3112]
+                          - img "Week from Monday, 11 May 2026, 51. Commits." [ref=f1e3113]
+                          - img "Week from Monday, 18 May 2026, 20. Commits." [ref=f1e3114]
+                          - img "Week from Monday, 25 May 2026, 8. Commits." [ref=f1e3115]
+                          - img "Week from Monday, 1 Jun 2026, 1. Commits." [ref=f1e3116]
+                          - img "Week from Monday, 8 Jun 2026, 6. Commits." [ref=f1e3117]
+                          - img "Week from Monday, 15 Jun 2026, 17. Commits." [ref=f1e3118]
+                          - img "Week from Monday, 22 Jun 2026, 33. Commits." [ref=f1e3119]
+                          - img "Week from Monday, 29 Jun 2026, 13. Commits." [ref=f1e3120]
+                          - img "Week from Monday, 6 Jul 2026, 5. Commits." [ref=f1e3121]
+                          - img "Week from Monday, 13 Jul 2026, 17. Commits." [ref=f1e3122]
+                          - img "Week from Monday, 20 Jul 2026, 5. Commits." [ref=f1e3123]
+                          - img "Week from Monday, 27 Jul 2026, 3. Commits." [ref=f1e3124]
+                          - img "Week from Monday, 3 Aug 2026, 2. Commits." [ref=f1e3125]
+                        - generic [ref=f1e3126]:
+                          - generic [ref=f1e3127]: Jan '26
+                          - generic [ref=f1e3128]: Apr '26
+                          - generic [ref=f1e3129]: Jul '26
+                        - generic [ref=f1e3130]:
+                          - generic [ref=f1e3131]: "0"
+                          - generic [ref=f1e3132]: 1k
+                          - generic [ref=f1e3133]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1810]:
+                - generic [ref=f1e3136]:
+                  - generic [ref=f1e3137]:
+                    - generic [ref=f1e3138]:
+                      - link "altaywtf" [ref=f1e3140] [cursor=pointer]:
+                        - /url: /altaywtf
+                      - generic [ref=f1e3142]:
+                        - heading "altaywtf 's Commits" [level=2] [ref=f1e3143]:
+                          - generic [ref=f1e3144]:
+                            - link "altaywtf" [ref=f1e3145] [cursor=pointer]:
+                              - /url: /altaywtf
+                            - generic [ref=f1e3146]: "'s Commits"
+                        - link "223 commits" [ref=f1e3149] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=altaywtf
+                    - generic [ref=f1e3150]:
+                      - generic [ref=f1e3151]: "#19"
+                      - button "Chart options" [ref=f1e3153] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e3156] [cursor=pointer]
+                  - region "altaywtf's Commits. Interactive chart." [ref=f1e3159]:
+                    - generic [ref=f1e3160]:
+                      - generic [ref=f1e3161]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e3163] [cursor=pointer]
+                      - generic [ref=f1e3164]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e3165]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 55.
+                    - application [ref=f1e3166]:
+                      - img "Interactive chart" [ref=f1e3167]:
+                        - generic [ref=f1e3173]: Contributions
+                        - generic [ref=f1e3176]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 12 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 19 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 26 Jan 2026, 0. Commits."
+                          - img "Week from Monday, 2 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 9 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 16 Feb 2026, 2. Commits." [ref=f1e3177]
+                          - img "Week from Monday, 23 Feb 2026, 18. Commits." [ref=f1e3178]
+                          - img "Week from Monday, 2 Mar 2026, 55. Commits." [ref=f1e3179]
+                          - img "Week from Monday, 9 Mar 2026, 4. Commits." [ref=f1e3180]
+                          - img "Week from Monday, 16 Mar 2026, 18. Commits." [ref=f1e3181]
+                          - img "Week from Monday, 23 Mar 2026, 18. Commits." [ref=f1e3182]
+                          - img "Week from Monday, 30 Mar 2026, 24. Commits." [ref=f1e3183]
+                          - img "Week from Monday, 6 Apr 2026, 14. Commits." [ref=f1e3184]
+                          - img "Week from Monday, 13 Apr 2026, 2. Commits." [ref=f1e3185]
+                          - img "Week from Monday, 20 Apr 2026, 5. Commits." [ref=f1e3186]
+                          - img "Week from Monday, 27 Apr 2026, 9. Commits." [ref=f1e3187]
+                          - img "Week from Monday, 4 May 2026, 15. Commits." [ref=f1e3188]
+                          - img "Week from Monday, 11 May 2026, 14. Commits." [ref=f1e3189]
+                          - img "Week from Monday, 18 May 2026, 4. Commits." [ref=f1e3190]
+                          - img "Week from Monday, 25 May 2026, 0. Commits."
+                          - img "Week from Monday, 1 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 1. Commits." [ref=f1e3191]
+                          - img "Week from Monday, 22 Jun 2026, 2. Commits." [ref=f1e3192]
+                          - img "Week from Monday, 29 Jun 2026, 2. Commits." [ref=f1e3193]
+                          - img "Week from Monday, 6 Jul 2026, 4. Commits." [ref=f1e3194]
+                          - img "Week from Monday, 13 Jul 2026, 6. Commits." [ref=f1e3195]
+                          - img "Week from Monday, 20 Jul 2026, 2. Commits." [ref=f1e3196]
+                          - img "Week from Monday, 27 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 3 Aug 2026, 4. Commits." [ref=f1e3197]
+                        - generic [ref=f1e3198]:
+                          - generic [ref=f1e3199]: Jan '26
+                          - generic [ref=f1e3200]: Apr '26
+                          - generic [ref=f1e3201]: Jul '26
+                        - generic [ref=f1e3202]:
+                          - generic [ref=f1e3203]: "0"
+                          - generic [ref=f1e3204]: 1k
+                          - generic [ref=f1e3205]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1812]:
+                - generic [ref=f1e3208]:
+                  - generic [ref=f1e3209]:
+                    - generic [ref=f1e3210]:
+                      - link "sebslight" [ref=f1e3212] [cursor=pointer]:
+                        - /url: /sebslight
+                      - generic [ref=f1e3214]:
+                        - heading "sebslight 's Commits" [level=2] [ref=f1e3215]:
+                          - generic [ref=f1e3216]:
+                            - link "sebslight" [ref=f1e3217] [cursor=pointer]:
+                              - /url: /sebslight
+                            - generic [ref=f1e3218]: "'s Commits"
+                        - link "215 commits" [ref=f1e3221] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commits?author=sebslight
+                    - generic [ref=f1e3222]:
+                      - generic [ref=f1e3223]: "#20"
+                      - button "Chart options" [ref=f1e3225] [cursor=pointer]
+                      - button "Customization settings" [ref=f1e3228] [cursor=pointer]
+                  - region "sebslight's Commits. Interactive chart." [ref=f1e3231]:
+                    - generic [ref=f1e3232]:
+                      - generic [ref=f1e3233]: Bar chart with 38 bars.
+                      - button "View as data table, Chart" [ref=f1e3235] [cursor=pointer]
+                      - generic [ref=f1e3236]: The chart has 1 X axis displaying Time. Data ranges from 2025-11-17 00:00:00 to 2026-08-09 00:00:00.
+                      - generic [ref=f1e3237]: The chart has 1 Y axis displaying Contributions. Data ranges from 0 to 117.
+                    - application [ref=f1e3238]:
+                      - img "Interactive chart" [ref=f1e3239]:
+                        - generic [ref=f1e3245]: Contributions
+                        - generic [ref=f1e3248]:
+                          - img "Week from Monday, 17 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 24 Nov 2025, 0. Commits."
+                          - img "Week from Monday, 1 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 8 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 15 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 22 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 29 Dec 2025, 0. Commits."
+                          - img "Week from Monday, 5 Jan 2026, 9. Commits." [ref=f1e3249]
+                          - img "Week from Monday, 12 Jan 2026, 5. Commits." [ref=f1e3250]
+                          - img "Week from Monday, 19 Jan 2026, 4. Commits." [ref=f1e3251]
+                          - img "Week from Monday, 26 Jan 2026, 33. Commits." [ref=f1e3252]
+                          - img "Week from Monday, 2 Feb 2026, 47. Commits." [ref=f1e3253]
+                          - img "Week from Monday, 9 Feb 2026, 117. Commits." [ref=f1e3254]
+                          - img "Week from Monday, 16 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 23 Feb 2026, 0. Commits."
+                          - img "Week from Monday, 2 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 9 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 16 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 23 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 30 Mar 2026, 0. Commits."
+                          - img "Week from Monday, 6 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 13 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 20 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 27 Apr 2026, 0. Commits."
+                          - img "Week from Monday, 4 May 2026, 0. Commits."
+                          - img "Week from Monday, 11 May 2026, 0. Commits."
+                          - img "Week from Monday, 18 May 2026, 0. Commits."
+                          - img "Week from Monday, 25 May 2026, 0. Commits."
+                          - img "Week from Monday, 1 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 8 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 15 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 22 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 29 Jun 2026, 0. Commits."
+                          - img "Week from Monday, 6 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 13 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 20 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 27 Jul 2026, 0. Commits."
+                          - img "Week from Monday, 3 Aug 2026, 0. Commits."
+                        - generic [ref=f1e3255]:
+                          - generic [ref=f1e3256]: Jan '26
+                          - generic [ref=f1e3257]: Apr '26
+                          - generic [ref=f1e3258]: Jul '26
+                        - generic [ref=f1e3259]:
+                          - generic [ref=f1e3260]: "0"
+                          - generic [ref=f1e3261]: 1k
+                          - generic [ref=f1e3262]: 2k
+                    - generic: End of interactive chart.
+              - listitem [ref=f1e1814]
+              - listitem [ref=f1e1816]
+              - listitem [ref=f1e1818]
+              - listitem [ref=f1e1820]
+              - listitem [ref=f1e1822]
+              - listitem [ref=f1e1824]
+              - listitem [ref=f1e1826]
+              - listitem [ref=f1e1828]
+              - listitem [ref=f1e1830]
+              - listitem [ref=f1e1832]
+              - listitem [ref=f1e1834]
+              - listitem [ref=f1e1836]
+              - listitem [ref=f1e1838]
+              - listitem [ref=f1e1840]
+              - listitem [ref=f1e1842]
+              - listitem [ref=f1e1844]
+              - listitem [ref=f1e1846]
+              - listitem [ref=f1e1848]
+              - listitem [ref=f1e1850]
+              - listitem [ref=f1e1852]
+              - listitem [ref=f1e1854]
+              - listitem [ref=f1e1856]
+              - listitem [ref=f1e1858]
+              - listitem [ref=f1e1860]
+              - listitem [ref=f1e1862]
+              - listitem [ref=f1e1864]
+              - listitem [ref=f1e1866]
+              - listitem [ref=f1e1868]
+              - listitem [ref=f1e1870]
+              - listitem [ref=f1e1872]
+              - listitem [ref=f1e1874]
+              - listitem [ref=f1e1876]
+              - listitem [ref=f1e1878]
+              - listitem [ref=f1e1880]
+              - listitem [ref=f1e1882]
+              - listitem [ref=f1e1884]
+              - listitem [ref=f1e1886]
+              - listitem [ref=f1e1888]
+              - listitem [ref=f1e1890]
+              - listitem [ref=f1e1892]
+              - listitem [ref=f1e1894]
+              - listitem [ref=f1e1896]
+              - listitem [ref=f1e1898]
+              - listitem [ref=f1e1900]
+              - listitem [ref=f1e1902]
+              - listitem [ref=f1e1904]
+              - listitem [ref=f1e1906]
+              - listitem [ref=f1e1908]
+              - listitem [ref=f1e1910]
+              - listitem [ref=f1e1912]
+              - listitem [ref=f1e1914]
+              - listitem [ref=f1e1916]
+              - listitem [ref=f1e1918]
+              - listitem [ref=f1e1920]
+              - listitem [ref=f1e1922]
+              - listitem [ref=f1e1924]
+              - listitem [ref=f1e1926]
+              - listitem [ref=f1e1928]
+              - listitem [ref=f1e1930]
+              - listitem [ref=f1e1932]
+              - listitem [ref=f1e1934]
+              - listitem [ref=f1e1936]
+              - listitem [ref=f1e1938]
+              - listitem [ref=f1e1940]
+              - listitem [ref=f1e1942]
+              - listitem [ref=f1e1944]
+              - listitem [ref=f1e1946]
+              - listitem [ref=f1e1948]
+              - listitem [ref=f1e1950]
+              - listitem [ref=f1e1952]
+              - listitem [ref=f1e1954]
+              - listitem [ref=f1e1956]
+              - listitem [ref=f1e1958]
+              - listitem [ref=f1e1960]
+              - listitem [ref=f1e1962]
+              - listitem [ref=f1e1964]
+              - listitem [ref=f1e1966]
+              - listitem [ref=f1e1968]
+              - listitem [ref=f1e1970]
+              - listitem [ref=f1e1972]
+  - contentinfo [ref=f1e625]:
+    - heading "Footer" [level=2] [ref=f1e626]
+    - generic [ref=f1e627]:
+      - generic [ref=f1e628]:
+        - link "GitHub Homepage" [ref=f1e629] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f1e632]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f1e633]:
+        - heading "Footer navigation" [level=3] [ref=f1e634]
+        - list "Footer navigation" [ref=f1e635]:
+          - listitem [ref=f1e636]:
+            - link "Terms" [ref=f1e637] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f1e638]:
+            - link "Privacy" [ref=f1e639] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f1e640]:
+            - link "Security" [ref=f1e641] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f1e642]:
+            - link "Status" [ref=f1e643] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f1e644]:
+            - link "Community" [ref=f1e645] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f1e646]:
+            - link "Docs" [ref=f1e647] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f1e648]:
+            - link "Contact" [ref=f1e649] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f1e650]:
+            - button "Manage cookies" [ref=f1e652] [cursor=pointer]
+          - listitem [ref=f1e653]:
+            - button "Do not share my personal information" [ref=f1e655] [cursor=pointer]

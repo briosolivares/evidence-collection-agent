@@ -1,0 +1,127 @@
+[
+  {
+    "handle": "steipete",
+    "rank": 1,
+    "name": "Peter Steinberger",
+    "linkedin": "https://www.linkedin.com/in/steipete",
+    "bio": "Came back from retirement to mess with AI. Clawdfather @openclaw\n\nPreviously: Founder of @PSPDFKit.",
+    "notFound": false,
+    "title": "steipete (Peter Steinberger) · GitHub"
+  },
+  {
+    "handle": "vincentkoc",
+    "rank": 2,
+    "name": "Vincent Koc",
+    "linkedin": "https://www.linkedin.com/in/koconder/",
+    "bio": "Chief Architect 🦞 @openclaw Ex @qantasairways @airbytehq @microsoft | Lecturer @mit | Ethical Hacker | FIrst Responder",
+    "notFound": false,
+    "title": "vincentkoc (Vincent Koc) · GitHub"
+  },
+  {
+    "handle": "shakkernerd",
+    "rank": 3,
+    "name": "Shakker",
+    "bio": "Building @openclaw \n\n|\n\nIs there a thing called boundary ?",
+    "notFound": false,
+    "title": "shakkernerd (Shakker) · GitHub"
+  },
+  {
+    "handle": "joshavant",
+    "rank": 4,
+    "name": "Josh Avant",
+    "linkedin": "https://linkedin.com/in/joshavant",
+    "bio": "",
+    "notFound": false,
+    "title": "joshavant (Josh Avant) · GitHub"
+  },
+  {
+    "handle": "github-actions[bot]",
+    "rank": 5,
+    "name": "",
+    "linkedin": "https://www.linkedin.com/company/github",
+    "bio": "",
+    "notFound": true,
+    "title": "Page not found · GitHub · GitHub"
+  },
+  {
+    "handle": "obviyus",
+    "rank": 6,
+    "name": "Ayaan Zaidi",
+    "bio": "Maintainer @ OpenClaw",
+    "notFound": false,
+    "title": "obviyus (Ayaan Zaidi) · GitHub"
+  },
+  {
+    "handle": "RomneyDa",
+    "rank": 7,
+    "name": "Dallin Romney",
+    "bio": "Building AI that actually does things @ OpenClaw. Former founding engineer @ Continue.dev",
+    "notFound": false,
+    "title": "RomneyDa (Dallin Romney) · GitHub"
+  },
+  {
+    "handle": "claude",
+    "rank": 8,
+    "name": "Claude",
+    "bio": "",
+    "notFound": false,
+    "title": "claude (Claude) · GitHub"
+  },
+  {
+    "handle": "fuller-stack-dev",
+    "rank": 9,
+    "name": "Jason (Json)",
+    "bio": "Member of Technical Staff &\nCommunity Moderator @ OpenClaw",
+    "notFound": false,
+    "title": "fuller-stack-dev (Jason (Json)) · GitHub"
+  },
+  {
+    "handle": "clawsweeper[bot]",
+    "rank": 10,
+    "name": "ClawSweeper",
+    "bio": "Your friendly neighborhood claw.",
+    "notFound": false,
+    "title": "clawsweeper (ClawSweeper) · GitHub"
+  },
+  {
+    "handle": "Alix-007",
+    "rank": 11,
+    "name": "",
+    "bio": "",
+    "notFound": false,
+    "title": "Alix-007 · GitHub"
+  },
+  {
+    "handle": "zhangguiping-xydt",
+    "rank": 12,
+    "name": "xingzhou",
+    "bio": "discord@xingzhou0818\ntelegram@xingzhou0818",
+    "notFound": false,
+    "title": "zhangguiping-xydt (xingzhou) · GitHub"
+  },
+  {
+    "handle": "ampagent",
+    "rank": 13,
+    "name": "Amp",
+    "bio": "",
+    "notFound": false,
+    "title": "ampagent (Amp) · GitHub"
+  },
+  {
+    "handle": "Takhoffman",
+    "rank": 14,
+    "name": "Tak Hoffman",
+    "bio": "Token Slinger",
+    "notFound": false,
+    "title": "Takhoffman (Tak Hoffman) · GitHub"
+  },
+  {
+    "handle": "giodl73-repo",
+    "rank": 15,
+    "name": "Gio Della-Libera",
+    "linkedin": "https://www.linkedin.com/in/giodl/",
+    "bio": "VP Engineering, Agents 365 & \nSkills Designer",
+    "notFound": false,
+    "title": "giodl73-repo (Gio Della-Libera) · GitHub"
+  }
+]

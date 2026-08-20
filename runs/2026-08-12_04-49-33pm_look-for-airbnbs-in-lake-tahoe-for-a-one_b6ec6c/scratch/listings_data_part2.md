@@ -1,0 +1,12 @@
+19. room/1724060201935702444 - "This Tahoe Vista cabin gives you a hot tub, fire pit, and fireplace" - New place to stay - 3 bedrooms, 6 beds, 2 baths - $3,354 (weekly discount to $2,873) for 7 nights
+20. room/42619882 - "This authentic Tahoe Pines log cabin gives you lake access and a sunny deck" - Top guest favorite - 5.0 (12 reviews) - 2 bedrooms, 3 beds, 1.5 baths - $2,546 (to $2,225) for 7 nights
+21. room/8459964 - "High ceilings and a stone accent wall greet you at this Tahoe condo with a loft" - Guest favorite - 4.88 (176 reviews) - 3 bedrooms, 4 beds, 2 baths - $1,911 (to $1,759) for 7 nights
+22. room/1699322423074934729 - "Vaulted ceilings and a fire pit greet you at this South Lake Tahoe house in the pines" - (no badge) - 4.6 (5 reviews) - 4 bedrooms, 4 beds, 3 baths - $2,987 for 7 nights
+23. room/45736549 - "Mountain views through floor-to-ceiling windows greet you at this Northstar house" - Guest favorite - 4.93 (153 reviews) - 3 bedrooms, 7 beds, 2.5 baths - $3,303 for 7 nights
+24. room/16112793 - "Three decks let you soak in the Sierra sun at this Kings Beach cabin" - Top guest favorite - 4.96 (185 reviews) - 2 bedrooms, 2 beds, 1 bath - $2,320 (to $2,133) for 7 nights
+25. room/26011317 - "This Incline Village condo gives you a fireplace, deck grill, and two-car garage" - (no badge) - 4.54 (67 reviews) - 3 bedrooms, 4 beds, 2.5 baths - $1,640 (extended stay discount to $1,507) for 7 nights
+26. room/568852605757981138 - "This Bijou chalet gives you Heavenly Mountain views, a fireplace, and a private yard" - (no badge) - 4.17 (12 reviews) - 4 bedrooms, 5 beds, 2 baths - $2,073 (to $1,901) for 7 nights
+27. room/1700880051558873763 - "Soaring ceilings and natural wood greet you at this Tahoe City cabin" - (no badge) - 5.0 (5 reviews) - 3 bedrooms, 4 beds, 2 baths - $3,403 for 7 nights
+28. room/1598556012303861821 - "Lake views, a fire pit, and pool table greet you at this Homewood house" - (no badge) - 5.0 (4 reviews) - 3 bedrooms, 4 beds, 2.5 baths - $5,950 for 7 nights
+29. room/45103407 - "Lake views greet you at this lakefront South Lake Tahoe condo with a hot tub" - Guest favorite - 5.0 (14 reviews) - 4 bedrooms, 6 beds, 4 baths - $9,084 for 7 nights
+30. room/1541227947868581792 - "This newly renovated Carnelian Bay cabin puts you steps from the beach with a fire pit" - Superhost - 4.8 (5 reviews) - 2 bedrooms, 5 beds, 2 baths - $2,449 (to $2,238) for 7 nights

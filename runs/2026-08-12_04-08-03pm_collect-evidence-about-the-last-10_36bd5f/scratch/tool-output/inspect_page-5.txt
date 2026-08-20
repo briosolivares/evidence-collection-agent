@@ -1,0 +1,1148 @@
+URL: https://github.com/openclaw/openclaw/pull/114388
+Title: refactor(agents): make multi-agent ownership explicit (H2-1 core) by steipete · Pull Request #114388 · openclaw/openclaw · GitHub
+
+- generic [ref=f11e2]:
+  - generic [ref=f11e3]:
+    - link "Skip to content" [ref=f11e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f11e8]:
+      - heading "Navigation Menu" [level=2] [ref=f11e9]
+      - generic [ref=f11e10]:
+        - link "Homepage" [ref=f11e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f11e15]:
+          - navigation "Global" [ref=f11e16]:
+            - list [ref=f11e17]:
+              - listitem [ref=f11e18]:
+                - button "Platform" [ref=f11e20] [cursor=pointer]
+              - listitem [ref=f11e23]:
+                - button "Solutions" [ref=f11e25] [cursor=pointer]
+              - listitem [ref=f11e28]:
+                - button "Resources" [ref=f11e30] [cursor=pointer]
+              - listitem [ref=f11e33]:
+                - button "Open Source" [ref=f11e35] [cursor=pointer]
+              - listitem [ref=f11e38]:
+                - button "Enterprise" [ref=f11e40] [cursor=pointer]
+              - listitem [ref=f11e43]:
+                - link "Pricing" [ref=f11e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f11e45]:
+            - button "Search or jump to, type / to search" [ref=f11e47] [cursor=pointer]:
+              - generic [ref=f11e50]:
+                - text: Type
+                - generic [ref=f11e51]: /
+                - text: to search
+            - link "Sign in" [ref=f11e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F114388
+            - link "Sign up" [ref=f11e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f11e55] [cursor=pointer]
+  - main [ref=f11e61]:
+    - generic [ref=f11e62]:
+      - generic [ref=f11e63]:
+        - generic [ref=f11e65]:
+          - link "openclaw" [ref=f11e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f11e70]: /
+          - strong [ref=f11e71]:
+            - link "openclaw" [ref=f11e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f11e73]: Public
+        - generic [ref=f11e74]:
+          - list:
+            - listitem [ref=f11e75]:
+              - link "Sponsor @openclaw" [ref=f11e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f11e77]: Sponsor
+            - listitem [ref=f11e81]:
+              - link "You must be signed in to change notification settings" [ref=f11e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f11e85]:
+              - link "Fork 81.1k" [ref=f11e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,147" [ref=f11e89]: 81.1k
+            - listitem [ref=f11e90]:
+              - link "You must be signed in to star a repository" [ref=f11e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386076 users starred this repository" [ref=f11e95]: 386k
+      - navigation "Repository" [ref=f11e96]:
+        - list [ref=f11e97]:
+          - listitem [ref=f11e98]:
+            - link "Code" [ref=f11e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f11e103]:
+            - link "Issues 3.4k" [ref=f11e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f11e108]: Issues
+              - generic "3,414" [ref=f11e109]: 3.4k
+          - listitem [ref=f11e110]:
+            - link "Pull requests 2.1k" [ref=f11e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f11e114]: Pull requests
+              - generic "2,113" [ref=f11e115]: 2.1k
+          - listitem [ref=f11e116]:
+            - link "Actions" [ref=f11e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f11e121]:
+            - link "Projects" [ref=f11e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f11e126]:
+            - link "Security and quality 647" [ref=f11e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f11e130]: Security and quality
+              - generic "647" [ref=f11e131]
+          - listitem [ref=f11e132]:
+            - link "Insights" [ref=f11e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f11e143]:
+      - generic [ref=f11e147]:
+        - generic [ref=f11e149]:
+          - 'heading "refactor(agents): make multi-agent ownership explicit (H2-1 core) - #114388" [level=1] [ref=f11e150]':
+            - text: "refactor(agents): make multi-agent ownership explicit (H2-1 core)"
+            - generic [ref=f11e151]: "- #114388"
+          - generic [ref=f11e152]: "#114388"
+        - generic [ref=f11e155]:
+          - generic [ref=f11e157]:
+            - img "Pull request" [ref=f11e158]
+            - text: Merged
+          - generic [ref=f11e161]:
+            - link "steipete" [ref=f11e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 72 commits into
+            - generic [ref=f11e163]:
+              - link "main" [ref=f11e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f11e165]: from
+              - generic [ref=f11e166]:
+                - link "claude/no-stored-default" [ref=f11e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/claude/no-stored-default
+                - button "Copy head branch name to clipboard" [ref=f11e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 3:55 PM PDT" [ref=f11e172]: Aug 12, 202614 minutes ago
+        - generic [ref=f11e173]:
+          - generic [ref=f11e175]:
+            - generic [ref=f11e176]: +21,380
+            - generic [ref=f11e177]: "-5,670"
+            - generic [ref=f11e178]: "Lines changed: 21380 additions & 5670 deletions"
+          - navigation "Pull request navigation tabs" [ref=f11e186]:
+            - generic [ref=f11e187]:
+              - link "Conversation (7)" [ref=f11e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/114388
+                - text: Conversation
+                - generic [ref=f11e191]: "7"
+                - generic [ref=f11e192]: (7)
+              - link "Commits (72)" [ref=f11e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/114388/commits
+                - text: Commits
+                - generic [ref=f11e196]: "72"
+                - generic [ref=f11e197]: (72)
+              - link "Checks (130)" [ref=f11e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/114388/checks
+                - text: Checks
+                - generic [ref=f11e201]: "130"
+                - generic [ref=f11e202]: (130)
+              - link "Files changed (814)" [ref=f11e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/114388/files
+                - text: Files changed
+                - generic [ref=f11e206]: "814"
+                - generic [ref=f11e207]: (814)
+      - generic [ref=f11e212]:
+        - generic [ref=f11e214]:
+          - heading "Conversation" [level=2] [ref=f11e215]
+          - generic [ref=f11e216]:
+            - generic [ref=f11e217]:
+              - generic [ref=f11e219]:
+                - link [ref=f11e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f11e221]
+                - generic [ref=f11e223]:
+                  - generic [ref=f11e224]:
+                    - heading "steipete commented Jul 27, 20262 weeks ago •" [level=3] [ref=f11e225]:
+                      - generic [ref=f11e226]:
+                        - strong [ref=f11e227]:
+                          - link "steipete" [ref=f11e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Jul 27, 20262 weeks ago" [ref=f11e229] [cursor=pointer]:
+                          - /url: "#issue-4985197703"
+                        - generic [ref=f11e230]:
+                          - generic [ref=f11e231]: •
+                          - group [ref=f11e232]:
+                            - button "edited" [ref=f11e233] [cursor=pointer]
+                    - generic [ref=f11e237]:
+                      - group [ref=f11e239]:
+                        - button [ref=f11e240] [cursor=pointer]:
+                          - img "Show options" [ref=f11e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f11e246]: Contributor
+                  - generic [ref=f11e251]:
+                    - paragraph [ref=f11e252]:
+                      - text: "Related:"
+                      - link "#112678" [ref=f11e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/112678
+                      - text: "Related:"
+                      - link "#113637" [ref=f11e254] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/113637
+                    - heading "What Problem This Solves" [level=2] [ref=f11e255]
+                    - paragraph [ref=f11e256]:
+                      - text: Resolves a problem where multi-agent installations persisted an ambient
+                      - code [ref=f11e257]: "default: true"
+                      - text: marker and then inferred that agent across sessions, channels, automation, and authorization paths. After roster changes or restart, that implicit default could select the wrong agent, lose a legacy owner, or allow colliding bare session keys such as
+                      - code [ref=f11e258]: global
+                      - text: to be attributed to the requester instead of their durable owner.
+                    - heading "Why This Change Was Made" [level=2] [ref=f11e259]
+                    - paragraph [ref=f11e260]:
+                      - text: The final design removes the stored default marker and uses sole-agent-or-explicit selection. A write-once
+                      - code [ref=f11e261]: "agents.ownership: \"explicit\""
+                      - text: stamp records intentional roster ownership, while a load-time WeakMap sidecar retains the legacy owner only as migration evidence and compatibility input.
+                    - paragraph [ref=f11e262]:
+                      - text: "Before retiring the marker, compatibility ownership is materialized into the surfaces that need durable identity: channel bindings, heartbeat, system-agent and Talk settings, auth inheritance, and the configured fixed session store. Fixed-store rows follow the persisted owner contract ("
+                      - code [ref=f11e263]: configured
+                      - text: ","
+                      - code [ref=f11e264]: retired
+                      - text: ", or"
+                      - code [ref=f11e265]: none
+                      - text: ); configured ownership is authoritative, retired ownership fails closed, and authorization surfaces reject conflicting explicit agents.
+                    - paragraph [ref=f11e266]:
+                      - text: The same ownership ladder now covers Gateway, CLI/TUI, session aliases and IDs, task runtimes, active runs, broadcasts, transcript lookup, and migration/recovery paths. Plugin discovery uses the config-wide manifest registry. Gateway protocol additions (
+                      - code [ref=f11e267]: ownership
+                      - text: and
+                      - code [ref=f11e268]: selectionRequired
+                      - text: ) remain additive, and Doctor owns the shipped config/data migrations.
+                    - heading "User Impact" [level=2] [ref=f11e269]
+                    - paragraph [ref=f11e270]: Single-agent installations continue to select their sole agent without extra configuration. Multi-agent installations now receive an actionable explicit-selection response instead of silently adopting a default or another agent's session/task state. Existing installations retain and durably materialize their legacy owner during migration, including bare fixed-store sessions, while conflicting and ownerless authorization requests fail closed.
+                    - paragraph [ref=f11e271]: Operators also get Doctor repairs for marker retirement, fixed-store ownership, heartbeat cadence, and startup-owned cron rows. Remote clients can consume the additive ownership metadata without breaking older protocol consumers.
+                    - heading "Evidence" [level=2] [ref=f11e272]
+                    - list [ref=f11e273]:
+                      - listitem [ref=f11e274]:
+                        - text: Exact current head
+                        - code [ref=f11e275]: 376669573fa853faff8352d8777a0ece94d65493
+                        - text: ": full pull-request CI green in"
+                        - link "run 31647212132" [ref=f11e276] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31647212132
+                        - text: ", including production tsgo,"
+                        - code [ref=f11e277]: check:test-types
+                        - text: ", lint, security/CodeQL, Plugin SDK API baseline, UI/E2E, iOS, and changed test shards."
+                      - listitem [ref=f11e278]:
+                        - text: "Full changed-surface gate:"
+                        - code [ref=f11e279]: node scripts/check-changed.mjs
+                        - text: green on
+                        - link "Testbox run 31335091251" [ref=f11e280] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31335091251
+                        - text: .
+                      - listitem [ref=f11e281]:
+                        - text: "Full type/build lane:"
+                        - code [ref=f11e282]: pnpm tsgo:all && pnpm check:test-types && pnpm build
+                        - text: green on
+                        - link "Testbox run 31336280194" [ref=f11e283] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31336280194
+                        - text: .
+                      - listitem [ref=f11e284]:
+                        - text: "Touched tests, unfiltered: 952 tests passed across 11 Vitest shards on"
+                        - link "Testbox run 31336453657" [ref=f11e285] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31336453657
+                        - text: ". The final task-owner repair additionally passed both unfiltered colocated suites: 10 tests across"
+                        - code [ref=f11e286]: src/tasks/task-owner-access.test.ts
+                        - text: and
+                        - code [ref=f11e287]: src/plugins/runtime/runtime-tasks.test.ts
+                        - text: .
+                      - listitem [ref=f11e288]:
+                        - text: "Linux-generated Plugin SDK contract reconciliation: Testbox"
+                        - code [ref=f11e289]: tbx_01kzvyf8dx3dmxcac08v85pvwk
+                        - text: ","
+                        - link "run 31643290834" [ref=f11e290] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31643290834
+                        - text: ", generated the final"
+                        - code [ref=f11e291]: infra-runtime
+                        - text: contract hash; the exact-head Linux baseline gate then passed.
+                      - listitem [ref=f11e292]:
+                        - text: External ownership gate reviewed head
+                        - code [ref=f11e293]: 61e8f70f246fecbf29628574b0a78fb3eb4047bc
+                        - text: clean. Subsequent changes were a conflict-free source replay onto current
+                        - code [ref=f11e294]: main
+                        - text: plus generated Plugin SDK baseline reconciliation only.
+                    - paragraph [ref=f11e295]: "ClawSweeper rank-up moves and maintainer dispositions:"
+                    - list [ref=f11e296]:
+                      - listitem [ref=f11e297]:
+                        - text: "Applied: trusted"
+                        - code [ref=f11e298]: agentId
+                        - text: is threaded from tool context and explicit task-session bindings; agent-scoped keys retain their encoded owner, and agentless bare bindings fail closed. A paired-agent
+                        - code [ref=f11e299]: global
+                        - text: regression covers get, list, resolve, and cancel.
+                      - listitem [ref=f11e300]: "Resolved: the two previously unlocated CodeQL concerns were not reproduced; exact-head CodeQL and security checks have no blocking finding."
+                      - listitem [ref=f11e301]: "Resolved: exact-head availability and proof gaps are superseded by the external gate clearance and exact-head green CI above."
+                      - listitem [ref=f11e302]: "Skipped with maintainer acceptance: a live Doctor upgrade/restart artifact was not published. Deterministic Doctor, cron handoff, session ownership, channel routing, explicit-selection, and migration suites provide the substitute proof; no private runtime artifact or sensitive endpoint was created."
+                      - listitem [ref=f11e303]: "Not repeated: sibling Codex CLI inspection was part of an already-gated older span, and the post-clearance delta changes no Codex behavior—only mechanical replay and generated contracts."
+                  - 'button "eyes (1): steipete, 06:52AM on July 27" [disabled] [ref=f11e308]':
+                    - generic [ref=f11e309]: 👀
+                    - generic [ref=f11e310]: "1"
+              - generic [ref=f11e311]:
+                - generic [ref=f11e312]:
+                  - generic [ref=f11e317]:
+                    - link [ref=f11e318] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f11e319]
+                    - link "openclaw-barnacle" [ref=f11e320] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f11e321]: Bot
+                    - text: added
+                    - link "docs" [ref=f11e322] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+                    - 'link "channel: discord" [ref=f11e323] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+                    - 'link "channel: voice-call" [ref=f11e324] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20voice-call%22
+                    - 'link "app: web-ui" [ref=f11e325] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+                    - link "gateway" [ref=f11e326] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+                    - link "cli" [ref=f11e327] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+                    - link "scripts" [ref=f11e328] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+                    - link "commands" [ref=f11e329] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+                    - link "agents" [ref=f11e330] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+                    - 'link "channel: feishu" [ref=f11e331] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20feishu%22
+                    - 'link "extensions: anthropic" [ref=f11e332] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20anthropic%22
+                    - 'link "extensions: qa-lab" [ref=f11e333] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20qa-lab%22
+                    - 'link "extensions: codex" [ref=f11e334] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20codex%22
+                    - 'link "size: XL" [ref=f11e335] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+                    - link "maintainer" [ref=f11e336] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Jul 27, 20262 weeks ago" [ref=f11e337] [cursor=pointer]:
+                      - /url: "#event-28521675600"
+                  - generic [ref=f11e342]:
+                    - link [ref=f11e343] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f11e344]
+                    - link "steipete" [ref=f11e345] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: self-assigned this
+                    - link "Jul 27, 20262 weeks ago" [ref=f11e346] [cursor=pointer]:
+                      - /url: "#event-28521683468"
+                  - generic [ref=f11e352]:
+                    - link [ref=f11e354] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f11e355]
+                    - generic [ref=f11e356]:
+                      - link "steipete" [ref=f11e357] [cursor=pointer]:
+                        - /url: /steipete
+                      - link "force-pushed" [ref=f11e358] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/9e39e7c0f50e29be47a595ca5fb69a0b0ec70b44..1d64c4a3888e10f4ed42b6304558da4319ac6211
+                      - text: the
+                      - generic [ref=f11e359]: claude/no-stored-default
+                      - text: branch from
+                      - link [ref=f11e361] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/9e39e7c0f50e29be47a595ca5fb69a0b0ec70b44
+                        - code [ref=f11e362]: 9e39e7c
+                      - text: to
+                      - link [ref=f11e363] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/1d64c4a3888e10f4ed42b6304558da4319ac6211
+                        - code [ref=f11e364]: 1d64c4a
+                      - link "Compare" [ref=f11e365] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/9e39e7c0f50e29be47a595ca5fb69a0b0ec70b44..1d64c4a3888e10f4ed42b6304558da4319ac6211
+                      - link "July 27, 2026 06:582 weeks ago" [ref=f11e368] [cursor=pointer]:
+                        - /url: "#event-28521918590"
+                  - generic [ref=f11e374]:
+                    - link [ref=f11e376] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f11e377]
+                    - generic [ref=f11e378]:
+                      - link "steipete" [ref=f11e379] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: marked this pull request as ready for review
+                      - link "July 27, 2026 06:582 weeks ago" [ref=f11e380] [cursor=pointer]:
+                        - /url: "#event-28521934353"
+                  - generic [ref=f11e386]:
+                    - link [ref=f11e388] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f11e389]
+                    - generic [ref=f11e390]:
+                      - link "steipete" [ref=f11e391] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: requested a review from a team as a
+                      - link "code owner" [ref=f11e392] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/blob/b461ae6de88345ddcc69c787d99e6404c2206cba/.github/CODEOWNERS#L27
+                      - link "July 27, 2026 06:582 weeks ago" [ref=f11e393] [cursor=pointer]:
+                        - /url: "#event-28521934741"
+                  - generic [ref=f11e398]:
+                    - link [ref=f11e399] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f11e400]
+                    - link "clawsweeper" [ref=f11e401] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f11e402]: Bot
+                    - text: added
+                    - 'link "rating: 🦪 silver shellfish" [ref=f11e403] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: 📣 needs proof" [ref=f11e404] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%93%A3%20needs%20proof%22
+                    - link "P2" [ref=f11e405] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                    - 'link "merge-risk: 🚨 compatibility" [ref=f11e406] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                    - 'link "merge-risk: 🚨 session-state" [ref=f11e407] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+                    - 'link "merge-risk: 🚨 auth-provider" [ref=f11e408] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20auth-provider%22
+                    - text: labels
+                    - link "Jul 27, 20262 weeks ago" [ref=f11e409] [cursor=pointer]:
+                      - /url: "#event-28522240962"
+                - generic [ref=f11e411]:
+                  - link [ref=f11e413] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f11e414]
+                  - generic [ref=f11e416]:
+                    - generic [ref=f11e417]:
+                      - heading "clawsweeper Bot commented Jul 27, 20262 weeks ago •" [level=3] [ref=f11e418]:
+                        - generic [ref=f11e419]:
+                          - strong [ref=f11e420]:
+                            - link "clawsweeper" [ref=f11e421] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f11e422]: Bot
+                          - text: commented
+                          - link "Jul 27, 20262 weeks ago" [ref=f11e423] [cursor=pointer]:
+                            - /url: "#issuecomment-5088305683"
+                          - generic [ref=f11e424]:
+                            - generic [ref=f11e425]: •
+                            - group [ref=f11e426]:
+                              - button "edited" [ref=f11e427] [cursor=pointer]
+                      - generic [ref=f11e431]:
+                        - group [ref=f11e433]:
+                          - button [ref=f11e434] [cursor=pointer]:
+                            - img "Show options" [ref=f11e437]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f11e440]: Contributor
+                    - table [ref=f11e444]:
+                      - rowgroup [ref=f11e445]:
+                        - row [ref=f11e446]:
+                          - cell [ref=f11e447]:
+                            - paragraph [ref=f11e448]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f11e449]: Reviewed August 12, 2026, 6:09 PM ET / 22:09 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f11e450]
+                            - heading "What this changes" [level=2] [ref=f11e451]
+                            - paragraph [ref=f11e452]: Replaces implicit multi-agent default selection with explicit ownership, migration, and agent-scoped routing across config, sessions, Gateway, task runtime, UI, and plugin discovery.
+                            - heading "Merge readiness" [level=2] [ref=f11e453]
+                            - paragraph [ref=f11e454]:
+                              - generic [ref=f11e455]: ⚠️
+                              - strong [ref=f11e456]: Ready for maintainer review - 4 items remain
+                            - paragraph [ref=f11e457]: "Keep open: this is maintainer-owned, protected ownership work, and current main still selects an omitted agent through the persisted default marker. The local checkout cannot load the exact PR head, so no exact-head merge verdict is safe."
+                            - paragraph [ref=f11e458]:
+                              - strong [ref=f11e459]: "Priority:"
+                              - text: P1
+                              - strong [ref=f11e460]: "Reviewed head:"
+                              - code [ref=f11e461]: 93fe3c28c2e018f1724c4ed22fda29cefaff6929
+                              - strong [ref=f11e462]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f11e463] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f11e464]
+                            - table [ref=f11e466]:
+                              - rowgroup [ref=f11e467]:
+                                - row [ref=f11e468]:
+                                  - columnheader "Measure" [ref=f11e469]
+                                  - columnheader "Result" [ref=f11e470]
+                                  - columnheader "What it means" [ref=f11e471]
+                              - rowgroup [ref=f11e472]:
+                                - row [ref=f11e473]:
+                                  - cell [ref=f11e474]:
+                                    - strong [ref=f11e475]: Overall readiness
+                                  - cell [ref=f11e476]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f11e477]: (3/6)
+                                  - cell "The PR has substantial stated validation, but current-head and dependency inspection are unavailable in this environment." [ref=f11e478]
+                                - row [ref=f11e479]:
+                                  - cell [ref=f11e480]:
+                                    - strong [ref=f11e481]: Proof confidence
+                                  - cell [ref=f11e482]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f11e483]: (3/6)
+                                  - 'cell "Not applicable: This maintainer-authored PR supplies CI and suite evidence; the external-contributor proof gate does not apply, but exact-head evidence remains unavailable to this reviewer." [ref=f11e484]'
+                                - row [ref=f11e485]:
+                                  - cell [ref=f11e486]:
+                                    - strong [ref=f11e487]: Patch quality
+                                  - cell [ref=f11e488]:
+                                    - text: 🦐 gold shrimp
+                                    - strong [ref=f11e489]: (3/6)
+                                  - cell "Security review found an item that needs attention." [ref=f11e490]
+                            - heading "Verification" [level=2] [ref=f11e491]
+                            - table [ref=f11e493]:
+                              - rowgroup [ref=f11e494]:
+                                - row [ref=f11e495]:
+                                  - columnheader "Check" [ref=f11e496]
+                                  - columnheader "Result" [ref=f11e497]
+                                  - columnheader "Evidence" [ref=f11e498]
+                              - rowgroup [ref=f11e499]:
+                                - row [ref=f11e500]:
+                                  - cell [ref=f11e501]:
+                                    - strong [ref=f11e502]: Real behavior
+                                  - cell "Not applicable" [ref=f11e503]
+                                  - 'cell "Not applicable: This maintainer-authored PR supplies CI and suite evidence; the external-contributor proof gate does not apply, but exact-head evidence remains unavailable to this reviewer." [ref=f11e504]'
+                                - row [ref=f11e505]:
+                                  - cell [ref=f11e506]:
+                                    - strong [ref=f11e507]: Evidence reviewed
+                                  - cell "5 items" [ref=f11e508]
+                                  - 'cell "Current-main default selection remains: When callers omit an agent ID, the resolver chooses the entry marked default or the first agent; this is the ambient-selection behavior the PR proposes to replace. Current-main migration preserves default markers: The roster migration materializes main with default:true and repairs absent or duplicate markers by selecting an effective default, so current main does not already implement the PR''s central change. Prior ownership groundwork: Merged commits establish the preceding roster-injection and per-surface ownership work referenced by this PR." [ref=f11e509]': "Current-main default selection remains: When callers omit an agent ID, the resolver chooses the entry marked default or the first agent; this is the ambient-selection behavior the PR proposes to replace.Current-main migration preserves default markers: The roster migration materializes main with default:true and repairs absent or duplicate markers by selecting an effective default, so current main does not already implement the PR's central change.Prior ownership groundwork: Merged commits establish the preceding roster-injection and per-surface ownership work referenced by this PR."
+                                - row [ref=f11e510]:
+                                  - cell [ref=f11e511]:
+                                    - strong [ref=f11e512]: Findings
+                                  - cell "None" [ref=f11e513]
+                                  - cell "None." [ref=f11e514]
+                                - row [ref=f11e515]:
+                                  - cell [ref=f11e516]:
+                                    - strong [ref=f11e517]: Security
+                                  - cell "Needs attention" [ref=f11e518]
+                                  - 'cell "Inspect exact-head authorization changes: The supplied PR changes ownership and authorization paths, but the current head is unavailable in this checkout, preventing a conclusive security-boundary review." [ref=f11e519]'
+                            - heading "How this fits together" [level=2] [ref=f11e520]
+                            - paragraph [ref=f11e521]: Agent selection begins with configuration and legacy roster migration, then feeds Gateway/session/task routing and user interfaces. The change makes ownership explicit before those consumers read or mutate agent-scoped state.
+                            - region "mermaid rendered output container" [ref=f11e522]:
+                              - generic [ref=f11e523]:
+                                - generic [ref=f11e524]:
+                                  - group [ref=f11e525]:
+                                    - button "Open dialog" [ref=f11e526] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f11e529] [cursor=pointer]
+                                - iframe [ref=f11e534]:
+                                  - generic [ref=f12e1]:
+                                    - document [ref=f12e5]:
+                                      - generic [ref=f12e11]:
+                                        - paragraph [ref=f12e18]: Config and legacy roster
+                                        - paragraph [ref=f12e25]: Ownership resolution
+                                        - paragraph [ref=f12e32]: Doctor migration
+                                        - paragraph [ref=f12e39]: Gateway and session routing
+                                        - paragraph [ref=f12e46]: Task runtime
+                                        - paragraph [ref=f12e53]: UI and channel requests
+                                        - paragraph [ref=f12e60]: Agent-scoped task results
+                                    - generic [ref=f12e61]:
+                                      - button "Zoom in" [ref=f12e62]
+                                      - button "Zoom out" [ref=f12e66]
+                                      - button "Reset view" [ref=f12e70]
+                                      - button "Pan up" [ref=f12e73]
+                                      - button "Pan down" [ref=f12e76]
+                                      - button "Pan left" [ref=f12e79]
+                                      - button "Pan right" [ref=f12e82]
+                            - heading "Decision needed" [level=2] [ref=f11e535]
+                            - table [ref=f11e537]:
+                              - rowgroup [ref=f11e538]:
+                                - row [ref=f11e539]:
+                                  - columnheader "Question" [ref=f11e540]
+                                  - columnheader "Recommendation" [ref=f11e541]
+                              - rowgroup [ref=f11e542]:
+                                - row [ref=f11e543]:
+                                  - cell "Should this protected maintainer PR remain paused until an exact-head review can inspect the branch and its Codex CLI integration, rather than relying on earlier-head evidence in the body?" [ref=f11e544]
+                                  - cell [ref=f11e545]:
+                                    - strong [ref=f11e546]: "Pause for exact-head evidence:"
+                                    - text: Wait for accessible exact-head source, current checks, and Codex contract inspection before deciding merge readiness.
+                            - paragraph [ref=f11e547]: "Why: The PR changes compatibility-sensitive ownership and invokes Codex-related behavior, but this reviewer cannot load the current head or sibling Codex source."
+                            - heading "Before merge" [level=2] [ref=f11e548]
+                            - list [ref=f11e549]:
+                              - listitem [ref=f11e550]:
+                                - checkbox "Incomplete task" [disabled] [ref=f11e551]
+                                - strong [ref=f11e552]: "Resolve security concern: Inspect exact-head authorization changes"
+                                - text: "- The supplied PR changes ownership and authorization paths, but the current head is unavailable in this checkout, preventing a conclusive security-boundary review."
+                              - listitem [ref=f11e553]:
+                                - checkbox "Incomplete task" [disabled] [ref=f11e554]
+                                - strong [ref=f11e555]: Resolve merge risk (P1)
+                                - text: "- The PR removes a persisted selection behavior and changes session/task ownership, so upgrade behavior needs exact-head source and migration proof before merge."
+                              - listitem [ref=f11e556]:
+                                - checkbox "Incomplete task" [disabled] [ref=f11e557]
+                                - strong [ref=f11e558]: Resolve merge risk (P1)
+                                - text: "- The exact PR head and Codex dependency source could not be inspected because the checkout lacks the objects and GitHub DNS was unavailable."
+                            - heading "Findings" [level=2] [ref=f11e559]
+                            - list [ref=f11e560]:
+                              - listitem [ref=f11e561]: "[low] Inspect exact-head authorization changes"
+                            - group [ref=f11e562]:
+                              - strong [ref=f11e564] [cursor=pointer]: Agent review details
+                - generic [ref=f11e565]:
+                  - generic [ref=f11e571]:
+                    - link [ref=f11e573] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f11e574]
+                    - generic [ref=f11e575]:
+                      - link "steipete" [ref=f11e576] [cursor=pointer]:
+                        - /url: /steipete
+                      - link "force-pushed" [ref=f11e577] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/1f039eaf0bf8666150a38bb968808bc340c51286..b840ee91834062ffdf654d6837f1d97f369385fd
+                      - text: the
+                      - generic [ref=f11e578]: claude/no-stored-default
+                      - text: branch 2 times, most recently from
+                      - link [ref=f11e580] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/1f039eaf0bf8666150a38bb968808bc340c51286
+                        - code [ref=f11e581]: 1f039ea
+                      - text: to
+                      - link [ref=f11e582] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/b840ee91834062ffdf654d6837f1d97f369385fd
+                        - code [ref=f11e583]: b840ee9
+                      - link "Compare" [ref=f11e584] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/1f039eaf0bf8666150a38bb968808bc340c51286..b840ee91834062ffdf654d6837f1d97f369385fd
+                      - link "July 27, 2026 13:052 weeks ago" [ref=f11e587] [cursor=pointer]:
+                        - /url: "#event-28538826984"
+                  - generic [ref=f11e592]:
+                    - link [ref=f11e593] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f11e594]
+                    - link "openclaw-barnacle" [ref=f11e595] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f11e596]: Bot
+                    - text: added the
+                    - 'link "channel: telegram" [ref=f11e597] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20telegram%22
+                    - text: label
+                    - link "Jul 27, 20262 weeks ago" [ref=f11e598] [cursor=pointer]:
+                      - /url: "#event-28538842052"
+                  - generic [ref=f11e603]:
+                    - link [ref=f11e604] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f11e605]
+                    - link "clawsweeper" [ref=f11e606] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f11e607]: Bot
+                    - text: removed the
+                    - 'link "rating: 🦪 silver shellfish" [ref=f11e608] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - text: label
+                    - link "Jul 27, 20262 weeks ago" [ref=f11e609] [cursor=pointer]:
+                      - /url: "#event-28539325749"
+                - generic [ref=f11e613]:
+                  - button "242 hidden items" [ref=f11e614] [cursor=pointer]
+                  - button "Load more…" [ref=f11e615] [cursor=pointer]
+                - generic [ref=f11e617]:
+                  - generic [ref=f11e622]:
+                    - link "steipete" [ref=f11e623] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: added 27 commits
+                    - link "August 12, 2026 15:2642 minutes ago" [ref=f11e624] [cursor=pointer]:
+                      - /url: "#commits-pushed-fd1c950"
+                  - generic [ref=f11e625]:
+                    - generic [ref=f11e633]:
+                      - link [ref=f11e636] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e637]
+                      - code [ref=f11e639]:
+                        - 'link "fix: align ownership rebase checks" [ref=f11e640] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/fd1c950bd677ac306becb2f4817550d8a41db8ba
+                      - group [ref=f11e644]:
+                        - img "0 / 1 checks OK" [ref=f11e646] [cursor=pointer]
+                      - code [ref=f11e649]:
+                        - link "fd1c950" [ref=f11e650] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/fd1c950bd677ac306becb2f4817550d8a41db8ba
+                    - generic [ref=f11e658]:
+                      - link [ref=f11e661] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e662]
+                      - code [ref=f11e664]:
+                        - 'link "fix: preserve compatibility owner during setup" [ref=f11e665] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/69eb38431a198e0360bcda9cd7dc1d71bcf57d66
+                      - group [ref=f11e669]:
+                        - img "0 / 1 checks OK" [ref=f11e671] [cursor=pointer]
+                      - code [ref=f11e674]:
+                        - link "69eb384" [ref=f11e675] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/69eb38431a198e0360bcda9cd7dc1d71bcf57d66
+                    - generic [ref=f11e683]:
+                      - link [ref=f11e686] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e687]
+                      - code [ref=f11e689]:
+                        - 'link "fix(doctor): migrate ownerless heartbeat monitors" [ref=f11e690] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/596583ee91fd403c0ff757ba60d1aff542446b8a
+                      - group [ref=f11e694]:
+                        - img "0 / 1 checks OK" [ref=f11e696] [cursor=pointer]
+                      - code [ref=f11e699]:
+                        - link "596583e" [ref=f11e700] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/596583ee91fd403c0ff757ba60d1aff542446b8a
+                    - generic [ref=f11e708]:
+                      - link [ref=f11e711] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e712]
+                      - code [ref=f11e714]:
+                        - 'link "fix(gateway): preserve explicit session ownership" [ref=f11e715] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/fb55c5b1ec716e754777ee6c2028e78a8c79c363
+                      - group [ref=f11e719]:
+                        - img "0 / 1 checks OK" [ref=f11e721] [cursor=pointer]
+                      - code [ref=f11e724]:
+                        - link "fb55c5b" [ref=f11e725] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/fb55c5b1ec716e754777ee6c2028e78a8c79c363
+                    - generic [ref=f11e733]:
+                      - link [ref=f11e736] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e737]
+                      - code [ref=f11e739]:
+                        - 'link "test: align ownership fixtures after rebase" [ref=f11e740] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/ee17e84b59d66db1c4b19b0b4156dc028cf4f9b2
+                      - group [ref=f11e744]:
+                        - img "0 / 1 checks OK" [ref=f11e746] [cursor=pointer]
+                      - code [ref=f11e749]:
+                        - link "ee17e84" [ref=f11e750] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/ee17e84b59d66db1c4b19b0b4156dc028cf4f9b2
+                    - generic [ref=f11e758]:
+                      - link [ref=f11e761] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e762]
+                      - code [ref=f11e764]:
+                        - 'link "test: complete plugin manifest fixture" [ref=f11e765] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/c778b2c09a3c5d892f8abf41e746bc3312868b4c
+                      - group [ref=f11e769]:
+                        - img "0 / 1 checks OK" [ref=f11e771] [cursor=pointer]
+                      - code [ref=f11e774]:
+                        - link "c778b2c" [ref=f11e775] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/c778b2c09a3c5d892f8abf41e746bc3312868b4c
+                    - generic [ref=f11e783]:
+                      - link [ref=f11e786] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e787]
+                      - code [ref=f11e789]:
+                        - 'link "test: align runtime context mocks" [ref=f11e790] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/2d65b3296cf1f2eefa062042a35bbc72234759c7
+                      - group [ref=f11e794]:
+                        - img "0 / 1 checks OK" [ref=f11e796] [cursor=pointer]
+                      - code [ref=f11e799]:
+                        - link "2d65b32" [ref=f11e800] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/2d65b3296cf1f2eefa062042a35bbc72234759c7
+                    - generic [ref=f11e808]:
+                      - link [ref=f11e811] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e812]
+                      - code [ref=f11e814]:
+                        - 'link "fix(gateway): preserve alias routing for existing sessions" [ref=f11e815] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/25fbd2291873bf8bd58dc422c9bb0a7a84b65895
+                      - group [ref=f11e819]:
+                        - img "0 / 1 checks OK" [ref=f11e821] [cursor=pointer]
+                      - code [ref=f11e824]:
+                        - link "25fbd22" [ref=f11e825] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/25fbd2291873bf8bd58dc422c9bb0a7a84b65895
+                    - generic [ref=f11e833]:
+                      - link [ref=f11e836] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e837]
+                      - code [ref=f11e839]:
+                        - 'link "style: format agent routing update" [ref=f11e840] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/77cbf5f7924d1eed3dfabe5beb712a40ce1b81c2
+                      - group [ref=f11e844]:
+                        - img "0 / 1 checks OK" [ref=f11e846] [cursor=pointer]
+                      - code [ref=f11e849]:
+                        - link "77cbf5f" [ref=f11e850] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/77cbf5f7924d1eed3dfabe5beb712a40ce1b81c2
+                    - generic [ref=f11e858]:
+                      - link [ref=f11e861] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e862]
+                      - code [ref=f11e864]:
+                        - 'link "fix(gateway): preserve selected owner during alias routing" [ref=f11e865] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/e90279c880607fe5e16627abf992fa26eaeaea7a
+                      - group [ref=f11e869]:
+                        - img "0 / 1 checks OK" [ref=f11e871] [cursor=pointer]
+                      - code [ref=f11e874]:
+                        - link "e90279c" [ref=f11e875] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/e90279c880607fe5e16627abf992fa26eaeaea7a
+                    - generic [ref=f11e883]:
+                      - link [ref=f11e886] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e887]
+                      - code [ref=f11e889]:
+                        - 'link "style: normalize rebased ownership files" [ref=f11e890] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/4aeda3f0c08e4af427891aa7e2da786666d70fc7
+                      - group [ref=f11e894]:
+                        - img "0 / 1 checks OK" [ref=f11e896] [cursor=pointer]
+                      - code [ref=f11e899]:
+                        - link "4aeda3f" [ref=f11e900] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/4aeda3f0c08e4af427891aa7e2da786666d70fc7
+                    - generic [ref=f11e908]:
+                      - link [ref=f11e911] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e912]
+                      - code [ref=f11e914]:
+                        - 'link "fix(gateway): preserve owner through global alias routing" [ref=f11e915] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/61b295765c20f58d5e8ba8ba813368b86d6561d1
+                      - group [ref=f11e919]:
+                        - img "0 / 1 checks OK" [ref=f11e921] [cursor=pointer]
+                      - code [ref=f11e924]:
+                        - link "61b2957" [ref=f11e925] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/61b295765c20f58d5e8ba8ba813368b86d6561d1
+                    - generic [ref=f11e933]:
+                      - link [ref=f11e936] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e937]
+                      - code [ref=f11e939]:
+                        - 'link "fix(gateway): preserve explicit ownership at HTTP boundaries" [ref=f11e940] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/92f18bd04f3ccec521e937d42b6e216b00792f56
+                      - group [ref=f11e944]:
+                        - img "0 / 1 checks OK" [ref=f11e946] [cursor=pointer]
+                      - code [ref=f11e949]:
+                        - link "92f18bd" [ref=f11e950] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/92f18bd04f3ccec521e937d42b6e216b00792f56
+                    - generic [ref=f11e958]:
+                      - link [ref=f11e961] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e962]
+                      - code [ref=f11e964]:
+                        - 'link "fix(gateway): validate compatibility model ownership" [ref=f11e965] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/768ab9be0509267fed0dede73e2ad69811ab0f39
+                      - group [ref=f11e969]:
+                        - img "0 / 1 checks OK" [ref=f11e971] [cursor=pointer]
+                      - code [ref=f11e974]:
+                        - link "768ab9b" [ref=f11e975] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/768ab9be0509267fed0dede73e2ad69811ab0f39
+                    - generic [ref=f11e983]:
+                      - link [ref=f11e986] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e987]
+                      - code [ref=f11e989]:
+                        - 'link "fix(agents): reconcile strict session ownership" [ref=f11e990] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/c28e0a5fb916a22d1f5e36838e7ae54e60be98d9
+                      - group [ref=f11e994]:
+                        - img "0 / 1 checks OK" [ref=f11e996] [cursor=pointer]
+                      - code [ref=f11e999]:
+                        - link "c28e0a5" [ref=f11e1000] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/c28e0a5fb916a22d1f5e36838e7ae54e60be98d9
+                    - generic [ref=f11e1008]:
+                      - link [ref=f11e1011] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1012]
+                      - code [ref=f11e1014]:
+                        - 'link "fix(agents): contain media yield callback failures" [ref=f11e1015] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/e57c6dc807faa75ccad54ef0c6b42d2084dd18f7
+                      - group [ref=f11e1019]:
+                        - img "0 / 1 checks OK" [ref=f11e1021] [cursor=pointer]
+                      - code [ref=f11e1024]:
+                        - link "e57c6dc" [ref=f11e1025] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/e57c6dc807faa75ccad54ef0c6b42d2084dd18f7
+                    - generic [ref=f11e1033]:
+                      - link [ref=f11e1036] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1037]
+                      - code [ref=f11e1039]:
+                        - 'link "fix(agents): avoid eager bare-key owner resolution" [ref=f11e1040] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/0da1103f9153530d8da74c703c2f470bf4147274
+                      - group [ref=f11e1044]:
+                        - img "0 / 1 checks OK" [ref=f11e1046] [cursor=pointer]
+                      - code [ref=f11e1049]:
+                        - link "0da1103" [ref=f11e1050] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/0da1103f9153530d8da74c703c2f470bf4147274
+                    - generic [ref=f11e1058]:
+                      - link [ref=f11e1061] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1062]
+                      - code [ref=f11e1064]:
+                        - 'link "chore: refresh rebased ownership baselines" [ref=f11e1065] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/17b27b91841ceee298938e953af3afff2e342b30
+                      - group [ref=f11e1069]:
+                        - img "0 / 1 checks OK" [ref=f11e1071] [cursor=pointer]
+                      - code [ref=f11e1074]:
+                        - link "17b27b9" [ref=f11e1075] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/17b27b91841ceee298938e953af3afff2e342b30
+                    - generic [ref=f11e1083]:
+                      - link [ref=f11e1086] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1087]
+                      - code [ref=f11e1089]:
+                        - 'link "chore: align hosted plugin SDK baseline" [ref=f11e1090] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/eb7b6be7a1b351b2dde570a98064419972906929
+                      - group [ref=f11e1094]:
+                        - img "0 / 1 checks OK" [ref=f11e1096] [cursor=pointer]
+                      - code [ref=f11e1099]:
+                        - link "eb7b6be" [ref=f11e1100] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/eb7b6be7a1b351b2dde570a98064419972906929
+                    - generic [ref=f11e1108]:
+                      - link [ref=f11e1111] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1112]
+                      - code [ref=f11e1114]:
+                        - 'link "chore: refresh ownership baselines after main sync" [ref=f11e1115] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/d8ab5b21e917d9ab8ca6ac410ffa6911b35c2020
+                      - group [ref=f11e1119]:
+                        - img "0 / 1 checks OK" [ref=f11e1121] [cursor=pointer]
+                      - code [ref=f11e1124]:
+                        - link "d8ab5b2" [ref=f11e1125] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/d8ab5b21e917d9ab8ca6ac410ffa6911b35c2020
+                    - generic [ref=f11e1133]:
+                      - link [ref=f11e1136] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1137]
+                      - code [ref=f11e1139]:
+                        - 'link "chore: refresh ownership baselines after main sync" [ref=f11e1140] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/001224ea6c4a1e04ffe246b99dbb28b8cc713f65
+                      - group [ref=f11e1144]:
+                        - img "0 / 1 checks OK" [ref=f11e1146] [cursor=pointer]
+                      - code [ref=f11e1149]:
+                        - link "001224e" [ref=f11e1150] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/001224ea6c4a1e04ffe246b99dbb28b8cc713f65
+                    - generic [ref=f11e1158]:
+                      - link [ref=f11e1161] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1162]
+                      - code [ref=f11e1164]:
+                        - 'link "test: align routed event owner fixtures" [ref=f11e1165] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/ab39cc1b0003c8e7b77b25fc4a7ba6a694c41494
+                      - group [ref=f11e1169]:
+                        - img "0 / 1 checks OK" [ref=f11e1171] [cursor=pointer]
+                      - code [ref=f11e1174]:
+                        - link "ab39cc1" [ref=f11e1175] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/ab39cc1b0003c8e7b77b25fc4a7ba6a694c41494
+                    - generic [ref=f11e1183]:
+                      - link [ref=f11e1186] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1187]
+                      - code [ref=f11e1189]:
+                        - 'link "chore: retrigger CI after runner startup failure" [ref=f11e1190] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/4bd6e0346b89b5333579d904f34a12e70fbcb8f2
+                      - group [ref=f11e1194]:
+                        - img "0 / 1 checks OK" [ref=f11e1196] [cursor=pointer]
+                      - code [ref=f11e1199]:
+                        - link "4bd6e03" [ref=f11e1200] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/4bd6e0346b89b5333579d904f34a12e70fbcb8f2
+                    - generic [ref=f11e1208]:
+                      - link [ref=f11e1211] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1212]
+                      - code [ref=f11e1214]:
+                        - 'link "chore: refresh ownership SDK budgets after main sync" [ref=f11e1215] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/6897d6bd0510ecb333a6cba87d50970109c50cf0
+                      - group [ref=f11e1219]:
+                        - img "0 / 1 checks OK" [ref=f11e1221] [cursor=pointer]
+                      - code [ref=f11e1224]:
+                        - link "6897d6b" [ref=f11e1225] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/6897d6bd0510ecb333a6cba87d50970109c50cf0
+                    - generic [ref=f11e1233]:
+                      - link [ref=f11e1236] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1237]
+                      - code [ref=f11e1239]:
+                        - 'link "fix(tasks): require agent identity for bare owners" [ref=f11e1240] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/d7d7b6cd64901dc62fd91dee0a82090d72e58b97
+                      - group [ref=f11e1244]:
+                        - img "0 / 1 checks OK" [ref=f11e1246] [cursor=pointer]
+                      - code [ref=f11e1249]:
+                        - link "d7d7b6c" [ref=f11e1250] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/d7d7b6cd64901dc62fd91dee0a82090d72e58b97
+                    - generic [ref=f11e1258]:
+                      - link [ref=f11e1261] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1262]
+                      - code [ref=f11e1264]:
+                        - 'link "chore: align Linux plugin SDK baseline" [ref=f11e1265] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/964b4d819eb1e2868efc74f04834519c56d76127
+                      - group [ref=f11e1269]:
+                        - img "0 / 1 checks OK" [ref=f11e1271] [cursor=pointer]
+                      - code [ref=f11e1274]:
+                        - link "964b4d8" [ref=f11e1275] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/964b4d819eb1e2868efc74f04834519c56d76127
+                    - generic [ref=f11e1283]:
+                      - link [ref=f11e1286] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f11e1287]
+                      - code [ref=f11e1289]:
+                        - 'link "chore: remove release-owned changelog entry" [ref=f11e1290] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/114388/commits/376669573fa853faff8352d8777a0ece94d65493
+                      - group [ref=f11e1294]:
+                        - img "103 / 124 checks OK" [ref=f11e1296] [cursor=pointer]
+                      - code [ref=f11e1299]:
+                        - link "3766695" [ref=f11e1300] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/114388/commits/376669573fa853faff8352d8777a0ece94d65493
+                - generic [ref=f11e1302]:
+                  - link [ref=f11e1304] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f11e1305]
+                  - generic [ref=f11e1307]:
+                    - generic [ref=f11e1308]:
+                      - heading "clawsweeper Bot commented Aug 12, 202636 minutes ago" [level=3] [ref=f11e1309]:
+                        - generic [ref=f11e1310]:
+                          - strong [ref=f11e1311]:
+                            - link "clawsweeper" [ref=f11e1312] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f11e1313]: Bot
+                          - text: commented
+                          - link "Aug 12, 202636 minutes ago" [ref=f11e1314] [cursor=pointer]:
+                            - /url: "#issuecomment-5273555314"
+                      - generic [ref=f11e1315]:
+                        - group [ref=f11e1317]:
+                          - button [ref=f11e1318] [cursor=pointer]:
+                            - img "Show options" [ref=f11e1321]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f11e1324]: Contributor
+                    - table [ref=f11e1328]:
+                      - rowgroup [ref=f11e1329]:
+                        - row [ref=f11e1330]:
+                          - cell [ref=f11e1331]:
+                            - paragraph [ref=f11e1332]: "ClawSweeper status: review started."
+                            - paragraph [ref=f11e1333]: "I am starting a fresh review of this pull request: refactor(agents): make multi-agent ownership explicit (H2-1 core) This is item 1/1 in the current shard. Shard 0/1."
+                            - paragraph [ref=f11e1334]: This placeholder means the worker is alive and reading the current context. I will edit this same comment with the actual review when the claws are done clicking.
+                            - paragraph [ref=f11e1335]: "Crustacean status: shell secured, claws on keyboard, evidence pebbles being sorted."
+                - generic [ref=f11e1337]:
+                  - link [ref=f11e1339] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f11e1340]
+                  - generic [ref=f11e1342]:
+                    - generic [ref=f11e1343]:
+                      - heading [level=3] [ref=f11e1344]:
+                        - generic [ref=f11e1345]:
+                          - strong [ref=f11e1346]:
+                            - link "steipete" [ref=f11e1347] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 12, 202613 minutes ago" [ref=f11e1348] [cursor=pointer]:
+                            - /url: "#issuecomment-5273730171"
+                      - generic [ref=f11e1349]:
+                        - group [ref=f11e1351]:
+                          - button [ref=f11e1352] [cursor=pointer]:
+                            - img "Show options" [ref=f11e1355]
+                        - generic [ref=f11e1357]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f11e1358]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f11e1360]: Author
+                    - table [ref=f11e1364]:
+                      - rowgroup [ref=f11e1365]:
+                        - row [ref=f11e1366]:
+                          - cell [ref=f11e1367]:
+                            - paragraph [ref=f11e1368]: Merged via squash.
+                            - list [ref=f11e1369]:
+                              - listitem [ref=f11e1370]:
+                                - text: "Prepared head SHA:"
+                                - link "376669573fa853faff8352d8777a0ece94d65493" [ref=f11e1371] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/114388/commits/376669573fa853faff8352d8777a0ece94d65493
+                              - listitem [ref=f11e1372]:
+                                - text: "Landed commit:"
+                                - link "1ca60fbc3a3f85c7072a9029346b5d31402ac0e4" [ref=f11e1373] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/1ca60fbc3a3f85c7072a9029346b5d31402ac0e4
+                - generic [ref=f11e1379]:
+                  - generic [ref=f11e1380]:
+                    - link [ref=f11e1381] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f11e1382]
+                    - link "clawsweeper" [ref=f11e1383] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f11e1384]: Bot
+                    - text: mentioned this pull request
+                    - link "Aug 12, 20261 minute ago" [ref=f11e1385] [cursor=pointer]:
+                      - /url: "#ref-pullrequest-5135912195"
+                  - generic [ref=f11e1386]:
+                    - 'link "refactor(agents): split subagent announce delivery #122853" [ref=f11e1388] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122853
+                    - 'generic "Status: Open" [ref=f11e1390]': Open
+            - generic [ref=f11e1396]:
+              - link "Sign up for free" [ref=f11e1397] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f11e1398]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f11e1399] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F114388
+        - generic [ref=f11e1403]:
+          - form "Select reviewers" [ref=f11e1405]:
+            - heading "Reviewers" [level=3] [ref=f11e1406]
+            - group [ref=f11e1408]:
+              - generic [ref=f11e1409] [cursor=pointer]
+              - generic [ref=f11e1414]:
+                - generic [ref=f11e1415]:
+                  - link [ref=f11e1416] [cursor=pointer]:
+                    - /url: /apps/github-advanced-security
+                    - img "@github-advanced-security" [ref=f11e1417]
+                  - link "github-advanced-security[bot]" [ref=f11e1418] [cursor=pointer]:
+                    - /url: /apps/github-advanced-security
+                - link "github-advanced-security[bot] left review comments" [ref=f11e1419] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/pull/114388/files/6a870b24a91d4dc5c0f2914bdd2d8cad7e81581d
+          - form "Select assignees" [ref=f11e1424]:
+            - heading "Assignees" [level=3] [ref=f11e1425]
+            - paragraph [ref=f11e1427]:
+              - generic [ref=f11e1428]:
+                - link [ref=f11e1429] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f11e1430]
+                - link "steipete" [ref=f11e1431] [cursor=pointer]:
+                  - /url: /steipete
+          - generic [ref=f11e1432]:
+            - heading "Labels" [level=3] [ref=f11e1433]
+            - generic [ref=f11e1434]:
+              - link "agents" [ref=f11e1435] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Aagents
+              - 'link "app: web-ui" [ref=f11e1437] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+              - 'link "channel: discord" [ref=f11e1439] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+              - link "cli" [ref=f11e1441] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+              - link "commands" [ref=f11e1443] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+              - link "docker" [ref=f11e1445] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocker
+              - link "docs" [ref=f11e1447] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+              - 'link "extensions: codex" [ref=f11e1449] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22extensions%3A%20codex%22
+              - link "gateway" [ref=f11e1451] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Agateway
+              - link "maintainer" [ref=f11e1453] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f11e1455] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - 'link "merge-risk: 🚨 session-state" [ref=f11e1457] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20session-state%22
+              - link "P1" [ref=f11e1459] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🦐 gold shrimp" [ref=f11e1461] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+              - link "scripts" [ref=f11e1463] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Ascripts
+              - 'link "size: XL" [ref=f11e1465] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+              - 'link "status: ⏳ waiting on author" [ref=f11e1467] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+          - form "Select projects" [ref=f11e1470]:
+            - heading "Projects" [level=3] [ref=f11e1471]
+            - text: None yet
+          - form "Select milestones" [ref=f11e1473]:
+            - heading "Milestone" [level=3] [ref=f11e1474]
+            - text: No milestone
+          - form "Link issues" [ref=f11e1480]:
+            - heading "Development" [level=3] [ref=f11e1481]
+            - paragraph [ref=f11e1482]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f11e1484]: None yet
+          - generic [ref=f11e1486]:
+            - heading "2 participants" [level=3] [ref=f11e1487]
+            - generic [ref=f11e1488]:
+              - link [ref=f11e1489] [cursor=pointer]:
+                - /url: /steipete
+                - img "@steipete" [ref=f11e1490]
+              - link [ref=f11e1491] [cursor=pointer]:
+                - /url: /apps/github-advanced-security
+                - img "@github-advanced-security" [ref=f11e1492]
+  - contentinfo [ref=f11e1493]:
+    - heading "Footer" [level=2] [ref=f11e1494]
+    - generic [ref=f11e1495]:
+      - generic [ref=f11e1496]:
+        - link "GitHub Homepage" [ref=f11e1497] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f11e1500]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f11e1501]:
+        - heading "Footer navigation" [level=3] [ref=f11e1502]
+        - list "Footer navigation" [ref=f11e1503]:
+          - listitem [ref=f11e1504]:
+            - link "Terms" [ref=f11e1505] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f11e1506]:
+            - link "Privacy" [ref=f11e1507] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f11e1508]:
+            - link "Security" [ref=f11e1509] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f11e1510]:
+            - link "Status" [ref=f11e1511] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f11e1512]:
+            - link "Community" [ref=f11e1513] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f11e1514]:
+            - link "Docs" [ref=f11e1515] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f11e1516]:
+            - link "Contact" [ref=f11e1517] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f11e1518]:
+            - button "Manage cookies" [ref=f11e1520] [cursor=pointer]
+          - listitem [ref=f11e1521]:
+            - button "Do not share my personal information" [ref=f11e1523] [cursor=pointer]

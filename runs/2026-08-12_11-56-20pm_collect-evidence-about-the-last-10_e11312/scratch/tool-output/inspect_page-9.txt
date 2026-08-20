@@ -1,0 +1,1049 @@
+URL: https://github.com/openclaw/openclaw/pull/122878
+Title: fix(discord): unblock ingress after retry exhaustion by joshavant · Pull Request #122878 · openclaw/openclaw · GitHub
+
+- generic [ref=f12e2]:
+  - generic [ref=f12e3]:
+    - link "Skip to content" [ref=f12e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f12e8]:
+      - heading "Navigation Menu" [level=2] [ref=f12e9]
+      - generic [ref=f12e10]:
+        - link "Homepage" [ref=f12e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f12e15]:
+          - navigation "Global" [ref=f12e16]:
+            - list [ref=f12e17]:
+              - listitem [ref=f12e18]:
+                - button "Platform" [ref=f12e20] [cursor=pointer]
+              - listitem [ref=f12e23]:
+                - button "Solutions" [ref=f12e25] [cursor=pointer]
+              - listitem [ref=f12e28]:
+                - button "Resources" [ref=f12e30] [cursor=pointer]
+              - listitem [ref=f12e33]:
+                - button "Open Source" [ref=f12e35] [cursor=pointer]
+              - listitem [ref=f12e38]:
+                - button "Enterprise" [ref=f12e40] [cursor=pointer]
+              - listitem [ref=f12e43]:
+                - link "Pricing" [ref=f12e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f12e45]:
+            - button "Search or jump to, type / to search" [ref=f12e47] [cursor=pointer]:
+              - generic [ref=f12e50]:
+                - text: Type
+                - generic [ref=f12e51]: /
+                - text: to search
+            - link "Sign in" [ref=f12e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122878
+            - link "Sign up" [ref=f12e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f12e55] [cursor=pointer]
+  - main [ref=f12e61]:
+    - generic [ref=f12e62]:
+      - generic [ref=f12e63]:
+        - generic [ref=f12e65]:
+          - link "openclaw" [ref=f12e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f12e70]: /
+          - strong [ref=f12e71]:
+            - link "openclaw" [ref=f12e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f12e73]: Public
+        - generic [ref=f12e74]:
+          - list:
+            - listitem [ref=f12e75]:
+              - link "Sponsor @openclaw" [ref=f12e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f12e77]: Sponsor
+            - listitem [ref=f12e81]:
+              - link "You must be signed in to change notification settings" [ref=f12e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f12e85]:
+              - link "Fork 81.2k" [ref=f12e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f12e89]: 81.2k
+            - listitem [ref=f12e90]:
+              - link "You must be signed in to star a repository" [ref=f12e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386123 users starred this repository" [ref=f12e95]: 386k
+      - navigation "Repository" [ref=f12e96]:
+        - list [ref=f12e97]:
+          - listitem [ref=f12e98]:
+            - link "Code" [ref=f12e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f12e103]:
+            - link "Issues 3.4k" [ref=f12e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f12e108]: Issues
+              - generic "3,402" [ref=f12e109]: 3.4k
+          - listitem [ref=f12e110]:
+            - link "Pull requests 2.1k" [ref=f12e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f12e114]: Pull requests
+              - generic "2,089" [ref=f12e115]: 2.1k
+          - listitem [ref=f12e116]:
+            - link "Actions" [ref=f12e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f12e121]:
+            - link "Projects" [ref=f12e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f12e126]:
+            - link "Security and quality 647" [ref=f12e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f12e130]: Security and quality
+              - generic "647" [ref=f12e131]
+          - listitem [ref=f12e132]:
+            - link "Insights" [ref=f12e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f12e143]:
+      - generic [ref=f12e147]:
+        - generic [ref=f12e149]:
+          - 'heading "fix(discord): unblock ingress after retry exhaustion - #122878" [level=1] [ref=f12e150]':
+            - text: "fix(discord): unblock ingress after retry exhaustion"
+            - generic [ref=f12e151]: "- #122878"
+          - generic [ref=f12e152]: "#122878"
+        - generic [ref=f12e155]:
+          - generic [ref=f12e157]:
+            - img "Pull request" [ref=f12e158]
+            - text: Merged
+          - generic [ref=f12e161]:
+            - link "joshavant" [ref=f12e162] [cursor=pointer]:
+              - /url: /joshavant
+            - text: merged 8 commits into
+            - generic [ref=f12e163]:
+              - link "main" [ref=f12e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f12e165]: from
+              - generic [ref=f12e166]:
+                - link "joshavant/issue-122465-20260812t184737z-143684e5" [ref=f12e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/joshavant/issue-122465-20260812t184737z-143684e5
+                - button "Copy head branch name to clipboard" [ref=f12e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 11:34 PM PDT" [ref=f12e172]: Aug 13, 202625 minutes ago
+        - generic [ref=f12e173]:
+          - generic [ref=f12e175]:
+            - generic [ref=f12e176]: +1,964
+            - generic [ref=f12e177]: "-328"
+            - generic [ref=f12e178]: "Lines changed: 1964 additions & 328 deletions"
+          - navigation "Pull request navigation tabs" [ref=f12e186]:
+            - generic [ref=f12e187]:
+              - link "Conversation (4)" [ref=f12e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122878
+                - text: Conversation
+                - generic [ref=f12e191]: "4"
+                - generic [ref=f12e192]: (4)
+              - link "Commits (8)" [ref=f12e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122878/commits
+                - text: Commits
+                - generic [ref=f12e196]: "8"
+                - generic [ref=f12e197]: (8)
+              - link "Checks (187)" [ref=f12e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122878/checks
+                - text: Checks
+                - generic [ref=f12e201]: "187"
+                - generic [ref=f12e202]: (187)
+              - link "Files changed (45)" [ref=f12e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122878/files
+                - text: Files changed
+                - generic [ref=f12e206]: "45"
+                - generic [ref=f12e207]: (45)
+      - generic [ref=f12e212]:
+        - generic [ref=f12e214]:
+          - heading "Conversation" [level=2] [ref=f12e215]
+          - generic [ref=f12e216]:
+            - generic [ref=f12e217]:
+              - generic [ref=f12e219]:
+                - link [ref=f12e220] [cursor=pointer]:
+                  - /url: /joshavant
+                  - img "@joshavant" [ref=f12e221]
+                - generic [ref=f12e223]:
+                  - generic [ref=f12e224]:
+                    - heading [level=3] [ref=f12e225]:
+                      - generic [ref=f12e226]:
+                        - strong [ref=f12e227]:
+                          - link "joshavant" [ref=f12e228] [cursor=pointer]:
+                            - /url: /joshavant
+                        - text: commented
+                        - link "Aug 13, 20266 hours ago" [ref=f12e229] [cursor=pointer]:
+                          - /url: "#issue-5136557894"
+                    - generic [ref=f12e230]:
+                      - group [ref=f12e232]:
+                        - button [ref=f12e233] [cursor=pointer]:
+                          - img "Show options" [ref=f12e236]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f12e239]: Contributor
+                  - generic [ref=f12e244]:
+                    - paragraph [ref=f12e245]:
+                      - text: Closes
+                      - link "#122465" [ref=f12e246] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/122465
+                    - heading "What Problem This Solves" [level=2] [ref=f12e247]
+                    - paragraph [ref=f12e248]: A genuine Discord pre-admission failure was settled as turn-abandoned before the shared debouncer reported the error. The later onFailed callback could no longer update the durable claim, so an attempt-exhausted poison event remained pending and blocked every later message in its channel lane. Explicit shutdown cancellation also consumed retry facts even though no delivery attempt occurred.
+                    - heading "Why This Change Was Made" [level=2] [ref=f12e249]
+                    - paragraph [ref=f12e250]: Separate delivery failure from cancellation at the ingress lifecycle owner. Genuine dispatcher exceptions flow to onFailed, while explicit abort, deactivation, and buffered cancellation use an optional ingress-only onCancelled callback that releases the claim without recording an attempt. Fan-in exposes cancellation only when every constituent lifecycle supports cancellation settlement, preserving settle/abandon fallback for mixed legacy sources. Discord retains the standard attempt limit and selects a zero minimum age for terminal retry disposition. Existing onAbandoned callers and model-visible turn adoption semantics remain unchanged.
+                    - heading "User Impact" [level=2] [ref=f12e251]
+                    - paragraph [ref=f12e252]: A repeatedly failing Discord event now becomes a queryable retry-limit dead letter at the standard attempt threshold, allowing the next message in the same channel to run. Messages interrupted only by shutdown or cancellation remain replayable without losing retry budget or prior failure diagnostics.
+                    - heading "Evidence" [level=2] [ref=f12e253]
+                    - paragraph [ref=f12e254]:
+                      - text: The regression failed on prepared base
+                      - link "74d7147" [ref=f12e255] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/commit/74d7147b1f802c8334b68fd102d2680f6adfca9e
+                      - text: ", reproducing turn-abandoned pending state and a blocked follower. After the controller-mandated rebase onto"
+                      - link "52cda53" [ref=f12e256] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/commit/52cda537a40ae4883de24d21f4b5806b9ea111a1
+                      - text: ", exact head"
+                      - link "b3eb640" [ref=f12e257] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/commit/b3eb6404160d0d0d396ccf91383b14649da40735
+                      - text: passed 238 focused tests across Discord, shared ingress, debounce, Plugin SDK, Signal, Mattermost, MS Teams, and Feishu plus all 32 Mattermost provider tests. Mixed capable/legacy cancellation uses one canonical fan-in cancel operation, and the Discord composition regression proves buffered deactivation settles every source. The exact-head build, all four typecheck lanes, SDK API/export/surface checks, and regenerated integrated API baselines passed. Fault-injection and two-account queue tests preserve durable settlement and isolation behavior.
+                  - 'button "eyes (1): joshavant, 12:32AM today" [disabled] [ref=f12e262]':
+                    - generic [ref=f12e263]: 👀
+                    - generic [ref=f12e264]: "1"
+              - generic [ref=f12e265]:
+                - generic [ref=f12e267]:
+                  - link [ref=f12e269] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f12e270]
+                  - generic [ref=f12e272]:
+                    - generic [ref=f12e273]:
+                      - heading "clawsweeper Bot commented Aug 13, 20266 hours ago" [level=3] [ref=f12e274]:
+                        - generic [ref=f12e275]:
+                          - strong [ref=f12e276]:
+                            - link "clawsweeper" [ref=f12e277] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f12e278]: Bot
+                          - text: commented
+                          - link "Aug 13, 20266 hours ago" [ref=f12e279] [cursor=pointer]:
+                            - /url: "#issuecomment-5274432888"
+                      - generic [ref=f12e280]:
+                        - group [ref=f12e282]:
+                          - button [ref=f12e283] [cursor=pointer]:
+                            - img "Show options" [ref=f12e286]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f12e289]: Contributor
+                    - table [ref=f12e293]:
+                      - rowgroup [ref=f12e294]:
+                        - row [ref=f12e295]:
+                          - cell [ref=f12e296]:
+                            - paragraph [ref=f12e297]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f12e298]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f12e299]:
+                  - generic [ref=f12e304]:
+                    - link [ref=f12e305] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f12e306]
+                    - link "openclaw-barnacle" [ref=f12e307] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f12e308]: Bot
+                    - text: added
+                    - link "docs" [ref=f12e309] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+                    - 'link "channel: discord" [ref=f12e310] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+                    - 'link "channel: mattermost" [ref=f12e311] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20mattermost%22
+                    - 'link "channel: msteams" [ref=f12e312] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20msteams%22
+                    - 'link "channel: signal" [ref=f12e313] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20signal%22
+                    - 'link "channel: feishu" [ref=f12e314] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20feishu%22
+                    - 'link "size: XL" [ref=f12e315] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+                    - link "maintainer" [ref=f12e316] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20266 hours ago" [ref=f12e317] [cursor=pointer]:
+                      - /url: "#event-29372903206"
+                  - generic [ref=f12e323]:
+                    - link [ref=f12e325] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e326]
+                    - generic [ref=f12e327]:
+                      - link "joshavant" [ref=f12e328] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 00:386 hours ago" [ref=f12e329] [cursor=pointer]:
+                        - /url: "#event-29373053597"
+                - generic [ref=f12e331]:
+                  - link [ref=f12e333] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f12e334]
+                  - generic [ref=f12e336]:
+                    - generic [ref=f12e337]:
+                      - heading "clawsweeper Bot commented Aug 13, 20266 hours ago •" [level=3] [ref=f12e338]:
+                        - generic [ref=f12e339]:
+                          - strong [ref=f12e340]:
+                            - link "clawsweeper" [ref=f12e341] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f12e342]: Bot
+                          - text: commented
+                          - link "Aug 13, 20266 hours ago" [ref=f12e343] [cursor=pointer]:
+                            - /url: "#issuecomment-5274491589"
+                          - generic [ref=f12e344]:
+                            - generic [ref=f12e345]: •
+                            - group [ref=f12e346]:
+                              - button "edited" [ref=f12e347] [cursor=pointer]
+                      - generic [ref=f12e351]:
+                        - group [ref=f12e353]:
+                          - button [ref=f12e354] [cursor=pointer]:
+                            - img "Show options" [ref=f12e357]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f12e360]: Contributor
+                    - table [ref=f12e364]:
+                      - rowgroup [ref=f12e365]:
+                        - row [ref=f12e366]:
+                          - cell [ref=f12e367]:
+                            - paragraph [ref=f12e368]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f12e369]: Reviewed August 13, 2026, 2:24 AM ET / 06:24 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f12e370]
+                            - heading "What this changes" [level=2] [ref=f12e371]
+                            - paragraph [ref=f12e372]: Repairs Discord durable ingress so exhausted retryable events dead-letter promptly and explicit pre-admission cancellation releases claims without consuming retry attempts.
+                            - heading "Merge readiness" [level=2] [ref=f12e373]
+                            - paragraph [ref=f12e374]:
+                              - generic [ref=f12e375]: ⚠️
+                              - strong [ref=f12e376]: Ready for maintainer review - 4 items remain
+                            - paragraph [ref=f12e377]: "Keep open for maintainer review: current main still has the Discord lane-blocking behavior, and this PR is the linked candidate fix. No remaining line-level correctness finding was found; acceptance of the additive Plugin SDK cancellation contract is the outstanding decision."
+                            - paragraph [ref=f12e378]:
+                              - strong [ref=f12e379]: "Priority:"
+                              - text: P1
+                              - strong [ref=f12e380]: "Reviewed head:"
+                              - code [ref=f12e381]: 466c609d0090b7fe79caca215b670fbdfe9ce966
+                              - strong [ref=f12e382]: "Owner decision:"
+                              - text: Required. See
+                              - link "Decision needed" [ref=f12e383] [cursor=pointer]:
+                                - /url: "#decision-needed"
+                              - text: .
+                            - heading "Review scores" [level=2] [ref=f12e384]
+                            - table [ref=f12e386]:
+                              - rowgroup [ref=f12e387]:
+                                - row [ref=f12e388]:
+                                  - columnheader "Measure" [ref=f12e389]
+                                  - columnheader "Result" [ref=f12e390]
+                                  - columnheader "What it means" [ref=f12e391]
+                              - rowgroup [ref=f12e392]:
+                                - row [ref=f12e393]:
+                                  - cell [ref=f12e394]:
+                                    - strong [ref=f12e395]: Overall readiness
+                                  - cell [ref=f12e396]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f12e397]: (4/6)
+                                  - cell "The patch is a focused owner-boundary repair with substantial regression coverage; only the public SDK contract decision remains." [ref=f12e398]
+                                - row [ref=f12e399]:
+                                  - cell [ref=f12e400]:
+                                    - strong [ref=f12e401]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f12e402]
+                                  - 'cell "Not applicable: This is maintainer-authored work, so the external-contributor real-behavior-proof gate does not apply; in-source fault and recovery coverage remains supplemental evidence." [ref=f12e403]'
+                                - row [ref=f12e404]:
+                                  - cell [ref=f12e405]:
+                                    - strong [ref=f12e406]: Patch quality
+                                  - cell [ref=f12e407]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f12e408]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f12e409]
+                            - heading "Verification" [level=2] [ref=f12e410]
+                            - table [ref=f12e412]:
+                              - rowgroup [ref=f12e413]:
+                                - row [ref=f12e414]:
+                                  - columnheader "Check" [ref=f12e415]
+                                  - columnheader "Result" [ref=f12e416]
+                                  - columnheader "Evidence" [ref=f12e417]
+                              - rowgroup [ref=f12e418]:
+                                - row [ref=f12e419]:
+                                  - cell [ref=f12e420]:
+                                    - strong [ref=f12e421]: Real behavior
+                                  - cell "Not applicable" [ref=f12e422]
+                                  - 'cell "Not applicable: This is maintainer-authored work, so the external-contributor real-behavior-proof gate does not apply; in-source fault and recovery coverage remains supplemental evidence." [ref=f12e423]'
+                                - row [ref=f12e424]:
+                                  - cell [ref=f12e425]:
+                                    - strong [ref=f12e426]: Evidence reviewed
+                                  - cell "8 items" [ref=f12e427]
+                                  - 'cell "Current-main failure mechanism: The generic policy requires both the eighth attempt and a 24-hour age before dead-lettering, so an exhausted poison event remains pending before the age gate. Discord inherits the problematic default: Current Discord ingress supplies non-retryable classification but no retry-policy override; the shared monitor therefore applies the generic 24-hour minimum age. Current test confirms the source reproduction: The shared-drain regression test deliberately burns all attempts while the event is too young and asserts that it remains pending until the age gate passes." [ref=f12e428]': "Current-main failure mechanism: The generic policy requires both the eighth attempt and a 24-hour age before dead-lettering, so an exhausted poison event remains pending before the age gate.Discord inherits the problematic default: Current Discord ingress supplies non-retryable classification but no retry-policy override; the shared monitor therefore applies the generic 24-hour minimum age.Current test confirms the source reproduction: The shared-drain regression test deliberately burns all attempts while the event is too young and asserts that it remains pending until the age gate passes."
+                                - row [ref=f12e429]:
+                                  - cell [ref=f12e430]:
+                                    - strong [ref=f12e431]: Findings
+                                  - cell "None" [ref=f12e432]
+                                  - cell "None." [ref=f12e433]
+                                - row [ref=f12e434]:
+                                  - cell [ref=f12e435]:
+                                    - strong [ref=f12e436]: Security
+                                  - cell "None" [ref=f12e437]
+                                  - cell "None." [ref=f12e438]
+                            - heading "How this fits together" [level=2] [ref=f12e439]
+                            - paragraph [ref=f12e440]: Discord events enter an account-scoped durable ingress queue, whose shared drain serializes each channel lane before dispatching work into the reply queue. Retry disposition determines whether a failed event is released for replay or terminally dead-lettered so later messages can proceed.
+                            - region "mermaid rendered output container" [ref=f12e441]:
+                              - generic [ref=f12e442]:
+                                - generic [ref=f12e443]:
+                                  - group [ref=f12e444]:
+                                    - button "Open dialog" [ref=f12e445] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f12e448] [cursor=pointer]
+                                - iframe [ref=f12e453]:
+                                  - generic [ref=f13e1]:
+                                    - document [ref=f13e5]:
+                                      - generic [ref=f13e7]:
+                                        - generic [ref=f13e13]:
+                                          - paragraph [ref=f13e19]: failure
+                                          - paragraph [ref=f13e25]: cancellation
+                                        - generic [ref=f13e26]:
+                                          - paragraph [ref=f13e33]: Discord message
+                                          - paragraph [ref=f13e40]: Durable ingress queue
+                                          - paragraph [ref=f13e47]: Shared lane drain
+                                          - paragraph [ref=f13e54]: Dispatcher and reply queue
+                                          - paragraph [ref=f13e61]: Delivery outcome
+                                          - paragraph [ref=f13e68]: Retry or dead letter
+                                          - paragraph [ref=f13e75]: Release without retry attempt
+                                          - paragraph [ref=f13e82]: Next lane message can proceed
+                                    - generic [ref=f13e83]:
+                                      - button "Zoom in" [ref=f13e84]
+                                      - button "Zoom out" [ref=f13e88]
+                                      - button "Reset view" [ref=f13e92]
+                                      - button "Pan up" [ref=f13e95]
+                                      - button "Pan down" [ref=f13e98]
+                                      - button "Pan left" [ref=f13e101]
+                                      - button "Pan right" [ref=f13e104]
+                            - heading "Decision needed" [level=2] [ref=f12e454]
+                            - table [ref=f12e456]:
+                              - rowgroup [ref=f12e457]:
+                                - row [ref=f12e458]:
+                                  - columnheader "Question" [ref=f12e459]
+                                  - columnheader "Recommendation" [ref=f12e460]
+                              - rowgroup [ref=f12e461]:
+                                - row [ref=f12e462]:
+                                  - cell "Should optional onCancelled plus fanInChannelIngressLifecycles().cancel() become the supported Plugin SDK contract for releasing pre-adoption work without spending retry budget?" [ref=f12e463]
+                                  - cell [ref=f12e464]:
+                                    - strong [ref=f12e465]: "Accept the lifecycle contract:"
+                                    - text: Approve the documented optional callback and legacy fallback, then let the PR proceed through normal exact-head checks.
+                            - paragraph [ref=f12e466]: "Why: The implementation is additive and internally covered, but it defines durable retry semantics for external plugin consumers and mixed legacy fan-in."
+                            - heading "Before merge" [level=2] [ref=f12e467]
+                            - list [ref=f12e468]:
+                              - listitem [ref=f12e469]:
+                                - checkbox "Incomplete task" [disabled] [ref=f12e470]
+                                - strong [ref=f12e471]: Resolve merge risk (P1)
+                                - text: "- The optional Plugin SDK cancellation callback and fan-in cancel method establish retry-accounting semantics for external channel plugins; mixed legacy fan-in intentionally consumes an attempt for sources without that callback."
+                              - listitem [ref=f12e472]:
+                                - checkbox "Incomplete task" [disabled] [ref=f12e473]
+                                - strong [ref=f12e474]: Resolve merge risk (P1)
+                                - text: "- This changes whether a failed Discord event blocks, replays, or dead-letters, so an incorrect lifecycle interpretation could affect message delivery and recovery ordering."
+                              - listitem [ref=f12e475]:
+                                - checkbox "Incomplete task" [disabled] [ref=f12e476]
+                                - strong [ref=f12e477]: Complete next step (P2)
+                                - text: "- A maintainer must accept the public Plugin SDK cancellation semantics; no narrow mechanical repair remains."
+                            - group [ref=f12e478]:
+                              - strong [ref=f12e480] [cursor=pointer]: Agent review details
+                - generic [ref=f12e481]:
+                  - generic [ref=f12e486]:
+                    - link [ref=f12e487] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f12e488]
+                    - link "clawsweeper" [ref=f12e489] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f12e490]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 compatibility" [ref=f12e491] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                    - link "P1" [ref=f12e492] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "rating: 🦐 gold shrimp" [ref=f12e493] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f12e494] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 20266 hours ago" [ref=f12e495] [cursor=pointer]:
+                      - /url: "#event-29373216670"
+                  - generic [ref=f12e501]:
+                    - link [ref=f12e503] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e504]
+                    - generic [ref=f12e505]:
+                      - link "joshavant" [ref=f12e506] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 00:476 hours ago" [ref=f12e507] [cursor=pointer]:
+                        - /url: "#event-29373298395"
+                  - generic [ref=f12e513]:
+                    - link [ref=f12e515] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e516]
+                    - generic [ref=f12e517]:
+                      - link "joshavant" [ref=f12e518] [cursor=pointer]:
+                        - /url: /joshavant
+                      - link "force-pushed" [ref=f12e519] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/b3eb6404160d0d0d396ccf91383b14649da40735..8fa849507f84c71ba4725aa674ec75e4fdb07cbd
+                      - text: the
+                      - generic [ref=f12e520]: joshavant/issue-122465-20260812t184737z-143684e5
+                      - text: branch from
+                      - link [ref=f12e522] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/b3eb6404160d0d0d396ccf91383b14649da40735
+                        - code [ref=f12e523]: b3eb640
+                      - text: to
+                      - link [ref=f12e524] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/8fa849507f84c71ba4725aa674ec75e4fdb07cbd
+                        - code [ref=f12e525]: 8fa8495
+                      - link "Compare" [ref=f12e526] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/b3eb6404160d0d0d396ccf91383b14649da40735..8fa849507f84c71ba4725aa674ec75e4fdb07cbd
+                      - link "August 13, 2026 01:185 hours ago" [ref=f12e529] [cursor=pointer]:
+                        - /url: "#event-29374146315"
+                  - generic [ref=f12e535]:
+                    - link [ref=f12e537] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e538]
+                    - generic [ref=f12e539]:
+                      - link "joshavant" [ref=f12e540] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 01:255 hours ago" [ref=f12e541] [cursor=pointer]:
+                        - /url: "#event-29374334399"
+                  - generic [ref=f12e546]:
+                    - link [ref=f12e547] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f12e548]
+                    - link "clawsweeper" [ref=f12e549] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f12e550]: Bot
+                    - text: added
+                    - 'link "rating: 🐚 platinum hermit" [ref=f12e551] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f12e552] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: and removed
+                    - 'link "rating: 🦐 gold shrimp" [ref=f12e553] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f12e554] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 20265 hours ago" [ref=f12e555] [cursor=pointer]:
+                      - /url: "#event-29374337555"
+                  - generic [ref=f12e561]:
+                    - link [ref=f12e563] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e564]
+                    - generic [ref=f12e565]:
+                      - link "joshavant" [ref=f12e566] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 01:305 hours ago" [ref=f12e567] [cursor=pointer]:
+                        - /url: "#event-29374485635"
+                  - generic [ref=f12e572]:
+                    - link [ref=f12e573] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f12e574]
+                    - link "clawsweeper" [ref=f12e575] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f12e576]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 message-delivery" [ref=f12e577] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+                    - 'link "rating: 🦐 gold shrimp" [ref=f12e578] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - 'link "status: ⏳ waiting on author" [ref=f12e579] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: and removed
+                    - 'link "rating: 🐚 platinum hermit" [ref=f12e580] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f12e581] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 13, 20264 hours ago" [ref=f12e582] [cursor=pointer]:
+                      - /url: "#event-29375564595"
+                  - generic [ref=f12e588]:
+                    - link [ref=f12e590] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e591]
+                    - generic [ref=f12e592]:
+                      - link "joshavant" [ref=f12e593] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 03:123 hours ago" [ref=f12e594] [cursor=pointer]:
+                        - /url: "#event-29377451260"
+                  - generic [ref=f12e600]:
+                    - link [ref=f12e602] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e603]
+                    - generic [ref=f12e604]:
+                      - link "joshavant" [ref=f12e605] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 03:253 hours ago" [ref=f12e606] [cursor=pointer]:
+                        - /url: "#event-29377807165"
+                - generic [ref=f12e610]:
+                  - button "5 hidden items" [ref=f12e611] [cursor=pointer]
+                  - button "Load more…" [ref=f12e612] [cursor=pointer]
+                - generic [ref=f12e613]:
+                  - generic [ref=f12e619]:
+                    - link [ref=f12e621] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e622]
+                    - generic [ref=f12e623]:
+                      - link "joshavant" [ref=f12e624] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 03:493 hours ago" [ref=f12e625] [cursor=pointer]:
+                        - /url: "#event-29378443112"
+                  - generic [ref=f12e631]:
+                    - link [ref=f12e633] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e634]
+                    - generic [ref=f12e635]:
+                      - link "joshavant" [ref=f12e636] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 04:023 hours ago" [ref=f12e637] [cursor=pointer]:
+                        - /url: "#event-29378804145"
+                  - generic [ref=f12e643]:
+                    - link [ref=f12e645] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e646]
+                    - generic [ref=f12e647]:
+                      - link "joshavant" [ref=f12e648] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 04:352 hours ago" [ref=f12e649] [cursor=pointer]:
+                        - /url: "#event-29379781886"
+                - generic [ref=f12e651]:
+                  - link [ref=f12e653] [cursor=pointer]:
+                    - /url: /joshavant
+                    - img "@joshavant" [ref=f12e654]
+                  - generic [ref=f12e656]:
+                    - generic [ref=f12e657]:
+                      - heading [level=3] [ref=f12e658]:
+                        - generic [ref=f12e659]:
+                          - strong [ref=f12e660]:
+                            - link "joshavant" [ref=f12e661] [cursor=pointer]:
+                              - /url: /joshavant
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f12e662] [cursor=pointer]:
+                            - /url: "#issuecomment-5276012384"
+                      - generic [ref=f12e663]:
+                        - group [ref=f12e665]:
+                          - button [ref=f12e666] [cursor=pointer]:
+                            - img "Show options" [ref=f12e669]
+                        - generic [ref=f12e671]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f12e672]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f12e674]: Author
+                    - table [ref=f12e678]:
+                      - rowgroup [ref=f12e679]:
+                        - row [ref=f12e680]:
+                          - cell [ref=f12e681]:
+                            - paragraph [ref=f12e682]:
+                              - link "@clawsweeper" [ref=f12e683] [cursor=pointer]:
+                                - /url: https://github.com/clawsweeper
+                              - text: re-review
+                - generic [ref=f12e685]:
+                  - link [ref=f12e687] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f12e688]
+                  - generic [ref=f12e690]:
+                    - generic [ref=f12e691]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago •" [level=3] [ref=f12e692]:
+                        - generic [ref=f12e693]:
+                          - strong [ref=f12e694]:
+                            - link "clawsweeper" [ref=f12e695] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f12e696]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f12e697] [cursor=pointer]:
+                            - /url: "#issuecomment-5276012818"
+                          - generic [ref=f12e698]:
+                            - generic [ref=f12e699]: •
+                            - group [ref=f12e700]:
+                              - button "edited" [ref=f12e701] [cursor=pointer]
+                      - generic [ref=f12e705]:
+                        - group [ref=f12e707]:
+                          - button [ref=f12e708] [cursor=pointer]:
+                            - img "Show options" [ref=f12e711]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f12e714]: Contributor
+                    - table [ref=f12e718]:
+                      - rowgroup [ref=f12e719]:
+                        - row [ref=f12e720]:
+                          - cell [ref=f12e721]:
+                            - paragraph [ref=f12e722]: 🦞🧹 ClawSweeper re-review requested.
+                            - paragraph [ref=f12e723]:
+                              - text: "I asked ClawSweeper to review this item again. Action: item re-review queued (workflow"
+                              - code [ref=f12e724]: sweep.yml
+                              - text: ", event"
+                              - code [ref=f12e725]: exact_review_queue
+                              - text: "). Result: when the review finishes, ClawSweeper will create the durable review comment if needed or update the existing comment in place."
+                - generic [ref=f12e726]:
+                  - generic [ref=f12e731]:
+                    - link [ref=f12e732] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f12e733]
+                    - link "clawsweeper" [ref=f12e734] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f12e735]: Bot
+                    - text: added
+                    - 'link "rating: 🦪 silver shellfish" [ref=f12e736] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - text: and removed
+                    - 'link "rating: 🦐 gold shrimp" [ref=f12e737] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%90%20gold%20shrimp%22
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f12e738] [cursor=pointer]:
+                      - /url: "#event-29380724023"
+                  - generic [ref=f12e744]:
+                    - link [ref=f12e746] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e747]
+                    - generic [ref=f12e748]:
+                      - link "joshavant" [ref=f12e749] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 05:201 hour ago" [ref=f12e750] [cursor=pointer]:
+                        - /url: "#event-29381098884"
+                  - generic [ref=f12e756]:
+                    - link [ref=f12e758] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e759]
+                    - generic [ref=f12e760]:
+                      - link "joshavant" [ref=f12e761] [cursor=pointer]:
+                        - /url: /joshavant
+                      - link "force-pushed" [ref=f12e762] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/c5312687d02561f1a11b64c1cf67bb8037c80459..1ab4433046afb94aa3f3a477ca39737446799dbc
+                      - text: the
+                      - generic [ref=f12e763]: joshavant/issue-122465-20260812t184737z-143684e5
+                      - text: branch from
+                      - link [ref=f12e765] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/c5312687d02561f1a11b64c1cf67bb8037c80459
+                        - code [ref=f12e766]: c531268
+                      - text: to
+                      - link [ref=f12e767] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/1ab4433046afb94aa3f3a477ca39737446799dbc
+                        - code [ref=f12e768]: 1ab4433
+                      - link "Compare" [ref=f12e769] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/c5312687d02561f1a11b64c1cf67bb8037c80459..1ab4433046afb94aa3f3a477ca39737446799dbc
+                      - link "August 13, 2026 05:331 hour ago" [ref=f12e772] [cursor=pointer]:
+                        - /url: "#event-29381470847"
+                  - generic [ref=f12e778]:
+                    - link [ref=f12e780] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e781]
+                    - generic [ref=f12e782]:
+                      - link "joshavant" [ref=f12e783] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 05:521 hour ago" [ref=f12e784] [cursor=pointer]:
+                        - /url: "#event-29382034993"
+                  - generic [ref=f12e789]:
+                    - link [ref=f12e790] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f12e791]
+                    - link "clawsweeper" [ref=f12e792] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f12e793]: Bot
+                    - text: added
+                    - 'link "rating: 🐚 platinum hermit" [ref=f12e794] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f12e795] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: and removed
+                    - 'link "rating: 🦪 silver shellfish" [ref=f12e796] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: ⏳ waiting on author" [ref=f12e797] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 202644 minutes ago" [ref=f12e798] [cursor=pointer]:
+                      - /url: "#event-29382777411"
+                  - generic [ref=f12e804]:
+                    - link [ref=f12e806] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e807]
+                    - generic [ref=f12e808]:
+                      - link "joshavant" [ref=f12e809] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as draft
+                      - link "August 13, 2026 06:1841 minutes ago" [ref=f12e810] [cursor=pointer]:
+                        - /url: "#event-29382899190"
+                - generic [ref=f12e812]:
+                  - generic [ref=f12e817]:
+                    - link "joshavant" [ref=f12e818] [cursor=pointer]:
+                      - /url: /joshavant
+                    - text: added 8 commits
+                    - link "August 13, 2026 01:1841 minutes ago" [ref=f12e819] [cursor=pointer]:
+                      - /url: "#commits-pushed-9ed48e9"
+                  - generic [ref=f12e820]:
+                    - generic [ref=f12e828]:
+                      - link [ref=f12e831] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e832]
+                      - code [ref=f12e834]:
+                        - 'link "fix(discord): unblock ingress after retry exhaustion" [ref=f12e835] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/9ed48e9538bdbd9858086513c2aa1612a8ea5510
+                      - button "Verified" [ref=f12e837] [cursor=pointer]
+                      - group [ref=f12e842]:
+                        - img "0 / 1 checks OK" [ref=f12e844] [cursor=pointer]
+                      - code [ref=f12e847]:
+                        - link "9ed48e9" [ref=f12e848] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/9ed48e9538bdbd9858086513c2aa1612a8ea5510
+                    - generic [ref=f12e856]:
+                      - link [ref=f12e859] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e860]
+                      - code [ref=f12e862]:
+                        - 'link "fix(plugin-sdk): make ingress cancellation fan-in safe" [ref=f12e863] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/dc2a4556b901d2b2a6dcd8af38ac41950df95493
+                      - button "Verified" [ref=f12e865] [cursor=pointer]
+                      - group [ref=f12e870]:
+                        - img "0 / 1 checks OK" [ref=f12e872] [cursor=pointer]
+                      - code [ref=f12e875]:
+                        - link "dc2a455" [ref=f12e876] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/dc2a4556b901d2b2a6dcd8af38ac41950df95493
+                    - generic [ref=f12e884]:
+                      - link [ref=f12e887] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e888]
+                      - code [ref=f12e890]:
+                        - 'link "test(mattermost): align tool preview fixture with privacy default" [ref=f12e891] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/739f3e2665a8723ecf7b8728fb5059d5934faf97
+                      - button "Verified" [ref=f12e893] [cursor=pointer]
+                      - group [ref=f12e898]:
+                        - img "0 / 1 checks OK" [ref=f12e900] [cursor=pointer]
+                      - code [ref=f12e903]:
+                        - link "739f3e2" [ref=f12e904] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/739f3e2665a8723ecf7b8728fb5059d5934faf97
+                    - generic [ref=f12e912]:
+                      - link [ref=f12e915] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e916]
+                      - code [ref=f12e918]:
+                        - 'link "fix(discord): settle mixed cancellation fan-in" [ref=f12e919] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/40b44382482c32a2123fd206694ff9319a009507
+                      - button "Verified" [ref=f12e921] [cursor=pointer]
+                      - group [ref=f12e926]:
+                        - img "0 / 1 checks OK" [ref=f12e928] [cursor=pointer]
+                      - code [ref=f12e931]:
+                        - link "40b4438" [ref=f12e932] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/40b44382482c32a2123fd206694ff9319a009507
+                    - generic [ref=f12e940]:
+                      - link [ref=f12e943] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e944]
+                      - code [ref=f12e946]:
+                        - 'link "fix(plugin-sdk): preserve cancellation receivers" [ref=f12e947] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/665833b37debd48199a96eb5f4c416ccc0dd54b4
+                      - button "Verified" [ref=f12e949] [cursor=pointer]
+                      - group [ref=f12e954]:
+                        - img "0 / 1 checks OK" [ref=f12e956] [cursor=pointer]
+                      - code [ref=f12e959]:
+                        - link "665833b" [ref=f12e960] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/665833b37debd48199a96eb5f4c416ccc0dd54b4
+                    - generic [ref=f12e968]:
+                      - link [ref=f12e971] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e972]
+                      - code [ref=f12e974]:
+                        - 'link "fix(tests): respect plugin helper boundary" [ref=f12e975] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/208fc987f9917e70eddc408e3320c44133682a8e
+                      - button "Verified" [ref=f12e977] [cursor=pointer]
+                      - group [ref=f12e982]:
+                        - img "0 / 1 checks OK" [ref=f12e984] [cursor=pointer]
+                      - code [ref=f12e987]:
+                        - link "208fc98" [ref=f12e988] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/208fc987f9917e70eddc408e3320c44133682a8e
+                    - generic [ref=f12e996]:
+                      - link [ref=f12e999] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e1000]
+                      - code [ref=f12e1002]:
+                        - 'link "fix(discord): cancel skipped queued ingress" [ref=f12e1003] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/1b674835f11300932fa6e9577a72101ed0d58740
+                      - button "Verified" [ref=f12e1005] [cursor=pointer]
+                      - group [ref=f12e1010]:
+                        - img "0 / 1 checks OK" [ref=f12e1012] [cursor=pointer]
+                      - code [ref=f12e1015]:
+                        - link "1b67483" [ref=f12e1016] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/1b674835f11300932fa6e9577a72101ed0d58740
+                    - generic [ref=f12e1024]:
+                      - link [ref=f12e1027] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e1028]
+                      - code [ref=f12e1030]:
+                        - 'link "fix(discord): cancel started ingress jobs on abort" [ref=f12e1031] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122878/commits/466c609d0090b7fe79caca215b670fbdfe9ce966
+                      - button "Verified" [ref=f12e1033] [cursor=pointer]
+                      - group [ref=f12e1038]:
+                        - img "86 / 126 checks OK" [ref=f12e1040] [cursor=pointer]
+                      - code [ref=f12e1043]:
+                        - link "466c609" [ref=f12e1044] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122878/commits/466c609d0090b7fe79caca215b670fbdfe9ce966
+                - generic [ref=f12e1045]:
+                  - generic [ref=f12e1051]:
+                    - link [ref=f12e1053] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e1054]
+                    - generic [ref=f12e1055]:
+                      - link "joshavant" [ref=f12e1056] [cursor=pointer]:
+                        - /url: /joshavant
+                      - link "force-pushed" [ref=f12e1057] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/1ab4433046afb94aa3f3a477ca39737446799dbc..466c609d0090b7fe79caca215b670fbdfe9ce966
+                      - text: the
+                      - generic [ref=f12e1058]: joshavant/issue-122465-20260812t184737z-143684e5
+                      - text: branch from
+                      - link [ref=f12e1060] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/1ab4433046afb94aa3f3a477ca39737446799dbc
+                        - code [ref=f12e1061]: 1ab4433
+                      - text: to
+                      - link [ref=f12e1062] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/466c609d0090b7fe79caca215b670fbdfe9ce966
+                        - code [ref=f12e1063]: 466c609
+                      - link "Compare" [ref=f12e1064] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/compare/1ab4433046afb94aa3f3a477ca39737446799dbc..466c609d0090b7fe79caca215b670fbdfe9ce966
+                      - link "August 13, 2026 06:1940 minutes ago" [ref=f12e1067] [cursor=pointer]:
+                        - /url: "#event-29382941735"
+                  - generic [ref=f12e1073]:
+                    - link [ref=f12e1075] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e1076]
+                    - generic [ref=f12e1077]:
+                      - link "joshavant" [ref=f12e1078] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: marked this pull request as ready for review
+                      - link "August 13, 2026 06:1939 minutes ago" [ref=f12e1079] [cursor=pointer]:
+                        - /url: "#event-29382943140"
+                  - generic [ref=f12e1084]:
+                    - button "View details" [ref=f12e1085] [cursor=pointer]
+                    - generic [ref=f12e1086]:
+                      - link [ref=f12e1088] [cursor=pointer]:
+                        - /url: /joshavant
+                        - img "@joshavant" [ref=f12e1089]
+                      - generic [ref=f12e1090]:
+                        - link "joshavant" [ref=f12e1091] [cursor=pointer]:
+                          - /url: /joshavant
+                        - text: merged commit
+                        - link [ref=f12e1092] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/be7a2c23e97d4ebeeb8a9c59aebcbe5eb03d638f
+                          - code [ref=f12e1093]: be7a2c2
+                        - text: into
+                        - generic [ref=f12e1094]: main
+                        - link "Aug 13, 202625 minutes ago" [ref=f12e1096] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122878#event-29383516899
+                        - generic [ref=f12e1097]: 176 of 187 checks passed
+                  - generic [ref=f12e1104]:
+                    - link [ref=f12e1106] [cursor=pointer]:
+                      - /url: /joshavant
+                      - img "@joshavant" [ref=f12e1107]
+                    - generic [ref=f12e1108]:
+                      - link "joshavant" [ref=f12e1109] [cursor=pointer]:
+                        - /url: /joshavant
+                      - text: deleted the
+                      - generic [ref=f12e1110]: joshavant/issue-122465-20260812t184737z-143684e5
+                      - text: branch
+                      - link "August 13, 2026 06:3425 minutes ago" [ref=f12e1112] [cursor=pointer]:
+                        - /url: "#event-29383518313"
+                  - generic [ref=f12e1117]:
+                    - generic [ref=f12e1118]: This was referenced Aug 13, 202621 minutes ago
+                    - generic [ref=f12e1119]:
+                      - 'link "Discord channel stops responding for up to 24 hours after one undeliverable message #122465" [ref=f12e1121] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/issues/122465
+                      - 'generic "Status: Closed" [ref=f12e1123]': Closed
+                    - generic [ref=f12e1127]:
+                      - 'link "fix(discord): channel stops responding for up to 24 hours after one undeliverable message #122466" [ref=f12e1129] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/122466
+                      - 'generic "Status: Closed" [ref=f12e1131]': Closed
+                  - generic [ref=f12e1138]:
+                    - generic [ref=f12e1139]:
+                      - link [ref=f12e1140] [cursor=pointer]:
+                        - /url: /vincentkoc
+                        - img "@vincentkoc" [ref=f12e1141]
+                      - link "vincentkoc" [ref=f12e1142] [cursor=pointer]:
+                        - /url: /vincentkoc
+                      - text: mentioned this pull request
+                      - link "Aug 13, 202613 minutes ago" [ref=f12e1143] [cursor=pointer]:
+                        - /url: "#ref-pullrequest-5138082448"
+                    - generic [ref=f12e1144]:
+                      - 'link "fix(ci): align Mattermost raw command preview fixture #123016" [ref=f12e1146] [cursor=pointer]':
+                        - /url: /openclaw/openclaw/pull/123016
+                      - 'generic "Status: Closed" [ref=f12e1148]': Closed
+            - generic [ref=f12e1154]:
+              - link "Sign up for free" [ref=f12e1155] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f12e1156]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f12e1157] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122878
+        - generic [ref=f12e1161]:
+          - form "Select reviewers" [ref=f12e1163]:
+            - heading "Reviewers" [level=3] [ref=f12e1164]
+            - text: No reviews
+          - form "Select assignees" [ref=f12e1166]:
+            - heading "Assignees" [level=3] [ref=f12e1167]
+            - text: No one assigned
+          - generic [ref=f12e1168]:
+            - heading "Labels" [level=3] [ref=f12e1169]
+            - generic [ref=f12e1170]:
+              - 'link "channel: discord" [ref=f12e1171] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20discord%22
+              - 'link "channel: feishu" [ref=f12e1173] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20feishu%22
+              - 'link "channel: mattermost" [ref=f12e1175] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20mattermost%22
+              - 'link "channel: msteams" [ref=f12e1177] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20msteams%22
+              - 'link "channel: signal" [ref=f12e1179] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22channel%3A%20signal%22
+              - link "docs" [ref=f12e1181] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Adocs
+              - link "maintainer" [ref=f12e1183] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f12e1185] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - 'link "merge-risk: 🚨 message-delivery" [ref=f12e1187] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20message-delivery%22
+              - link "P1" [ref=f12e1189] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🐚 platinum hermit" [ref=f12e1191] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: XL" [ref=f12e1193] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20XL%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f12e1195] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f12e1198]:
+            - heading "Projects" [level=3] [ref=f12e1199]
+            - text: None yet
+          - form "Select milestones" [ref=f12e1201]:
+            - heading "Milestone" [level=3] [ref=f12e1202]
+            - text: No milestone
+          - form "Link issues" [ref=f12e1208]:
+            - heading "Development" [level=3] [ref=f12e1209]
+            - paragraph [ref=f12e1210]: Successfully merging this pull request may close these issues.
+            - link [ref=f12e1212] [cursor=pointer]:
+              - /url: https://github.com/openclaw/openclaw/issues/122465
+              - img "Closed issue" [ref=f12e1213]
+              - text: Discord channel stops responding for up to 24 hours after one undeliverable message
+          - generic [ref=f12e1217]:
+            - heading "1 participant" [level=3] [ref=f12e1218]
+            - link [ref=f12e1220] [cursor=pointer]:
+              - /url: /joshavant
+              - img "@joshavant" [ref=f12e1221]
+  - contentinfo [ref=f12e1222]:
+    - heading "Footer" [level=2] [ref=f12e1223]
+    - generic [ref=f12e1224]:
+      - generic [ref=f12e1225]:
+        - link "GitHub Homepage" [ref=f12e1226] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f12e1229]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f12e1230]:
+        - heading "Footer navigation" [level=3] [ref=f12e1231]
+        - list "Footer navigation" [ref=f12e1232]:
+          - listitem [ref=f12e1233]:
+            - link "Terms" [ref=f12e1234] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f12e1235]:
+            - link "Privacy" [ref=f12e1236] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f12e1237]:
+            - link "Security" [ref=f12e1238] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f12e1239]:
+            - link "Status" [ref=f12e1240] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f12e1241]:
+            - link "Community" [ref=f12e1242] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f12e1243]:
+            - link "Docs" [ref=f12e1244] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f12e1245]:
+            - link "Contact" [ref=f12e1246] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f12e1247]:
+            - button "Manage cookies" [ref=f12e1249] [cursor=pointer]
+          - listitem [ref=f12e1250]:
+            - button "Do not share my personal information" [ref=f12e1252] [cursor=pointer]

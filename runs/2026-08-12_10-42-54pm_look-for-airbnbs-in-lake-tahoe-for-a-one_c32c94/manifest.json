@@ -1,0 +1,64 @@
+{
+  "task": "Look for Airbnbs in Lake Tahoe for a one-week stay next week. Review the first 30 suggested places. Write answer.md with the exact check-in and check-out dates, a numbered list from 1 through 30 in which every item identifies the place, includes its Airbnb listing URL, and gives a brief listing-specific summary, followed by an overall summary of the options.",
+  "startedAt": "2026-08-13T05:42:54.426Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "cb273e8f5b8baba4c9a26dce7530f539a7f179b0552b1df9649ac9b1305cf660",
+      "capturedAt": "2026-08-13T05:43:33.473Z"
+    },
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "6c8467e6834a52c07653adc9532781097b8b49ecad5424f696b1bbb6c351d1d4",
+      "capturedAt": "2026-08-13T05:43:35.672Z"
+    },
+    {
+      "filename": "scratch/listings.md",
+      "sha256": "a95b42515d4ef78b11b63dbfb9774974416306b77530b290e7674e15b79fc2ba",
+      "capturedAt": "2026-08-13T05:44:10.432Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "cb273e8f5b8baba4c9a26dce7530f539a7f179b0552b1df9649ac9b1305cf660",
+      "capturedAt": "2026-08-13T05:43:55.912Z"
+    },
+    {
+      "filename": "scratch/listings_append2.md",
+      "sha256": "805867367cfc5f6db977bf6d07162aa4ad8e295d1f519a56357813c8aec77bc1",
+      "capturedAt": "2026-08-13T05:44:19.621Z"
+    },
+    {
+      "filename": "scratch/listings_append3.md",
+      "sha256": "280cfe4eff9581cac997d605021fcb236589642089aee515c11f955fa627fe5f",
+      "capturedAt": "2026-08-13T05:44:33.699Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "eed922bb9ad55f325ed6d8ff6084ef4a91ebb3aa7019ca2a6ccd8e8c76d9acc2",
+      "capturedAt": "2026-08-13T05:44:48.382Z"
+    },
+    {
+      "filename": "scratch/listings_p2.md",
+      "sha256": "6d41ab17eb94163a3507b5473051135d82e174e1cffeaaab8fe5bc0172a85711",
+      "capturedAt": "2026-08-13T05:45:24.640Z"
+    },
+    {
+      "filename": "artifacts/search_results_page2.png",
+      "sha256": "e6638ae8dc9a37cb46d2c05e8f8a89b8bec69e32d6b73a1c905e98680a9a1f10",
+      "sourceUrl": "https://www.airbnb.com/s/Lake-Tahoe/homes?refinement_paths%5B%5D=%2Fhomes&place_id=ChIJUREfuaF4mYARILWv7q8fP4w&acp_id=236baac8-79d8-4942-8ca5-65ec5de48d70&date_picker_type=calendar&checkin=2026-08-17&checkout=2026-08-24&query=Lake%20Tahoe&flexible_trip_lengths%5B%5D=one_week&monthly_start_date=2026-09-01&monthly_length=3&monthly_end_date=2026-12-01&price_filter_input_type=2&price_filter_num_nights=7&channel=EXPLORE&federated_search_session_id=f8f009b6-f857-4ca6-bfd0-ac3812ba4d90&pagination_search=true&cursor=eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0%3D",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:45:27.311Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "2859455fddc91fee397bc4e70083a181fecda7359fed938d16a9cd31ba56b7c4",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T05:46:16.783Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T05:46:28.135Z"
+}

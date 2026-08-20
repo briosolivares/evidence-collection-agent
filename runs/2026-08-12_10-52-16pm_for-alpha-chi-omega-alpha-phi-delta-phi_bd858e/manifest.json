@@ -1,0 +1,82 @@
+{
+  "task": "For Alpha Chi Omega, Alpha Phi, Delta Phi Epsilon, Kappa Alpha Theta, Pi Beta Phi, and Sigma Kappa at MIT: use Google to identify each sorority's official website, find its sisters page, and identify the seniors (class of 2026) and juniors (class of 2027). Add the available information to a Google Sheet with exactly these columns: name, class, major, affiliation, interests, other. Also save sorority_members.csv as a local evidence copy with exactly the same columns and save answer.md containing the Google Sheet URL.",
+  "startedAt": "2026-08-13T05:52:16.777Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/grep-1.txt",
+      "sha256": "9cda619fe56c253e4bbd4fb3f079105c9d94944781ab169f508ce9a77ff8dda7",
+      "capturedAt": "2026-08-13T05:53:00.323Z"
+    },
+    {
+      "filename": "scratch/axo_data.md",
+      "sha256": "771f1681ac822e28f24d8a1c45c359c7def93386776959f1c08da92470530dc0",
+      "capturedAt": "2026-08-13T05:53:07.429Z"
+    },
+    {
+      "filename": "scratch/aphi_data.md",
+      "sha256": "6ff175a404bd9d3b68bda9f1542d03ba219f298b7eaea6842ff3d49b30229e4b",
+      "capturedAt": "2026-08-13T05:53:53.464Z"
+    },
+    {
+      "filename": "artifacts/dphie_sisters_page.png",
+      "sha256": "47480631917fe1c5cc5c1b21734e720895d5b0016a09a4255df5ac65b9d13a39",
+      "sourceUrl": "http://dphie.mit.edu/sisterhood/meet-the-sisters/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T05:54:22.244Z"
+    },
+    {
+      "filename": "scratch/tool-output/read_file-1.txt",
+      "sha256": "9d5fdbfe5c8f2c2cc3f3adb2056f1c9eef8b60657bef4eb2a38a8e0f394a8039",
+      "capturedAt": "2026-08-13T05:54:24.661Z"
+    },
+    {
+      "filename": "scratch/dphie_data.md",
+      "sha256": "ccba6389893e13da5c6fc8e2fcefb1ec8e3fdd766baf05298eedf0e14159d29b",
+      "capturedAt": "2026-08-13T05:55:29.948Z"
+    },
+    {
+      "filename": "scratch/theta_data.md",
+      "sha256": "42e2f2b152cf45ff30b974e878cd4cf8e57d8a5f50faada87f1ac51de236ff9b",
+      "capturedAt": "2026-08-13T05:56:36.749Z"
+    },
+    {
+      "filename": "scratch/theta_data_2026.md",
+      "sha256": "b0a41420935a02416f5a037799d1b56881823643eef107d793df0db69035b180",
+      "capturedAt": "2026-08-13T05:56:53.017Z"
+    },
+    {
+      "filename": "scratch/pibetaphi_data.md",
+      "sha256": "0093f68ce4b6388151bfbbdb83416d1d3990fc9caf641b3fbb8630297f2aac1a",
+      "capturedAt": "2026-08-13T05:57:33.846Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2026.md",
+      "sha256": "05761794840deb9c1fd3f04f865e250d031fbbe94d957d438d0643f57213b597",
+      "capturedAt": "2026-08-13T05:58:02.126Z"
+    },
+    {
+      "filename": "scratch/sigmakappa_2027.md",
+      "sha256": "97d7242ffca3be3c403ff7ab2ee6e0ebd1f2118e9f984adc924f9a66715377b3",
+      "capturedAt": "2026-08-13T05:58:18.749Z"
+    },
+    {
+      "filename": "artifacts/sorority_members.csv",
+      "sha256": "0397c16eb2af1da5e68abc532c9510f95c6054b3e37bb9560072a2f33ed0650c",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:01:10.977Z"
+    },
+    {
+      "filename": "artifacts/answer.md",
+      "sha256": "d51260c26d8aa008084005d178d2a9d72fb1bcbe88a9b184d1d21f661a1c43fa",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:01:58.565Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:02:24.685Z"
+}

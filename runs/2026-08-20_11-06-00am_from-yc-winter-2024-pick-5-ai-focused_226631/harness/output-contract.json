@@ -1,0 +1,47 @@
+{
+  "outputs": [
+    {
+      "id": "cold_outreach_csv",
+      "kind": "table",
+      "filename": "cold_outreach.csv",
+      "format": "csv",
+      "columns": [
+        {
+          "name": "founder_name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "linkedin_url",
+          "required": true,
+          "type": "url"
+        },
+        {
+          "name": "cold_outreach_email",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "rules": [
+        {
+          "type": "minimum_row_count",
+          "value": 1
+        },
+        {
+          "type": "unique",
+          "columns": [
+            "founder_name",
+            "linkedin_url"
+          ]
+        }
+      ]
+    }
+  ],
+  "contentExpectations": [
+    "Select exactly 5 AI-focused companies from the YC Winter 2024 (W24) batch.",
+    "Include one row for every founder of each of the 5 selected companies (all co-founders represented, not just one per company).",
+    "Each cold_outreach_email must be personalized to the specific founder and their specific company, referencing details relevant to that founder/company.",
+    "Each cold_outreach_email must explicitly request a 15-minute call.",
+    "linkedin_url should be the founder's individual LinkedIn profile URL."
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T06:53:58.994Z",
+  "artifacts": [
+    {
+      "filename": "scratch/roster.md",
+      "sha256": "861ce7c75c6cbf020f44364e1d4735e5e085ac53c0b2ec38b4a9438318ea6aee",
+      "capturedAt": "2026-08-13T07:00:17.110Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_outreach.csv",
+      "sha256": "3a7fcc002844fb8956f252dbff49ab5b8b5fa394fe48516d0255f23e1e4ecaa2",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T07:00:56.011Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_directory_search_evidence.png",
+      "sha256": "95ef18b847ba4486219dd3af70a309332b111050f94c8f87977d01de2999c5b9",
+      "sourceUrl": "https://www.ycombinator.com/companies?batch=Winter%202024&q=AI",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T07:01:09.936Z"
+    },
+    {
+      "filename": "artifacts/selection_notes.md",
+      "sha256": "bd26864bd56fcf41907e14aa557b6d398fb238b404f6ea1c4febda4ee23a673c",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T07:01:21.206Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T07:01:29.062Z"
+}

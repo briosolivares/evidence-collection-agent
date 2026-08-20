@@ -1,0 +1,762 @@
+URL: https://github.com/openclaw/openclaw/pull/122992
+Title: fix(ui): open the current session desktop directly by steipete · Pull Request #122992 · openclaw/openclaw · GitHub
+
+- generic [ref=f19e2]:
+  - generic [ref=f19e3]:
+    - link "Skip to content" [ref=f19e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f19e8]:
+      - heading "Navigation Menu" [level=2] [ref=f19e9]
+      - generic [ref=f19e10]:
+        - link "Homepage" [ref=f19e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f19e15]:
+          - navigation "Global" [ref=f19e16]:
+            - list [ref=f19e17]:
+              - listitem [ref=f19e18]:
+                - button "Platform" [ref=f19e20] [cursor=pointer]
+              - listitem [ref=f19e23]:
+                - button "Solutions" [ref=f19e25] [cursor=pointer]
+              - listitem [ref=f19e28]:
+                - button "Resources" [ref=f19e30] [cursor=pointer]
+              - listitem [ref=f19e33]:
+                - button "Open Source" [ref=f19e35] [cursor=pointer]
+              - listitem [ref=f19e38]:
+                - button "Enterprise" [ref=f19e40] [cursor=pointer]
+              - listitem [ref=f19e43]:
+                - link "Pricing" [ref=f19e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f19e45]:
+            - button "Search or jump to, type / to search" [ref=f19e47] [cursor=pointer]:
+              - generic [ref=f19e50]:
+                - text: Type
+                - generic [ref=f19e51]: /
+                - text: to search
+            - link "Sign in" [ref=f19e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122992
+            - link "Sign up" [ref=f19e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f19e55] [cursor=pointer]
+  - main [ref=f19e61]:
+    - generic [ref=f19e62]:
+      - generic [ref=f19e63]:
+        - generic [ref=f19e65]:
+          - link "openclaw" [ref=f19e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f19e70]: /
+          - strong [ref=f19e71]:
+            - link "openclaw" [ref=f19e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f19e73]: Public
+        - generic [ref=f19e74]:
+          - list:
+            - listitem [ref=f19e75]:
+              - link "Sponsor @openclaw" [ref=f19e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f19e77]: Sponsor
+            - listitem [ref=f19e81]:
+              - link "You must be signed in to change notification settings" [ref=f19e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f19e85]:
+              - link "Fork 81.2k" [ref=f19e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f19e89]: 81.2k
+            - listitem [ref=f19e90]:
+              - link "You must be signed in to star a repository" [ref=f19e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386123 users starred this repository" [ref=f19e95]: 386k
+      - navigation "Repository" [ref=f19e96]:
+        - list [ref=f19e97]:
+          - listitem [ref=f19e98]:
+            - link "Code" [ref=f19e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f19e103]:
+            - link "Issues 3.4k" [ref=f19e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f19e108]: Issues
+              - generic "3,402" [ref=f19e109]: 3.4k
+          - listitem [ref=f19e110]:
+            - link "Pull requests 2.1k" [ref=f19e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f19e114]: Pull requests
+              - generic "2,089" [ref=f19e115]: 2.1k
+          - listitem [ref=f19e116]:
+            - link "Actions" [ref=f19e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f19e121]:
+            - link "Projects" [ref=f19e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f19e126]:
+            - link "Security and quality 647" [ref=f19e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f19e130]: Security and quality
+              - generic "647" [ref=f19e131]
+          - listitem [ref=f19e132]:
+            - link "Insights" [ref=f19e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f19e143]:
+      - generic [ref=f19e147]:
+        - generic [ref=f19e149]:
+          - 'heading "fix(ui): open the current session desktop directly - #122992" [level=1] [ref=f19e150]':
+            - text: "fix(ui): open the current session desktop directly"
+            - generic [ref=f19e151]: "- #122992"
+          - generic [ref=f19e152]: "#122992"
+        - generic [ref=f19e155]:
+          - generic [ref=f19e157]:
+            - img "Pull request" [ref=f19e158]
+            - text: Merged
+          - generic [ref=f19e161]:
+            - link "steipete" [ref=f19e162] [cursor=pointer]:
+              - /url: /steipete
+            - text: merged 2 commits into
+            - generic [ref=f19e163]:
+              - link "main" [ref=f19e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f19e165]: from
+              - generic [ref=f19e166]:
+                - link "steipete/blissful-murdock-5fdc73" [ref=f19e167] [cursor=pointer]:
+                  - /url: /openclaw/openclaw/tree/steipete/blissful-murdock-5fdc73
+                - button "Copy head branch name to clipboard" [ref=f19e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 11:24 PM PDT" [ref=f19e172]: Aug 13, 202635 minutes ago
+        - generic [ref=f19e173]:
+          - generic [ref=f19e175]:
+            - generic [ref=f19e176]: "+383"
+            - generic [ref=f19e177]: "-71"
+            - generic [ref=f19e178]: "Lines changed: 383 additions & 71 deletions"
+          - navigation "Pull request navigation tabs" [ref=f19e186]:
+            - generic [ref=f19e187]:
+              - link "Conversation (4)" [ref=f19e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122992
+                - text: Conversation
+                - generic [ref=f19e191]: "4"
+                - generic [ref=f19e192]: (4)
+              - link "Commits (2)" [ref=f19e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122992/commits
+                - text: Commits
+                - generic [ref=f19e196]: "2"
+                - generic [ref=f19e197]: (2)
+              - link "Checks (105)" [ref=f19e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122992/checks
+                - text: Checks
+                - generic [ref=f19e201]: "105"
+                - generic [ref=f19e202]: (105)
+              - link "Files changed (7)" [ref=f19e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122992/files
+                - text: Files changed
+                - generic [ref=f19e206]: "7"
+                - generic [ref=f19e207]: (7)
+      - generic [ref=f19e212]:
+        - generic [ref=f19e214]:
+          - heading "Conversation" [level=2] [ref=f19e215]
+          - generic [ref=f19e216]:
+            - generic [ref=f19e217]:
+              - generic [ref=f19e219]:
+                - link [ref=f19e220] [cursor=pointer]:
+                  - /url: /steipete
+                  - img "@steipete" [ref=f19e221]
+                - generic [ref=f19e223]:
+                  - generic [ref=f19e224]:
+                    - heading "steipete commented Aug 13, 20262 hours ago •" [level=3] [ref=f19e225]:
+                      - generic [ref=f19e226]:
+                        - strong [ref=f19e227]:
+                          - link "steipete" [ref=f19e228] [cursor=pointer]:
+                            - /url: /steipete
+                        - text: commented
+                        - link "Aug 13, 20262 hours ago" [ref=f19e229] [cursor=pointer]:
+                          - /url: "#issue-5137811309"
+                        - generic [ref=f19e230]:
+                          - generic [ref=f19e231]: •
+                          - group [ref=f19e232]:
+                            - button "edited" [ref=f19e233] [cursor=pointer]
+                    - generic [ref=f19e237]:
+                      - group [ref=f19e239]:
+                        - button [ref=f19e240] [cursor=pointer]:
+                          - img "Show options" [ref=f19e243]
+                      - generic "This user has previously committed to the openclaw repository." [ref=f19e246]: Contributor
+                  - generic [ref=f19e251]:
+                    - heading "What Problem This Solves" [level=2] [ref=f19e252]
+                    - paragraph [ref=f19e253]:
+                      - text: Fixes an issue where users opening
+                      - strong [ref=f19e254]: Desktop
+                      - text: from a chat session were shown the Gateway-wide
+                      - strong [ref=f19e255]: Desktop sources
+                      - text: picker and had to choose a second time, even though the session already has one authoritative execution environment.
+                    - heading "Why This Change Was Made" [level=2] [ref=f19e256]
+                    - paragraph [ref=f19e257]: The chat header now resolves the current session directly to its Gateway host, cloud-worker environment, or execution node and passes that target to the Desktop panel. Direct activation refreshes the environment inventory before observing so worker app metadata remains available, while unresolved remote placements never fall back to another machine. The command-palette Desktop action remains the explicit global source picker.
+                    - heading "User Impact" [level=2] [ref=f19e258]
+                    - paragraph [ref=f19e259]:
+                      - text: Clicking
+                      - strong [ref=f19e260]: Desktop
+                      - text: inside a local, cloud, or node-hosted session now opens that session's desktop immediately. Users no longer need to select
+                      - strong [ref=f19e261]: This machine
+                      - text: or another already-known source a second time.
+                    - heading "Evidence" [level=2] [ref=f19e262]
+                    - list [ref=f19e263]:
+                      - listitem [ref=f19e264]:
+                        - paragraph [ref=f19e265]:
+                          - text: "Regression proof before the fix: the local-session header emitted only"
+                          - code [ref=f19e266]: "{ open: true }"
+                          - text: instead of targeting
+                          - code [ref=f19e267]: gateway
+                          - text: .
+                      - listitem [ref=f19e268]:
+                        - paragraph [ref=f19e269]:
+                          - code [ref=f19e270]: node scripts/run-vitest.mjs ui/src/pages/chat/chat-pane-terminal.test.ts
+                          - text: — 9 passed.
+                      - listitem [ref=f19e271]:
+                        - paragraph [ref=f19e272]:
+                          - code [ref=f19e273]: node scripts/run-vitest.mjs run --config test/vitest/vitest.ui-e2e.config.ts --configLoader runner ui/src/e2e/desktop-panel.e2e.test.ts
+                          - text: — 12 passed.
+                      - listitem [ref=f19e274]:
+                        - paragraph [ref=f19e275]:
+                          - code [ref=f19e276]: node scripts/check-changed.mjs -- <seven changed UI paths>
+                          - text: — passed after remote Testbox was unavailable and the repository wrapper fell back to local execution.
+                      - listitem [ref=f19e277]:
+                        - paragraph [ref=f19e278]: Fresh Codex autoreview — clean, no accepted/actionable findings.
+                      - listitem [ref=f19e279]:
+                        - paragraph [ref=f19e280]: "Production LOC: +113/-49 (net +64); tests: +270/-22."
+                      - listitem [ref=f19e281]:
+                        - paragraph [ref=f19e282]:
+                          - text: "Before (current Team production): clicking"
+                          - strong [ref=f19e283]: Desktop
+                          - text: opens the Gateway-wide source picker and requires a second
+                          - strong [ref=f19e284]: Connect
+                          - text: action.
+                        - paragraph [ref=f19e285]:
+                          - link [ref=f19e286] [cursor=pointer]:
+                            - /url: https://private-user-images.githubusercontent.com/58493/635257292-898cd769-7657-4a5f-a3e6-a9635e5d989b.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY2MDQ3MDQsIm5iZiI6MTc4NjYwNDQwNCwicGF0aCI6Ii81ODQ5My82MzUyNTcyOTItODk4Y2Q3NjktNzY1Ny00YTVmLWEzZTYtYTk2MzVlNWQ5ODliLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEzVDA3MDAwNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWFiZDY4ZTAxMTAyZTIxY2NjYjljZmZmODc5YTk0YTkyOGU2YWRmNjAyZDgxMzhkYjVmOWE0YjQ5NTlhZGU3NjImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.dbhTSSWdBnY1lq90ibrkHlk3lax5NSqi_kNe4cESOrk
+                            - 'img "Before: session Desktop opens the source picker" [ref=f19e287]'
+                      - listitem [ref=f19e288]:
+                        - paragraph [ref=f19e289]:
+                          - text: After, live on Team at the first PR head
+                          - code [ref=f19e290]: 84a63af11ea0ed2fe791fa4b219a83e6b2505609
+                          - text: ": one"
+                          - strong [ref=f19e291]: Desktop
+                          - text: click goes directly through
+                          - strong [ref=f19e292]: Connecting to desktop…
+                          - text: to the real XFCE/RFB canvas. No source picker or second
+                          - strong [ref=f19e293]: Connect
+                          - text: action appears. Final head
+                          - code [ref=f19e294]: dad46ead768712c99ff7341f47ff6af2b225c7e4
+                          - text: adds only the review-requested retry state for inventory failures; the successful routing path shown here is unchanged.
+                    - group [ref=f19e295]:
+                      - generic "session-desktop-live-proof.mp4" [ref=f19e296] [cursor=pointer]
+                    - paragraph [ref=f19e301]:
+                      - link [ref=f19e302] [cursor=pointer]:
+                        - /url: https://private-user-images.githubusercontent.com/58493/635278097-fb651086-cf8f-4382-be13-fb612dee6f9e.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3ODY2MDQ3MDQsIm5iZiI6MTc4NjYwNDQwNCwicGF0aCI6Ii81ODQ5My82MzUyNzgwOTctZmI2NTEwODYtY2Y4Zi00MzgyLWJlMTMtZmI2MTJkZWU2ZjllLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA4MTMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwODEzVDA3MDAwNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWQxYTlhN2ViZWQ2N2ViNTE0ZGE0ZjU2YWEyZTc5MTAzMmJlOTljYjRlOWE0MWExNWNkZTc3NmEzNmMzYjEwOTYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.1hsoQs5H307J4CL9lybnbeIn6Xo_ZzPbUc9muQKmxPY
+                        - 'img "After: session Desktop is connected directly" [ref=f19e303]'
+                    - list [ref=f19e304]:
+                      - listitem [ref=f19e305]:
+                        - text: "Live deployment proof: cold build with cache disabled, non-interactive Doctor,"
+                        - code [ref=f19e306]: /healthz
+                        - text: 200,
+                        - code [ref=f19e307]: /readyz
+                        - text: 200, exact deployed source SHA verified before recording. Team was then restored to current
+                        - code [ref=f19e308]: main
+                        - text: with auto-update enabled.
+                      - listitem [ref=f19e309]:
+                        - text: "Review recovery proof on final head: the inventory-failure E2E now shows"
+                        - strong [ref=f19e310]: Retry
+                        - text: ", performs a second"
+                        - code [ref=f19e311]: environments.list
+                        - text: ", observes the same retained worker target, and never exposes the source picker."
+                    - paragraph [ref=f19e312]: AI-assisted change; implementation and behavior were independently reviewed and verified against the owning UI and Gateway boundaries.
+                  - 'button "eyes (1): steipete, 04:28AM today" [disabled] [ref=f19e317]':
+                    - generic [ref=f19e318]: 👀
+                    - generic [ref=f19e319]: "1"
+              - generic [ref=f19e320]:
+                - generic [ref=f19e331]:
+                  - link [ref=f19e334] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f19e335]
+                  - code [ref=f19e337]:
+                    - 'link "fix(ui): open session desktop directly" [ref=f19e338] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122992/commits/84a63af11ea0ed2fe791fa4b219a83e6b2505609
+                  - button "Unverified" [ref=f19e340] [cursor=pointer]
+                  - group [ref=f19e345]:
+                    - img "67 / 97 checks OK" [ref=f19e347] [cursor=pointer]
+                  - code [ref=f19e350]:
+                    - link "84a63af" [ref=f19e351] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122992/commits/84a63af11ea0ed2fe791fa4b219a83e6b2505609
+                - generic [ref=f19e353]:
+                  - link [ref=f19e355] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f19e356]
+                  - generic [ref=f19e358]:
+                    - generic [ref=f19e359]:
+                      - heading "clawsweeper Bot commented Aug 13, 20262 hours ago" [level=3] [ref=f19e360]:
+                        - generic [ref=f19e361]:
+                          - strong [ref=f19e362]:
+                            - link "clawsweeper" [ref=f19e363] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f19e364]: Bot
+                          - text: commented
+                          - link "Aug 13, 20262 hours ago" [ref=f19e365] [cursor=pointer]:
+                            - /url: "#issuecomment-5275966594"
+                      - generic [ref=f19e366]:
+                        - group [ref=f19e368]:
+                          - button [ref=f19e369] [cursor=pointer]:
+                            - img "Show options" [ref=f19e372]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f19e375]: Contributor
+                    - table [ref=f19e379]:
+                      - rowgroup [ref=f19e380]:
+                        - row [ref=f19e381]:
+                          - cell [ref=f19e382]:
+                            - paragraph [ref=f19e383]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f19e384]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f19e385]:
+                  - generic [ref=f19e390]:
+                    - link [ref=f19e391] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f19e392]
+                    - link "openclaw-barnacle" [ref=f19e393] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f19e394]: Bot
+                    - text: added
+                    - 'link "app: web-ui" [ref=f19e395] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+                    - 'link "size: M" [ref=f19e396] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f19e397] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 13, 20262 hours ago" [ref=f19e398] [cursor=pointer]:
+                      - /url: "#event-29379579939"
+                  - generic [ref=f19e403]:
+                    - link [ref=f19e404] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f19e405]
+                    - link "clawsweeper" [ref=f19e406] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f19e407]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 other" [ref=f19e408] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20other%22
+                    - link "P2" [ref=f19e409] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+                    - 'link "rating: 🦪 silver shellfish" [ref=f19e410] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: ⏳ waiting on author" [ref=f19e411] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - text: labels
+                    - link "Aug 13, 20261 hour ago" [ref=f19e412] [cursor=pointer]:
+                      - /url: "#event-29381109694"
+                - generic [ref=f19e414]:
+                  - link [ref=f19e416] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f19e417]
+                  - generic [ref=f19e419]:
+                    - generic [ref=f19e420]:
+                      - heading "clawsweeper Bot commented Aug 13, 20261 hour ago •" [level=3] [ref=f19e421]:
+                        - generic [ref=f19e422]:
+                          - strong [ref=f19e423]:
+                            - link "clawsweeper" [ref=f19e424] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f19e425]: Bot
+                          - text: commented
+                          - link "Aug 13, 20261 hour ago" [ref=f19e426] [cursor=pointer]:
+                            - /url: "#issuecomment-5276299376"
+                          - generic [ref=f19e427]:
+                            - generic [ref=f19e428]: •
+                            - group [ref=f19e429]:
+                              - button "edited" [ref=f19e430] [cursor=pointer]
+                      - generic [ref=f19e434]:
+                        - group [ref=f19e436]:
+                          - button [ref=f19e437] [cursor=pointer]:
+                            - img "Show options" [ref=f19e440]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f19e443]: Contributor
+                    - table [ref=f19e447]:
+                      - rowgroup [ref=f19e448]:
+                        - row [ref=f19e449]:
+                          - cell [ref=f19e450]:
+                            - paragraph [ref=f19e451]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f19e452]: Reviewed August 13, 2026, 2:14 AM ET / 06:14 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f19e453]
+                            - heading "What this changes" [level=2] [ref=f19e454]
+                            - paragraph [ref=f19e455]: The PR makes a chat session’s Desktop action connect directly to its resolved host, worker, or node desktop, with retry when fresh environment inventory loading fails.
+                            - heading "Merge readiness" [level=2] [ref=f19e456]
+                            - paragraph [ref=f19e457]:
+                              - generic [ref=f19e458]: ⚠️
+                              - strong [ref=f19e459]: Ready for maintainer review - 2 items remain
+                            - paragraph [ref=f19e460]: Keep open. Current main still opens the generic Desktop picker, while the final branch routes through the session’s authoritative target and resolves the prior retry blocker; no blocking correctness finding remains. The maintainer-owned PR should proceed through normal exact-head CI and ownership review.
+                            - paragraph [ref=f19e461]:
+                              - strong [ref=f19e462]: "Priority:"
+                              - text: P2
+                              - strong [ref=f19e463]: "Reviewed head:"
+                              - code [ref=f19e464]: dad46ead768712c99ff7341f47ff6af2b225c7e4
+                            - heading "Review scores" [level=2] [ref=f19e465]
+                            - table [ref=f19e467]:
+                              - rowgroup [ref=f19e468]:
+                                - row [ref=f19e469]:
+                                  - columnheader "Measure" [ref=f19e470]
+                                  - columnheader "Result" [ref=f19e471]
+                                  - columnheader "What it means" [ref=f19e472]
+                              - rowgroup [ref=f19e473]:
+                                - row [ref=f19e474]:
+                                  - cell [ref=f19e475]:
+                                    - strong [ref=f19e476]: Overall readiness
+                                  - cell [ref=f19e477]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f19e478]: (4/6)
+                                  - cell "Strong real UI proof and focused boundary coverage support a correct fix; the only remaining concern is whether the added production structure is necessary." [ref=f19e479]
+                                - row [ref=f19e480]:
+                                  - cell [ref=f19e481]:
+                                    - strong [ref=f19e482]: Proof confidence
+                                  - cell [ref=f19e483]:
+                                    - text: 🦞 diamond lobster
+                                    - strong [ref=f19e484]: (5/6)
+                                    - text: ✨ media proof bonus
+                                  - 'cell "Sufficient (recording): The PR includes a redacted live before/after desktop recording for the central direct-connect behavior and final-head E2E evidence for the inventory-failure Retry path." [ref=f19e485]'
+                                - row [ref=f19e486]:
+                                  - cell [ref=f19e487]:
+                                    - strong [ref=f19e488]: Patch quality
+                                  - cell [ref=f19e489]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f19e490]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f19e491]
+                            - heading "Verification" [level=2] [ref=f19e492]
+                            - table [ref=f19e494]:
+                              - rowgroup [ref=f19e495]:
+                                - row [ref=f19e496]:
+                                  - columnheader "Check" [ref=f19e497]
+                                  - columnheader "Result" [ref=f19e498]
+                                  - columnheader "Evidence" [ref=f19e499]
+                              - rowgroup [ref=f19e500]:
+                                - row [ref=f19e501]:
+                                  - cell [ref=f19e502]:
+                                    - strong [ref=f19e503]: Real behavior
+                                  - cell "Verified" [ref=f19e504]
+                                  - 'cell "Sufficient (recording): The PR includes a redacted live before/after desktop recording for the central direct-connect behavior and final-head E2E evidence for the inventory-failure Retry path." [ref=f19e505]'
+                                - row [ref=f19e506]:
+                                  - cell [ref=f19e507]:
+                                    - strong [ref=f19e508]: Evidence reviewed
+                                  - cell "7 items" [ref=f19e509]
+                                  - 'cell "Current-main behavior: Current main emits a targetless Desktop-open event from the chat header, which takes the panel’s generic picker path rather than selecting the current session’s environment. Direct target owner: The branch resolves cloud placement to its environment ID, node execution to a node source ID, and local execution to the Gateway target; unresolved cloud placement returns no Desktop action. Recovery fix: The final commit refreshes inventory before direct observation, enters a recoverable inventory-error state on failure, and retries the retained target instead of exposing another source picker." [ref=f19e510]': "Current-main behavior: Current main emits a targetless Desktop-open event from the chat header, which takes the panel’s generic picker path rather than selecting the current session’s environment.Direct target owner: The branch resolves cloud placement to its environment ID, node execution to a node source ID, and local execution to the Gateway target; unresolved cloud placement returns no Desktop action.Recovery fix: The final commit refreshes inventory before direct observation, enters a recoverable inventory-error state on failure, and retries the retained target instead of exposing another source picker."
+                                - row [ref=f19e511]:
+                                  - cell [ref=f19e512]:
+                                    - strong [ref=f19e513]: Findings
+                                  - cell "None" [ref=f19e514]
+                                  - cell "None." [ref=f19e515]
+                                - row [ref=f19e516]:
+                                  - cell [ref=f19e517]:
+                                    - strong [ref=f19e518]: Security
+                                  - cell "None" [ref=f19e519]
+                                  - cell "None." [ref=f19e520]
+                            - heading "How this fits together" [level=2] [ref=f19e521]
+                            - paragraph [ref=f19e522]: A chat session exposes placement data that identifies its execution environment. The Control UI converts that placement into a desktop source, refreshes desktop metadata, and asks the Gateway to observe the exact source; the command palette remains the global source picker.
+                            - region "mermaid rendered output container" [ref=f19e523]:
+                              - generic [ref=f19e524]:
+                                - generic [ref=f19e525]:
+                                  - group [ref=f19e526]:
+                                    - button "Open dialog" [ref=f19e527] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f19e530] [cursor=pointer]
+                                - iframe [ref=f19e535]:
+                                  - generic [ref=f20e1]:
+                                    - document [ref=f20e5]:
+                                      - generic [ref=f20e11]:
+                                        - paragraph [ref=f20e18]: Chat session
+                                        - paragraph [ref=f20e25]: Placement resolution
+                                        - paragraph [ref=f20e32]: Desktop target
+                                        - paragraph [ref=f20e39]: Desktop panel
+                                        - paragraph [ref=f20e46]: Refresh environment inventory
+                                        - paragraph [ref=f20e53]: Observe exact desktop
+                                        - paragraph [ref=f20e60]: Remote desktop canvas
+                                        - paragraph [ref=f20e67]: Retry after inventory failure
+                                    - generic [ref=f20e68]:
+                                      - button "Zoom in" [ref=f20e69]
+                                      - button "Zoom out" [ref=f20e73]
+                                      - button "Reset view" [ref=f20e77]
+                                      - button "Pan up" [ref=f20e80]
+                                      - button "Pan down" [ref=f20e83]
+                                      - button "Pan left" [ref=f20e86]
+                                      - button "Pan right" [ref=f20e89]
+                            - heading "Before merge" [level=2] [ref=f19e536]
+                            - list [ref=f19e537]:
+                              - listitem [ref=f19e538]:
+                                - checkbox "Incomplete task" [disabled] [ref=f19e539]
+                                - strong [ref=f19e540]: Resolve merge risk (P1)
+                                - text: "- Production code grows by 64 net lines for this bug fix; maintainers should confirm the one-use recovery-rendering module is worth its added surface before merge."
+                              - listitem [ref=f19e541]:
+                                - checkbox "Incomplete task" [disabled] [ref=f19e542]
+                                - strong [ref=f19e543]: Complete next step (P2)
+                                - text: "- This maintainer-owned PR has a resolved prior finding and needs normal exact-head CI and ownership handling, not a separate repair job."
+                            - group [ref=f19e544]:
+                              - strong [ref=f19e546] [cursor=pointer]: Agent review details
+                - generic [ref=f19e553]:
+                  - link [ref=f19e555] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f19e556]
+                  - generic [ref=f19e557]:
+                    - link "steipete" [ref=f19e558] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: marked this pull request as ready for review
+                    - link "August 13, 2026 05:381 hour ago" [ref=f19e559] [cursor=pointer]:
+                      - /url: "#event-29381624017"
+                - generic [ref=f19e570]:
+                  - link [ref=f19e573] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f19e574]
+                  - code [ref=f19e576]:
+                    - 'link "fix(ui): make session desktop retryable" [ref=f19e577] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122992/commits/dad46ead768712c99ff7341f47ff6af2b225c7e4
+                  - button "Unverified" [ref=f19e579] [cursor=pointer]
+                  - group [ref=f19e584]:
+                    - img "73 / 97 checks OK" [ref=f19e586] [cursor=pointer]
+                  - code [ref=f19e589]:
+                    - link "dad46ea" [ref=f19e590] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122992/commits/dad46ead768712c99ff7341f47ff6af2b225c7e4
+                - generic [ref=f19e591]:
+                  - generic [ref=f19e596]:
+                    - link [ref=f19e597] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f19e598]
+                    - link "steipete" [ref=f19e599] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: closed this
+                    - link "Aug 13, 202652 minutes ago" [ref=f19e600] [cursor=pointer]:
+                      - /url: "#event-29382536670"
+                  - generic [ref=f19e606]:
+                    - link [ref=f19e607] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f19e608]
+                    - link "steipete" [ref=f19e609] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: reopened this
+                    - link "Aug 13, 202652 minutes ago" [ref=f19e610] [cursor=pointer]:
+                      - /url: "#event-29382539438"
+                  - generic [ref=f19e615]:
+                    - link [ref=f19e616] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f19e617]
+                    - link "clawsweeper" [ref=f19e618] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f19e619]: Bot
+                    - text: added
+                    - 'link "proof: 🎥 video" [ref=f19e620] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20%F0%9F%8E%A5%20video%22
+                    - 'link "proof: sufficient" [ref=f19e621] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+                    - 'link "rating: 🐚 platinum hermit" [ref=f19e622] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f19e623] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: and removed
+                    - 'link "rating: 🦪 silver shellfish" [ref=f19e624] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%A6%AA%20silver%20shellfish%22
+                    - 'link "status: ⏳ waiting on author" [ref=f19e625] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%E2%8F%B3%20waiting%20on%20author%22
+                    - 'link "merge-risk: 🚨 other" [ref=f19e626] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20other%22
+                    - text: labels
+                    - link "Aug 13, 202645 minutes ago" [ref=f19e627] [cursor=pointer]:
+                      - /url: "#event-29382786232"
+                - generic [ref=f19e629]:
+                  - link [ref=f19e631] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f19e632]
+                  - generic [ref=f19e634]:
+                    - generic [ref=f19e635]:
+                      - heading [level=3] [ref=f19e636]:
+                        - generic [ref=f19e637]:
+                          - strong [ref=f19e638]:
+                            - link "steipete" [ref=f19e639] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202640 minutes ago" [ref=f19e640] [cursor=pointer]:
+                            - /url: "#issuecomment-5276699667"
+                      - generic [ref=f19e641]:
+                        - group [ref=f19e643]:
+                          - button [ref=f19e644] [cursor=pointer]:
+                            - img "Show options" [ref=f19e647]
+                        - generic [ref=f19e649]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f19e650]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f19e652]: Author
+                    - table [ref=f19e656]:
+                      - rowgroup [ref=f19e657]:
+                        - row [ref=f19e658]:
+                          - cell [ref=f19e659]:
+                            - paragraph [ref=f19e660]:
+                              - text: Land-ready proof for final head
+                              - code [ref=f19e661]: dad46ead768712c99ff7341f47ff6af2b225c7e4
+                              - text: ":"
+                            - list [ref=f19e662]:
+                              - listitem [ref=f19e663]:
+                                - text: "Focused UI unit:"
+                                - code [ref=f19e664]: node scripts/run-vitest.mjs ui/src/pages/chat/chat-pane-terminal.test.ts
+                                - text: — 9 passed.
+                              - listitem [ref=f19e665]:
+                                - text: "Browser E2E:"
+                                - code [ref=f19e666]: node scripts/run-vitest.mjs run --config test/vitest/vitest.ui-e2e.config.ts --configLoader runner ui/src/e2e/desktop-panel.e2e.test.ts
+                                - text: — 12 passed, including retained-target Retry after an inventory failure.
+                              - listitem [ref=f19e667]:
+                                - text: "Changed gate:"
+                                - code [ref=f19e668]: node scripts/check-changed.mjs -- <seven changed UI paths>
+                                - text: — passed. The remote backend was unavailable, so the repository wrapper performed its documented local fallback; typechecks, lint, max-lines, dead exports, formatting, and shared guards passed.
+                              - listitem [ref=f19e669]: Fresh Codex autoreview — clean, no accepted/actionable findings.
+                              - listitem [ref=f19e670]:
+                                - text: "Exact-head CI:"
+                                - link "https://github.com/openclaw/openclaw/actions/runs/31672717708" [ref=f19e671] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/actions/runs/31672717708
+                                - text: — green.
+                              - listitem [ref=f19e672]:
+                                - text: "Live Team proof is embedded in the PR body: sanitized before screenshot plus a real one-click session Desktop video through the connected XFCE/RFB canvas. Team was restored to current"
+                                - code [ref=f19e673]: main
+                                - text: ", health/readiness 200, and auto-update enabled after recording."
+                              - listitem [ref=f19e674]:
+                                - text: Latest ClawSweeper review has no findings and marks proof sufficient. I am keeping
+                                - code [ref=f19e675]: desktop-panel-state.ts
+                                - text: ": it owns the closed recovery-state vocabulary and the shared Retry/Reconnect presentation for two distinct panel failures while keeping the already-full desktop panel below the 700-line gate."
+                            - paragraph [ref=f19e676]: "Known proof gap: the live success video was recorded on the first PR head; the final commit changes only inventory-failure recovery. The final-head E2E covers that exact Retry behavior and the successful routing path is unchanged."
+                - generic [ref=f19e677]:
+                  - generic [ref=f19e682]:
+                    - button "View details" [ref=f19e683] [cursor=pointer]
+                    - generic [ref=f19e684]:
+                      - link [ref=f19e686] [cursor=pointer]:
+                        - /url: /steipete
+                        - img "@steipete" [ref=f19e687]
+                      - generic [ref=f19e688]:
+                        - link "steipete" [ref=f19e689] [cursor=pointer]:
+                          - /url: /steipete
+                        - text: merged commit
+                        - link [ref=f19e690] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/commit/2464c17ab56034007d6f1f90083c8cd742fa1bb7
+                          - code [ref=f19e691]: 2464c17
+                        - text: into
+                        - generic [ref=f19e692]: main
+                        - link "Aug 13, 202635 minutes ago" [ref=f19e694] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122992#event-29383150115
+                        - generic [ref=f19e695]: 105 checks passed
+                  - generic [ref=f19e702]:
+                    - link [ref=f19e704] [cursor=pointer]:
+                      - /url: /steipete
+                      - img "@steipete" [ref=f19e705]
+                    - generic [ref=f19e706]:
+                      - link "steipete" [ref=f19e707] [cursor=pointer]:
+                        - /url: /steipete
+                      - text: deleted the
+                      - generic [ref=f19e708]: steipete/blissful-murdock-5fdc73
+                      - text: branch
+                      - link "August 13, 2026 06:2435 minutes ago" [ref=f19e710] [cursor=pointer]:
+                        - /url: "#event-29383151640"
+                - generic [ref=f19e712]:
+                  - link [ref=f19e714] [cursor=pointer]:
+                    - /url: /steipete
+                    - img "@steipete" [ref=f19e715]
+                  - generic [ref=f19e717]:
+                    - generic [ref=f19e718]:
+                      - heading [level=3] [ref=f19e719]:
+                        - generic [ref=f19e720]:
+                          - strong [ref=f19e721]:
+                            - link "steipete" [ref=f19e722] [cursor=pointer]:
+                              - /url: /steipete
+                          - text: commented
+                          - link "Aug 13, 202634 minutes ago" [ref=f19e723] [cursor=pointer]:
+                            - /url: "#issuecomment-5276756594"
+                      - generic [ref=f19e724]:
+                        - group [ref=f19e726]:
+                          - button [ref=f19e727] [cursor=pointer]:
+                            - img "Show options" [ref=f19e730]
+                        - generic [ref=f19e732]:
+                          - generic "This user has previously committed to the openclaw repository." [ref=f19e733]: Contributor
+                          - generic "This user is the author of this pull request." [ref=f19e735]: Author
+                    - table [ref=f19e739]:
+                      - rowgroup [ref=f19e740]:
+                        - row [ref=f19e741]:
+                          - cell [ref=f19e742]:
+                            - paragraph [ref=f19e743]: Merged via squash.
+                            - list [ref=f19e744]:
+                              - listitem [ref=f19e745]:
+                                - text: "Prepared head SHA:"
+                                - link "dad46ead768712c99ff7341f47ff6af2b225c7e4" [ref=f19e746] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/pull/122992/commits/dad46ead768712c99ff7341f47ff6af2b225c7e4
+                              - listitem [ref=f19e747]:
+                                - text: "Landed commit:"
+                                - link "2464c17ab56034007d6f1f90083c8cd742fa1bb7" [ref=f19e748] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/2464c17ab56034007d6f1f90083c8cd742fa1bb7
+            - generic [ref=f19e752]:
+              - link "Sign up for free" [ref=f19e753] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f19e754]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f19e755] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122992
+        - generic [ref=f19e759]:
+          - form "Select reviewers" [ref=f19e761]:
+            - heading "Reviewers" [level=3] [ref=f19e762]
+            - text: No reviews
+          - form "Select assignees" [ref=f19e764]:
+            - heading "Assignees" [level=3] [ref=f19e765]
+            - text: No one assigned
+          - generic [ref=f19e766]:
+            - heading "Labels" [level=3] [ref=f19e767]
+            - generic [ref=f19e768]:
+              - 'link "app: web-ui" [ref=f19e769] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22app%3A%20web-ui%22
+              - link "maintainer" [ref=f19e771] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - link "P2" [ref=f19e773] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP2
+              - 'link "proof: sufficient" [ref=f19e775] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20sufficient%22
+              - 'link "proof: 🎥 video" [ref=f19e777] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22proof%3A%20%F0%9F%8E%A5%20video%22
+              - 'link "rating: 🐚 platinum hermit" [ref=f19e779] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: M" [ref=f19e781] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f19e783] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f19e786]:
+            - heading "Projects" [level=3] [ref=f19e787]
+            - text: None yet
+          - form "Select milestones" [ref=f19e789]:
+            - heading "Milestone" [level=3] [ref=f19e790]
+            - text: No milestone
+          - form "Link issues" [ref=f19e796]:
+            - heading "Development" [level=3] [ref=f19e797]
+            - paragraph [ref=f19e798]: Successfully merging this pull request may close these issues.
+            - paragraph [ref=f19e800]: None yet
+          - generic [ref=f19e802]:
+            - heading "1 participant" [level=3] [ref=f19e803]
+            - link [ref=f19e805] [cursor=pointer]:
+              - /url: /steipete
+              - img "@steipete" [ref=f19e806]
+  - contentinfo [ref=f19e807]:
+    - heading "Footer" [level=2] [ref=f19e808]
+    - generic [ref=f19e809]:
+      - generic [ref=f19e810]:
+        - link "GitHub Homepage" [ref=f19e811] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f19e814]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f19e815]:
+        - heading "Footer navigation" [level=3] [ref=f19e816]
+        - list "Footer navigation" [ref=f19e817]:
+          - listitem [ref=f19e818]:
+            - link "Terms" [ref=f19e819] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f19e820]:
+            - link "Privacy" [ref=f19e821] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f19e822]:
+            - link "Security" [ref=f19e823] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f19e824]:
+            - link "Status" [ref=f19e825] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f19e826]:
+            - link "Community" [ref=f19e827] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f19e828]:
+            - link "Docs" [ref=f19e829] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f19e830]:
+            - link "Contact" [ref=f19e831] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f19e832]:
+            - button "Manage cookies" [ref=f19e834] [cursor=pointer]
+          - listitem [ref=f19e835]:
+            - button "Do not share my personal information" [ref=f19e837] [cursor=pointer]

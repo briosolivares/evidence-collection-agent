@@ -1,0 +1,73 @@
+{
+  "startedAt": "2026-08-13T03:46:48.678Z",
+  "finishedAt": "2026-08-13T04:00:16.306Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "mit_sororities",
+      "k": 3,
+      "accuracy": 0.14285714285714285,
+      "taskPassed": false,
+      "meanLatencyMs": 658320.5729583333,
+      "trials": [
+        {
+          "assertions": [],
+          "latencyMs": 798480.953125,
+          "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cdz5XYhBx8D2tAozt93Rx\"}",
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 807507.973125,
+          "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cdz5ZbwwyyU99acvKVZJz\"}",
+          "completed": false
+        },
+        {
+          "runDir": "/Users/briosolivares/Desktop/Code/evidence-collection-agent/runs/2026-08-12_08-46-53pm_for-alpha-chi-omega-alpha-phi-delta-phi_22c262",
+          "assertions": [
+            {
+              "name": "sorority_members.csv exists with a manifest entry",
+              "passed": true,
+              "detail": "artifacts/sorority_members.csv found and manifested"
+            },
+            {
+              "name": "answer.md contains a plausible Google Sheets URL",
+              "passed": false,
+              "detail": "no docs.google.com/spreadsheets/d/<id> URL found (private sheet contents remain human-reviewed)"
+            },
+            {
+              "name": "CSV has exactly the columns name, class, major, affiliation, interests, other (no more, no fewer)",
+              "passed": true,
+              "detail": "header: name, class, major, affiliation, interests, other"
+            },
+            {
+              "name": "CSV has plausible rows and every sorority/class cohort is represented",
+              "passed": false,
+              "detail": "found 0 rows, expected 12–400; missing cohort(s): Alpha Chi Omega 2026, Alpha Chi Omega 2027, Alpha Phi 2026, Alpha Phi 2027, Delta Phi Epsilon 2026, Delta Phi Epsilon 2027, Kappa Alpha Theta 2026, Kappa Alpha Theta 2027, Pi Beta Phi 2026, Pi Beta Phi 2027, Sigma Kappa 2026, Sigma Kappa 2027"
+            },
+            {
+              "name": "member names are plausible and unique within each affiliation",
+              "passed": false,
+              "detail": "0 plausible, affiliation-unique names"
+            },
+            {
+              "name": "major and interests/other fields meet minimum information coverage",
+              "passed": false,
+              "detail": "major 0% (min 50%); interests/other 0% (min 25%)"
+            },
+            {
+              "name": "manifest hashes verify",
+              "passed": true,
+              "detail": "8 artifact(s) verified"
+            }
+          ],
+          "latencyMs": 368972.792625,
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

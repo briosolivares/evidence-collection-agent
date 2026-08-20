@@ -1,0 +1,37 @@
+{
+  "startedAt": "2026-08-13T03:24:27.850Z",
+  "finishedAt": "2026-08-13T03:41:29.753Z",
+  "k": 3,
+  "concurrency": 3,
+  "model": "claude-sonnet-5",
+  "toolProfile": "atomic",
+  "tasks": [
+    {
+      "task": "mit_sororities",
+      "k": 3,
+      "accuracy": 0,
+      "taskPassed": false,
+      "meanLatencyMs": 886036.0255973333,
+      "trials": [
+        {
+          "assertions": [],
+          "latencyMs": 1021855.70325,
+          "error": "model stream ended with unterminated content blocks — response is truncated (stream age 59.5s, first event +1.2s, last event message_stop +59.5s, 17 events, ~102 output chars, open: write_file[46 chars json], stop_reason max_tokens)",
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 749334.389583,
+          "error": "model stream ended with unterminated content blocks — response is truncated (stream age 56.4s, first event +1.5s, last event message_stop +56.3s, 19 events, ~136 output chars, open: write_file[46 chars json], stop_reason max_tokens)",
+          "completed": false
+        },
+        {
+          "assertions": [],
+          "latencyMs": 886917.983959,
+          "error": "model stream ended with unterminated content blocks — response is truncated (stream age 59.1s, first event +1.3s, last event message_stop +59.1s, 17 events, ~104 output chars, open: write_file[46 chars json], stop_reason max_tokens)",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

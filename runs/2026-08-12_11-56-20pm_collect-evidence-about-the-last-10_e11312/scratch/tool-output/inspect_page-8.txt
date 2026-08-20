@@ -1,0 +1,1560 @@
+URL: https://github.com/openclaw/openclaw/pull/122871
+Title: fix: prevent bundled plugin startup convergence loops by fuller-stack-dev · Pull Request #122871 · openclaw/openclaw · GitHub
+
+- generic [ref=f9e2]:
+  - generic [ref=f9e3]:
+    - link "Skip to content" [ref=f9e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f9e8]:
+      - heading "Navigation Menu" [level=2] [ref=f9e9]
+      - generic [ref=f9e10]:
+        - link "Homepage" [ref=f9e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f9e15]:
+          - navigation "Global" [ref=f9e16]:
+            - list [ref=f9e17]:
+              - listitem [ref=f9e18]:
+                - button "Platform" [ref=f9e20] [cursor=pointer]
+              - listitem [ref=f9e23]:
+                - button "Solutions" [ref=f9e25] [cursor=pointer]
+              - listitem [ref=f9e28]:
+                - button "Resources" [ref=f9e30] [cursor=pointer]
+              - listitem [ref=f9e33]:
+                - button "Open Source" [ref=f9e35] [cursor=pointer]
+              - listitem [ref=f9e38]:
+                - button "Enterprise" [ref=f9e40] [cursor=pointer]
+              - listitem [ref=f9e43]:
+                - link "Pricing" [ref=f9e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+          - generic [ref=f9e45]:
+            - button "Search or jump to, type / to search" [ref=f9e47] [cursor=pointer]:
+              - generic [ref=f9e50]:
+                - text: Type
+                - generic [ref=f9e51]: /
+                - text: to search
+            - link "Sign in" [ref=f9e53] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122871
+            - link "Sign up" [ref=f9e54] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fpull_requests_fragments%2Fpull_request_layout&source=header-repo&source_repo=openclaw%2Fopenclaw
+            - button "Appearance settings" [ref=f9e55] [cursor=pointer]
+  - main [ref=f9e61]:
+    - generic [ref=f9e62]:
+      - generic [ref=f9e63]:
+        - generic [ref=f9e65]:
+          - link "openclaw" [ref=f9e69] [cursor=pointer]:
+            - /url: /openclaw
+          - generic [ref=f9e70]: /
+          - strong [ref=f9e71]:
+            - link "openclaw" [ref=f9e72] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - generic [ref=f9e73]: Public
+        - generic [ref=f9e74]:
+          - list:
+            - listitem [ref=f9e75]:
+              - link "Sponsor @openclaw" [ref=f9e76] [cursor=pointer]:
+                - /url: /sponsors/openclaw
+                - generic [ref=f9e77]: Sponsor
+            - listitem [ref=f9e81]:
+              - link "You must be signed in to change notification settings" [ref=f9e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Notifications
+            - listitem [ref=f9e85]:
+              - link "Fork 81.2k" [ref=f9e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Fork
+                - generic "81,156" [ref=f9e89]: 81.2k
+            - listitem [ref=f9e90]:
+              - link "You must be signed in to star a repository" [ref=f9e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fopenclaw%2Fopenclaw
+                - text: Star
+                - generic "386123 users starred this repository" [ref=f9e95]: 386k
+      - navigation "Repository" [ref=f9e96]:
+        - list [ref=f9e97]:
+          - listitem [ref=f9e98]:
+            - link "Code" [ref=f9e99] [cursor=pointer]:
+              - /url: /openclaw/openclaw
+          - listitem [ref=f9e103]:
+            - link "Issues 3.4k" [ref=f9e104] [cursor=pointer]:
+              - /url: /openclaw/openclaw/issues
+              - generic [ref=f9e108]: Issues
+              - generic "3,402" [ref=f9e109]: 3.4k
+          - listitem [ref=f9e110]:
+            - link "Pull requests 2.1k" [ref=f9e111] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulls
+              - generic [ref=f9e114]: Pull requests
+              - generic "2,089" [ref=f9e115]: 2.1k
+          - listitem [ref=f9e116]:
+            - link "Actions" [ref=f9e117] [cursor=pointer]:
+              - /url: /openclaw/openclaw/actions
+          - listitem [ref=f9e121]:
+            - link "Projects" [ref=f9e122] [cursor=pointer]:
+              - /url: /openclaw/openclaw/projects
+          - listitem [ref=f9e126]:
+            - link "Security and quality 647" [ref=f9e127] [cursor=pointer]:
+              - /url: /openclaw/openclaw/security
+              - generic [ref=f9e130]: Security and quality
+              - generic "647" [ref=f9e131]
+          - listitem [ref=f9e132]:
+            - link "Insights" [ref=f9e133] [cursor=pointer]:
+              - /url: /openclaw/openclaw/pulse
+    - generic [ref=f9e143]:
+      - generic [ref=f9e147]:
+        - generic [ref=f9e149]:
+          - 'heading "fix: prevent bundled plugin startup convergence loops - #122871" [level=1] [ref=f9e150]':
+            - text: "fix: prevent bundled plugin startup convergence loops"
+            - generic [ref=f9e151]: "- #122871"
+          - generic [ref=f9e152]: "#122871"
+        - generic [ref=f9e155]:
+          - generic [ref=f9e157]:
+            - img "Pull request" [ref=f9e158]
+            - text: Merged
+          - generic [ref=f9e161]:
+            - link "fuller-stack-dev" [ref=f9e162] [cursor=pointer]:
+              - /url: /fuller-stack-dev
+            - text: merged 125 commits into
+            - generic [ref=f9e163]:
+              - link "openclaw:main" [ref=f9e164] [cursor=pointer]:
+                - /url: /openclaw/openclaw/tree/main
+              - generic [ref=f9e165]: from
+              - generic [ref=f9e166]:
+                - link "fuller-stack-dev:fix/122321-startup-convergence-record-retirement" [ref=f9e167] [cursor=pointer]:
+                  - /url: /fuller-stack-dev/openclaw/tree/fix/122321-startup-convergence-record-retirement
+                - button "Copy head branch name to clipboard" [ref=f9e168] [cursor=pointer]
+            - generic "Aug 12, 2026, 11:39 PM PDT" [ref=f9e172]: Aug 13, 202619 minutes ago
+        - generic [ref=f9e173]:
+          - generic [ref=f9e175]:
+            - generic [ref=f9e176]: "+377"
+            - generic [ref=f9e177]: "-71"
+            - generic [ref=f9e178]: "Lines changed: 377 additions & 71 deletions"
+          - navigation "Pull request navigation tabs" [ref=f9e186]:
+            - generic [ref=f9e187]:
+              - link "Conversation (4)" [ref=f9e188] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122871
+                - text: Conversation
+                - generic [ref=f9e191]: "4"
+                - generic [ref=f9e192]: (4)
+              - link "Commits (125)" [ref=f9e193] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122871/commits
+                - text: Commits
+                - generic [ref=f9e196]: "125"
+                - generic [ref=f9e197]: (125)
+              - link "Checks (125)" [ref=f9e198] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122871/checks
+                - text: Checks
+                - generic [ref=f9e201]: "125"
+                - generic [ref=f9e202]: (125)
+              - link "Files changed (8)" [ref=f9e203] [cursor=pointer]:
+                - /url: /openclaw/openclaw/pull/122871/files
+                - text: Files changed
+                - generic [ref=f9e206]: "8"
+                - generic [ref=f9e207]: (8)
+      - generic [ref=f9e212]:
+        - generic [ref=f9e214]:
+          - heading "Conversation" [level=2] [ref=f9e215]
+          - generic [ref=f9e216]:
+            - generic [ref=f9e217]:
+              - generic [ref=f9e219]:
+                - link [ref=f9e220] [cursor=pointer]:
+                  - /url: /fuller-stack-dev
+                  - img "@fuller-stack-dev" [ref=f9e221]
+                - generic [ref=f9e223]:
+                  - generic [ref=f9e224]:
+                    - heading "fuller-stack-dev commented Aug 12, 20267 hours ago •" [level=3] [ref=f9e225]:
+                      - generic [ref=f9e226]:
+                        - strong [ref=f9e227]:
+                          - link "fuller-stack-dev" [ref=f9e228] [cursor=pointer]:
+                            - /url: /fuller-stack-dev
+                        - text: commented
+                        - link "Aug 12, 20267 hours ago" [ref=f9e229] [cursor=pointer]:
+                          - /url: "#issue-5136371823"
+                        - generic [ref=f9e230]:
+                          - generic [ref=f9e231]: •
+                          - group [ref=f9e232]:
+                            - button "edited" [ref=f9e233] [cursor=pointer]
+                    - generic [ref=f9e237]:
+                      - group [ref=f9e239]:
+                        - button [ref=f9e240] [cursor=pointer]:
+                          - img "Show options" [ref=f9e243]
+                      - generic "This user is a member of the openclaw organization." [ref=f9e246]: Member
+                  - generic [ref=f9e251]:
+                    - paragraph [ref=f9e252]:
+                      - text: Closes
+                      - link "#122321" [ref=f9e253] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/issues/122321
+                    - heading "What Problem This Solves" [level=2] [ref=f9e254]
+                    - paragraph [ref=f9e255]: Fixes an issue where users updating to a runtime that bundles a previously managed official plugin could repeatedly fail gateway startup convergence. The stale managed package was removed, but its persisted install record could still make the subsequent missing-plugin repair reinstall the same package and change the migration fingerprint.
+                    - heading "Why This Change Was Made" [level=2] [ref=f9e256]
+                    - paragraph [ref=f9e257]: Bundled-plugin retirement now captures one authoritative installed-plugin baseline, removes both the obsolete managed payload and its persisted install record, and passes that filtered baseline through the remaining convergence repairs before the final record map is persisted. This keeps unchanged startup convergence read-only, preserves retained managed overrides and external plugins, and leaves the fail-closed identity checkpoint intact for genuine external drift.
+                    - heading "User Impact" [level=2] [ref=f9e258]
+                    - paragraph [ref=f9e259]: Gateways can converge after an update replaces a managed official plugin with the bundled runtime copy, without repeatedly reinstalling the retired package or creating new managed generation directories.
+                    - heading "Evidence" [level=2] [ref=f9e260]
+                    - list [ref=f9e261]:
+                      - listitem [ref=f9e262]:
+                        - text: Base red proof at
+                        - code [ref=f9e263]: d003e08756420b2798e35699700cf8d649d142fc
+                        - text: ": stale bundled-package cleanup removed the package directory but left the persisted"
+                        - code [ref=f9e264]: codex
+                        - text: "install record. Testbox run:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31647748383" [ref=f9e265] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31647748383
+                      - listitem [ref=f9e266]: "Focused owner and startup-convergence suites: 105 tests passed across the post-core convergence, plugin registry, doctor sequencing, and state-migration tests."
+                      - listitem [ref=f9e267]: Adjacent and negative controls cover retained managed overrides, non-bundled external plugins, unrelated external drift, no-op read-only startup, and two independent two-start convergence fixtures.
+                      - listitem [ref=f9e268]:
+                        - text: Packaged runtime proof on validated content commit
+                        - code [ref=f9e269]: 0dc922628180ca3569e0f396723b04a28859bfa9
+                        - text: ": each independent fixture refused the first changed-input start, became ready on the second start, emitted no managed-package refresh, created no new generation directory, removed the stale payload, and persisted an empty retired-record map."
+                      - listitem [ref=f9e270]:
+                        - code [ref=f9e271]: pnpm check:changed
+                        - text: passed for all eight changed paths, including formatting, core/test type checks, lint, and policy guards.
+                      - listitem [ref=f9e272]:
+                        - code [ref=f9e273]: pnpm build
+                        - text: passed.
+                      - listitem [ref=f9e274]: Source-blind behavior validation passed all seven observable contract clauses twice.
+                      - listitem [ref=f9e275]: Shared autoreview completed clean on the exact published diff.
+                      - listitem [ref=f9e276]:
+                        - text: "Validation Testbox:"
+                        - code [ref=f9e277]: tbx_01kzw5saf6wx0xdtp3ztdw830b
+                        - text: "; run:"
+                        - link "https://github.com/openclaw/openclaw/actions/runs/31651965094" [ref=f9e278] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/actions/runs/31651965094
+                      - listitem [ref=f9e279]:
+                        - text: "Published exact head: canonical base"
+                        - code [ref=f9e280]: cc2ed816bee42e0c42c3344126e92afc8f575fa7
+                        - text: ", PR head"
+                        - code [ref=f9e281]: a71dddafbf461e117c09f8a3cb5ad8713cc2f4fb
+                        - text: . The publication graph preserves both the original hosted PR ancestry and freshly fetched canonical-main ancestry; the tree diff retained stable patch ID
+                        - code [ref=f9e282]: 43b7283fd13ffe22c7ce76e505ecf75426d8b03e
+                        - text: ", and the fresh-base ancestry gate passed."
+                      - listitem [ref=f9e283]: "Exact publication head: all 105 focused tests passed; the scoped changed gate passed formatting, dead-code scans, core and test type checks, changed-file lint, import cycles, and policy guards; shared autoreview completed clean. Exact-head GitHub CI remains the publication gate."
+                    - paragraph [ref=f9e284]: The minimal current-main packaged fixture exposed the stale-record owner inconsistency but converged after one refusal rather than reproducing the field report's indefinite loop. The regression therefore targets the proven package/record split and models the reinstall path directly; it does not relax the checkpoint or add startup retries.
+                    - paragraph [ref=f9e285]: Raw terminal video capture was attempted, but the local AVFoundation recorder acquired no frames. No reconstructed video is presented as evidence; the raw state output, focused tests, packaged runtime proof, and Testbox run remain canonical.
+                    - paragraph [ref=f9e286]: "AI-assisted: yes. The change and evidence were manually reviewed."
+                  - 'button "eyes (1): fuller-stack-dev, 11:58PM yesterday" [disabled] [ref=f9e291]':
+                    - generic [ref=f9e292]: 👀
+                    - generic [ref=f9e293]: "1"
+              - generic [ref=f9e294]:
+                - generic [ref=f9e305]:
+                  - link [ref=f9e308] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                    - img "@fuller-stack-dev" [ref=f9e309]
+                  - code [ref=f9e311]:
+                    - 'link "fix: stop bundled plugin startup refresh loops" [ref=f9e312] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/pull/122871/commits/14ecfcb9edbae0f1e771699857df7fee0f0a9634
+                  - button "Verified" [ref=f9e314] [cursor=pointer]
+                  - group [ref=f9e319]:
+                    - img "73 / 119 checks OK" [ref=f9e321] [cursor=pointer]
+                  - code [ref=f9e324]:
+                    - link "14ecfcb" [ref=f9e325] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/pull/122871/commits/14ecfcb9edbae0f1e771699857df7fee0f0a9634
+                - generic [ref=f9e327]:
+                  - link [ref=f9e329] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e330]
+                  - generic [ref=f9e332]:
+                    - generic [ref=f9e333]:
+                      - heading "clawsweeper Bot commented Aug 12, 20267 hours ago" [level=3] [ref=f9e334]:
+                        - generic [ref=f9e335]:
+                          - strong [ref=f9e336]:
+                            - link "clawsweeper" [ref=f9e337] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e338]: Bot
+                          - text: commented
+                          - link "Aug 12, 20267 hours ago" [ref=f9e339] [cursor=pointer]:
+                            - /url: "#issuecomment-5274191661"
+                      - generic [ref=f9e340]:
+                        - group [ref=f9e342]:
+                          - button [ref=f9e343] [cursor=pointer]:
+                            - img "Show options" [ref=f9e346]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e349]: Contributor
+                    - table [ref=f9e353]:
+                      - rowgroup [ref=f9e354]:
+                        - row [ref=f9e355]:
+                          - cell [ref=f9e356]:
+                            - paragraph [ref=f9e357]: 🦞👀 ClawSweeper picked this up.
+                            - paragraph [ref=f9e358]: Pull request received. I will update this pull request when review starts.
+                - generic [ref=f9e359]:
+                  - generic [ref=f9e364]:
+                    - link [ref=f9e365] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                      - img "@openclaw-barnacle" [ref=f9e366]
+                    - link "openclaw-barnacle" [ref=f9e367] [cursor=pointer]:
+                      - /url: /apps/openclaw-barnacle
+                    - generic [ref=f9e368]: Bot
+                    - text: added
+                    - link "cli" [ref=f9e369] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+                    - link "commands" [ref=f9e370] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+                    - 'link "size: M" [ref=f9e371] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+                    - link "maintainer" [ref=f9e372] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+                    - text: labels
+                    - link "Aug 12, 20267 hours ago" [ref=f9e373] [cursor=pointer]:
+                      - /url: "#event-29371878913"
+                  - generic [ref=f9e378]:
+                    - link [ref=f9e379] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                      - img "@clawsweeper" [ref=f9e380]
+                    - link "clawsweeper" [ref=f9e381] [cursor=pointer]:
+                      - /url: /apps/clawsweeper
+                    - generic [ref=f9e382]: Bot
+                    - text: added
+                    - 'link "merge-risk: 🚨 compatibility" [ref=f9e383] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+                    - link "P1" [ref=f9e384] [cursor=pointer]:
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+                    - 'link "rating: 🐚 platinum hermit" [ref=f9e385] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+                    - 'link "status: 👀 ready for maintainer look" [ref=f9e386] [cursor=pointer]':
+                      - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+                    - text: labels
+                    - link "Aug 13, 20266 hours ago" [ref=f9e387] [cursor=pointer]:
+                      - /url: "#event-29372125184"
+                - generic [ref=f9e389]:
+                  - link [ref=f9e391] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e392]
+                  - generic [ref=f9e394]:
+                    - generic [ref=f9e395]:
+                      - heading "clawsweeper Bot commented Aug 13, 20266 hours ago" [level=3] [ref=f9e396]:
+                        - generic [ref=f9e397]:
+                          - strong [ref=f9e398]:
+                            - link "clawsweeper" [ref=f9e399] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e400]: Bot
+                          - text: commented
+                          - link "Aug 13, 20266 hours ago" [ref=f9e401] [cursor=pointer]:
+                            - /url: "#issuecomment-5274241008"
+                      - generic [ref=f9e402]:
+                        - group [ref=f9e404]:
+                          - button [ref=f9e405] [cursor=pointer]:
+                            - img "Show options" [ref=f9e408]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e411]: Contributor
+                    - table [ref=f9e415]:
+                      - rowgroup [ref=f9e416]:
+                        - row [ref=f9e417]:
+                          - cell [ref=f9e418]:
+                            - paragraph [ref=f9e419]:
+                              - text: "Codex review: needs maintainer review before merge."
+                              - emphasis [ref=f9e420]: Reviewed August 12, 2026, 8:05 PM ET / August 13, 2026, 00:05 UTC.
+                            - heading "ClawSweeper review" [level=1] [ref=f9e421]
+                            - heading "What this changes" [level=2] [ref=f9e422]
+                            - paragraph [ref=f9e423]: The PR retires persisted managed-plugin records together with obsolete bundled-plugin payloads so later startup repair cannot reinstall the retired package.
+                            - heading "Regression provenance" [level=2] [ref=f9e424]
+                            - paragraph [ref=f9e425]: Possible regression — probable (reviewed change; failure trace). No predecessor PR is attributed.
+                            - heading "Merge readiness" [level=2] [ref=f9e426]
+                            - paragraph [ref=f9e427]:
+                              - generic [ref=f9e428]: ⚠️
+                              - strong [ref=f9e429]: Ready for maintainer review - 3 items remain
+                            - paragraph [ref=f9e430]: "Keep open for normal member-authored PR review: current main has the stale package/record split, and this patch repairs it at the record owner without weakening the startup checkpoint."
+                            - paragraph [ref=f9e431]:
+                              - strong [ref=f9e432]: "Priority:"
+                              - text: P1
+                              - strong [ref=f9e433]: "Reviewed head:"
+                              - code [ref=f9e434]: 14ecfcb9edbae0f1e771699857df7fee0f0a9634
+                            - heading "Review scores" [level=2] [ref=f9e435]
+                            - table [ref=f9e437]:
+                              - rowgroup [ref=f9e438]:
+                                - row [ref=f9e439]:
+                                  - columnheader "Measure" [ref=f9e440]
+                                  - columnheader "Result" [ref=f9e441]
+                                  - columnheader "What it means" [ref=f9e442]
+                              - rowgroup [ref=f9e443]:
+                                - row [ref=f9e444]:
+                                  - cell [ref=f9e445]:
+                                    - strong [ref=f9e446]: Overall readiness
+                                  - cell [ref=f9e447]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f9e448]: (4/6)
+                                  - cell "The repair is coherent and behaviorally covered; exact-head CI remains the final merge gate." [ref=f9e449]
+                                - row [ref=f9e450]:
+                                  - cell [ref=f9e451]:
+                                    - strong [ref=f9e452]: Proof confidence
+                                  - cell "🌊 off-meta tidepool" [ref=f9e453]
+                                  - 'cell "Not applicable: The author is a repository member, so the external-contributor proof gate does not apply; the PR body’s packaged-runtime Testbox evidence remains useful supplemental support." [ref=f9e454]'
+                                - row [ref=f9e455]:
+                                  - cell [ref=f9e456]:
+                                    - strong [ref=f9e457]: Patch quality
+                                  - cell [ref=f9e458]:
+                                    - text: 🐚 platinum hermit
+                                    - strong [ref=f9e459]: (4/6)
+                                  - cell "No actionable review findings were identified." [ref=f9e460]
+                            - heading "Verification" [level=2] [ref=f9e461]
+                            - table [ref=f9e463]:
+                              - rowgroup [ref=f9e464]:
+                                - row [ref=f9e465]:
+                                  - columnheader "Check" [ref=f9e466]
+                                  - columnheader "Result" [ref=f9e467]
+                                  - columnheader "Evidence" [ref=f9e468]
+                              - rowgroup [ref=f9e469]:
+                                - row [ref=f9e470]:
+                                  - cell [ref=f9e471]:
+                                    - strong [ref=f9e472]: Real behavior
+                                  - cell "Not applicable" [ref=f9e473]
+                                  - 'cell "Not applicable: The author is a repository member, so the external-contributor proof gate does not apply; the PR body’s packaged-runtime Testbox evidence remains useful supplemental support." [ref=f9e474]'
+                                - row [ref=f9e475]:
+                                  - cell [ref=f9e476]:
+                                    - strong [ref=f9e477]: Evidence reviewed
+                                  - cell "6 items" [ref=f9e478]
+                                  - 'cell "Current-main manifestation: The managed-shadow cleanup deletes the npm payload but only returns a boolean, leaving its persisted install record available to later repair. Current-main caller path: Post-core convergence discards the cleanup result and invokes missing-plugin repair without a filtered baseline, permitting the stale record to be reread. Patch owner boundary: The branch snapshots records before payload deletion, removes only the retired IDs, and passes that map through downstream repair and persistence." [ref=f9e479]': "Current-main manifestation: The managed-shadow cleanup deletes the npm payload but only returns a boolean, leaving its persisted install record available to later repair.Current-main caller path: Post-core convergence discards the cleanup result and invokes missing-plugin repair without a filtered baseline, permitting the stale record to be reread.Patch owner boundary: The branch snapshots records before payload deletion, removes only the retired IDs, and passes that map through downstream repair and persistence."
+                                - row [ref=f9e480]:
+                                  - cell [ref=f9e481]:
+                                    - strong [ref=f9e482]: Findings
+                                  - cell "None" [ref=f9e483]
+                                  - cell "None." [ref=f9e484]
+                                - row [ref=f9e485]:
+                                  - cell [ref=f9e486]:
+                                    - strong [ref=f9e487]: Security
+                                  - cell "None" [ref=f9e488]
+                                  - cell "None." [ref=f9e489]
+                            - heading "How this fits together" [level=2] [ref=f9e490]
+                            - paragraph [ref=f9e491]: Startup convergence and Doctor reconcile bundled plugins, managed npm payloads, and persisted install records before the gateway becomes ready. The resulting record map feeds missing-plugin repair and is persisted for the next start.
+                            - region "mermaid rendered output container" [ref=f9e492]:
+                              - generic [ref=f9e493]:
+                                - generic [ref=f9e494]:
+                                  - group [ref=f9e495]:
+                                    - button "Open dialog" [ref=f9e496] [cursor=pointer]
+                                  - button "Copy mermaid code" [ref=f9e499] [cursor=pointer]
+                                - iframe [ref=f9e504]:
+                                  - generic [ref=f10e1]:
+                                    - document [ref=f10e5]:
+                                      - generic [ref=f10e11]:
+                                        - paragraph [ref=f10e18]: Persisted plugin records
+                                        - paragraph [ref=f10e25]: Startup and Doctor repair
+                                        - paragraph [ref=f10e32]: Managed npm payloads
+                                        - paragraph [ref=f10e39]: Bundled plugin catalog
+                                        - paragraph [ref=f10e46]: Retire obsolete managed shadow
+                                        - paragraph [ref=f10e53]: Repair configured installs
+                                        - paragraph [ref=f10e60]: Persist final record map
+                                        - paragraph [ref=f10e67]: Gateway readiness
+                                    - generic [ref=f10e68]:
+                                      - button "Zoom in" [ref=f10e69]
+                                      - button "Zoom out" [ref=f10e73]
+                                      - button "Reset view" [ref=f10e77]
+                                      - button "Pan up" [ref=f10e80]
+                                      - button "Pan down" [ref=f10e83]
+                                      - button "Pan left" [ref=f10e86]
+                                      - button "Pan right" [ref=f10e89]
+                            - heading "Before merge" [level=2] [ref=f9e505]
+                            - list [ref=f9e506]:
+                              - listitem [ref=f9e507]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e508]
+                                - strong [ref=f9e509]: Resolve merge risk (P1)
+                                - text: "- This changes upgrade-time persisted install-record handling; exact-head CI must confirm that retained managed overrides and external plugins remain untouched."
+                              - listitem [ref=f9e510]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e511]
+                                - strong [ref=f9e512]: Resolve merge risk (P1)
+                                - text: "- The bug fix has a net production increase of 28 lines, justified by carrying one authoritative record baseline through existing owner boundaries; a smaller consumer-side guard would reintroduce split state."
+                              - listitem [ref=f9e513]:
+                                - checkbox "Incomplete task" [disabled] [ref=f9e514]
+                                - strong [ref=f9e515]: Complete next step (P2)
+                                - text: "- No repair lane is needed; retain this member-authored, maintainer-labelled PR for normal exact-head CI and merge review."
+                            - group [ref=f9e516]:
+                              - strong [ref=f9e518] [cursor=pointer]: Agent review details
+                - generic [ref=f9e524]:
+                  - link [ref=f9e525] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                    - img "@fuller-stack-dev" [ref=f9e526]
+                  - link "fuller-stack-dev" [ref=f9e527] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                  - text: self-assigned this
+                  - link "Aug 13, 20265 hours ago" [ref=f9e528] [cursor=pointer]:
+                    - /url: "#event-29374985424"
+                - generic [ref=f9e530]:
+                  - generic [ref=f9e535]:
+                    - link "steipete" [ref=f9e536] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: and others added 18 commits
+                    - link "August 12, 2026 23:271 hour ago" [ref=f9e537] [cursor=pointer]:
+                      - /url: "#commits-pushed-08e8876"
+                  - generic [ref=f9e538]:
+                    - generic [ref=f9e546]:
+                      - generic [ref=f9e548]:
+                        - link [ref=f9e549] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e550]
+                        - link [ref=f9e551] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e552]
+                      - generic [ref=f9e553]:
+                        - code [ref=f9e554]:
+                          - 'link "feat: continue web sessions in the terminal (" [ref=f9e555] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/08e88765bc70c99c92f4a1b2472b1b03b2286c33
+                          - link "openclaw#122870" [ref=f9e556] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122870
+                          - link ")" [ref=f9e557] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/08e88765bc70c99c92f4a1b2472b1b03b2286c33
+                        - button "Commit message body" [ref=f9e559] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e561] [cursor=pointer]
+                      - code [ref=f9e566]:
+                        - link "08e8876" [ref=f9e567] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/08e88765bc70c99c92f4a1b2472b1b03b2286c33
+                    - generic [ref=f9e575]:
+                      - generic [ref=f9e577]:
+                        - link [ref=f9e578] [cursor=pointer]:
+                          - /url: /vyctorbrzezowski
+                          - img "@vyctorbrzezowski" [ref=f9e579]
+                        - link [ref=f9e580] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e581]
+                      - generic [ref=f9e582]:
+                        - code [ref=f9e583]:
+                          - 'link "fix(ui): keep composer capability menus within the viewport (" [ref=f9e584] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/98fe7c749fe29c4bbdbfc1ddcb923bb7825a8e78
+                          - link "openclaw…" [ref=f9e585] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122296
+                        - button "Commit message body" [ref=f9e587] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e589] [cursor=pointer]
+                      - code [ref=f9e594]:
+                        - link "98fe7c7" [ref=f9e595] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/98fe7c749fe29c4bbdbfc1ddcb923bb7825a8e78
+                    - generic [ref=f9e603]:
+                      - generic [ref=f9e605]:
+                        - link [ref=f9e606] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e607]
+                        - link [ref=f9e608] [cursor=pointer]:
+                          - /url: /ampagent
+                          - img "@ampagent" [ref=f9e609]
+                        - link [ref=f9e610] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e611]
+                      - generic [ref=f9e612]:
+                        - code [ref=f9e613]:
+                          - 'link "test(cron): focus runtime config composition (" [ref=f9e614] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/aba84225ba1b12f19d3dbfe070b2293f4b0bce79
+                          - link "openclaw#122867" [ref=f9e615] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122867
+                          - link ")" [ref=f9e616] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/aba84225ba1b12f19d3dbfe070b2293f4b0bce79
+                        - button "Commit message body" [ref=f9e618] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e620] [cursor=pointer]
+                      - code [ref=f9e625]:
+                        - link "aba8422" [ref=f9e626] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/aba84225ba1b12f19d3dbfe070b2293f4b0bce79
+                    - generic [ref=f9e634]:
+                      - generic [ref=f9e636]:
+                        - link [ref=f9e637] [cursor=pointer]:
+                          - /url: /jjjhenriksen
+                          - img "@jjjhenriksen" [ref=f9e638]
+                        - link [ref=f9e639] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e640]
+                      - generic [ref=f9e641]:
+                        - code [ref=f9e642]:
+                          - 'link "feat(cli): allow editing automation display names (" [ref=f9e643] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/71f16d334cc552ef72e514dd03c8df6ad02dd755
+                          - link "openclaw#122702" [ref=f9e644] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122702
+                          - link ")" [ref=f9e645] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/71f16d334cc552ef72e514dd03c8df6ad02dd755
+                        - button "Commit message body" [ref=f9e647] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e649] [cursor=pointer]
+                      - code [ref=f9e654]:
+                        - link "71f16d3" [ref=f9e655] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/71f16d334cc552ef72e514dd03c8df6ad02dd755
+                    - generic [ref=f9e663]:
+                      - generic [ref=f9e665]:
+                        - link [ref=f9e666] [cursor=pointer]:
+                          - /url: /jalehman
+                          - img "@jalehman" [ref=f9e667]
+                        - link [ref=f9e668] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e669]
+                      - generic [ref=f9e670]:
+                        - code [ref=f9e671]:
+                          - 'link "fix(ui): show progress during new session startup (" [ref=f9e672] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/5bc6af4f781ed1e99feab973cb006c6b5ae7c6d0
+                          - link "openclaw#122713" [ref=f9e673] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122713
+                          - link ")" [ref=f9e674] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/5bc6af4f781ed1e99feab973cb006c6b5ae7c6d0
+                        - button "Commit message body" [ref=f9e676] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e678] [cursor=pointer]
+                      - code [ref=f9e683]:
+                        - link "5bc6af4" [ref=f9e684] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/5bc6af4f781ed1e99feab973cb006c6b5ae7c6d0
+                    - generic [ref=f9e692]:
+                      - generic [ref=f9e694]:
+                        - link [ref=f9e695] [cursor=pointer]:
+                          - /url: /jalehman
+                          - img "@jalehman" [ref=f9e696]
+                        - link [ref=f9e697] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e698]
+                      - code [ref=f9e700]:
+                        - 'link "fix: make live updater checkout portable (oc-237) (" [ref=f9e701] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/e6fb8b5f46af8605962a76481c26ede52821cb2d
+                        - link "openclaw#122873" [ref=f9e702] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122873
+                        - link ")" [ref=f9e703] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/e6fb8b5f46af8605962a76481c26ede52821cb2d
+                      - button "Verified" [ref=f9e705] [cursor=pointer]
+                      - code [ref=f9e710]:
+                        - link "e6fb8b5" [ref=f9e711] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/e6fb8b5f46af8605962a76481c26ede52821cb2d
+                    - generic [ref=f9e719]:
+                      - generic [ref=f9e721]:
+                        - link [ref=f9e722] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e723]
+                        - link [ref=f9e724] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e725]
+                      - code [ref=f9e727]:
+                        - 'link "refactor(media): remove orphan generation facades (" [ref=f9e728] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/cf1ff5d979299ad371d484b07c47602c79f109fa
+                        - link "openclaw#122874" [ref=f9e729] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122874
+                        - link ")" [ref=f9e730] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/cf1ff5d979299ad371d484b07c47602c79f109fa
+                      - button "Verified" [ref=f9e732] [cursor=pointer]
+                      - code [ref=f9e737]:
+                        - link "cf1ff5d" [ref=f9e738] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/cf1ff5d979299ad371d484b07c47602c79f109fa
+                    - generic [ref=f9e746]:
+                      - generic [ref=f9e748]:
+                        - link [ref=f9e749] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e750]
+                        - link [ref=f9e751] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e752]
+                      - generic [ref=f9e753]:
+                        - code [ref=f9e754]:
+                          - 'link "refactor(agents): split subagent-control.ts into owner modules (" [ref=f9e755] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/88d9582bb30c356b7367100413bd95e53dc249ec
+                          - link "openc…" [ref=f9e756] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122875
+                        - button "Commit message body" [ref=f9e758] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e760] [cursor=pointer]
+                      - code [ref=f9e765]:
+                        - link "88d9582" [ref=f9e766] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/88d9582bb30c356b7367100413bd95e53dc249ec
+                    - generic [ref=f9e774]:
+                      - generic [ref=f9e776]:
+                        - link [ref=f9e777] [cursor=pointer]:
+                          - /url: /jalehman
+                          - img "@jalehman" [ref=f9e778]
+                        - link [ref=f9e779] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e780]
+                      - generic [ref=f9e781]:
+                        - code [ref=f9e782]:
+                          - 'link "fix(ui): archived sessions leave sidebar after navigation (" [ref=f9e783] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/f511da420bedf7335243072d8b7d5bbe28859c3c
+                          - link "openclaw#1…" [ref=f9e784] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122876
+                        - button "Commit message body" [ref=f9e786] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e788] [cursor=pointer]
+                      - code [ref=f9e793]:
+                        - link "f511da4" [ref=f9e794] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/f511da420bedf7335243072d8b7d5bbe28859c3c
+                    - generic [ref=f9e802]:
+                      - generic [ref=f9e804]:
+                        - link [ref=f9e805] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e806]
+                        - link [ref=f9e807] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e808]
+                      - code [ref=f9e810]:
+                        - 'link "fix(ci): expose AI pack diagnostics (" [ref=f9e811] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/ad3b89cd1eecee396a34ce20a9ccb41b5a5e202f
+                        - link "openclaw#122786" [ref=f9e812] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122786
+                        - link ")" [ref=f9e813] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/ad3b89cd1eecee396a34ce20a9ccb41b5a5e202f
+                      - button "Partially verified" [ref=f9e815] [cursor=pointer]
+                      - code [ref=f9e820]:
+                        - link "ad3b89c" [ref=f9e821] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/ad3b89cd1eecee396a34ce20a9ccb41b5a5e202f
+                    - generic [ref=f9e829]:
+                      - generic [ref=f9e831]:
+                        - link [ref=f9e832] [cursor=pointer]:
+                          - /url: /licheer-zte
+                          - img "@licheer-zte" [ref=f9e833]
+                        - link [ref=f9e834] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e835]
+                      - generic [ref=f9e836]:
+                        - code [ref=f9e837]:
+                          - 'link "fix(recovery): reclaim proven-stale reply-only ownership with zero qu…" [ref=f9e838] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/caa9d46514745ce975c356807a7f77f115aa1bf1
+                        - button "Commit message body" [ref=f9e840] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e842] [cursor=pointer]
+                      - code [ref=f9e847]:
+                        - link "caa9d46" [ref=f9e848] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/caa9d46514745ce975c356807a7f77f115aa1bf1
+                    - generic [ref=f9e856]:
+                      - generic [ref=f9e858]:
+                        - link [ref=f9e859] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e860]
+                        - link [ref=f9e861] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e862]
+                      - code [ref=f9e864]:
+                        - 'link "fix(ci): ignore zombie-only Vitest process groups (" [ref=f9e865] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/4c08abe9983195798a95575ce65600dc447a577d
+                        - link "openclaw#122759" [ref=f9e866] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122759
+                        - link ")" [ref=f9e867] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/4c08abe9983195798a95575ce65600dc447a577d
+                      - button "Partially verified" [ref=f9e869] [cursor=pointer]
+                      - code [ref=f9e874]:
+                        - link "4c08abe" [ref=f9e875] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/4c08abe9983195798a95575ce65600dc447a577d
+                    - generic [ref=f9e883]:
+                      - generic [ref=f9e885]:
+                        - link [ref=f9e886] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e887]
+                        - link [ref=f9e888] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e889]
+                      - generic [ref=f9e890]:
+                        - code [ref=f9e891]:
+                          - 'link "test(agents): scope extension fixtures to explicit owners (" [ref=f9e892] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/826cc8a714c5f88a4cd75a0dafb38fc0924aac54
+                          - link "openclaw#1…" [ref=f9e893] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122883
+                        - button "Commit message body" [ref=f9e895] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e897] [cursor=pointer]
+                      - code [ref=f9e902]:
+                        - link "826cc8a" [ref=f9e903] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/826cc8a714c5f88a4cd75a0dafb38fc0924aac54
+                    - generic [ref=f9e911]:
+                      - generic [ref=f9e913]:
+                        - link [ref=f9e914] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e915]
+                        - link [ref=f9e916] [cursor=pointer]:
+                          - /url: /ampagent
+                          - img "@ampagent" [ref=f9e917]
+                        - link [ref=f9e918] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e919]
+                      - generic [ref=f9e920]:
+                        - code [ref=f9e921]:
+                          - 'link "ci: fingerprint preferred pnpm hooks (" [ref=f9e922] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/b65f8a1b4b453dfee5c766099798317ef1f07c91
+                          - link "openclaw#122852" [ref=f9e923] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122852
+                          - link ")" [ref=f9e924] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/b65f8a1b4b453dfee5c766099798317ef1f07c91
+                        - button "Commit message body" [ref=f9e926] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e928] [cursor=pointer]
+                      - code [ref=f9e933]:
+                        - link "b65f8a1" [ref=f9e934] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/b65f8a1b4b453dfee5c766099798317ef1f07c91
+                    - generic [ref=f9e942]:
+                      - generic [ref=f9e944]:
+                        - link [ref=f9e945] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e946]
+                        - link [ref=f9e947] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e948]
+                      - generic [ref=f9e949]:
+                        - code [ref=f9e950]:
+                          - 'link "fix(ci): record startup JS growth in the Control UI budget baseline" [ref=f9e951] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/c56c1ba75cd4e3d05a2209ff00df1c23bc234752
+                        - button "Commit message body" [ref=f9e953] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e955] [cursor=pointer]
+                      - code [ref=f9e960]:
+                        - link "c56c1ba" [ref=f9e961] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/c56c1ba75cd4e3d05a2209ff00df1c23bc234752
+                    - generic [ref=f9e969]:
+                      - generic [ref=f9e971]:
+                        - link [ref=f9e972] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e973]
+                        - link [ref=f9e974] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e975]
+                      - generic [ref=f9e976]:
+                        - code [ref=f9e977]:
+                          - 'link "fix(codex): keep sessionless mirror warnings out of onboarding (" [ref=f9e978] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/73235cb37c7af401f8adf8bc8bbfae539430db9f
+                          - link "openc…" [ref=f9e979] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122831
+                        - button "Commit message body" [ref=f9e981] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e983] [cursor=pointer]
+                      - code [ref=f9e988]:
+                        - link "73235cb" [ref=f9e989] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/73235cb37c7af401f8adf8bc8bbfae539430db9f
+                    - generic [ref=f9e997]:
+                      - generic [ref=f9e999]:
+                        - link [ref=f9e1000] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1001]
+                        - link [ref=f9e1002] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1003]
+                      - generic [ref=f9e1004]:
+                        - code [ref=f9e1005]:
+                          - 'link "fix(telegram): prevent multi-agent startup migration false positives (" [ref=f9e1006] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/9b069515b5f71e671d19294e27868749daa31748
+                          - link "o…" [ref=f9e1007] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122877
+                        - button "Commit message body" [ref=f9e1009] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1011] [cursor=pointer]
+                      - code [ref=f9e1016]:
+                        - link "9b06951" [ref=f9e1017] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/9b069515b5f71e671d19294e27868749daa31748
+                    - generic [ref=f9e1025]:
+                      - generic [ref=f9e1027]:
+                        - link [ref=f9e1028] [cursor=pointer]:
+                          - /url: /sunlit-deng
+                          - img "@sunlit-deng" [ref=f9e1029]
+                        - link [ref=f9e1030] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1031]
+                      - code [ref=f9e1033]:
+                        - 'link "fix(reef): redact relay errors containing credentials (" [ref=f9e1034] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/5a729318ad9d9322b13deca75f1b70d0fd9138d5
+                        - link "openclaw#119603" [ref=f9e1035] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/119603
+                        - link ")" [ref=f9e1036] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/5a729318ad9d9322b13deca75f1b70d0fd9138d5
+                      - button "Verified" [ref=f9e1038] [cursor=pointer]
+                      - code [ref=f9e1043]:
+                        - link "5a72931" [ref=f9e1044] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/5a729318ad9d9322b13deca75f1b70d0fd9138d5
+                - generic [ref=f9e1048]:
+                  - button "110 hidden items" [ref=f9e1049] [cursor=pointer]
+                  - button "Load more…" [ref=f9e1050] [cursor=pointer]
+                - generic [ref=f9e1052]:
+                  - generic [ref=f9e1057]:
+                    - link "steipete" [ref=f9e1058] [cursor=pointer]:
+                      - /url: /steipete
+                    - text: and others added 26 commits
+                    - link "August 12, 2026 23:271 hour ago" [ref=f9e1059] [cursor=pointer]:
+                      - /url: "#commits-pushed-fff7a37"
+                  - generic [ref=f9e1060]:
+                    - generic [ref=f9e1068]:
+                      - generic [ref=f9e1070]:
+                        - link [ref=f9e1071] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1072]
+                        - link [ref=f9e1073] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1074]
+                      - generic [ref=f9e1075]:
+                        - code [ref=f9e1076]:
+                          - 'link "improve: one channel picker and one model picker across the Control UI (" [ref=f9e1077] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/fff7a371a9601edf8bdff3f7e733b4801b293717
+                        - button "Commit message body" [ref=f9e1079] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1081] [cursor=pointer]
+                      - code [ref=f9e1086]:
+                        - link "fff7a37" [ref=f9e1087] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/fff7a371a9601edf8bdff3f7e733b4801b293717
+                    - generic [ref=f9e1095]:
+                      - generic [ref=f9e1097]:
+                        - link [ref=f9e1098] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1099]
+                        - link [ref=f9e1100] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1101]
+                      - generic [ref=f9e1102]:
+                        - code [ref=f9e1103]:
+                          - 'link "fix(ci): rename state migration assertion map off the env-var pattern" [ref=f9e1104] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/f24d5143427223abdbe981c51c1c6e889ad776e3
+                        - button "Commit message body" [ref=f9e1106] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1108] [cursor=pointer]
+                      - code [ref=f9e1113]:
+                        - link "f24d514" [ref=f9e1114] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/f24d5143427223abdbe981c51c1c6e889ad776e3
+                    - generic [ref=f9e1122]:
+                      - generic [ref=f9e1124]:
+                        - link [ref=f9e1125] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1126]
+                        - link [ref=f9e1127] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1128]
+                      - generic [ref=f9e1129]:
+                        - code [ref=f9e1130]:
+                          - 'link "test(oc-path): make perf budgets robust to CI scheduler noise (" [ref=f9e1131] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/bcba78e8480f98413644de775cc8fbb73125c231
+                          - link "opencl…" [ref=f9e1132] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122994
+                        - button "Commit message body" [ref=f9e1134] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1136] [cursor=pointer]
+                      - code [ref=f9e1141]:
+                        - link "bcba78e" [ref=f9e1142] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/bcba78e8480f98413644de775cc8fbb73125c231
+                    - generic [ref=f9e1150]:
+                      - generic [ref=f9e1152]:
+                        - link [ref=f9e1153] [cursor=pointer]:
+                          - /url: /sunlit-deng
+                          - img "@sunlit-deng" [ref=f9e1154]
+                        - link [ref=f9e1155] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1156]
+                      - generic [ref=f9e1157]:
+                        - code [ref=f9e1158]:
+                          - 'link "fix(memory): keep session reconciliation off search path (" [ref=f9e1159] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/9e21f2f0b50873a6990df105744964328e3a4540
+                          - link "openclaw#12…" [ref=f9e1160] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/120837
+                        - button "Commit message body" [ref=f9e1162] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1164] [cursor=pointer]
+                      - code [ref=f9e1169]:
+                        - link "9e21f2f" [ref=f9e1170] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/9e21f2f0b50873a6990df105744964328e3a4540
+                    - generic [ref=f9e1178]:
+                      - generic [ref=f9e1180]:
+                        - link [ref=f9e1181] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1182]
+                        - link [ref=f9e1183] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1184]
+                      - code [ref=f9e1186]:
+                        - 'link "fix(agents): preserve headless timeout ownership (" [ref=f9e1187] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/43fc231000f21b1d722ffea38e9b4755f1b69f3e
+                        - link "openclaw#122997" [ref=f9e1188] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122997
+                        - link ")" [ref=f9e1189] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/43fc231000f21b1d722ffea38e9b4755f1b69f3e
+                      - button "Verified" [ref=f9e1191] [cursor=pointer]
+                      - code [ref=f9e1196]:
+                        - link "43fc231" [ref=f9e1197] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/43fc231000f21b1d722ffea38e9b4755f1b69f3e
+                    - generic [ref=f9e1205]:
+                      - generic [ref=f9e1207]:
+                        - link [ref=f9e1208] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1209]
+                        - link [ref=f9e1210] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1211]
+                      - generic [ref=f9e1212]:
+                        - code [ref=f9e1213]:
+                          - 'link "fix(gateway): preserve system agent ownership (" [ref=f9e1214] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/0467cb1e32e8d6a03cbf02174833e0e74fa08154
+                          - link "openclaw#122987" [ref=f9e1215] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122987
+                          - link ")" [ref=f9e1216] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/0467cb1e32e8d6a03cbf02174833e0e74fa08154
+                        - button "Commit message body" [ref=f9e1218] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1220] [cursor=pointer]
+                      - code [ref=f9e1225]:
+                        - link "0467cb1" [ref=f9e1226] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/0467cb1e32e8d6a03cbf02174833e0e74fa08154
+                    - generic [ref=f9e1234]:
+                      - generic [ref=f9e1236]:
+                        - link [ref=f9e1237] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1238]
+                        - link [ref=f9e1239] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1240]
+                      - generic [ref=f9e1241]:
+                        - code [ref=f9e1242]:
+                          - 'link "refactor(ui): one task-detail surface for rail and subagent clicks (" [ref=f9e1243] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/5c99458aad0baa484f95e9711b17b5c589be0c30
+                          - link "o…" [ref=f9e1244] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/123003
+                        - button "Commit message body" [ref=f9e1246] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1248] [cursor=pointer]
+                      - code [ref=f9e1253]:
+                        - link "5c99458" [ref=f9e1254] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/5c99458aad0baa484f95e9711b17b5c589be0c30
+                    - generic [ref=f9e1262]:
+                      - generic [ref=f9e1264]:
+                        - link [ref=f9e1265] [cursor=pointer]:
+                          - /url: /Patrick-Erichsen
+                          - img "@Patrick-Erichsen" [ref=f9e1266]
+                        - link [ref=f9e1267] [cursor=pointer]:
+                          - /url: /RomneyDa
+                          - img "@RomneyDa" [ref=f9e1268]
+                        - link [ref=f9e1269] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1270]
+                      - generic [ref=f9e1271]:
+                        - code [ref=f9e1272]:
+                          - 'link "test(buzz): add opt-in thread QA coverage (" [ref=f9e1273] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/a38feb1e81150372197cf9f4bc01950ec578ca33
+                          - link "openclaw#116081" [ref=f9e1274] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/116081
+                          - link ")" [ref=f9e1275] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/a38feb1e81150372197cf9f4bc01950ec578ca33
+                        - button "Commit message body" [ref=f9e1277] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1279] [cursor=pointer]
+                      - code [ref=f9e1284]:
+                        - link "a38feb1" [ref=f9e1285] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a38feb1e81150372197cf9f4bc01950ec578ca33
+                    - generic [ref=f9e1293]:
+                      - generic [ref=f9e1295]:
+                        - link [ref=f9e1296] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1297]
+                        - link [ref=f9e1298] [cursor=pointer]:
+                          - /url: /ampagent
+                          - img "@ampagent" [ref=f9e1299]
+                        - link [ref=f9e1300] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1301]
+                      - generic [ref=f9e1302]:
+                        - code [ref=f9e1303]:
+                          - 'link "perf(test): avoid unrelated runtime imports in MCP suite (" [ref=f9e1304] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/b3e0808c6b162a5d55cd76690b14146fd3ec58c2
+                          - link "openclaw#12…" [ref=f9e1305] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122998
+                        - button "Commit message body" [ref=f9e1307] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1309] [cursor=pointer]
+                      - code [ref=f9e1314]:
+                        - link "b3e0808" [ref=f9e1315] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/b3e0808c6b162a5d55cd76690b14146fd3ec58c2
+                    - generic [ref=f9e1323]:
+                      - generic [ref=f9e1325]:
+                        - link [ref=f9e1326] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e1327]
+                        - link [ref=f9e1328] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1329]
+                      - code [ref=f9e1331]:
+                        - 'link "fix(ci): sanitize AI manifest during installer pack (" [ref=f9e1332] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/a515b9a73c0cf6eb4fa21ebee6c8b393ba83c3aa
+                        - link "openclaw#122952" [ref=f9e1333] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122952
+                        - link ")" [ref=f9e1334] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a515b9a73c0cf6eb4fa21ebee6c8b393ba83c3aa
+                      - button "Partially verified" [ref=f9e1336] [cursor=pointer]
+                      - code [ref=f9e1341]:
+                        - link "a515b9a" [ref=f9e1342] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a515b9a73c0cf6eb4fa21ebee6c8b393ba83c3aa
+                    - generic [ref=f9e1350]:
+                      - generic [ref=f9e1352]:
+                        - link [ref=f9e1353] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1354]
+                        - link [ref=f9e1355] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1356]
+                      - code [ref=f9e1358]:
+                        - 'link "test(agents): move recovery transcript proof to QA (" [ref=f9e1359] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/4b95596e4342a2262c803b8355b25f64eccdffb7
+                        - link "openclaw#123006" [ref=f9e1360] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123006
+                        - link ")" [ref=f9e1361] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/4b95596e4342a2262c803b8355b25f64eccdffb7
+                      - button "Verified" [ref=f9e1363] [cursor=pointer]
+                      - code [ref=f9e1368]:
+                        - link "4b95596" [ref=f9e1369] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/4b95596e4342a2262c803b8355b25f64eccdffb7
+                    - generic [ref=f9e1377]:
+                      - generic [ref=f9e1379]:
+                        - link [ref=f9e1380] [cursor=pointer]:
+                          - /url: /zhangguiping-xydt
+                          - img "@zhangguiping-xydt" [ref=f9e1381]
+                        - link [ref=f9e1382] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1383]
+                      - generic [ref=f9e1384]:
+                        - code [ref=f9e1385]:
+                          - 'link "fix(discord): chunk long thread initial messages (" [ref=f9e1386] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/5fc2fdb605f0b59c5a301c8d6704ed4036744879
+                          - link "openclaw#117354" [ref=f9e1387] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/117354
+                          - link ")" [ref=f9e1388] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/5fc2fdb605f0b59c5a301c8d6704ed4036744879
+                        - button "Commit message body" [ref=f9e1390] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1392] [cursor=pointer]
+                      - code [ref=f9e1397]:
+                        - link "5fc2fdb" [ref=f9e1398] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/5fc2fdb605f0b59c5a301c8d6704ed4036744879
+                    - generic [ref=f9e1406]:
+                      - generic [ref=f9e1408]:
+                        - link [ref=f9e1409] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1410]
+                        - link [ref=f9e1411] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1412]
+                      - generic [ref=f9e1413]:
+                        - code [ref=f9e1414]:
+                          - 'link "refactor(plugin-sdk): remove retired Copilot login chain (" [ref=f9e1415] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/e81d7f1eadcb24c9e793b2c603954cffaf2e1444
+                          - link "openclaw#12…" [ref=f9e1416] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122988
+                        - button "Commit message body" [ref=f9e1418] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1420] [cursor=pointer]
+                      - code [ref=f9e1425]:
+                        - link "e81d7f1" [ref=f9e1426] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/e81d7f1eadcb24c9e793b2c603954cffaf2e1444
+                    - generic [ref=f9e1434]:
+                      - generic [ref=f9e1436]:
+                        - link [ref=f9e1437] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e1438]
+                        - link [ref=f9e1439] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1440]
+                      - code [ref=f9e1442]:
+                        - 'link "fix(e2e): declare agents-delete fixture owners (" [ref=f9e1443] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/2364a693df3c8e4cf72ce8a00e46e549eb9229d1
+                        - link "openclaw#123000" [ref=f9e1444] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123000
+                        - link ")" [ref=f9e1445] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/2364a693df3c8e4cf72ce8a00e46e549eb9229d1
+                      - button "Partially verified" [ref=f9e1447] [cursor=pointer]
+                      - code [ref=f9e1452]:
+                        - link "2364a69" [ref=f9e1453] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/2364a693df3c8e4cf72ce8a00e46e549eb9229d1
+                    - generic [ref=f9e1461]:
+                      - generic [ref=f9e1463]:
+                        - link [ref=f9e1464] [cursor=pointer]:
+                          - /url: /RomneyDa
+                          - img "@RomneyDa" [ref=f9e1465]
+                        - link [ref=f9e1466] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1467]
+                      - generic [ref=f9e1468]:
+                        - code [ref=f9e1469]:
+                          - 'link "fix(sessions): preserve pinned sessions during maintenance (" [ref=f9e1470] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/7886083ed713fa7d041f0f82f9110db4a1a64db7
+                          - link "openclaw#…" [ref=f9e1471] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/122990
+                        - button "Commit message body" [ref=f9e1473] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1475] [cursor=pointer]
+                      - code [ref=f9e1480]:
+                        - link "7886083" [ref=f9e1481] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/7886083ed713fa7d041f0f82f9110db4a1a64db7
+                    - generic [ref=f9e1489]:
+                      - generic [ref=f9e1491]:
+                        - link [ref=f9e1492] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e1493]
+                        - link [ref=f9e1494] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1495]
+                      - code [ref=f9e1497]:
+                        - 'link "fix(state): accept shipped commitments schema (" [ref=f9e1498] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/a8fb51a5be98f99164c119dff9a7633c7c645588
+                        - link "openclaw#122945" [ref=f9e1499] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122945
+                        - link ")" [ref=f9e1500] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a8fb51a5be98f99164c119dff9a7633c7c645588
+                      - button "Partially verified" [ref=f9e1502] [cursor=pointer]
+                      - code [ref=f9e1507]:
+                        - link "a8fb51a" [ref=f9e1508] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a8fb51a5be98f99164c119dff9a7633c7c645588
+                    - generic [ref=f9e1516]:
+                      - generic [ref=f9e1518]:
+                        - link [ref=f9e1519] [cursor=pointer]:
+                          - /url: /vincentkoc
+                          - img "@vincentkoc" [ref=f9e1520]
+                        - link [ref=f9e1521] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1522]
+                      - code [ref=f9e1524]:
+                        - 'link "fix(parallels): recover migration-refused gateway startup" [ref=f9e1525] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/79be582709fde19853a496bfb028aad0004e8500
+                      - button "Partially verified" [ref=f9e1527] [cursor=pointer]
+                      - code [ref=f9e1532]:
+                        - link "79be582" [ref=f9e1533] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/79be582709fde19853a496bfb028aad0004e8500
+                    - generic [ref=f9e1541]:
+                      - generic [ref=f9e1543]:
+                        - link [ref=f9e1544] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1545]
+                        - link [ref=f9e1546] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1547]
+                      - code [ref=f9e1549]:
+                        - 'link "fix(signal): fail probe when RPC verification fails (" [ref=f9e1550] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+                        - link "openclaw#123001" [ref=f9e1551] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123001
+                        - link ")" [ref=f9e1552] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+                      - button "Verified" [ref=f9e1554] [cursor=pointer]
+                      - code [ref=f9e1559]:
+                        - link "fc3581c" [ref=f9e1560] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/fc3581c9823efc6f6a17dd1578d9bdaa4964e07d
+                    - generic [ref=f9e1568]:
+                      - generic [ref=f9e1570]:
+                        - link [ref=f9e1571] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1572]
+                        - link [ref=f9e1573] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1574]
+                      - generic [ref=f9e1575]:
+                        - code [ref=f9e1576]:
+                          - 'link "feat(worker): expose supervised terminal outcomes (" [ref=f9e1577] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                          - link "openclaw#123013" [ref=f9e1578] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/123013
+                          - link ")" [ref=f9e1579] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                        - button "Commit message body" [ref=f9e1581] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1583] [cursor=pointer]
+                      - code [ref=f9e1588]:
+                        - link "1d8a491" [ref=f9e1589] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/1d8a4918ce5bdb4bcea8db518cd13b840fb69539
+                    - generic [ref=f9e1597]:
+                      - generic [ref=f9e1599]:
+                        - link [ref=f9e1600] [cursor=pointer]:
+                          - /url: /steipete
+                          - img "@steipete" [ref=f9e1601]
+                        - link [ref=f9e1602] [cursor=pointer]:
+                          - /url: /ampagent
+                          - img "@ampagent" [ref=f9e1603]
+                        - link [ref=f9e1604] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1605]
+                      - generic [ref=f9e1606]:
+                        - code [ref=f9e1607]:
+                          - 'link "test: speed up attempt execution helpers (" [ref=f9e1608] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/6ba6fa1e222f36503d6dea96a3c28c0c02cdef62
+                          - link "openclaw#123012" [ref=f9e1609] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/123012
+                          - link ")" [ref=f9e1610] [cursor=pointer]:
+                            - /url: /openclaw/openclaw/pull/122871/commits/6ba6fa1e222f36503d6dea96a3c28c0c02cdef62
+                        - button "Commit message body" [ref=f9e1612] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1614] [cursor=pointer]
+                      - code [ref=f9e1619]:
+                        - link "6ba6fa1" [ref=f9e1620] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/6ba6fa1e222f36503d6dea96a3c28c0c02cdef62
+                    - generic [ref=f9e1628]:
+                      - generic [ref=f9e1630]:
+                        - link [ref=f9e1631] [cursor=pointer]:
+                          - /url: /Leon-SK668
+                          - img "@Leon-SK668" [ref=f9e1632]
+                        - link [ref=f9e1633] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1634]
+                      - generic [ref=f9e1635]:
+                        - code [ref=f9e1636]:
+                          - 'link "fix(replies): keep approval-unavailable notices durable (" [ref=f9e1637] [cursor=pointer]':
+                            - /url: /openclaw/openclaw/pull/122871/commits/ab7ce36a888f02ed37c79b3110cc7efaa42b9352
+                          - link "openclaw#121179" [ref=f9e1638] [cursor=pointer]:
+                            - /url: https://github.com/openclaw/openclaw/pull/121179
+                        - button "Commit message body" [ref=f9e1640] [cursor=pointer]: …
+                      - button "Verified" [ref=f9e1642] [cursor=pointer]
+                      - code [ref=f9e1647]:
+                        - link "ab7ce36" [ref=f9e1648] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/ab7ce36a888f02ed37c79b3110cc7efaa42b9352
+                    - generic [ref=f9e1656]:
+                      - generic [ref=f9e1658]:
+                        - link [ref=f9e1659] [cursor=pointer]:
+                          - /url: /RomneyDa
+                          - img "@RomneyDa" [ref=f9e1660]
+                        - link [ref=f9e1661] [cursor=pointer]:
+                          - /url: /fuller-stack-dev
+                          - img "@fuller-stack-dev" [ref=f9e1662]
+                      - code [ref=f9e1664]:
+                        - 'link "fix(ui): stop misreporting limited Custodian access (" [ref=f9e1665] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/ea397f90f9484768a47bc11dbe7907b33cb1c0a5
+                        - link "openclaw#123011" [ref=f9e1666] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/123011
+                        - link ")" [ref=f9e1667] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/ea397f90f9484768a47bc11dbe7907b33cb1c0a5
+                      - button "Verified" [ref=f9e1669] [cursor=pointer]
+                      - code [ref=f9e1674]:
+                        - link "ea397f9" [ref=f9e1675] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/ea397f90f9484768a47bc11dbe7907b33cb1c0a5
+                    - generic [ref=f9e1683]:
+                      - link [ref=f9e1686] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f9e1687]
+                      - code [ref=f9e1689]:
+                        - 'link "merge: sync canonical main for PR" [ref=f9e1690] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/202ff34e2d484243d7402f6cc89efc58b486767b
+                        - link "openclaw#122871" [ref=f9e1691] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122871
+                      - button "Verified" [ref=f9e1693] [cursor=pointer]
+                      - code [ref=f9e1698]:
+                        - link "202ff34" [ref=f9e1699] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/202ff34e2d484243d7402f6cc89efc58b486767b
+                    - generic [ref=f9e1707]:
+                      - link [ref=f9e1710] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f9e1711]
+                      - code [ref=f9e1713]:
+                        - 'link "merge: refresh canonical main for PR" [ref=f9e1714] [cursor=pointer]':
+                          - /url: /openclaw/openclaw/pull/122871/commits/40299351d58ea457c52bd54197316873bf2e7656
+                        - link "openclaw#122871" [ref=f9e1715] [cursor=pointer]:
+                          - /url: https://github.com/openclaw/openclaw/pull/122871
+                      - button "Verified" [ref=f9e1717] [cursor=pointer]
+                      - group [ref=f9e1722]:
+                        - img "75 / 119 checks OK" [ref=f9e1724] [cursor=pointer]
+                      - code [ref=f9e1727]:
+                        - link "4029935" [ref=f9e1728] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/40299351d58ea457c52bd54197316873bf2e7656
+                    - generic [ref=f9e1736]:
+                      - link [ref=f9e1739] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f9e1740]
+                      - code [ref=f9e1742]:
+                        - link "Merge remote-tracking branch 'origin/main' into pr-122871-prep" [ref=f9e1743] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/e713fbac17ab4ca4452bbbc6180283bf3de6f14c
+                      - button "Verified" [ref=f9e1745] [cursor=pointer]
+                      - code [ref=f9e1750]:
+                        - link "e713fba" [ref=f9e1751] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/e713fbac17ab4ca4452bbbc6180283bf3de6f14c
+                    - generic [ref=f9e1759]:
+                      - link [ref=f9e1762] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                        - img "@fuller-stack-dev" [ref=f9e1763]
+                      - code [ref=f9e1765]:
+                        - link "Merge remote-tracking branch 'origin/main' into pr-122871-prep" [ref=f9e1766] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a71dddafbf461e117c09f8a3cb5ad8713cc2f4fb
+                      - button "Verified" [ref=f9e1768] [cursor=pointer]
+                      - group [ref=f9e1773]:
+                        - img "77 / 119 checks OK" [ref=f9e1775] [cursor=pointer]
+                      - code [ref=f9e1778]:
+                        - link "a71ddda" [ref=f9e1779] [cursor=pointer]:
+                          - /url: /openclaw/openclaw/pull/122871/commits/a71dddafbf461e117c09f8a3cb5ad8713cc2f4fb
+                - generic [ref=f9e1781]:
+                  - link [ref=f9e1783] [cursor=pointer]:
+                    - /url: /apps/clawsweeper
+                    - img "@clawsweeper" [ref=f9e1784]
+                  - generic [ref=f9e1786]:
+                    - generic [ref=f9e1787]:
+                      - heading "clawsweeper Bot commented Aug 13, 202635 minutes ago" [level=3] [ref=f9e1788]:
+                        - generic [ref=f9e1789]:
+                          - strong [ref=f9e1790]:
+                            - link "clawsweeper" [ref=f9e1791] [cursor=pointer]:
+                              - /url: /apps/clawsweeper
+                            - generic [ref=f9e1792]: Bot
+                          - text: commented
+                          - link "Aug 13, 202635 minutes ago" [ref=f9e1793] [cursor=pointer]:
+                            - /url: "#issuecomment-5276726947"
+                      - generic [ref=f9e1794]:
+                        - group [ref=f9e1796]:
+                          - button [ref=f9e1797] [cursor=pointer]:
+                            - img "Show options" [ref=f9e1800]
+                        - generic "This user has previously committed to the openclaw repository." [ref=f9e1803]: Contributor
+                    - table [ref=f9e1807]:
+                      - rowgroup [ref=f9e1808]:
+                        - row [ref=f9e1809]:
+                          - cell [ref=f9e1810]:
+                            - paragraph [ref=f9e1811]: "ClawSweeper status: review started."
+                            - paragraph [ref=f9e1812]: "I am starting a fresh review of this pull request: fix: prevent bundled plugin startup convergence loops This is item 1/1 in the current shard. Shard 0/1."
+                            - paragraph [ref=f9e1813]: This placeholder means the worker is alive and reading the current context. I will edit this same comment with the actual review when the claws are done clicking.
+                            - paragraph [ref=f9e1814]: "Crustacean status: shell secured, claws on keyboard, evidence pebbles being sorted."
+                - generic [ref=f9e1820]:
+                  - button "View details" [ref=f9e1821] [cursor=pointer]
+                  - generic [ref=f9e1822]:
+                    - link [ref=f9e1824] [cursor=pointer]:
+                      - /url: /fuller-stack-dev
+                      - img "@fuller-stack-dev" [ref=f9e1825]
+                    - generic [ref=f9e1826]:
+                      - link "fuller-stack-dev" [ref=f9e1827] [cursor=pointer]:
+                        - /url: /fuller-stack-dev
+                      - text: merged commit
+                      - link [ref=f9e1828] [cursor=pointer]:
+                        - /url: /openclaw/openclaw/commit/ad4856c51c672434596c5d7f64dad4079a8dd194
+                        - code [ref=f9e1829]: ad4856c
+                      - text: into
+                      - generic [ref=f9e1830]: openclaw:main
+                      - link "Aug 13, 202619 minutes ago" [ref=f9e1832] [cursor=pointer]:
+                        - /url: https://github.com/openclaw/openclaw/pull/122871#event-29383712504
+                      - generic [ref=f9e1833]: 125 checks passed
+                - generic [ref=f9e1836]:
+                  - link [ref=f9e1838] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                    - img "@fuller-stack-dev" [ref=f9e1839]
+                  - generic [ref=f9e1841]:
+                    - generic [ref=f9e1842]:
+                      - heading [level=3] [ref=f9e1843]:
+                        - generic [ref=f9e1844]:
+                          - strong [ref=f9e1845]:
+                            - link "fuller-stack-dev" [ref=f9e1846] [cursor=pointer]:
+                              - /url: /fuller-stack-dev
+                          - text: commented
+                          - link "Aug 13, 202619 minutes ago" [ref=f9e1847] [cursor=pointer]:
+                            - /url: "#issuecomment-5276907406"
+                      - generic [ref=f9e1848]:
+                        - group [ref=f9e1850]:
+                          - button [ref=f9e1851] [cursor=pointer]:
+                            - img "Show options" [ref=f9e1854]
+                        - generic [ref=f9e1856]:
+                          - generic "This user is a member of the openclaw organization." [ref=f9e1857]: Member
+                          - generic "This user is the author of this pull request." [ref=f9e1859]: Author
+                    - table [ref=f9e1863]:
+                      - rowgroup [ref=f9e1864]:
+                        - row [ref=f9e1865]:
+                          - cell [ref=f9e1866]:
+                            - paragraph [ref=f9e1867]: Merged via squash.
+                            - list [ref=f9e1868]:
+                              - listitem [ref=f9e1869]:
+                                - text: "Prepared head SHA:"
+                                - link "a71dddafbf461e117c09f8a3cb5ad8713cc2f4fb" [ref=f9e1870] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/a71dddafbf461e117c09f8a3cb5ad8713cc2f4fb
+                              - listitem [ref=f9e1871]:
+                                - text: "Landed commit:"
+                                - link "ad4856c51c672434596c5d7f64dad4079a8dd194" [ref=f9e1872] [cursor=pointer]:
+                                  - /url: https://github.com/openclaw/openclaw/commit/ad4856c51c672434596c5d7f64dad4079a8dd194
+                - generic [ref=f9e1879]:
+                  - link [ref=f9e1881] [cursor=pointer]:
+                    - /url: /fuller-stack-dev
+                    - img "@fuller-stack-dev" [ref=f9e1882]
+                  - generic [ref=f9e1883]:
+                    - link "fuller-stack-dev" [ref=f9e1884] [cursor=pointer]:
+                      - /url: /fuller-stack-dev
+                    - text: deleted the
+                    - generic [ref=f9e1885]: fix/122321-startup-convergence-record-retirement
+                    - text: branch
+                    - link "August 13, 2026 06:3919 minutes ago" [ref=f9e1887] [cursor=pointer]:
+                      - /url: "#event-29383716783"
+            - generic [ref=f9e1891]:
+              - link "Sign up for free" [ref=f9e1892] [cursor=pointer]:
+                - /url: /join?source=comment-repo
+              - strong [ref=f9e1893]: to join this conversation on GitHub
+              - text: . Already have an account?
+              - link "Sign in to comment" [ref=f9e1894] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fopenclaw%2Fopenclaw%2Fpull%2F122871
+        - generic [ref=f9e1898]:
+          - form "Select reviewers" [ref=f9e1900]:
+            - heading "Reviewers" [level=3] [ref=f9e1901]
+            - text: No reviews
+          - form "Select assignees" [ref=f9e1903]:
+            - heading "Assignees" [level=3] [ref=f9e1904]
+            - paragraph [ref=f9e1906]:
+              - generic [ref=f9e1907]:
+                - link [ref=f9e1908] [cursor=pointer]:
+                  - /url: /fuller-stack-dev
+                  - img "@fuller-stack-dev" [ref=f9e1909]
+                - link "fuller-stack-dev" [ref=f9e1910] [cursor=pointer]:
+                  - /url: /fuller-stack-dev
+          - generic [ref=f9e1911]:
+            - heading "Labels" [level=3] [ref=f9e1912]
+            - generic [ref=f9e1913]:
+              - link "cli" [ref=f9e1914] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acli
+              - link "commands" [ref=f9e1916] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Acommands
+              - link "maintainer" [ref=f9e1918] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3Amaintainer
+              - 'link "merge-risk: 🚨 compatibility" [ref=f9e1920] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22merge-risk%3A%20%F0%9F%9A%A8%20compatibility%22
+              - link "P1" [ref=f9e1922] [cursor=pointer]:
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3AP1
+              - 'link "rating: 🐚 platinum hermit" [ref=f9e1924] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22rating%3A%20%F0%9F%90%9A%20platinum%20hermit%22
+              - 'link "size: M" [ref=f9e1926] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22size%3A%20M%22
+              - 'link "status: 👀 ready for maintainer look" [ref=f9e1928] [cursor=pointer]':
+                - /url: /openclaw/openclaw/issues?q=state%3Aopen%20label%3A%22status%3A%20%F0%9F%91%80%20ready%20for%20maintainer%20look%22
+          - form "Select projects" [ref=f9e1931]:
+            - heading "Projects" [level=3] [ref=f9e1932]
+            - text: None yet
+          - form "Select milestones" [ref=f9e1934]:
+            - heading "Milestone" [level=3] [ref=f9e1935]
+            - text: No milestone
+          - form "Link issues" [ref=f9e1941]:
+            - heading "Development" [level=3] [ref=f9e1942]
+            - paragraph [ref=f9e1943]: Successfully merging this pull request may close these issues.
+            - link [ref=f9e1945] [cursor=pointer]:
+              - /url: https://github.com/openclaw/openclaw/issues/122321
+              - img "Closed issue" [ref=f9e1946]
+              - text: Gateway crash-loops on "plugin migration inputs changed during startup convergence" (codex@beta), leaking un-pruned npm generation dirs — filled host disk in ~2h
+          - generic [ref=f9e1950]:
+            - heading "20 participants" [level=3] [ref=f9e1951]
+            - generic [ref=f9e1952]:
+              - link [ref=f9e1953] [cursor=pointer]:
+                - /url: /fuller-stack-dev
+                - img "@fuller-stack-dev" [ref=f9e1954]
+              - link [ref=f9e1955] [cursor=pointer]:
+                - /url: /steipete
+                - img "@steipete" [ref=f9e1956]
+              - link [ref=f9e1957] [cursor=pointer]:
+                - /url: /vyctorbrzezowski
+                - img "@vyctorbrzezowski" [ref=f9e1958]
+              - link [ref=f9e1959] [cursor=pointer]:
+                - /url: /jjjhenriksen
+                - img "@jjjhenriksen" [ref=f9e1960]
+              - link [ref=f9e1961] [cursor=pointer]:
+                - /url: /jalehman
+                - img "@jalehman" [ref=f9e1962]
+              - link [ref=f9e1963] [cursor=pointer]:
+                - /url: /vincentkoc
+                - img "@vincentkoc" [ref=f9e1964]
+              - link [ref=f9e1965] [cursor=pointer]:
+                - /url: /licheer-zte
+                - img "@licheer-zte" [ref=f9e1966]
+              - link [ref=f9e1967] [cursor=pointer]:
+                - /url: /sunlit-deng
+                - img "@sunlit-deng" [ref=f9e1968]
+              - link [ref=f9e1969] [cursor=pointer]:
+                - /url: /joshavant
+                - img "@joshavant" [ref=f9e1970]
+              - link [ref=f9e1971] [cursor=pointer]:
+                - /url: /calinilie
+                - img "@calinilie" [ref=f9e1972]
+              - link [ref=f9e1973] [cursor=pointer]:
+                - /url: /carjes232
+                - img "@carjes232" [ref=f9e1974]
+              - link [ref=f9e1975] [cursor=pointer]:
+                - /url: /Solvely-Colin
+                - img "@Solvely-Colin" [ref=f9e1976]
+              - link [ref=f9e1977] [cursor=pointer]:
+                - /url: /Chinmayrawat15
+                - img "@Chinmayrawat15" [ref=f9e1978]
+              - link [ref=f9e1979] [cursor=pointer]:
+                - /url: /masatohoshino
+                - img "@masatohoshino" [ref=f9e1980]
+              - link [ref=f9e1981] [cursor=pointer]:
+                - /url: /Adkid-Zephyr
+                - img "@Adkid-Zephyr" [ref=f9e1982]
+              - link [ref=f9e1983] [cursor=pointer]:
+                - /url: /Piyushrathoree
+                - img "@Piyushrathoree" [ref=f9e1984]
+              - link [ref=f9e1985] [cursor=pointer]:
+                - /url: /sjf-oa
+                - img "@sjf-oa" [ref=f9e1986]
+              - link [ref=f9e1987] [cursor=pointer]:
+                - /url: /obviyus
+                - img "@obviyus" [ref=f9e1988]
+              - link [ref=f9e1989] [cursor=pointer]:
+                - /url: /kiranmagic7
+                - img "@kiranmagic7" [ref=f9e1990]
+              - link [ref=f9e1991] [cursor=pointer]:
+                - /url: /Patrick-Erichsen
+                - img "@Patrick-Erichsen" [ref=f9e1992]
+  - contentinfo [ref=f9e1993]:
+    - heading "Footer" [level=2] [ref=f9e1994]
+    - generic [ref=f9e1995]:
+      - generic [ref=f9e1996]:
+        - link "GitHub Homepage" [ref=f9e1997] [cursor=pointer]:
+          - /url: https://github.com
+        - generic [ref=f9e2000]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f9e2001]:
+        - heading "Footer navigation" [level=3] [ref=f9e2002]
+        - list "Footer navigation" [ref=f9e2003]:
+          - listitem [ref=f9e2004]:
+            - link "Terms" [ref=f9e2005] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f9e2006]:
+            - link "Privacy" [ref=f9e2007] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f9e2008]:
+            - link "Security" [ref=f9e2009] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f9e2010]:
+            - link "Status" [ref=f9e2011] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f9e2012]:
+            - link "Community" [ref=f9e2013] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f9e2014]:
+            - link "Docs" [ref=f9e2015] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f9e2016]:
+            - link "Contact" [ref=f9e2017] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f9e2018]:
+            - button "Manage cookies" [ref=f9e2020] [cursor=pointer]
+          - listitem [ref=f9e2021]:
+            - button "Do not share my personal information" [ref=f9e2023] [cursor=pointer]

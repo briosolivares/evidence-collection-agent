@@ -1,0 +1,48 @@
+# Lake Tahoe Airbnb Search — One-Week Stay Next Week
+
+**Check-in date:** Monday, August 17, 2026
+**Check-out date:** Monday, August 24, 2026
+(7 nights)
+
+Search performed on Airbnb.com for "Lake Tahoe, CA" homes, filtered to these exact dates. Below are the first 30 listings shown by Airbnb's default sort order for this search, each with its listing URL and a brief listing-specific summary based on the details Airbnb displays in search results (photo captions, rating, bedroom/bed/bath count, and total price for the 7-night stay).
+
+1. **Wake to mountain-lake views from this Incline Village home with a fireplace and grill** — https://www.airbnb.com/rooms/23545038 — Guest favorite, 4.75★ (57 reviews); 3 bedrooms, 4 beds, 2 baths; $2,495 for 7 nights.
+2. **This peaceful Incline Village condo gives you a fireplace, deck, and community sauna** — https://www.airbnb.com/rooms/1421190065331657251 — Guest favorite, 4.91★ (11 reviews); 2 bedrooms, 3 beds, 2 baths; $1,923 for 7 nights (discounted from $2,944).
+3. **This A-frame cabin in Tahoe puts you among the trees with a wood-burning fireplace** — https://www.airbnb.com/rooms/868211075181482270 — Guest favorite, 4.92★ (74 reviews); 3 bedrooms, 3 beds, 2 baths; $1,843 for 7 nights.
+4. **Forest views and a gas fireplace greet you at this Kingsbury condo near Heavenly** — https://www.airbnb.com/rooms/936234357176767343 — Superhost, 4.77★ (98 reviews); 2 bedrooms, 3 beds, 2 baths; $1,171 for 7 nights (weekly discount from $1,304).
+5. **This Tahoe condo nestles you in the pines with a gas fireplace and patio** — https://www.airbnb.com/rooms/44449491 — Superhost, 4.9★ (336 reviews); 2 beds, 1 bath; $1,172 for 7 nights (weekly discount from $1,290).
+6. **Mountain views greet you at this alpine Incline Village home with a fireplace** — https://www.airbnb.com/rooms/23545100 — Guest favorite, 4.95★ (88 reviews); 4 bedrooms, 7 beds, 3.5 baths; $2,492 for 7 nights (discounted from $2,914).
+7. **This South Lake Tahoe chalet gives you a hot tub, fire pit, and pines all around** — https://www.airbnb.com/rooms/1669752142489887155 — Top guest favorite, 5.0★ (16 reviews); 3 bedrooms, 5 beds, 2 baths; $3,793 for 7 nights (weekly discount from $4,138).
+8. **Wake to forest views at this modern A-frame cabin with a hot tub in Tahoe** — https://www.airbnb.com/rooms/1001827428698682854 — Top guest favorite, 5.0★ (127 reviews); 3 bedrooms, 3 beds, 1.5 baths; $4,401 for 7 nights.
+9. **This wooded South Lake Tahoe townhouse gives you beach access, pools, and a sauna** — https://www.airbnb.com/rooms/990528905768430626 — 4.13★ (8 reviews); 2 bedrooms, 4 beds, 2 baths; $2,839 for 7 nights (discounted from $5,580).
+10. **This Brockway Tract townhouse puts you a 5-minute walk from the beach** — https://www.airbnb.com/rooms/53137419 — Superhost, 4.7★ (108 reviews); 3 bedrooms, 5 beds, 2.5 baths; $2,263 for 7 nights (discounted from $2,737).
+11. **Towering pines and a fireplace greet you at this wooded Tahoe Park cabin** — https://www.airbnb.com/rooms/1744274461340134192 — New listing; 3 bedrooms, 5 beds, 2 baths; $1,363 for 7 nights (discounted from $1,626).
+12. **This remodeled Carnelian Bay log cabin gives you a sauna, hot tub, and fireplace** — https://www.airbnb.com/rooms/628317980246128436 — Guest favorite, 5.0★ (9 reviews); 3 bedrooms, 4 beds, 3 baths; $3,198 for 7 nights.
+13. **This lakefront South Lake Tahoe townhouse gives you mountain views and a private deck** — https://www.airbnb.com/rooms/1630538945134337788 — 3 bedrooms, 6 beds, 2 baths; $4,443 for 7 nights.
+14. **Floor-to-ceiling windows give you lake views at this Kings Beach house** — https://www.airbnb.com/rooms/1016059785401904161 — 5.0★ (11 reviews); 3 bedrooms, 6 beds, 2 baths; $3,310 for 7 nights.
+15. **Skylights and a wood-burning fireplace greet you at this multi-level Tahoe City condo** — https://www.airbnb.com/rooms/1700872532842386510 — New listing; 3 bedrooms, 6 beds, 2 baths; $1,920 for 7 nights (discounted from $2,336).
+16. **This authentic Tahoe Pines log cabin gives you lake access and a sunny deck** — https://www.airbnb.com/rooms/42619882 — Top guest favorite, 5.0★ (12 reviews); 2 bedrooms, 3 beds, 1.5 baths; $2,186 for 7 nights (weekly discount from $2,500).
+17. **This South Lake Tahoe cabin gives you a hot tub, game loft, and trailside access** — https://www.airbnb.com/rooms/981465918386465432 — Guest favorite, 4.88★ (112 reviews); 5 bedrooms, 8 beds, 3 baths; $4,236 for 7 nights (weekly discount from $4,612).
+18. **This newly renovated Tahoe condo puts you steps from a private beach** — https://www.airbnb.com/rooms/967012534340633251 — Guest favorite, 4.95★ (57 reviews); 1 bedroom, 2 beds, 1.5 baths; $2,248 for 7 nights (discounted from $2,906).
+19. **Soak in the views from this all-glass A-frame cabin in Chamberlands** — https://www.airbnb.com/rooms/21426276 — Guest favorite, 4.93★ (30 reviews); 3 bedrooms, 6 beds, 2 baths; $2,678 for 7 nights.
+20. **This ski-in/ski-out Tahoe loft gives you mountain views from a private balcony** — https://www.airbnb.com/rooms/1521124191548653420 — 4.77★ (13 reviews); 1 bed, 2 baths; $1,119 for 7 nights (weekly discount from $1,257).
+21. **Exposed beams and a wood-burning fireplace greet you at this Ski Run cabin** — https://www.airbnb.com/rooms/1532115385910855477 — Superhost, 4.79★ (28 reviews); 2 bedrooms, 3 beds, 1 bath; $1,703 for 7 nights (weekly discount from $1,913).
+22. **Vaulted ceilings and a fire pit greet you at this South Lake Tahoe house in the pines** — https://www.airbnb.com/rooms/1699322423074934729 — 4.6★ (5 reviews); 4 bedrooms, 4 beds, 3 baths; $2,987 for 7 nights.
+23. **High ceilings and a stone accent wall greet you at this Tahoe condo with a loft** — https://www.airbnb.com/rooms/8459964 — Guest favorite, 4.88★ (176 reviews); 3 bedrooms, 4 beds, 2 baths; $1,759 for 7 nights (weekly discount from $1,911).
+24. **This Tahoe Vista cabin gives you a hot tub, fire pit, and fireplace** — https://www.airbnb.com/rooms/1724060201935702444 — New listing; 3 bedrooms, 6 beds, 2 baths; $2,873 for 7 nights (weekly discount from $3,354).
+25. **This newly renovated Kings Beach house puts you an 8-minute walk from the lake** — https://www.airbnb.com/rooms/1299708892694688871 — 4.81★ (26 reviews); 2 bedrooms, 3 beds, 1 bath; $1,628 for 7 nights (weekly discount from $1,785).
+26. **Lake views, a fire pit, and pool table greet you at this Homewood house** — https://www.airbnb.com/rooms/1598556012303861821 — 5.0★ (4 reviews); 3 bedrooms, 4 beds, 2.5 baths; $5,950 for 7 nights.
+27. **Light fills this pine-surrounded Truckee home where you'll find a deck, pool, and fireplace** — https://www.airbnb.com/rooms/1719616133429927241 — 4.67★ (3 reviews); 3 bedrooms, 5 beds, 2.5 baths; $1,288 for 7 nights (discounted from $2,001).
+28. **Soaring ceilings and natural wood greet you at this Tahoe City cabin** — https://www.airbnb.com/rooms/1700880051558873763 — 5.0★ (5 reviews); 3 bedrooms, 4 beds, 2 baths; $3,403 for 7 nights.
+29. **This modern Tahoe City house gives you a private backyard, hot tub, and large deck** — https://www.airbnb.com/rooms/1020704001485137702 — Top guest favorite, 5.0★ (23 reviews); 4 bedrooms, 5 beds, 3 baths; $5,735 for 7 nights.
+30. **Soaring A-frame ceilings and redwood decks greet you at this West Shore chalet** — https://www.airbnb.com/rooms/10234321 — Top guest favorite, 4.92★ (231 reviews); 3 bedrooms, 5 beds, 2.5 baths; $3,962 for 7 nights.
+
+## Overall Summary
+
+The 30 Lake Tahoe listings reviewed for the August 17–24, 2026 week span the full range of the basin, including North Shore towns (Incline Village, Kings Beach, Carnelian Bay, Tahoe Vista, Crystal Bay/Brockway Tract), the West Shore (Tahoe City, Tahoe Pines, Homewood, Chamberlands), and South Lake Tahoe/Kingsbury/Ski Run on the south side, plus a couple of Truckee-area properties just outside the immediate lake basin. Property types are dominated by cabins, A-frames, and condos, with a good mix of standalone houses, chalets, and townhouses; sizes range from a single studio-style loft (1 bedroom) up to a 5-bedroom, 8-bed house that sleeps large groups.
+
+**Pricing:** For the full 7-night stay, prices range from about $1,119 (a small ski-in/ski-out loft) up to $5,950 (a lakeside Homewood house with a pool table), with most listings clustering between roughly $1,700 and $3,500. Many listings show a "weekly discount" that meaningfully lowers the total (e.g., discounts of several hundred to over $2,700 off the nightly-rate total), so booking a full week is generally cost-effective compared to nightly rates.
+
+**Quality signals:** The vast majority of listings carry "Guest favorite," "Top guest favorite," or "Superhost" badges, and ratings are uniformly high — nearly all fall between 4.6 and 5.0 stars, with only a handful of newer listings lacking enough reviews yet ("New place to stay"). Amenities frequently highlighted include fireplaces (wood-burning or gas), hot tubs, decks/patios, fire pits, and proximity to the lake, ski access, or hiking trails — reflecting Tahoe's four-season draw for both summer lake recreation and winter skiing.
+
+**Takeaway:** For this one-week window, travelers have abundant, highly-rated options across all price points and lake-side locations. Budget-conscious travelers can find comfortable 1–2 bedroom condos/lofts for roughly $1,100–$1,300 for the week (thanks to weekly discounts), mid-range travelers have numerous well-reviewed 2–3 bedroom cabins and condos in the $1,700–$3,000 range, and larger groups seeking premium homes with amenities like private hot tubs, pools, or lakefront/lake-view settings should expect to pay $4,000–$6,000 for the week.

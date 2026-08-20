@@ -1,0 +1,29 @@
+{
+  "Alpha Chi Omega": {
+    "website": "https://axo.mit.edu",
+    "sistersPageUrl": "https://axo.mit.edu/sisters/",
+    "note": "No Class of 2026 (seniors) section on the sisters page - only 2027-2030 listed. No major/affiliation/interests/other fields available; page shows only names grouped by class year.",
+    "members": [
+      {"name": "Stuti Agarwal", "class": "2027"},
+      {"name": "Stephanie Chang", "class": "2027"},
+      {"name": "Fatima Hernandez", "class": "2027"},
+      {"name": "Sharona Huang", "class": "2027"},
+      {"name": "Elizabeth Jackson", "class": "2027"},
+      {"name": "Anna Kim", "class": "2027"},
+      {"name": "Maddy Laws", "class": "2027"},
+      {"name": "Priscilla Leang", "class": "2027"},
+      {"name": "Nicole Li", "class": "2027"},
+      {"name": "Minnie Liang", "class": "2027"},
+      {"name": "Molly McCormick", "class": "2027"},
+      {"name": "Qingqing Ouyang", "class": "2027"},
+      {"name": "Anisha Parsan", "class": "2027"},
+      {"name": "Lidia Prokopovych", "class": "2027"},
+      {"name": "Ruoxi Qian", "class": "2027"},
+      {"name": "Pria Sawhney", "class": "2027"},
+      {"name": "Fiona Shangguan", "class": "2027"},
+      {"name": "Ridhima Singh", "class": "2027"},
+      {"name": "Jessie Wang", "class": "2027"},
+      {"name": "Emily Zhang", "class": "2027"}
+    ]
+  }
+}

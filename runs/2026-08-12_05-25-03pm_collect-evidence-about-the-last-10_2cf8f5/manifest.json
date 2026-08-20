@@ -1,0 +1,145 @@
+{
+  "task": "Collect evidence about the last 10 merged pull requests on the OpenClaw GitHub repository. Take a full-page screenshot of each pull request's page, and create a CSV describing the 10 pull requests with columns pr_number, committer, reviewer, merger.",
+  "startedAt": "2026-08-13T00:25:03.830Z",
+  "artifacts": [
+    {
+      "filename": "scratch/tool-output/inspect_page-1.txt",
+      "sha256": "933fb45cc981326396004a843f16da4695a609510e354e9b9ca3eec7bb0bf1e6",
+      "capturedAt": "2026-08-13T00:25:11.678Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-2.txt",
+      "sha256": "0dcf691e0d5f20a22452ec425bfa97c2b6c8b75ff5ee8796757b4f404294f39b",
+      "capturedAt": "2026-08-13T00:25:18.098Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-3.txt",
+      "sha256": "145d7464975ac6ce5639610b556c4e938cb6aa478a15cbe0f31a6fcb534ed806",
+      "capturedAt": "2026-08-13T00:25:23.502Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-4.txt",
+      "sha256": "7b15cf4373e2b47f7e9e32e1d40854c57edc007a591489edebd99817d16c3371",
+      "capturedAt": "2026-08-13T00:25:39.526Z"
+    },
+    {
+      "filename": "artifacts/pr_122875.png",
+      "sha256": "56474647ccae4db700a6cace4c90e95d1bcb5d33708330c97fd86c538cd61687",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122875",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:25:59.294Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-5.txt",
+      "sha256": "53164162051d7f1888d160711a621f84e45a1f0dde329d21c29524de28b785c4",
+      "capturedAt": "2026-08-13T00:26:06.114Z"
+    },
+    {
+      "filename": "artifacts/pr_122874.png",
+      "sha256": "bdcbe92ba906d262d246b16a80fa6ee6f1b0218234743d2bf7cc27092f752d4a",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122874",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:26:16.999Z"
+    },
+    {
+      "filename": "artifacts/pr_122873.png",
+      "sha256": "7343e0a66cf79c78f6061cf226ddf17b895ce599cf560c7d89c38a87dbc812eb",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122873",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:26:32.219Z"
+    },
+    {
+      "filename": "scratch/tool-output/inspect_page-6.txt",
+      "sha256": "6ae9b6c54aefe1c1a931aa58451cd4b8bdc38337b977194ce5ed66c732f5ec0b",
+      "capturedAt": "2026-08-13T00:26:41.236Z"
+    },
+    {
+      "filename": "artifacts/pr_122870.png",
+      "sha256": "0c4c358520b3a0e04b215e40ebd383517bc315141447dc4a6108eb7a824547d3",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122870",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:26:49.394Z"
+    },
+    {
+      "filename": "artifacts/pr_122869.png",
+      "sha256": "62e732297f5dbe706f44ee1b6cbab053a8677255ce454f22b09d4629ef40eab0",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122869",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:26:57.386Z"
+    },
+    {
+      "filename": "artifacts/pr_122867.png",
+      "sha256": "b70ea628da8d2f55715bfebd0c9296f169589a8e82eb0d8879f6977783c53bb5",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122867",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:27:08.068Z"
+    },
+    {
+      "filename": "artifacts/pr_122861.png",
+      "sha256": "881422dc6a03014682e66d76bcca554040b861d5530fed0c1931429c190edd5a",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122861",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:27:17.599Z"
+    },
+    {
+      "filename": "artifacts/pr_122860.png",
+      "sha256": "9cfd23bfe687c31628409b9781d993bcdc00ad309372363af3f0b924c1317931",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122860",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:27:26.470Z"
+    },
+    {
+      "filename": "artifacts/pr_122857.png",
+      "sha256": "28e9d695ca124b55e0f6f6cd7547541af6f45ac7a15f555ebf7b7bd653ee0c5e",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122857",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:27:35.452Z"
+    },
+    {
+      "filename": "artifacts/pr_122856.png",
+      "sha256": "321fa8350f328c627cc88aa9f6340e1492a11fabf8b183ff5df6005c571c1ede",
+      "sourceUrl": "https://github.com/openclaw/openclaw/pull/122856",
+      "roles": [
+        "requested_output",
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T00:27:43.523Z"
+    },
+    {
+      "filename": "artifacts/merged_prs.csv",
+      "sha256": "5e2e73d6e2414bef634b40531226d187d37379a0f672159155538d65d5ea7e38",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T00:27:48.821Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T00:28:01.782Z"
+}

@@ -1,0 +1,29 @@
+{
+  "task": "Create a CSV of the top 5 stories on Hacker News right now, with columns for title, URL, and points.",
+  "startedAt": "2026-08-13T07:02:12.483Z",
+  "artifacts": [
+    {
+      "filename": "scratch/roster.md",
+      "sha256": "741a77457c5dcfc10cbf31b75a9c9e3e5fcae1072065b1968ee8a146e7355669",
+      "capturedAt": "2026-08-13T07:02:25.231Z"
+    },
+    {
+      "filename": "artifacts/hn_top5_stories.csv",
+      "sha256": "f5314439a923f84bff54b42eb9fee7c7cb4b3ce97633e2838ce8a7cf0b413d1b",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T07:02:29.175Z"
+    },
+    {
+      "filename": "artifacts/hn_frontpage_evidence.png",
+      "sha256": "8e8f4dbcf5a4342cab4e0cdb0abe4b4a86fe4539e4fe44ba98c9af6799c6b278",
+      "sourceUrl": "https://news.ycombinator.com/",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T07:02:32.528Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T07:02:38.282Z"
+}

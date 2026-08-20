@@ -1,0 +1,55 @@
+{
+  "task": "From YC Winter 2024, pick 5 AI-focused companies. Create a CSV with exactly these columns: founder_name, linkedin_url, cold_outreach_email. Include one row for every founder of the five selected companies. Each email must be personalized to that founder and company and ask for a 15-minute call.",
+  "startedAt": "2026-08-13T06:00:19.272Z",
+  "artifacts": [
+    {
+      "filename": "scratch/notes.md",
+      "sha256": "7b45287be412c4678de7b3e72824e6564feda7cf70bbb84b2628021d907f67d8",
+      "capturedAt": "2026-08-13T06:01:27.756Z"
+    },
+    {
+      "filename": "artifacts/kater_ai_yc_page.png",
+      "sha256": "03a3acea9d72fe58f16e87f707d1183a19cb371d0296c95a9508462a0c5f2a1e",
+      "sourceUrl": "https://www.ycombinator.com/companies/kater-ai",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:01:47.737Z"
+    },
+    {
+      "filename": "artifacts/marr_labs_yc_page.png",
+      "sha256": "63707c51919356bafc4d8ec9d4dd6ff03f207167ff0b70002ec798f7d0ee1b41",
+      "sourceUrl": "https://www.ycombinator.com/companies/marr-labs",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:01:54.210Z"
+    },
+    {
+      "filename": "artifacts/dragoneye_yc_page.png",
+      "sha256": "4485cb84d100ff8000922927be9de160d16a320849a08435da1b7e4177e6a889",
+      "sourceUrl": "https://www.ycombinator.com/companies/dragoneye",
+      "roles": [
+        "evidence"
+      ],
+      "capturedAt": "2026-08-13T06:02:01.748Z"
+    },
+    {
+      "filename": "artifacts/yc_w24_ai_founders_outreach.csv",
+      "sha256": "5f4c1e206392c588ced48abb2bd62152535db10688e5b2a90c1baea107d9d884",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:03:13.332Z"
+    },
+    {
+      "filename": "artifacts/selection_summary.md",
+      "sha256": "123df708fce5dcaea7991e6d7551320ff338979fdaef21fb06b565690604feeb",
+      "roles": [
+        "requested_output"
+      ],
+      "capturedAt": "2026-08-13T06:03:24.568Z"
+    }
+  ],
+  "finishedAt": "2026-08-13T06:03:31.312Z"
+}

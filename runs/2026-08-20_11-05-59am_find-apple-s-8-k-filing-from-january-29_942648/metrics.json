@@ -1,0 +1,23 @@
+{
+  "status": "incomplete",
+  "turns": 0,
+  "protocolCorrections": 0,
+  "inputTokens": 40,
+  "outputTokens": 657,
+  "cacheReadInputTokens": 10298,
+  "cacheCreationInputTokens": 712,
+  "toolCalls": 2,
+  "toolResultBytes": 180,
+  "peakContextTokens": 0,
+  "wallClockMs": 8498,
+  "roles": {
+    "initializer": {
+      "turns": 2,
+      "inputTokens": 40,
+      "outputTokens": 657,
+      "cacheReadInputTokens": 10298,
+      "cacheCreationInputTokens": 712,
+      "wallClockMs": 8177
+    }
+  }
+}
