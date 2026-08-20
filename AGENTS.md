@@ -1,24 +1,26 @@
 # AGENTS.md
 
 Navigation and binding rules for agents working in this repository. Start with
-[the current v3 implementation plan](docs/browser-agent-v3/implementation-plan.md)
-for live progress and [the v3 design](docs/browser-agent-v3/sherlock-v3-design-doc.md)
-for rationale. `.agents/summary/` is the concise architecture reference;
-historical checkpoint-1 planning and reports remain useful only as history.
+[the current implementation plan](docs/browser-agent-v3/implementation-plan.md)
+for live progress and [the design doc](docs/browser-agent-v3/sherlock-v3-design-doc.md)
+for rationale (the docs keep their historical v3 naming). `.agents/summary/`
+is the concise architecture reference; historical checkpoint-1 planning and
+reports remain useful only as history.
 
 ## What this is
 
 Sherlock is a general browser agent for audit evidence collection. The single
-production composition root is `src/cli/runTask.ts`. It runs a bounded contract
-initializer, one persistent sequential worker session, deterministic finish
-checks, and a fresh read-only verifier under the durable coordinator in
-`src/v3/run/coordinator.ts`.
+production composition root is `src/agent/runTask.ts`. It runs a bounded
+contract initializer, one persistent sequential worker session, deterministic
+finish checks, and a fresh read-only verifier under the durable lifecycle in
+`src/agent/lifecycle.ts` (`runAgent`).
 
 The worker sees exactly eight tools in the frozen order declared by
-`V3_TOOL_ORDER`: `browser_execute`, `publish_artifact`, `read_file`,
-`write_file`, `edit_file`, `bash`, `ask_user`, and `finish`. Browser work goes
-through the engine-neutral `BrowserController`; `BrowserSessionProvider`
-selects local Chrome or Browserbase in `src/browser/provider.ts`.
+`WORKER_TOOL_ORDER`: `browser_execute`, `publish_artifact`, `read_file`,
+`write_file`, `edit_file`, `bash`, `ask_user`, and `finish`. Each tool lives in
+its own folder under `src/tools/`. Browser work goes through the
+engine-neutral `BrowserController`; `BrowserSessionProvider` selects local
+Chrome or Browserbase in `src/browser/provider.ts`.
 
 Each run is a self-contained directory under `runs/`:
 
@@ -33,11 +35,13 @@ from manifest entries carrying `requested_output`.
 
 | Subsystem | Entry point | Notes |
 | --- | --- | --- |
-| Composition | `src/cli/runTask.ts` | Only production model/tool/coordinator wiring |
+| Composition | `src/agent/runTask.ts` | Only production model/tool/lifecycle wiring |
+| Agent runtime | `src/agent/` | `lifecycle.ts` plus `initializer/`, `worker/`, `completion/`, `verifier/` stage folders and the durable checkpoint |
+| System prompts | `src/prompts/*.md` | Markdown files loaded once per process by `src/prompts/index.ts` |
+| Model-facing tools | `src/tools/<toolName>/` | One folder per worker tool; registry/pipeline plumbing at the root |
 | Interactive TUI | `src/tui/main.tsx` (`npm run sherlock`) | Attaches to the user's local Chrome or uses Browserbase |
 | REPL | `src/cli/repl.ts` (`npm run agent`) | Explicit managed browser session |
 | Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b> [--k N] [--concurrency N]`) | Parallel isolated normal lane plus serial headed lane |
-| V3 runtime | `src/v3/` | Initializer, worker, tools, finish checks, verifier, checkpoint/coordinator |
 | Provenance | `src/run/` | Atomic manifest/artifact transactions, reconciliation, budget, transcript |
 | Browser login | `src/cli/login.ts` (`npm run login`) | Managed local profile or Browserbase Context |
 | Remote smoke | `scripts/browserbaseSmoke.ts` | Live/billable; never part of `npm test` |
@@ -48,13 +52,15 @@ from manifest entries carrying `requested_output`.
   task-name branches. Hidden evals make per-task tuning worthless.
 - **The run directory is the product boundary.** Never grade a transcript or
   treat conversation text/scratch files as a deliverable.
-- **Keep the cached prefix byte-stable.** `V3_SYSTEM_PROMPT` and
-  `V3_API_TOOL_DEFS` are process-wide and deterministic. Task/config/run data
-  belongs in conversation messages, not the static prefix.
+- **Keep the cached prefix byte-stable.** `workerPrompt` (from
+  `src/prompts/worker.md`) and `WORKER_API_TOOL_DEFS` are process-wide and
+  deterministic. Task/config/run data belongs in conversation messages, not
+  the static prefix.
 - **Exact requested shapes are exact.** Named CSV columns mean precisely those
   columns in that order; extra columns fail.
 - **One immutable contract.** The initializer alone calls
-  `set_output_contract`, at most twice. The worker cannot revise it.
+  `set_output_contract`, at most twice. The worker cannot revise it. The
+  contract schema lives in `src/agent/initializer/outputContract.schema.ts`.
 - **One completion protocol.** `finish` must be the only tool call in its
   response. It requests deterministic checks and fresh verification; it does
   not declare success. Prose or a zero-tool response never completes a run.
@@ -112,6 +118,10 @@ from manifest entries carrying `requested_output`.
 
 - There is no build step; `tsx` runs TypeScript and `tsconfig` is `noEmit`.
   `npm run typecheck` covers `src`, `demos`, `evals`, `scripts`, and `tests`.
+- Tests live in `tests/`, mirroring the `src/` layout (`tests/agent/`,
+  `tests/tools/`, ...); production `src/` contains no test files.
+- `npm run format` applies Biome (formatter only, 100-character lines) to all
+  ts/tsx/mjs sources.
 - `npm test` is hermetic/network-free but requires local Chrome. Tests must
   pass `env: {}` to eval browser composition so a developer's exported
   provider variable cannot trigger Browserbase.
@@ -123,28 +133,33 @@ from manifest entries carrying `requested_output`.
   denylist.
 - The TUI's `artifact_published` event is derived by diffing the manifest after
   tool execution. The manifest remains authoritative.
-- Defaults in `src/cli/runTask.ts`: model `claude-sonnet-5`, unbounded worker
-  turns, 100 tool calls, unbounded aggregate model tokens, 900k per-request
-  context ceiling, and one hour wall time. Model-visible tool output is
-  bounded per result and per message, with complete oversized text offloaded
-  under `scratch/tool-output/`; cumulative result bytes remain a metric, not a
-  whole-run completion ceiling.
-- Planning docs are part of the workflow. Track v3 work in
+- Defaults in `src/agent/runTask.ts` (`PRODUCTION_DEFAULTS`): model
+  `claude-sonnet-5`, unbounded worker turns and tool calls, unbounded
+  aggregate model tokens, 900k per-request context ceiling, and one hour wall
+  time — wall time is the run's bound on research persistence. Model-visible
+  tool output is bounded per result and per message, with complete oversized
+  text offloaded under `scratch/tool-output/`; cumulative result bytes remain
+  a metric, not a whole-run completion ceiling.
+- Durable on-disk formats keep their historical names: the checkpoint version
+  is 3 and `transcript.jsonl` event types keep their `v3_*` prefixes. Renaming
+  those values breaks resume of existing run directories.
+- Planning docs are part of the workflow. Track work in
   `docs/browser-agent-v3/implementation-plan.md`; use scoped commits and include
   the tracker after every verified step. Never edit
   `docs/architecture-whiteboard.html` unless explicitly asked.
 
-## Current state (2026-08-15)
+## Current state (2026-08-19)
 
-The v3 runtime, attached-local cutover, public composition, TUI/eval adapters,
-legacy-runtime retirement, active documentation, and local final acceptance are
-complete. The original TypeScript/TSX production convention is now 31,843
-lines across 111 files; the three shipping browser-child/helper `.mjs` files
-add 982 lines. The complete hermetic suite passes 136 files / 1,477 tests, and
-typecheck is green. The live Browserbase smoke, first-use attachment to the
-user's daily Chrome, and an eval re-baseline were not run because they require
-explicit external authority or consume live resources; their status is
-recorded in the v3 implementation plan.
+The runtime, attached-local cutover, public composition, TUI/eval adapters,
+legacy-runtime retirement, and active documentation are complete. A structural
+simplification pass dissolved the historical `src/v3/` layer into `src/agent/`
+(stage folders per model role), moved the three system prompts to Markdown in
+`src/prompts/`, gave durable Zod schemas dedicated `.schema.ts` files, made
+`src/tools/` folder-per-tool, relocated all colocated tests to `tests/`, and
+adopted Biome formatting. Production is 114 TypeScript files (~31.8k lines)
+plus three browser-child/helper `.mjs` files (~1k lines) and the prompt
+Markdown. The complete hermetic suite passes 140 files / 1,544 tests, and
+typecheck is green.
 
 ## Custom Instructions
 

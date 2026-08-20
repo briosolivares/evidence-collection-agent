@@ -16,9 +16,9 @@ npx tsx --env-file=.env demos/12-run-task.ts "your task here"
 | `04-registry` | Generic tool validation/execution pipeline | — |
 | `05-offload` | Bounded model-visible tool results | — |
 | `10-controller` | Browser controller over explicit managed local Chrome or Browserbase | Chrome/provider config |
-| `12-run-task` | Complete initializer → worker → checks → verifier v3 stack | Chrome/provider config, API key, **spends tokens** |
+| `12-run-task` | Complete initializer → worker → checks → verifier stack | Chrome/provider config, API key, **spends tokens** |
 
-Use `npm test` for hermetic behavior coverage. It exercises the v3 tools,
+Use `npm test` for hermetic behavior coverage. It exercises the tools,
 coordinator, crash/resume boundaries, public composition, TUI bridge, and local
 Chrome against the loopback fixture server without model tokens or oracle
 network calls.
