@@ -59,8 +59,14 @@ describe('capResult', () => {
     const result = expectOffloaded(capResult(runDir, 'echo', original, 64));
 
     expect(result.offloadedTo).toBe(`${OFFLOAD_DIR}/echo-1.txt`);
-    // The note must point the model at the file so it can recover the rest.
+    // The note must point the model at the file so it can recover the rest,
+    // via the one follow-up tool the worker registry actually has (read_file;
+    // there is no worker grep).
     expect(result.note).toContain(result.offloadedTo);
+    expect(result.note).toContain(
+      'use read_file on that path to read the rest, with offset/limit for windows.',
+    );
+    expect(result.note).not.toContain('grep');
     expect(readFileSync(join(runDir, result.offloadedTo), 'utf8')).toBe(original);
   });
 
