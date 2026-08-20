@@ -8,8 +8,8 @@ Responsibilities of the active production modules. Tests mirror source under `te
 | --- | --- |
 | `src/agent/runTask.ts` | The single public composition root. `runTask` creates a fresh run, model drivers, the nine-tool registry, tracing/progress, and delegates to `runAgent`. |
 | `src/tui/main.tsx` | Installed `sherlock` TUI edge: env/key setup, attached-local or Browserbase provider selection, interactive runtime, eval runtime, and Ink rendering. |
-| `src/tui/bridge/runSession.ts` | Converts `runTask` progress/outcomes, permission questions, tracing, cancellation, and published-manifest changes into UI events. |
-| `src/tui/bridge/runtime.ts` | Owns the session-long interactive browser, one run at a time, and browser-death replacement. Local TUI startup receives an already attached controller. |
+| `src/tui/bridge/runSession.ts` | Converts `runTask` progress/outcomes, permission questions, tracing, steering/interruption/cancellation, and published-manifest changes into UI events. |
+| `src/tui/bridge/runtime.ts` | Owns the lazy session-long interactive browser, claims the composer before browser startup, queues early steering, and replaces a dead browser between runs. |
 | `src/tui/bridge/evalRuntime.ts` | Keeps `/evals` on managed browser lanes. Local evals never borrow the attached daily browser. |
 | `src/cli/login.ts` and login helpers | Provider-aware login creation/checking. Browserbase provisions a Context and exposes Live View; local uses the managed profile. |
 
@@ -19,6 +19,7 @@ Responsibilities of the active production modules. Tests mirror source under `te
 | --- | --- |
 | `lifecycle.ts` | Runs or recovers initializer → worker → checks → verifier. Owns phase transitions, budgets/deadline, page ownership, checkpoint hooks, correction cycles, terminal cleanup, and projection repair. |
 | `checkpoint.schema.ts`, `checkpoint.ts` | Strict checkpoint schema plus the exclusive store. Bounded/no-follow reads; monotonic atomic saves; immutable configuration/contract; stale-lock recovery. |
+| `steering.ts` | Private durable interrupt/message journal, checkpoint cursor, pause/resume wait, and per-model-call abort boundary for interactive runs. |
 | `initializer/contractFile.ts` | Ensures `harness/output-contract.json` matches the checkpointed immutable contract; reconstructs a missing projection and rejects drift. |
 | `src/run/runDeadline.ts` | One whole-run abort/deadline signal shared across roles and effects. |
 
@@ -38,10 +39,13 @@ The verifier has no browser and cannot mutate the run. It receives one immutable
 
 | File | Responsibility |
 | --- | --- |
-| `worker/worker.ts` | Full durable worker conversation, strict model turns, no-tool continuation, exclusive `finish` interception, sequential dispatch, result bounding/offload, lifecycle snapshots, and uncertain-effect recovery. |
+| `worker/worker.ts` | Full durable worker conversation, strict/steerable model turns, no-tool continuation, exclusive `finish` interception, sequential dispatch, result bounding/offload, lifecycle snapshots, and uncertain-effect recovery. |
 | `worker/contextView.ts` | Builds a pure model-request view from never-collapsed durable history. Older bulky browser results and consumed screenshot pixels become deterministic request-view stubs while durable state stays complete. |
 
-Calls in one response execute in order. `finish` mixed with another call executes nothing. A timed-out executor remains globally registered as busy so later work and terminalization cannot overlap it.
+Calls in one response execute in order. `finish` mixed with another call
+executes nothing. User steering lets the active call settle and gives later
+unstarted calls ordered error results. A timed-out executor remains globally
+registered as busy so later work and terminalization cannot overlap it.
 
 ### Deterministic checks (`src/agent/completion`)
 

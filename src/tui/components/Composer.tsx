@@ -9,8 +9,10 @@ import { CommandSuggestions } from './CommandSuggestions.js';
 interface ComposerProps {
   /** While true the input ignores keystrokes and shows the hint. */
   disabled?: boolean;
-  /** What the disabled composer shows (why input is unavailable). */
+  /** Disabled text, or the enabled composer's empty-value placeholder. */
   hint?: string;
+  /** Optional empty-value guidance while the composer remains enabled. */
+  placeholder?: string;
   /** The reducer-owned input substate (value, selection, remount count). */
   composer: ComposerState;
   /** The suggestion panel derived from that substate — App passes
@@ -47,6 +49,7 @@ interface ComposerProps {
 export function Composer({
   disabled = false,
   hint = '(waiting for agent…)',
+  placeholder,
   composer,
   suggestions,
   dispatch,
@@ -107,6 +110,7 @@ export function Composer({
               <TextInput
                 key={completions}
                 value={value}
+                placeholder={placeholder}
                 onChange={(next) => dispatch({ type: 'composer_changed', value: next })}
                 onSubmit={handleSubmit}
               />

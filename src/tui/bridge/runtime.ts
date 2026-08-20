@@ -95,6 +95,12 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
     startRun(task, onEvent, opts) {
       let inner: RunHandle | undefined;
       let cancelled = false;
+      const pendingControl: Array<{ kind: 'interrupt' } | { kind: 'steer'; text: string }> = [];
+
+      // Claim the composer immediately, including while attached Chrome is
+      // still launching or awaiting its consent prompt. The inner bridge is
+      // told not to emit a second start event once the browser arrives.
+      onEvent({ type: 'run_started', task, at: now() });
 
       const done: Promise<RunOutcome> = (async () => {
         let session: BrowserController;
@@ -110,7 +116,10 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
 
         inner = startRunFn(task, {
           browser: session,
-          onEvent,
+          onEvent: (event) => {
+            if (event.type !== 'run_started') onEvent(event);
+          },
+          emitRunStarted: false,
           ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
           ...(opts?.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
           ...(opts?.requestPermission === undefined
@@ -118,6 +127,11 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
             : { requestPermission: opts.requestPermission }),
           ...deps.runConfig,
         });
+        for (const action of pendingControl) {
+          if (action.kind === 'interrupt') inner.interrupt?.();
+          else inner.steer?.(action.text);
+        }
+        pendingControl.length = 0;
         if (cancelled) inner.cancel();
         const outcome = await inner.done;
         if (outcome.status === 'failed' && isBrowserDeathMessage(outcome.message)) {
@@ -127,6 +141,14 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
       })();
 
       return {
+        steer: (text) => {
+          if (inner === undefined) pendingControl.push({ kind: 'steer', text });
+          else inner.steer?.(text);
+        },
+        interrupt: () => {
+          if (inner === undefined) pendingControl.push({ kind: 'interrupt' });
+          else inner.interrupt?.();
+        },
         cancel: () => {
           cancelled = true;
           inner?.cancel();

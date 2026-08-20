@@ -268,6 +268,62 @@ describe('startRun public bridge', () => {
     expect(events.some((event) => event.type === 'run_failed')).toBe(false);
   });
 
+  it('soft-interrupts, waits for steering, then resumes the same durable run', async () => {
+    let sawDelta!: () => void;
+    const firstDelta = new Promise<void>((resolve) => {
+      sawDelta = resolve;
+    });
+    const calls: Array<{ params: unknown; signal: AbortSignal | undefined }> = [];
+    const responses = [publishResponse(), finishResponse('Finished with the user update.')];
+
+    const createStream: StreamFactory = (params, signal) => {
+      calls.push({ params, signal });
+      if (calls.length === 1) {
+        return (async function* () {
+          const partial = scriptedResponse([{ type: 'text', text: 'Checking older filings.' }], {
+            input: 1,
+            output: 1,
+          });
+          yield* partial.slice(0, 3);
+          sawDelta();
+          await new Promise((_resolve, reject) => {
+            const abort = () =>
+              reject(Object.assign(new Error('soft interrupted'), { name: 'AbortError' }));
+            if (signal?.aborted === true) abort();
+            else signal?.addEventListener('abort', abort, { once: true });
+          });
+        })();
+      }
+      const response = responses[calls.length - 2];
+      if (response === undefined) throw new Error('unexpected extra worker request');
+      return (async function* () {
+        yield* response;
+      })();
+    };
+
+    const { events, handle } = startWithStream(createStream);
+    await firstDelta;
+    handle.interrupt?.();
+    await new Promise<void>((resolve) => setTimeout(resolve, 30));
+    expect(calls).toHaveLength(1);
+
+    handle.steer?.('Only use filings from 2025.');
+    const outcome = await handle.done;
+
+    expect(outcome).toMatchObject({ status: 'verified' });
+    if (outcome.status !== 'verified') throw new Error('unreachable');
+    expect(calls).toHaveLength(3);
+    expect(JSON.stringify(calls[1]?.params)).toContain('Only use filings from 2025.');
+    expect(events.some((event) => event.type === 'run_failed')).toBe(false);
+    expect(readFileSync(join(outcome.runDir, 'transcript.jsonl'), 'utf8')).toContain(
+      '"type":"user_steering"',
+    );
+    const checkpoint = JSON.parse(
+      readFileSync(join(outcome.runDir, 'harness/checkpoint.json'), 'utf8'),
+    );
+    expect(checkpoint.progress.steeringCursor).toBe(2);
+  });
+
   it('forwards cancellation into a running bash command', async () => {
     const response = scriptedResponse(
       [

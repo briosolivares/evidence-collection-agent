@@ -157,9 +157,17 @@ sequenceDiagram
 
 Browser/model work may overlap, but oracle fetch and grading are serialized independently. `headed` selects the serial lane; `requiresLogin` drives the pre-batch probe. A trial error is recorded and the rest of the batch continues; caller cancellation stops the batch. Never fix evals with task-name or task-text branches.
 
-## 8. Interactive progress and cancellation
+## 8. Interactive progress, steering, and cancellation
 
-`src/tui/bridge/runSession.ts` forwards attempt-scoped streaming progress in order, derives publication events from manifest diffs, translates `ask_user` into a local dialog, and forwards abort signals through model calls and cancellable tools. Cancelling a model stream or in-flight effect first durably terminalizes the run; no effect is allowed to outlive lock release.
+`src/tui/bridge/runSession.ts` forwards attempt-scoped streaming progress in
+order, derives publication events from manifest diffs, and translates
+`ask_user` into a local dialog. The composer stays live during a run: Enter
+journals an update and interrupts active model work, while Esc pauses before
+the next model boundary and a second Esc invokes hard cancellation. Running
+effects settle, later batch calls are skipped, and steering during checking or
+verification rejects the pending finish back to the same worker. Hard
+cancellation still reaches models and tools, durably terminalizes the run, and
+allows no effect to outlive lock release.
 
 ## 9. Developer loops
 

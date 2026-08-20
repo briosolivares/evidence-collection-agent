@@ -424,15 +424,38 @@ describe('reduce (run lifecycle events)', () => {
 // ————— Step 5: cancellation transitions —————
 
 describe('reduce (cancellation)', () => {
+  it('soft-interrupts, records a steering update, and resumes the same live run', () => {
+    let state = fold([
+      ...started,
+      { type: 'text_delta', text: 'I was checking the older filing.' },
+      { type: 'interrupt_requested' },
+    ]);
+    expect(state.mode).toBe('interrupted');
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'agent_text',
+      text: 'I was checking the older filing.',
+    });
+
+    state = reduce(state, { type: 'submit_steering', text: 'Use only the 2025 filing.' });
+    expect(state.mode).toBe('running');
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'user_steering',
+      text: 'Use only the 2025 filing.',
+    });
+    expect(state.live).toBeDefined();
+  });
+
   it('cancel_requested flips running to cancelling', () => {
     const state = fold([...started, { type: 'cancel_requested' }]);
     expect(state.mode).toBe('cancelling');
     expect(state.live).toBeDefined();
   });
 
-  it('cancel_requested is a no-op outside running', () => {
+  it('cancel_requested cancels an interrupted run and is a no-op outside active modes', () => {
     const idle = createInitialState();
     expect(reduce(idle, { type: 'cancel_requested' })).toEqual(idle);
+    const interrupted = fold([...started, { type: 'interrupt_requested' }]);
+    expect(reduce(interrupted, { type: 'cancel_requested' }).mode).toBe('cancelling');
     const cancelling = fold([...started, { type: 'cancel_requested' }]);
     expect(reduce(cancelling, { type: 'cancel_requested' })).toEqual(cancelling);
   });
@@ -1006,7 +1029,7 @@ describe('reduce (composer substate)', () => {
     expect(deriveSuggestions(typed).suggestions.map((entry) => entry.name)).toEqual(['/exit']);
   });
 
-  it('deriveSuggestions is empty outside idle — the composer is disabled there', () => {
+  it('deriveSuggestions is empty during a run even though free-form steering stays enabled', () => {
     const typed = fold([{ type: 'composer_changed', value: '/e' }]);
     const running = fold(started, typed);
     expect(running.mode).toBe('running');

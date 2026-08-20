@@ -266,6 +266,7 @@ describe('browser relaunch on next submit', () => {
     const outcome = await runtime.startRun('cannot recover', (event) => events.push(event)).done;
     expect(outcome.status).toBe('failed');
     expect(events).toEqual([
+      { type: 'run_started', task: 'cannot recover', at: 7 },
       {
         type: 'run_failed',
         message: 'browser relaunch failed: no chrome anymore',

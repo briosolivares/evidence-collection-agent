@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -35,6 +35,7 @@ import {
   type WorkerDeps,
   type PendingToolTurn,
 } from '../../../src/agent/worker/worker.js';
+import { RunSteeringMailbox } from '../../../src/agent/steering.js';
 
 const NO_TOOL_CONTINUATION =
   'Continue working with tools, or call finish alone when the requested work is ready.';
@@ -215,6 +216,36 @@ describe('ordinary response execution', () => {
     expect(results[1]?.content).toBe('result:two');
     expect(results[2]?.content).toBe('result:three');
     expect(transcript().filter((event) => event.type === 'tool_result')).toHaveLength(3);
+  });
+
+  it('settles the active tool but skips later calls when user steering arrives', async () => {
+    mkdirSync(join(runDir, 'harness'), { mode: 0o700 });
+    const steering = new RunSteeringMailbox();
+    steering.bindRunDir(runDir);
+    steering.restoreConsumedCursor(0);
+    const first = vi.fn(() => {
+      steering.steer('Use the signed copy before doing anything else.');
+      return 'first settled';
+    });
+    const later = vi.fn(() => 'should not run');
+    const worker = session(
+      scriptedDriver([
+        accepted([
+          { type: 'tool_use', id: 'first', name: 'first', input: {} },
+          { type: 'tool_use', id: 'later', name: 'later', input: {} },
+        ]),
+      ]),
+      [tool('first', first), tool('later', later)],
+      { deps: { signal: new AbortController().signal, steering } },
+    );
+
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+
+    expect(first).toHaveBeenCalledOnce();
+    expect(later).not.toHaveBeenCalled();
+    expect(lastResults(worker)[0]?.content).toBe('first settled');
+    expect(lastResults(worker)[1]).toMatchObject({ is_error: true });
+    expect(lastResults(worker)[1]?.content).toContain('user interrupted or added information');
   });
 
   it('treats a prose-only response as working even when stop_reason says tool_use', async () => {

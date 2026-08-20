@@ -49,12 +49,14 @@ function compactDetail(value: unknown): string {
  * overlay control). */
 export type UiAction =
   | { type: 'submit_task'; text: string }
+  | { type: 'submit_steering'; text: string }
   | { type: 'notice'; text: string }
   | { type: 'composer_changed'; value: string }
   | { type: 'composer_submitted' }
   | { type: 'suggest_nav'; delta: -1 | 1 }
   | { type: 'suggest_dismiss' }
   | { type: 'tab_pressed' }
+  | { type: 'interrupt_requested' }
   | { type: 'cancel_requested' }
   | { type: 'open_runs' }
   | { type: 'close_overlay' }
@@ -107,7 +109,8 @@ export function helpText(evalsEnabled = true): string {
     'Commands',
     ...commands.map((entry) => `  ${entry.name.padEnd(namePad)}${entry.description}`),
     'Keys',
-    `  ${'Esc'.padEnd(namePad)}Cancel the current run`,
+    `  ${'Enter'.padEnd(namePad)}Send an update while Sherlock works`,
+    `  ${'Esc'.padEnd(namePad)}Interrupt; press again to cancel`,
     `  ${'Ctrl+C'.padEnd(namePad)}Quit`,
   ].join('\n');
 }
@@ -311,7 +314,7 @@ function displayTokens(live: LiveRunState): number {
  * (cancelled/failed carry no runDir of their own) — and return to idle,
  * or to evalsRunning while an eval batch owns the session. */
 function endRun(state: SessionState): SessionState {
-  const { live, ...rest } = state;
+  const { live, liveArtifactFocus: _liveArtifactFocus, ...rest } = state;
   return {
     ...rest,
     ...(live?.runDir === undefined ? {} : { lastRunDir: live.runDir }),
@@ -328,6 +331,17 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
   switch (action.type) {
     case 'submit_task':
       return append(state, { kind: 'user_task', text: action.text });
+
+    case 'submit_steering': {
+      if (state.live === undefined || (state.mode !== 'running' && state.mode !== 'interrupted')) {
+        return state;
+      }
+      const next = append(finalizeStreamingText(state), {
+        kind: 'user_steering',
+        text: action.text,
+      });
+      return { ...next, mode: 'running' };
+    }
 
     case 'notice':
       return append(state, { kind: 'notice', text: action.text });
@@ -393,16 +407,36 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       // Toggle focus on the completion artifacts panel (design decision
       // 4), reusing the guarded focus/blur cases verbatim.
       if (state.mode === 'artifacts') return reduce(state, { type: 'artifacts_blur' });
+      if (
+        (state.mode === 'running' || state.mode === 'interrupted') &&
+        state.artifacts.length > 0
+      ) {
+        if (state.liveArtifactFocus === true) {
+          return {
+            ...state,
+            liveArtifactFocus: false,
+            artifactUi: { ...state.artifactUi, view: 'rows' },
+          };
+        }
+        return {
+          ...state,
+          liveArtifactFocus: true,
+          artifactUi: initialArtifactUi(),
+        };
+      }
       if (state.mode === 'idle' && state.completedRun !== undefined) {
         return reduce(state, { type: 'artifacts_focus' });
       }
       return state;
     }
 
-    case 'cancel_requested':
-      // Esc is meaningful only while a run streams; a second press while
-      // already cancelling (or any press while idle) is a no-op.
+    case 'interrupt_requested':
       if (state.mode !== 'running') return state;
+      return { ...finalizeStreamingText(state), mode: 'interrupted' };
+
+    case 'cancel_requested':
+      // A second Esc from the interrupted state is the explicit hard cancel.
+      if (state.mode !== 'running' && state.mode !== 'interrupted') return state;
       return { ...state, mode: 'cancelling' };
 
     case 'open_runs':
@@ -517,7 +551,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
 
     case 'run_started': {
       // The previous run's completion summary is superseded, not kept.
-      const { completedRun: _completedRun, ...rest } = state;
+      const { completedRun: _completedRun, liveArtifactFocus: _liveArtifactFocus, ...rest } = state;
       return {
         ...rest,
         mode: 'running',

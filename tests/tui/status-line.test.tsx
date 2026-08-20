@@ -87,4 +87,14 @@ describe('StatusLine', () => {
     expect(lastFrame()).toContain('Wrapping up…');
     unmount();
   });
+
+  it('shows the resume and second-Esc affordances while interrupted', async () => {
+    const { lastFrame, unmount } = render(
+      <StatusLine live={liveState()} interrupted={true} now={() => 1_000} rng={() => 0} />,
+    );
+    await tick();
+    expect(lastFrame()).toContain('Paused for your update…');
+    expect(lastFrame()).toContain('enter to resume · esc again to cancel');
+    unmount();
+  });
 });

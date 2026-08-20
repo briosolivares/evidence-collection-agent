@@ -15,6 +15,7 @@ runs/<run-id>/
     tool-output/                     # oversize model-result offloads
   harness/                           # never a model-supplied path
     checkpoint.json
+    steering.json                    # durable interactive control journal
     output-contract.json             # recoverable contract projection
     run.lock                         # while the coordinator owns the run
     run.lock.recovery                # transient stale-lock guard
@@ -73,6 +74,11 @@ Every v3 checkpoint has strict common fields:
 
 `DurableRunConfiguration` binds task text, model/output/context settings, browser provider, explicit authentication, JavaScript policy, optional start URL, initializer/check ceilings, and whole-run budget limits. Numeric infinity is serialized as the explicit `"unbounded"` sentinel. Configuration and accepted contract are immutable across revisions.
 
+`CheckpointProgress.steeringCursor` optionally records the highest
+`harness/steering.json` action incorporated into worker history. The journal
+contains ordered interrupt/message actions; a missing cursor remains compatible
+with older version-3 checkpoints and means zero actions consumed.
+
 ```mermaid
 stateDiagram-v2
     [*] --> initializing
@@ -107,6 +113,10 @@ The public `RunOutcome` deliberately exposes only `verified` and explicit `incom
 SDK-free conversation types in `src/model/messages.ts` mirror the Messages API: `TextBlock`, `ToolUseBlock`, `ToolResultBlock`, `Message`, `Usage`, and `ModelResponse`. `stop_reason` is validated by `ModelDriver`; completion itself depends on an exclusive `finish` call, not prose or a no-tool response.
 
 `WorkerSnapshot` stores the full never-collapsed message history, logical turn count, peak context, protocol-correction count, and start time. `src/agent/worker/contextView.ts` may replace old bulky browser results only in the pure request view; checkpoint history remains complete.
+
+Free-form user steering enters that history only at a safe worker model
+boundary. A journal action committed after the checkpoint is replayed on
+recovery; one at or below the checkpoint cursor is not duplicated.
 
 `ToolCall` and `ToolCallResult` in `src/tools/pipeline.ts` form the execution boundary. Errors are classified as unknown tool, invalid input, permission denied, execution failure, timeout, or busy resource. A timed-out effect remains in the busy ledger until its underlying promise settles.
 

@@ -7,6 +7,7 @@ import { StatusLine } from './StatusLine.js';
 interface LiveRegionProps {
   live: LiveRunState;
   cancelling?: boolean;
+  interrupted?: boolean;
   now?: () => number;
   rng?: () => number;
 }
@@ -16,7 +17,7 @@ interface LiveRegionProps {
  * lines, and the animated status line. Everything here is mutable —
  * content moves into <Static> only once finalized by the reducer.
  */
-export function LiveRegion({ live, cancelling, now, rng }: LiveRegionProps) {
+export function LiveRegion({ live, cancelling, interrupted, now, rng }: LiveRegionProps) {
   return (
     <Box flexDirection="column">
       {live.streamingText !== '' && (
@@ -35,7 +36,13 @@ export function LiveRegion({ live, cancelling, now, rng }: LiveRegionProps) {
           </Text>
         </Box>
       ))}
-      <StatusLine live={live} cancelling={cancelling} now={now} rng={rng} />
+      <StatusLine
+        live={live}
+        cancelling={cancelling}
+        interrupted={interrupted}
+        now={now}
+        rng={rng}
+      />
     </Box>
   );
 }

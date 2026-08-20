@@ -13,6 +13,8 @@ flowchart LR
     REG --> CTX["ToolCtx"]
     CTX --> B["BrowserController"]
     UI --> SP["BrowserSessionProvider"]
+    UI --> STEER["RunSteeringMailbox"]
+    STEER --> COORD
     SP --> B
     API --> TR["RunTracing"]
     COORD --> CP["CheckpointStore"]
@@ -79,7 +81,15 @@ type RunOutcome =
   | { status: 'incomplete'; reason: IncompleteRunReason; detail: string; finalText: string }
 ```
 
-The configuration requires a live `BrowserController` and accepts model/progress/tracing/permission/cancellation seams. Each call creates a fresh run with durable model, start URL, authentication, JavaScript policy, and production ceilings.
+The configuration requires a live `BrowserController` and accepts
+model/progress/tracing/permission/cancellation plus optional interactive
+steering seams. Each call creates a fresh run with durable model, start URL,
+authentication, JavaScript policy, and production ceilings.
+
+The TUI's `RunHandle` exposes `steer(text)`, soft `interrupt()`, hard
+`cancel()`, and terminal `done`. `RunSteeringMailbox` journals input before
+preempting an active model request; the whole-run abort signal remains the
+separate cancellation authority for tools and terminalization.
 
 On normal resolution the coordinator has persisted terminal state, reconciled run projections, closed run-owned pages, and finalized the manifest. The public composition root closes its tracing lifecycle; the caller still owns the browser session.
 

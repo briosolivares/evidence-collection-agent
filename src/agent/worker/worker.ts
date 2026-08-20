@@ -43,6 +43,7 @@ import {
   finishInputSchema,
   type FinishInput,
 } from '../../tools/finish/finish.js';
+import type { RunSteeringMailbox, SteeringMessage } from '../steering.js';
 import { buildContextView } from './contextView.js';
 
 export const METRICS_FILENAME = 'metrics.json';
@@ -61,6 +62,8 @@ export interface WorkerDeps {
   /** Shared across every turn; a session creates one when the caller omits it. */
   busyRegistry?: BusyResourceRegistry;
   signal?: AbortSignal;
+  /** Durable interactive user steering, consumed only at safe model boundaries. */
+  steering?: RunSteeringMailbox;
   onModelEvent?: (event: ModelAttemptEvent) => void;
   lifecycle?: WorkerHooks;
   /** Test/metrics seam. Budget wall time remains owned by RunBudgetTracker. */
@@ -268,6 +271,28 @@ function appendWorkerFeedback(session: Worker, feedback: string): void {
   });
 }
 
+function appendUserSteering(session: Worker, message: SteeringMessage): void {
+  const text = [
+    '# User steering update',
+    message.text,
+    '',
+    'Apply this new information to the active run. The accepted output contract remains immutable;',
+    'if the update conflicts with that contract, explain the conflict rather than silently changing',
+    'the deliverable that deterministic checks and verification will grade.',
+  ].join('\n');
+  const trailing = session.state.messages.at(-1);
+  if (trailing?.role === 'user') {
+    trailing.content.push({ type: 'text', text });
+  } else {
+    session.state.messages.push({ role: 'user', content: [{ type: 'text', text }] });
+  }
+  appendTranscriptEvent(session.deps.runDir, {
+    type: 'user_steering',
+    steeringId: message.id,
+    text: message.text,
+  });
+}
+
 /** Advance one strict model turn and, for ordinary calls, one serial batch. */
 export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome> {
   throwIfAborted(session.deps.signal);
@@ -276,74 +301,93 @@ export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome>
     return { kind: 'incomplete', reason: existingGuard };
   }
 
+  const steeringTurn = await session.deps.steering?.beginWorkerTurn(
+    session.deps.signal ?? new AbortController().signal,
+  );
   const turn = session.state.turnCount + 1;
-  const requestMessages = buildContextView(session.state.messages);
-  await session.deps.lifecycle?.beforeModelRequest?.({
-    turn,
-    session: captureWorkerSnapshot(session),
-    messages: structuredClone(requestMessages),
-  });
-  throwIfAborted(session.deps.signal);
-  session.state.turnCount = turn;
-
-  appendTranscriptEvent(session.deps.runDir, {
-    type: 'model_request',
-    turn,
-    messages: modelMessagesLogView(requestMessages),
-  });
-
   let accepted;
   try {
-    accepted = await runAccountedModelCall({
-      model: session.deps.model,
-      messages: requestMessages,
-      budget: session.config.budget,
-      role: 'worker',
-      ...(session.deps.signal === undefined ? {} : { signal: session.deps.signal }),
-      ...(session.deps.onModelEvent === undefined ? {} : { onEvent: session.deps.onModelEvent }),
-      afterUsageRecorded: (usage, outcome) =>
-        persistWorkerModelAccounting(session, turn, usage, outcome),
-      ...(session.deps.now === undefined ? {} : { now: session.deps.now }),
+    for (const message of steeringTurn?.messages ?? []) appendUserSteering(session, message);
+    const requestMessages = buildContextView(session.state.messages);
+    await session.deps.lifecycle?.beforeModelRequest?.({
+      turn,
+      session: captureWorkerSnapshot(session),
+      messages: structuredClone(requestMessages),
     });
-  } catch (error) {
-    if (!isModelResponseRejectedError(error)) throw error;
+    throwIfAborted(session.deps.signal);
+    session.state.turnCount = turn;
 
     appendTranscriptEvent(session.deps.runDir, {
-      type: 'model_response_rejected',
+      type: 'model_request',
       turn,
-      reason: error.reason,
-      message: error.message,
+      messages: modelMessagesLogView(requestMessages),
     });
-    if (error.reason === 'context_exhausted') {
-      return {
-        kind: 'incomplete',
-        reason: 'context_budget',
-        modelRejection: error.reason,
-        detail: error.message,
-      };
-    }
-    if (isProtocolCorrectableRejection(error.reason)) {
-      if (session.protocolCorrections >= MAX_PROTOCOL_CORRECTIONS) {
+
+    try {
+      accepted = await runAccountedModelCall({
+        model: session.deps.model,
+        messages: requestMessages,
+        budget: session.config.budget,
+        role: 'worker',
+        ...(steeringTurn === undefined
+          ? session.deps.signal === undefined
+            ? {}
+            : { signal: session.deps.signal }
+          : { signal: steeringTurn.signal }),
+        ...(session.deps.onModelEvent === undefined ? {} : { onEvent: session.deps.onModelEvent }),
+        afterUsageRecorded: (usage, outcome) =>
+          persistWorkerModelAccounting(session, turn, usage, outcome),
+        ...(session.deps.now === undefined ? {} : { now: session.deps.now }),
+      });
+    } catch (error) {
+      if (steeringTurn?.interrupted() === true && session.deps.signal?.aborted !== true) {
+        appendTranscriptEvent(session.deps.runDir, {
+          type: 'worker_model_interrupted',
+          turn,
+        });
+        return { kind: 'working' };
+      }
+      if (!isModelResponseRejectedError(error)) throw error;
+
+      appendTranscriptEvent(session.deps.runDir, {
+        type: 'model_response_rejected',
+        turn,
+        reason: error.reason,
+        message: error.message,
+      });
+      if (error.reason === 'context_exhausted') {
         return {
           kind: 'incomplete',
-          reason: 'model_rejection_limit',
+          reason: 'context_budget',
           modelRejection: error.reason,
           detail: error.message,
         };
       }
-      session.protocolCorrections += 1;
-      appendWorkerFeedback(session, error.protocolFeedback);
-      const correctionGuard = guardReason(session);
-      return correctionGuard === undefined
-        ? { kind: 'working' }
-        : { kind: 'incomplete', reason: correctionGuard };
+      if (isProtocolCorrectableRejection(error.reason)) {
+        if (session.protocolCorrections >= MAX_PROTOCOL_CORRECTIONS) {
+          return {
+            kind: 'incomplete',
+            reason: 'model_rejection_limit',
+            modelRejection: error.reason,
+            detail: error.message,
+          };
+        }
+        session.protocolCorrections += 1;
+        appendWorkerFeedback(session, error.protocolFeedback);
+        const correctionGuard = guardReason(session);
+        return correctionGuard === undefined
+          ? { kind: 'working' }
+          : { kind: 'incomplete', reason: correctionGuard };
+      }
+      return {
+        kind: 'incomplete',
+        reason: 'model_rejected',
+        modelRejection: error.reason,
+        detail: error.message,
+      };
     }
-    return {
-      kind: 'incomplete',
-      reason: 'model_rejected',
-      modelRejection: error.reason,
-      detail: error.message,
-    };
+  } finally {
+    steeringTurn?.close();
   }
 
   const response = accepted.response;
@@ -618,6 +662,23 @@ async function continueSequentialCalls(
 
   for (let index = startIndex; index < calls.length; index += 1) {
     throwIfAborted(session.deps.signal);
+    if (session.deps.steering?.hasUnconsumedActions() === true) {
+      const interrupted = calls
+        .slice(index)
+        .map((call) =>
+          generatedErrorResult(
+            session.deps.runDir,
+            call,
+            'Not executed because the user interrupted or added information before this call ' +
+              'started. Consume the user update and reconsider the next action.',
+          ),
+        );
+      completed = capCombinedResults(session.deps.runDir, calls, [...completed, ...interrupted]);
+      await session.deps.lifecycle?.afterResult?.(
+        pendingToolTurn(turn, assistant, calls, completed, calls.length, 'not_started'),
+      );
+      break;
+    }
     const call = calls[index]!;
 
     let result: ToolCallResult | undefined;

@@ -99,7 +99,8 @@ describe('registry drives routeInput and help text', () => {
         '  /evals      Run eval tasks',
         '  /exit       Quit Sherlock',
         'Keys',
-        '  Esc         Cancel the current run',
+        '  Enter       Send an update while Sherlock works',
+        '  Esc         Interrupt; press again to cancel',
         '  Ctrl+C      Quit',
       ].join('\n'),
     );

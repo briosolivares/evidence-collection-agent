@@ -22,6 +22,7 @@ export function TranscriptItemView({
     case 'banner':
       return <WelcomeCard apiKeyPresent={item.apiKeyPresent} identity={item.identity} />;
     case 'user_task':
+    case 'user_steering':
       return (
         <Box marginTop={1} paddingLeft={1}>
           <Text>

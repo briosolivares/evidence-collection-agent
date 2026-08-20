@@ -43,7 +43,7 @@ describe('preflight and exit paths', () => {
     expect(lines[0]).toMatch(/interactive terminal|TTY/i);
   });
 
-  it('double-Esc and Ctrl+C while cancelling stay safe', async () => {
+  it('soft interrupt, cancel, repeated Esc, and Ctrl+C stay safe', async () => {
     const cancel = vi.fn();
     let emit: ((event: UiEvent) => void) | undefined;
     const runner = vi.fn((task: string, onEvent: (event: UiEvent) => void): RunHandle => {
@@ -62,8 +62,12 @@ describe('preflight and exit paths', () => {
 
     stdin.write(ESC);
     await tick(150);
+    expect(lastFrame()).toContain('Paused for your update…');
+    expect(cancel).not.toHaveBeenCalled();
+    stdin.write(ESC);
+    await tick(150);
     expect(lastFrame()).toContain('Wrapping up…');
-    stdin.write(ESC); // double-Esc: no second cancel, still cancelling
+    stdin.write(ESC); // repeated Esc: no second cancel, still cancelling
     await tick(150);
     expect(cancel).toHaveBeenCalledTimes(1);
     expect(lastFrame()).toContain('Wrapping up…');

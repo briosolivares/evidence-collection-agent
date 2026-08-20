@@ -69,6 +69,7 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
 
       let inner: RunHandle | undefined;
       let cancelled = false;
+      const pendingControl: Array<{ kind: 'interrupt' } | { kind: 'steer'; text: string }> = [];
       const done = browserRuntime
         .withBrowser(opts.headed, async (browser) => {
           // Local headed trials remain visible and may ask the TUI's human,
@@ -86,6 +87,11 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
             authenticated: opts.headed,
             javascriptPolicy: 'allow',
           });
+          for (const action of pendingControl) {
+            if (action.kind === 'interrupt') inner.interrupt?.();
+            else inner.steer?.(action.text);
+          }
+          pendingControl.length = 0;
           if (cancelled) inner.cancel();
           return inner.done;
         })
@@ -96,6 +102,14 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
         });
 
       return {
+        steer: (text) => {
+          if (inner === undefined) pendingControl.push({ kind: 'steer', text });
+          else inner.steer?.(text);
+        },
+        interrupt: () => {
+          if (inner === undefined) pendingControl.push({ kind: 'interrupt' });
+          else inner.interrupt?.();
+        },
         cancel: () => {
           if (cancelled) return;
           cancelled = true;

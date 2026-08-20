@@ -176,6 +176,32 @@ gate passes 4 files / 119 tests, `npm run typecheck` passes, and
 `git diff --check` passes. Per user direction, the already-green full suite was
 not repeated for this final UI slice.
 
+## Free-form interactive steering complete (2026-08-20)
+
+- [x] Keep the composer active while Sherlock launches the browser, streams a
+  worker response, executes tools, and verifies completion. Enter submits a
+  visible follow-up to the same run; slash commands remain an idle-session
+  surface rather than stealing active-run text.
+- [x] Make Esc a soft interrupt that preserves the draft and pauses before the
+  next worker model request. Enter with new information resumes the run; a
+  second Esc performs the existing hard cancellation and terminal cleanup.
+- [x] Journal interrupt/message actions durably under `harness/`, consume them
+  exactly once through a checkpointed cursor, and keep the cached worker
+  system/tool prefix byte-stable by adding updates only as conversation
+  messages.
+- [x] Abort in-flight model and read-only verifier requests promptly without
+  abandoning state-changing effects. Let an active tool settle, synthesize
+  ordered not-executed results for later calls in its batch, and invalidate a
+  pending `finish` before returning the update to the persistent worker.
+- [x] Keep the live artifact rail passive while the composer owns input; Tab
+  explicitly focuses it, and Esc unwinds detail/focus before interrupting the
+  run.
+
+Verification: the complete `tests/agent` + `tests/tui` gate passes 48 files /
+622 tests. The final two-worker hermetic repository gate passes 148 files /
+1,500 tests; `npm run typecheck` and `git diff --check` pass. Live evals and
+the billable Browserbase smoke were not run.
+
 ## Semantic system atlas complete (2026-08-20)
 
 - [x] Rebuild `docs/sherlock-system-atlas.html` around `@xyflow/react`, with

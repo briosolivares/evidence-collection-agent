@@ -12,6 +12,36 @@ function makeHandle(): RunHandle {
 }
 
 describe('TUI browser lifecycle', () => {
+  it('claims the composer immediately and replays steering queued during browser startup', async () => {
+    let resolveBrowser!: (browser: BrowserController) => void;
+    const browserReady = new Promise<BrowserController>((resolve) => {
+      resolveBrowser = resolve;
+    });
+    const steer = vi.fn();
+    const interrupt = vi.fn();
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession: () => browserReady },
+      startRunFn: () => ({
+        steer,
+        interrupt,
+        cancel: vi.fn(),
+        done: Promise.resolve({ status: 'cancelled' }),
+      }),
+      now: () => 17,
+    });
+    const events: UiEvent[] = [];
+
+    const handle = runtime.startRun('use the signed copy', (event) => events.push(event));
+    expect(events).toEqual([{ type: 'run_started', task: 'use the signed copy', at: 17 }]);
+    handle.interrupt?.();
+    handle.steer?.('The signed copy is in the second tab.');
+
+    resolveBrowser(stubBrowser());
+    await handle.done;
+    expect(interrupt).toHaveBeenCalledOnce();
+    expect(steer).toHaveBeenCalledWith('The signed copy is in the second tab.');
+  });
+
   it('launches one persistent browser and hands it to every run', async () => {
     const controller = stubBrowser();
     const createSession = vi.fn(async (): Promise<BrowserController> => controller);

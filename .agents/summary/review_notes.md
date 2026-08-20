@@ -6,7 +6,10 @@ Review snapshot for the active summaries as of 2026-08-20. Historical planning a
 
 1. **Production has one path.** `src/agent/runTask.ts` composes the initializer, sequential worker, deterministic finish checks, fresh verifier, static nine-tool registry, and durable lifecycle.
 2. **The cached worker prefix is static.** `workerPrompt` and `WORKER_API_TOOL_DEFS` hold no task/run/provider state. Per-run facts enter conversation guidance and durable configuration.
-3. **Durability is authoritative.** The checkpointed configuration, contract, budget, worker history, pending effect, and terminal outcome are primary. `manifest.json`, `output-contract.json`, transcript, and metrics are durable product/diagnostic projections with explicit recovery rules.
+3. **Durability is authoritative.** The checkpointed configuration, contract,
+   budget, worker history, steering cursor, pending effect, and terminal outcome
+   are primary. The private steering journal plus `manifest.json`,
+   `output-contract.json`, transcript, and metrics have explicit recovery rules.
 4. **Browser ownership is explicit.** The local TUI attaches to user-owned Chrome, while login and both eval lanes use managed sessions. Browserbase is selected only by the provider variable; possessing a key alone does not start a remote session.
 5. **Evaluation remains isolated.** Dataset metadata selects normal/headed lanes and login preflight. Graders see only run-directory files plus fresh oracle data, and published deliverables are selected by manifest role.
 

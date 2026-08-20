@@ -32,6 +32,8 @@ interface ArtifactRailProps {
    * every keypress to every mounted useInput, so two live handlers on
    * the same keys would both fire. */
   active?: boolean;
+  /** Tab gives the rail focus; otherwise it remains a passive live list. */
+  focused?: boolean;
 }
 
 /**
@@ -62,8 +64,10 @@ export function ArtifactRail({
   reveal,
   preview,
   active = true,
+  focused,
   limit = 8,
 }: ArtifactRailProps) {
+  const isFocused = focused ?? true;
   useArtifactKeys({
     artifacts,
     ui,
@@ -79,7 +83,7 @@ export function ArtifactRail({
   if (artifacts.length === 0) return null;
 
   const current = artifacts[ui.cursor];
-  if (ui.view === 'detail' && current !== undefined) {
+  if (isFocused && ui.view === 'detail' && current !== undefined) {
     return (
       <Box flexDirection="column" marginTop={1}>
         <Text>
@@ -98,9 +102,11 @@ export function ArtifactRail({
       <Text color={theme.primary} bold>
         Artifacts
       </Text>
-      <ArtifactRows artifacts={artifacts} cursor={ui.cursor} limit={limit} />
+      <ArtifactRows artifacts={artifacts} cursor={ui.cursor} limit={limit} showCursor={isFocused} />
       <Text color={theme.muted}>
-        {'  ↑↓ select · enter details · space preview · o open · r reveal'}
+        {isFocused
+          ? '  ↑↓ select · enter details · space preview · o open · r reveal'
+          : '  tab to browse'}
       </Text>
     </Box>
   );

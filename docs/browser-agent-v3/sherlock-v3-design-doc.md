@@ -40,8 +40,10 @@ that make evidence trustworthy.
    debugging endpoint, so existing authenticated state is available. Isolated
    eval trials still launch their own managed profiles. Browserbase remains an
    explicit alternative provider.
-4. The TUI streams assistant progress text and visible tool activity. It does
-   not claim to reveal hidden chain-of-thought.
+4. The TUI streams assistant progress text and visible tool activity without
+   locking the composer. The user may press Enter to steer the active run, or
+   Esc to pause at a safe boundary and provide new information; a second Esc
+   explicitly cancels. The TUI does not claim to reveal hidden chain-of-thought.
 5. The worker inspects and drives the page with `browser_execute`, using
    `capture_screenshot` when it needs to see the exact live viewport. It may
    write and repair reusable JavaScript helpers under the run's private
@@ -985,7 +987,30 @@ Langfuse remains a tracing delegate. The manifest is authoritative for
 artifacts; TUI events are derived. Tracing must never receive provider secrets,
 raw CDP URLs, or child environment blocks.
 
-### 14.2 Eval boundary
+### 14.2 Interactive steering contract
+
+The composer remains available from the immediate `run_started` event through
+browser startup, initialization, worker execution, and verification. Enter
+journals a free-form user update under `harness/` before returning control to
+Ink. The worker consumes each journal action exactly once at its next model
+boundary; the checkpoint's steering cursor makes crash recovery replay an
+uncommitted update without duplicating one already present in worker history.
+
+A user update aborts only an active model request. Partial model output remains
+ephemeral and never enters worker history. An already-running tool settles
+under its existing effect and timeout rules, while later calls in the same
+model response receive explicit not-executed results. Bare Esc pauses before
+the next worker request and preserves the composer draft. Enter with an update
+resumes; Esc while paused invokes the separate whole-run cancellation path.
+
+Steering that arrives after `finish` invalidates that completion attempt. A
+read-only verifier call may be interrupted, the pending finish receives a
+model-readable `user_steering` rejection, and the persistent worker continues
+with the new message. Steering never revises the initializer-owned immutable
+output contract; a conflicting request must be surfaced rather than silently
+changing the deliverable being graded.
+
+### 14.3 Eval boundary
 
 V3 preserves:
 
@@ -1041,6 +1066,7 @@ the grader contract.
 | CDP target disappeared | Fail that call with exact target identity; no first-page fallback. |
 | Browser disconnected | Classify browser death; current run fails/incompletes honestly; TUI runtime may relaunch for the next task. |
 | Tool timeout | Kill owned child/process group when possible; effect may be uncertain; require inspection. |
+| User interrupt / steering | Abort only active model work; settle the current tool, skip unstarted calls, persist the update, and resume the same worker conversation. |
 | Cancellation | Abort model and child/tool work, finalize run files, close owned pages, emit cancelled once. |
 | Deterministic finish failure | Answer a complete claim with exact repairable defects; submit findings to the judge with reported unresolved work. |
 | Judge correction | Answer `finish` with requirement-specific problem and next action; same conversation continues. |

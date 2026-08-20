@@ -11,6 +11,7 @@ import type { UnresolvedRequirement } from '../../run/runOutcome.js';
 export type SessionMode =
   | 'idle'
   | 'running'
+  | 'interrupted'
   | 'cancelling'
   | 'artifacts'
   | 'runsList'
@@ -93,6 +94,7 @@ export interface CompletionArtifact {
 export type TranscriptItemBody =
   | { kind: 'banner'; apiKeyPresent: boolean; identity?: BannerIdentity }
   | { kind: 'user_task'; text: string }
+  | { kind: 'user_steering'; text: string }
   | { kind: 'agent_text'; text: string }
   | {
       kind: 'activity';
@@ -339,6 +341,8 @@ export interface SessionState {
   artifacts: readonly PublishedArtifact[];
   /** Cursor + view of the artifact rail/panel; reset on run_started. */
   artifactUi: ArtifactUiState;
+  /** Tab temporarily hands live-run keys from the composer to the artifact rail. */
+  liveArtifactFocus?: boolean;
   /** Summary of the last terminal interactive run — the answer/artifact
    * panel's data and its render condition; cleared on run_started. */
   completedRun?: CompletedRunSummary;

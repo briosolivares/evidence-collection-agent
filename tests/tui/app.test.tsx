@@ -85,10 +85,14 @@ function fakeRunner(outcome: RunOutcome = { status: 'cancelled' }) {
   let emit: ((event: UiEvent) => void) | undefined;
   let resolveDone: ((value: RunOutcome) => void) | undefined;
   const cancel = vi.fn();
+  const interrupt = vi.fn();
+  const steer = vi.fn();
   const runner = vi.fn((task: string, onEvent: (event: UiEvent) => void): RunHandle => {
     emit = onEvent;
     onEvent({ type: 'run_started', task, at: 0 });
     return {
+      steer,
+      interrupt,
       cancel,
       done: new Promise<RunOutcome>((resolve) => {
         resolveDone = resolve;
@@ -98,13 +102,15 @@ function fakeRunner(outcome: RunOutcome = { status: 'cancelled' }) {
   return {
     runner,
     cancel,
+    interrupt,
+    steer,
     emit: (event: UiEvent) => emit?.(event),
     finish: () => resolveDone?.(outcome),
   };
 }
 
 describe('App run-session wiring', () => {
-  it('submitting a task invokes the bridge and disables the composer', async () => {
+  it('submitting a task invokes the bridge and keeps the composer available', async () => {
     const bridge = fakeRunner();
     const { frames, lastFrame, stdin, unmount } = render(
       <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
@@ -113,8 +119,23 @@ describe('App run-session wiring', () => {
     await submitLine(stdin, 'collect the filings');
     expect(bridge.runner).toHaveBeenCalledTimes(1);
     expect(bridge.runner.mock.calls[0]?.[0]).toBe('collect the filings');
-    expect(lastFrame()).toContain('(waiting for agent…)');
+    expect(lastFrame()).toContain('(type an update — enter to steer)');
     expect(frames.join('\n')).toContain('▸ collect the filings');
+    unmount();
+  });
+
+  it('submits free-form steering through the live composer', async () => {
+    const bridge = fakeRunner();
+    const { frames, lastFrame, stdin, unmount } = render(
+      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
+    );
+    await tick();
+    await submitLine(stdin, 'collect the filings');
+    await submitLine(stdin, 'Only use filings from 2025.');
+
+    expect(bridge.steer).toHaveBeenCalledWith('Only use filings from 2025.');
+    expect(frames.join('\n')).toContain('▸ Only use filings from 2025.');
+    expect(lastFrame()).toContain('(type an update — enter to steer)');
     unmount();
   });
 
@@ -369,7 +390,12 @@ describe('App artifact rail Esc precedence', () => {
       toolExecId: 1,
     });
     await tick();
-    // The rail mounted the moment the artifact landed, mid-run.
+    // The rail mounts passively so ordinary typing remains composer input.
+    expect(lastFrame()).toContain('◆ artifacts/page.png');
+    expect(lastFrame()).not.toContain('› ◆ artifacts/page.png');
+
+    stdin.write('\t'); // Tab focuses the live rail.
+    await tick();
     expect(lastFrame()).toContain('› ◆ artifacts/page.png');
 
     stdin.write('\r'); // Enter opens the provenance card
@@ -384,7 +410,16 @@ describe('App artifact rail Esc precedence', () => {
     expect(lastFrame()).toContain('› ◆ artifacts/page.png');
     expect(lastFrame()).not.toContain('Wrapping up…');
 
-    stdin.write(ESC); // rows view: Esc cancels as today
+    stdin.write(ESC); // rows view: Esc returns focus to the composer
+    await tick(150);
+    expect(bridge.interrupt).not.toHaveBeenCalled();
+
+    stdin.write(ESC); // composer-focused: soft interrupt
+    await tick(150);
+    expect(bridge.interrupt).toHaveBeenCalledTimes(1);
+    expect(lastFrame()).toContain('Paused for your update');
+
+    stdin.write(ESC); // second Esc explicitly cancels
     await tick(150);
     expect(bridge.cancel).toHaveBeenCalledTimes(1);
     expect(lastFrame()).toContain('Wrapping up…');
@@ -564,7 +599,7 @@ describe('App completion summary panel', () => {
     await tick(150);
     expect(lastFrame()).not.toContain('› ◆');
     await submitLine(stdin, 'next question');
-    expect(lastFrame()).toContain('(waiting for agent…)');
+    expect(lastFrame()).toContain('(type an update — enter to steer)');
     unmount();
   });
 
@@ -597,7 +632,7 @@ describe('App Esc cancellation', () => {
     unmount();
   });
 
-  it('Esc during a run cancels once and shows the wrapping-up state', async () => {
+  it('Esc interrupts first and a second Esc cancels once', async () => {
     const bridge = fakeRunner();
     const { stdin, lastFrame, unmount } = render(
       <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
@@ -606,7 +641,10 @@ describe('App Esc cancellation', () => {
     await submitLine(stdin, 'a long investigation');
     stdin.write(ESC);
     await tick(150);
-    stdin.write(ESC); // double-Esc while already cancelling
+    expect(bridge.interrupt).toHaveBeenCalledTimes(1);
+    expect(bridge.cancel).not.toHaveBeenCalled();
+    expect(lastFrame()).toContain('Paused for your update');
+    stdin.write(ESC);
     await tick(150);
     expect(bridge.cancel).toHaveBeenCalledTimes(1);
     expect(lastFrame()).toContain('Wrapping up…');
@@ -622,6 +660,8 @@ describe('App Esc cancellation', () => {
     await submitLine(stdin, 'to be interrupted');
     bridge.emit({ type: 'turn_start', turn: 1 });
     bridge.emit({ type: 'turn_end', usage: { input: 9_000, output: 300 } });
+    stdin.write(ESC);
+    await tick();
     stdin.write(ESC);
     await tick();
     bridge.emit({ type: 'run_cancelled', at: 18_000 });

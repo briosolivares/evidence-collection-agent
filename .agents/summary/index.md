@@ -27,7 +27,7 @@ This directory is the current architecture summary for Sherlock's production pat
 ```text
 runTask
   → immutable contract initializer
-  → sequential worker (8 static tools)
+  → sequential worker (9 static tools)
   → exclusive finish request
   → deterministic read-only checks
   → fresh read-only verifier

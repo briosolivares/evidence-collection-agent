@@ -40,6 +40,7 @@ import { runAgent } from './lifecycle.js';
 import { workerPrompt } from '../prompts/index.js';
 import { WORKER_API_TOOL_DEFS, createWorkerToolRegistry } from '../tools/index.js';
 import { BASH_SECRET_ENV_DENYLIST } from '../tools/bash/secretEnvironment.js';
+import type { RunSteeringMailbox } from './steering.js';
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DEFAULT_RUNS_BASE_DIR = resolveSherlockPaths({
@@ -94,6 +95,8 @@ export interface RunTaskConfig {
   javascriptPolicy?: BrowserJavaScriptPolicy;
   harness?: HarnessConfig;
   signal?: AbortSignal;
+  /** Interactive user steering for this run. */
+  steering?: RunSteeringMailbox;
 }
 
 /** A finished run directory and its truthful terminal outcome. */
@@ -118,6 +121,7 @@ type LiveRunConfig = Pick<
   | 'onProgress'
   | 'requestPermission'
   | 'signal'
+  | 'steering'
   | 'tracing'
 >;
 
@@ -182,6 +186,7 @@ async function executeRun(
           ? {}
           : { requestPermission: config.requestPermission }),
         ...(config.signal === undefined ? {} : { signal: config.signal }),
+        ...(config.steering === undefined ? {} : { steering: config.steering }),
         ...(progress === undefined
           ? {}
           : {

@@ -280,6 +280,9 @@ export type PendingVerifier = z.infer<typeof pendingVerifierSchema>;
 export const checkpointProgressSchema = z.strictObject({
   verifierCycles: z.number().int().nonnegative(),
   completionCheckFailures: z.number().int().nonnegative(),
+  /** Highest durable steering-journal action incorporated into worker history.
+   * Optional so existing version-3 checkpoints remain resumable. */
+  steeringCursor: z.number().int().nonnegative().optional(),
 });
 
 export type CheckpointProgress = z.infer<typeof checkpointProgressSchema>;

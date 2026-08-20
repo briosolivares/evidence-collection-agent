@@ -27,6 +27,8 @@ flowchart TD
 
 1. The initializer receives only the task and must return exactly one schema-valid output contract. It gets one initial attempt plus one repair. Once accepted, the contract is immutable and checkpointed; `harness/output-contract.json` is a recoverable convenience projection.
 2. The worker receives the task, immutable contract guidance, and durable capability policy. Model responses are fully streamed and validated before content enters history or any tool runs.
+   Interactive user updates are journaled separately, then enter the same
+   durable conversation exactly once at a safe model boundary.
 3. Ordinary tool calls execute strictly in response order. Each effect boundary is checkpointed conservatively so recovery never blindly replays an uncertain call.
 4. A response without tool calls receives a continuation message. It does not complete the run.
 5. Completion is requested only by an exclusive `finish` call containing a user-facing summary. Requested-output paths are derived from the manifest rather than claimed by the worker.

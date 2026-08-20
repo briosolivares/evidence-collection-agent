@@ -136,7 +136,7 @@ describe('QuestionDialog in the App', () => {
     });
     await tick();
     // The run is still live — dismissing the dialog is not a cancel.
-    expect(lastFrame()).toContain('(waiting for agent…)');
+    expect(lastFrame()).toContain('(type an update — enter to steer)');
     unmount();
   });
 });

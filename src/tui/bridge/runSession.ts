@@ -40,6 +40,7 @@ import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
+import { RunSteeringMailbox } from '../../agent/steering.js';
 
 /**
  * Recognize failures that make a session controller unsafe to reuse.
@@ -66,8 +67,13 @@ export type RunOutcome =
   | { status: 'cancelled' }
   | { status: 'failed'; message: string };
 
-/** A live run: cancel it, or await its terminal outcome. */
+/** A live run: steer, pause, cancel, or await its terminal outcome. */
 export interface RunHandle {
+  /** Queue user information for the next safe worker boundary and preempt an
+   * active model request. Running tools settle before the message is read. */
+  steer?(text: string): void;
+  /** Pause before the next worker model request and preempt one in flight. */
+  interrupt?(): void;
   /** Abort the in-flight model call; an executing tool batch settles
    * first (bounded by browser timeouts). Idempotent. */
   cancel(): void;
@@ -81,6 +87,9 @@ export interface RunSessionDeps {
   browser: BrowserController;
   /** Receives the run's ordered UiEvent stream. */
   onEvent: (event: UiEvent) => void;
+  /** Runtime adapters that already emitted the immediate UI start event can
+   * suppress this bridge's default emission. */
+  emitRunStarted?: boolean;
   runsBaseDir?: string;
   /** Whether the browser carries logged-in authority. */
   authenticated?: boolean;
@@ -124,6 +133,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
   const runTaskFn = deps.runTaskFn ?? runTask;
   const controller = new AbortController();
   const { signal } = controller;
+  const steering = new RunSteeringMailbox();
 
   // 1:1 with ProgressEvent (see model/callModel.ts), forwarded into
   // RunTaskConfig.onProgress so runTask's own model client — worker,
@@ -199,7 +209,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           });
         };
 
-  emit({ type: 'run_started', task, at: now() });
+  if (deps.emitRunStarted !== false) emit({ type: 'run_started', task, at: now() });
 
   // The tracing seam gives the TUI tool inputs/results and the runDir
   // mid-run, while delegating spans to the real tracing (Langfuse).
@@ -228,6 +238,7 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         // the tool half a cancelled run would return while its command kept
         // running.
         signal,
+        steering,
       });
       emit({
         type: 'run_finished',
@@ -246,10 +257,14 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
       }
       emit({ type: 'run_failed', message, at: now() });
       return { status: 'failed', message } as const;
+    } finally {
+      steering.seal();
     }
   })();
 
   return {
+    steer: (text) => steering.steer(text),
+    interrupt: () => steering.interrupt(),
     cancel: () => controller.abort(),
     done,
   };

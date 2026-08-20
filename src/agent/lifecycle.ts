@@ -92,6 +92,7 @@ import {
 } from './findingsReport.js';
 import { ensureOutputContractFile } from './initializer/contractFile.js';
 import { createRunDeadline, raceWithRunSignal } from '../run/runDeadline.js';
+import { RunSteeringMailbox } from './steering.js';
 
 type CheckpointCommonKey =
   | 'version'
@@ -154,6 +155,9 @@ export interface RunAgentOptions {
   browser?: BrowserController;
   requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
   signal?: AbortSignal;
+  /** Interactive user steering. Omit for a mailbox that only replays any
+   * durable journal already present in the run directory. */
+  steering?: RunSteeringMailbox;
   onModelEvent?: (role: 'initializer' | 'worker' | 'verifier', event: ModelAttemptEvent) => void;
   checkpointStoreOptions?: CheckpointStoreOptions;
   /** Observability/test seam called only after a checkpoint is durable. */
@@ -191,7 +195,10 @@ export async function runAgent(options: RunAgentOptions): Promise<DurableTermina
 
   const store = await openCheckpointStore(options.runDir, options.checkpointStoreOptions);
   try {
+    const steering = options.steering ?? new RunSteeringMailbox();
+    steering.bindRunDir(options.runDir);
     const loaded = store.load();
+    steering.restoreConsumedCursor(loaded?.progress.steeringCursor ?? 0);
     if (
       loaded !== undefined &&
       JSON.stringify(loaded.configuration) !== JSON.stringify(configuration)
@@ -200,6 +207,7 @@ export async function runAgent(options: RunAgentOptions): Promise<DurableTermina
     }
     const now = options.now ?? Date.now;
     if (loaded?.phase === 'terminal') {
+      steering.seal();
       const checkActive = createTerminalResumeInspectionGuard(options, now);
       recoverAndInspectRun(options.runDir, configuration, loaded.phase, checkActive);
       if (loaded.contract !== undefined) {
@@ -234,7 +242,7 @@ export async function runAgent(options: RunAgentOptions): Promise<DurableTermina
     const deadline = createRunDeadline(budget, options.signal);
     try {
       const state = new CoordinatorState(
-        options,
+        { ...options, steering },
         configuration,
         store,
         budget,
@@ -368,7 +376,7 @@ class CoordinatorState {
   private readonly busyRegistry: BusyResourceRegistry;
 
   constructor(
-    private readonly options: RunAgentOptions,
+    private readonly options: RunAgentOptions & { steering: RunSteeringMailbox },
     private readonly configuration: DurableRunConfiguration,
     private readonly store: Awaited<ReturnType<typeof openCheckpointStore>>,
     private readonly budget: RunBudgetTracker,
@@ -479,6 +487,7 @@ class CoordinatorState {
       }
 
       if (state.phase === 'checking') {
+        if (await this.deferFinishForSteering(state)) continue;
         const request = state.pendingFinish;
         const resourcesSettled = await raceWithRunSignal(
           () => this.busyRegistry.waitUntilFree(BUSY_RESOURCE_GATE_TIMEOUT_MS, this.runSignal),
@@ -569,11 +578,13 @@ class CoordinatorState {
       }
 
       if (state.phase === 'verifying') {
+        if (await this.deferFinishForSteering(state)) continue;
         const request = state.pendingFinish;
         const facts = state.facts;
         const surfacedArtifacts = collectSurfacedArtifacts(this.options.runDir);
         const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(surfacedArtifacts);
         let verification: Awaited<ReturnType<typeof runVerifier>>;
+        const verifierCall = this.options.steering.beginInterruptibleCall(this.runSignal);
         try {
           verification = await runVerifier({
             taskText: this.configuration.taskText,
@@ -587,7 +598,7 @@ class CoordinatorState {
             verificationHistory: this.verificationHistory,
             model: this.options.verifierModel,
             budget: this.budget,
-            signal: this.runSignal,
+            signal: verifierCall.signal,
             ...(this.options.onModelEvent === undefined
               ? {}
               : {
@@ -606,6 +617,12 @@ class CoordinatorState {
           await this.saveVerifying(state);
           this.runSignal.throwIfAborted();
         } catch (error) {
+          if (verifierCall.interrupted() && !this.runSignal.aborted) {
+            if (!(await this.deferFinishForSteering(state))) {
+              throw new Error('verifier was interrupted without a pending steering action');
+            }
+            continue;
+          }
           const budgetError = verifierBudgetError(error, this.runSignal);
           if (budgetError !== undefined) {
             await this.appendTerminalFinishFailure(
@@ -619,7 +636,11 @@ class CoordinatorState {
             );
           }
           throw error;
+        } finally {
+          verifierCall.close();
         }
+
+        if (await this.deferFinishForSteering(state)) continue;
 
         if (verification.status === 'invalid_verdict') {
           // The model responded but never produced a valid verdict, even
@@ -808,6 +829,7 @@ class CoordinatorState {
   ): Promise<DurableTerminalOutcome> {
     if (this.terminalizing) throw new Error('recursive terminalization');
     this.terminalizing = true;
+    this.options.steering.seal();
     const terminalState = this.state;
 
     // A timed-out executor is still a live effect, even though the model has
@@ -1045,6 +1067,7 @@ class CoordinatorState {
         ? {}
         : { requestPermission: this.options.requestPermission }),
       signal: this.runSignal,
+      steering: this.options.steering,
       ...(this.options.onModelEvent === undefined
         ? {}
         : {
@@ -1179,6 +1202,28 @@ class CoordinatorState {
     }
   }
 
+  /** A user update supersedes an in-flight finish claim. Close that finish
+   * call with a model-readable rejection, then let the same worker consume
+   * the durable steering journal at its next safe model boundary. */
+  private async deferFinishForSteering(
+    state: CheckingCoordinatorState | VerifyingCoordinatorState,
+  ): Promise<boolean> {
+    if (!this.options.steering.hasUnconsumedActions()) return false;
+    await appendFinishResult(
+      state.session,
+      state.pendingFinish,
+      JSON.stringify({
+        status: 'rejected',
+        source: 'user_steering',
+        message:
+          'The user interrupted or added information while completion was being checked. ' +
+          'Consume the new user update, continue the run, and call finish again when ready.',
+      }),
+    );
+    this.state = readyState(state);
+    return true;
+  }
+
   private async saveInitializing(
     state:
       | { initializer: ContractInitializerState; contract?: never }
@@ -1279,6 +1324,7 @@ class CoordinatorState {
       progress: {
         verifierCycles: this.verifierCycles,
         completionCheckFailures: this.completionCheckFailures,
+        steeringCursor: this.options.steering.consumedCursor(),
       },
       ...phaseState,
     } as Checkpoint;
@@ -1322,7 +1368,7 @@ function workerModelBoundary(model: ModelDriver, signal: AbortSignal): ModelDriv
         return await model.generate(options);
       } catch (error) {
         if (
-          (isAbortError(error) && signal.aborted) ||
+          (isAbortError(error) && (signal.aborted || options.signal?.aborted === true)) ||
           isModelResponseRejectedError(error) ||
           isModelGenerationFailedError(error)
         ) {

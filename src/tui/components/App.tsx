@@ -130,8 +130,8 @@ export function App({
     return playDemo(createDemoScript(Date.now()), dispatch);
   }, [demo]);
 
-  // Esc cancels an in-flight run (R9) — unless an artifact detail card
-  // is open, which Esc closes instead (the reducer-owned artifact
+  // Esc interrupts an in-flight run unless the live artifact rail owns
+  // input; there it closes detail/focus first (the reducer-owned artifact
   // substate exists precisely so this handler can check that precedence;
   // the rail itself never listens for Esc). During an eval batch it
   // cancels the current trial and skips the rest; the overlays handle
@@ -164,14 +164,29 @@ export function App({
       }
       return;
     }
-    if (state.mode === 'running') {
-      if (state.artifactUi.view === 'detail') {
-        dispatch({ type: 'artifact_close_detail' });
+    if (state.mode === 'running' || state.mode === 'interrupted') {
+      if (state.liveArtifactFocus === true) {
+        if (state.artifactUi.view === 'detail') {
+          dispatch({ type: 'artifact_close_detail' });
+        } else {
+          dispatch({ type: 'tab_pressed' });
+        }
         return;
       }
-      dispatch({ type: 'cancel_requested' });
-      if (evalHandle.current !== undefined) evalHandle.current.cancel();
-      else runHandle.current?.cancel();
+      if (state.mode === 'running') {
+        try {
+          runHandle.current?.interrupt?.();
+          dispatch({ type: 'interrupt_requested' });
+        } catch (error) {
+          dispatch({
+            type: 'notice',
+            text: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } else {
+        dispatch({ type: 'cancel_requested' });
+        runHandle.current?.cancel();
+      }
       return;
     }
     if (state.mode === 'evalsRunning') {
@@ -180,6 +195,20 @@ export function App({
   });
 
   const handleSubmit = (text: string) => {
+    if (state.mode === 'running' || state.mode === 'interrupted') {
+      try {
+        runHandle.current?.steer?.(text);
+        dispatch({ type: 'composer_submitted' });
+        dispatch({ type: 'submit_steering', text });
+      } catch (error) {
+        dispatch({
+          type: 'notice',
+          text: error instanceof Error ? error.message : String(error),
+        });
+      }
+      return;
+    }
+
     // The field reset lives with the rest of the composer substate in
     // the reducer; routing continues on the already-captured text.
     dispatch({ type: 'composer_submitted' });
@@ -247,7 +276,8 @@ export function App({
     });
   };
 
-  const running = state.mode === 'running' || state.mode === 'cancelling';
+  const running =
+    state.mode === 'running' || state.mode === 'interrupted' || state.mode === 'cancelling';
   const EvalsMenu = evals?.Menu;
   const EvalsLiveRegion = evals?.LiveRegion;
   const composerHint =
@@ -259,24 +289,39 @@ export function App({
           ? '(evals running — esc to stop)'
           : state.mode === 'artifacts'
             ? '(browsing artifacts — esc to return)'
-            : '(waiting for agent…)';
+            : state.liveArtifactFocus === true
+              ? '(browsing live artifacts — tab or esc to return)'
+              : state.mode === 'interrupted'
+                ? '(paused — type an update and press enter)'
+                : state.mode === 'running'
+                  ? '(type an update — enter to steer)'
+                  : '(ask Sherlock to collect evidence…)';
+  const composerEnabled =
+    question === undefined &&
+    state.liveArtifactFocus !== true &&
+    (state.mode === 'idle' || state.mode === 'running' || state.mode === 'interrupted');
 
   return (
     <Box flexDirection="column">
       <Transcript items={state.transcript} verbose={config.verbose} />
       {running && state.live !== undefined && (
-        <LiveRegion live={state.live} cancelling={state.mode === 'cancelling'} />
+        <LiveRegion
+          live={state.live}
+          cancelling={state.mode === 'cancelling'}
+          interrupted={state.mode === 'interrupted'}
+        />
       )}
       {/* Mounted for the whole run (it renders nothing until the first
           publish) so its key subscription is registered by the submit
           keystroke, not by a mid-run publish event — see ArtifactRail. */}
-      {state.mode === 'running' && (
+      {(state.mode === 'running' || state.mode === 'interrupted') && (
         <ArtifactRail
           artifacts={state.artifacts}
           ui={state.artifactUi}
           runDir={state.live?.runDir}
           dispatch={dispatch}
-          active={question === undefined}
+          active={question === undefined && state.liveArtifactFocus === true}
+          focused={state.liveArtifactFocus === true}
         />
       )}
       {EvalsLiveRegion !== undefined &&
@@ -334,14 +379,25 @@ export function App({
       )}
       <Box flexDirection="column" marginTop={1}>
         <Composer
-          disabled={state.mode !== 'idle'}
+          disabled={!composerEnabled}
           hint={composerHint}
+          placeholder={composerHint}
           composer={state.composer}
           suggestions={deriveSuggestions(state)}
           dispatch={dispatch}
           onSubmit={handleSubmit}
         />
-        <Text color={theme.muted}>{'  /help for commands'}</Text>
+        <Text color={theme.muted}>
+          {question !== undefined
+            ? '  answer the question above'
+            : state.liveArtifactFocus === true
+              ? '  tab or esc to return to the composer'
+              : state.mode === 'running'
+                ? '  enter to steer · esc to interrupt · tab for artifacts'
+                : state.mode === 'interrupted'
+                  ? '  enter to resume · esc again to cancel'
+                  : '  /help for commands'}
+        </Text>
       </Box>
     </Box>
   );

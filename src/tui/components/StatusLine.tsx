@@ -49,6 +49,8 @@ interface StatusLineProps {
   wordCycleMs?: number;
   /** True while Esc has been pressed and the run is wrapping up. */
   cancelling?: boolean;
+  /** True after a soft interrupt while Sherlock waits for a user update. */
+  interrupted?: boolean;
   /** Injectable clock (epoch ms) for tests. */
   now?: () => number;
   /** Injectable RNG in [0, 1) for tests. */
@@ -65,6 +67,7 @@ export function StatusLine({
   workingWords = DEFAULT_WORKING_WORDS,
   wordCycleMs = 6_000,
   cancelling = false,
+  interrupted = false,
   now = Date.now,
   rng = Math.random,
 }: StatusLineProps) {
@@ -94,7 +97,7 @@ export function StatusLine({
   }, []);
 
   const glyph = glyphs.spinnerFrames[frame % glyphs.spinnerFrames.length];
-  const label = cancelling ? 'Wrapping up' : word;
+  const label = cancelling ? 'Wrapping up' : interrupted ? 'Paused for your update' : word;
   const tokens = formatTokens(Math.round(live.tokens.estimate));
   const elapsed = formatDuration(now() - live.startedAt);
 
@@ -105,7 +108,9 @@ export function StatusLine({
         {` ${label}…`}
       </Text>
       <Text color={theme.muted}>
-        {`${glyphs.metadata} ${tokens} · ${elapsed} (esc to interrupt)`}
+        {`${glyphs.metadata} ${tokens} · ${elapsed} ${
+          interrupted ? '(enter to resume · esc again to cancel)' : '(esc to interrupt)'
+        }`}
       </Text>
     </Box>
   );
