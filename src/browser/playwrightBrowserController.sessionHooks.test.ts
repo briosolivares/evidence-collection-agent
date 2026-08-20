@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BrowserContext } from 'playwright';
 
-import { isBrowserDeathMessage } from '../tui/bridge/runtime.js';
+import { isBrowserDeathMessage } from '../tui/bridge/runSession.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics } from './sessionProvider.js';
 

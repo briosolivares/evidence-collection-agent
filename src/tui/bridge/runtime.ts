@@ -9,14 +9,12 @@ import type { BrowserController } from '../../browser/controller.js';
 import type { BrowserSessionProvider } from '../../browser/sessionProvider.js';
 import type { UiEvent } from '../store/state.js';
 import {
+  isBrowserDeathMessage,
   startRun,
   type RunHandle,
   type RunOutcome,
   type RunSessionDeps,
 } from './runSession.js';
-import { isBrowserDeathMessage } from './browserDeath.js';
-
-export { isBrowserDeathMessage } from './browserDeath.js';
 
 /** What the runtime needs; launch is injectable for tests. */
 export interface TuiRuntimeDeps {

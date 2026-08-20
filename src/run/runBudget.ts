@@ -379,3 +379,20 @@ export function createRunBudgetTracker(
 
   return tracker;
 }
+
+/** Thrown when a role's model call would exceed a run budget limit. */
+export class RoleBudgetExceededError extends Error {
+  readonly limit: RunBudgetLimit;
+
+  constructor(limit: RunBudgetLimit, options: { cause?: unknown } = {}) {
+    super(`role model call stopped at run budget limit: ${limit}`, options);
+    this.name = 'RoleBudgetExceededError';
+    this.limit = limit;
+  }
+}
+
+export function isRoleBudgetExceededError(
+  error: unknown,
+): error is RoleBudgetExceededError {
+  return error instanceof RoleBudgetExceededError;
+}

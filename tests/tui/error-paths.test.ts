@@ -6,11 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { CallModel } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
+import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
 import {
-  createTuiRuntime,
   isBrowserDeathMessage,
-} from '../../src/tui/bridge/runtime.js';
-import { startRun, type RunSessionDeps, type RunHandle } from '../../src/tui/bridge/runSession.js';
+  startRun,
+  type RunSessionDeps,
+  type RunHandle,
+} from '../../src/tui/bridge/runSession.js';
 import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse } from './streamFixtures.js';

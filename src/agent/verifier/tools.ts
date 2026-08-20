@@ -10,7 +10,7 @@ import { extname, join, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
-import { detectContentFormat } from '../../tools/contentReader.js';
+import { detectContentFormat, splitLines } from '../../tools/contentReader.js';
 import type {
   ImageBlock,
   ToolResultBlock,
@@ -26,7 +26,6 @@ import {
   type ToolDef,
   type ToolRegistry,
 } from '../../tools/registry.js';
-import { splitLines } from '../../tools/lines.js';
 
 export const VERIFIER_MAX_FILE_BYTES = 16 * 1024 * 1024;
 export const VERIFIER_MAX_GREP_BYTES = 64 * 1024 * 1024;

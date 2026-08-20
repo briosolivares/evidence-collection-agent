@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createRunBudgetTracker } from '../run/runBudget.js';
+import { createRunBudgetTracker } from './runBudget.js';
 import {
   createRunDeadline,
   raceWithRunSignal,

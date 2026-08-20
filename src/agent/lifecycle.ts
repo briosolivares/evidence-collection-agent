@@ -75,11 +75,11 @@ import {
   type Worker,
   type WorkerSnapshot,
 } from './worker/worker.js';
+import { createBudgetedCallModel } from '../model/budgetedCall.js';
 import {
   RoleBudgetExceededError,
-  createBudgetedCallModel,
   isRoleBudgetExceededError,
-} from '../model/budgetedCall.js';
+} from '../run/runBudget.js';
 import {
   durableFinishInputSchema,
   type FinishInput,
@@ -107,7 +107,7 @@ import { ensureOutputContractFile } from './initializer/contractFile.js';
 import {
   createRunDeadline,
   raceWithRunSignal,
-} from './runDeadline.js';
+} from '../run/runDeadline.js';
 
 type CheckpointCommonKey =
   | 'version'

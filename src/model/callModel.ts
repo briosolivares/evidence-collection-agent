@@ -1,9 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-import type { CallModel, Message, Usage } from './messages.js';
+import type { Message, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import { isCollapsedBrowserResult } from '../agent/worker/contextView.js';
-import { createAnthropicModelDriver, type ModelDriverConfig } from './modelDriver.js';
+import type { ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
 // CallModel contract the T7 fake satisfies, so it drops into the loop
@@ -63,9 +62,10 @@ export type ProgressEvent =
   | { type: 'retry'; turn: number; attempt: number; maxAttempts: number; delayMs: number; reason: string }
   | { type: 'turn_end'; turn: number; usage: Usage };
 
-/** Everything makeCallModel closes over. The system prompt and tool
- * definitions form the cached prompt prefix, so they are fixed for the
- * closure's lifetime — a new prompt or tool set means a new CallModel. */
+/** Configuration for one model call. The system prompt and tool
+ * definitions form the cached prompt prefix built by buildRequestParams,
+ * so they must stay fixed for a given prefix — a new prompt or tool set
+ * means a new prefix. */
 export interface CallModelConfig {
   /** Model id; DEFAULT_MODEL when omitted. */
   model?: string;
@@ -200,6 +200,29 @@ function tipPosition(messages: readonly Message[]): BlockPosition | undefined {
   return blockIndex < 0 ? undefined : { messageIndex, blockIndex };
 }
 
+/**
+ * Stable prefix for a collapsed result. A message-content convention the
+ * agent/worker context view uses when it stubs an older browser_execute
+ * result (see buildContextView in agent/worker/contextView.ts) — the model
+ * layer only consumes it here, through the exported predicate, to place the
+ * cache frontier at the newest displaced result.
+ */
+export const COLLAPSED_BROWSER_RESULT_MARKER =
+  '[Older browser_execute result collapsed — only the two most recent ' +
+  'successful browser_execute results stay expanded.]';
+
+/** Whether a content block is one of the context view's deterministic stubs. */
+export function isCollapsedBrowserResult(block: {
+  type: string;
+  content?: unknown;
+}): boolean {
+  return (
+    block.type === 'tool_result' &&
+    typeof block.content === 'string' &&
+    block.content.startsWith(COLLAPSED_BROWSER_RESULT_MARKER)
+  );
+}
+
 /** The collapse frontier: the newest recognized collapsed result in the view — the
  * block where a displacement turn's request diverges from the previous
  * turn's, and therefore where its cache entry must end. */
@@ -215,79 +238,6 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     }
   }
   return undefined;
-}
-
-/**
- * Create the production CallModel: a temporary adapter over the strict
- * ModelDriver (createAnthropicModelDriver), kept so existing call sites
- * keep their CallModel seam while callers migrate to the driver directly.
- *
- * @param config - see CallModelConfig; the returned function sends
- *   config.system + config.apiToolDefs as the stable cached prefix on
- *   every call. Credentials come from the environment (ANTHROPIC_API_KEY,
- *   or the SDK's other ambient sources) — calls fail without them
- * @returns a CallModel that streams every request through the shared
- *   driver: the complete ModelResponse is assembled (strictly — the
- *   terminal message_delta/message_stop are required), transient failures
- *   retry across the whole create-and-consume span (surfacing as `retry`
- *   progress events), one structurally complete max_tokens response is
- *   re-asked once with a larger allowance, and every returned response has
- *   passed validateModelResponseForExecution — a truncated, refused, or
- *   malformed response rejects (ModelResponseRejectedError) instead of
- *   returning. Progress arrives through config.onProgress (see
- *   ProgressEvent), turns numbered from 1 across invocations. The messages
- *   argument is never mutated
- */
-export function makeCallModel(config: CallModelConfig): CallModel {
-  const driver = createAnthropicModelDriver({
-    ...(config.model === undefined ? {} : { model: config.model }),
-    system: config.system,
-    apiToolDefs: config.apiToolDefs,
-    maxOutputTokens: config.maxOutputTokens,
-    ...(config.maxToolCallsPerTurn === undefined
-      ? {}
-      : { maxToolCallsPerTurn: config.maxToolCallsPerTurn }),
-    ...(config.maxTokensRetryOutputTokens === undefined
-      ? {}
-      : { maxTokensRetryOutputTokens: config.maxTokensRetryOutputTokens }),
-    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
-    ...(config.toolChoice === undefined ? {} : { toolChoice: config.toolChoice }),
-  });
-  let turnCount = 0;
-
-  return async (messages) => {
-    turnCount += 1;
-    const turn = turnCount;
-    config.onProgress?.({ type: 'turn_start', turn });
-
-    const accepted = await driver.generate({
-      messages,
-      ...(config.signal === undefined ? {} : { signal: config.signal }),
-      onEvent: (event) => {
-        // Attempt-scoped driver events map onto the legacy turn-scoped
-        // ProgressEvents; a rejected attempt's deltas may already have
-        // streamed (the documented cosmetic wart) but its content is never
-        // returned, so nothing rejected can be committed downstream.
-        if (event.type === 'text_delta') {
-          config.onProgress?.({ type: 'text_delta', turn, text: event.text });
-        } else if (event.type === 'tool_use_start') {
-          config.onProgress?.({ type: 'tool_use_start', turn, toolName: event.toolName });
-        } else if (event.type === 'retry') {
-          config.onProgress?.({
-            type: 'retry',
-            turn,
-            attempt: event.attempt,
-            maxAttempts: event.maxAttempts,
-            delayMs: event.delayMs,
-            reason: event.reason,
-          });
-        }
-      },
-    });
-
-    config.onProgress?.({ type: 'turn_end', turn, usage: accepted.response.usage });
-    return accepted.response;
-  };
 }
 
 /**

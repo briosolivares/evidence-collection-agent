@@ -1,3 +1,6 @@
+/** Optional explicit loopback endpoint for attached local Chrome. */
+export const ATTACHED_CHROME_ENDPOINT_ENV_VAR = 'SHERLOCK_CHROME_CDP_ENDPOINT';
+
 /** The only host Chrome session-control endpoints may use locally. */
 export const CDP_LOOPBACK_HOST = '127.0.0.1';
 

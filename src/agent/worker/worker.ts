@@ -50,7 +50,7 @@ import {
   finishInputSchema,
   type FinishInput,
 } from '../../tools/finish/finish.js';
-import { raceWithRunSignal } from '../runDeadline.js';
+import { raceWithRunSignal } from '../../run/runDeadline.js';
 import { buildContextView } from './contextView.js';
 
 export const METRICS_FILENAME = 'metrics.json';

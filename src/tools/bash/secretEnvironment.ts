@@ -1,4 +1,4 @@
-import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from '../../browser/browserEnvironment.js';
+import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from '../../browser/cdpEndpoint.js';
 
 /**
  * Environment variables the worker's local code-execution children must not

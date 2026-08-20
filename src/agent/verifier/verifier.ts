@@ -27,11 +27,11 @@ import type {
   SettledFact,
   TableFact,
 } from '../completion/finishChecks.js';
+import { createBudgetedCallModel } from '../../model/budgetedCall.js';
 import {
   RoleBudgetExceededError,
-  createBudgetedCallModel,
   isRoleBudgetExceededError,
-} from '../../model/budgetedCall.js';
+} from '../../run/runBudget.js';
 import {
   createVerifierPathPolicy,
   createVerifierRegistry,

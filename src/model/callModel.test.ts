@@ -3,12 +3,10 @@ import { z } from 'zod';
 
 import type { Message } from './messages.js';
 import { createRegistry, toApiToolDefs, type ToolDef } from '../tools/registry.js';
-import {
-  COLLAPSED_BROWSER_RESULT_MARKER,
-  buildContextView,
-} from '../agent/worker/contextView.js';
+import { buildContextView } from '../agent/worker/contextView.js';
 import {
   buildRequestParams,
+  COLLAPSED_BROWSER_RESULT_MARKER,
   DEFAULT_MODEL,
   makeAnthropicClient,
   type CallModelConfig,

@@ -37,7 +37,7 @@ import {
 } from './checkpoint.schema.js';
 import { runAgent } from './lifecycle.js';
 import { FINDINGS_REPORT_FILENAME } from './findingsReport.js';
-import { raceWithRunSignal } from './runDeadline.js';
+import { raceWithRunSignal } from '../run/runDeadline.js';
 
 const TASK =
   'Publish report.csv with exactly one name column and one row. Do not take screenshots.';

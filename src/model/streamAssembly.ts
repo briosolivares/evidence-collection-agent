@@ -13,8 +13,8 @@ export type ModelStreamEvent = Anthropic.Messages.RawMessageStreamEvent;
 
 /**
  * Fine-grained progress emitted while a response streams in, before the
- * complete ModelResponse exists. `makeCallModel` decorates these with the
- * turn number (see ProgressEvent in callModel.ts).
+ * complete ModelResponse exists. The model driver's caller decorates these
+ * with the turn number (see ProgressEvent in callModel.ts).
  */
 export type StreamProgressEvent =
   /** A fragment of assistant prose, in stream order; concatenating every

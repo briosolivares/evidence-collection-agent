@@ -16,12 +16,12 @@ import { performance } from 'node:perf_hooks';
 import { setTimeout as delay } from 'node:timers/promises';
 
 import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSessionProvider.js';
-import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './browserEnvironment.js';
+import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './cdpEndpoint.js';
 import { resolveRealChromePath } from './localChromeExecutable.js';
 import type { BrowserController } from './controller.js';
 import type { BrowserSessionProvider } from './sessionProvider.js';
 
-export { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './browserEnvironment.js';
+export { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './cdpEndpoint.js';
 export const ATTACHED_CHROME_SETUP_URL = 'chrome://inspect/#remote-debugging';
 
 const DEFAULT_SETUP_TIMEOUT_MS = 60_000;

@@ -1,18 +1,11 @@
 import type { Message, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
+import { COLLAPSED_BROWSER_RESULT_MARKER } from '../../model/callModel.js';
 
 /** The only heavyweight result collapsed in the per-request view. */
 export const BROWSER_EXECUTE_TOOL_NAME = 'browser_execute' as const;
 
 /** The newest two successful browser results retain their complete content. */
 export const KEPT_BROWSER_EXECUTE_RESULTS = 2;
-
-/**
- * Stable prefix for a collapsed result. `callModel.ts` uses the exported
- * predicate to place the cache frontier at the newest displaced result.
- */
-export const COLLAPSED_BROWSER_RESULT_MARKER =
-  '[Older browser_execute result collapsed — only the two most recent ' +
-  'successful browser_execute results stay expanded.]';
 
 const RECOVERY_GUIDANCE =
   'Large value/stdout/stderr/file details were removed from this request view. ' +
@@ -30,18 +23,6 @@ interface BrowserResultSummary {
     url?: string;
     active?: boolean;
   }>;
-}
-
-/** Whether a content block is one of this module's deterministic stubs. */
-export function isCollapsedBrowserResult(block: {
-  type: string;
-  content?: unknown;
-}): boolean {
-  return (
-    block.type === 'tool_result' &&
-    typeof block.content === 'string' &&
-    block.content.startsWith(COLLAPSED_BROWSER_RESULT_MARKER)
-  );
 }
 
 /**

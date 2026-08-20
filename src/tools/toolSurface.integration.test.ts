@@ -17,7 +17,9 @@ import {
 } from '../run/artifacts.js';
 import { executeToolCall } from './pipeline.js';
 import { createRegistry } from './registry.js';
-import { editFileTool, readFileTool, writeFileTool } from './fileTools.js';
+import { editFileTool } from './editFile/editFile.js';
+import { readFileTool } from './readFile/readFile.js';
+import { writeFileTool } from './writeFile/writeFile.js';
 import { publishArtifactTool } from './publishArtifact/publishArtifact.js';
 
 let runDir: string;

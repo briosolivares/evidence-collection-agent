@@ -4,21 +4,14 @@ import {
   type ModelAttemptEvent,
   type ModelDriver,
 } from './modelDriver.js';
-import type {
-  ModelRole,
-  RunBudgetLimit,
-  RunBudgetTracker,
-} from '../run/runBudget.js';
-import { raceWithRunSignal } from '../agent/runDeadline.js';
 import {
   RoleBudgetExceededError,
   isRoleBudgetExceededError,
-} from './budgetError.js';
-
-export {
-  RoleBudgetExceededError,
-  isRoleBudgetExceededError,
-} from './budgetError.js';
+  type ModelRole,
+  type RunBudgetLimit,
+  type RunBudgetTracker,
+} from '../run/runBudget.js';
+import { raceWithRunSignal } from '../run/runDeadline.js';
 
 export interface BudgetedCallModelOptions {
   model: ModelDriver;

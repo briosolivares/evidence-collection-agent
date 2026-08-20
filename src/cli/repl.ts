@@ -31,7 +31,7 @@ import {
   loadFirstEnvFile,
   resolveSherlockPaths,
 } from '../config/paths.js';
-import { isBrowserDeathMessage } from '../tui/bridge/runtime.js';
+import { isBrowserDeathMessage } from '../tui/bridge/runSession.js';
 import { formatProgressEvent, formatRunSummary } from './replFormat.js';
 import { runTask } from '../agent/runTask.js';
 

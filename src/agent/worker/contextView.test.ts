@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import type { Message, ToolResultBlock } from '../../model/messages.js';
 import {
   COLLAPSED_BROWSER_RESULT_MARKER,
-  buildContextView,
   isCollapsedBrowserResult,
-} from './contextView.js';
+} from '../../model/callModel.js';
+import { buildContextView } from './contextView.js';
 
 function browserExchange(
   id: string,

@@ -1,5 +1,7 @@
-import type { RunBudgetTracker } from '../run/runBudget.js';
-import { RoleBudgetExceededError } from '../model/budgetError.js';
+import {
+  RoleBudgetExceededError,
+  type RunBudgetTracker,
+} from './runBudget.js';
 
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
