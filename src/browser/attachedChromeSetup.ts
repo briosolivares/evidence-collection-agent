@@ -19,7 +19,7 @@ import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSes
 import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './cdpEndpoint.js';
 import { resolveRealChromePath } from './localChromeExecutable.js';
 import type { BrowserController } from './controller.js';
-import type { BrowserSessionProvider } from './sessionProvider.js';
+import type { BrowserSessionCreationOptions, BrowserSessionProvider } from './sessionProvider.js';
 
 export { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './cdpEndpoint.js';
 export const ATTACHED_CHROME_SETUP_URL = 'chrome://inspect/#remote-debugging';
@@ -209,8 +209,10 @@ type AttachedProviderFactory = (
 export interface AttachedChromeSetupBrowserSessionOptions {
   explicitEndpoint?: string;
   executablePath?: string;
-  /** Required visible edge: the TUI prints each state before Ink starts. */
-  onSetupState: (message: string) => void;
+  /** Optional default observer. Interactive session callers normally supply
+   * their current run observer to createSession() so lazy setup lands in the
+   * right transcript. */
+  onSetupState?: (message: string) => void;
   setupTimeoutMs?: number;
   connectionTimeoutMs?: number;
   /** Test seams. Production uses Chrome's stable default profile. */
@@ -231,7 +233,7 @@ export interface AttachedChromeSetupBrowserSessionOptions {
 export class AttachedChromeSetupBrowserSessionProvider implements BrowserSessionProvider {
   private readonly explicitProvider: BrowserSessionProvider | undefined;
   private readonly executablePath: string | undefined;
-  private readonly onSetupState: (message: string) => void;
+  private readonly defaultOnSetupState: ((message: string) => void) | undefined;
   private readonly setupTimeoutMs: number;
   private readonly connectionTimeoutMs: number;
   private readonly discoverEndpoint: () => Promise<string | undefined>;
@@ -250,7 +252,7 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
       'connectionTimeoutMs',
     );
     this.executablePath = options.executablePath;
-    this.onSetupState = options.onSetupState;
+    this.defaultOnSetupState = options.onSetupState;
     this.discoverEndpoint = options.discoverEndpoint ?? discoverAttachedChromeEndpoint;
     this.openSetupPage =
       options.openSetupPage ?? (() => openAttachedChromeSetupPage(this.executablePath));
@@ -275,14 +277,18 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
           );
   }
 
-  async createSession(): Promise<BrowserController> {
+  async createSession(options: BrowserSessionCreationOptions = {}): Promise<BrowserController> {
+    const onSetupState = options.onSetupState ?? this.defaultOnSetupState;
+    if (onSetupState === undefined) {
+      throw new TypeError('Attached Chrome setup requires an onSetupState callback.');
+    }
     const deadline = this.now() + this.setupTimeoutMs;
 
     if (this.explicitProvider !== undefined) {
       try {
         return await this.explicitProvider.createSession();
       } catch {
-        this.onSetupState(
+        onSetupState(
           'Configured attached Chrome endpoint was unavailable; trying local Chrome discovery.',
         );
       }
@@ -290,12 +296,12 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
 
     const alreadyEnabled = await this.discoverEndpoint();
     if (alreadyEnabled !== undefined) {
-      return this.connectDiscovered(alreadyEnabled, deadline);
+      return this.connectDiscovered(alreadyEnabled, deadline, onSetupState);
     }
 
-    this.onSetupState(`Opening ${ATTACHED_CHROME_SETUP_URL} in Chrome.`);
+    onSetupState(`Opening ${ATTACHED_CHROME_SETUP_URL} in Chrome.`);
     await this.openSetupPage();
-    this.onSetupState(
+    onSetupState(
       'In Chrome, enable “Allow remote debugging for this browser instance”. ' +
         `Sherlock will wait up to ${Math.ceil(this.setupTimeoutMs / 1_000)} seconds and will ` +
         'not click the permission prompt for you.',
@@ -306,17 +312,23 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
       if (remaining <= 0) throw setupTimeoutError();
 
       const endpoint = await this.discoverEndpoint();
-      if (endpoint !== undefined) return this.connectDiscovered(endpoint, deadline);
+      if (endpoint !== undefined) {
+        return this.connectDiscovered(endpoint, deadline, onSetupState);
+      }
 
       await this.wait(Math.min(DISCOVERY_POLL_MS, remaining));
     }
   }
 
-  private async connectDiscovered(endpoint: string, deadline: number): Promise<BrowserController> {
+  private async connectDiscovered(
+    endpoint: string,
+    deadline: number,
+    onSetupState: (message: string) => void,
+  ): Promise<BrowserController> {
     const remaining = deadline - this.now();
     if (remaining <= 0) throw setupTimeoutError();
 
-    this.onSetupState(
+    onSetupState(
       'Chrome remote debugging is ready. Approve Chrome’s connection prompt to continue.',
     );
     const provider = this.createAttachedProvider(

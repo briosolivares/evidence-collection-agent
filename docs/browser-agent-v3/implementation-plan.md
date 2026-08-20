@@ -36,6 +36,54 @@ initializer/contract/table/evidence/scheduler complexity merely to avoid
 writing a smaller coherent replacement. After the new path passed its gates,
 the public cutover and legacy-production removal were completed.
 
+## Production-depth follow-ups complete (2026-08-20)
+
+- [x] Restore the public `maxTurns`, `maxContextTokens`, and `maxWallTimeMs`
+  run levers with production defaults as fallbacks, and correct oversized tool
+  output guidance so it no longer recommends a verifier-only tool.
+- [x] Give Bash and browser programs one bounded child-process supervisor and
+  one shared browser IPC definition while preserving their domain-specific
+  outcome and cleanup policy.
+- [x] Consolidate identical browser target resolution, deadline settlement,
+  controller assembly, local-session creation, and stateless run-page
+  ownership mechanics. Keep the SIGKILL-tested mutable ownership epoch in its
+  existing owner.
+- [x] Tighten authentication guidance: use the existing session, then ask the
+  user for a login handoff, then report the blocker only when the answered
+  handoff still fails or `ask_user` fails closed.
+
+The quiet-machine hermetic gate passed 147 files / 1,483 tests and typecheck.
+The authorized nine-task live batch then passed 47/51 assertions and 6/9 task
+gates: Airbnb, company freshness, Hacker News, OpenClaw contributors,
+OpenClaw merged PRs, and EDGAR passed; OpenClaw latest PR, Wikipedia reference,
+and YC outreach each missed one grader requirement. Eight runs were internally
+verified. EDGAR alone terminated internally incomplete despite passing all
+three oracle assertions because its immutable download contract used the
+over-broad filename pattern `*`; deterministic assignment therefore treated
+SEC-sourced PNG screenshots as candidates for both the download and screenshot
+outputs and exhausted five correction attempts.
+
+## Lazy interactive Chrome attachment complete (2026-08-20)
+
+- [x] Stop creating the attached local-Chrome session before Ink renders;
+  opening `sherlock` and browsing prior runs no longer triggers Chrome's
+  remote-debugging consent flow.
+- [x] Create both attached-Chrome and Browserbase sessions lazily after the
+  first task is submitted, then retain the session for later runs as before.
+- [x] Bind attached-Chrome setup state to the session-creation call and surface
+  each safe message as a transcript notice for the submitting run. CDP
+  endpoints and provider credentials remain outside the event contract.
+- [x] Keep setup failures on the existing run-failure path and preserve
+  post-browser-death relaunch behavior.
+- [x] Remove the two prompt-content test files; the Markdown prompts remain the
+  byte-stable runtime source without a parallel set of brittle prose
+  assertions.
+
+Verification: the focused attached-setup/provider/TUI reducer and lifecycle
+gate passes 4 files / 119 tests, `npm run typecheck` passes, and
+`git diff --check` passes. Per user direction, the already-green full suite was
+not repeated for this final UI slice.
+
 ## Semantic system atlas complete (2026-08-20)
 
 - [x] Rebuild `docs/sherlock-system-atlas.html` around `@xyflow/react`, with

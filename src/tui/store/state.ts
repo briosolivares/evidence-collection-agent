@@ -272,6 +272,17 @@ export type UiEvent =
       sessionId?: string;
       liveViewUrl?: string;
     }
+  | {
+      /** One attached-Chrome setup state ("enable remote debugging",
+       * "approve Chrome's connection prompt") raised while the runtime
+       * lazily creates the session for a just-submitted run. Surfaced as
+       * a transcript notice so the wait is visible in the TUI; once
+       * attached, ordinary run events follow and supersede it. Never
+       * carries the CDP endpoint — attachedChromeSetup keeps it out of
+       * every setup message. */
+      type: 'browser_setup';
+      message: string;
+    }
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; text: string }
   | { type: 'tool_pending'; name: string }

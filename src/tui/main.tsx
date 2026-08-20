@@ -170,10 +170,9 @@ if (
   await promptForApiKey(['the environment', ...candidates], candidates[candidates.length - 1]!);
 }
 
-// Local attachment completes before Ink claims the terminal, so Chrome's
-// permission instructions remain visible during first-use setup. Browserbase
-// stays lazy and billable only when the first task needs it. Local evals use a
-// separate managed runtime so a batch never touches the attached daily browser.
+// Both attached Chrome and Browserbase stay lazy until the first submitted
+// task. Attached setup messages travel through the runtime into the transcript;
+// local evals use a separate managed runtime and never touch the daily browser.
 const browserExecutablePath = chromeExecutablePath();
 let browserProvider: ReturnType<typeof resolveBrowserProviderKind> = 'local';
 let runtime: ReturnType<typeof createTuiRuntime> | undefined;
@@ -194,15 +193,9 @@ try {
       // `optional` rather than `required` lets public browsing work before a
       // user has run `npm run login` for Browserbase.
       context: 'optional',
-      // Local attachment is awaited below before Ink renders. Chrome
-      // permission remains a visible, bounded human action.
-      onAttachedSetupState: (message) => console.error(message),
     });
-    const initialBrowser =
-      browserProvider === 'local' ? await browserSessionProvider.createSession() : undefined;
     runtime = createTuiRuntime({
       browserSessionProvider,
-      ...(initialBrowser === undefined ? {} : { initialBrowser }),
       runsBaseDir: config.runsBaseDir,
       // The attached interactive browser may carry cookies, stored
       // credentials, and live logins. The runtime requires that authority and its

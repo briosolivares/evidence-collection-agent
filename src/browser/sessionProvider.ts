@@ -2,6 +2,13 @@ import { z } from 'zod';
 
 import type { BrowserController } from './controller.js';
 
+/** Operator-visible state emitted while a provider prepares one session. */
+export interface BrowserSessionCreationOptions {
+  /** Safe setup text for the interactive UI. Must never contain a connection
+   * endpoint or provider credential. Providers with no setup flow ignore it. */
+  onSetupState?: (message: string) => void;
+}
+
 /**
  * Creates browser sessions without exposing where or how they are hosted.
  *
@@ -10,7 +17,7 @@ import type { BrowserController } from './controller.js';
  * task tab; the caller owns that session and must close the controller.
  */
 export interface BrowserSessionProvider {
-  createSession(): Promise<BrowserController>;
+  createSession(options?: BrowserSessionCreationOptions): Promise<BrowserController>;
 }
 
 /** Which runtime hosts a browser session. Provider selection is always

@@ -550,6 +550,14 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return append(state, { kind: 'notice', text });
     }
 
+    case 'browser_setup':
+      // Attached-Chrome setup asks the user to act inside Chrome (enable
+      // remote debugging, approve the connection prompt) while their
+      // submitted run waits for its lazily created session. Each state
+      // lands as a transcript notice so the wait is visible; once
+      // attached, the run's own events follow and supersede it.
+      return append(state, { kind: 'notice', text: action.message });
+
     case 'turn_start': {
       if (state.live === undefined) return state;
       const next = settleDanglingPending(finalizeStreamingText(state));

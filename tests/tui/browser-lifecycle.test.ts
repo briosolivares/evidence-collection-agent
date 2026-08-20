@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
+import type { BrowserSessionCreationOptions } from '../../src/browser/sessionProvider.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
 import type { RunHandle, RunSessionDeps } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
@@ -34,6 +35,27 @@ describe('TUI browser lifecycle', () => {
     expect(seenDeps[0]?.browser).toBe(controller);
     expect(seenDeps[1]?.browser).toBe(controller);
     expect(seenDeps[0]?.runsBaseDir).toBe('/tmp/runs');
+  });
+
+  it('routes lazy attached-browser setup states into the submitting run', async () => {
+    const controller = stubBrowser();
+    const createSession = vi.fn(async (options?: BrowserSessionCreationOptions) => {
+      options?.onSetupState?.('Waiting for Chrome approval.');
+      return controller;
+    });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn: () => makeHandle(),
+    });
+    const events: UiEvent[] = [];
+
+    expect(createSession).not.toHaveBeenCalled();
+    await runtime.startRun('use the browser', (event) => events.push(event)).done;
+
+    expect(events).toContainEqual({
+      type: 'browser_setup',
+      message: 'Waiting for Chrome approval.',
+    });
   });
 
   it('closes the browser exactly once during teardown', async () => {

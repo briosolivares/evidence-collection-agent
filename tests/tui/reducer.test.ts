@@ -1136,6 +1136,18 @@ describe('reduce (tab_pressed routing)', () => {
 });
 
 describe('reduce (browser session diagnostics)', () => {
+  it('appends attached-Chrome setup state as a transcript notice', () => {
+    const state = fold([
+      started[0]!,
+      { type: 'browser_setup', message: 'Waiting for Chrome approval.' },
+      started[1]!,
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'notice',
+      text: 'Waiting for Chrome approval.',
+    });
+  });
+
   it('appends a Browserbase notice with the Live View URL', () => {
     const state = fold([
       ...started,

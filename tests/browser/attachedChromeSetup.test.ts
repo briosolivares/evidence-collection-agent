@@ -81,6 +81,29 @@ describe('attached Chrome configuration and discovery', () => {
 });
 
 describe('AttachedChromeSetupBrowserSessionProvider', () => {
+  it('requires a visible setup observer when the session is created', async () => {
+    const provider = new AttachedChromeSetupBrowserSessionProvider({
+      discoverEndpoint: async () => DISCOVERED_ENDPOINT,
+    });
+
+    await expect(provider.createSession()).rejects.toThrow(/onSetupState/);
+  });
+
+  it('accepts the current run observer when the session is created', async () => {
+    const states: string[] = [];
+    const provider = new AttachedChromeSetupBrowserSessionProvider({
+      discoverEndpoint: async () => DISCOVERED_ENDPOINT,
+      createAttachedProvider: () => providerReturning(),
+    });
+
+    await expect(
+      provider.createSession({ onSetupState: (state) => states.push(state) }),
+    ).resolves.toBe(controller);
+    expect(states).toEqual([
+      'Chrome remote debugging is ready. Approve Chrome’s connection prompt to continue.',
+    ]);
+  });
+
   it('probes a configured endpoint first and performs no discovery on success', async () => {
     const explicitProvider = providerReturning();
     const createAttachedProvider = vi.fn(() => explicitProvider);

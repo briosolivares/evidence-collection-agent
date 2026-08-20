@@ -1,6 +1,7 @@
-// Session-long wiring: one browser, either supplied after a visible pre-render
-// attached-Chrome setup or launched lazily on the first interactive run,
-// handed to later runs and closed at TUI teardown. If the
+// Session-long wiring: one browser, either supplied by a host or launched
+// lazily on the first interactive run, handed to later runs and closed at TUI
+// teardown. Attached-Chrome setup state is routed into that first run's
+// transcript instead of printing before Ink owns the terminal. If the
 // browser dies mid-session (window closed, process killed), the failure
 // is classified and the next submit relaunches a fresh browser instead of
 // failing every subsequent run.
@@ -68,7 +69,9 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         // Already gone.
       }
     }
-    browser = await deps.browserSessionProvider.createSession();
+    browser = await deps.browserSessionProvider.createSession({
+      onSetupState: (message) => onEvent({ type: 'browser_setup', message }),
+    });
     browserDead = false;
     // A relaunch is a brand-new remote session with its own Live View URL,
     // not a resumption of the old one — so this fires on every successful

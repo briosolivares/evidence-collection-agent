@@ -101,19 +101,18 @@ describe('createBrowserSessionProvider', () => {
       env: { [ATTACHED_CHROME_ENDPOINT_ENV_VAR]: 'http://127.0.0.1:9222' },
       localMode: 'attached',
       profileDir: PROFILE_DIR,
-      onAttachedSetupState: () => undefined,
     });
     expect(provider).toBeInstanceOf(AttachedChromeSetupBrowserSessionProvider);
   });
 
-  it('requires a visible setup callback for attached local mode', () => {
+  it('does not attach while composing interactive local mode', () => {
     expect(() =>
       createBrowserSessionProvider({
         env: {},
         localMode: 'attached',
         profileDir: PROFILE_DIR,
       }),
-    ).toThrow(/onAttachedSetupState/);
+    ).not.toThrow();
   });
 
   it('fails closed for an unknown local mode before selecting a provider', () => {

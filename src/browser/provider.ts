@@ -97,8 +97,8 @@ export interface BrowserProviderCompositionOptions {
    *   next.
    */
   context?: 'optional' | 'none';
-  /** Local attached-only: visible first-use setup state. Required at runtime
-   * because enabling and approving debugging is deliberately a human action. */
+  /** Local attached-only: optional default for visible first-use setup state.
+   * Interactive callers normally bind the current run through createSession(). */
   onAttachedSetupState?: (message: string) => void;
 }
 
@@ -119,16 +119,13 @@ export function createBrowserSessionProvider(
   if (resolveBrowserProviderKind(env) === 'local') {
     const localMode = requireLocalBrowserMode(options.localMode);
     if (localMode === 'attached') {
-      if (options.onAttachedSetupState === undefined) {
-        throw new TypeError(
-          'Attached local browser mode requires an onAttachedSetupState callback.',
-        );
-      }
       const explicitEndpoint = attachedChromeEndpoint(env);
       return new AttachedChromeSetupBrowserSessionProvider({
         ...(explicitEndpoint === undefined ? {} : { explicitEndpoint }),
         ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
-        onSetupState: options.onAttachedSetupState,
+        ...(options.onAttachedSetupState === undefined
+          ? {}
+          : { onSetupState: options.onAttachedSetupState }),
       });
     }
     return new LocalChromeBrowserSessionProvider({
