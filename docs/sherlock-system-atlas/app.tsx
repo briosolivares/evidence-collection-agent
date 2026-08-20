@@ -38,6 +38,7 @@ interface AtlasNodeData extends Record<string, unknown> {
   dimmed: boolean;
   visited: boolean;
   traced: boolean;
+  handoffView: boolean;
   onExpand: (id: string) => void;
 }
 
@@ -87,6 +88,21 @@ function toneLabel(tone: SemanticNode['tone']): string {
   }[tone];
 }
 
+function escapeMarkup(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function tourList(label: string, values: readonly string[]): string {
+  return `<div class="tour-handoff"><strong>${label}</strong><ul>${values
+    .map((value) => `<li>${escapeMarkup(value)}</li>`)
+    .join('')}</ul></div>`;
+}
+
 function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
   const node = data.semantic;
   const isConcept = node.kind === 'concept';
@@ -102,6 +118,7 @@ function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
         data.dimmed ? 'is-dimmed' : '',
         data.visited ? 'is-visited' : '',
         data.traced ? 'is-traced' : '',
+        data.handoffView ? 'is-handoff' : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -116,7 +133,9 @@ function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
       <p>{node.summary}</p>
       <div className="card-footer">
         <span>
-          {node.answers.code.length} code {node.answers.code.length === 1 ? 'site' : 'sites'}
+          {data.handoffView
+            ? `${node.answers.inputs.length} in · ${node.answers.outputs.length} out`
+            : `${node.answers.code.length} code ${node.answers.code.length === 1 ? 'site' : 'sites'}`}
         </span>
         {isConcept ? (
           <button
@@ -218,6 +237,7 @@ async function layoutGraph(
         dimmed: false,
         visited: false,
         traced: false,
+        handoffView: false,
         onExpand,
       },
     };
@@ -455,10 +475,11 @@ function Atlas() {
           dimmed: traceId !== null && traceId !== node.id,
           traced: traceId === node.id,
           visited: visitedIds.has(node.id),
+          handoffView: route.id === 'handoff',
         },
         className: traceId !== null && traceId !== node.id ? 'flow-node-dimmed' : '',
       })),
-    [baseNodes, expandedId, traceId, visitedIds],
+    [baseNodes, expandedId, route.id, traceId, visitedIds],
   );
 
   const edges = useMemo(
@@ -545,7 +566,13 @@ function Atlas() {
         data: { nodeId: id, index },
         popover: {
           title: `${node.code} · ${node.title}`,
-          description: `<p>${node.summary}</p><div class="tour-answer"><strong>Authority</strong>${node.answers.authority}</div><div class="tour-answer"><strong>Why</strong>${node.answers.why}</div>`,
+          description: [
+            `<p>${escapeMarkup(node.summary)}</p>`,
+            tourList('Receives', node.answers.inputs),
+            tourList('Hands off', node.answers.outputs),
+            `<div class="tour-answer tour-guardrail"><strong>Guardrail</strong>${escapeMarkup(node.answers.enforcement[0])}</div>`,
+            `<div class="tour-answer"><strong>Authority</strong>${escapeMarkup(node.answers.authority)}</div>`,
+          ].join(''),
           side: 'bottom',
           align: 'start',
         },
@@ -676,7 +703,7 @@ function Atlas() {
           <RouteMenu active={route} onChange={changeRoute} />
         </div>
 
-        <section className="canvas-shell" aria-label="Architecture graph">
+        <section className={`canvas-shell route-${route.id}`} aria-label="Architecture graph">
           <div className="canvas-meta">
             <span>
               <strong>{route.nodeIds.length}</strong> concepts
@@ -724,12 +751,22 @@ function Atlas() {
                   boundary.
                 </p>
               ) : (
-                <p>
+                <div className="trace-node-copy">
                   <strong>
                     {traceNode.code} · {traceNode.title}
                   </strong>
-                  {traceNode.summary}
-                </p>
+                  <p>{traceNode.summary}</p>
+                  <div className="trace-handoff">
+                    <span>
+                      <em>Receives</em>
+                      {traceNode.answers.inputs.join(' · ')}
+                    </span>
+                    <span>
+                      <em>Hands off</em>
+                      {traceNode.answers.outputs.join(' · ')}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
             <div className="trace-actions">

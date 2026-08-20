@@ -41,12 +41,16 @@ the public cutover and legacy-production removal were completed.
 - [x] Rebuild `docs/sherlock-system-atlas.html` around `@xyflow/react`, with
   every visible position computed from semantic nodes and edges by ELK rather
   than retained as hand-authored SVG coordinates.
-- [x] Start with a four-concept core run, then offer six learning routes up to
-  the 14-concept whole-system view; add manual one-concept tracing plus
-  Driver.js route walkthroughs that focus the active node and dim the rest.
-- [x] Make every concept expandable into a two-node implementation subgraph,
-  with ELK recomputing the graph after each expansion or route change.
-- [x] Give all 42 concept and implementation nodes explicit answers for what
+- [x] Start with a four-stage contract initializer → persistent worker →
+  deterministic checks → fresh verifier handoff, then offer seven learning
+  routes up to the 14-concept whole-system view.
+- [x] Add manual one-concept tracing plus Driver.js walkthroughs that focus the
+  active node, dim the rest, and show the role's received inputs, handed-off
+  outputs, hard guardrail, and authority.
+- [x] Make every concept expandable into an implementation subgraph of at
+  least two nodes, with the initializer opening into its model call,
+  `set_output_contract` protocol, and OutputContract schema/persistence path.
+- [x] Give all 43 concept and implementation nodes explicit answers for what
   the node is, inputs, outputs, creator, consumers, enforcement, authority,
   rationale, and relevant current code.
 - [x] Keep the deliverable self-contained and offline by checking in the
@@ -55,12 +59,13 @@ the public cutover and legacy-production removal were completed.
 
 Verification: `npm run typecheck`, two consecutive atlas builds with the same
 SHA-256, and `git diff --check` pass. A temporary Playwright run against local
-Chrome exercises the four-node initial view, all nine inspector contracts,
-implementation expansion, route relayout, concept focus/dimming, two Driver.js
-steps, whole-system layout, an observability subgraph, and both responsive
-drawers. It reports zero page/console errors, unlabeled buttons, or remote
-requests. The four-concept, expanded, and 14-concept 1600×1000 renders were
-visually inspected; temporary screenshots were kept outside the repository.
+Chrome exercises the four-stage role handoff and five named transitions, all
+nine inspector contracts, the three-node initializer expansion, route
+relayout, manual handoff tracing, all four detailed Driver.js steps,
+whole-system and verifier-subgraph layout, and both responsive drawers. It
+reports zero page/console errors, unlabeled buttons, or remote requests. The
+default handoff and guided-tour 1600×1000 renders were visually inspected;
+temporary screenshots were kept outside the repository.
 
 ## Post-v3 simplification complete (2026-08-17)
 
