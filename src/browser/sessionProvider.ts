@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import type { BrowserController } from './controller.js';
 
 /**
@@ -15,6 +17,15 @@ export interface BrowserSessionProvider {
  * explicit (see `resolveBrowserProviderKind`) so merely holding a
  * Browserbase API key cannot silently start billable remote sessions. */
 export type BrowserProviderKind = 'local' | 'browserbase';
+
+/** The Zod counterpart of `BrowserProviderKind`, shared by every schema that
+ * persists or reports a provider kind (durable run configuration, artifact
+ * inspection manifests, finish facts). The `satisfies` tie keeps the two
+ * declarations from drifting apart. */
+export const browserProviderKindSchema = z.enum([
+  'local',
+  'browserbase',
+] satisfies readonly BrowserProviderKind[]);
 
 /**
  * Provider-neutral, user-facing facts about one live browser session.

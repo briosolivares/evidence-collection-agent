@@ -1,11 +1,8 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 
-import {
-  outputContractSchema,
-  validateOutputContract,
-  type OutputContract,
-} from './outputContract.js';
+import { outputContractSchema, type OutputContract } from './outputContract.schema.js';
+import { validateOutputContract } from './validate.js';
 import { contractPrompt } from '../../prompts/index.js';
 import type { CallModel, Message, ToolUseBlock } from '../../model/messages.js';
 import {

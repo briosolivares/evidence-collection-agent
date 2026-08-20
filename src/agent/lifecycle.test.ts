@@ -15,7 +15,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../browser/controller.js';
-import type { OutputContract } from './initializer/outputContract.js';
+import type { OutputContract } from './initializer/outputContract.schema.js';
 import type { ToolResultBlock } from '../model/messages.js';
 import {
   ModelGenerationFailedError,
@@ -33,13 +33,12 @@ import {
   commitArtifactWriteTransaction,
 } from '../run/artifactWriteTransaction.js';
 import { createRegistry } from '../tools/registry.js';
+import { RUN_CHECKPOINT_FILENAME, HARNESS_DIR } from './checkpoint.js';
 import {
-  RUN_CHECKPOINT_FILENAME,
-  HARNESS_DIR,
   checkpointSchema,
   type Checkpoint,
   type DurableRunConfiguration,
-} from './checkpoint.js';
+} from './checkpoint.schema.js';
 import { runAgent } from './lifecycle.js';
 import { OUTPUT_CONTRACT_PATH } from './initializer/contractFile.js';
 

@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { OutputContract } from './initializer/outputContract.js';
+import type { OutputContract } from './initializer/outputContract.schema.js';
 import type { FinishFacts, TableFact } from './completion/finishChecks.js';
 import {
   CHECKPOINT_MAX_BYTES,
@@ -29,13 +29,15 @@ import {
   ceilingFromCheckpoint,
   ceilingToCheckpoint,
   openCheckpointStore,
+} from './checkpoint.js';
+import {
   checkpointSchema,
   durableTerminalOutcomeSchema,
   initializerProgressSchema,
   pendingToolTurnSchema,
   type Checkpoint,
   type DurableRunConfiguration,
-} from './checkpoint.js';
+} from './checkpoint.schema.js';
 
 let runDir: string;
 

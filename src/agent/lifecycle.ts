@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { BrowserController } from '../browser/controller.js';
-import type { OutputContract } from './initializer/outputContract.js';
+import type { OutputContract } from './initializer/outputContract.schema.js';
 import type { CallModel } from '../model/messages.js';
 import {
   isModelGenerationFailedError,
@@ -54,13 +54,12 @@ import {
   runContractInitializer,
   type ContractInitializerState,
 } from './initializer/initializer.js';
+import { runVerifier, VERIFICATION_HISTORY_LIMIT } from './verifier/verifier.js';
 import {
-  runVerifier,
-  VERIFICATION_HISTORY_LIMIT,
   type CorrectionFinding,
   type SurfacedArtifact,
   type VerificationHistoryEntry,
-} from './verifier/verifier.js';
+} from './verifier/verificationResult.schema.js';
 import {
   appendFinishResult,
   captureWorkerSnapshot,
@@ -86,16 +85,18 @@ import {
   type FinishInput,
 } from '../tools/finish/finish.js';
 import {
-  CHECKPOINT_VERSION,
   openCheckpointStore,
   ceilingFromCheckpoint,
+  type CheckpointStoreOptions,
+} from './checkpoint.js';
+import {
+  CHECKPOINT_VERSION,
   durableRunConfigurationSchema,
   type Checkpoint,
   type CheckpointPhase,
-  type CheckpointStoreOptions,
   type DurableRunConfiguration,
   type DurableTerminalOutcome,
-} from './checkpoint.js';
+} from './checkpoint.schema.js';
 import {
   buildFindingsReportInputFromCheckpoint,
   writeFindingsReport,

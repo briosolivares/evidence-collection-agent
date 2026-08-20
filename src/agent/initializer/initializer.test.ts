@@ -7,7 +7,7 @@ import type {
 } from '../../model/messages.js';
 import { ModelResponseRejectedError } from '../../model/modelDriver.js';
 import { contractPrompt } from '../../prompts/index.js';
-import type { OutputContract } from './outputContract.js';
+import type { OutputContract } from './outputContract.schema.js';
 import {
   CONTRACT_INITIALIZER_API_TOOL_DEFS,
   INITIALIZER_MAX_ATTEMPTS,

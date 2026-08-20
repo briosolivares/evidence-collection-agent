@@ -13,14 +13,14 @@ import type {
   IncompleteFinding,
   SurfacedArtifact,
   VerificationHistoryEntry,
-} from './verifier/verifier.js';
+} from './verifier/verificationResult.schema.js';
 import type { FinishInput } from '../tools/finish/finish.js';
-import {
-  HARNESS_DIR,
-  type Checkpoint,
-  type CheckpointPhase,
-  type DurableTerminalOutcome,
-} from './checkpoint.js';
+import { HARNESS_DIR } from './checkpoint.js';
+import type {
+  Checkpoint,
+  CheckpointPhase,
+  DurableTerminalOutcome,
+} from './checkpoint.schema.js';
 
 export const FINDINGS_REPORT_FILENAME = 'findings.md';
 export const FINDINGS_REPORT_PATH = `${HARNESS_DIR}/${FINDINGS_REPORT_FILENAME}`;

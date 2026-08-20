@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   outputContractSchema,
-  validateOutputContract,
   type OutputContract,
   type OutputSpec,
-} from './outputContract.js';
+} from './outputContract.schema.js';
+import { validateOutputContract } from './validate.js';
 
 // Every cross-field rule lives in validateOutputContract() rather than in
 // the Zod schema (refinements are dropped by z.toJSONSchema(), so the model

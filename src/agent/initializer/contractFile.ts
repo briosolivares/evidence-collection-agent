@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import {
   outputContractSchema,
   type OutputContract,
-} from './outputContract.js';
+} from './outputContract.schema.js';
 import { writeFileDurablyAtomic } from '../../run/atomicFile.js';
 import { HARNESS_DIR } from '../checkpoint.js';
 

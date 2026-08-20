@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { browserProviderKindSchema } from '../../browser/sessionProvider.js';
 import { durableFinishInputSchema } from '../../tools/finish/finish.js';
 
 /** Durable structural finding produced by deterministic finish inspection. */
@@ -86,7 +87,7 @@ export const finishFactsSchema = z.strictObject({
   manifest: z
     .strictObject({
       task: z.string(),
-      browserProvider: z.enum(['local', 'browserbase']).optional(),
+      browserProvider: browserProviderKindSchema.optional(),
       entryCount: z.number().int().nonnegative(),
       verifiedPaths: z.array(z.string()),
       requestedOutputPaths: z.array(z.string()),

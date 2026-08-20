@@ -11,6 +11,7 @@ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
+import { browserProviderKindSchema } from '../../browser/sessionProvider.js';
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
@@ -52,7 +53,7 @@ const manifestShapeSchema = z
     task: z.string(),
     startedAt: canonicalUtcIsoTimestampSchema,
     finishedAt: canonicalUtcIsoTimestampSchema.optional(),
-    browserProvider: z.enum(['local', 'browserbase']).optional(),
+    browserProvider: browserProviderKindSchema.optional(),
     artifacts: z.array(manifestEntryShapeSchema),
   })
   .passthrough();

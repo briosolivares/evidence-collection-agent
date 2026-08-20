@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../browser/controller.js';
-import type { OutputContract } from './initializer/outputContract.js';
+import type { OutputContract } from './initializer/outputContract.schema.js';
 import type {
   Message,
   ModelResponse,
@@ -21,10 +21,8 @@ import {
 } from '../run/artifacts.js';
 import type { RunTracing } from '../tracing/runTracing.js';
 import type { ResumeTaskConfig } from './runTask.js';
-import {
-  readCheckpointConfiguration,
-  UNBOUNDED_CEILING,
-} from './checkpoint.js';
+import { readCheckpointConfiguration } from './checkpoint.js';
+import { UNBOUNDED_CEILING } from './checkpoint.schema.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../tools/browserExecute/browserExecute.js';
 import {
   PRODUCTION_DEFAULTS,

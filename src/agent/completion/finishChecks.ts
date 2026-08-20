@@ -1,10 +1,7 @@
 import { basename } from 'node:path';
 
-import {
-  matchesFilenamePattern,
-  type OutputContract,
-  type OutputSpec,
-} from '../initializer/outputContract.js';
+import type { OutputContract, OutputSpec } from '../initializer/outputContract.schema.js';
+import { matchesFilenamePattern } from '../initializer/validate.js';
 import { ARTIFACTS_DIR, type ManifestEntry } from '../../run/artifacts.js';
 import type { FinishInput } from '../../tools/finish/finish.js';
 import {

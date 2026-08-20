@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 
 import { z } from 'zod';
 
-import type { OutputContract } from '../../src/agent/initializer/outputContract.js';
+import type { OutputContract } from '../../src/agent/initializer/outputContract.schema.js';
 import type {
   AcceptedModelResponse,
   ModelDriver,
@@ -17,7 +17,7 @@ import { writeArtifact } from '../../src/run/artifacts.js';
 import type {
   Checkpoint,
   DurableRunConfiguration,
-} from '../../src/agent/checkpoint.js';
+} from '../../src/agent/checkpoint.schema.js';
 import { runAgent } from '../../src/agent/lifecycle.js';
 
 type Scenario =

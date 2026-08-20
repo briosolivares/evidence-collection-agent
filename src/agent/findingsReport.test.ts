@@ -16,7 +16,7 @@ import type {
   IncompleteFinding,
   SurfacedArtifact,
   VerificationHistoryEntry,
-} from './verifier/verifier.js';
+} from './verifier/verificationResult.schema.js';
 import type { FinishInput } from '../tools/finish/finish.js';
 import { HARNESS_DIR } from './checkpoint.js';
 import {

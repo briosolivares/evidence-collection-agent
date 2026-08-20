@@ -45,10 +45,12 @@ import {
   readCheckpointResumeInfo,
   ceilingFromCheckpoint,
   ceilingToCheckpoint,
+} from './checkpoint.js';
+import {
   durableRunConfigurationSchema,
   type DurableRunConfiguration,
   type DurableTerminalOutcome,
-} from './checkpoint.js';
+} from './checkpoint.schema.js';
 import { runAgent } from './lifecycle.js';
 import { workerPrompt } from '../prompts/index.js';
 import {

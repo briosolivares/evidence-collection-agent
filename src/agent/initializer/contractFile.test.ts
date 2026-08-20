@@ -12,7 +12,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { OutputContract } from './outputContract.js';
+import type { OutputContract } from './outputContract.schema.js';
 import {
   OUTPUT_CONTRACT_PATH,
   ensureOutputContractFile,

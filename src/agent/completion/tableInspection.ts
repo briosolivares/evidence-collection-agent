@@ -4,7 +4,7 @@ import type {
   OutputColumn,
   OutputSpec,
   TableRule,
-} from '../initializer/outputContract.js';
+} from '../initializer/outputContract.schema.js';
 import type { FinishDefect, TableFact } from './finishFacts.schema.js';
 
 interface ParsedCell {

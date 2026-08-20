@@ -11,7 +11,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { OutputContract, OutputSpec } from '../initializer/outputContract.js';
+import type { OutputContract, OutputSpec } from '../initializer/outputContract.schema.js';
 import { initManifest, writeArtifact } from '../../run/artifacts.js';
 import type { FinishInput } from '../../tools/finish/finish.js';
 import {

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OutputContract } from '../initializer/outputContract.js';
+import type { OutputContract } from '../initializer/outputContract.schema.js';
 import {
   ModelGenerationFailedError,
   type AcceptedModelResponse,
@@ -22,9 +22,11 @@ import {
   VERIFIER_MAX_CONTEXT_TOKENS,
   createVerifierModelDriver,
   runVerifier,
+} from './verifier.js';
+import {
   verificationResultSchema,
   type SurfacedArtifact,
-} from './verifier.js';
+} from './verificationResult.schema.js';
 import { verifierPrompt } from '../../prompts/index.js';
 
 let runDir: string;

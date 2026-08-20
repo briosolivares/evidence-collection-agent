@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import type { BrowserController } from '../browser/controller.js';
-import type { OutputContract } from './initializer/outputContract.js';
+import type { OutputContract } from './initializer/outputContract.schema.js';
 import type { Message } from '../model/messages.js';
 import type {
   AcceptedModelResponse,
@@ -29,13 +29,12 @@ import {
 } from '../tools/registry.js';
 import { publishArtifactTool } from '../tools/publishArtifact/publishArtifact.js';
 import { finishTool, type FinishInput } from '../tools/finish/finish.js';
+import { HARNESS_DIR, RUN_CHECKPOINT_FILENAME } from './checkpoint.js';
 import {
-  HARNESS_DIR,
-  RUN_CHECKPOINT_FILENAME,
   checkpointSchema,
   type Checkpoint,
   type DurableRunConfiguration,
-} from './checkpoint.js';
+} from './checkpoint.schema.js';
 import { runAgent } from './lifecycle.js';
 import { FINDINGS_REPORT_FILENAME } from './findingsReport.js';
 import { raceWithRunSignal } from './runDeadline.js';
