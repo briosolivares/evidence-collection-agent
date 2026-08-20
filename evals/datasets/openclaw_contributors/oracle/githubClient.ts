@@ -24,7 +24,7 @@ export const REQUIRED_ROW_COUNT = 30;
 
 /** How many top contributors the oracle keeps. Larger than the task's 30
  *  because the website's contributors graph — ruled a valid, correct source
- *  for this task (user/Tina decision, 2026-08-11) — ranks differently from
+ *  for this task (design-review decision, 2026-08-11) — ranks differently from
  *  this REST endpoint: the graph credits `Co-authored-by:` trailers and
  *  orders ties differently, so handles the site shows at ranks ~23–30 sit
  *  at API ranks 41–70. 100 (the per_page maximum, one request) absorbs

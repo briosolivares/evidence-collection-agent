@@ -1,7 +1,7 @@
 # Medium-Task Re-Baseline (Step 2) — Moving Breakpoint + Per-Request Context Guard
 
 **Date:** August 11, 2026 (runs 2026-08-11T23:02–23:24Z, graded 23:26Z)
-**Changes under test:** spec Parts 1–4 (`.agents/planning/2026-08-11-cache-context-guard/spec.md`, commit `8d0ea98`): moving conversation cache breakpoint, per-request context guard (200k, replacing the 250k cumulative budget), cache-miss tripwire, 200k-byte per-message batch cap. `maxTurns` 60.
+**Changes under test:** the cache/context-guard changes (commit `8d0ea98`): moving conversation cache breakpoint, per-request context guard (200k, replacing the 250k cumulative budget), cache-miss tripwire, 200k-byte per-message batch cap. `maxTurns` 60.
 **Command:** `npx tsx --env-file=.env evals/runners/cli.ts --tasks openclaw_merged_prs,openclaw_contributors --k 3` (graded via `evals/runners/regrade.ts` — see Eval-infra fragility below).
 **Results JSON:** `evals/experiments/2026-08-11_04-26-41pm_eval-openclaw-merged-prs-openclaw_e3a3fe.json`
 

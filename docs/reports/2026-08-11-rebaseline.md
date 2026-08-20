@@ -4,7 +4,7 @@
 **Command:** `npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news,edgar,openclaw_pr --k 3` (same suite and k as the baseline)
 **Headline: 3 of 3 tasks passed — 9/9 trials complete, 100% accuracy on every task.** The baseline was 0/3. All four mechanisms (F1–F4) show direct transcript evidence of doing their job.
 
-Baseline for comparison: `2026-08-11-baseline.md`. Failure→mechanism log (now closed out): `.agents/planning/evidence-collection-agent-checkpoint-1/implementation/baseline-failure-log.md`.
+Baseline for comparison: `2026-08-11-baseline.md`.
 
 ## Results
 

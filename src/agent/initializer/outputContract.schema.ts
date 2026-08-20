@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-// The output contract: the one typed statement of what a run must produce
-// (docs/revised-browser-agent-proposal.md, "Define a small, validated output
-// contract"). It replaces the prose INTENT.md/CONTRACT.md pair — nothing here
+// The output contract: the one typed statement of what a run must produce.
+// It replaces the prose INTENT.md/CONTRACT.md pair — nothing here
 // is parsed out of model prose, and nothing downstream re-derives
 // requirements from headings. The worker, the initializer, the code-based
 // completion checks, and the verifier all read the same validated object.

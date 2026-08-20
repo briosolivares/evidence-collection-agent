@@ -1,7 +1,7 @@
 # Medium-Task Ceiling-Raise Experiment (Step 0) — Evidence-Collection Agent
 
 **Date:** August 11, 2026 (run started 2026-08-11T21:51:35Z)
-**Change under test:** `DEFAULT_MAX_TOKENS` 250,000 → 750,000 and `DEFAULT_MAX_TURNS` 24 → 60 in `src/cli/runTask.ts` (Step 0 of `.agents/planning/2026-08-11-cache-context-guard/spec.md`).
+**Change under test:** `DEFAULT_MAX_TOKENS` 250,000 → 750,000 and `DEFAULT_MAX_TURNS` 24 → 60 in `src/cli/runTask.ts`.
 **Command:** `npx tsx --env-file=.env evals/runners/cli.ts --tasks openclaw_merged_prs,openclaw_contributors --k 3`
 **Headline: 0 of 2 tasks passed — all six trials died `budget_exceeded` on the raised 750k ceiling at 22–28 turns.** Tripling the cumulative ceiling bought only ~1.6–2× the turns, exactly the square-root scaling the cumulative measure predicts. Raising the ceiling further is not a viable path; the experiment confirms the spec's Parts 1–2 as the durable fix.
 

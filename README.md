@@ -199,8 +199,7 @@ npm run login -- --manual # local Chrome only
 ```
 
 For contributor navigation and binding repository rules, read
-[`AGENTS.md`](AGENTS.md) and [`.agents/summary/index.md`](.agents/summary/index.md).
-Current rationale and progress live in the
+[`AGENTS.md`](AGENTS.md). Design rationale and progress live in the
 [Sherlock v3 design](docs/browser-agent-v3/sherlock-v3-design-doc.md) and
-[implementation plan](docs/browser-agent-v3/implementation-plan.md). The
-checkpoint-1 planning tree is historical context only.
+[implementation plan](docs/browser-agent-v3/implementation-plan.md); dated
+eval reports are in [`docs/reports/`](docs/reports/).

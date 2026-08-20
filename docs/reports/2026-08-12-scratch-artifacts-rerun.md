@@ -1,7 +1,7 @@
 # Medium Rerun Under the Scratch/Artifacts Contract — Both Tasks Pass
 
 **Date:** August 12, 2026 (batch 2026-08-12T22:49–23:21Z)
-**Configuration under test:** the scratch/artifacts run-dir split with manifest roles, implemented per `.agents/planning/2026-08-12-scratch-artifacts-roles/plan.md` (commits `6e77876`…`7724963`): every write lands in `artifacts/` (published, non-empty `roles`) or `scratch/` (private, no roles); graders select deliverables only from `requested_output` entries; system prompt teaches the four-point workspace contract. Otherwise unchanged from the morning batch: context ceiling 900k, `maxTurns` Infinity, model `claude-sonnet-5`, atomic tool profile.
+**Configuration under test:** the scratch/artifacts run-dir split with manifest roles, implemented in commits `6e77876`…`7724963`: every write lands in `artifacts/` (published, non-empty `roles`) or `scratch/` (private, no roles); graders select deliverables only from `requested_output` entries; system prompt teaches the four-point workspace contract. Otherwise unchanged from the morning batch: context ceiling 900k, `maxTurns` Infinity, model `claude-sonnet-5`, atomic tool profile.
 **Command:** `evals/runners/cli.ts --tasks openclaw_contributors,openclaw_merged_prs --k 3` (plus a `hacker_news --k 1` smoke beforehand).
 **Results JSON:** `evals/experiments/2026-08-12_04-21-16pm_eval-openclaw-contributors-openclaw_b1866a.json`
 **Baseline for comparison:** `docs/reports/2026-08-12-medium-evals.md` (same tasks, same k, pre-change code, ~16 hours earlier).

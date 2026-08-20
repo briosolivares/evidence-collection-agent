@@ -494,8 +494,8 @@ Do not claim a baseline until the commands are run on the current checkout.
 - [x] `npm test` (requires local Chrome) — coordinator rerun passed all 1,833
   tests across 140 files in 68.87 seconds
 - [x] record collected test count — 1,833 cases across 140 files
-- [x] record production/test raw line counts using the same convention as
-  `docs/reports/2026-08-14-simplification-audit.md` — 33,557 production
+- [x] record production/test raw line counts using the raw physical-line
+  convention — 33,557 production
   `src` lines in 132 files; 36,458 test lines in 140 files
 - [x] fixture-backed current application smoke path
 
@@ -1101,9 +1101,8 @@ proved, even if supporting code already exists.
 - Step 5 is committed at `071a9ec`. The rollback point is green: 175 test
   files / 2,265 tests, `npm run typecheck`, and `git diff --check` all pass.
   The execution board is 43/55 checked items (78%) before Step 6 removals.
-- Use the raw physical-line convention from
-  `docs/reports/2026-08-14-simplification-audit.md`; do not count generated or
-  vendor code and do not claim comment/format churn as structural savings.
+- Use the raw physical-line convention; do not count generated or vendor
+  code and do not claim comment/format churn as structural savings.
   The post-cutover coexistence baseline is 579 tracked files, 51,209
   production `src` lines across 167 files, 51,885 test lines across 175 test
   files, and 12,877 `evals` lines. The pre-v3 production baseline was 33,557
@@ -1400,8 +1399,8 @@ proved, even if supporting code already exists.
 
 ### 2026-08-15 — active documentation consolidated
 
-- Rewrote `AGENTS.md`, README, the retained demo guide, and all nine active
-  `.agents/summary/` documents around the sole v3 production path, static
+- Rewrote `AGENTS.md`, README, and the retained demo guide around the sole v3
+  production path, static
   eight-tool surface, immutable contract, durable coordinator, attached versus
   managed browser ownership, and current provider/eval boundaries.
 - Marked the superseded v2 proposal/implementation documents as historical

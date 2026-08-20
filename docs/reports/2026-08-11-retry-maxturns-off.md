@@ -1,7 +1,7 @@
 # Retry on Transients + maxTurns Off — Easy & Medium Re-Run
 
 **Date:** August 11, 2026 (runs 2026-08-12T01:02–01:42Z, each suite graded at its end)
-**Changes under test:** `.agents/planning/2026-08-11-retry-mechanism/spec.md`, commit `fced2f7`: Part A oracle-fetch retry (`fetchWithRetry` in `githubGetJson`), Part B model-call retry over stream creation *and* consumption (SDK `maxRetries: 0`, 4 attempts, 1/2/4s ±50% jitter), Part C metrics-on-crash bookkeeping — plus `maxTurns` off by default (60 → `Infinity`; the 200k per-request context ceiling is the sole terminating guard).
+**Changes under test:** commit `fced2f7`: Part A oracle-fetch retry (`fetchWithRetry` in `githubGetJson`), Part B model-call retry over stream creation *and* consumption (SDK `maxRetries: 0`, 4 attempts, 1/2/4s ±50% jitter), Part C metrics-on-crash bookkeeping — plus `maxTurns` off by default (60 → `Infinity`; the 200k per-request context ceiling is the sole terminating guard).
 **Commands:** `npx tsx --env-file=.env evals/runners/cli.ts --tasks hacker_news,edgar,openclaw_pr --k 3`, then `--tasks openclaw_merged_prs,openclaw_contributors --k 3` (sequential; shared Chrome profile).
 **Results JSON:** easy `evals/experiments/2026-08-11_06-09-19pm_eval-hacker-news-edgar-openclaw-pr_95646e.json`; medium `evals/experiments/2026-08-11_06-42-21pm_eval-openclaw-merged-prs-openclaw_0e2b3f.json`
 
