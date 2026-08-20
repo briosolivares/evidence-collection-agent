@@ -314,21 +314,6 @@ describe('BrowserbaseBrowserSessionProvider contextId / persistContext', () => {
     const params = create.mock.calls[0]?.[0];
     expect(params.api_timeout).toBe(3_600);
   });
-
-  it('lets a caller override the default session timeout', async () => {
-    const { client, create } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
-    const provider = buildProvider({
-      client,
-      connectOverCDP: async () => browser,
-      timeoutSeconds: 90,
-    });
-
-    await provider.createSession();
-
-    const params = create.mock.calls[0]?.[0];
-    expect(params.api_timeout).toBe(90);
-  });
 });
 
 describe('BrowserbaseBrowserSessionProvider Live View', () => {

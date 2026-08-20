@@ -278,35 +278,6 @@ describe('createBrowserbaseDownloadReader', () => {
 
     expect(new TextDecoder().decode(first.bytes)).toBe('second');
     expect(new TextDecoder().decode(second.bytes)).toBe('first');
-    expect([...reader.retrievedIds()].sort()).toEqual(['a', 'b']);
-  });
-
-  it('reports retrievedIds() as exactly the ids whose bytes were returned', async () => {
-    const bytes = new TextEncoder().encode('only-one');
-    const record: BrowserbaseDownloadRecord = {
-      id: 'only',
-      filename: 'f.csv',
-      checksum: sha256Hex(bytes),
-      createdAt: '2026-01-01T00:00:00.000Z',
-    };
-    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.includes('/v1/downloads?')) return jsonResponse({ downloads: [record] });
-      return bytesResponse(bytes);
-    });
-
-    const clock = makeClock();
-    const reader = createBrowserbaseDownloadReader({
-      apiKey: 'k',
-      sessionId: 's',
-      fetchImpl,
-      now: clock.now,
-      sleep: clock.sleep,
-    });
-
-    expect(reader.retrievedIds()).toEqual([]);
-    await reader.read(fakeDownload('f.csv'));
-    expect(reader.retrievedIds()).toEqual(['only']);
   });
 
   it('throws a clear error when nothing appears before the deadline, with bounded polling', async () => {

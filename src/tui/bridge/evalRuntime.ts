@@ -20,16 +20,6 @@ export interface TuiEvalRuntimeDeps {
   authenticatedProfileDir: string;
   browserExecutablePath?: string;
   runsBaseDir?: string;
-  runConfig?: Pick<
-    RunSessionDeps,
-    | 'model'
-    | 'harness'
-    | 'maxTurns'
-    | 'maxContextTokens'
-    | 'authenticated'
-    | 'javascriptPolicy'
-    | 'tracingDelegate'
-  >;
   /** Test seams. */
   browserRuntime?: EvalBrowserRuntime;
   startRunFn?: typeof startRun;
@@ -93,9 +83,8 @@ export function createTuiEvalRuntime(deps: TuiEvalRuntimeDeps): TuiEvalRuntime {
             ...(opts.headed && opts.requestPermission !== undefined
               ? { requestPermission: opts.requestPermission }
               : {}),
-            ...deps.runConfig,
             authenticated: opts.headed,
-            javascriptPolicy: deps.runConfig?.javascriptPolicy ?? 'allow',
+            javascriptPolicy: 'allow',
           });
           if (cancelled) inner.cancel();
           return inner.done;

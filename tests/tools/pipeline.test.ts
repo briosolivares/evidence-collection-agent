@@ -8,7 +8,6 @@ import { initManifest } from '../../src/run/artifacts.js';
 import { DEFAULT_MAX_RESULT_BYTES, type OffloadedResult } from '../../src/tools/capResult.js';
 import { executeToolCall } from '../../src/tools/pipeline.js';
 import {
-  accessKey,
   createBusyResourceRegistry,
   createRegistry,
   type BusyResourceRegistry,
@@ -24,7 +23,6 @@ const echo: ToolDef<{ message: string }> = {
   name: 'echo',
   description: 'Echo the message back.',
   inputSchema: z.object({ message: z.string() }),
-  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) => `echo: ${input.message}`,
 };
 
@@ -32,7 +30,6 @@ const inventory: ToolDef<{ item: string }> = {
   name: 'inventory',
   description: 'Look up an item, returning structured data.',
   inputSchema: z.object({ item: z.string() }),
-  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) => ({ item: input.item, count: 3 }),
 };
 
@@ -40,7 +37,6 @@ const explode: ToolDef<Record<string, never>> = {
   name: 'explode',
   description: 'Always throws.',
   inputSchema: z.object({}),
-  getAccess: () => ({ reads: [], writes: [] }),
   execute: async () => {
     throw new Error('boiler pressure too high');
   },
@@ -145,7 +141,6 @@ describe('executeToolCall result capping (stage 5)', () => {
       name: 'flood',
       description: 'Emit the requested number of bytes.',
       inputSchema: z.object({ bytes: z.number() }),
-      getAccess: () => ({ reads: [], writes: [] }),
       ...(maxBytes !== undefined ? { maxBytes } : {}),
       execute: async (input) => 'x'.repeat(input.bytes),
     };
@@ -188,7 +183,6 @@ describe('executeToolCall permission gate', () => {
       name: 'interactive',
       description: 'Requires a user decision before running.',
       inputSchema: z.object({ question: z.string() }),
-      getAccess: () => ({ reads: [], writes: [] }),
       requiresUserInteraction: true,
       execute: async (input) => {
         executed.push(input);
@@ -325,7 +319,6 @@ describe('executeToolCall execution deadline', () => {
     name: 'wedged',
     description: 'Never returns.',
     inputSchema: z.object({}).strict(),
-    getAccess: () => ({ reads: [], writes: [] }),
     timeoutMs: 40,
     execute: () => new Promise<never>(() => undefined),
   };
@@ -354,7 +347,6 @@ describe('executeToolCall execution deadline', () => {
       name: 'late_throw',
       description: 'Rejects after its deadline.',
       inputSchema: z.object({}).strict(),
-      getAccess: () => ({ reads: [], writes: [] }),
       timeoutMs: 20,
       execute: () =>
         new Promise<never>((_resolve, reject) => {
@@ -397,7 +389,6 @@ describe('executeToolCall execution deadline', () => {
       name: 'patient',
       description: 'Slow but legitimate.',
       inputSchema: z.object({}).strict(),
-      getAccess: () => ({ reads: [], writes: [] }),
       timeoutMs: Infinity,
       execute: async () => {
         await new Promise((resolve) => setTimeout(resolve, 60));
@@ -418,13 +409,10 @@ describe('executeToolCall execution deadline', () => {
 });
 
 describe('executeToolCall busy-resource gate', () => {
-  /** A write tool whose access is entirely driven by input, matching the
-   * real getAccess pattern (page(pageId), not a hardcoded key). */
   const writesPage: ToolDef<{ pageId: string }> = {
     name: 'writes_page',
     description: 'Writes the named page.',
     inputSchema: z.object({ pageId: z.string() }),
-    getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
     execute: async (input) => `wrote ${input.pageId}`,
   };
   const registryWithPageWriter = createRegistry([writesPage as ToolDef]);
@@ -435,7 +423,6 @@ describe('executeToolCall busy-resource gate', () => {
       name: 'never_starts',
       description: 'Would run, but the gate should refuse it first.',
       inputSchema: z.object({}).strict(),
-      getAccess: () => ({ reads: [], writes: [] }),
       execute: () => {
         executed = true;
         return 'ran';
@@ -459,7 +446,7 @@ describe('executeToolCall busy-resource gate', () => {
     expect(executed).toBe(false);
   });
 
-  it('registers a timed-out call under its own access, so a later conflicting call waits for it instead of racing it', async () => {
+  it('registers a timed-out call globally, so a later call waits instead of racing it', async () => {
     const busyRegistry = createBusyResourceRegistry();
     const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
     let resolveWedged: ((value: string) => void) | undefined;
@@ -468,7 +455,6 @@ describe('executeToolCall busy-resource gate', () => {
       description: 'Times out, then eventually resolves in the background.',
       inputSchema: z.object({ pageId: z.string() }),
       timeoutMs: 20,
-      getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
       execute: () =>
         new Promise<string>((resolve) => {
           resolveWedged = resolve;
@@ -483,9 +469,7 @@ describe('executeToolCall busy-resource gate', () => {
     );
     expect(abandoned.isError === true && abandoned.errorKind).toBe('timeout');
 
-    // A second call on the SAME page must wait for the abandoned call to
-    // actually settle rather than starting immediately — proven by checking
-    // it has not settled yet, then unblocking it and confirming it proceeds.
+    // Every later call waits for abandoned work to actually settle.
     let secondSettled = false;
     const second = executeToolCall(
       registry,
@@ -504,16 +488,19 @@ describe('executeToolCall busy-resource gate', () => {
     expect(result).toEqual({ toolCallId: 'gate-2', isError: false, content: 'wrote p1' });
   });
 
-  it('does not gate a call on an unrelated page, even while another page has an abandoned call outstanding', async () => {
+  it('also gates a call naming a different page while abandoned work remains live', async () => {
     const busyRegistry = createBusyResourceRegistry();
     const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
+    let resolveWedged: (() => void) | undefined;
     const wedgedWrite: ToolDef<{ pageId: string }> = {
       name: 'wedged_write_2',
-      description: 'Times out and never settles for this test.',
+      description: 'Times out, then settles after the global gate observes it.',
       inputSchema: z.object({ pageId: z.string() }),
       timeoutMs: 20,
-      getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
-      execute: () => new Promise<never>(() => undefined),
+      execute: () =>
+        new Promise<void>((resolve) => {
+          resolveWedged = resolve;
+        }),
     };
     const registry = createRegistry([wedgedWrite as ToolDef, writesPage as ToolDef]);
 
@@ -524,11 +511,19 @@ describe('executeToolCall busy-resource gate', () => {
     );
     expect(abandoned.isError === true && abandoned.errorKind).toBe('timeout');
 
-    const result = await executeToolCall(
+    let settled = false;
+    const later = executeToolCall(
       registry,
       { id: 'gate-3', name: 'writes_page', input: { pageId: 'p2' } },
       gatedCtx,
-    );
+    ).then((result) => {
+      settled = true;
+      return result;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    expect(settled).toBe(false);
+    resolveWedged!();
+    const result = await later;
     expect(result).toEqual({ toolCallId: 'gate-3', isError: false, content: 'wrote p2' });
   });
 });

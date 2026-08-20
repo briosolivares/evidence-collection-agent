@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { writeArtifact } from '../../run/artifacts.js';
 import type { ToolDef } from '../registry.js';
-import { accessKey } from '../registry.js';
 import {
   assertNotAborted,
   assertWithinFileToolLimit,
@@ -42,10 +41,6 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
     'canonical run-relative path and exact byte count as JSON; pass that path unchanged to ' +
     'publish_artifact kind=file when publishing a workspace file.',
   inputSchema: writeFileInputSchema,
-  getAccess: (input) => ({
-    reads: [],
-    writes: [accessKey.file(input.file_path), accessKey.manifest()],
-  }),
   execute(input, ctx): WriteFileResult {
     assertNotAborted(ctx.abortSignal, 'write_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'write');

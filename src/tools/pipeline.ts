@@ -1,11 +1,7 @@
 import { capResult, DEFAULT_MAX_RESULT_BYTES } from './capResult.js';
-import {
-  deriveAccess,
-  type BusyResourceRegistry,
-  type ToolAccess,
-  type ToolCtx,
-  type ToolRegistry,
-} from './registry.js';
+import type { ImageBlock } from '../model/messages.js';
+import { inlineImageBlock, isInlineImageToolOutput } from './inlineImage.js';
+import { type BusyResourceRegistry, type ToolCtx, type ToolRegistry } from './registry.js';
 
 /** One tool invocation as requested by the model (a `tool_use` block). */
 export interface ToolCall {
@@ -77,7 +73,15 @@ export const BUSY_RESOURCE_GATE_TIMEOUT_MS = DEFAULT_TOOL_TIMEOUT_MS;
  * API's `is_error` flag.
  */
 export type ToolCallResult =
-  | { toolCallId: string; isError: false; content: string }
+  | {
+      toolCallId: string;
+      isError: false;
+      content: string;
+      /** Present only for a deliberately multimodal tool result. */
+      image?: ImageBlock;
+      /** Raw decoded bytes, retained for truthful metrics without re-decoding base64. */
+      imageBytes?: number;
+    }
   | { toolCallId: string; isError: true; errorKind: ToolErrorKind; content: string };
 
 /**
@@ -168,15 +172,14 @@ export async function executeToolCall(
     input = decision.updatedInput;
   }
 
-  // Stage 3.5: the busy-resource gate. Derived once here — and reused by
-  // withToolDeadline below to register THIS call's own abandonment, if it
-  // times out — so a call that is about to touch a resource an earlier,
-  // abandoned call left possibly still busy waits for it (bounded) rather
-  // than racing it blind. See BusyResourceRegistry's module doc for why
-  // this cannot just be "wait forever": an abandoned call may never settle.
-  const access = deriveAccess(tool, input);
+  // Stage 3.5: every validated, permission-approved call passes the global
+  // abandoned-effect gate before it starts. An abandoned call may never
+  // settle, so the wait remains bounded and fails closed.
   if (ctx.busyRegistry !== undefined) {
-    const free = await ctx.busyRegistry.waitUntilFree(access, BUSY_RESOURCE_GATE_TIMEOUT_MS);
+    const free = await ctx.busyRegistry.waitUntilFree(
+      BUSY_RESOURCE_GATE_TIMEOUT_MS,
+      ctx.abortSignal,
+    );
     if (!free) {
       return {
         toolCallId: call.id,
@@ -199,16 +202,22 @@ export async function executeToolCall(
   // try so an unserializable output or a failed offload is reported as an
   // execution error rather than crashing the pipeline.
   let content: string;
+  let image: ImageBlock | undefined;
+  let imageBytes: number | undefined;
   try {
-    const normalized = normalizeOutput(
-      await withToolDeadline(
-        tool.name,
-        tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS,
-        () => tool.execute(input, ctx),
-        ctx.busyRegistry,
-        access,
-      ),
+    const output = await withToolDeadline(
+      tool.name,
+      tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS,
+      () => tool.execute(input, ctx),
+      ctx.busyRegistry,
     );
+    const normalized = isInlineImageToolOutput(output)
+      ? inlineImageText(output)
+      : normalizeOutput(output);
+    if (isInlineImageToolOutput(output)) {
+      image = inlineImageBlock(output);
+      imageBytes = output.bytes.byteLength;
+    }
     const capped = capResult(
       ctx.runDir,
       tool.name,
@@ -242,7 +251,12 @@ export async function executeToolCall(
   }
 
   // Stage 7: return.
-  return { toolCallId: call.id, isError: false, content };
+  return {
+    toolCallId: call.id,
+    isError: false,
+    content,
+    ...(image === undefined ? {} : { image, imageBytes }),
+  };
 }
 
 /** Raised when a tool execution outlives its deadline. Distinct from any
@@ -269,14 +283,10 @@ export class ToolTimeoutError extends Error {
  * the call becomes a failed result the model can read and route around, and
  * the loop's budget guards get to run again.
  *
- * On timeout, `access`'s keys are registered with `busyRegistry` (when one
- * is given) as possibly still busy until `started` itself eventually
- * settles — see `BusyResourceRegistry`'s module doc for why a later call
- * touching the same keys needs to know that, rather than treating this
- * call's timeout as proof the resource is free. Without a registry, the
- * abandoned promise's eventual rejection is swallowed the old way: nobody is
- * listening for it any more, and an unhandled rejection must not take the
- * process down long after the call it belonged to was reported.
+ * On timeout, the call is registered with `busyRegistry` (when one is given)
+ * until `started` itself eventually settles. Without a registry, the
+ * abandoned promise's eventual rejection is swallowed so an unhandled
+ * rejection cannot take the process down later.
  *
  * A non-finite `timeoutMs` opts out entirely, for a tool whose waiting is
  * legitimately unbounded. Note that the human wait in `ask_user`
@@ -288,7 +298,6 @@ async function withToolDeadline<T>(
   timeoutMs: number,
   work: () => Promise<T> | T,
   busyRegistry: BusyResourceRegistry | undefined,
-  access: ToolAccess,
 ): Promise<T> {
   if (!Number.isFinite(timeoutMs)) return await work();
   const started = Promise.resolve(work());
@@ -303,7 +312,7 @@ async function withToolDeadline<T>(
   } catch (error) {
     if (error instanceof ToolTimeoutError) {
       if (busyRegistry !== undefined) {
-        busyRegistry.markAbandoned(access, started);
+        busyRegistry.markAbandoned(started);
       } else {
         void started.catch(() => undefined);
       }
@@ -321,4 +330,23 @@ function normalizeOutput(output: unknown): string {
   if (typeof output === 'string') return output;
   if (output === undefined) return '';
   return JSON.stringify(output);
+}
+
+function inlineImageText(output: {
+  text: string;
+  mediaType: string;
+  bytes: Uint8Array;
+  dimensions: { width: number; height: number };
+}): string {
+  return [
+    output.text,
+    `Image metadata: ${JSON.stringify({
+      media_type: output.mediaType,
+      width: output.dimensions.width,
+      height: output.dimensions.height,
+      bytes: output.bytes.byteLength,
+    })}`,
+  ]
+    .filter((line) => line.length > 0)
+    .join('\n');
 }

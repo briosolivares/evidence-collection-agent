@@ -121,8 +121,8 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
 describe('startEvalBatch', () => {
   it('runs trials with keyed framing, verdicts, report, and persistence', async () => {
     const fixture = makeFixture([
-      { status: 'verified', finalText: '', runDir: '/runs/t1' },
-      { status: 'verified', finalText: '', runDir: '/runs/t2' },
+      { status: 'verified', runDir: '/runs/t1' },
+      { status: 'verified', runDir: '/runs/t2' },
     ]);
 
     const handle = startEvalBatch(['stub'], 2, 1, {
@@ -187,7 +187,7 @@ describe('startEvalBatch', () => {
 
   it('a cancelled trial skips every remaining trial and writes no report', async () => {
     const fixture = makeFixture([
-      { status: 'verified', finalText: '', runDir: '/runs/t1' },
+      { status: 'verified', runDir: '/runs/t1' },
       { status: 'cancelled' },
     ]);
 
@@ -221,7 +221,7 @@ describe('startEvalBatch', () => {
     // browser death must not discard the batch's remaining trials.
     const fixture = makeFixture([
       { status: 'failed', message: 'browser died' },
-      { status: 'verified', finalText: '', runDir: '/runs/t2' },
+      { status: 'verified', runDir: '/runs/t2' },
     ]);
     const handle = startEvalBatch(['stub'], 2, 1, {
       onAction: (action) => fixture.actions.push(action),
@@ -269,7 +269,7 @@ describe('startEvalBatch', () => {
         expect(await opts.requestPermission?.({ toolName: 'ask_user', input: {} })).toEqual(
           decision,
         );
-        return { status: 'verified', finalText: '', runDir };
+        return { status: 'verified', runDir };
       })();
       return { cancel: vi.fn(), done };
     };
@@ -296,8 +296,8 @@ describe('startEvalBatch', () => {
 
   it('a batch that never needed a dialog stays unlabeled even with a resolver present', async () => {
     const fixture = makeFixture([
-      { status: 'verified', finalText: '', runDir: '/runs/t1' },
-      { status: 'verified', finalText: '', runDir: '/runs/t2' },
+      { status: 'verified', runDir: '/runs/t1' },
+      { status: 'verified', runDir: '/runs/t2' },
     ]);
 
     const handle = startEvalBatch(['stub'], 2, 1, {

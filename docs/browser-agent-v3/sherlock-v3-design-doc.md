@@ -42,9 +42,10 @@ that make evidence trustworthy.
    explicit alternative provider.
 4. The TUI streams assistant progress text and visible tool activity. It does
    not claim to reveal hidden chain-of-thought.
-5. The worker inspects and drives the page with `browser_execute`. It may write
-   and repair reusable JavaScript helpers under the run's private workspace and
-   exercise them immediately.
+5. The worker inspects and drives the page with `browser_execute`, using
+   `capture_screenshot` when it needs to see the exact live viewport. It may
+   write and repair reusable JavaScript helpers under the run's private
+   workspace and exercise them immediately.
 6. The worker publishes requested outputs and supporting evidence through the
    artifact boundary. Browser-backed work normally includes at least one
    evidence screenshot of the final/source state.
@@ -114,8 +115,8 @@ Sherlock must:
 - save private intermediate state separately from published output;
 - state an explicit final summary, including any concrete unresolved constraint;
 - validate and independently verify every production run;
-- resume a durable incomplete run without blindly repeating an uncertain
-  state-changing call;
+- preserve durable lifecycle state so `runAgent` can recover an incomplete run
+  without blindly repeating an uncertain state-changing call;
 - close every run-owned page on success, failure, cancellation, and crash
   recovery.
 
@@ -175,7 +176,7 @@ flowchart TD
   APP --> INIT["immutable output initializer"]
   APP --> LOOP["sequential worker session"]
   LOOP --> MODEL["strict streaming model driver"]
-  LOOP --> TOOLS["eight-tool v3 registry"]
+  LOOP --> TOOLS["nine-tool v3 registry"]
   TOOLS --> BX["browser_execute runner"]
   BX --> CHILD["fresh bounded child program"]
   CHILD <-->|"private JSON IPC; no URL"| CDP["target-pinned CDP session"]
@@ -201,43 +202,35 @@ The dependency direction is deliberate:
 
 ### 6.1 Modules
 
-The completed runtime lives under a cohesive `src/v3/` tree:
+The completed runtime is organized by its current ownership boundaries:
 
-    src/v3/
-      browser/
-        runner.ts
-        child.mjs
-        coreHelpers.mjs
+    src/
+      agent/
+        runTask.ts
+        lifecycle.ts
+        checkpoint.ts
+        checkpoint.schema.ts
+        initializer/
+        worker/
+        completion/
+        verifier/
       tools/
         index.ts
-        browserExecute.ts
-        publishArtifact.ts
-        fileTools.ts
-        bash.ts
-        askUser.ts
-        finish.ts
-        secretEnvironment.ts
-      loop/
-        workerSession.ts
-        contextView.ts
-      harness/
-        initializer.ts
-        verifier.ts
-        verifierTools.ts
-      completion/
-        finishChecks.ts
-        artifactInspection.ts
-        tableInspection.ts
-        types.ts
-      run/
-        coordinator.ts
-        checkpoint.ts
-        outputContractFile.ts
-        runDeadline.ts
+        registry.ts
+        pipeline.ts
+        browserExecute/
+        publishArtifact/
+        readFile/ writeFile/ editFile/
+        bash/ askUser/ finish/
+      browser/
+        controller.ts
+        provider.ts
+        playwrightBrowserController.ts
+        browserCommandSession.ts
       model/
-        budgetedCall.ts
-        budgetError.ts
-      systemPrompt.ts
+      run/
+      tracing/
+      tui/
 
 This is a responsibility map, not a requirement for one tiny file per type.
 Deep cohesive modules are preferred to either god objects or policy fragments.
@@ -246,7 +239,7 @@ Stable shared seams remain in their existing directories and are imported:
 - the strict streaming model driver and message types;
 - browser providers and controller primitives;
 - run-directory/path/artifact/transcript primitives;
-- output-contract parsing plus the generic tool pipeline and access ledger;
+- output-contract parsing plus the generic tool pipeline and global busy ledger;
 - TUI tracing and eval/grader boundaries.
 
 ## 7. Browser runtime
@@ -292,7 +285,10 @@ interface BrowserCommandSession {
   readonly pageId: string;
   readonly targetId: string;
   send(method: string, params?: Record<string, unknown>): Promise<unknown>;
-  upload(backendDOMNodeId: number, absolutePath: string): Promise<void>;
+  upload(
+    target: number | { selector: string; frameUrlIncludes?: string },
+    absolutePath: string,
+  ): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -325,10 +321,12 @@ semantics:
 - A stale or missing target fails; it never falls back to the first page.
 - The raw provider/CDP URL never leaves the controller.
 - Upload resolves a model-supplied workspace path in the parent, then uses the
-  provider's local-path or remote-byte encoder against the exact backend node;
-  the upload RPC never receives provider credentials and the parent accepts a
-  file only from the current run workspace. The child itself is not a sandbox
-  and retains the application OS user's authority as stated below.
+  provider's local-path or remote-byte encoder against either the exact backend
+  node or exactly one selector match across the pinned page's eligible frames.
+  The optional `frameUrlIncludes` value only narrows that frame search. The
+  upload RPC never receives provider credentials and the parent accepts a file
+  only from the current run workspace. The child itself is not a sandbox and
+  retains the application OS user's authority as stated below.
 - `close()` is idempotent and always attempted in `finally`.
 - Browser-level target commands are an owned-target API, not ambient browser
   authority: inventory is filtered to positively run-owned targets; info,
@@ -506,6 +504,10 @@ interface BrowserProgramApi {
   close(targetId?: string): Promise<void>;
   importModule(workspacePath: string): Promise<Record<string, unknown>>;
   upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
+  upload(
+    workspacePath: string,
+    target: { selector: string; frameUrlIncludes?: string },
+  ): Promise<void>;
 }
 ```
 
@@ -518,10 +520,13 @@ it never retargets the program's command session away from its initial page.
 `importModule` validates a no-follow, regular entry file under the run
 workspace and enforces its entry-size bound before import. Nested imports use
 normal Node resolution and are not recursively confined; this is a documented
-same-user, non-sandbox limitation. `upload` sends only a bounded backend node
-id and workspace-relative path over host IPC. The parent revalidates and
-confines the path, applies the provider-specific encoder, and fences any
-late-running upload before command-session detach or run finalization.
+same-user, non-sandbox limitation. `upload` sends only a bounded exact-node or
+selector target plus the workspace-relative path over host IPC. The parent
+revalidates and confines the path, resolves selector targets to exactly one
+file input across eligible frames, applies the provider-specific encoder, and
+fences any late-running upload before command-session detach or run
+finalization. `frameUrlIncludes` is an optional dynamic disambiguator, not a
+site-specific requirement.
 
 Interaction guidance in the static prompt:
 
@@ -582,19 +587,34 @@ hidden task-specific policy.
 The exact deterministic order is:
 
 1. `browser_execute`
-2. `publish_artifact`
-3. `read_file`
-4. `write_file`
-5. `edit_file`
-6. `bash`
-7. `ask_user`
-8. `finish`
+2. `capture_screenshot`
+3. `publish_artifact`
+4. `read_file`
+5. `write_file`
+6. `edit_file`
+7. `bash`
+8. `ask_user`
+9. `finish`
 
 Names use snake_case consistently. Existing file-tool parameter conventions
 (`file_path`, `offset`, `limit`, old/new text) are retained where the model has
 strong learned priors.
 
-### 10.1 `publish_artifact`
+### 10.1 `capture_screenshot`
+
+`capture_screenshot` takes an optional run-owned `page_id`, captures the exact
+current viewport at CSS scale, and returns one bounded PNG as an inline image
+tool result. It observes the existing page without navigating or scrolling.
+The call must be the only tool in its assistant response so the next model
+decision can depend on the returned pixels.
+
+The pixels are private working context, not a run artifact. They are included
+in exactly one model request and then replaced in later request views by a
+deterministic metadata stub. Transcript and tracing projections retain media
+type, dimensions, and byte count but never raw pixels. Requested screenshots
+and evidence still cross the explicit `publish_artifact` boundary.
+
+### 10.2 `publish_artifact`
 
 One strict top-level object uses a `kind` discriminator and optional fields
 validated as an exactly-one mode. This avoids API-incompatible top-level JSON
@@ -625,7 +645,7 @@ The result returns the manifest entry. Overwriting an artifact is allowed only
 when the path already has the same semantic role set; otherwise the call fails
 for an explicit correction.
 
-### 10.2 File tools
+### 10.3 File tools
 
 - `write_file` and `edit_file` write only private files under `scratch/`, with
   `scratch/workspace/` the normal location. Publication always goes through
@@ -643,7 +663,7 @@ for an explicit correction.
 provides search within the workspace. The prompt gives the familiar `rg`
 example.
 
-### 10.3 `bash`
+### 10.4 `bash`
 
 `bash` keeps the current finite foreground process contract:
 
@@ -661,7 +681,7 @@ V3 removes `uses_browser` and all CDP environment variables from `bash`.
 Browser work belongs to `browser_execute`, which works for Browserbase without
 leaking the remote connection capability.
 
-### 10.4 `ask_user`
+### 10.5 `ask_user`
 
 `ask_user` pauses through the existing TUI permission/question channel. It
 contains a concise question, optional context, and two to four answer choices
@@ -669,7 +689,7 @@ when choices are known. Headless/eval runs fail closed with model-readable
 feedback. Cancellation while paused resolves as denied and ends normally at
 the next guard.
 
-### 10.5 `finish`
+### 10.6 `finish`
 
 ```json
 {
@@ -719,6 +739,13 @@ assumptions, domain heuristics, evidence requirements, or other desirable but
 unstated conditions. Requested scope remains a condition for the judge rather
 than a guessed deterministic rule. The original request is authoritative if
 the normalized contract conflicts with it.
+
+A wildcard-only screenshot/download filename pattern carries no information
+and is canonicalized to omission rather than consuming the initializer's
+bounded repair attempt. When the request states no filename, media type, or
+source URL for a download, deterministic checks match only an artifact whose
+runtime-recorded publication kind is `download`; an older untyped manifest
+entry cannot satisfy that unconstrained output by inference.
 
 The worker cannot restate or revise the contract. New claims about source
 availability may be reported in the final summary; user clarifications are
@@ -816,19 +843,22 @@ Rules:
   gets one result in the same order, even after an earlier error.
 - `finish` combined with another call is rejected as a protocol error; nothing
   in that response executes.
+- `capture_screenshot` combined with another call is likewise rejected so no
+  action can run before the model has inspected the pixels.
 - Tool input is validated before execution. Errors become bounded tool results,
   not loop crashes.
 - The loop preserves result offloading, context guards, run budgets, model
   rejection correction, transcript events, metrics, cancellation, and stale
   heavyweight browser-result collapse.
-- Only the two most recent full `browser_execute` results remain inline. Older
-  results collapse to deterministic stubs; durable facts belong in workspace
-  files.
+- Only the two most recent full `browser_execute` results remain inline. A
+  successful `capture_screenshot` remains inline for the immediately following
+  request only. Consumed results collapse to deterministic stubs; durable facts
+  belong in workspace files.
 
 The static `SYSTEM_PROMPT` and exact ordered API tool definitions are built
 once per process and byte-stable across runs. Task text, contract facts,
-clarifications, resume notices, and browser provider details appear only in the
-per-run opening message or later conversation.
+clarifications, recovery notices, and browser provider details appear only in
+the per-run opening message or later conversation.
 
 ## 13. Durable run state
 
@@ -862,7 +892,8 @@ manifest, not truncated JSON.
 
 ### 13.2 Checkpoint schema and phases
 
-The v3 checkpoint is a compact versioned snapshot owned by the v3 coordinator:
+The v3 checkpoint is a compact versioned snapshot owned by the `runAgent`
+lifecycle:
 
 ```ts
 interface V3Checkpoint {
@@ -907,7 +938,13 @@ run lock. Saves occur:
 - after deterministic finish checks pass and before verifier execution;
 - before terminal return.
 
-### 13.3 Resume semantics
+### 13.3 `runAgent` recovery semantics
+
+`runTask` is the single public composition root and always starts a fresh run.
+There is no public `resumeTask` or agent REPL surface. Durable checkpoint
+restoration and crash recovery remain internal responsibilities of `runAgent`;
+when it is invoked for an existing run directory, the recorded phase determines
+the only permitted continuation:
 
 - `ready_for_model`: restore the conversation and continue.
 - `executing_tool` with `not_started`: execute the named next call once.
@@ -921,7 +958,7 @@ run lock. Saves occur:
 - `terminal`: return the recorded outcome without reopening the browser.
 
 Manifest hashes are verified before restoring model-visible files or state.
-Provider and scalar configuration are cross-checked. Resume never puts a CDP
+Provider and scalar configuration are cross-checked. Recovery never puts a CDP
 URL in the checkpoint.
 
 ## 14. TUI, tracing, and eval compatibility
@@ -1010,9 +1047,9 @@ the grader contract.
 | Judge incomplete | Preserve the latest worker response and all surfaced artifacts. |
 | Verifier unavailable | End incomplete; preserve artifacts. |
 | Budget exhausted | End incomplete with named guard. |
-| Crash during state-changing tool | Checkpoint as uncertain; resume never blindly replays. |
+| Crash during state-changing tool | Checkpoint as uncertain; `runAgent` recovery never blindly replays. |
 | Cleanup failure | Attempt all remaining finalizers, record combined failure, never hide primary outcome. |
-| Manifest/checkpoint corruption | Refuse resume and name the corrupt file; never regenerate provenance from guesses. |
+| Manifest/checkpoint corruption | `runAgent` refuses recovery and names the corrupt file; never regenerate provenance from guesses. |
 
 ## 17. Migration and cutover
 
@@ -1056,9 +1093,10 @@ V3 is not complete until all of these are direct current evidence:
 5. **Cancellation:** cancel during a browser child and during Bash; no process,
    page, lock, or partial unmanifested workspace file survives unnoticed; a
    second task in the same TUI session works.
-6. **Crash/resume:** a real second process kills a run at model, pre-tool,
-   uncertain-tool, post-tool, and verifying boundaries; recovery follows the
-   declared semantics and never duplicates an uncertain effect.
+6. **Crash recovery:** a real second process kills `runAgent` at model,
+   pre-tool, uncertain-tool, post-tool, and verifying boundaries; reinvoking
+   the lifecycle on the same run directory follows the declared semantics and
+   never duplicates an uncertain effect.
 7. **Provider contract:** attached local, managed local, and Browserbase fakes
    satisfy the same command-session, download/upload, diagnostics redaction,
    cleanup, and idempotent-close behavior.

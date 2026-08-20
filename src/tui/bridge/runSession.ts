@@ -40,7 +40,6 @@ import type { RunTracing } from '../../tracing/runTracing.js';
 import { createTuiTracing } from './tuiTracing.js';
 import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { UiEvent } from '../store/state.js';
-import type { UnresolvedRequirement } from '../../run/runOutcome.js';
 
 /**
  * Recognize failures that make a session controller unsafe to reuse.
@@ -63,15 +62,7 @@ export function isBrowserDeathMessage(message: string): boolean {
  * `incomplete` is an early stop with the run preserved, kept distinct from
  * `failed` (a runtime crash outside the harness's own accounting). */
 export type RunOutcome =
-  | { status: 'verified'; finalText: string; runDir: string }
-  | {
-      status: 'incomplete';
-      reason: string;
-      detail?: string;
-      finalText: string;
-      unresolved: readonly UnresolvedRequirement[];
-      runDir: string;
-    }
+  | { status: 'verified' | 'incomplete'; runDir: string }
   | { status: 'cancelled' }
   | { status: 'failed'; message: string };
 
@@ -91,9 +82,6 @@ export interface RunSessionDeps {
   /** Receives the run's ordered UiEvent stream. */
   onEvent: (event: UiEvent) => void;
   runsBaseDir?: string;
-  model?: string;
-  maxTurns?: number;
-  maxContextTokens?: number;
   /** Whether the browser carries logged-in authority. */
   authenticated?: boolean;
   /** Explicit capability decision for authenticated browser sessions. */
@@ -161,10 +149,6 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
           usage: {
             input: event.usage.input_tokens,
             output: event.usage.output_tokens,
-            ...(event.usage.cache_read_input_tokens === null ||
-            event.usage.cache_read_input_tokens === undefined
-              ? {}
-              : { cacheRead: event.usage.cache_read_input_tokens }),
           },
         });
         break;
@@ -232,9 +216,6 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         tracing,
         ...(deps.harness === undefined ? {} : { harness: deps.harness }),
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
-        ...(deps.model === undefined ? {} : { model: deps.model }),
-        ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
-        ...(deps.maxContextTokens === undefined ? {} : { maxContextTokens: deps.maxContextTokens }),
         ...(deps.authenticated === undefined ? {} : { authenticated: deps.authenticated }),
         ...(deps.javascriptPolicy === undefined ? {} : { javascriptPolicy: deps.javascriptPolicy }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
@@ -248,42 +229,15 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         // running.
         signal,
       });
-      switch (result.status) {
-        case 'verified': {
-          emit({
-            type: 'run_finished',
-            outcome: result.status,
-            finalText: result.finalText,
-            runDir: result.runDir,
-            at: now(),
-          });
-          return {
-            status: result.status,
-            finalText: result.finalText,
-            runDir: result.runDir,
-          } as const;
-        }
-        case 'incomplete': {
-          emit({
-            type: 'run_finished',
-            outcome: 'incomplete',
-            reason: result.reason,
-            detail: result.detail,
-            finalText: result.finalText,
-            unresolved: result.unresolved,
-            runDir: result.runDir,
-            at: now(),
-          });
-          return {
-            status: 'incomplete',
-            reason: result.reason,
-            detail: result.detail,
-            finalText: result.finalText,
-            unresolved: result.unresolved,
-            runDir: result.runDir,
-          } as const;
-        }
-      }
+      emit({
+        type: 'run_finished',
+        outcome: result.status,
+        finalText: result.finalText,
+        ...(result.status === 'incomplete' ? { unresolved: result.unresolved } : {}),
+        runDir: result.runDir,
+        at: now(),
+      });
+      return { status: result.status, runDir: result.runDir };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (signal.aborted && !isBrowserDeathMessage(message)) {

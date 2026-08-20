@@ -5,7 +5,7 @@ import {
   AttachedChromeSetupBrowserSessionProvider,
 } from '../../src/browser/attachedChromeSetup.js';
 import { BrowserbaseBrowserSessionProvider } from '../../src/browser/browserbaseBrowserSessionProvider.js';
-import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/localChromeSessionProvider.js';
 import {
   BROWSER_PROVIDER_ENV_VAR,
   BROWSERBASE_CONTEXT_ENV_VAR,
@@ -101,19 +101,18 @@ describe('createBrowserSessionProvider', () => {
       env: { [ATTACHED_CHROME_ENDPOINT_ENV_VAR]: 'http://127.0.0.1:9222' },
       localMode: 'attached',
       profileDir: PROFILE_DIR,
-      onAttachedSetupState: () => undefined,
     });
     expect(provider).toBeInstanceOf(AttachedChromeSetupBrowserSessionProvider);
   });
 
-  it('requires a visible setup callback for attached local mode', () => {
+  it('does not attach while composing interactive local mode', () => {
     expect(() =>
       createBrowserSessionProvider({
         env: {},
         localMode: 'attached',
         profileDir: PROFILE_DIR,
       }),
-    ).toThrow(/onAttachedSetupState/);
+    ).not.toThrow();
   });
 
   it('fails closed for an unknown local mode before selecting a provider', () => {
@@ -157,17 +156,6 @@ describe('createBrowserSessionProvider', () => {
         profileDir: PROFILE_DIR,
       }),
     ).toThrow(/BROWSERBASE_API_KEY/);
-  });
-
-  it("throws when context: 'required' and no BROWSERBASE_CONTEXT_ID is set", () => {
-    expect(() =>
-      createBrowserSessionProvider({
-        env: { [BROWSER_PROVIDER_ENV_VAR]: 'browserbase', BROWSERBASE_API_KEY: 'sk-test' },
-        localMode: 'managed',
-        profileDir: PROFILE_DIR,
-        context: 'required',
-      }),
-    ).toThrow(/npm run login/);
   });
 
   it("succeeds when context: 'optional' and no context id is set", () => {

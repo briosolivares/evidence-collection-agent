@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
+import { decodeUtf8 } from '../../utf8.js';
 import { detectContentFormat, splitLines } from '../contentReader.js';
 import type { ToolDef } from '../registry.js';
-import { accessKey } from '../registry.js';
 import { assertNotAborted, readRegularFileNoFollow, resolveWorkerFile } from '../fileAccess.js';
 
 const LINE_NUMBER_PAD = 6;
@@ -32,10 +32,6 @@ export const readFileTool: ToolDef<ReadFileInput> = {
     'content; use offset and limit for a window. Run metadata and harness-private files are ' +
     'never readable. Binary files and files over 64 MiB are refused.',
   inputSchema: readFileInputSchema,
-  getAccess: (input) => ({
-    reads: [accessKey.file(input.file_path)],
-    writes: [],
-  }),
   execute(input, ctx) {
     assertNotAborted(ctx.abortSignal, 'read_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'read');
@@ -71,9 +67,9 @@ function decodeReadableUtf8(bytes: Buffer, filePath: string): string {
     );
   }
 
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-  } catch {
+  const content = decodeUtf8(bytes);
+  if (content === undefined) {
     throw new Error(`${filePath} is not valid UTF-8 text. read_file reads text files only.`);
   }
+  return content;
 }

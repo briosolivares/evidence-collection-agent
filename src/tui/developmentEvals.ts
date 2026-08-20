@@ -4,11 +4,7 @@
 
 import type { TuiEvalRuntimeDeps } from './bridge/evalRuntime.js';
 import { createTuiEvalRuntime } from './bridge/evalRuntime.js';
-import {
-  discoverEvalTasks,
-  startEvalBatch,
-  type EvalRunner,
-} from './bridge/evalSession.js';
+import { discoverEvalTasks, startEvalBatch, type EvalRunner } from './bridge/evalSession.js';
 import type { EvalsFeature } from './bridge/evalsFeature.js';
 import { EvalsLiveRegion } from './components/EvalsLiveRegion.js';
 import { EvalsMenu } from './components/EvalsMenu.js';
@@ -47,9 +43,7 @@ export interface DevelopmentEvals {
 }
 
 /** Create the complete checkout-only eval runtime and UI adapter. */
-export function createDevelopmentEvals(
-  options: DevelopmentEvalsOptions,
-): DevelopmentEvals {
+export function createDevelopmentEvals(options: DevelopmentEvalsOptions): DevelopmentEvals {
   const { evalsDir, resultsDir, ...runtimeOptions } = options;
   const runtime = createTuiEvalRuntime(runtimeOptions);
   return {

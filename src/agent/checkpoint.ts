@@ -1,21 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import {
-  chmodSync,
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  mkdirSync,
-  openSync,
-  readFileSync,
-  readSync,
-  unlinkSync,
-} from 'node:fs';
+import { chmodSync, lstatSync, mkdirSync, readFileSync, unlinkSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
 
 import { z } from 'zod';
 
+import { errorMessage } from '../errors.js';
 import { writeFileDurablyAtomic } from '../run/atomicFile.js';
+import { NoFollowFileError, readFileNoFollow } from '../run/noFollowFile.js';
 import {
   canonicalJson,
   checkpointSchema,
@@ -44,7 +35,6 @@ export const RUN_LOCK_RECOVERY_FILENAME = 'run.lock.recovery';
 
 const HARNESS_DIR_MODE = 0o700;
 const HARNESS_FILE_MODE = 0o600;
-const CHECKPOINT_READ_CHUNK_BYTES = 64 * 1024;
 
 export type SerializedCeiling = number | typeof UNBOUNDED_CEILING;
 
@@ -58,24 +48,6 @@ export function ceilingToCheckpoint(value: number): SerializedCeiling {
 
 export function ceilingFromCheckpoint(value: SerializedCeiling): number {
   return value === UNBOUNDED_CEILING ? Infinity : value;
-}
-
-type DeepReadonly<T> = T extends readonly (infer Child)[]
-  ? readonly DeepReadonly<Child>[]
-  : T extends object
-    ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
-    : T;
-
-/** Detached, recursively frozen configuration observed before resume opens
- * the mutating checkpoint store. The coordinator still re-reads and
- * revalidates the complete checkpoint after acquiring the run lock. */
-export type ReadonlyDurableRunConfiguration = DeepReadonly<DurableRunConfiguration>;
-
-/** Minimal, immutable composition-time view used to route a resume
- * without exposing or mutating the checkpoint's actionable cargo. */
-export interface CheckpointResumeInfo {
-  readonly phase: CheckpointPhase;
-  readonly configuration: ReadonlyDurableRunConfiguration;
 }
 
 const VALID_PHASE_TRANSITIONS: Readonly<Record<CheckpointPhase, readonly CheckpointPhase[]>> = {
@@ -101,38 +73,6 @@ export interface CheckpointStore {
   load(): Checkpoint | undefined;
   save(checkpoint: Checkpoint): Promise<void>;
   close(): Promise<void>;
-}
-
-/**
- * Observe the immutable configuration of an existing run without taking
- * its lock or changing any run-directory state. This is deliberately only a
- * composition-time hint: resume must still open the checkpoint store and
- * revalidate the checkpoint under its exclusive lock before doing work.
- *
- * The complete checkpoint is read through the same schema as the store, with
- * a finite byte ceiling and no-follow regular-file checks. The returned value
- * is detached from the parsed checkpoint and recursively frozen.
- */
-export function readCheckpointConfiguration(runDir: string): ReadonlyDurableRunConfiguration {
-  return readCheckpointResumeInfo(runDir).configuration;
-}
-
-/** Observe the checkpoint phase together with its immutable configuration.
- * Terminal resumes use this hint to avoid constructing a new external trace;
- * the coordinator still re-reads and validates the full checkpoint under its
- * exclusive run lock before trusting either value. */
-export function readCheckpointResumeInfo(runDir: string): Readonly<CheckpointResumeInfo> {
-  assertRealRunDirectory(runDir);
-  const harnessDir = existingHarnessDirectory(runDir);
-  const checkpointPath = join(harnessDir, RUN_CHECKPOINT_FILENAME);
-  const checkpoint = readCheckpointFile(checkpointPath);
-  if (checkpoint === undefined) {
-    throw new Error(`checkpoint does not exist at ${checkpointPath}`);
-  }
-  return Object.freeze({
-    phase: checkpoint.phase,
-    configuration: deepFreeze(checkpoint.configuration),
-  });
 }
 
 /**
@@ -266,29 +206,6 @@ function assertRealRunDirectory(runDir: string): void {
   if (!runStats.isDirectory() || runStats.isSymbolicLink()) {
     throw new Error(`checkpoint runDir must be a real directory: ${runDir}`);
   }
-}
-
-function existingHarnessDirectory(runDir: string): string {
-  const harnessDir = join(runDir, HARNESS_DIR);
-  let stats: ReturnType<typeof lstatSync>;
-  try {
-    stats = lstatSync(harnessDir);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      throw new Error(`checkpoint harness directory does not exist: ${harnessDir}`);
-    }
-    throw error;
-  }
-  if (!stats.isDirectory() || stats.isSymbolicLink()) {
-    throw new Error(`${harnessDir} must be a real directory`);
-  }
-  const mode = stats.mode & 0o777;
-  if (mode !== HARNESS_DIR_MODE) {
-    throw new Error(
-      `${harnessDir} has mode 0${mode.toString(8)}, expected 0${HARNESS_DIR_MODE.toString(8)}`,
-    );
-  }
-  return harnessDir;
 }
 
 function ensureHarnessDirectory(runDir: string): string {
@@ -500,58 +417,33 @@ function readCheckpointText(path: string): string | undefined {
     throw new Error(`checkpoint at ${path} must be a regular file; symlinks are not followed`);
   }
 
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  let descriptor: number;
   try {
-    descriptor = openSync(path, flags);
+    return readFileNoFollow(path, {
+      expectedMode: HARNESS_FILE_MODE,
+      maxBytes: CHECKPOINT_MAX_BYTES,
+      stableSize: true,
+    }).toString('utf8');
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
-    throw error;
-  }
-
-  try {
-    const opened = fstatSync(descriptor);
-    if (!opened.isFile()) {
+    if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
+      throw new Error(`checkpoint at ${path} must be a regular file; symlinks are not followed`);
+    }
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
       throw new Error(`checkpoint at ${path} must be a regular file`);
     }
-    const mode = opened.mode & 0o777;
-    if (mode !== HARNESS_FILE_MODE) {
+    if (error instanceof NoFollowFileError && error.kind === 'mode_mismatch') {
       throw new Error(
-        `checkpoint at ${path} has mode 0${mode.toString(8)}, ` +
-          `expected 0${HARNESS_FILE_MODE.toString(8)}`,
+        `checkpoint at ${path} has mode 0${error.actualMode!.toString(8)}, ` +
+          `expected 0${error.expectedMode!.toString(8)}`,
       );
     }
-    if (opened.size > CHECKPOINT_MAX_BYTES) {
-      throw checkpointSizeLimitError(path, opened.size);
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      throw checkpointSizeLimitError(path, error.observedBytes!);
     }
-
-    const bytes = Buffer.allocUnsafe(opened.size);
-    let total = 0;
-    while (total < bytes.byteLength) {
-      const count = readSync(
-        descriptor,
-        bytes,
-        total,
-        Math.min(CHECKPOINT_READ_CHUNK_BYTES, bytes.byteLength - total),
-        null,
-      );
-      if (count === 0) break;
-      total += count;
-    }
-
-    const overflowProbe = Buffer.allocUnsafe(1);
-    const overflow = readSync(descriptor, overflowProbe, 0, 1, null);
-    const after = fstatSync(descriptor);
-    if (after.size > CHECKPOINT_MAX_BYTES) {
-      throw checkpointSizeLimitError(path, Math.max(after.size, total + overflow));
-    }
-    if (overflow !== 0 || total !== opened.size || after.size !== opened.size) {
+    if (error instanceof NoFollowFileError && error.kind === 'changed') {
       throw new Error(`checkpoint at ${path} changed while it was being read`);
     }
-    return bytes.toString('utf8');
-  } finally {
-    closeSync(descriptor);
+    throw error;
   }
 }
 
@@ -566,7 +458,7 @@ function parseJson(raw: string, label: string): unknown {
   try {
     return JSON.parse(raw);
   } catch (error) {
-    throw new Error(`${label} is not valid JSON: ${(error as Error).message}`);
+    throw new Error(`${label} is not valid JSON: ${errorMessage(error)}`);
   }
 }
 
@@ -583,18 +475,6 @@ class LockOwnershipError extends Error {}
 
 function isLockOwnershipError(error: unknown): boolean {
   return error instanceof LockOwnershipError;
-}
-
-function deepFreeze<T>(value: T): DeepReadonly<T> {
-  if (value !== null && typeof value === 'object') {
-    for (const child of Object.values(value)) deepFreeze(child);
-    Object.freeze(value);
-  }
-  return value as DeepReadonly<T>;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 function formatZodIssues(error: z.ZodError): string {

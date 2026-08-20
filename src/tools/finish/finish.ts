@@ -43,23 +43,8 @@ export const finishInputSchema = z.strictObject({
 
 export type FinishInput = z.infer<typeof finishInputSchema>;
 
-/**
- * Read compatibility for checkpoints written before requested outputs became
- * manifest-derived. This schema is never exposed to the model-facing API.
- */
-export const legacyFinishInputSchema = z.strictObject({
-  summary: finishInputSchema.shape.summary,
-  artifacts: z.array(nonBlankString(1_024, 'Legacy artifact path')).max(100).optional(),
-  limitations: z.array(nonBlankString(2_000, 'Legacy limitation')).max(100).optional(),
-});
-
-/** Read old checkpoint cargo, but expose and rewrite only the current shape. */
-export const durableFinishInputSchema = z
-  .union([finishInputSchema, legacyFinishInputSchema])
-  .transform(
-    (finish): FinishInput =>
-      'unresolved' in finish ? finish : { summary: finish.summary, unresolved: [] },
-  );
+/** The finish shape embedded in durable checkpoints. */
+export const durableFinishInputSchema = finishInputSchema;
 
 /**
  * Model-facing definition for the exclusive completion control call.
@@ -78,7 +63,6 @@ export const finishTool: ToolDef<FinishInput> = {
     'finish must be the only tool call in its assistant response; it requests review and cannot ' +
     'declare success by itself.',
   inputSchema: finishInputSchema,
-  getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   execute() {
     throw new Error(
       'finish is a control call that must be intercepted by the worker loop; it cannot execute as an ordinary tool.',

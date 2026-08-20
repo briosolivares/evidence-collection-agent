@@ -1,15 +1,9 @@
-import {
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  mkdirSync,
-  openSync,
-} from 'node:fs';
+import { lstatSync, mkdirSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
+import { safeBrowserErrorMessage } from '../../browser/capabilityRedaction.js';
 import type {
   BrowserDialog,
   BrowserCommandSession,
@@ -18,6 +12,7 @@ import type {
 } from '../../browser/controller.js';
 import type { BrowserJavaScriptPolicy } from '../../browser/browserJavaScript.js';
 import { SCRATCH_DIR } from '../../run/artifacts.js';
+import { inspectPathNoFollow, NoFollowFileError } from '../../run/noFollowFile.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import {
   syncScratchWorkspace,
@@ -143,20 +138,17 @@ export function createBrowserExecuteTool(
       "list's start offset), or from a rendered marker that names it (like an inline " +
       'citation superscript) — an index into your own query results is not a displayed ' +
       'number. ' +
-      'browser.upload targets a backend DOM node and a path relative to scratch/workspace. ' +
+      'browser.upload supports `await browser.upload(backendDOMNodeId, "file.csv")` for an ' +
+      'exact known node and `await browser.upload("file.csv", { selector: ' +
+      '`input[type="file"]`, frameUrlIncludes: "/picker" })` to resolve exactly one file ' +
+      'input across page frames; frameUrlIncludes is optional and should narrow ambiguous ' +
+      'dialogs, never be hardcoded to one site. Paths are relative to scratch/workspace. ' +
       'Use page_id to target a page returned by a prior result; omit it for the active task ' +
       'page. Intermediate files belong in the current scratch/workspace directory and are ' +
       'reconciled into changed_files. The child ' +
       'receives no CDP URL or provider/model/tracing secret. This is powerful local code, not ' +
       'a security sandbox, and the call always runs alone.',
     inputSchema: browserExecuteInputSchema,
-    // A denied call touches no resource. Declaring that truthfully keeps the
-    // generic abandoned-effect gate from replacing the policy refusal with a
-    // resource_busy result before execute gets a chance to reject it.
-    getAccess: () =>
-      javascriptPolicy === 'deny'
-        ? { reads: [], writes: [] }
-        : { reads: [], writes: [], exclusive: true },
     timeoutMs: BROWSER_EXECUTE_TOOL_TIMEOUT_MS,
     execute: (input, ctx) => {
       // This is the complete browser-program authority boundary. Refuse
@@ -219,9 +211,9 @@ async function executeBrowserProgram(
       },
       sendCdp: (method, params) => commandSession!.send(method, params),
       navigate: (url, options) => commandSession!.navigate(url, options),
-      upload: async (backendDOMNodeId, workspacePath) => {
+      upload: async (target, workspacePath) => {
         const absolutePath = resolveWorkspaceUploadPath(workspaceDir, workspacePath);
-        await commandSession!.upload(backendDOMNodeId, absolutePath);
+        await commandSession!.upload(target, absolutePath);
       },
     });
   } catch (error) {
@@ -327,27 +319,19 @@ function resolveWorkspaceUploadPath(workspaceDir: string, workspacePath: string)
     }
   }
 
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  let fd: number;
   try {
-    fd = openSync(absolutePath, flags);
+    inspectPathNoFollow(absolutePath, { maxBytes: BROWSER_UPLOAD_MAX_FILE_BYTES });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
       throw new Error('browser.upload path must not contain symbolic links');
     }
-    throw error;
-  }
-  try {
-    const stats = fstatSync(fd);
-    if (!stats.isFile()) {
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
       throw new Error('browser.upload path must name a regular file');
     }
-    if (stats.size > BROWSER_UPLOAD_MAX_FILE_BYTES) {
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
       throw new Error(`browser.upload file exceeds ${BROWSER_UPLOAD_MAX_FILE_BYTES} bytes`);
     }
-  } finally {
-    closeSync(fd);
+    throw error;
   }
   return absolutePath;
 }
@@ -398,32 +382,32 @@ async function cleanupAfterBrowserProgram(
     try {
       await commandSession.close();
     } catch (error) {
-      errors.push(`command-session close failed: ${safeMessage(error)}`);
+      errors.push(`command-session close failed: ${safeBrowserErrorMessage(error)}`);
     }
   }
 
   try {
     changedFiles = syncScratchWorkspace(runDir);
   } catch (error) {
-    errors.push(`workspace sync failed: ${safeMessage(error)}`);
+    errors.push(`workspace sync failed: ${safeBrowserErrorMessage(error)}`);
   }
 
   try {
     await browser.refreshAfterExternalCommands();
   } catch (error) {
-    errors.push(`browser refresh failed: ${safeMessage(error)}`);
+    errors.push(`browser refresh failed: ${safeBrowserErrorMessage(error)}`);
   }
 
   try {
     pages = await browser.pages();
   } catch (error) {
-    errors.push(`browser page listing failed: ${safeMessage(error)}`);
+    errors.push(`browser page listing failed: ${safeBrowserErrorMessage(error)}`);
   }
 
   try {
     pendingDialogs = browser.listPendingDialogs();
   } catch (error) {
-    errors.push(`browser dialog listing failed: ${safeMessage(error)}`);
+    errors.push(`browser dialog listing failed: ${safeBrowserErrorMessage(error)}`);
   }
 
   return { changedFiles, pages, pendingDialogs, errors };
@@ -436,15 +420,5 @@ function combinedFailure(
 ): Error {
   const cleanup =
     cleanupErrors.length > 0 ? ` (cleanup also failed: ${cleanupErrors.join('; ')})` : '';
-  return new Error(`${prefix}: ${safeMessage(primary)}${cleanup}`);
-}
-
-function safeMessage(error: unknown): string {
-  const raw = error instanceof Error ? error.message : String(error);
-  return raw
-    .replace(/\bwss?:\/\/[^\s)'"\]]+/giu, '[REDACTED_WEBSOCKET_URL]')
-    .replace(
-      /\bhttps?:\/\/[^\s)'"\]]*(?:\/devtools\/(?:browser|page)|browserbase|\/json\/version)[^\s)'"\]]*/giu,
-      '[REDACTED_CDP_URL]',
-    );
+  return new Error(`${prefix}: ${safeBrowserErrorMessage(primary)}${cleanup}`);
 }

@@ -60,6 +60,7 @@ const STRUCTURAL_FINDING: FinishDefect = {
 const SURFACED_ARTIFACT: SurfacedArtifact = {
   filename: 'artifacts/report.csv',
   sha256: 'a'.repeat(64),
+  publicationKind: 'file',
   roles: ['requested_output'],
   capturedAt: '2026-08-18T00:00:00.000Z',
   sourceUrl: 'https://example.test/source',
@@ -182,7 +183,7 @@ describe('renderFindingsReport', () => {
     const rendered = renderFindingsReport(minimalInput({ surfacedArtifacts: [SURFACED_ARTIFACT] }));
     expect(rendered).toContain('## Surfaced artifacts (1)');
     expect(rendered).toContain(
-      `| ${SURFACED_ARTIFACT.filename} | ${SURFACED_ARTIFACT.sha256} | requested_output | ` +
+      `| ${SURFACED_ARTIFACT.filename} | ${SURFACED_ARTIFACT.sha256} | file | requested_output | ` +
         `${SURFACED_ARTIFACT.capturedAt} | ${SURFACED_ARTIFACT.sourceUrl} |  |`,
     );
   });

@@ -1,22 +1,23 @@
-import {
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  openSync,
-  readSync,
-} from 'node:fs';
+import { lstatSync } from 'node:fs';
 import { extname, join, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
+import { errorMessage, isAbortError } from '../../errors.js';
+import { decodeUtf8 } from '../../utf8.js';
 import { detectContentFormat, splitLines } from '../../tools/contentReader.js';
 import type { ImageBlock, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
+import {
+  imageBlockFromBytes,
+  imageDimensions,
+  MODEL_MAX_IMAGE_BYTES,
+  MODEL_MAX_IMAGE_DIMENSION_PX,
+} from '../../model/imageContent.js';
 import { ARTIFACTS_DIR } from '../../run/artifacts.js';
+import { NoFollowFileError, readFileChunksNoFollow } from '../../run/noFollowFile.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { executeToolCall, type ToolCallResult } from '../../tools/pipeline.js';
 import {
-  accessKey,
   createRegistry,
   type ToolCtx,
   type ToolDef,
@@ -28,9 +29,9 @@ export const VERIFIER_MAX_GREP_BYTES = 64 * 1024 * 1024;
 export const VERIFIER_MAX_RESULT_BYTES = 48 * 1024;
 export const VERIFIER_MAX_FILES = 512;
 /** 3.75MB of raw bytes stays within the API's ~5MB encoded-image limit. */
-export const VERIFIER_MAX_IMAGE_BYTES = 3_750_000;
+export const VERIFIER_MAX_IMAGE_BYTES = MODEL_MAX_IMAGE_BYTES;
 /** The API rejects an image with either dimension above 8,000 pixels. */
-export const VERIFIER_MAX_IMAGE_DIMENSION_PX = 8_000;
+export const VERIFIER_MAX_IMAGE_DIMENSION_PX = MODEL_MAX_IMAGE_DIMENSION_PX;
 
 const LINE_NUMBER_PAD = 6;
 const READ_DEFAULT_LINES = 400;
@@ -85,10 +86,6 @@ function createReadFileTool(policy: VerifierPathPolicy): ToolDef<ReadInput> {
       'artifacts are returned as images. Only requested-output/evidence files are visible; use ' +
       'offset/limit for large text files.',
     inputSchema: verifierReadFileInputSchema,
-    getAccess: (input) => ({
-      reads: [accessKey.file(input.file_path)],
-      writes: [],
-    }),
     // Results are bounded in memory below. Infinity prevents the generic
     // pipeline from offloading and thereby mutating the run during verification.
     maxBytes: Number.MAX_SAFE_INTEGER,
@@ -131,10 +128,6 @@ function createGrepTool(policy: VerifierPathPolicy): ToolDef<GrepInput> {
       'Defaults to artifacts/. This is deliberately literal rather than regex so untrusted ' +
       'file content cannot trigger unbounded regular-expression work.',
     inputSchema: verifierGrepInputSchema,
-    getAccess: (input) => ({
-      reads: [accessKey.file(input.path ?? ARTIFACTS_DIR)],
-      writes: [],
-    }),
     maxBytes: Number.MAX_SAFE_INTEGER,
     async execute(input, ctx) {
       throwIfAborted(ctx.abortSignal);
@@ -309,60 +302,9 @@ function verifierImageResultFromBytes(
         type: 'text',
         text: `${relativePath} (${mediaType}, ${bytes.byteLength} bytes):`,
       },
-      {
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: mediaType,
-          data: bytes.toString('base64'),
-        },
-      },
+      imageBlockFromBytes(bytes, mediaType),
     ],
   };
-}
-
-const PNG_SIGNATURE = Buffer.from('89504e470d0a1a0a', 'hex');
-
-/** Read bounded PNG/JPEG dimensions without an image-processing dependency. */
-function imageDimensions(
-  bytes: Buffer,
-  mediaType: ImageBlock['source']['media_type'],
-): { width: number; height: number } | undefined {
-  return mediaType === 'image/png' ? pngDimensions(bytes) : jpegDimensions(bytes);
-}
-
-function pngDimensions(bytes: Buffer): { width: number; height: number } | undefined {
-  if (
-    bytes.length < 24 ||
-    !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE) ||
-    bytes.toString('latin1', 12, 16) !== 'IHDR'
-  ) {
-    return undefined;
-  }
-  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
-}
-
-function jpegDimensions(bytes: Buffer): { width: number; height: number } | undefined {
-  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
-    return undefined;
-  }
-  let offset = 2;
-  while (offset + 9 <= bytes.length) {
-    if (bytes[offset] !== 0xff) return undefined;
-    const marker = bytes[offset + 1]!;
-    if (marker >= 0xd0 && marker <= 0xd8) {
-      offset += 2;
-      continue;
-    }
-    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
-      return {
-        height: bytes.readUInt16BE(offset + 5),
-        width: bytes.readUInt16BE(offset + 7),
-      };
-    }
-    offset += 2 + bytes.readUInt16BE(offset + 2);
-  }
-  return undefined;
 }
 
 interface PublishedPath {
@@ -448,36 +390,42 @@ async function readRegularFileNoFollow(
   maximumBytes: number,
   signal?: AbortSignal,
 ): Promise<Buffer> {
-  throwIfAborted(signal);
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  const fd = openSync(absolutePath, flags);
   try {
-    const stat = fstatSync(fd);
-    if (!stat.isFile()) throw new Error(`${givenPath} is not a regular file`);
-    if (stat.size > maximumBytes) {
-      throw new Error(
-        `${givenPath} is ${stat.size} bytes, above the ${maximumBytes}-byte verifier limit`,
-      );
-    }
     const chunks: Buffer[] = [];
     let total = 0;
-    for (;;) {
-      throwIfAborted(signal);
-      const chunk = Buffer.allocUnsafe(Math.min(64 * 1024, maximumBytes - total + 1));
-      const count = readSync(fd, chunk, 0, chunk.length, null);
-      if (count === 0) break;
-      total += count;
-      if (total > maximumBytes) {
-        throw new Error(`${givenPath} grew above the ${maximumBytes}-byte verifier limit`);
+    let bytesSinceYield = 0;
+    for (const chunk of readFileChunksNoFollow(absolutePath, {
+      checkActive: () => throwIfAborted(signal),
+      chunkBytes: 64 * 1024,
+      maxBytes: maximumBytes,
+    })) {
+      chunks.push(chunk);
+      total += chunk.length;
+      bytesSinceYield += chunk.length;
+      if (bytesSinceYield >= 1024 * 1024) {
+        await yieldToEventLoop();
+        bytesSinceYield = 0;
       }
-      chunks.push(chunk.subarray(0, count));
-      if (total % (1024 * 1024) < chunk.length) await yieldToEventLoop();
     }
     throwIfAborted(signal);
     return Buffer.concat(chunks, total);
-  } finally {
-    closeSync(fd);
+  } catch (error) {
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
+      throw new Error(`${givenPath} is not a regular file`);
+    }
+    if (
+      error instanceof NoFollowFileError &&
+      error.kind === 'max_bytes' &&
+      error.phase === 'inspection'
+    ) {
+      throw new Error(
+        `${givenPath} is ${error.observedBytes} bytes, above the ${maximumBytes}-byte verifier limit`,
+      );
+    }
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      throw new Error(`${givenPath} grew above the ${maximumBytes}-byte verifier limit`);
+    }
+    throw error;
   }
 }
 
@@ -496,11 +444,7 @@ function tryDecodeText(bytes: Buffer, filename: string): string | undefined {
   if (format === 'pdf' || format === 'spreadsheet' || format === 'image') {
     return undefined;
   }
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-  } catch {
-    return undefined;
-  }
+  return decodeUtf8(bytes);
 }
 
 function boundText(content: string, suffix = ''): string {
@@ -543,14 +487,6 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
 
 function throwIfAborted(signal: AbortSignal | undefined): void {
   signal?.throwIfAborted();
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 function yieldToEventLoop(): Promise<void> {

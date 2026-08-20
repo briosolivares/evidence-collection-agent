@@ -74,13 +74,7 @@ describe('mid-stream failure', () => {
       createStream: () => dyingStream(),
     });
     const outcome = await handle.done;
-    expect(outcome).toMatchObject({
-      status: 'incomplete',
-      reason: 'worker_incomplete',
-      detail: 'socket hang up',
-      finalText: 'The assistant stopped before it could prepare a final response.',
-      unresolved: [],
-    });
+    expect(outcome).toMatchObject({ status: 'incomplete' });
 
     // Fold the emitted events through the reducer: the involuntary stop gets
     // a deterministic human-facing response and the composer comes back.
@@ -163,7 +157,6 @@ describe('browser relaunch on next submit', () => {
       browserSessionProvider: { createSession },
       startRunFn,
     });
-    await runtime.start();
 
     const first = runtime.startRun('cancel during cleanup', () => {});
     await firstStarted;
@@ -216,7 +209,6 @@ describe('browser relaunch on next submit', () => {
       browserSessionProvider: { createSession },
       startRunFn,
     });
-    await runtime.start();
     expect(createSession).toHaveBeenCalledTimes(0);
 
     const first = await runtime.startRun('dies', () => {}).done;
@@ -242,7 +234,6 @@ describe('browser relaunch on next submit', () => {
       browserSessionProvider: { createSession },
       startRunFn,
     });
-    await runtime.start();
     await runtime.startRun('a', () => {}).done;
     await runtime.startRun('b', () => {}).done;
     expect(createSession).toHaveBeenCalledTimes(1);
@@ -269,7 +260,6 @@ describe('browser relaunch on next submit', () => {
       startRunFn,
       now: () => 7,
     });
-    await runtime.start();
     await runtime.startRun('dies', () => {}).done;
 
     const events: UiEvent[] = [];

@@ -19,6 +19,7 @@ import type {
   BrowserProviderKind,
   BrowserSessionProvider,
 } from '../../src/browser/sessionProvider.js';
+import { errorMessage } from '../../src/errors.js';
 
 const TEMP_PROFILE_PREFIX = 'evidence-agent-eval-chrome-';
 
@@ -491,8 +492,4 @@ async function defaultListTempProfiles(root: string): Promise<string[]> {
   return entries
     .filter((entry) => entry.isDirectory() && entry.name.startsWith(TEMP_PROFILE_PREFIX))
     .map((entry) => join(root, entry.name));
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

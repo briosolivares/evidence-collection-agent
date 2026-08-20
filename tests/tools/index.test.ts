@@ -9,6 +9,7 @@ import {
 
 const exactOrder = [
   'browser_execute',
+  'capture_screenshot',
   'publish_artifact',
   'read_file',
   'write_file',
@@ -44,6 +45,7 @@ describe('tool registry', () => {
     expect(first.get('browser_execute')).not.toBe(second.get('browser_execute'));
     expect(first.get('bash')).not.toBe(second.get('bash'));
     for (const staticName of [
+      'capture_screenshot',
       'publish_artifact',
       'read_file',
       'write_file',

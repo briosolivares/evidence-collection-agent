@@ -223,7 +223,7 @@ describe('browser_execute real-browser journey', () => {
   );
 
   it(
-    'uploads a confined workspace file to an accessibility backend node and removes its marker',
+    'uploads a confined workspace file by backend node and by a unique iframe selector',
     async () => {
       const workspace = join(suite.runDir(), 'scratch/workspace');
       mkdirSync(workspace, { recursive: true });
@@ -233,6 +233,7 @@ describe('browser_execute real-browser journey', () => {
         `export const uploadPath = 'evidence.csv';\n`,
       );
       const actionsUrl = suite.server().url('/actions.html');
+      const framesUrl = suite.server().url('/frames.html');
       const code = `
         const helper = await browser.importModule('./upload-helper.mjs');
         await browser.goto(${JSON.stringify(actionsUrl)});
@@ -251,7 +252,7 @@ describe('browser_execute real-browser journey', () => {
           throw new Error('file input backend node was absent');
         }
         await browser.upload(input.backendDOMNodeId, helper.uploadPath);
-        return browser.js(\`(async () => {
+        const backendUpload = await browser.js(\`(async () => {
           const element = document.querySelector('#attachment-input');
           const file = element?.files?.[0];
           return {
@@ -261,6 +262,26 @@ describe('browser_execute real-browser journey', () => {
             markerCount: document.querySelectorAll('[data-sherlock-backend-target]').length
           };
         })()\`);
+
+        await browser.goto(${JSON.stringify(framesUrl)});
+        if (!(await browser.waitForLoad({ timeoutMs: 5000, pollIntervalMs: 25 }))) {
+          throw new Error('iframe upload fixture did not finish loading');
+        }
+        await browser.upload(helper.uploadPath, {
+          selector: '#frame-attachment-input',
+          frameUrlIncludes: '/second.html'
+        });
+        const frameUpload = await browser.js(\`(async () => {
+          const documentInFrame = document.querySelector('iframe')?.contentDocument;
+          const element = documentInFrame?.querySelector('#frame-attachment-input');
+          const file = element?.files?.[0];
+          return {
+            name: file?.name ?? null,
+            text: file ? await file.text() : null,
+            visible: documentInFrame?.querySelector('#frame-attachment')?.textContent ?? null
+          };
+        })()\`);
+        return { backendUpload, frameUpload };
       `;
       const tool = createBrowserExecuteTool({
         javascriptPolicy: 'allow',
@@ -277,10 +298,17 @@ describe('browser_execute real-browser journey', () => {
       expect(parsed).toMatchObject({
         status: 'exited',
         value: {
-          name: 'evidence.csv',
-          text: 'name\nAda Lovelace\n',
-          visible: 'Attachment: evidence.csv',
-          markerCount: 0,
+          backendUpload: {
+            name: 'evidence.csv',
+            text: 'name\nAda Lovelace\n',
+            visible: 'Attachment: evidence.csv',
+            markerCount: 0,
+          },
+          frameUpload: {
+            name: 'evidence.csv',
+            text: 'name\nAda Lovelace\n',
+            visible: 'Frame attachment: evidence.csv',
+          },
         },
         changed_files: [
           { path: 'scratch/workspace/evidence.csv', change: 'created' },

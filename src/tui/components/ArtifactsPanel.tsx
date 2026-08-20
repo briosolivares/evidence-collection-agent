@@ -1,6 +1,6 @@
 import { Box, Text } from 'ink';
 
-import { formatDuration, formatTokens, truncate } from '../format.js';
+import { formatCompletionLine, truncate } from '../format.js';
 import { NO_COMPLETION_REPORT_TEXT } from '../../run/runOutcome.js';
 import { orderArtifactsForSummary, type UiAction } from '../store/reducer.js';
 import type { ArtifactUiState, CompletedRunSummary, PublishedArtifact } from '../store/state.js';
@@ -11,7 +11,7 @@ import { ArtifactRows, useArtifactKeys, type ExternalAction } from './ArtifactRo
 interface ArtifactsPanelProps {
   /** The completed run the panel summarizes (header + answer data).
    * Absent when /artifacts reopens artifacts retained from a run that
-   * recorded no summary (cancelled / budget-exceeded): the panel then
+   * recorded no summary (cancelled): the panel then
    * renders an artifacts-only header and no answer block. */
   summary?: CompletedRunSummary;
   /** Published artifacts in publish order (state.artifacts verbatim);
@@ -81,11 +81,7 @@ export function ArtifactsPanel({
             <Text color={summary.outcome === 'complete' ? theme.success : theme.error}>
               {`${summary.outcome === 'complete' ? glyphs.success : glyphs.error} `}
             </Text>
-            <Text>
-              {summary.outcome === 'complete'
-                ? `${summary.verb} in ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`
-                : `Incomplete after ${formatDuration(summary.elapsedMs)} · ${formatTokens(summary.tokens)}`}
-            </Text>
+            <Text>{formatCompletionLine(summary.outcome, summary.elapsedMs, summary.tokens)}</Text>
           </Box>
           <Text color={theme.muted}>{`  ${summary.runDir}`}</Text>
           <Box paddingLeft={2} marginBottom={ordered.length > 0 ? 1 : 0}>

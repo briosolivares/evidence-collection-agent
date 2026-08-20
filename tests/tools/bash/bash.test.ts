@@ -65,15 +65,10 @@ function exited(overrides: Partial<ForegroundCommandResult> = {}): ForegroundCom
 }
 
 describe('bash tool', () => {
-  it('has a strict browser-free schema and an exclusive bounded contract', () => {
+  it('has a strict browser-free schema and a bounded contract', () => {
     const tool = createBashTool({ secretEnvDenylist: [] });
 
     expect(tool.name).toBe('bash');
-    expect(tool.getAccess({ command: 'true' })).toEqual({
-      reads: [],
-      writes: [],
-      exclusive: true,
-    });
     expect(tool.timeoutMs).toBe(BASH_TOOL_TIMEOUT_MS);
     expect(BASH_TOOL_TIMEOUT_MS).toBeGreaterThan(MAX_BASH_TIMEOUT_MS + 2_000);
     expect(DEFAULT_BASH_TIMEOUT_MS).toBe(30_000);
@@ -231,7 +226,9 @@ describe('bash tool', () => {
         secretEnvDenylist: [],
         runCommand: async (options) => {
           writeFileSync(join(options.cwd, 'before-failure.txt'), 'survived');
-          throw new Error('spawn failed');
+          throw new Error(
+            'spawn failed at (http://127.0.0.1:9222/json/version?token=bash-secret) file survived',
+          );
         },
       },
       { command: 'never started' },
@@ -242,6 +239,8 @@ describe('bash tool', () => {
       errorKind: 'execution_error',
     });
     expect(result.content).toContain('spawn failed');
+    expect(result.content).toContain('([REDACTED_CDP_URL]) file survived');
+    expect(result.content).not.toContain('bash-secret');
     expect(readManifest(runDir).artifacts).toEqual([
       expect.objectContaining({
         filename: 'scratch/workspace/before-failure.txt',

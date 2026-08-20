@@ -9,7 +9,17 @@
     <main>
       <h1>Second fixture page</h1>
       <p>The fixture link reached its intended destination.</p>
+      <p id="frame-attachment">Frame attachment: (none)</p>
+      <label for="frame-attachment-input">Frame attachment file</label>
+      <input id="frame-attachment-input" type="file" accept="text/csv" />
       <a href="/">Return to browser controller fixture</a>
     </main>
+    <script>
+      document.querySelector('#frame-attachment-input').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        document.querySelector('#frame-attachment').textContent =
+          'Frame attachment: ' + (file ? file.name : '(none)');
+      });
+    </script>
   </body>
 </html>

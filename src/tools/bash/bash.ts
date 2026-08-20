@@ -2,6 +2,7 @@ import { mkdirSync } from 'node:fs';
 
 import { z } from 'zod';
 
+import { safeBrowserErrorMessage } from '../../browser/capabilityRedaction.js';
 import { SCRATCH_DIR } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import {
@@ -104,7 +105,6 @@ export function createBashTool(deps: BashToolDeps): ToolDef<BashInput> {
       'ends. Keep intermediate files in scratch/workspace, inspect changed_files, and ' +
       'use browser_execute for all browser work.',
     inputSchema: bashInputSchema,
-    getAccess: () => ({ reads: [], writes: [], exclusive: true }),
     timeoutMs: BASH_TOOL_TIMEOUT_MS,
     execute: (input, ctx) =>
       executeBash(input, ctx, {
@@ -163,14 +163,18 @@ async function executeBash(
 
   if (executionError !== undefined) {
     const cleanup =
-      syncError === undefined ? '' : ` (workspace sync also failed: ${safeMessage(syncError)})`;
-    throw new Error(`bash failed to start or run: ${safeMessage(executionError)}${cleanup}`);
+      syncError === undefined
+        ? ''
+        : ` (workspace sync also failed: ${safeBrowserErrorMessage(syncError)})`;
+    throw new Error(
+      `bash failed to start or run: ${safeBrowserErrorMessage(executionError)}${cleanup}`,
+    );
   }
 
   if (syncError !== undefined) {
     throw new Error(
       `bash finished with status ${JSON.stringify(commandResult!.status)}, ` +
-        `but workspace sync failed: ${safeMessage(syncError)}`,
+        `but workspace sync failed: ${safeBrowserErrorMessage(syncError)}`,
     );
   }
 
@@ -224,14 +228,4 @@ function buildChildEnvironment(
   env.GIT_TERMINAL_PROMPT = '0';
 
   return env;
-}
-
-function safeMessage(error: unknown): string {
-  const raw = error instanceof Error ? error.message : String(error);
-  return raw
-    .replace(/\bwss?:\/\/[^\s)'"\]]+/giu, '[REDACTED_WEBSOCKET_URL]')
-    .replace(
-      /\bhttps?:\/\/[^\s)'"\]]*(?:\/devtools\/(?:browser|page)|browserbase|\/json\/version)[^\s)'"\]]*/giu,
-      '[REDACTED_CDP_URL]',
-    );
 }

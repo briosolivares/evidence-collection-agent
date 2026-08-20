@@ -9,6 +9,7 @@ import {
   readdirSync,
   rmSync,
   symlinkSync,
+  truncateSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -19,9 +20,9 @@ import {
   finalizeManifest,
   initManifest,
   MANIFEST_FILENAME,
+  MANIFEST_MAX_BYTES,
   readManifest,
   removeScratchArtifactEntry,
-  verifyManifestFiles,
   writeArtifact,
   type Manifest,
 } from '../../src/run/artifacts.js';
@@ -104,6 +105,38 @@ describe('writeArtifact', () => {
     expect(manifest.artifacts[0]!.filename).toBe('artifacts/data.csv');
   });
 
+  it('allows only same-role published overwrites and leaves refused bytes untouched', () => {
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('old'), {
+      roles: ['evidence', 'requested_output'],
+    });
+
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('refused'), {
+        roles: ['evidence'],
+      }),
+    ).toThrow(/do not match requested roles/);
+    expect(readFileSync(join(runDir, 'artifacts/data.csv'), 'utf8')).toBe('old');
+
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('new'), {
+      roles: ['requested_output', 'evidence'],
+    });
+    expect(readFileSync(join(runDir, 'artifacts/data.csv'), 'utf8')).toBe('new');
+    expect(readManifestFile().artifacts).toHaveLength(1);
+  });
+
+  it('refuses to adopt an unmanifested published destination', () => {
+    const destination = join(runDir, 'artifacts/untracked.txt');
+    writeFileSync(destination, 'outside publication');
+
+    expect(() =>
+      writeArtifact(runDir, 'artifacts/untracked.txt', Buffer.from('replacement'), {
+        roles: ['evidence'],
+      }),
+    ).toThrow(/unmanifested file/);
+    expect(readFileSync(destination, 'utf8')).toBe('outside publication');
+    expect(readManifestFile().artifacts).toEqual([]);
+  });
+
   it('creates parent directories for nested artifact paths', () => {
     const entry = writeArtifact(runDir, 'artifacts/sub/dir/file.bin', Buffer.from('nested'), {
       roles: ['evidence'],
@@ -136,6 +169,27 @@ describe('writeArtifact', () => {
     const [withUrl, withoutUrl] = readManifestFile().artifacts;
     expect(withUrl!.sourceUrl).toBe('https://example.com/page');
     expect(withoutUrl).not.toHaveProperty('sourceUrl');
+  });
+
+  it('records trusted publication kind when provided and omits it otherwise', () => {
+    writeArtifact(runDir, 'artifacts/page.png', Buffer.from('img'), {
+      publicationKind: 'screenshot',
+      roles: ['evidence'],
+    });
+    writeArtifact(runDir, 'scratch/notes.md', Buffer.from('text'));
+
+    const [published, scratch] = readManifestFile().artifacts;
+    expect(published!.publicationKind).toBe('screenshot');
+    expect(scratch).not.toHaveProperty('publicationKind');
+  });
+
+  it('rejects publication kind on private scratch files', () => {
+    expect(() =>
+      writeArtifact(runDir, 'scratch/not-published.png', Buffer.from('img'), {
+        publicationKind: 'screenshot',
+      }),
+    ).toThrow(/publicationKind/);
+    expect(readManifestFile().artifacts).toEqual([]);
   });
 
   it('records roles when provided — including both roles on one artifact — and omits the key otherwise', () => {
@@ -344,7 +398,27 @@ describe('readManifest', () => {
 
   it('fails loudly when the manifest is not valid JSON', () => {
     writeFileSync(join(runDir, MANIFEST_FILENAME), 'not json');
-    expect(() => readManifest(runDir)).toThrow();
+    expect(() => readManifest(runDir)).toThrow(/manifest at .* is not valid JSON/);
+  });
+
+  it('does not follow a manifest symlink', () => {
+    const path = join(runDir, MANIFEST_FILENAME);
+    const target = join(runDir, 'outside-manifest.json');
+    writeFileSync(target, JSON.stringify({ task: 'outside', startedAt: '', artifacts: [] }));
+    symlinkSync(target, path);
+
+    expect(() => readManifest(runDir)).toThrow(/symlinks are not followed/);
+  });
+
+  it('rejects non-regular and oversized manifest paths before parsing', () => {
+    const path = join(runDir, MANIFEST_FILENAME);
+    mkdirSync(path);
+    expect(() => readManifest(runDir)).toThrow(/must be a regular file/);
+
+    rmSync(path, { recursive: true });
+    writeFileSync(path, '');
+    truncateSync(path, MANIFEST_MAX_BYTES + 1);
+    expect(() => readManifest(runDir)).toThrow(new RegExp(`${MANIFEST_MAX_BYTES}-byte read limit`));
   });
 });
 
@@ -397,73 +471,5 @@ describe('removeScratchArtifactEntry', () => {
   it('is a no-op for a scratch path the manifest never tracked', () => {
     expect(() => removeScratchArtifactEntry(runDir, 'scratch/never-written.tmp')).not.toThrow();
     expect(readManifestFile().artifacts).toHaveLength(0);
-  });
-});
-
-describe('verifyManifestFiles', () => {
-  beforeEach(() => {
-    initManifest(runDir, 'verify task');
-  });
-
-  it('returns normally when every entry matches its recorded hash and is a regular file', () => {
-    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
-    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
-
-    expect(() => verifyManifestFiles(runDir)).not.toThrow();
-  });
-
-  it('detects a missing file', () => {
-    writeArtifact(runDir, 'artifacts/gone.txt', Buffer.from('x'), {
-      roles: ['requested_output'],
-    });
-    rmSync(join(runDir, 'artifacts/gone.txt'));
-
-    expect(() => verifyManifestFiles(runDir)).toThrow(/gone\.txt/);
-  });
-
-  it('detects a symlink substituted for a regular file', () => {
-    writeArtifact(runDir, 'artifacts/real.txt', Buffer.from('real bytes'), {
-      roles: ['requested_output'],
-    });
-    const target = join(runDir, 'link-target.txt');
-    writeFileSync(target, 'real bytes');
-    rmSync(join(runDir, 'artifacts/real.txt'));
-    symlinkSync(target, join(runDir, 'artifacts/real.txt'));
-
-    // The symlink's target holds byte-identical content to what was
-    // recorded — only the file-type check catches this, not a hash diff.
-    expect(() => verifyManifestFiles(runDir)).toThrow(/real\.txt/);
-  });
-
-  it('detects a byte/hash mismatch', () => {
-    writeArtifact(runDir, 'artifacts/data.txt', Buffer.from('original'), {
-      roles: ['requested_output'],
-    });
-    writeFileSync(join(runDir, 'artifacts/data.txt'), 'tampered');
-
-    expect(() => verifyManifestFiles(runDir)).toThrow(/data\.txt/);
-  });
-
-  it('reports ALL mismatches in one error, not just the first', () => {
-    writeArtifact(runDir, 'artifacts/missing.txt', Buffer.from('a'), {
-      roles: ['requested_output'],
-    });
-    writeArtifact(runDir, 'artifacts/tampered.txt', Buffer.from('original'), {
-      roles: ['requested_output'],
-    });
-    rmSync(join(runDir, 'artifacts/missing.txt'));
-    writeFileSync(join(runDir, 'artifacts/tampered.txt'), 'tampered');
-
-    let caught: unknown;
-    try {
-      verifyManifestFiles(runDir);
-    } catch (error) {
-      caught = error;
-    }
-
-    expect(caught).toBeInstanceOf(Error);
-    const message = (caught as Error).message;
-    expect(message).toMatch(/missing\.txt/);
-    expect(message).toMatch(/tampered\.txt/);
   });
 });

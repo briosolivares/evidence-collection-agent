@@ -200,7 +200,6 @@ async function main(): Promise<void> {
   section('1. session creation');
   const provider = new BrowserbaseBrowserSessionProvider({
     apiKey,
-    recordSession: true,
     liveView: true,
     userMetadata: { purpose: 'smoke' },
   });

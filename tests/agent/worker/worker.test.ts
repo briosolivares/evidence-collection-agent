@@ -20,24 +20,24 @@ import {
   type RunBudgetConfig,
 } from '../../../src/run/runBudget.js';
 import { createRegistry, type ToolCtx, type ToolDef } from '../../../src/tools/registry.js';
+import { CAPTURE_SCREENSHOT_TOOL_NAME } from '../../../src/tools/captureScreenshot/captureScreenshot.js';
+import { createInlineImageToolOutput } from '../../../src/tools/inlineImage.js';
 import { finishTool, type FinishInput } from '../../../src/tools/finish/finish.js';
 import {
   MAX_PROTOCOL_CORRECTIONS,
-  NO_TOOL_CONTINUATION,
   appendFinishResult,
-  appendWorkerFeedback,
   captureWorkerSnapshot,
   createWorker,
-  dropUnansweredAssistantTurn,
-  readWorkerMetrics,
   resumePendingToolTurn,
   restoreWorker,
   runWorkerTurn,
-  writeWorkerMetrics,
   type Worker,
   type WorkerDeps,
   type PendingToolTurn,
 } from '../../../src/agent/worker/worker.js';
+
+const NO_TOOL_CONTINUATION =
+  'Continue working with tools, or call finish alone when the requested work is ready.';
 
 let runDir: string;
 
@@ -56,7 +56,6 @@ const UNBOUNDED: RunBudgetConfig = {
   maxToolCalls: Infinity,
   maxModelTokens: Infinity,
   maxWallTimeMs: Infinity,
-  maxVerifierCorrections: Infinity,
 };
 
 const USAGE: Usage = {
@@ -70,6 +69,11 @@ const VALID_FINISH: FinishInput = {
   summary: 'The requested report and evidence were published.',
   unresolved: [],
 };
+
+const ONE_PIXEL_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+  'base64',
+);
 
 function accepted(
   content: AcceptedModelResponse['response']['content'],
@@ -114,7 +118,6 @@ function tool(
     name,
     description: `${name} test tool`,
     inputSchema: z.strictObject({ label: z.string().optional() }),
-    getAccess: () => ({ reads: [], writes: [], exclusive: true }),
     ...(maxBytes === undefined ? {} : { maxBytes }),
     execute,
   };
@@ -229,6 +232,104 @@ describe('ordinary response execution', () => {
       role: 'user',
       content: [{ type: 'text', text: NO_TOOL_CONTINUATION }],
     });
+  });
+
+  it('delivers capture pixels once, preserves metrics, and redacts durable transcript views', async () => {
+    const capture: ToolDef<Record<string, never>> = {
+      name: CAPTURE_SCREENSHOT_TOOL_NAME,
+      description: 'capture test pixels',
+      inputSchema: z.strictObject({}),
+      execute: () =>
+        createInlineImageToolOutput(
+          'Captured the live viewport from https://example.test/live.',
+          'image/png',
+          ONE_PIXEL_PNG,
+        ),
+    };
+    const requests: Array<readonly Message[]> = [];
+    const model = scriptedDriver([
+      accepted([
+        {
+          type: 'tool_use',
+          id: 'capture-1',
+          name: CAPTURE_SCREENSHOT_TOOL_NAME,
+          input: {},
+        },
+      ]),
+      (options) => {
+        requests.push(options.messages);
+        const result = options.messages.at(-1)?.content[0];
+        expect(result?.type).toBe('tool_result');
+        if (result?.type !== 'tool_result') throw new Error('expected capture result');
+        expect(Array.isArray(result.content)).toBe(true);
+        if (!Array.isArray(result.content)) throw new Error('expected multimodal content');
+        expect(result.content.some((item) => item.type === 'image')).toBe(true);
+        return accepted([{ type: 'tool_use', id: 'after-1', name: 'after', input: {} }]);
+      },
+      (options) => {
+        requests.push(options.messages);
+        let consumed: ToolResultBlock | undefined;
+        for (const message of options.messages) {
+          if (message.role !== 'user') continue;
+          consumed = message.content.find(
+            (block): block is ToolResultBlock =>
+              block.type === 'tool_result' && block.tool_use_id === 'capture-1',
+          );
+          if (consumed !== undefined) break;
+        }
+        expect(consumed?.type).toBe('tool_result');
+        if (consumed?.type !== 'tool_result') throw new Error('expected consumed result');
+        expect(typeof consumed.content).toBe('string');
+        expect(consumed.content).toContain('Consumed capture_screenshot pixels collapsed');
+        return accepted([
+          { type: 'tool_use', id: 'finish-1', name: 'finish', input: VALID_FINISH },
+        ]);
+      },
+    ]);
+    const worker = session(model, [capture, tool('after', () => 'done'), finishTool]);
+
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toMatchObject({ kind: 'finish_requested' });
+
+    expect(requests).toHaveLength(2);
+    expect(captureRunBudgetSnapshot(worker.config.budget).toolResultBytes).toBeGreaterThanOrEqual(
+      ONE_PIXEL_PNG.byteLength,
+    );
+    const durableTranscript = readFileSync(join(runDir, 'transcript.jsonl'), 'utf8');
+    expect(durableTranscript).not.toContain(ONE_PIXEL_PNG.toString('base64'));
+    expect(durableTranscript).toContain('pixel payload omitted');
+  });
+
+  it('rejects capture_screenshot mixed with another call before either executes', async () => {
+    const captureExecute = vi.fn(() => 'must not run');
+    const otherExecute = vi.fn(() => 'must not run');
+    const worker = session(
+      scriptedDriver([
+        accepted([
+          {
+            type: 'tool_use',
+            id: 'capture',
+            name: CAPTURE_SCREENSHOT_TOOL_NAME,
+            input: {},
+          },
+          { type: 'tool_use', id: 'other', name: 'other', input: {} },
+        ]),
+      ]),
+      [tool(CAPTURE_SCREENSHOT_TOOL_NAME, captureExecute), tool('other', otherExecute)],
+    );
+
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    expect(captureExecute).not.toHaveBeenCalled();
+    expect(otherExecute).not.toHaveBeenCalled();
+    expect(lastResults(worker)).toEqual([
+      expect.objectContaining({
+        tool_use_id: 'capture',
+        is_error: true,
+        content: expect.stringContaining('capture_screenshot must be the only tool call'),
+      }),
+      expect.objectContaining({ tool_use_id: 'other', is_error: true }),
+    ]);
   });
 });
 
@@ -433,6 +534,18 @@ describe('rejection and guards', () => {
     expect(worker.state.messages).toHaveLength(1);
   });
 
+  it('does not checkpoint an unknown worker failure with no usage to persist', async () => {
+    const failure = new Error('transport failed before usage');
+    const afterModelAccounting = vi.fn(async () => undefined);
+    const worker = session(scriptedDriver([failure]), [], {
+      deps: { lifecycle: { afterModelAccounting } },
+    });
+
+    await expect(runWorkerTurn(worker)).rejects.toBe(failure);
+    expect(afterModelAccounting).not.toHaveBeenCalled();
+    expect(worker.config.budget.roleUsage().worker).toBeUndefined();
+  });
+
   it('allows exactly three correctable model rejections, then ends incomplete', async () => {
     const rejections = Array.from(
       { length: MAX_PROTOCOL_CORRECTIONS + 1 },
@@ -467,7 +580,7 @@ describe('rejection and guards', () => {
       budget: { maxWorkerTurns: 1 },
       maxContextTokens: Infinity,
       usage: USAGE,
-      reason: 'max_turns',
+      reason: 'worker_turns',
     },
     {
       name: 'model-token',
@@ -902,8 +1015,8 @@ describe('result bounds, cancellation, and lifecycle', () => {
   });
 });
 
-describe('snapshots and metrics', () => {
-  it('deep-copies capture/restore state and can drop a trailing unanswered turn', async () => {
+describe('snapshots', () => {
+  it('deep-copies capture and restore state', async () => {
     const worker = session(
       scriptedDriver([
         accepted([
@@ -920,35 +1033,20 @@ describe('snapshots and metrics', () => {
     await runWorkerTurn(worker);
     const snapshot = captureWorkerSnapshot(worker);
 
-    appendWorkerFeedback(worker, 'later mutation');
+    worker.state.messages.push({
+      role: 'user',
+      content: [{ type: 'text', text: 'later mutation' }],
+    });
     expect(JSON.stringify(snapshot.messages)).not.toContain('later mutation');
 
     const restored = restoreWorker(snapshot, worker.deps, worker.config);
-    expect(dropUnansweredAssistantTurn(restored)).toBe(true);
     expect(restored.state.turnCount).toBe(1);
-    expect(dropUnansweredAssistantTurn(restored)).toBe(false);
+    expect(restored.state.messages).toEqual(snapshot.messages);
+    restored.state.messages.push({
+      role: 'user',
+      content: [{ type: 'text', text: 'restored mutation' }],
+    });
+    expect(JSON.stringify(snapshot.messages)).not.toContain('restored mutation');
     expect(snapshot.messages.at(-1)?.role).toBe('assistant');
-  });
-
-  it('reports and writes aggregate metrics from the persistent budget', async () => {
-    let clock = 100;
-    const worker = session(scriptedDriver([accepted([{ type: 'text', text: 'continuing' }])]), [], {
-      deps: { now: () => clock },
-    });
-    await runWorkerTurn(worker);
-    clock = 175;
-
-    const metrics = readWorkerMetrics(worker, 'incomplete');
-    expect(metrics).toMatchObject({
-      status: 'incomplete',
-      turns: 1,
-      inputTokens: 10,
-      outputTokens: 5,
-      peakContextTokens: 18,
-      wallClockMs: 75,
-    });
-
-    writeWorkerMetrics(worker, 'incomplete');
-    expect(JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8'))).toEqual(metrics);
   });
 });

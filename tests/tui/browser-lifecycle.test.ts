@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
+import type { BrowserSessionCreationOptions } from '../../src/browser/sessionProvider.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
 import type { RunHandle, RunSessionDeps } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
@@ -25,7 +26,6 @@ describe('TUI browser lifecycle', () => {
       startRunFn,
       runsBaseDir: '/tmp/runs',
     });
-    await runtime.start();
     expect(createSession).toHaveBeenCalledTimes(0);
 
     await runtime.startRun('first', () => {}).done;
@@ -37,26 +37,45 @@ describe('TUI browser lifecycle', () => {
     expect(seenDeps[0]?.runsBaseDir).toBe('/tmp/runs');
   });
 
+  it('routes lazy attached-browser setup states into the submitting run', async () => {
+    const controller = stubBrowser();
+    const createSession = vi.fn(async (options?: BrowserSessionCreationOptions) => {
+      options?.onSetupState?.('Waiting for Chrome approval.');
+      return controller;
+    });
+    const runtime = createTuiRuntime({
+      browserSessionProvider: { createSession },
+      startRunFn: () => makeHandle(),
+    });
+    const events: UiEvent[] = [];
+
+    expect(createSession).not.toHaveBeenCalled();
+    await runtime.startRun('use the browser', (event) => events.push(event)).done;
+
+    expect(events).toContainEqual({
+      type: 'browser_setup',
+      message: 'Waiting for Chrome approval.',
+    });
+  });
+
   it('closes the browser exactly once during teardown', async () => {
     const controller = stubBrowser();
     const runtime = createTuiRuntime({
       browserSessionProvider: { createSession: async () => controller },
       startRunFn: () => makeHandle(),
     });
-    await runtime.start();
     await runtime.startRun('launch it', () => {}).done;
     await runtime.shutdown();
     await runtime.shutdown();
     expect(controller.close).toHaveBeenCalledTimes(1);
   });
 
-  it('does not launch headed Chrome when started and shut down without an interactive run', async () => {
+  it('does not launch headed Chrome when shut down without an interactive run', async () => {
     const createSession = vi.fn(async () => stubBrowser());
     const runtime = createTuiRuntime({
       browserSessionProvider: { createSession },
       startRunFn: () => makeHandle(),
     });
-    await runtime.start();
     await runtime.shutdown();
     expect(createSession).not.toHaveBeenCalled();
   });
@@ -70,7 +89,6 @@ describe('TUI browser lifecycle', () => {
       startRunFn: () => makeHandle(),
     });
 
-    await runtime.start();
     await runtime.shutdown();
 
     expect(createSession).not.toHaveBeenCalled();
@@ -91,7 +109,6 @@ describe('TUI browser lifecycle', () => {
       startRunFn: () => makeHandle(),
     });
     const events: UiEvent[] = [];
-    await runtime.start();
     await runtime.startRun('first', (event) => events.push(event)).done;
 
     const sessionEvents = events.filter((event) => event.type === 'browser_session');
@@ -112,18 +129,7 @@ describe('TUI browser lifecycle', () => {
       startRunFn: () => makeHandle(),
     });
     const localEvents: UiEvent[] = [];
-    await localRuntime.start();
     await localRuntime.startRun('first', (event) => localEvents.push(event)).done;
     expect(localEvents.filter((event) => event.type === 'browser_session')).toHaveLength(0);
-  });
-
-  it('refuses to run before the browser session exists', async () => {
-    const runtime = createTuiRuntime({
-      browserSessionProvider: { createSession: async () => stubBrowser() },
-      startRunFn: () => makeHandle(),
-    });
-    expect(() => runtime.startRun('too early', () => {})).toThrow(/not started/);
-    await runtime.start();
-    await expect(runtime.start()).rejects.toThrow(/already started/);
   });
 });

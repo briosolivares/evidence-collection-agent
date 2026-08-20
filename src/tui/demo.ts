@@ -292,7 +292,7 @@ export function createDemoScript(baseAt: number): DemoStep[] {
       delayMs: 500,
       action: {
         type: 'run_finished',
-        outcome: 'completed',
+        outcome: 'verified',
         // The completion panel's answer block — a real one-line answer
         // (the full prose is already in the transcript above).
         finalText:

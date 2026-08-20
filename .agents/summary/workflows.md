@@ -1,21 +1,21 @@
 # Workflows
 
-Current end-to-end behavior of the v3-only runtime.
+Current end-to-end behavior of the production runtime.
 
 ## 1. Fresh task run
 
 ```mermaid
 sequenceDiagram
-    participant U as TUI / REPL / eval
+    participant U as TUI / eval
     participant R as runTask
-    participant C as v3 coordinator
+    participant C as runAgent lifecycle
     participant I as initializer
     participant W as worker
     participant D as deterministic checks
     participant V as fresh verifier
     U->>R: task + live browser + explicit policy
     R->>R: durable configuration, run dir, manifest
-    R->>C: runV3Coordinator(...)
+    R->>C: runAgent(...)
     C->>C: acquire run lock; write initializing checkpoint
     C->>I: task, contract-only tools
     I-->>C: one immutable OutputContract
@@ -55,6 +55,7 @@ flowchart TD
     F --> G{"tool calls?"}
     G -->|none| H["append continuation; keep working"]
     G -->|ordinary calls| I["execute sequentially in response order"]
+    G -->|capture_screenshot only| P["capture viewport; show pixels once"]
     I --> J["append ordered results; checkpoint"]
     G -->|finish only| K["deterministic read-only checks"]
     G -->|finish mixed with another call| L["execute nothing; protocol correction"]
@@ -64,12 +65,13 @@ flowchart TD
     N -->|verified| O["terminal verified checkpoint"]
     H --> A
     J --> A
+    P --> A
     M --> A
 ```
 
 No-tool prose is not completion. `finish` must be the only call in its response and carries `{ summary }`; deterministic checks derive requested outputs and evidence from the manifest. A summary claim cannot waive a missing output or evidence requirement. Deterministic failures never reach the verifier; verifier corrections resume the same worker conversation. Only verifier acceptance yields public success.
 
-Whole-run ceilings cover worker turns, request context, tool calls, all-role model tokens, model-visible tool-result bytes, wall time, deterministic failures, and verifier corrections. Accounting is monotone and checkpointed.
+Accounting covers worker turns, request context, tool calls, all-role model tokens, model-visible result bytes, wall time, and deterministic failures. Production leaves aggregate turns, calls, and model tokens unbounded; request context, wall time, per-result/per-message output, and deterministic failures remain bounded. Accounting is monotone and checkpointed.
 
 ## 3. Tool execution
 
@@ -86,11 +88,12 @@ flowchart LR
     G --> H["ToolCallResult"]
 ```
 
-Failures become structured model-readable results. A timeout abandons waiting, not necessarily the underlying effect: its access set stays busy until the executor settles. Later conflicting work waits only for a finite gate, and terminalization drains the registry to a fixed point before releasing ownership.
+Failures become structured model-readable results. A timeout abandons waiting, not necessarily the underlying effect: the effect stays globally busy until its promise settles. Every later call waits through a finite gate, and terminalization drains the registry to a fixed point before releasing ownership.
 
-The worker's eight tools are static and ordered: `browser_execute`, `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`, `finish`.
+The worker's nine tools are static and ordered: `browser_execute`, `capture_screenshot`, `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`, `finish`.
 
 - `browser_execute` runs one finite program against one exact run-owned page. Its run-scoped JavaScript policy is durable and explicit.
+- `capture_screenshot` observes the exact live viewport as inline pixels. It must be called alone, is visible for one model request, and never writes or publishes an artifact.
 - `publish_artifact` is the sole worker publication surface for text, workspace bytes, screenshots, and downloads.
 - File editing and `bash` operate in private `scratch/workspace/`; `bash` is foreground-only, bounded, and reconciles surviving files before returning.
 - `ask_user` passes through the interactive permission seam. Headless or unavailable environments fail closed instead of hanging.
@@ -104,31 +107,24 @@ The checkpoint store reads regular files without following symlinks, enforces a 
 
 `bash` is the deliberate write-chokepoint exception. It writes directly inside `scratch/workspace/`; `syncScratchWorkspace` then scans without following symlinks, hashes every surviving regular file, removes deleted tracked entries, and fails on unsafe or oversized nodes.
 
-## 5. Resume
+## 5. Crash recovery
 
 ```mermaid
 sequenceDiagram
-    participant U as caller
-    participant R as resumeTask
-    participant P as read-only checkpoint probe
-    participant C as coordinator
+    participant P as restarted lifecycle process
+    participant C as runAgent
     participant S as locked checkpoint store
-    U->>R: runDir + fresh browser + explicit authenticated
-    R->>P: bounded/no-follow observation
-    P-->>R: frozen phase + durable configuration
-    R->>R: compare caller assertions
-    R->>C: compose from durable values
-    C->>S: acquire lock; re-read and validate full checkpoint
+    P->>C: existing runDir + durable configuration
+    C->>S: acquire lock; bounded no-follow checkpoint read
     S-->>C: authoritative phase state
     C->>C: recover conservatively and continue/repair projections
 ```
 
-The pre-lock observation performs no write, cleanup, or lock acquisition. It is only enough to select composition. The coordinator revalidates under lock. An `uncertain` tool effect is not replayed blindly; verifier work is safe to restart because its view is bounded and read-only. A terminal resume invokes no model or browser work and creates no external trace root; it only validates integrity and repairs local projections when needed.
+There is no public resume composition API. Crash tests reinvoke `runAgent` on the same run directory; it acquires the run lock, validates configuration and checkpoint state, reconciles journals/workspace effects, and continues the recorded phase. An `uncertain` tool effect is not replayed blindly; verifier work is safe to restart because its view is bounded and read-only. A terminal checkpoint invokes no model work; the lifecycle validates integrity and repairs local projections when needed.
 
 ## 6. Browser ownership modes
 
 - **Installed TUI, local:** attach to the user's existing Chrome over an approved loopback DevTools endpoint. Sherlock closes only its own run pages and client connection.
-- **REPL, local:** managed headed Chrome with the persistent project profile.
 - **Normal local eval:** managed headless Chrome with a unique temporary profile per trial; bounded parallel pool.
 - **Headed local eval:** managed persistent profile in a separate serial lane. It never borrows the TUI's attached browser.
 - **Browserbase:** isolated context-free sessions for normal work; configured Context for authenticated/headed work. Live View supports human takeover.
@@ -172,7 +168,6 @@ Browser/model work may overlap, but oracle fetch and grading are serialized inde
 | Hermetic test suite (local Chrome required for browser suites) | `npm test` |
 | Typecheck all TypeScript | `npm run typecheck` |
 | Installed TUI | `npm run sherlock` |
-| Minimal agent REPL | `npm run agent` |
 | Eval batch | `npm run evals -- --tasks <names> [--k <n>] [--concurrency <n>]` |
 | Login/preflight | `npm run login` / `npm run login -- --check` |
 | Live Browserbase smoke (billable/networked) | `npm run smoke:browserbase` |

@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   createInitialState,
   deriveSuggestions,
-  HELP_TEXT,
   orderArtifactsForSummary,
   reduce,
   routeInput,
@@ -143,9 +142,10 @@ describe('reduce (session store, step 2 scope)', () => {
   });
 
   it('appends notices and keeps idle mode', () => {
-    const state = reduce(createInitialState(), { type: 'notice', text: HELP_TEXT });
+    const text = 'notice';
+    const state = reduce(createInitialState(), { type: 'notice', text });
     expect(state.mode).toBe('idle');
-    expect(state.transcript.at(-1)).toMatchObject({ kind: 'notice', text: HELP_TEXT });
+    expect(state.transcript.at(-1)).toMatchObject({ kind: 'notice', text });
   });
 
   it('handles an unknown command as a gentle notice, staying idle', () => {
@@ -215,7 +215,6 @@ describe('reduce (run lifecycle events)', () => {
       pendingTools: [],
       startedAt: 1_000,
       tokens: { settled: 0, estimate: 0 },
-      turn: 0,
     });
   });
 
@@ -265,7 +264,7 @@ describe('reduce (run lifecycle events)', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
-      { type: 'turn_end', usage: { input: 1000, output: 200, cacheRead: 900 } },
+      { type: 'turn_end', usage: { input: 1000, output: 200 } },
       { type: 'turn_start', turn: 2 },
       { type: 'turn_end', usage: { input: 2000, output: 300 } },
     ]);
@@ -321,7 +320,7 @@ describe('reduce (run lifecycle events)', () => {
     });
   });
 
-  it('run_finished (completed) appends the completion item and returns to idle', () => {
+  it('run_finished (verified) appends the completion item and returns to idle', () => {
     const state = fold([
       ...started,
       { type: 'turn_start', turn: 1 },
@@ -329,7 +328,7 @@ describe('reduce (run lifecycle events)', () => {
       { type: 'turn_end', usage: { input: 15_000, output: 3_700 } },
       {
         type: 'run_finished',
-        outcome: 'completed',
+        outcome: 'verified',
         finalText: 'Here is the answer.',
         runDir: '/runs/abc',
         at: 43_000,
@@ -339,7 +338,6 @@ describe('reduce (run lifecycle events)', () => {
     expect(state.live).toBeUndefined();
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'completion',
-      verb: 'Brewed',
       elapsedMs: 42_000,
       tokens: 18_700,
       runDir: '/runs/abc',
@@ -370,42 +368,6 @@ describe('reduce (run lifecycle events)', () => {
       status: 'ok',
     });
     expect(state.transcript.at(-1)).toMatchObject({ kind: 'completion' });
-  });
-
-  it('run_finished uses the configured completion verb', () => {
-    const state = fold(
-      [
-        ...started,
-        {
-          type: 'run_finished',
-          outcome: 'completed',
-          runDir: '/runs/abc',
-          at: 2_000,
-        },
-      ],
-      createInitialState({ completionVerb: 'Distilled' }),
-    );
-    expect(state.transcript.at(-1)).toMatchObject({ kind: 'completion', verb: 'Distilled' });
-  });
-
-  it('run_finished (budget_exceeded) appends a distinct error item', () => {
-    const state = fold([
-      ...started,
-      { type: 'turn_start', turn: 1 },
-      { type: 'turn_end', usage: { input: 200_000, output: 60_000 } },
-      {
-        type: 'run_finished',
-        outcome: 'budget_exceeded',
-        reason: 'context_budget',
-        runDir: '/runs/over',
-        at: 100_000,
-      },
-    ]);
-    expect(state.mode).toBe('idle');
-    const last = state.transcript.at(-1);
-    expect(last).toMatchObject({ kind: 'error' });
-    expect((last as { message: string }).message).toContain('context budget');
-    expect((last as { message: string }).message).toContain('/runs/over');
   });
 
   it('run_cancelled preserves elapsed and token estimates in the cancelled item', () => {
@@ -665,7 +627,7 @@ describe('reduce (published artifacts)', () => {
   it('retains artifacts with full provenance after the run ends, clears them on the next run_started', () => {
     const finished = fold([
       ...captured,
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+      { type: 'run_finished', outcome: 'verified', runDir: '/runs/abc', at: 2_000 },
     ]);
     expect(finished.mode).toBe('idle');
     expect(finished.live).toBeUndefined();
@@ -824,7 +786,7 @@ describe('reduce (artifact UI substate)', () => {
     state = reduce(state, { type: 'artifact_open_detail' });
     state = reduce(state, {
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       runDir: '/runs/abc',
       at: 2_000,
     });
@@ -843,12 +805,12 @@ describe('reduce (completion summary)', () => {
     published(1, publishedEntry({ filename: 'artifacts/page.png' })),
   ];
 
-  it('run_finished (completed) records the summary the panel renders', () => {
+  it('run_finished (verified) records the summary the panel renders', () => {
     const state = fold([
       ...oneArtifact,
       {
         type: 'run_finished',
-        outcome: 'completed',
+        outcome: 'verified',
         finalText: 'Here is the answer.',
         runDir: '/runs/abc',
         at: 43_000,
@@ -858,7 +820,6 @@ describe('reduce (completion summary)', () => {
       outcome: 'complete',
       unresolved: [],
       finalText: 'Here is the answer.',
-      verb: 'Brewed',
       elapsedMs: 42_000,
       tokens: 18_700,
       runDir: '/runs/abc',
@@ -868,7 +829,7 @@ describe('reduce (completion summary)', () => {
   it('a completion without finalText records a summary without it', () => {
     const state = fold([
       ...started,
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+      { type: 'run_finished', outcome: 'verified', runDir: '/runs/abc', at: 2_000 },
     ]);
     expect(state.completedRun).toBeDefined();
     expect(state.completedRun?.finalText).toBeUndefined();
@@ -877,23 +838,9 @@ describe('reduce (completion summary)', () => {
   it('the next run_started clears the previous summary', () => {
     let state = fold([
       ...started,
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+      { type: 'run_finished', outcome: 'verified', runDir: '/runs/abc', at: 2_000 },
     ]);
     state = reduce(state, { type: 'run_started', task: 'again', at: 3_000 });
-    expect(state.completedRun).toBeUndefined();
-  });
-
-  it('budget_exceeded records no summary', () => {
-    const state = fold([
-      ...started,
-      {
-        type: 'run_finished',
-        outcome: 'budget_exceeded',
-        reason: 'max_turns',
-        runDir: '/runs/over',
-        at: 2_000,
-      },
-    ]);
     expect(state.completedRun).toBeUndefined();
   });
 
@@ -925,7 +872,7 @@ describe('reduce (completion summary)', () => {
         publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }),
         96,
       ),
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+      { type: 'run_finished', outcome: 'verified', runDir: '/runs/abc', at: 2_000 },
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'completion',
@@ -936,13 +883,13 @@ describe('reduce (completion summary)', () => {
     });
   });
 
-  it('a completed eval trial records no summary — no panel between trials', () => {
+  it('a verified eval trial records no summary — no panel between trials', () => {
     const state = fold([
       { type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 },
       { type: 'run_started', task: 'stub', at: 0 },
       {
         type: 'run_finished',
-        outcome: 'completed',
+        outcome: 'verified',
         finalText: 'done',
         runDir: '/runs/eval-trial',
         at: 9_000,
@@ -962,7 +909,7 @@ describe('reduce (artifacts focus mode)', () => {
     published(2, publishedEntry({ filename: 'artifacts/b.csv', roles: ['requested_output'] })),
     {
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'Saved.',
       runDir: '/runs/abc',
       at: 2_000,
@@ -992,7 +939,7 @@ describe('reduce (artifacts focus mode)', () => {
   it('artifacts_focus is a no-op with nothing to browse', () => {
     const state = fold([
       ...started,
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
+      { type: 'run_finished', outcome: 'verified', runDir: '/runs/abc', at: 2_000 },
     ]);
     expect(reduce(state, { type: 'artifacts_focus' })).toEqual(state);
   });
@@ -1056,9 +1003,7 @@ describe('reduce (composer substate)', () => {
   it('deriveSuggestions omits evals when development features are disabled', () => {
     const initial = createInitialState({ evalsEnabled: false });
     const typed = reduce(initial, { type: 'composer_changed', value: '/e' });
-    expect(deriveSuggestions(typed).suggestions.map((entry) => entry.name)).toEqual([
-      '/exit',
-    ]);
+    expect(deriveSuggestions(typed).suggestions.map((entry) => entry.name)).toEqual(['/exit']);
   });
 
   it('deriveSuggestions is empty outside idle — the composer is disabled there', () => {
@@ -1121,7 +1066,7 @@ describe('reduce (tab_pressed routing)', () => {
     published(1, publishedEntry({ filename: 'artifacts/a.png' })),
     {
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'Saved.',
       runDir: '/runs/abc',
       at: 2_000,
@@ -1191,6 +1136,18 @@ describe('reduce (tab_pressed routing)', () => {
 });
 
 describe('reduce (browser session diagnostics)', () => {
+  it('appends attached-Chrome setup state as a transcript notice', () => {
+    const state = fold([
+      started[0]!,
+      { type: 'browser_setup', message: 'Waiting for Chrome approval.' },
+      started[1]!,
+    ]);
+    expect(state.transcript.at(-1)).toMatchObject({
+      kind: 'notice',
+      text: 'Waiting for Chrome approval.',
+    });
+  });
+
   it('appends a Browserbase notice with the Live View URL', () => {
     const state = fold([
       ...started,

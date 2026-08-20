@@ -106,7 +106,6 @@ type StreamFactory = NonNullable<RunSessionDeps['createStream']>;
 interface StartOptions {
   task?: string;
   browser?: BrowserController;
-  maxTurns?: number;
   now?: () => number;
   requestPermission?: RunSessionDeps['requestPermission'];
   observeEvent?: (event: UiEvent) => void;
@@ -123,7 +122,6 @@ function startWithStream(createStream: StreamFactory, options: StartOptions = {}
       events.push(event);
       options.observeEvent?.(event);
     },
-    ...(options.maxTurns === undefined ? {} : { maxTurns: options.maxTurns }),
     ...(options.now === undefined ? {} : { now: options.now }),
     ...(options.requestPermission === undefined
       ? {}
@@ -158,7 +156,6 @@ describe('startRun public bridge', () => {
 
     expect(outcome).toMatchObject({
       status: 'verified',
-      finalText: 'Published report.csv.',
     });
     if (outcome.status !== 'verified') throw new Error('unreachable');
     expect(readFileSync(join(outcome.runDir, 'artifacts/report.csv'), 'utf8')).toBe(REPORT_CONTENT);
@@ -183,7 +180,7 @@ describe('startRun public bridge', () => {
     const turnEnds = events.filter((event) => event.type === 'turn_end');
     expect(turnEnds).toHaveLength(2);
     expect(turnEnds[0]).toMatchObject({
-      usage: { input: 1_000, output: 200, cacheRead: 400 },
+      usage: { input: 1_000, output: 200 },
     });
     const publishPending = events.findIndex(
       (event) => event.type === 'tool_pending' && event.name === 'publish_artifact',
@@ -223,38 +220,6 @@ describe('startRun public bridge', () => {
     expect(state.transcript.at(-1)).toMatchObject({ kind: 'completion' });
   });
 
-  it('maps a worker-turn budget stop to incomplete', async () => {
-    const response = scriptedResponse(
-      [
-        {
-          type: 'tool_use',
-          id: 'write-1',
-          name: 'write_file',
-          input: { file_path: 'scratch/note.txt', content: 'still working' },
-        },
-      ],
-      { input: 500, output: 50 },
-      'tool_use',
-    );
-    const { events, handle } = startScripted([response], { maxTurns: 1 });
-
-    const outcome = await handle.done;
-
-    expect(outcome).toMatchObject({
-      status: 'incomplete',
-      reason: 'budget_exceeded',
-      finalText: 'The assistant stopped before it could prepare a final response.',
-      unresolved: [],
-    });
-    expect(events.at(-1)).toMatchObject({
-      type: 'run_finished',
-      outcome: 'incomplete',
-      reason: 'budget_exceeded',
-      finalText: 'The assistant stopped before it could prepare a final response.',
-      unresolved: [],
-    });
-  });
-
   it('maps a worker model failure to truthful incomplete', async () => {
     const { events, handle } = startWithStream(() => {
       throw new Error('api unreachable');
@@ -264,16 +229,10 @@ describe('startRun public bridge', () => {
 
     expect(outcome).toMatchObject({
       status: 'incomplete',
-      reason: 'worker_incomplete',
-      detail: expect.stringContaining('api unreachable'),
-      finalText: 'The assistant stopped before it could prepare a final response.',
-      unresolved: [],
     });
     expect(events.at(-1)).toMatchObject({
       type: 'run_finished',
       outcome: 'incomplete',
-      reason: 'worker_incomplete',
-      detail: expect.stringContaining('api unreachable'),
       finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });

@@ -2,7 +2,6 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import type { Message, Usage } from './messages.js';
 import type { ApiToolDef } from '../tools/registry.js';
-import type { ModelDriverConfig } from './modelDriver.js';
 
 // The production deps.callModel: the real Anthropic client behind the same
 // CallModel contract the T7 fake satisfies, so it drops into the loop
@@ -18,7 +17,7 @@ import type { ModelDriverConfig } from './modelDriver.js';
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
 //    turn. A second marker rides the collapse frontier — the newest
-//    collapsed browser-result stub in the API message view.
+//    collapsed heavyweight-result stub in the API message view.
 //    It exists because the server matches cached prefixes only up to ~20
 //    content blocks back from a marker: when a new observation stubs the
 //    third-most-recent one, the request diverges at that stub — usually
@@ -33,15 +32,15 @@ import type { ModelDriverConfig } from './modelDriver.js';
 //    silently miss at the tip; our turns append two messages with at most
 //    ~12 blocks (5-parallel tool cap).
 // 3. Always streaming. Long tool-filled turns can run for minutes;
-//    streaming avoids API timeouts and feeds live progress to the REPL.
+//    streaming avoids API timeouts and feeds live progress to the TUI.
 
 /** Model used when the config names none — the design's default (Sonnet
  * tier matches the deployment reality being evaluated against). */
 export const DEFAULT_MODEL = 'claude-sonnet-5';
 
 /**
- * Live progress emitted while a turn streams, for interactive surfaces
- * (the T15 REPL). Per turn, events arrive in this order: one `turn_start`;
+ * Live progress emitted while a turn streams, for interactive surfaces.
+ * Per turn, events arrive in this order: one `turn_start`;
  * then `text_delta` and `tool_use_start` events in stream order (the
  * concatenated text_delta texts reproduce the turn's prose; one
  * tool_use_start per tool call, when its name is known but its input is
@@ -82,20 +81,10 @@ export interface CallModelConfig {
   apiToolDefs: readonly ApiToolDef[];
   /** max_tokens for each response; a positive integer. */
   maxOutputTokens: number;
-  /** Optional live-progress callback (see ProgressEvent). */
-  onProgress?: (event: ProgressEvent) => void;
   /** Forces the model's tool use for every call — used by roles whose
    * response IS a single tool call (the contract initializer). Part of the
    * cached prefix, so it must stay fixed for the closure's lifetime. */
   toolChoice?: Anthropic.Messages.ToolChoice;
-  /** Cancellation carried into streaming and retry backoff. */
-  signal?: AbortSignal;
-  /** Per-response tool-call cap; the driver's default when omitted. */
-  maxToolCallsPerTurn?: number;
-  /** Larger allowance for the driver's single max_tokens re-ask. */
-  maxTokensRetryOutputTokens?: number;
-  /** Test seam passed through to the driver (see ModelDriverConfig). */
-  createStream?: ModelDriverConfig['createStream'];
 }
 
 /**
@@ -218,12 +207,27 @@ export const COLLAPSED_BROWSER_RESULT_MARKER =
   '[Older browser_execute result collapsed — only the two most recent ' +
   'successful browser_execute results stay expanded.]';
 
+/** Stable prefix for a capture already consumed by one model request. */
+export const COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER =
+  '[Consumed capture_screenshot pixels collapsed — capture again if the live visual state is still needed.]';
+
 /** Whether a content block is one of the context view's deterministic stubs. */
 export function isCollapsedBrowserResult(block: { type: string; content?: unknown }): boolean {
   return (
     block.type === 'tool_result' &&
     typeof block.content === 'string' &&
     block.content.startsWith(COLLAPSED_BROWSER_RESULT_MARKER)
+  );
+}
+
+export function isCollapsedCaptureScreenshotResult(block: {
+  type: string;
+  content?: unknown;
+}): boolean {
+  return (
+    block.type === 'tool_result' &&
+    typeof block.content === 'string' &&
+    block.content.startsWith(COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER)
   );
 }
 
@@ -236,7 +240,7 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     if (message.role !== 'user') continue;
     for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
       const block = message.content[blockIndex]!;
-      if (isCollapsedBrowserResult(block)) {
+      if (isCollapsedBrowserResult(block) || isCollapsedCaptureScreenshotResult(block)) {
         return { messageIndex, blockIndex };
       }
     }

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BrowserContext, Disposable, Frame, Page } from 'playwright';
 
-import { createBusyResourceRegistry, EXCLUSIVE_ACCESS } from '../../src/tools/registry.js';
+import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 import type {
   ChromiumPageTargetRef,
   ChromiumTargetControl,
@@ -399,7 +399,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     abort.abort(reason);
 
     await expect(preparation).rejects.toBe(reason);
-    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10)).resolves.toBe(false);
+    await expect(busyRegistry.waitUntilFree(10)).resolves.toBe(false);
     let cleanupSettled = false;
     void controller.closeTaskPages().then(() => {
       cleanupSettled = true;
@@ -440,7 +440,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     });
     await Promise.resolve();
     expect(cleanupSettled).toBe(false);
-    const ownershipSettled = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000);
+    const ownershipSettled = busyRegistry.waitUntilFree(1_000);
     releaseInitialization();
     await expect(ownershipSettled).resolves.toBe(true);
     await expect(cleanup).resolves.toBeUndefined();
@@ -476,7 +476,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       cleanupSettled = true;
     });
     let containmentSettled = false;
-    const containment = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000).then((free) => {
+    const containment = busyRegistry.waitUntilFree(1_000).then((free) => {
       containmentSettled = free;
     });
     await Promise.resolve();
@@ -518,7 +518,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       cleanupSettled = true;
     });
     let containmentSettled = false;
-    const containment = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000).then((free) => {
+    const containment = busyRegistry.waitUntilFree(1_000).then((free) => {
       containmentSettled = free;
     });
     await Promise.resolve();

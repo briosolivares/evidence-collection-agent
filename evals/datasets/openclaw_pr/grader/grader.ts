@@ -3,8 +3,8 @@ import { join } from 'node:path';
 
 import type { Manifest, ManifestEntry } from '../../../../src/run/artifacts.js';
 import {
-  findRequestedOutputByName,
   readManifest,
+  requestedOutputs,
   verifyManifestHashes,
 } from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
@@ -14,18 +14,20 @@ import {
   type OpenClawPrOracle,
 } from '../oracle/githubClient.js';
 
-/** Run-dir-relative path of the deliverable this task's answer must land in
- *  (the system prompt's own naming convention for natural-language answers). */
-const ANSWER_FILENAME = 'answer.md';
+const ANSWER_ASSERTION_NAME = 'one requested answer artifact exists';
+const CONTENT_ASSERTION_NAME =
+  'requested answer mentions the number and title of a most-recent-in-window PR';
 
 /**
  * Grade one OpenClaw PR task trial. Per the standing rule, reads only the
  * run directory's manifest and artifacts — never the transcript. Checks
- * that `answer.md` exists and names both the number and title of a pull
- * request that was "most recent" at some point during the run's own time
- * window (the design's churn-tolerance rule — a PR filed after the run
- * ended cannot be held against it), plus the standing manifest-hash
- * re-check.
+ * that the run's sole requested output names both the number and title of a
+ * pull request that was "most recent" at some point during the run's own
+ * time window (the design's churn-tolerance rule — a PR filed after the run
+ * ended cannot be held against it), plus the standing manifest-hash re-check.
+ * The task states no filename, so the manifest's requested_output role is the
+ * authority; accepting exactly one avoids both a hidden answer.md requirement
+ * and grader cherry-picking among multiple guesses.
  *
  * @param runDirPath - absolute path to the trial's run directory
  * @param oracleData - an OpenClawPrOracle with enough recent PR history to
@@ -38,15 +40,20 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOpenClawPrOracle(oracleData);
   const manifest = readManifest(runDirPath);
 
-  const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
+  const outputs = requestedOutputs(manifest);
+  const answerEntry = outputs.length === 1 ? outputs[0] : undefined;
   const answerExists =
     answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
   const existsAssertion: AssertionResult = {
-    name: `${ANSWER_FILENAME} exists`,
+    name: ANSWER_ASSERTION_NAME,
     passed: answerExists,
     detail: answerExists
       ? `${answerEntry!.filename} found in run dir`
-      : `${ANSWER_FILENAME} missing or not published as a requested output`,
+      : outputs.length === 0
+        ? 'no artifact was published as a requested output'
+        : outputs.length > 1
+          ? `${outputs.length} requested outputs were published; expected one answer artifact`
+          : `${outputs[0]!.filename} is listed as requested output but missing on disk`,
   };
 
   return [
@@ -64,10 +71,10 @@ function mentionsPrAssertion(
   manifest: Manifest,
   oracle: OpenClawPrOracle,
 ): AssertionResult {
-  const name = `${ANSWER_FILENAME} mentions the number and title of a most-recent-in-window PR`;
+  const name = CONTENT_ASSERTION_NAME;
 
   if (answerEntry === undefined) {
-    return { name, passed: false, detail: `${ANSWER_FILENAME} missing from run dir` };
+    return { name, passed: false, detail: 'a unique readable requested answer is unavailable' };
   }
   if (manifest.finishedAt === undefined) {
     return { name, passed: false, detail: 'run manifest has no finishedAt (not finalized)' };
@@ -96,7 +103,7 @@ function mentionsPrAssertion(
         ? `mentions #${matched.number} "${matched.title}"`
         : `none of the window's acceptable PR(s) (${acceptable
             .map((p) => `#${p.number} "${p.title}"`)
-            .join(', ')}) are both numbered and titled in ${ANSWER_FILENAME}`,
+            .join(', ')}) are both numbered and titled in ${answerEntry.filename}`,
   };
 }
 

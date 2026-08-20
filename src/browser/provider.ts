@@ -2,8 +2,8 @@
  * Provider composition: the one place that turns environment into a
  * {@link BrowserSessionProvider}.
  *
- * Every production entry point — the Sherlock TUI, the REPL, the eval CLI, TUI
- * evals, the login helper and its preflight, the browser-backed demos — comes
+ * Every production entry point — the Sherlock TUI, the eval CLI, TUI evals,
+ * the login helper and its preflight, and the browser-backed demos — comes
  * through here, so "which browser runtime does this run use?" has exactly one
  * answer and one place to change it. Duplicating the selection in each entry
  * point is how a batch ends up half remote and half local.
@@ -21,7 +21,7 @@ import {
   attachedChromeEndpoint,
   AttachedChromeSetupBrowserSessionProvider,
 } from './attachedChromeSetup.js';
-import { LocalChromeBrowserSessionProvider } from './playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from './localChromeSessionProvider.js';
 import type { BrowserProviderKind, BrowserSessionProvider } from './sessionProvider.js';
 
 /** The environment variable that selects the runtime. */
@@ -85,17 +85,9 @@ export interface BrowserProviderCompositionOptions {
   profileDir: string;
   /** Local-only: Chrome/Chromium binary override. */
   executablePath?: string;
-  /** Local-only: run Chrome without a window. Meaningless remotely — a
-   * Browserbase browser has no local window either way, and Live View is how a
-   * human sees it. */
-  headless?: boolean;
   /**
    * Remote-only: whether to open the session with the persistent Context.
    *
-   * - `'required'` — use `BROWSERBASE_CONTEXT_ID` and FAIL when it is unset.
-   *   For the authenticated eval lane and the login preflight: a lane that
-   *   silently ran context-free would report every login as missing, which
-   *   reads as "the login did not stick" rather than "nothing was configured".
    * - `'optional'` — use it when set, otherwise open a context-free session.
    *   For interactive runtimes: a user who has not run `npm run login` yet
    *   should still be able to browse public pages, not be locked out of the
@@ -104,19 +96,9 @@ export interface BrowserProviderCompositionOptions {
    *   sharing a Context across trials would let one trial's state reach the
    *   next.
    */
-  context?: 'required' | 'optional' | 'none';
-  /** Remote-only: write this session's cookies back into the Context on close.
-   * Only the login flow wants this. */
-  persistContext?: boolean;
-  /** Remote-only: fetch the Live View URL at creation. Default on; the eval
-   * normal lane turns it off because nobody is watching. */
-  liveView?: boolean;
-  /** Remote-only correlation metadata for the Browserbase session list. */
-  userMetadata?: Record<string, unknown>;
-  /** Receives operator-facing warnings. */
-  onWarning?: (message: string) => void;
-  /** Local attached-only: visible first-use setup state. Required at runtime
-   * because enabling and approving debugging is deliberately a human action. */
+  context?: 'optional' | 'none';
+  /** Local attached-only: optional default for visible first-use setup state.
+   * Interactive callers normally bind the current run through createSession(). */
   onAttachedSetupState?: (message: string) => void;
 }
 
@@ -134,41 +116,28 @@ export function createBrowserSessionProvider(
   options: BrowserProviderCompositionOptions,
 ): BrowserSessionProvider {
   const env = options.env ?? process.env;
-  const localMode = requireLocalBrowserMode(options.localMode);
   if (resolveBrowserProviderKind(env) === 'local') {
+    const localMode = requireLocalBrowserMode(options.localMode);
     if (localMode === 'attached') {
-      if (options.onAttachedSetupState === undefined) {
-        throw new TypeError(
-          'Attached local browser mode requires an onAttachedSetupState callback.',
-        );
-      }
       const explicitEndpoint = attachedChromeEndpoint(env);
       return new AttachedChromeSetupBrowserSessionProvider({
         ...(explicitEndpoint === undefined ? {} : { explicitEndpoint }),
         ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
-        onSetupState: options.onAttachedSetupState,
+        ...(options.onAttachedSetupState === undefined
+          ? {}
+          : { onSetupState: options.onAttachedSetupState }),
       });
     }
     return new LocalChromeBrowserSessionProvider({
       profileDir: options.profileDir,
       ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
-      ...(options.headless === undefined ? {} : { headless: options.headless }),
     });
   }
 
-  const contextId =
-    options.context === 'required'
-      ? requireBrowserbaseContextId(env)
-      : options.context === 'optional'
-        ? browserbaseContextId(env)
-        : undefined;
+  const contextId = options.context === 'optional' ? browserbaseContextId(env) : undefined;
   return new BrowserbaseBrowserSessionProvider({
     apiKey: requireBrowserbaseApiKey(env),
     ...(contextId === undefined ? {} : { contextId }),
-    ...(options.persistContext === undefined ? {} : { persistContext: options.persistContext }),
-    ...(options.liveView === undefined ? {} : { liveView: options.liveView }),
-    ...(options.userMetadata === undefined ? {} : { userMetadata: options.userMetadata }),
-    ...(options.onWarning === undefined ? {} : { onWarning: options.onWarning }),
   });
 }
 
@@ -205,9 +174,8 @@ export function describeBrowserProvider(options: {
   profileDir: string;
 }): string {
   const env = options.env ?? process.env;
-  const localMode = requireLocalBrowserMode(options.localMode);
   if (resolveBrowserProviderKind(env) === 'local') {
-    return localMode === 'attached'
+    return options.localMode === 'attached'
       ? 'browser: local Chrome, attached to the current user session'
       : `browser: local Chrome, managed profile ${options.profileDir}`;
   }
@@ -234,10 +202,9 @@ export function formatBrowserStartupError(
   message: string,
   localMode: LocalBrowserMode,
 ): string {
-  const checkedLocalMode = requireLocalBrowserMode(localMode);
   const lines =
     kind === 'local'
-      ? checkedLocalMode === 'attached'
+      ? localMode === 'attached'
         ? [
             'sherlock could not attach to the current local Chrome.',
             'Open chrome://inspect/#remote-debugging in Chrome and enable ' +

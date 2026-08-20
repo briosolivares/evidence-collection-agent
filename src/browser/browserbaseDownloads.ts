@@ -73,27 +73,14 @@ export interface BrowserbaseDownloadReaderOptions {
 }
 
 /**
- * A download reader for one Browserbase session, plus the bookkeeping the
- * session's cleanup needs.
- */
-export interface BrowserbaseDownloadReaderHandle extends BrowserDownloadReader {
-  /** Remote download ids whose bytes this run has already retrieved and
-   * written into the local run directory. Read by session cleanup so remote
-   * copies of evidence already held locally can be released. */
-  retrievedIds(): string[];
-}
-
-/**
  * Build the download reader for one Browserbase session.
  *
  * @param options - the session's id, an API key (never logged), and the test
  *   seams for HTTP and the clock
- * @returns a reader usable as {@link BrowserDownloadReader}, which also
- *   reports the remote ids it consumed
  */
 export function createBrowserbaseDownloadReader(
   options: BrowserbaseDownloadReaderOptions,
-): BrowserbaseDownloadReaderHandle {
+): BrowserDownloadReader {
   const baseUrl = options.baseUrl ?? BROWSERBASE_API_BASE_URL;
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const now = options.now ?? Date.now;
@@ -140,8 +127,6 @@ export function createBrowserbaseDownloadReader(
   };
 
   return {
-    retrievedIds: () => [...consumed],
-
     async read(download: Download): Promise<BrowserDownloadResult> {
       const suggestedFilename = download.suggestedFilename();
       const record = await pollForRecord({
@@ -163,7 +148,6 @@ export function createBrowserbaseDownloadReader(
 
       return {
         finalUrl: download.url(),
-        headers: {},
         bytes,
         // The browser's own suggestion, not the remote store's: the filename
         // the page asked for is what the rest of the run (and the artifact

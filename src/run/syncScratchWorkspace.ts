@@ -1,14 +1,5 @@
 import { createHash } from 'node:crypto';
-import {
-  closeSync,
-  constants as fsConstants,
-  existsSync,
-  fstatSync,
-  lstatSync,
-  openSync,
-  opendirSync,
-  readSync,
-} from 'node:fs';
+import { existsSync, lstatSync, opendirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
@@ -17,6 +8,7 @@ import {
   SCRATCH_DIR,
   writeArtifact,
 } from './artifacts.js';
+import { NoFollowFileError, readFileNoFollow } from './noFollowFile.js';
 
 /**
  * Run-dir-relative subtree this module reconciles: `scratch/workspace`. This
@@ -214,23 +206,18 @@ function walkWorkspace(workspaceDir: string, checkActive?: () => void): WalkedWo
  * entry type, but that check and this read are two different moments in
  * time — the entry could be swapped for a symlink or a FIFO in between. This
  * is the second, TOCTOU-safe check on the same handle the bytes are read
- * from, mirroring `verifyManifestFiles` in ./artifacts.ts.
+ * from, through the shared no-follow reader.
  */
 function readRegularFileNoFollow(
   absPath: string,
   relPath: string,
   checkActive?: () => void,
 ): Buffer {
-  // See verifyManifestFiles for why these two flags: O_NOFOLLOW refuses to
-  // open a symlink at all, and O_NONBLOCK keeps a FIFO from hanging this
-  // call forever waiting for a writer — regular files are unaffected by
-  // O_NONBLOCK, so it changes nothing for the files this is meant to read.
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-
-  let fd: number;
   try {
-    fd = openSync(absPath, flags);
+    return readFileNoFollow(absPath, {
+      checkActive,
+      maxBytes: SCRATCH_WORKSPACE_MAX_FILE_BYTES,
+    });
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === 'ELOOP') {
@@ -238,48 +225,29 @@ function readRegularFileNoFollow(
         `scratch workspace entry is a symlink, which is never followed or manifested: ${relPath}`,
       );
     }
-    throw error;
-  }
-
-  try {
-    const stats = fstatSync(fd);
-    if (!stats.isFile()) {
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
       throw new Error(
         `scratch workspace entry is not a regular file (socket, FIFO, or device are ` +
           `rejected): ${relPath}`,
       );
     }
-    if (stats.size > SCRATCH_WORKSPACE_MAX_FILE_BYTES) {
+    if (
+      error instanceof NoFollowFileError &&
+      error.kind === 'max_bytes' &&
+      error.phase === 'inspection'
+    ) {
       throw new Error(
         `scratch workspace entry exceeds the ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}-byte ` +
           `(256 MiB) per-file limit before any of it is read into memory: ${relPath} ` +
-          `(${stats.size} bytes)`,
+          `(${error.observedBytes} bytes)`,
       );
     }
-
-    // Read in fixed-size chunks rather than trusting the size fstat just
-    // reported for the whole read: the file can grow between this fstat and
-    // the last byte read, and the ceiling has to hold for the entire read,
-    // not just its starting point.
-    const chunkSize = 1024 * 1024;
-    const chunk = Buffer.alloc(chunkSize);
-    const chunks: Buffer[] = [];
-    let total = 0;
-    for (;;) {
-      checkActive?.();
-      const bytesRead = readSync(fd, chunk, 0, chunkSize, null);
-      if (bytesRead === 0) break;
-      total += bytesRead;
-      if (total > SCRATCH_WORKSPACE_MAX_FILE_BYTES) {
-        throw new Error(
-          `scratch workspace entry grew past the ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}-byte ` +
-            `(256 MiB) limit while it was being read: ${relPath}`,
-        );
-      }
-      chunks.push(Buffer.from(chunk.subarray(0, bytesRead)));
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      throw new Error(
+        `scratch workspace entry grew past the ${SCRATCH_WORKSPACE_MAX_FILE_BYTES}-byte ` +
+          `(256 MiB) limit while it was being read: ${relPath}`,
+      );
     }
-    return Buffer.concat(chunks, total);
-  } finally {
-    closeSync(fd);
+    throw error;
   }
 }

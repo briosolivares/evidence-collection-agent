@@ -151,7 +151,6 @@ describe('loadRunSummary', () => {
         filename: 'top5.csv',
         sizeBytes: 12,
         sha256Prefix: 'deadbeefcafe',
-        sourceUrl: 'https://news.ycombinator.com/',
       },
     ]);
     expect(summary.metrics).toEqual({

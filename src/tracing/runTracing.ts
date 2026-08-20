@@ -6,9 +6,10 @@ import { TraceFlags, type SpanContext } from '@opentelemetry/api';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
-import type { CallModel } from '../model/messages.js';
-import { knownModelUsageFromError } from '../model/modelDriver.js';
+import { knownModelUsageFromError, type ModelDriver } from '../model/modelDriver.js';
+import { modelMessagesLogView } from '../model/logView.js';
 import type { ModelRole } from '../run/runBudget.js';
+import { inlineImageTraceView, isInlineImageToolOutput } from '../tools/inlineImage.js';
 import type { ToolCtx, ToolDef, ToolRegistry } from '../tools/registry.js';
 
 const RUN_OBSERVATION_NAME = 'run-evidence-agent';
@@ -30,14 +31,12 @@ export interface RunTracing {
    * resumes it. Optional so non-UI tracing implementations remain source
    * compatible; the TUI uses it to cover tool-free terminal paths. */
   announceRunDir?(runDir: string): void;
-  /** Return a CallModel with one generation observation per invocation. */
-  wrapCallModel(callModel: CallModel, model?: string, role?: ModelRole): CallModel;
+  /** Return a model driver with one generation observation per invocation. */
+  wrapModelDriver(driver: ModelDriver, model: string, role: ModelRole): ModelDriver;
   /** Return a registry with one tool observation per executor invocation. */
   wrapRegistry(registry: ToolRegistry): ToolRegistry;
   /** Run an operation inside the run's root agent observation. */
   traceRun<T>(taskText: string, operation: () => Promise<T>): Promise<T>;
-  /** Finish exporting observations recorded so far. */
-  flush(): Promise<void>;
   /** Release tracing resources and remove the isolated provider. */
   close(): Promise<void>;
 }
@@ -84,10 +83,9 @@ export function createRunTracing(options: CreateRunTracingOptions = {}): RunTrac
 
 function createNoopRunTracing(): RunTracing {
   return {
-    wrapCallModel: (callModel) => callModel,
+    wrapModelDriver: (driver) => driver,
     wrapRegistry: (registry) => registry,
     traceRun: (_taskText, operation) => operation(),
-    flush: async () => {},
     close: async () => {},
   };
 }
@@ -101,22 +99,18 @@ function createEnabledRunTracing(
   let turnCount = 0;
   const toolsUsed = new Set<string>();
 
-  const wrapCallModel = (callModel: CallModel, model?: string, role?: ModelRole): CallModel => {
-    return async (messages) => {
-      if (!enabled) return callModel(messages);
+  const wrapModelDriver = (driver: ModelDriver, model: string, role: ModelRole): ModelDriver => ({
+    async generate(options) {
+      if (!enabled) return driver.generate(options);
 
-      // `turnCount` has historically meant worker turns. Callers predating
-      // role attribution still receive that behavior, while private
-      // initializer/verifier calls remain visible as generations without
-      // changing the root metric's meaning.
-      if (role === undefined || role === 'worker') turnCount += 1;
+      if (role === 'worker') turnCount += 1;
       const generation = safelyStartObservation(() =>
         startObservation(
           MODEL_OBSERVATION_NAME,
           {
-            input: messages,
-            ...(model === undefined ? {} : { model }),
-            ...(role === undefined ? {} : { metadata: { role } }),
+            input: modelMessagesLogView(options.messages),
+            model,
+            metadata: { role },
           },
           {
             asType: 'generation',
@@ -126,14 +120,14 @@ function createEnabledRunTracing(
       );
 
       try {
-        const response = await callModel(messages);
+        const accepted = await driver.generate(options);
         safelyObserve(() =>
           generation?.update({
-            output: response,
-            usageDetails: usageDetails(response.usage),
+            output: accepted.response,
+            usageDetails: usageDetails(accepted.usage),
           }),
         );
-        return response;
+        return accepted;
       } catch (error) {
         const usage = knownModelUsageFromError(error);
         if (usage !== undefined) {
@@ -148,8 +142,8 @@ function createEnabledRunTracing(
       } finally {
         safelyObserve(() => generation?.end());
       }
-    };
-  };
+    },
+  });
 
   const wrapRegistry = (registry: ToolRegistry): ToolRegistry => {
     if (!enabled) return registry;
@@ -178,9 +172,12 @@ function createEnabledRunTracing(
           try {
             const output = await tool.execute(input, ctx);
             const resultBytes = getResultSizeBytes(output);
+            const observedOutput = isInlineImageToolOutput(output)
+              ? inlineImageTraceView(output)
+              : output;
             safelyObserve(() =>
               observation?.update({
-                output,
+                output: observedOutput,
                 ...(resultBytes === undefined ? {} : { metadata: { resultBytes } }),
               }),
             );
@@ -238,16 +235,9 @@ function createEnabledRunTracing(
   };
 
   return {
-    wrapCallModel,
+    wrapModelDriver,
     wrapRegistry,
     traceRun,
-    flush: async () => {
-      try {
-        await provider.forceFlush();
-      } catch {
-        // Tracing is an optional side channel; the transcript is durable.
-      }
-    },
     close: async () => {
       if (!enabled) return;
       enabled = false;
@@ -296,6 +286,9 @@ function usageDetails(usage: {
 }
 
 function getResultSizeBytes(output: unknown): number | undefined {
+  if (isInlineImageToolOutput(output)) {
+    return Buffer.byteLength(output.text, 'utf8') + output.bytes.byteLength;
+  }
   try {
     const normalized =
       typeof output === 'string' ? output : output === undefined ? '' : JSON.stringify(output);

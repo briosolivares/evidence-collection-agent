@@ -5,7 +5,7 @@ explicitly deferred pending user authorization
 
 **Last updated:** 2026-08-20
 
-**Working branch:** `simplify/sherlock-core`
+**Working branch:** `simplify/production-deep`
 
 **Design authority:** [sherlock-v3-design-doc.md](./sherlock-v3-design-doc.md)
 
@@ -35,6 +35,146 @@ the legacy harness. New v3 modules reused stable seams without inheriting
 initializer/contract/table/evidence/scheduler complexity merely to avoid
 writing a smaller coherent replacement. After the new path passed its gates,
 the public cutover and legacy-production removal were completed.
+
+## Production-depth follow-ups complete (2026-08-20)
+
+- [x] Restore the public `maxTurns`, `maxContextTokens`, and `maxWallTimeMs`
+  run levers with production defaults as fallbacks, and correct oversized tool
+  output guidance so it no longer recommends a verifier-only tool.
+- [x] Give Bash and browser programs one bounded child-process supervisor and
+  one shared browser IPC definition while preserving their domain-specific
+  outcome and cleanup policy.
+- [x] Consolidate identical browser target resolution, deadline settlement,
+  controller assembly, local-session creation, and stateless run-page
+  ownership mechanics. Keep the SIGKILL-tested mutable ownership epoch in its
+  existing owner.
+- [x] Tighten authentication guidance: use the existing session, then ask the
+  user for a login handoff, then report the blocker only when the answered
+  handoff still fails or `ask_user` fails closed.
+
+The quiet-machine hermetic gate passed 147 files / 1,483 tests and typecheck.
+The authorized nine-task live batch then passed 47/51 assertions and 6/9 task
+gates: Airbnb, company freshness, Hacker News, OpenClaw contributors,
+OpenClaw merged PRs, and EDGAR passed; OpenClaw latest PR, Wikipedia reference,
+and YC outreach each missed one grader requirement. Eight runs were internally
+verified. EDGAR alone terminated internally incomplete despite passing all
+three oracle assertions because its immutable download contract used the
+over-broad filename pattern `*`; deterministic assignment therefore treated
+SEC-sourced PNG screenshots as candidates for both the download and screenshot
+outputs and exhausted five correction attempts.
+
+## Post-eval failure corrections complete (2026-08-20)
+
+- [x] Preserve the runtime-executed `publish_artifact` mode as optional
+  `publicationKind` manifest provenance through atomic write recovery,
+  inspection, verifier surfacing, fingerprints, and audit reports. Existing
+  runs without the field retain their historical inference path.
+- [x] Match new screenshot/download contract outputs only to their trusted
+  publication kind. Evidence-only captures no longer create role defects when
+  requested captures already satisfy the count, while a matching evidence-only
+  capture still produces a useful role hint when the requested count is unmet.
+- [x] Canonicalize wildcard-only filename patterns such as `*` to omission
+  during initialization. Another stated constraint remains usable; when the
+  request states none, trusted download publication provenance plus the count
+  identifies the output without inventing a filename.
+- [x] Remove OpenClaw latest PR's hidden `answer.md` grader requirement. Because
+  that task states no filename, its sole manifest-declared requested output is
+  the answer; zero or multiple requested outputs fail without grader
+  cherry-picking.
+- [x] Accept a non-trivial base brand for dotted official YC company names
+  (`Kater` for `kater.ai`) while retaining founder-name, company-specific
+  detail, length, uniqueness, and 15-minute-call requirements.
+
+The Wikipedia visible-ordinal miss was deliberately separated from this
+correction slice rather than receiving a prompt-only patch; the general visual
+observation capability is recorded below. Verification for this slice passes
+9 focused files / 203 tests, `npm run typecheck`, and `git diff --check`; the
+full suite and live evals were not rerun.
+
+## Worker viewport observation complete (2026-08-20)
+
+- [x] Add `capture_screenshot` as the second tool in the frozen worker order.
+  It captures the exact live viewport at CSS scale from the existing
+  run-owned page and returns bounded PNG pixels inline without navigating,
+  writing a file, or publishing an artifact.
+- [x] Require the capture to be the only call in its assistant response so
+  the worker must inspect pixels before taking its next action. Preserve
+  `publish_artifact kind=screenshot` as the sole screenshot evidence and
+  deliverable boundary.
+- [x] Keep successful capture pixels in exactly one model request, then
+  replace them with stable metadata. Preserve real pixels in checkpoint state
+  for crash recovery while redacting them from transcript and tracing
+  projections; count decoded image bytes in result metrics.
+- [x] Share the verifier's API image byte/dimension validation, add strict
+  checkpoint bounds, expose concise TUI activity, and document the nine-tool
+  architecture and visual-observation guidance.
+
+Verification: targeted unit and real-Chrome gates pass 10 files / 140 tests,
+`npm run typecheck` passes, `git diff --check` passes, and the complete
+low-concurrency hermetic suite passes 147 files / 1,489 tests. Live evals and
+the billable Browserbase smoke were not run.
+
+## Download filename canonicalization complete (2026-08-20)
+
+- [x] Run the authorized one-trial EDGAR, Wikipedia reference, and YC outreach
+  follow-up. YC passed 8/8 and verified. Wikipedia exercised
+  `capture_screenshot` twice before a host `ENOSPC` checkpoint failure. EDGAR
+  stopped in initialization because both bounded attempts repeated the
+  wildcard-only download filename pattern.
+- [x] Canonicalize wildcard-only screenshot/download filename patterns to
+  omission instead of rejecting the immutable contract. Meaningful patterns
+  such as `*.pdf` retain their existing semantics.
+- [x] Permit a download contract with no stated filename, media type, or source
+  URL. Deterministic completion matches it only to an artifact carrying the
+  trusted runtime `download` publication kind; legacy untyped artifacts remain
+  fail-closed.
+
+Verification: 3 focused files / 90 tests pass, `npm run typecheck` and
+`git diff --check` pass, and the complete low-concurrency hermetic suite passes
+147 files / 1,491 tests. The post-fix EDGAR trial used `capture_screenshot`,
+verified internally, and passed all 3/3 grader assertions.
+
+## Frame-aware browser upload complete (2026-08-20)
+
+- [x] Keep `browser.upload(backendDOMNodeId, workspacePath)` for exact nodes and
+  add `browser.upload(workspacePath, { selector, frameUrlIncludes? })` for file
+  inputs that are visible only inside application-owned dialogs or iframes.
+- [x] Resolve the selector across every eligible frame of the already pinned
+  page and fail closed unless it identifies exactly one `input[type=file]`.
+  Treat the optional frame URL substring only as a dynamic disambiguator.
+- [x] Route both forms through the existing confined workspace validation,
+  provider byte encoder, upload timeout, command-session drain, and busy-ledger
+  fencing. No browser connection capability enters child IPC.
+- [x] Extend one IPC test, one command-session test, and one existing
+  real-browser upload journey; no broad new test matrix was added.
+
+Verification: focused unit and real-Chrome gates pass 3 files / 45 tests,
+`npm run typecheck` and `git diff --check` pass, and the complete
+low-concurrency hermetic suite passes 147 files / 1,491 tests. One
+concurrency-sensitive renderer-retirement assertion failed during the initial
+four-worker run; its complete browser file passed 4/4 immediately afterward,
+then the two-worker full-suite gate passed cleanly.
+
+## Lazy interactive Chrome attachment complete (2026-08-20)
+
+- [x] Stop creating the attached local-Chrome session before Ink renders;
+  opening `sherlock` and browsing prior runs no longer triggers Chrome's
+  remote-debugging consent flow.
+- [x] Create both attached-Chrome and Browserbase sessions lazily after the
+  first task is submitted, then retain the session for later runs as before.
+- [x] Bind attached-Chrome setup state to the session-creation call and surface
+  each safe message as a transcript notice for the submitting run. CDP
+  endpoints and provider credentials remain outside the event contract.
+- [x] Keep setup failures on the existing run-failure path and preserve
+  post-browser-death relaunch behavior.
+- [x] Remove the two prompt-content test files; the Markdown prompts remain the
+  byte-stable runtime source without a parallel set of brittle prose
+  assertions.
+
+Verification: the focused attached-setup/provider/TUI reducer and lifecycle
+gate passes 4 files / 119 tests, `npm run typecheck` passes, and
+`git diff --check` passes. Per user direction, the already-green full suite was
+not repeated for this final UI slice.
 
 ## Semantic system atlas complete (2026-08-20)
 
@@ -254,13 +394,14 @@ updating the design and this plan in the same commit.
 1. **One persistent worker conversation.** The worker keeps its full useful
    history across verifier corrections.
 2. **Sequential tools.** Tool calls execute in response order. There is no
-   access-key scheduler in the v3 loop. The generic pipeline's session-owned
-   busy-resource registry remains only as a fail-closed timeout guard: if a
-   timed-out promise may still be mutating a resource, a later conflicting
-   call must not race it merely because v3 itself dispatches sequentially.
-3. **Eight worker-visible capabilities.** `browser_execute`,
-   `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
-   `ask_user`, and `finish`. Internals may use more modules; the model-facing
+   access-key scheduler or per-tool access declaration. The pipeline's
+   run-owned busy-resource registry remains as a global fail-closed timeout
+   guard: if a timed-out promise may still be mutating state, later calls and
+   terminalization wait rather than race it merely because dispatch itself is
+   sequential.
+3. **Nine worker-visible capabilities.** `browser_execute`,
+   `capture_screenshot`, `publish_artifact`, `read_file`, `write_file`,
+   `edit_file`, `bash`, `ask_user`, and `finish`. Internals may use more modules; the model-facing
    surface stays compact and deterministically ordered.
 4. **Programmable browser execution.** `browser_execute` runs bounded
    JavaScript in a fresh child process against a parent-owned, target-pinned
@@ -1447,10 +1588,14 @@ proved, even if supporting code already exists.
   complete hermetic suite passes 136 files / 1,484 tests. No live eval or
   Browserbase smoke was run.
 
-### 2026-08-18 — research persistence follow-up planned
+### 2026-08-18 — research persistence follow-up implemented locally
 
-- [ ] Implement the regression fixes and simplification checklist in
+- [x] Implement sections 1 and 3-8, plus the local verification gates in
+  section 9 of
   [research-persistence-follow-up.md](research-persistence-follow-up.md).
+- [x] Deliberately skip section 2's structure-only splits because no behavior
+  change depended on them.
+- [ ] Run section 9's live re-evaluation only with explicit user direction.
 - The August 17 live batch kept Hacker News and YC W24 correct while making
   both more efficient, but MIT sororities CSV regressed to 4/6. A verifier
   correction explicitly allowed a placeholder row, the worker stopped
@@ -1461,8 +1606,71 @@ proved, even if supporting code already exists.
   required coverage, retains typed evidence-backed artifact/report repairs,
   adds bounded source and requested-field research depth, preserves old
   checkpoints, and derives `harness/findings.md` without another model call.
-- Implementation has not started. Refactoring and behavior changes must remain
-  separate verified slices.
+- Local implementation and verification are complete. Live re-evaluation
+  remains open.
+
+### 2026-08-20 — production-depth simplification complete
+
+This pass removed obsolete public surfaces and duplicate runtime mechanics
+without changing Sherlock's model-facing eight-tool prefix or durable wire
+identifiers.
+
+- [x] **T1 — resume and compatibility:** retire the unused public
+  `resumeTask` composition/configuration surface and obsolete contract,
+  correction-cap, finish-input, and budget compatibility branches. Keep
+  checkpoint version 3, `v3_*` transcript events, run locking, and
+  `runAgent`'s checkpoint/crash recovery.
+- [x] **T2 — no-follow file reads:** give descriptor-level no-follow,
+  regular-file, byte-cap, mode, and stable-size mechanics one run-layer owner;
+  preserve caller-specific policy and error text.
+- [x] **T3 — timed-out effects:** remove access keys, conflict derivation, and
+  `ToolDef.getAccess`; use one global abandoned-effect ledger with bounded
+  fixed-point waits and terminal draining.
+- [x] **T4 — lifecycle state:** represent coordinator phases as a
+  discriminated union, remove duplicate worker metrics/restoration checks,
+  and keep durable effect boundaries direct.
+- [x] **T5 — publication:** centralize publication preflight before browser
+  work and at commit, remove the unused manifest verifier, and retain the
+  atomic-file and artifact-journal trust boundaries.
+- [x] **T6 — configuration:** remove unused model, run, TUI, and provider
+  knobs while retaining real eval/provider and durable production policy.
+- [x] **T7 — repeated mechanics:** share only behaviorally identical error,
+  UTF-8, output-decoding, freezing, capability-redaction, and watchdog-start
+  logic; keep domain-specific abort and IPC state machines local.
+- [x] **T8 — model and tracing:** trace `ModelDriver` directly and centralize
+  model usage settlement without merging the distinct stream, attempt, and
+  worker-progress event boundaries.
+- [x] **T9 — browser dead code:** remove unused download/provider fields and
+  repeated CDP parsing; keep the SIGKILL-tested target-ownership seam.
+- [x] **T10 — TUI:** remove dead outcomes/state/configuration and duplicate
+  display helpers without changing Ink mount or interaction ownership.
+- [x] **T11 — login:** fold the one-use manual-login module into the login
+  owner and share service-tab/probe behavior.
+- [x] **T12 — REPL:** retire the unused `npm run agent` surface and its
+  formatter while keeping the TUI and eval entry points on `runTask`.
+
+Under the same production audit convention as the approved baseline (`src` +
+`bin`, excluding tests, prompts, and five development-eval TUI files), the
+tree moves from 32,390 lines / 115 files to 30,664 lines / 121 files: 1,726
+production lines removed (5.3%). Three obsolete production files disappear;
+nine small shared-policy owners are added, so the file count rises by six.
+Those owners were retained after a dedicated fragmentation audit because each
+replaces multiple implementations or owns a security/race contract with
+focused tests; no generic utilities barrel was introduced.
+
+Verification is incremental as well as repository-wide. The focused gates
+cover lifecycle/crash recovery, tools, browser ownership/providers,
+publication transactions, model accounting/tracing, CLI, and TUI behavior.
+`npm run typecheck` and `git diff --check` pass. After making the packaged-TUI
+smoke child wait through full-suite TypeScript-loader contention, the complete
+hermetic suite passes 147 files / 1,482 tests in 74.73 seconds.
+
+Deliberate stops: no generic browser deadline/target-resolution layer, shared
+provider assembly ladder, controller responsibility split, or common Bash /
+browser-execute supervisor was introduced because their error, authority,
+cleanup, and result-precedence semantics differ. The attached-profile reader
+and stock-Node child `.mjs` checks remain at their independent trust
+boundaries. No live Browserbase smoke or eval re-baseline ran.
 
 ## Rules for coordinators and subagents
 

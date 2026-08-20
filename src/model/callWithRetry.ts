@@ -1,5 +1,7 @@
 import { APIConnectionError, APIError, APIUserAbortError } from '@anthropic-ai/sdk';
 
+import { isAbortError } from '../errors.js';
+
 // Manual retry around one whole model call — stream creation AND
 // consumption. The SDK's built-in retry covers only the initial POST;
 // mid-stream SSE `error` events (overloaded_error killed a full eval
@@ -108,7 +110,9 @@ export async function callWithRetry<T>(
       // An abort is never retried — cancellation must propagate now, and a
       // failure observed after abort (e.g. truncation from a killed stream)
       // is the abort wearing a costume.
-      if (opts.signal?.aborted || isAbortError(error)) throw error;
+      if (opts.signal?.aborted || error instanceof APIUserAbortError || isAbortError(error)) {
+        throw error;
+      }
       const reason = transientReason(error);
       const maxAttempts = isTruncatedStreamError(error)
         ? MAX_TRUNCATED_STREAM_ATTEMPTS
@@ -149,14 +153,6 @@ function transientReason(error: unknown): string | undefined {
  * deterministic throws as plain Errors. */
 function isTruncatedStreamError(error: unknown): boolean {
   return error instanceof Error && error.name === 'TruncatedStreamError';
-}
-
-/** Cancellation in any of its shapes: the SDK's abort error class, or the
- * conventional name (the TUI bridge throws Errors named AbortError). */
-function isAbortError(error: unknown): boolean {
-  return (
-    error instanceof APIUserAbortError || (error instanceof Error && error.name === 'AbortError')
-  );
 }
 
 /** The delay before the next attempt: the error's numeric retry-after when

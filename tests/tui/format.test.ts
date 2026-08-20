@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatDuration, formatTokens, truncate } from '../../src/tui/format.js';
+import {
+  formatCompletionLine,
+  formatDuration,
+  formatTokens,
+  truncate,
+  windowAround,
+} from '../../src/tui/format.js';
 
 describe('formatTokens', () => {
   it('renders sub-thousand counts verbatim', () => {
@@ -33,6 +39,24 @@ describe('formatDuration', () => {
   it('rounds to whole seconds and clamps negatives to zero', () => {
     expect(formatDuration(41_700)).toBe('42s');
     expect(formatDuration(-5)).toBe('0s');
+  });
+});
+
+describe('formatCompletionLine', () => {
+  it('formats verified and incomplete terminal states', () => {
+    expect(formatCompletionLine('complete', 42_000, 18_700)).toBe('Brewed in 42s · 18.7k tokens');
+    expect(formatCompletionLine('incomplete', 84_000, 900)).toBe(
+      'Incomplete after 1m 24s · 900 tokens',
+    );
+  });
+});
+
+describe('windowAround', () => {
+  it('centers when possible and clamps at both ends', () => {
+    const items = [0, 1, 2, 3, 4, 5];
+    expect(windowAround(items, 0, 3)).toEqual({ start: 0, items: [0, 1, 2] });
+    expect(windowAround(items, 3, 3)).toEqual({ start: 2, items: [2, 3, 4] });
+    expect(windowAround(items, 5, 3)).toEqual({ start: 3, items: [3, 4, 5] });
   });
 });
 

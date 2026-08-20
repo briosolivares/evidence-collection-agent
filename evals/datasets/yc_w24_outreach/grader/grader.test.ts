@@ -9,7 +9,7 @@ import type { YcW24AiOracle } from '../oracle/ycClient.js';
 import { grade } from './grader.js';
 import { byName } from '../../../testSupport.js';
 
-const COMPANY_NAMES = ['Atlas Labs', 'Beacon AI', 'Cedar Systems', 'Delta Works', 'Ember Logic'];
+const COMPANY_NAMES = ['Atlas Labs', 'Beacon AI', 'Cedar Systems', 'Delta Works', 'Kater.ai'];
 const KEYWORDS = ['robotics', 'compliance', 'forecasting', 'dispatching', 'diagnostics'];
 const ORACLE: YcW24AiOracle = {
   companies: COMPANY_NAMES.map((name, index) => ({
@@ -53,6 +53,20 @@ describe('yc_w24_outreach grader', () => {
       roles: ['requested_output'],
     });
     expect((await grade(runDir, ORACLE)).every((result) => result.passed)).toBe(true);
+  });
+
+  it('accepts the base brand of a domain-style official company name', async () => {
+    const baseBrand = passingCsv().replaceAll('Kater.ai', 'Kater');
+    writeArtifact(runDir, 'artifacts/outreach.csv', Buffer.from(baseBrand), {
+      roles: ['requested_output'],
+    });
+
+    expect(
+      byName(
+        await grade(runDir, ORACLE),
+        'every outreach email is founder/company personalized and asks for a 15-minute call',
+      ).passed,
+    ).toBe(true);
   });
 
   it('rejects an unknown founder and a missing cofounder', async () => {

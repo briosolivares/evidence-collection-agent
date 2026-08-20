@@ -3,23 +3,24 @@ import { z } from 'zod';
 import { browserProviderKindSchema } from '../browser/sessionProvider.js';
 import { outputContractSchema } from './initializer/outputContract.schema.js';
 import type { Message } from '../model/messages.js';
+import { MODEL_MAX_IMAGE_BYTES } from '../model/imageContent.js';
 import type { ModelRole, RunBudgetSnapshot } from '../run/runBudget.js';
-import {
-  finishDefectSchema,
-  finishFactsSchema,
-  type FinishFacts,
-} from './completion/finishFacts.schema.js';
+import { finishDefectSchema, finishFactsSchema } from './completion/finishFacts.schema.js';
 import { VERIFICATION_HISTORY_LIMIT } from './verifier/verifier.js';
 import {
   correctionFindingSchema,
-  type CorrectionFinding,
   type VerificationHistoryEntry,
 } from './verifier/verificationResult.schema.js';
 import {
   durableFinishInputSchema,
   finishUnresolvedRequirementSchema,
 } from '../tools/finish/finish.js';
-import type { FinishRequest, PendingToolTurn, WorkerSnapshot } from './worker/worker.js';
+import {
+  MAX_PROTOCOL_CORRECTIONS,
+  type FinishRequest,
+  type PendingToolTurn,
+  type WorkerSnapshot,
+} from './worker/worker.js';
 
 // The durable checkpoint format: every Zod shape the coordinator persists to
 // and reads from harness/checkpoint.json, plus the types inferred from them.
@@ -78,7 +79,7 @@ const imageBlockSchema = z.strictObject({
   source: z.strictObject({
     type: z.literal('base64'),
     media_type: z.enum(['image/png', 'image/jpeg']),
-    data: z.string(),
+    data: z.string().max(4 * Math.ceil(MODEL_MAX_IMAGE_BYTES / 3)),
   }),
 });
 
@@ -117,12 +118,7 @@ const messageSchema: z.ZodType<Message> = z.discriminatedUnion('role', [
   assistantMessageSchema,
 ]);
 
-const modelRoles = [
-  'initializer',
-  'worker',
-  'verifier',
-  'repair',
-] as const satisfies readonly ModelRole[];
+const modelRoles = ['initializer', 'worker', 'verifier'] as const satisfies readonly ModelRole[];
 
 const roleUsageSchema = z.strictObject({
   turns: z.number().finite().nonnegative(),
@@ -158,11 +154,7 @@ export const durableRunConfigurationSchema = z.strictObject({
     maxWorkerTurns: serializedCeilingSchema(1),
     maxToolCalls: serializedCeilingSchema(0),
     maxModelTokens: serializedCeilingSchema(1),
-    /** Retired whole-run ceiling accepted only so existing checkpoints
-     * remain resumable. New runs omit it and the runtime ignores it. */
-    maxToolResultBytes: serializedCeilingSchema(0).optional(),
     maxWallTimeMs: serializedCeilingSchema(1),
-    maxVerifierCorrections: serializedCeilingSchema(0),
   }),
 });
 
@@ -181,7 +173,7 @@ export const workerSnapshotSchema: z.ZodType<WorkerSnapshot> = z.strictObject({
   messages: z.array(messageSchema).min(1),
   turnCount: z.number().int().nonnegative(),
   peakContextTokens: z.number().int().nonnegative(),
-  protocolCorrections: z.number().int().nonnegative(),
+  protocolCorrections: z.number().int().min(0).max(MAX_PROTOCOL_CORRECTIONS),
   startedMs: z.number().finite().nonnegative(),
 });
 
@@ -273,23 +265,6 @@ export const pendingFinishSchema: z.ZodType<FinishRequest> = z
     }
   });
 
-/** State saved before deterministic checks, or their passed verifier facts. */
-export const pendingCheckSchema = z.discriminatedUnion('status', [
-  z.strictObject({
-    status: z.literal('pending'),
-    attempt: z.number().int().positive(),
-  }),
-  z.strictObject({
-    status: z.literal('passed'),
-    attempt: z.number().int().positive(),
-    facts: finishFactsSchema,
-  }),
-]);
-
-export type PendingCheck =
-  | { status: 'pending'; attempt: number }
-  | { status: 'passed'; attempt: number; facts: FinishFacts };
-
 /** Verifying is intentionally restart-only. The verifier's private
  * conversation is not durable state: recovery reconstructs fresh context
  * from the task, contract, completion report, surfaced manifest entries,
@@ -330,7 +305,6 @@ export const durableTerminalOutcomeSchema = z.discriminatedUnion('status', [
       'worker_incomplete',
       'completion_check_attempts',
       'verifier_unavailable',
-      'verification_attempts',
       'verification_incomplete',
       'budget_exceeded',
     ]),
@@ -388,39 +362,11 @@ const initializingCheckpointSchema = z
     }
   });
 
-/** Legacy durable correction-finding shape from before typed finding kinds
- * existed. Normalized at this read boundary into a non-actionable `research`
- * finding; `nextAction` and `outputId` are intentionally dropped so an old
- * free-form instruction can never be executed after upgrade. */
-const legacyCorrectionFindingSchema = z.strictObject({
-  requirement: nonBlankString(4_000),
-  problem: nonBlankString(4_000),
-  nextAction: nonBlankString(4_000),
-  outputId: nonBlankString(1_024).optional(),
-  evidencePaths: z.array(nonBlankString(1_024)).max(50).optional(),
-});
-
-/** Durable read compatibility for one correction finding: a current typed
- * finding round-trips unchanged; a legacy finding normalizes to `research`.
- * This union is the only place legacy finding handling lives — the
- * coordinator and verifier work purely with the new typed shape. */
-const durableCorrectionFindingSchema: z.ZodType<CorrectionFinding> = z.union([
-  correctionFindingSchema,
-  legacyCorrectionFindingSchema.transform(
-    (legacy): CorrectionFinding => ({
-      kind: 'research',
-      requirement: legacy.requirement,
-      problem: legacy.problem,
-    }),
-  ),
-]);
-
-/** Durable read compatibility for one verification-history entry. */
 const durableVerificationHistoryEntrySchema: z.ZodType<VerificationHistoryEntry> = z.strictObject({
   cycle: z.number().int().positive(),
   completionReport: durableFinishInputSchema,
   surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-  findings: z.array(durableCorrectionFindingSchema).min(1).max(50),
+  findings: z.array(correctionFindingSchema).min(1).max(50),
 });
 
 const activeCommonShape = {

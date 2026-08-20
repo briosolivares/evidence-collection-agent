@@ -1,23 +1,31 @@
-import type { BrowserContext, CDPSession, Page } from 'playwright';
+import type { BrowserContext, CDPSession, Locator, Page } from 'playwright';
 
 import type {
   BrowserCommandSession,
   BrowserNavigationOptions,
   BrowserNavigationResult,
+  BrowserUploadSelectorTarget,
+  BrowserUploadTarget,
 } from './controller.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
+import { settleWithin } from './boundedSettlement.js';
+import { arbitraryCdpSend, isRecord, type ArbitraryCdpSend } from './cdpProtocol.js';
+import {
+  detachSessionWithinDeadline,
+  requireTargetIdFromResponse,
+  targetIdFromTargetInfoResponse,
+} from './targetResolution.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 
 /** Transport URLs are session-control capabilities. Even if a driver error
  * happens to echo one, it must stop at this controller-owned boundary. */
 const TRANSPORT_URL = /\b(?:https?|wss?):\/\/[^\s"'<>]+/giu;
-const DETACH_DEADLINE_MS = 1_000;
 const NAVIGATION_STOP_DEADLINE_MS = 1_000;
 const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const MAX_NAVIGATION_URL_BYTES = 256_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
-
-type ArbitraryCdpSend = (method: string, params?: Record<string, unknown>) => Promise<unknown>;
+const MAX_UPLOAD_SELECTOR_BYTES = 4_096;
+const MAX_UPLOAD_FRAME_URL_HINT_BYTES = 4_096;
 
 /**
  * Controller-owned authority policy for browser-scoped Target commands.
@@ -53,25 +61,79 @@ export interface PlaywrightCommandSessionHooks {
   release?: (detach: () => Promise<void>, hadPendingCommands: boolean) => Promise<void>;
 }
 
-async function uploadToBackendNode(
+async function uploadToTarget(
   page: Page,
   send: ArbitraryCdpSend,
   uploadEncoder: BrowserUploadEncoder,
-  backendDOMNodeId: number,
+  target: BrowserUploadTarget,
   absolutePath: string,
 ): Promise<void> {
   // Encode/read before touching the page. A missing or unreadable file must
   // fail before even the temporary marker becomes observable in the document.
   const encoded = await uploadEncoder.encode([absolutePath]);
-  await withBackendNodeLocator(page, send, backendDOMNodeId, async (target) => {
-    const isFileInput = await target.evaluate(
+  const attach = async (locator: Locator): Promise<void> => {
+    const isFileInput = await locator.evaluate(
       (element) => element instanceof HTMLInputElement && element.type === 'file',
     );
     if (!isFileInput) {
       throw new TypeError('browser.upload target must be an input[type=file]');
     }
-    await target.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
-  });
+    await locator.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
+  };
+  if (typeof target === 'number') {
+    await withBackendNodeLocator(page, send, target, attach);
+    return;
+  }
+  await attach(await uniqueUploadLocator(page, validateUploadSelectorTarget(target)));
+}
+
+function validateUploadSelectorTarget(
+  target: BrowserUploadSelectorTarget,
+): BrowserUploadSelectorTarget {
+  if (
+    typeof target.selector !== 'string' ||
+    target.selector.length === 0 ||
+    Buffer.byteLength(target.selector, 'utf8') > MAX_UPLOAD_SELECTOR_BYTES
+  ) {
+    throw new TypeError(
+      `browser.upload selector must contain 1 through ${MAX_UPLOAD_SELECTOR_BYTES} UTF-8 bytes`,
+    );
+  }
+  if (
+    target.frameUrlIncludes !== undefined &&
+    (typeof target.frameUrlIncludes !== 'string' ||
+      target.frameUrlIncludes.length === 0 ||
+      Buffer.byteLength(target.frameUrlIncludes, 'utf8') > MAX_UPLOAD_FRAME_URL_HINT_BYTES)
+  ) {
+    throw new TypeError(
+      `browser.upload frameUrlIncludes must contain 1 through ${MAX_UPLOAD_FRAME_URL_HINT_BYTES} UTF-8 bytes`,
+    );
+  }
+  return target;
+}
+
+async function uniqueUploadLocator(
+  page: Page,
+  target: BrowserUploadSelectorTarget,
+): Promise<Locator> {
+  let match: Locator | undefined;
+  let matchCount = 0;
+  for (const frame of page.frames()) {
+    if (target.frameUrlIncludes !== undefined && !frame.url().includes(target.frameUrlIncludes)) {
+      continue;
+    }
+    const candidate = frame.locator(target.selector);
+    const count = await candidate.count();
+    matchCount += count;
+    if (count === 1 && match === undefined) match = candidate;
+    if (matchCount > 1) break;
+  }
+  if (matchCount !== 1 || match === undefined) {
+    throw new Error(
+      `browser.upload selector must match exactly one file input across eligible frames; matched ${matchCount}`,
+    );
+  }
+  return match;
 }
 
 function errorText(error: unknown): string {
@@ -84,27 +146,6 @@ function commandError(operation: string, error: unknown): Error {
   // provider connection URL in its message or metadata even after the public
   // message is redacted.
   return new Error(`${operation}: ${errorText(error)}`);
-}
-
-function arbitrarySend(session: CDPSession): ArbitraryCdpSend {
-  // Playwright types the method argument as the protocol methods known by the
-  // installed package. This seam intentionally permits newer/experimental CDP
-  // methods too; Chrome remains the runtime validator.
-  return session.send.bind(session) as unknown as ArbitraryCdpSend;
-}
-
-async function detachWithoutHanging(session: CDPSession): Promise<void> {
-  let timer: NodeJS.Timeout | undefined;
-  try {
-    await Promise.race([
-      session.detach().catch(() => undefined),
-      new Promise<void>((resolve) => {
-        timer = setTimeout(resolve, DETACH_DEADLINE_MS);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
 }
 
 function validateNavigation(url: string, options: BrowserNavigationOptions): void {
@@ -132,32 +173,15 @@ function validateNavigation(url: string, options: BrowserNavigationOptions): voi
 }
 
 async function stopNavigationWithoutHanging(send: ArbitraryCdpSend): Promise<void> {
-  let timer: NodeJS.Timeout | undefined;
-  try {
-    await Promise.race([
-      send('Page.stopLoading').catch(() => undefined),
-      new Promise<void>((resolve) => {
-        timer = setTimeout(resolve, NAVIGATION_STOP_DEADLINE_MS);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  await settleWithin(send('Page.stopLoading'), NAVIGATION_STOP_DEADLINE_MS);
 }
 
 function responseTargetId(value: unknown, operation: string): string {
-  if (!isRecord(value) || !isRecord(value.targetInfo)) {
-    throw new Error(`${operation} returned an invalid response.`);
-  }
-  const targetId = value.targetInfo.targetId;
-  if (typeof targetId !== 'string' || targetId.length === 0) {
-    throw new Error(`${operation} returned an invalid target identity.`);
-  }
-  return targetId;
+  return requireTargetIdFromResponse(
+    value,
+    () => new Error(`${operation} returned an invalid response.`),
+    () => new Error(`${operation} returned an invalid target identity.`),
+  );
 }
 
 function requiredTargetId(params: Record<string, unknown>, operation: string): string {
@@ -273,13 +297,12 @@ export async function openPlaywrightCommandSession(
     throw commandError(`Could not attach a browser command session to pageId ${pageId}`, error);
   }
 
-  const send = arbitrarySend(session);
+  const send = arbitraryCdpSend(session);
   const uploadEncoder = hooks.uploadEncoder ?? localUploadEncoder;
   let targetId: string;
   try {
-    const response = await send('Target.getTargetInfo');
-    const candidate = (response as { targetInfo?: { targetId?: unknown } }).targetInfo?.targetId;
-    if (typeof candidate !== 'string' || candidate.length === 0) {
+    const candidate = targetIdFromTargetInfoResponse(await send('Target.getTargetInfo'));
+    if (candidate === undefined) {
       throw new Error('Target.getTargetInfo returned no target id');
     }
     targetId = candidate;
@@ -287,7 +310,7 @@ export async function openPlaywrightCommandSession(
       throw new Error(`pageId ${pageId} closed while its command session was opening`);
     }
   } catch (error) {
-    await detachWithoutHanging(session);
+    await detachSessionWithinDeadline(session);
     throw commandError(`Could not resolve the browser target for pageId ${pageId}`, error);
   }
 
@@ -364,19 +387,15 @@ export async function openPlaywrightCommandSession(
       })();
       return trackCommand(operation);
     },
-    upload(backendDOMNodeId, absolutePath) {
+    upload(target, absolutePath) {
       if (closed) {
         return Promise.reject(new Error(`Browser command session for pageId ${pageId} is closed.`));
       }
-      const effect = uploadToBackendNode(
-        page,
-        send,
-        uploadEncoder,
-        backendDOMNodeId,
-        absolutePath,
-      ).catch((error: unknown) => {
-        throw commandError(`Browser upload failed for pageId ${pageId}`, error);
-      });
+      const effect = uploadToTarget(page, send, uploadEncoder, target, absolutePath).catch(
+        (error: unknown) => {
+          throw commandError(`Browser upload failed for pageId ${pageId}`, error);
+        },
+      );
       const settled = effect.then(
         () => undefined,
         () => undefined,
@@ -399,7 +418,7 @@ export async function openPlaywrightCommandSession(
         await Promise.all([...inFlightUploads]);
         // Detach is cleanup: it is attempted exactly once and cannot mask the
         // command/program outcome merely because the target disappeared first.
-        const detach = () => detachWithoutHanging(session);
+        const detach = () => detachSessionWithinDeadline(session);
         await (hooks.release?.(detach, inFlightCommands.size > 0) ?? detach());
       })();
       return closePromise;

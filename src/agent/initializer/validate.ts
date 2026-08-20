@@ -33,10 +33,9 @@ export const RESERVED_OUTPUT_FILENAMES: readonly string[] = [
  * or `download` output spec. `*` matches any run of characters; everything
  * else is literal.
  *
- * Lives here, beside the field it interprets, because TWO places must agree on
- * it: the capture tools check a filename before writing it, and the submission
- * checks count the captures that matched. Two implementations would let a tool
- * accept a name the submission check then rejects.
+ * Lives here, beside the field it interprets: the finish checks are its one
+ * consumer today, and keeping the interpretation with the contract means any
+ * future consumer inherits the same semantics instead of reimplementing them.
  */
 export function matchesFilenamePattern(name: string, pattern: string): boolean {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
@@ -61,16 +60,15 @@ export type OutputContractValidation =
  *   so the model can correct the whole contract in one follow-up call
  *
  * Rejects, beyond the schema: duplicate output ids; two outputs claiming the
- * same file; unsafe filenames and filename patterns (path separators,
+ * same file; unsafe filenames and meaningful filename patterns (path separators,
  * absolute paths, `.`/`..`, control characters, the run's own reserved
- * names); duplicate table columns; enum columns with repeated values;
+ * names); wildcard-only filename patterns are canonicalized to omission;
+ * duplicate table columns; enum columns with repeated values;
  * invalid IANA timezones or BCP 47 locales; conflicting table rules
- * (repeated count rules, a minimum above an exact count, uniqueness or
- * expected values naming an undeclared column, more expected values than
- * rows); a download constrained by nothing; a document requiring
- * per-section evidence with no sections, or visible footnotes with no
- * evidence at all; an external action demanding visible proof content
- * while requiring no proof screenshots.
+ * (repeated count rules, a minimum above an exact count, uniqueness rules
+ * naming an undeclared column); a document requiring per-section evidence with no sections, or visible
+ * footnotes with no evidence at all; an external action demanding visible
+ * proof content while requiring no proof screenshots.
  */
 export function validateOutputContract(input: unknown): OutputContractValidation {
   const parsed = outputContractSchema.safeParse(input);
@@ -86,10 +84,32 @@ export function validateOutputContract(input: unknown): OutputContractValidation
     );
   }
 
-  const errors = checkOutputs(parsed.data.outputs);
+  const contract = canonicalizeFilenamePatterns(parsed.data);
+  const errors = checkOutputs(contract.outputs);
   if (errors.length > 0) return failure(errors);
 
-  return { ok: true, contract: parsed.data };
+  return { ok: true, contract };
+}
+
+/** A wildcard-only pattern carries no filename information. Store omission
+ * as the one canonical representation so downstream matching cannot confuse
+ * it with a meaningful constraint. */
+function canonicalizeFilenamePatterns(contract: OutputContract): OutputContract {
+  return {
+    ...contract,
+    outputs: contract.outputs.map((output) => {
+      if (
+        (output.kind === 'screenshots' || output.kind === 'download') &&
+        output.filenamePattern !== undefined &&
+        output.filenamePattern.replaceAll('*', '') === ''
+      ) {
+        const normalized = structuredClone(output);
+        delete normalized.filenamePattern;
+        return normalized;
+      }
+      return output;
+    }),
+  };
 }
 
 /** Every cross-field check over the contract's outputs. */
@@ -204,9 +224,12 @@ function unsafeFilenameReason(filename: string): string | undefined {
  * inherits the same safety rules (wildcards excepted). */
 function checkFilenamePattern(outputId: string, pattern: string): string[] {
   const problem = unsafeFilenameReason(pattern);
-  return problem === undefined
-    ? []
-    : [`output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`];
+  if (problem !== undefined) {
+    return [
+      `output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`,
+    ];
+  }
+  return [];
 }
 
 /** Column-level checks: distinct headers, well-formed enum value sets, and
@@ -290,7 +313,6 @@ function checkRules(
   }
 
   const seenUniqueSets = new Set<string>();
-  const seenExpectedColumns = new Set<string>();
   for (const rule of rules) {
     if (rule.type === 'unique') {
       const duplicates = duplicatesOf(rule.columns);
@@ -314,36 +336,6 @@ function checkRules(
         );
       }
       seenUniqueSets.add(key);
-    }
-
-    if (rule.type === 'matches_expected_values') {
-      if (!declared.has(rule.column)) {
-        errors.push(
-          `${label} matches_expected_values rule names undeclared column ` +
-            `${JSON.stringify(rule.column)}`,
-        );
-      }
-      if (seenExpectedColumns.has(rule.column)) {
-        errors.push(
-          `${label} declares two matches_expected_values rules for column ` +
-            `${JSON.stringify(rule.column)}`,
-        );
-      }
-      seenExpectedColumns.add(rule.column);
-
-      const duplicates = duplicatesOf(rule.expected);
-      if (duplicates.length > 0) {
-        errors.push(
-          `${label} matches_expected_values rule for column ${JSON.stringify(rule.column)} ` +
-            `repeats value(s) ${duplicates.map((value) => JSON.stringify(value)).join(', ')}`,
-        );
-      }
-      if (exact !== undefined && rule.expected.length > exact.value) {
-        errors.push(
-          `${label} expects ${rule.expected.length} values in column ` +
-            `${JSON.stringify(rule.column)} but allows only ${exact.value} rows`,
-        );
-      }
     }
   }
   return errors;
@@ -392,22 +384,14 @@ function checkExternalAction(output: Extract<OutputSpec, { kind: 'external_actio
   return [];
 }
 
-/** A download must constrain something. "Any file the browser happened to
- * save" is not a requirement, and code could never check it. */
+/** Validate optional download media constraints. A contract without a
+ * filename/media/source constraint is legitimate when the request does not
+ * name one; completion then requires the runtime-recorded download
+ * publication kind rather than guessing from bytes or filenames. */
 function checkDownload(output: Extract<OutputSpec, { kind: 'download' }>): string[] {
   const errors: string[] = [];
   const label = `output ${JSON.stringify(output.id)}`;
 
-  const constrained =
-    output.filenamePattern !== undefined ||
-    output.allowedMediaTypes !== undefined ||
-    output.sourceUrlPattern !== undefined;
-  if (!constrained) {
-    errors.push(
-      `${label} constrains nothing: a download output needs at least one of ` +
-        `filenamePattern, allowedMediaTypes, or sourceUrlPattern, or any saved file would satisfy it`,
-    );
-  }
   for (const mediaType of output.allowedMediaTypes ?? []) {
     if (!/^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*\/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$/.test(mediaType)) {
       errors.push(

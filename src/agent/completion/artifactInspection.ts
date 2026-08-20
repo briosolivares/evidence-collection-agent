@@ -1,17 +1,11 @@
 import { createHash } from 'node:crypto';
-import {
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  openSync,
-  readSync,
-} from 'node:fs';
+import { lstatSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
 import { browserProviderKindSchema } from '../../browser/sessionProvider.js';
+import { errorMessage } from '../../errors.js';
 import {
   ARTIFACTS_DIR,
   MANIFEST_FILENAME,
@@ -20,8 +14,14 @@ import {
   type Manifest,
   type ManifestEntry,
 } from '../../run/artifacts.js';
+import {
+  inspectPathNoFollow,
+  NoFollowFileError,
+  readFileChunksNoFollow,
+} from '../../run/noFollowFile.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { SCRATCH_WORKSPACE_MAX_FILE_BYTES } from '../../run/syncScratchWorkspace.js';
+import { decodeUtf8 } from '../../utf8.js';
 import type { FinishDefect } from './finishFacts.schema.js';
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
@@ -44,6 +44,7 @@ const manifestEntryShapeSchema = z
     sha256: z.string(),
     capturedAt: canonicalUtcIsoTimestampSchema,
     sourceUrl: z.string().optional(),
+    publicationKind: z.enum(['file', 'text', 'screenshot', 'download']).optional(),
     roles: z.array(z.enum(['requested_output', 'evidence'])).optional(),
     completionStatus: z.enum(['complete', 'partial']).optional(),
   })
@@ -464,19 +465,19 @@ function inspectRegularFileMetadataNoFollow(
   runDir: string,
   artifactPath: string,
 ): { byteLength: number } | { defect: FinishDefect } {
-  const opened = openRegularFileNoFollow(runDir, artifactPath);
-  if ('defect' in opened) return opened;
+  const target = resolveInspectableArtifactPath(runDir, artifactPath);
+  if ('defect' in target) return target;
   try {
-    return { byteLength: opened.byteLength };
-  } finally {
-    closeSync(opened.descriptor);
+    return { byteLength: inspectPathNoFollow(target.absolutePath).size };
+  } catch (error) {
+    return { defect: artifactReadDefect(artifactPath, error) };
   }
 }
 
-function openRegularFileNoFollow(
+function resolveInspectableArtifactPath(
   runDir: string,
   artifactPath: string,
-): { descriptor: number; byteLength: number } | { defect: FinishDefect } {
+): { absolutePath: string } | { defect: FinishDefect } {
   let absolute: string;
   try {
     absolute = resolveRunPath(runDir, artifactPath);
@@ -516,48 +517,7 @@ function openRegularFileNoFollow(
     }
   }
 
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  let descriptor: number;
-  try {
-    descriptor = openSync(absolute, flags);
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException).code;
-    return {
-      defect: {
-        code: code === 'ELOOP' ? 'artifact_symlink' : 'missing_recorded_file',
-        artifactPath,
-        message:
-          code === 'ELOOP'
-            ? `${artifactPath} is a symlink, not a published regular file.`
-            : `${artifactPath} is recorded in the manifest but is missing or unreadable: ${errorMessage(error)}.`,
-      },
-    };
-  }
-
-  try {
-    const stat = fstatSync(descriptor);
-    if (!stat.isFile()) {
-      closeSync(descriptor);
-      return {
-        defect: {
-          code: 'artifact_not_regular_file',
-          artifactPath,
-          message: `${artifactPath} is not a regular file. Re-publish it as ordinary file bytes.`,
-        },
-      };
-    }
-    return { descriptor, byteLength: stat.size };
-  } catch (error) {
-    closeSync(descriptor);
-    return {
-      defect: {
-        code: 'unreadable_recorded_file',
-        artifactPath,
-        message: `${artifactPath} could not be read: ${errorMessage(error)}.`,
-      },
-    };
-  }
+  return { absolutePath: absolute };
 }
 
 function hashRegularFileNoFollow(
@@ -577,18 +537,14 @@ function hashRegularFileNoFollow(
       retentionExceeded: boolean;
     }
   | { defect: FinishDefect; byteLength?: number } {
-  const opened = openRegularFileNoFollow(runDir, artifactPath);
-  if ('defect' in opened) return opened;
-  if (opened.byteLength > SCRATCH_WORKSPACE_MAX_FILE_BYTES) {
-    closeSync(opened.descriptor);
-    return {
-      defect: artifactTooLargeDefect(artifactPath, opened.byteLength),
-      byteLength: opened.byteLength,
-    };
-  }
+  const target = resolveInspectableArtifactPath(runDir, artifactPath);
+  if ('defect' in target) return target;
 
   const hash = createHash('sha256');
-  const chunk = Buffer.allocUnsafe(STREAM_CHUNK_BYTES);
+  const chunks = readFileChunksNoFollow(target.absolutePath, {
+    chunkBytes: STREAM_CHUNK_BYTES,
+    maxBytes: SCRATCH_WORKSPACE_MAX_FILE_BYTES,
+  });
   const retainedChunks: Buffer[] = [];
   const prefixChunks: Buffer[] = [];
   let retainedForEntry = 0;
@@ -597,21 +553,17 @@ function hashRegularFileNoFollow(
   let retentionExceeded = false;
   let activeCheckFailed = false;
   try {
-    while (true) {
+    for (;;) {
       try {
         checkActive?.();
       } catch (error) {
         activeCheckFailed = true;
         throw error;
       }
-      const count = readSync(opened.descriptor, chunk, 0, chunk.byteLength, null);
-      if (count === 0) break;
-      if (byteLength + count > SCRATCH_WORKSPACE_MAX_FILE_BYTES) {
-        return {
-          defect: artifactTooLargeDefect(artifactPath, byteLength + count, true),
-          byteLength: byteLength + count,
-        };
-      }
+      const next = chunks.next();
+      if (next.done) break;
+      const view = next.value;
+      const count = view.byteLength;
       if (totalBudget.used + count > totalBudget.max) {
         totalBudget.exceeded = true;
         return {
@@ -627,7 +579,6 @@ function hashRegularFileNoFollow(
       }
       totalBudget.used += count;
       byteLength += count;
-      const view = chunk.subarray(0, count);
       hash.update(view);
 
       if (prefixed < prefixBytes) {
@@ -660,6 +611,22 @@ function hashRegularFileNoFollow(
     };
   } catch (error) {
     if (activeCheckFailed) throw error;
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      return {
+        defect: artifactTooLargeDefect(artifactPath, error.observedBytes!, error.phase === 'read'),
+        byteLength: error.observedBytes,
+      };
+    }
+    const code = (error as NodeJS.ErrnoException).code;
+    if (
+      code === 'ELOOP' ||
+      code === 'ENOENT' ||
+      code === 'ENOTDIR' ||
+      code === 'EACCES' ||
+      (error instanceof NoFollowFileError && error.kind === 'not_regular')
+    ) {
+      return { defect: artifactReadDefect(artifactPath, error), byteLength };
+    }
     return {
       defect: {
         code: 'unreadable_recorded_file',
@@ -669,7 +636,7 @@ function hashRegularFileNoFollow(
       byteLength,
     };
   } finally {
-    closeSync(opened.descriptor);
+    chunks.return();
   }
 }
 
@@ -678,58 +645,29 @@ function readManifestNoFollow(
   maxBytes: number,
   checkActive?: () => void,
 ): { raw: string } | { defect: FinishDefect } {
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  let descriptor: number;
-  try {
-    descriptor = openSync(manifestPath, flags);
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException).code;
-    return {
-      defect: {
-        code: code === 'ELOOP' ? 'unsafe_manifest_file' : 'missing_manifest',
-        message:
-          code === 'ELOOP'
-            ? `${MANIFEST_FILENAME} is a symlink; run provenance must be an ordinary file.`
-            : `${MANIFEST_FILENAME} is missing or unreadable. Preserve the run directory and retry only after its provenance is restored.`,
-      },
-    };
-  }
-
+  const chunks = readFileChunksNoFollow(manifestPath, {
+    chunkBytes: STREAM_CHUNK_BYTES,
+    maxBytes,
+  });
   let activeCheckFailed = false;
+  const buffers: Buffer[] = [];
+  let total = 0;
   try {
-    const stat = fstatSync(descriptor);
-    if (!stat.isFile()) {
-      return {
-        defect: {
-          code: 'unsafe_manifest_file',
-          message: `${MANIFEST_FILENAME} is not a regular file. Restore ordinary bounded provenance JSON.`,
-        },
-      };
-    }
-    if (stat.size > maxBytes) return { defect: manifestTooLargeDefect(stat.size, maxBytes) };
-
-    const chunks: Buffer[] = [];
-    let total = 0;
-    const chunk = Buffer.allocUnsafe(Math.min(STREAM_CHUNK_BYTES, maxBytes + 1));
-    while (true) {
+    for (;;) {
       try {
         checkActive?.();
       } catch (error) {
         activeCheckFailed = true;
         throw error;
       }
-      const count = readSync(descriptor, chunk, 0, chunk.byteLength, null);
-      if (count === 0) break;
-      total += count;
-      if (total > maxBytes) return { defect: manifestTooLargeDefect(total, maxBytes) };
-      chunks.push(Buffer.from(chunk.subarray(0, count)));
+      const next = chunks.next();
+      if (next.done) break;
+      buffers.push(next.value);
+      total += next.value.byteLength;
     }
-    const bytes = Buffer.concat(chunks, total);
-    let raw: string;
-    try {
-      raw = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-    } catch {
+    const bytes = Buffer.concat(buffers, total);
+    const raw = decodeUtf8(bytes);
+    if (raw === undefined) {
       return {
         defect: {
           code: 'unparseable_manifest',
@@ -740,6 +678,26 @@ function readManifestNoFollow(
     return { raw };
   } catch (error) {
     if (activeCheckFailed) throw error;
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === 'ELOOP') {
+      return {
+        defect: {
+          code: 'unsafe_manifest_file',
+          message: `${MANIFEST_FILENAME} is a symlink; run provenance must be an ordinary file.`,
+        },
+      };
+    }
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
+      return {
+        defect: {
+          code: 'unsafe_manifest_file',
+          message: `${MANIFEST_FILENAME} is not a regular file. Restore ordinary bounded provenance JSON.`,
+        },
+      };
+    }
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      return { defect: manifestTooLargeDefect(error.observedBytes!, maxBytes) };
+    }
     return {
       defect: {
         code: 'missing_manifest',
@@ -747,8 +705,30 @@ function readManifestNoFollow(
       },
     };
   } finally {
-    closeSync(descriptor);
+    chunks.return();
   }
+}
+
+function artifactReadDefect(artifactPath: string, error: unknown): FinishDefect {
+  if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
+    return {
+      code: 'artifact_symlink',
+      artifactPath,
+      message: `${artifactPath} is a symlink, not a published regular file.`,
+    };
+  }
+  if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
+    return {
+      code: 'artifact_not_regular_file',
+      artifactPath,
+      message: `${artifactPath} is not a regular file. Re-publish it as ordinary file bytes.`,
+    };
+  }
+  return {
+    code: 'missing_recorded_file',
+    artifactPath,
+    message: `${artifactPath} is recorded in the manifest but is missing or unreadable: ${errorMessage(error)}.`,
+  };
 }
 
 function validateTimestampOrder(manifest: Manifest, defects: FinishDefect[]): Set<number> {
@@ -894,14 +874,6 @@ export function inferMediaTypes(bytes: Uint8Array, filename: string): string[] {
   return ['application/octet-stream'];
 }
 
-export function decodeUtf8(bytes: Uint8Array): string | undefined {
-  try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-  } catch {
-    return undefined;
-  }
-}
-
 function startsWith(bytes: Uint8Array, signature: readonly number[]): boolean {
   return (
     bytes.length >= signature.length && signature.every((byte, index) => bytes[index] === byte)
@@ -921,8 +893,4 @@ function includesAscii(bytes: Uint8Array, value: string, limit: number): boolean
 
 function toPortablePath(value: string): string {
   return value.split(sep).join('/');
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

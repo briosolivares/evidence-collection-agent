@@ -20,12 +20,13 @@ export interface BrowserDialog {
 export interface BrowserScreenshotOptions {
   pageId?: string;
   fullPage?: boolean;
+  /** CSS scale keeps visual-observation screenshots compact on high-DPI displays. */
+  scale?: 'css' | 'device';
 }
 
 export interface BrowserDownloadResult {
   finalUrl: string;
   status?: number;
-  headers: Readonly<Record<string, string>>;
   bytes: Uint8Array;
   suggestedFilename?: string;
 }
@@ -62,6 +63,15 @@ export interface BrowserNavigationResult {
   title: string;
 }
 
+/** A file input selected atomically across the pinned page's frames. */
+export interface BrowserUploadSelectorTarget {
+  selector: string;
+  frameUrlIncludes?: string;
+}
+
+/** Existing exact-node authority plus a frame-aware file-input convenience. */
+export type BrowserUploadTarget = number | BrowserUploadSelectorTarget;
+
 /** Provider-neutral command channel pinned to one exact live page. */
 export interface BrowserCommandSession {
   readonly pageId: string;
@@ -70,8 +80,9 @@ export interface BrowserCommandSession {
   /** Navigate the pinned page and return only after the requested lifecycle
    * state, or after containing a bounded timeout/failure. */
   navigate(url: string, options: BrowserNavigationOptions): Promise<BrowserNavigationResult>;
-  /** Attach one confined local file to an exact accessibility backend node. */
-  upload(backendDOMNodeId: number, absolutePath: string): Promise<void>;
+  /** Attach one confined local file to an exact backend node or one unique
+   * file input resolved across the pinned page's frames. */
+  upload(target: BrowserUploadTarget, absolutePath: string): Promise<void>;
   close(): Promise<void>;
 }
 

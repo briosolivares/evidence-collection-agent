@@ -68,7 +68,6 @@ const runner = (
     });
     resolveDone({
       status: 'verified',
-      finalText: 'Resumed after the human handoff and finished.',
       runDir: '/tmp/pty-harness-run',
     });
   })();

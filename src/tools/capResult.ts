@@ -49,7 +49,7 @@ export interface OffloadedResult {
    * min(PREVIEW_MAX_BYTES, the cap) bytes, always whole UTF-8 characters. */
   preview: string;
   /** Run-dir-relative path of the file holding the complete output, usable
-   * directly with read_file / grep. */
+   * directly with read_file. */
   offloadedTo: string;
   /** Human/model-readable explanation: the output's size, the cap it broke,
    * and how to read the rest. */
@@ -61,7 +61,7 @@ export interface OffloadedResult {
  * pass through untouched; oversize results are written — complete — to a
  * numbered file under scratch/tool-output/ in the run directory (via
  * writeArtifact, so the manifest records its hash) and replaced by a
- * preview + path the model can follow up on with read_file / grep.
+ * preview + path the model can follow up on with read_file.
  *
  * @param runDir - absolute path to a run directory whose manifest has been
  *   initialized (offloading throws otherwise, writing nothing)
@@ -147,7 +147,7 @@ export function offloadResult(
     note:
       `Output was ${sizeBytes} bytes, ${limitDescription}. ` +
       `The complete output is saved at ${relPath} in the run directory — ` +
-      `use read_file or grep on that path to read the rest.`,
+      `use read_file on that path to read the rest, with offset/limit for windows.`,
   };
 }
 

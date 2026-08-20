@@ -1,4 +1,5 @@
 import type { BrowserJavaScriptPolicy } from '../browser/browserJavaScript.js';
+import { deepFreezeJsonLike } from '../deepFreeze.js';
 import {
   createRegistry,
   toApiToolDefs,
@@ -9,6 +10,7 @@ import {
 import { askUserTool } from './askUser/askUser.js';
 import { createBashTool } from './bash/bash.js';
 import { createBrowserExecuteTool } from './browserExecute/browserExecute.js';
+import { captureScreenshotTool } from './captureScreenshot/captureScreenshot.js';
 import { editFileTool } from './editFile/editFile.js';
 import { readFileTool } from './readFile/readFile.js';
 import { writeFileTool } from './writeFile/writeFile.js';
@@ -18,6 +20,7 @@ import { publishArtifactTool } from './publishArtifact/publishArtifact.js';
 /** Exact model-visible order. It is part of the byte-stable cached prefix. */
 export const WORKER_TOOL_ORDER = Object.freeze([
   'browser_execute',
+  'capture_screenshot',
   'publish_artifact',
   'read_file',
   'write_file',
@@ -37,6 +40,7 @@ export interface WorkerToolRegistryDeps {
 }
 
 const STATIC_TOOLS: ReadonlyMap<WorkerToolName, ToolDef> = new Map([
+  ['capture_screenshot', captureScreenshotTool as ToolDef],
   ['publish_artifact', publishArtifactTool as ToolDef],
   ['read_file', readFileTool as ToolDef],
   ['write_file', writeFileTool as ToolDef],
@@ -85,7 +89,7 @@ export function createWorkerToolRegistry(deps: WorkerToolRegistryDeps): ToolRegi
  * affect tool closures, never names, descriptions, or schemas. Deep freezing
  * prevents a caller from corrupting the shared prefix for later runs.
  */
-export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
+export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreezeJsonLike(
   toApiToolDefs(
     createWorkerToolRegistry({
       javascriptPolicy: 'allow',
@@ -93,13 +97,3 @@ export const WORKER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
     }),
   ),
 );
-
-function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    for (const child of Object.values(value as Record<string, unknown>)) {
-      deepFreeze(child);
-    }
-    Object.freeze(value);
-  }
-  return value;
-}

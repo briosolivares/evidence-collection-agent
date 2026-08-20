@@ -21,19 +21,12 @@ export const SLASH_COMMANDS: readonly SlashCommand[] = [
 ];
 
 /** Commands available in this runtime. Evals exist only in a checkout. */
-export function availableCommands(
-  evalsEnabled = true,
-): readonly SlashCommand[] {
-  return evalsEnabled
-    ? SLASH_COMMANDS
-    : SLASH_COMMANDS.filter((entry) => entry.name !== '/evals');
+export function availableCommands(evalsEnabled = true): readonly SlashCommand[] {
+  return evalsEnabled ? SLASH_COMMANDS : SLASH_COMMANDS.filter((entry) => entry.name !== '/evals');
 }
 
 /** The registry entry whose name is exactly `command`, if any. */
-export function findCommand(
-  command: string,
-  evalsEnabled = true,
-): SlashCommand | undefined {
+export function findCommand(command: string, evalsEnabled = true): SlashCommand | undefined {
   return availableCommands(evalsEnabled).find((entry) => entry.name === command);
 }
 
@@ -43,13 +36,8 @@ export function findCommand(
  * match's name must start with the typed prefix (case-insensitive).
  * Returns [] otherwise — an empty result hides the panel.
  */
-export function filterCommands(
-  input: string,
-  evalsEnabled = true,
-): readonly SlashCommand[] {
+export function filterCommands(input: string, evalsEnabled = true): readonly SlashCommand[] {
   if (!input.startsWith('/') || /\s/.test(input)) return [];
   const prefix = input.toLowerCase();
-  return availableCommands(evalsEnabled).filter((entry) =>
-    entry.name.startsWith(prefix),
-  );
+  return availableCommands(evalsEnabled).filter((entry) => entry.name.startsWith(prefix));
 }

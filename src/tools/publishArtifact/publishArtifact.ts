@@ -1,24 +1,17 @@
-import {
-  closeSync,
-  constants as fsConstants,
-  fstatSync,
-  lstatSync,
-  openSync,
-  readSync,
-} from 'node:fs';
+import { lstatSync } from 'node:fs';
 import { join, posix, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
 import type { BrowserController, BrowserDownloadResult } from '../../browser/controller.js';
 import {
-  ARTIFACTS_DIR,
   type ArtifactRole,
   type ManifestEntry,
-  readManifest,
+  preflightArtifactWrite,
   SCRATCH_DIR,
   writeArtifact,
 } from '../../run/artifacts.js';
+import { NoFollowFileError, readFileNoFollow } from '../../run/noFollowFile.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { SCRATCH_WORKSPACE_MAX_FILE_BYTES } from '../../run/syncScratchWorkspace.js';
 import type { ToolCtx, ToolDef } from '../registry.js';
@@ -191,12 +184,11 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
     'the same assistant response; they execute sequentially. Overwriting is ' +
     'allowed only when the existing artifact has the same role set.',
   inputSchema: publishArtifactInputSchema,
-  getAccess: () => ({ reads: [], writes: [], exclusive: true }),
   async execute(input, ctx): Promise<ManifestEntry> {
     assertNotCancelled(ctx.abortSignal);
 
     const roles = canonicalRoles(input.roles);
-    const artifactPath = prepareArtifactWrite(ctx.runDir, input.artifact_path, roles);
+    const artifactPath = preflightArtifactWrite(ctx.runDir, input.artifact_path, roles);
 
     let bytes: Uint8Array;
     let sourceUrl: string | undefined;
@@ -251,6 +243,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
 
     return writeArtifact(ctx.runDir, artifactPath, bytes, {
       roles,
+      publicationKind: input.kind,
       ...(sourceUrl === undefined ? {} : { sourceUrl }),
     });
   },
@@ -258,93 +251,6 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
 
 function canonicalRoles(roles: readonly ArtifactRole[]): ArtifactRole[] {
   return (['requested_output', 'evidence'] as const).filter((role) => roles.includes(role));
-}
-
-/** Resolve and validate an artifact destination before acquiring bytes. */
-function prepareArtifactWrite(
-  runDir: string,
-  requestedPath: string,
-  roles: readonly ArtifactRole[],
-): string {
-  const absolutePath = resolveRunPath(runDir, requestedPath);
-  const normalizedPath = relative(resolve(runDir), absolutePath);
-  if (!normalizedPath.startsWith(`${ARTIFACTS_DIR}${sep}`)) {
-    throw new Error(
-      `artifact_path must resolve under ${ARTIFACTS_DIR}/: ${JSON.stringify(requestedPath)}`,
-    );
-  }
-
-  const existingEntry = readManifest(runDir).artifacts.find(
-    (entry) => entry.filename === normalizedPath,
-  );
-  if (existingEntry !== undefined && !sameRoleSet(existingEntry.roles, roles)) {
-    throw new Error(
-      `cannot overwrite ${normalizedPath}: existing roles ${formatRoles(existingEntry.roles)} ` +
-        `do not match requested roles ${formatRoles(roles)}`,
-    );
-  }
-
-  const destinationState = inspectDestinationPath(runDir, normalizedPath);
-  if (destinationState === 'file' && existingEntry === undefined) {
-    throw new Error(
-      `cannot overwrite unmanifested file at ${normalizedPath}; choose another artifact_path`,
-    );
-  }
-
-  return normalizedPath;
-}
-
-function sameRoleSet(
-  left: readonly ArtifactRole[] | undefined,
-  right: readonly ArtifactRole[],
-): boolean {
-  if (left === undefined || left.length !== right.length) return false;
-  const rightSet = new Set(right);
-  return left.every((role) => rightSet.has(role));
-}
-
-function formatRoles(roles: readonly ArtifactRole[] | undefined): string {
-  return JSON.stringify(roles ?? []);
-}
-
-/**
- * Reject a destination whose existing path contains a symlink or special
- * file. `writeArtifact` is intentionally still the writer; this guard keeps
- * its ordinary filesystem write from following a model-created link.
- */
-function inspectDestinationPath(runDir: string, normalizedPath: string): 'missing' | 'file' {
-  const segments = normalizedPath.split(sep);
-  let current = resolve(runDir);
-
-  for (let index = 0; index < segments.length; index += 1) {
-    current = join(current, segments[index]!);
-    let stats;
-    try {
-      stats = lstatSync(current);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return 'missing';
-      throw error;
-    }
-
-    const display = segments.slice(0, index + 1).join('/');
-    if (stats.isSymbolicLink()) {
-      throw new Error(
-        `artifact destination contains a symlink, which is never followed: ${display}`,
-      );
-    }
-    if (index < segments.length - 1) {
-      if (!stats.isDirectory()) {
-        throw new Error(`artifact destination ancestor is not a directory: ${display}`);
-      }
-      continue;
-    }
-    if (!stats.isFile()) {
-      throw new Error(`artifact destination is not a regular file: ${normalizedPath}`);
-    }
-    return 'file';
-  }
-
-  return 'missing';
 }
 
 /**
@@ -364,48 +270,32 @@ function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
 
   assertSourceAncestorsAreDirectories(runDir, normalizedPath);
 
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  let fd: number;
   try {
-    fd = openSync(absolutePath, flags);
+    return readFileNoFollow(absolutePath, { maxBytes: MAX_PUBLISH_ARTIFACT_BYTES });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
       throw new Error(`source_path is a symlink, which is never followed: ${normalizedPath}`);
     }
-    throw error;
-  }
-
-  try {
-    const stats = fstatSync(fd);
-    if (!stats.isFile()) {
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
       throw new Error(`source_path is not a regular file: ${normalizedPath}`);
     }
-    if (stats.size > MAX_PUBLISH_ARTIFACT_BYTES) {
+    if (
+      error instanceof NoFollowFileError &&
+      error.kind === 'max_bytes' &&
+      error.phase === 'inspection'
+    ) {
       throw new Error(
         `source_path exceeds the ${MAX_PUBLISH_ARTIFACT_BYTES}-byte publication limit: ` +
-          `${normalizedPath} (${stats.size} bytes)`,
+          `${normalizedPath} (${error.observedBytes} bytes)`,
       );
     }
-
-    const chunk = Buffer.alloc(1024 * 1024);
-    const chunks: Buffer[] = [];
-    let total = 0;
-    for (;;) {
-      const bytesRead = readSync(fd, chunk, 0, chunk.byteLength, null);
-      if (bytesRead === 0) break;
-      total += bytesRead;
-      if (total > MAX_PUBLISH_ARTIFACT_BYTES) {
-        throw new Error(
-          `source_path grew past the ${MAX_PUBLISH_ARTIFACT_BYTES}-byte publication limit ` +
-            `while being read: ${normalizedPath}`,
-        );
-      }
-      chunks.push(Buffer.from(chunk.subarray(0, bytesRead)));
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      throw new Error(
+        `source_path grew past the ${MAX_PUBLISH_ARTIFACT_BYTES}-byte publication limit ` +
+          `while being read: ${normalizedPath}`,
+      );
     }
-    return Buffer.concat(chunks, total);
-  } finally {
-    closeSync(fd);
+    throw error;
   }
 }
 

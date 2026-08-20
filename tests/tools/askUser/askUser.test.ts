@@ -33,14 +33,9 @@ function allowWith(answers: AskUserAnswers) {
 }
 
 describe('ask_user tool', () => {
-  it('is an exclusive interactive tool with the ask_user name', () => {
+  it('is an interactive tool with the ask_user name', () => {
     expect(askUserTool.name).toBe('ask_user');
     expect(askUserTool.requiresUserInteraction).toBe(true);
-    expect(askUserTool.getAccess({ question: 'Continue?' })).toEqual({
-      reads: [],
-      writes: [],
-      exclusive: true,
-    });
   });
 
   it('accepts optional context and exactly two to four unique options', () => {

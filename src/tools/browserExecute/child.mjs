@@ -1,11 +1,9 @@
 import { createBrowserApi } from './coreHelpers.mjs';
+import { isRecord, sendBoundedIpc, structuredError } from './ipcShared.mjs';
 
 const PROTOCOL_VERSION = 1;
 const HARD_MAX_IPC_MESSAGE_BYTES = 1_048_576;
 const HARD_MAX_RESULT_BYTES = 524_288;
-const MAX_ERROR_NAME_BYTES = 256;
-const MAX_ERROR_MESSAGE_BYTES = 8_192;
-const MAX_ERROR_STACK_BYTES = 24_576;
 
 let started = false;
 let finished = false;
@@ -14,64 +12,21 @@ let maxIpcMessageBytes = HARD_MAX_IPC_MESSAGE_BYTES;
 let maxResultBytes = HARD_MAX_RESULT_BYTES;
 const pending = new Map();
 
-function truncateUtf8(value, maxBytes) {
-  const text = String(value);
-  const bytes = Buffer.from(text, 'utf8');
-  if (bytes.length <= maxBytes) return text;
-  let end = maxBytes;
-  while (end > 0 && (bytes[end] & 0b1100_0000) === 0b1000_0000) end -= 1;
-  return `${bytes.subarray(0, end).toString('utf8')}…`;
-}
-
-function structuredError(thrown) {
-  if (thrown instanceof Error) {
-    return {
-      name: truncateUtf8(thrown.name || 'Error', MAX_ERROR_NAME_BYTES),
-      message: truncateUtf8(thrown.message || String(thrown), MAX_ERROR_MESSAGE_BYTES),
-      ...(typeof thrown.stack === 'string'
-        ? { stack: truncateUtf8(thrown.stack, MAX_ERROR_STACK_BYTES) }
-        : {}),
-    };
-  }
-  return {
-    name: 'Error',
-    message: truncateUtf8(String(thrown), MAX_ERROR_MESSAGE_BYTES),
-  };
-}
-
-function serializedSize(value) {
-  const json = JSON.stringify(value);
-  if (json === undefined) throw new TypeError('value is not JSON-serializable');
-  return Buffer.byteLength(json, 'utf8');
-}
-
-function isRecord(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
 function sendBounded(message, callback) {
-  let size;
-  try {
-    size = serializedSize(message);
-  } catch (error) {
-    callback?.(error);
-    return false;
-  }
-  if (size > maxIpcMessageBytes) {
-    callback?.(new RangeError(`IPC message exceeds ${maxIpcMessageBytes} bytes`));
-    return false;
-  }
-  if (typeof process.send !== 'function' || !process.connected) {
-    callback?.(new Error('browser-program IPC channel is closed'));
-    return false;
-  }
-  try {
-    process.send(message, callback);
-    return true;
-  } catch (error) {
-    callback?.(error);
-    return false;
-  }
+  return sendBoundedIpc(message, {
+    maxBytes: maxIpcMessageBytes,
+    isConnected: () => typeof process.send === 'function' && process.connected,
+    send: (payload) => process.send(payload, callback),
+    fail: (kind, error) => {
+      callback?.(
+        kind === 'oversized'
+          ? new RangeError(`IPC message exceeds ${maxIpcMessageBytes} bytes`)
+          : kind === 'closed'
+            ? new Error('browser-program IPC channel is closed')
+            : error,
+      );
+    },
+  });
 }
 
 function rejectPending(error) {
@@ -210,15 +165,13 @@ process.on('message', (message) => {
       failProtocol('browser program received more than one start message');
       return;
     }
+    // The parent is trusted and already validated the page identity (shape,
+    // non-empty, 4096-byte bounds) before sending `start`, and coreHelpers
+    // re-normalizes it when building the browser API. Only the child's own
+    // hard IPC/result ceilings are enforced here.
     if (
       typeof message.code !== 'string' ||
       !isRecord(message.page) ||
-      typeof message.page.pageId !== 'string' ||
-      message.page.pageId.length === 0 ||
-      Buffer.byteLength(message.page.pageId, 'utf8') > 4_096 ||
-      typeof message.page.targetId !== 'string' ||
-      message.page.targetId.length === 0 ||
-      Buffer.byteLength(message.page.targetId, 'utf8') > 4_096 ||
       !Number.isInteger(message.maxIpcMessageBytes) ||
       message.maxIpcMessageBytes <= 0 ||
       message.maxIpcMessageBytes > HARD_MAX_IPC_MESSAGE_BYTES ||

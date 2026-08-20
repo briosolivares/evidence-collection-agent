@@ -72,6 +72,7 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
     await runAndExpectSigkill('after_artifact', 'artifacts/capture.bin', bytes, {
       roles: ['requested_output', 'evidence'],
       sourceUrl: 'https://example.test/capture',
+      publicationKind: 'download',
     });
 
     expect(readFileSync(join(runDir, 'artifacts/capture.bin'))).toEqual(bytes);
@@ -95,6 +96,7 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
         filename: 'artifacts/capture.bin',
         roles: ['requested_output', 'evidence'],
         sourceUrl: 'https://example.test/capture',
+        publicationKind: 'download',
         sha256: hash(bytes),
       },
     });
@@ -109,6 +111,7 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
         filename: 'artifacts/capture.bin',
         roles: ['requested_output', 'evidence'],
         sourceUrl: 'https://example.test/capture',
+        publicationKind: 'download',
         sha256: hash(bytes),
       }),
     ]);

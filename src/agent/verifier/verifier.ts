@@ -1,5 +1,7 @@
 import { Buffer } from 'node:buffer';
 
+import { deepFreezeJsonLike } from '../../deepFreeze.js';
+import { errorMessage, isAbortError } from '../../errors.js';
 import type { OutputContract } from '../initializer/outputContract.schema.js';
 import type { CallModel, Message, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
 import {
@@ -92,7 +94,7 @@ const FORCED_REPORT_PROMPT =
 const REPAIR_SUFFIX =
   'Respond again with one valid report_verification call and no other tool calls.';
 
-export const VERIFIER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze([
+export const VERIFIER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreezeJsonLike([
   ...toApiToolDefs(createVerifierRegistry()),
   structuredClone(REPORT_VERIFICATION_TOOL),
 ]);
@@ -461,13 +463,9 @@ export function buildVerifierOpeningInput(
 }
 
 /** Render per-column nonblank cell counts as plain informational coverage
- * facts alongside the settled row count. Absent for outputs loaded from a
- * checkpoint written before this field existed, and never a threshold. */
+ * facts alongside the settled row count. */
 function formatColumnCoverage(outputs: readonly OutputFact[] | undefined): string[] {
-  const tables = (outputs ?? []).filter(
-    (output): output is TableFact =>
-      output.kind === 'table' && output.columnNonblankCounts !== undefined,
-  );
+  const tables = (outputs ?? []).filter((output): output is TableFact => output.kind === 'table');
   if (tables.length === 0) return [];
   return [
     '',
@@ -475,7 +473,7 @@ function formatColumnCoverage(outputs: readonly OutputFact[] | undefined): strin
     'Plain nonblank cell counts computed by code, out of the settled row count above.',
     ...tables.flatMap((table) => [
       `- ${table.artifactPath} (${table.rowCount} row(s)):`,
-      ...table.columnNonblankCounts!.map(
+      ...table.columnNonblankCounts.map(
         (count) => `  - ${count.column}: ${count.nonblankCount} nonblank`,
       ),
     ]),
@@ -505,22 +503,4 @@ function verifierResultBytes(results: readonly ToolResultBlock[]): number {
       typeof result.content === 'string' ? result.content : JSON.stringify(result.content);
     return total + Buffer.byteLength(content, 'utf8');
   }, 0);
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError';
-}
-
-function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
-    for (const child of Object.values(value as Record<string, unknown>)) {
-      deepFreeze(child);
-    }
-    Object.freeze(value);
-  }
-  return value;
 }

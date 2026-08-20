@@ -1,6 +1,6 @@
 import { Box, Text } from 'ink';
 
-import { formatBytes, formatDuration, formatTokens } from '../format.js';
+import { formatBytes, formatCompletionLine, formatDuration, formatTokens } from '../format.js';
 import type { TranscriptItem } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 import { describeRoles } from './ArtifactDetail.js';
@@ -67,11 +67,7 @@ export function TranscriptItemView({
             <Text color={item.outcome === 'complete' ? theme.success : theme.error}>
               {`${item.outcome === 'complete' ? glyphs.success : glyphs.error} `}
             </Text>
-            <Text>
-              {item.outcome === 'complete'
-                ? `${item.verb} in ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`
-                : `Incomplete after ${formatDuration(item.elapsedMs)} · ${formatTokens(item.tokens)}`}
-            </Text>
+            <Text>{formatCompletionLine(item.outcome, item.elapsedMs, item.tokens)}</Text>
           </Box>
           {item.artifacts.map((artifact) => (
             <Text key={artifact.filename}>

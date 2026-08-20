@@ -12,7 +12,6 @@ import { initManifest, readManifest, writeArtifact } from '../../src/run/artifac
 import {
   createBusyResourceRegistry,
   createRegistry,
-  EXCLUSIVE_ACCESS,
   type BusyResourceRegistry,
   type ToolDef,
   type ToolRegistry,
@@ -64,7 +63,6 @@ const CONFIGURATION: DurableRunConfiguration = {
     maxToolCalls: 20,
     maxModelTokens: 100_000,
     maxWallTimeMs: 1_000_000,
-    maxVerifierCorrections: 2,
   },
 };
 
@@ -648,43 +646,12 @@ describe('coordinator terminal lifecycle', () => {
     expectBrowserLifecycle(browser);
   });
 
-  it('ignores the retired verifier-correction ceiling and continues the same worker session', async () => {
-    const browser = fakeBrowser();
-    const outcome = await runCoordinator({
-      initializer: scriptedDriver([initializerAccepted()]),
-      worker: scriptedDriver([
-        publishReport('Alice', 'publish-before-correction-limit'),
-        finishResponse('finish-correction-limit'),
-        publishReport('Bob', 'publish-after-correction-limit'),
-        finishResponse('finish-after-correction-limit'),
-      ]),
-      verifier: scriptedDriver([
-        verifierResponse('needs_correction'),
-        verifierResponse('verified'),
-      ]),
-      browser: browser.controller,
-      configuration: {
-        ...CONFIGURATION,
-        budgetLimits: {
-          ...CONFIGURATION.budgetLimits,
-          maxVerifierCorrections: 0,
-        },
-      },
-    });
-
-    expect(outcome).toMatchObject({ status: 'verified' });
-    const results = toolResultsFor(readCheckpoint(runDir), 'finish-correction-limit');
-    expect(results).toHaveLength(1);
-    expect(results[0]?.content).toContain('"status":"needs_correction"');
-    expectBrowserLifecycle(browser);
-  });
-
   it.each([
     {
       label: 'worker-turn ceiling',
       limits: { maxWorkerTurns: 1 },
       response: publishReport('Alice', 'publish-at-turn-limit'),
-      detail: 'max_turns',
+      detail: 'worker_turns',
     },
     {
       label: 'aggregate model-token ceiling',
@@ -962,7 +929,7 @@ describe('coordinator terminal lifecycle', () => {
     });
     const verifier = scriptedDriver([
       () => {
-        busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect);
+        busyRegistry.markAbandoned(effect);
         return verifierResponse('verified');
       },
     ]);
@@ -1259,7 +1226,6 @@ function delayedPublishTool(
     name: 'delayed_publish_for_test',
     description: 'Test-only publisher that outlives its pipeline deadline.',
     inputSchema: z.strictObject({}),
-    getAccess: () => EXCLUSIVE_ACCESS,
     timeoutMs: 5,
     async execute(_input, ctx) {
       if (typeof delay === 'number') {

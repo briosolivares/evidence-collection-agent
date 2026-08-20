@@ -12,6 +12,12 @@ describe('deriveSemanticLine', () => {
       isEvidence: false,
     },
     {
+      name: 'capture_screenshot',
+      input: { page_id: 'page-1' },
+      line: 'Inspecting the live viewport',
+      isEvidence: false,
+    },
+    {
       name: 'publish_artifact',
       input: {
         kind: 'screenshot',

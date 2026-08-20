@@ -2,14 +2,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import {
   chmodSync,
   closeSync,
-  constants as fsConstants,
-  fstatSync,
   fsyncSync,
   lstatSync,
   mkdirSync,
   opendirSync,
   openSync,
-  readSync,
   unlinkSync,
 } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
@@ -18,6 +15,7 @@ import { z } from 'zod';
 
 import type { Manifest, ManifestEntry } from './artifacts.js';
 import { writeFileDurablyAtomic } from './atomicFile.js';
+import { NoFollowFileError, readFileChunksNoFollow } from './noFollowFile.js';
 import { resolveRunPath } from './runDir.js';
 
 const MANIFEST_FILENAME = 'manifest.json';
@@ -41,6 +39,7 @@ const manifestEntrySchema = z.strictObject({
   filename: z.string().min(1),
   sha256: z.string().regex(SHA256_PATTERN),
   sourceUrl: z.string().optional(),
+  publicationKind: z.enum(['file', 'text', 'screenshot', 'download']).optional(),
   roles: z
     .array(z.enum(['requested_output', 'evidence']))
     .min(1)
@@ -336,6 +335,9 @@ function assertEntryPartition(entry: ManifestEntry): void {
   if (scratch && entry.roles !== undefined) {
     throw new Error(`scratch artifact transaction entry must not carry roles`);
   }
+  if (scratch && entry.publicationKind !== undefined) {
+    throw new Error(`scratch artifact transaction entry must not carry publicationKind`);
+  }
 }
 
 function upsertManifestEntry(runDir: string, entry: ManifestEntry, checkActive?: () => void): void {
@@ -350,7 +352,7 @@ function loadManifestNoFollow(runDir: string, checkActive?: () => void): Manifes
   const path = join(resolve(runDir), MANIFEST_FILENAME);
   let raw: string;
   try {
-    raw = readRegularFileNoFollow(path, ARTIFACT_WRITE_MAX_MANIFEST_BYTES, checkActive).toString(
+    raw = readTransactionFile(path, ARTIFACT_WRITE_MAX_MANIFEST_BYTES, checkActive).toString(
       'utf8',
     );
   } catch (error) {
@@ -481,83 +483,93 @@ function targetMatchesIntent(
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
     throw error;
   }
-  let descriptor: number;
+  const chunks = readFileChunksNoFollow(path, {
+    chunkBytes: HASH_CHUNK_BYTES,
+    maxBytes: byteLength,
+    stableSize: true,
+  });
+  const hash = createHash('sha256');
+  let observed = 0;
+  let activeCheckFailed = false;
   try {
-    descriptor = openSync(
-      path,
-      fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0),
-    );
+    for (;;) {
+      try {
+        checkActive?.();
+      } catch (error) {
+        activeCheckFailed = true;
+        throw error;
+      }
+      const next = chunks.next();
+      if (next.done) break;
+      observed += next.value.byteLength;
+      hash.update(next.value);
+    }
+    return observed === byteLength && hash.digest('hex') === expectedHash;
   } catch (error) {
+    if (activeCheckFailed) throw error;
     const code = (error as NodeJS.ErrnoException).code;
     // The target may change between lstat and O_NOFOLLOW open. Treat absence
     // or a newly planted symlink as a non-match; never follow it.
     if (code === 'ENOENT' || code === 'ELOOP') return false;
+    if (error instanceof NoFollowFileError) return false;
     throw error;
-  }
-  try {
-    const before = fstatSync(descriptor);
-    if (!before.isFile() || before.size !== byteLength) return false;
-
-    const hash = createHash('sha256');
-    const chunk = Buffer.allocUnsafe(HASH_CHUNK_BYTES);
-    let observed = 0;
-    for (;;) {
-      checkActive?.();
-      const count = readSync(descriptor, chunk, 0, chunk.byteLength, null);
-      if (count === 0) break;
-      observed += count;
-      if (observed > byteLength) return false;
-      hash.update(chunk.subarray(0, count));
-    }
-    const after = fstatSync(descriptor);
-    return (
-      observed === byteLength &&
-      after.isFile() &&
-      after.size === byteLength &&
-      hash.digest('hex') === expectedHash
-    );
   } finally {
-    closeSync(descriptor);
+    chunks.return();
   }
 }
 
-function readRegularFileNoFollow(
+function readTransactionFile(
   path: string,
   maximumBytes: number,
   checkActive?: () => void,
+  expectedMode?: number,
 ): Buffer {
   const before = lstatSync(path);
   if (!before.isFile() || before.isSymbolicLink()) {
     throw new Error(`${path} must be a regular file; symlinks are not followed`);
   }
-  const flags =
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
-  const fd = openSync(path, flags);
+  const chunks = readFileChunksNoFollow(path, {
+    chunkBytes: HASH_CHUNK_BYTES,
+    maxBytes: maximumBytes,
+    ...(expectedMode === undefined ? {} : { expectedMode }),
+  });
+  const buffers: Buffer[] = [];
+  let total = 0;
+  let activeCheckFailed = false;
   try {
-    const stat = fstatSync(fd);
-    if (!stat.isFile()) {
+    for (;;) {
+      try {
+        checkActive?.();
+      } catch (error) {
+        activeCheckFailed = true;
+        throw error;
+      }
+      const next = chunks.next();
+      if (next.done) break;
+      buffers.push(next.value);
+      total += next.value.byteLength;
+    }
+    return Buffer.concat(buffers, total);
+  } catch (error) {
+    if (activeCheckFailed) throw error;
+    if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
+      throw new Error(`${path} must be a regular file; symlinks are not followed`);
+    }
+    if (error instanceof NoFollowFileError && error.kind === 'not_regular') {
       throw new Error(`${path} must be a regular file`);
     }
-    if (stat.size > maximumBytes) {
-      throw fileSizeLimitError(path, stat.size, maximumBytes);
+    if (error instanceof NoFollowFileError && error.kind === 'mode_mismatch') {
+      throw new Error(
+        `${path} has mode 0${error.actualMode!.toString(8)}, ` +
+          `expected 0${error.expectedMode!.toString(8)}`,
+      );
     }
-
-    const chunks: Buffer[] = [];
-    const chunk = Buffer.allocUnsafe(HASH_CHUNK_BYTES);
-    let total = 0;
-    for (;;) {
-      checkActive?.();
-      const count = readSync(fd, chunk, 0, chunk.byteLength, null);
-      if (count === 0) break;
-      total += count;
-      if (total > maximumBytes) {
-        throw fileSizeLimitError(path, total, maximumBytes);
-      }
-      chunks.push(Buffer.from(chunk.subarray(0, count)));
+    if (error instanceof NoFollowFileError && error.kind === 'max_bytes') {
+      throw fileSizeLimitError(path, error.observedBytes!, maximumBytes);
     }
-    return Buffer.concat(chunks, total);
+    throw error;
   } finally {
-    closeSync(fd);
+    chunks.return();
   }
 }
 
@@ -572,9 +584,12 @@ function readJournal(path: string, checkActive?: () => void): ArtifactWriteJourn
       `${path} has mode 0${mode.toString(8)}, expected 0${PRIVATE_FILE_MODE.toString(8)}`,
     );
   }
-  const raw = readRegularFileNoFollow(path, ARTIFACT_WRITE_MAX_JOURNAL_BYTES, checkActive).toString(
-    'utf8',
-  );
+  const raw = readTransactionFile(
+    path,
+    ARTIFACT_WRITE_MAX_JOURNAL_BYTES,
+    checkActive,
+    PRIVATE_FILE_MODE,
+  ).toString('utf8');
   let value: unknown;
   try {
     value = JSON.parse(raw);

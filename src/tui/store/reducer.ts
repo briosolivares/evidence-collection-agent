@@ -11,7 +11,6 @@
 //   are invisible to the tracing seam) settle as ⚠ retried at the next
 //   turn_start, or at run end.
 
-import { formatDuration, formatTokens } from '../format.js';
 import {
   availableCommands,
   filterCommands,
@@ -113,9 +112,6 @@ export function helpText(evalsEnabled = true): string {
   ].join('\n');
 }
 
-/** Complete development-checkout help, retained for pure store callers. */
-export const HELP_TEXT = helpText();
-
 /**
  * Route one submitted composer line: `/`-prefixed lines are commands
  * (known — per the SLASH_COMMANDS registry — or unknown), everything
@@ -142,7 +138,6 @@ export function unknownCommandNotice(command: string): string {
 export function createInitialState(
   options: {
     apiKeyPresent?: boolean;
-    completionVerb?: string;
     identity?: BannerIdentity | undefined;
     evalsEnabled?: boolean;
   } = {},
@@ -158,7 +153,6 @@ export function createInitialState(
       },
     ],
     nextItemId: 1,
-    completionVerb: options.completionVerb ?? 'Brewed',
     evalsEnabled: options.evalsEnabled ?? true,
     composer: initialComposer(),
     artifacts: [],
@@ -535,7 +529,6 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           nextPendingId: 1,
           startedAt: action.at,
           tokens: { settled: 0, estimate: 0 },
-          turn: 0,
         },
       };
     }
@@ -557,10 +550,18 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       return append(state, { kind: 'notice', text });
     }
 
+    case 'browser_setup':
+      // Attached-Chrome setup asks the user to act inside Chrome (enable
+      // remote debugging, approve the connection prompt) while their
+      // submitted run waits for its lazily created session. Each state
+      // lands as a transcript notice so the wait is visible; once
+      // attached, the run's own events follow and supersede it.
+      return append(state, { kind: 'notice', text: action.message });
+
     case 'turn_start': {
       if (state.live === undefined) return state;
       const next = settleDanglingPending(finalizeStreamingText(state));
-      return { ...next, live: { ...next.live!, turn: action.turn } };
+      return next;
     }
 
     case 'text_delta': {
@@ -723,55 +724,33 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'run_finished': {
       const live = state.live;
       if (live === undefined) return state;
-      const successful = action.outcome === 'completed' || action.outcome === 'verified';
-      const humanFacing = successful || action.outcome === 'incomplete';
-      let next = settleTerminalControlPending(
-        finalizeStreamingText(state),
-        humanFacing ? 'ok' : 'error',
-      );
+      const outcome = action.outcome === 'verified' ? 'complete' : 'incomplete';
+      let next = settleTerminalControlPending(finalizeStreamingText(state), 'ok');
       next = settleDanglingPending(next);
       const elapsedMs = action.at - live.startedAt;
       const tokens = displayTokens(next.live!);
-      if (humanFacing) {
-        const outcome = successful ? 'complete' : 'incomplete';
-        next = append(next, {
-          kind: 'completion',
-          outcome,
-          verb: state.completionVerb,
-          elapsedMs,
-          tokens,
-          runDir: action.runDir,
-          artifacts: completionDigest(state.artifacts),
-        });
-        // Record the completion panel's summary — interactive runs only
-        // (eval trials complete between trials, where no panel belongs).
-        if (state.evalsActive !== true) {
-          next = {
-            ...next,
-            completedRun: {
-              outcome,
-              unresolved: action.unresolved ?? [],
-              verb: state.completionVerb,
-              elapsedMs,
-              tokens,
-              runDir: action.runDir,
-              ...(action.finalText === undefined ? {} : { finalText: action.finalText }),
-            },
-          };
-        }
-      } else {
-        // Synthetic legacy budget stops retain their historical diagnostic
-        // rendering. Real incomplete runs take the human-facing branch above.
-        const reason =
-          action.reason === 'max_turns' ? 'turn limit reached' : 'context budget exhausted';
-        next = append(next, {
-          kind: 'error',
-          message:
-            `Stopped early after ${formatDuration(elapsedMs)} · ` +
-            `${formatTokens(tokens)} — ${reason}` +
-            (action.detail === undefined ? '' : `\n  ${action.detail}`) +
-            `\n  ${action.runDir}`,
-        });
+      next = append(next, {
+        kind: 'completion',
+        outcome,
+        elapsedMs,
+        tokens,
+        runDir: action.runDir,
+        artifacts: completionDigest(state.artifacts),
+      });
+      // Record the completion panel's summary — interactive runs only
+      // (eval trials complete between trials, where no panel belongs).
+      if (state.evalsActive !== true) {
+        next = {
+          ...next,
+          completedRun: {
+            outcome,
+            unresolved: action.unresolved ?? [],
+            elapsedMs,
+            tokens,
+            runDir: action.runDir,
+            ...(action.finalText === undefined ? {} : { finalText: action.finalText }),
+          },
+        };
       }
       return endRun(next);
     }

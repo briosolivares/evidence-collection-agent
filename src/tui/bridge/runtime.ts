@@ -1,6 +1,7 @@
-// Session-long wiring: one browser, either supplied after a visible pre-render
-// attached-Chrome setup or launched lazily on the first interactive run,
-// handed to later runs and closed at TUI teardown. If the
+// Session-long wiring: one browser, either supplied by a host or launched
+// lazily on the first interactive run, handed to later runs and closed at TUI
+// teardown. Attached-Chrome setup state is routed into that first run's
+// transcript instead of printing before Ink owns the terminal. If the
 // browser dies mid-session (window closed, process killed), the failure
 // is classified and the next submit relaunches a fresh browser instead of
 // failing every subsequent run.
@@ -27,24 +28,13 @@ export interface TuiRuntimeDeps {
   /** Test seam: replaces the run-session bridge. */
   startRunFn?: (task: string, deps: RunSessionDeps) => RunHandle;
   /** Extra per-run configuration forwarded to the bridge. */
-  runConfig?: Pick<
-    RunSessionDeps,
-    | 'model'
-    | 'harness'
-    | 'maxTurns'
-    | 'maxContextTokens'
-    | 'authenticated'
-    | 'javascriptPolicy'
-    | 'tracingDelegate'
-  >;
+  runConfig?: Pick<RunSessionDeps, 'authenticated' | 'javascriptPolicy'>;
   /** Test seam: clock for event stamps. */
   now?: () => number;
 }
 
 /** The session runtime the App drives runs through. */
 export interface TuiRuntime {
-  /** Mark the runtime ready; the persistent browser launches lazily. */
-  start(): Promise<void>;
   /** Start one agent run against the session browser. */
   startRun(
     task: string,
@@ -64,13 +54,9 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
   const now = deps.now ?? Date.now;
   let browser: BrowserController | undefined = deps.initialBrowser;
-  let started = false;
   let browserDead = false;
 
   const ensureBrowser = async (onEvent: (event: UiEvent) => void): Promise<BrowserController> => {
-    if (!started) {
-      throw new Error('runtime not started — no browser session');
-    }
     if (browser !== undefined && !browserDead) return browser;
     // Relaunch after a browser death: best-effort close of the corpse,
     // then a fresh session for this and later runs.
@@ -83,7 +69,9 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         // Already gone.
       }
     }
-    browser = await deps.browserSessionProvider.createSession();
+    browser = await deps.browserSessionProvider.createSession({
+      onSetupState: (message) => onEvent({ type: 'browser_setup', message }),
+    });
     browserDead = false;
     // A relaunch is a brand-new remote session with its own Live View URL,
     // not a resumption of the old one — so this fires on every successful
@@ -104,17 +92,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   };
 
   return {
-    async start() {
-      if (started) {
-        throw new Error('runtime already started');
-      }
-      started = true;
-    },
-
     startRun(task, onEvent, opts) {
-      if (!started) {
-        throw new Error('runtime not started — no browser session');
-      }
       let inner: RunHandle | undefined;
       let cancelled = false;
 
@@ -160,7 +138,6 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
     async shutdown() {
       const open = browser;
       browser = undefined;
-      started = false;
       if (open !== undefined) {
         try {
           await open.close();

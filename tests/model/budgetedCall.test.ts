@@ -16,7 +16,6 @@ function budget() {
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
     maxWallTimeMs: Infinity,
-    maxVerifierCorrections: Infinity,
   });
 }
 
@@ -72,6 +71,26 @@ describe('createBudgetedCallModel', () => {
       inputTokens: 8,
       outputTokens: 3,
     });
+  });
+
+  it('persists an unknown private-role failure without inventing usage', async () => {
+    const tracker = budget();
+    const failure = new Error('transport failed before usage');
+    const afterAttemptSettled = vi.fn(async () => undefined);
+    const call = createBudgetedCallModel({
+      model: {
+        generate: vi.fn(async () => {
+          throw failure;
+        }),
+      },
+      budget: tracker,
+      role: 'initializer',
+      afterAttemptSettled,
+    });
+
+    await expect(call(messages)).rejects.toBe(failure);
+    expect(afterAttemptSettled).toHaveBeenCalledOnce();
+    expect(tracker.roleUsage().initializer).toBeUndefined();
   });
 
   it('passes cancellation and attempt events to the strict driver unchanged', async () => {

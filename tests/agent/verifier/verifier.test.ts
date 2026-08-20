@@ -74,7 +74,6 @@ function budget(overrides: Partial<RunBudgetConfig> = {}) {
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
     maxWallTimeMs: Infinity,
-    maxVerifierCorrections: 2,
     ...overrides,
   });
 }
@@ -699,7 +698,7 @@ describe('runVerifier', () => {
     );
   });
 
-  it('renders per-column nonblank coverage as informational, and omits it when absent', async () => {
+  it('renders per-column nonblank coverage as informational', async () => {
     const model: ModelDriver = {
       generate: vi.fn(async () => accepted('verified')),
     };
@@ -729,36 +728,6 @@ describe('runVerifier', () => {
     expect(opening).toContain('Per-column nonblank coverage');
     expect(opening).toContain('informational');
     expect(opening).toContain('name: 2 nonblank');
-
-    // Outputs loaded from an old checkpoint omit the field entirely; the
-    // section must not render at all rather than render an empty one.
-    const withoutCounts: ModelDriver = {
-      generate: vi.fn(async () => accepted('verified')),
-    };
-    await runVerifier({
-      taskText: 'Create report.csv.',
-      runDir,
-      contract: CONTRACT,
-      finish: FINISH,
-      surfacedArtifacts: SURFACED_ARTIFACTS,
-      model: withoutCounts,
-      budget: budget(),
-      outputs: [
-        {
-          kind: 'table',
-          outputId: 'report',
-          artifactPath: 'artifacts/report.csv',
-          format: 'csv',
-          columns: ['name'],
-          rowCount: 5,
-          satisfiedRules: [],
-        },
-      ],
-    });
-    const openingWithoutCounts = JSON.stringify(
-      vi.mocked(withoutCounts.generate).mock.calls[0]![0].messages,
-    );
-    expect(openingWithoutCounts).not.toContain('Per-column nonblank coverage');
   });
 
   it('builds its opening without walking an unmanifested symlink cycle', async () => {

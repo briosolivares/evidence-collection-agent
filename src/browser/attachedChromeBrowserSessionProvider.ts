@@ -16,10 +16,8 @@ import { chromium, type Browser } from 'playwright';
 
 import type { BrowserController } from './controller.js';
 import { assertLoopbackCdpUrl } from './cdpEndpoint.js';
-import {
-  createChromiumTargetControl,
-  type ChromiumTargetControl,
-} from './chromiumTargetControl.js';
+import { createChromiumTargetControl } from './chromiumTargetControl.js';
+import { assembleBrowserController } from './controllerAssembly.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 
@@ -37,8 +35,8 @@ export interface AttachedChromeBrowserSessionOptions {
   connectionTimeoutMs?: number;
   /** Test seam; production uses Playwright Chromium directly. */
   connectOverCDP?: (cdpEndpoint: string) => Promise<Browser>;
-  /** Test-only crash seam, awaited after an exact target commit receipt and
-   * before any Playwright page claim/marker work. */
+  /** Crash-test seam, awaited after an exact target commit and before page
+   * marker work. Required by the real SIGKILL sentinel regression. */
   afterTargetCreated?: () => Promise<void> | void;
 }
 
@@ -56,8 +54,7 @@ class AttachedChromeSessionError extends Error {}
 function requireLoopbackEndpoint(cdpEndpoint: string): string {
   let parsed: URL;
   try {
-    parsed = new URL(cdpEndpoint);
-    assertLoopbackCdpUrl(cdpEndpoint);
+    parsed = assertLoopbackCdpUrl(cdpEndpoint);
   } catch {
     throw new TypeError(
       'Attached Chrome requires a valid loopback HTTP or WebSocket CDP endpoint.',
@@ -146,58 +143,53 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
     }
 
     const disconnect = createClientDisconnect(browser);
-    let targetControl: ChromiumTargetControl | undefined;
+    return assembleBrowserController({
+      build: async (own) => {
+        const contexts = browser.contexts();
+        if (contexts.length === 0) {
+          throw new AttachedChromeSessionError(
+            'Attached Chrome exposed no browser context; exactly one is required.',
+          );
+        }
+        if (contexts.length > 1) {
+          throw new AttachedChromeSessionError(
+            `Attached Chrome exposed ${contexts.length} browser contexts; exactly one is required.`,
+          );
+        }
 
-    try {
-      const contexts = browser.contexts();
-      if (contexts.length === 0) {
-        throw new AttachedChromeSessionError(
-          'Attached Chrome exposed no browser context; exactly one is required.',
+        const context = contexts[0]!;
+        // Snapshot, do not mutate. The controller excludes this whole set from
+        // owned-page discovery. The run lifecycle later opens its own durable
+        // task page through prepareTaskPage().
+        const preexistingSessionPages = [...context.pages()];
+        // Browser-scoped CDP needs no provider-internal page. Recovery may close
+        // every stale run page in this snapshot without detaching its own target
+        // inventory capability, and SIGKILL during setup cannot leak an
+        // unclassified blank anchor.
+        const targetControl = own(
+          await createChromiumTargetControl(
+            { context, browser },
+            this.afterTargetCreated === undefined
+              ? {}
+              : { afterTargetCreated: this.afterTargetCreated },
+          ),
         );
-      }
-      if (contexts.length > 1) {
-        throw new AttachedChromeSessionError(
-          `Attached Chrome exposed ${contexts.length} browser contexts; exactly one is required.`,
-        );
-      }
 
-      const context = contexts[0]!;
-      // Snapshot, do not mutate. The controller excludes this whole set from
-      // owned-page discovery. The run lifecycle later opens its own durable
-      // task page through prepareTaskPage().
-      const preexistingSessionPages = [...context.pages()];
-      // Browser-scoped CDP needs no provider-internal page. Recovery may close
-      // every stale run page in this snapshot without detaching its own target
-      // inventory capability, and SIGKILL during setup cannot leak an
-      // unclassified blank anchor.
-      targetControl = await createChromiumTargetControl({
-        context,
-        browser,
-        ...(this.afterTargetCreated === undefined
-          ? {}
-          : { afterTargetCreated: this.afterTargetCreated }),
-      });
-
-      return new PlaywrightBrowserController({
-        context,
-        preexistingSessionPages,
-        targetControl,
-        closeSession: disconnect,
-        sessionDiagnostics: ATTACHED_SESSION_DIAGNOSTICS,
-      });
-    } catch (error) {
-      let cleanupFailed = false;
-      try {
-        await targetControl?.close();
-      } catch {
-        cleanupFailed = true;
-      }
-      try {
-        await disconnect();
-      } catch {
-        cleanupFailed = true;
-      }
-      throw safeSetupError(error, cleanupFailed);
-    }
+        return new PlaywrightBrowserController({
+          context,
+          preexistingSessionPages,
+          targetControl,
+          closeSession: disconnect,
+          sessionDiagnostics: ATTACHED_SESSION_DIAGNOSTICS,
+        });
+      },
+      // The user owns this Chrome: releasing the session only disconnects
+      // Sherlock's Playwright client.
+      releaseSession: disconnect,
+      // A cleanup failure must never replace the setup error here — it is
+      // folded into the redacted message instead.
+      cleanupFailures: 'collect',
+      mapFailure: (error, cleanupFailed) => safeSetupError(error, cleanupFailed),
+    });
   }
 }

@@ -48,13 +48,13 @@ Published files live under `artifacts/` and require one or both roles. Private f
 
 Graders select deliverables through manifest roles. The transcript, filename guesses, scratch content, and evidence-only entries cannot substitute for a requested output.
 
-## Immutable output contract (`src/contracts/outputContract.ts`)
+## Immutable output contract (`src/agent/initializer/outputContract.schema.ts`)
 
-The initializer produces one immutable `OutputContract` before browser work. It records typed outputs (`table`, `document`, `screenshots`, or `download`), exact filenames, kind-specific schema/rules, content expectations, and assumptions. The checkpoint is authoritative; `harness/output-contract.json` is a readable projection that can be reconstructed but cannot drift.
+The initializer produces one immutable `OutputContract` before browser work. It records typed outputs (`table`, `document`, `screenshots`, or `download`), exact filenames, kind-specific schema/rules, and content expectations. The checkpoint is authoritative; `harness/output-contract.json` is a readable projection that can be reconstructed but cannot drift.
 
-The worker and verifier consume the contract but cannot mutate it. Finish claims list artifact paths; deterministic code compares those claims and the manifest/files against the contract.
+The worker and verifier consume the contract but cannot mutate it. Deterministic code derives artifact paths from the manifest and compares the published files against the contract.
 
-## Checkpoint (`src/v3/run/checkpoint.ts`)
+## Checkpoint (`src/agent/checkpoint.schema.ts`, `src/agent/checkpoint.ts`)
 
 Every v3 checkpoint has strict common fields:
 
@@ -63,15 +63,15 @@ Every v3 checkpoint has strict common fields:
   version: 3;
   revision: number;
   updatedAt: string;
-  configuration: V3DurableRunConfiguration;
-  budget: V3RunBudgetSnapshot;
-  progress: V3CheckpointProgress;
-  phase: V3CheckpointPhase;
+  configuration: DurableRunConfiguration;
+  budget: RunBudgetSnapshot;
+  progress: CheckpointProgress;
+  phase: CheckpointPhase;
   // phase-specific cargo
 }
 ```
 
-`V3DurableRunConfiguration` binds task text, model/output/context settings, browser provider, explicit authentication, JavaScript policy, optional start URL, initializer/check ceilings, and whole-run budget limits. Numeric infinity is serialized as the explicit `"unbounded"` sentinel. Configuration and accepted contract are immutable across revisions.
+`DurableRunConfiguration` binds task text, model/output/context settings, browser provider, explicit authentication, JavaScript policy, optional start URL, initializer/check ceilings, and whole-run budget limits. Numeric infinity is serialized as the explicit `"unbounded"` sentinel. Configuration and accepted contract are immutable across revisions.
 
 ```mermaid
 stateDiagram-v2
@@ -91,7 +91,7 @@ stateDiagram-v2
     verifying --> terminal
 ```
 
-Phase-specific cargo prevents ambiguous resume:
+Phase-specific cargo prevents ambiguous recovery:
 
 - `initializing`: optional initializer messages/attempts until a contract is accepted.
 - `ready_for_model`: immutable contract plus full worker snapshot.
@@ -104,21 +104,21 @@ The public `RunOutcome` deliberately exposes only `verified` and explicit `incom
 
 ## Worker conversation and effects
 
-SDK-free conversation types in `src/loop/messages.ts` mirror the Messages API: `TextBlock`, `ToolUseBlock`, `ToolResultBlock`, `Message`, `Usage`, and `ModelResponse`. `stop_reason` is validated by `ModelDriver`; completion itself depends on an exclusive `finish` call, not prose or a no-tool response.
+SDK-free conversation types in `src/model/messages.ts` mirror the Messages API: `TextBlock`, `ToolUseBlock`, `ToolResultBlock`, `Message`, `Usage`, and `ModelResponse`. `stop_reason` is validated by `ModelDriver`; completion itself depends on an exclusive `finish` call, not prose or a no-tool response.
 
-`V3WorkerSessionSnapshot` stores the full never-collapsed message history, logical turn count, peak context, protocol-correction count, and start time. `src/v3/loop/contextView.ts` may replace old bulky browser results only in the pure request view; checkpoint history remains complete.
+`WorkerSnapshot` stores the full never-collapsed message history, logical turn count, peak context, protocol-correction count, and start time. `src/agent/worker/contextView.ts` may replace old bulky browser results only in the pure request view; checkpoint history remains complete.
 
 `ToolCall` and `ToolCallResult` in `src/tools/pipeline.ts` form the execution boundary. Errors are classified as unknown tool, invalid input, permission denied, execution failure, timeout, or busy resource. A timed-out effect remains in the busy ledger until its underlying promise settles.
 
 ## Finish and verification data
 
-`finish` input is `{ summary }`. It is control flow, not a generic executor. Concrete unresolved constraints may be stated in that summary, but do not waive objective checks. Requested outputs and evidence are selected from the authoritative manifest; the derived requested-output paths are persisted with deterministic facts for verifier and recovery use. Historical v3 checkpoints containing `limitations` are normalized on read. `src/v3/completion/types.ts` defines strict serializable defects and positive facts produced by deterministic inspection. The fresh verifier returns either `verified`, `needs_correction`, or an unavailable outcome; it does not author facts that code can settle.
+`finish` input is `{ summary }`. It is control flow, not a generic executor. Concrete unresolved constraints may be stated in that summary, but do not waive objective checks. Requested outputs and evidence are selected from the authoritative manifest; derived requested-output paths are persisted with deterministic facts for verifier and recovery use. `src/agent/completion/finishFacts.schema.ts` defines checkpoint-safe positive facts. The fresh verifier returns `verified`, `needs_correction`, or an unavailable outcome; it does not author facts that code can settle.
 
 ## Transcript and metrics
 
 `transcript.jsonl` is append-only. V3 events include model request/accepted response/rejection, cache warnings, continuation messages, ordered tool calls/results, finish requests, deterministic-check failures, terminal outcome, and run errors. Events record what happened; they are not trusted product state.
 
-`V3WorkerMetrics` in `src/v3/loop/workerSession.ts` records terminal status (`verified`, `incomplete`, `failed`, or `cancelled`), turns, protocol corrections, input/output/cache tokens, tool calls/result bytes, peak context, wall time, and per-role usage. Metrics and transcript are terminal projections repaired from checkpoint state when necessary.
+`WorkerMetrics` in `src/agent/worker/worker.ts` records terminal status (`verified`, `incomplete`, `failed`, or `cancelled`), turns, protocol corrections, input/output/cache tokens, tool calls/result bytes, peak context, wall time, and per-role usage. Metrics and transcript are terminal projections repaired from checkpoint state when necessary.
 
 ## Eval report
 

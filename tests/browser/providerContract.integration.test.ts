@@ -25,7 +25,7 @@ import type {
   BrowserDownloadResult,
 } from '../../src/browser/controller.js';
 import { localDownloadReader } from '../../src/browser/downloadReader.js';
-import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/localChromeSessionProvider.js';
 import type { BrowserSessionDiagnostics } from '../../src/browser/sessionProvider.js';
 import { localUploadEncoder, remoteUploadEncoder } from '../../src/browser/uploadEncoder.js';
 
@@ -611,7 +611,6 @@ function assertDownload(download: BrowserDownloadResult): void {
   expect(Buffer.from(download.bytes)).toEqual(DOWNLOAD_BYTES);
   expect(download.suggestedFilename).toBe('javascript-evidence.bin');
   expect(download.finalUrl).toMatch(/^blob:/);
-  expect(download.headers).toEqual({});
 }
 
 async function waitForOwnedPageCount(

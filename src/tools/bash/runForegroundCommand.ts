@@ -2,11 +2,9 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 import type { Writable } from 'node:stream';
 
-import {
-  ParentDeathWatchdogError,
-  startParentDeathWatchdog,
-  type ParentDeathWatchdog,
-} from '../../process/parentDeathWatchdog.js';
+import { superviseBoundedChildProcess } from '../../process/boundedChildProcess.js';
+import { ParentDeathWatchdogError } from '../../process/parentDeathWatchdog.js';
+import { startAbortAwareParentDeathWatchdog } from '../../process/startAbortAwareParentDeathWatchdog.js';
 
 export interface ForegroundCommandOptions {
   /** Path to the shell binary, e.g. '/bin/bash'. The gated child ultimately
@@ -74,58 +72,21 @@ const START_GATE_SCRIPT = [
   'exec "$0" -c "$1"',
 ].join('\n');
 
-function isAborted(signal: AbortSignal | undefined): boolean {
-  return signal?.aborted === true;
-}
-
 /**
- * Decode captured bytes, dropping a trailing INCOMPLETE UTF-8 sequence.
- *
- * The byte ceiling cuts at an exact byte offset, which can land in the middle
- * of a multibyte character. Decoding that partial sequence directly would
- * yield U+FFFD, and U+FFFD re-encodes to THREE bytes — so a result truncated
- * to exactly N bytes could come back as N+1 and break the very ceiling the
- * truncation exists to enforce.
- *
- * This trims at the concatenated boundary rather than per chunk on purpose: a
- * character can straddle two chunks, so only the final assembled buffer knows
- * where the last complete character actually ends. At most three bytes are
- * dropped, and only from output already declared over its limit.
+ * This runner resolves with a status for every real command result and
+ * *rejects* only for infrastructure failures (watchdog loss, an unusable
+ * start gate, a shell that never spawned at all) — the completion outcome
+ * keeps the two apart.
  */
-function decodeRetainedBytes(chunks: Buffer[]): string {
-  const buffer = Buffer.concat(chunks);
-  // Walk back over continuation bytes (10xxxxxx) to the sequence's lead byte.
-  let cut = buffer.length;
-  let continuationBytes = 0;
-  while (cut > 0 && (buffer[cut - 1]! & 0b1100_0000) === 0b1000_0000 && continuationBytes < 3) {
-    cut -= 1;
-    continuationBytes += 1;
-  }
-  // cut === 0: the whole tail (up to 3 bytes) was continuation bytes with no
-  // lead byte before them at all — pathological input; leave it alone.
-  if (cut === 0) return buffer.toString('utf8');
-  const lead = buffer[cut - 1]!;
-  // Plain ASCII (or any byte with the high bit clear) ends the buffer: there
-  // is no multibyte sequence to check at all, complete or not — this also
-  // covers continuationBytes === 0 by way of `cut` never having moved.
-  if ((lead & 0b1000_0000) === 0) return buffer.toString('utf8');
-  // How many bytes the lead byte says its sequence needs, in total.
-  const expected = lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
-  // Not a lead byte at all (a stray continuation byte the walk-back stopped
-  // on, e.g. because it hit the 3-continuation-byte cap) — invalid input we
-  // leave alone rather than silently reshaping.
-  if (expected === 1) return buffer.toString('utf8');
-  // Complete iff the lead byte plus every continuation byte found together
-  // account for the whole sequence the lead byte declares. A genuinely
-  // complete trailing character always has exactly `expected - 1`
-  // continuation bytes, so comparing `expected` to `continuationBytes`
-  // directly (as opposed to `continuationBytes + 1`, the lead byte
-  // included) can never recognize a complete sequence as complete.
-  if (continuationBytes + 1 >= expected) return buffer.toString('utf8');
-  // Incomplete: drop the dangling lead byte and whatever continuation bytes
-  // were captured with it, keeping everything decodable before it.
-  return buffer.subarray(0, cut - 1).toString('utf8');
-}
+type ForegroundOutcome =
+  | { kind: 'status'; status: ForegroundCommandStatus }
+  | { kind: 'reject'; error: unknown };
+
+const status = (value: ForegroundCommandStatus): ForegroundOutcome => ({
+  kind: 'status',
+  status: value,
+});
+const rejection = (error: unknown): ForegroundOutcome => ({ kind: 'reject', error });
 
 /**
  * Bounds ONE foreground process tree: spawn it, capture its output, and
@@ -133,7 +94,9 @@ function decodeRetainedBytes(chunks: Buffer[]): string {
  * whether it finished on its own, ran past `timeoutMs`, wrote past
  * `maxOutputBytes`, or was cancelled via `abortSignal`. This function knows
  * nothing about tools, transcripts, or models; it only manages one process
- * group's lifecycle.
+ * group's lifecycle, delegating the shared machine (byte-capped capture,
+ * SIGTERM→grace→SIGKILL, stray-kill, stream-drain deadline, settle-once,
+ * watchdog wiring) to `superviseBoundedChildProcess`.
  *
  * A tiny shell gate waits until the independent parent-death watchdog is
  * armed, then `exec`s exactly `[shellPath, '-c', command]` — never a login
@@ -143,12 +106,10 @@ function decodeRetainedBytes(chunks: Buffer[]): string {
  * background jobs the command itself forks — can be reached with one signal
  * to `-pid`.
  *
- * Every path that can end the call (normal exit, spawn `error`, timeout,
- * abort, output overflow) funnels through one `settleOnce` guard so the
- * returned promise settles exactly once. The only path that *rejects*
- * instead of resolving is a spawn failure that never produced a process at
- * all (Node reports this as an `error` event with `child.pid` still
- * `undefined`) — see the comment on that branch below.
+ * The only path that *rejects* with a non-infrastructure error is a spawn
+ * failure that never produced a process at all (Node reports this as an
+ * `error` event with `child.pid` still `undefined`) — there is no command
+ * result of any kind to report in that case.
  */
 export async function runForegroundCommand(
   options: ForegroundCommandOptions,
@@ -157,9 +118,10 @@ export async function runForegroundCommand(
   const now = options.now ?? (() => performance.now());
   const startedAt = now();
 
-  // An already-aborted signal must never spawn either a command or its
-  // supervisor.
-  if (isAborted(abortSignal)) {
+  const watchdogStart = await startAbortAwareParentDeathWatchdog(abortSignal);
+  if (watchdogStart.kind === 'start_failed') throw watchdogStart.error;
+  // Cancellation before or during watchdog startup must never spawn a command.
+  if (watchdogStart.kind === 'cancelled') {
     return {
       status: 'cancelled',
       exitCode: null,
@@ -169,33 +131,7 @@ export async function runForegroundCommand(
       stderr: '',
     };
   }
-
-  let abortedDuringWatchdogStart = false;
-  const onWatchdogStartAbort = (): void => {
-    abortedDuringWatchdogStart = true;
-  };
-  abortSignal?.addEventListener('abort', onWatchdogStartAbort, { once: true });
-
-  let watchdog: ParentDeathWatchdog;
-  try {
-    watchdog = await startParentDeathWatchdog();
-  } finally {
-    abortSignal?.removeEventListener('abort', onWatchdogStartAbort);
-  }
-
-  // Cancellation can race the watchdog handshake. Keep the no-command-spawn
-  // guarantee even when it arrives during that short setup window.
-  if (abortedDuringWatchdogStart || isAborted(abortSignal)) {
-    await watchdog.disarm();
-    return {
-      status: 'cancelled',
-      exitCode: null,
-      terminationSignal: null,
-      durationMs: now() - startedAt,
-      stdout: '',
-      stderr: '',
-    };
-  }
+  const watchdog = watchdogStart.watchdog;
 
   let child: ChildProcess;
   try {
@@ -210,259 +146,85 @@ export async function runForegroundCommand(
     throw error;
   }
 
-  return new Promise<ForegroundCommandResult>((resolve, reject) => {
-    const startGate = child.stdio[3] as Writable | null;
-    const stdout = child.stdout!;
-    const stderr = child.stderr!;
+  const startGate = child.stdio[3] as Writable | null;
 
-    let settled = false;
-    // Set by whichever of timeout/abort/overflow fires first, so the exit
-    // that our own kill signal causes is reported with the right reason
-    // instead of the generic 'exited'. Left null for a process that simply
-    // ran to completion (or died on its own, e.g. a self-inflicted signal).
-    let pendingStatus: ForegroundCommandStatus | null = null;
-    let terminationTriggered = false;
-    let infrastructureError: ParentDeathWatchdogError | null = null;
+  const supervision = superviseBoundedChildProcess<ForegroundOutcome>({
+    child,
+    watchdog,
+    abortSignal,
+    maxOutputBytes,
+    // A chunk that exactly fills the remaining budget needs no truncation but
+    // still means the ceiling is fully spent — terminate right away rather
+    // than leaving the output-limit kill path to the next chunk.
+    terminateOnExactFill: true,
+    timings: {
+      timeoutMs,
+      terminateGraceMs: TERMINATE_GRACE_MS,
+      strayKillDelayMs: STRAY_KILL_DELAY_MS,
+      drainDeadlineMs: DRAIN_DEADLINE_MS,
+    },
+    outcomes: {
+      timedOut: () => status('timed_out'),
+      outputLimitExceeded: () => status('output_limit_exceeded'),
+      aborted: () => status('cancelled'),
+      watchdogFailed: rejection,
+    },
+    onCleanup: () => startGate?.destroy(),
+  });
 
-    const stdoutChunks: Buffer[] = [];
-    const stderrChunks: Buffer[] = [];
-    let totalBytes = 0;
-    let stdoutEnded = false;
-    let stderrEnded = false;
-
-    let timeoutTimer: NodeJS.Timeout | null = null;
-    let graceKillTimer: NodeJS.Timeout | null = null;
-    let strayKillTimer: NodeJS.Timeout | null = null;
-    let drainDeadlineTimer: NodeJS.Timeout | null = null;
-
-    const clearAllTimers = (): void => {
-      if (timeoutTimer !== null) clearTimeout(timeoutTimer);
-      if (graceKillTimer !== null) clearTimeout(graceKillTimer);
-      if (strayKillTimer !== null) clearTimeout(strayKillTimer);
-      if (drainDeadlineTimer !== null) clearTimeout(drainDeadlineTimer);
-      timeoutTimer = null;
-      graceKillTimer = null;
-      strayKillTimer = null;
-      drainDeadlineTimer = null;
-    };
-
-    const onAbort = (): void => triggerTermination('cancelled');
-    const detachAbort = (): void => {
-      abortSignal?.removeEventListener('abort', onAbort);
-    };
-    const detachWatchdogFailure = watchdog.onFailure((error) => {
-      if (settled) return;
-      infrastructureError = error;
-      pendingStatus = 'cancelled';
-      terminationTriggered = true;
-      if (timeoutTimer !== null) {
-        clearTimeout(timeoutTimer);
-        timeoutTimer = null;
-      }
-      if (graceKillTimer !== null) {
-        clearTimeout(graceKillTimer);
-        graceKillTimer = null;
-      }
-      // The independent watcher is already gone. There can be no soft-kill
-      // interval during which a subsequent harness SIGKILL would abandon this
-      // group, so fail closed with an immediate synchronous hard signal.
-      killGroup('SIGKILL');
-    });
-
-    /** Signals the whole process group. The group may already be gone — that's fine, not an error. */
-    function killGroup(signal: NodeJS.Signals): void {
-      const pid = child.pid;
-      if (pid === undefined) return;
-      try {
-        process.kill(-pid, signal);
-      } catch {
-        // ESRCH (group already reaped) or similar — nothing left to clean up.
-      }
-    }
-
-    /**
-     * Idempotent: the first caller (timeout, abort, or output overflow) wins
-     * and records the reason; later callers are no-ops. Actually resolving
-     * the promise still waits for the resulting `exit` event (below), which
-     * is what lets a natural exit and a timeout/abort race safely — whichever
-     * reaches `settleOnce` first is the only one that matters.
-     */
-    function triggerTermination(status: ForegroundCommandStatus): void {
-      if (settled || terminationTriggered) return;
-      terminationTriggered = true;
-      pendingStatus = status;
-      killGroup('SIGTERM');
-      graceKillTimer = setTimeout(() => {
-        graceKillTimer = null;
-        killGroup('SIGKILL');
-      }, TERMINATE_GRACE_MS);
-    }
-
-    function appendChunk(target: Buffer[], chunk: Buffer): void {
-      if (settled) return;
-      const remaining = maxOutputBytes - totalBytes;
-      if (remaining <= 0) {
-        // Already at or over budget from an earlier chunk that exactly
-        // filled it (see below) — triggerTermination is idempotent, so this
-        // just guarantees the kill path fires even if that earlier chunk's
-        // own check somehow didn't.
-        triggerTermination('output_limit_exceeded');
-        return;
-      }
-      // Byte ceiling, enforced on the raw Buffer length — never on decoded
-      // string length, which would undercount multibyte UTF-8 text.
-      const toKeep = chunk.length <= remaining ? chunk : chunk.subarray(0, remaining);
-      target.push(toKeep);
-      totalBytes += toKeep.length;
-      // Checked against the running total, not `toKeep.length < chunk.length`:
-      // a chunk that exactly fills the remaining budget needs no truncation
-      // (toKeep === chunk) but still means the ceiling is now fully spent —
-      // the old per-chunk-truncation check missed exactly that boundary and
-      // left the output-limit kill path unreachable from it.
-      if (totalBytes >= maxOutputBytes) {
-        triggerTermination('output_limit_exceeded');
-      }
-    }
-
-    stdout.on('data', (chunk: Buffer) => appendChunk(stdoutChunks, chunk));
-    stderr.on('data', (chunk: Buffer) => appendChunk(stderrChunks, chunk));
-    stdout.on('end', () => {
-      stdoutEnded = true;
-    });
-    stderr.on('end', () => {
-      stderrEnded = true;
-    });
-
-    function settleOnce(action: () => void): void {
-      if (settled) return;
-      settled = true;
-      clearAllTimers();
-      detachAbort();
-      detachWatchdogFailure();
-      // This synchronous hard kill closes the target before the watchdog is
-      // disarmed. It also covers SIGTERM-resistant background descendants on
-      // ordinary completion.
-      killGroup('SIGKILL');
-      startGate?.destroy();
-      stdout.removeAllListeners();
-      stderr.removeAllListeners();
-      void watchdog.disarm().then(action, action);
-    }
-
-    function finalize(
-      status: ForegroundCommandStatus,
-      exitCode: number | null,
-      terminationSignal: string | null,
-    ): void {
-      settleOnce(() => {
-        if (infrastructureError !== null) {
-          reject(infrastructureError);
-          return;
-        }
-        resolve({
-          status,
-          exitCode,
-          terminationSignal,
-          durationMs: now() - startedAt,
-          stdout: decodeRetainedBytes(stdoutChunks),
-          stderr: decodeRetainedBytes(stderrChunks),
-        });
-      });
-    }
-
-    child.once('error', (err) => {
-      if (child.pid === undefined) {
-        // The process was never actually spawned (e.g. shellPath does not
-        // exist) — there is no command result of any kind to report, so
-        // this rejects instead of resolving through the normal result path.
-        settleOnce(() => reject(err));
-        return;
-      }
-      // A process did exist, so an 'error' here (e.g. an async failure
-      // delivering a signal) still leaves us with a real, if partial,
-      // result — resolve with whatever was captured rather than throwing it away.
-      finalize(pendingStatus ?? 'exited', null, null);
-    });
-
-    child.once('exit', (code, signal) => {
-      if (settled) return;
-      // The active-termination grace timer is now moot — the process is gone.
-      if (timeoutTimer !== null) {
-        clearTimeout(timeoutTimer);
-        timeoutTimer = null;
-      }
-      if (graceKillTimer !== null) {
-        clearTimeout(graceKillTimer);
-        graceKillTimer = null;
-      }
-
-      // The shell itself is gone, but it may have started a background
-      // descendant that is still alive and still in its process group — it
-      // must not outlive this call.
-      killGroup('SIGTERM');
-      strayKillTimer = setTimeout(() => {
-        strayKillTimer = null;
-        killGroup('SIGKILL');
-      }, STRAY_KILL_DELAY_MS);
-
-      const finishExit = (): void => {
-        stdout.off('end', onStreamsEnded);
-        stderr.off('end', onStreamsEnded);
-        finalize(pendingStatus ?? 'exited', code, signal);
-      };
-
-      const onStreamsEnded = (): void => {
-        if (stdoutEnded && stderrEnded) finishExit();
-      };
-
-      if (stdoutEnded && stderrEnded) {
-        finishExit();
-        return;
-      }
-      // A descendant that inherited these pipes can hold them open
-      // indefinitely, so this drain never waits past a hard deadline.
-      stdout.on('end', onStreamsEnded);
-      stderr.on('end', onStreamsEnded);
-      drainDeadlineTimer = setTimeout(finishExit, DRAIN_DEADLINE_MS);
-    });
-
-    if (abortSignal) {
-      abortSignal.addEventListener('abort', onAbort, { once: true });
-      if (abortSignal.aborted) onAbort();
-    }
-
-    // timeoutMs bounds the complete child lifecycle, including the gated arm
-    // handshake. The command still cannot execute until arm() acknowledges
-    // below, but a stalled supervisor must not extend the caller's budget.
-    timeoutTimer = setTimeout(() => {
-      timeoutTimer = null;
-      triggerTermination('timed_out');
-    }, timeoutMs);
-
-    if (startGate === null) {
-      infrastructureError = new ParentDeathWatchdogError(
-        'foreground command start gate was unavailable',
-      );
-      triggerTermination('cancelled');
+  child.once('error', (err) => {
+    if (child.pid === undefined) {
+      // The process was never actually spawned (e.g. shellPath does not
+      // exist) — there is no command result of any kind to report, so
+      // this rejects instead of resolving through the normal result path.
+      supervision.forceOutcome(rejection(err));
+      supervision.finishNow();
       return;
     }
+    // A process did exist, so an 'error' here (e.g. an async failure
+    // delivering a signal) still leaves us with a real, if partial,
+    // result — resolve with whatever was captured rather than throwing it away.
+    supervision.finishNow({ exitCode: null, terminationSignal: null });
+  });
 
+  if (startGate === null) {
+    supervision.forceOutcome(
+      rejection(new ParentDeathWatchdogError('foreground command start gate was unavailable')),
+    );
+    supervision.terminate(status('cancelled'));
+  } else {
     void watchdog.arm(child.pid ?? -1).then(
       () => {
-        if (settled || terminationTriggered) {
+        if (supervision.settled || supervision.terminationStarted) {
           startGate.destroy();
           return;
         }
         startGate.end('start\n');
       },
       (error: unknown) => {
-        infrastructureError =
-          error instanceof ParentDeathWatchdogError
-            ? error
-            : new ParentDeathWatchdogError('parent-death watchdog failed while arming the command');
+        supervision.forceOutcome(
+          rejection(
+            error instanceof ParentDeathWatchdogError
+              ? error
+              : new ParentDeathWatchdogError(
+                  'parent-death watchdog failed while arming the command',
+                ),
+          ),
+        );
         startGate.destroy();
-        triggerTermination('cancelled');
+        supervision.terminate(status('cancelled'));
       },
     );
-  });
+  }
+
+  const completion = await supervision.completion;
+  if (completion.outcome?.kind === 'reject') throw completion.outcome.error;
+  return {
+    status: completion.outcome?.status ?? 'exited',
+    exitCode: completion.exitCode,
+    terminationSignal: completion.terminationSignal,
+    durationMs: now() - startedAt,
+    stdout: completion.stdout,
+    stderr: completion.stderr,
+  };
 }

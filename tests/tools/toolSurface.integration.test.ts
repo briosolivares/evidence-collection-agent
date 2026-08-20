@@ -5,8 +5,9 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { inspectManifest } from '../../src/agent/completion/artifactInspection.js';
 import type { BrowserController } from '../../src/browser/controller.js';
-import { initManifest, readManifest, verifyManifestFiles } from '../../src/run/artifacts.js';
+import { initManifest, readManifest } from '../../src/run/artifacts.js';
 import { executeToolCall } from '../../src/tools/pipeline.js';
 import { createRegistry } from '../../src/tools/registry.js';
 import { editFileTool } from '../../src/tools/editFile/editFile.js';
@@ -139,6 +140,6 @@ describe('generic artifact surface', () => {
       expect(entry.sourceUrl).toBe(wanted!.sourceUrl);
     }
 
-    expect(() => verifyManifestFiles(runDir)).not.toThrow();
+    expect(inspectManifest(runDir).defects).toEqual([]);
   });
 });

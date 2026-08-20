@@ -27,7 +27,6 @@ const dumpLog: ToolDef<{ lines: number }> = {
   inputSchema: z.object({ lines: z.number() }),
   // Touches nothing named by its input — the modern equivalent of the old
   // `readOnly: true`.
-  getAccess: () => ({ reads: [], writes: [] }),
   execute: async (input) =>
     Array.from(
       { length: input.lines },

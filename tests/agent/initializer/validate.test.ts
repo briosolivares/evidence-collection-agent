@@ -53,6 +53,29 @@ describe('outputContractSchema shape', () => {
     expect(validateOutputContract({ outputs: [tableOutput()], extra: 1 }).ok).toBe(false);
   });
 
+  it('rejects retired assumptions and matches_expected_values fields at the schema boundary', () => {
+    expect(
+      outputContractSchema.safeParse({ outputs: [tableOutput()], assumptions: ['available'] })
+        .success,
+    ).toBe(false);
+    expect(
+      outputContractSchema.safeParse({
+        outputs: [
+          tableOutput({
+            rules: [
+              {
+                type: 'matches_expected_values',
+                column: 'name',
+                expected: ['Alpha'],
+                source: { kind: 'original_task' },
+              },
+            ] as never,
+          }),
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
   it('normalizes empty optional constraint lists to absent instead of rejecting', () => {
     // Initializer models legitimately write [] for "none"; a wikipedia_reference
     // trial died in the initializer when requiredSections: [] was rejected.
@@ -189,11 +212,48 @@ describe('validateOutputContract cross-field rules', () => {
     }
   });
 
-  it('rejects a download constrained by nothing', () => {
+  it('accepts a download constrained only by count and trusted publication kind', () => {
     const result = validate(
       contract([{ id: 'dl', kind: 'download', count: { minimum: 1 } } as OutputSpec]),
     );
-    expect(errorsOf(result).join('\n')).toMatch(/download/i);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error('unreachable');
+    expect(result.contract.outputs[0]).toEqual({
+      id: 'dl',
+      kind: 'download',
+      count: { minimum: 1 },
+    });
+  });
+
+  it('canonicalizes wildcard-only filename patterns to omission', () => {
+    const result = validate(
+      contract([
+        {
+          id: 'dl',
+          kind: 'download',
+          count: { minimum: 1 },
+          filenamePattern: '*',
+          sourceUrlPattern: 'https://example.test/*',
+        } as OutputSpec,
+        {
+          id: 'shots',
+          kind: 'screenshots',
+          count: { exact: 1 },
+          filenamePattern: '***',
+        } as OutputSpec,
+      ]),
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error('unreachable');
+    expect(result.contract.outputs).toEqual([
+      {
+        id: 'dl',
+        kind: 'download',
+        count: { minimum: 1 },
+        sourceUrlPattern: 'https://example.test/*',
+      },
+      { id: 'shots', kind: 'screenshots', count: { exact: 1 } },
+    ]);
   });
 
   it('rejects per-section evidence with no required sections', () => {

@@ -2,7 +2,6 @@ import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 
 import { pickWord, StatusLine } from '../../src/tui/components/StatusLine.js';
-import { createConfig } from '../../src/tui/config.js';
 import type { LiveRunState } from '../../src/tui/store/state.js';
 import { tick } from './helpers.js';
 
@@ -13,7 +12,6 @@ function liveState(overrides: Partial<LiveRunState> = {}): LiveRunState {
     nextPendingId: 1,
     startedAt: 0,
     tokens: { settled: 0, estimate: 0 },
-    turn: 1,
     ...overrides,
   };
 }
@@ -38,10 +36,8 @@ describe('pickWord', () => {
 
 describe('StatusLine', () => {
   it('renders the metrics line `↳ 12.4k tokens · 18s`', async () => {
-    const config = createConfig();
     const { lastFrame, unmount } = render(
       <StatusLine
-        config={config}
         live={liveState({ startedAt: 0, tokens: { settled: 12_400, estimate: 12_400 } })}
         now={() => 18_000}
         rng={() => 0}
@@ -53,17 +49,19 @@ describe('StatusLine', () => {
   });
 
   it('cycles working words on the injected clock without immediate repeats', async () => {
-    const config = createConfig({
-      workingWords: ['Foraging', 'Sifting', 'Rummaging'],
-      wordCycleMs: 40,
-    });
     let roll = 0;
     const rng = () => {
       roll = (roll + 1) % 3;
       return roll / 3;
     };
     const { frames, unmount } = render(
-      <StatusLine config={config} live={liveState()} now={() => 0} rng={rng} />,
+      <StatusLine
+        live={liveState()}
+        workingWords={['Foraging', 'Sifting', 'Rummaging']}
+        wordCycleMs={40}
+        now={() => 0}
+        rng={rng}
+      />,
     );
     await tick(260);
     unmount();
@@ -82,15 +80,8 @@ describe('StatusLine', () => {
   });
 
   it('shows the wrapping-up phrase while cancelling', async () => {
-    const config = createConfig();
     const { lastFrame, unmount } = render(
-      <StatusLine
-        config={config}
-        live={liveState()}
-        cancelling={true}
-        now={() => 1_000}
-        rng={() => 0}
-      />,
+      <StatusLine live={liveState()} cancelling={true} now={() => 1_000} rng={() => 0} />,
     );
     await tick();
     expect(lastFrame()).toContain('Wrapping up…');

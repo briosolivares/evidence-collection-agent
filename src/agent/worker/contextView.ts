@@ -1,7 +1,11 @@
 import type { Message, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
-import { COLLAPSED_BROWSER_RESULT_MARKER } from '../../model/callModel.js';
+import {
+  COLLAPSED_BROWSER_RESULT_MARKER,
+  COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER,
+} from '../../model/callModel.js';
+import { CAPTURE_SCREENSHOT_TOOL_NAME } from '../../tools/captureScreenshot/captureScreenshot.js';
 
-/** The only heavyweight result collapsed in the per-request view. */
+/** Text-heavy browser results retain two windows; visual captures are shown once. */
 export const BROWSER_EXECUTE_TOOL_NAME = 'browser_execute' as const;
 
 /** The newest two successful browser results retain their complete content. */
@@ -10,6 +14,10 @@ export const KEPT_BROWSER_EXECUTE_RESULTS = 2;
 const RECOVERY_GUIDANCE =
   'Large value/stdout/stderr/file details were removed from this request view. ' +
   'Run browser_execute again if live page detail is needed; keep durable facts in scratch/workspace files.';
+
+const CAPTURE_RECOVERY_GUIDANCE =
+  'The pixels were shown once and removed from later request views. ' +
+  'Call capture_screenshot again to inspect the current live viewport.';
 
 interface BrowserCallIdentity {
   toolUseId: string;
@@ -37,7 +45,8 @@ interface BrowserResultSummary {
  */
 export function buildContextView(messages: readonly Message[]): readonly Message[] {
   const browserCalls = collectBrowserCalls(messages);
-  if (browserCalls.size === 0) return messages;
+  const captureCalls = collectCaptureCalls(messages);
+  if (browserCalls.size === 0 && captureCalls.size === 0) return messages;
 
   const successfulResults: Array<{ messageIndex: number; blockIndex: number }> = [];
   messages.forEach((message, messageIndex) => {
@@ -53,10 +62,26 @@ export function buildContextView(messages: readonly Message[]): readonly Message
     });
   });
 
-  const stale = successfulResults.slice(
+  const staleBrowserResults = successfulResults.slice(
     0,
     Math.max(0, successfulResults.length - KEPT_BROWSER_EXECUTE_RESULTS),
   );
+
+  const staleCaptureResults: Array<{ messageIndex: number; blockIndex: number }> = [];
+  messages.forEach((message, messageIndex) => {
+    if (message.role !== 'user' || messageIndex === messages.length - 1) return;
+    message.content.forEach((block, blockIndex) => {
+      if (
+        block.type === 'tool_result' &&
+        block.is_error !== true &&
+        captureCalls.has(block.tool_use_id)
+      ) {
+        staleCaptureResults.push({ messageIndex, blockIndex });
+      }
+    });
+  });
+
+  const stale = [...staleBrowserResults, ...staleCaptureResults];
   if (stale.length === 0) return messages;
 
   const staleByMessage = new Map<number, Set<number>>();
@@ -74,10 +99,24 @@ export function buildContextView(messages: readonly Message[]): readonly Message
       role: 'user',
       content: message.content.map((block, blockIndex) => {
         if (!staleIndexes.has(blockIndex) || block.type !== 'tool_result') return block;
-        return stubBrowserResult(block, browserCalls.get(block.tool_use_id)!);
+        const browserCall = browserCalls.get(block.tool_use_id);
+        if (browserCall !== undefined) return stubBrowserResult(block, browserCall);
+        return stubCaptureResult(block, captureCalls.get(block.tool_use_id)!);
       }),
     };
   });
+}
+
+function collectCaptureCalls(messages: readonly Message[]): Map<string, BrowserCallIdentity> {
+  const calls = new Map<string, BrowserCallIdentity>();
+  for (const message of messages) {
+    if (message.role !== 'assistant') continue;
+    for (const block of message.content) {
+      if (block.type !== 'tool_use' || block.name !== CAPTURE_SCREENSHOT_TOOL_NAME) continue;
+      calls.set(block.id, callIdentity(block));
+    }
+  }
+  return calls;
 }
 
 function collectBrowserCalls(messages: readonly Message[]): Map<string, BrowserCallIdentity> {
@@ -119,6 +158,30 @@ function stubBrowserResult(block: ToolResultBlock, identity: BrowserCallIdentity
     RECOVERY_GUIDANCE,
   ];
   return { ...block, content: lines.join('\n') };
+}
+
+function stubCaptureResult(block: ToolResultBlock, identity: BrowserCallIdentity): ToolResultBlock {
+  const metadata =
+    typeof block.content === 'string'
+      ? block.content
+      : block.content
+          .filter((item) => item.type === 'text')
+          .map((item) => item.text)
+          .join('\n');
+  return {
+    ...block,
+    content: [
+      COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER,
+      `Identity: ${JSON.stringify({
+        tool_use_id: identity.toolUseId,
+        ...(identity.requestedPageId === undefined
+          ? { requested_page: 'active task page' }
+          : { requested_page_id: identity.requestedPageId }),
+      })}`,
+      ...(metadata.length === 0 ? [] : [`Metadata: ${metadata}`]),
+      CAPTURE_RECOVERY_GUIDANCE,
+    ].join('\n'),
+  };
 }
 
 /**

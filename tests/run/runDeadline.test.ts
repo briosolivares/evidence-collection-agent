@@ -9,7 +9,6 @@ function budget(maxWallTimeMs: number) {
     maxToolCalls: Infinity,
     maxModelTokens: Infinity,
     maxWallTimeMs,
-    maxVerifierCorrections: Infinity,
   });
 }
 

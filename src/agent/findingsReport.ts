@@ -136,13 +136,14 @@ function renderArtifactsTable(artifacts: readonly SurfacedArtifact[]): string[] 
   if (artifacts.length === 0) return ['_None surfaced._'];
   const { kept, omitted } = truncateList(artifacts, ARTIFACT_LIST_MAX_ITEMS);
   const header = [
-    '| filename | sha256 | roles | capturedAt | sourceUrl | completionStatus |',
-    '| --- | --- | --- | --- | --- | --- |',
+    '| filename | sha256 | publicationKind | roles | capturedAt | sourceUrl | completionStatus |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
   ];
   const rows = kept.map(
     (artifact) =>
       `| ${escapeCell(artifact.filename)} | ${artifact.sha256} | ` +
-      `${artifact.roles.join(', ')} | ${escapeCell(artifact.capturedAt)} | ` +
+      `${artifact.publicationKind ?? ''} | ${artifact.roles.join(', ')} | ` +
+      `${escapeCell(artifact.capturedAt)} | ` +
       `${escapeCell(artifact.sourceUrl ?? '')} | ${artifact.completionStatus ?? ''} |`,
   );
   return [...header, ...rows, ...elisionLine(omitted, 'artifact(s)')];

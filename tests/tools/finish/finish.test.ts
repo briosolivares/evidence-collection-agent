@@ -60,30 +60,20 @@ describe('finish schema', () => {
     ).toBe(false);
   });
 
-  it('normalizes historical checkpoint inputs to the current shape', () => {
+  it('uses the same strict current shape for durable checkpoint inputs', () => {
+    expect(durableFinishInputSchema.parse(validInput)).toEqual(validInput);
     expect(
-      durableFinishInputSchema.parse({
-        summary: 'Published the requested report.',
-        limitations: ['The source required an unavailable account.'],
-      }),
-    ).toEqual({ summary: 'Published the requested report.', unresolved: [] });
-    expect(
-      durableFinishInputSchema.parse({
+      durableFinishInputSchema.safeParse({
         summary: 'Published the requested report.',
         artifacts: ['artifacts/report.csv'],
         limitations: [],
-      }),
-    ).toEqual({ summary: 'Published the requested report.', unresolved: [] });
+      }).success,
+    ).toBe(false);
   });
 });
 
 describe('finish control definition', () => {
-  it('is exclusive and fails loudly if generic dispatch reaches execute', () => {
-    expect(finishTool.getAccess(validInput)).toEqual({
-      reads: [],
-      writes: [],
-      exclusive: true,
-    });
+  it('fails loudly if generic dispatch reaches execute', () => {
     expect(() => finishTool.execute(validInput, { runDir: '/unused' })).toThrow(
       /must be intercepted by the worker loop/,
     );
