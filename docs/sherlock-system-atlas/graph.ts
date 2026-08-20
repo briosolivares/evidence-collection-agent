@@ -178,10 +178,10 @@ export const concepts: readonly SemanticNode[] = [
     tone: 'model',
     code: '05',
     title: 'Persistent worker',
-    kicker: 'Research session',
+    kicker: 'Model 2 · persistent context',
     summary: 'Browses, writes, publishes, and repairs through one sequential conversation.',
     answers: {
-      what: 'The only stateful model role that performs research and produces requested artifacts.',
+      what: 'The only stateful model role that performs research and produces requested artifacts; production defaults to Sonnet while preserving one useful conversation across corrections.',
       inputs: ['Task and contract', 'Tool results', 'Deterministic defects', 'Verifier findings'],
       outputs: ['Progress text', 'Sequential tool calls', 'Exclusive finish request'],
       creator: 'The durable lifecycle creates one WorkerSession after contract initialization.',
@@ -309,7 +309,7 @@ export const concepts: readonly SemanticNode[] = [
     tone: 'verification',
     code: '10',
     title: 'Deterministic finish checks',
-    kicker: 'Objective gate',
+    kicker: 'Code gate · no model',
     summary: 'Settles integrity, role, shape, count, media, and other code-decidable requirements.',
     answers: {
       what: 'A synchronous inspection gate triggered only by an exclusive finish tool response.',
@@ -340,10 +340,10 @@ export const concepts: readonly SemanticNode[] = [
     tone: 'verification',
     code: '11',
     title: 'Fresh verifier',
-    kicker: 'Independent judgment',
+    kicker: 'Model 3 · fresh context',
     summary: 'Reviews semantic completeness in a new read-only context and alone accepts success.',
     answers: {
-      what: 'A fresh model role that judges the request against contract, settled facts, and published evidence.',
+      what: 'A fresh read-only Haiku model role that judges the request against the contract, code-settled facts, and published evidence.',
       inputs: [
         'Task and contract',
         'Finish report',
@@ -934,7 +934,7 @@ export const implementations: readonly SemanticNode[] = [
     code: '11.a',
     title: 'Verifier model',
     kicker: 'Fresh context',
-    summary: 'Re-derives semantic completeness without inheriting the worker conversation.',
+    summary: 'Haiku re-derives semantic completeness without inheriting the worker conversation.',
     answers: {
       what: 'A dedicated read-only model role and strict result protocol.',
       inputs: ['Verifier prompt', 'Surfaced run evidence', 'Deterministic facts'],

@@ -534,12 +534,16 @@ button:focus-visible,
 
 .card-tone,
 .implementation-label {
+  max-width: 72%;
+  overflow: hidden;
   color: var(--ink-faint);
   font-family: var(--mono);
   font-size: 8px;
   font-weight: 750;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .semantic-card h3 {

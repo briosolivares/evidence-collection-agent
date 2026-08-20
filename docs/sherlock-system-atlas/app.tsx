@@ -127,7 +127,7 @@ function SemanticCard({ data, selected }: NodeProps<AtlasNode>) {
       <Handle className="atlas-handle" type="target" position={Position.Left} />
       <div className="card-topline">
         <span className="card-code">{node.code}</span>
-        <span className="card-tone">{toneLabel(node.tone)}</span>
+        <span className="card-tone">{data.handoffView ? node.kicker : toneLabel(node.tone)}</span>
       </div>
       <h3>{node.title}</h3>
       <p>{node.summary}</p>
@@ -283,7 +283,7 @@ function Inspector({ node, onSelect }: { node: SemanticNode; onSelect: (id: stri
       <div className="inspector-scroll">
         <div className="inspector-heading">
           <span className={`inspector-code tone-${node.tone}`}>{node.code}</span>
-          <span>{node.kind === 'concept' ? 'Concept contract' : 'Implementation contract'}</span>
+          <span>{node.kicker}</span>
         </div>
         <h2>{node.title}</h2>
         <p className="inspector-summary">{node.summary}</p>
