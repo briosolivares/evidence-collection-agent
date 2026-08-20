@@ -243,6 +243,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
 
     return writeArtifact(ctx.runDir, artifactPath, bytes, {
       roles,
+      publicationKind: input.kind,
       ...(sourceUrl === undefined ? {} : { sourceUrl }),
     });
   },

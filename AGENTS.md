@@ -15,10 +15,10 @@ contract initializer, one persistent sequential worker session, deterministic
 finish checks, and a fresh read-only verifier under the durable lifecycle in
 `src/agent/lifecycle.ts` (`runAgent`).
 
-The worker sees exactly eight tools in the frozen order declared by
-`WORKER_TOOL_ORDER`: `browser_execute`, `publish_artifact`, `read_file`,
-`write_file`, `edit_file`, `bash`, `ask_user`, and `finish`. Each tool lives in
-its own folder under `src/tools/`. Browser work goes through the
+The worker sees exactly nine tools in the frozen order declared by
+`WORKER_TOOL_ORDER`: `browser_execute`, `capture_screenshot`,
+`publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`,
+and `finish`. Each tool lives in its own folder under `src/tools/`. Browser work goes through the
 engine-neutral `BrowserController`; `BrowserSessionProvider` selects local
 Chrome or Browserbase in `src/browser/provider.ts`.
 
@@ -72,6 +72,10 @@ from manifest entries carrying `requested_output`.
 - **Publication is explicit.** `write_file` and `edit_file` write only private
   scratch files. `publish_artifact` is the sole worker publication boundary
   and requires nonempty `requested_output` and/or `evidence` roles.
+- **Visual observation is private.** `capture_screenshot` returns the live
+  viewport inline for one model turn and must be called alone. It does not
+  write or publish an artifact; requested screenshots still use
+  `publish_artifact`.
 - **Constrain every model path.** Use `resolveRunPath`; never permit a
   model-supplied path under `harness/` or to metadata files.
 - **Workspace writes are the deliberate exception.** `bash` and
@@ -87,7 +91,8 @@ from manifest entries carrying `requested_output`.
   Raw target inventory/mutation is confined to run-owned pages, and the
   browser-global `Browser.*` domain is denied. A durable
   `javascriptPolicy: deny` disables the whole tool without changing the static
-  tool prefix.
+  tool prefix. Uploads may target an exact backend node or exactly one file
+  input across eligible frames; optional frame URL hints only disambiguate.
 - **Crash safety is product behavior.** Checkpoint effect state before and
   after every call, preserve artifact-write journals, use parent-death
   watchdogs for child processes, and reclaim only pages marked for the same

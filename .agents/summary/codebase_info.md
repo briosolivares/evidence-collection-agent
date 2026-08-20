@@ -31,7 +31,7 @@ src/
   tui/                     Ink application and run/eval bridges
   browser/                 controller/provider implementations and downloads/uploads
   model/                   streaming client, retries, strict ModelDriver
-  tools/                   eight tools, registry, pipeline, and result capping
+  tools/                   nine tools, registry, pipeline, and result capping
   run/                     run dirs, manifest, atomic writes, budget, transcript
   tracing/                 optional Langfuse/OTel side channel
 evals/

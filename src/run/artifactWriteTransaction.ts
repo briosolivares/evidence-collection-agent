@@ -39,6 +39,7 @@ const manifestEntrySchema = z.strictObject({
   filename: z.string().min(1),
   sha256: z.string().regex(SHA256_PATTERN),
   sourceUrl: z.string().optional(),
+  publicationKind: z.enum(['file', 'text', 'screenshot', 'download']).optional(),
   roles: z
     .array(z.enum(['requested_output', 'evidence']))
     .min(1)
@@ -333,6 +334,9 @@ function assertEntryPartition(entry: ManifestEntry): void {
   }
   if (scratch && entry.roles !== undefined) {
     throw new Error(`scratch artifact transaction entry must not carry roles`);
+  }
+  if (scratch && entry.publicationKind !== undefined) {
+    throw new Error(`scratch artifact transaction entry must not carry publicationKind`);
   }
 }
 

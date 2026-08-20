@@ -387,7 +387,7 @@ describe('command-session transport boundary', () => {
     expect(message).not.toContain(PRIVATE_CONNECT_URL);
   });
 
-  it('encodes a remote upload as bytes, targets the exact backend node, and cleans its marker', async () => {
+  it('encodes uploads and supports exact backend-node and frame-selector targets', async () => {
     const setInputFiles = vi.fn(async () => undefined);
     const locator = {
       count: vi.fn(async () => 1),
@@ -396,7 +396,12 @@ describe('command-session transport boundary', () => {
     };
     const page = {
       isClosed: () => false,
-      frames: () => [{ locator: vi.fn(() => locator) }],
+      frames: () => [
+        {
+          url: () => 'https://docs.example.test/picker/upload',
+          locator: vi.fn(() => locator),
+        },
+      ],
     } as unknown as Page;
     const send = vi.fn(async (method: string) => {
       if (method === 'Target.getTargetInfo') {
@@ -425,12 +430,18 @@ describe('command-session transport boundary', () => {
     });
 
     await session.upload(73, '/confined/workspace/evidence.csv');
-
-    expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith([
+    await session.upload(
+      { selector: 'input[type="file"]', frameUrlIncludes: '/picker/' },
       '/confined/workspace/evidence.csv',
-    ]);
+    );
+
+    expect(uploadEncoder.encode).toHaveBeenCalledTimes(2);
+    expect(uploadEncoder.encode).toHaveBeenNthCalledWith(1, ['/confined/workspace/evidence.csv']);
+    expect(uploadEncoder.encode).toHaveBeenNthCalledWith(2, ['/confined/workspace/evidence.csv']);
     expect(send).toHaveBeenCalledWith('DOM.resolveNode', { backendNodeId: 73 });
-    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith([payload], { timeout: 5_000 });
+    expect(setInputFiles).toHaveBeenCalledTimes(2);
+    expect(setInputFiles).toHaveBeenNthCalledWith(1, [payload], { timeout: 5_000 });
+    expect(setInputFiles).toHaveBeenNthCalledWith(2, [payload], { timeout: 5_000 });
     expect(send.mock.calls.filter(([method]) => method === 'Runtime.callFunctionOn')).toHaveLength(
       2,
     );

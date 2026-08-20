@@ -37,6 +37,13 @@ export const SCRATCH_DIR = 'scratch';
  */
 export type ArtifactRole = 'requested_output' | 'evidence';
 
+/** The trusted publication path that produced a published artifact. The
+ * worker chooses a publish_artifact mode, but the runtime executes that mode
+ * and records it only after acquiring the corresponding bytes. Keeping this
+ * fact lets finish checks distinguish, for example, an SEC screenshot from
+ * an SEC download without guessing from an overlapping filename or URL. */
+export type ArtifactPublicationKind = 'file' | 'text' | 'screenshot' | 'download';
+
 /** Provenance record for one artifact in the run directory. */
 export interface ManifestEntry {
   /** Run-dir-relative path of the artifact file. */
@@ -45,6 +52,9 @@ export interface ManifestEntry {
   sha256: string;
   /** URL the artifact was captured from, when one applies. */
   sourceUrl?: string;
+  /** Runtime-executed publish_artifact mode. Optional for compatibility with
+   * existing run directories and writes outside that model-facing boundary. */
+  publicationKind?: ArtifactPublicationKind;
   /** Semantic roles of a published artifact. Present exactly when the file
    * lives under artifacts/ — scratch entries carry no roles, so the field's
    * presence is itself the published/private marker. */
@@ -93,6 +103,8 @@ export interface Manifest {
 export interface ArtifactMeta {
   /** URL the artifact was captured from, recorded in its manifest entry. */
   sourceUrl?: string;
+  /** Runtime-executed publication mode, when the caller owns that fact. */
+  publicationKind?: ArtifactPublicationKind;
   /** Semantic roles for a published (artifacts/) write, recorded in its
    * manifest entry. Scratch writes carry none. */
   roles?: ArtifactRole[];
@@ -183,11 +195,15 @@ export function writeArtifact(
   // entry. publish_artifact also calls this before acquiring browser bytes;
   // this second check closes that potentially long check/write window.
   const filename = preflightArtifactWrite(runDir, relPath, meta.roles);
+  if (meta.publicationKind !== undefined && !filename.startsWith(`${ARTIFACTS_DIR}${sep}`)) {
+    throw new Error('publicationKind is valid only for published artifacts');
+  }
 
   const entry: ManifestEntry = {
     filename,
     sha256: createHash('sha256').update(bytes).digest('hex'),
     ...(meta.sourceUrl !== undefined ? { sourceUrl: meta.sourceUrl } : {}),
+    ...(meta.publicationKind !== undefined ? { publicationKind: meta.publicationKind } : {}),
     ...(meta.roles !== undefined ? { roles: meta.roles } : {}),
     capturedAt: new Date().toISOString(),
     ...(meta.completionStatus !== undefined ? { completionStatus: meta.completionStatus } : {}),

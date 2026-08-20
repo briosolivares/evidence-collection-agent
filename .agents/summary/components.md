@@ -6,7 +6,7 @@ Responsibilities of the active production modules. Tests mirror source under `te
 
 | File/area | Responsibility |
 | --- | --- |
-| `src/agent/runTask.ts` | The single public composition root. `runTask` creates a fresh run, model drivers, the eight-tool registry, tracing/progress, and delegates to `runAgent`. |
+| `src/agent/runTask.ts` | The single public composition root. `runTask` creates a fresh run, model drivers, the nine-tool registry, tracing/progress, and delegates to `runAgent`. |
 | `src/tui/main.tsx` | Installed `sherlock` TUI edge: env/key setup, attached-local or Browserbase provider selection, interactive runtime, eval runtime, and Ink rendering. |
 | `src/tui/bridge/runSession.ts` | Converts `runTask` progress/outcomes, permission questions, tracing, cancellation, and published-manifest changes into UI events. |
 | `src/tui/bridge/runtime.ts` | Owns the session-long interactive browser, one run at a time, and browser-death replacement. Local TUI startup receives an already attached controller. |
@@ -28,7 +28,7 @@ Checkpoint phases are `initializing`, `ready_for_model`, `executing_tool`, `chec
 
 | File | Responsibility |
 | --- | --- |
-| `initializer.ts` | Contract-only model role. Forces one `set_output_contract` call, validates the immutable contract, permits one repair, and returns one `OutputContract`. The tool is initializer-private and never executes. |
+| `initializer.ts` | Contract-only model role. Forces one `set_output_contract` call, canonicalizes vacuous optional constraints, validates the immutable contract, permits one repair, and returns one `OutputContract`. The tool is initializer-private and never executes. |
 | `verifier.ts` | Fresh-context semantic review. Owns the report schema/loop, fail-closed repair behavior, role accounting, settled facts, and verified/needs-correction/unavailable result. |
 | `verifier/tools.ts` | Bounded literal `grep` and windowed `read_file` over published artifacts plus `manifest.json`; rejects scratch, traversal, symlinks, special files, oversized trees/files/images, and performs no offload writes. |
 
@@ -39,7 +39,7 @@ The verifier has no browser and cannot mutate the run. It receives one immutable
 | File | Responsibility |
 | --- | --- |
 | `worker/worker.ts` | Full durable worker conversation, strict model turns, no-tool continuation, exclusive `finish` interception, sequential dispatch, result bounding/offload, lifecycle snapshots, and uncertain-effect recovery. |
-| `worker/contextView.ts` | Builds a pure model-request view from never-collapsed durable history. Older bulky browser results become deterministic request-view stubs while durable state stays complete. |
+| `worker/contextView.ts` | Builds a pure model-request view from never-collapsed durable history. Older bulky browser results and consumed screenshot pixels become deterministic request-view stubs while durable state stays complete. |
 
 Calls in one response execute in order. `finish` mixed with another call executes nothing. A timed-out executor remains globally registered as busy so later work and terminalization cannot overlap it.
 
@@ -52,27 +52,29 @@ Calls in one response execute in order. `finish` mixed with another call execute
 | `finishChecks.ts` | Compares the exclusive `finish` claim, immutable contract, manifest, published bytes, and evidence. Returns repairable defects or structured positive facts; never writes or revises requirements. |
 | `finishFacts.schema.ts` | Strict checkpoint-safe positive facts produced by deterministic inspection. |
 
-## `src/tools` — eight model-visible tools
+## `src/tools` — nine model-visible tools
 
 `src/tools/index.ts` fixes this byte-stable order:
 
 1. `browser_execute` — one bounded async browser program against an exact owned page; run-scoped JavaScript policy and secret denylist.
-2. `publish_artifact` — publish text, a workspace file, screenshot, or browser download with explicit manifest roles/provenance.
-3. `read_file` — bounded content-aware reads from the run workspace.
-4. `write_file` — write private workspace bytes.
-5. `edit_file` — exact-match edits to private workspace text.
-6. `bash` — bounded foreground local commands in `scratch/workspace/`, followed by manifest reconciliation.
-7. `ask_user` — permission-mediated interactive question; unavailable/headless paths fail closed.
-8. `finish` — exclusive completion control request, intercepted before generic dispatch.
+2. `capture_screenshot` — return the exact live viewport inline for one model request; private observation only and exclusive within its response.
+3. `publish_artifact` — publish text, a workspace file, screenshot, or browser download with explicit manifest roles/provenance.
+4. `read_file` — bounded content-aware reads from the run workspace.
+5. `write_file` — write private workspace bytes.
+6. `edit_file` — exact-match edits to private workspace text.
+7. `bash` — bounded foreground local commands in `scratch/workspace/`, followed by manifest reconciliation.
+8. `ask_user` — permission-mediated interactive question; unavailable/headless paths fail closed.
+9. `finish` — exclusive completion control request, intercepted before generic dispatch.
 
-There is no active legacy tool barrel or one-directory-per-browser-action surface. Browser observation/action is consolidated behind `browser_execute`; publication is consolidated behind `publish_artifact`.
+There is no active legacy tool barrel or one-directory-per-browser-action surface. Programmable browser observation/action is consolidated behind `browser_execute`; pixel observation is `capture_screenshot`; publication is consolidated behind `publish_artifact`.
 
 ## Shared tool framework (`src/tools`)
 
 | File | Responsibility |
 | --- | --- |
 | `registry.ts` | `ToolDef`, deterministic registries/API definitions, permission types, and the run-owned global abandoned-effect ledger. |
-| `pipeline.ts` | Existence/schema/permission/busy gates, bounded execution timeout, normalization, result capping, and structured errors. It never lets a timed-out effect disappear from accounting. |
+| `pipeline.ts` | Existence/schema/permission/busy gates, bounded execution timeout, normalization, inline-image conversion, result capping, and structured errors. It never lets a timed-out effect disappear from accounting. |
+| `inlineImage.ts` | Validates bounded trusted screenshot bytes and constructs multimodal tool-result blocks without exposing pixels to telemetry. |
 | `capResult.ts` | Per-result and combined-result byte limits. Oversize output is durably offloaded under `scratch/tool-output/` with a bounded UTF-8 preview. |
 | `bash/runForegroundCommand.ts` | Process-group-aware finite foreground command runner used by `bash`. |
 
@@ -90,7 +92,7 @@ There is no active legacy tool barrel or one-directory-per-browser-action surfac
 
 | File/area | Responsibility |
 | --- | --- |
-| `controller.ts` | Minimal engine-neutral `BrowserController`: run-page ownership/preparation/cleanup, safe page summaries, target-pinned command sessions (including protected upload), dialogs, screenshots/downloads, and diagnostics. |
+| `controller.ts` | Minimal engine-neutral `BrowserController`: run-page ownership/preparation/cleanup, safe page summaries, target-pinned command sessions (including exact-node and unique frame-aware selector uploads), dialogs, screenshots/downloads, and diagnostics. |
 | `sessionProvider.ts` | `BrowserSessionProvider` and provider-safe diagnostics (`local` or `browserbase`). |
 | `provider.ts` | The only environment-to-provider composition point; explicit local/Browserbase choice and explicit local `attached`/`managed` authority. |
 | `attachedChromeSetup.ts`, `attachedChromeBrowserSessionProvider.ts` | Bounded loopback discovery/approval and non-owning connection to the user's current Chrome. Endpoint values never enter user-visible errors. |

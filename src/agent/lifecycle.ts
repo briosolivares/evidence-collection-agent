@@ -1784,6 +1784,7 @@ function collectSurfacedArtifacts(runDir: string): SurfacedArtifact[] {
       roles: [...entry.roles!] as ('requested_output' | 'evidence')[],
       capturedAt: entry.capturedAt,
       ...(entry.sourceUrl === undefined ? {} : { sourceUrl: entry.sourceUrl }),
+      ...(entry.publicationKind === undefined ? {} : { publicationKind: entry.publicationKind }),
       ...(entry.completionStatus === undefined ? {} : { completionStatus: entry.completionStatus }),
     }))
     .sort((left, right) => left.filename.localeCompare(right.filename));
@@ -1791,10 +1792,11 @@ function collectSurfacedArtifacts(runDir: string): SurfacedArtifact[] {
 
 function fingerprintSurfacedArtifacts(artifacts: readonly SurfacedArtifact[]): string {
   const stableEvidence = artifacts.map(
-    ({ filename, sha256, sourceUrl, roles, completionStatus }) => ({
+    ({ filename, sha256, sourceUrl, publicationKind, roles, completionStatus }) => ({
       filename,
       sha256,
       ...(sourceUrl === undefined ? {} : { sourceUrl }),
+      ...(publicationKind === undefined ? {} : { publicationKind }),
       roles: [...roles].sort(),
       ...(completionStatus === undefined ? {} : { completionStatus }),
     }),

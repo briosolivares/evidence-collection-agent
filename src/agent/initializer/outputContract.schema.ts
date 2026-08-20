@@ -194,7 +194,10 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
     count: outputCountSchema.describe('How many screenshots the run must publish'),
     filenamePattern: nonBlankString
       .optional()
-      .describe('Bare filename pattern the captures must match, e.g. "profile-*.png"'),
+      .describe(
+        'Bare filename pattern the captures must match, e.g. "profile-*.png". Omit when ' +
+          'the request gives no filename; wildcard-only values are treated as omitted',
+      ),
     mustShow: optionalConstraintList.describe(
       'What must be visible in the images. Deliberately semantic: checked by an ' +
         'image-capable verifier, never by code',
@@ -234,7 +237,10 @@ export const outputSpecSchema = z.discriminatedUnion('kind', [
     count: outputCountSchema.describe('How many downloaded files the run must publish'),
     filenamePattern: nonBlankString
       .optional()
-      .describe('Bare filename pattern the downloads must match, e.g. "*.pdf"'),
+      .describe(
+        'Bare filename pattern the downloads must match, e.g. "*.pdf". Omit when the ' +
+          'request gives no filename; wildcard-only values are treated as omitted',
+      ),
     allowedMediaTypes: optionalConstraintList.describe(
       'Accepted media types, e.g. ["application/pdf"]',
     ),

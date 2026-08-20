@@ -63,6 +63,98 @@ over-broad filename pattern `*`; deterministic assignment therefore treated
 SEC-sourced PNG screenshots as candidates for both the download and screenshot
 outputs and exhausted five correction attempts.
 
+## Post-eval failure corrections complete (2026-08-20)
+
+- [x] Preserve the runtime-executed `publish_artifact` mode as optional
+  `publicationKind` manifest provenance through atomic write recovery,
+  inspection, verifier surfacing, fingerprints, and audit reports. Existing
+  runs without the field retain their historical inference path.
+- [x] Match new screenshot/download contract outputs only to their trusted
+  publication kind. Evidence-only captures no longer create role defects when
+  requested captures already satisfy the count, while a matching evidence-only
+  capture still produces a useful role hint when the requested count is unmet.
+- [x] Canonicalize wildcard-only filename patterns such as `*` to omission
+  during initialization. Another stated constraint remains usable; when the
+  request states none, trusted download publication provenance plus the count
+  identifies the output without inventing a filename.
+- [x] Remove OpenClaw latest PR's hidden `answer.md` grader requirement. Because
+  that task states no filename, its sole manifest-declared requested output is
+  the answer; zero or multiple requested outputs fail without grader
+  cherry-picking.
+- [x] Accept a non-trivial base brand for dotted official YC company names
+  (`Kater` for `kater.ai`) while retaining founder-name, company-specific
+  detail, length, uniqueness, and 15-minute-call requirements.
+
+The Wikipedia visible-ordinal miss was deliberately separated from this
+correction slice rather than receiving a prompt-only patch; the general visual
+observation capability is recorded below. Verification for this slice passes
+9 focused files / 203 tests, `npm run typecheck`, and `git diff --check`; the
+full suite and live evals were not rerun.
+
+## Worker viewport observation complete (2026-08-20)
+
+- [x] Add `capture_screenshot` as the second tool in the frozen worker order.
+  It captures the exact live viewport at CSS scale from the existing
+  run-owned page and returns bounded PNG pixels inline without navigating,
+  writing a file, or publishing an artifact.
+- [x] Require the capture to be the only call in its assistant response so
+  the worker must inspect pixels before taking its next action. Preserve
+  `publish_artifact kind=screenshot` as the sole screenshot evidence and
+  deliverable boundary.
+- [x] Keep successful capture pixels in exactly one model request, then
+  replace them with stable metadata. Preserve real pixels in checkpoint state
+  for crash recovery while redacting them from transcript and tracing
+  projections; count decoded image bytes in result metrics.
+- [x] Share the verifier's API image byte/dimension validation, add strict
+  checkpoint bounds, expose concise TUI activity, and document the nine-tool
+  architecture and visual-observation guidance.
+
+Verification: targeted unit and real-Chrome gates pass 10 files / 140 tests,
+`npm run typecheck` passes, `git diff --check` passes, and the complete
+low-concurrency hermetic suite passes 147 files / 1,489 tests. Live evals and
+the billable Browserbase smoke were not run.
+
+## Download filename canonicalization complete (2026-08-20)
+
+- [x] Run the authorized one-trial EDGAR, Wikipedia reference, and YC outreach
+  follow-up. YC passed 8/8 and verified. Wikipedia exercised
+  `capture_screenshot` twice before a host `ENOSPC` checkpoint failure. EDGAR
+  stopped in initialization because both bounded attempts repeated the
+  wildcard-only download filename pattern.
+- [x] Canonicalize wildcard-only screenshot/download filename patterns to
+  omission instead of rejecting the immutable contract. Meaningful patterns
+  such as `*.pdf` retain their existing semantics.
+- [x] Permit a download contract with no stated filename, media type, or source
+  URL. Deterministic completion matches it only to an artifact carrying the
+  trusted runtime `download` publication kind; legacy untyped artifacts remain
+  fail-closed.
+
+Verification: 3 focused files / 90 tests pass, `npm run typecheck` and
+`git diff --check` pass, and the complete low-concurrency hermetic suite passes
+147 files / 1,491 tests. The post-fix EDGAR trial used `capture_screenshot`,
+verified internally, and passed all 3/3 grader assertions.
+
+## Frame-aware browser upload complete (2026-08-20)
+
+- [x] Keep `browser.upload(backendDOMNodeId, workspacePath)` for exact nodes and
+  add `browser.upload(workspacePath, { selector, frameUrlIncludes? })` for file
+  inputs that are visible only inside application-owned dialogs or iframes.
+- [x] Resolve the selector across every eligible frame of the already pinned
+  page and fail closed unless it identifies exactly one `input[type=file]`.
+  Treat the optional frame URL substring only as a dynamic disambiguator.
+- [x] Route both forms through the existing confined workspace validation,
+  provider byte encoder, upload timeout, command-session drain, and busy-ledger
+  fencing. No browser connection capability enters child IPC.
+- [x] Extend one IPC test, one command-session test, and one existing
+  real-browser upload journey; no broad new test matrix was added.
+
+Verification: focused unit and real-Chrome gates pass 3 files / 45 tests,
+`npm run typecheck` and `git diff --check` pass, and the complete
+low-concurrency hermetic suite passes 147 files / 1,491 tests. One
+concurrency-sensitive renderer-retirement assertion failed during the initial
+four-worker run; its complete browser file passed 4/4 immediately afterward,
+then the two-worker full-suite gate passed cleanly.
+
 ## Lazy interactive Chrome attachment complete (2026-08-20)
 
 - [x] Stop creating the attached local-Chrome session before Ink renders;
@@ -276,9 +368,9 @@ updating the design and this plan in the same commit.
    guard: if a timed-out promise may still be mutating state, later calls and
    terminalization wait rather than race it merely because dispatch itself is
    sequential.
-3. **Eight worker-visible capabilities.** `browser_execute`,
-   `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
-   `ask_user`, and `finish`. Internals may use more modules; the model-facing
+3. **Nine worker-visible capabilities.** `browser_execute`,
+   `capture_screenshot`, `publish_artifact`, `read_file`, `write_file`,
+   `edit_file`, `bash`, `ask_user`, and `finish`. Internals may use more modules; the model-facing
    surface stays compact and deterministically ordered.
 4. **Programmable browser execution.** `browser_execute` runs bounded
    JavaScript in a fresh child process against a parent-owned, target-pinned

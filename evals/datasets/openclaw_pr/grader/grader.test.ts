@@ -71,10 +71,17 @@ function mentionText(pr: GithubPullRequest): string {
 }
 
 describe('openclaw_pr grader', () => {
-  it('passes every assertion when answer.md names the PR created during the run', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
-      roles: ['requested_output'],
-    });
+  const answerExistsName = 'one requested answer artifact exists';
+  const answerContentName =
+    'requested answer mentions the number and title of a most-recent-in-window PR';
+
+  it('passes every assertion for a sole requested answer with an agent-chosen filename', async () => {
+    writeArtifact(
+      runDir,
+      'artifacts/openclaw_latest_pr.md',
+      Buffer.from(mentionText(PR_CREATED_MID_RUN)),
+      { roles: ['requested_output'] },
+    );
 
     const results = await grade(runDir, ORACLE);
 
@@ -92,10 +99,7 @@ describe('openclaw_pr grader', () => {
 
     const results = await grade(runDir, ORACLE);
 
-    expect(
-      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
-        .passed,
-    ).toBe(true);
+    expect(byName(results, answerContentName).passed).toBe(true);
   });
 
   it('churn tolerance: rejects a PR that only became most recent after the run finished', async () => {
@@ -105,11 +109,8 @@ describe('openclaw_pr grader', () => {
 
     const results = await grade(runDir, ORACLE);
 
-    expect(
-      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
-        .passed,
-    ).toBe(false);
-    expect(byName(results, 'answer.md exists').passed).toBe(true);
+    expect(byName(results, answerContentName).passed).toBe(false);
+    expect(byName(results, answerExistsName).passed).toBe(true);
   });
 
   it('fails when answer.md names a PR that was never most-recent', async () => {
@@ -119,27 +120,36 @@ describe('openclaw_pr grader', () => {
 
     const results = await grade(runDir, ORACLE);
 
-    expect(
-      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
-        .passed,
-    ).toBe(false);
+    expect(byName(results, answerContentName).passed).toBe(false);
   });
 
-  it('fails both content assertions, with detail, when answer.md is missing', async () => {
+  it('fails both content assertions, with detail, when no requested answer exists', async () => {
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, 'answer.md exists').passed).toBe(false);
-    expect(
-      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
-        .passed,
-    ).toBe(false);
+    expect(byName(results, answerExistsName).passed).toBe(false);
+    expect(byName(results, answerContentName).passed).toBe(false);
     for (const r of results) {
       if (r.name === 'manifest hashes verify') continue;
       expect(r.detail).not.toBe('');
     }
   });
 
-  it('fails only the manifest-hash assertion when answer.md is tampered with after capture', async () => {
+  it('rejects multiple requested outputs instead of cherry-picking one', async () => {
+    writeArtifact(runDir, 'artifacts/first.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'artifacts/second.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
+      roles: ['requested_output'],
+    });
+
+    const results = await grade(runDir, ORACLE);
+
+    expect(byName(results, answerExistsName).passed).toBe(false);
+    expect(byName(results, answerExistsName).detail).toContain('2 requested outputs');
+    expect(byName(results, answerContentName).passed).toBe(false);
+  });
+
+  it('fails only the manifest-hash assertion when the answer is tampered with after capture', async () => {
     writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
       roles: ['requested_output'],
     });
@@ -152,11 +162,8 @@ describe('openclaw_pr grader', () => {
     const results = await grade(runDir, ORACLE);
 
     expect(byName(results, 'manifest hashes verify').passed).toBe(false);
-    expect(byName(results, 'answer.md exists').passed).toBe(true);
-    expect(
-      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
-        .passed,
-    ).toBe(true);
+    expect(byName(results, answerExistsName).passed).toBe(true);
+    expect(byName(results, answerContentName).passed).toBe(true);
 
     // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);

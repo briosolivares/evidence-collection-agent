@@ -17,7 +17,7 @@ import type { ApiToolDef } from '../tools/registry.js';
 //    resumes from the cache entry turn N wrote: the whole conversation is
 //    read at cache rates instead of being re-paid as fresh input each
 //    turn. A second marker rides the collapse frontier — the newest
-//    collapsed browser-result stub in the API message view.
+//    collapsed heavyweight-result stub in the API message view.
 //    It exists because the server matches cached prefixes only up to ~20
 //    content blocks back from a marker: when a new observation stubs the
 //    third-most-recent one, the request diverges at that stub — usually
@@ -207,12 +207,27 @@ export const COLLAPSED_BROWSER_RESULT_MARKER =
   '[Older browser_execute result collapsed — only the two most recent ' +
   'successful browser_execute results stay expanded.]';
 
+/** Stable prefix for a capture already consumed by one model request. */
+export const COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER =
+  '[Consumed capture_screenshot pixels collapsed — capture again if the live visual state is still needed.]';
+
 /** Whether a content block is one of the context view's deterministic stubs. */
 export function isCollapsedBrowserResult(block: { type: string; content?: unknown }): boolean {
   return (
     block.type === 'tool_result' &&
     typeof block.content === 'string' &&
     block.content.startsWith(COLLAPSED_BROWSER_RESULT_MARKER)
+  );
+}
+
+export function isCollapsedCaptureScreenshotResult(block: {
+  type: string;
+  content?: unknown;
+}): boolean {
+  return (
+    block.type === 'tool_result' &&
+    typeof block.content === 'string' &&
+    block.content.startsWith(COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER)
   );
 }
 
@@ -225,7 +240,7 @@ function frontierPosition(messages: readonly Message[]): BlockPosition | undefin
     if (message.role !== 'user') continue;
     for (let blockIndex = message.content.length - 1; blockIndex >= 0; blockIndex -= 1) {
       const block = message.content[blockIndex]!;
-      if (isCollapsedBrowserResult(block)) {
+      if (isCollapsedBrowserResult(block) || isCollapsedCaptureScreenshotResult(block)) {
         return { messageIndex, blockIndex };
       }
     }

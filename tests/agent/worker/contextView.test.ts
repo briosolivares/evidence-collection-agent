@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import type { Message, ToolResultBlock } from '../../../src/model/messages.js';
 import {
   COLLAPSED_BROWSER_RESULT_MARKER,
+  COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER,
   isCollapsedBrowserResult,
+  isCollapsedCaptureScreenshotResult,
 } from '../../../src/model/callModel.js';
 import { buildContextView } from '../../../src/agent/worker/contextView.js';
 
@@ -46,6 +48,41 @@ function resultAt(messages: readonly Message[], index: number): ToolResultBlock 
   const block = messages[index]!.content[0]!;
   if (block.type !== 'tool_result') throw new Error('expected tool result');
   return block;
+}
+
+function captureExchange(id: string, pageId?: string, isError = false): Message[] {
+  return [
+    {
+      role: 'assistant',
+      content: [
+        {
+          type: 'tool_use',
+          id,
+          name: 'capture_screenshot',
+          input: pageId === undefined ? {} : { page_id: pageId },
+        },
+      ],
+    },
+    {
+      role: 'user',
+      content: [
+        {
+          type: 'tool_result',
+          tool_use_id: id,
+          content: isError
+            ? 'capture failed'
+            : [
+                { type: 'text', text: 'Captured https://example.test/live' },
+                {
+                  type: 'image',
+                  source: { type: 'base64', media_type: 'image/png', data: 'aW1hZ2U=' },
+                },
+              ],
+          ...(isError ? { is_error: true } : {}),
+        },
+      ],
+    },
+  ];
 }
 
 describe('buildContextView', () => {
@@ -142,6 +179,45 @@ describe('buildContextView', () => {
       isCollapsedBrowserResult({
         type: 'tool_result',
         content: `prefix ${COLLAPSED_BROWSER_RESULT_MARKER}`,
+      }),
+    ).toBe(false);
+  });
+
+  it('shows capture pixels once, then replaces them with stable metadata', () => {
+    const messages: Message[] = [
+      { role: 'user', content: [{ type: 'text', text: 'task' }] },
+      ...captureExchange('capture-1', 'page-9'),
+    ];
+    const original = structuredClone(messages);
+
+    expect(buildContextView(messages)).toBe(messages);
+
+    messages.push({ role: 'assistant', content: [{ type: 'text', text: 'I inspected it.' }] });
+    const first = buildContextView(messages);
+    const second = buildContextView(messages);
+    const collapsed = resultAt(first, 2);
+
+    expect(collapsed.content).toContain(COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER);
+    expect(collapsed.content).toContain('"requested_page_id":"page-9"');
+    expect(collapsed.content).toContain('Captured https://example.test/live');
+    expect(isCollapsedCaptureScreenshotResult(collapsed)).toBe(true);
+    expect(resultAt(second, 2).content).toBe(collapsed.content);
+    expect(messages.slice(0, original.length)).toEqual(original);
+    expect(Array.isArray(resultAt(messages, 2).content)).toBe(true);
+  });
+
+  it('never collapses a failed capture result', () => {
+    const messages: Message[] = [
+      { role: 'user', content: [{ type: 'text', text: 'task' }] },
+      ...captureExchange('capture-failed', undefined, true),
+      { role: 'assistant', content: [{ type: 'text', text: 'I will recover.' }] },
+    ];
+
+    expect(buildContextView(messages)).toBe(messages);
+    expect(
+      isCollapsedCaptureScreenshotResult({
+        type: 'tool_result',
+        content: `prefix ${COLLAPSED_CAPTURE_SCREENSHOT_RESULT_MARKER}`,
       }),
     ).toBe(false);
   });

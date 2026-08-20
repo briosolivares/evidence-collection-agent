@@ -14,14 +14,14 @@ flowchart TD
     C --> D["Deterministic finish checks"]
     C --> V["Fresh read-only verifier"]
     W --> P["Tool pipeline"]
-    P --> TOOLS["8 tools\nbrowser_execute, publish_artifact,\nread/write/edit_file, bash, ask_user, finish"]
+    P --> TOOLS["9 tools\nbrowser_execute, capture_screenshot, publish_artifact,\nread/write/edit_file, bash, ask_user, finish"]
     TOOLS --> B["BrowserController"]
     TOOLS --> R["Run directory\nmanifest + artifacts + scratch"]
     C --> CP["checkpoint v3\nharness/checkpoint.json"]
     R --> G["Eval graders\nrun directory + oracle only"]
 ```
 
-`src/agent/runTask.ts` is the public composition root. It creates a fresh run directory, fixes durable configuration, builds three model roles and the eight-tool registry, then delegates lifecycle and recovery to `runAgent`.
+`src/agent/runTask.ts` is the public composition root. It creates a fresh run directory, fixes durable configuration, builds three model roles and the nine-tool registry, then delegates lifecycle and recovery to `runAgent`.
 
 ## One lifecycle
 
@@ -41,7 +41,7 @@ graph BT
     RUN["src/run\ndurable files, budgets, provenance"]
     MSG["src/model/messages.ts\nSDK-free message types"]
     BIF["src/browser/controller.ts + sessionProvider.ts"]
-    TF["src/tools\n8 tools, global busy gate, pipeline, result caps"] --> RUN
+    TF["src/tools\n9 tools, global busy gate, pipeline, result caps"] --> RUN
     MODEL["src/model\nstreaming + strict ModelDriver"] --> MSG
     AGENT["src/agent\nlifecycle + four stages + checkpoint"] --> MODEL & TF & RUN & BIF
     COMPOSE["src/agent/runTask.ts"] --> AGENT & TF & MODEL
@@ -54,8 +54,9 @@ may still be running; there is no per-tool access-key representation.
 
 ## Binding invariants
 
-- **One immutable contract.** The initializer authors it before browsing. The worker cannot revise it, and lifecycle recovery rejects configuration or contract drift.
+- **One immutable contract.** The initializer authors it before browsing. Vacuous wildcard-only filename patterns canonicalize to omission; the worker cannot revise the accepted contract, and lifecycle recovery rejects configuration or contract drift.
 - **Explicit completion.** `finish` is intercepted control flow and must be the only call in its response.
+- **Ephemeral visual observation.** `capture_screenshot` must also be the only call in its response. Its live viewport pixels enter one model request, then collapse to pixel-free metadata; publication remains explicit.
 - **Fail closed.** Partial/truncated/refused/unknown model responses never enter history or execute. Deterministic-check or verifier failure cannot become success.
 - **Durability before replay.** Checkpoints are schema-validated, monotonically revised, atomically replaced under an exclusive run lock, and terminal state is absorbing. Recovery marks an effect uncertain before dispatch and never replays that boundary blindly.
 - **Manifest is the product boundary.** Published files live under `artifacts/` with `requested_output` and/or `evidence` roles; private work lives under `scratch/`. Graders select requested outputs by manifest role, not filenames or transcript claims.

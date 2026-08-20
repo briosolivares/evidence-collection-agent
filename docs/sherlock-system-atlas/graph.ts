@@ -135,7 +135,7 @@ export const concepts: readonly SemanticNode[] = [
       outputs: [
         'DurableRunConfiguration',
         'Three model drivers',
-        'Eight-tool registry',
+        'Nine-tool registry',
         'Run outcome',
       ],
       creator: 'Task-entry adapters call runTask.',
@@ -231,7 +231,7 @@ export const concepts: readonly SemanticNode[] = [
       opening:
         'The persistent worker is where the investigation actually happens. Unlike the initializer and verifier, it keeps one Sonnet conversation alive across research, tool results, failed checks, and verifier corrections, so it can repair its work without relearning the task from scratch.',
       mechanics: [
-        'Each model turn is assembled and validated before any effect occurs. Valid tool calls then run in response order through the frozen eight-tool registry: the worker can operate the browser, work in private scratch files, publish artifacts, ask the user, run bounded shell commands, and eventually request finish.',
+        'Each model turn is assembled and validated before any effect occurs. Valid tool calls then run in response order through the frozen nine-tool registry: the worker can operate the browser, inspect live viewport pixels, work in private scratch files, publish artifacts, ask the user, run bounded shell commands, and eventually request finish.',
         'Private work and public evidence stay separate throughout that loop. write_file and edit_file only change scratch space; publish_artifact is the deliberate crossing into the manifest. When the worker believes the contract is satisfied, finish must be the only tool call in its response. That pauses production and asks the rest of Sherlock to inspect the result—it does not declare success.',
       ],
       handoff:
@@ -263,10 +263,10 @@ export const concepts: readonly SemanticNode[] = [
     tone: 'capability',
     code: '06',
     title: 'Capability boundary',
-    kicker: 'Eight frozen tools',
+    kicker: 'Nine frozen tools',
     summary: 'Turns validated model requests into bounded, permissioned, observable effects.',
     answers: {
-      what: 'Exactly eight model-visible tools behind one registry and execution pipeline.',
+      what: 'Exactly nine model-visible tools behind one registry and execution pipeline.',
       inputs: ['Validated worker tool calls', 'Tool context', 'Durable browser policy'],
       outputs: ['Bounded CapResult values', 'Checkpointable effects', 'Finish control flow'],
       creator: 'Production composition builds one run-scoped registry in frozen order.',
@@ -793,7 +793,7 @@ export const implementations: readonly SemanticNode[] = [
     title: 'Registry + API defs',
     kicker: 'Frozen surface',
     summary:
-      'Assembles browser_execute, publish_artifact, five file/control tools, bash, ask_user, and finish.',
+      'Assembles browser_execute, capture_screenshot, publish_artifact, read/write/edit_file, bash, ask_user, and finish.',
     answers: {
       what: 'The ordered ToolDef map and canonical model-facing JSON schemas.',
       inputs: ['JavaScript policy', 'Secret environment denylist'],

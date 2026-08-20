@@ -20,6 +20,8 @@ import {
   type RunBudgetConfig,
 } from '../../../src/run/runBudget.js';
 import { createRegistry, type ToolCtx, type ToolDef } from '../../../src/tools/registry.js';
+import { CAPTURE_SCREENSHOT_TOOL_NAME } from '../../../src/tools/captureScreenshot/captureScreenshot.js';
+import { createInlineImageToolOutput } from '../../../src/tools/inlineImage.js';
 import { finishTool, type FinishInput } from '../../../src/tools/finish/finish.js';
 import {
   MAX_PROTOCOL_CORRECTIONS,
@@ -67,6 +69,11 @@ const VALID_FINISH: FinishInput = {
   summary: 'The requested report and evidence were published.',
   unresolved: [],
 };
+
+const ONE_PIXEL_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+  'base64',
+);
 
 function accepted(
   content: AcceptedModelResponse['response']['content'],
@@ -225,6 +232,104 @@ describe('ordinary response execution', () => {
       role: 'user',
       content: [{ type: 'text', text: NO_TOOL_CONTINUATION }],
     });
+  });
+
+  it('delivers capture pixels once, preserves metrics, and redacts durable transcript views', async () => {
+    const capture: ToolDef<Record<string, never>> = {
+      name: CAPTURE_SCREENSHOT_TOOL_NAME,
+      description: 'capture test pixels',
+      inputSchema: z.strictObject({}),
+      execute: () =>
+        createInlineImageToolOutput(
+          'Captured the live viewport from https://example.test/live.',
+          'image/png',
+          ONE_PIXEL_PNG,
+        ),
+    };
+    const requests: Array<readonly Message[]> = [];
+    const model = scriptedDriver([
+      accepted([
+        {
+          type: 'tool_use',
+          id: 'capture-1',
+          name: CAPTURE_SCREENSHOT_TOOL_NAME,
+          input: {},
+        },
+      ]),
+      (options) => {
+        requests.push(options.messages);
+        const result = options.messages.at(-1)?.content[0];
+        expect(result?.type).toBe('tool_result');
+        if (result?.type !== 'tool_result') throw new Error('expected capture result');
+        expect(Array.isArray(result.content)).toBe(true);
+        if (!Array.isArray(result.content)) throw new Error('expected multimodal content');
+        expect(result.content.some((item) => item.type === 'image')).toBe(true);
+        return accepted([{ type: 'tool_use', id: 'after-1', name: 'after', input: {} }]);
+      },
+      (options) => {
+        requests.push(options.messages);
+        let consumed: ToolResultBlock | undefined;
+        for (const message of options.messages) {
+          if (message.role !== 'user') continue;
+          consumed = message.content.find(
+            (block): block is ToolResultBlock =>
+              block.type === 'tool_result' && block.tool_use_id === 'capture-1',
+          );
+          if (consumed !== undefined) break;
+        }
+        expect(consumed?.type).toBe('tool_result');
+        if (consumed?.type !== 'tool_result') throw new Error('expected consumed result');
+        expect(typeof consumed.content).toBe('string');
+        expect(consumed.content).toContain('Consumed capture_screenshot pixels collapsed');
+        return accepted([
+          { type: 'tool_use', id: 'finish-1', name: 'finish', input: VALID_FINISH },
+        ]);
+      },
+    ]);
+    const worker = session(model, [capture, tool('after', () => 'done'), finishTool]);
+
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    await expect(runWorkerTurn(worker)).resolves.toMatchObject({ kind: 'finish_requested' });
+
+    expect(requests).toHaveLength(2);
+    expect(captureRunBudgetSnapshot(worker.config.budget).toolResultBytes).toBeGreaterThanOrEqual(
+      ONE_PIXEL_PNG.byteLength,
+    );
+    const durableTranscript = readFileSync(join(runDir, 'transcript.jsonl'), 'utf8');
+    expect(durableTranscript).not.toContain(ONE_PIXEL_PNG.toString('base64'));
+    expect(durableTranscript).toContain('pixel payload omitted');
+  });
+
+  it('rejects capture_screenshot mixed with another call before either executes', async () => {
+    const captureExecute = vi.fn(() => 'must not run');
+    const otherExecute = vi.fn(() => 'must not run');
+    const worker = session(
+      scriptedDriver([
+        accepted([
+          {
+            type: 'tool_use',
+            id: 'capture',
+            name: CAPTURE_SCREENSHOT_TOOL_NAME,
+            input: {},
+          },
+          { type: 'tool_use', id: 'other', name: 'other', input: {} },
+        ]),
+      ]),
+      [tool(CAPTURE_SCREENSHOT_TOOL_NAME, captureExecute), tool('other', otherExecute)],
+    );
+
+    await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
+    expect(captureExecute).not.toHaveBeenCalled();
+    expect(otherExecute).not.toHaveBeenCalled();
+    expect(lastResults(worker)).toEqual([
+      expect.objectContaining({
+        tool_use_id: 'capture',
+        is_error: true,
+        content: expect.stringContaining('capture_screenshot must be the only tool call'),
+      }),
+      expect.objectContaining({ tool_use_id: 'other', is_error: true }),
+    ]);
   });
 });
 

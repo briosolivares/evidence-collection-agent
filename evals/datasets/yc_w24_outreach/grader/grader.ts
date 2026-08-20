@@ -208,7 +208,9 @@ function emailAssertion(rows: OutreachRow[], matched: MatchedRow[]): AssertionRe
     }
     const email = normalize(row.email);
     const firstName = normalize(match.canonicalFounder).split(' ')[0]!;
-    const companyName = normalize(match.company.name);
+    const companyNamed = companyNameAliases(match.company.name).some((alias) =>
+      containsNormalizedPhrase(email, alias),
+    );
     const asksFor15Minutes =
       /\b15\s*(?:min|mins|minute|minutes)\b/.test(email) &&
       /\b(call|chat|conversation|meeting)\b/.test(email);
@@ -216,7 +218,7 @@ function emailAssertion(rows: OutreachRow[], matched: MatchedRow[]): AssertionRe
     const hasSpecificDetail = personalizedTokens.some((token) => email.includes(token));
     const problems = [
       !email.includes(firstName) ? 'missing founder first name' : '',
-      !email.includes(companyName) ? 'missing company name' : '',
+      !companyNamed ? 'missing company name' : '',
       !asksFor15Minutes ? 'no 15-minute call ask' : '',
       !hasSpecificDetail ? 'no company-specific product/detail term' : '',
       row.email.trim().length < 120 ? 'under 120 characters' : '',
@@ -233,6 +235,24 @@ function emailAssertion(rows: OutreachRow[], matched: MatchedRow[]): AssertionRe
       ? bad.join('; ')
       : `${rows.length} personalized call requests passed structural checks (prose quality is human-reviewed)`,
   };
+}
+
+/** Official YC names sometimes use a domain-style brand such as kater.ai,
+ * while ordinary outreach correctly addresses the company as Kater. Accept
+ * the full normalized name and, only for an explicit dotted name with a
+ * plausible alphabetic suffix, its non-trivial base brand. */
+function companyNameAliases(companyName: string): string[] {
+  const aliases = [normalize(companyName)];
+  const dotted = /^(.+)\.([a-z]{2,10})$/i.exec(companyName.trim());
+  if (dotted !== null) {
+    const base = normalize(dotted[1]!);
+    if (base.length >= 4 && !aliases.includes(base)) aliases.push(base);
+  }
+  return aliases;
+}
+
+function containsNormalizedPhrase(text: string, phrase: string): boolean {
+  return phrase.length > 0 && ` ${text} `.includes(` ${phrase} `);
 }
 
 function personalizationTokens(company: YcAiCompany): string[] {

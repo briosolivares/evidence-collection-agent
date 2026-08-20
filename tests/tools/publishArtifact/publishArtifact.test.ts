@@ -194,6 +194,7 @@ describe('publish_artifact file and text modes', () => {
       filename: 'artifacts/report.md',
       sha256: sha256(expected),
       sourceUrl: 'https://example.test/source',
+      publicationKind: 'text',
       roles: ['requested_output', 'evidence'],
     });
     expect(readManifest(runDir).artifacts).toEqual([entry]);
@@ -393,6 +394,7 @@ describe('publish_artifact browser modes', () => {
     expect(entry).toMatchObject({
       sha256: sha256(png),
       sourceUrl: 'https://source.example.test/report',
+      publicationKind: 'screenshot',
       roles: ['evidence'],
     });
   });
@@ -416,6 +418,7 @@ describe('publish_artifact browser modes', () => {
     });
     expect(readFileSync(join(runDir, directEntry.filename))).toEqual(directBytes);
     expect(directEntry.sourceUrl).toBe('https://files.example.test/final.bin');
+    expect(directEntry.publicationKind).toBe('download');
 
     const generated = fakeBrowser({ finalUrl: 'blob:generated-download' });
     const generatedEntry = await successfulCall(

@@ -21,6 +21,8 @@ export function deriveSemanticLine(name: string, input?: unknown): SemanticLine 
   switch (name) {
     case 'browser_execute':
       return { line: 'Running a browser program', isEvidence: false };
+    case 'capture_screenshot':
+      return { line: 'Inspecting the live viewport', isEvidence: false };
     case 'publish_artifact': {
       const kind = field(input, 'kind');
       const path = field(input, 'artifact_path');

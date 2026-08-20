@@ -26,6 +26,7 @@ const entry: ManifestEntry = {
   filename,
   sha256: createHash('sha256').update(bytes).digest('hex'),
   ...(meta.sourceUrl === undefined ? {} : { sourceUrl: meta.sourceUrl }),
+  ...(meta.publicationKind === undefined ? {} : { publicationKind: meta.publicationKind }),
   ...(meta.roles === undefined ? {} : { roles: meta.roles }),
   capturedAt: new Date().toISOString(),
   ...(meta.completionStatus === undefined ? {} : { completionStatus: meta.completionStatus }),

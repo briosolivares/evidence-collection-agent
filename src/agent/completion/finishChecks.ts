@@ -338,6 +338,9 @@ function finishChecksNeedFullBytes(
       continue;
     }
     if (output.kind !== 'download') continue;
+    if (entry.publicationKind !== undefined && entry.publicationKind !== 'download') {
+      continue;
+    }
     if (
       output.filenamePattern !== undefined &&
       matchesFilenamePattern(basename(artifactPath), output.filenamePattern)
@@ -352,6 +355,14 @@ function finishChecksNeedFullBytes(
       output.sourceUrlPattern !== undefined &&
       entry.sourceUrl !== undefined &&
       matchesFilenamePattern(entry.sourceUrl, output.sourceUrlPattern)
+    ) {
+      return true;
+    }
+    if (
+      output.filenamePattern === undefined &&
+      output.allowedMediaTypes === undefined &&
+      output.sourceUrlPattern === undefined &&
+      entry.publicationKind === 'download'
     ) {
       return true;
     }
@@ -518,15 +529,18 @@ function inspectCaptureOutput(
   validPaths: string[];
 } {
   const patternMatches = candidates.filter((entry) => {
+    if (!matchesPublicationKind(output, entry)) return false;
     if (output.filenamePattern !== undefined) {
       return matchesFilenamePattern(artifactBasename(entry), output.filenamePattern);
     }
     if (output.kind === 'screenshots') return isPng(inspectionBytes(entry));
 
-    // A download contract without a filename pattern is still required by
-    // contract validation to constrain media type or source URL. Use those
-    // positive constraints to avoid treating an unrelated requested
-    // screenshot as a malformed download (or vice versa).
+    // Optional media/source constraints positively identify compatible
+    // historical entries. With neither, require the trusted runtime mode;
+    // never infer an unconstrained download from an older untyped artifact.
+    if (output.allowedMediaTypes === undefined && output.sourceUrlPattern === undefined) {
+      return entry.entry.publicationKind === 'download';
+    }
     const mediaMatches =
       output.allowedMediaTypes?.some((allowed) => {
         if (allowed.toLowerCase() === 'application/octet-stream') return true;
@@ -542,105 +556,39 @@ function inspectCaptureOutput(
   });
   const defects: FinishDefect[] = [];
   const valid: Array<{ entry: VerifiedContentEntry; sourceUrl: string }> = [];
+  const requestedMatches = patternMatches.filter((entry) => hasRole(entry, 'requested_output'));
 
-  for (const entry of patternMatches) {
-    const bytes = inspectionBytes(entry);
-    const sourceUrl = hasSource(entry) ? entry.entry.sourceUrl : undefined;
-    let acceptable = true;
-    if (!hasRole(entry, 'requested_output')) {
-      defects.push(
-        captureDefect(
-          output,
-          entry,
-          'capture_wrong_role',
-          `${entry.canonicalPath} matches required ${output.kind} output ${output.id} but lacks requested_output. Re-publish it with requested_output (and evidence too when it supports the run).`,
-        ),
-      );
-      acceptable = false;
+  for (const entry of requestedMatches) {
+    const outcome = validateCaptureCandidate(output, entry);
+    defects.push(...outcome.defects);
+    if (outcome.valid && outcome.sourceUrl !== undefined) {
+      valid.push({ entry, sourceUrl: outcome.sourceUrl });
     }
-    if (entry.byteLength === 0) {
-      defects.push(
-        captureDefect(output, entry, 'empty_capture', `${entry.canonicalPath} is empty.`),
-      );
-      acceptable = false;
-    }
-    if (!hasSource(entry)) {
-      defects.push(
-        captureDefect(
-          output,
-          entry,
-          'missing_capture_source_url',
-          `${entry.canonicalPath} has no source URL. Re-publish the browser capture so its origin is auditable.`,
-        ),
-      );
-      acceptable = false;
-    }
-
-    if (output.kind === 'screenshots') {
-      if (!isPng(bytes)) {
-        defects.push(
-          captureDefect(
-            output,
-            entry,
-            'screenshot_format_mismatch',
-            `${entry.canonicalPath} matches the requested screenshot name but is not PNG screenshot bytes.`,
-          ),
-        );
-        acceptable = false;
-      }
-    } else {
-      if (entry.bytes === undefined) {
-        defects.push(
-          captureDefect(
-            output,
-            entry,
-            'capture_content_not_inspected',
-            `${entry.canonicalPath} could not be retained within the bounded deterministic content-inspection budget. Reduce or split it before finishing.`,
-          ),
-        );
-        acceptable = false;
-      }
-      if (
-        output.sourceUrlPattern !== undefined &&
-        entry.entry.sourceUrl !== undefined &&
-        !matchesFilenamePattern(entry.entry.sourceUrl, output.sourceUrlPattern)
-      ) {
-        defects.push(
-          captureDefect(
-            output,
-            entry,
-            'download_source_mismatch',
-            `${entry.canonicalPath} source URL ${JSON.stringify(entry.entry.sourceUrl)} does not match ${JSON.stringify(output.sourceUrlPattern)}.`,
-          ),
-        );
-        acceptable = false;
-      }
-      const inferred = inferMediaTypes(bytes, artifactBasename(entry));
-      if (
-        output.allowedMediaTypes !== undefined &&
-        !output.allowedMediaTypes.some(
-          (allowed) => allowed.toLowerCase() === 'application/octet-stream',
-        ) &&
-        !output.allowedMediaTypes.some((allowed) =>
-          inferred.some((actual) => actual.toLowerCase() === allowed.toLowerCase()),
-        )
-      ) {
-        defects.push(
-          captureDefect(
-            output,
-            entry,
-            'download_media_type_mismatch',
-            `${entry.canonicalPath} has inferred media type(s) [${inferred.join(', ')}], not one of [${output.allowedMediaTypes.join(', ')}].`,
-          ),
-        );
-        acceptable = false;
-      }
-    }
-    if (acceptable && sourceUrl !== undefined) valid.push({ entry, sourceUrl });
   }
 
   const countDefect = validateCaptureCount(output, valid.length);
-  if (countDefect !== undefined) defects.push(countDefect);
+  if (countDefect !== undefined) {
+    defects.push(countDefect);
+    const belowRequired =
+      'exact' in output.count
+        ? valid.length < output.count.exact
+        : valid.length < output.count.minimum;
+    if (belowRequired) {
+      for (const entry of patternMatches) {
+        if (hasRole(entry, 'requested_output')) continue;
+        const outcome = validateCaptureCandidate(output, entry);
+        if (!outcome.valid) continue;
+        defects.push(
+          captureDefect(
+            output,
+            entry,
+            'capture_wrong_role',
+            `${entry.canonicalPath} matches required ${output.kind} output ${output.id} but lacks requested_output. Re-publish it with requested_output (and evidence too when it supports the run).`,
+          ),
+        );
+      }
+    }
+  }
   return {
     defects,
     fact: {
@@ -654,8 +602,106 @@ function inspectCaptureOutput(
       ),
       sourceUrls: valid.map(({ sourceUrl }) => sourceUrl),
     },
-    attemptedPaths: patternMatches.map((entry) => entry.canonicalPath),
+    attemptedPaths: requestedMatches.map((entry) => entry.canonicalPath),
     validPaths: valid.map(({ entry }) => entry.canonicalPath),
+  };
+}
+
+/** New publications carry the runtime-executed mode, which is authoritative.
+ * Older manifests omit it and retain the historical byte/name inference so
+ * existing run directories remain inspectable and resumable. */
+function matchesPublicationKind(
+  output: Extract<OutputSpec, { kind: 'screenshots' | 'download' }>,
+  entry: VerifiedContentEntry,
+): boolean {
+  const actual = entry.entry.publicationKind;
+  if (actual === undefined) return true;
+  return output.kind === 'screenshots' ? actual === 'screenshot' : actual === 'download';
+}
+
+function validateCaptureCandidate(
+  output: Extract<OutputSpec, { kind: 'screenshots' | 'download' }>,
+  entry: VerifiedContentEntry,
+): { valid: boolean; sourceUrl?: string; defects: FinishDefect[] } {
+  const defects: FinishDefect[] = [];
+  const bytes = inspectionBytes(entry);
+  const sourceUrl = hasSource(entry) ? entry.entry.sourceUrl : undefined;
+
+  if (entry.byteLength === 0) {
+    defects.push(captureDefect(output, entry, 'empty_capture', `${entry.canonicalPath} is empty.`));
+  }
+  if (sourceUrl === undefined) {
+    defects.push(
+      captureDefect(
+        output,
+        entry,
+        'missing_capture_source_url',
+        `${entry.canonicalPath} has no source URL. Re-publish the browser capture so its origin is auditable.`,
+      ),
+    );
+  }
+
+  if (output.kind === 'screenshots') {
+    if (!isPng(bytes)) {
+      defects.push(
+        captureDefect(
+          output,
+          entry,
+          'screenshot_format_mismatch',
+          `${entry.canonicalPath} matches the requested screenshot name but is not PNG screenshot bytes.`,
+        ),
+      );
+    }
+  } else {
+    if (entry.bytes === undefined) {
+      defects.push(
+        captureDefect(
+          output,
+          entry,
+          'capture_content_not_inspected',
+          `${entry.canonicalPath} could not be retained within the bounded deterministic content-inspection budget. Reduce or split it before finishing.`,
+        ),
+      );
+    }
+    if (
+      output.sourceUrlPattern !== undefined &&
+      sourceUrl !== undefined &&
+      !matchesFilenamePattern(sourceUrl, output.sourceUrlPattern)
+    ) {
+      defects.push(
+        captureDefect(
+          output,
+          entry,
+          'download_source_mismatch',
+          `${entry.canonicalPath} source URL ${JSON.stringify(sourceUrl)} does not match ${JSON.stringify(output.sourceUrlPattern)}.`,
+        ),
+      );
+    }
+    const inferred = inferMediaTypes(bytes, artifactBasename(entry));
+    if (
+      output.allowedMediaTypes !== undefined &&
+      !output.allowedMediaTypes.some(
+        (allowed) => allowed.toLowerCase() === 'application/octet-stream',
+      ) &&
+      !output.allowedMediaTypes.some((allowed) =>
+        inferred.some((actual) => actual.toLowerCase() === allowed.toLowerCase()),
+      )
+    ) {
+      defects.push(
+        captureDefect(
+          output,
+          entry,
+          'download_media_type_mismatch',
+          `${entry.canonicalPath} has inferred media type(s) [${inferred.join(', ')}], not one of [${output.allowedMediaTypes.join(', ')}].`,
+        ),
+      );
+    }
+  }
+
+  return {
+    valid: defects.length === 0,
+    ...(sourceUrl === undefined ? {} : { sourceUrl }),
+    defects,
   };
 }
 

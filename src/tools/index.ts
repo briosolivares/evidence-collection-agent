@@ -10,6 +10,7 @@ import {
 import { askUserTool } from './askUser/askUser.js';
 import { createBashTool } from './bash/bash.js';
 import { createBrowserExecuteTool } from './browserExecute/browserExecute.js';
+import { captureScreenshotTool } from './captureScreenshot/captureScreenshot.js';
 import { editFileTool } from './editFile/editFile.js';
 import { readFileTool } from './readFile/readFile.js';
 import { writeFileTool } from './writeFile/writeFile.js';
@@ -19,6 +20,7 @@ import { publishArtifactTool } from './publishArtifact/publishArtifact.js';
 /** Exact model-visible order. It is part of the byte-stable cached prefix. */
 export const WORKER_TOOL_ORDER = Object.freeze([
   'browser_execute',
+  'capture_screenshot',
   'publish_artifact',
   'read_file',
   'write_file',
@@ -38,6 +40,7 @@ export interface WorkerToolRegistryDeps {
 }
 
 const STATIC_TOOLS: ReadonlyMap<WorkerToolName, ToolDef> = new Map([
+  ['capture_screenshot', captureScreenshotTool as ToolDef],
   ['publish_artifact', publishArtifactTool as ToolDef],
   ['read_file', readFileTool as ToolDef],
   ['write_file', writeFileTool as ToolDef],

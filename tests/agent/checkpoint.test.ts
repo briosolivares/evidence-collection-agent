@@ -515,6 +515,31 @@ describe('checkpoint schema', () => {
         nextCallIndex: 0,
       }).success,
     ).toBe(false);
+    expect(
+      pendingToolTurnSchema.safeParse({
+        turn: 1,
+        assistant: {
+          role: 'assistant',
+          content: [{ type: 'tool_use', id: 'capture', name: 'capture_screenshot', input: {} }],
+        },
+        calls: [{ id: 'capture', name: 'capture_screenshot', input: {} }],
+        completedResults: [
+          {
+            type: 'tool_result',
+            tool_use_id: 'capture',
+            content: [
+              { type: 'text', text: 'Captured one viewport.' },
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: 'image/png', data: 'aW1hZ2U=' },
+              },
+            ],
+          },
+        ],
+        nextCallIndex: 1,
+        effect: 'not_started',
+      }).success,
+    ).toBe(true);
   });
 
   it('cross-checks task and turn identity against the immutable snapshot', () => {

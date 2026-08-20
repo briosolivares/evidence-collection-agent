@@ -252,6 +252,7 @@ export class PlaywrightBrowserController implements BrowserController {
   async screenshot(options: BrowserScreenshotOptions = {}): Promise<Uint8Array> {
     const bytes = await this.pageFor(options.pageId).screenshot({
       fullPage: options.fullPage ?? false,
+      ...(options.scale === undefined ? {} : { scale: options.scale }),
       type: 'png',
     });
     return new Uint8Array(bytes);

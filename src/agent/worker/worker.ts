@@ -4,6 +4,7 @@ import { errorMessage, isAbortError } from '../../errors.js';
 import type {
   AssistantContentBlock,
   AssistantMessage,
+  ImageBlock,
   Message,
   ModelResponse,
   TextBlock,
@@ -11,6 +12,7 @@ import type {
   ToolUseBlock,
   Usage,
 } from '../../model/messages.js';
+import { imageBlockLogView, modelMessagesLogView } from '../../model/logView.js';
 import {
   isModelResponseRejectedError,
   isProtocolCorrectableRejection,
@@ -29,6 +31,7 @@ import {
   capResult,
 } from '../../tools/capResult.js';
 import { executeToolCall, type ToolCall, type ToolCallResult } from '../../tools/pipeline.js';
+import { CAPTURE_SCREENSHOT_TOOL_NAME } from '../../tools/captureScreenshot/captureScreenshot.js';
 import {
   createBusyResourceRegistry,
   type BusyResourceRegistry,
@@ -286,7 +289,7 @@ export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome>
   appendTranscriptEvent(session.deps.runDir, {
     type: 'model_request',
     turn,
-    messages: requestMessages,
+    messages: modelMessagesLogView(requestMessages),
   });
 
   let accepted;
@@ -399,6 +402,29 @@ export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome>
             : 'Protocol error: this call was not executed because ' +
                 `${FINISH_TOOL_NAME} was mixed with other tool calls. ` +
                 `Call ${FINISH_TOOL_NAME} alone.`,
+        ),
+      ),
+    );
+    appendToolResults(session, turn, calls, results);
+    return afterTurnGuard(session, contextTokens);
+  }
+
+  const captureCalls = calls.filter((call) => call.name === CAPTURE_SCREENSHOT_TOOL_NAME);
+  if (captureCalls.length > 0 && calls.length !== 1) {
+    const results = capCombinedResults(
+      session.deps.runDir,
+      calls,
+      calls.map((call) =>
+        generatedErrorResult(
+          session.deps.runDir,
+          call,
+          call.name === CAPTURE_SCREENSHOT_TOOL_NAME
+            ? `Protocol error: ${CAPTURE_SCREENSHOT_TOOL_NAME} must be the only tool call ` +
+                'in its response so its pixels can be inspected before the next action; ' +
+                'nothing in this response executed.'
+            : 'Protocol error: this call was not executed because ' +
+                `${CAPTURE_SCREENSHOT_TOOL_NAME} was mixed with other tool calls. ` +
+                `Call ${CAPTURE_SCREENSHOT_TOOL_NAME} alone, inspect it, then act in a later response.`,
         ),
       ),
     );
@@ -684,7 +710,7 @@ function appendToolResults(
     appendTranscriptEvent(session.deps.runDir, {
       type: 'tool_result',
       turn,
-      result,
+      result: transcriptResult(result),
     });
   });
 }
@@ -854,21 +880,47 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
   return {
     type: 'tool_result',
     tool_use_id: result.toolCallId,
-    content: result.content,
+    content:
+      !result.isError && result.image !== undefined
+        ? [{ type: 'text', text: result.content }, result.image]
+        : result.content,
     ...(result.isError ? { is_error: true } : {}),
   };
 }
 
 function fromResultBlock(block: ToolResultBlock): ToolCallResult {
-  const content = typeof block.content === 'string' ? block.content : JSON.stringify(block.content);
-  return block.is_error === true
-    ? {
+  const content =
+    typeof block.content === 'string'
+      ? block.content
+      : block.content
+          .filter((item): item is TextBlock => item.type === 'text')
+          .map((item) => item.text)
+          .join('\n');
+  if (block.is_error === true) {
+    return {
+      toolCallId: block.tool_use_id,
+      isError: true,
+      errorKind: 'execution_error',
+      content,
+    };
+  }
+  const images =
+    typeof block.content === 'string'
+      ? []
+      : block.content.filter((item): item is ImageBlock => item.type === 'image');
+  if (images.length > 1) {
+    throw new Error(`tool result ${JSON.stringify(block.tool_use_id)} contains multiple images`);
+  }
+  const image = images[0];
+  return image === undefined
+    ? { toolCallId: block.tool_use_id, isError: false, content }
+    : {
         toolCallId: block.tool_use_id,
-        isError: true,
-        errorKind: 'execution_error',
+        isError: false,
         content,
-      }
-    : { toolCallId: block.tool_use_id, isError: false, content };
+        image,
+        imageBytes: Buffer.from(image.source.data, 'base64').byteLength,
+      };
 }
 
 function extractText(content: readonly AssistantContentBlock[]): string {
@@ -879,7 +931,21 @@ function extractText(content: readonly AssistantContentBlock[]): string {
 }
 
 function resultBytes(results: readonly ToolCallResult[]): number {
-  return results.reduce((sum, result) => sum + Buffer.byteLength(result.content, 'utf8'), 0);
+  return results.reduce(
+    (sum, result) =>
+      sum +
+      Buffer.byteLength(result.content, 'utf8') +
+      (!result.isError && result.image !== undefined ? (result.imageBytes ?? 0) : 0),
+    0,
+  );
+}
+
+function transcriptResult(result: ToolCallResult): Record<string, unknown> {
+  if (result.isError || result.image === undefined) return result;
+  return {
+    ...result,
+    image: imageBlockLogView(result.image, result.imageBytes),
+  };
 }
 
 function assertPendingFinishCall(session: Worker, request: FinishRequest): void {

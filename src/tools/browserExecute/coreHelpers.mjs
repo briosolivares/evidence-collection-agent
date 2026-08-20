@@ -18,6 +18,8 @@ const MAX_WAIT_MS = 120_000;
 const DEFAULT_NAVIGATION_TIMEOUT_MS = 15_000;
 const MAX_DIALOG_PROMPT_BYTES = 16_384;
 const MAX_WORKSPACE_PATH_BYTES = 4_096;
+const MAX_UPLOAD_SELECTOR_BYTES = 4_096;
+const MAX_UPLOAD_FRAME_URL_HINT_BYTES = 4_096;
 const MAX_WORKSPACE_MODULE_BYTES = 1_048_576;
 
 const KEY_DEFINITIONS = Object.freeze({
@@ -611,12 +613,40 @@ export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
     return import(pathToFileURL(modulePath).href);
   };
 
-  const upload = async (backendDOMNodeId, workspacePath) => {
-    boundedInteger(backendDOMNodeId, 'upload backendDOMNodeId', 1, 2_147_483_647);
-    boundedString(workspacePath, 'upload workspace path', {
+  const upload = async (targetOrWorkspacePath, workspacePathOrOptions) => {
+    if (typeof targetOrWorkspacePath === 'number') {
+      const backendDOMNodeId = boundedInteger(
+        targetOrWorkspacePath,
+        'upload backendDOMNodeId',
+        1,
+        2_147_483_647,
+      );
+      const workspacePath = boundedString(workspacePathOrOptions, 'upload workspace path', {
+        maxBytes: MAX_WORKSPACE_PATH_BYTES,
+      });
+      await requestHost('upload', { backendDOMNodeId, workspacePath });
+      return;
+    }
+
+    const workspacePath = boundedString(targetOrWorkspacePath, 'upload workspace path', {
       maxBytes: MAX_WORKSPACE_PATH_BYTES,
     });
-    await requestHost('upload', { backendDOMNodeId, workspacePath });
+    const options = plainObject(workspacePathOrOptions, 'upload selector options');
+    rejectUnknownKeys(options, 'upload selector options', ['selector', 'frameUrlIncludes']);
+    const selector = boundedString(options.selector, 'upload selector', {
+      maxBytes: MAX_UPLOAD_SELECTOR_BYTES,
+    });
+    const frameUrlIncludes =
+      options.frameUrlIncludes === undefined
+        ? undefined
+        : boundedString(options.frameUrlIncludes, 'upload frameUrlIncludes', {
+            maxBytes: MAX_UPLOAD_FRAME_URL_HINT_BYTES,
+          });
+    await requestHost('upload', {
+      workspacePath,
+      selector,
+      ...(frameUrlIncludes === undefined ? {} : { frameUrlIncludes }),
+    });
   };
 
   return Object.freeze({

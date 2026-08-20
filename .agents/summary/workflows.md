@@ -55,6 +55,7 @@ flowchart TD
     F --> G{"tool calls?"}
     G -->|none| H["append continuation; keep working"]
     G -->|ordinary calls| I["execute sequentially in response order"]
+    G -->|capture_screenshot only| P["capture viewport; show pixels once"]
     I --> J["append ordered results; checkpoint"]
     G -->|finish only| K["deterministic read-only checks"]
     G -->|finish mixed with another call| L["execute nothing; protocol correction"]
@@ -64,6 +65,7 @@ flowchart TD
     N -->|verified| O["terminal verified checkpoint"]
     H --> A
     J --> A
+    P --> A
     M --> A
 ```
 
@@ -88,9 +90,10 @@ flowchart LR
 
 Failures become structured model-readable results. A timeout abandons waiting, not necessarily the underlying effect: the effect stays globally busy until its promise settles. Every later call waits through a finite gate, and terminalization drains the registry to a fixed point before releasing ownership.
 
-The worker's eight tools are static and ordered: `browser_execute`, `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`, `finish`.
+The worker's nine tools are static and ordered: `browser_execute`, `capture_screenshot`, `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`, `ask_user`, `finish`.
 
 - `browser_execute` runs one finite program against one exact run-owned page. Its run-scoped JavaScript policy is durable and explicit.
+- `capture_screenshot` observes the exact live viewport as inline pixels. It must be called alone, is visible for one model request, and never writes or publishes an artifact.
 - `publish_artifact` is the sole worker publication surface for text, workspace bytes, screenshots, and downloads.
 - File editing and `bash` operate in private `scratch/workspace/`; `bash` is foreground-only, bounded, and reconciles surviving files before returning.
 - `ask_user` passes through the interactive permission seam. Headless or unavailable environments fail closed instead of hanging.

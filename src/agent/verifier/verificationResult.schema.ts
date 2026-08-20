@@ -77,6 +77,7 @@ export const surfacedArtifactSchema = z.strictObject({
   filename: boundedNonBlank(1_024),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   sourceUrl: boundedNonBlank(8_192).optional(),
+  publicationKind: z.enum(['file', 'text', 'screenshot', 'download']).optional(),
   roles: z
     .array(z.enum(['requested_output', 'evidence']))
     .min(1)

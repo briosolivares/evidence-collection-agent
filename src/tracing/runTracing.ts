@@ -7,7 +7,9 @@ import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 import { knownModelUsageFromError, type ModelDriver } from '../model/modelDriver.js';
+import { modelMessagesLogView } from '../model/logView.js';
 import type { ModelRole } from '../run/runBudget.js';
+import { inlineImageTraceView, isInlineImageToolOutput } from '../tools/inlineImage.js';
 import type { ToolCtx, ToolDef, ToolRegistry } from '../tools/registry.js';
 
 const RUN_OBSERVATION_NAME = 'run-evidence-agent';
@@ -106,7 +108,7 @@ function createEnabledRunTracing(
         startObservation(
           MODEL_OBSERVATION_NAME,
           {
-            input: options.messages,
+            input: modelMessagesLogView(options.messages),
             model,
             metadata: { role },
           },
@@ -170,9 +172,12 @@ function createEnabledRunTracing(
           try {
             const output = await tool.execute(input, ctx);
             const resultBytes = getResultSizeBytes(output);
+            const observedOutput = isInlineImageToolOutput(output)
+              ? inlineImageTraceView(output)
+              : output;
             safelyObserve(() =>
               observation?.update({
-                output,
+                output: observedOutput,
                 ...(resultBytes === undefined ? {} : { metadata: { resultBytes } }),
               }),
             );
@@ -281,6 +286,9 @@ function usageDetails(usage: {
 }
 
 function getResultSizeBytes(output: unknown): number | undefined {
+  if (isInlineImageToolOutput(output)) {
+    return Buffer.byteLength(output.text, 'utf8') + output.bytes.byteLength;
+  }
   try {
     const normalized =
       typeof output === 'string' ? output : output === undefined ? '' : JSON.stringify(output);

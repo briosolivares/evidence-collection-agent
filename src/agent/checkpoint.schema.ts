@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { browserProviderKindSchema } from '../browser/sessionProvider.js';
 import { outputContractSchema } from './initializer/outputContract.schema.js';
 import type { Message } from '../model/messages.js';
+import { MODEL_MAX_IMAGE_BYTES } from '../model/imageContent.js';
 import type { ModelRole, RunBudgetSnapshot } from '../run/runBudget.js';
 import { finishDefectSchema, finishFactsSchema } from './completion/finishFacts.schema.js';
 import { VERIFICATION_HISTORY_LIMIT } from './verifier/verifier.js';
@@ -78,7 +79,7 @@ const imageBlockSchema = z.strictObject({
   source: z.strictObject({
     type: z.literal('base64'),
     media_type: z.enum(['image/png', 'image/jpeg']),
-    data: z.string(),
+    data: z.string().max(4 * Math.ceil(MODEL_MAX_IMAGE_BYTES / 3)),
   }),
 });
 

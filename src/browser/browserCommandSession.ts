@@ -1,9 +1,11 @@
-import type { BrowserContext, CDPSession, Page } from 'playwright';
+import type { BrowserContext, CDPSession, Locator, Page } from 'playwright';
 
 import type {
   BrowserCommandSession,
   BrowserNavigationOptions,
   BrowserNavigationResult,
+  BrowserUploadSelectorTarget,
+  BrowserUploadTarget,
 } from './controller.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
 import { settleWithin } from './boundedSettlement.js';
@@ -22,6 +24,8 @@ const NAVIGATION_STOP_DEADLINE_MS = 1_000;
 const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const MAX_NAVIGATION_URL_BYTES = 256_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
+const MAX_UPLOAD_SELECTOR_BYTES = 4_096;
+const MAX_UPLOAD_FRAME_URL_HINT_BYTES = 4_096;
 
 /**
  * Controller-owned authority policy for browser-scoped Target commands.
@@ -57,25 +61,79 @@ export interface PlaywrightCommandSessionHooks {
   release?: (detach: () => Promise<void>, hadPendingCommands: boolean) => Promise<void>;
 }
 
-async function uploadToBackendNode(
+async function uploadToTarget(
   page: Page,
   send: ArbitraryCdpSend,
   uploadEncoder: BrowserUploadEncoder,
-  backendDOMNodeId: number,
+  target: BrowserUploadTarget,
   absolutePath: string,
 ): Promise<void> {
   // Encode/read before touching the page. A missing or unreadable file must
   // fail before even the temporary marker becomes observable in the document.
   const encoded = await uploadEncoder.encode([absolutePath]);
-  await withBackendNodeLocator(page, send, backendDOMNodeId, async (target) => {
-    const isFileInput = await target.evaluate(
+  const attach = async (locator: Locator): Promise<void> => {
+    const isFileInput = await locator.evaluate(
       (element) => element instanceof HTMLInputElement && element.type === 'file',
     );
     if (!isFileInput) {
       throw new TypeError('browser.upload target must be an input[type=file]');
     }
-    await target.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
-  });
+    await locator.setInputFiles(encoded, { timeout: UPLOAD_TIMEOUT_MS });
+  };
+  if (typeof target === 'number') {
+    await withBackendNodeLocator(page, send, target, attach);
+    return;
+  }
+  await attach(await uniqueUploadLocator(page, validateUploadSelectorTarget(target)));
+}
+
+function validateUploadSelectorTarget(
+  target: BrowserUploadSelectorTarget,
+): BrowserUploadSelectorTarget {
+  if (
+    typeof target.selector !== 'string' ||
+    target.selector.length === 0 ||
+    Buffer.byteLength(target.selector, 'utf8') > MAX_UPLOAD_SELECTOR_BYTES
+  ) {
+    throw new TypeError(
+      `browser.upload selector must contain 1 through ${MAX_UPLOAD_SELECTOR_BYTES} UTF-8 bytes`,
+    );
+  }
+  if (
+    target.frameUrlIncludes !== undefined &&
+    (typeof target.frameUrlIncludes !== 'string' ||
+      target.frameUrlIncludes.length === 0 ||
+      Buffer.byteLength(target.frameUrlIncludes, 'utf8') > MAX_UPLOAD_FRAME_URL_HINT_BYTES)
+  ) {
+    throw new TypeError(
+      `browser.upload frameUrlIncludes must contain 1 through ${MAX_UPLOAD_FRAME_URL_HINT_BYTES} UTF-8 bytes`,
+    );
+  }
+  return target;
+}
+
+async function uniqueUploadLocator(
+  page: Page,
+  target: BrowserUploadSelectorTarget,
+): Promise<Locator> {
+  let match: Locator | undefined;
+  let matchCount = 0;
+  for (const frame of page.frames()) {
+    if (target.frameUrlIncludes !== undefined && !frame.url().includes(target.frameUrlIncludes)) {
+      continue;
+    }
+    const candidate = frame.locator(target.selector);
+    const count = await candidate.count();
+    matchCount += count;
+    if (count === 1 && match === undefined) match = candidate;
+    if (matchCount > 1) break;
+  }
+  if (matchCount !== 1 || match === undefined) {
+    throw new Error(
+      `browser.upload selector must match exactly one file input across eligible frames; matched ${matchCount}`,
+    );
+  }
+  return match;
 }
 
 function errorText(error: unknown): string {
@@ -329,19 +387,15 @@ export async function openPlaywrightCommandSession(
       })();
       return trackCommand(operation);
     },
-    upload(backendDOMNodeId, absolutePath) {
+    upload(target, absolutePath) {
       if (closed) {
         return Promise.reject(new Error(`Browser command session for pageId ${pageId} is closed.`));
       }
-      const effect = uploadToBackendNode(
-        page,
-        send,
-        uploadEncoder,
-        backendDOMNodeId,
-        absolutePath,
-      ).catch((error: unknown) => {
-        throw commandError(`Browser upload failed for pageId ${pageId}`, error);
-      });
+      const effect = uploadToTarget(page, send, uploadEncoder, target, absolutePath).catch(
+        (error: unknown) => {
+          throw commandError(`Browser upload failed for pageId ${pageId}`, error);
+        },
+      );
       const settled = effect.then(
         () => undefined,
         () => undefined,

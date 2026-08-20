@@ -8,7 +8,11 @@ import type {
   OutputContract,
   OutputSpec,
 } from '../../../src/agent/initializer/outputContract.schema.js';
-import { initManifest, writeArtifact } from '../../../src/run/artifacts.js';
+import {
+  initManifest,
+  writeArtifact,
+  type ArtifactPublicationKind,
+} from '../../../src/run/artifacts.js';
 import type { FinishInput } from '../../../src/tools/finish/finish.js';
 import {
   inspectManifest,
@@ -69,6 +73,7 @@ function publish(
   options: {
     roles?: Array<'requested_output' | 'evidence'>;
     sourceUrl?: string;
+    publicationKind?: ArtifactPublicationKind;
   } = {},
 ): void {
   writeArtifact(
@@ -78,6 +83,9 @@ function publish(
     {
       roles: options.roles ?? ['requested_output'],
       ...(options.sourceUrl === undefined ? {} : { sourceUrl: options.sourceUrl }),
+      ...(options.publicationKind === undefined
+        ? {}
+        : { publicationKind: options.publicationKind }),
     },
   );
 }
@@ -948,6 +956,104 @@ describe('runFinishChecks — documents and captures', () => {
       ['download', 'download'],
     ]);
     expect(finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts)))).toEqual(result.facts);
+  });
+
+  it('uses trusted publication kind to separate broad same-site downloads and screenshots', () => {
+    publish('artifacts/filing.htm', '<html>filing</html>', {
+      sourceUrl: 'https://www.sec.gov/Archives/filing.htm',
+      publicationKind: 'download',
+    });
+    publish('artifacts/filing-page.png', PNG, {
+      roles: ['requested_output', 'evidence'],
+      sourceUrl: 'https://www.sec.gov/Archives/filing-index.htm',
+      publicationKind: 'screenshot',
+    });
+    publish('artifacts/supporting-view.png', PNG, {
+      roles: ['evidence'],
+      sourceUrl: 'https://www.sec.gov/Archives/filing-index.htm',
+      publicationKind: 'screenshot',
+    });
+    const download = {
+      id: 'filing',
+      kind: 'download',
+      count: { minimum: 1 },
+      // Existing accepted contracts may contain this historical broad
+      // pattern even though new initializer validation canonicalizes it.
+      filenamePattern: '*',
+      sourceUrlPattern: 'https://www.sec.gov/*',
+    } as OutputSpec;
+    const screenshots = {
+      id: 'filing-page',
+      kind: 'screenshots',
+      count: { minimum: 1 },
+    } as OutputSpec;
+
+    const result = runFinishChecks({
+      runDir,
+      contract: contract(download, screenshots),
+      finish: finish(),
+    });
+
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs).toEqual([
+      expect.objectContaining({
+        outputId: 'filing',
+        artifactPaths: ['artifacts/filing.htm'],
+      }),
+      expect.objectContaining({
+        outputId: 'filing-page',
+        artifactPaths: ['artifacts/filing-page.png'],
+      }),
+    ]);
+  });
+
+  it('uses trusted publication kind for a download with no filename, media, or source constraint', () => {
+    publish('artifacts/filing.htm', '<html>filing</html>', {
+      sourceUrl: 'https://www.sec.gov/Archives/filing.htm',
+      publicationKind: 'download',
+    });
+    publish('artifacts/filing-page.png', PNG, {
+      roles: ['requested_output', 'evidence'],
+      sourceUrl: 'https://www.sec.gov/Archives/filing-index.htm',
+      publicationKind: 'screenshot',
+    });
+    const result = runFinishChecks({
+      runDir,
+      contract: contract(
+        { id: 'filing', kind: 'download', count: { exact: 1 } } as OutputSpec,
+        { id: 'filing-page', kind: 'screenshots', count: { exact: 1 } } as OutputSpec,
+      ),
+      finish: finish(),
+    });
+
+    expect(result.status).toBe('passed');
+    expect(result.facts.outputs).toEqual([
+      expect.objectContaining({
+        outputId: 'filing',
+        artifactPaths: ['artifacts/filing.htm'],
+      }),
+      expect.objectContaining({
+        outputId: 'filing-page',
+        artifactPaths: ['artifacts/filing-page.png'],
+      }),
+    ]);
+  });
+
+  it('does not infer an unconstrained download from a legacy untyped artifact', () => {
+    publish('artifacts/filing.htm', '<html>filing</html>', {
+      sourceUrl: 'https://www.sec.gov/Archives/filing.htm',
+    });
+    const result = runFinishChecks({
+      runDir,
+      contract: contract({
+        id: 'filing',
+        kind: 'download',
+        count: { exact: 1 },
+      } as OutputSpec),
+      finish: finish(),
+    });
+
+    expect(codes(result)).toContain('capture_count_mismatch');
   });
 
   it('rejects one valid capture satisfying two unconstrained capture outputs', () => {

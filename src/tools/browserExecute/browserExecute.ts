@@ -138,7 +138,11 @@ export function createBrowserExecuteTool(
       "list's start offset), or from a rendered marker that names it (like an inline " +
       'citation superscript) — an index into your own query results is not a displayed ' +
       'number. ' +
-      'browser.upload targets a backend DOM node and a path relative to scratch/workspace. ' +
+      'browser.upload supports `await browser.upload(backendDOMNodeId, "file.csv")` for an ' +
+      'exact known node and `await browser.upload("file.csv", { selector: ' +
+      '`input[type="file"]`, frameUrlIncludes: "/picker" })` to resolve exactly one file ' +
+      'input across page frames; frameUrlIncludes is optional and should narrow ambiguous ' +
+      'dialogs, never be hardcoded to one site. Paths are relative to scratch/workspace. ' +
       'Use page_id to target a page returned by a prior result; omit it for the active task ' +
       'page. Intermediate files belong in the current scratch/workspace directory and are ' +
       'reconciled into changed_files. The child ' +
@@ -207,9 +211,9 @@ async function executeBrowserProgram(
       },
       sendCdp: (method, params) => commandSession!.send(method, params),
       navigate: (url, options) => commandSession!.navigate(url, options),
-      upload: async (backendDOMNodeId, workspacePath) => {
+      upload: async (target, workspacePath) => {
         const absolutePath = resolveWorkspaceUploadPath(workspaceDir, workspacePath);
-        await commandSession!.upload(backendDOMNodeId, absolutePath);
+        await commandSession!.upload(target, absolutePath);
       },
     });
   } catch (error) {

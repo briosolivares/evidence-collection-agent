@@ -44,6 +44,7 @@ const manifestEntryShapeSchema = z
     sha256: z.string(),
     capturedAt: canonicalUtcIsoTimestampSchema,
     sourceUrl: z.string().optional(),
+    publicationKind: z.enum(['file', 'text', 'screenshot', 'download']).optional(),
     roles: z.array(z.enum(['requested_output', 'evidence'])).optional(),
     completionStatus: z.enum(['complete', 'partial']).optional(),
   })

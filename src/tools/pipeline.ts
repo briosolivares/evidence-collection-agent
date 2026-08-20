@@ -1,4 +1,6 @@
 import { capResult, DEFAULT_MAX_RESULT_BYTES } from './capResult.js';
+import type { ImageBlock } from '../model/messages.js';
+import { inlineImageBlock, isInlineImageToolOutput } from './inlineImage.js';
 import { type BusyResourceRegistry, type ToolCtx, type ToolRegistry } from './registry.js';
 
 /** One tool invocation as requested by the model (a `tool_use` block). */
@@ -71,7 +73,15 @@ export const BUSY_RESOURCE_GATE_TIMEOUT_MS = DEFAULT_TOOL_TIMEOUT_MS;
  * API's `is_error` flag.
  */
 export type ToolCallResult =
-  | { toolCallId: string; isError: false; content: string }
+  | {
+      toolCallId: string;
+      isError: false;
+      content: string;
+      /** Present only for a deliberately multimodal tool result. */
+      image?: ImageBlock;
+      /** Raw decoded bytes, retained for truthful metrics without re-decoding base64. */
+      imageBytes?: number;
+    }
   | { toolCallId: string; isError: true; errorKind: ToolErrorKind; content: string };
 
 /**
@@ -192,15 +202,22 @@ export async function executeToolCall(
   // try so an unserializable output or a failed offload is reported as an
   // execution error rather than crashing the pipeline.
   let content: string;
+  let image: ImageBlock | undefined;
+  let imageBytes: number | undefined;
   try {
-    const normalized = normalizeOutput(
-      await withToolDeadline(
-        tool.name,
-        tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS,
-        () => tool.execute(input, ctx),
-        ctx.busyRegistry,
-      ),
+    const output = await withToolDeadline(
+      tool.name,
+      tool.timeoutMs ?? DEFAULT_TOOL_TIMEOUT_MS,
+      () => tool.execute(input, ctx),
+      ctx.busyRegistry,
     );
+    const normalized = isInlineImageToolOutput(output)
+      ? inlineImageText(output)
+      : normalizeOutput(output);
+    if (isInlineImageToolOutput(output)) {
+      image = inlineImageBlock(output);
+      imageBytes = output.bytes.byteLength;
+    }
     const capped = capResult(
       ctx.runDir,
       tool.name,
@@ -234,7 +251,12 @@ export async function executeToolCall(
   }
 
   // Stage 7: return.
-  return { toolCallId: call.id, isError: false, content };
+  return {
+    toolCallId: call.id,
+    isError: false,
+    content,
+    ...(image === undefined ? {} : { image, imageBytes }),
+  };
 }
 
 /** Raised when a tool execution outlives its deadline. Distinct from any
@@ -308,4 +330,23 @@ function normalizeOutput(output: unknown): string {
   if (typeof output === 'string') return output;
   if (output === undefined) return '';
   return JSON.stringify(output);
+}
+
+function inlineImageText(output: {
+  text: string;
+  mediaType: string;
+  bytes: Uint8Array;
+  dimensions: { width: number; height: number };
+}): string {
+  return [
+    output.text,
+    `Image metadata: ${JSON.stringify({
+      media_type: output.mediaType,
+      width: output.dimensions.width,
+      height: output.dimensions.height,
+      bytes: output.bytes.byteLength,
+    })}`,
+  ]
+    .filter((line) => line.length > 0)
+    .join('\n');
 }

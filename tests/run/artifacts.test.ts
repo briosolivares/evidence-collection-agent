@@ -171,6 +171,27 @@ describe('writeArtifact', () => {
     expect(withoutUrl).not.toHaveProperty('sourceUrl');
   });
 
+  it('records trusted publication kind when provided and omits it otherwise', () => {
+    writeArtifact(runDir, 'artifacts/page.png', Buffer.from('img'), {
+      publicationKind: 'screenshot',
+      roles: ['evidence'],
+    });
+    writeArtifact(runDir, 'scratch/notes.md', Buffer.from('text'));
+
+    const [published, scratch] = readManifestFile().artifacts;
+    expect(published!.publicationKind).toBe('screenshot');
+    expect(scratch).not.toHaveProperty('publicationKind');
+  });
+
+  it('rejects publication kind on private scratch files', () => {
+    expect(() =>
+      writeArtifact(runDir, 'scratch/not-published.png', Buffer.from('img'), {
+        publicationKind: 'screenshot',
+      }),
+    ).toThrow(/publicationKind/);
+    expect(readManifestFile().artifacts).toEqual([]);
+  });
+
   it('records roles when provided — including both roles on one artifact — and omits the key otherwise', () => {
     writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), {
       roles: ['requested_output'],

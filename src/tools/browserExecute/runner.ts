@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
 import { redactBrowserCapabilities } from '../../browser/capabilityRedaction.js';
+import type { BrowserUploadTarget } from '../../browser/controller.js';
 import { superviseBoundedChildProcess } from '../../process/boundedChildProcess.js';
 import { ParentDeathWatchdogError } from '../../process/parentDeathWatchdog.js';
 import { startAbortAwareParentDeathWatchdog } from '../../process/startAbortAwareParentDeathWatchdog.js';
@@ -28,6 +29,8 @@ export const BROWSER_PROGRAM_LIMITS = Object.freeze({
   maxHostCalls: 32,
   maxPendingHostCalls: 8,
   maxWorkspacePathBytes: 4_096,
+  maxUploadSelectorBytes: 4_096,
+  maxUploadFrameUrlHintBytes: 4_096,
   maxUploadFileBytes: 64 * 1024 * 1024,
 });
 
@@ -94,7 +97,7 @@ export interface BrowserProgramOptions {
   ): Promise<BrowserProgramNavigationResult>;
   /** Parent-owned upload effect. The implementation must confine workspacePath
    * before invoking the exact target-pinned command session. */
-  upload(backendDOMNodeId: number, workspacePath: string): Promise<void>;
+  upload(target: BrowserUploadTarget, workspacePath: string): Promise<void>;
 }
 
 export interface BrowserProgramResult {
@@ -562,17 +565,32 @@ export async function runBrowserProgram(
           key !== 'operation' &&
           key !== 'params',
       );
-    const validUpload =
-      operation === 'upload' &&
+    const validWorkspacePath =
       isRecord(params) &&
-      Number.isInteger(params.backendDOMNodeId) &&
-      (params.backendDOMNodeId as number) > 0 &&
-      (params.backendDOMNodeId as number) <= 2_147_483_647 &&
       typeof params.workspacePath === 'string' &&
       params.workspacePath.length > 0 &&
       Buffer.byteLength(params.workspacePath, 'utf8') <=
-        BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes &&
+        BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes;
+    const validBackendUpload =
+      validWorkspacePath &&
+      Number.isInteger(params.backendDOMNodeId) &&
+      (params.backendDOMNodeId as number) > 0 &&
+      (params.backendDOMNodeId as number) <= 2_147_483_647 &&
       !Object.keys(params).some((key) => key !== 'backendDOMNodeId' && key !== 'workspacePath');
+    const validSelectorUpload =
+      validWorkspacePath &&
+      typeof params.selector === 'string' &&
+      params.selector.length > 0 &&
+      Buffer.byteLength(params.selector, 'utf8') <= BROWSER_PROGRAM_LIMITS.maxUploadSelectorBytes &&
+      (params.frameUrlIncludes === undefined ||
+        (typeof params.frameUrlIncludes === 'string' &&
+          params.frameUrlIncludes.length > 0 &&
+          Buffer.byteLength(params.frameUrlIncludes, 'utf8') <=
+            BROWSER_PROGRAM_LIMITS.maxUploadFrameUrlHintBytes)) &&
+      !Object.keys(params).some(
+        (key) => key !== 'selector' && key !== 'frameUrlIncludes' && key !== 'workspacePath',
+      );
+    const validUpload = operation === 'upload' && (validBackendUpload || validSelectorUpload);
     const validNavigation =
       operation === 'navigate' &&
       isRecord(params) &&
@@ -614,10 +632,17 @@ export async function runBrowserProgram(
     }
     pendingHost.add(requestId);
     const effect = validUpload
-      ? () =>
-          options
-            .upload(params.backendDOMNodeId as number, params.workspacePath as string)
-            .then(() => null)
+      ? () => {
+          const target: BrowserUploadTarget = validBackendUpload
+            ? (params.backendDOMNodeId as number)
+            : {
+                selector: params.selector as string,
+                ...(params.frameUrlIncludes === undefined
+                  ? {}
+                  : { frameUrlIncludes: params.frameUrlIncludes as string }),
+              };
+          return options.upload(target, params.workspacePath as string).then(() => null);
+        }
       : () =>
           options.navigate(params.url as string, {
             timeoutMs: params.timeoutMs as number,

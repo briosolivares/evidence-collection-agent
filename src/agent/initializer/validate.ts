@@ -60,13 +60,13 @@ export type OutputContractValidation =
  *   so the model can correct the whole contract in one follow-up call
  *
  * Rejects, beyond the schema: duplicate output ids; two outputs claiming the
- * same file; unsafe filenames and filename patterns (path separators,
+ * same file; unsafe filenames and meaningful filename patterns (path separators,
  * absolute paths, `.`/`..`, control characters, the run's own reserved
- * names); duplicate table columns; enum columns with repeated values;
+ * names); wildcard-only filename patterns are canonicalized to omission;
+ * duplicate table columns; enum columns with repeated values;
  * invalid IANA timezones or BCP 47 locales; conflicting table rules
  * (repeated count rules, a minimum above an exact count, uniqueness rules
- * naming an undeclared column); a download constrained by nothing; a
- * document requiring per-section evidence with no sections, or visible
+ * naming an undeclared column); a document requiring per-section evidence with no sections, or visible
  * footnotes with no evidence at all; an external action demanding visible
  * proof content while requiring no proof screenshots.
  */
@@ -84,10 +84,32 @@ export function validateOutputContract(input: unknown): OutputContractValidation
     );
   }
 
-  const errors = checkOutputs(parsed.data.outputs);
+  const contract = canonicalizeFilenamePatterns(parsed.data);
+  const errors = checkOutputs(contract.outputs);
   if (errors.length > 0) return failure(errors);
 
-  return { ok: true, contract: parsed.data };
+  return { ok: true, contract };
+}
+
+/** A wildcard-only pattern carries no filename information. Store omission
+ * as the one canonical representation so downstream matching cannot confuse
+ * it with a meaningful constraint. */
+function canonicalizeFilenamePatterns(contract: OutputContract): OutputContract {
+  return {
+    ...contract,
+    outputs: contract.outputs.map((output) => {
+      if (
+        (output.kind === 'screenshots' || output.kind === 'download') &&
+        output.filenamePattern !== undefined &&
+        output.filenamePattern.replaceAll('*', '') === ''
+      ) {
+        const normalized = structuredClone(output);
+        delete normalized.filenamePattern;
+        return normalized;
+      }
+      return output;
+    }),
+  };
 }
 
 /** Every cross-field check over the contract's outputs. */
@@ -202,9 +224,12 @@ function unsafeFilenameReason(filename: string): string | undefined {
  * inherits the same safety rules (wildcards excepted). */
 function checkFilenamePattern(outputId: string, pattern: string): string[] {
   const problem = unsafeFilenameReason(pattern);
-  return problem === undefined
-    ? []
-    : [`output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`];
+  if (problem !== undefined) {
+    return [
+      `output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`,
+    ];
+  }
+  return [];
 }
 
 /** Column-level checks: distinct headers, well-formed enum value sets, and
@@ -359,22 +384,14 @@ function checkExternalAction(output: Extract<OutputSpec, { kind: 'external_actio
   return [];
 }
 
-/** A download must constrain something. "Any file the browser happened to
- * save" is not a requirement, and code could never check it. */
+/** Validate optional download media constraints. A contract without a
+ * filename/media/source constraint is legitimate when the request does not
+ * name one; completion then requires the runtime-recorded download
+ * publication kind rather than guessing from bytes or filenames. */
 function checkDownload(output: Extract<OutputSpec, { kind: 'download' }>): string[] {
   const errors: string[] = [];
   const label = `output ${JSON.stringify(output.id)}`;
 
-  const constrained =
-    output.filenamePattern !== undefined ||
-    output.allowedMediaTypes !== undefined ||
-    output.sourceUrlPattern !== undefined;
-  if (!constrained) {
-    errors.push(
-      `${label} constrains nothing: a download output needs at least one of ` +
-        `filenamePattern, allowedMediaTypes, or sourceUrlPattern, or any saved file would satisfy it`,
-    );
-  }
   for (const mediaType of output.allowedMediaTypes ?? []) {
     if (!/^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*\/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$/.test(mediaType)) {
       errors.push(
