@@ -269,6 +269,9 @@ tests (including the packed-install smoke), `npm run typecheck` passes, and
 
 ## User README refresh (2026-08-20)
 
+- [x] Lead with the two-command global install and launch path, make clear that
+  `nvm` is optional when Node 22+ is already installed, and document the
+  current one-Esc pause/two-Esc cancel interaction.
 - [x] Replace the obsolete managed-window description with the attached local
   Chrome setup, permission, existing-login, and run-owned-page behavior.
 - [x] Document explicit Browserbase selection, optional authenticated Contexts,
@@ -282,7 +285,9 @@ tests (including the packed-install smoke), `npm run typecheck` passes, and
   resolution before provider setup, including the two early path exceptions.
 
 Verification: every documented flag, environment variable, command, path, and
-local link was checked against its current owner; `git diff --check` is clean.
+local link was checked against its current owner; an npm tarball installed into
+an isolated global prefix and its `sherlock --demo` launcher opened successfully
+under Node 22; `git diff --check` is clean.
 
 ## Post-v3 simplification complete (2026-08-17)
 

@@ -9,14 +9,20 @@ requested outputs with provenance.
 You need:
 
 - Node.js 22 or newer
-- an Anthropic API key or auth token
+- an Anthropic API key or auth token (you can enter an API key on first launch)
 - Google Chrome for the default local provider, or a Browserbase account and
   API key for the remote provider
 
+If `node --version` reports `v22` or newer, install and launch Sherlock with:
+
 ```bash
-npm install -g github:briosolivares/evidence-collection-agent
+npm install --global github:briosolivares/evidence-collection-agent
 sherlock
 ```
+
+You do not need `nvm`. It is only one way to install the required Node version.
+If your current Node version is older than 22 and you already use `nvm`, run
+`nvm install 22` and `nvm use 22` before the commands above.
 
 On first launch, Sherlock asks for an Anthropic API key when no supported
 credential is already configured and can save it to `~/.sherlock/.env` for
@@ -105,7 +111,8 @@ Useful commands inside Sherlock:
 - `/evals` — run development eval tasks (checkout only)
 - `/exit` — quit
 
-Press Esc to cancel the current task and Ctrl+C to quit.
+Press Esc once to pause an active task for an update, or twice to cancel it.
+Press Ctrl+C to quit.
 
 ## Where results go
 
