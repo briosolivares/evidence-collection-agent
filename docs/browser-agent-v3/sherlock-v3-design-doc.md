@@ -114,8 +114,8 @@ Sherlock must:
 - save private intermediate state separately from published output;
 - state an explicit final summary, including any concrete unresolved constraint;
 - validate and independently verify every production run;
-- resume a durable incomplete run without blindly repeating an uncertain
-  state-changing call;
+- preserve durable lifecycle state so `runAgent` can recover an incomplete run
+  without blindly repeating an uncertain state-changing call;
 - close every run-owned page on success, failure, cancellation, and crash
   recovery.
 
@@ -201,43 +201,35 @@ The dependency direction is deliberate:
 
 ### 6.1 Modules
 
-The completed runtime lives under a cohesive `src/v3/` tree:
+The completed runtime is organized by its current ownership boundaries:
 
-    src/v3/
-      browser/
-        runner.ts
-        child.mjs
-        coreHelpers.mjs
+    src/
+      agent/
+        runTask.ts
+        lifecycle.ts
+        checkpoint.ts
+        checkpoint.schema.ts
+        initializer/
+        worker/
+        completion/
+        verifier/
       tools/
         index.ts
-        browserExecute.ts
-        publishArtifact.ts
-        fileTools.ts
-        bash.ts
-        askUser.ts
-        finish.ts
-        secretEnvironment.ts
-      loop/
-        workerSession.ts
-        contextView.ts
-      harness/
-        initializer.ts
-        verifier.ts
-        verifierTools.ts
-      completion/
-        finishChecks.ts
-        artifactInspection.ts
-        tableInspection.ts
-        types.ts
-      run/
-        coordinator.ts
-        checkpoint.ts
-        outputContractFile.ts
-        runDeadline.ts
+        registry.ts
+        pipeline.ts
+        browserExecute/
+        publishArtifact/
+        readFile/ writeFile/ editFile/
+        bash/ askUser/ finish/
+      browser/
+        controller.ts
+        provider.ts
+        playwrightBrowserController.ts
+        browserCommandSession.ts
       model/
-        budgetedCall.ts
-        budgetError.ts
-      systemPrompt.ts
+      run/
+      tracing/
+      tui/
 
 This is a responsibility map, not a requirement for one tiny file per type.
 Deep cohesive modules are preferred to either god objects or policy fragments.
@@ -246,7 +238,7 @@ Stable shared seams remain in their existing directories and are imported:
 - the strict streaming model driver and message types;
 - browser providers and controller primitives;
 - run-directory/path/artifact/transcript primitives;
-- output-contract parsing plus the generic tool pipeline and access ledger;
+- output-contract parsing plus the generic tool pipeline and global busy ledger;
 - TUI tracing and eval/grader boundaries.
 
 ## 7. Browser runtime
@@ -827,8 +819,8 @@ Rules:
 
 The static `SYSTEM_PROMPT` and exact ordered API tool definitions are built
 once per process and byte-stable across runs. Task text, contract facts,
-clarifications, resume notices, and browser provider details appear only in the
-per-run opening message or later conversation.
+clarifications, recovery notices, and browser provider details appear only in
+the per-run opening message or later conversation.
 
 ## 13. Durable run state
 
@@ -862,7 +854,8 @@ manifest, not truncated JSON.
 
 ### 13.2 Checkpoint schema and phases
 
-The v3 checkpoint is a compact versioned snapshot owned by the v3 coordinator:
+The v3 checkpoint is a compact versioned snapshot owned by the `runAgent`
+lifecycle:
 
 ```ts
 interface V3Checkpoint {
@@ -907,7 +900,13 @@ run lock. Saves occur:
 - after deterministic finish checks pass and before verifier execution;
 - before terminal return.
 
-### 13.3 Resume semantics
+### 13.3 `runAgent` recovery semantics
+
+`runTask` is the single public composition root and always starts a fresh run.
+There is no public `resumeTask` or agent REPL surface. Durable checkpoint
+restoration and crash recovery remain internal responsibilities of `runAgent`;
+when it is invoked for an existing run directory, the recorded phase determines
+the only permitted continuation:
 
 - `ready_for_model`: restore the conversation and continue.
 - `executing_tool` with `not_started`: execute the named next call once.
@@ -921,7 +920,7 @@ run lock. Saves occur:
 - `terminal`: return the recorded outcome without reopening the browser.
 
 Manifest hashes are verified before restoring model-visible files or state.
-Provider and scalar configuration are cross-checked. Resume never puts a CDP
+Provider and scalar configuration are cross-checked. Recovery never puts a CDP
 URL in the checkpoint.
 
 ## 14. TUI, tracing, and eval compatibility
@@ -1010,9 +1009,9 @@ the grader contract.
 | Judge incomplete | Preserve the latest worker response and all surfaced artifacts. |
 | Verifier unavailable | End incomplete; preserve artifacts. |
 | Budget exhausted | End incomplete with named guard. |
-| Crash during state-changing tool | Checkpoint as uncertain; resume never blindly replays. |
+| Crash during state-changing tool | Checkpoint as uncertain; `runAgent` recovery never blindly replays. |
 | Cleanup failure | Attempt all remaining finalizers, record combined failure, never hide primary outcome. |
-| Manifest/checkpoint corruption | Refuse resume and name the corrupt file; never regenerate provenance from guesses. |
+| Manifest/checkpoint corruption | `runAgent` refuses recovery and names the corrupt file; never regenerate provenance from guesses. |
 
 ## 17. Migration and cutover
 
@@ -1056,9 +1055,10 @@ V3 is not complete until all of these are direct current evidence:
 5. **Cancellation:** cancel during a browser child and during Bash; no process,
    page, lock, or partial unmanifested workspace file survives unnoticed; a
    second task in the same TUI session works.
-6. **Crash/resume:** a real second process kills a run at model, pre-tool,
-   uncertain-tool, post-tool, and verifying boundaries; recovery follows the
-   declared semantics and never duplicates an uncertain effect.
+6. **Crash recovery:** a real second process kills `runAgent` at model,
+   pre-tool, uncertain-tool, post-tool, and verifying boundaries; reinvoking
+   the lifecycle on the same run directory follows the declared semantics and
+   never duplicates an uncertain effect.
 7. **Provider contract:** attached local, managed local, and Browserbase fakes
    satisfy the same command-session, download/upload, diagnostics redaction,
    cleanup, and idempotent-close behavior.

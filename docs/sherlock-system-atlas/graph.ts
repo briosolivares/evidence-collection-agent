@@ -108,10 +108,10 @@ export const concepts: readonly SemanticNode[] = [
     kicker: 'Public surface',
     summary: 'Turns a human or eval task into one call through the production seam.',
     answers: {
-      what: 'The TUI, minimal REPL, and eval runner are adapters around the same public run API.',
+      what: 'The TUI and eval runner are adapters around the same public run API.',
       inputs: ['Task text', 'Browser authority', 'Optional human permission answers'],
-      outputs: ['runTask or resumeTask call', 'Progress events', 'Terminal result presentation'],
-      creator: 'A human starts the TUI or REPL; the eval CLI creates isolated trials.',
+      outputs: ['runTask call', 'Progress events', 'Terminal result presentation'],
+      creator: 'A human starts the TUI; the eval CLI creates isolated trials.',
       consumers: ['Production composition', 'Human operator', 'Eval reporting'],
       enforcement: [
         'Each adapter chooses attached versus managed browser authority explicitly.',
@@ -119,7 +119,7 @@ export const concepts: readonly SemanticNode[] = [
       ],
       authority: 'May collect a task and present results; it cannot declare a run verified.',
       why: 'Many entry experiences can evolve without duplicating the agent runtime.',
-      code: ['src/tui/main.tsx', 'src/cli/repl.ts', 'evals/runners/cli.ts'],
+      code: ['src/tui/main.tsx', 'evals/runners/cli.ts'],
     },
   }),
   concept({
@@ -131,17 +131,17 @@ export const concepts: readonly SemanticNode[] = [
     summary: 'Creates the run directory, model roles, tools, tracing, and durable configuration.',
     answers: {
       what: 'The only production location where live dependencies become one executable Sherlock run.',
-      inputs: ['Task text or resume directory', 'BrowserController', 'Run configuration'],
+      inputs: ['Task text', 'BrowserController', 'Run configuration'],
       outputs: [
         'DurableRunConfiguration',
         'Three model drivers',
         'Eight-tool registry',
         'Run outcome',
       ],
-      creator: 'Task-entry adapters call runTask or resumeTask.',
+      creator: 'Task-entry adapters call runTask.',
       consumers: ['Durable lifecycle', 'Tracing adapter', 'Public entry surfaces'],
       enforcement: [
-        'Resume configuration must match the checkpoint.',
+        'Durable configuration is persisted before lifecycle execution.',
         'Worker prompt and API tool definitions remain byte-stable process-wide values.',
       ],
       authority:
@@ -166,7 +166,8 @@ export const concepts: readonly SemanticNode[] = [
         'Optional browser and abort signal',
       ],
       outputs: ['Monotonic checkpoints', 'Terminal outcome', 'Finalized projections'],
-      creator: 'Production composition invokes runAgent for a fresh or resumed run.',
+      creator:
+        'Production composition invokes runAgent; runAgent restores any checkpoint it finds.',
       consumers: ['Worker session', 'Run directory', 'Public composition'],
       enforcement: [
         'Effects are checkpointed before and after calls.',
@@ -271,10 +272,11 @@ export const concepts: readonly SemanticNode[] = [
       creator: 'Production composition builds one run-scoped registry in frozen order.',
       consumers: ['Worker history', 'Browser runtime', 'Run directory', 'Human permission UI'],
       enforcement: [
-        'Every ToolDef declares getAccess(input).',
-        'Schema, permission, busy-resource, timeout, and result-size checks wrap execution.',
+        'One global busy-resource gate blocks every later call behind abandoned effects.',
+        'Schema, permission, timeout, and result-size checks wrap execution.',
       ],
-      authority: 'Grants only the capability declared by each tool; it is not a security sandbox.',
+      authority:
+        'Runs only capabilities exposed by registered tools; it is not a security sandbox.',
       why: 'A small stable surface concentrates safety and recovery rules around every effect.',
       code: ['src/tools/index.ts', 'src/tools/registry.ts', 'src/tools/pipeline.ts'],
     },
@@ -389,7 +391,7 @@ export const concepts: readonly SemanticNode[] = [
       consumers: [
         'Same worker on failure',
         'Fresh verifier on success',
-        'Terminal resume integrity checks',
+        'Terminal checkpoint integrity checks',
       ],
       enforcement: [
         'Manifest and artifacts are inspected with bounded no-follow reads.',
@@ -470,7 +472,7 @@ export const concepts: readonly SemanticNode[] = [
       ],
       creator:
         'Coordinator terminalization persists an absorbing checkpoint after integrity cleanup.',
-      consumers: ['TUI', 'REPL', 'Eval runner', 'Terminal resume'],
+      consumers: ['TUI', 'Eval runner', 'Recovery integrity checks'],
       enforcement: [
         'finish never maps directly to success.',
         'Unavailable verification, exhausted limits, uncertainty, and cancellation remain non-success.',
@@ -529,7 +531,7 @@ export const concepts: readonly SemanticNode[] = [
       consumers: ['Human operator', 'Debugging', 'Performance analysis'],
       enforcement: [
         'Provider capabilities and secrets are redacted from diagnostics and tracing.',
-        'Terminal resume does not create a second external root trace.',
+        'Tracing remains observational during recovery and projection repair.',
       ],
       authority: 'Can explain execution but cannot select deliverables or determine success.',
       why: 'Operators need visibility without confusing telemetry with evidence.',
@@ -566,19 +568,19 @@ export const implementations: readonly SemanticNode[] = [
     id: 'entry-cli',
     tone: 'surface',
     code: '01.b',
-    title: 'REPL + eval CLI',
+    title: 'Eval CLI',
     kicker: 'Managed adapters',
-    summary: 'Uses explicit managed browsers for direct commands and isolated trials.',
+    summary: 'Uses explicit managed browsers for isolated evaluation trials.',
     answers: {
-      what: 'Line-oriented and batch adapters over the public run seam.',
-      inputs: ['Task line or dataset metadata', 'Managed browser configuration'],
-      outputs: ['runTask calls', 'Printed outcome or trial report'],
-      creator: 'CLI entry modules parse arguments and create provider sessions.',
+      what: 'The batch evaluation adapter over the public run seam.',
+      inputs: ['Dataset metadata', 'Managed browser configuration'],
+      outputs: ['runTask calls', 'Trial reports'],
+      creator: 'The eval CLI parses arguments and creates provider sessions.',
       consumers: ['Production composition', 'Eval reporting'],
       enforcement: ['Never attach to ambient Chrome.', 'Eval lanes follow explicit metadata.'],
       authority: 'Owns session setup and reporting only.',
       why: 'Supports automation without a second agent runtime.',
-      code: ['src/cli/repl.ts', 'evals/runners/cli.ts'],
+      code: ['evals/runners/cli.ts'],
     },
   }),
   implementation('composition', {
@@ -593,7 +595,7 @@ export const implementations: readonly SemanticNode[] = [
       inputs: ['Task text', 'RunTaskConfig'],
       outputs: ['New runDir', 'Initialized manifest', 'RunTaskResult'],
       creator: 'A public adapter calls it.',
-      consumers: ['executeRun', 'TUI, REPL, and eval adapters'],
+      consumers: ['executeRun', 'TUI and eval adapters'],
       enforcement: [
         'Validates browser JavaScript policy.',
         'Applies production defaults before persistence.',
@@ -614,7 +616,7 @@ export const implementations: readonly SemanticNode[] = [
       what: 'The internal live-dependency assembly function.',
       inputs: ['runDir', 'Durable config', 'Live seams'],
       outputs: ['Initializer, worker, verifier drivers', 'Tool registry', 'Normalized outcome'],
-      creator: 'runTask and active resumeTask call it.',
+      creator: 'runTask calls it.',
       consumers: ['runAgent', 'Tracing'],
       enforcement: [
         'Closes tracing in finally.',
@@ -659,8 +661,8 @@ export const implementations: readonly SemanticNode[] = [
       what: 'Durable schema, store, recovery inspection, budget, and deadline machinery.',
       inputs: ['harness checkpoint', 'Run files', 'Current time and abort signal'],
       outputs: ['Validated restored state', 'Reconciled workspace', 'Deadline signal'],
-      creator: 'runAgent opens these for every run or resume.',
-      consumers: ['CoordinatorState', 'Terminal resume'],
+      creator: 'runAgent opens these on every lifecycle invocation.',
+      consumers: ['CoordinatorState', 'Terminal integrity repair'],
       enforcement: [
         'Monotonic revisions and exclusive lock.',
         'Never blindly replays an uncertain state-changing effect.',
@@ -727,7 +729,7 @@ export const implementations: readonly SemanticNode[] = [
       inputs: ['Proposed tool input from set_output_contract'],
       outputs: ['Typed contract', 'harness/output-contract.json'],
       creator: 'Initializer validation accepts and persists it.',
-      consumers: ['Worker context', 'Finish checks', 'Verifier', 'Resume'],
+      consumers: ['Worker context', 'Finish checks', 'Verifier', 'Crash recovery'],
       enforcement: [
         'Dedicated schema validates exact durable shape.',
         'ensureOutputContractFile detects drift.',
@@ -814,7 +816,7 @@ export const implementations: readonly SemanticNode[] = [
     title: 'Execution pipeline',
     kicker: 'Effect gate',
     summary:
-      'Wraps each tool with validation, access, permission, timeout, recovery, and output bounds.',
+      'Wraps each tool with validation, permission, a global busy gate, timeout, recovery, and output bounds.',
     answers: {
       what: 'The common executor around every model-visible ToolDef.',
       inputs: ['Tool call', 'Tool context', 'BusyResourceRegistry'],
@@ -823,9 +825,9 @@ export const implementations: readonly SemanticNode[] = [
       consumers: ['Worker history', 'Lifecycle checkpoint'],
       enforcement: [
         'Timed-out resources remain busy until underlying work settles.',
-        'Access declarations gate conflicts and finish quiescence.',
+        'The global busy gate blocks every later call and terminalization until effects settle.',
       ],
-      authority: 'May run or reject a declared effect.',
+      authority: 'May run or reject a validated effect.',
       why: 'One enforcement path avoids tool-specific safety drift.',
       code: ['src/tools/pipeline.ts', 'src/tools/capResult.ts'],
     },
@@ -1066,10 +1068,10 @@ export const implementations: readonly SemanticNode[] = [
       inputs: ['Accepted verdict or failure reason', 'Coordinator state'],
       outputs: ['DurableTerminalOutcome'],
       creator: 'CoordinatorState.terminalize writes it.',
-      consumers: ['Public result', 'Terminal resume'],
+      consumers: ['Public result', 'Recovery integrity checks'],
       enforcement: [
         'Cannot transition back to active.',
-        'Verified resumes re-run deterministic integrity checks.',
+        'A restored verified terminal checkpoint re-runs deterministic integrity checks.',
       ],
       authority: 'Canonical terminal status.',
       why: 'Restarting cannot accidentally rerun a finished job or rewrite its meaning.',
@@ -1093,7 +1095,7 @@ export const implementations: readonly SemanticNode[] = [
         'RunTaskResult',
       ],
       creator: 'Lifecycle terminalization invokes it before lock release.',
-      consumers: ['TUI, REPL, eval runner'],
+      consumers: ['TUI and eval runner'],
       enforcement: [
         'Does not abandon still-running timed-out effects.',
         'Never closes ambient pages.',
@@ -1159,7 +1161,7 @@ export const implementations: readonly SemanticNode[] = [
       inputs: ['Model/tool/lifecycle events'],
       outputs: ['transcript.jsonl', 'metrics.json'],
       creator: 'Lifecycle and execution seams update them.',
-      consumers: ['Debugging', 'Eval metrics', 'Terminal resume repair'],
+      consumers: ['Debugging', 'Eval metrics', 'Terminal projection repair'],
       enforcement: [
         'Historical v3 event names remain stable.',
         'They never determine deliverable roles.',
@@ -1219,7 +1221,7 @@ export const edges: readonly SemanticEdge[] = [
     source: 'entry',
     target: 'composition',
     label: 'calls',
-    explanation: 'Every public adapter enters through runTask or resumeTask.',
+    explanation: 'Every public adapter enters through runTask.',
     kind: 'flow',
   },
   {
@@ -1252,7 +1254,8 @@ export const edges: readonly SemanticEdge[] = [
     source: 'lifecycle',
     target: 'worker',
     label: 'coordinates',
-    explanation: 'The coordinator owns worker creation, resume, correction, and stop.',
+    explanation:
+      'The coordinator owns worker creation, checkpoint restoration, correction, and stop.',
     kind: 'control',
   },
   {
@@ -1424,7 +1427,7 @@ export const routes: readonly LearningRoute[] = [
   {
     id: 'recovery',
     number: '05',
-    title: 'Crash + resume',
+    title: 'Crash recovery',
     summary: 'What survives interruption.',
     promise: 'Trace configuration, checkpoint state, reconciliation, and terminal truth.',
     nodeIds: ['entry', 'composition', 'lifecycle', 'worker', 'tools', 'run-store', 'outcome'],

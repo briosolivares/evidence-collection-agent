@@ -40,7 +40,6 @@ from manifest entries carrying `requested_output`.
 | System prompts | `src/prompts/*.md` | Markdown files loaded once per process by `src/prompts/index.ts` |
 | Model-facing tools | `src/tools/<toolName>/` | One folder per worker tool; registry/pipeline plumbing at the root |
 | Interactive TUI | `src/tui/main.tsx` (`npm run sherlock`) | Attaches to the user's local Chrome or uses Browserbase |
-| REPL | `src/cli/repl.ts` (`npm run agent`) | Explicit managed browser session |
 | Eval harness | `evals/runners/cli.ts` (`npm run evals -- --tasks <a,b> [--k N] [--concurrency N]`) | Parallel isolated normal lane plus serial headed lane |
 | Provenance | `src/run/` | Atomic manifest/artifact transactions, reconciliation, budget, transcript |
 | Browser login | `src/cli/login.ts` (`npm run login`) | Managed local profile or Browserbase Context |
@@ -67,8 +66,9 @@ from manifest entries carrying `requested_output`.
   Only verifier acceptance yields `verified`; every bounded failure is a
   truthful `incomplete` reason.
 - **Worker tools execute sequentially.** Do not reintroduce the retired
-  scheduler. Every `ToolDef` still requires `getAccess(input)` because the
-  access declaration gates timed-out effects, finish quiescence, and recovery.
+  scheduler or access-key model. A run-owned busy-resource ledger globally
+  gates calls and terminalization after a timed-out effect may still be
+  running.
 - **Publication is explicit.** `write_file` and `edit_file` write only private
   scratch files. `publish_artifact` is the sole worker publication boundary
   and requires nonempty `requested_output` and/or `evidence` roles.
@@ -100,8 +100,8 @@ from manifest entries carrying `requested_output`.
   Merely holding a Browserbase key never selects it.
 - Interactive local `sherlock` uses **attached** Chrome. It preserves existing
   user tabs, owns/marks only task pages, and disconnects without closing the
-  daily browser. Local evals, login, REPL, demos, and tests choose **managed**
-  Chrome explicitly so they never touch ambient state.
+  daily browser. Local evals, login, demos, and tests choose **managed** Chrome
+  explicitly so they never touch ambient state.
 - Attached setup accepts an explicit loopback
   `SHERLOCK_CHROME_CDP_ENDPOINT` or bounded Chrome discovery; the endpoint is a
   capability and must always be redacted.
@@ -148,7 +148,7 @@ from manifest entries carrying `requested_output`.
   the tracker after every verified step. Never edit
   `docs/architecture-whiteboard.html` unless explicitly asked.
 
-## Current state (2026-08-19)
+## Current state (2026-08-20)
 
 The runtime, attached-local cutover, public composition, TUI/eval adapters,
 legacy-runtime retirement, and active documentation are complete. A structural
@@ -156,9 +156,9 @@ simplification pass dissolved the historical `src/v3/` layer into `src/agent/`
 (stage folders per model role), moved the three system prompts to Markdown in
 `src/prompts/`, gave durable Zod schemas dedicated `.schema.ts` files, made
 `src/tools/` folder-per-tool, relocated all colocated tests to `tests/`, and
-adopted Biome formatting. Production is 114 TypeScript files (~31.8k lines)
-plus three browser-child/helper `.mjs` files (~1k lines) and the prompt
-Markdown. The complete hermetic suite passes 140 files / 1,544 tests, and
+adopted Biome formatting. Production is 122 TypeScript/TSX files (~30.2k
+lines) plus three browser-child/helper `.mjs` files (~1k lines) and the prompt
+Markdown. The complete hermetic suite passes 147 files / 1,482 tests, and
 typecheck is green.
 
 ## Custom Instructions

@@ -1,6 +1,6 @@
 # Codebase Information
 
-Current repository orientation for Sherlock's v3-only runtime. See [index.md](index.md) for the rest of the summary set.
+Current repository orientation for Sherlock's production runtime. See [index.md](index.md) for the rest of the summary set.
 
 ## What this project is
 
@@ -26,23 +26,14 @@ The run directory—not assistant prose—is the product. Its manifest hashes pu
 ```text
 bin/                       installed `sherlock` launcher
 src/
-  cli/                     runTask/resumeTask, REPL, login, env/config edges
+  agent/                   runTask, lifecycle, checkpoint, and four model stages
+  cli/                     login and env/config edges
   tui/                     Ink application and run/eval bridges
-  v3/
-    run/                   checkpoint, coordinator, output-contract projection
-    loop/                  sequential worker and collapsed model request view
-    harness/               immutable initializer and fresh verifier
-    completion/            deterministic artifact/table checks
-    tools/                 eight model-visible tools
-    model/                 shared-budget model wrapper
-    browser/               bounded browser-program child runtime
   browser/                 controller/provider implementations and downloads/uploads
   model/                   streaming client, retries, strict ModelDriver
-  tools/                   registry, access/resource pipeline, result capping
+  tools/                   eight tools, registry, pipeline, and result capping
   run/                     run dirs, manifest, atomic writes, budget, transcript
   tracing/                 optional Langfuse/OTel side channel
-  contracts/               immutable output-contract schema
-  loop/messages.ts         SDK-free message types (not a second runtime loop)
 evals/
   datasets/                task.json + oracle + grader packages
   runners/                 CLI, browser policies, scheduling/reporting
@@ -59,11 +50,10 @@ docs/                      v3/provider designs and dated reports
 | Command | Entry | Browser behavior |
 | --- | --- | --- |
 | `sherlock` / `npm run sherlock` | `bin/sherlock.mjs` → `src/tui/main.tsx` | Local attaches to the user's current Chrome; Browserbase is lazy |
-| `npm run agent` | `src/cli/repl.ts` | Managed persistent local profile or Browserbase session |
 | `npm run evals -- --tasks …` | `evals/runners/cli.ts` | Managed isolated normal lane plus serial headed lane |
 | `npm run login` | `src/cli/login.ts` | Provider-aware login/provisioning flow |
 | `npm run smoke:browserbase` | `scripts/browserbaseSmoke.ts` | Explicit live remote smoke; costs real minutes |
-| programmatic | `runTask()` / `resumeTask()` in `src/cli/runTask.ts` | Caller supplies a `BrowserController` and explicit authority |
+| programmatic | `runTask()` in `src/agent/runTask.ts` | Caller supplies a `BrowserController` and explicit authority |
 
 Other common commands:
 
@@ -78,7 +68,7 @@ Other common commands:
 `src/config/paths.ts` resolves checkout-relative paths during development and per-user `~/.sherlock` paths when installed.
 
 - `runs/` — run directories and eval trials.
-- `chrome-profile/` — managed persistent local profile used by login/headed eval/REPL paths, not by attached TUI browsing.
+- `chrome-profile/` — managed persistent local profile used by login and headed eval paths, not by attached TUI browsing.
 - `evals/experiments/` or configured eval-results directory — batch reports.
 - `.env` candidates — API/provider/tracing configuration; values must never be printed.
 

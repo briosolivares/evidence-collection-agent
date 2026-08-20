@@ -1,6 +1,6 @@
 # Knowledge Base Index — evidence-collection-agent
 
-This directory is the current architecture summary for Sherlock's v3-only production path as of 2026-08-15, after the legacy runtime, verifier, and typed output stores were retired.
+This directory is the current architecture summary for Sherlock's production path as of 2026-08-20.
 
 ## How to use this documentation
 
@@ -16,7 +16,7 @@ This directory is the current architecture summary for Sherlock's v3-only produc
 | [codebase_info.md](codebase_info.md) | Purpose, stack, repository layout, entry points, scripts | Orientation and “where is X?” |
 | [architecture.md](architecture.md) | v3 lifecycle, layers, invariants, browser policy, defaults | Design and runtime behavior |
 | [components.md](components.md) | Responsibilities of active source/eval/test areas | Module ownership |
-| [interfaces.md](interfaces.md) | Browser, model, tool, run/resume, checkpoint, tracing, and eval seams | Integration work |
+| [interfaces.md](interfaces.md) | Browser, model, tool, run, checkpoint, tracing, and eval seams | Integration work |
 | [data_models.md](data_models.md) | Run directory, manifest, contract, checkpoint, budget, transcript, eval report | Persisted and in-memory shapes |
 | [workflows.md](workflows.md) | Fresh run, worker turn, verification, recovery, browser lanes, grading | End-to-end execution |
 | [dependencies.md](dependencies.md) | Runtime/development dependencies and environment assumptions | Setup and dependency changes |
@@ -25,22 +25,22 @@ This directory is the current architecture summary for Sherlock's v3-only produc
 ## Current production path
 
 ```text
-runTask / resumeTask
+runTask
   → immutable contract initializer
-  → sequential v3 worker (8 static tools)
+  → sequential worker (8 static tools)
   → exclusive finish request
   → deterministic read-only checks
   → fresh read-only verifier
   → verified or explicit incomplete outcome
 ```
 
-The coordinator checkpoints every durable boundary under `harness/`. A response with no tools means “continue”, not completion. Pre-v3 dispatch, mutable-store, and completion-protocol surfaces are not part of the active architecture.
+`runAgent` checkpoints every durable boundary under `harness/`. A response with no tools means “continue”, not completion. Historical dispatch, mutable-store, and completion-protocol surfaces are not part of the active architecture.
 
 ## Typical reading paths
 
 - Change run behavior: [architecture.md](architecture.md) → [components.md](components.md) → [interfaces.md](interfaces.md).
-- Debug resume/crash behavior: [workflows.md](workflows.md) → [data_models.md](data_models.md).
-- Add or change a v3 tool: [components.md](components.md) → [interfaces.md](interfaces.md) → `src/v3/tools/`.
+- Debug crash recovery: [workflows.md](workflows.md) → [data_models.md](data_models.md).
+- Add or change a tool: [components.md](components.md) → [interfaces.md](interfaces.md) → `src/tools/`.
 - Work on browsers: [architecture.md](architecture.md) → [interfaces.md](interfaces.md) → [Browserbase plan](../../docs/browserbase-provider-plan.md).
 - Work on evals: [components.md](components.md) → [interfaces.md](interfaces.md) → [workflows.md](workflows.md).
 

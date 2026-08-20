@@ -1,13 +1,13 @@
 # Interfaces and Integration Points
 
-Current public and internal seams for the v3-only runtime.
+Current public and internal seams for the production runtime.
 
 ## Runtime boundaries
 
 ```mermaid
 flowchart LR
-    UI["TUI / REPL / eval runner"] --> API["runTask / resumeTask"]
-    API --> COORD["runV3Coordinator"]
+    UI["TUI / eval runner"] --> API["runTask"]
+    API --> COORD["runAgent"]
     COORD --> MD["ModelDriver"]
     COORD --> REG["ToolRegistry"]
     REG --> CTX["ToolCtx"]
@@ -15,7 +15,7 @@ flowchart LR
     UI --> SP["BrowserSessionProvider"]
     SP --> B
     API --> TR["RunTracing"]
-    COORD --> CP["V3CheckpointStore"]
+    COORD --> CP["CheckpointStore"]
 ```
 
 ### Browser seam
@@ -46,7 +46,7 @@ interface ModelDriver {
 }
 ```
 
-A complete stream must assemble and pass stop-reason/content/tool-call validation before it enters history or executes. The SDK-free `Message`, `ModelResponse`, and `CallModel` compatibility types remain in `src/loop/messages.ts`; only `src/model/` knows Anthropic SDK types.
+A complete stream must assemble and pass stop-reason/content/tool-call validation before it enters history or executes. The SDK-free `Message`, `ModelResponse`, and `CallModel` types live in `src/model/messages.ts`; only the request/stream implementation knows Anthropic SDK types.
 
 ### Tool seam
 
@@ -57,7 +57,6 @@ interface ToolDef<Input> {
   name: string;
   description: string;
   inputSchema: ZodType<Input>;
-  getAccess(input: Input): ToolAccess;
   maxBytes?: number;
   requiresUserInteraction?: boolean;
   timeoutMs?: number;
@@ -65,15 +64,14 @@ interface ToolDef<Input> {
 }
 ```
 
-`ToolCtx` carries `runDir`, optional browser and permission/cancellation seams, and the run-owned busy-resource ledger. `getAccess` is mandatory and derives concrete read/write/exclusive resources from validated input. The worker dispatches calls sequentially; access declarations still prevent a later call or terminalization from overlapping an abandoned timed-out effect.
+`ToolCtx` carries `runDir`, optional browser and permission/cancellation seams, and the run-owned `BusyResourceRegistry`. The worker dispatches calls sequentially; the global ledger prevents every later call and terminalization from overlapping an abandoned timed-out effect.
 
-`src/v3/tools/index.ts` exports `V3_API_TOOL_DEFS` and `createV3ToolRegistry`. API definitions are static, deeply frozen, and ordered identically to the registry so the cached prompt prefix is byte-stable.
+`src/tools/index.ts` exports `WORKER_API_TOOL_DEFS` and `createWorkerToolRegistry`. API definitions are static, deeply frozen, and ordered identically to the registry so the cached prompt prefix is byte-stable.
 
-## Public run API (`src/cli/runTask.ts`)
+## Public run API (`src/agent/runTask.ts`)
 
 ```ts
 runTask(taskText: string, config: RunTaskConfig): Promise<RunTaskResult>
-resumeTask(runDir: string, config: ResumeTaskConfig): Promise<RunTaskResult>
 
 type RunTaskResult = { runDir: string } & RunOutcome
 type RunOutcome =
@@ -81,19 +79,17 @@ type RunOutcome =
   | { status: 'incomplete'; reason: IncompleteRunReason; detail: string; finalText: string }
 ```
 
-Both configurations require a live `BrowserController` and accept model/progress/tracing/permission/cancellation seams. A fresh run may set durable model, start URL, authentication, JavaScript policy, and finite ceilings. Resume reads those values from the checkpoint; any caller-supplied assertion must match, and `authenticated` is required explicitly because a newly acquired browser's authority cannot be inferred from old state.
+The configuration requires a live `BrowserController` and accepts model/progress/tracing/permission/cancellation seams. Each call creates a fresh run with durable model, start URL, authentication, JavaScript policy, and production ceilings.
 
 On normal resolution the coordinator has persisted terminal state, reconciled run projections, closed run-owned pages, and finalized the manifest. The public composition root closes its tracing lifecycle; the caller still owns the browser session.
 
-## Checkpoint observation and ownership (`src/v3/run/checkpoint.ts`)
+## Checkpoint ownership (`src/agent/checkpoint.ts`)
 
-`readV3CheckpointConfiguration(runDir)` and `readV3CheckpointResumeInfo(runDir)` are lock-free composition hints. They perform bounded, no-follow, schema-validated reads and return detached recursively frozen configuration (plus the phase for the latter). They write nothing and acquire no lock. The coordinator never trusts that pre-lock observation alone: it opens `V3CheckpointStore`, re-reads the complete checkpoint under exclusive ownership, and revalidates configuration and contract.
-
-`openV3CheckpointStore(runDir)` is the mutating seam. Its `load`, monotonic `save`, and `close` operations own the run lock, atomic checkpoint replacement, stale-lock recovery, and terminal-state constraints.
+`openCheckpointStore(runDir)` is the durable ownership seam. Its `load`, monotonic `save`, and `close` operations own the run lock, bounded no-follow reads, atomic checkpoint replacement, stale-lock recovery, and terminal-state constraints. `runAgent` revalidates configuration and contract under that lock before continuing a stored phase.
 
 ## Tracing and progress
 
-`RunTracing` in `src/tracing/runTracing.ts` can announce a run directory, wrap model calls and the tool registry, create the run root, flush, and close. Without both Langfuse keys it is an identity no-op; tracing failures are isolated from outcomes. An already-terminal resume announces the directory for local UI use but creates no new external trace root.
+`RunTracing` in `src/tracing/runTracing.ts` can announce a run directory, wrap model drivers and the tool registry, create the run root, and close. Without both Langfuse keys it is an identity no-op; tracing failures are isolated from outcomes.
 
 `ProgressEvent` from `src/model/callModel.ts` and attempt events from `src/model/modelDriver.ts` feed `src/tui/bridge/runSession.ts`. Published-artifact UI events are derived by diffing the manifest after tool execution; they are not a second provenance channel.
 
@@ -122,7 +118,7 @@ The CLI surface is `npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n
 | Service/capability | Boundary | Important constraint |
 | --- | --- | --- |
 | Anthropic Messages API | `src/model/callModel.ts` | Streaming only; cached static prefix; credentials stay ambient. |
-| Local Chrome | `src/browser/` | TUI interactive mode attaches; REPL/evals use managed sessions. |
+| Local Chrome | `src/browser/` | TUI interactive mode attaches; evals and login use managed sessions. |
 | Browserbase | `src/browser/browserbase*` | Explicit provider selection only; CDP URL is a secret control capability. |
 | Langfuse/OTel | `src/tracing/runTracing.ts` | Optional and failure-isolated. |
 | Eval oracles | `evals/datasets/*/oracle/` | Fetched at grading time; GitHub needs a token for sustained runs and SEC needs its plain User-Agent. |
@@ -137,4 +133,4 @@ The CLI surface is `npm run evals -- --tasks <a,b,c> [--k <n>] [--concurrency <n
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | Optional tracing. |
 | `GITHUB_TOKEN` | Prevents eval-oracle rate-limit failures. |
 
-There is no general-purpose dotenv import in application modules. The installed TUI, eval CLI, login command, and agent command load the repository `.env` at their documented entry boundaries; standalone scripts need `--env-file=.env` explicitly.
+There is no general-purpose dotenv import in application modules. The installed TUI, eval CLI, and login command load supported `.env` files at their documented entry boundaries; standalone scripts need `--env-file=.env` explicitly.

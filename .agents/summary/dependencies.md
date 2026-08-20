@@ -1,6 +1,6 @@
 # Dependencies
 
-Runtime and tooling dependencies for the current v3 architecture as of 2026-08-15. Versions below reflect `package.json`; source imports remain authoritative.
+Runtime and tooling dependencies for the current architecture as of 2026-08-20. Versions below reflect `package.json`; source imports remain authoritative.
 
 ## Runtime packages
 
@@ -36,8 +36,8 @@ graph LR
     PW["Playwright + Browserbase SDK"] --> BROWSER["src/browser"]
     UI["React + Ink"] --> TUI["src/tui"]
     OBS["Langfuse + OTel"] --> TRACE["src/tracing"]
-    ZOD["Zod"] --> SCHEMAS["tools / contracts / v3 durability"]
-    CORE["src/v3/run + src/run"] --> NODE["Node built-ins"]
+    ZOD["Zod"] --> SCHEMAS["tools / contract / checkpoint durability"]
+    CORE["src/agent + src/run"] --> NODE["Node built-ins"]
 ```
 
 - Only the model adapter imports Anthropic SDK shapes; durable conversation types are local structural types.
@@ -51,7 +51,7 @@ graph LR
 | System | Used by | Authority / constraint |
 | --- | --- | --- |
 | Anthropic API | All real model roles | Ambient SDK credentials such as `ANTHROPIC_API_KEY`. |
-| Local Chrome | Attached TUI, managed REPL/evals, browser tests | System Chrome; persistent-profile ownership must be singular. |
+| Local Chrome | Attached TUI, managed login/evals, browser tests | System Chrome; persistent-profile ownership must be singular. |
 | Browserbase | Explicit remote provider | `BROWSERBASE_API_KEY`; Context id only for configured authenticated work. Live use is billable. |
 | Langfuse | Optional tracing | Both public and secret keys; absent/incomplete config becomes a no-op. |
 | GitHub REST | Several eval oracles | Use `GITHUB_TOKEN` for batches; anonymous quota is too small for repeated grading. |
@@ -62,4 +62,4 @@ graph LR
 
 ## Environment loading
 
-Application modules do not import a general dotenv loader. The installed `sherlock` entry, eval command, login command, and agent command load the repository `.env` at their entry boundaries. Other direct `tsx` invocations need `--env-file=.env`. Never print credential values, and never forward the Browserbase CDP URL or denylisted secrets to `bash` child processes.
+Application modules do not import a general dotenv loader. The installed `sherlock` entry, eval command, and login command load supported `.env` files at their entry boundaries. Other direct `tsx` invocations need `--env-file=.env`. Never print credential values, and never forward the Browserbase CDP URL or denylisted secrets to `bash` child processes.

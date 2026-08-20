@@ -5,7 +5,7 @@ explicitly deferred pending user authorization
 
 **Last updated:** 2026-08-20
 
-**Working branch:** `simplify/sherlock-core`
+**Working branch:** `simplify/production-deep`
 
 **Design authority:** [sherlock-v3-design-doc.md](./sherlock-v3-design-doc.md)
 
@@ -223,10 +223,11 @@ updating the design and this plan in the same commit.
 1. **One persistent worker conversation.** The worker keeps its full useful
    history across verifier corrections.
 2. **Sequential tools.** Tool calls execute in response order. There is no
-   access-key scheduler in the v3 loop. The generic pipeline's session-owned
-   busy-resource registry remains only as a fail-closed timeout guard: if a
-   timed-out promise may still be mutating a resource, a later conflicting
-   call must not race it merely because v3 itself dispatches sequentially.
+   access-key scheduler or per-tool access declaration. The pipeline's
+   run-owned busy-resource registry remains as a global fail-closed timeout
+   guard: if a timed-out promise may still be mutating state, later calls and
+   terminalization wait rather than race it merely because dispatch itself is
+   sequential.
 3. **Eight worker-visible capabilities.** `browser_execute`,
    `publish_artifact`, `read_file`, `write_file`, `edit_file`, `bash`,
    `ask_user`, and `finish`. Internals may use more modules; the model-facing
@@ -1416,10 +1417,14 @@ proved, even if supporting code already exists.
   complete hermetic suite passes 136 files / 1,484 tests. No live eval or
   Browserbase smoke was run.
 
-### 2026-08-18 — research persistence follow-up planned
+### 2026-08-18 — research persistence follow-up implemented locally
 
-- [ ] Implement the regression fixes and simplification checklist in
+- [x] Implement sections 1 and 3-8, plus the local verification gates in
+  section 9 of
   [research-persistence-follow-up.md](research-persistence-follow-up.md).
+- [x] Deliberately skip section 2's structure-only splits because no behavior
+  change depended on them.
+- [ ] Run section 9's live re-evaluation only with explicit user direction.
 - The August 17 live batch kept Hacker News and YC W24 correct while making
   both more efficient, but MIT sororities CSV regressed to 4/6. A verifier
   correction explicitly allowed a placeholder row, the worker stopped
@@ -1430,8 +1435,71 @@ proved, even if supporting code already exists.
   required coverage, retains typed evidence-backed artifact/report repairs,
   adds bounded source and requested-field research depth, preserves old
   checkpoints, and derives `harness/findings.md` without another model call.
-- Implementation has not started. Refactoring and behavior changes must remain
-  separate verified slices.
+- Local implementation and verification are complete. Live re-evaluation
+  remains open.
+
+### 2026-08-20 — production-depth simplification complete
+
+This pass removed obsolete public surfaces and duplicate runtime mechanics
+without changing Sherlock's model-facing eight-tool prefix or durable wire
+identifiers.
+
+- [x] **T1 — resume and compatibility:** retire the unused public
+  `resumeTask` composition/configuration surface and obsolete contract,
+  correction-cap, finish-input, and budget compatibility branches. Keep
+  checkpoint version 3, `v3_*` transcript events, run locking, and
+  `runAgent`'s checkpoint/crash recovery.
+- [x] **T2 — no-follow file reads:** give descriptor-level no-follow,
+  regular-file, byte-cap, mode, and stable-size mechanics one run-layer owner;
+  preserve caller-specific policy and error text.
+- [x] **T3 — timed-out effects:** remove access keys, conflict derivation, and
+  `ToolDef.getAccess`; use one global abandoned-effect ledger with bounded
+  fixed-point waits and terminal draining.
+- [x] **T4 — lifecycle state:** represent coordinator phases as a
+  discriminated union, remove duplicate worker metrics/restoration checks,
+  and keep durable effect boundaries direct.
+- [x] **T5 — publication:** centralize publication preflight before browser
+  work and at commit, remove the unused manifest verifier, and retain the
+  atomic-file and artifact-journal trust boundaries.
+- [x] **T6 — configuration:** remove unused model, run, TUI, and provider
+  knobs while retaining real eval/provider and durable production policy.
+- [x] **T7 — repeated mechanics:** share only behaviorally identical error,
+  UTF-8, output-decoding, freezing, capability-redaction, and watchdog-start
+  logic; keep domain-specific abort and IPC state machines local.
+- [x] **T8 — model and tracing:** trace `ModelDriver` directly and centralize
+  model usage settlement without merging the distinct stream, attempt, and
+  worker-progress event boundaries.
+- [x] **T9 — browser dead code:** remove unused download/provider fields and
+  repeated CDP parsing; keep the SIGKILL-tested target-ownership seam.
+- [x] **T10 — TUI:** remove dead outcomes/state/configuration and duplicate
+  display helpers without changing Ink mount or interaction ownership.
+- [x] **T11 — login:** fold the one-use manual-login module into the login
+  owner and share service-tab/probe behavior.
+- [x] **T12 — REPL:** retire the unused `npm run agent` surface and its
+  formatter while keeping the TUI and eval entry points on `runTask`.
+
+Under the same production audit convention as the approved baseline (`src` +
+`bin`, excluding tests, prompts, and five development-eval TUI files), the
+tree moves from 32,390 lines / 115 files to 30,664 lines / 121 files: 1,726
+production lines removed (5.3%). Three obsolete production files disappear;
+nine small shared-policy owners are added, so the file count rises by six.
+Those owners were retained after a dedicated fragmentation audit because each
+replaces multiple implementations or owns a security/race contract with
+focused tests; no generic utilities barrel was introduced.
+
+Verification is incremental as well as repository-wide. The focused gates
+cover lifecycle/crash recovery, tools, browser ownership/providers,
+publication transactions, model accounting/tracing, CLI, and TUI behavior.
+`npm run typecheck` and `git diff --check` pass. After making the packaged-TUI
+smoke child wait through full-suite TypeScript-loader contention, the complete
+hermetic suite passes 147 files / 1,482 tests in 74.73 seconds.
+
+Deliberate stops: no generic browser deadline/target-resolution layer, shared
+provider assembly ladder, controller responsibility split, or common Bash /
+browser-execute supervisor was introduced because their error, authority,
+cleanup, and result-precedence semantics differ. The attached-profile reader
+and stock-Node child `.mjs` checks remain at their independent trust
+boundaries. No live Browserbase smoke or eval re-baseline ran.
 
 ## Rules for coordinators and subagents
 
