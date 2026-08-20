@@ -138,15 +138,12 @@ export async function captureClickDownload(
 }
 
 async function readNavigationResponse(response: Response): Promise<BrowserDownloadResult> {
-  const headers = response.headers();
+  const suggestedFilename = suggestedFilenameFromHeaders(response.headers());
   return {
     finalUrl: response.url(),
     status: response.status(),
-    headers,
     bytes: new Uint8Array(await response.body()),
-    ...(suggestedFilenameFromHeaders(headers) !== undefined
-      ? { suggestedFilename: suggestedFilenameFromHeaders(headers) }
-      : {}),
+    ...(suggestedFilename === undefined ? {} : { suggestedFilename }),
   };
 }
 

@@ -9,7 +9,7 @@
 
 import { Box, Text, useInput } from 'ink';
 
-import { formatBytes } from '../format.js';
+import { formatBytes, windowAround } from '../format.js';
 import { openPath, quickLookPath, revealPath, type OpenExternalResult } from '../openExternal.js';
 import { isHelperProposalArtifact, type UiAction } from '../store/reducer.js';
 import type { ArtifactUiState, PublishedArtifact } from '../store/state.js';
@@ -120,11 +120,7 @@ export function ArtifactRows({
   limit = 8,
   showVerifiedHelperProposals = false,
 }: ArtifactRowsProps) {
-  const windowStart = Math.max(
-    0,
-    Math.min(cursor - Math.floor(limit / 2), artifacts.length - limit),
-  );
-  const visible = artifacts.slice(windowStart, windowStart + limit);
+  const { start: windowStart, items: visible } = windowAround(artifacts, cursor, limit);
 
   return (
     <Box flexDirection="column">

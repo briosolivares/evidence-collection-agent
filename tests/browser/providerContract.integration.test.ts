@@ -611,7 +611,6 @@ function assertDownload(download: BrowserDownloadResult): void {
   expect(Buffer.from(download.bytes)).toEqual(DOWNLOAD_BYTES);
   expect(download.suggestedFilename).toBe('javascript-evidence.bin');
   expect(download.finalUrl).toMatch(/^blob:/);
-  expect(download.headers).toEqual({});
 }
 
 async function waitForOwnedPageCount(

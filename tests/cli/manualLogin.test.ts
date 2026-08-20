@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  MANUAL_LOGIN_START_URL,
-  manualLoginArgs,
-  resolveRealChromePath,
-} from '../../src/cli/manualLogin.js';
+import { MANUAL_LOGIN_START_URL, manualLoginArgs } from '../../src/cli/login.js';
+import { resolveRealChromePath } from '../../src/browser/localChromeExecutable.js';
 
 describe('resolveRealChromePath', () => {
   it('uses an explicit override verbatim, without probing the filesystem', () => {

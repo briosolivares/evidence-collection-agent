@@ -16,11 +16,10 @@ describe('installed package', () => {
     const temporaryRoot = mkdtempSync(join(tmpdir(), 'sherlock-package-'));
     try {
       const packResult = JSON.parse(
-        execFileSync(
-          'npm',
-          ['pack', '--json', '--pack-destination', temporaryRoot],
-          { cwd: repositoryRoot, encoding: 'utf8' },
-        ),
+        execFileSync('npm', ['pack', '--json', '--pack-destination', temporaryRoot], {
+          cwd: repositoryRoot,
+          encoding: 'utf8',
+        }),
       ) as Array<{ filename: string }>;
       const tarball = join(temporaryRoot, packResult[0]!.filename);
       const contents = execFileSync('tar', ['-tzf', tarball], {
@@ -40,16 +39,12 @@ describe('installed package', () => {
       const temporaryHome = join(temporaryRoot, 'home');
       mkdirSync(temporaryHome);
 
-      const launched = spawnSync(
-        process.execPath,
-        [join(installedPackage, 'bin/sherlock.mjs')],
-        {
-          cwd: temporaryRoot,
-          env: { ...process.env, HOME: temporaryHome },
-          encoding: 'utf8',
-          timeout: 90_000,
-        },
-      );
+      const launched = spawnSync(process.execPath, [join(installedPackage, 'bin/sherlock.mjs')], {
+        cwd: temporaryRoot,
+        env: { ...process.env, HOME: temporaryHome },
+        encoding: 'utf8',
+        timeout: 90_000,
+      });
 
       expect(launched.status).not.toBe(0);
       expect(launched.stderr.trim()).toMatch(/interactive terminal|TTY/i);
@@ -65,7 +60,9 @@ describe('installed package', () => {
         "Object.defineProperty(process.stdout, 'isTTY', { value: true });",
         'process.stdin.setRawMode = () => process.stdin;',
         "process.argv.push('--demo');",
-        'setTimeout(() => process.exit(0), 5_000);',
+        // Full-suite CPU contention can make the tsx import take well over
+        // five seconds. Keep the child alive long enough to render once.
+        'setTimeout(() => process.exit(0), 20_000);',
         `await import(${JSON.stringify(pathToFileURL(installedLauncher).href)});`,
       ].join('\n');
       const terminalLaunch = spawnSync(

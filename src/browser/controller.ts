@@ -25,7 +25,6 @@ export interface BrowserScreenshotOptions {
 export interface BrowserDownloadResult {
   finalUrl: string;
   status?: number;
-  headers: Readonly<Record<string, string>>;
   bytes: Uint8Array;
   suggestedFilename?: string;
 }

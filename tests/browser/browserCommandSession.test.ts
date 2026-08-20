@@ -12,7 +12,7 @@ import {
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import type { BrowserUploadEncoder, UploadPayload } from '../../src/browser/uploadEncoder.js';
-import { createBusyResourceRegistry, EXCLUSIVE_ACCESS } from '../../src/tools/registry.js';
+import { createBusyResourceRegistry } from '../../src/tools/registry.js';
 import { runBrowserProgram } from '../../src/tools/browserExecute/runner.js';
 
 const TEST_TIMEOUT_MS = 15_000;
@@ -486,7 +486,7 @@ describe('command-session transport boundary', () => {
     const session = await openPlaywrightCommandSession(context, page, 'page-late', {
       targetPolicy: allowOwnedTargets('target-late'),
       uploadEncoder,
-      trackUploadEffect: (effect) => busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect),
+      trackUploadEffect: (effect) => busyRegistry.markAbandoned(effect),
     });
 
     const program = runBrowserProgram({
@@ -506,7 +506,7 @@ describe('command-session transport boundary', () => {
 
     expect(result.status).toBe('timed_out');
     expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith(['/confined/late.csv']);
-    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10)).resolves.toBe(false);
+    await expect(busyRegistry.waitUntilFree(10)).resolves.toBe(false);
 
     let closeSettled = false;
     const close = session.close().then(() => {
@@ -521,7 +521,7 @@ describe('command-session transport boundary', () => {
 
     expect(setInputFiles).toHaveBeenCalledExactlyOnceWith([payload], { timeout: 5_000 });
     expect(detach).toHaveBeenCalledOnce();
-    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 100)).resolves.toBe(true);
+    await expect(busyRegistry.waitUntilFree(100)).resolves.toBe(true);
   });
 
   it('reports only an exact successful Target.createTarget result to the ownership hook', async () => {

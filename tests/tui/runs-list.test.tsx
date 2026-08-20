@@ -37,7 +37,6 @@ function summaryFor(runDir: string): RunSummaryView {
           filename: `evidence-${index}.csv`,
           sizeBytes: 2_048,
           sha256Prefix: `deadbeefcaf${index}`,
-          sourceUrl: 'https://news.ycombinator.com/',
         },
       ],
     },

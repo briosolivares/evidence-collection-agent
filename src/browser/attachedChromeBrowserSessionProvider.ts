@@ -37,8 +37,8 @@ export interface AttachedChromeBrowserSessionOptions {
   connectionTimeoutMs?: number;
   /** Test seam; production uses Playwright Chromium directly. */
   connectOverCDP?: (cdpEndpoint: string) => Promise<Browser>;
-  /** Test-only crash seam, awaited after an exact target commit receipt and
-   * before any Playwright page claim/marker work. */
+  /** Crash-test seam, awaited after an exact target commit and before page
+   * marker work. Required by the real SIGKILL sentinel regression. */
   afterTargetCreated?: () => Promise<void> | void;
 }
 
@@ -56,8 +56,7 @@ class AttachedChromeSessionError extends Error {}
 function requireLoopbackEndpoint(cdpEndpoint: string): string {
   let parsed: URL;
   try {
-    parsed = new URL(cdpEndpoint);
-    assertLoopbackCdpUrl(cdpEndpoint);
+    parsed = assertLoopbackCdpUrl(cdpEndpoint);
   } catch {
     throw new TypeError(
       'Attached Chrome requires a valid loopback HTTP or WebSocket CDP endpoint.',
@@ -170,13 +169,12 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
       // every stale run page in this snapshot without detaching its own target
       // inventory capability, and SIGKILL during setup cannot leak an
       // unclassified blank anchor.
-      targetControl = await createChromiumTargetControl({
-        context,
-        browser,
-        ...(this.afterTargetCreated === undefined
+      targetControl = await createChromiumTargetControl(
+        { context, browser },
+        this.afterTargetCreated === undefined
           ? {}
-          : { afterTargetCreated: this.afterTargetCreated }),
-      });
+          : { afterTargetCreated: this.afterTargetCreated },
+      );
 
       return new PlaywrightBrowserController({
         context,

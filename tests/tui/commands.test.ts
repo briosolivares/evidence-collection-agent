@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { filterCommands, findCommand, SLASH_COMMANDS } from '../../src/tui/store/commands.js';
-import { HELP_TEXT, helpText, routeInput } from '../../src/tui/store/reducer.js';
+import { helpText, routeInput } from '../../src/tui/store/reducer.js';
 
 describe('SLASH_COMMANDS registry', () => {
   it('lists exactly the five commands, each with a description', () => {
@@ -66,7 +66,7 @@ describe('filterCommands (autosuggest filter)', () => {
   });
 });
 
-describe('registry drives routeInput and HELP_TEXT', () => {
+describe('registry drives routeInput and help text', () => {
   it('routes every registry command to its non-unknown kind', () => {
     for (const entry of SLASH_COMMANDS) {
       expect(routeInput(entry.name)).toEqual({ kind: entry.name.slice(1) });
@@ -89,8 +89,8 @@ describe('registry drives routeInput and HELP_TEXT', () => {
   });
 
   // The byte-for-byte lock below subsumes a name-by-name listing check.
-  it('HELP_TEXT is locked byte-for-byte (one aligned name column)', () => {
-    expect(HELP_TEXT).toBe(
+  it('help text is locked byte-for-byte (one aligned name column)', () => {
+    expect(helpText()).toBe(
       [
         'Commands',
         '  /help       Show this list',

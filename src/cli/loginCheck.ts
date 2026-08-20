@@ -16,6 +16,7 @@ import { launchPersistentChrome } from '../browser/playwrightBrowserController.j
 import { requireBrowserbaseContextId, resolveBrowserProviderKind } from '../browser/provider.js';
 import type { BrowserProviderKind } from '../browser/sessionProvider.js';
 import {
+  formatLoginState,
   settleProbe,
   type LoginService,
   type LoginState,
@@ -24,7 +25,7 @@ import {
 
 import type { BrowserContext } from 'playwright';
 
-const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
+export const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
 
 /**
  * Navigate a fresh tab to `service.probeUrl` and classify where it landed.
@@ -68,6 +69,38 @@ export async function probeServices(
     onStatus?.(status);
   }
   return statuses;
+}
+
+/**
+ * Park one tab per service on its sign-in page, reusing tabs already open.
+ *
+ * Both interactive helpers do this before handing the browser over, so
+ * whoever acts next — a human in the window or Live View — finds every
+ * page already loaded. A failed navigation is swallowed: the tab is still
+ * there to retry in by hand.
+ */
+export async function openServiceTabs(
+  context: BrowserContext,
+  services: readonly LoginService[],
+): Promise<void> {
+  const pages = context.pages();
+  for (let index = 0; index < services.length; index += 1) {
+    const page = pages[index] ?? (await context.newPage());
+    await page
+      .goto(services[index]!.probeUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: PROBE_NAVIGATION_TIMEOUT_MS,
+      })
+      .catch(() => undefined);
+  }
+}
+
+/** The one `onStatus` printer every login caller uses, so a probe's status
+ * line reads identically wherever it appears. */
+export function probeStatusPrinter(
+  log: (message: string) => void = console.log,
+): (status: ServiceLoginStatus) => void {
+  return (status) => log(`  ${status.service.name}: ${formatLoginState(status.state)}`);
 }
 
 export interface CheckProfileLoginsOptions {
@@ -204,5 +237,3 @@ export async function checkProfileLogins(
     await session.close();
   }
 }
-
-export type { ServiceLoginStatus };

@@ -2,6 +2,8 @@
 // semantic activity lines. Kept free of Ink imports so they are trivially
 // unit-testable.
 
+const COMPLETION_VERB = 'Brewed';
+
 /**
  * Format a token count compactly: `847 tokens` below 1000, `18.7k tokens`
  * (one decimal) from 1000 up.
@@ -21,6 +23,26 @@ export function formatDuration(ms: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}m ${seconds}s`;
+}
+
+/** The permanent terminal line for a verified or incomplete run. */
+export function formatCompletionLine(
+  outcome: 'complete' | 'incomplete',
+  elapsedMs: number,
+  tokens: number,
+): string {
+  const timing = `${formatDuration(elapsedMs)} · ${formatTokens(tokens)}`;
+  return outcome === 'complete' ? `${COMPLETION_VERB} in ${timing}` : `Incomplete after ${timing}`;
+}
+
+/** A cursor-centered slice and its absolute starting index. */
+export function windowAround<T>(
+  items: readonly T[],
+  cursor: number,
+  limit: number,
+): { start: number; items: readonly T[] } {
+  const start = Math.max(0, Math.min(cursor - Math.floor(limit / 2), items.length - limit));
+  return { start, items: items.slice(start, start + limit) };
 }
 
 /**

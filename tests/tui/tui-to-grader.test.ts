@@ -148,7 +148,6 @@ describe('Sherlock TUI-to-grader acceptance', () => {
     vi.mocked(browser.download).mockResolvedValue({
       finalUrl: FINAL_DOWNLOAD_URL,
       status: 200,
-      headers: { 'content-type': 'application/octet-stream' },
       bytes: DOWNLOAD,
       suggestedFilename: 'export.bin',
     });

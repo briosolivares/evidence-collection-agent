@@ -1,11 +1,7 @@
 import { Box, Text, useApp, useInput } from 'ink';
 import { useEffect, useReducer, useRef, useState } from 'react';
 
-import type {
-  EvalBatchHandle,
-  EvalsFeature,
-  EvalTaskChoice,
-} from '../bridge/evalsFeature.js';
+import type { EvalBatchHandle, EvalsFeature, EvalTaskChoice } from '../bridge/evalsFeature.js';
 import type { RunHandle } from '../bridge/runSession.js';
 import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { AskUserAnswers } from '../../tools/askUser/askUser.js';
@@ -78,7 +74,6 @@ export function App({
     reduce,
     {
       apiKeyPresent,
-      completionVerb: config.completionVerb,
       identity,
       evalsEnabled,
     },
@@ -210,8 +205,8 @@ export function App({
         return;
       case 'artifacts':
         // Re-render the panel for the most recent run and focus it —
-        // with or without a completion summary (cancelled and
-        // budget-exceeded runs keep their artifacts in state).
+        // with or without a completion summary (cancelled runs keep their
+        // artifacts in state).
         if (state.artifacts.length === 0) {
           dispatch({
             type: 'notice',
@@ -270,7 +265,7 @@ export function App({
     <Box flexDirection="column">
       <Transcript items={state.transcript} verbose={config.verbose} />
       {running && state.live !== undefined && (
-        <LiveRegion config={config} live={state.live} cancelling={state.mode === 'cancelling'} />
+        <LiveRegion live={state.live} cancelling={state.mode === 'cancelling'} />
       )}
       {/* Mounted for the whole run (it renders nothing until the first
           publish) so its key subscription is registered by the submit
@@ -286,9 +281,7 @@ export function App({
       )}
       {EvalsLiveRegion !== undefined &&
         state.mode === 'evalsRunning' &&
-        state.evalsLive !== undefined && (
-        <EvalsLiveRegion trials={state.evalsLive} />
-      )}
+        state.evalsLive !== undefined && <EvalsLiveRegion trials={state.evalsLive} />}
       {state.mode === 'runsList' && (
         <RunsList entries={runEntries} onClose={() => dispatch({ type: 'close_overlay' })} />
       )}
@@ -326,7 +319,7 @@ export function App({
           focused (input-owning) in artifacts mode. Between eval trials
           the mode is evalsRunning, never idle, so no panel mid-batch.
           /artifacts enters artifacts mode with no summary recorded (a
-          cancelled/budget-exceeded run's retained artifacts): the panel
+          cancelled run's retained artifacts): the panel
           then renders artifacts-only, and only while focused. */}
       {(state.mode === 'artifacts' ||
         (state.mode === 'idle' && state.completedRun !== undefined)) && (

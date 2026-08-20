@@ -118,10 +118,9 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
 
   return {
     announceRunDir,
-    wrapCallModel: (callModel, model, role) => delegate.wrapCallModel(callModel, model, role),
+    wrapModelDriver: (driver, model, role) => delegate.wrapModelDriver(driver, model, role),
     wrapRegistry,
     traceRun: (taskText, operation) => delegate.traceRun(taskText, operation),
-    flush: () => delegate.flush(),
     close: () => delegate.close(),
   };
 }

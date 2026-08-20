@@ -7,6 +7,7 @@ import {
   formatRelativeTime,
   formatTokens,
   truncate,
+  windowAround,
 } from '../format.js';
 import { loadRunSummary, type RunListEntry } from '../runScanner.js';
 import type { ManifestView, MetricsView } from '../store/state.js';
@@ -103,8 +104,7 @@ export function RunsList({
     );
   }
 
-  const windowStart = Math.max(0, Math.min(cursor - Math.floor(limit / 2), entries.length - limit));
-  const visible = entries.slice(windowStart, windowStart + limit);
+  const { start: windowStart, items: visible } = windowAround(entries, cursor, limit);
 
   return (
     <Box flexDirection="column" marginTop={1}>

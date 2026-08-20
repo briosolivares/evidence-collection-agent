@@ -137,9 +137,6 @@ const runsBaseDir = runsDirFlag !== undefined ? resolve(runsDirFlag) : paths.run
 const config = createConfig({
   verbose,
   runsBaseDir,
-  evalsDir: paths.evalsDir,
-  evalResultsDir:
-    runsDirFlag !== undefined ? resolve(runsBaseDir, 'eval-results') : paths.evalResultsDir,
 });
 
 if (verbose) {
@@ -216,25 +213,22 @@ try {
       },
     });
   }
-  await runtime?.start();
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
   console.error(formatBrowserStartupError(browserProvider, message, 'attached'));
   process.exit(1);
 }
-let developmentEvals:
-  | { feature: EvalsFeature; close(): Promise<void> }
-  | undefined;
+let developmentEvals: { feature: EvalsFeature; close(): Promise<void> } | undefined;
 if (runtime !== undefined && developmentRoot !== undefined) {
   const { createDevelopmentEvals } = await import('./developmentEvals.js');
   developmentEvals = createDevelopmentEvals({
-    authenticatedRunner: (task, onEvent, opts) =>
-      runtime.startRun(task, onEvent, opts),
+    authenticatedRunner: (task, onEvent, opts) => runtime.startRun(task, onEvent, opts),
     authenticatedProfileDir: paths.profileDir,
     browserExecutablePath,
     runsBaseDir: config.runsBaseDir,
-    evalsDir: config.evalsDir,
-    resultsDir: config.evalResultsDir,
+    evalsDir: paths.evalsDir,
+    resultsDir:
+      runsDirFlag !== undefined ? resolve(runsBaseDir, 'eval-results') : paths.evalResultsDir,
   });
 }
 

@@ -386,11 +386,13 @@ describe('Chromium target control', () => {
       hookEntered.resolve(target);
       await releaseHook.promise;
     });
-    const control = await createChromiumTargetControl({
-      context: fake.context,
-      anchorPage: fake.anchorPage,
-      afterTargetCreated,
-    });
+    const control = await createChromiumTargetControl(
+      {
+        context: fake.context,
+        anchorPage: fake.anchorPage,
+      },
+      { afterTargetCreated },
+    );
 
     const creation = control.createPageTarget('about:blank#crash-sentinel');
     const hookRef = await hookEntered.promise;
@@ -425,7 +427,7 @@ describe('Chromium target control', () => {
     await control.close();
   });
 
-  it('fails closed on malformed protocol records and contains a known created target', async () => {
+  it('fails closed on malformed used protocol fields and contains a known created target', async () => {
     const fake = fakeChromium({ browserContextId: 'context-a' });
     fake.setIntercept(({ method, params }) => {
       if (method !== 'Target.getTargetInfo' || params?.targetId !== 'target-created-1') {
@@ -436,8 +438,9 @@ describe('Chromium target control', () => {
           targetId: 'target-created-1',
           type: 'page',
           title: '',
-          url: 'about:blank',
-          // Required `attached` field deliberately absent.
+          // Required, used `url` field deliberately absent. Fields ignored by
+          // this control are not redundantly validated.
+          attached: true,
           browserContextId: 'context-a',
         },
       });

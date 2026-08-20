@@ -26,16 +26,15 @@
 import Browserbase from '@browserbasehq/sdk';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 
+import { errorMessage } from '../errors.js';
 import type { BrowserController } from './controller.js';
 import {
   createChromiumTargetControl,
   type ChromiumTargetControl,
 } from './chromiumTargetControl.js';
-import {
-  createBrowserbaseDownloadReader,
-  type BrowserbaseDownloadReaderHandle,
-} from './browserbaseDownloads.js';
+import { createBrowserbaseDownloadReader } from './browserbaseDownloads.js';
 import { withBrowserbaseRetry, type BrowserbaseRetryOptions } from './browserbaseRetry.js';
+import type { BrowserDownloadReader } from './downloadReader.js';
 import { PlaywrightBrowserController, prepareSessionPage } from './playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 import { remoteUploadEncoder } from './uploadEncoder.js';
@@ -52,25 +51,6 @@ import { remoteUploadEncoder } from './uploadEncoder.js';
  */
 const HEARTBEAT_INTERVAL_MS = 120_000;
 
-/**
- * How long a session may live before Browserbase ends it, when a caller has
- * not asked for something specific.
- *
- * Explicit because the alternative is not "no limit" — it is the project's
- * `defaultTimeout`, a dashboard setting nobody here chose. A new project ships
- * 300s, which is shorter than an agent turn on a hard task, shorter than a
- * human signing in through Live View, and long enough to look like the browser
- * died rather than expired. Both failures were observed before this existed.
- *
- * Bounded rather than maximal because the heartbeat keeps a live session alive
- * indefinitely, so this value is really the backstop for a session whose owner
- * crashed without reaching REQUEST_RELEASE: the longest a leak can bill.
- * Browserbase permits 60s–21600s.
- *
- * An hour, because 1800s was measured to be too short: a `mit_sororities`
- * trial was still driving the browser at 30 minutes when its session expired
- * underneath it. Raise this from evidence, not from nerves.
- */
 const DEFAULT_SESSION_TIMEOUT_SECONDS = 3_600;
 
 /** Where a human watches or reviews a session. Live View comes from the API;
@@ -96,32 +76,10 @@ export interface BrowserbaseBrowserSessionOptions {
    * state bleed into the next.
    */
   persistContext?: boolean;
-  /** Session recording; on by default, per the project's decision to record
-   * every Browserbase session. */
-  recordSession?: boolean;
   /** Fetch the Live View URL at session creation. On for interactive runtimes,
    * where a human may need to take over; off for the eval normal lane, where
    * nobody is watching and it is one API call per trial. */
   liveView?: boolean;
-  /**
-   * Ask Browserbase to keep the session alive across CDP disconnects.
-   *
-   * Off by default and deliberately so: it requires a Hobby-or-above plan, and
-   * a session that survives disconnection is a session that can bill after the
-   * run that owned it is gone. When it IS enabled, close() still issues an
-   * explicit release.
-   */
-  keepAlive?: boolean;
-  /** Seconds before Browserbase ends the session on its own; omitted means
-   * {@link DEFAULT_SESSION_TIMEOUT_SECONDS}, NOT the project's dashboard
-   * default — see that constant for why deferring to the project is a trap. */
-  timeoutSeconds?: number;
-  /** Region to run in; omitted means the project's default. */
-  region?: 'us-west-2' | 'us-east-1' | 'eu-central-1' | 'ap-southeast-1';
-  /** Browserbase proxy configuration. Left unset until a measured need — a
-   * proxy changes the IP a login target sees, which is the variable the POC
-   * acceptance check exists to measure. */
-  proxies?: boolean;
   /** Arbitrary correlation metadata attached to the remote session. */
   userMetadata?: Record<string, unknown>;
   /** Receives operator-facing warnings (retries, cleanup failures). Never
@@ -149,13 +107,10 @@ export interface BrowserbaseClient {
   sessions: {
     create(params: {
       projectId?: string;
-      keepAlive?: boolean;
-      region?: string;
       api_timeout?: number;
-      proxies?: boolean;
       userMetadata?: Record<string, unknown>;
       browserSettings?: {
-        recordSession?: boolean;
+        recordSession: true;
         context?: { id: string; persist?: boolean };
       };
     }): Promise<{ id: string; connectUrl: string }>;
@@ -229,9 +184,6 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
   private readonly retryOptions: BrowserbaseRetryOptions;
 
   constructor(private readonly options: BrowserbaseBrowserSessionOptions) {
-    if (options.apiKey.trim() === '') {
-      throw new Error('BrowserbaseBrowserSessionProvider requires a non-empty apiKey.');
-    }
     this.client = options.client ?? createBrowserbaseClient(options.apiKey);
     this.connect =
       options.connectOverCDP ?? ((connectUrl: string) => chromium.connectOverCDP(connectUrl));
@@ -261,7 +213,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
       () =>
         this.client.sessions.create({
           browserSettings: {
-            recordSession: this.options.recordSession ?? true,
+            recordSession: true,
             ...(this.options.contextId === undefined
               ? {}
               : {
@@ -271,10 +223,9 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
                   },
                 }),
           },
-          ...(this.options.keepAlive === undefined ? {} : { keepAlive: this.options.keepAlive }),
-          ...(this.options.region === undefined ? {} : { region: this.options.region }),
-          api_timeout: this.options.timeoutSeconds ?? DEFAULT_SESSION_TIMEOUT_SECONDS,
-          ...(this.options.proxies === undefined ? {} : { proxies: this.options.proxies }),
+          // Never inherit Browserbase's project default: 1,800 seconds was
+          // measured too short when a live MIT trial expired at 30 minutes.
+          api_timeout: DEFAULT_SESSION_TIMEOUT_SECONDS,
           ...(this.options.userMetadata === undefined
             ? {}
             : { userMetadata: this.options.userMetadata }),
@@ -304,9 +255,8 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
       closed = true;
       if (heartbeat !== undefined) this.stopInterval(heartbeat);
       try {
-        // Disconnects this CDP client; without keepAlive it also ends the
-        // remote session. The explicit release below is what makes that
-        // guarantee independent of the plan tier.
+        // Disconnect this CDP client. The explicit release below is what
+        // guarantees the remote session does not outlive its owner.
         await browser.close();
       } catch (error) {
         this.warn(
@@ -357,7 +307,7 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
 
   async createSession(): Promise<BrowserController> {
     const raw = await this.createRawSession();
-    let downloadReader: BrowserbaseDownloadReaderHandle;
+    let downloadReader: BrowserDownloadReader;
     let targetControl: ChromiumTargetControl | undefined;
     try {
       downloadReader = createBrowserbaseDownloadReader({
@@ -419,10 +369,10 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
   /**
    * Ask Browserbase to end the session now.
    *
-   * Always attempted, even without `keepAlive`, because this is the only step
-   * that makes "no session outlives its run" true independently of how the
-   * disconnect went. Tolerant of failure: a session already COMPLETED rejects
-   * this, and that rejection means the desired state already holds.
+   * Always attempted because this is the only step that makes "no session
+   * outlives its run" true independently of how the disconnect went. Tolerant
+   * of failure: a session already COMPLETED rejects this, and that rejection
+   * means the desired state already holds.
    */
   private async releaseSession(sessionId: string): Promise<void> {
     try {
@@ -432,8 +382,4 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
       // session is not left running by this path.
     }
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

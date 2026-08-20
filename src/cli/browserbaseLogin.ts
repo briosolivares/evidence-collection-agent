@@ -38,8 +38,13 @@ import {
 } from '../browser/browserbaseBrowserSessionProvider.js';
 import { BROWSERBASE_CONTEXT_ENV_VAR, browserbaseContextId } from '../browser/provider.js';
 import { setEnvFileValue } from './envFile.js';
-import { openLoginProbeSession, probeServices } from './loginCheck.js';
-import { allLoggedIn, formatLoginState, type LoginService } from './loginProbe.js';
+import {
+  openLoginProbeSession,
+  openServiceTabs,
+  probeServices,
+  probeStatusPrinter,
+} from './loginCheck.js';
+import { allLoggedIn, type LoginService } from './loginProbe.js';
 
 /**
  * How long to wait after closing the sign-in session before probing the
@@ -53,8 +58,6 @@ import { allLoggedIn, formatLoginState, type LoginService } from './loginProbe.j
  * more than five seconds.
  */
 const CONTEXT_SYNC_DELAY_MS = 5_000;
-
-const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
 
 export interface BrowserbaseLoginDeps {
   /** Services to sign into and verify. */
@@ -147,18 +150,7 @@ export async function runBrowserbaseLogin(deps: BrowserbaseLoginDeps): Promise<b
   });
   try {
     log(`Browserbase session: ${session.sessionId ?? '(unknown)'}`);
-    // One tab per service, so each sign-in page is already loaded when the
-    // operator opens Live View — same reasoning as the local helper.
-    const pages = session.context.pages();
-    for (let index = 0; index < deps.services.length; index += 1) {
-      const page = pages[index] ?? (await session.context.newPage());
-      await page
-        .goto(deps.services[index]!.probeUrl, {
-          waitUntil: 'domcontentloaded',
-          timeout: PROBE_NAVIGATION_TIMEOUT_MS,
-        })
-        .catch(() => undefined);
-    }
+    await openServiceTabs(session.context, deps.services);
 
     if (session.liveViewUrl === undefined) {
       log(
@@ -192,9 +184,11 @@ export async function runBrowserbaseLogin(deps: BrowserbaseLoginDeps): Promise<b
     onWarning: log,
   });
   try {
-    const statuses = await probeServices(verification.context, deps.services, (status) => {
-      log(`  ${status.service.name}: ${formatLoginState(status.state)}`);
-    });
+    const statuses = await probeServices(
+      verification.context,
+      deps.services,
+      probeStatusPrinter(log),
+    );
     return allLoggedIn(statuses);
   } finally {
     await verification.close();

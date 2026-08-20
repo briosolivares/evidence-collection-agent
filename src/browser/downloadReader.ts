@@ -54,7 +54,6 @@ export const localDownloadReader: BrowserDownloadReader = {
 
     return {
       finalUrl: download.url(),
-      headers: {},
       bytes: new Uint8Array(Buffer.concat(chunks)),
       suggestedFilename: download.suggestedFilename(),
     };

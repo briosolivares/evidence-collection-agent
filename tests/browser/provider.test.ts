@@ -159,17 +159,6 @@ describe('createBrowserSessionProvider', () => {
     ).toThrow(/BROWSERBASE_API_KEY/);
   });
 
-  it("throws when context: 'required' and no BROWSERBASE_CONTEXT_ID is set", () => {
-    expect(() =>
-      createBrowserSessionProvider({
-        env: { [BROWSER_PROVIDER_ENV_VAR]: 'browserbase', BROWSERBASE_API_KEY: 'sk-test' },
-        localMode: 'managed',
-        profileDir: PROFILE_DIR,
-        context: 'required',
-      }),
-    ).toThrow(/npm run login/);
-  });
-
   it("succeeds when context: 'optional' and no context id is set", () => {
     const provider = createBrowserSessionProvider({
       env: { [BROWSER_PROVIDER_ENV_VAR]: 'browserbase', BROWSERBASE_API_KEY: 'sk-test' },

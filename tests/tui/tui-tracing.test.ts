@@ -24,7 +24,7 @@ function makeDelegate() {
   const executedThroughDelegate: string[] = [];
   const delegate: RunTracing = {
     announceRunDir: vi.fn(),
-    wrapCallModel: vi.fn((callModel) => callModel),
+    wrapModelDriver: vi.fn((driver) => driver),
     wrapRegistry: vi.fn((registry) => {
       // Wrap each tool so delegate-level execution is observable.
       const wrapped = new Map();
@@ -40,7 +40,6 @@ function makeDelegate() {
       return wrapped;
     }),
     traceRun: vi.fn((_task, operation) => operation()),
-    flush: vi.fn(async () => {}),
     close: vi.fn(async () => {}),
   };
   return { delegate, executedThroughDelegate };
@@ -52,14 +51,12 @@ function makeRegistry() {
       name: 'echo',
       description: 'echoes',
       inputSchema: z.object({ value: z.string() }),
-      getAccess: () => ({ reads: [], writes: [] }),
       execute: async (input: { value: string }) => `echo:${input.value}`,
     },
     {
       name: 'boom',
       description: 'always fails',
       inputSchema: z.object({}),
-      getAccess: () => ({ reads: [], writes: [] }),
       execute: async () => {
         throw new Error('kaboom');
       },
@@ -149,7 +146,6 @@ describe('createTuiTracing', () => {
           name: 'publish',
           description: 'writes one published artifact',
           inputSchema: publishInput,
-          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: PublishInput, ctx: ToolCtx) => {
             const entry = publish(input, ctx);
             return { path: entry.filename, size: input.content.length };
@@ -159,7 +155,6 @@ describe('createTuiTracing', () => {
           name: 'batch',
           description: 'several inner writes in one execution',
           inputSchema: z.object({ items: z.array(publishInput) }),
-          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: { items: PublishInput[] }, ctx: ToolCtx) => {
             for (const item of input.items) publish(item, ctx);
             return { results: input.items.length };
@@ -169,7 +164,6 @@ describe('createTuiTracing', () => {
           name: 'offload',
           description: 'capResult shape: a private scratch write, no roles',
           inputSchema: z.object({ file_path: z.string(), content: z.string() }),
-          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (input: { file_path: string; content: string }, ctx: ToolCtx) => {
             writeArtifact(ctx.runDir, input.file_path, Buffer.from(input.content));
             return { path: input.file_path };
@@ -179,7 +173,6 @@ describe('createTuiTracing', () => {
           name: 'publish_boom',
           description: 'publishes, then fails',
           inputSchema: z.object({}),
-          getAccess: () => ({ reads: [], writes: [] }),
           execute: async (_input: unknown, ctx: ToolCtx) => {
             writeArtifact(ctx.runDir, 'artifacts/partial.png', Buffer.from('png'), {
               roles: ['evidence'],
@@ -339,20 +332,14 @@ describe('createTuiTracing', () => {
     const { delegate } = makeDelegate();
     const tracing = createTuiTracing({ onEvent: () => {}, delegate });
 
-    const callModel = async () => ({
-      content: [],
-      stop_reason: null,
-      usage: { input_tokens: 0, output_tokens: 0 },
-    });
-    tracing.wrapCallModel(callModel, 'model-x', 'verifier');
-    expect(delegate.wrapCallModel).toHaveBeenCalledWith(callModel, 'model-x', 'verifier');
+    const driver = { generate: vi.fn() };
+    tracing.wrapModelDriver(driver, 'model-x', 'verifier');
+    expect(delegate.wrapModelDriver).toHaveBeenCalledWith(driver, 'model-x', 'verifier');
 
     await tracing.traceRun('task', async () => 'result');
     expect(delegate.traceRun).toHaveBeenCalledTimes(1);
 
-    await tracing.flush();
     await tracing.close();
-    expect(delegate.flush).toHaveBeenCalledTimes(1);
     expect(delegate.close).toHaveBeenCalledTimes(1);
   });
 });

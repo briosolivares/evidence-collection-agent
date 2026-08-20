@@ -1,10 +1,32 @@
 import { Box, Text } from 'ink';
 import { useEffect, useState } from 'react';
 
-import type { SherlockConfig } from '../config.js';
 import { formatDuration, formatTokens } from '../format.js';
 import type { LiveRunState } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
+
+const DEFAULT_WORKING_WORDS: readonly string[] = [
+  'Foraging',
+  'Sifting',
+  'Rummaging',
+  'Ferreting',
+  'Digging',
+  'Scouring',
+  'Tracing',
+  'Poking around',
+  'Connecting dots',
+  'Following leads',
+  'Chasing citations',
+  'Dusting for clues',
+  'Reading the fine print',
+  'Peeking under rocks',
+  'Untangling threads',
+  'Consulting the archives',
+  'Cross-examining the web',
+  'Separating signal from noise',
+  'Brewing',
+];
+const GLYPH_FPS = 4;
 
 /**
  * Pick a working word, never repeating the current one (R4's "no
@@ -22,8 +44,9 @@ export function pickWord(
 }
 
 interface StatusLineProps {
-  config: SherlockConfig;
   live: LiveRunState;
+  workingWords?: readonly string[];
+  wordCycleMs?: number;
   /** True while Esc has been pressed and the run is wrapping up. */
   cancelling?: boolean;
   /** Injectable clock (epoch ms) for tests. */
@@ -38,31 +61,32 @@ interface StatusLineProps {
  * the transcript.
  */
 export function StatusLine({
-  config,
   live,
+  workingWords = DEFAULT_WORKING_WORDS,
+  wordCycleMs = 6_000,
   cancelling = false,
   now = Date.now,
   rng = Math.random,
 }: StatusLineProps) {
   const [frame, setFrame] = useState(0);
-  const [word, setWord] = useState(() => pickWord(config.workingWords, undefined, rng));
+  const [word, setWord] = useState(() => pickWord(workingWords, undefined, rng));
   const [, setClockTick] = useState(0);
 
   useEffect(() => {
     const id = setInterval(
       () => setFrame((current) => current + 1),
-      Math.max(16, Math.round(1000 / config.glyphFps)),
+      Math.max(16, Math.round(1000 / GLYPH_FPS)),
     );
     return () => clearInterval(id);
-  }, [config.glyphFps]);
+  }, []);
 
   useEffect(() => {
     const id = setInterval(
-      () => setWord((current) => pickWord(config.workingWords, current, rng)),
-      config.wordCycleMs,
+      () => setWord((current) => pickWord(workingWords, current, rng)),
+      wordCycleMs,
     );
     return () => clearInterval(id);
-  }, [config.wordCycleMs, config.workingWords, rng]);
+  }, [wordCycleMs, workingWords, rng]);
 
   useEffect(() => {
     const id = setInterval(() => setClockTick((tick) => tick + 1), 1000);

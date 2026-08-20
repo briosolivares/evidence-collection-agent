@@ -1,5 +1,7 @@
 import type { Browser, BrowserContext, CDPSession, Page } from 'playwright';
 
+import { arbitraryCdpSend, isRecord, type ArbitraryCdpSend } from './cdpProtocol.js';
+
 const DEFAULT_OPERATION_TIMEOUT_MS = 5_000;
 const MAX_OPERATION_TIMEOUT_MS = 60_000;
 const DETACH_TIMEOUT_MS = 1_000;
@@ -7,14 +9,10 @@ const MAX_CDP_ID_BYTES = 4_096;
 const MAX_TARGET_URL_BYTES = 16_384;
 const MAX_READ_ONLY_INVENTORY_ATTEMPTS = 2;
 
-type ArbitraryCdpSend = (method: string, params?: Record<string, unknown>) => Promise<unknown>;
-
 interface TargetInfo {
   targetId: string;
   type: string;
-  title: string;
   url: string;
-  attached: boolean;
   browserContextId?: string;
 }
 
@@ -53,8 +51,11 @@ interface ChromiumTargetControlBaseOptions extends ChromiumTargetOperationOption
   context: BrowserContext;
   /** Per-operation hard bound. Defaults to five seconds. */
   operationTimeoutMs?: number;
-  /** Test-only crash seam. Awaited immediately after a create receipt is
-   * converted to an opaque ref, before any follow-up target inspection. */
+}
+
+interface ChromiumTargetControlTestHooks {
+  /** Awaited immediately after a create receipt is converted to an opaque
+   * ref, before any follow-up target inspection. */
   afterTargetCreated?: (target: ChromiumPageTargetRef) => Promise<void> | void;
 }
 
@@ -104,10 +105,6 @@ export interface ChromiumTargetControl {
  * either can retain a provider's session-control URL. */
 export class ChromiumTargetControlError extends Error {}
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
 function isNonEmptyCdpId(value: unknown): value is string {
   return (
     typeof value === 'string' &&
@@ -130,32 +127,16 @@ function parseTargetInfo(value: unknown, operation: string): TargetInfo {
     !isNonEmptyCdpId(value.targetId) ||
     typeof value.type !== 'string' ||
     value.type.length === 0 ||
-    typeof value.title !== 'string' ||
     typeof value.url !== 'string' ||
-    typeof value.attached !== 'boolean' ||
     !optionalNonEmptyCdpId(value.browserContextId, hasBrowserContextId)
   ) {
-    throw new ChromiumTargetControlError(`${operation} returned an invalid target record.`);
-  }
-
-  for (const key of ['openerId', 'openerFrameId'] as const) {
-    if (Object.hasOwn(value, key) && !isNonEmptyCdpId(value[key])) {
-      throw new ChromiumTargetControlError(`${operation} returned an invalid target record.`);
-    }
-  }
-  if (Object.hasOwn(value, 'canAccessOpener') && typeof value.canAccessOpener !== 'boolean') {
-    throw new ChromiumTargetControlError(`${operation} returned an invalid target record.`);
-  }
-  if (Object.hasOwn(value, 'subtype') && typeof value.subtype !== 'string') {
     throw new ChromiumTargetControlError(`${operation} returned an invalid target record.`);
   }
 
   return {
     targetId: value.targetId,
     type: value.type,
-    title: value.title,
     url: value.url,
-    attached: value.attached,
     ...(hasBrowserContextId ? { browserContextId: value.browserContextId } : {}),
   };
 }
@@ -301,10 +282,6 @@ async function detachWithinDeadline(session: CDPSession): Promise<void> {
   ).catch(() => undefined);
 }
 
-function arbitrarySend(session: CDPSession): ArbitraryCdpSend {
-  return session.send.bind(session) as unknown as ArbitraryCdpSend;
-}
-
 function sameContext(target: TargetInfo, browserContextId: string | undefined): boolean {
   return target.browserContextId === browserContextId;
 }
@@ -326,7 +303,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
       | ((target: ChromiumPageTargetRef) => Promise<void> | void)
       | undefined,
   ) {
-    this.sendRaw = arbitrarySend(session);
+    this.sendRaw = arbitraryCdpSend(session);
   }
 
   async listPageTargets(
@@ -644,7 +621,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     try {
       const response = await runWithDeadline(
         'Inspect Playwright page target',
-        () => arbitrarySend(pageSession)('Target.getTargetInfo'),
+        () => arbitraryCdpSend(pageSession)('Target.getTargetInfo'),
         this.operationTimeoutMs,
         signal,
       );
@@ -687,6 +664,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
  */
 export async function createChromiumTargetControl(
   options: ChromiumTargetControlOptions,
+  testHooks: ChromiumTargetControlTestHooks = {},
 ): Promise<ChromiumTargetControl> {
   const timeoutMs = validateTimeout(options.operationTimeoutMs);
   options.signal?.throwIfAborted();
@@ -760,7 +738,7 @@ export async function createChromiumTargetControl(
       session,
       browserContextId,
       timeoutMs,
-      options.afterTargetCreated,
+      testHooks.afterTargetCreated,
     );
   } catch (error) {
     await detachWithinDeadline(session);
@@ -788,7 +766,7 @@ async function inspectAnchorBrowserContextId(
   }
   const response = await runWithDeadline(
     'Inspect Chromium target-control anchor',
-    () => arbitrarySend(session)('Target.getTargetInfo'),
+    () => arbitraryCdpSend(session)('Target.getTargetInfo'),
     timeoutMs,
     signal,
   );
@@ -839,7 +817,7 @@ async function inspectBrowserScopedContextId(
     try {
       const response = await runWithDeadline(
         'Inspect Chromium target-control context',
-        () => arbitrarySend(pageSession)('Target.getTargetInfo'),
+        () => arbitraryCdpSend(pageSession)('Target.getTargetInfo'),
         timeoutMs,
         signal,
       );
@@ -857,7 +835,7 @@ async function inspectBrowserScopedContextId(
 
   const response = await runWithDeadline(
     'Inspect empty Chromium target-control context',
-    () => arbitrarySend(browserSession)('Target.getBrowserContexts'),
+    () => arbitraryCdpSend(browserSession)('Target.getBrowserContexts'),
     timeoutMs,
     signal,
   );

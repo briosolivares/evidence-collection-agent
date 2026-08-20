@@ -106,7 +106,6 @@ export function loadRunSummary(runDir: string): { manifest: ManifestView; metric
       filename: artifact.filename,
       sizeBytes,
       sha256Prefix: artifact.sha256.slice(0, 12),
-      ...(artifact.sourceUrl === undefined ? {} : { sourceUrl: artifact.sourceUrl }),
     };
   });
 

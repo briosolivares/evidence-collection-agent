@@ -189,10 +189,9 @@ function shellQuote(value: string): string {
 
 function noopTracing(): RunTracing {
   return {
-    wrapCallModel: (callModel) => callModel,
+    wrapModelDriver: (driver) => driver,
     wrapRegistry: (registry) => registry,
     traceRun: (_task, operation) => operation(),
-    flush: async () => {},
     close: async () => {},
   };
 }
@@ -323,24 +322,25 @@ describe('Sherlock cancellation acceptance', () => {
         runsBaseDir,
         runConfig: {
           javascriptPolicy: 'allow',
-          maxTurns: 6,
-          harness: {
-            initializerCallModel,
-            verifierCallModel,
-          },
-          tracingDelegate: noopTracing(),
         },
         startRunFn: (task, deps) => {
           const createStream = streams.get(task);
           if (createStream === undefined) {
             throw new Error(`missing scripted worker for ${JSON.stringify(task)}`);
           }
-          return startRun(task, { ...deps, createStream });
+          return startRun(task, {
+            ...deps,
+            createStream,
+            harness: {
+              initializerCallModel,
+              verifierCallModel,
+            },
+            tracingDelegate: noopTracing(),
+          });
         },
       });
       const handles: RunHandle[] = [];
 
-      await runtime.start();
       try {
         const browserEvents: UiEvent[] = [];
         const browserHandle = runtime.startRun(BROWSER_CANCELLATION_TASK, (event) =>
@@ -449,9 +449,6 @@ describe('Sherlock cancellation acceptance', () => {
         if (recoveryOutcome.status !== 'verified') {
           throw new Error('recovery task did not verify');
         }
-        expect(recoveryOutcome.finalText).toBe(
-          'The same TUI browser session completed a later task.',
-        );
         expect(readFileSync(join(recoveryOutcome.runDir, 'artifacts/success.md'), 'utf8')).toBe(
           SUCCESS_DOCUMENT,
         );

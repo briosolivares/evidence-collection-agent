@@ -28,7 +28,6 @@
     "format": "biome format --write .",
     "build:atlas": "node scripts/buildSystemAtlas.mjs",
     "evals": "tsx --env-file-if-exists=.env evals/runners/cli.ts",
-    "agent": "tsx src/cli/repl.ts",
     "login": "tsx src/cli/login.ts",
     "smoke:browserbase": "tsx --env-file-if-exists=.env scripts/browserbaseSmoke.ts",
     "sherlock": "node bin/sherlock.mjs",

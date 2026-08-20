@@ -103,7 +103,7 @@ function completedState(
     { type: 'turn_end', usage: { input: 17_000, output: 1_700 } },
     {
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       ...(options.finalText === undefined ? {} : { finalText: options.finalText }),
       runDir: RUN_DIR,
       at: 42_000,
@@ -183,8 +183,6 @@ describe('ArtifactsPanel (passive)', () => {
               attempts: ['Opened the account page'],
             },
           ],
-          reason: 'worker_incomplete',
-          detail: 'internal diagnostic that should stay hidden',
           runDir: RUN_DIR,
           at: 42_000,
         },

@@ -18,7 +18,7 @@ import {
 import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 import { localDownloadReader, type BrowserDownloadReader } from './downloadReader.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
-import { EXCLUSIVE_ACCESS, type BusyResourceRegistry } from '../tools/registry.js';
+import type { BusyResourceRegistry } from '../tools/registry.js';
 import { captureClickDownload, captureUrlThroughChrome } from './downloadCapture.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
 import {
@@ -31,6 +31,7 @@ import {
   type ChromiumPageTargetRef,
   type ChromiumTargetControl,
 } from './chromiumTargetControl.js';
+import { settleWithin } from './boundedSettlement.js';
 
 /** The browser-visible property/value namespace is deliberately generic and
  * versioned. The caller's durable run id is hashed before it crosses into a
@@ -298,9 +299,8 @@ export class PlaywrightBrowserController implements BrowserController {
    * marking of a positively-owned popup fails, close it immediately and retain
    * this generic fault for the next explicit controller boundary. */
   private runPageOwnershipFailure = false;
-  /** Set via {@link setBusyRegistry}; undefined until the run's toolchain
-   * wires it up (see runTask.ts's buildRunToolchain), or in a test that
-   * constructs this controller directly. */
+  /** Set via {@link setBusyRegistry}; undefined until `runAgent` binds this
+   * controller, or in a test that constructs it directly. */
   private busyRegistry: BusyResourceRegistry | undefined;
 
   private readonly context: BrowserContext;
@@ -474,7 +474,7 @@ export class PlaywrightBrowserController implements BrowserController {
       targetPolicy,
       handleDialogCommand: (params) => this.handleRawDialogCommand(record.pageId, params),
       uploadEncoder: this.uploadEncoder,
-      trackUploadEffect: (effect) => this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, effect),
+      trackUploadEffect: (effect) => this.busyRegistry?.markAbandoned(effect),
       release: (detach, hadPendingCommands) =>
         this.releaseCommandSession(record.pageId, detach, hadPendingCommands),
     });
@@ -597,7 +597,7 @@ export class PlaywrightBrowserController implements BrowserController {
       () => undefined,
     );
     return raceBrowserPreparationStep(initialization, options.signal, () => {
-      this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, initialization);
+      this.busyRegistry?.markAbandoned(initialization);
     });
   }
 
@@ -1024,27 +1024,13 @@ export class PlaywrightBrowserController implements BrowserController {
     } catch {
       return;
     }
-    let settled = false;
-    let timer: NodeJS.Timeout | undefined;
-    try {
-      settled = await Promise.race([
-        closing.then(
-          () => true,
-          () => true,
-        ),
-        new Promise<false>((resolve) => {
-          timer = setTimeout(() => resolve(false), BROWSER_PREPARATION_CONTAINMENT_TIMEOUT_MS);
-        }),
-      ]);
-    } finally {
-      if (timer !== undefined) clearTimeout(timer);
-    }
-    if (!settled && !page.isClosed()) {
+    const outcome = await settleWithin(closing, BROWSER_PREPARATION_CONTAINMENT_TIMEOUT_MS);
+    if (outcome === 'timed_out' && !page.isClosed()) {
       // The outer coordinator checks this exact exclusive fence before any
       // terminal cleanup or checkpoint. A close that never acknowledges
       // therefore leaves the active checkpoint resumable instead of racing a
       // terminal projection.
-      this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, closing);
+      this.busyRegistry?.markAbandoned(closing);
     }
   }
 
@@ -1111,8 +1097,8 @@ export class PlaywrightBrowserController implements BrowserController {
     // have continued indefinitely (worker turns are unbounded by default).
     //
     // Phrased so isBrowserDeathMessage() recognizes it, which routes the TUI
-    // and REPL into their existing relaunch path — for a remote provider, a
-    // fresh session on the persisted Context.
+    // into its existing relaunch path — for a remote provider, a fresh session
+    // on the persisted Context.
     //
     // `context.browser()` is null for a locally launched persistent context,
     // so this is inert for local Chrome, which has no equivalent failure.
@@ -1450,17 +1436,11 @@ export class PlaywrightBrowserController implements BrowserController {
       } catch {
         throw new Error('Could not retire a page left busy by an abandoned browser command.');
       }
-      const outcome = await Promise.race([
-        closeEffect.then(
-          () => 'closed' as const,
-          () => 'failed' as const,
-        ),
-        delay(ABANDONED_COMMAND_PAGE_CLOSE_TIMEOUT_MS).then(() => 'timed_out' as const),
-      ]);
+      const outcome = await settleWithin(closeEffect, ABANDONED_COMMAND_PAGE_CLOSE_TIMEOUT_MS);
       if (outcome === 'timed_out') {
-        this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, closeEffect);
+        this.busyRegistry?.markAbandoned(closeEffect);
       }
-      if (outcome !== 'closed' || !record.page.isClosed()) {
+      if (outcome !== 'fulfilled' || !record.page.isClosed()) {
         throw new Error('Could not retire a page left busy by an abandoned browser command.');
       }
       this.pagesWithAbandonedCommands.delete(pageId);
@@ -1717,7 +1697,7 @@ export class PlaywrightBrowserController implements BrowserController {
     };
     const holdForContainment = (effect: Promise<unknown>): void => {
       lifecycleHolds += 1;
-      this.busyRegistry?.markAbandoned(EXCLUSIVE_ACCESS, effect);
+      this.busyRegistry?.markAbandoned(effect);
       void effect.then(
         () => {
           lifecycleHolds -= 1;

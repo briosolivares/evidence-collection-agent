@@ -130,7 +130,7 @@ describe('App run-session wiring', () => {
     bridge.emit({ type: 'turn_end', usage: { input: 900, output: 100 } });
     bridge.emit({
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'On it.',
       runDir: '/runs/2026-08-11_quick',
       at: 42_000,
@@ -251,7 +251,7 @@ describe('App /evals workflow', () => {
       // The repo's real, hermetic `stub` eval task: static oracle, and a
       // grader that returns failed assertions (never throws) for a run
       // dir that does not exist.
-      const evalsConfig = createConfig({ evalsDir: 'evals/datasets', evalResultsDir: resultsDir });
+      const evalsConfig = createConfig();
       const bridge = fakeRunner();
       const runner = vi.fn((task: string, onEvent: (event: UiEvent) => void): RunHandle => {
         onEvent({ type: 'run_started', task, at: 0 });
@@ -269,7 +269,6 @@ describe('App /evals workflow', () => {
           cancel: bridge.cancel,
           done: Promise.resolve({
             status: 'verified',
-            finalText: 'done',
             runDir: '/runs/eval-trial',
           }),
         };
@@ -281,8 +280,8 @@ describe('App /evals workflow', () => {
           apiKeyPresent={true}
           runner={runner}
           evals={createEvalsFeature({
-            evalsDir: evalsConfig.evalsDir,
-            resultsDir: evalsConfig.evalResultsDir,
+            evalsDir: 'evals/datasets',
+            resultsDir,
             runner,
           })}
         />,
@@ -422,7 +421,7 @@ describe('App completion summary panel', () => {
     bridge.emit({ type: 'turn_end', usage: { input: 900, output: 100 } });
     bridge.emit({
       type: 'run_finished',
-      outcome: 'completed',
+      outcome: 'verified',
       finalText: 'The filings are captured.',
       runDir: '/runs/done',
       at: 42_000,
@@ -580,28 +579,6 @@ describe('App completion summary panel', () => {
     );
     // Still idle: no focused panel, composer usable.
     expect(lastFrame()).not.toContain('(browsing artifacts');
-    unmount();
-  });
-
-  it('renders no panel after a budget-exceeded run', async () => {
-    const bridge = fakeRunner();
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
-    );
-    await tick();
-    await submitLine(stdin, 'a run that overruns');
-    bridge.emit({ type: 'turn_start', turn: 1 });
-    bridge.emit({
-      type: 'run_finished',
-      outcome: 'budget_exceeded',
-      reason: 'max_turns',
-      runDir: '/runs/over',
-      at: 9_000,
-    });
-    bridge.finish();
-    await tick();
-    expect(lastFrame()).toContain('turn limit reached');
-    expect(lastFrame()).not.toContain(PASSIVE_HINT);
     unmount();
   });
 });

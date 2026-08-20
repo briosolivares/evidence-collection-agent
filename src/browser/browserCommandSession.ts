@@ -6,6 +6,8 @@ import type {
   BrowserNavigationResult,
 } from './controller.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
+import { settleWithin } from './boundedSettlement.js';
+import { arbitraryCdpSend, isRecord, type ArbitraryCdpSend } from './cdpProtocol.js';
 import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 
 /** Transport URLs are session-control capabilities. Even if a driver error
@@ -16,8 +18,6 @@ const NAVIGATION_STOP_DEADLINE_MS = 1_000;
 const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const MAX_NAVIGATION_URL_BYTES = 256_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
-
-type ArbitraryCdpSend = (method: string, params?: Record<string, unknown>) => Promise<unknown>;
 
 /**
  * Controller-owned authority policy for browser-scoped Target commands.
@@ -86,25 +86,8 @@ function commandError(operation: string, error: unknown): Error {
   return new Error(`${operation}: ${errorText(error)}`);
 }
 
-function arbitrarySend(session: CDPSession): ArbitraryCdpSend {
-  // Playwright types the method argument as the protocol methods known by the
-  // installed package. This seam intentionally permits newer/experimental CDP
-  // methods too; Chrome remains the runtime validator.
-  return session.send.bind(session) as unknown as ArbitraryCdpSend;
-}
-
 async function detachWithoutHanging(session: CDPSession): Promise<void> {
-  let timer: NodeJS.Timeout | undefined;
-  try {
-    await Promise.race([
-      session.detach().catch(() => undefined),
-      new Promise<void>((resolve) => {
-        timer = setTimeout(resolve, DETACH_DEADLINE_MS);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
+  await settleWithin(session.detach(), DETACH_DEADLINE_MS);
 }
 
 function validateNavigation(url: string, options: BrowserNavigationOptions): void {
@@ -132,21 +115,7 @@ function validateNavigation(url: string, options: BrowserNavigationOptions): voi
 }
 
 async function stopNavigationWithoutHanging(send: ArbitraryCdpSend): Promise<void> {
-  let timer: NodeJS.Timeout | undefined;
-  try {
-    await Promise.race([
-      send('Page.stopLoading').catch(() => undefined),
-      new Promise<void>((resolve) => {
-        timer = setTimeout(resolve, NAVIGATION_STOP_DEADLINE_MS);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  await settleWithin(send('Page.stopLoading'), NAVIGATION_STOP_DEADLINE_MS);
 }
 
 function responseTargetId(value: unknown, operation: string): string {
@@ -273,7 +242,7 @@ export async function openPlaywrightCommandSession(
     throw commandError(`Could not attach a browser command session to pageId ${pageId}`, error);
   }
 
-  const send = arbitrarySend(session);
+  const send = arbitraryCdpSend(session);
   const uploadEncoder = hooks.uploadEncoder ?? localUploadEncoder;
   let targetId: string;
   try {

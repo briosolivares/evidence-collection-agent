@@ -30,7 +30,7 @@ export const RUNS_DIR = fileURLToPath(new URL('../runs', import.meta.url));
  */
 export const EXPERIMENTS_DIR = fileURLToPath(new URL('./experiments/', import.meta.url));
 
-/** Persistent Chrome profile shared with the REPL and demos — anchored
+/** Persistent Chrome profile shared by authenticated evals and demos — anchored
  * to the checkout: a cwd-relative profile silently starts Chrome with a
  * fresh empty profile (every login lost) when run from elsewhere. */
 export const PROFILE_DIR = fileURLToPath(new URL('../chrome-profile', import.meta.url));

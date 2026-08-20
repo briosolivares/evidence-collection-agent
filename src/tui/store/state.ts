@@ -37,7 +37,6 @@ export interface ManifestArtifactView {
   filename: string;
   sizeBytes: number | undefined;
   sha256Prefix: string;
-  sourceUrl?: string;
 }
 
 /** What the /runs detail view shows from a run's manifest. */
@@ -110,7 +109,6 @@ export type TranscriptItemBody =
   | {
       kind: 'completion';
       outcome: 'complete' | 'incomplete';
-      verb: string;
       elapsedMs: number;
       tokens: number;
       runDir: string;
@@ -181,8 +179,6 @@ export interface CompletedRunSummary {
   outcome: 'complete' | 'incomplete';
   /** Worker-reported blockers shown concisely for incomplete runs. */
   unresolved: readonly UnresolvedRequirement[];
-  /** Completion-line verb, fixed from config at session start. */
-  verb: string;
   /** Wall-clock duration of the run. */
   elapsedMs: number;
   /** Tokens the run visibly consumed (settled or estimate, whichever is
@@ -251,7 +247,6 @@ export interface LiveRunState {
    * plus a light in-turn guess from streamed text (~chars/4), snapped back
    * to settled at each turn_end. */
   tokens: { settled: number; estimate: number };
-  turn: number;
   /** Known once tracing captures it (step 6); shown on completion. */
   runDir?: string;
 }
@@ -301,27 +296,14 @@ export type UiEvent =
       toolName: string;
       input: unknown;
     }
-  | { type: 'turn_end'; usage: { input: number; output: number; cacheRead?: number } }
+  | { type: 'turn_end'; usage: { input: number; output: number } }
   | {
       type: 'run_finished';
-      /** A real run emits only 'verified' (the one harness success) or
-       * 'incomplete' (judge crash, correction exhaustion, budget
-       * exhaustion — never a runtime failure, which stays run_failed):
-       * since the runtime cutover every run goes through the harness, so
-       * the bridge switches over a status union of just those two.
-       * 'completed'/'budget_exceeded' outlive the judge-less path they came
-       * from because the synthetic `--demo` stream still emits them and the
-       * reducer still renders them; they are unreachable from a real run. */
-      outcome: 'completed' | 'budget_exceeded' | 'verified' | 'incomplete';
+      outcome: 'verified' | 'incomplete';
       finalText?: string;
       /** Worker-reported unresolved request parts for an incomplete run. */
       unresolved?: readonly UnresolvedRequirement[];
       runDir: string;
-      /** Which guard tripped (budget_exceeded) or why the run is
-       * incomplete (incomplete). */
-      reason?: string;
-      /** Bounded core diagnostic for an incomplete run. */
-      detail?: string;
       at: number;
     }
   | { type: 'run_cancelled'; at: number }
@@ -333,8 +315,6 @@ export interface SessionState {
   transcript: readonly TranscriptItem[];
   /** Monotonic id source for transcript items. */
   nextItemId: number;
-  /** Completion-line verb, fixed at session start from config (R6). */
-  completionVerb: string;
   /** Whether checkout-only eval commands appear in routing and help. */
   evalsEnabled: boolean;
   /** The composer's input line + suggestion selection; the suggestion
@@ -353,7 +333,7 @@ export interface SessionState {
   completedRun?: CompletedRunSummary;
   /** Run dir of the most recent run whatever its outcome, retained as
    * the run ends — /artifacts opens retained artifacts against it when
-   * no completion summary exists (cancelled / budget-exceeded runs). */
+   * no completion summary exists (cancelled runs). */
   lastRunDir?: string;
   /** True while an eval batch owns the session (its runs return to
    * evalsRunning between trials instead of idle). */
